@@ -666,7 +666,10 @@ function getStateResourceAddress(resource, instance) {
   return address;
 }
 
-/** Merges tfstate instances into nodes: `values`, `terraform_state`, and `edges_existing` from dependencies. */
+/** Merges tfstate instances into nodes: `values`, `terraform_state`, and `edges_existing` from dependencies.
+ * Used after `loadPlanAndNodes` for both plan+dot uploads (optional state) and **state-only** uploads
+ * (empty `resource_changes`, nodes seeded entirely from `state.resources`).
+ */
 function mergeTerraformState(nodes, state) {
   if (!state || !Array.isArray(state.resources)) {
     return nodes;

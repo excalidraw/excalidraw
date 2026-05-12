@@ -216,5 +216,18 @@
         }
       }
     }
+
+    &__muted {
+      display: block;
+      font-weight: 400;
+      font-size: 0.75rem;
+      color: var(--color-gray-60);
+      line-height: 1.35;
+
+      code {
+        font-family: var(--font-family);
+        font-size: 0.7rem;
+      }
+    }
   }
 }

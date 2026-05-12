@@ -27,3 +27,27 @@ variable "aws_account_id" {
   description = "12-digit AWS account ID that hosts terraform_deploy_role_name. Ignored when terraform_deploy_role_arn is set."
   default     = ""
 }
+
+variable "single_nat_gateway" {
+  type        = bool
+  default     = false
+  description = "When true, one NAT gateway serves all private subnets (lower cost). When false, one NAT per AZ (typical production availability)."
+}
+
+variable "alb_acm_certificate_arn" {
+  type        = string
+  default     = ""
+  description = "Optional ACM certificate ARN in var.aws_region. When non-empty, the writer ALB terminates TLS on 443 and redirects HTTP 80 to HTTPS."
+}
+
+variable "alb_deletion_protection" {
+  type        = bool
+  default     = true
+  description = "Enable deletion protection on the Application Load Balancer in front of the writer Lambda."
+}
+
+variable "alb_idle_timeout_seconds" {
+  type        = number
+  default     = 60
+  description = "Idle timeout (seconds) for the writer Application Load Balancer."
+}

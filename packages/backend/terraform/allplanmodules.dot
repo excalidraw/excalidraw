@@ -242,12 +242,20 @@ digraph {
 		"[root] module.private_workload_network.module.vpc_flow_logs.aws_iam_role.publish (expand)" [label = "module.private_workload_network.module.vpc_flow_logs.aws_iam_role.publish", shape = "box"]
 		"[root] module.private_workload_network.module.vpc_flow_logs.aws_iam_role_policy.publish (expand)" [label = "module.private_workload_network.module.vpc_flow_logs.aws_iam_role_policy.publish", shape = "box"]
 		"[root] module.private_workload_network.module.vpc_flow_logs.data.aws_iam_policy_document.publish_assume (expand)" [label = "module.private_workload_network.module.vpc_flow_logs.data.aws_iam_policy_document.publish_assume", shape = "box"]
+		"[root] module.workload_monitoring_lambda.data.aws_region.current (orphan)" [label = "module.workload_monitoring_lambda.data.aws_region.current", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_caller_identity.current (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_caller_identity.current", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy.tracing[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy.tracing", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.additional_inline[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.additional_inline", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.assume_role[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.assume_role", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.logs[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.logs", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_partition.current (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_partition.current", shape = "box"]
+		"[root] module.workload_monitoring_lambda.module.lambda.data.aws_region.current (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.data.aws_region.current", shape = "box"]
 		"[root] module.workload_monitoring_lambda.module.lambda.terraform_data.package_filename_for_hash[0] (orphan)" [label = "module.workload_monitoring_lambda.module.lambda.terraform_data.package_filename_for_hash", shape = "box"]
 		"[root] module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors (expand)" [label = "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors", shape = "box"]
 		"[root] module.workload_reader_lambda.data.aws_ec2_managed_prefix_list.s3 (expand)" [label = "module.workload_reader_lambda.data.aws_ec2_managed_prefix_list.s3", shape = "box"]
@@ -318,6 +326,14 @@ digraph {
 		"[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_prefix_list_ids (expand)" [label = "module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_prefix_list_ids", shape = "box"]
 		"[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_self (expand)" [label = "module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_self", shape = "box"]
 		"[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_source_security_group_id (expand)" [label = "module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_source_security_group_id", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lambda_permission.alb_invoke (expand)" [label = "module.workload_writer_alb.aws_lambda_permission.alb_invoke", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb.this (expand)" [label = "module.workload_writer_alb.aws_lb.this", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb_listener.http_forward (expand)" [label = "module.workload_writer_alb.aws_lb_listener.http_forward", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb_listener.http_redirect (expand)" [label = "module.workload_writer_alb.aws_lb_listener.http_redirect", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb_listener.https (expand)" [label = "module.workload_writer_alb.aws_lb_listener.https", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)" [label = "module.workload_writer_alb.aws_lb_target_group.lambda", shape = "box"]
+		"[root] module.workload_writer_alb.aws_lb_target_group_attachment.lambda (expand)" [label = "module.workload_writer_alb.aws_lb_target_group_attachment.lambda", shape = "box"]
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" [label = "module.workload_writer_alb.aws_security_group.alb", shape = "box"]
 		"[root] module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors (expand)" [label = "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors", shape = "box"]
 		"[root] module.workload_writer_lambda.data.aws_ec2_managed_prefix_list.s3 (expand)" [label = "module.workload_writer_lambda.data.aws_ec2_managed_prefix_list.s3", shape = "box"]
 		"[root] module.workload_writer_lambda.data.aws_region.current (expand)" [label = "module.workload_writer_lambda.data.aws_region.current", shape = "box"]
@@ -394,9 +410,13 @@ digraph {
 		"[root] provider[\"registry.terraform.io/hashicorp/local\"]" [label = "provider[\"registry.terraform.io/hashicorp/local\"]", shape = "diamond"]
 		"[root] provider[\"registry.terraform.io/hashicorp/null\"]" [label = "provider[\"registry.terraform.io/hashicorp/null\"]", shape = "diamond"]
 		"[root] provider[\"terraform.io/builtin/terraform\"]" [label = "provider[\"terraform.io/builtin/terraform\"]", shape = "diamond"]
+		"[root] var.alb_acm_certificate_arn" [label = "var.alb_acm_certificate_arn", shape = "note"]
+		"[root] var.alb_deletion_protection" [label = "var.alb_deletion_protection", shape = "note"]
+		"[root] var.alb_idle_timeout_seconds" [label = "var.alb_idle_timeout_seconds", shape = "note"]
 		"[root] var.aws_account_id" [label = "var.aws_account_id", shape = "note"]
 		"[root] var.aws_profile" [label = "var.aws_profile", shape = "note"]
 		"[root] var.aws_region" [label = "var.aws_region", shape = "note"]
+		"[root] var.single_nat_gateway" [label = "var.single_nat_gateway", shape = "note"]
 		"[root] var.terraform_deploy_role_arn" [label = "var.terraform_deploy_role_arn", shape = "note"]
 		"[root] var.terraform_deploy_role_name" [label = "var.terraform_deploy_role_name", shape = "note"]
 		"[root] aws_s3_object.lambda_deployment_package (expand)" -> "[root] data.archive_file.lambda_deployment_package (expand)"
@@ -1620,12 +1640,15 @@ digraph {
 		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.intra_route_table_ids (expand)"
 		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.intra_subnets (expand)"
 		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.managed_service_endpoints (expand)"
+		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.nat_gateway_public_ips (expand)"
+		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.private_subnets (expand)"
+		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.public_subnets (expand)"
 		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.vpc_cidr_block (expand)"
 		"[root] module.private_workload_network (close)" -> "[root] module.private_workload_network.output.vpc_id (expand)"
 		"[root] module.private_workload_network.data.aws_availability_zones.available (expand)" -> "[root] module.private_workload_network (expand)"
 		"[root] module.private_workload_network.data.aws_availability_zones.available (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
 		"[root] module.private_workload_network.local.azs (expand)" -> "[root] module.private_workload_network.data.aws_availability_zones.available (expand)"
-		"[root] module.private_workload_network.local.azs (expand)" -> "[root] module.private_workload_network.var.intra_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.local.azs (expand)" -> "[root] module.private_workload_network.var.intra_subnet_cidrs (validation)"
 		"[root] module.private_workload_network.module.interface_endpoint_security_group (close)" -> "[root] module.private_workload_network.module.interface_endpoint_security_group.aws_security_group_rule.computed_egress_rules (expand)"
 		"[root] module.private_workload_network.module.interface_endpoint_security_group (close)" -> "[root] module.private_workload_network.module.interface_endpoint_security_group.aws_security_group_rule.computed_egress_with_cidr_blocks (expand)"
 		"[root] module.private_workload_network.module.interface_endpoint_security_group (close)" -> "[root] module.private_workload_network.module.interface_endpoint_security_group.aws_security_group_rule.computed_egress_with_ipv6_cidr_blocks (expand)"
@@ -1913,6 +1936,7 @@ digraph {
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.endpoints (expand)" -> "[root] module.private_workload_network.module.managed_service_endpoints (expand)"
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.endpoints (expand)" -> "[root] module.private_workload_network.module.vpc.output.intra_route_table_ids (expand)"
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.endpoints (expand)" -> "[root] module.private_workload_network.module.vpc.output.intra_subnets (expand)"
+		"[root] module.private_workload_network.module.managed_service_endpoints.var.endpoints (expand)" -> "[root] module.private_workload_network.module.vpc.output.private_route_table_ids (expand)"
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.region (expand)" -> "[root] module.private_workload_network.module.managed_service_endpoints (expand)"
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.security_group_description (expand)" -> "[root] module.private_workload_network.module.managed_service_endpoints (expand)"
 		"[root] module.private_workload_network.module.managed_service_endpoints.var.security_group_ids (expand)" -> "[root] module.private_workload_network.module.managed_service_endpoints (expand)"
@@ -2803,7 +2827,7 @@ digraph {
 		"[root] module.private_workload_network.module.vpc.var.intra_subnet_suffix (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.intra_subnet_tags (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.intra_subnets (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
-		"[root] module.private_workload_network.module.vpc.var.intra_subnets (expand)" -> "[root] module.private_workload_network.var.intra_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.module.vpc.var.intra_subnets (expand)" -> "[root] module.private_workload_network.var.intra_subnet_cidrs (validation)"
 		"[root] module.private_workload_network.module.vpc.var.ipv4_ipam_pool_id (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.ipv4_netmask_length (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.ipv6_cidr (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
@@ -2856,6 +2880,7 @@ digraph {
 		"[root] module.private_workload_network.module.vpc.var.private_subnet_tags (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.private_subnet_tags_per_az (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.private_subnets (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
+		"[root] module.private_workload_network.module.vpc.var.private_subnets (expand)" -> "[root] module.private_workload_network.var.private_subnet_cidrs (expand)"
 		"[root] module.private_workload_network.module.vpc.var.propagate_intra_route_tables_vgw (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.propagate_private_route_tables_vgw (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.propagate_public_route_tables_vgw (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
@@ -2876,6 +2901,7 @@ digraph {
 		"[root] module.private_workload_network.module.vpc.var.public_subnet_tags (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.public_subnet_tags_per_az (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.public_subnets (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
+		"[root] module.private_workload_network.module.vpc.var.public_subnets (expand)" -> "[root] module.private_workload_network.var.public_subnet_cidrs (expand)"
 		"[root] module.private_workload_network.module.vpc.var.putin_khuylo (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.redshift_acl_tags (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.redshift_dedicated_network_acl (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
@@ -2899,6 +2925,7 @@ digraph {
 		"[root] module.private_workload_network.module.vpc.var.reuse_nat_ips (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.secondary_cidr_blocks (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.single_nat_gateway (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
+		"[root] module.private_workload_network.module.vpc.var.single_nat_gateway (expand)" -> "[root] module.private_workload_network.var.single_nat_gateway (expand)"
 		"[root] module.private_workload_network.module.vpc.var.tags (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
 		"[root] module.private_workload_network.module.vpc.var.tags (expand)" -> "[root] module.private_workload_network.var.tags (expand)"
 		"[root] module.private_workload_network.module.vpc.var.use_ipam_pool (expand)" -> "[root] module.private_workload_network.module.vpc (expand)"
@@ -2960,6 +2987,9 @@ digraph {
 		"[root] module.private_workload_network.output.intra_route_table_ids (expand)" -> "[root] module.private_workload_network.module.vpc.output.intra_route_table_ids (expand)"
 		"[root] module.private_workload_network.output.intra_subnets (expand)" -> "[root] module.private_workload_network.module.vpc.output.intra_subnets (expand)"
 		"[root] module.private_workload_network.output.managed_service_endpoints (expand)" -> "[root] module.private_workload_network.module.managed_service_endpoints.output.endpoints (expand)"
+		"[root] module.private_workload_network.output.nat_gateway_public_ips (expand)" -> "[root] module.private_workload_network.module.vpc.output.nat_public_ips (expand)"
+		"[root] module.private_workload_network.output.private_subnets (expand)" -> "[root] module.private_workload_network.module.vpc.output.private_subnets (expand)"
+		"[root] module.private_workload_network.output.public_subnets (expand)" -> "[root] module.private_workload_network.module.vpc.output.public_subnets (expand)"
 		"[root] module.private_workload_network.output.vpc_cidr_block (expand)" -> "[root] module.private_workload_network.module.vpc.output.vpc_cidr_block (expand)"
 		"[root] module.private_workload_network.output.vpc_id (expand)" -> "[root] module.private_workload_network.module.vpc.output.vpc_id (expand)"
 		"[root] module.private_workload_network.var.flow_logs_log_group_name (expand)" -> "[root] module.private_workload_network (expand)"
@@ -2968,8 +2998,17 @@ digraph {
 		"[root] module.private_workload_network.var.flow_logs_traffic_type (validation)" -> "[root] module.private_workload_network.var.flow_logs_traffic_type (expand)"
 		"[root] module.private_workload_network.var.interface_endpoint_security_group_description (expand)" -> "[root] module.private_workload_network (expand)"
 		"[root] module.private_workload_network.var.interface_endpoint_security_group_name (expand)" -> "[root] module.private_workload_network (expand)"
-		"[root] module.private_workload_network.var.intra_subnet_cidrs (expand)" -> "[root] local.workload_private_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.intra_subnet_cidrs (expand)" -> "[root] local.workload_intra_subnet_cidrs (expand)"
 		"[root] module.private_workload_network.var.intra_subnet_cidrs (expand)" -> "[root] module.private_workload_network (expand)"
+		"[root] module.private_workload_network.var.intra_subnet_cidrs (validation)" -> "[root] module.private_workload_network.var.intra_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.intra_subnet_cidrs (validation)" -> "[root] module.private_workload_network.var.private_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.intra_subnet_cidrs (validation)" -> "[root] module.private_workload_network.var.public_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.private_subnet_cidrs (expand)" -> "[root] local.workload_private_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.private_subnet_cidrs (expand)" -> "[root] module.private_workload_network (expand)"
+		"[root] module.private_workload_network.var.public_subnet_cidrs (expand)" -> "[root] local.workload_public_subnet_cidrs (expand)"
+		"[root] module.private_workload_network.var.public_subnet_cidrs (expand)" -> "[root] module.private_workload_network (expand)"
+		"[root] module.private_workload_network.var.single_nat_gateway (expand)" -> "[root] module.private_workload_network (expand)"
+		"[root] module.private_workload_network.var.single_nat_gateway (expand)" -> "[root] var.single_nat_gateway"
 		"[root] module.private_workload_network.var.tags (expand)" -> "[root] local.workload_tags (expand)"
 		"[root] module.private_workload_network.var.tags (expand)" -> "[root] module.private_workload_network (expand)"
 		"[root] module.private_workload_network.var.vpc_cidr (expand)" -> "[root] local.workload_vpc_cidr (expand)"
@@ -3727,6 +3766,7 @@ digraph {
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_rules (expand)" -> "[root] module.workload_reader_lambda.module.security_group (expand)"
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_reader_lambda.local.restricted_sg_egress (expand)"
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_reader_lambda.module.security_group (expand)"
+		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_reader_lambda.var.allow_internet_https_egress (expand)"
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_ipv6_cidr_blocks (expand)" -> "[root] module.workload_reader_lambda.module.security_group (expand)"
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_prefix_list_ids (expand)" -> "[root] module.workload_reader_lambda.data.aws_ec2_managed_prefix_list.s3 (expand)"
 		"[root] module.workload_reader_lambda.module.security_group.var.egress_with_prefix_list_ids (expand)" -> "[root] module.workload_reader_lambda.module.security_group (expand)"
@@ -3767,6 +3807,7 @@ digraph {
 		"[root] module.workload_reader_lambda.output.lambda_function_arn (expand)" -> "[root] module.workload_reader_lambda.module.lambda.output.lambda_function_arn (expand)"
 		"[root] module.workload_reader_lambda.output.lambda_function_name (expand)" -> "[root] module.workload_reader_lambda.module.lambda.output.lambda_function_name (expand)"
 		"[root] module.workload_reader_lambda.output.security_group_id (expand)" -> "[root] module.workload_reader_lambda.module.security_group.output.security_group_id (expand)"
+		"[root] module.workload_reader_lambda.var.allow_internet_https_egress (expand)" -> "[root] module.workload_reader_lambda (expand)"
 		"[root] module.workload_reader_lambda.var.attach_policy_statements (expand)" -> "[root] module.workload_reader_lambda (expand)"
 		"[root] module.workload_reader_lambda.var.create_errors_alarm (expand)" -> "[root] module.workload_reader_lambda (expand)"
 		"[root] module.workload_reader_lambda.var.enable_vpc (expand)" -> "[root] module.workload_reader_lambda (expand)"
@@ -3797,8 +3838,65 @@ digraph {
 		"[root] module.workload_reader_lambda.var.vpc_id (expand)" -> "[root] module.private_workload_network.output.vpc_id (expand)"
 		"[root] module.workload_reader_lambda.var.vpc_id (expand)" -> "[root] module.workload_reader_lambda (expand)"
 		"[root] module.workload_reader_lambda.var.vpc_ingress_cidr_blocks (expand)" -> "[root] module.workload_reader_lambda (expand)"
-		"[root] module.workload_reader_lambda.var.vpc_subnet_ids (expand)" -> "[root] module.private_workload_network.output.intra_subnets (expand)"
+		"[root] module.workload_reader_lambda.var.vpc_subnet_ids (expand)" -> "[root] module.private_workload_network.output.private_subnets (expand)"
 		"[root] module.workload_reader_lambda.var.vpc_subnet_ids (expand)" -> "[root] module.workload_reader_lambda (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.http_forward (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.http_redirect (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.https (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.aws_lb_target_group_attachment.lambda (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.output.lb_arn (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.output.lb_dns_name (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.output.lb_id (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.output.lb_zone_id (expand)"
+		"[root] module.workload_writer_alb (close)" -> "[root] module.workload_writer_alb.output.target_group_arn (expand)"
+		"[root] module.workload_writer_alb.aws_lambda_permission.alb_invoke (expand)" -> "[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)"
+		"[root] module.workload_writer_alb.aws_lambda_permission.alb_invoke (expand)" -> "[root] module.workload_writer_alb.var.lambda_function_name (expand)"
+		"[root] module.workload_writer_alb.aws_lb.this (expand)" -> "[root] module.workload_writer_alb.aws_security_group.alb (expand)"
+		"[root] module.workload_writer_alb.aws_lb.this (expand)" -> "[root] module.workload_writer_alb.var.deletion_protection (expand)"
+		"[root] module.workload_writer_alb.aws_lb.this (expand)" -> "[root] module.workload_writer_alb.var.idle_timeout (expand)"
+		"[root] module.workload_writer_alb.aws_lb.this (expand)" -> "[root] module.workload_writer_alb.var.public_subnet_ids (expand)"
+		"[root] module.workload_writer_alb.aws_lb_listener.http_forward (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.aws_lb_listener.http_forward (expand)" -> "[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)"
+		"[root] module.workload_writer_alb.aws_lb_listener.http_redirect (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.aws_lb_listener.https (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.aws_lb_listener.https (expand)" -> "[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)"
+		"[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)" -> "[root] module.workload_writer_alb.var.name_prefix (expand)"
+		"[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)" -> "[root] module.workload_writer_alb.var.tags (expand)"
+		"[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] module.workload_writer_alb.aws_lb_target_group_attachment.lambda (expand)" -> "[root] module.workload_writer_alb.aws_lambda_permission.alb_invoke (expand)"
+		"[root] module.workload_writer_alb.aws_lb_target_group_attachment.lambda (expand)" -> "[root] module.workload_writer_alb.var.lambda_function_arn (expand)"
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" -> "[root] module.workload_writer_alb.local.common_tags (expand)"
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" -> "[root] module.workload_writer_alb.local.use_https (expand)"
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" -> "[root] module.workload_writer_alb.var.internet_ingress_cidr_blocks (expand)"
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" -> "[root] module.workload_writer_alb.var.listener_port (expand)"
+		"[root] module.workload_writer_alb.aws_security_group.alb (expand)" -> "[root] module.workload_writer_alb.var.vpc_id (expand)"
+		"[root] module.workload_writer_alb.local.common_tags (expand)" -> "[root] module.workload_writer_alb.var.name_prefix (expand)"
+		"[root] module.workload_writer_alb.local.common_tags (expand)" -> "[root] module.workload_writer_alb.var.tags (expand)"
+		"[root] module.workload_writer_alb.local.use_https (expand)" -> "[root] module.workload_writer_alb.var.acm_certificate_arn (expand)"
+		"[root] module.workload_writer_alb.output.lb_arn (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.output.lb_dns_name (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.output.lb_id (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.output.lb_zone_id (expand)" -> "[root] module.workload_writer_alb.aws_lb.this (expand)"
+		"[root] module.workload_writer_alb.output.target_group_arn (expand)" -> "[root] module.workload_writer_alb.aws_lb_target_group.lambda (expand)"
+		"[root] module.workload_writer_alb.var.acm_certificate_arn (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.acm_certificate_arn (expand)" -> "[root] var.alb_acm_certificate_arn"
+		"[root] module.workload_writer_alb.var.deletion_protection (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.deletion_protection (expand)" -> "[root] var.alb_deletion_protection"
+		"[root] module.workload_writer_alb.var.idle_timeout (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.idle_timeout (expand)" -> "[root] var.alb_idle_timeout_seconds"
+		"[root] module.workload_writer_alb.var.internet_ingress_cidr_blocks (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.lambda_function_arn (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.lambda_function_arn (expand)" -> "[root] module.workload_writer_lambda.output.lambda_function_arn (expand)"
+		"[root] module.workload_writer_alb.var.lambda_function_name (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.lambda_function_name (expand)" -> "[root] module.workload_writer_lambda.output.lambda_function_name (expand)"
+		"[root] module.workload_writer_alb.var.listener_port (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.name_prefix (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.public_subnet_ids (expand)" -> "[root] module.private_workload_network.output.public_subnets (expand)"
+		"[root] module.workload_writer_alb.var.public_subnet_ids (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.tags (expand)" -> "[root] local.workload_tags (expand)"
+		"[root] module.workload_writer_alb.var.tags (expand)" -> "[root] module.workload_writer_alb (expand)"
+		"[root] module.workload_writer_alb.var.vpc_id (expand)" -> "[root] module.private_workload_network.output.vpc_id (expand)"
+		"[root] module.workload_writer_alb.var.vpc_id (expand)" -> "[root] module.workload_writer_alb (expand)"
 		"[root] module.workload_writer_lambda (close)" -> "[root] module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors (expand)"
 		"[root] module.workload_writer_lambda (close)" -> "[root] module.workload_writer_lambda.module.lambda (close)"
 		"[root] module.workload_writer_lambda (close)" -> "[root] module.workload_writer_lambda.module.security_group (close)"
@@ -4544,6 +4642,7 @@ digraph {
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_rules (expand)" -> "[root] module.workload_writer_lambda.module.security_group (expand)"
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_writer_lambda.local.restricted_sg_egress (expand)"
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_writer_lambda.module.security_group (expand)"
+		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_cidr_blocks (expand)" -> "[root] module.workload_writer_lambda.var.allow_internet_https_egress (expand)"
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_ipv6_cidr_blocks (expand)" -> "[root] module.workload_writer_lambda.module.security_group (expand)"
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_prefix_list_ids (expand)" -> "[root] module.workload_writer_lambda.data.aws_ec2_managed_prefix_list.s3 (expand)"
 		"[root] module.workload_writer_lambda.module.security_group.var.egress_with_prefix_list_ids (expand)" -> "[root] module.workload_writer_lambda.module.security_group (expand)"
@@ -4584,6 +4683,7 @@ digraph {
 		"[root] module.workload_writer_lambda.output.lambda_function_arn (expand)" -> "[root] module.workload_writer_lambda.module.lambda.output.lambda_function_arn (expand)"
 		"[root] module.workload_writer_lambda.output.lambda_function_name (expand)" -> "[root] module.workload_writer_lambda.module.lambda.output.lambda_function_name (expand)"
 		"[root] module.workload_writer_lambda.output.security_group_id (expand)" -> "[root] module.workload_writer_lambda.module.security_group.output.security_group_id (expand)"
+		"[root] module.workload_writer_lambda.var.allow_internet_https_egress (expand)" -> "[root] module.workload_writer_lambda (expand)"
 		"[root] module.workload_writer_lambda.var.attach_policy_statements (expand)" -> "[root] module.workload_writer_lambda (expand)"
 		"[root] module.workload_writer_lambda.var.create_errors_alarm (expand)" -> "[root] module.workload_writer_lambda (expand)"
 		"[root] module.workload_writer_lambda.var.enable_vpc (expand)" -> "[root] module.workload_writer_lambda (expand)"
@@ -4618,6 +4718,8 @@ digraph {
 		"[root] module.workload_writer_lambda.var.vpc_subnet_ids (expand)" -> "[root] module.workload_writer_lambda (expand)"
 		"[root] output.aws_caller_identity_account_id (expand)" -> "[root] data.aws_caller_identity.current (expand)"
 		"[root] output.aws_caller_identity_arn (expand)" -> "[root] data.aws_caller_identity.current (expand)"
+		"[root] output.workload_writer_alb_dns_name (expand)" -> "[root] module.workload_writer_alb.output.lb_dns_name (expand)"
+		"[root] output.workload_writer_alb_zone_id (expand)" -> "[root] module.workload_writer_alb.output.lb_zone_id (expand)"
 		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)" -> "[root] module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0] (orphan)"
 		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)" -> "[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda[0] (orphan)"
 		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)" -> "[root] module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline[0] (orphan)"
@@ -4784,6 +4886,10 @@ digraph {
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_prefix_list_ids (expand)"
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_self (expand)"
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_reader_lambda.module.security_group.aws_security_group_rule.ingress_with_source_security_group_id (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.http_forward (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.http_redirect (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_alb.aws_lb_listener.https (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_alb.aws_lb_target_group_attachment.lambda (expand)"
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors (expand)"
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_lambda.module.lambda.aws_lambda_event_source_mapping.this (expand)"
 		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.workload_writer_lambda.module.lambda.aws_lambda_function_event_invoke_config.this (expand)"
@@ -4838,11 +4944,23 @@ digraph {
 		"[root] root" -> "[root] module.application_job_queue (close)"
 		"[root] root" -> "[root] module.lambda_deployment_artifacts (close)"
 		"[root] root" -> "[root] module.private_workload_network (close)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda (close)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.data.aws_region.current (orphan)"
 		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda (close)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_caller_identity.current (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy.tracing[0] (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.additional_inline[0] (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.assume_role[0] (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_iam_policy_document.logs[0] (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_partition.current (orphan)"
+		"[root] root" -> "[root] module.workload_monitoring_lambda.module.lambda.data.aws_region.current (orphan)"
 		"[root] root" -> "[root] module.workload_reader_lambda (close)"
+		"[root] root" -> "[root] module.workload_writer_alb (close)"
 		"[root] root" -> "[root] module.workload_writer_lambda (close)"
 		"[root] root" -> "[root] output.aws_caller_identity_account_id (expand)"
 		"[root] root" -> "[root] output.aws_caller_identity_arn (expand)"
+		"[root] root" -> "[root] output.workload_writer_alb_dns_name (expand)"
+		"[root] root" -> "[root] output.workload_writer_alb_zone_id (expand)"
 		"[root] root" -> "[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)"
 		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/archive\"] (close)"
 		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"

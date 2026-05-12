@@ -37,23 +37,32 @@ module "security_group" {
     }
   ]
 
-  egress_with_cidr_blocks = local.restricted_sg_egress ? [
-    {
-      rule        = "https-443-tcp"
-      description = "Interface VPC endpoints (SQS, Logs, X-Ray)"
-      cidr_blocks = var.vpc_cidr_for_restricted_egress
-    },
-    {
-      rule        = "dns-udp"
-      description = "VPC resolver"
-      cidr_blocks = var.vpc_cidr_for_restricted_egress
-    },
-    {
-      rule        = "dns-tcp"
-      description = "VPC resolver"
-      cidr_blocks = var.vpc_cidr_for_restricted_egress
-    },
-  ] : []
+  egress_with_cidr_blocks = local.restricted_sg_egress ? concat(
+    [
+      {
+        rule        = "https-443-tcp"
+        description = "Interface VPC endpoints (SQS, Logs, X-Ray)"
+        cidr_blocks = var.vpc_cidr_for_restricted_egress
+      },
+      {
+        rule        = "dns-udp"
+        description = "VPC resolver"
+        cidr_blocks = var.vpc_cidr_for_restricted_egress
+      },
+      {
+        rule        = "dns-tcp"
+        description = "VPC resolver"
+        cidr_blocks = var.vpc_cidr_for_restricted_egress
+      },
+    ],
+    var.allow_internet_https_egress ? [
+      {
+        rule        = "https-443-tcp"
+        description = "HTTPS to the public internet via NAT gateway"
+        cidr_blocks = "0.0.0.0/0"
+      },
+    ] : [],
+  ) : []
 
   egress_with_prefix_list_ids = local.restricted_sg_egress ? [
     {

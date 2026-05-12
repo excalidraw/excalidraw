@@ -102,10 +102,134 @@ function emitLocalParseDebug(payload: Record<string, unknown>) {
   console.log(DEBUG_PREFIX, payload);
 }
 
+/** Strip `count` / `for_each` instance keys so graph ids match `terraform graph` / `depends_on` variants. */
+const stripTerraformAddressIndexes = (address = "") =>
+  address.replace(/\[[^\]]+\]/g, "");
+
 export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
 };
+
+const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
+
+function isExcludedDataSourceAddressForGraph(address: string): boolean {
+  const parts = stripTerraformAddressIndexes(address).split(".");
+  const di = parts.indexOf("data");
+  if (di === -1 || di >= parts.length - 2) {
+    return false;
+  }
+  const sourceType = parts[di + 1] || "";
+  return !DATA_SOURCE_GRAPH_ALLOWLIST.has(sourceType);
+}
+
+type TerraformStateResource = {
+  module?: string;
+  mode?: string;
+  type?: string;
+  name?: string;
+  provider?: string;
+  instances?: Array<{
+    index_key?: unknown;
+    attributes?: Record<string, unknown>;
+    schema_version?: number;
+    private?: unknown;
+    dependencies?: string[];
+  }>;
+};
+
+/** Builds the Terraform state address for one resource instance (mirrors backend `getStateResourceAddress`). */
+function getStateResourceAddress(
+  resource: TerraformStateResource,
+  instance: NonNullable<TerraformStateResource["instances"]>[number],
+): string {
+  const parts: string[] = [];
+  if (resource.module) {
+    parts.push(resource.module);
+  }
+  if (resource.mode === "data") {
+    parts.push("data");
+  }
+  parts.push(resource.type || "", resource.name || "");
+  let address = parts.join(".");
+  if (Object.prototype.hasOwnProperty.call(instance, "index_key")) {
+    const key = instance.index_key;
+    address +=
+      typeof key === "number" ? `[${key}]` : `[${JSON.stringify(key)}]`;
+  }
+  return address;
+}
+
+/** Merges raw tfstate `resources` into nodes (same semantics as backend `mergeTerraformState`). */
+function mergeRawTerraformStateIntoNodes(
+  nodes: Record<string, TerraformPlanGraphNode>,
+  state: unknown,
+): Record<string, TerraformPlanGraphNode> {
+  if (!state || typeof state !== "object") {
+    return nodes;
+  }
+  const resources = (state as { resources?: unknown }).resources;
+  if (!Array.isArray(resources)) {
+    return nodes;
+  }
+
+  for (const resource of resources as TerraformStateResource[]) {
+    if (
+      resource.mode === "data" &&
+      resource.type &&
+      !DATA_SOURCE_GRAPH_ALLOWLIST.has(resource.type)
+    ) {
+      continue;
+    }
+
+    for (const instance of resource.instances || []) {
+      const address = getStateResourceAddress(resource, instance);
+      const nodePath = address;
+
+      if (!nodes[nodePath]) {
+        nodes[nodePath] = { resources: {} };
+      }
+
+      const existingResource = (nodes[nodePath].resources[address] ||
+        {}) as Record<string, unknown>;
+      nodes[nodePath].resources[address] = {
+        ...existingResource,
+        address,
+        mode: resource.mode,
+        type: resource.type,
+        name: resource.name,
+        provider_name: resource.provider,
+        values: {
+          ...((instance.attributes || {}) as Record<string, unknown>),
+          ...(existingResource.values as Record<string, unknown> | undefined),
+        },
+        change: existingResource.change || { actions: ["existing"] },
+        terraform_state: {
+          schema_version: instance.schema_version,
+          private: Boolean(instance.private),
+          dependencies: instance.dependencies || [],
+        },
+      };
+
+      nodes[nodePath].edges_existing ||= [];
+      for (const dependency of instance.dependencies || []) {
+        if (!dependency || isExcludedDataSourceAddressForGraph(dependency)) {
+          continue;
+        }
+        const target = resolveTerraformPlanNodeKey(nodes, dependency);
+        if (
+          target &&
+          target !== nodePath &&
+          !nodes[nodePath].edges_existing!.includes(target)
+        ) {
+          nodes[nodePath].edges_existing!.push(target);
+        }
+      }
+    }
+  }
+
+  return nodes;
+}
 
 /**
  * Builds the same `nodes` map as local import (`loadPlan` → edges → `attachModuleTree`), for
@@ -114,13 +238,15 @@ export type TerraformPlanParsingOptions = {
 export function buildTerraformLocalImportNodesMap(
   plan: unknown,
   graph: Graph,
+  tfstate?: unknown | null,
 ): TerraformPlanNodesMap {
   const adjacency = getAdjacencyListFromDot(graph);
   const planTyped = plan as {
     resource_changes: { address: string }[];
     prior_state?: { values: { root_module: unknown } };
   };
-  const nodes = loadPlan(planTyped);
+  let nodes = loadPlan(planTyped);
+  nodes = mergeRawTerraformStateIntoNodes(nodes, tfstate);
   const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
   const nodes3 = buildNewEdges(nodes2, adjacency);
   const nodes4 = buildExistingEdges(
@@ -136,35 +262,119 @@ export function buildTerraformLocalImportNodesMap(
 
 /** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
 export const terraformPlanParsing = async (
-  planFile: File,
-  dotFile: File,
+  planFile: File | null,
+  dotFile: File | null,
   stateFile: File | null,
   options?: TerraformPlanParsingOptions,
 ) => {
   const semanticLayout = options?.semanticLayout === true;
-  const [planText, dotText, stateText] = await Promise.all([
-    planFile.text(),
-    dotFile.text(),
-    stateFile ? stateFile.text() : Promise.resolve(null),
-  ]);
-  const plan = JSON.parse(planText);
-  const state = stateText ? JSON.parse(stateText) : null;
+  let plan: unknown;
+  let dotText: string;
+  let tfstateForMerge: unknown | null = null;
+
+  if (planFile && dotFile) {
+    const [planText, dotT, stateText] = await Promise.all([
+      planFile.text(),
+      dotFile.text(),
+      stateFile ? stateFile.text() : Promise.resolve(null),
+    ]);
+    dotText = dotT;
+    try {
+      plan = JSON.parse(planText);
+    } catch {
+      return new Response(JSON.stringify({ error: "planFile must be valid JSON." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (stateText) {
+      try {
+        const parsed = JSON.parse(stateText) as { resources?: unknown };
+        if (parsed && Array.isArray(parsed.resources)) {
+          tfstateForMerge = parsed;
+        }
+      } catch {
+        return new Response(JSON.stringify({ error: "stateFile must be valid JSON." }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+  } else if (stateFile) {
+    const stateText = await stateFile.text();
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stateText);
+    } catch {
+      return new Response(JSON.stringify({ error: "stateFile must be valid JSON." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      !Array.isArray((parsed as { resources?: unknown }).resources)
+    ) {
+      return new Response(
+        JSON.stringify({
+          error:
+            'State-only import requires raw Terraform state JSON (top-level "resources" array), e.g. terraform state pull.',
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+    plan = { resource_changes: [] };
+    dotText = "digraph G {}\n";
+    tfstateForMerge = parsed;
+  } else {
+    return new Response(
+      JSON.stringify({
+        error:
+          "Upload plan JSON + DOT together, or a raw Terraform state JSON file alone.",
+      }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  if (semanticLayout) {
+    const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
+    if (!Array.isArray(rc) || rc.length === 0) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Semantic layout requires plan JSON with resource_changes. Upload plan+dot or turn off semantic layout for state-only imports.",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+  }
+
   const graph = graphlibDot.read(dotText);
 
   emitLocalParseDebug({
     phase: "init",
     plan,
-    state,
+    state: tfstateForMerge,
     graph,
   });
 
   const adjacency = getAdjacencyListFromDot(graph);
   emitLocalParseDebug({
     phase: "parsedDot",
-    adjacency
+    adjacency,
   });
 
-  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph);
+  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, tfstateForMerge);
   emitLocalParseDebug({
     phase: "planParsed_through_moduleTree",
     nodes: nodes5,
@@ -174,10 +384,12 @@ export const terraformPlanParsing = async (
   let sceneBody: Record<string, unknown>;
 
   if (semanticLayout) {
-    const topoModel = extractTerraformTopologyFromPlan(plan);
-    const primaryZones = extractPrimaryTopologyZones(plan);
+    type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
+    const semPlan = plan as SemanticPlan;
+    const topoModel = extractTerraformTopologyFromPlan(semPlan);
+    const primaryZones = extractPrimaryTopologyZones(semPlan);
     const supplementaryZones = extractSupplementarySubnetZones(
-      plan,
+      semPlan,
       primaryZones,
     );
     const zones = [...primaryZones, ...supplementaryZones].sort((a, b) => {
@@ -192,15 +404,15 @@ export const terraformPlanParsing = async (
       }
       return a.subnetSignature.localeCompare(b.subnetSignature);
     });
-    const regionalBuckets = extractRegionalTopologyPrimaries(plan);
-    const vpcEndpointBuckets = extractVpcEndpointsByVpc(plan);
-    const routeTableBuckets = extractRouteTablesByVpc(plan);
-    const vpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(plan);
-    const vpcFlowLogBuckets = extractVpcFlowLogBundles(plan);
+    const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
+    const vpcEndpointBuckets = extractVpcEndpointsByVpc(semPlan);
+    const routeTableBuckets = extractRouteTablesByVpc(semPlan);
+    const vpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(semPlan);
+    const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
     const endpointSecurityGroupBuckets =
-      extractInterfaceEndpointSecurityGroupBuckets(plan, vpcEndpointBuckets);
+      extractInterfaceEndpointSecurityGroupBuckets(semPlan, vpcEndpointBuckets);
     const routeTableBottomPlacements =
-      computeRouteTableBottomEdgePlacements(zones, plan);
+      computeRouteTableBottomEdgePlacements(zones, semPlan);
     mergeTopologyModelWithPlacementZones(topoModel, zones);
     mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
     mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
@@ -213,7 +425,7 @@ export const terraformPlanParsing = async (
       zones,
       regionalBuckets,
       nodes5,
-      plan,
+      semPlan,
       vpcEndpointBuckets,
       routeTableBottomPlacements,
       vpcDefaultPlumbingBuckets,
@@ -272,9 +484,6 @@ function getAdjacencyListFromDot(graph: Graph) {
 
   return adjacency;
 }
-
-/** Strip `count` / `for_each` instance keys so graph ids match `terraform graph` / `depends_on` variants. */
-const stripTerraformAddressIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
 /**
  * Map a Terraform address (plan / prior_state / `depends_on`) to a key in `nodes`.

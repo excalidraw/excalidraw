@@ -38,7 +38,11 @@ check "assume_role_configured" {
 
 
 locals {
-  workload_private_subnet_cidrs = ["10.42.1.0/24", "10.42.2.0/24"]
+  # Three subnet tiers (same number of AZs each): public (ALB + NAT), private (NAT default route),
+  # intra (isolated workloads + interface VPC endpoints). CIDRs must sit inside workload_vpc_cidr.
+  workload_public_subnet_cidrs  = ["10.42.0.0/24", "10.42.1.0/24"]
+  workload_private_subnet_cidrs = ["10.42.2.0/24", "10.42.3.0/24"]
+  workload_intra_subnet_cidrs   = ["10.42.10.0/24", "10.42.11.0/24"]
   # Literal — must match private_workload_network.vpc_cidr (lambda_service SG planning).
   workload_vpc_cidr = "10.42.0.0/16"
 
@@ -74,9 +78,12 @@ module "application_job_queue" {
 module "private_workload_network" {
   source = "./modules/private_workload_network"
 
-  vpc_name           = "ts-test-lambda"
-  vpc_cidr           = local.workload_vpc_cidr
-  intra_subnet_cidrs = local.workload_private_subnet_cidrs
+  vpc_name             = "ts-test-lambda"
+  vpc_cidr             = local.workload_vpc_cidr
+  public_subnet_cidrs  = local.workload_public_subnet_cidrs
+  private_subnet_cidrs = local.workload_private_subnet_cidrs
+  intra_subnet_cidrs   = local.workload_intra_subnet_cidrs
+  single_nat_gateway   = var.single_nat_gateway
 
   tags = local.workload_tags
 }
@@ -105,8 +112,9 @@ module "workload_writer_lambda" {
   errors_alarm_name = "test-writer-errors"
 
   environment_variables = {
-    DATA_BUCKET = module.application_data_bucket.s3_bucket_id
+    DATA_BUCKET    = module.application_data_bucket.s3_bucket_id
     DATA_QUEUE_URL = module.application_job_queue.queue_url
+    test = "test1"
   }
 
   attach_policy_statements = true
@@ -147,6 +155,25 @@ module "workload_writer_lambda" {
       resources = [module.application_job_queue.kms_key_arn]
     }
   }
+}
+
+# --- Public ALB → writer Lambda (TLS optional via alb_acm_certificate_arn) ---
+
+module "workload_writer_alb" {
+  source = "./modules/http_alb_lambda"
+
+  name_prefix = "ts-writer"
+
+  vpc_id               = module.private_workload_network.vpc_id
+  public_subnet_ids    = module.private_workload_network.public_subnets
+  lambda_function_arn  = module.workload_writer_lambda.lambda_function_arn
+  lambda_function_name = module.workload_writer_lambda.lambda_function_name
+
+  acm_certificate_arn = trimspace(var.alb_acm_certificate_arn) != "" ? trimspace(var.alb_acm_certificate_arn) : null
+  deletion_protection = var.alb_deletion_protection
+  idle_timeout        = var.alb_idle_timeout_seconds
+
+  tags = local.workload_tags
 }
 
 # --- Lambda: monitoring (mock/no-op) ---
@@ -196,9 +223,10 @@ module "workload_reader_lambda" {
   }
 
   vpc_id                         = module.private_workload_network.vpc_id
-  vpc_subnet_ids                 = module.private_workload_network.intra_subnets
+  vpc_subnet_ids                 = module.private_workload_network.private_subnets
   security_group_name            = "ts-test-reader-lambda-sg"
   vpc_cidr_for_restricted_egress = local.workload_vpc_cidr
+  allow_internet_https_egress    = true
 
   errors_alarm_name = "test-reader-errors"
 
