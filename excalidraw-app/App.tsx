@@ -1336,7 +1336,11 @@ const LandingPage = () => {
         <div className="landing-nav__links">
           <a href="#workflow">Workflow</a>
           <a href="#use-cases">Use cases</a>
-          <button type="button" onClick={scrollToCanvas}>
+          <button
+            type="button"
+            className="landing-cta"
+            onClick={scrollToCanvas}
+          >
             View changes
           </button>
         </div>
@@ -1350,10 +1354,18 @@ const LandingPage = () => {
             canvas, so teams can coordinate faster.
           </p>
           <div className="landing-hero__actions">
-            <button type="button" onClick={scrollToCanvas}>
+            <button
+              type="button"
+              className="landing-cta"
+              onClick={scrollToCanvas}
+            >
               Visualize a plan
             </button>
-            <button type="button" onClick={scrollToCanvas}>
+            <button
+              type="button"
+              className="landing-cta"
+              onClick={scrollToCanvas}
+            >
               Open the canvas
             </button>
           </div>
@@ -1541,7 +1553,11 @@ const LandingPage = () => {
 
       <section className="landing-final" aria-labelledby="final-title">
         <h2 id="final-title">Bring the next Terraform review to tfdraw.io.</h2>
-        <button type="button" onClick={scrollToCanvas}>
+        <button
+          type="button"
+          className="landing-cta"
+          onClick={scrollToCanvas}
+        >
           Visualize Terraform changes
         </button>
       </section>
