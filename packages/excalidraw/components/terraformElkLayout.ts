@@ -1597,7 +1597,10 @@ export async function buildTerraformElkExcalidrawScene(
     layoutBoxes,
     frameSkeletons,
   );
-  const skeleton = [...frameSkeletons, ...edgeSkeletons, ...resourceSkeletons];
+  // Edges first so they render behind frames and resource cards. Cards use orbit
+  // binding (`mode: "orbit"`) which clips arrow endpoints to the card boundary, so
+  // arrowheads stay visible on the card edge even though the line itself sits behind.
+  const skeleton = [...edgeSkeletons, ...frameSkeletons, ...resourceSkeletons];
 
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,

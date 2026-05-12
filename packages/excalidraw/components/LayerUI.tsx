@@ -849,6 +849,7 @@ const LayerUI = ({
     const result = applyTerraformRelationshipFocus(
       allElements,
       activeFocusNodePath,
+      appState.viewBackgroundColor,
     );
 
     if (result.didChange) {
@@ -858,7 +859,13 @@ const LayerUI = ({
           : result.elements,
       );
     }
-  }, [app, appState, appState.hoveredElementIds, elements]);
+  }, [
+    app,
+    appState,
+    appState.hoveredElementIds,
+    appState.viewBackgroundColor,
+    elements,
+  ]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
