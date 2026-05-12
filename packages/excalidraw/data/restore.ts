@@ -1,4 +1,4 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
   type CombineBrandsIfNeeded,
@@ -97,15 +97,6 @@ type RestoredAppState = Omit<
 >;
 
 const MAX_ARROW_PX = 75_000;
-
-const isValidPoint = (point: unknown): point is LocalPoint => {
-  return (
-    Array.isArray(point) &&
-    point.length === 2 &&
-    isFiniteNumber(point[0]) &&
-    isFiniteNumber(point[1])
-  );
-};
 
 const restoreLinearElementPoints = (
   points: unknown,
