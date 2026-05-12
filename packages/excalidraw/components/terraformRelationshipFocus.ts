@@ -12,6 +12,7 @@ import {
   dimmedTerraformElementOverrides,
   restoredTerraformElementOverrides,
 } from "./terraformColorWash";
+import { isTerraformExpandAllActive } from "./terraformVisibility";
 
 /**
  * Semantic dim levels (0–100). Identical numeric scale to the legacy `opacity` knobs
@@ -35,16 +36,6 @@ const TERRAFORM_AMBIENT_PRIMARY_NODE_LEVEL = 100;
 const TERRAFORM_AMBIENT_GROUP_LEVEL = 68;
 
 const DEFAULT_VIEW_BACKGROUND_COLOR = "#ffffff";
-
-const readTerraformExpandAllViewActive = (
-  allElements: readonly ExcalidrawElement[],
-): boolean =>
-  isTerraformSemanticOverviewScene(allElements) &&
-  allElements.some(
-    (e) =>
-      e.customData?.terraformVisibilityRole === "resource" &&
-      e.customData?.terraformExpandAllView === true,
-  );
 
 const getRelationship = (element: ExcalidrawElement) =>
   element.customData?.relationship &&
@@ -373,7 +364,7 @@ export const applyTerraformRelationshipFocus = (
         return element;
       }
 
-      const expandAllView = readTerraformExpandAllViewActive(allElements);
+      const expandAllView = isTerraformExpandAllActive(allElements);
 
       if (isTerraformLayerEdge(element)) {
         return trackChange(
