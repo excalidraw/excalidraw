@@ -1,0 +1,17 @@
+/**
+ * Cloudflare Pages (not a Worker-only static bundle).
+ * - `name` must match your Pages project name in the dashboard.
+ * - `pages_build_output_dir` is where Vite writes the static app (`yarn build:pages`).
+ *
+ * Git-connected Pages: point the dashboard build command at your monorepo install + build
+ * (this file does not run the build; it tells Pages / Wrangler where output lives).
+ * Direct upload / CI: `npx wrangler pages deploy excalidraw-app/build --project-name=<name>`
+ * still works; flags override `name` when needed.
+ *
+ * Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+ */
+{
+  "name": "ainur",
+  "compatibility_date": "2025-05-12",
+  "pages_build_output_dir": "./excalidraw-app/build"
+}

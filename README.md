@@ -36,6 +36,8 @@ The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, 
 
 ## Quick start
 
+Use **Node.js 22 or newer** (dependency `chevrotain@12` requires it). If you use nvm: `nvm install` / `nvm use` from the repo root reads [`.nvmrc`](.nvmrc).
+
 **Run the Excalidraw developer app:**
 
 ```bash
@@ -89,7 +91,9 @@ Then only **`wrangler pages deploy`** from GitHub Actions updates the site. Prod
 npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-Use the **`pages`** subcommand. If Wrangler prints a hint about `wrangler versions upload --assets=...` or a `wrangler.jsonc` **`assets`** block, you are on **`wrangler deploy`** (Workers), not Pages. Workers static sites and **Cloudflare Pages** are different; this repo’s workflow uses **`wrangler pages deploy`**, which only needs the output directory and `--project-name`.
+Use the **`pages`** subcommand. If Wrangler prints a hint about `wrangler versions upload --assets=...` or a `wrangler.jsonc` **`assets`** block, you are on **`wrangler deploy`** (Workers static assets), not **Pages**. This repo uses **Pages**; config is in [wrangler.jsonc](wrangler.jsonc) with **`pages_build_output_dir`** (not `assets`).
+
+**`wrangler.jsonc` (Pages):** [wrangler.jsonc](wrangler.jsonc) sets **`pages_build_output_dir`** to `./excalidraw-app/build` and a placeholder **`name`**. Replace **`name`** with your real **Pages project name** (same value as `CF_PAGES_PROJECT_NAME` / dashboard). You can also run `npx wrangler pages download config <PROJECT_NAME>` to generate a file from an existing project ([docs](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)). This file does **not** run the Vite build on Cloudflare by itself; it mainly aligns Wrangler / Pages with the output folder and becomes config source-of-truth once adopted.
 
 **Run the backend-backed importer:**
 
