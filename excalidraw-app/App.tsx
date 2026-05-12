@@ -1323,39 +1323,42 @@ const LandingPage = () => {
 
   return (
     <main id="top" className="landing-page">
-      <nav className="landing-nav" aria-label="Terraform Canvas">
+      <nav className="landing-nav" aria-label="Ainur.draw">
         <a className="landing-nav__brand" href="#top">
-          Terraform Canvas
+          Ainur.draw
         </a>
         <div className="landing-nav__links">
           <a href="#workflow">Workflow</a>
           <a href="#use-cases">Use cases</a>
           <button type="button" onClick={scrollToCanvas}>
-            Open canvas
+            View changes
           </button>
         </div>
       </nav>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">Terraform, but drawable</p>
-          <h1 id="landing-title">Terraform Canvas</h1>
+          <p className="landing-hero__eyebrow">
+            Your Terraform, made visible
+          </p>
+          <h1 id="landing-title">Your architecture diagram is your state.</h1>
           <p className="landing-hero__lede">
-            Turn Terraform plans, graphs, and state into editable architecture
-            diagrams. Sketch changes, inspect topology, and export the story
-            your infrastructure is trying to tell.
+            Ainur.draw maps Terraform state and plans into a living
+            architecture canvas, so teams can understand what exists and what is
+            changing without reading raw plan noise.
           </p>
           <div className="landing-hero__actions">
             <button type="button" onClick={scrollToCanvas}>
-              Try the canvas
+              Visualize a plan
             </button>
             <button type="button" onClick={scrollToCanvas}>
-              Import Terraform
+              Open the canvas
             </button>
           </div>
-          <div className="landing-proof" aria-label="Terraform Canvas values">
-            <span>Local-first demo</span>
-            <span>Editable Excalidraw scenes</span>
-            <span>AWS-aware topology</span>
+          <div className="landing-proof" aria-label="Ainur.draw values">
+            <span>State-backed architecture view</span>
+            <span>Visual plan diffs</span>
+            <span>Custom annotations</span>
+            <span>Shareable review canvas</span>
           </div>
         </div>
         <div className="landing-hero__sketch" aria-hidden="true">
@@ -1371,7 +1374,7 @@ const LandingPage = () => {
           <span className="landing-link landing-link--b" />
           <span className="landing-link landing-link--c" />
           <span className="landing-note landing-note--bottom">
-            drag labels, redraw edges, export
+            annotate the source-backed view
           </span>
         </div>
       </section>
@@ -1379,11 +1382,11 @@ const LandingPage = () => {
       <section
         id="terraform-canvas"
         className="landing-canvas-section"
-        aria-label="Embedded Terraform diagram editor"
+        aria-label="Embedded Terraform architecture canvas"
       >
         <div className="landing-canvas-section__header">
-          <p>Live demo</p>
-          <h2>Draw, import, adjust, export.</h2>
+          <p>Live architecture view</p>
+          <h2>See what is built. See what will change.</h2>
         </div>
         <div className="landing-canvas-shell">
           <TopErrorBoundary>
@@ -1398,14 +1401,14 @@ const LandingPage = () => {
 
       <section className="landing-strip" aria-label="Product highlights">
         <p>
-          For platform teams turning drift, plans, and reviews into diagrams
-          people can edit.
+          For platform teams turning state, plans, and reviews into one
+          source-backed architecture view.
         </p>
         <div>
-          <span>Plan JSON</span>
-          <span>Graph DOT</span>
-          <span>Optional state</span>
-          <span>PNG / SVG export</span>
+          <span>Terraform state</span>
+          <span>Plan semantics</span>
+          <span>Dependency impact</span>
+          <span>Hosted review ready</span>
         </div>
       </section>
 
@@ -1417,27 +1420,29 @@ const LandingPage = () => {
         <div className="landing-section-heading">
           <p>Workflow</p>
           <h2 id="workflow-title">
-            From Terraform output to a working canvas.
+            From Terraform truth to a readable canvas.
           </h2>
         </div>
         <ol className="landing-steps">
           <li>
-            <strong>Import</strong>
+            <strong>Load state and plan</strong>
             <span>
-              Load a plan JSON, graph DOT, and optional state snapshot.
+              Map actual Terraform state and tfplan output into the visual
+              model.
             </span>
           </li>
           <li>
-            <strong>Arrange</strong>
+            <strong>Read the change</strong>
             <span>
-              Use generated grouping for modules, networks, regions, and
-              accounts.
+              See creates, deletes, replacements, and dependency impact in the
+              architecture view.
             </span>
           </li>
           <li>
-            <strong>Explain</strong>
+            <strong>Annotate the truth</strong>
             <span>
-              Annotate, simplify, and export a diagram that survives review.
+              Customize and annotate the view without forking it from the
+              underlying infrastructure model.
             </span>
           </li>
         </ol>
@@ -1446,26 +1451,26 @@ const LandingPage = () => {
       <section className="landing-features" aria-label="Feature highlights">
         <article>
           <span>01</span>
-          <h3>Topology with context</h3>
+          <h3>The diagram is the source-backed view</h3>
           <p>
-            Resource cards, dependency arrows, and nested boundaries keep the
-            architecture readable.
+            There is no separate architecture diagram to keep in sync with what
+            Terraform actually manages.
           </p>
         </article>
         <article>
           <span>02</span>
-          <h3>Designed for edits</h3>
+          <h3>Plan semantics at a glance</h3>
           <p>
-            The output lands on an Excalidraw canvas, so teams can reshape it
-            without a diagramming handoff.
+            Replace Terraform plan noise with visual architecture changes your
+            team can scan and discuss.
           </p>
         </article>
         <article>
           <span>03</span>
-          <h3>Static-friendly demo</h3>
+          <h3>Ready for shared reviews</h3>
           <p>
-            The public page keeps drawing, local files, and exports while hiding
-            backend sharing surfaces.
+            Hosted review mode can synchronize the actual built and changing
+            view for multiple users.
           </p>
         </article>
       </section>
@@ -1478,21 +1483,21 @@ const LandingPage = () => {
         <div className="landing-section-heading">
           <p>Use cases</p>
           <h2 id="use-cases-title">
-            Make infrastructure easier to reason about.
+            Review the real infrastructure model together.
           </h2>
         </div>
         <div className="landing-use-case-grid">
+          <span>Plan reviews</span>
+          <span>Drift investigations</span>
           <span>Architecture reviews</span>
-          <span>Migration planning</span>
-          <span>Module documentation</span>
-          <span>Incident reconstruction</span>
+          <span>Change approvals</span>
         </div>
       </section>
 
       <section className="landing-final" aria-labelledby="final-title">
-        <h2 id="final-title">Bring the next plan review to the canvas.</h2>
+        <h2 id="final-title">Bring the next Terraform review to Ainur.draw.</h2>
         <button type="button" onClick={scrollToCanvas}>
-          Open Terraform Canvas
+          Visualize Terraform changes
         </button>
       </section>
     </main>
