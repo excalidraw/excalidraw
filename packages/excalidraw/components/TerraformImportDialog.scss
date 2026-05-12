@@ -38,7 +38,7 @@
       background-color: var(--color-gray-20);
     }
 
-    &__layoutEngine {
+    &__viewSelector {
       &__options {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -79,6 +79,15 @@
           border-color: var(--color-primary);
           background-color: var(--color-primary-light);
           box-shadow: 0 0 0 1px var(--color-primary) inset;
+        }
+
+        &--disabled,
+        &--disabled:hover {
+          border-color: var(--color-gray-20);
+          background-color: transparent;
+          box-shadow: none;
+          cursor: not-allowed;
+          opacity: 0.55;
         }
       }
 
