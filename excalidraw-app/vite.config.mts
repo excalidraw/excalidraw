@@ -124,7 +124,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       Sitemap({
-        hostname: "https://excalidraw.com",
+        hostname: "https://tfdraw.io",
         outDir: "build",
         changefreq: "monthly",
         // its static in public folder
@@ -221,15 +221,22 @@ export default defineConfig(({ mode }) => {
           maximumFileSizeToCacheInBytes: 4.5 * 1024 ** 2, // 4.5MB
         },
         manifest: {
-          short_name: "Excalidraw",
-          name: "Excalidraw",
+          short_name: "tfdraw.io",
+          name: "tfdraw.io",
           description:
-            "Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
+            "tfdraw.io maps Terraform state and plans into an editable architecture canvas for visual reviews.",
           icons: [
+            {
+              src: "tfdraw-logo.png",
+              sizes: "1024x1024",
+              type: "image/png",
+              purpose: "any maskable",
+            },
             {
               src: "android-chrome-192x192.png",
               sizes: "192x192",
               type: "image/png",
+              purpose: "any maskable",
             },
             {
               src: "apple-touch-icon.png",
@@ -248,7 +255,7 @@ export default defineConfig(({ mode }) => {
             },
           ],
           start_url: "/",
-          id: "excalidraw",
+          id: "tfdraw.io",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",

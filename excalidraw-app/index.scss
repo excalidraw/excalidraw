@@ -1,10 +1,10 @@
 @import "../packages/excalidraw/css/variables.module.scss";
 
 .excalidraw {
-  --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
+  --color-primary-contrast-offset: #0f8b5f; // to offset Chubb illusion
 
   &.theme--dark {
-    --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
+    --color-primary-contrast-offset: #46c99a; // to offset Chubb illusion
   }
 
   .footer-center {
@@ -189,8 +189,21 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-nav__brand {
+  display: inline-flex;
+  gap: 0.65rem;
+  align-items: center;
   font-family: "Virgil", "Segoe Print", cursive;
   font-size: clamp(1.25rem, 2vw, 1.7rem);
+}
+
+.landing-nav__logo {
+  width: 2.45rem;
+  height: 2.45rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: #121212;
+  object-fit: cover;
+  box-shadow: 3px 4px 0 var(--landing-green);
 }
 
 .landing-nav__links {

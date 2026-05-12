@@ -885,7 +885,7 @@ const ExcalidrawWrapper = ({
   }
 
   const ExcalidrawPlusCommand = {
-    label: "Excalidraw+",
+    label: "tfdraw.io",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
@@ -905,7 +905,7 @@ const ExcalidrawWrapper = ({
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
     keywords: [
-      "excalidraw",
+      "tfdraw",
       "plus",
       "cloud",
       "server",
@@ -1241,7 +1241,7 @@ const ExcalidrawWrapper = ({
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
+                    label: "Sign in / Go to tfdraw.io",
                   },
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
@@ -1325,6 +1325,12 @@ const LandingPage = () => {
     <main id="top" className="landing-page">
       <nav className="landing-nav" aria-label="tfdraw.io">
         <a className="landing-nav__brand" href="#top">
+          <img
+            className="landing-nav__logo"
+            src="/tfdraw-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
           tfdraw.io
         </a>
         <div className="landing-nav__links">

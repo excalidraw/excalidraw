@@ -10,4 +10,4 @@ Allow: /
 Allow: /sitemap.xml
 Disallow: /
 
-Sitemap: https://excalidraw.com/sitemap.xml
+Sitemap: https://tfdraw.io/sitemap.xml
