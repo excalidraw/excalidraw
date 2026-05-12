@@ -7,6 +7,14 @@
 #
 # If CF_PAGES_PROJECT_NAME is unset, the workflow builds and skips deploy (green).
 # Do not reference secrets in `if:` (GitHub restriction); gate deploy on vars only.
+#
+# Turn off automatic Git builds on the Cloudflare Pages project (Builds & deployments),
+# or pushes will still trigger Cloudflare’s builder and can fail (OOM) alongside this workflow.
+#
+# Deploy runs when a commit lands on `main` or `master` — that includes merging a PR
+# into the branch (GitHub records a push to the base branch). Direct pushes to those
+# branches also trigger a deploy. Align Cloudflare production branch (if Git-connected)
+# with these names, or edit the list below.
 
 name: Deploy to Cloudflare Pages
 
@@ -40,6 +48,7 @@ jobs:
       - name: Build static app
         run: yarn build:pages
 
+      # Must be `wrangler pages deploy` (Pages). Do not use `wrangler deploy` — that targets Workers and expects assets/main in wrangler.jsonc.
       - name: Deploy to Cloudflare Pages
         if: ${{ vars.CF_PAGES_PROJECT_NAME != '' }}
         env:

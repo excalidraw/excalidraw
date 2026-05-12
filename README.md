@@ -64,7 +64,7 @@ This disables Sentry and product analytics for the bundle, omits production sour
 
 **Cloudflare Pages via GitHub Actions (direct upload):**
 
-The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml) runs on pushes to `master`: `yarn install --frozen-lockfile`, `yarn build:pages`, then `wrangler pages deploy excalidraw-app/build`. Configure the repository under **Settings → Secrets and variables → Actions**:
+The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml) deploys when a **push** lands on **`main` or `master`**, and on **workflow_dispatch** (manual run in the Actions tab). That **includes merging a pull request** into `main` or `master`, because GitHub adds the merge commit as a push to the base branch. Direct pushes to those branches also run the workflow. Steps: `yarn install --frozen-lockfile`, `yarn build:pages`, then `wrangler pages deploy excalidraw-app/build`. Configure the repository under **Settings → Secrets and variables → Actions**:
 
 | Kind | Name | Purpose |
 | --- | --- | --- |
@@ -72,7 +72,24 @@ The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy
 | Secret | `CLOUDFLARE_ACCOUNT_ID` | Account ID from the Cloudflare dashboard sidebar. |
 | Variable | `CF_PAGES_PROJECT_NAME` | Exact **Pages project name** (creates production deploy when set). If unset, the workflow still **builds** but **skips deploy** so forks stay green. |
 
-After this is wired, disable or ignore the Cloudflare dashboard **Git-connected production build** for the same project if you no longer want Pages to build on Cloudflare’s runners (avoids duplicate deploys and the previous Vite OOM there). Keep Git linked only for previews if you still want that behavior.
+**Use the branch this workflow listens to.** Production deploys from Actions when code is **merged or pushed** into **`main` or `master`**—whichever your team uses. If your default branch is something else (for example only `develop`), either merge release commits into `master`/`main`, or edit `pages-deploy.yml` `on.push.branches` to match. If the Pages project is still **Git-connected**, set the Cloudflare **production branch** ( **Settings → Builds & deployments → Production** ) to that same primary branch so you are not expecting deploys from a branch that never triggers the workflow.
+
+After this is wired, **turn off Cloudflare’s Git-triggered builds** for this project. Otherwise every push still starts a **Pages build on Cloudflare** (the one that OOMs), even when GitHub Actions deploys successfully.
+
+In the dashboard: **Workers & Pages** → your Pages project → **Settings** → **Builds & deployments**:
+
+1. Under **Production**, open **Configure Production deployments** and **disable** “Enable automatic production branch deployments” (see [Branch deployment controls](https://developers.cloudflare.com/pages/configuration/branch-build-controls/) and [Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/#disable-automatic-deployments)).
+2. Under **Preview**, set automatic preview deployments to **None** (or restrict branches) so pushes do not spawn preview builds on Cloudflare either.
+
+Then only **`wrangler pages deploy`** from GitHub Actions updates the site. Production updates after a **merge into** or **push to** **`main` or `master`**, or when you use **Run workflow** in the Actions tab.
+
+**Manual upload (same as CI):** after `yarn build:pages`, from the repo root:
+
+```bash
+npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
+```
+
+Use the **`pages`** subcommand. If Wrangler prints a hint about `wrangler versions upload --assets=...` or a `wrangler.jsonc` **`assets`** block, you are on **`wrangler deploy`** (Workers), not Pages. Workers static sites and **Cloudflare Pages** are different; this repo’s workflow uses **`wrangler pages deploy`**, which only needs the output directory and `--project-name`.
 
 **Run the backend-backed importer:**
 
