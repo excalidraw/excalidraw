@@ -224,7 +224,7 @@ body.terraform-canvas-landing #root {
   background: rgba(255, 255, 255, 0.65);
 }
 
-.landing-page button {
+.landing-page .landing-cta {
   min-height: 48px;
   padding: 0.7rem 1.1rem;
   border: 2px solid var(--landing-ink);
@@ -236,13 +236,13 @@ body.terraform-canvas-landing #root {
   font: 700 1rem "Assistant", "Segoe UI", sans-serif;
 }
 
-.landing-nav button {
+.landing-nav .landing-cta {
   min-height: 42px;
   padding: 0.5rem 0.8rem;
   box-shadow: 3px 4px 0 var(--landing-blue);
 }
 
-.landing-page button:hover {
+.landing-page .landing-cta:hover {
   transform: translate(1px, 1px);
   box-shadow: 3px 4px 0 var(--landing-ink);
 }
@@ -296,8 +296,8 @@ body.terraform-canvas-landing #root {
   margin-top: 2rem;
 }
 
-.landing-hero__actions button:first-child,
-.landing-final button {
+.landing-hero__actions .landing-cta:first-child,
+.landing-final .landing-cta {
   background: #dff4e8;
   box-shadow: 4px 5px 0 var(--landing-green);
 }
@@ -743,9 +743,7 @@ body.terraform-canvas-landing #root {
 }
 
 @media (max-width: 520px) {
-  .landing-page button,
-  .landing-hero__actions button,
-  .landing-final button {
+  .landing-page .landing-cta {
     width: 100%;
   }
 
@@ -755,7 +753,7 @@ body.terraform-canvas-landing #root {
   }
 
   .landing-nav__links,
-  .landing-nav__links button {
+  .landing-nav__links .landing-cta {
     width: 100%;
   }
 
@@ -803,4 +801,59 @@ body.terraform-canvas-landing #root {
   .landing-canvas-instructions {
     grid-template-columns: 1fr;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Landing firewall (production only hook: body.terraform-canvas-landing).
+// Isolates marketing DOM from document-level editor / Radix effects when the
+// embedded Excalidraw instance is on the page. Does not target .excalidraw.
+// Main canvas menu uses modal=false, so body scroll-lock overrides are avoided.
+// ---------------------------------------------------------------------------
+body.terraform-canvas-landing .landing-page {
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+}
+
+body.terraform-canvas-landing .landing-hero,
+body.terraform-canvas-landing .landing-strip,
+body.terraform-canvas-landing .landing-workflow,
+body.terraform-canvas-landing .landing-features,
+body.terraform-canvas-landing .landing-use-cases,
+body.terraform-canvas-landing .landing-final,
+body.terraform-canvas-landing .landing-canvas-section__header,
+body.terraform-canvas-landing .landing-canvas-instructions {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+body.terraform-canvas-landing .landing-hero__sketch,
+body.terraform-canvas-landing .landing-hero__sketch * {
+  filter: none;
+}
+
+body.terraform-canvas-landing .landing-topology,
+body.terraform-canvas-landing .landing-service,
+body.terraform-canvas-landing .landing-link,
+body.terraform-canvas-landing .landing-note {
+  filter: none;
+  backdrop-filter: none;
+}
+
+body.terraform-canvas-landing .landing-nav {
+  filter: none;
+}
+
+body.terraform-canvas-landing .landing-canvas-instructions article {
+  border-radius: 8px;
+  box-shadow: 4px 5px 0 rgba(22, 33, 29, 0.13);
+}
+
+body.terraform-canvas-landing .landing-steps li {
+  border-radius: 8px;
+}
+
+body.terraform-canvas-landing .landing-features article {
+  border-radius: 8px;
+  box-shadow: none;
 }
