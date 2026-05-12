@@ -746,6 +746,126 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ]);
   });
 
+  it("places IGW on the VPC left edge and NAT/EIP on the right edge", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([["subnet-public", { subnetId: "subnet-public" }]]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-public",
+        subnetIds: ["subnet-public"],
+        addresses: [],
+      },
+    ];
+    const nodes: TerraformPlanNodesMap = {
+      "aws_internet_gateway.igw": {
+        resources: {
+          "aws_internet_gateway.igw": {
+            address: "aws_internet_gateway.igw",
+            mode: "managed",
+            type: "aws_internet_gateway",
+            change: { actions: ["no-op"], after: { vpc_id: "vpc-test" } },
+          },
+        },
+      },
+      "aws_nat_gateway.nat": {
+        resources: {
+          "aws_nat_gateway.nat": {
+            address: "aws_nat_gateway.nat",
+            mode: "managed",
+            type: "aws_nat_gateway",
+            change: { actions: ["no-op"], after: { subnet_id: "subnet-public" } },
+          },
+        },
+      },
+      "aws_eip.nat": {
+        resources: {
+          "aws_eip.nat": {
+            address: "aws_eip.nat",
+            mode: "managed",
+            type: "aws_eip",
+            change: { actions: ["no-op"], after: { id: "eipalloc-1" } },
+          },
+        },
+      },
+    };
+    const defaultBuckets = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        addresses: [
+          "aws_internet_gateway.igw",
+          "aws_nat_gateway.nat",
+          "aws_eip.nat",
+        ],
+      },
+    ];
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      undefined,
+      [],
+      { zoneBottom: [], vpcBottom: [] },
+      defaultBuckets,
+    );
+
+    const byPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+      );
+    const vpc = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpc",
+    )!;
+    const igw = byPath("aws_internet_gateway.igw")!;
+    const nat = byPath("aws_nat_gateway.nat")!;
+    const eip = byPath("aws_eip.nat")!;
+
+    expect(igw.x).toBe(vpc.x);
+    expect(nat.x + (nat.width ?? 0)).toBe(vpc.x + (vpc.width ?? 0));
+    expect(eip.x + (eip.width ?? 0)).toBe(vpc.x + (vpc.width ?? 0));
+    expect(igw.frameId).toBe(vpc.id);
+    expect(nat.frameId).toBe(vpc.id);
+    expect(eip.frameId).toBe(vpc.id);
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("places unassociated route table tiles on the VPC body bottom edge", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
