@@ -157,6 +157,10 @@ const VPC_ENDPOINT_TILE_GAP = px(10);
 const ROUTE_TABLE_TILE_W = VPC_ENDPOINT_TILE_W;
 const ROUTE_TABLE_TILE_H = VPC_ENDPOINT_TILE_H;
 const ROUTE_TABLE_TILE_GAP = VPC_ENDPOINT_TILE_GAP;
+const VPC_INTERNET_EDGE_TILE_W = TOPOLOGY_TIER2_W;
+const VPC_INTERNET_EDGE_TILE_H = TOPOLOGY_TIER2_H;
+const VPC_INTERNET_EDGE_TILE_GAP = TOPOLOGY_SATELLITE_GAP_PX;
+const VPC_INTERNET_EDGE_GUTTER = VPC_INTERNET_EDGE_TILE_W + px(12);
 
 /** Extra frame height so bottom-edge VPC tiles sit fully inside the VPC frame (tile mid stays on the body bottom line). */
 function vpcBottomStripInsetPx(epCount: number, vpcBottomRtCount: number): number {
@@ -561,6 +565,7 @@ function vpcFrameDimensionsForZones(
   routeTableCountByZoneSignature?: ReadonlyMap<string, number>,
   vpcInfrastructureTopPadPx = 0,
   subnetNameById: ReadonlyMap<string, string> = new Map(),
+  sideGutterPx = 0,
 ): {
   w: number;
   h: number;
@@ -612,7 +617,7 @@ function vpcFrameDimensionsForZones(
     znRows * perZoneH + (znRows > 0 ? znRows - 1 : 0) * ZONE_CELL_GAP;
   const w = Math.max(
     MIN_VPC_W + FRAME_CONTENT_SLACK_X,
-    2 * INNER_PAD + innerW + FRAME_CONTENT_SLACK_X,
+    2 * INNER_PAD + 2 * sideGutterPx + innerW + FRAME_CONTENT_SLACK_X,
   );
   const h = Math.max(
     MIN_VPC_H + FRAME_CONTENT_SLACK_Y,
@@ -1181,6 +1186,55 @@ function bucketAddressesForVpc<T extends { accountId: string; region: string; vp
   return [];
 }
 
+function resourceTypeForAddress(
+  nodes: TerraformPlanNodesMap,
+  addr: string,
+): string {
+  const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+  const resource = getPrimaryResource(node);
+  return getTerraformCardResourceType(
+    addr,
+    resource as Record<string, unknown> | null,
+  );
+}
+
+type VpcInternetEdgeAddresses = {
+  defaultTop: string[];
+  left: string[];
+  right: string[];
+};
+
+function splitVpcInternetEdgeAddresses(
+  addrs: readonly string[],
+  nodes: TerraformPlanNodesMap,
+): VpcInternetEdgeAddresses {
+  const out: VpcInternetEdgeAddresses = {
+    defaultTop: [],
+    left: [],
+    right: [],
+  };
+  for (const addr of addrs) {
+    const t = resourceTypeForAddress(nodes, addr);
+    if (t === "aws_internet_gateway") {
+      out.left.push(addr);
+    } else if (t === "aws_nat_gateway" || t === "aws_eip") {
+      out.right.push(addr);
+    } else {
+      out.defaultTop.push(addr);
+    }
+  }
+  out.left.sort();
+  out.right.sort();
+  out.defaultTop.sort();
+  return out;
+}
+
+function vpcInternetSideGutterPx(edgeAddrs: VpcInternetEdgeAddresses): number {
+  return edgeAddrs.left.length > 0 || edgeAddrs.right.length > 0
+    ? VPC_INTERNET_EDGE_GUTTER
+    : 0;
+}
+
 function vpcInfrastructureTopPadPx(
   accountId: string,
   regionName: string,
@@ -1188,9 +1242,14 @@ function vpcInfrastructureTopPadPx(
   vpcDefaultPlumbing: readonly TopologyVpcDefaultPlumbingBucket[],
   vpcFlowLogs: readonly TopologyVpcFlowLogBucket[],
   endpointSgs: readonly TopologyEndpointSecurityGroupBucket[],
+  nodes: TerraformPlanNodesMap,
 ): number {
   let rows = 0;
-  if (bucketAddressesForVpc(vpcDefaultPlumbing, accountId, regionName, vpcId).length) {
+  const defaultTop = splitVpcInternetEdgeAddresses(
+    bucketAddressesForVpc(vpcDefaultPlumbing, accountId, regionName, vpcId),
+    nodes,
+  ).defaultTop;
+  if (defaultTop.length) {
     rows++;
   }
   if (bucketAddressesForVpc(vpcFlowLogs, accountId, regionName, vpcId).length) {
@@ -1203,6 +1262,63 @@ function vpcInfrastructureTopPadPx(
     return 0;
   }
   return rows * (TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX) + TOPOLOGY_SATELLITE_GAP_PX;
+}
+
+function appendVpcInternetEdgeRectangles(
+  skeleton: ExcalidrawElementSkeleton[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+  vpcX: number,
+  vpcY: number,
+  vpcCellW: number,
+  vpcCellBodyH: number,
+  nodes: TerraformPlanNodesMap,
+  edgeAddrs: VpcInternetEdgeAddresses,
+): string[] {
+  const out: string[] = [];
+  const placeColumn = (addrs: readonly string[], side: "left" | "right") => {
+    if (addrs.length === 0) {
+      return;
+    }
+    const columnH =
+      addrs.length * VPC_INTERNET_EDGE_TILE_H +
+      Math.max(0, addrs.length - 1) * VPC_INTERNET_EDGE_TILE_GAP;
+    const x =
+      side === "left"
+        ? vpcX
+        : vpcX + vpcCellW - VPC_INTERNET_EDGE_TILE_W;
+    let y = vpcY + Math.max(VPC_TOP_PAD, (vpcCellBodyH - columnH) / 2);
+    for (const addr of addrs) {
+      out.push(addr);
+      const resourceType = resourceTypeForAddress(nodes, addr);
+      const action = getTerraformPlanNodeAction(
+        nodes[addr] as TerraformPlanGraphNode | undefined,
+      );
+      pushResourceRectangleSkeleton(
+        skeleton,
+        addr,
+        x,
+        y,
+        VPC_INTERNET_EDGE_TILE_W,
+        VPC_INTERNET_EDGE_TILE_H,
+        nodes,
+        {
+          initiallyVisible: isInitiallyVisibleTerraformTopologyTile(
+            resourceType,
+            action,
+          ),
+          explodeParentKeys: [],
+          satelliteTier: 2,
+          egress: { accountId, region: regionName, vpcId },
+        },
+      );
+      y += VPC_INTERNET_EDGE_TILE_H + VPC_INTERNET_EDGE_TILE_GAP;
+    }
+  };
+  placeColumn(edgeAddrs.left, "left");
+  placeColumn(edgeAddrs.right, "right");
+  return out;
 }
 
 function appendVpcFlowLogBundleSatelliteEdges(
@@ -2082,6 +2198,17 @@ export async function buildTerraformTopologyExcalidrawScene(
             vpcDefaultPlumbingBuckets,
             vpcFlowLogBuckets,
             endpointSecurityGroupBuckets,
+            nodes,
+          );
+          const defaultPlumbingAddrs = bucketAddressesForVpc(
+            vpcDefaultPlumbingBuckets,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          const internetEdges = splitVpcInternetEdgeAddresses(
+            defaultPlumbingAddrs,
+            nodes,
           );
           const vd = vpcFrameDimensionsForZones(
             vpcZs,
@@ -2091,6 +2218,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             rtZoneCounts,
             infraTop,
             subnetNameById,
+            vpcInternetSideGutterPx(internetEdges),
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2133,6 +2261,17 @@ export async function buildTerraformTopologyExcalidrawScene(
             vpcDefaultPlumbingBuckets,
             vpcFlowLogBuckets,
             endpointSecurityGroupBuckets,
+            nodes,
+          );
+          const defaultPlumbingAddrs = bucketAddressesForVpc(
+            vpcDefaultPlumbingBuckets,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          const internetEdges = splitVpcInternetEdgeAddresses(
+            defaultPlumbingAddrs,
+            nodes,
           );
           const vd = vpcFrameDimensionsForZones(
             vpcZs,
@@ -2142,6 +2281,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             rtZoneCounts,
             infraTop,
             subnetNameById,
+            vpcInternetSideGutterPx(internetEdges),
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2255,6 +2395,10 @@ export async function buildTerraformTopologyExcalidrawScene(
           regionName,
           vpcId,
         );
+        const internetEdgeAddrs = splitVpcInternetEdgeAddresses(
+          defaultPlumbingAddrs,
+          nodes,
+        );
         const flowLogAddrs = bucketAddressesForVpc(
           vpcFlowLogBuckets,
           accountId,
@@ -2274,6 +2418,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           vpcDefaultPlumbingBuckets,
           vpcFlowLogBuckets,
           endpointSecurityGroupBuckets,
+          nodes,
         );
         const vpcInfraIds = appendVpcInfrastructureStrips(
           skeleton,
@@ -2284,9 +2429,21 @@ export async function buildTerraformTopologyExcalidrawScene(
           vpcY,
           vpcCellW,
           nodes,
-          defaultPlumbingAddrs,
+          internetEdgeAddrs.defaultTop,
           flowLogAddrs,
           endpointSgAddrs,
+        );
+        const vpcInternetEdgeIds = appendVpcInternetEdgeRectangles(
+          skeleton,
+          accountId,
+          regionName,
+          vpcId,
+          vpcX,
+          vpcY,
+          vpcCellW,
+          vpcCellBodyH,
+          nodes,
+          internetEdgeAddrs,
         );
         appendVpcFlowLogBundleSatelliteEdges(
           satelliteLineSpecs,
@@ -2338,6 +2495,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             height: vpcCellFrameH,
             children: [
               ...vpcInfraIds,
+              ...vpcInternetEdgeIds,
               ...vpcBottomRtRectIdsEmpty,
               ...vpcEpRectIdsEmpty,
             ] as readonly string[],
@@ -2366,8 +2524,10 @@ export async function buildTerraformTopologyExcalidrawScene(
           rtZoneCounts,
           infraTop,
           subnetNameById,
+          vpcInternetSideGutterPx(internetEdgeAddrs),
         );
-        const zoneGridOriginX = vpcX + INNER_PAD;
+        const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
+        const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
         const zoneGridOriginY = vpcY + VPC_TOP_PAD + infraTop;
         const zoneFrameIds: string[] = [];
         const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
@@ -2498,6 +2658,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           height: vpcCellFrameH,
           children: [
             ...vpcInfraIds,
+            ...vpcInternetEdgeIds,
             ...zoneFrameIds,
             ...vpcBottomRtRectIds,
             ...vpcEpRectIds,
