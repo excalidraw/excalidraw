@@ -1305,6 +1305,16 @@ const ExcalidrawWrapper = ({
 };
 
 const LandingPage = () => {
+  useEffect(() => {
+    document.documentElement.classList.add("terraform-canvas-landing");
+    document.body.classList.add("terraform-canvas-landing");
+
+    return () => {
+      document.documentElement.classList.remove("terraform-canvas-landing");
+      document.body.classList.remove("terraform-canvas-landing");
+    };
+  }, []);
+
   const scrollToCanvas = () => {
     document
       .getElementById("terraform-canvas")
@@ -1312,10 +1322,22 @@ const LandingPage = () => {
   };
 
   return (
-    <main className="landing-page">
+    <main id="top" className="landing-page">
+      <nav className="landing-nav" aria-label="Terraform Canvas">
+        <a className="landing-nav__brand" href="#top">
+          Terraform Canvas
+        </a>
+        <div className="landing-nav__links">
+          <a href="#workflow">Workflow</a>
+          <a href="#use-cases">Use cases</a>
+          <button type="button" onClick={scrollToCanvas}>
+            Open canvas
+          </button>
+        </div>
+      </nav>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">Terraform Canvas</p>
+          <p className="landing-hero__eyebrow">Terraform, but drawable</p>
           <h1 id="landing-title">Terraform Canvas</h1>
           <p className="landing-hero__lede">
             Turn Terraform plans, graphs, and state into editable architecture
@@ -1337,6 +1359,9 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="landing-hero__sketch" aria-hidden="true">
+          <span className="landing-note landing-note--top">
+            plan diff lands here
+          </span>
           <span className="landing-node landing-node--vpc">vpc</span>
           <span className="landing-node landing-node--alb">alb</span>
           <span className="landing-node landing-node--lambda">lambda</span>
@@ -1345,6 +1370,29 @@ const LandingPage = () => {
           <span className="landing-link landing-link--a" />
           <span className="landing-link landing-link--b" />
           <span className="landing-link landing-link--c" />
+          <span className="landing-note landing-note--bottom">
+            drag labels, redraw edges, export
+          </span>
+        </div>
+      </section>
+
+      <section
+        id="terraform-canvas"
+        className="landing-canvas-section"
+        aria-label="Embedded Terraform diagram editor"
+      >
+        <div className="landing-canvas-section__header">
+          <p>Live demo</p>
+          <h2>Draw, import, adjust, export.</h2>
+        </div>
+        <div className="landing-canvas-shell">
+          <TopErrorBoundary>
+            <Provider store={appJotaiStore}>
+              <ExcalidrawAPIProvider>
+                <ExcalidrawWrapper frontendOnly />
+              </ExcalidrawAPIProvider>
+            </Provider>
+          </TopErrorBoundary>
         </div>
       </section>
 
@@ -1361,7 +1409,11 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="landing-workflow" aria-labelledby="workflow-title">
+      <section
+        id="workflow"
+        className="landing-workflow"
+        aria-labelledby="workflow-title"
+      >
         <div className="landing-section-heading">
           <p>Workflow</p>
           <h2 id="workflow-title">
@@ -1418,7 +1470,11 @@ const LandingPage = () => {
         </article>
       </section>
 
-      <section className="landing-use-cases" aria-labelledby="use-cases-title">
+      <section
+        id="use-cases"
+        className="landing-use-cases"
+        aria-labelledby="use-cases-title"
+      >
         <div className="landing-section-heading">
           <p>Use cases</p>
           <h2 id="use-cases-title">
@@ -1430,26 +1486,6 @@ const LandingPage = () => {
           <span>Migration planning</span>
           <span>Module documentation</span>
           <span>Incident reconstruction</span>
-        </div>
-      </section>
-
-      <section
-        id="terraform-canvas"
-        className="landing-canvas-section"
-        aria-label="Embedded Terraform diagram editor"
-      >
-        <div className="landing-canvas-section__header">
-          <p>Live demo</p>
-          <h2>Draw, import, adjust, export.</h2>
-        </div>
-        <div className="landing-canvas-shell">
-          <TopErrorBoundary>
-            <Provider store={appJotaiStore}>
-              <ExcalidrawAPIProvider>
-                <ExcalidrawWrapper frontendOnly />
-              </ExcalidrawAPIProvider>
-            </Provider>
-          </TopErrorBoundary>
         </div>
       </section>
 
