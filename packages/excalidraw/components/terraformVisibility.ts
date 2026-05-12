@@ -739,11 +739,22 @@ export const isTerraformExpandAllActive = (
   elements: readonly ExcalidrawElement[],
 ): boolean => {
   if (isTerraformSemanticOverviewScene(elements)) {
-    return elements.some(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        e.customData?.terraformExpandAllView === true,
-    );
+    let keyedResourceCount = 0;
+    for (const e of elements) {
+      const cd = getCustomData(e);
+      if (cd.terraformVisibilityRole !== "resource") {
+        continue;
+      }
+      const key = getTerraformVisibilityKey(e);
+      if (!key) {
+        continue;
+      }
+      keyedResourceCount++;
+      if (cd.terraformExpandAllView !== true) {
+        return false;
+      }
+    }
+    return keyedResourceCount > 0;
   }
 
   const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
