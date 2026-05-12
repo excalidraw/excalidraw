@@ -11,6 +11,10 @@ import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
+  const isProductionBuild = mode === "production";
+  const enableProdSourcemaps =
+    envVars.VITE_PROD_SOURCEMAP === "true" ||
+    process.env.VITE_PROD_SOURCEMAP === "true";
   // https://vitejs.dev/config/
   return {
     server: {
@@ -113,7 +117,8 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      sourcemap: true,
+      sourcemap: isProductionBuild ? enableProdSourcemaps : true,
+      reportCompressedSize: !isProductionBuild,
       // don't auto-inline small assets (i.e. fonts hosted on CDN)
       assetsInlineLimit: 0,
     },
@@ -127,17 +132,21 @@ export default defineConfig(({ mode }) => {
       }),
       woff2BrowserPlugin(),
       react(),
-      checker({
-        typescript: true,
-        eslint:
-          envVars.VITE_APP_ENABLE_ESLINT === "false"
-            ? undefined
-            : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
-        overlay: {
-          initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
-          badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
-        },
-      }),
+      ...(isProductionBuild
+        ? []
+        : [
+            checker({
+              typescript: true,
+              eslint:
+                envVars.VITE_APP_ENABLE_ESLINT === "false"
+                  ? undefined
+                  : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
+              overlay: {
+                initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
+                badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
+              },
+            }),
+          ]),
       svgrPlugin(),
       ViteEjsPlugin(),
       VitePWA({

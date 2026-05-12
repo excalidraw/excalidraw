@@ -54,6 +54,26 @@ yarn build:preview
 
 The static app is emitted to `excalidraw-app/build`. Hosted static builds and `yarn build:preview` render the Terraform Canvas landing page at `/` with the embedded frontend-only demo below it.
 
+**Lean static build for hosting (smaller output, less Vite memory):**
+
+```bash
+yarn build:pages
+```
+
+This disables Sentry and product analytics for the bundle, omits production source maps by default (set `VITE_PROD_SOURCEMAP=true` in env to opt back in), and skips `vite-plugin-checker` during `vite build` (typecheck and lint remain available via `yarn test:typecheck` and `yarn test:code`).
+
+**Cloudflare Pages via GitHub Actions (direct upload):**
+
+The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml) runs on pushes to `master`: `yarn install --frozen-lockfile`, `yarn build:pages`, then `wrangler pages deploy excalidraw-app/build`. Configure the repository under **Settings → Secrets and variables → Actions**:
+
+| Kind | Name | Purpose |
+| --- | --- | --- |
+| Secret | `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit** (and read as needed). |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Account ID from the Cloudflare dashboard sidebar. |
+| Variable | `CF_PAGES_PROJECT_NAME` | Exact **Pages project name** (creates production deploy when set). If unset, the workflow still **builds** but **skips deploy** so forks stay green. |
+
+After this is wired, disable or ignore the Cloudflare dashboard **Git-connected production build** for the same project if you no longer want Pages to build on Cloudflare’s runners (avoids duplicate deploys and the previous Vite OOM there). Keep Git linked only for previews if you still want that behavior.
+
 **Run the backend-backed importer:**
 
 ```bash
