@@ -141,7 +141,6 @@ import {
   isArrowElement,
   isBindingElement,
   isBindingElementType,
-  isFreeDrawElementType,
   isBoundToContainer,
   isFrameLikeElement,
   isImageElement,
@@ -504,10 +503,6 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
-
-function maybeBindLinearElement(...args: any) {
-  // TODO: Remove after rebase
-}
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7076,10 +7071,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    const { newElement } = this.state;
     if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
-      const { newElement } = this.state;
       if (!newElement && isBindingEnabled(this.state)) {
         const globalPoint = pointFrom<GlobalPoint>(
           scenePointerX,
@@ -7110,42 +7105,37 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    } else if (isFreeDrawElementType(this.state.activeTool.type)) {
-      const { newElement } = this.state;
-
-      if (newElement && isFreeDrawElement(newElement)) {
-        const detectedElement = convertToShape(newElement);
-
-        if (isBindingElement(detectedElement, false)) {
-          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            detectedElement,
-            1,
-            this.scene.getNonDeletedElementsMap(),
-          );
-          const bindableElement = getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(x, y),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
-          );
-
-          if (bindableElement) {
-            this.setState({
-              suggestedBinding: {
-                element: bindableElement,
-                midPoint: getSnapOutlineMidPoint(
-                  pointFrom<GlobalPoint>(x, y),
-                  bindableElement,
-                  this.scene.getNonDeletedElementsMap(),
-                  this.state.zoom,
-                ),
-              },
-            });
-          } else {
-            this.setState({
-              suggestedBinding: null,
-            });
-          }
+    } else if (newElement && isFreeDrawElement(newElement)) {
+      const detectedElement = convertToShape(newElement);
+      if (isBindingElement(detectedElement, false)) {
+        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          detectedElement,
+          1,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        const elementsMap = this.scene.getNonDeletedElementsMap();
+        const bindableElement = getHoveredElementForBinding(
+          pointFrom<GlobalPoint>(x, y),
+          this.scene.getNonDeletedElements(),
+          elementsMap,
+          maxBindingDistance_simple(this.state.zoom),
+        );
+        if (bindableElement) {
+          this.setState({
+            suggestedBinding: {
+              element: bindableElement,
+              midPoint: getSnapOutlineMidPoint(
+                pointFrom<GlobalPoint>(x, y),
+                bindableElement,
+                elementsMap,
+                this.state.zoom,
+              ),
+            },
+          });
+        } else {
+          this.setState({
+            suggestedBinding: null,
+          });
         }
       }
     }
@@ -10910,7 +10900,14 @@ class App extends React.Component<AppProps, AppState> {
           const detectedElement = convertToShape(newElement);
 
           if (detectedElement !== newElement) {
-            if (detectedElement.type === "arrow") {
+            this.scene.replaceAllElements([
+              ...this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== newElement.id),
+              detectedElement,
+            ]);
+
+            if (isBindingElement(detectedElement)) {
               const [x, y] =
                 LinearElementEditor.getPointAtIndexGlobalCoordinates(
                   detectedElement,
@@ -10918,25 +10915,40 @@ class App extends React.Component<AppProps, AppState> {
                   this.scene.getNonDeletedElementsMap(),
                 );
 
-              maybeBindLinearElement(
-                detectedElement,
-                this.state,
-                { x, y },
-                this.scene,
-              );
-
+              // Set arrowhead
               this.scene.mutateElement(detectedElement, {
                 startArrowhead: this.state.currentItemStartArrowhead,
                 endArrowhead: this.state.currentItemEndArrowhead,
               });
-            }
 
-            this.scene.replaceAllElements([
-              ...this.scene
-                .getElementsIncludingDeleted()
-                .filter((el) => el.id !== newElement.id),
-              detectedElement,
-            ]);
+              // Set up selectedLinearElement se we can finalize it
+              flushSync(() => {
+                const linearElement = new LinearElementEditor(
+                  detectedElement,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+                this.setState({
+                  newElement: detectedElement,
+                  selectedLinearElement: {
+                    ...linearElement,
+                    pointerOffset: {
+                      x: 0,
+                      y: 0,
+                    },
+                    initialState: {
+                      ...linearElement.initialState,
+                      lastClickedPoint: 1,
+                    },
+                    selectedPointsIndices: [1],
+                  },
+                });
+              });
+
+              this.actionManager.executeAction(actionFinalize, "ui", {
+                event: childEvent,
+                sceneCoords: { x, y },
+              });
+            }
 
             makeNextSelectedElementIds(
               { [detectedElement.id]: true },

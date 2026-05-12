@@ -75,31 +75,27 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
+
+      if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
+        const detectedElement = convertToShape(newElement);
+        if (detectedElement !== newElement) {
+          renderElement(
+            {
+              ...detectedElement,
+              roughness: 0,
+              backgroundColor: "rgba(0,0,0,.05)",
+            },
+            elementsMap,
+            allElementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
+        }
+      }
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
-    }
-
-    // TODO: Can we interleave the context save?
-    context.restore();
-    context.save();
-
-    if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
-      const detectedElement = convertToShape(newElement);
-      if (detectedElement !== newElement) {
-        renderElement(
-          {
-            ...detectedElement,
-            roughness: 0,
-            backgroundColor: "rgba(0,0,0,.05)",
-          },
-          elementsMap,
-          allElementsMap,
-          rc,
-          context,
-          renderConfig,
-          appState,
-        );
-      }
     }
 
     context.restore();

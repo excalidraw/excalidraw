@@ -21,7 +21,7 @@ import {
   shouldRotateWithDiscreteAngle,
   updateActiveTool,
 } from "@excalidraw/common";
-import { isPathALoop } from "@excalidraw/element";
+import { isPathALoop, convertToShape } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
@@ -60,10 +60,14 @@ export const actionFinalize = register<FormData>({
 
     if (data && appState.selectedLinearElement) {
       const { event, sceneCoords } = data;
-      const element = LinearElementEditor.getElement(
+      let element = LinearElementEditor.getElement(
         appState.selectedLinearElement.elementId,
         elementsMap,
       );
+      const detectedShape = isFreeDrawElement(element)
+        ? convertToShape(element)
+        : element;
+      element = isBindingElement(detectedShape) ? detectedShape : element;
 
       invariant(
         element,
