@@ -1747,10 +1747,11 @@ function collectTopologyRectangleLayoutFromSkeleton(
 }
 
 /**
- * Excalidraw paints later elements on top. Put topology **frames** under graph **edges**
- * (arrows/lines with terraform edge layers), and those edges under **resource** rectangles /
- * labels so connectors sit on the frame chrome but stay behind cards (matches ELK scene:
- * frames → edges → resources).
+ * Excalidraw paints later elements on top. Put graph **edges** at the back, then topology
+ * **frames**, then everything else (resource rectangles / AWS icons / labels). This keeps
+ * dimmed cards (which now have opaque washed backgrounds — see `terraformColorWash`) from
+ * being hidden behind edges that route across them, while orbit binding still anchors the
+ * arrowhead to the card boundary so endpoints stay legible.
  */
 function reorderTopologyElementsZStack(
   elements: readonly ExcalidrawElement[],
@@ -1775,13 +1776,13 @@ function reorderTopologyElementsZStack(
   };
 
   const withIndex = elements.map((el, index) => ({ el, index }));
-  const frames = withIndex.filter(({ el }) => isTopologyFrame(el));
   const lines = withIndex.filter(({ el }) => isTerraformTopologyEdge(el));
+  const frames = withIndex.filter(({ el }) => isTopologyFrame(el));
   const rest = withIndex.filter(
     ({ el }) => !isTopologyFrame(el) && !isTerraformTopologyEdge(el),
   );
 
-  return [...frames, ...lines, ...rest].map(({ el }) => el);
+  return [...lines, ...frames, ...rest].map(({ el }) => el);
 }
 
 function normalizeTopologyOrigin(elements: readonly ExcalidrawElement[]) {

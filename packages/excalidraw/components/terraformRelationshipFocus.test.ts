@@ -6,6 +6,21 @@ import {
   applyTerraformRelationshipFocus,
   getTerraformRelationshipFocus,
 } from "./terraformRelationshipFocus";
+import { washHexColor } from "./terraformColorWash";
+
+const VIEW_BG = "#ffffff";
+
+/**
+ * Color washing levels mirror the constants in `terraformRelationshipFocus.ts`. A
+ * `level` of 100 means "no dimming" (so stroke / background stay as-is); below 100
+ * the stroke color is blended toward the canvas background by `(100 - level) / 100`.
+ */
+const expectedWashedStroke = (level: number, baseColor = "#000000") =>
+  washHexColor(baseColor, (100 - level) / 100, VIEW_BG);
+
+/** Transparent backgrounds become an opaque washed fill (the user's "fully hides what's behind" requirement). */
+const expectedWashedTransparentBackground = (level: number) =>
+  washHexColor("transparent", (100 - level) / 100, VIEW_BG);
 
 const baseElement = (
   id: string,
@@ -167,12 +182,14 @@ describe("terraform relationship focus", () => {
     const result = applyTerraformRelationshipFocus(
       elements,
       "aws_instance.web",
+      VIEW_BG,
     );
     const byId = new Map(result.elements.map((e) => [e.id, e]));
 
     expect(byId.get("rect:sg")?.isDeleted).toBe(false);
     expect(byId.get("text:sg")?.isDeleted).toBe(false);
     expect(byId.get("text:sg")?.opacity).toBe(100);
+    expect(byId.get("text:sg")?.strokeColor).toBe("#000000");
   });
 
   it("reveals direct dependency edges and direct neighbor nodes", () => {
@@ -198,13 +215,15 @@ describe("terraform relationship focus", () => {
     const result = applyTerraformRelationshipFocus(
       elements,
       "aws_instance.web",
+      VIEW_BG,
     );
     const byId = new Map(
       result.elements.map((element) => [element.id, element]),
     );
 
     expect(byId.get("edge:web-sg")?.isDeleted).toBe(false);
-    expect(byId.get("edge:web-sg")?.opacity).toBe(85);
+    expect(byId.get("edge:web-sg")?.opacity).toBe(100);
+    expect(byId.get("edge:web-sg")?.strokeColor).toBe(expectedWashedStroke(85));
     expect(byId.get("edge:web-sg")?.customData?.terraformFocusPreview).toBe(
       true,
     );
@@ -212,8 +231,12 @@ describe("terraform relationship focus", () => {
     expect(
       byId.get("node:aws_security_group.sg")?.customData?.terraformFocusPreview,
     ).toBe(true);
-    expect(byId.get("edge:sg-vpc")?.opacity).toBe(15);
-    expect(byId.get("node:aws_vpc.main")?.opacity).toBe(25);
+    expect(byId.get("edge:sg-vpc")?.opacity).toBe(100);
+    expect(byId.get("edge:sg-vpc")?.strokeColor).toBe(expectedWashedStroke(15));
+    expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
+    expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe(
+      expectedWashedStroke(25),
+    );
   });
 
   it("includes hidden data-flow edges touching the focus node", () => {
@@ -232,19 +255,23 @@ describe("terraform relationship focus", () => {
     const result = applyTerraformRelationshipFocus(
       elements,
       "aws_lambda_function.fn",
+      VIEW_BG,
     );
     const byId = new Map(
       result.elements.map((element) => [element.id, element]),
     );
 
     expect(byId.get("edge:fn-logs")?.isDeleted).toBe(false);
-    expect(byId.get("edge:fn-logs")?.opacity).toBe(85);
+    expect(byId.get("edge:fn-logs")?.opacity).toBe(100);
+    expect(byId.get("edge:fn-logs")?.strokeColor).toBe(
+      expectedWashedStroke(85),
+    );
     expect(byId.get("node:aws_cloudwatch_log_group.logs")?.isDeleted).toBe(
       false,
     );
   });
 
-  it("keeps bound label text at full opacity when the resource rectangle is dimmed", () => {
+  it("keeps bound label text at full color when the resource rectangle is dimmed", () => {
     const rectS3 = resource("aws_s3_bucket.logs", { id: "rect:s3" });
     const labelText = baseElement(
       "text:s3",
@@ -280,11 +307,14 @@ describe("terraform relationship focus", () => {
     const result = applyTerraformRelationshipFocus(
       elements,
       "aws_instance.web",
+      VIEW_BG,
     );
     const byId = new Map(result.elements.map((e) => [e.id, e]));
 
-    expect(byId.get("rect:s3")?.opacity).toBe(25);
+    expect(byId.get("rect:s3")?.opacity).toBe(100);
+    expect(byId.get("rect:s3")?.strokeColor).toBe(expectedWashedStroke(25));
     expect(byId.get("text:s3")?.opacity).toBe(100);
+    expect(byId.get("text:s3")?.strokeColor).toBe("#000000");
   });
 
   it("dims unrelated Terraform resources, groups, and edges", () => {
@@ -306,39 +336,159 @@ describe("terraform relationship focus", () => {
     const result = applyTerraformRelationshipFocus(
       elements,
       "aws_instance.web",
+      VIEW_BG,
     );
     const byId = new Map(
       result.elements.map((element) => [element.id, element]),
     );
 
-    expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
-    expect(byId.get("node:aws_security_group.sg")?.opacity).toBe(85);
-    expect(byId.get("edge:web-sg")?.opacity).toBe(85);
-    expect(byId.get("group:focus")?.opacity).toBe(60);
-    expect(byId.get("node:aws_vpc.main")?.opacity).toBe(25);
-    expect(byId.get("group:other")?.opacity).toBe(25);
-    expect(byId.get("edge:other")?.opacity).toBe(15);
+    for (const id of [
+      "node:aws_instance.web",
+      "node:aws_security_group.sg",
+      "edge:web-sg",
+      "group:focus",
+      "node:aws_vpc.main",
+      "group:other",
+      "edge:other",
+    ]) {
+      expect(byId.get(id)?.opacity).toBe(100);
+    }
+
+    expect(byId.get("node:aws_instance.web")?.strokeColor).toBe("#000000");
+    expect(byId.get("node:aws_security_group.sg")?.strokeColor).toBe(
+      expectedWashedStroke(85),
+    );
+    expect(byId.get("edge:web-sg")?.strokeColor).toBe(expectedWashedStroke(85));
+    expect(byId.get("group:focus")?.strokeColor).toBe(
+      expectedWashedStroke(60),
+    );
+    expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe(
+      expectedWashedStroke(25),
+    );
+    expect(byId.get("group:other")?.strokeColor).toBe(
+      expectedWashedStroke(25),
+    );
+    expect(byId.get("edge:other")?.strokeColor).toBe(
+      expectedWashedStroke(15),
+    );
   });
 
-  it("clearing focus restores opacity and re-hides only preview-revealed elements", () => {
-    const focused = applyTerraformRelationshipFocus(
-      [
-        resource("aws_instance.web"),
-        resource("aws_security_group.sg", { isDeleted: true }),
-        resource("aws_vpc.main"),
-        baseElement("freehand:note", {}, { opacity: 40 }),
-        edge(
-          "edge:web-sg",
-          "dependency",
-          "aws_instance.web",
-          "aws_security_group.sg",
-          { isDeleted: true },
-        ),
-      ],
+  it("turns transparent backgrounds opaque so dimmed elements fully hide what's behind", () => {
+    const elements = [
+      resource("aws_instance.web"),
+      resource("aws_vpc.main"),
+      group("group:other", ["aws_vpc.main"]),
+    ];
+
+    const result = applyTerraformRelationshipFocus(
+      elements,
       "aws_instance.web",
+      VIEW_BG,
+    );
+    const byId = new Map(
+      result.elements.map((element) => [element.id, element]),
+    );
+
+    const dimmedNode = byId.get("node:aws_vpc.main");
+    expect(dimmedNode?.backgroundColor).toBe(
+      expectedWashedTransparentBackground(25),
+    );
+    expect(dimmedNode?.backgroundColor).not.toBe("transparent");
+    expect(dimmedNode?.fillStyle).toBe("solid");
+
+    const dimmedGroup = byId.get("group:other");
+    expect(dimmedGroup?.backgroundColor).toBe(
+      expectedWashedTransparentBackground(25),
+    );
+    expect(dimmedGroup?.backgroundColor).not.toBe("transparent");
+    expect(dimmedGroup?.fillStyle).toBe("solid");
+  });
+
+  it("re-dimming after a level change blends from the canonical originals, not the washed value", () => {
+    const elements = [
+      resource("aws_instance.web", {
+        strokeColor: "#112233",
+        backgroundColor: "#ffaabb",
+        fillStyle: "hachure",
+      }),
+      resource("aws_security_group.sg", {
+        strokeColor: "#112233",
+        backgroundColor: "#ffaabb",
+        fillStyle: "hachure",
+      }),
+      resource("aws_vpc.main", {
+        strokeColor: "#112233",
+        backgroundColor: "#ffaabb",
+        fillStyle: "hachure",
+      }),
+    ];
+
+    const focusedOnWeb = applyTerraformRelationshipFocus(
+      elements,
+      "aws_instance.web",
+      VIEW_BG,
+    ).elements;
+    const focusedOnSg = applyTerraformRelationshipFocus(
+      focusedOnWeb,
+      "aws_security_group.sg",
+      VIEW_BG,
+    ).elements;
+    const byId = new Map(focusedOnSg.map((e) => [e.id, e]));
+
+    expect(byId.get("node:aws_security_group.sg")?.strokeColor).toBe("#112233");
+    expect(byId.get("node:aws_security_group.sg")?.backgroundColor).toBe(
+      "#ffaabb",
+    );
+    expect(byId.get("node:aws_security_group.sg")?.fillStyle).toBe("hachure");
+
+    const dimmedVpc = byId.get("node:aws_vpc.main");
+    expect(dimmedVpc?.strokeColor).toBe(washHexColor("#112233", 0.75, VIEW_BG));
+    expect(dimmedVpc?.backgroundColor).toBe(
+      washHexColor("#ffaabb", 0.75, VIEW_BG),
+    );
+    expect(dimmedVpc?.fillStyle).toBe("hachure");
+  });
+
+  it("clearing focus restores stroke/background/fillStyle and clears the originals stash", () => {
+    const original = [
+      resource("aws_instance.web", {
+        strokeColor: "#123456",
+        backgroundColor: "#fedcba",
+        fillStyle: "cross-hatch",
+      }),
+      resource("aws_security_group.sg", {
+        strokeColor: "#123456",
+        backgroundColor: "#fedcba",
+        fillStyle: "cross-hatch",
+        isDeleted: true,
+      }),
+      resource("aws_vpc.main", {
+        strokeColor: "#123456",
+        backgroundColor: "#fedcba",
+        fillStyle: "cross-hatch",
+      }),
+      baseElement("freehand:note", {}, { opacity: 40 }),
+      edge(
+        "edge:web-sg",
+        "dependency",
+        "aws_instance.web",
+        "aws_security_group.sg",
+        {
+          isDeleted: true,
+          strokeColor: "#123456",
+          backgroundColor: "#fedcba",
+          fillStyle: "cross-hatch",
+        },
+      ),
+    ];
+
+    const focused = applyTerraformRelationshipFocus(
+      original,
+      "aws_instance.web",
+      VIEW_BG,
     ).elements;
 
-    const cleared = applyTerraformRelationshipFocus(focused, null);
+    const cleared = applyTerraformRelationshipFocus(focused, null, VIEW_BG);
     const byId = new Map(
       cleared.elements.map((element) => [element.id, element]),
     );
@@ -347,9 +497,21 @@ describe("terraform relationship focus", () => {
     expect(byId.get("edge:web-sg")?.isDeleted).toBe(true);
     expect(byId.get("node:aws_instance.web")?.isDeleted).toBe(false);
     expect(byId.get("node:aws_vpc.main")?.isDeleted).toBe(false);
-    expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
-    expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
-    expect(byId.get("edge:web-sg")?.opacity).toBe(100);
+
+    for (const id of [
+      "node:aws_instance.web",
+      "node:aws_vpc.main",
+      "edge:web-sg",
+      "node:aws_security_group.sg",
+    ]) {
+      const el = byId.get(id);
+      expect(el?.opacity).toBe(100);
+      expect(el?.strokeColor).toBe("#123456");
+      expect(el?.backgroundColor).toBe("#fedcba");
+      expect(el?.fillStyle).toBe("cross-hatch");
+      expect(el?.customData?.terraformDimmedOriginals).toBeUndefined();
+    }
+
     expect(byId.get("freehand:note")?.opacity).toBe(40);
     expect(
       [...byId.values()].some(
@@ -412,7 +574,7 @@ describe("terraform relationship focus", () => {
     expect(focus.relatedNodePaths.has("aws_security_group.sg")).toBe(true);
   });
 
-  describe("semantic overview (topology) ambient opacities", () => {
+  describe("semantic overview (topology) ambient washing", () => {
     it("applies dim edges and primary vs non-primary nodes when focus clears", () => {
       const focused = applyTerraformRelationshipFocus(
         [
@@ -426,17 +588,25 @@ describe("terraform relationship focus", () => {
           ),
         ],
         "aws_instance.web",
+        VIEW_BG,
       ).elements;
 
-      const cleared = applyTerraformRelationshipFocus(focused, null);
+      const cleared = applyTerraformRelationshipFocus(focused, null, VIEW_BG);
       const byId = new Map(cleared.elements.map((e) => [e.id, e]));
 
       expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
-      expect(byId.get("node:aws_vpc.main")?.opacity).toBe(35);
-      expect(byId.get("edge:web-vpc")?.opacity).toBe(22);
+      expect(byId.get("node:aws_instance.web")?.strokeColor).toBe("#000000");
+      expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
+      expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe(
+        expectedWashedStroke(35),
+      );
+      expect(byId.get("edge:web-vpc")?.opacity).toBe(100);
+      expect(byId.get("edge:web-vpc")?.strokeColor).toBe(
+        expectedWashedStroke(22),
+      );
     });
 
-    it("with expand-all view, non-primary resources return to full opacity when focus clears", () => {
+    it("with expand-all view, non-primary resources return to full color when focus clears", () => {
       const focused = applyTerraformRelationshipFocus(
         [
           resource("aws_instance.web", {}, {
@@ -457,14 +627,20 @@ describe("terraform relationship focus", () => {
           ),
         ],
         "aws_instance.web",
+        VIEW_BG,
       ).elements;
 
-      const cleared = applyTerraformRelationshipFocus(focused, null);
+      const cleared = applyTerraformRelationshipFocus(focused, null, VIEW_BG);
       const byId = new Map(cleared.elements.map((e) => [e.id, e]));
 
       expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
+      expect(byId.get("node:aws_instance.web")?.strokeColor).toBe("#000000");
       expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
-      expect(byId.get("edge:web-vpc")?.opacity).toBe(22);
+      expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe("#000000");
+      expect(byId.get("edge:web-vpc")?.opacity).toBe(100);
+      expect(byId.get("edge:web-vpc")?.strokeColor).toBe(
+        expectedWashedStroke(22),
+      );
     });
 
     it("dims terraform module groups when focus clears", () => {
@@ -474,9 +650,11 @@ describe("terraform relationship focus", () => {
           group("group:a", ["aws_instance.web"], {}, true),
         ],
         null,
+        VIEW_BG,
       ).elements;
       const byId = new Map(clearedElements.map((e) => [e.id, e]));
-      expect(byId.get("group:a")?.opacity).toBe(68);
+      expect(byId.get("group:a")?.opacity).toBe(100);
+      expect(byId.get("group:a")?.strokeColor).toBe(expectedWashedStroke(68));
     });
   });
 });

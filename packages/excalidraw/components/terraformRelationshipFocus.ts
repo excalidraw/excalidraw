@@ -8,21 +8,33 @@ import {
   isTerraformResourceElement,
   isTerraformSemanticOverviewScene,
 } from "./terraformElementMetadata";
+import {
+  dimmedTerraformElementOverrides,
+  restoredTerraformElementOverrides,
+} from "./terraformColorWash";
 
-const TERRAFORM_FOCUS_NODE_OPACITY = 100;
-const TERRAFORM_RELATED_OPACITY = 85;
-const TERRAFORM_CONTAINER_OPACITY = 60;
-const TERRAFORM_DIM_NODE_OPACITY = 25;
-const TERRAFORM_DIM_EDGE_OPACITY = 15;
+/**
+ * Semantic dim levels (0–100). Identical numeric scale to the legacy `opacity` knobs
+ * but applied as a color-wash factor (`1 - level / 100`) by `terraformColorWash`,
+ * so dimmed elements still fully cover what's behind them on canvas. `level === 100`
+ * means "no dimming" (and triggers a restore of any previously stashed colors).
+ */
+const TERRAFORM_FOCUS_NODE_LEVEL = 100;
+const TERRAFORM_RELATED_LEVEL = 85;
+const TERRAFORM_CONTAINER_LEVEL = 60;
+const TERRAFORM_DIM_NODE_LEVEL = 25;
+const TERRAFORM_DIM_EDGE_LEVEL = 15;
 
 /** Greyed dependency / data-flow edges when no node is focused. */
-const TERRAFORM_AMBIENT_EDGE_OPACITY = 22;
+const TERRAFORM_AMBIENT_EDGE_LEVEL = 22;
 /** Collapsed overview: non-primary resource cards. */
-const TERRAFORM_AMBIENT_NON_PRIMARY_NODE_OPACITY = 35;
+const TERRAFORM_AMBIENT_NON_PRIMARY_NODE_LEVEL = 35;
 /** Collapsed overview: primary resource cards (see `terraformInitiallyVisible`). */
-const TERRAFORM_AMBIENT_PRIMARY_NODE_OPACITY = 100;
+const TERRAFORM_AMBIENT_PRIMARY_NODE_LEVEL = 100;
 /** Collapsed overview: account/region/VPC/module frame rectangles. */
-const TERRAFORM_AMBIENT_GROUP_OPACITY = 68;
+const TERRAFORM_AMBIENT_GROUP_LEVEL = 68;
+
+const DEFAULT_VIEW_BACKGROUND_COLOR = "#ffffff";
 
 const readTerraformExpandAllViewActive = (
   allElements: readonly ExcalidrawElement[],
@@ -33,14 +45,6 @@ const readTerraformExpandAllViewActive = (
       e.customData?.terraformVisibilityRole === "resource" &&
       e.customData?.terraformExpandAllView === true,
   );
-
-const clearTerraformFocusPreviewData = (
-  customData: ExcalidrawElement["customData"],
-) => {
-  const nextCustomData = { ...(customData ?? {}) };
-  delete nextCustomData.terraformFocusPreview;
-  return nextCustomData;
-};
 
 const getRelationship = (element: ExcalidrawElement) =>
   element.customData?.relationship &&
@@ -108,11 +112,6 @@ const getRelatedNodePathsForEdge = (
 
   return relatedNodePaths;
 };
-
-const getTerraformNodePath = (element: ExcalidrawElement) =>
-  typeof element.customData?.nodePath === "string"
-    ? element.customData.nodePath
-    : null;
 
 /** Graph address for focus / edges (`nodePath`, else `terraformVisibilityKey`). */
 const readTerraformGraphAddress = (
@@ -206,21 +205,75 @@ const isParentGroupOfFocusedNode = (
   );
 };
 
-const getFocusPreviewCustomData = (
+type PreviewAction = "set" | "clear" | "leave";
+
+/**
+ * Builds the wash + opacity + customData patch for one focus update step. Returns
+ * `null` when nothing would change so the caller can keep the original reference.
+ *
+ * - `level >= 100` → restore stashed originals (if any) and ensure `opacity: 100`.
+ * - `level < 100`  → blend stroke / background toward `viewBackgroundColor` and
+ *   stash the originals under `customData.terraformDimmedOriginals`.
+ * - `previewAction` toggles `customData.terraformFocusPreview` independently.
+ */
+const buildTerraformFocusUpdate = (
   element: ExcalidrawElement,
-  shouldReveal: boolean,
-  shouldHideExpiredPreview: boolean,
-) => {
-  if (shouldHideExpiredPreview) {
-    return clearTerraformFocusPreviewData(element.customData);
+  level: number,
+  nextIsDeleted: boolean,
+  previewAction: PreviewAction,
+  viewBackgroundColor: string,
+): ExcalidrawElement | null => {
+  const washPatch =
+    level >= 100
+      ? restoredTerraformElementOverrides(element)
+      : dimmedTerraformElementOverrides(element, level, viewBackgroundColor);
+
+  let nextCustomData: Record<string, any> = washPatch
+    ? { ...washPatch.customData }
+    : { ...(element.customData ?? {}) };
+
+  if (previewAction === "set") {
+    if (nextCustomData.terraformFocusPreview !== true) {
+      nextCustomData = {
+        ...nextCustomData,
+        terraformFocusPreview: true,
+      };
+    }
+  } else if (previewAction === "clear") {
+    if (nextCustomData.terraformFocusPreview !== undefined) {
+      nextCustomData = { ...nextCustomData };
+      delete nextCustomData.terraformFocusPreview;
+    }
   }
-  if (shouldReveal) {
-    return {
-      ...(element.customData ?? {}),
-      terraformFocusPreview: true,
-    };
+
+  const opacityChanged = element.opacity !== 100;
+  const isDeletedChanged = element.isDeleted !== nextIsDeleted;
+  const colorsChanged = washPatch !== null;
+  const prevPreview = element.customData?.terraformFocusPreview === true;
+  const nextPreview = nextCustomData.terraformFocusPreview === true;
+  const previewChanged = prevPreview !== nextPreview;
+
+  if (
+    !opacityChanged &&
+    !isDeletedChanged &&
+    !colorsChanged &&
+    !previewChanged
+  ) {
+    return null;
   }
-  return element.customData;
+
+  return newElementWith(element, {
+    isDeleted: nextIsDeleted,
+    opacity: 100,
+    customData: nextCustomData,
+    ...(washPatch
+      ? {
+          strokeColor: washPatch.strokeColor,
+          backgroundColor: washPatch.backgroundColor,
+          fillStyle: washPatch.fillStyle,
+        }
+      : {}),
+  });
 };
 
 export const getTerraformRelationshipFocus = (
@@ -263,11 +316,23 @@ export const getTerraformRelationshipFocus = (
 export const applyTerraformRelationshipFocus = (
   allElements: readonly ExcalidrawElement[],
   focusNodePath: string | null,
+  viewBackgroundColor: string = DEFAULT_VIEW_BACKGROUND_COLOR,
 ) => {
   const { focusedNodePaths, relatedNodePaths, focusedEdgeIds } =
     getTerraformRelationshipFocus(allElements, focusNodePath);
   const elementById = new Map(allElements.map((e) => [e.id, e]));
   let didChange = false;
+
+  const trackChange = (
+    element: ExcalidrawElement,
+    updated: ExcalidrawElement | null,
+  ) => {
+    if (updated) {
+      didChange = true;
+      return updated;
+    }
+    return element;
+  };
 
   const nextElements = allElements.map((element) => {
     const isFocusActive = focusNodePath !== null;
@@ -275,12 +340,16 @@ export const applyTerraformRelationshipFocus = (
 
     if (!isFocusActive) {
       if (isPreview) {
-        didChange = true;
-        return newElementWith(element, {
-          isDeleted: true,
-          opacity: 100,
-          customData: clearTerraformFocusPreviewData(element.customData),
-        });
+        return trackChange(
+          element,
+          buildTerraformFocusUpdate(
+            element,
+            TERRAFORM_FOCUS_NODE_LEVEL,
+            true,
+            "clear",
+            viewBackgroundColor,
+          ),
+        );
       }
 
       if (!isTerraformFocusManagedElement(element, elementById)) {
@@ -288,14 +357,16 @@ export const applyTerraformRelationshipFocus = (
       }
 
       if (!isTerraformSemanticOverviewScene(allElements)) {
-        if (element.opacity !== 100) {
-          didChange = true;
-          return newElementWith(element, {
-            opacity: 100,
-            customData: clearTerraformFocusPreviewData(element.customData),
-          });
-        }
-        return element;
+        return trackChange(
+          element,
+          buildTerraformFocusUpdate(
+            element,
+            TERRAFORM_FOCUS_NODE_LEVEL,
+            element.isDeleted,
+            "clear",
+            viewBackgroundColor,
+          ),
+        );
       }
 
       if (element.isDeleted) {
@@ -303,20 +374,18 @@ export const applyTerraformRelationshipFocus = (
       }
 
       const expandAllView = readTerraformExpandAllViewActive(allElements);
-      const clearedCustomData = clearTerraformFocusPreviewData(
-        element.customData,
-      );
 
       if (isTerraformLayerEdge(element)) {
-        const nextOpacity = TERRAFORM_AMBIENT_EDGE_OPACITY;
-        if (element.opacity === nextOpacity) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, {
-          opacity: nextOpacity,
-          customData: clearedCustomData,
-        });
+        return trackChange(
+          element,
+          buildTerraformFocusUpdate(
+            element,
+            TERRAFORM_AMBIENT_EDGE_LEVEL,
+            element.isDeleted,
+            "clear",
+            viewBackgroundColor,
+          ),
+        );
       }
 
       if (isTerraformResourceLikeElement(element, elementById)) {
@@ -326,31 +395,34 @@ export const applyTerraformRelationshipFocus = (
           element.type === "text" &&
           "containerId" in element &&
           Boolean(element.containerId);
-        const nextOpacity = isBoundTerraformLabel
-          ? TERRAFORM_FOCUS_NODE_OPACITY
+        const nextLevel = isBoundTerraformLabel
+          ? TERRAFORM_FOCUS_NODE_LEVEL
           : expandAllView || isPrimary
-            ? TERRAFORM_AMBIENT_PRIMARY_NODE_OPACITY
-            : TERRAFORM_AMBIENT_NON_PRIMARY_NODE_OPACITY;
-        if (element.opacity === nextOpacity) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, {
-          opacity: nextOpacity,
-          customData: clearedCustomData,
-        });
+            ? TERRAFORM_AMBIENT_PRIMARY_NODE_LEVEL
+            : TERRAFORM_AMBIENT_NON_PRIMARY_NODE_LEVEL;
+        return trackChange(
+          element,
+          buildTerraformFocusUpdate(
+            element,
+            nextLevel,
+            element.isDeleted,
+            "clear",
+            viewBackgroundColor,
+          ),
+        );
       }
 
       if (isTerraformGroupElement(element)) {
-        const nextOpacity = TERRAFORM_AMBIENT_GROUP_OPACITY;
-        if (element.opacity === nextOpacity) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, {
-          opacity: nextOpacity,
-          customData: clearedCustomData,
-        });
+        return trackChange(
+          element,
+          buildTerraformFocusUpdate(
+            element,
+            TERRAFORM_AMBIENT_GROUP_LEVEL,
+            element.isDeleted,
+            "clear",
+            viewBackgroundColor,
+          ),
+        );
       }
 
       return element;
@@ -358,9 +430,9 @@ export const applyTerraformRelationshipFocus = (
 
     if (isTerraformLayerEdge(element)) {
       const isFocusedEdge = focusedEdgeIds.has(element.id);
-      const nextOpacity = isFocusedEdge
-        ? TERRAFORM_RELATED_OPACITY
-        : TERRAFORM_DIM_EDGE_OPACITY;
+      const nextLevel = isFocusedEdge
+        ? TERRAFORM_RELATED_LEVEL
+        : TERRAFORM_DIM_EDGE_LEVEL;
       const shouldReveal = isFocusedEdge && element.isDeleted;
       const shouldHideExpiredPreview = !isFocusedEdge && isPreview;
       const nextIsDeleted = shouldHideExpiredPreview
@@ -368,47 +440,43 @@ export const applyTerraformRelationshipFocus = (
         : shouldReveal
         ? false
         : element.isDeleted;
-      const nextCustomData = getFocusPreviewCustomData(
+      const previewAction: PreviewAction = shouldHideExpiredPreview
+        ? "clear"
+        : shouldReveal
+          ? "set"
+          : "leave";
+
+      return trackChange(
         element,
-        shouldReveal,
-        shouldHideExpiredPreview,
+        buildTerraformFocusUpdate(
+          element,
+          nextLevel,
+          nextIsDeleted,
+          previewAction,
+          viewBackgroundColor,
+        ),
       );
-
-      if (
-        element.opacity === nextOpacity &&
-        element.isDeleted === nextIsDeleted &&
-        !shouldReveal &&
-        !shouldHideExpiredPreview
-      ) {
-        return element;
-      }
-
-      didChange = true;
-      return newElementWith(element, {
-        isDeleted: nextIsDeleted,
-        opacity: nextOpacity,
-        customData: nextCustomData,
-      });
     }
 
     if (isTerraformResourceLikeElement(element, elementById)) {
       const nodePath = resolveTerraformFocusNodePath(element, elementById);
       const isFocusNode = nodePath === focusNodePath;
       const isRelatedNode = Boolean(nodePath && relatedNodePaths.has(nodePath));
-      const cardOpacity = isFocusNode
-        ? TERRAFORM_FOCUS_NODE_OPACITY
+      const cardLevel = isFocusNode
+        ? TERRAFORM_FOCUS_NODE_LEVEL
         : isRelatedNode
-          ? TERRAFORM_RELATED_OPACITY
-          : TERRAFORM_DIM_NODE_OPACITY;
-      // Bound labels share the same dimming as their card and become unreadable at 25%.
-      // Keep label text at full opacity so resource names stay visible during hover focus.
+          ? TERRAFORM_RELATED_LEVEL
+          : TERRAFORM_DIM_NODE_LEVEL;
+      // Bound labels share the same dimming as their card and become unreadable when
+      // washed toward white. Keep label text at full color so resource names stay
+      // visible during hover focus.
       const isBoundTerraformLabel =
         element.type === "text" &&
         "containerId" in element &&
         Boolean(element.containerId);
-      const nextOpacity = isBoundTerraformLabel
-        ? TERRAFORM_FOCUS_NODE_OPACITY
-        : cardOpacity;
+      const nextLevel = isBoundTerraformLabel
+        ? TERRAFORM_FOCUS_NODE_LEVEL
+        : cardLevel;
       const shouldReveal = (isFocusNode || isRelatedNode) && element.isDeleted;
       const shouldHideExpiredPreview =
         !isFocusNode && !isRelatedNode && isPreview;
@@ -417,27 +485,22 @@ export const applyTerraformRelationshipFocus = (
         : shouldReveal
         ? false
         : element.isDeleted;
-      const nextCustomData = getFocusPreviewCustomData(
+      const previewAction: PreviewAction = shouldHideExpiredPreview
+        ? "clear"
+        : shouldReveal
+          ? "set"
+          : "leave";
+
+      return trackChange(
         element,
-        shouldReveal,
-        shouldHideExpiredPreview,
+        buildTerraformFocusUpdate(
+          element,
+          nextLevel,
+          nextIsDeleted,
+          previewAction,
+          viewBackgroundColor,
+        ),
       );
-
-      if (
-        element.opacity === nextOpacity &&
-        element.isDeleted === nextIsDeleted &&
-        !shouldReveal &&
-        !shouldHideExpiredPreview
-      ) {
-        return element;
-      }
-
-      didChange = true;
-      return newElementWith(element, {
-        isDeleted: nextIsDeleted,
-        opacity: nextOpacity,
-        customData: nextCustomData,
-      });
     }
 
     if (isTerraformGroupElement(element)) {
@@ -445,9 +508,9 @@ export const applyTerraformRelationshipFocus = (
         element,
         focusedNodePaths,
       );
-      const nextOpacity = isFocusedParent
-        ? TERRAFORM_CONTAINER_OPACITY
-        : TERRAFORM_DIM_NODE_OPACITY;
+      const nextLevel = isFocusedParent
+        ? TERRAFORM_CONTAINER_LEVEL
+        : TERRAFORM_DIM_NODE_LEVEL;
       const shouldReveal = isFocusedParent && element.isDeleted;
       const shouldHideExpiredPreview = !isFocusedParent && isPreview;
       const nextIsDeleted = shouldHideExpiredPreview
@@ -455,27 +518,22 @@ export const applyTerraformRelationshipFocus = (
         : shouldReveal
         ? false
         : element.isDeleted;
-      const nextCustomData = getFocusPreviewCustomData(
+      const previewAction: PreviewAction = shouldHideExpiredPreview
+        ? "clear"
+        : shouldReveal
+          ? "set"
+          : "leave";
+
+      return trackChange(
         element,
-        shouldReveal,
-        shouldHideExpiredPreview,
+        buildTerraformFocusUpdate(
+          element,
+          nextLevel,
+          nextIsDeleted,
+          previewAction,
+          viewBackgroundColor,
+        ),
       );
-
-      if (
-        element.opacity === nextOpacity &&
-        element.isDeleted === nextIsDeleted &&
-        !shouldReveal &&
-        !shouldHideExpiredPreview
-      ) {
-        return element;
-      }
-
-      didChange = true;
-      return newElementWith(element, {
-        isDeleted: nextIsDeleted,
-        opacity: nextOpacity,
-        customData: nextCustomData,
-      });
     }
 
     return element;

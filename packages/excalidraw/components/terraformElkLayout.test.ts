@@ -229,11 +229,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
     });
     expect((tfEdges[0] as any).startArrowhead).toBe(null);
     expect((tfEdges[0] as any).endArrowhead).toBe("arrow");
-    expect(
-      Math.max(...frames.map((frame) => elements.indexOf(frame))),
-    ).toBeLessThan(Math.min(...tfEdges.map((edge) => elements.indexOf(edge))));
+    // Edges sit behind everything (incl. frames), then frames, then resource rects.
     expect(
       Math.max(...tfEdges.map((edge) => elements.indexOf(edge))),
+    ).toBeLessThan(Math.min(...frames.map((frame) => elements.indexOf(frame))));
+    expect(
+      Math.max(...frames.map((frame) => elements.indexOf(frame))),
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
