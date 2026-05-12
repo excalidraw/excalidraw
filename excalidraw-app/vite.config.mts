@@ -123,12 +123,18 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 0,
     },
     plugins: [
+      // SEO: sitemap is emitted here; crawl rules live in /public/robots.txt (do not
+      // enable generateRobotsTxt on this plugin without merging those rules). For richer
+      // crawls of the marketing homepage only, consider prerendering `/` in CI and
+      // merging HTML into build/index.html (see vite-plugin-prerender / react-snap).
       Sitemap({
         hostname: "https://tfdraw.io",
         outDir: "build",
-        changefreq: "monthly",
-        // its static in public folder
+        changefreq: "weekly",
+        priority: 1,
         generateRobotsTxt: false,
+        dynamicRoutes: ["/"],
+        exclude: ["/excalidraw-plus-export"],
       }),
       woff2BrowserPlugin(),
       react(),

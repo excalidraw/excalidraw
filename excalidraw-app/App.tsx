@@ -1,3 +1,4 @@
+import polyfill from "@excalidraw/excalidraw/polyfill";
 import {
   Excalidraw,
   LiveCollaborationTrigger,
@@ -33,7 +34,6 @@ import {
   isRunningInIframe,
   isDevEnv,
 } from "@excalidraw/common";
-import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -141,16 +141,18 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
-import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
-
-import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
 
+import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+
+import "./index.scss";
+
 polyfill();
+
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
@@ -200,18 +202,19 @@ if (window.self !== window.top) {
   }
 }
 
-const shareableLinkConfirmDialog = {
-  title: t("overwriteConfirm.modal.shareableLink.title"),
-  description: (
-    <Trans
-      i18nKey="overwriteConfirm.modal.shareableLink.description"
-      bold={(text) => <strong>{text}</strong>}
-      br={() => <br />}
-    />
-  ),
-  actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
-  color: "danger",
-} as const;
+const getShareableLinkConfirmDialog = () =>
+  ({
+    title: t("overwriteConfirm.modal.shareableLink.title"),
+    description: (
+      <Trans
+        i18nKey="overwriteConfirm.modal.shareableLink.description"
+        bold={(text) => <strong>{text}</strong>}
+        br={() => <br />}
+      />
+    ),
+    actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
+    color: "danger",
+  }) as const;
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
@@ -258,7 +261,7 @@ const initializeScene = async (opts: {
       // don't prompt for collab scenes because we don't override local storage
       roomLinkData ||
       // otherwise, prompt whether user wants to override current scene
-      (await openConfirmModal(shareableLinkConfirmDialog))
+      (await openConfirmModal(getShareableLinkConfirmDialog()))
     ) {
       if (jsonBackendMatch) {
         const imported = await importFromBackend(
@@ -312,7 +315,7 @@ const initializeScene = async (opts: {
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
-        (await openConfirmModal(shareableLinkConfirmDialog))
+        (await openConfirmModal(getShareableLinkConfirmDialog()))
       ) {
         return { scene: data, isExternalScene };
       }
@@ -1323,35 +1326,44 @@ const LandingPage = () => {
 
   return (
     <main id="top" className="landing-page">
-      <nav className="landing-nav" aria-label="tfdraw.io">
-        <a className="landing-nav__brand" href="#top">
-          <img
-            className="landing-nav__logo"
-            src="/tfdraw-logo.png"
-            alt=""
-            aria-hidden="true"
-          />
-          tfdraw.io
-        </a>
-        <div className="landing-nav__links">
-          <a href="#workflow">Workflow</a>
-          <a href="#use-cases">Use cases</a>
-          <button
-            type="button"
-            className="landing-cta"
-            onClick={scrollToCanvas}
-          >
-            View changes
-          </button>
-        </div>
-      </nav>
+      <header className="landing-nav-wrap">
+        <nav className="landing-nav" aria-label="tfdraw.io">
+          <a className="landing-nav__brand" href="#top">
+            <img
+              className="landing-nav__logo"
+              src="/tfdraw-logo.png"
+              alt=""
+              aria-hidden="true"
+            />
+            tfdraw.io
+          </a>
+          <div className="landing-nav__links">
+            <a href="#terraform-canvas">Terraform canvas</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#use-cases">Use cases</a>
+            <a href="#faq">FAQ</a>
+            <button
+              type="button"
+              className="landing-cta"
+              onClick={scrollToCanvas}
+            >
+              View changes
+            </button>
+          </div>
+        </nav>
+      </header>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">Keep your architecture diagram in sync with your terraform.</p>
-          <h1 id="landing-title">Your terraform is your architecture diagram .</h1>
+          <p className="landing-hero__eyebrow">
+            Keep your architecture diagram in sync with your Terraform.
+          </p>
+          <h1 id="landing-title">
+            Terraform as a living architecture diagram
+          </h1>
           <p className="landing-hero__lede">
-            tfdraw.io maps Terraform state and plans into a living architecture
-            canvas, so teams can coordinate faster.
+            tfdraw.io maps Terraform state, tfplan JSON, and graph data into an
+            editable architecture canvas so platform teams can visualize changes,
+            review plans, and annotate the real infrastructure model.
           </p>
           <div className="landing-hero__actions">
             <button
@@ -1411,11 +1423,13 @@ const LandingPage = () => {
       <section
         id="terraform-canvas"
         className="landing-canvas-section"
-        aria-label="Embedded Terraform architecture canvas"
+        aria-labelledby="terraform-canvas-heading"
       >
         <div className="landing-canvas-section__header">
           <p>Live architecture view</p>
-          <h2>See what is built. See what will change.</h2>
+          <h2 id="terraform-canvas-heading">
+            See what is built. See what will change.
+          </h2>
         </div>
         <div
           className="landing-canvas-instructions"
@@ -1456,10 +1470,16 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="landing-strip" aria-label="Product highlights">
+      <section
+        className="landing-strip"
+        aria-labelledby="landing-strip-title"
+      >
+        <h2 id="landing-strip-title" className="landing-strip__heading">
+          Source-backed view for platform teams
+        </h2>
         <p>
-          For platform teams turning state, plans, and reviews into one
-          source-backed architecture view.
+          Turn Terraform state, plans, and reviews into one architecture canvas
+          your team can read together.
         </p>
         <div>
           <span>Terraform state</span>
@@ -1505,31 +1525,37 @@ const LandingPage = () => {
         </ol>
       </section>
 
-      <section className="landing-features" aria-label="Feature highlights">
-        <article>
-          <span>01</span>
-          <h3>The diagram is the source-backed view</h3>
-          <p>
-            There is no separate architecture diagram to keep in sync with what
-            Terraform actually manages.
-          </p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>Plan semantics at a glance</h3>
-          <p>
-            Replace Terraform plan noise with visual architecture changes your
-            team can scan and discuss.
-          </p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>Ready for shared reviews</h3>
-          <p>
-            Hosted review mode can synchronize the actual built and changing
-            view for multiple users.
-          </p>
-        </article>
+      <section className="landing-features" aria-labelledby="features-title">
+        <div className="landing-section-heading">
+          <p>Product</p>
+          <h2 id="features-title">Why teams use tfdraw.io</h2>
+        </div>
+        <div className="landing-features__grid">
+          <article>
+            <span>01</span>
+            <h3>The diagram is the source-backed view</h3>
+            <p>
+              There is no separate architecture diagram to keep in sync with
+              what Terraform actually manages.
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Plan semantics at a glance</h3>
+            <p>
+              Replace Terraform plan noise with visual architecture changes your
+              team can scan and discuss.
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Ready for shared reviews</h3>
+            <p>
+              Hosted review mode can synchronize the actual built and changing
+              view for multiple users.
+            </p>
+          </article>
+        </div>
       </section>
 
       <section
@@ -1549,6 +1575,61 @@ const LandingPage = () => {
           <span>Architecture reviews</span>
           <span>Change approvals</span>
         </div>
+      </section>
+
+      <section
+        id="faq"
+        className="landing-faq"
+        aria-labelledby="faq-title"
+      >
+        <div className="landing-section-heading">
+          <p>FAQ</p>
+          <h2 id="faq-title">Terraform visualization questions</h2>
+        </div>
+        <dl className="landing-faq__list">
+          <div className="landing-faq__item">
+            <dt>How do I visualize a Terraform plan in tfdraw.io?</dt>
+            <dd>
+              Save a binary plan with{" "}
+              <code>terraform plan -out=tfplan.bin</code>, export JSON with{" "}
+              <code>terraform show -json tfplan.bin</code>, optionally export
+              matching state and graph files, redact secrets, then import the
+              files into the on-page canvas.
+            </dd>
+          </div>
+          <div className="landing-faq__item">
+            <dt>Does tfdraw.io replace Terraform or HCL?</dt>
+            <dd>
+              No. It is a read-and-annotate view on top of Terraform outputs. You
+              keep HCL, modules, and workflows in Git; the canvas reflects what
+              state and plans say is true in the environment.
+            </dd>
+          </div>
+          <div className="landing-faq__item">
+            <dt>What files does the canvas use?</dt>
+            <dd>
+              Typical imports include Terraform state JSON, plan JSON, and a DOT
+              graph from <code>terraform graph</code>. Exact formats can evolve;
+              the instructions above the canvas list the current export steps.
+            </dd>
+          </div>
+          <div className="landing-faq__item">
+            <dt>Can I share a diagram with my team?</dt>
+            <dd>
+              The product supports collaboration and shareable review flows so
+              multiple people can inspect the same architecture view. Use the
+              in-app sharing options when you are in the full editor experience.
+            </dd>
+          </div>
+          <div className="landing-faq__item">
+            <dt>Is my Terraform data uploaded to a server?</dt>
+            <dd>
+              Treat exports as sensitive. Redact plan JSON before sharing, and
+              follow your org data policy. Prefer local review until you confirm
+              how your deployment handles persistence and collaboration.
+            </dd>
+          </div>
+        </dl>
       </section>
 
       <section className="landing-final" aria-labelledby="final-title">
