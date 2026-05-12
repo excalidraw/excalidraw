@@ -308,43 +308,99 @@ body.terraform-canvas-landing #root {
 
 .landing-hero__sketch {
   position: relative;
-  min-height: 430px;
+  min-height: 470px;
   isolation: isolate;
 }
 
-.landing-hero__sketch::before,
-.landing-hero__sketch::after {
+.landing-topology,
+.landing-service,
+.landing-link,
+.landing-note {
+  position: absolute;
+}
+
+.landing-topology {
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.72);
+  box-shadow: 8px 10px 0 rgba(22, 33, 29, 0.13);
+}
+
+.landing-topology::before {
   content: "";
   position: absolute;
-  inset: 11% 5% 13% 3%;
-  border: 3px solid rgba(22, 33, 29, 0.78);
-  border-radius: 38% 45% 35% 42%;
-  transform: rotate(-4deg);
+  pointer-events: none;
+  inset: 10px;
+  border: 2px dashed rgba(22, 33, 29, 0.18);
+  border-radius: 6px;
 }
 
-.landing-hero__sketch::after {
-  inset: 29% 1% 30% 16%;
-  border-color: rgba(49, 95, 153, 0.82);
-  transform: rotate(8deg);
-}
-
-.landing-node {
+.landing-topology__label {
   position: absolute;
-  z-index: 1;
+  top: -14px;
+  left: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.2rem 0.62rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 999px;
+  background: #fffaf0;
+  box-shadow: 3px 4px 0 rgba(22, 33, 29, 0.12);
+  font: 800 0.78rem "Assistant", "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.landing-topology--account {
+  inset: 11% 5% 13% 3%;
+  background: linear-gradient(
+      135deg,
+      rgba(217, 164, 47, 0.18),
+      rgba(255, 250, 240, 0.86) 42%,
+      rgba(15, 139, 95, 0.1)
+    ),
+    #fffaf0;
+}
+
+.landing-topology--region {
+  inset: 14% 8% 12% 9%;
+  border-color: rgba(49, 95, 153, 0.92);
+  background: rgba(225, 236, 251, 0.58);
+  box-shadow: 6px 7px 0 rgba(49, 95, 153, 0.14);
+}
+
+.landing-topology--vpc {
+  inset: 29% 6% 19% 6%;
+  display: flex;
+  gap: clamp(0.35rem, 0.8vw, 0.75rem);
+  align-items: center;
+  justify-content: center;
+  padding: 2.1rem 1.25rem 1rem;
+  border-color: rgba(15, 139, 95, 0.95);
+  background: rgba(223, 244, 232, 0.7);
+  box-shadow: 5px 6px 0 rgba(15, 139, 95, 0.13);
+}
+
+.landing-service {
+  z-index: 2;
   display: grid;
+  position: relative;
   place-items: center;
-  min-width: 88px;
-  min-height: 58px;
-  padding: 0.45rem 0.7rem;
+  width: clamp(58px, 6.2vw, 82px);
+  min-height: 52px;
+  padding: 0.35rem 0.45rem;
   border: 2px solid var(--landing-ink);
   border-radius: 8px;
   background: #fffaf0;
   box-shadow: 5px 6px 0 rgba(22, 33, 29, 0.16);
-  font: 800 1.05rem "Assistant", "Segoe UI", sans-serif;
+  font: 800 0.82rem "Assistant", "Segoe UI", sans-serif;
   text-transform: uppercase;
 }
 
-.landing-node::before {
+.landing-service::before {
   content: "";
   position: absolute;
   inset: 6px;
@@ -353,8 +409,31 @@ body.terraform-canvas-landing #root {
   transform: rotate(-2deg);
 }
 
+.landing-service--igw {
+  background: #ffffff;
+}
+
+.landing-service--alb {
+  background: #dff4e8;
+}
+
+.landing-service--lambda {
+  background: #ffe7a3;
+}
+
+.landing-service--s3 {
+  background: #ffffff;
+}
+
+.landing-service--sqs {
+  background: #f7d8ce;
+}
+
+.landing-service--nat {
+  background: #e1ecfb;
+}
+
 .landing-note {
-  position: absolute;
   z-index: 2;
   max-width: 150px;
   color: rgba(22, 33, 29, 0.82);
@@ -363,19 +442,22 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-note--top {
-  top: 0;
-  right: 12%;
+  top: 4%;
+  right: 2%;
   transform: rotate(5deg);
 }
 
 .landing-note--bottom {
   right: 0;
-  bottom: 0;
+  bottom: 3%;
   transform: rotate(-4deg);
 }
 
 .landing-link {
-  position: absolute;
+  z-index: 1;
+  position: relative;
+  flex: 0 0 clamp(18px, 2vw, 34px);
+  width: clamp(18px, 2vw, 34px);
   height: 3px;
   border-radius: 999px;
   background: var(--landing-ink);
@@ -395,54 +477,23 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-link--a {
-  top: 30%;
-  left: 29%;
-  width: 38%;
-  transform: rotate(12deg);
+  transform: rotate(0deg);
 }
 
 .landing-link--b {
-  top: 50%;
-  left: 38%;
-  width: 31%;
-  transform: rotate(30deg);
+  transform: rotate(0deg);
 }
 
 .landing-link--c {
-  top: 68%;
-  left: 18%;
-  width: 35%;
-  transform: rotate(-18deg);
+  transform: rotate(0deg);
 }
 
-.landing-node--vpc {
-  top: 8%;
-  left: 9%;
-  background: #dff4e8;
+.landing-link--d {
+  transform: rotate(0deg);
 }
 
-.landing-node--alb {
-  top: 25%;
-  right: 4%;
-  background: #e1ecfb;
-}
-
-.landing-node--lambda {
-  top: 48%;
-  left: 25%;
-  background: #ffe7a3;
-}
-
-.landing-node--queue {
-  right: 14%;
-  bottom: 13%;
-  background: #f7d8ce;
-}
-
-.landing-node--state {
-  left: 0;
-  bottom: 23%;
-  background: #ffffff;
+.landing-link--e {
+  transform: rotate(0deg);
 }
 
 .landing-strip,
@@ -700,15 +751,36 @@ body.terraform-canvas-landing #root {
     text-align: center;
   }
 
-  .landing-node {
-    min-width: 70px;
-    min-height: 48px;
-    font-size: 0.88rem;
+  .landing-topology--account {
+    inset: 9% 1% 13% 0;
   }
 
-  .landing-link--a {
-    left: 31%;
-    width: 28%;
+  .landing-topology--region {
+    inset: 15% 5% 11% 6%;
+  }
+
+  .landing-topology--vpc {
+    inset: 28% 5% 15% 6%;
+    gap: 0.22rem;
+    padding-inline: 0.45rem;
+  }
+
+  .landing-topology__label {
+    left: 10px;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+  }
+
+  .landing-service {
+    width: 48px;
+    min-height: 44px;
+    font-size: 0.62rem;
+  }
+
+  .landing-link {
+    flex-basis: 9px;
   }
 
   .landing-canvas-section {

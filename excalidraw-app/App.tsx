@@ -1359,19 +1359,33 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="landing-hero__sketch" aria-hidden="true">
-          <span className="landing-note landing-note--top">
-            plan diff lands here
-          </span>
-          <span className="landing-node landing-node--vpc">vpc</span>
-          <span className="landing-node landing-node--alb">alb</span>
-          <span className="landing-node landing-node--lambda">lambda</span>
-          <span className="landing-node landing-node--queue">sqs</span>
-          <span className="landing-node landing-node--state">tfstate</span>
-          <span className="landing-link landing-link--a" />
-          <span className="landing-link landing-link--b" />
-          <span className="landing-link landing-link--c" />
+          <div className="landing-topology landing-topology--account">
+            <span className="landing-topology__label">aws account</span>
+            <div className="landing-topology landing-topology--region">
+              <span className="landing-topology__label">region</span>
+              <div className="landing-topology landing-topology--vpc">
+                <span className="landing-topology__label">vpc</span>
+                <span className="landing-service landing-service--igw">igw</span>
+                <span className="landing-link landing-link--a" />
+                <span className="landing-service landing-service--alb">alb</span>
+                <span className="landing-link landing-link--b" />
+                <span className="landing-service landing-service--lambda">
+                  lambda
+                </span>
+                <span className="landing-link landing-link--c" />
+                <span className="landing-service landing-service--s3">s3</span>
+                <span className="landing-link landing-link--d" />
+                <span className="landing-service landing-service--sqs">sqs</span>
+                <span className="landing-link landing-link--e" />
+                <span className="landing-service landing-service--nat">
+                  nat
+                </span>
+              </div>
+            </div>
+          </div>
+          <span className="landing-note landing-note--top">semantic view</span>
           <span className="landing-note landing-note--bottom">
-            annotate the source-backed view
+            allplanmodules.json
           </span>
         </div>
       </section>
