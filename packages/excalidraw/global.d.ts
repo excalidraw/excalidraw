@@ -33,6 +33,8 @@ interface Clipboard extends EventTarget {
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };
+type ITXtChunk = { name: "iTXt"; data: Uint8Array };
+type PNGChunk = { name: string; data: Uint8Array };
 
 declare module "png-chunk-text" {
   function encode(
@@ -42,11 +44,11 @@ declare module "png-chunk-text" {
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
 declare module "png-chunks-encode" {
-  function encode(chunks: TEXtChunk[]): Uint8Array<ArrayBuffer>;
+  function encode(chunks: PNGChunk[]): Uint8Array<ArrayBuffer>;
   export = encode;
 }
 declare module "png-chunks-extract" {
-  function extract(buffer: Uint8Array): TEXtChunk[];
+  function extract(buffer: Uint8Array): PNGChunk[];
   export = extract;
 }
 // -----------------------------------------------------------------------------
