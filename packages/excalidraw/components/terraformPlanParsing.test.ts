@@ -21,6 +21,33 @@ const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
 const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
 const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
 
+/** Minimal raw Terraform state (`terraform state pull` shape) for state-only import tests. */
+const MINIMAL_TFSTATE = JSON.stringify({
+  version: 4,
+  terraform_version: "1.0.0",
+  serial: 1,
+  lineage: "fixture-lineage",
+  outputs: {},
+  resources: [
+    {
+      mode: "managed",
+      type: "aws_s3_bucket",
+      name: "fixture_bucket",
+      provider: 'provider["registry.terraform.io/hashicorp/aws"]',
+      instances: [
+        {
+          schema_version: 0,
+          attributes: {
+            bucket: "demo-fixture-bucket",
+            region: "us-east-1",
+          },
+          dependencies: [],
+        },
+      ],
+    },
+  ],
+});
+
 /** Minimal `File` stand-in: Vitest’s jsdom `File` / `Blob` may omit `.text()`. */
 function textFileLike(contents: string): File {
   return {
@@ -157,6 +184,45 @@ describe("terraformPlanParsing", () => {
 
   afterAll(() => {
     vi.restoreAllMocks();
+  });
+
+  it(
+    "state-only import runs ELK pipeline without plan or dot",
+    async () => {
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(MINIMAL_TFSTATE),
+        {},
+      );
+
+      expect(res.ok).toBe(true);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.meta?.layoutEngine).toBe("elk");
+      expect(Array.isArray(body.elements)).toBe(true);
+      expect(body.elements.length).toBeGreaterThan(0);
+      const labels = renderedLabels(body.elements);
+      expect(
+        labels.some(
+          (label) =>
+            label.includes("fixture_bucket") ||
+            label.includes("aws_s3_bucket") ||
+            label.includes("demo-fixture-bucket"),
+        ),
+      ).toBe(true);
+    },
+    60_000,
+  );
+
+  it("state-only with semanticLayout returns 400", async () => {
+    const res = await terraformPlanParsing(null, null, textFileLike(MINIMAL_TFSTATE), {
+      semanticLayout: true,
+    });
+    expect(res.ok).toBe(false);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/Semantic layout requires/i);
   });
 
   it(

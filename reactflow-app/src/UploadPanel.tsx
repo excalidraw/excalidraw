@@ -30,29 +30,51 @@ export function UploadPanel({ onSceneLoaded }: Props) {
   const [stateFile, setStateFile] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
+  const hasPlanAndDot = Boolean(planFile && dotFile);
+  const canImport = hasPlanAndDot || Boolean(stateFile && !planFile && !dotFile);
+
   const setError = (message: string) => {
     setStatus({ kind: "error", message });
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!planFile || !dotFile) {
-      setError("Plan JSON and DOT files are required.");
+    if ((planFile && !dotFile) || (!planFile && dotFile)) {
+      setError(
+        "Select plan JSON and DOT together, or clear both and upload raw Terraform state alone.",
+      );
+      return;
+    }
+    if (!canImport) {
+      setError("Upload plan+DOT (optional state), or a raw state JSON file alone.");
       return;
     }
     try {
       setStatus({ kind: "uploading" });
       const fd = new FormData();
-      fd.append("planFile", planFile);
-      fd.append("dotFile", dotFile);
-      if (stateFile) fd.append("stateFile", stateFile);
+      if (hasPlanAndDot) {
+        fd.append("planFile", planFile!);
+        fd.append("dotFile", dotFile!);
+      }
+      if (stateFile) {
+        fd.append("stateFile", stateFile);
+      }
 
       const uploadRes = await fetch(`${BACKEND_URL}/terraform/upload`, {
         method: "POST",
         body: fd,
       });
-      if (!uploadRes.ok) throw new Error(`Upload failed: ${uploadRes.status}`);
-      const { id } = (await uploadRes.json()) as { id: number };
+      const uploadBody = (await uploadRes.json().catch(() => ({}))) as {
+        error?: string;
+        id?: number;
+      };
+      if (!uploadRes.ok) {
+        throw new Error(uploadBody.error || `Upload failed: ${uploadRes.status}`);
+      }
+      const { id } = uploadBody;
+      if (typeof id !== "number") {
+        throw new Error("Upload response missing id");
+      }
 
       setStatus({ kind: "rendering", uploadId: id });
       const sceneRes = await fetch(
@@ -88,14 +110,14 @@ export function UploadPanel({ onSceneLoaded }: Props) {
         />
       </label>
       <label>
-        state (optional)
+        state (optional with plan+dot, or alone for state-only)
         <input
           type="file"
-          accept=".json,application/json"
+          accept=".tfstate,.json,application/json"
           onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
         />
       </label>
-      <button type="submit" disabled={busy}>
+      <button type="submit" disabled={busy || !canImport}>
         {status.kind === "uploading"
           ? "Uploading..."
           : status.kind === "rendering"

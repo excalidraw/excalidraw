@@ -1,6 +1,7 @@
 /**
- * Modal to upload plan JSON + graph DOT (+ optional state) to the Terraform backend and replace
- * the canvas with the returned Excalidraw scene, or reload a prior upload by numeric id.
+ * Modal to upload plan JSON + graph DOT (optional raw state), or raw Terraform state alone,
+ * to the Terraform backend and replace the canvas with the returned Excalidraw scene,
+ * or reload a prior upload by numeric id.
  */
 import React, { useState } from "react";
 
@@ -91,17 +92,29 @@ const TerraformImportModal = ({
     replaceEditorWithExcalidrawScene(scene);
   };
 
+  const hasPlanAndDot = Boolean(planFile && dotFile);
+  const stateOnly = Boolean(stateFile && !planFile && !dotFile);
+  const canImport = hasPlanAndDot || stateOnly;
+
   /** POST multipart upload then opens the new upload’s Excalidraw document. */
   const handleImport = async () => {
-    if (!planFile || !dotFile) {
+    if ((planFile && !dotFile) || (!planFile && dotFile)) {
+      setError(
+        "Plan JSON and graph DOT must be selected together, or clear both and upload a raw Terraform state file alone.",
+      );
+      return;
+    }
+    if (!canImport) {
       return;
     }
     setLoading(true);
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("planFile", planFile);
-      formData.append("dotFile", dotFile);
+      if (hasPlanAndDot) {
+        formData.append("planFile", planFile!);
+        formData.append("dotFile", dotFile!);
+      }
       if (stateFile) {
         formData.append("stateFile", stateFile);
       }
@@ -119,9 +132,14 @@ const TerraformImportModal = ({
         await loadExcalidrawScene(data.id);
       } else {
         console.log("not using backend");
-        const res = await terraformPlanParsing(planFile, dotFile, stateFile, {
-          semanticLayout,
-        });
+        const res = await terraformPlanParsing(
+          hasPlanAndDot ? planFile : null,
+          hasPlanAndDot ? dotFile : null,
+          stateFile,
+          {
+            semanticLayout,
+          },
+        );
         const scene = await res.json();
         if (!res.ok) {
           const err =
@@ -222,7 +240,11 @@ const TerraformImportModal = ({
             />
           </label>
           <label>
-            State file (.tfstate, optional)
+            State file (.tfstate / state pull JSON)
+            <span className="TerraformImportModal__muted">
+              Optional with plan+dot to enrich nodes; or upload alone for a state-only graph (raw
+              state with a top-level <code>resources</code> array).
+            </span>
             <input
               type="file"
               accept=".tfstate,.json"
@@ -265,13 +287,15 @@ const TerraformImportModal = ({
             title={
               useBackend
                 ? "Semantic layout applies to local import only (uncheck use backend)."
-                : "Nested AWS account / region / VPC / subnet frames from the plan JSON."
+                : hasPlanAndDot
+                  ? "Nested AWS account / region / VPC / subnet frames from the plan JSON."
+                  : "Semantic layout requires plan JSON with resource_changes. Select plan+dot or use ELK for state-only imports."
             }
           >
             <input
               type="checkbox"
               checked={semanticLayout}
-              disabled={loading || useBackend}
+              disabled={loading || useBackend || !hasPlanAndDot}
               onChange={(e) => setSemanticLayout(e.target.checked)}
             />
             Use semantic layout
@@ -280,7 +304,7 @@ const TerraformImportModal = ({
         <div className="TerraformImportModal__settings__buttons">
           <FilledButton
             onClick={handleImport}
-            disabled={!planFile || !dotFile || loading}
+            disabled={!canImport || loading}
           >
             {loading ? "Importing..." : "Import & Open"}
           </FilledButton>

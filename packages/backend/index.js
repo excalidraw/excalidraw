@@ -1,5 +1,5 @@
 /**
- * Express API for Terraform/OpenTofu uploads: multipart plan + DOT (+ optional state) → SQLite row
+ * Express API for Terraform/OpenTofu uploads: multipart plan+DOT and/or raw state → SQLite row
  * and JSON graph; `GET …/excalidraw` runs `nodesToExcalidraw` for the web app import flow.
  */
 const express = require("express");
@@ -78,7 +78,8 @@ app.get("/terraform/test-client", (_req, res) => {
 });
 
 /**
- * Accepts `planFile`, `dotFile`, optional `stateFile`; runs the pipeline; stores JSON `nodes` in SQLite.
+ * Accepts `planFile`+`dotFile` together, and/or `stateFile`.
+ * State-only: raw Terraform state JSON (`resources` array, e.g. `terraform state pull`).
  * Temp multer files are always unlinked in `finally`.
  */
 app.post(
@@ -96,19 +97,63 @@ app.post(
       const stateFile = req.files?.stateFile?.[0];
       uploadedFiles.push(...[planFile, dotFile, stateFile].filter(Boolean));
 
-      if (!planFile || !dotFile) {
-        return res
-          .status(400)
-          .json({ error: "Both planFile and dotFile are required" });
+      const hasPlan = Boolean(planFile);
+      const hasDot = Boolean(dotFile);
+      const hasState = Boolean(stateFile);
+
+      if ((hasPlan && !hasDot) || (!hasPlan && hasDot)) {
+        return res.status(400).json({
+          error:
+            "planFile and dotFile must be supplied together, or omit both and upload stateFile only (raw Terraform state JSON with a top-level \"resources\" array).",
+        });
       }
 
-      const planContent = fs.readFileSync(planFile.path, "utf-8");
-      const dotContent = fs.readFileSync(dotFile.path, "utf-8");
-      const stateContent = stateFile
-        ? fs.readFileSync(stateFile.path, "utf-8")
-        : null;
-      const plan = JSON.parse(planContent);
-      const state = stateContent ? JSON.parse(stateContent) : null;
+      if (!hasPlan && !hasDot && !hasState) {
+        return res.status(400).json({
+          error:
+            "Upload planFile+dotFile (optional stateFile), or stateFile alone.",
+        });
+      }
+
+      let plan;
+      let state = null;
+      let dotContent;
+
+      if (hasPlan && hasDot) {
+        const planContent = fs.readFileSync(planFile.path, "utf-8");
+        dotContent = fs.readFileSync(dotFile.path, "utf-8");
+        try {
+          plan = JSON.parse(planContent);
+        } catch {
+          return res.status(400).json({ error: "planFile must be valid JSON." });
+        }
+        if (stateFile) {
+          const stateContent = fs.readFileSync(stateFile.path, "utf-8");
+          try {
+            state = JSON.parse(stateContent);
+          } catch {
+            return res.status(400).json({ error: "stateFile must be valid JSON." });
+          }
+        }
+      } else {
+        const stateContent = fs.readFileSync(stateFile.path, "utf-8");
+        let parsedState;
+        try {
+          parsedState = JSON.parse(stateContent);
+        } catch {
+          return res.status(400).json({ error: "stateFile must be valid JSON." });
+        }
+        if (!Array.isArray(parsedState.resources)) {
+          return res.status(400).json({
+            error:
+              "state-only uploads require raw Terraform state JSON (top-level \"resources\" array), e.g. output of terraform state pull.",
+          });
+        }
+        state = parsedState;
+        plan = { resource_changes: [] };
+        dotContent = "digraph G {}\n";
+      }
+
       const graph = dot.read(dotContent);
       const structuralPruneMode = normalizeStructuralPruneMode(
         req.body?.structuralPruneMode || req.query?.structuralPruneMode,
@@ -225,8 +270,8 @@ app.post(
 
       const inserted = db.insert(uploads).values({
         data: JSON.stringify(nodes),
-        planFilename: planFile.originalname,
-        dotFilename: dotFile.originalname,
+        planFilename: planFile?.originalname ?? null,
+        dotFilename: dotFile?.originalname ?? null,
         stateFilename: stateFile?.originalname || null,
         nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__")).length,
       }).returning({ id: uploads.id }).get();

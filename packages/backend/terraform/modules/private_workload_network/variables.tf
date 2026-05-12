@@ -8,9 +8,34 @@ variable "vpc_cidr" {
   description = "VPC IPv4 CIDR (used for interface endpoint SG ingress/egress)."
 }
 
+variable "public_subnet_cidrs" {
+  type        = list(string)
+  description = "One public subnet CIDR per AZ (internet gateway + NAT gateway placement)."
+}
+
+variable "private_subnet_cidrs" {
+  type        = list(string)
+  description = "One private subnet CIDR per AZ (default route via NAT for outbound internet)."
+}
+
 variable "intra_subnet_cidrs" {
   type        = list(string)
   description = "One isolated subnet CIDR per AZ (module picks the first N AZs)."
+
+  validation {
+    condition = (
+      length(var.intra_subnet_cidrs) > 0 &&
+      length(var.intra_subnet_cidrs) == length(var.public_subnet_cidrs) &&
+      length(var.intra_subnet_cidrs) == length(var.private_subnet_cidrs)
+    )
+    error_message = "public_subnet_cidrs, private_subnet_cidrs, and intra_subnet_cidrs must be the same non-zero length (one CIDR per AZ)."
+  }
+}
+
+variable "single_nat_gateway" {
+  type        = bool
+  default     = false
+  description = "If true, a single NAT gateway serves all private subnets (lower cost). If false, one NAT gateway per AZ (recommended for production availability)."
 }
 
 variable "interface_endpoint_security_group_name" {
