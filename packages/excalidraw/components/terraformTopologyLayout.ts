@@ -79,6 +79,12 @@ import {
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
 import {
+  albCompanionDrawMetrics,
+  albSatelliteStackHeightPx,
+  buildAlbListenerTargetCluster,
+  filterTopologyAddressesExcludingAlbSatellites,
+} from "./terraformTopologyAlbLinks";
+import {
   buildS3CompanionCluster,
   s3SatelliteStackHeightPx,
 } from "./terraformTopologyS3Links";
@@ -364,8 +370,12 @@ function topologyPrimaryCellFootprintPx(
   const kmsBuild = buildKmsKeyPolicyCluster(nodes, address, arnIndex);
   const sgBuild = buildLambdaSgCluster(nodes, address, arnIndex, plan);
   const cwBuild = buildResourceCloudWatchCluster(nodes, address);
+  const albFootprint = buildAlbListenerTargetCluster(nodes, address, arnIndex);
 
-  const hasLeft = Boolean(iamCluster) || Boolean(kmsBuild.cluster);
+  const hasLeft =
+    Boolean(iamCluster) ||
+    Boolean(kmsBuild.cluster) ||
+    Boolean(albFootprint.cluster);
   const hasSg = Boolean(sgBuild.cluster);
   let w = TOPOLOGY_TIER0_W;
   if (hasLeft && hasSg) {
@@ -483,6 +493,14 @@ function zoneFrameSizeForTopologyAddresses(
       TOPOLOGY_TIER2_H,
       TOPOLOGY_SATELLITE_GAP_PX,
     );
+    const albExtra = albSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
     const sqsExtra = sqsSatelliteStackHeightPx(
       nodes,
       addr,
@@ -493,7 +511,7 @@ function zoneFrameSizeForTopologyAddresses(
     );
     const leftColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
-      [iamExtra, kmsPolicyExtra, s3Extra],
+      [iamExtra, kmsPolicyExtra, s3Extra, albExtra],
     );
     const rightColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
@@ -665,7 +683,11 @@ function vpcFrameDimensionsForZones(
   let perZoneBodyH = 0;
   let maxZoneRouteTableInset = 0;
   for (const z of vpcZs) {
-    const sortedZ = [...z.addresses].sort();
+    const sortedZ = filterTopologyAddressesExcludingAlbSatellites(
+      nodes,
+      arnIndex,
+      [...z.addresses],
+    ).sort((a, b) => a.localeCompare(b));
     const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
     const sizing = routeTableZoneSizing?.get(z.subnetSignature);
     const rtMinW =
@@ -1625,6 +1647,7 @@ type TopologySatelliteLineSpec = {
     | "topology_cloudwatch"
     | "topology_kms"
     | "topology_s3"
+    | "topology_alb"
     | "topology_sqs"
     | "topology_vpc_flow"
     | "topology_vpc_defaults"
@@ -1998,6 +2021,7 @@ function appendTopologyResourceRectangles(
   globalPlacedCloudWatchSatellites: Set<string>,
   globalPlacedS3Satellites: Set<string>,
   globalPlacedSqsSatellites: Set<string>,
+  globalPlacedAlbSatellites: Set<string>,
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
@@ -2049,6 +2073,14 @@ function appendTopologyResourceRectangles(
       TOPOLOGY_TIER2_H,
       TOPOLOGY_SATELLITE_GAP_PX,
     );
+    const albExtra = albSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
     const sqsExtra = sqsSatelliteStackHeightPx(
       nodes,
       addr,
@@ -2059,7 +2091,7 @@ function appendTopologyResourceRectangles(
     );
     const leftColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
-      [iamExtra, kmsPolicyExtra, s3Extra],
+      [iamExtra, kmsPolicyExtra, s3Extra, albExtra],
     );
     const rightColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
@@ -2136,6 +2168,7 @@ function appendTopologyResourceRectangles(
     const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
     const s3Build = buildS3CompanionCluster(nodes, addr, arnIndex);
+    const albBuild = buildAlbListenerTargetCluster(nodes, addr, arnIndex);
     const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
     const { iamW, sgW } = satelliteColumnWidths();
@@ -2169,6 +2202,13 @@ function appendTopologyResourceRectangles(
         strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
+    for (const e of albBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_alb",
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
+      });
+    }
     for (const e of sqsBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
@@ -2185,7 +2225,10 @@ function appendTopologyResourceRectangles(
     }
 
     const hasLeft =
-      Boolean(cluster) || Boolean(kmsBuild.cluster) || Boolean(s3Build.cluster);
+      Boolean(cluster) ||
+      Boolean(kmsBuild.cluster) ||
+      Boolean(s3Build.cluster) ||
+      Boolean(albBuild.cluster);
     const hasSg = Boolean(sgBuild.cluster);
     const hasSqs = Boolean(sqsBuild.cluster);
     const cwHasAlarm = Boolean(cloudWatchBuild.cluster?.alarms.length);
@@ -2351,6 +2394,50 @@ function appendTopologyResourceRectangles(
           skeleton,
           satAddr,
           satXS3 + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+            satelliteTier: m.tier,
+          },
+        );
+        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+      }
+    }
+
+    if (albBuild.cluster) {
+      if (!cluster && !kmsBuild.cluster && !s3Build.cluster) {
+        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
+      }
+      const satXAlb = rx;
+      for (const satAddr of albBuild.cluster.stack) {
+        const m = albCompanionDrawMetrics(
+          nodes,
+          satAddr,
+          iamW,
+          TOPOLOGY_TIER2_W,
+          TOPOLOGY_TIER1_H,
+          TOPOLOGY_TIER2_H,
+        );
+        if (globalPlacedAlbSatellites.has(satAddr)) {
+          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+          continue;
+        }
+        globalPlacedAlbSatellites.add(satAddr);
+        addClusterMember(
+          satAddr,
+          satXAlb + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+        );
+        pushResourceRectangleSkeleton(
+          skeleton,
+          satAddr,
+          satXAlb + m.tileXOffset,
           yLeft,
           m.tileW,
           m.tileH,
@@ -2667,6 +2754,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   const globalPlacedCloudWatchSatellites = new Set<string>();
   const globalPlacedS3Satellites = new Set<string>();
   const globalPlacedSqsSatellites = new Set<string>();
+  const globalPlacedAlbSatellites = new Set<string>();
   const zoneRouteAnchorDebug: TerraformTopologyZoneRouteAnchorDebugRow[] = [];
 
   let accountCursorX = MARGIN;
@@ -2694,11 +2782,16 @@ export async function buildTerraformTopologyExcalidrawScene(
         a.localeCompare(b),
       );
 
-      const regionalAddrs = regionalAddressesFor(
+      const regionalAddrsRaw = regionalAddressesFor(
         regionalBuckets,
         accountId,
         regionName,
       );
+      const regionalAddrs = filterTopologyAddressesExcludingAlbSatellites(
+        nodes,
+        arnIndex,
+        regionalAddrsRaw,
+      ).sort((a, b) => a.localeCompare(b));
       const hasVpc = vpcEntries.length > 0;
       const hasReg = regionalAddrs.length > 0;
       if (!hasVpc && !hasReg) {
@@ -2843,12 +2936,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         : { cols: 0, rows: 0 };
 
       const regDims = hasReg
-        ? zoneFrameSizeForTopologyAddresses(
-            [...regionalAddrs].sort(),
-            nodes,
-            arnIndex,
-            plan,
-          )
+        ? zoneFrameSizeForTopologyAddresses(regionalAddrs, nodes, arnIndex, plan)
         : { w: 0, h: 0 };
 
       let vpcGridW = 0;
@@ -2884,6 +2972,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           globalPlacedCloudWatchSatellites,
           globalPlacedS3Satellites,
           globalPlacedSqsSatellites,
+          globalPlacedAlbSatellites,
           satelliteLineSpecs,
           plan,
         );
@@ -3146,7 +3235,11 @@ export async function buildTerraformTopologyExcalidrawScene(
                   )
                 : [];
 
-            const addrs = [...z.addresses].sort();
+            const addrs = filterTopologyAddressesExcludingAlbSatellites(
+              nodes,
+              arnIndex,
+              [...z.addresses],
+            ).sort((a, b) => a.localeCompare(b));
             const rectIds = z.mergedSupplementaryComposite
               ? appendMergedSubnetCompositeRectangles(
                   skeleton,
@@ -3174,6 +3267,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                   globalPlacedCloudWatchSatellites,
                   globalPlacedS3Satellites,
                   globalPlacedSqsSatellites,
+                  globalPlacedAlbSatellites,
                   satelliteLineSpecs,
                   plan,
                 );
