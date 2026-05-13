@@ -34,6 +34,9 @@ const VIEW_OPTIONS: ReadonlyArray<{
   },
 ];
 
+/** State file upload is off for now; set to `true` to re-enable. */
+const TERRAFORM_STATE_UPLOAD_ENABLED = false;
+
 const TerraformImportModal = ({
   onCloseRequest,
 }: {
@@ -62,15 +65,19 @@ const TerraformImportModal = ({
     onCloseRequest();
   };
 
+  const effectiveStateFile = TERRAFORM_STATE_UPLOAD_ENABLED ? stateFile : null;
+
   const hasPlanAndDot = Boolean(planFile && dotFile);
-  const stateOnly = Boolean(stateFile && !planFile && !dotFile);
+  const stateOnly = Boolean(effectiveStateFile && !planFile && !dotFile);
   const canImport = hasPlanAndDot || stateOnly;
   const semanticViewDisabled = loading || !hasPlanAndDot;
 
   const handleImport = async () => {
     if ((planFile && !dotFile) || (!planFile && dotFile)) {
       setError(
-        "Plan JSON and graph DOT must be selected together, or clear both and upload a raw Terraform state file alone.",
+        TERRAFORM_STATE_UPLOAD_ENABLED
+          ? "Plan JSON and graph DOT must be selected together, or clear both and upload a raw Terraform state file alone."
+          : "Plan JSON and graph DOT must be selected together.",
       );
       return;
     }
@@ -83,7 +90,7 @@ const TerraformImportModal = ({
       const res = await terraformPlanParsing(
         hasPlanAndDot ? planFile : null,
         hasPlanAndDot ? dotFile : null,
-        stateFile,
+        effectiveStateFile,
         {
           semanticLayout: view === "semantic" && hasPlanAndDot,
         },
@@ -128,16 +135,29 @@ const TerraformImportModal = ({
               onChange={(e) => setDotFile(e.target.files?.[0] ?? null)}
             />
           </label>
-          <label>
+          <label
+            className={
+              TERRAFORM_STATE_UPLOAD_ENABLED
+                ? undefined
+                : "TerraformImportModal__inputRow--disabled"
+            }
+          >
             State file (.tfstate / state pull JSON)
             <span className="TerraformImportModal__muted">
-              Optional with plan+dot to enrich nodes; or upload alone for a
-              state-only graph (raw state with a top-level{" "}
-              <code>resources</code> array).
+              {TERRAFORM_STATE_UPLOAD_ENABLED ? (
+                <>
+                  Optional with plan+dot to enrich nodes; or upload alone for a
+                  state-only graph (raw state with a top-level{" "}
+                  <code>resources</code> array).
+                </>
+              ) : (
+                "Temporarily unavailable."
+              )}
             </span>
             <input
               type="file"
               accept=".tfstate,.json"
+              disabled={!TERRAFORM_STATE_UPLOAD_ENABLED}
               onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
             />
           </label>
