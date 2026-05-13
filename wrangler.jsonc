@@ -11,6 +11,9 @@
  *
  * Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
  * Static assets on Workers: https://developers.cloudflare.com/workers/static-assets/binding/
+ *
+ * SPA: rely on assets.not_found_handling (below). Avoid _redirects rules like /* /index.html 200
+ * in the static bundle — Workers validation rejects them as an infinite loop (error 10021).
  */
 {
   "name": "tfdraw-io",
