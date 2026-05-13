@@ -505,9 +505,102 @@ export type LambdaSgGroup = {
 };
 
 export type LambdaSgCluster = {
+  /** Primary resource address (`aws_lambda_function` or `aws_lb`). */
   lambda: string;
   groups: LambdaSgGroup[];
 };
+
+/**
+ * Unique ordered refs from `aws_lb.security_groups`.
+ */
+export function collectLoadBalancerSecurityGroupRefs(
+  nodes: TerraformPlanNodesMap,
+  lbAddress: string,
+  _plan?: unknown,
+): string[] {
+  const node = nodes[lbAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  if (!primary || primary.type !== "aws_lb") {
+    return [];
+  }
+  const values = mergeTerraformPlanResourceValues(primary);
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const flat: string[] = [];
+  flattenStringish(values.security_groups, flat);
+  for (const sid of flat) {
+    if (!seen.has(sid)) {
+      seen.add(sid);
+      out.push(sid);
+    }
+  }
+  return out;
+}
+
+/**
+ * Build SG column for one `aws_lb` (same layout as Lambda SG cluster).
+ */
+export function buildLoadBalancerSgCluster(
+  nodes: TerraformPlanNodesMap,
+  lbAddress: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
+  const refs = collectLoadBalancerSecurityGroupRefs(nodes, lbAddress, plan);
+  if (refs.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const groups: LambdaSgGroup[] = [];
+  const edges: TopologyIamEdge[] = [];
+  const seenSg = new Set<string>();
+
+  for (const ref of refs) {
+    const sgPath = resolveSecurityGroupRefToPath(
+      nodes,
+      lbAddress,
+      ref,
+      arnIndex,
+      idToPath,
+    );
+    if (!sgPath || seenSg.has(sgPath)) {
+      continue;
+    }
+    seenSg.add(sgPath);
+    const rules = collectSecurityGroupRulesForSg(
+      nodes,
+      sgPath,
+      arnIndex,
+      idToPath,
+      plan,
+    );
+    groups.push({ sgPath, rules });
+    edges.push({
+      source: lbAddress,
+      target: sgPath,
+      type: "security_group",
+      label: "security group",
+    });
+    for (const r of rules) {
+      edges.push({
+        source: sgPath,
+        target: r,
+        type: "sg_rule",
+        label: "rule",
+      });
+    }
+  }
+
+  if (groups.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  return {
+    cluster: { lambda: lbAddress, groups },
+    edges,
+  };
+}
 
 /**
  * Build SG column (each SG + rules below) for one Lambda, plus data-flow edges
@@ -590,7 +683,13 @@ export function sgSatelliteStackHeightPx(
   gap: number,
   plan?: unknown,
 ): number {
-  const { cluster } = buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  const node = nodes[address] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  const t = typeof primary?.type === "string" ? primary.type : "";
+  const { cluster } =
+    t === "aws_lb"
+      ? buildLoadBalancerSgCluster(nodes, address, arnIndex, plan)
+      : buildLambdaSgCluster(nodes, address, arnIndex, plan);
   if (!cluster || cluster.groups.length === 0) {
     return 0;
   }

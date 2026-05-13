@@ -678,7 +678,12 @@ describe("computeNatGatewayZonePlacements", () => {
     expect(result.byZone.size).toBe(2);
 
     const az1 = result.byZone.get(
-      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-a"),
+      natZonePlacementsKey(
+        "111111111111",
+        "us-east-1",
+        "vpc-1",
+        "subnet-pub-a",
+      ),
     );
     expect(az1).toBeDefined();
     expect(az1!).toEqual([
@@ -686,7 +691,12 @@ describe("computeNatGatewayZonePlacements", () => {
     ]);
 
     const az2 = result.byZone.get(
-      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-b"),
+      natZonePlacementsKey(
+        "111111111111",
+        "us-east-1",
+        "vpc-1",
+        "subnet-pub-b",
+      ),
     );
     expect(az2).toBeDefined();
     expect(az2!).toEqual([
@@ -759,7 +769,12 @@ describe("computeNatGatewayZonePlacements", () => {
     const result = computeNatGatewayZonePlacements(plan, zones);
     expect(result.byZone.size).toBe(1);
     const az = result.byZone.get(
-      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-a"),
+      natZonePlacementsKey(
+        "111111111111",
+        "us-east-1",
+        "vpc-1",
+        "subnet-pub-a",
+      ),
     )!;
     expect(az).toEqual([
       { natAddress: "aws_nat_gateway.solo", eipAddresses: [] },
@@ -910,8 +925,7 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
   });
 
   it("places aws_lb in subnet zone inferred from aws_instance sharing security_groups", () => {
-    const subnetArn =
-      "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-0work";
+    const subnetArn = "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-0work";
     const plan = {
       ...planWithDefaultAwsAccountRegion,
       resource_changes: [
@@ -1102,5 +1116,138 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
     const lbZone = zones.find((z) => z.addresses.includes("aws_lb.internal"));
     expect(lbZone).toBeDefined();
     expect(lbZone!.subnetIds).toContain("subnet-0lam");
+  });
+
+  it("places aws_lambda_permission in the same zone as the target Lambda", () => {
+    const lambdaArn = "arn:aws:lambda:us-east-1:111111111111:function:myfn";
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.lambda",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-0lam",
+              id: "subnet-0lam",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "module.api.aws_lambda_function.fn",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: lambdaArn,
+              function_name: "myfn",
+              region: "us-east-1",
+              vpc_config: [
+                {
+                  subnet_ids: ["subnet-0lam"],
+                  security_group_ids: ["sg-lambda"],
+                },
+              ],
+            },
+          },
+        },
+        {
+          address: "module.api.aws_lambda_permission.invoke",
+          mode: "managed",
+          type: "aws_lambda_permission",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              function_name: lambdaArn,
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    expect(zones).toHaveLength(1);
+    const z = zones[0]!;
+    expect(z.addresses).toContain("module.api.aws_lambda_function.fn");
+    expect(z.addresses).toContain("module.api.aws_lambda_permission.invoke");
+  });
+
+  it("places LB security_groups and matching rules in the same zone as aws_lb", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.public",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-0pub",
+              id: "subnet-0pub",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_security_group.lb",
+          mode: "managed",
+          type: "aws_security_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              id: "sg-lb01",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_security_group_rule.https",
+          mode: "managed",
+          type: "aws_security_group_rule",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              security_group_id: "sg-lb01",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb.main",
+          mode: "managed",
+          type: "aws_lb",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/x/abc",
+              vpc_id: "vpc-1",
+              subnets: ["subnet-0pub"],
+              security_groups: ["sg-lb01"],
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    const lbZone = zones.find((z) => z.addresses.includes("aws_lb.main"));
+    expect(lbZone).toBeDefined();
+    expect(lbZone!.addresses).toContain("aws_security_group.lb");
+    expect(lbZone!.addresses).toContain("aws_security_group_rule.https");
   });
 });

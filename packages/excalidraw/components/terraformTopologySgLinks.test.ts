@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildLambdaSgCluster,
+  buildLoadBalancerSgCluster,
   buildSecurityGroupIdToPathIndex,
   collectLambdaVpcSecurityGroupRefs,
   collectSecurityGroupRulesForSg,
@@ -147,6 +148,58 @@ describe("terraformTopologySgLinks", () => {
       ),
     ).toBe(true);
     expect(edges.filter((e) => e.type === "sg_rule").length).toBe(2);
+  });
+
+  it("buildLoadBalancerSgCluster links aws_lb security_groups to aws_security_group", () => {
+    const lbArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/x/abc";
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lb.main": {
+        resources: {
+          "aws_lb.main": {
+            address: "aws_lb.main",
+            mode: "managed",
+            type: "aws_lb",
+            change: {
+              actions: ["create"],
+              after: {
+                arn: lbArn,
+                security_groups: ["sg-lb2"],
+              },
+            },
+          },
+        },
+      },
+      "aws_security_group.lb": {
+        resources: {
+          "aws_security_group.lb": {
+            address: "aws_security_group.lb",
+            mode: "managed",
+            type: "aws_security_group",
+            change: {
+              actions: ["create"],
+              after: { id: "sg-lb2", vpc_id: "vpc-1" },
+            },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const { cluster, edges } = buildLoadBalancerSgCluster(
+      nodes,
+      "aws_lb.main",
+      arnIndex,
+    );
+    expect(cluster?.groups).toHaveLength(1);
+    expect(cluster?.groups[0]?.sgPath).toBe("aws_security_group.lb");
+    expect(
+      edges.some(
+        (e) =>
+          e.source === "aws_lb.main" &&
+          e.target === "aws_security_group.lb" &&
+          e.type === "security_group",
+      ),
+    ).toBe(true);
   });
 
   it("resolves Lambda SG ref via security group ARN index", () => {
