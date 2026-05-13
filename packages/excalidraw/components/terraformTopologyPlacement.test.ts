@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   computeRouteTableBottomEdgePlacements,
+  computeVpcRouteTableFanOutAddressesForVpc,
   extractInterfaceEndpointSecurityGroupBuckets,
   extractRouteTablesByVpc,
   extractSupplementarySubnetZones,
   extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
+  mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
 
 import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
@@ -358,6 +360,191 @@ describe("computeRouteTableBottomEdgePlacements", () => {
     expect(vpcBottom[0]!.routeChildrenByTable).toEqual({
       "aws_route_table.rt": [],
     });
+  });
+});
+
+describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
+  it("merges two supplementary aws_subnet-only zones that share one route table", () => {
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_subnet.a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-a",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_subnet.b",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-b",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table.common",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "rtb-1",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.a",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-a",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.b",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-b",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_subnet.a"],
+        topologyZoneSource: "supplementary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-b",
+        subnetIds: ["subnet-b"],
+        addresses: ["aws_subnet.b"],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+    const merged = mergeSupplementarySubnetZonesSharedRouteTable(
+      zones,
+      plan as never,
+    );
+    expect(merged).toHaveLength(1);
+    expect(merged[0]!.subnetSignature).toBe("subnet-a|subnet-b");
+    expect(merged[0]!.mergedSupplementaryComposite).toBe(true);
+  });
+});
+
+describe("computeVpcRouteTableFanOutAddressesForVpc", () => {
+  it("returns route table addresses that hit two or more placement zones", () => {
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.a"],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-b",
+        subnetIds: ["subnet-b"],
+        addresses: ["aws_lambda_function.b"],
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_route_table.rt",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-1",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.assoc",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-a",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.assoc2",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-b",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+      ],
+    };
+    const placements = computeRouteTableBottomEdgePlacements(
+      zones,
+      plan as never,
+    );
+    const fan = computeVpcRouteTableFanOutAddressesForVpc(
+      zones,
+      placements,
+      plan as never,
+      "111111111111",
+      "us-east-1",
+      "vpc-aaa",
+    );
+    expect(fan.has("aws_route_table.rt")).toBe(true);
   });
 });
 

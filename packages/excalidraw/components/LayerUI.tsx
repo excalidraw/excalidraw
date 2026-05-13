@@ -680,6 +680,25 @@ const TerraformElementActions = ({
             {formatTerraformPanelValue(customData.resourceType ?? element.type)}
           </div>
         </div>
+        {customData.terraformSemanticRouteTableDuplicate ? (
+          <div className="terraform-element-actions__row">
+            <div className="terraform-element-actions__label">Note</div>
+            <div className="terraform-element-actions__value">
+              Duplicate tile for semantic subnet-column alignment. Canonical
+              address:{" "}
+              {formatTerraformPanelValue(String(customData.nodePath ?? ""))}.
+            </div>
+          </div>
+        ) : null}
+        {customData.terraformMergedSubnetComposite ? (
+          <div className="terraform-element-actions__row">
+            <div className="terraform-element-actions__label">Note</div>
+            <div className="terraform-element-actions__value">
+              One tile for multiple subnets that share a route table (merged
+              supplementary zones).
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="terraform-element-actions__config">

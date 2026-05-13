@@ -26,6 +26,9 @@ import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
 
+/** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
+export type TopologyZoneSource = "primary" | "supplementary";
+
 export type TopologyPlacementZone = {
   accountId: string;
   region: string;
@@ -34,6 +37,9 @@ export type TopologyPlacementZone = {
   subnetSignature: string;
   subnetIds: string[];
   addresses: string[];
+  topologyZoneSource?: TopologyZoneSource;
+  /** Supplementary-only zones merged because subnets share one route table. */
+  mergedSupplementaryComposite?: boolean;
 };
 
 /** Primary resources with resolved account/region but no VPC (S3, SQS, …). */
@@ -130,7 +136,9 @@ export function routeTableClusterContentHeightPx(routeCount: number): number {
 
 /** Full cluster frame height (matches `appendTopologyResourceRectangles` primaryCluster frame). */
 export function routeTableCompositeHeightPx(routeCount: number): number {
-  return routeTableClusterContentHeightPx(routeCount) + 2 * RT_CLUSTER_FRAME_PAD;
+  return (
+    routeTableClusterContentHeightPx(routeCount) + 2 * RT_CLUSTER_FRAME_PAD
+  );
 }
 
 /** Outer width of one route-table primaryCluster frame. */
@@ -170,6 +178,38 @@ export function routeTableMaxCompositeHeightForRowPx(
     maxH = Math.max(maxH, routeTableCompositeHeightPx(n));
   }
   return maxH;
+}
+
+/**
+ * Vertical distance from the body-bottom anchor midline (tier-0 center) down to the outer
+ * bottom of the `primaryCluster` frame in `appendRouteTableBottomEdgeRectangles`. Using
+ * half of {@link routeTableCompositeHeightPx} is wrong when `aws_route` tiles stack below
+ * the primary — most of the composite sits under the anchor, not split evenly above/below.
+ */
+export function routeTableExtentBelowAnchorMidlinePx(
+  routeCount: number,
+): number {
+  const primaryLower =
+    RT_CLUSTER_PRIMARY_H - Math.round(RT_CLUSTER_PRIMARY_H / 2);
+  const routeBlock =
+    routeCount <= 0
+      ? 0
+      : RT_CLUSTER_SAT_GAP +
+        routeCount * RT_CLUSTER_TIER2_H +
+        (routeCount - 1) * RT_CLUSTER_SAT_GAP;
+  return primaryLower + routeBlock + RT_CLUSTER_FRAME_PAD;
+}
+
+export function routeTableMaxExtentBelowAnchorForRowPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  let maxE = 0;
+  for (const addr of tableAddrs) {
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    maxE = Math.max(maxE, routeTableExtentBelowAnchorMidlinePx(n));
+  }
+  return maxE;
 }
 
 type ResourceChange = {
@@ -816,7 +856,9 @@ export function computeRouteTableBottomEdgePlacements(
         );
       }
 
-      const routesForTable = [...(rtidToRoutes.get(meta.rtbId) ?? new Set())].sort();
+      const routesForTable = [
+        ...(rtidToRoutes.get(meta.rtbId) ?? new Set()),
+      ].sort();
 
       if (zonePick) {
         const zk = `${meta.accountId}\0${meta.region}\0${meta.vpcId}\0${zonePick.subnetSignature}`;
@@ -913,11 +955,313 @@ export function computeRouteTableBottomEdgePlacements(
   return { zoneBottom, vpcBottom };
 }
 
+function resourceChangeForAddress(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  address: string,
+): ResourceChange | null {
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  for (const rc of changes) {
+    if (rc.address === address) {
+      return rc as ResourceChange;
+    }
+  }
+  return null;
+}
+
+/** Each subnet id → route table ids from `aws_route_table_association` (usually size 1). */
+function buildSubnetIdToRouteTableIdsMap(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_route_table_association") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const rtid = stringField(values.route_table_id);
+    const sid = stringField(values.subnet_id);
+    if (!rtid || !sid || !rtid.startsWith("rtb-")) {
+      continue;
+    }
+    if (!out.has(sid)) {
+      out.set(sid, new Set());
+    }
+    out.get(sid)!.add(rtid);
+  }
+  return out;
+}
+
+function zoneAddressesAreAllAwsSubnet(
+  z: TopologyPlacementZone,
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): boolean {
+  if (z.addresses.length === 0) {
+    return false;
+  }
+  for (const addr of z.addresses) {
+    const rc = resourceChangeForAddress(plan, addr);
+    if (!rc || rc.type !== "aws_subnet") {
+      return false;
+    }
+  }
+  return true;
+}
+
+function singleRouteTableIdForSubnets(
+  subnetIds: readonly string[],
+  sidToRtbs: ReadonlyMap<string, Set<string>>,
+): string | null {
+  let common: string | null = null;
+  for (const sid of subnetIds) {
+    const set = sidToRtbs.get(sid);
+    if (!set || set.size !== 1) {
+      return null;
+    }
+    const rt = [...set][0]!;
+    if (common === null) {
+      common = rt;
+    } else if (common !== rt) {
+      return null;
+    }
+  }
+  return common;
+}
+
+function routeTableIdForZoneSubnets(
+  z: TopologyPlacementZone,
+  sidToRtbs: ReadonlyMap<string, Set<string>>,
+): string | null {
+  return singleRouteTableIdForSubnets(z.subnetIds, sidToRtbs);
+}
+
+function sortPlacementZones(
+  a: TopologyPlacementZone,
+  b: TopologyPlacementZone,
+): number {
+  if (a.accountId !== b.accountId) {
+    return a.accountId.localeCompare(b.accountId);
+  }
+  if (a.region !== b.region) {
+    return a.region.localeCompare(b.region);
+  }
+  if (a.vpcId !== b.vpcId) {
+    return a.vpcId.localeCompare(b.vpcId);
+  }
+  return a.subnetSignature.localeCompare(b.subnetSignature);
+}
+
+/**
+ * Merge supplementary `aws_subnet`-only zones in the same VPC when every subnet in the union
+ * associates to exactly one shared route table id (generic; not tier-specific).
+ */
+export function mergeSupplementarySubnetZonesSharedRouteTable(
+  zones: readonly TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyPlacementZone[] {
+  const sidToRtbs = buildSubnetIdToRouteTableIdsMap(plan);
+  const primary = zones.filter((z) => z.topologyZoneSource !== "supplementary");
+  const supplementary = zones.filter(
+    (z) => z.topologyZoneSource === "supplementary",
+  );
+  const byVpc = new Map<string, TopologyPlacementZone[]>();
+  for (const z of supplementary) {
+    if (!zoneAddressesAreAllAwsSubnet(z, plan)) {
+      continue;
+    }
+    const vk = `${z.accountId}\0${z.region}\0${z.vpcId}`;
+    if (!byVpc.has(vk)) {
+      byVpc.set(vk, []);
+    }
+    byVpc.get(vk)!.push(z);
+  }
+
+  const mergedSupp: TopologyPlacementZone[] = [];
+  const passthroughSupp: TopologyPlacementZone[] = [];
+
+  for (const z of supplementary) {
+    if (!zoneAddressesAreAllAwsSubnet(z, plan)) {
+      passthroughSupp.push(z);
+    }
+  }
+
+  for (const [, group] of byVpc) {
+    if (group.length < 2) {
+      mergedSupp.push(...group);
+      continue;
+    }
+    const n = group.length;
+    const adj: number[][] = Array.from({ length: n }, () => []);
+    for (let i = 0; i < n; i++) {
+      const ri = routeTableIdForZoneSubnets(group[i]!, sidToRtbs);
+      if (!ri) {
+        continue;
+      }
+      for (let j = i + 1; j < n; j++) {
+        const rj = routeTableIdForZoneSubnets(group[j]!, sidToRtbs);
+        if (rj && ri === rj) {
+          adj[i]!.push(j);
+          adj[j]!.push(i);
+        }
+      }
+    }
+    const seen = new Set<number>();
+    for (let i = 0; i < n; i++) {
+      if (seen.has(i)) {
+        continue;
+      }
+      const stack = [i];
+      const comp: number[] = [];
+      seen.add(i);
+      while (stack.length) {
+        const u = stack.pop()!;
+        comp.push(u);
+        for (const v of adj[u] ?? []) {
+          if (!seen.has(v)) {
+            seen.add(v);
+            stack.push(v);
+          }
+        }
+      }
+      if (comp.length < 2) {
+        for (const idx of comp) {
+          mergedSupp.push(group[idx]!);
+        }
+        continue;
+      }
+      const subnets = new Set<string>();
+      const addrs = new Set<string>();
+      for (const idx of comp) {
+        const zz = group[idx]!;
+        for (const sid of zz.subnetIds) {
+          subnets.add(sid);
+        }
+        for (const a of zz.addresses) {
+          addrs.add(a);
+        }
+      }
+      const subnetIds = [...subnets].sort();
+      if (singleRouteTableIdForSubnets(subnetIds, sidToRtbs) == null) {
+        for (const idx of comp) {
+          mergedSupp.push(group[idx]!);
+        }
+        continue;
+      }
+      const z0 = group[comp[0]!]!;
+      mergedSupp.push({
+        accountId: z0.accountId,
+        region: z0.region,
+        vpcId: z0.vpcId,
+        subnetSignature: subnetIds.join("|"),
+        subnetIds,
+        addresses: [...addrs].sort(),
+        topologyZoneSource: "supplementary",
+        mergedSupplementaryComposite: true,
+      });
+    }
+  }
+
+  return [...primary, ...mergedSupp, ...passthroughSupp].sort(
+    sortPlacementZones,
+  );
+}
+
+/**
+ * Route table addresses on the VPC bottom strip that should be drawn per intersecting subnet
+ * column instead (shared RT whose subnets span multiple placement zones).
+ */
+export function computeVpcRouteTableFanOutAddressesForVpc(
+  zones: readonly TopologyPlacementZone[],
+  placements: TopologyRouteTableBottomPlacements,
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): ReadonlySet<string> {
+  const row = placements.vpcBottom.find(
+    (x) =>
+      x.accountId === accountId && x.region === regionName && x.vpcId === vpcId,
+  );
+  if (!row || row.addresses.length === 0) {
+    return new Set();
+  }
+  const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const addrToMeta = buildRouteTableAddressToMeta(plan);
+  const vpcZones = zones.filter(
+    (z) =>
+      z.accountId === accountId &&
+      z.region === regionName &&
+      z.vpcId === vpcId &&
+      z.subnetIds.length > 0,
+  );
+  const out = new Set<string>();
+  for (const addr of row.addresses) {
+    const meta = addrToMeta.get(addr);
+    if (!meta) {
+      continue;
+    }
+    const subnetSet = rtidToSubnets.get(meta.rtbId);
+    if (!subnetSet || subnetSet.size === 0) {
+      continue;
+    }
+    let hit = 0;
+    for (const z of vpcZones) {
+      if (z.subnetIds.some((sid) => subnetSet.has(sid))) {
+        hit++;
+        if (hit >= 2) {
+          break;
+        }
+      }
+    }
+    if (hit >= 2) {
+      out.add(addr);
+    }
+  }
+  return out;
+}
+
+/** Subnet ids associated with this `aws_route_table` Terraform address (via RT id in plan). */
+export function subnetSetForRouteTableAddress(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  routeTableAddress: string,
+): ReadonlySet<string> | null {
+  const meta = buildRouteTableAddressToMeta(plan).get(routeTableAddress);
+  if (!meta) {
+    return null;
+  }
+  const set = buildRouteTableIdToSubnetIdsFromPlan(plan).get(meta.rtbId);
+  return set ?? null;
+}
+
 /** Per subnet-zone row: table count, min inner width, and tallest composite (for frame inset). */
 export type RouteTableZoneBottomSizing = {
   tableCount: number;
   minInnerWidthPx: number;
   maxCompositeHeightPx: number;
+  /** Subnet-zone frame bottom padding so route clusters are not clipped by the parent frame. */
+  maxExtentBelowAnchorPx: number;
 };
 
 export function buildRouteTableZoneSizingMapForVpc(
@@ -943,6 +1287,10 @@ export function buildRouteTableZoneSizingMapForVpc(
           z.addresses,
           z.routeChildrenByTable,
         ),
+        maxExtentBelowAnchorPx: routeTableMaxExtentBelowAnchorForRowPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
       });
     }
   }
@@ -957,13 +1305,12 @@ export function vpcBottomRouteTablesRowSizing(
 ): {
   minInnerWidthPx: number;
   maxCompositeHeightPx: number;
+  maxExtentBelowAnchorPx: number;
   tableCount: number;
 } | null {
   const row = placements.vpcBottom.find(
     (x) =>
-      x.accountId === accountId &&
-      x.region === regionName &&
-      x.vpcId === vpcId,
+      x.accountId === accountId && x.region === regionName && x.vpcId === vpcId,
   );
   if (!row || row.addresses.length === 0) {
     return null;
@@ -975,6 +1322,10 @@ export function vpcBottomRouteTablesRowSizing(
       row.routeChildrenByTable,
     ),
     maxCompositeHeightPx: routeTableMaxCompositeHeightForRowPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+    maxExtentBelowAnchorPx: routeTableMaxExtentBelowAnchorForRowPx(
       row.addresses,
       row.routeChildrenByTable,
     ),
