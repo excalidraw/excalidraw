@@ -66,9 +66,16 @@ import {
   isTerraformInspectableElement,
   isTerraformLayerEdge,
   isTerraformResourceElement,
+  getTerraformGraphAddressForElement,
 } from "./terraformElementMetadata";
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
-import { repairTerraformEdgeBindings } from "./terraformVisibility";
+import {
+  buildTerraformReconcileOptionsForAppState,
+  getTerraformEdgeHoverPeekKeyFromHoveredIds,
+  getTerraformEdgeLayer,
+  reconcileTerraformVisibility,
+  repairTerraformEdgeBindings,
+} from "./terraformVisibility";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -184,20 +191,14 @@ type TerraformContainerFacet = {
   sources?: string[];
 };
 
-const getHoveredTerraformNodePath = (
-  allElements: readonly ExcalidrawElement[],
-  hoveredElementIds: AppState["hoveredElementIds"],
-) => {
-  const hoveredTerraformResource = allElements.find(
-    (element) =>
-      hoveredElementIds[element.id] &&
-      element.customData?.terraformVisibilityRole === "resource" &&
-      typeof element.customData?.nodePath === "string",
-  );
-  return typeof hoveredTerraformResource?.customData?.nodePath === "string"
-    ? hoveredTerraformResource.customData.nodePath
-    : null;
-};
+const terraformEdgesVisibilitySig = (
+  els: readonly ExcalidrawElement[],
+): string =>
+  els
+    .filter((e) => getTerraformEdgeLayer(e))
+    .map((e) => `${e.id}:${e.isDeleted ? 1 : 0}`)
+    .sort()
+    .join(";");
 
 const tryParseJsonString = (value: string): unknown | null => {
   const trimmed = value.trim();
@@ -831,7 +832,7 @@ const LayerUI = ({
 
   React.useEffect(() => {
     const allElements = app.scene.getElementsIncludingDeleted();
-    const hoveredNodePath = getHoveredTerraformNodePath(
+    const hoveredPeek = getTerraformEdgeHoverPeekKeyFromHoveredIds(
       allElements,
       appState.hoveredElementIds,
     );
@@ -839,30 +840,47 @@ const LayerUI = ({
       elements,
       appState,
     );
-    const selectedNodePath =
-      terraformElement &&
-      isTerraformResourceElement(terraformElement) &&
-      typeof terraformElement.customData?.nodePath === "string"
-        ? terraformElement.customData.nodePath
+    const selectedGraphKey =
+      terraformElement && isTerraformResourceElement(terraformElement)
+        ? getTerraformGraphAddressForElement(terraformElement)
         : null;
-    const activeFocusNodePath = hoveredNodePath || selectedNodePath;
+    const activeFocusNodePath = hoveredPeek || selectedGraphKey;
     const result = applyTerraformRelationshipFocus(
       allElements,
       activeFocusNodePath,
       appState.viewBackgroundColor,
     );
 
-    if (result.didChange) {
-      app.scene.replaceAllElements(
-        result.shouldRepairBindings
-          ? repairTerraformEdgeBindings(result.elements)
-          : result.elements,
+    const pinReconcile = buildTerraformReconcileOptionsForAppState(
+      appState.terraformEdgeLayerPins,
+      activeFocusNodePath,
+    );
+    let next = result.elements;
+    if (pinReconcile) {
+      next = reconcileTerraformVisibility(
+        repairTerraformEdgeBindings(next),
+        pinReconcile,
       );
+    } else if (result.shouldRepairBindings) {
+      next = repairTerraformEdgeBindings(next);
     }
+
+    if (
+      !result.didChange &&
+      (appState.terraformEdgeLayerPins == null ||
+        terraformEdgesVisibilitySig(next) ===
+          terraformEdgesVisibilitySig(allElements))
+    ) {
+      return;
+    }
+
+    app.scene.replaceAllElements(next);
   }, [
     app,
     appState,
     appState.hoveredElementIds,
+    appState.selectedElementIds,
+    appState.terraformEdgeLayerPins,
     appState.viewBackgroundColor,
     elements,
   ]);

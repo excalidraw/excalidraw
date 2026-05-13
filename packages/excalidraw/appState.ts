@@ -128,6 +128,8 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    terraformEdgeLayerPins: null,
+    terraformEdgeHoverPeekKey: null,
   };
 };
 
@@ -254,6 +256,8 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  terraformEdgeLayerPins: { browser: true, export: true, server: true },
+  terraformEdgeHoverPeekKey: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

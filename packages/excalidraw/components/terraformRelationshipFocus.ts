@@ -3,6 +3,7 @@ import { newElementWith } from "@excalidraw/element";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
+  getTerraformGraphAddressForElement,
   isTerraformGroupElement,
   isTerraformLayerEdge,
   isTerraformResourceElement,
@@ -104,26 +105,6 @@ const getRelatedNodePathsForEdge = (
   return relatedNodePaths;
 };
 
-/** Graph address for focus / edges (`nodePath`, else `terraformVisibilityKey`). */
-const readTerraformGraphAddress = (
-  element: ExcalidrawElement | undefined,
-): string | null => {
-  if (!element?.customData) {
-    return null;
-  }
-  const cd = element.customData;
-  if (typeof cd.nodePath === "string" && cd.nodePath.length > 0) {
-    return cd.nodePath;
-  }
-  if (
-    typeof cd.terraformVisibilityKey === "string" &&
-    cd.terraformVisibilityKey.length > 0
-  ) {
-    return cd.terraformVisibilityKey;
-  }
-  return null;
-};
-
 /**
  * Bound label text may omit `nodePath` while its container card has it. Without the
  * same address as the rectangle, related-node reveal leaves the label soft-deleted and
@@ -133,7 +114,7 @@ const resolveTerraformFocusNodePath = (
   element: ExcalidrawElement,
   elementById: ReadonlyMap<string, ExcalidrawElement>,
 ): string | null => {
-  const own = readTerraformGraphAddress(element);
+  const own = getTerraformGraphAddressForElement(element);
   if (own) {
     return own;
   }
@@ -143,7 +124,9 @@ const resolveTerraformFocusNodePath = (
     typeof element.containerId === "string" &&
     element.containerId
   ) {
-    return readTerraformGraphAddress(elementById.get(element.containerId));
+    return getTerraformGraphAddressForElement(
+      elementById.get(element.containerId),
+    );
   }
   return null;
 };

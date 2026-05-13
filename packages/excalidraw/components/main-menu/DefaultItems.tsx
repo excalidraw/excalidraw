@@ -1,7 +1,6 @@
 import clsx from "clsx";
 
 import { THEME } from "@excalidraw/common";
-import { newElementWith } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
@@ -36,7 +35,11 @@ import {
 import {
   collapseAllTerraformExplode,
   expandAllTerraformExplode,
+  buildTerraformReconcileOptionsForAppState,
+  getTerraformEdgeLayer,
+  inferLegacyTerraformEdgePinsFromElements,
   isTerraformExpandAllActive,
+  reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "../terraformVisibility";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
@@ -72,24 +75,9 @@ import "./DefaultItems.scss";
 
 type TerraformEdgeLayer = "dependency" | "dataFlow" | "networking";
 
-const getTerraformEdgeLayer = (element: { customData?: Record<string, any> }) =>
-  element.customData?.terraformEdgeLayer === "dependency" ||
-  element.customData?.terraformEdgeLayer === "dataFlow" ||
-  element.customData?.terraformEdgeLayer === "networking"
-    ? element.customData.terraformEdgeLayer
-    : null;
-
 const isTerraformDependencyPreviewEdge = (element: {
   customData?: Record<string, any>;
 }) => element.customData?.terraformDependencyPreview === true;
-
-const clearTerraformDependencyPreviewData = (
-  customData: Record<string, any> | undefined,
-) => {
-  const nextCustomData = { ...(customData ?? {}) };
-  delete nextCustomData.terraformDependencyPreview;
-  return nextCustomData;
-};
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -212,10 +200,14 @@ export const TerraformExpandAllToggle = () => {
       onSelect={(event) => {
         event.preventDefault();
         const els = app.scene.getElementsIncludingDeleted();
+        const reconcileOpts = buildTerraformReconcileOptionsForAppState(
+          app.state.terraformEdgeLayerPins,
+          app.state.terraformEdgeHoverPeekKey,
+        );
         app.scene.replaceAllElements(
           isTerraformExpandAllActive(els)
-            ? collapseAllTerraformExplode(els)
-            : expandAllTerraformExplode(els),
+            ? collapseAllTerraformExplode(els, reconcileOpts)
+            : expandAllTerraformExplode(els, reconcileOpts),
         );
       }}
       aria-label="Expand all Terraform nodes"
@@ -234,16 +226,22 @@ const TerraformLayerItem = ({
   children: React.ReactNode;
 }) => {
   const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
   const allElements = app.scene.getElementsIncludingDeleted();
   const hasLayer = allElements.some(
     (element) => getTerraformEdgeLayer(element) === layer,
   );
-  const checked = elements.some(
-    (element) =>
-      getTerraformEdgeLayer(element) === layer &&
-      (layer !== "dependency" || !isTerraformDependencyPreviewEdge(element)),
-  );
+  const pins = app.state.terraformEdgeLayerPins;
+  const checked =
+    pins != null
+      ? pins[layer]
+      : elements.some(
+          (element) =>
+            getTerraformEdgeLayer(element) === layer &&
+            (layer !== "dependency" ||
+              !isTerraformDependencyPreviewEdge(element)),
+        );
 
   if (!hasLayer) {
     return null;
@@ -254,23 +252,23 @@ const TerraformLayerItem = ({
       checked={checked}
       onSelect={(event) => {
         const nextChecked = !checked;
-        const nextElements = allElements.map((element) => {
-          if (getTerraformEdgeLayer(element) !== layer) {
-            return element;
-          }
-          return newElementWith(element, {
-            isDeleted: !nextChecked,
-            ...(layer === "dependency"
-              ? {
-                  opacity: 100,
-                  customData: clearTerraformDependencyPreviewData(
-                    element.customData,
-                  ),
-                }
-              : null),
-          });
+        let basePins = pins;
+        if (basePins == null) {
+          basePins = inferLegacyTerraformEdgePinsFromElements(allElements);
+        }
+        const updatedPins = { ...basePins, [layer]: nextChecked };
+        setAppState({
+          terraformEdgeLayerPins: updatedPins,
         });
-        app.scene.replaceAllElements(repairTerraformEdgeBindings(nextElements));
+        app.scene.replaceAllElements(
+          reconcileTerraformVisibility(
+            repairTerraformEdgeBindings(allElements),
+            {
+              pins: updatedPins,
+              hoverPeekKey: app.state.terraformEdgeHoverPeekKey ?? null,
+            },
+          ),
+        );
         event.preventDefault();
       }}
     >
