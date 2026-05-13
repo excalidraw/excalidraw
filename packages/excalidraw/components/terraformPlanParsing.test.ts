@@ -190,7 +190,10 @@ describe("resolveTerraformPlanNodeKey", () => {
 
 describe("terraformPlanParsing", () => {
   beforeAll(() => {
-    vi.spyOn(console, "log").mockImplementation(() => {});
+    /** Hide `[terraform:local-parse]` noise unless `VITEST_TERRAFORM_VERBOSE=1`. */
+    if (process.env.VITEST_TERRAFORM_VERBOSE !== "1") {
+      vi.spyOn(console, "log").mockImplementation(() => {});
+    }
   });
 
   afterAll(() => {
@@ -346,13 +349,106 @@ describe("terraformPlanParsing", () => {
     const omitted = (plan.resource_changes || []).filter(
       (rc: any) => !represented.has(rc.address),
     );
-    expect(omitted.map((rc: any) => rc.type)).toEqual([
-      "terraform_data",
-      "terraform_data",
-      "terraform_data",
-    ]);
-    expect(body.meta?.representedResourceCount).toBe(102);
+    const omittedTypes = omitted.map((rc: any) => rc.type).sort();
+    expect(omittedTypes).toEqual(
+      [
+        ...Array(6).fill("aws_route_table_association"),
+        "terraform_data",
+        "terraform_data",
+        "terraform_data",
+      ].sort(),
+    );
+    expect(body.meta?.representedResourceCount).toBe(96);
     expect(body.meta?.omittedResourceCount).toBe(3);
+
+    const zd = body.meta?.zoneRouteAnchorDebug as
+      | Array<{
+          zoneContentBodyHPx: number;
+          routeAnchorBodyHPx: number;
+        }>
+      | undefined;
+    if (Array.isArray(zd) && zd.length > 0) {
+      expect(
+        zd.some((r) => r.zoneContentBodyHPx < r.routeAnchorBodyHPx - 1),
+      ).toBe(true);
+    }
+  }, 60_000);
+
+  /**
+   * Serialized semantic response (same contract as saved scenes): frames must fully contain
+   * direct children or Excalidraw will clip — catches route-table / primaryCluster overflow.
+   */
+  it("allplanmodules semantic: topology frames contain direct children (layout sanity)", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("topology");
+
+    type SerEl = {
+      type?: string;
+      id?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      frameId?: string | null;
+      isDeleted?: boolean;
+      customData?: { terraformTopologyRole?: string };
+    };
+
+    const elements = body.elements as SerEl[];
+    const eps = 6;
+    const axisBounds = (el: SerEl) => {
+      const w = el.width ?? 0;
+      const h = el.height ?? 0;
+      return {
+        minX: el.x ?? 0,
+        minY: el.y ?? 0,
+        maxX: (el.x ?? 0) + w,
+        maxY: (el.y ?? 0) + h,
+      };
+    };
+    const isTopoFrame = (e: SerEl) =>
+      e.type === "frame" && Boolean(e.customData?.terraformTopologyRole);
+
+    const frames = elements.filter(isTopoFrame);
+    expect(frames.length).toBeGreaterThan(0);
+
+    for (const frame of frames) {
+      const fid = frame.id;
+      if (!fid) {
+        continue;
+      }
+      const kids = elements.filter((e) => e.frameId === fid && !e.isDeleted);
+      if (kids.length === 0) {
+        continue;
+      }
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const c of kids) {
+        const b = axisBounds(c);
+        minX = Math.min(minX, b.minX);
+        minY = Math.min(minY, b.minY);
+        maxX = Math.max(maxX, b.maxX);
+        maxY = Math.max(maxY, b.maxY);
+      }
+      const fb = axisBounds(frame);
+      const role = frame.customData?.terraformTopologyRole ?? frame.id;
+      expect(fb.minX, `${role} left`).toBeLessThanOrEqual(minX + eps);
+      expect(fb.minY, `${role} top`).toBeLessThanOrEqual(minY + eps);
+      expect(fb.maxX, `${role} right`).toBeGreaterThanOrEqual(maxX - eps);
+      expect(fb.maxY, `${role} bottom`).toBeGreaterThanOrEqual(maxY - eps);
+    }
   }, 60_000);
 });
 
