@@ -26,6 +26,7 @@ pluralith-*.pdf
 *.tgz
 build
 dist
+releases/
 firebase
 logs
 node_modules
