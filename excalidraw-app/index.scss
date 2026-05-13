@@ -239,6 +239,14 @@ body.terraform-canvas-landing #root {
   font: 700 1rem "Assistant", "Segoe UI", sans-serif;
 }
 
+a.landing-cta {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
 .landing-nav .landing-cta {
   min-height: 42px;
   padding: 0.5rem 0.8rem;

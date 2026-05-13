@@ -133,7 +133,7 @@ export default defineConfig(({ mode }) => {
         changefreq: "weekly",
         priority: 1,
         generateRobotsTxt: false,
-        dynamicRoutes: ["/"],
+        dynamicRoutes: ["/", "/demo"],
         exclude: ["/excalidraw-plus-export"],
       }),
       woff2BrowserPlugin(),

@@ -1342,6 +1342,7 @@ const LandingPage = () => {
             <a href="#workflow">Workflow</a>
             <a href="#use-cases">Use cases</a>
             <a href="#faq">FAQ</a>
+            <a href="/demo">Full editor</a>
             <button
               type="button"
               className="landing-cta"
@@ -1380,6 +1381,9 @@ const LandingPage = () => {
             >
               Open the canvas
             </button>
+            <a href="/demo" className="landing-cta">
+              Full editor demo
+            </a>
           </div>
           <div className="landing-proof" aria-label="tfdraw.io values">
             <span>State-backed architecture view</span>
@@ -1664,6 +1668,11 @@ const ExcalidrawApp = () => {
   }
 
   if (import.meta.env.DEV || isTestEnv()) {
+    return <EditorApp />;
+  }
+
+  const pathname = window.location.pathname;
+  if (pathname === "/demo" || pathname === "/demo/") {
     return <EditorApp />;
   }
 
