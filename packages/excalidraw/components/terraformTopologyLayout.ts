@@ -94,9 +94,13 @@ import {
 } from "./terraformVisibility";
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
+import { natZonePlacementsKey } from "./terraformTopologyPlacement";
+
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type {
   TopologyEndpointSecurityGroupBucket,
+  TopologyNatZoneCluster,
+  TopologyNatZonePlacements,
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
   TopologyRouteTableBottomPlacements,
@@ -191,6 +195,14 @@ const VPC_INTERNET_EDGE_TILE_W = TOPOLOGY_TIER2_W;
 const VPC_INTERNET_EDGE_TILE_H = TOPOLOGY_TIER2_H;
 const VPC_INTERNET_EDGE_TILE_GAP = TOPOLOGY_SATELLITE_GAP_PX;
 const VPC_INTERNET_EDGE_GUTTER = VPC_INTERNET_EDGE_TILE_W + px(12);
+
+/**
+ * Horizontal gap between adjacent NAT primaryCluster slots in the zone NAT band
+ * (top-of-zone row, one cluster per `aws_nat_gateway`).
+ */
+const NAT_ZONE_CLUSTER_GAP = px(12);
+/** Gap between the NAT band and the primary grid below it. */
+const NAT_ZONE_BAND_BOTTOM_GAP = px(12);
 
 /** Extra frame height for VPC bottom strip (endpoints + route-table composites). */
 function vpcBottomStripInsetPx(
@@ -600,6 +612,20 @@ function topologyZoneColumns(
   return columns;
 }
 
+function natClustersForZone(
+  natZonePlacements: TopologyNatZonePlacements | undefined,
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): readonly TopologyNatZoneCluster[] {
+  if (!natZonePlacements) {
+    return [];
+  }
+  const key = natZonePlacementsKey(accountId, region, vpcId, subnetSignature);
+  return natZonePlacements.byZone.get(key) ?? [];
+}
+
 /** VPC frame size that fits all subnet-zone cells for this VPC. */
 function vpcFrameDimensionsForZones(
   vpcZs: readonly TopologyPlacementZone[],
@@ -610,6 +636,7 @@ function vpcFrameDimensionsForZones(
   vpcInfrastructureTopPadPx = 0,
   subnetNameById: ReadonlyMap<string, string> = new Map(),
   sideGutterPx = 0,
+  natZonePlacements?: TopologyNatZonePlacements,
 ): {
   w: number;
   h: number;
@@ -645,8 +672,22 @@ function vpcFrameDimensionsForZones(
       sizing && sizing.tableCount > 0
         ? 2 * INNER_PAD + FRAME_CONTENT_SLACK_X + sizing.minInnerWidthPx
         : 0;
-    perZoneW = Math.max(perZoneW, d.w, rtMinW);
-    perZoneBodyH = Math.max(perZoneBodyH, d.h);
+    const natClusters = natClustersForZone(
+      natZonePlacements,
+      z.accountId,
+      z.region,
+      z.vpcId,
+      z.subnetSignature,
+    );
+    const natBandH = natZoneBandTotalHeightPx(natClusters);
+    const natBandMinOuterW =
+      natClusters.length > 0
+        ? 2 * INNER_PAD +
+          FRAME_CONTENT_SLACK_X +
+          natZoneBandMinInnerWidthPx(natClusters)
+        : 0;
+    perZoneW = Math.max(perZoneW, d.w, rtMinW, natBandMinOuterW);
+    perZoneBodyH = Math.max(perZoneBodyH, d.h + natBandH);
     if (sizing && sizing.tableCount > 0) {
       maxZoneRouteTableInset = Math.max(
         maxZoneRouteTableInset,
@@ -1130,6 +1171,198 @@ function appendVpcEndpointEgressRectangles(
   return rectIds;
 }
 
+/** Width of the NAT cluster band content for one cluster (tier-0 wrapped in cluster pad). */
+function natZoneClusterOuterWidthPx(): number {
+  return RESOURCE_RECT_W + 2 * TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+}
+
+/** Outer height of one NAT primaryCluster frame (tier-0 NAT + stacked tier-2 EIPs + 2 × frame pad). */
+function natZoneClusterOuterHeightPx(eipCount: number): number {
+  const tier2Block =
+    eipCount <= 0
+      ? 0
+      : TOPOLOGY_SATELLITE_GAP_PX +
+        eipCount * TOPOLOGY_TIER2_H +
+        Math.max(0, eipCount - 1) * TOPOLOGY_SATELLITE_GAP_PX;
+  return RESOURCE_RECT_H + tier2Block + 2 * TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+}
+
+/** Minimum inner-content width to fit a row of NAT clusters (excludes zone `INNER_PAD`). */
+function natZoneBandMinInnerWidthPx(
+  clusters: readonly TopologyNatZoneCluster[],
+): number {
+  if (clusters.length === 0) {
+    return 0;
+  }
+  return (
+    clusters.length * natZoneClusterOuterWidthPx() +
+    Math.max(0, clusters.length - 1) * NAT_ZONE_CLUSTER_GAP
+  );
+}
+
+/** Height of the NAT band including the bottom gap before the primary grid (0 when empty). */
+function natZoneBandTotalHeightPx(
+  clusters: readonly TopologyNatZoneCluster[],
+): number {
+  if (clusters.length === 0) {
+    return 0;
+  }
+  let maxH = 0;
+  for (const c of clusters) {
+    maxH = Math.max(maxH, natZoneClusterOuterHeightPx(c.eipAddresses.length));
+  }
+  return maxH + NAT_ZONE_BAND_BOTTOM_GAP;
+}
+
+/**
+ * NAT primaryCluster band at the **top** of a subnet zone (one cluster per `aws_nat_gateway`,
+ * EIPs stacked as tier-2 satellites). Mirrors `appendRouteTableBottomEdgeRectangles` shape so
+ * grouping / drag / explode semantics match route-table clusters.
+ *
+ * Returns the cluster frame ids (parents of the NAT rects and their EIP satellites).
+ */
+function appendNatGatewayZoneClusters(
+  skeleton: ExcalidrawElementSkeleton[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+  clusters: readonly TopologyNatZoneCluster[],
+  zoneX: number,
+  zoneY: number,
+  zoneInnerW: number,
+  bandTopY: number,
+  nodes: TerraformPlanNodesMap,
+): string[] {
+  if (clusters.length === 0) {
+    return [];
+  }
+
+  const sorted = [...clusters].sort((a, b) =>
+    a.natAddress.localeCompare(b.natAddress),
+  );
+  const rowW = natZoneBandMinInnerWidthPx(sorted);
+  const innerLeft = zoneX + INNER_PAD;
+  /** Center the row in the zone's inner width — keeps primaries below visually aligned. */
+  const startX = innerLeft + Math.max(0, (zoneInnerW - rowW) / 2);
+  const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+
+  const clusterFrameIds: string[] = [];
+  let cursorX = startX;
+  for (const cluster of sorted) {
+    const { natAddress, eipAddresses } = cluster;
+    const rx = cursorX + pad;
+    const ry = bandTopY + pad;
+
+    const clusterChildIds: string[] = [];
+    let clusterBounds: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    } | null = null;
+    const addClusterMember = (
+      id: string,
+      bx: number,
+      by: number,
+      bw: number,
+      bh: number,
+    ) => {
+      clusterChildIds.push(id);
+      clusterBounds = growClusterBounds(clusterBounds, bx, by, bw, bh);
+    };
+
+    const natNode = nodes[natAddress] as TerraformPlanGraphNode | undefined;
+    const natResourceType = getTerraformCardResourceType(
+      natAddress,
+      getPrimaryResource(natNode) as Record<string, unknown> | null,
+    );
+    const natAction = getTerraformPlanNodeAction(natNode);
+    const natVisible = isInitiallyVisibleTerraformTopologyTile(
+      natResourceType,
+      natAction,
+    );
+
+    addClusterMember(natAddress, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
+    pushResourceRectangleSkeleton(
+      skeleton,
+      natAddress,
+      rx,
+      ry,
+      RESOURCE_RECT_W,
+      RESOURCE_RECT_H,
+      nodes,
+      {
+        initiallyVisible: natVisible,
+        explodeParentKeys: [],
+        natZonePrimary: true,
+      },
+    );
+
+    /** Centered horizontally on the NAT — same offset pattern as `aws_route` tiles under a route table. */
+    const eipTileX = rx + Math.floor((RESOURCE_RECT_W - TOPOLOGY_TIER2_W) / 2);
+    let ySat = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+    for (const eipAddr of eipAddresses) {
+      const eipNode = nodes[eipAddr] as TerraformPlanGraphNode | undefined;
+      const eipResourceType = getTerraformCardResourceType(
+        eipAddr,
+        getPrimaryResource(eipNode) as Record<string, unknown> | null,
+      );
+      const eipAction = getTerraformPlanNodeAction(eipNode);
+      const eipVisible = isInitiallyVisibleTerraformTopologyTile(
+        eipResourceType,
+        eipAction,
+      );
+      addClusterMember(
+        eipAddr,
+        eipTileX,
+        ySat,
+        TOPOLOGY_TIER2_W,
+        TOPOLOGY_TIER2_H,
+      );
+      pushResourceRectangleSkeleton(
+        skeleton,
+        eipAddr,
+        eipTileX,
+        ySat,
+        TOPOLOGY_TIER2_W,
+        TOPOLOGY_TIER2_H,
+        nodes,
+        {
+          initiallyVisible: eipVisible,
+          explodeParentKeys: [natAddress],
+          satelliteTier: 2,
+        },
+      );
+      ySat += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
+    }
+
+    const b = clusterBounds!;
+    const clusterSkId = primaryClusterSkeletonId(natAddress);
+    skeleton.push({
+      type: "frame",
+      id: clusterSkId,
+      name: shortTerraformResourceLabel(natAddress).slice(0, 48),
+      x: b.minX - pad,
+      y: b.minY - pad,
+      width: b.maxX - b.minX + 2 * pad,
+      height: b.maxY - b.minY + 2 * pad,
+      children: clusterChildIds as readonly string[],
+      customData: frameCustomData(
+        "primaryCluster",
+        accountId,
+        regionName,
+        vpcId,
+        clusterSkId,
+        { terraformPrimaryAddress: natAddress },
+      ),
+    });
+    clusterFrameIds.push(clusterSkId);
+
+    cursorX += natZoneClusterOuterWidthPx() + NAT_ZONE_CLUSTER_GAP;
+  }
+  return clusterFrameIds;
+}
+
 function pushResourceRectangleSkeleton(
   skeleton: ExcalidrawElementSkeleton[],
   addr: string,
@@ -1151,6 +1384,11 @@ function pushResourceRectangleSkeleton(
       /** When set, tile is scoped to this subnet zone’s bottom edge. */
       zoneSubnetSignature?: string;
     };
+    /**
+     * Mark this resource as the tier-0 NAT of a subnet zone NAT primaryCluster band
+     * (top-of-zone semantic placement, paired EIPs are tier-2 satellites).
+     */
+    natZonePrimary?: boolean;
     /** When set, skeleton element id (not equal to Terraform `addr` for semantic duplicates). */
     elementId?: string;
     terraformSemanticRouteTableDuplicate?: boolean;
@@ -1246,6 +1484,8 @@ function pushResourceRectangleSkeleton(
                 vpcRouteTable.vpcId,
               ],
             }
+        : options.natZonePrimary
+        ? { terraformTopologyRole: "natGatewayPrimary" as const }
         : {}),
       terraformResources:
         resource &&
@@ -2367,6 +2607,10 @@ export async function buildTerraformTopologyExcalidrawScene(
   vpcDefaultPlumbingBuckets: readonly TopologyVpcDefaultPlumbingBucket[] = [],
   vpcFlowLogBuckets: readonly TopologyVpcFlowLogBucket[] = [],
   endpointSecurityGroupBuckets: readonly TopologyEndpointSecurityGroupBucket[] = [],
+  natZonePlacements: TopologyNatZonePlacements = {
+    byZone: new Map(),
+    consumedAddresses: new Set(),
+  },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
@@ -2504,6 +2748,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             infraTop,
             subnetNameById,
             vpcInternetSideGutterPx(internetEdges),
+            natZonePlacements,
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2567,6 +2812,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             infraTop,
             subnetNameById,
             vpcInternetSideGutterPx(internetEdges),
+            natZonePlacements,
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2850,6 +3096,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           infraTop,
           subnetNameById,
           vpcInternetSideGutterPx(internetEdgeAddrs),
+          natZonePlacements,
         );
         const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
         const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
@@ -2874,6 +3121,31 @@ export async function buildTerraformTopologyExcalidrawScene(
             );
             zoneFrameIds.push(zoneSkId);
 
+            const natClusters = natClustersForZone(
+              natZonePlacements,
+              accountId,
+              regionName,
+              vpcId,
+              z.subnetSignature,
+            );
+            const natBandHeight = natZoneBandTotalHeightPx(natClusters);
+            /** NAT primaryClusters band at the top; primary grid below pushed down by band height. */
+            const natRectIds =
+              natClusters.length > 0
+                ? appendNatGatewayZoneClusters(
+                    skeleton,
+                    accountId,
+                    regionName,
+                    vpcId,
+                    natClusters,
+                    zoneX,
+                    zoneY,
+                    Math.max(0, vd.perZoneW - 2 * INNER_PAD),
+                    zoneY + VPC_TOP_PAD,
+                    nodes,
+                  )
+                : [];
+
             const addrs = [...z.addresses].sort();
             const rectIds = z.mergedSupplementaryComposite
               ? appendMergedSubnetCompositeRectangles(
@@ -2882,7 +3154,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                   addrs,
                   z,
                   zoneX + INNER_PAD,
-                  zoneY + VPC_TOP_PAD,
+                  zoneY + VPC_TOP_PAD + natBandHeight,
                   nodes,
                   arnIndex,
                   plan,
@@ -2893,7 +3165,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                   { accountId, region: regionName, vpcId },
                   addrs,
                   zoneX + INNER_PAD,
-                  zoneY + VPC_TOP_PAD,
+                  zoneY + VPC_TOP_PAD + natBandHeight,
                   nodes,
                   arnIndex,
                   globalPlacedIamSatellites,
@@ -3016,6 +3288,7 @@ export async function buildTerraformTopologyExcalidrawScene(
               width: vd.perZoneW,
               height: vd.perZoneH,
               children: [
+                ...natRectIds,
                 ...rectIds,
                 ...zoneRtRectIds,
                 ...fanOutRtRectIds,

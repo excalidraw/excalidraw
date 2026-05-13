@@ -11,6 +11,7 @@ import {
   pickResourceValuesForTopologyPlacement,
 } from "./terraformTopologyExtract";
 import {
+  computeNatGatewayZonePlacements,
   computeRouteTableBottomEdgePlacements,
   extractInterfaceEndpointSecurityGroupBuckets,
   extractPrimaryTopologyZones,
@@ -493,7 +494,25 @@ export const terraformPlanParsing = async (
     const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
     const vpcEndpointBuckets = extractVpcEndpointsByVpc(semPlan);
     const routeTableBuckets = extractRouteTablesByVpc(semPlan);
-    const vpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(semPlan);
+    const rawVpcDefaultPlumbingBuckets =
+      extractVpcDefaultPlumbingBuckets(semPlan);
+    const natZonePlacements = computeNatGatewayZonePlacements(semPlan, zones);
+    /**
+     * NAT/EIP that we placed inside their public-subnet zone (semantic AZ rendering) must NOT
+     * also appear on the VPC right edge via `appendVpcInternetEdgeRectangles`. Filter them out
+     * before the buckets reach the scene builder.
+     */
+    const vpcDefaultPlumbingBuckets =
+      natZonePlacements.consumedAddresses.size === 0
+        ? rawVpcDefaultPlumbingBuckets
+        : rawVpcDefaultPlumbingBuckets
+            .map((b) => ({
+              ...b,
+              addresses: b.addresses.filter(
+                (a) => !natZonePlacements.consumedAddresses.has(a),
+              ),
+            }))
+            .filter((b) => b.addresses.length > 0);
     const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
     const endpointSecurityGroupBuckets =
       extractInterfaceEndpointSecurityGroupBuckets(semPlan, vpcEndpointBuckets);
@@ -519,6 +538,7 @@ export const terraformPlanParsing = async (
       vpcDefaultPlumbingBuckets,
       vpcFlowLogBuckets,
       endpointSecurityGroupBuckets,
+      natZonePlacements,
     );
     const represented = collectSemanticRepresentedResourceAddresses(
       topoScene.elements as Array<{ customData?: Record<string, any> }>,

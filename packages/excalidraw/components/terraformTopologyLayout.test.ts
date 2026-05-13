@@ -1135,7 +1135,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ]);
   });
 
-  it("places IGW on the VPC left edge and NAT/EIP on the right edge", async () => {
+  it("places NAT+EIP inside the public subnet zone (semantic AZ) and IGW on the VPC left edge", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -1176,6 +1176,62 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         addresses: [],
       },
     ];
+    const plan = {
+      configuration: {
+        provider_config: {
+          aws: {
+            name: "aws",
+            expressions: {
+              region: { constant_value: "us-east-1" },
+              assume_role: [
+                {
+                  role_arn: {
+                    constant_value: "arn:aws:iam::111111111111:role/Deploy",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      resource_changes: [
+        {
+          address: "aws_internet_gateway.igw",
+          mode: "managed",
+          type: "aws_internet_gateway",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: { actions: ["no-op"], after: { vpc_id: "vpc-test" } },
+        },
+        {
+          address: "aws_nat_gateway.nat",
+          mode: "managed",
+          type: "aws_nat_gateway",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-public",
+              allocation_id: "eipalloc-1",
+              vpc_id: "vpc-test",
+            },
+          },
+        },
+        {
+          address: "aws_eip.nat",
+          mode: "managed",
+          type: "aws_eip",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: { id: "eipalloc-1", allocation_id: "eipalloc-1" },
+          },
+        },
+      ],
+    };
+    const { computeNatGatewayZonePlacements } = await import(
+      "./terraformTopologyPlacement"
+    );
+    const natZonePlacements = computeNatGatewayZonePlacements(plan, zones);
     const nodes: TerraformPlanNodesMap = {
       "aws_internet_gateway.igw": {
         resources: {
@@ -1195,7 +1251,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
             type: "aws_nat_gateway",
             change: {
               actions: ["no-op"],
-              after: { subnet_id: "subnet-public" },
+              after: {
+                subnet_id: "subnet-public",
+                allocation_id: "eipalloc-1",
+              },
             },
           },
         },
@@ -1206,7 +1265,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
             address: "aws_eip.nat",
             mode: "managed",
             type: "aws_eip",
-            change: { actions: ["no-op"], after: { id: "eipalloc-1" } },
+            change: {
+              actions: ["no-op"],
+              after: { id: "eipalloc-1", allocation_id: "eipalloc-1" },
+            },
           },
         },
       },
@@ -1218,8 +1280,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         vpcId: "vpc-test",
         addresses: [
           "aws_internet_gateway.igw",
-          "aws_nat_gateway.nat",
-          "aws_eip.nat",
+          /** NAT/EIP get filtered into the zone — the right edge should only carry IGW here. */
+          ...["aws_nat_gateway.nat", "aws_eip.nat"].filter(
+            (a) => !natZonePlacements.consumedAddresses.has(a),
+          ),
         ],
       },
     ];
@@ -1229,10 +1293,13 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       zones,
       [],
       nodes,
-      undefined,
+      plan,
       [],
       { zoneBottom: [], vpcBottom: [] },
       defaultBuckets,
+      [],
+      [],
+      natZonePlacements,
     );
 
     const byPath = (path: string) =>
@@ -1248,16 +1315,65 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         (e.customData as { terraformTopologyRole?: string } | undefined)
           ?.terraformTopologyRole === "vpc",
     )!;
+    const subnetZone = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZone",
+    )!;
     const igw = byPath("aws_internet_gateway.igw")!;
     const nat = byPath("aws_nat_gateway.nat")!;
     const eip = byPath("aws_eip.nat")!;
 
+    const natRole = (
+      nat.customData as { terraformTopologyRole?: string } | undefined
+    )?.terraformTopologyRole;
+    expect(natRole).toBe("natGatewayPrimary");
+
+    /** NAT is tier-0 sized (matches RESOURCE_RECT_W = px(200)), not the smaller right-edge tile. */
+    expect(nat.width).toBe(px(200));
+    expect(nat.height).toBe(px(88));
+
+    /** NAT/EIP nest inside their own primaryCluster, which itself nests inside the public-subnet zone. */
+    expect(nat.frameId).toBeTruthy();
+    expect(nat.frameId).toBe(eip.frameId);
+    const natClusterFrame = elements.find(
+      (e) => e.type === "frame" && e.id === nat.frameId,
+    )!;
+    expect(natClusterFrame).toBeTruthy();
+    expect(
+      (natClusterFrame.customData as { terraformTopologyRole?: string })
+        .terraformTopologyRole,
+    ).toBe("primaryCluster");
+    expect(natClusterFrame.frameId).toBe(subnetZone.id);
+
+    /** IGW remains on the VPC left edge as before. */
     expect(igw.x).toBe(vpc.x);
-    expect(nat.x + (nat.width ?? 0)).toBe(vpc.x + (vpc.width ?? 0));
-    expect(eip.x + (eip.width ?? 0)).toBe(vpc.x + (vpc.width ?? 0));
     expect(igw.frameId).toBe(vpc.id);
-    expect(nat.frameId).toBe(vpc.id);
-    expect(eip.frameId).toBe(vpc.id);
+
+    /** Right edge no longer holds NAT/EIP tiles. */
+    const rightEdgeRectangles = elements.filter((e) => {
+      if (e.type !== "rectangle") {
+        return false;
+      }
+      const role = (
+        e.customData as { terraformTopologyRole?: string } | undefined
+      )?.terraformTopologyRole;
+      if (role !== "vpcEgressEndpoint" && e.strokeStyle !== "dashed") {
+        // egress tiles use dashed stroke + role; the right edge column lives there
+      }
+      return e.x + (e.width ?? 0) === vpc.x + (vpc.width ?? 0);
+    });
+    expect(
+      rightEdgeRectangles.find(
+        (e) =>
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            "aws_nat_gateway.nat" ||
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            "aws_eip.nat",
+      ),
+    ).toBeUndefined();
+
     assertTopologyFramesContainChildren(elements);
   });
 
