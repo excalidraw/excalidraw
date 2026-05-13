@@ -63,3 +63,12 @@ packages/backend/terraform/allplan-s3kms-policy-trace.json
 packages/backend/terraform/allplan-s3kms-stage-snapshots.json
 packages/backend/terraform/allplan-s3kms-withstate-stage-snapshots.json
 **/terraform/.pluralith/
+
+# Cloudflare Wrangler (local dev state, caches; not source-controlled)
+.wrangler/
+
+# TypeScript incremental / composite emit (if enabled by a package or tool)
+*.tsbuildinfo
+
+# Local Reddit notes / scratch (not part of the product docs)
+docs/reddit/

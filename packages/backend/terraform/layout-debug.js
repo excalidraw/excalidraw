@@ -21,10 +21,10 @@ const members = [
   `${modulePath}.aws_iam_role_policy.logs[0]`,
 ];
 
-console.log(
-  JSON.stringify(
+process.stdout.write(
+  `${JSON.stringify(
     buildModuleInternalOffsets(members, modulePath, moduleGroup),
     null,
     2,
-  ),
+  )}\n`,
 );

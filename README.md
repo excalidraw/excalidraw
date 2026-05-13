@@ -15,13 +15,13 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
     <img alt="Tests workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml/badge.svg" />
   </a>
   <img alt="Node 22+" src="https://img.shields.io/badge/node-22%2B-339933" />
-  <a href="https://tfdraw.io/">
-    <img alt="Live app" src="https://img.shields.io/badge/live-tfdraw.io-0f766e" />
+  <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">
+    <img alt="Live demo" src="https://img.shields.io/badge/live-demo-0f766e" />
   </a>
 </p>
 
 <p align="center">
-  <a href="https://tfdraw.io/">Open tfdraw.io</a>
+  <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">Open live demo</a>
   |
   <a href="https://github.com/TusharSariya/excalidraw-tf">GitHub repository</a>
 </p>
@@ -50,7 +50,7 @@ The result is not a static screenshot. It is a normal Excalidraw scene you can r
 ## How it works
 
 1. You run Terraform or OpenTofu locally to create a plan and graph.
-2. You open `tfdraw.io` or the local development app.
+2. You open the [hosted demo](https://master-ainur.tushar-sariya77.workers.dev/demo) or the local development app.
 3. You select the plan JSON and graph DOT together in the **Import Terraform** dialog.
 4. The browser parser builds an Excalidraw scene and replaces the current canvas.
 5. You inspect, edit, save, or export the diagram locally.
@@ -62,7 +62,7 @@ The client-side import pipeline lives in [`packages/excalidraw/components/terraf
 Use the hosted app:
 
 ```text
-https://tfdraw.io/
+https://master-ainur.tushar-sariya77.workers.dev/demo
 ```
 
 Or run the project locally with **Node.js 22 or newer**. If you use `nvm`, the repo includes [`.nvmrc`](./.nvmrc).
@@ -102,7 +102,7 @@ tofu graph -type=plan > graph.dot
 
 ### 3. Import both files
 
-In tfdraw.io, open **Import Terraform** and choose:
+In the hosted app, open **Import Terraform** and choose:
 
 | File | Expected input |
 | --- | --- |

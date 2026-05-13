@@ -122,11 +122,10 @@ const main = () => {
   const archivePath = path.join(outAbs, fileName);
 
   console.info(`Creating ${archivePath} …`);
-  execFileSync(
-    "tar",
-    ["-czf", archivePath, "-C", BUILD_DIR, "."],
-    { stdio: "inherit", cwd: REPO_ROOT },
-  );
+  execFileSync("tar", ["-czf", archivePath, "-C", BUILD_DIR, "."], {
+    stdio: "inherit",
+    cwd: REPO_ROOT,
+  });
 
   console.info(`Done: ${archivePath}`);
 };

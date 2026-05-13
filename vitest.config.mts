@@ -1,6 +1,6 @@
 import path from "path";
 
-import { defineConfig } from "vitest/config";
+import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -54,8 +54,13 @@ export default defineConfig({
     // we need to run them in parallel
     sequence: {
       hooks: "parallel",
+      setupFiles: "list",
     },
-    setupFiles: ["./setupTests.ts"],
+    setupFiles: [
+      "./setupVitestCanvasMock.ts",
+      "vitest-canvas-mock",
+      "./setupTests.ts",
+    ],
     globals: true,
     environment: "jsdom",
     poolOptions: {
@@ -69,6 +74,15 @@ export default defineConfig({
       /** Ensures CI / vitest-coverage-report-action still get json-summary when tests or thresholds fail */
       reportOnFailure: true,
       reporter: ["text", "json-summary", "json", "html", "lcovonly"],
+      exclude: [
+        ...coverageConfigDefaults.exclude,
+        "dev-docs/**",
+        "examples/**",
+        "excalidraw-app/build/**",
+        "packages/**/dist/**",
+        "public/**",
+        "scripts/**",
+      ],
       // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
       // Additionally the thresholds also needs to be updated slightly as a result of this change
       ignoreEmptyLines: false,
