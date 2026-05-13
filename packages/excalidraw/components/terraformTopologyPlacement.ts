@@ -257,7 +257,131 @@ export function collectPlacementSubnetIds(
   for (const sid of stringArrayField(values.subnet_ids)) {
     ids.add(sid);
   }
+  for (const sid of stringArrayField(values.subnets)) {
+    ids.add(sid);
+  }
+  const subnetMapping = values.subnet_mapping;
+  if (Array.isArray(subnetMapping)) {
+    for (const entry of subnetMapping) {
+      if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+        const sid = stringField(
+          (entry as Record<string, unknown>).subnet_id,
+        );
+        if (sid) {
+          ids.add(sid);
+        }
+      }
+    }
+  }
   return [...ids].sort();
+}
+
+/** `aws_lb.security_groups` entries that are resolved SG ids in the plan JSON. */
+function parseLbSecurityGroupIds(values: Record<string, unknown>): string[] {
+  return stringArrayField(values.security_groups).filter((s) =>
+    s.startsWith("sg-"),
+  );
+}
+
+function collectInferenceSubnetIdsFromResource(
+  type: string,
+  values: Record<string, unknown>,
+): string[] {
+  const ids = new Set<string>();
+  if (
+    type === "aws_instance" ||
+    type === "aws_spot_instance_request"
+  ) {
+    const sid = stringField(values.subnet_id);
+    if (sid) {
+      ids.add(sid);
+    }
+  }
+  if (type === "aws_lambda_function") {
+    for (const block of vpcConfigBlocks(values)) {
+      for (const sid of stringArrayField(block.subnet_ids)) {
+        ids.add(sid);
+      }
+    }
+  }
+  return [...ids].sort();
+}
+
+function collectInferenceSecurityGroupIdsFromResource(
+  type: string,
+  values: Record<string, unknown>,
+): string[] {
+  const out: string[] = [];
+  if (
+    type === "aws_instance" ||
+    type === "aws_spot_instance_request"
+  ) {
+    out.push(...stringArrayField(values.vpc_security_group_ids));
+  }
+  if (type === "aws_lambda_function") {
+    for (const block of vpcConfigBlocks(values)) {
+      out.push(...stringArrayField(block.security_group_ids));
+    }
+  }
+  return out.filter((s) => s.startsWith("sg-"));
+}
+
+/**
+ * When an `aws_lb` has no `subnets` / `subnet_mapping` / `subnet_ids` in the placement snapshot,
+ * infer subnet ids from other resources in the plan that share the LB's security group ids
+ * (same VPC when `vpc_id` is known on the LB).
+ */
+export function inferSubnetIdsForLbFromPlanSecurityGroups(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  lbValues: Record<string, unknown>,
+  subnetToVpc: ReadonlyMap<string, string>,
+): string[] {
+  const lbSg = new Set(parseLbSecurityGroupIds(lbValues));
+  if (lbSg.size === 0) {
+    return [];
+  }
+  const lbVpcId = stringField(lbValues.vpc_id);
+  const inferred = new Set<string>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    const t = rc.type;
+    if (
+      t !== "aws_instance" &&
+      t !== "aws_spot_instance_request" &&
+      t !== "aws_lambda_function"
+    ) {
+      continue;
+    }
+    const v = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!v) {
+      continue;
+    }
+    const candSgs = collectInferenceSecurityGroupIdsFromResource(t, v);
+    if (!candSgs.some((sg) => lbSg.has(sg))) {
+      continue;
+    }
+    const candSubnets = collectInferenceSubnetIdsFromResource(t, v);
+    for (const sid of candSubnets) {
+      if (lbVpcId) {
+        const vpc = subnetToVpc.get(sid);
+        if (vpc === lbVpcId) {
+          inferred.add(sid);
+        }
+      } else {
+        inferred.add(sid);
+      }
+    }
+  }
+
+  return [...inferred].sort((a, b) => a.localeCompare(b));
 }
 
 function zoneMapKey(
@@ -315,7 +439,14 @@ export function extractPrimaryTopologyZones(
       continue;
     }
 
-    const subnetIds = collectPlacementSubnetIds(values);
+    let subnetIds = collectPlacementSubnetIds(values);
+    if (t === "aws_lb" && subnetIds.length === 0) {
+      subnetIds = inferSubnetIdsForLbFromPlanSecurityGroups(
+        plan,
+        values,
+        subnetToVpc,
+      );
+    }
     const merged = mergeWithDefaultAwsProviderAccountRegion(
       plan,
       mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
