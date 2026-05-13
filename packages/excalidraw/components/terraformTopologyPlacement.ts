@@ -65,7 +65,10 @@ export type RouteTableBottomZonePlacement = {
   region: string;
   vpcId: string;
   subnetSignature: string;
+  /** Managed `aws_route_table` resource addresses on this row (one composite box each). */
   addresses: string[];
+  /** `aws_route` addresses nested under each route table, sorted per table. */
+  routeChildrenByTable: Record<string, string[]>;
 };
 
 /** Route tables drawn straddling the VPC bottom (no subnet-only association, or subnets span multiple zones). */
@@ -74,6 +77,7 @@ export type RouteTableBottomVpcPlacement = {
   region: string;
   vpcId: string;
   addresses: string[];
+  routeChildrenByTable: Record<string, string[]>;
 };
 
 /** Semantic bottom-edge route table layout (subnet zone vs VPC). */
@@ -82,7 +86,6 @@ export type TopologyRouteTableBottomPlacements = {
   vpcBottom: RouteTableBottomVpcPlacement[];
 };
 
-const ROUTE_TABLE_SEMANTIC_TILE_W = tfComfortPx(160);
 const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
 const ALB_COMPANION_TYPES = new Set([
   "aws_lb_listener",
@@ -93,15 +96,80 @@ const ALB_COMPANION_TYPES = new Set([
   "aws_security_group_rule",
 ]);
 
-/** Minimum inner width for one horizontal row of route table tiles (matches layout constants). */
+/** Minimum inner width for one horizontal row of route-table cluster frames (legacy helper). */
 export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
   if (addrCount <= 0) {
     return 0;
   }
   return (
-    addrCount * ROUTE_TABLE_SEMANTIC_TILE_W +
+    addrCount * routeTableCompositeSlotWidthPx(0) +
     (addrCount - 1) * ROUTE_TABLE_SEMANTIC_GAP
   );
+}
+
+/** Same footprint as topology tier-0 primary + `TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX`. */
+const RT_CLUSTER_PRIMARY_W = tfComfortPx(200);
+const RT_CLUSTER_PRIMARY_H = tfComfortPx(88);
+const RT_CLUSTER_TIER2_W = tfComfortPx(154);
+const RT_CLUSTER_TIER2_H = tfComfortPx(44);
+const RT_CLUSTER_SAT_GAP = tfComfortPx(8);
+const RT_CLUSTER_FRAME_PAD = tfComfortPx(10);
+
+/** Content height (tier-0 + stacked tier-2 `aws_route` tiles) without outer cluster frame pad. */
+export function routeTableClusterContentHeightPx(routeCount: number): number {
+  if (routeCount <= 0) {
+    return RT_CLUSTER_PRIMARY_H;
+  }
+  return (
+    RT_CLUSTER_PRIMARY_H +
+    RT_CLUSTER_SAT_GAP +
+    routeCount * RT_CLUSTER_TIER2_H +
+    (routeCount - 1) * RT_CLUSTER_SAT_GAP
+  );
+}
+
+/** Full cluster frame height (matches `appendTopologyResourceRectangles` primaryCluster frame). */
+export function routeTableCompositeHeightPx(routeCount: number): number {
+  return routeTableClusterContentHeightPx(routeCount) + 2 * RT_CLUSTER_FRAME_PAD;
+}
+
+/** Outer width of one route-table primaryCluster frame. */
+export function routeTableCompositeSlotWidthPx(_routeCount: number): number {
+  return RT_CLUSTER_PRIMARY_W + 2 * RT_CLUSTER_FRAME_PAD;
+}
+
+/** Sum of composite slot widths + gaps for one bottom row. */
+export function routeTableCompositeRowMinInnerWidthPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  const sorted = [...tableAddrs].sort();
+  if (sorted.length === 0) {
+    return 0;
+  }
+  let sum = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    const addr = sorted[i]!;
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    sum += routeTableCompositeSlotWidthPx(n);
+    if (i < sorted.length - 1) {
+      sum += ROUTE_TABLE_SEMANTIC_GAP;
+    }
+  }
+  return sum;
+}
+
+/** Tallest composite on a row (for zone / VPC bottom inset). */
+export function routeTableMaxCompositeHeightForRowPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  let maxH = 0;
+  for (const addr of tableAddrs) {
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    maxH = Math.max(maxH, routeTableCompositeHeightPx(n));
+  }
+  return maxH;
 }
 
 type ResourceChange = {
@@ -567,7 +635,8 @@ function buildRouteTableIdToSubnetIdsFromPlan(
   return out;
 }
 
-function buildRouteTableIdToCompanionAddressesFromPlan(
+/** `aws_route` addresses keyed by route table id (`route_table_id` in plan values). */
+function buildRouteTableIdToRouteAddressesFromPlan(
   plan: TerraformPlanProviderContext & {
     resource_changes?: ResourceChange[];
   },
@@ -580,10 +649,7 @@ function buildRouteTableIdToCompanionAddressesFromPlan(
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
     }
-    if (
-      rc.mode !== "managed" ||
-      (rc.type !== "aws_route" && rc.type !== "aws_route_table_association")
-    ) {
+    if (rc.mode !== "managed" || rc.type !== "aws_route") {
       continue;
     }
     const address = rc.address;
@@ -708,15 +774,18 @@ export function computeRouteTableBottomEdgePlacements(
 ): TopologyRouteTableBottomPlacements {
   const buckets = extractRouteTablesByVpc(plan);
   const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
-  const rtidToCompanions = buildRouteTableIdToCompanionAddressesFromPlan(plan);
+  const rtidToRoutes = buildRouteTableIdToRouteAddressesFromPlan(plan);
   const addrToMeta = buildRouteTableAddressToMeta(plan);
 
   const zoneAccum = new Map<string, string[]>();
+  const zoneChildrenAccum = new Map<string, Map<string, string[]>>();
   const vpcAccum = new Map<string, string[]>();
+  const vpcChildrenAccum = new Map<string, Map<string, string[]>>();
 
   for (const bucket of buckets) {
     for (const addr of bucket.addresses) {
       const meta = addrToMeta.get(addr);
+
       if (!meta) {
         const vk = routeTableVpcAccumKey(
           bucket.accountId,
@@ -727,6 +796,10 @@ export function computeRouteTableBottomEdgePlacements(
           vpcAccum.set(vk, []);
         }
         vpcAccum.get(vk)!.push(addr);
+        if (!vpcChildrenAccum.has(vk)) {
+          vpcChildrenAccum.set(vk, new Map());
+        }
+        vpcChildrenAccum.get(vk)!.set(addr, []);
         continue;
       }
       const subnetSet = rtidToSubnets.get(meta.rtbId);
@@ -743,17 +816,18 @@ export function computeRouteTableBottomEdgePlacements(
         );
       }
 
-      const addressesForPlacement = [
-        addr,
-        ...[...(rtidToCompanions.get(meta.rtbId) ?? new Set<string>())].sort(),
-      ];
+      const routesForTable = [...(rtidToRoutes.get(meta.rtbId) ?? new Set())].sort();
 
       if (zonePick) {
         const zk = `${meta.accountId}\0${meta.region}\0${meta.vpcId}\0${zonePick.subnetSignature}`;
         if (!zoneAccum.has(zk)) {
           zoneAccum.set(zk, []);
         }
-        zoneAccum.get(zk)!.push(...addressesForPlacement);
+        zoneAccum.get(zk)!.push(addr);
+        if (!zoneChildrenAccum.has(zk)) {
+          zoneChildrenAccum.set(zk, new Map());
+        }
+        zoneChildrenAccum.get(zk)!.set(addr, routesForTable);
       } else {
         const vk = routeTableVpcAccumKey(
           meta.accountId,
@@ -763,7 +837,11 @@ export function computeRouteTableBottomEdgePlacements(
         if (!vpcAccum.has(vk)) {
           vpcAccum.set(vk, []);
         }
-        vpcAccum.get(vk)!.push(...addressesForPlacement);
+        vpcAccum.get(vk)!.push(addr);
+        if (!vpcChildrenAccum.has(vk)) {
+          vpcChildrenAccum.set(vk, new Map());
+        }
+        vpcChildrenAccum.get(vk)!.set(addr, routesForTable);
       }
     }
   }
@@ -774,12 +852,19 @@ export function computeRouteTableBottomEdgePlacements(
     if (!accountId || !region || !vpcId) {
       continue;
     }
+    const sortedAddrs = [...new Set(addresses)].sort();
+    const childMap = zoneChildrenAccum.get(key);
+    const routeChildrenByTable: Record<string, string[]> = {};
+    for (const a of sortedAddrs) {
+      routeChildrenByTable[a] = [...(childMap?.get(a) ?? [])];
+    }
     zoneBottom.push({
       accountId,
       region,
       vpcId,
       subnetSignature,
-      addresses: [...new Set(addresses)].sort(),
+      addresses: sortedAddrs,
+      routeChildrenByTable,
     });
   }
   zoneBottom.sort((a, b) => {
@@ -801,11 +886,18 @@ export function computeRouteTableBottomEdgePlacements(
     if (!accountId || !region || !vpcId) {
       continue;
     }
+    const sortedAddrs = [...new Set(addresses)].sort();
+    const childMap = vpcChildrenAccum.get(key);
+    const routeChildrenByTable: Record<string, string[]> = {};
+    for (const a of sortedAddrs) {
+      routeChildrenByTable[a] = [...(childMap?.get(a) ?? [])];
+    }
     vpcBottom.push({
       accountId,
       region,
       vpcId,
-      addresses: [...new Set(addresses)].sort(),
+      addresses: sortedAddrs,
+      routeChildrenByTable,
     });
   }
   vpcBottom.sort((a, b) => {
@@ -819,6 +911,74 @@ export function computeRouteTableBottomEdgePlacements(
   });
 
   return { zoneBottom, vpcBottom };
+}
+
+/** Per subnet-zone row: table count, min inner width, and tallest composite (for frame inset). */
+export type RouteTableZoneBottomSizing = {
+  tableCount: number;
+  minInnerWidthPx: number;
+  maxCompositeHeightPx: number;
+};
+
+export function buildRouteTableZoneSizingMapForVpc(
+  placements: TopologyRouteTableBottomPlacements,
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): Map<string, RouteTableZoneBottomSizing> {
+  const m = new Map<string, RouteTableZoneBottomSizing>();
+  for (const z of placements.zoneBottom) {
+    if (
+      z.accountId === accountId &&
+      z.region === regionName &&
+      z.vpcId === vpcId
+    ) {
+      m.set(z.subnetSignature, {
+        tableCount: z.addresses.length,
+        minInnerWidthPx: routeTableCompositeRowMinInnerWidthPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
+        maxCompositeHeightPx: routeTableMaxCompositeHeightForRowPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
+      });
+    }
+  }
+  return m;
+}
+
+export function vpcBottomRouteTablesRowSizing(
+  placements: TopologyRouteTableBottomPlacements,
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): {
+  minInnerWidthPx: number;
+  maxCompositeHeightPx: number;
+  tableCount: number;
+} | null {
+  const row = placements.vpcBottom.find(
+    (x) =>
+      x.accountId === accountId &&
+      x.region === regionName &&
+      x.vpcId === vpcId,
+  );
+  if (!row || row.addresses.length === 0) {
+    return null;
+  }
+  return {
+    tableCount: row.addresses.length,
+    minInnerWidthPx: routeTableCompositeRowMinInnerWidthPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+    maxCompositeHeightPx: routeTableMaxCompositeHeightForRowPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+  };
 }
 
 function bucketMapKey(accountId: string, region: string): string {
