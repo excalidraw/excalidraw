@@ -223,6 +223,36 @@
           font-size: 0.875rem;
           color: var(--color-on-surface);
         }
+
+        label.TerraformImportModal__inputRow--disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
+          color: var(--color-gray-60);
+
+          input[type="file"] {
+            pointer-events: none;
+            cursor: not-allowed;
+            border-color: var(--color-gray-30);
+            color: var(--color-gray-60);
+
+            &:hover,
+            &:active {
+              border-color: var(--color-gray-30);
+              color: var(--color-gray-60);
+              background-color: transparent;
+            }
+
+            &::file-selector-button {
+              background-color: var(--color-gray-40);
+              color: var(--color-surface-lowest);
+              cursor: not-allowed;
+
+              &:hover {
+                background-color: var(--color-gray-40);
+              }
+            }
+          }
+        }
       }
     }
 
