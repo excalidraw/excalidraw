@@ -1,149 +1,84 @@
-# Excalidraw Terraform
+# tfdraw.io
 
-A **Terraform architecture visualizer** built on [Excalidraw](https://excalidraw.com). You upload **plan JSON** (from `terraform show -json`) and **graph DOT** (from `terraform graph`); the **browser** parses them, lays out resources, and replaces the canvas with an editable diagram—no separate import API or collaboration backend.
+**A browser-only Terraform plan visualizer that turns plan output into an editable Excalidraw architecture canvas.**
 
-Production/static builds open on a **Terraform Canvas** landing page with an embedded canvas: draw, load/save local scenes, export images, and run **Import Terraform** the same way as in development—all without a collaboration server, Firebase share links, or Excalidraw+ cloud actions.
-
-![Sample import: plan JSON and graph DOT rendered as an editable AWS-style diagram](docs/terraform-import-sample.png)
+Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated infrastructure diagram, then edit, annotate, and export it like any other Excalidraw scene. The app does not ask for cloud credentials, upload your files to a backend, or run Terraform for you.
 
 <p align="center">
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
+  <a href="https://github.com/TusharSariya/excalidraw-tf/blob/master/LICENSE">
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg" />
+  </a>
+  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml">
+    <img alt="Lint workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml/badge.svg" />
+  </a>
+  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml">
+    <img alt="Tests workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml/badge.svg" />
+  </a>
+  <img alt="Node 22+" src="https://img.shields.io/badge/node-22%2B-339933" />
+  <a href="https://tfdraw.io/">
+    <img alt="Live app" src="https://img.shields.io/badge/live-tfdraw.io-0f766e" />
   </a>
 </p>
 
----
+<p align="center">
+  <a href="https://tfdraw.io/">Open tfdraw.io</a>
+  |
+  <a href="https://github.com/TusharSariya/excalidraw-tf">GitHub repository</a>
+</p>
 
-## What this fork adds
+![Sample import: plan JSON and graph DOT rendered as an editable AWS-style diagram](docs/terraform-import-sample.png)
 
-- **Frontend-only public landing page** — production/static `/` renders a Terraform Canvas landing page and an embedded Excalidraw canvas in the same page. Public mode intentionally hides collaboration, share-link, Firebase-backed export, and Excalidraw+ cloud surfaces.
-- **Client-side Terraform plan + graph import** — Plan JSON (`terraform show -json`) and DOT (`terraform graph`) are read in the browser; [`terraformPlanParsing`](./packages/excalidraw/components/terraformPlanParsing.tsx) builds nodes, edges, and an Excalidraw scene (no Node upload service). [`packages/backend/`](./packages/backend/) holds **fixtures** and legacy reference scripts used for parity with the client pipeline.
-- **Semantic and module views** — Choose **Semantic view** (account, region, VPC, subnet topology) or **Module view** (module-framed graph) in the import dialog.
-- **AWS architecture icons** — Resource cards use the bundled AWS architecture icon library (IAM, Lambda, S3, SQS, RDS, VPC, CloudWatch, and many others).
-- **Module-aware layout** — Modules are layout units so sibling modules have space and internals stay readable.
-- **Nested infrastructure boundaries** — Account, region, VPC, subnet, and module containers use staggered padding so hierarchy is visible.
-- **Lambda module preset** — Common Lambda module internals (function, role, inline policies, log group, package) get stable relative placement.
-- **Relationship rendering** — Planned dependencies (and state-backed edges when state is supplied) render as arrows behind resource cards.
-- **Terraform details on elements** — Resource diffs, known-after-apply values, and selected fields are stored on Excalidraw elements for inspection.
+## What is tfdraw.io?
 
-The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
+tfdraw.io is a Terraform architecture canvas built on [Excalidraw](https://excalidraw.com). It reads the files you already generate during a Terraform review:
 
----
+- plan JSON from `terraform show -json`
+- dependency graph DOT from `terraform graph`
+
+Those files are parsed in the browser and converted into Excalidraw elements: resource cards, dependency arrows, module boundaries, cloud hierarchy containers, and Terraform metadata attached to elements for inspection.
+
+The result is not a static screenshot. It is a normal Excalidraw scene you can rearrange, annotate, save locally, and export.
+
+## Why use it?
+
+- **Review planned changes visually.** Turn plan output into a diagram before applying infrastructure changes.
+- **Keep the workflow local.** Import files directly in the browser; no app-side Terraform execution, cloud credentials, or backend upload service.
+- **Edit the diagram after import.** Move resources, add notes, group systems, and export PNG/SVG using the familiar Excalidraw editor.
+- **Understand relationships faster.** Dependency edges, module containers, account/region/VPC/subnet boundaries, and AWS-style cards make large plans easier to scan.
+- **Use it with Terraform or OpenTofu.** The importer consumes standard JSON and DOT outputs rather than provider credentials.
+
+## How it works
+
+1. You run Terraform or OpenTofu locally to create a plan and graph.
+2. You open `tfdraw.io` or the local development app.
+3. You select the plan JSON and graph DOT together in the **Import Terraform** dialog.
+4. The browser parser builds an Excalidraw scene and replaces the current canvas.
+5. You inspect, edit, save, or export the diagram locally.
+
+The client-side import pipeline lives in [`packages/excalidraw/components/terraformPlanParsing.tsx`](./packages/excalidraw/components/terraformPlanParsing.tsx). [`packages/backend/`](./packages/backend/) currently holds fixtures and legacy reference scripts used for parity with the client pipeline; it is not required as an upload service for normal browser import.
 
 ## Quick start
 
-Use **Node.js 22 or newer** (dependency `chevrotain@12` requires it). If you use nvm: `nvm install` / `nvm use` from the repo root reads [`.nvmrc`](.nvmrc).
+Use the hosted app:
 
-**Run the Excalidraw developer app:**
+```text
+https://tfdraw.io/
+```
+
+Or run the project locally with **Node.js 22 or newer**. If you use `nvm`, the repo includes [`.nvmrc`](./.nvmrc).
 
 ```bash
 yarn install
 yarn start
 ```
 
-Open the Vite URL printed by the command, usually `http://localhost:3000/`. In development, `/` opens directly into the normal Excalidraw editor for faster local work.
+Open the Vite URL printed by the command, usually `http://localhost:3000/`. In development, `/` opens directly into the Excalidraw editor for faster local work. Use **Import Terraform** from the menu or press **Ctrl/Cmd+Shift+K**.
 
-**Build or preview the public landing page:**
+## Import Terraform plan output
 
-```bash
-yarn build:app
-yarn build:preview
-```
+Generate both files from the same Terraform or OpenTofu working directory and select them together in the import dialog.
 
-The static app is emitted to `excalidraw-app/build`. Hosted static builds and `yarn build:preview` render the Terraform Canvas landing page at `/` with the embedded frontend-only demo below it.
-
-**Lean static build for hosting (smaller output, less Vite memory):**
-
-```bash
-yarn build:pages
-```
-
-This disables Sentry and product analytics for the bundle, omits production source maps by default (set `VITE_PROD_SOURCEMAP=true` in env to opt back in), and skips `vite-plugin-checker` during `vite build` (typecheck and lint remain available via `yarn test:typecheck` and `yarn test:code`).
-
-**Ship a static bundle tarball** (for uploads or handoff): `yarn bundle:whiteboard` runs `yarn build:pages` then writes `releases/tfdraw-whiteboard-<appVersion>-<gitShortSha>.tar.gz` (contents of `excalidraw-app/build/`). Use `yarn bundle:whiteboard:archive` if you already built. Pass options after `--`, e.g. `yarn bundle:whiteboard -- --profile=full` for `yarn build:app` plus version stamp, or `--out=dist` / `--name=my-board`. Requires `tar` on your PATH.
-
-**Cloudflare Pages via GitHub Actions (direct upload):**
-
-The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml) deploys when a **push** lands on **`main` or `master`**, and on **workflow_dispatch** (manual run in the Actions tab). That **includes merging a pull request** into `main` or `master`, because GitHub adds the merge commit as a push to the base branch. Direct pushes to those branches also run the workflow. Steps: `yarn install --frozen-lockfile`, `yarn build:pages`, then `wrangler pages deploy excalidraw-app/build`. Configure the repository under **Settings → Secrets and variables → Actions**:
-
-| Kind | Name | Purpose |
-| --- | --- | --- |
-| Secret | `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit** (and read as needed). |
-| Secret | `CLOUDFLARE_ACCOUNT_ID` | Account ID from the Cloudflare dashboard sidebar. |
-| Variable | `CF_PAGES_PROJECT_NAME` | Exact **Pages project name** (creates production deploy when set). If unset, the workflow still **builds** but **skips deploy** so forks stay green. |
-
-**Use the branch this workflow listens to.** Production deploys from Actions when code is **merged or pushed** into **`main` or `master`**—whichever your team uses. If your default branch is something else (for example only `develop`), either merge release commits into `master`/`main`, or edit `pages-deploy.yml` `on.push.branches` to match. If the Pages project is still **Git-connected**, set the Cloudflare **production branch** ( **Settings → Builds & deployments → Production** ) to that same primary branch so you are not expecting deploys from a branch that never triggers the workflow.
-
-After this is wired, **turn off Cloudflare’s Git-triggered builds** for this project. Otherwise every push still starts a **Pages build on Cloudflare** (the one that OOMs), even when GitHub Actions deploys successfully.
-
-In the dashboard: **Workers & Pages** → your Pages project → **Settings** → **Builds & deployments**:
-
-1. Under **Production**, open **Configure Production deployments** and **disable** “Enable automatic production branch deployments” (see [Branch deployment controls](https://developers.cloudflare.com/pages/configuration/branch-build-controls/) and [Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/#disable-automatic-deployments)).
-2. Under **Preview**, set automatic preview deployments to **None** (or restrict branches) so pushes do not spawn preview builds on Cloudflare either.
-
-Then only **`wrangler pages deploy`** from GitHub Actions updates the site. Production updates after a **merge into** or **push to** **`main` or `master`**, or when you use **Run workflow** in the Actions tab.
-
-**Manual upload (same as CI):** after `yarn build:pages`, from the repo root:
-
-```bash
-npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
-```
-
-Use the **`pages`** subcommand for Cloudflare **Pages** (`wrangler pages deploy …`). **`wrangler deploy`** targets **Workers** with static assets and uses the `assets` block instead of (or in addition to) Pages upload semantics.
-
-**`wrangler.jsonc`:** [wrangler.jsonc](wrangler.jsonc) sets **`pages_build_output_dir`** to `./excalidraw-app/build` for **`wrangler pages deploy`**, and an **`assets`** block with the same directory plus **`not_found_handling`: `single-page-application`** for **Workers + static assets** / SPA routing. Replace **`name`** with your real **Pages** or **Worker** name as appropriate. This file does **not** run the Vite build on Cloudflare by itself; CI and local builds write `excalidraw-app/build` first. You can run `npx wrangler pages download config <PROJECT_NAME>` to align with an existing Pages project ([docs](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)).
-
-**Import Terraform in the app**
-
-```bash
-yarn install
-yarn start
-```
-
-Open the Vite URL (usually `http://localhost:3000/`). In development, `/` opens the Excalidraw editor directly. Use the **Import Terraform** action in the menu or **Ctrl/Cmd+Shift+K**.
-
-1. **Plan file** — JSON from `terraform show -json <planfile>` (or equivalent OpenTofu).
-2. **Graph file** — DOT from `terraform graph` (e.g. `terraform graph -type=plan > graph.dot`).
-
-Plan and DOT must be selected **together**. The client runs [`terraformPlanParsing`](./packages/excalidraw/components/terraformPlanParsing.tsx) and replaces the canvas with the returned scene.
-
-**Try the fixtures:** [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot) (same pair used by [`terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts)).
-
-**State files:** The parsing pipeline can merge optional raw `terraform.tfstate`, but the **state file control is currently disabled** in the import dialog (`TERRAFORM_STATE_UPLOAD_ENABLED` in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx)).
-
----
-
-## Frontend-only public mode
-
-The production root Excalidraw app (`/`) is intended to be deployable as a static frontend from `excalidraw-app/build`. Development mode (`yarn start`) intentionally opens the raw editor instead.
-
-Available in public mode:
-
-- Draw and edit on the embedded canvas.
-- Local browser persistence.
-- Load/save Excalidraw scenes from disk.
-- Export images.
-- **Import Terraform** — plan JSON + graph DOT in the browser (same as full editor mode).
-
-Hidden in public mode:
-
-- Collaboration and live-share controls.
-- Share-link dialogs and backend share-link creation.
-- Firebase-backed scene/file loading from share URLs.
-- Excalidraw+ sign-up, promo, and cloud export controls.
-- Backend export actions in the export dialog.
-
-The special `/excalidraw-plus-export` route is still preserved for the existing Excalidraw+ iframe export behavior.
-
----
-
-## Generating Terraform Inputs
-
-To import your infrastructure, you need to generate a plan JSON and a graph DOT file from your Terraform or OpenTofu project.
-
-### 1. Generate Plan JSON
-
-This provides the resource details, diffs, and attributes.
+### 1. Generate plan JSON
 
 ```bash
 # Terraform
@@ -155,9 +90,7 @@ tofu plan -out=tfplan
 tofu show -json tfplan > plan.json
 ```
 
-### 2. Generate Graph DOT
-
-This provides the dependency relationship data.
+### 2. Generate graph DOT
 
 ```bash
 # Terraform
@@ -167,47 +100,168 @@ terraform graph -type=plan > graph.dot
 tofu graph -type=plan > graph.dot
 ```
 
-### 3. State file (optional; UI currently off)
+### 3. Import both files
 
-The importer’s parsing layer can merge raw `terraform.tfstate` when provided, but **uploading state is not enabled** in the dialog yet. Skip this until the UI flag is turned on in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx).
+In tfdraw.io, open **Import Terraform** and choose:
 
----
+| File | Expected input |
+| --- | --- |
+| Plan file | JSON from `terraform show -json <planfile>` or `tofu show -json <planfile>` |
+| Graph file | DOT from `terraform graph -type=plan` or `tofu graph -type=plan` |
 
-## Development
+Try the included fixtures if you want a known-good pair: [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot).
 
-### Tests
+## What you get on the canvas
 
-Vitest runs from the **repository root** (`vitest.config.mts`, `jsdom`).
+- **AWS-style resource cards** for common services such as IAM, Lambda, S3, SQS, RDS, VPC, CloudWatch, and more.
+- **Dependency arrows** rendered behind resource cards from Terraform graph relationships.
+- **Semantic cloud boundaries** for account, region, VPC, subnet, and related topology.
+- **Module-aware layout** so sibling modules get space and module internals stay readable.
+- **Nested infrastructure containers** with staggered padding to make hierarchy visible.
+- **Lambda module placement presets** for common Lambda internals such as functions, roles, inline policies, log groups, and packages.
+- **Terraform details on elements**, including diffs, known-after-apply values, and selected fields.
+
+Everything remains editable because the output is an Excalidraw scene.
+
+## Safety model
+
+tfdraw.io is designed as a local-file review tool:
+
+- The app does not request AWS, Terraform Cloud, or other cloud credentials.
+- The app does not run `terraform`, `tofu`, provider plugins, or shell commands.
+- Plan JSON and graph DOT are read by browser code during import.
+- The normal workflow does not require uploading plans to a tfdraw backend.
+- Excalidraw scenes can be saved to disk and exported from the browser.
+
+You should still treat Terraform plan JSON as sensitive. It can contain resource names, ARNs, tags, environment data, outputs, and sometimes secrets if your configuration exposes them. Review what is in the generated files before sharing diagrams or imported scenes.
+
+## Supported views
+
+The import dialog supports two diagram modes:
+
+- **Semantic view**: emphasizes account, region, VPC, subnet, and infrastructure topology.
+- **Module view**: frames the graph around Terraform module structure.
+
+Production/static builds open on a Terraform Canvas landing page with an embedded editor. Development mode opens the standard editor directly. In public mode, drawing, local persistence, load/save from disk, image export, and Terraform import remain available.
+
+## Current limitations
+
+- Terraform plan JSON and graph DOT must be selected together.
+- The importer is strongest on AWS-shaped infrastructure today; other providers may render with generic cards or less semantic grouping.
+- The parsing layer can merge optional raw `terraform.tfstate`, but the state upload control is currently disabled in the import dialog (`TERRAFORM_STATE_UPLOAD_ENABLED` in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx)).
+- Public mode intentionally hides collaboration, share-link creation, Firebase-backed share loading, Excalidraw+ promotion/cloud export controls, and backend export actions.
+- The special `/excalidraw-plus-export` route is preserved for the existing Excalidraw+ iframe export behavior.
+
+## FAQ
+
+### Does tfdraw.io need access to my AWS account?
+
+No. You generate Terraform/OpenTofu outputs locally and import those files in the browser.
+
+### Does the app apply or modify infrastructure?
+
+No. It does not run Terraform/OpenTofu and cannot apply changes. It visualizes files you provide.
+
+### Is this a replacement for Terraform plan review?
+
+No. It is a visual companion for review. Keep reading the plan, policy checks, CI output, and provider-specific details.
+
+### Can I edit the imported diagram?
+
+Yes. Imported resources, labels, arrows, and containers are regular Excalidraw elements.
+
+### Can I use OpenTofu?
+
+Yes, as long as you provide compatible JSON from `tofu show -json` and DOT from `tofu graph`.
+
+### Is there a backend parser?
+
+The active import flow is client-side. The backend package contains fixtures and legacy reference scripts used to compare behavior with the browser parser.
+
+## Contributing / development
+
+Install dependencies and run the app:
 
 ```bash
-yarn test                         # watch mode (default)
-yarn test --watch=false           # single run (CI-style)
-yarn test:update                  # all Vitest tests + snapshot updates, no watch
+yarn install
+yarn start
 ```
 
-Run a **subset** of tests by passing a filename fragment Vitest treats as a filter:
+Useful commands:
+
+| Command | Purpose |
+| --- | --- |
+| `yarn test` | Run Vitest in watch mode |
+| `yarn test --watch=false` | Run Vitest once |
+| `yarn test terraformPlanParsing.test --watch=false` | Run the Terraform plan parser test subset |
+| `yarn test:typecheck` | Run TypeScript checks |
+| `yarn test:code` | Run ESLint |
+| `yarn test:other` | Run Prettier checks |
+| `yarn test:update` | Run Vitest once and update snapshots |
+| `yarn build:packages` | Build workspace packages |
+| `yarn build:app` | Build the app |
+| `yarn build:preview` | Preview the static app |
+
+The parser test lives at [`packages/excalidraw/components/terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts) and uses the fixture pair in [`packages/backend/terraform/`](./packages/backend/terraform/).
+
+Core editor development still follows the upstream [Excalidraw documentation](https://docs.excalidraw.com) and [development guide](https://docs.excalidraw.com/docs/introduction/development).
+
+## Deployment notes
+
+Build the static public app:
 
 ```bash
-yarn test terraformPlanParsing.test --watch=false
+yarn build:pages
 ```
 
-That executes the **local Terraform plan parser** pipeline test ([`packages/excalidraw/components/terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts)): it loads [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot), runs `terraformPlanParsing`, and asserts the HTTP-style response and empty Excalidraw scene shape.
+The output is written to `excalidraw-app/build`. The `build:pages` script uses CI-friendly Vite settings: Sentry and product analytics are disabled, production source maps are omitted unless `VITE_PROD_SOURCEMAP=true` is set, and `vite-plugin-checker` is skipped during the Vite build. Typecheck and lint remain available through `yarn test:typecheck` and `yarn test:code`.
 
-Other packages may define their own `yarn test` scripts under `packages/*`; run them with `yarn --cwd <path> test` when needed.
+Create a static bundle tarball:
 
-### Other commands
+```bash
+yarn bundle:whiteboard
+```
 
-- **Type checking:** `yarn test:typecheck`
-- **Lint / format:** `yarn fix`
-- **Build packages:** `yarn build:packages`
-- **Build app:** `yarn build:app`
+That runs `yarn build:pages` and writes `releases/tfdraw-whiteboard-<appVersion>-<gitShortSha>.tar.gz` from `excalidraw-app/build/`. Use `yarn bundle:whiteboard:archive` if the build already exists. Pass options after `--`, for example `yarn bundle:whiteboard -- --profile=full`, `--out=dist`, or `--name=my-board`.
 
-See the main [Excalidraw documentation](https://docs.excalidraw.com) and [development guide](https://docs.excalidraw.com/docs/introduction/development) for the core editor.
+### Cloudflare Pages
 
----
+[`pages-deploy.yml`](./.github/workflows/pages-deploy.yml) builds and deploys to Cloudflare Pages when a commit lands on `master`, or when the workflow is run manually. It runs:
+
+```bash
+yarn install --frozen-lockfile
+yarn build:pages
+npx wrangler@4 pages deploy excalidraw-app/build --project-name="$CF_PAGES_PROJECT_NAME"
+```
+
+Configure GitHub Actions with:
+
+| Kind | Name | Purpose |
+| --- | --- | --- |
+| Secret | `CLOUDFLARE_API_TOKEN` | API token with Cloudflare Pages edit access |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
+| Variable | `CF_PAGES_PROJECT_NAME` | Cloudflare Pages project name; if unset, CI builds and skips deploy |
+
+For manual upload after `yarn build:pages`:
+
+```bash
+npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
+```
+
+Use `wrangler pages deploy` for Cloudflare Pages. `wrangler deploy` targets Workers with static assets and different configuration semantics.
+
+[`wrangler.jsonc`](./wrangler.jsonc) sets `pages_build_output_dir` to `./excalidraw-app/build` for Pages deploys and includes an `assets` block for Workers/static-assets SPA routing. The file does not run the Vite build by itself; CI or your local build must create `excalidraw-app/build` first.
+
+If the Cloudflare Pages project is still Git-connected, disable Cloudflare automatic Git builds after GitHub Actions deploy is wired. Otherwise pushes may start a separate Cloudflare builder run in addition to the direct Wrangler upload.
 
 ## Upstream Excalidraw
 
-This repo is built on [Excalidraw](https://github.com/excalidraw/excalidraw): an open-source, collaborative whiteboard with a hand-drawn look. We keep the existing Excalidraw features (canvas, tools, export, etc.) and add the Terraform import pipeline and graph-to-canvas flow on top.
+This repository is built on [Excalidraw](https://github.com/excalidraw/excalidraw), the open-source whiteboard with a hand-drawn look. tfdraw.io keeps the canvas, tools, local scene loading/saving, export behavior, and editor ergonomics, then adds the Terraform import pipeline and graph-to-canvas flow on top.
 
-- [Excalidraw](https://excalidraw.com) · [Docs](https://docs.excalidraw.com) · [License (MIT)](https://github.com/excalidraw/excalidraw/blob/master/LICENSE)
+- [Excalidraw](https://excalidraw.com)
+- [Excalidraw documentation](https://docs.excalidraw.com)
+- [Upstream MIT license](https://github.com/excalidraw/excalidraw/blob/master/LICENSE)
+
+## License
+
+MIT. See [`LICENSE`](./LICENSE).
