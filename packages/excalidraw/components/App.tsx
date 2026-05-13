@@ -5072,7 +5072,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD]
       ) {
         event.preventDefault();
-        // Cmd/Ctrl+Shift+K — Terraform import (plan + DOT + optional state → backend → canvas).
+        // Cmd/Ctrl+Shift+K — Terraform import (plan + DOT → client parse → canvas).
         this.setState({ openDialog: { name: "terraformImport" } });
         return;
       }
