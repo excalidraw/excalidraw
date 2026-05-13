@@ -125,6 +125,48 @@ const TerraformImportModal = ({
     <div className="TerraformImportModal">
       <h3>Import Terraform</h3>
 
+      <details className="TerraformImportModal__instructions">
+        <summary className="TerraformImportModal__instructionsSummary">
+          How to generate plan.json and graph.dot
+        </summary>
+        <div className="TerraformImportModal__instructionsBody">
+          <p className="TerraformImportModal__instructionsLead">
+            From the same Terraform or OpenTofu working directory, create a
+            binary plan, export JSON from that plan, then export the plan-type
+            dependency graph. Import both files together below.
+          </p>
+          <ol className="TerraformImportModal__instructionsSteps">
+            <li>
+              <strong>Plan JSON</strong>
+              <pre className="TerraformImportModal__instructionsCode">
+                <code>{`# Terraform
+terraform plan -out=tfplan
+terraform show -json tfplan > plan.json
+
+# OpenTofu
+tofu plan -out=tfplan
+tofu show -json tfplan > plan.json`}</code>
+              </pre>
+            </li>
+            <li>
+              <strong>Graph DOT</strong>
+              <pre className="TerraformImportModal__instructionsCode">
+                <code>{`# Terraform
+terraform graph -type=plan > graph.dot
+
+# OpenTofu
+tofu graph -type=plan > graph.dot`}</code>
+              </pre>
+            </li>
+          </ol>
+          <p className="TerraformImportModal__instructionsFoot">
+            Filenames are up to you; the importer expects JSON from{" "}
+            <code>terraform show -json</code> / <code>tofu show -json</code> and
+            a DOT file from <code>graph -type=plan</code>.
+          </p>
+        </div>
+      </details>
+
       <div className="TerraformImportModal__section">
         <h4>Upload new plan</h4>
         <div className="TerraformImportModal__settings__inputs">

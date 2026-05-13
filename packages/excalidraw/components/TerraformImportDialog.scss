@@ -268,5 +268,114 @@
         font-size: 0.7rem;
       }
     }
+
+    &__instructions {
+      width: 100%;
+      border: 1px solid var(--color-gray-30);
+      border-radius: 0.5rem;
+      background-color: var(--color-surface-low);
+
+      &Summary {
+        list-style-position: outside;
+        padding: 0.625rem 0.875rem 0.625rem 1.75rem;
+        margin: 0;
+        font-family: "Assistant";
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--color-on-surface);
+        cursor: pointer;
+        user-select: none;
+
+        &:focus-visible {
+          outline: 2px solid var(--color-primary);
+          outline-offset: 2px;
+        }
+
+        &::-webkit-details-marker {
+          color: var(--color-gray-60);
+        }
+      }
+
+      &[open] > summary {
+        border-bottom: 1px solid var(--color-gray-20);
+      }
+
+      &Body {
+        padding: 0.75rem 0.875rem 0.875rem;
+        user-select: text;
+        cursor: auto;
+      }
+
+      &Lead,
+      &Foot {
+        margin: 0 0 0.75rem;
+        font-family: "Assistant";
+        font-weight: 400;
+        font-size: 0.8125rem;
+        line-height: 1.45;
+        color: var(--color-gray-70);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        code {
+          font-family: var(--font-family);
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: var(--color-on-surface);
+        }
+      }
+
+      &Foot {
+        margin-top: 0.75rem;
+        margin-bottom: 0;
+      }
+
+      &Steps {
+        margin: 0;
+        padding-left: 1.25rem;
+        font-family: "Assistant";
+        font-size: 0.8125rem;
+        line-height: 1.45;
+        color: var(--color-on-surface);
+
+        li {
+          margin-bottom: 0.75rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        strong {
+          display: block;
+          margin-bottom: 0.35rem;
+          font-weight: 600;
+        }
+      }
+
+      &Code {
+        margin: 0.35rem 0 0;
+        padding: 0.5rem 0.625rem;
+        border-radius: 0.375rem;
+        background-color: var(--color-gray-10);
+        border: 1px solid var(--color-gray-20);
+        overflow-x: auto;
+        font-family: var(--font-family);
+        font-size: 0.6875rem;
+        line-height: 1.4;
+        color: var(--color-on-surface);
+        white-space: pre;
+
+        code {
+          font-family: inherit;
+          font-size: inherit;
+          background: none;
+          border: none;
+          padding: 0;
+        }
+      }
+    }
   }
 }
