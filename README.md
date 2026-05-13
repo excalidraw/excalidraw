@@ -60,6 +60,8 @@ yarn build:pages
 
 This disables Sentry and product analytics for the bundle, omits production source maps by default (set `VITE_PROD_SOURCEMAP=true` in env to opt back in), and skips `vite-plugin-checker` during `vite build` (typecheck and lint remain available via `yarn test:typecheck` and `yarn test:code`).
 
+**Ship a static bundle tarball** (for uploads or handoff): `yarn bundle:whiteboard` runs `yarn build:pages` then writes `releases/tfdraw-whiteboard-<appVersion>-<gitShortSha>.tar.gz` (contents of `excalidraw-app/build/`). Use `yarn bundle:whiteboard:archive` if you already built. Pass options after `--`, e.g. `yarn bundle:whiteboard -- --profile=full` for `yarn build:app` plus version stamp, or `--out=dist` / `--name=my-board`. Requires `tar` on your PATH.
+
 **Cloudflare Pages via GitHub Actions (direct upload):**
 
 The workflow [.github/workflows/pages-deploy.yml](.github/workflows/pages-deploy.yml) deploys when a **push** lands on **`main` or `master`**, and on **workflow_dispatch** (manual run in the Actions tab). That **includes merging a pull request** into `main` or `master`, because GitHub adds the merge commit as a push to the base branch. Direct pushes to those branches also run the workflow. Steps: `yarn install --frozen-lockfile`, `yarn build:pages`, then `wrangler pages deploy excalidraw-app/build`. Configure the repository under **Settings → Secrets and variables → Actions**:
