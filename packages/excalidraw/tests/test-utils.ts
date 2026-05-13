@@ -1,11 +1,18 @@
 import "pepjs";
-import { act } from "@testing-library/react";
 import {
-  render,
+  act,
   queries,
   waitFor,
   fireEvent,
   cleanup,
+  createEvent,
+  getByTestId,
+  queryAllByTestId,
+  queryAllByText,
+  queryByTestId,
+  queryByText,
+  screen,
+  render as rtlRender,
 } from "@testing-library/react";
 import ansi from "ansicolor";
 
@@ -47,13 +54,14 @@ const renderApp: TestRenderFn = async (ui, options) => {
   // when tests reuse Pointer instances let's reset the last
   // pointer poisitions so there's no leak between tests
   Pointer.resetAll();
+  cleanup();
 
   if (options?.localStorageData) {
     initLocalStorage(options.localStorageData);
     delete options.localStorageData;
   }
 
-  const renderResult = render(ui, {
+  const renderResult = rtlRender(ui, {
     queries: customQueries,
     ...options,
   });
@@ -100,11 +108,20 @@ const renderApp: TestRenderFn = async (ui, options) => {
   return renderResult;
 };
 
-// re-export everything
-export * from "@testing-library/react";
-
-// override render method
-export { renderApp as render };
+export {
+  act,
+  cleanup,
+  createEvent,
+  fireEvent,
+  getByTestId,
+  queryAllByTestId,
+  queryAllByText,
+  queryByTestId,
+  queryByText,
+  renderApp as render,
+  screen,
+  waitFor,
+};
 
 /**
  * For state-sharing across test helpers.

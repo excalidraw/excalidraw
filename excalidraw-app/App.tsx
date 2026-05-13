@@ -145,14 +145,13 @@ import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 
-import type { CollabAPI } from "./collab/Collab";
-
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
 
-polyfill();
+import type { CollabAPI } from "./collab/Collab";
 
+polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
@@ -214,7 +213,7 @@ const getShareableLinkConfirmDialog = () =>
     ),
     actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
     color: "danger",
-  }) as const;
+  } as const);
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
@@ -1358,13 +1357,11 @@ const LandingPage = () => {
           <p className="landing-hero__eyebrow">
             Keep your architecture diagram in sync with your Terraform.
           </p>
-          <h1 id="landing-title">
-            Terraform as a living architecture diagram
-          </h1>
+          <h1 id="landing-title">Terraform as a living architecture diagram</h1>
           <p className="landing-hero__lede">
             tfdraw.io maps Terraform state, tfplan JSON, and graph data into an
-            editable architecture canvas so platform teams can visualize changes,
-            review plans, and annotate the real infrastructure model.
+            editable architecture canvas so platform teams can visualize
+            changes, review plans, and annotate the real infrastructure model.
           </p>
           <div className="landing-hero__actions">
             <button
@@ -1399,9 +1396,13 @@ const LandingPage = () => {
               <span className="landing-topology__label">region</span>
               <div className="landing-topology landing-topology--vpc">
                 <span className="landing-topology__label">vpc</span>
-                <span className="landing-service landing-service--igw">igw</span>
+                <span className="landing-service landing-service--igw">
+                  igw
+                </span>
                 <span className="landing-link landing-link--a" />
-                <span className="landing-service landing-service--alb">alb</span>
+                <span className="landing-service landing-service--alb">
+                  alb
+                </span>
                 <span className="landing-link landing-link--b" />
                 <span className="landing-service landing-service--lambda">
                   lambda
@@ -1409,7 +1410,9 @@ const LandingPage = () => {
                 <span className="landing-link landing-link--c" />
                 <span className="landing-service landing-service--s3">s3</span>
                 <span className="landing-link landing-link--d" />
-                <span className="landing-service landing-service--sqs">sqs</span>
+                <span className="landing-service landing-service--sqs">
+                  sqs
+                </span>
                 <span className="landing-link landing-link--e" />
                 <span className="landing-service landing-service--nat">
                   nat
@@ -1474,10 +1477,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section
-        className="landing-strip"
-        aria-labelledby="landing-strip-title"
-      >
+      <section className="landing-strip" aria-labelledby="landing-strip-title">
         <h2 id="landing-strip-title" className="landing-strip__heading">
           Source-backed view for platform teams
         </h2>
@@ -1581,11 +1581,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section
-        id="faq"
-        className="landing-faq"
-        aria-labelledby="faq-title"
-      >
+      <section id="faq" className="landing-faq" aria-labelledby="faq-title">
         <div className="landing-section-heading">
           <p>FAQ</p>
           <h2 id="faq-title">Terraform visualization questions</h2>
@@ -1604,9 +1600,9 @@ const LandingPage = () => {
           <div className="landing-faq__item">
             <dt>Does tfdraw.io replace Terraform or HCL?</dt>
             <dd>
-              No. It is a read-and-annotate view on top of Terraform outputs. You
-              keep HCL, modules, and workflows in Git; the canvas reflects what
-              state and plans say is true in the environment.
+              No. It is a read-and-annotate view on top of Terraform outputs.
+              You keep HCL, modules, and workflows in Git; the canvas reflects
+              what state and plans say is true in the environment.
             </dd>
           </div>
           <div className="landing-faq__item">
@@ -1638,11 +1634,7 @@ const LandingPage = () => {
 
       <section className="landing-final" aria-labelledby="final-title">
         <h2 id="final-title">Bring the next Terraform review to tfdraw.io.</h2>
-        <button
-          type="button"
-          className="landing-cta"
-          onClick={scrollToCanvas}
-        >
+        <button type="button" className="landing-cta" onClick={scrollToCanvas}>
           Visualize Terraform changes
         </button>
       </section>

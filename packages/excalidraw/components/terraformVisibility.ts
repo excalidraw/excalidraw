@@ -764,9 +764,7 @@ export const isTerraformExpandAllActive = (
 
   const keysOnResources = new Set(
     elements
-      .filter(
-        (e) => getCustomData(e).terraformVisibilityRole === "resource",
-      )
+      .filter((e) => getCustomData(e).terraformVisibilityRole === "resource")
       .map((e) => getTerraformVisibilityKey(e))
       .filter((k): k is string => Boolean(k)),
   );

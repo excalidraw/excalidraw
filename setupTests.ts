@@ -1,21 +1,19 @@
 import fs from "fs";
 
-// vitest.setup.ts
-import "vitest-canvas-mock";
 import "@testing-library/jest-dom";
 import { beforeEach, vi } from "vitest";
 
 import "fake-indexeddb/auto";
 
-// `vitest-canvas-mock` registers `afterAll` that deletes `global.jest`; restore before each test.
-beforeEach(() => {
-  (globalThis as unknown as { jest: typeof vi }).jest = vi;
-});
-
 import polyfill from "./packages/excalidraw/polyfill";
 import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+
+// `vitest-canvas-mock` registers `afterAll` that deletes `global.jest`; restore before each test.
+beforeEach(() => {
+  (globalThis as unknown as { jest: typeof vi }).jest = vi;
+});
 
 vi.mock("@excalidraw/common", async (importOriginal) => {
   const module = await importOriginal<typeof import("@excalidraw/common")>();
