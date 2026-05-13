@@ -1,12 +1,10 @@
 # Excalidraw Terraform
 
-A **Terraform architecture visualizer**, originally built on [Excalidraw](https://excalidraw.com) and now with an experimental [tldraw](https://tldraw.dev) frontend as well.
+A **Terraform architecture visualizer** built on [Excalidraw](https://excalidraw.com). You upload **plan JSON** (from `terraform show -json`) and **graph DOT** (from `terraform graph`); the **browser** parses them, lays out resources, and replaces the canvas with an editable diagram—no separate import API or collaboration backend.
 
-Production/static Excalidraw builds open on a frontend-only Terraform Canvas landing page with an embedded editable canvas. From there you can draw, load/save local scenes, export images, and use local Terraform import entry points without a collaboration server, Firebase share links, or Excalidraw+ cloud actions.
+Production/static builds open on a **Terraform Canvas** landing page with an embedded canvas: draw, load/save local scenes, export images, and run **Import Terraform** the same way as in development—all without a collaboration server, Firebase share links, or Excalidraw+ cloud actions.
 
-For backend-backed rendering, upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the backend enriches the graph and serves it through any registered frontend connector — today that's a fully-featured Excalidraw scene (AWS service icons, dependency arrows, module boxes, account/region/VPC/subnet boundaries) and a first-pass tldraw renderer.
-
-![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas-aws-icons.png)
+![Sample import: plan JSON and graph DOT rendered as an editable AWS-style diagram](docs/terraform-import-sample.png)
 
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
@@ -18,17 +16,15 @@ For backend-backed rendering, upload a Terraform plan JSON, graph DOT, and optio
 
 ## What this fork adds
 
-- **Frontend-only public landing page** — production/static `/` renders a Terraform Canvas landing page and an embedded Excalidraw canvas in the same page. The public mode intentionally hides collaboration, share-link, Firebase-backed export, and Excalidraw+ cloud surfaces.
-- **Terraform plan + graph import** — Upload plan JSON from `terraform show -json` and DOT from `terraform graph`; the backend builds resource nodes and dependency edges.
-- **Optional state enrichment** — Upload `terraform.tfstate` to merge real deployed attributes, existing dependencies, ARNs, regions, accounts, VPC IDs, and subnet IDs into the rendered graph.
-- **AWS architecture icons** — Resource cards use the bundled AWS architecture icon library, including IAM, Lambda, S3, SQS, RDS, VPC, CloudWatch, and many other services.
-- **Module-aware layout** — Terraform modules are placed as layout units so sibling modules have space and module internals stay readable.
-- **Nested infrastructure boundaries** — Account, region, VPC, subnet, and module containers are rendered with staggered padding so the ownership/context hierarchy is visible.
-- **Lambda module preset** — Common Lambda module internals such as function, role, inline policies, log group, and package resources get stable relative placement.
-- **Relationship rendering** — Planned dependencies and state-derived dependencies are drawn as arrows behind the resource cards.
-- **Terraform details panel data** — Resource diffs, known-after-apply values, and selected state/config fields are stored on the Excalidraw elements for inspection.
-- **Pluggable frontend connectors** — The backend exposes `GET /terraform/upload/:id/render/:renderer`. Today `:renderer` can be `excalidraw` (stable) or `tldraw` (beta); new frontends plug in via `packages/backend/connectors/`. A renderer-neutral `DiagramIR` is built once per request so future connectors don't need to re-derive node/edge/group structure.
-- **Sibling tldraw app** — `tldraw-app/` mounts backend-rendered tldraw documents on a [tldraw](https://tldraw.dev) canvas via the `render/tldraw` connector route.
+- **Frontend-only public landing page** — production/static `/` renders a Terraform Canvas landing page and an embedded Excalidraw canvas in the same page. Public mode intentionally hides collaboration, share-link, Firebase-backed export, and Excalidraw+ cloud surfaces.
+- **Client-side Terraform plan + graph import** — Plan JSON (`terraform show -json`) and DOT (`terraform graph`) are read in the browser; [`terraformPlanParsing`](./packages/excalidraw/components/terraformPlanParsing.tsx) builds nodes, edges, and an Excalidraw scene (no Node upload service). [`packages/backend/`](./packages/backend/) holds **fixtures** and legacy reference scripts used for parity with the client pipeline.
+- **Semantic and module views** — Choose **Semantic view** (account, region, VPC, subnet topology) or **Module view** (module-framed graph) in the import dialog.
+- **AWS architecture icons** — Resource cards use the bundled AWS architecture icon library (IAM, Lambda, S3, SQS, RDS, VPC, CloudWatch, and many others).
+- **Module-aware layout** — Modules are layout units so sibling modules have space and internals stay readable.
+- **Nested infrastructure boundaries** — Account, region, VPC, subnet, and module containers use staggered padding so hierarchy is visible.
+- **Lambda module preset** — Common Lambda module internals (function, role, inline policies, log group, package) get stable relative placement.
+- **Relationship rendering** — Planned dependencies (and state-backed edges when state is supplied) render as arrows behind resource cards.
+- **Terraform details on elements** — Resource diffs, known-after-apply values, and selected fields are stored on Excalidraw elements for inspection.
 
 The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
 
@@ -91,38 +87,27 @@ Then only **`wrangler pages deploy`** from GitHub Actions updates the site. Prod
 npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-Use the **`pages`** subcommand. If Wrangler prints a hint about `wrangler versions upload --assets=...` or a `wrangler.jsonc` **`assets`** block, you are on **`wrangler deploy`** (Workers static assets), not **Pages**. This repo uses **Pages**; config is in [wrangler.jsonc](wrangler.jsonc) with **`pages_build_output_dir`** (not `assets`).
+Use the **`pages`** subcommand for Cloudflare **Pages** (`wrangler pages deploy …`). **`wrangler deploy`** targets **Workers** with static assets and uses the `assets` block instead of (or in addition to) Pages upload semantics.
 
-**`wrangler.jsonc` (Pages):** [wrangler.jsonc](wrangler.jsonc) sets **`pages_build_output_dir`** to `./excalidraw-app/build` and a placeholder **`name`**. Replace **`name`** with your real **Pages project name** (same value as `CF_PAGES_PROJECT_NAME` / dashboard). You can also run `npx wrangler pages download config <PROJECT_NAME>` to generate a file from an existing project ([docs](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)). This file does **not** run the Vite build on Cloudflare by itself; it mainly aligns Wrangler / Pages with the output folder and becomes config source-of-truth once adopted.
+**`wrangler.jsonc`:** [wrangler.jsonc](wrangler.jsonc) sets **`pages_build_output_dir`** to `./excalidraw-app/build` for **`wrangler pages deploy`**, and an **`assets`** block with the same directory plus **`not_found_handling`: `single-page-application`** for **Workers + static assets** / SPA routing. Replace **`name`** with your real **Pages** or **Worker** name as appropriate. This file does **not** run the Vite build on Cloudflare by itself; CI and local builds write `excalidraw-app/build` first. You can run `npx wrangler pages download config <PROJECT_NAME>` to align with an existing Pages project ([docs](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)).
 
-**Run the backend-backed importer:**
-
-```bash
-yarn install
-yarn start           # Excalidraw app (Vite dev server)
-# In another terminal:
-yarn start:backend   # Backend on http://localhost:3000
-```
-
-Then use the **Terraform Import** flow in the app to upload:
-
-1. **Plan file** — JSON from `terraform show -json <planfile>` (or your plan output saved as JSON).
-2. **Graph file** — DOT output (e.g. from `terraform graph` or your plan’s graph representation).
-3. **State file, optional** — `terraform.tfstate` for deployed-resource enrichment and existing dependency discovery.
-
-The backend stores the upload, generates the enriched graph, and returns an Excalidraw scene that the app inserts into the canvas.
-
-Import shortcut: `Ctrl/Cmd + Shift + K`.
-
-**Try the experimental tldraw frontend:**
+**Import Terraform in the app**
 
 ```bash
 yarn install
-yarn start:backend   # one terminal — :3000
-yarn start:tldraw    # another terminal — :3001
+yarn start
 ```
 
-The tldraw app talks to the same backend (`VITE_TERRAFORM_BACKEND_URL`, defaults to `http://localhost:3000`) and converts the Excalidraw scene to tldraw shapes client-side. See [`tldraw-app/README.md`](./tldraw-app/README.md) for details and known limitations of the first-pass converter.
+Open the Vite URL (usually `http://localhost:3000/`). In development, `/` opens the Excalidraw editor directly. Use the **Import Terraform** action in the menu or **Ctrl/Cmd+Shift+K**.
+
+1. **Plan file** — JSON from `terraform show -json <planfile>` (or equivalent OpenTofu).
+2. **Graph file** — DOT from `terraform graph` (e.g. `terraform graph -type=plan > graph.dot`).
+
+Plan and DOT must be selected **together**. The client runs [`terraformPlanParsing`](./packages/excalidraw/components/terraformPlanParsing.tsx) and replaces the canvas with the returned scene.
+
+**Try the fixtures:** [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot) (same pair used by [`terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts)).
+
+**State files:** The parsing pipeline can merge optional raw `terraform.tfstate`, but the **state file control is currently disabled** in the import dialog (`TERRAFORM_STATE_UPLOAD_ENABLED` in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx)).
 
 ---
 
@@ -136,7 +121,7 @@ Available in public mode:
 - Local browser persistence.
 - Load/save Excalidraw scenes from disk.
 - Export images.
-- Local Terraform import paths that do not require the backend.
+- **Import Terraform** — plan JSON + graph DOT in the browser (same as full editor mode).
 
 Hidden in public mode:
 
@@ -180,9 +165,9 @@ terraform graph -type=plan > graph.dot
 tofu graph -type=plan > graph.dot
 ```
 
-### 3. State File (Optional)
+### 3. State file (optional; UI currently off)
 
-You can also upload your `terraform.tfstate` file to enrich the diagram with real ARNs, VPC IDs, and existing resource attributes.
+The importer’s parsing layer can merge raw `terraform.tfstate` when provided, but **uploading state is not enabled** in the dialog yet. Skip this until the UI flag is turned on in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx).
 
 ---
 
@@ -206,10 +191,7 @@ yarn test terraformPlanParsing.test --watch=false
 
 That executes the **local Terraform plan parser** pipeline test ([`packages/excalidraw/components/terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts)): it loads [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot), runs `terraformPlanParsing`, and asserts the HTTP-style response and empty Excalidraw scene shape.
 
-Additional suites:
-
-- **Backend:** `yarn test:backend`
-- **tldraw-app** (includes an allplanmodules-related smoke): `yarn test:tldraw`
+Other packages may define their own `yarn test` scripts under `packages/*`; run them with `yarn --cwd <path> test` when needed.
 
 ### Other commands
 
@@ -217,7 +199,6 @@ Additional suites:
 - **Lint / format:** `yarn fix`
 - **Build packages:** `yarn build:packages`
 - **Build app:** `yarn build:app`
-- **Build tldraw app:** `yarn build:tldraw`
 
 See the main [Excalidraw documentation](https://docs.excalidraw.com) and [development guide](https://docs.excalidraw.com/docs/introduction/development) for the core editor.
 
