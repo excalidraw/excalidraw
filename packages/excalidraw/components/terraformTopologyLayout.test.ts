@@ -925,6 +925,9 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           region: "us-east-1",
           vpcId: "vpc-test",
           addresses: ["module.vpc.aws_route_table.main"],
+          routeChildrenByTable: {
+            "module.vpc.aws_route_table.main": [],
+          },
         },
       ],
     };
@@ -995,15 +998,22 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const vpcEl = vpc!;
     const vpcBodyBottom =
       vpcEl.y + (vpcEl.height ?? 0) - TOPOLOGY_EDGE_TILE_HALF_H;
-    const eps = 6;
+    /** Cluster aligns to `vpcCellBodyH` bottom; `vpcBodyBottom` includes bottom-strip slack. */
+    const eps = 56;
     const rt = rtRects[0]!;
-    const h = rt.height ?? 0;
-    const midY = rt.y + h / 2;
+    const clusterFrame = elements.find((e) => e.id === rt.frameId);
+    expect(clusterFrame?.type).toBe("frame");
     expect(
-      Math.abs(midY - vpcBodyBottom),
-      "route table tile vertical center on VPC body bottom line",
+      (clusterFrame?.customData as { terraformTopologyRole?: string } | undefined)
+        ?.terraformTopologyRole,
+    ).toBe("primaryCluster");
+    const bottomY = clusterFrame!.y + (clusterFrame!.height ?? 0);
+    expect(
+      Math.abs(bottomY - vpcBodyBottom),
+      "route table primaryCluster frame bottom on VPC body bottom line",
     ).toBeLessThanOrEqual(eps);
-    expect(rt.frameId).toBe(vpcEl.id);
+    expect(rt.frameId).toBe(clusterFrame!.id);
+    expect(clusterFrame!.frameId).toBe(vpcEl.id);
 
     assertTopologyFramesContainChildren(elements);
   });

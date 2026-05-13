@@ -46,7 +46,16 @@ import {
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 
-import { routeTableBottomRowMinInnerWidth } from "./terraformTopologyPlacement";
+import {
+  buildRouteTableZoneSizingMapForVpc,
+  routeTableCompositeHeightPx,
+  routeTableCompositeSlotWidthPx,
+  routeTableMaxCompositeHeightForRowPx,
+  vpcBottomRouteTablesRowSizing,
+  type RouteTableBottomVpcPlacement,
+  type RouteTableBottomZonePlacement,
+  type RouteTableZoneBottomSizing,
+} from "./terraformTopologyPlacement";
 
 import {
   buildResourceCloudWatchCluster,
@@ -163,21 +172,26 @@ const VPC_INTERNET_EDGE_TILE_H = TOPOLOGY_TIER2_H;
 const VPC_INTERNET_EDGE_TILE_GAP = TOPOLOGY_SATELLITE_GAP_PX;
 const VPC_INTERNET_EDGE_GUTTER = VPC_INTERNET_EDGE_TILE_W + px(12);
 
-/** Extra frame height so bottom-edge VPC tiles sit fully inside the VPC frame (tile mid stays on the body bottom line). */
+/** Extra frame height for VPC bottom strip (endpoints + route-table composites). */
 function vpcBottomStripInsetPx(
   epCount: number,
-  vpcBottomRtCount: number,
+  vpcBottomRouteTableMaxCompositeH: number,
 ): number {
-  if (epCount === 0 && vpcBottomRtCount === 0) {
-    return 0;
+  const epHalf = epCount > 0 ? Math.ceil(VPC_ENDPOINT_TILE_H / 2) : 0;
+  const rtHalf =
+    vpcBottomRouteTableMaxCompositeH > 0
+      ? Math.ceil(vpcBottomRouteTableMaxCompositeH / 2)
+      : 0;
+  if (epCount > 0 && vpcBottomRouteTableMaxCompositeH > 0) {
+    return epHalf + rtHalf + 8;
   }
-  return Math.ceil(VPC_ENDPOINT_TILE_H / 2);
+  return Math.max(epHalf, rtHalf);
 }
 
-function zoneBottomRouteTableInsetPx(
-  anySubnetZoneHasRouteTable: boolean,
-): number {
-  return anySubnetZoneHasRouteTable ? Math.ceil(ROUTE_TABLE_TILE_H / 2) : 0;
+function zoneBottomRouteTableInsetPx(maxCompositeHeightPx: number): number {
+  return maxCompositeHeightPx > 0
+    ? Math.ceil(maxCompositeHeightPx / 2)
+    : 0;
 }
 
 export type TerraformTopologyRole =
@@ -581,7 +595,7 @@ function vpcFrameDimensionsForZones(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   plan?: unknown,
-  routeTableCountByZoneSignature?: ReadonlyMap<string, number>,
+  routeTableZoneSizing?: ReadonlyMap<string, RouteTableZoneBottomSizing>,
   vpcInfrastructureTopPadPx = 0,
   subnetNameById: ReadonlyMap<string, string> = new Map(),
   sideGutterPx = 0,
@@ -611,24 +625,27 @@ function vpcFrameDimensionsForZones(
   const znRows = Math.max(1, ...zoneColumns.map((col) => col.length));
   let perZoneW = 0;
   let perZoneBodyH = 0;
-  let anyZoneRouteTable = false;
+  let maxZoneRouteTableInset = 0;
   for (const z of vpcZs) {
     const sortedZ = [...z.addresses].sort();
     const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
-    const rtN = routeTableCountByZoneSignature?.get(z.subnetSignature) ?? 0;
+    const sizing = routeTableZoneSizing?.get(z.subnetSignature);
     const rtMinW =
-      rtN > 0
+      sizing && sizing.tableCount > 0
         ? 2 * INNER_PAD +
           FRAME_CONTENT_SLACK_X +
-          routeTableBottomRowMinInnerWidth(rtN)
+          sizing.minInnerWidthPx
         : 0;
     perZoneW = Math.max(perZoneW, d.w, rtMinW);
     perZoneBodyH = Math.max(perZoneBodyH, d.h);
-    if (rtN > 0) {
-      anyZoneRouteTable = true;
+    if (sizing && sizing.tableCount > 0) {
+      maxZoneRouteTableInset = Math.max(
+        maxZoneRouteTableInset,
+        zoneBottomRouteTableInsetPx(sizing.maxCompositeHeightPx),
+      );
     }
   }
-  const zoneRtInset = zoneBottomRouteTableInsetPx(anyZoneRouteTable);
+  const zoneRtInset = maxZoneRouteTableInset;
   const perZoneH = perZoneBodyH + zoneRtInset;
   const innerW =
     znCols * perZoneW + (znCols > 0 ? znCols - 1 : 0) * ZONE_CELL_GAP;
@@ -810,26 +827,26 @@ function endpointsForVpc(
   return b?.addresses ?? [];
 }
 
-function routeTablesVpcBottomFor(
+function routeTablesVpcBottomRow(
   placements: TopologyRouteTableBottomPlacements,
   accountId: string,
   regionName: string,
   vpcId: string,
-): readonly string[] {
+): RouteTableBottomVpcPlacement | null {
   const row = placements.vpcBottom.find(
     (x) =>
       x.accountId === accountId && x.region === regionName && x.vpcId === vpcId,
   );
-  return row?.addresses ?? [];
+  return row ?? null;
 }
 
-function routeTablesZoneBottomFor(
+function routeTablesZoneBottomRow(
   placements: TopologyRouteTableBottomPlacements,
   accountId: string,
   regionName: string,
   vpcId: string,
   subnetSignature: string,
-): readonly string[] {
+): RouteTableBottomZonePlacement | null {
   const row = placements.zoneBottom.find(
     (x) =>
       x.accountId === accountId &&
@@ -837,38 +854,20 @@ function routeTablesZoneBottomFor(
       x.vpcId === vpcId &&
       x.subnetSignature === subnetSignature,
   );
-  return row?.addresses ?? [];
-}
-
-function buildRouteTableZoneCountMapForVpc(
-  placements: TopologyRouteTableBottomPlacements,
-  accountId: string,
-  regionName: string,
-  vpcId: string,
-): Map<string, number> {
-  const m = new Map<string, number>();
-  for (const z of placements.zoneBottom) {
-    if (
-      z.accountId === accountId &&
-      z.region === regionName &&
-      z.vpcId === vpcId
-    ) {
-      m.set(z.subnetSignature, z.addresses.length);
-    }
-  }
-  return m;
+  return row ?? null;
 }
 
 /**
- * `aws_route_table` rectangles along the bottom of a subnet zone or VPC frame (tile mid on the
- * logical body bottom line; frame height includes bottom-strip inset).
+ * One `primaryCluster` frame per `aws_route_table` — same box pattern as Lambda/S3/SQS in
+ * `appendTopologyResourceRectangles` (tier-0 primary + tier-2 `aws_route` stack below).
  */
 function appendRouteTableBottomEdgeRectangles(
   skeleton: ExcalidrawElementSkeleton[],
   accountId: string,
   regionName: string,
   vpcId: string,
-  addrs: readonly string[],
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
   boxX: number,
   boxY: number,
   boxW: number,
@@ -877,26 +876,50 @@ function appendRouteTableBottomEdgeRectangles(
   zoneSubnetSignature: string | undefined,
   stackAboveBottomPx: number,
 ): string[] {
-  if (addrs.length === 0) {
+  if (tableAddrs.length === 0) {
     return [];
   }
-  const sorted = [...addrs].sort();
+  const sorted = [...tableAddrs].sort();
   const innerLeft = boxX + INNER_PAD;
   const innerW = Math.max(0, boxW - 2 * INNER_PAD);
-  const cols = sorted.length;
+  const slotW = routeTableCompositeSlotWidthPx(0);
   const rowW =
-    cols * ROUTE_TABLE_TILE_W +
-    (cols > 0 ? cols - 1 : 0) * ROUTE_TABLE_TILE_GAP;
+    sorted.length * slotW +
+    (sorted.length > 0 ? sorted.length - 1 : 0) * ROUTE_TABLE_TILE_GAP;
   const startX = innerLeft + Math.max(0, (innerW - rowW) / 2);
 
-  const bottomRowTop =
-    boxY + boxH - Math.round(ROUTE_TABLE_TILE_H / 2) - stackAboveBottomPx;
-  const rectIds: string[] = [];
+  const clusterFrameIds: string[] = [];
+  let cursorX = startX;
+  const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
 
-  for (let i = 0; i < sorted.length; i++) {
-    const addr = sorted[i]!;
-    const rx = startX + i * (ROUTE_TABLE_TILE_W + ROUTE_TABLE_TILE_GAP);
-    const ry = bottomRowTop;
+  for (const addr of sorted) {
+    const routes = routeChildrenByTable[addr] ?? [];
+    const routeCount = routes.length;
+    const frameH = routeTableCompositeHeightPx(routeCount);
+    const compositeBottom = boxY + boxH - stackAboveBottomPx;
+    const frameY = compositeBottom - frameH;
+
+    const clusterChildIds: string[] = [];
+    let clusterBounds: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    } | null = null;
+    const addClusterMember = (
+      id: string,
+      bx: number,
+      by: number,
+      bw: number,
+      bh: number,
+    ) => {
+      clusterChildIds.push(id);
+      clusterBounds = growClusterBounds(clusterBounds, bx, by, bw, bh);
+    };
+
+    const rx = cursorX + pad;
+    const ry = frameY + pad;
+
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformCardResourceType(
       addr,
@@ -907,14 +930,15 @@ function appendRouteTableBottomEdgeRectangles(
       resourceType,
       action,
     );
-    rectIds.push(addr);
+
+    addClusterMember(addr, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
     pushResourceRectangleSkeleton(
       skeleton,
       addr,
       rx,
       ry,
-      ROUTE_TABLE_TILE_W,
-      ROUTE_TABLE_TILE_H,
+      RESOURCE_RECT_W,
+      RESOURCE_RECT_H,
       nodes,
       {
         initiallyVisible,
@@ -929,9 +953,60 @@ function appendRouteTableBottomEdgeRectangles(
         },
       },
     );
+
+    const ruleTileX =
+      rx + Math.floor((RESOURCE_RECT_W - TOPOLOGY_TIER2_W) / 2);
+    let ySat = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+    for (const rAddr of routes) {
+      const rNode = nodes[rAddr] as TerraformPlanGraphNode | undefined;
+      const rResource = getPrimaryResource(rNode) as Record<string, unknown> | null;
+      const rType = getTerraformCardResourceType(rAddr, rResource);
+      const rAction = getTerraformPlanNodeAction(rNode);
+      const rVisible = isInitiallyVisibleTerraformTopologyTile(rType, rAction);
+      addClusterMember(rAddr, ruleTileX, ySat, TOPOLOGY_TIER2_W, TOPOLOGY_TIER2_H);
+      pushResourceRectangleSkeleton(
+        skeleton,
+        rAddr,
+        ruleTileX,
+        ySat,
+        TOPOLOGY_TIER2_W,
+        TOPOLOGY_TIER2_H,
+        nodes,
+        {
+          initiallyVisible: rVisible,
+          explodeParentKeys: [addr],
+          satelliteTier: 2,
+        },
+      );
+      ySat += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
+    }
+
+    const b = clusterBounds!;
+    const clusterSkId = primaryClusterSkeletonId(addr);
+    skeleton.push({
+      type: "frame",
+      id: clusterSkId,
+      name: shortTerraformResourceLabel(addr).slice(0, 48),
+      x: b.minX - pad,
+      y: b.minY - pad,
+      width: b.maxX - b.minX + 2 * pad,
+      height: b.maxY - b.minY + 2 * pad,
+      children: clusterChildIds as readonly string[],
+      customData: frameCustomData(
+        "primaryCluster",
+        accountId,
+        regionName,
+        vpcId,
+        clusterSkId,
+        { terraformPrimaryAddress: addr },
+      ),
+    });
+    clusterFrameIds.push(clusterSkId);
+
+    cursorX += slotW + ROUTE_TABLE_TILE_GAP;
   }
 
-  return rectIds;
+  return clusterFrameIds;
 }
 
 /**
@@ -2221,7 +2296,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       if (hasVpc) {
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
-          const rtZoneCounts = buildRouteTableZoneCountMapForVpc(
+          const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
             routeTableBottomPlacements,
             accountId,
             regionName,
@@ -2251,7 +2326,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             nodes,
             arnIndex,
             plan,
-            rtZoneCounts,
+            rtZoneSizing,
             infraTop,
             subnetNameById,
             vpcInternetSideGutterPx(internetEdges),
@@ -2268,23 +2343,23 @@ export async function buildTerraformTopologyExcalidrawScene(
                 FRAME_CONTENT_SLACK_X +
                 vpcEndpointSingleRowMinInnerWidth(epAddrs.length)
               : 0;
-          const vpcBottomRt = routeTablesVpcBottomFor(
+          const vpcRtSizing = vpcBottomRouteTablesRowSizing(
             routeTableBottomPlacements,
             accountId,
             regionName,
             vpcId,
           );
           const rtMinOuter =
-            vpcBottomRt.length > 0
+            vpcRtSizing != null
               ? 2 * INNER_PAD +
                 FRAME_CONTENT_SLACK_X +
-                routeTableBottomRowMinInnerWidth(vpcBottomRt.length)
+                vpcRtSizing.minInnerWidthPx
               : 0;
           vpcCellW = Math.max(vpcCellW, vd.w, epMinOuter, rtMinOuter);
         }
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
-          const rtZoneCounts = buildRouteTableZoneCountMapForVpc(
+          const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
             routeTableBottomPlacements,
             accountId,
             regionName,
@@ -2314,7 +2389,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             nodes,
             arnIndex,
             plan,
-            rtZoneCounts,
+            rtZoneSizing,
             infraTop,
             subnetNameById,
             vpcInternetSideGutterPx(internetEdges),
@@ -2325,7 +2400,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             regionName,
             vpcId,
           );
-          const vpcBottomRt = routeTablesVpcBottomFor(
+          const vpcRtSizing = vpcBottomRouteTablesRowSizing(
             routeTableBottomPlacements,
             accountId,
             regionName,
@@ -2334,7 +2409,10 @@ export async function buildTerraformTopologyExcalidrawScene(
           vpcCellBodyH = Math.max(vpcCellBodyH, vd.h);
           maxVpcBottomStripInset = Math.max(
             maxVpcBottomStripInset,
-            vpcBottomStripInsetPx(epAddrs.length, vpcBottomRt.length),
+            vpcBottomStripInsetPx(
+              epAddrs.length,
+              vpcRtSizing?.maxCompositeHeightPx ?? 0,
+            ),
           );
         }
       }
@@ -2413,14 +2491,22 @@ export async function buildTerraformTopologyExcalidrawScene(
           regionName,
           vpcId,
         );
-        const vpcBottomRtAddrs = routeTablesVpcBottomFor(
+        const vpcBottomRtRow = routeTablesVpcBottomRow(
           routeTableBottomPlacements,
           accountId,
           regionName,
           vpcId,
         );
+        const vpcBottomRtMaxH = vpcBottomRtRow
+          ? routeTableMaxCompositeHeightForRowPx(
+              vpcBottomRtRow.addresses,
+              vpcBottomRtRow.routeChildrenByTable,
+            )
+          : 0;
         const rtStackAboveVpcBottomPx =
-          epAddrs.length > 0 ? ROUTE_TABLE_TILE_H + 8 : 0;
+          epAddrs.length > 0
+            ? Math.max(VPC_ENDPOINT_TILE_H, vpcBottomRtMaxH) + 8
+            : 0;
 
         const defaultPlumbingAddrs = bucketAddressesForVpc(
           vpcDefaultPlumbingBuckets,
@@ -2486,13 +2572,14 @@ export async function buildTerraformTopologyExcalidrawScene(
 
         if (vpcZs.length === 0) {
           const vpcBottomRtRectIdsEmpty =
-            vpcBottomRtAddrs.length > 0
+            vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
               ? appendRouteTableBottomEdgeRectangles(
                   skeleton,
                   accountId,
                   regionName,
                   vpcId,
-                  vpcBottomRtAddrs,
+                  vpcBottomRtRow.addresses,
+                  vpcBottomRtRow.routeChildrenByTable,
                   vpcX,
                   vpcY,
                   vpcCellW,
@@ -2543,7 +2630,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           continue;
         }
 
-        const rtZoneCounts = buildRouteTableZoneCountMapForVpc(
+        const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
           routeTableBottomPlacements,
           accountId,
           regionName,
@@ -2554,7 +2641,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           nodes,
           arnIndex,
           plan,
-          rtZoneCounts,
+          rtZoneSizing,
           infraTop,
           subnetNameById,
           vpcInternetSideGutterPx(internetEdgeAddrs),
@@ -2601,7 +2688,7 @@ export async function buildTerraformTopologyExcalidrawScene(
               plan,
             );
 
-            const zoneRtAddrs = routeTablesZoneBottomFor(
+            const zoneRtRow = routeTablesZoneBottomRow(
               routeTableBottomPlacements,
               accountId,
               regionName,
@@ -2609,13 +2696,14 @@ export async function buildTerraformTopologyExcalidrawScene(
               z.subnetSignature,
             );
             const zoneRtRectIds =
-              zoneRtAddrs.length > 0
+              zoneRtRow && zoneRtRow.addresses.length > 0
                 ? appendRouteTableBottomEdgeRectangles(
                     skeleton,
                     accountId,
                     regionName,
                     vpcId,
-                    zoneRtAddrs,
+                    zoneRtRow.addresses,
+                    zoneRtRow.routeChildrenByTable,
                     zoneX,
                     zoneY,
                     vd.perZoneW,
@@ -2648,13 +2736,14 @@ export async function buildTerraformTopologyExcalidrawScene(
         }
 
         const vpcBottomRtRectIds =
-          vpcBottomRtAddrs.length > 0
+          vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
             ? appendRouteTableBottomEdgeRectangles(
                 skeleton,
                 accountId,
                 regionName,
                 vpcId,
-                vpcBottomRtAddrs,
+                vpcBottomRtRow.addresses,
+                vpcBottomRtRow.routeChildrenByTable,
                 vpcX,
                 vpcY,
                 vpcCellW,
