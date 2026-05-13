@@ -483,6 +483,19 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+
+  /**
+   * When set on a Terraform-import scene, edge visibility follows these pins plus
+   * transient peek (hover/selection path). When undefined, legacy behavior applies
+   * (edges visible whenever both endpoints are visible).
+   */
+  terraformEdgeLayerPins: {
+    dependency: boolean;
+    dataFlow: boolean;
+    networking: boolean;
+  } | null;
+  /** Transient graph key for revealing incident edges when `terraformEdgeLayerPins` is set. */
+  terraformEdgeHoverPeekKey: string | null;
 }
 
 export type SearchMatch = {

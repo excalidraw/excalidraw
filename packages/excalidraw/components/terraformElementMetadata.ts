@@ -41,3 +41,23 @@ export const isTerraformInspectableElement = (
 export const isTerraformSemanticOverviewScene = (
   elements: readonly ExcalidrawElement[],
 ) => elements.some((e) => e.customData?.terraformSemanticOverview === true);
+
+/** Graph address for Terraform focus / edges (`nodePath`, else `terraformVisibilityKey`). */
+export const getTerraformGraphAddressForElement = (
+  element: ExcalidrawElement | NonDeletedExcalidrawElement | undefined,
+): string | null => {
+  if (!element?.customData) {
+    return null;
+  }
+  const cd = element.customData;
+  if (typeof cd.nodePath === "string" && cd.nodePath.length > 0) {
+    return cd.nodePath;
+  }
+  if (
+    typeof cd.terraformVisibilityKey === "string" &&
+    cd.terraformVisibilityKey.length > 0
+  ) {
+    return cd.terraformVisibilityKey;
+  }
+  return null;
+};

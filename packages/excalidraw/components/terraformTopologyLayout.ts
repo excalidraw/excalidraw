@@ -79,6 +79,7 @@ import {
   getTerraformEdgeLayer,
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
+  TERRAFORM_IMPORT_EDGE_LAYER_PINS,
 } from "./terraformVisibility";
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
@@ -2902,8 +2903,12 @@ export async function buildTerraformTopologyExcalidrawScene(
   });
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = await injectTerraformAwsIconsIntoElements(elements);
-  elements = repairTerraformEdgeBindings(
-    reconcileTerraformVisibility(elements),
+  elements = reconcileTerraformVisibility(
+    repairTerraformEdgeBindings(elements),
+    {
+      pins: TERRAFORM_IMPORT_EDGE_LAYER_PINS,
+      hoverPeekKey: null,
+    },
   );
   elements = reorderTopologyElementsZStack(elements);
 

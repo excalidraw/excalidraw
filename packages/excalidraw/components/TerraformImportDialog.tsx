@@ -10,7 +10,7 @@ import { restoreElements } from "../data/restore";
 
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
-import { useApp } from "./App";
+import { useApp, useExcalidrawSetAppState } from "./App";
 import { terraformPlanParsing } from "./terraformPlanParsing";
 
 import "./TerraformImportDialog.scss";
@@ -43,6 +43,7 @@ const TerraformImportModal = ({
   onCloseRequest: () => void;
 }) => {
   const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
 
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [dotFile, setDotFile] = useState<File | null>(null);
@@ -61,6 +62,14 @@ const TerraformImportModal = ({
       },
     );
     app.scene.replaceAllElements(elements);
+    setAppState({
+      terraformEdgeLayerPins: {
+        dependency: false,
+        dataFlow: false,
+        networking: false,
+      },
+      terraformEdgeHoverPeekKey: null,
+    });
     app.scrollToContent();
     onCloseRequest();
   };

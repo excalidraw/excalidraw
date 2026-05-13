@@ -16,7 +16,10 @@ import type {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { isTerraformSemanticOverviewScene } from "./terraformElementMetadata";
+import {
+  getTerraformGraphAddressForElement,
+  isTerraformSemanticOverviewScene,
+} from "./terraformElementMetadata";
 
 import type { PointerDownState } from "../types";
 
@@ -26,13 +29,75 @@ import type { PointerDownState } from "../types";
  * Element `customData` is written by `packages/backend/excalidraw.js`.
  */
 
-type TerraformLayerState = {
+export type TerraformEdgeLayerPins = {
+  dependency: boolean;
+  dataFlow: boolean;
+  networking: boolean;
+};
+
+/** Default after ELK / topology layout: all edge layers off until pins or hover reveal. */
+export const TERRAFORM_IMPORT_EDGE_LAYER_PINS: TerraformEdgeLayerPins = {
+  dependency: false,
+  dataFlow: false,
+  networking: false,
+};
+
+export type TerraformVisibilityReconcileOverrides = {
   dependencyLayerEnabled?: boolean;
   dataFlowLayerEnabled?: boolean;
   networkingLayerEnabled?: boolean;
+  pins?: TerraformEdgeLayerPins;
+  hoverPeekKey?: string | null;
 };
 
+/** Build reconcile overrides from editor appState (legacy when `pins` is null). */
+export const buildTerraformReconcileOptionsForAppState = (
+  pins: TerraformEdgeLayerPins | null,
+  hoverPeekKey: string | null | undefined,
+): TerraformVisibilityReconcileOverrides | undefined =>
+  pins != null
+    ? {
+        pins,
+        hoverPeekKey: hoverPeekKey ?? null,
+      }
+    : undefined;
+
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
+
+/** Infer pin snapshot from current edge visibility (legacy scenes, first menu interaction). */
+export const inferLegacyTerraformEdgePinsFromElements = (
+  elements: readonly ExcalidrawElement[],
+): TerraformEdgeLayerPins => ({
+  dependency: elements.some(
+    (e) =>
+      getTerraformEdgeLayer(e) === "dependency" &&
+      !getCustomData(e).terraformDependencyPreview &&
+      !e.isDeleted,
+  ),
+  dataFlow: elements.some(
+    (e) => getTerraformEdgeLayer(e) === "dataFlow" && !e.isDeleted,
+  ),
+  networking: elements.some(
+    (e) => getTerraformEdgeLayer(e) === "networking" && !e.isDeleted,
+  ),
+});
+
+/** Graph peek key from hovered element ids (first matching Terraform address). */
+export const getTerraformEdgeHoverPeekKeyFromHoveredIds = (
+  elements: readonly ExcalidrawElement[],
+  hoveredElementIds: Readonly<{ [id: string]: true }>,
+): string | null => {
+  for (const el of elements) {
+    if (!hoveredElementIds[el.id] || el.isDeleted) {
+      continue;
+    }
+    const addr = getTerraformGraphAddressForElement(el);
+    if (addr) {
+      return addr;
+    }
+  }
+  return null;
+};
 
 /** `"dependency"` | `"dataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
@@ -264,18 +329,31 @@ const groupHasVisibleChild = (
 
 const deriveLayerState = (
   elements: readonly ExcalidrawElement[],
-  overrides: TerraformLayerState = {},
-) => ({
-  dependencyLayerEnabled:
-    overrides.dependencyLayerEnabled ??
-    elements.some((element) => getTerraformEdgeLayer(element) === "dependency"),
-  dataFlowLayerEnabled:
-    overrides.dataFlowLayerEnabled ??
-    elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
-  networkingLayerEnabled:
-    overrides.networkingLayerEnabled ??
-    elements.some((element) => getTerraformEdgeLayer(element) === "networking"),
-});
+  overrides: TerraformVisibilityReconcileOverrides = {},
+) => {
+  if (overrides.pins != null) {
+    return {
+      dependencyLayerEnabled: overrides.pins.dependency,
+      dataFlowLayerEnabled: overrides.pins.dataFlow,
+      networkingLayerEnabled: overrides.pins.networking,
+    };
+  }
+  return {
+    dependencyLayerEnabled:
+      overrides.dependencyLayerEnabled ??
+      elements.some(
+        (element) => getTerraformEdgeLayer(element) === "dependency",
+      ),
+    dataFlowLayerEnabled:
+      overrides.dataFlowLayerEnabled ??
+      elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
+    networkingLayerEnabled:
+      overrides.networkingLayerEnabled ??
+      elements.some(
+        (element) => getTerraformEdgeLayer(element) === "networking",
+      ),
+  };
+};
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -581,11 +659,14 @@ export const repairTerraformEdgeBindings = (
 /** Applies soft-delete to edges and group wrappers based on visible resource keys and layer flags. */
 export const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
-  overrides: TerraformLayerState = {},
+  overrides: TerraformVisibilityReconcileOverrides = {},
 ) => {
   const visibleKeys = getVisibleTerraformKeys(elements);
   const layerState = deriveLayerState(elements, overrides);
   const semanticScene = isTerraformSemanticOverviewScene(elements);
+  const pinMode = overrides.pins != null;
+  const hoverPeekKey =
+    pinMode && overrides.hoverPeekKey ? overrides.hoverPeekKey : null;
 
   return elements.map((element) => {
     if (isTerraformGroupElement(element)) {
@@ -614,8 +695,20 @@ export const reconcileTerraformVisibility = (
         : layer === "dataFlow"
         ? layerState.dataFlowLayerEnabled
         : layerState.networkingLayerEnabled;
+
+    const relationship = getCustomData(element).relationship as
+      | { source?: unknown; target?: unknown }
+      | undefined;
+    const hoverTouches =
+      hoverPeekKey &&
+      typeof relationship?.source === "string" &&
+      typeof relationship?.target === "string" &&
+      (relationship.source === hoverPeekKey ||
+        relationship.target === hoverPeekKey);
+
     const shouldShow =
-      layerEnabled && edgeEndpointsAreVisible(element, visibleKeys);
+      (layerEnabled || Boolean(hoverTouches)) &&
+      edgeEndpointsAreVisible(element, visibleKeys);
 
     if (
       element.isDeleted === !shouldShow &&
@@ -639,6 +732,7 @@ export const reconcileTerraformVisibility = (
 export const toggleTerraformExplode = (
   elements: readonly ExcalidrawElement[],
   triggerElement: ExcalidrawElement,
+  reconcileOverrides?: TerraformVisibilityReconcileOverrides,
 ) => {
   if (!isExplodableTerraformElement(triggerElement)) {
     return elements;
@@ -709,7 +803,7 @@ export const toggleTerraformExplode = (
   });
 
   return repairTerraformEdgeBindings(
-    reconcileTerraformVisibility(nextElements),
+    reconcileTerraformVisibility(nextElements, reconcileOverrides),
   );
 };
 
@@ -793,6 +887,7 @@ export const isTerraformExpandAllActive = (
 /** Show every Terraform resource rectangle and mark explode triggers expanded. */
 export const expandAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
+  reconcileOverrides?: TerraformVisibilityReconcileOverrides,
 ): ExcalidrawElement[] => {
   const semanticScene = isTerraformSemanticOverviewScene(elements);
   const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
@@ -815,12 +910,15 @@ export const expandAllTerraformExplode = (
       },
     });
   });
-  return repairTerraformEdgeBindings(reconcileTerraformVisibility(next));
+  return repairTerraformEdgeBindings(
+    reconcileTerraformVisibility(next, reconcileOverrides),
+  );
 };
 
 /** Restore default visibility (primary types only) and collapse explode triggers. */
 export const collapseAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
+  reconcileOverrides?: TerraformVisibilityReconcileOverrides,
 ): ExcalidrawElement[] => {
   const semanticScene = isTerraformSemanticOverviewScene(elements);
   const next = elements.map((element) => {
@@ -853,5 +951,7 @@ export const collapseAllTerraformExplode = (
       },
     });
   });
-  return repairTerraformEdgeBindings(reconcileTerraformVisibility(next));
+  return repairTerraformEdgeBindings(
+    reconcileTerraformVisibility(next, reconcileOverrides),
+  );
 };
