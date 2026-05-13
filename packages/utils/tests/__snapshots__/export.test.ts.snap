@@ -103,6 +103,8 @@ exports[`exportToSvg > with default arguments 1`] = `
     "panels": 3,
   },
   "suggestedBinding": null,
+  "terraformEdgeHoverPeekKey": null,
+  "terraformEdgeLayerPins": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
