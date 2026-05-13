@@ -44,7 +44,7 @@ const TerraformImportModal = ({
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [dotFile, setDotFile] = useState<File | null>(null);
   const [stateFile, setStateFile] = useState<File | null>(null);
-  const [view, setView] = useState<TerraformView>("module");
+  const [view, setView] = useState<TerraformView>("semantic");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -109,12 +109,49 @@ const TerraformImportModal = ({
     <div className="TerraformImportModal">
       <h3>Import Terraform</h3>
 
+      <div className="TerraformImportModal__section">
+        <h4>Upload new plan</h4>
+        <div className="TerraformImportModal__settings__inputs">
+          <label>
+            Plan file (.json)
+            <input
+              type="file"
+              accept=".json"
+              onChange={(e) => setPlanFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <label>
+            Graph file (.dot)
+            <input
+              type="file"
+              accept=".dot"
+              onChange={(e) => setDotFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <label>
+            State file (.tfstate / state pull JSON)
+            <span className="TerraformImportModal__muted">
+              Optional with plan+dot to enrich nodes; or upload alone for a
+              state-only graph (raw state with a top-level{" "}
+              <code>resources</code> array).
+            </span>
+            <input
+              type="file"
+              accept=".tfstate,.json"
+              onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="TerraformImportModal__divider" />
+
       <div
         className="TerraformImportModal__section TerraformImportModal__viewSelector"
         role="radiogroup"
-        aria-label="View"
+        aria-label="View options"
       >
-        <h4>View</h4>
+        <h4>View options</h4>
         <div className="TerraformImportModal__viewSelector__options">
           {VIEW_OPTIONS.map((option) => {
             const checked = view === option.value;
@@ -158,46 +195,10 @@ const TerraformImportModal = ({
         </div>
       </div>
 
-      <div className="TerraformImportModal__divider" />
-
-      <div className="TerraformImportModal__section">
-        <h4>Upload new plan</h4>
-        <div className="TerraformImportModal__settings__inputs">
-          <label>
-            Plan file (.json)
-            <input
-              type="file"
-              accept=".json"
-              onChange={(e) => setPlanFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-          <label>
-            Graph file (.dot)
-            <input
-              type="file"
-              accept=".dot"
-              onChange={(e) => setDotFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-          <label>
-            State file (.tfstate / state pull JSON)
-            <span className="TerraformImportModal__muted">
-              Optional with plan+dot to enrich nodes; or upload alone for a
-              state-only graph (raw state with a top-level{" "}
-              <code>resources</code> array).
-            </span>
-            <input
-              type="file"
-              accept=".tfstate,.json"
-              onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-        </div>
-        <div className="TerraformImportModal__settings__buttons">
-          <FilledButton onClick={handleImport} disabled={!canImport || loading}>
-            {loading ? "Importing..." : "Import & Open"}
-          </FilledButton>
-        </div>
+      <div className="TerraformImportModal__settings__buttons">
+        <FilledButton onClick={handleImport} disabled={!canImport || loading}>
+          {loading ? "Importing..." : "Import & Open"}
+        </FilledButton>
       </div>
 
       {error && <div className="TerraformImportModal__error">{error}</div>}
