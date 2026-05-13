@@ -12639,7 +12639,12 @@ class App extends React.Component<AppProps, AppState> {
     // -------------------------------------------------------------------------
 
     if (targetElement && isTerraformInspectableElement(targetElement)) {
-      return [actionTerraformInspect, actionToggleTerraformExplode];
+      return [
+        actionTerraformInspect,
+        ...(isTerraformResourceElement(targetElement)
+          ? [actionToggleTerraformExplode]
+          : []),
+      ];
     }
 
     options.push(copyText);
@@ -12668,7 +12673,9 @@ class App extends React.Component<AppProps, AppState> {
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
       actionWrapSelectionInFrame,
-      actionToggleTerraformExplode,
+      ...(getTerraformResourceElementForSelection(this, this.state)
+        ? [actionToggleTerraformExplode]
+        : []),
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,

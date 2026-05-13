@@ -5,7 +5,12 @@ import { reseed } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
-import { render, queryByTestId, unmountComponent, waitFor } from "../tests/test-utils";
+import {
+  render,
+  queryByTestId,
+  unmountComponent,
+  waitFor,
+} from "../tests/test-utils";
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
