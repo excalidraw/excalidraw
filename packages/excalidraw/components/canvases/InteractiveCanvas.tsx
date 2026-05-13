@@ -32,9 +32,6 @@ import type {
 } from "../../types";
 import type { DOMAttributes } from "react";
 
-const PERF_METRICS_UPDATE_MS = 250;
-const PERF_FRAME_SAMPLE_WINDOW = 120;
-
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement | null>;
   canvas: HTMLCanvasElement | null;
@@ -89,17 +86,6 @@ export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
   const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
-  const perfMetricsRef = useRef<{
-    samples: number[];
-    lastUpdatedAt: number;
-    interactiveRenderMs: number;
-    snapshot: InteractiveCanvasRenderConfig["performanceMetrics"];
-  }>({
-    samples: [],
-    lastUpdatedAt: 0,
-    interactiveRenderMs: 0,
-    snapshot: null,
-  });
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -154,7 +140,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         getComputedStyle(props.containerRef.current).getPropertyValue(
           "--color-selection",
         )) ||
-      "#6965db";
+      "#0f8b5f";
 
     rendererParams.current = {
       app: props.app,
@@ -173,7 +159,6 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         remotePointerUserStates,
         selectionColor,
         renderScrollbars: props.renderScrollbars,
-        performanceMetrics: perfMetricsRef.current.snapshot,
         // NOTE not memoized on so we don't rerender on cursor move
         lastViewportPosition: props.app.lastViewportPosition,
       },
@@ -189,59 +174,11 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       AnimationController.start<InteractiveSceneRenderAnimationState>(
         INTERACTIVE_SCENE_ANIMATION_KEY,
         ({ deltaTime, state }) => {
-          const runStart = performance.now();
           const nextAnimationState = renderInteractiveScene({
             ...rendererParams.current!,
             deltaTime,
             animationState: state,
-            renderConfig: {
-              ...rendererParams.current!.renderConfig,
-              performanceMetrics: perfMetricsRef.current.snapshot,
-            },
           }).animationState;
-          const interactiveRenderMs = performance.now() - runStart;
-          const now = performance.now();
-
-          if (props.appState.performanceMonitorEnabled) {
-            const metrics = perfMetricsRef.current;
-            metrics.samples.push(deltaTime);
-            if (metrics.samples.length > PERF_FRAME_SAMPLE_WINDOW) {
-              metrics.samples.shift();
-            }
-            metrics.interactiveRenderMs = interactiveRenderMs;
-
-            if (now - metrics.lastUpdatedAt >= PERF_METRICS_UPDATE_MS) {
-              const sorted = [...metrics.samples].sort((a, b) => a - b);
-              const avg =
-                metrics.samples.reduce((sum, sample) => sum + sample, 0) /
-                Math.max(1, metrics.samples.length);
-              const p95Index = Math.min(
-                sorted.length - 1,
-                Math.max(0, Math.ceil(sorted.length * 0.95) - 1),
-              );
-              const visibleElements =
-                rendererParams.current?.visibleElements.length || 0;
-              const visibleFrames =
-                rendererParams.current?.visibleElements.filter(
-                  (element) =>
-                    element.type === "frame" || element.type === "magicframe",
-                ).length || 0;
-              metrics.snapshot = {
-                fps: avg > 0 ? 1000 / avg : 0,
-                averageFrameMs: avg,
-                p95FrameMs: sorted[p95Index] || 0,
-                interactiveRenderMs: metrics.interactiveRenderMs,
-                visibleElements,
-                visibleFrames,
-              };
-              metrics.lastUpdatedAt = now;
-            }
-          } else if (perfMetricsRef.current.snapshot) {
-            perfMetricsRef.current.samples = [];
-            perfMetricsRef.current.interactiveRenderMs = 0;
-            perfMetricsRef.current.lastUpdatedAt = 0;
-            perfMetricsRef.current.snapshot = null;
-          }
 
           if (nextAnimationState) {
             for (const key in nextAnimationState) {
@@ -330,7 +267,6 @@ const getRelevantAppStateProps = (
   activeLockedId: appState.activeLockedId,
   hoveredElementIds: appState.hoveredElementIds,
   frameRendering: appState.frameRendering,
-  performanceMonitorEnabled: appState.performanceMonitorEnabled,
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
   exportScale: appState.exportScale,
   currentItemArrowType: appState.currentItemArrowType,

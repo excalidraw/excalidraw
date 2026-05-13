@@ -2,59 +2,160 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Excalidraw Whiteboard</title>
+    <title>
+      tfdraw.io — Terraform plan &amp; state architecture canvas
+    </title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
     />
     <meta name="referrer" content="origin" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#121212" />
-
-    <!-- Primary Meta Tags -->
+    <meta name="theme-color" content="#0f8b5f" />
     <meta
-      name="title"
-      content="Free, collaborative whiteboard • Hand-drawn look & feel | Excalidraw"
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
+
     <meta
       name="description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="Visualize Terraform as a living architecture diagram. Import tfplan JSON, state, and graph exports into tfdraw.io for reviews, diffs, and annotations your team can share."
     />
-    <meta name="image" content="https://excalidraw.com/og-image-3.png" />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:site_name" content="Excalidraw" />
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="tfdraw.io" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://excalidraw.com" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://tfdraw.io/" />
     <meta
       property="og:title"
-      content="Excalidraw — Collaborative whiteboarding made easy"
+      content="tfdraw.io — Terraform plan and state architecture canvas"
     />
-    <meta property="og:image:alt" content="Excalidraw logo" />
     <meta
       property="og:description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="Visualize Terraform as a living architecture diagram. Import tfplan JSON, state, and graph exports for reviews, diffs, and annotations."
     />
-    <meta property="og:image" content="https://excalidraw.com/og-image-3.png" />
+    <meta property="og:image" content="https://tfdraw.io/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta
+      property="og:image:alt"
+      content="tfdraw.io — Terraform plan and state as an architecture canvas for visual reviews"
+    />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:site" content="@excalidraw" />
-    <meta property="twitter:url" content="https://excalidraw.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@tfdraw" />
+    <meta name="twitter:url" content="https://tfdraw.io/" />
     <meta
-      property="twitter:title"
-      content="Excalidraw — Collaborative whiteboarding made easy"
+      name="twitter:title"
+      content="tfdraw.io — Terraform plan and state architecture canvas"
     />
     <meta
-      property="twitter:description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      name="twitter:description"
+      content="Visualize Terraform as a living architecture diagram. Import tfplan JSON, state, and graph exports for team reviews."
     />
+    <meta name="twitter:image" content="https://tfdraw.io/og-image.png" />
     <meta
-      property="twitter:image"
-      content="https://excalidraw.com/og-image-3.png"
+      name="twitter:image:alt"
+      content="tfdraw.io — Terraform plan and state as an architecture canvas for visual reviews"
     />
 
-    <link rel="canonical" href="https://excalidraw.com" />
+    <link rel="canonical" href="https://tfdraw.io/" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://tfdraw.io/#website",
+            "url": "https://tfdraw.io/",
+            "name": "tfdraw.io",
+            "description": "Terraform plan and state architecture canvas for visual infrastructure reviews.",
+            "publisher": { "@id": "https://tfdraw.io/#organization" },
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://tfdraw.io/#organization",
+            "name": "tfdraw.io",
+            "url": "https://tfdraw.io/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://tfdraw.io/tfdraw-logo.png"
+            },
+            "sameAs": ["https://x.com/tfdraw"]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "tfdraw.io",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "url": "https://tfdraw.io/",
+            "description": "Maps Terraform state, tfplan JSON, and graph data into an editable architecture canvas for plan reviews and annotations.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "State-backed architecture view",
+              "Terraform plan visualization and diffs",
+              "Custom annotations on the infrastructure model",
+              "Shareable review canvas"
+            ],
+            "publisher": { "@id": "https://tfdraw.io/#organization" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I visualize a Terraform plan in tfdraw.io?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Save a binary plan with terraform plan -out=tfplan.bin, export JSON with terraform show -json tfplan.bin, optionally export matching state and graph files, redact secrets, then import the files into the on-page canvas."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does tfdraw.io replace Terraform or HCL?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. It is a read-and-annotate view on top of Terraform outputs. You keep HCL, modules, and workflows in Git; the canvas reflects what state and plans report about the environment."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What files does the canvas use?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Typical imports include Terraform state JSON, plan JSON, and a DOT graph from terraform graph. The instructions on the homepage list the current export steps."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I share a diagram with my team?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The product supports collaboration and shareable review flows. Use the in-app sharing options when you are in the full editor experience."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is my Terraform data uploaded to a server?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Treat exports as sensitive. Redact plan JSON before sharing, follow your organization data policy, and prefer local review until you confirm how your deployment handles persistence and collaboration."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
 
     <!------------------------------------------------------------------------->
     <!--   to minimize white flash on load when user has dark mode enabled   -->
@@ -99,7 +200,7 @@
     <!------------------------------------------------------------------------->
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <script>
-      // Redirect Excalidraw+ users which have auto-redirect enabled.
+      // Redirect legacy plus users which have auto-redirect enabled.
       //
       // Redirect only the bare root path, so link/room/library urls are not
       // redirected.
@@ -137,7 +238,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-    <!-- Excalidraw version -->
+    <!-- tfdraw.io version -->
     <meta name="version" content="{version}" />
 
     <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
@@ -208,9 +309,32 @@
   </head>
 
   <body>
-    <noscript> You need to enable JavaScript to run this app. </noscript>
-    <header>
-      <h1 class="visually-hidden">Excalidraw</h1>
+    <noscript>
+      <div
+        style="
+          max-width: 44rem;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          font-family: system-ui, sans-serif;
+          line-height: 1.5;
+          color: #16211d;
+        "
+      >
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.75rem">
+          tfdraw.io — Terraform plan &amp; state architecture canvas
+        </h1>
+        <p style="margin-bottom: 1rem">
+          Visualize Terraform state, tfplan JSON, and graph exports as a living
+          architecture diagram. Enable JavaScript for the full interactive
+          canvas, import flow, and collaboration features.
+        </p>
+        <p style="margin: 0">
+          <a href="#terraform-canvas">Jump to Terraform canvas section</a>
+        </p>
+      </div>
+    </noscript>
+    <header class="visually-hidden">
+      <p><a href="#top">Skip to main content — tfdraw.io</a></p>
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
@@ -236,8 +360,8 @@
       // if iframe
       if (window.self !== window.top) {
         scriptEle.addEventListener("load", () => {
-          if (window.sa_pageview) {
-            window.window.sa_event(action, {
+          if (typeof window.sa_event === "function") {
+            window.sa_event("iframe_embed", {
               category: "iframe",
               label: "embed",
               value: window.location.pathname,

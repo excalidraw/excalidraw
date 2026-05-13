@@ -36,6 +36,7 @@ import {
 import {
   collapseAllTerraformExplode,
   expandAllTerraformExplode,
+  isTerraformExpandAllActive,
   repairTerraformEdgeBindings,
 } from "../terraformVisibility";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
@@ -65,8 +66,6 @@ import {
   SunIcon,
   TrashIcon,
   usersIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
 } from "../icons";
 
 import "./DefaultItems.scss";
@@ -189,79 +188,43 @@ export const ImportTerraform = () => {
 };
 ImportTerraform.displayName = "ImportTerraform";
 
-export const PerformanceMonitorToggle = () => {
-  const setAppState = useExcalidrawSetAppState();
-  const appState = useUIAppState();
-  return (
-    <DropdownMenuItemCheckbox
-      checked={appState.performanceMonitorEnabled}
-      onSelect={(event) => {
-        setAppState({
-          performanceMonitorEnabled: !appState.performanceMonitorEnabled,
-        });
-        event.preventDefault();
-      }}
-      shortcut={getShortcutFromShortcutName("performanceMonitor")}
-      data-testid="performance-monitor-toggle"
-    >
-      Performance monitor
-    </DropdownMenuItemCheckbox>
-  );
-};
-PerformanceMonitorToggle.displayName = "PerformanceMonitorToggle";
-
 const hasTerraformResourceNodes = (
   elements: ReadonlyArray<{ customData?: any }>,
 ) =>
   elements.some((el) => el.customData?.terraformVisibilityRole === "resource");
 
-export const TerraformExpandAll = () => {
+export const TerraformExpandAllToggle = () => {
   const app = useApp();
+  // Subscribe to scene updates so the checkbox re-renders while the menu stays open.
+  useExcalidrawElements();
+  const elements = app.scene.getElementsIncludingDeleted();
 
-  if (!hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())) {
+  if (!hasTerraformResourceNodes(elements)) {
     return null;
   }
 
+  const checked = isTerraformExpandAllActive(elements);
+
   return (
-    <DropdownMenuItem
-      icon={ZoomInIcon}
-      data-testid="terraform-expand-all"
-      onSelect={() => {
+    <DropdownMenuItemCheckbox
+      checked={checked}
+      data-testid="terraform-expand-all-toggle"
+      onSelect={(event) => {
+        event.preventDefault();
+        const els = app.scene.getElementsIncludingDeleted();
         app.scene.replaceAllElements(
-          expandAllTerraformExplode(app.scene.getElementsIncludingDeleted()),
+          isTerraformExpandAllActive(els)
+            ? collapseAllTerraformExplode(els)
+            : expandAllTerraformExplode(els),
         );
       }}
       aria-label="Expand all Terraform nodes"
     >
       Expand all Terraform
-    </DropdownMenuItem>
+    </DropdownMenuItemCheckbox>
   );
 };
-TerraformExpandAll.displayName = "TerraformExpandAll";
-
-export const TerraformCollapseAll = () => {
-  const app = useApp();
-
-  if (!hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())) {
-    return null;
-  }
-
-  return (
-    <DropdownMenuItem
-      icon={ZoomOutIcon}
-      data-testid="terraform-collapse-all"
-      onSelect={() => {
-        app.scene.replaceAllElements(
-          collapseAllTerraformExplode(app.scene.getElementsIncludingDeleted()),
-        );
-      }}
-      aria-label="Collapse all Terraform nodes"
-    >
-      Collapse all Terraform
-    </DropdownMenuItem>
-  );
-};
-TerraformCollapseAll.displayName = "TerraformCollapseAll";
+TerraformExpandAllToggle.displayName = "TerraformExpandAllToggle";
 
 const TerraformLayerItem = ({
   layer,

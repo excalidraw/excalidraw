@@ -31,9 +31,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
       <MainMenu.DefaultItems.ImportTerraform />
-      <MainMenu.DefaultItems.PerformanceMonitorToggle />
-      <MainMenu.DefaultItems.TerraformExpandAll />
-      <MainMenu.DefaultItems.TerraformCollapseAll />
+      <MainMenu.DefaultItems.TerraformExpandAllToggle />
       <MainMenu.DefaultItems.TerraformLayers />
       {props.isCollabEnabled && !props.frontendOnly && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
@@ -55,7 +53,7 @@ export const AppMainMenu: React.FC<{
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
             className=""
           >
-            Excalidraw+
+            tfdraw.io
           </MainMenu.ItemLink>
           <MainMenu.DefaultItems.Socials />
           <MainMenu.ItemLink

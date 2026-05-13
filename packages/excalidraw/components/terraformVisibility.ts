@@ -730,6 +730,68 @@ const collectTerraformParentKeysWithChildren = (
   return keysWithChildren;
 };
 
+/**
+ * True when the scene matches the fully-expanded outcome of
+ * {@link expandAllTerraformExplode} (semantic overview uses `terraformExpandAllView`;
+ * module-style graphs use `terraformExploded` vs {@link collectTerraformParentKeysWithChildren}).
+ */
+export const isTerraformExpandAllActive = (
+  elements: readonly ExcalidrawElement[],
+): boolean => {
+  if (isTerraformSemanticOverviewScene(elements)) {
+    let keyedResourceCount = 0;
+    for (const e of elements) {
+      const cd = getCustomData(e);
+      if (cd.terraformVisibilityRole !== "resource") {
+        continue;
+      }
+      const key = getTerraformVisibilityKey(e);
+      if (!key) {
+        continue;
+      }
+      keyedResourceCount++;
+      if (cd.terraformExpandAllView !== true) {
+        return false;
+      }
+    }
+    return keyedResourceCount > 0;
+  }
+
+  const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
+  if (keysWithChildren.size === 0) {
+    return false;
+  }
+
+  const keysOnResources = new Set(
+    elements
+      .filter(
+        (e) => getCustomData(e).terraformVisibilityRole === "resource",
+      )
+      .map((e) => getTerraformVisibilityKey(e))
+      .filter((k): k is string => Boolean(k)),
+  );
+  if (![...keysWithChildren].some((k) => keysOnResources.has(k))) {
+    return false;
+  }
+
+  for (const element of elements) {
+    const cd = getCustomData(element);
+    if (cd.terraformVisibilityRole !== "resource") {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      continue;
+    }
+    const shouldExplode = keysWithChildren.has(key);
+    if (Boolean(cd.terraformExploded) !== shouldExplode) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 /** Show every Terraform resource rectangle and mark explode triggers expanded. */
 export const expandAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],

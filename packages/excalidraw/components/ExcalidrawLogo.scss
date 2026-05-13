@@ -18,69 +18,79 @@
     display: flex;
     align-items: center;
 
-    svg {
+    img {
       flex: 0 0 auto;
     }
 
     .ExcalidrawLogo-icon {
-      width: auto;
-      color: var(--color-logo-icon);
+      width: var(--logo-icon--small);
+      height: var(--logo-icon--small);
+      border-radius: 8px;
+      object-fit: cover;
     }
 
     .ExcalidrawLogo-text {
       margin-left: 0.75rem;
-      width: auto;
       color: var(--color-logo-text);
+      font-family: "Virgil", "Segoe Print", cursive;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     &.is-mobile {
       .ExcalidrawLogo-icon {
+        width: var(--logo-icon--mobile);
         height: var(--logo-icon--mobile);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--mobile);
+        font-size: var(--logo-text--mobile);
         margin-left: 0.5rem;
       }
     }
 
     &.is-xs {
       .ExcalidrawLogo-icon {
+        width: var(--logo-icon--xs);
         height: var(--logo-icon--xs);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--xs);
+        font-size: var(--logo-text--xs);
       }
     }
 
     &.is-small {
       .ExcalidrawLogo-icon {
+        width: var(--logo-icon--small);
         height: var(--logo-icon--small);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--small);
+        font-size: var(--logo-text--small);
       }
     }
 
     &.is-normal {
       .ExcalidrawLogo-icon {
+        width: var(--logo-icon--normal);
         height: var(--logo-icon--normal);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--normal);
+        font-size: var(--logo-text--normal);
       }
     }
 
     &.is-large {
       .ExcalidrawLogo-icon {
+        width: var(--logo-icon--large);
         height: var(--logo-icon--large);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--large);
+        font-size: var(--logo-text--large);
       }
     }
   }

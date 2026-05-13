@@ -1,10 +1,10 @@
 @import "../packages/excalidraw/css/variables.module.scss";
 
 .excalidraw {
-  --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
+  --color-primary-contrast-offset: #0f8b5f; // to offset Chubb illusion
 
   &.theme--dark {
-    --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
+    --color-primary-contrast-offset: #46c99a; // to offset Chubb illusion
   }
 
   .footer-center {
@@ -168,10 +168,13 @@ body.terraform-canvas-landing #root {
   box-sizing: border-box;
 }
 
-.landing-nav {
+.landing-nav-wrap {
   position: sticky;
   top: 0;
   z-index: 20;
+}
+
+.landing-nav {
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -189,8 +192,21 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-nav__brand {
+  display: inline-flex;
+  gap: 0.65rem;
+  align-items: center;
   font-family: "Virgil", "Segoe Print", cursive;
   font-size: clamp(1.25rem, 2vw, 1.7rem);
+}
+
+.landing-nav__logo {
+  width: 2.45rem;
+  height: 2.45rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: #121212;
+  object-fit: cover;
+  box-shadow: 3px 4px 0 var(--landing-green);
 }
 
 .landing-nav__links {
@@ -211,7 +227,7 @@ body.terraform-canvas-landing #root {
   background: rgba(255, 255, 255, 0.65);
 }
 
-.landing-page button {
+.landing-page .landing-cta {
   min-height: 48px;
   padding: 0.7rem 1.1rem;
   border: 2px solid var(--landing-ink);
@@ -223,13 +239,21 @@ body.terraform-canvas-landing #root {
   font: 700 1rem "Assistant", "Segoe UI", sans-serif;
 }
 
-.landing-nav button {
+a.landing-cta {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.landing-nav .landing-cta {
   min-height: 42px;
   padding: 0.5rem 0.8rem;
   box-shadow: 3px 4px 0 var(--landing-blue);
 }
 
-.landing-page button:hover {
+.landing-page .landing-cta:hover {
   transform: translate(1px, 1px);
   box-shadow: 3px 4px 0 var(--landing-ink);
 }
@@ -283,8 +307,8 @@ body.terraform-canvas-landing #root {
   margin-top: 2rem;
 }
 
-.landing-hero__actions button:first-child,
-.landing-final button {
+.landing-hero__actions .landing-cta:first-child,
+.landing-final .landing-cta {
   background: #dff4e8;
   box-shadow: 4px 5px 0 var(--landing-green);
 }
@@ -308,43 +332,99 @@ body.terraform-canvas-landing #root {
 
 .landing-hero__sketch {
   position: relative;
-  min-height: 430px;
+  min-height: 470px;
   isolation: isolate;
 }
 
-.landing-hero__sketch::before,
-.landing-hero__sketch::after {
+.landing-topology,
+.landing-service,
+.landing-link,
+.landing-note {
+  position: absolute;
+}
+
+.landing-topology {
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.72);
+  box-shadow: 8px 10px 0 rgba(22, 33, 29, 0.13);
+}
+
+.landing-topology::before {
   content: "";
   position: absolute;
-  inset: 11% 5% 13% 3%;
-  border: 3px solid rgba(22, 33, 29, 0.78);
-  border-radius: 38% 45% 35% 42%;
-  transform: rotate(-4deg);
+  pointer-events: none;
+  inset: 10px;
+  border: 2px dashed rgba(22, 33, 29, 0.18);
+  border-radius: 6px;
 }
 
-.landing-hero__sketch::after {
-  inset: 29% 1% 30% 16%;
-  border-color: rgba(49, 95, 153, 0.82);
-  transform: rotate(8deg);
-}
-
-.landing-node {
+.landing-topology__label {
   position: absolute;
-  z-index: 1;
+  top: -14px;
+  left: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.2rem 0.62rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 999px;
+  background: #fffaf0;
+  box-shadow: 3px 4px 0 rgba(22, 33, 29, 0.12);
+  font: 800 0.78rem "Assistant", "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.landing-topology--account {
+  inset: 11% 5% 13% 3%;
+  background: linear-gradient(
+      135deg,
+      rgba(217, 164, 47, 0.18),
+      rgba(255, 250, 240, 0.86) 42%,
+      rgba(15, 139, 95, 0.1)
+    ),
+    #fffaf0;
+}
+
+.landing-topology--region {
+  inset: 14% 8% 12% 9%;
+  border-color: rgba(49, 95, 153, 0.92);
+  background: rgba(225, 236, 251, 0.58);
+  box-shadow: 6px 7px 0 rgba(49, 95, 153, 0.14);
+}
+
+.landing-topology--vpc {
+  inset: 29% 6% 19% 6%;
+  display: flex;
+  gap: clamp(0.35rem, 0.8vw, 0.75rem);
+  align-items: center;
+  justify-content: center;
+  padding: 2.1rem 1.25rem 1rem;
+  border-color: rgba(15, 139, 95, 0.95);
+  background: rgba(223, 244, 232, 0.7);
+  box-shadow: 5px 6px 0 rgba(15, 139, 95, 0.13);
+}
+
+.landing-service {
+  z-index: 2;
   display: grid;
+  position: relative;
   place-items: center;
-  min-width: 88px;
-  min-height: 58px;
-  padding: 0.45rem 0.7rem;
+  width: clamp(58px, 6.2vw, 82px);
+  min-height: 52px;
+  padding: 0.35rem 0.45rem;
   border: 2px solid var(--landing-ink);
   border-radius: 8px;
   background: #fffaf0;
   box-shadow: 5px 6px 0 rgba(22, 33, 29, 0.16);
-  font: 800 1.05rem "Assistant", "Segoe UI", sans-serif;
+  font: 800 0.82rem "Assistant", "Segoe UI", sans-serif;
   text-transform: uppercase;
 }
 
-.landing-node::before {
+.landing-service::before {
   content: "";
   position: absolute;
   inset: 6px;
@@ -353,8 +433,31 @@ body.terraform-canvas-landing #root {
   transform: rotate(-2deg);
 }
 
+.landing-service--igw {
+  background: #ffffff;
+}
+
+.landing-service--alb {
+  background: #dff4e8;
+}
+
+.landing-service--lambda {
+  background: #ffe7a3;
+}
+
+.landing-service--s3 {
+  background: #ffffff;
+}
+
+.landing-service--sqs {
+  background: #f7d8ce;
+}
+
+.landing-service--nat {
+  background: #e1ecfb;
+}
+
 .landing-note {
-  position: absolute;
   z-index: 2;
   max-width: 150px;
   color: rgba(22, 33, 29, 0.82);
@@ -363,19 +466,22 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-note--top {
-  top: 0;
-  right: 12%;
+  top: 4%;
+  right: 2%;
   transform: rotate(5deg);
 }
 
 .landing-note--bottom {
   right: 0;
-  bottom: 0;
+  bottom: 3%;
   transform: rotate(-4deg);
 }
 
 .landing-link {
-  position: absolute;
+  z-index: 1;
+  position: relative;
+  flex: 0 0 clamp(18px, 2vw, 34px);
+  width: clamp(18px, 2vw, 34px);
   height: 3px;
   border-radius: 999px;
   background: var(--landing-ink);
@@ -395,54 +501,23 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-link--a {
-  top: 30%;
-  left: 29%;
-  width: 38%;
-  transform: rotate(12deg);
+  transform: rotate(0deg);
 }
 
 .landing-link--b {
-  top: 50%;
-  left: 38%;
-  width: 31%;
-  transform: rotate(30deg);
+  transform: rotate(0deg);
 }
 
 .landing-link--c {
-  top: 68%;
-  left: 18%;
-  width: 35%;
-  transform: rotate(-18deg);
+  transform: rotate(0deg);
 }
 
-.landing-node--vpc {
-  top: 8%;
-  left: 9%;
-  background: #dff4e8;
+.landing-link--d {
+  transform: rotate(0deg);
 }
 
-.landing-node--alb {
-  top: 25%;
-  right: 4%;
-  background: #e1ecfb;
-}
-
-.landing-node--lambda {
-  top: 48%;
-  left: 25%;
-  background: #ffe7a3;
-}
-
-.landing-node--queue {
-  right: 14%;
-  bottom: 13%;
-  background: #f7d8ce;
-}
-
-.landing-node--state {
-  left: 0;
-  bottom: 23%;
-  background: #ffffff;
+.landing-link--e {
+  transform: rotate(0deg);
 }
 
 .landing-strip,
@@ -450,12 +525,14 @@ body.terraform-canvas-landing #root {
 .landing-features,
 .landing-use-cases,
 .landing-canvas-section,
-.landing-final {
+.landing-final,
+.landing-faq {
   padding-inline: clamp(1rem, 5vw, 5.5rem);
 }
 
 .landing-strip {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: space-between;
   align-items: center;
@@ -464,11 +541,24 @@ body.terraform-canvas-landing #root {
   background: rgba(255, 255, 255, 0.62);
 }
 
+.landing-strip__heading {
+  flex: 1 1 100%;
+  margin: 0 0 0.25rem;
+  color: var(--landing-ink);
+  font-family: "Virgil", "Segoe Print", cursive;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
 .landing-strip p {
+  flex: 1 1 280px;
   max-width: 620px;
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(22, 33, 29, 0.88);
+  line-height: 1.45;
 }
 
 .landing-strip div,
@@ -503,7 +593,7 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-steps li,
-.landing-features article {
+.landing-features__grid article {
   border: 2px solid var(--landing-ink);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.76);
@@ -512,39 +602,54 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-steps strong,
-.landing-features h3 {
+.landing-features__grid h3 {
   display: block;
   margin: 0 0 0.5rem;
   font-size: 1.22rem;
 }
 
 .landing-steps span,
-.landing-features p {
+.landing-features__grid p {
   color: rgba(22, 33, 29, 0.78);
   line-height: 1.45;
 }
 
 .landing-features {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding-block: clamp(2rem, 5vw, 4rem);
   background: #19231f;
   color: #f7f1e4;
 }
 
-.landing-features article {
+.landing-features .landing-section-heading {
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.landing-features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.landing-features__grid article {
   border-color: rgba(247, 241, 228, 0.72);
   background: rgba(247, 241, 228, 0.08);
   box-shadow: none;
 }
 
-.landing-features article span {
+.landing-features__grid article span {
   color: #81d6ad;
   font-weight: 800;
 }
 
-.landing-features p {
+.landing-features__grid p {
   color: rgba(247, 241, 228, 0.78);
 }
 
@@ -632,10 +737,50 @@ body.terraform-canvas-landing #root {
   max-width: 820px;
 }
 
+.landing-faq {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+  border-top: 2px solid var(--landing-ink);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.landing-faq__list {
+  max-width: 820px;
+  margin: 1.25rem 0 0;
+}
+
+.landing-faq__item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--landing-line);
+}
+
+.landing-faq__item:last-child {
+  border-bottom: none;
+}
+
+.landing-faq dt {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--landing-ink);
+}
+
+.landing-faq dd {
+  margin: 0.55rem 0 0;
+  color: rgba(22, 33, 29, 0.82);
+  line-height: 1.55;
+}
+
+.landing-faq code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(22, 33, 29, 0.08);
+  font-size: 0.88rem;
+}
+
 @media (max-width: 900px) {
   .landing-hero,
   .landing-steps,
-  .landing-features {
+  .landing-features__grid {
     grid-template-columns: 1fr;
   }
 
@@ -679,9 +824,7 @@ body.terraform-canvas-landing #root {
 }
 
 @media (max-width: 520px) {
-  .landing-page button,
-  .landing-hero__actions button,
-  .landing-final button {
+  .landing-page .landing-cta {
     width: 100%;
   }
 
@@ -691,7 +834,7 @@ body.terraform-canvas-landing #root {
   }
 
   .landing-nav__links,
-  .landing-nav__links button {
+  .landing-nav__links .landing-cta {
     width: 100%;
   }
 
@@ -700,15 +843,36 @@ body.terraform-canvas-landing #root {
     text-align: center;
   }
 
-  .landing-node {
-    min-width: 70px;
-    min-height: 48px;
-    font-size: 0.88rem;
+  .landing-topology--account {
+    inset: 9% 1% 13% 0;
   }
 
-  .landing-link--a {
-    left: 31%;
-    width: 28%;
+  .landing-topology--region {
+    inset: 15% 5% 11% 6%;
+  }
+
+  .landing-topology--vpc {
+    inset: 28% 5% 15% 6%;
+    gap: 0.22rem;
+    padding-inline: 0.45rem;
+  }
+
+  .landing-topology__label {
+    left: 10px;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+  }
+
+  .landing-service {
+    width: 48px;
+    min-height: 44px;
+    font-size: 0.62rem;
+  }
+
+  .landing-link {
+    flex-basis: 9px;
   }
 
   .landing-canvas-section {
@@ -718,4 +882,60 @@ body.terraform-canvas-landing #root {
   .landing-canvas-instructions {
     grid-template-columns: 1fr;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Landing firewall (production only hook: body.terraform-canvas-landing).
+// Isolates marketing DOM from document-level editor / Radix effects when the
+// embedded Excalidraw instance is on the page. Does not target .excalidraw.
+// Main canvas menu uses modal=false, so body scroll-lock overrides are avoided.
+// ---------------------------------------------------------------------------
+body.terraform-canvas-landing .landing-page {
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+}
+
+body.terraform-canvas-landing .landing-hero,
+body.terraform-canvas-landing .landing-strip,
+body.terraform-canvas-landing .landing-workflow,
+body.terraform-canvas-landing .landing-features,
+body.terraform-canvas-landing .landing-faq,
+body.terraform-canvas-landing .landing-use-cases,
+body.terraform-canvas-landing .landing-final,
+body.terraform-canvas-landing .landing-canvas-section__header,
+body.terraform-canvas-landing .landing-canvas-instructions {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+body.terraform-canvas-landing .landing-hero__sketch,
+body.terraform-canvas-landing .landing-hero__sketch * {
+  filter: none;
+}
+
+body.terraform-canvas-landing .landing-topology,
+body.terraform-canvas-landing .landing-service,
+body.terraform-canvas-landing .landing-link,
+body.terraform-canvas-landing .landing-note {
+  filter: none;
+  backdrop-filter: none;
+}
+
+body.terraform-canvas-landing .landing-nav {
+  filter: none;
+}
+
+body.terraform-canvas-landing .landing-canvas-instructions article {
+  border-radius: 8px;
+  box-shadow: 4px 5px 0 rgba(22, 33, 29, 0.13);
+}
+
+body.terraform-canvas-landing .landing-steps li {
+  border-radius: 8px;
+}
+
+body.terraform-canvas-landing .landing-features__grid article {
+  border-radius: 8px;
+  box-shadow: none;
 }
