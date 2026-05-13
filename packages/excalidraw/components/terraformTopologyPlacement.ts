@@ -1557,6 +1557,177 @@ export function extractVpcDefaultPlumbingBuckets(
   return out;
 }
 
+/** One NAT gateway clustered with its paired EIP(s), scoped to a subnet zone. */
+export type TopologyNatZoneCluster = {
+  /** Address of the `aws_nat_gateway` primary. */
+  natAddress: string;
+  /** Paired `aws_eip` addresses (resolved by `allocation_id`); sorted for stability. */
+  eipAddresses: string[];
+};
+
+/** NAT/EIP placements broken out of default plumbing into the owning public-subnet zone. */
+export type TopologyNatZonePlacements = {
+  /** `(account, region, vpcId, subnetSignature)` zone key → list of NAT clusters in that zone. */
+  byZone: Map<string, TopologyNatZoneCluster[]>;
+  /**
+   * Plan addresses (NAT + paired EIP) successfully placed in a zone. Strip from
+   * `vpcDefaultPlumbingBuckets` so the right-edge column does not double-render them.
+   */
+  consumedAddresses: Set<string>;
+};
+
+/**
+ * Pair each `aws_nat_gateway` with the `aws_eip` referencing its `allocation_id`, and route the
+ * pair into the placement zone whose `subnetIds` contains the NAT's `subnet_id`.
+ *
+ * NATs whose `subnet_id` does not land in any zone (e.g. plan has the NAT but the public subnet
+ * is missing from the zone graph) are left **unconsumed** so they continue to fall through to
+ * `vpcDefaultPlumbingBuckets` and render on the VPC right edge.
+ */
+export function computeNatGatewayZonePlacements(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  zones: readonly TopologyPlacementZone[],
+): TopologyNatZonePlacements {
+  const empty: TopologyNatZonePlacements = {
+    byZone: new Map(),
+    consumedAddresses: new Set(),
+  };
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  if (changes.length === 0 || zones.length === 0) {
+    return empty;
+  }
+
+  /** EIP id / allocation_id → EIP address (either side of the join works). */
+  const eipByJoinKey = new Map<string, string>();
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_eip") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const id = stringField(values.id);
+    const allocationId = stringField(values.allocation_id);
+    if (id) {
+      eipByJoinKey.set(id, address);
+    }
+    if (allocationId) {
+      eipByJoinKey.set(allocationId, address);
+    }
+  }
+
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+
+  const byZone = new Map<string, TopologyNatZoneCluster[]>();
+  const consumed = new Set<string>();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_nat_gateway") {
+      continue;
+    }
+    const natAddress = rc.address;
+    if (!natAddress || typeof natAddress !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const subnetId = stringField(values.subnet_id);
+    if (!subnetId) {
+      continue;
+    }
+    const vpcId =
+      stringField(values.vpc_id) ?? subnetToVpc.get(subnetId) ?? null;
+    if (!vpcId) {
+      continue;
+    }
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          [subnetId],
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const zone = zones.find(
+      (z) =>
+        z.accountId === accountId &&
+        z.region === region &&
+        z.vpcId === vpcId &&
+        z.subnetIds.includes(subnetId),
+    );
+    if (!zone) {
+      continue;
+    }
+
+    const eipAddresses: string[] = [];
+    const allocationId = stringField(values.allocation_id);
+    if (allocationId) {
+      const eipAddr = eipByJoinKey.get(allocationId);
+      if (eipAddr) {
+        eipAddresses.push(eipAddr);
+      }
+    }
+
+    const zk = zoneMapKey(accountId, region, vpcId, zone.subnetSignature);
+    let bucket = byZone.get(zk);
+    if (!bucket) {
+      bucket = [];
+      byZone.set(zk, bucket);
+    }
+    bucket.push({
+      natAddress,
+      eipAddresses: [...new Set(eipAddresses)].sort(),
+    });
+
+    consumed.add(natAddress);
+    for (const eipAddr of eipAddresses) {
+      consumed.add(eipAddr);
+    }
+  }
+
+  for (const list of byZone.values()) {
+    list.sort((a, b) => a.natAddress.localeCompare(b.natAddress));
+  }
+
+  return { byZone, consumedAddresses: consumed };
+}
+
+/** Read-only zone lookup key for `TopologyNatZonePlacements.byZone`. */
+export function natZonePlacementsKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): string {
+  return zoneMapKey(accountId, region, vpcId, subnetSignature);
+}
+
 /**
  * `aws_subnet` resources not covered by any primary zone’s subnet multiset (e.g. intra subnets).
  */

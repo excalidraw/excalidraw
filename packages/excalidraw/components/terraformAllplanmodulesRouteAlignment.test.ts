@@ -160,9 +160,18 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
         if (path.includes("aws_route")) {
           return false;
         }
+        /**
+         * NAT gateways now render inside their public-subnet zone as a `natGatewayPrimary`
+         * primaryCluster band at the top — exclude from "primary grid" midX so the route-table
+         * alignment continues to track the LB/lambda/etc. cluster, not the NAT box.
+         */
+        if (path.includes("aws_nat_gateway")) {
+          return false;
+        }
         if (
           cd.terraformTopologyRole === "subnetZoneRouteTable" ||
-          cd.terraformTopologyRole === "vpcRouteTable"
+          cd.terraformTopologyRole === "vpcRouteTable" ||
+          cd.terraformTopologyRole === "natGatewayPrimary"
         ) {
           return false;
         }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  computeNatGatewayZonePlacements,
   computeRouteTableBottomEdgePlacements,
   computeVpcRouteTableFanOutAddressesForVpc,
   extractInterfaceEndpointSecurityGroupBuckets,
@@ -10,6 +11,7 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   mergeSupplementarySubnetZonesSharedRouteTable,
+  natZonePlacementsKey,
 } from "./terraformTopologyPlacement";
 
 import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
@@ -590,6 +592,177 @@ describe("extractVpcDefaultPlumbingBuckets", () => {
         "aws_default_security_group.this",
       ].sort(),
     );
+  });
+});
+
+describe("computeNatGatewayZonePlacements", () => {
+  /** Two AZs, two NATs each in its own public-subnet zone, each NAT pairs with one EIP. */
+  const twoAzNatPlan = () => ({
+    ...planWithDefaultAwsAccountRegion,
+    resource_changes: [
+      {
+        address: "aws_nat_gateway.a",
+        mode: "managed",
+        type: "aws_nat_gateway",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            subnet_id: "subnet-pub-a",
+            allocation_id: "eipalloc-a",
+            vpc_id: "vpc-1",
+          },
+        },
+      },
+      {
+        address: "aws_nat_gateway.b",
+        mode: "managed",
+        type: "aws_nat_gateway",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            subnet_id: "subnet-pub-b",
+            allocation_id: "eipalloc-b",
+            vpc_id: "vpc-1",
+          },
+        },
+      },
+      {
+        address: "aws_eip.a",
+        mode: "managed",
+        type: "aws_eip",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: { id: "eipalloc-a", allocation_id: "eipalloc-a" },
+        },
+      },
+      {
+        address: "aws_eip.b",
+        mode: "managed",
+        type: "aws_eip",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: { id: "eipalloc-b", allocation_id: "eipalloc-b" },
+        },
+      },
+    ],
+  });
+
+  it("pairs each NAT with its EIP and routes the pair into the owning public-subnet zone", () => {
+    const plan = twoAzNatPlan();
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: [],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-pub-b",
+        subnetIds: ["subnet-pub-b"],
+        addresses: [],
+      },
+    ];
+
+    const result = computeNatGatewayZonePlacements(plan, zones);
+    expect(result.byZone.size).toBe(2);
+
+    const az1 = result.byZone.get(
+      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-a"),
+    );
+    expect(az1).toBeDefined();
+    expect(az1!).toEqual([
+      { natAddress: "aws_nat_gateway.a", eipAddresses: ["aws_eip.a"] },
+    ]);
+
+    const az2 = result.byZone.get(
+      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-b"),
+    );
+    expect(az2).toBeDefined();
+    expect(az2!).toEqual([
+      { natAddress: "aws_nat_gateway.b", eipAddresses: ["aws_eip.b"] },
+    ]);
+
+    expect([...result.consumedAddresses].sort()).toEqual(
+      [
+        "aws_nat_gateway.a",
+        "aws_nat_gateway.b",
+        "aws_eip.a",
+        "aws_eip.b",
+      ].sort(),
+    );
+  });
+
+  it("leaves NAT and orphan EIP unconsumed when no zone owns the NAT subnet", () => {
+    const plan = twoAzNatPlan();
+    const zonesMissingB: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: [],
+      },
+      /** Zone for subnet-pub-b intentionally omitted — NAT.b should fall back to the right edge. */
+    ];
+
+    const result = computeNatGatewayZonePlacements(plan, zonesMissingB);
+    expect(result.byZone.size).toBe(1);
+    expect(result.consumedAddresses.has("aws_nat_gateway.a")).toBe(true);
+    expect(result.consumedAddresses.has("aws_eip.a")).toBe(true);
+    expect(result.consumedAddresses.has("aws_nat_gateway.b")).toBe(false);
+    expect(result.consumedAddresses.has("aws_eip.b")).toBe(false);
+  });
+
+  it("emits a NAT cluster with no EIP when allocation_id has no matching aws_eip", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_nat_gateway.solo",
+          mode: "managed",
+          type: "aws_nat_gateway",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              subnet_id: "subnet-pub-a",
+              allocation_id: "eipalloc-missing",
+              vpc_id: "vpc-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: [],
+      },
+    ];
+
+    const result = computeNatGatewayZonePlacements(plan, zones);
+    expect(result.byZone.size).toBe(1);
+    const az = result.byZone.get(
+      natZonePlacementsKey("111111111111", "us-east-1", "vpc-1", "subnet-pub-a"),
+    )!;
+    expect(az).toEqual([
+      { natAddress: "aws_nat_gateway.solo", eipAddresses: [] },
+    ]);
+    expect([...result.consumedAddresses]).toEqual(["aws_nat_gateway.solo"]);
   });
 });
 
