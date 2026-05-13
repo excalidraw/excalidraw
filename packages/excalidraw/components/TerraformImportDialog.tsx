@@ -23,14 +23,14 @@ const VIEW_OPTIONS: ReadonlyArray<{
   description: string;
 }> = [
   {
-    value: "module",
-    label: "Module view",
-    description: "Module-framed infrastructure graph.",
-  },
-  {
     value: "semantic",
     label: "Semantic view",
     description: "Account, region, VPC, and subnet topology.",
+  },
+  {
+    value: "module",
+    label: "Module view",
+    description: "Module-framed infrastructure graph.",
   },
 ];
 
