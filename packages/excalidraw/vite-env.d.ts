@@ -51,7 +51,7 @@ interface ImportMetaEnv {
 
   VITE_WORKER_ID: string;
 
-  /** Base URL of `@excalidraw/backend` for Terraform import (`yarn start:backend`). */
+  /** Legacy env hook; Terraform import runs client-side (see `terraformPlanParsing`). */
   VITE_TERRAFORM_BACKEND_URL?: string;
 
   MODE: string;
