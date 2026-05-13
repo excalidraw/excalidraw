@@ -66,6 +66,7 @@
     "start:production": "yarn --cwd ./excalidraw-app start:production",
     "start:example": "yarn build:packages && yarn --cwd ./examples/with-script-in-browser start",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
+    "test:prepush": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:coverage && yarn workspace @excalidraw/excalidraw run build:esm && yarn workspace @excalidraw/excalidraw run check:size",
     "test:app": "vitest",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
     "test:other": "yarn prettier --list-different",
