@@ -75,6 +75,7 @@ import {
 } from "./terraformTopologyKmsLinks";
 import {
   buildLambdaSgCluster,
+  buildLoadBalancerSgCluster,
   sgSatelliteStackHeightPx,
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
@@ -84,6 +85,11 @@ import {
   buildAlbListenerTargetCluster,
   filterTopologyAddressesExcludingAlbSatellites,
 } from "./terraformTopologyAlbLinks";
+import {
+  buildLambdaPermissionCluster,
+  filterTopologyAddressesExcludingLambdaPermissionSatellites,
+  lambdaPermissionSatelliteStackHeightPx,
+} from "./terraformTopologyLambdaPermissionLinks";
 import {
   buildS3CompanionCluster,
   s3SatelliteStackHeightPx,
@@ -114,6 +120,24 @@ import type {
   TopologyVpcEndpointBucket,
   TopologyVpcFlowLogBucket,
 } from "./terraformTopologyPlacement";
+
+function filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  addresses: readonly string[],
+  plan?: unknown,
+): string[] {
+  return filterTopologyAddressesExcludingLambdaPermissionSatellites(
+    nodes,
+    arnIndex,
+    filterTopologyAddressesExcludingAlbSatellites(
+      nodes,
+      arnIndex,
+      addresses,
+      plan,
+    ),
+  );
+}
 
 const px = tfComfortPx;
 
@@ -362,20 +386,35 @@ function topologyPrimaryCellFootprintPx(
   arnIndex: Map<string, string>,
   plan?: unknown,
 ): number {
+  const node = nodes[address] as TerraformPlanGraphNode | undefined;
+  const pr = getPrimaryResource(node) as Record<string, unknown> | null;
+  const primaryType =
+    typeof pr?.type === "string"
+      ? pr.type
+      : getTerraformCardResourceType(address, pr);
+
   const { cluster: iamCluster } = buildLambdaIamCluster(
     nodes,
     address,
     arnIndex,
   );
   const kmsBuild = buildKmsKeyPolicyCluster(nodes, address, arnIndex);
-  const sgBuild = buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  const sgBuild =
+    primaryType === "aws_lb"
+      ? buildLoadBalancerSgCluster(nodes, address, arnIndex, plan)
+      : buildLambdaSgCluster(nodes, address, arnIndex, plan);
   const cwBuild = buildResourceCloudWatchCluster(nodes, address);
   const albFootprint = buildAlbListenerTargetCluster(nodes, address, arnIndex);
+  const lambdaPermissionFootprint =
+    primaryType === "aws_lambda_function"
+      ? buildLambdaPermissionCluster(nodes, address, arnIndex)
+      : { cluster: null };
 
   const hasLeft =
     Boolean(iamCluster) ||
     Boolean(kmsBuild.cluster) ||
-    Boolean(albFootprint.cluster);
+    Boolean(albFootprint.cluster) ||
+    Boolean(lambdaPermissionFootprint.cluster);
   const hasSg = Boolean(sgBuild.cluster);
   let w = TOPOLOGY_TIER0_W;
   if (hasLeft && hasSg) {
@@ -509,9 +548,16 @@ function zoneFrameSizeForTopologyAddresses(
       TOPOLOGY_TIER2_H,
       TOPOLOGY_SATELLITE_GAP_PX,
     );
+    const lambdaPermissionExtra = lambdaPermissionSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
     const leftColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
-      [iamExtra, kmsPolicyExtra, s3Extra, albExtra],
+      [iamExtra, kmsPolicyExtra, s3Extra, albExtra, lambdaPermissionExtra],
     );
     const rightColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
@@ -683,11 +729,13 @@ function vpcFrameDimensionsForZones(
   let perZoneBodyH = 0;
   let maxZoneRouteTableInset = 0;
   for (const z of vpcZs) {
-    const sortedZ = filterTopologyAddressesExcludingAlbSatellites(
-      nodes,
-      arnIndex,
-      [...z.addresses],
-    ).sort((a, b) => a.localeCompare(b));
+    const sortedZ =
+      filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
+        nodes,
+        arnIndex,
+        [...z.addresses],
+        plan,
+      ).sort((a, b) => a.localeCompare(b));
     const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
     const sizing = routeTableZoneSizing?.get(z.subnetSignature);
     const rtMinW =
@@ -1206,7 +1254,9 @@ function natZoneClusterOuterHeightPx(eipCount: number): number {
       : TOPOLOGY_SATELLITE_GAP_PX +
         eipCount * TOPOLOGY_TIER2_H +
         Math.max(0, eipCount - 1) * TOPOLOGY_SATELLITE_GAP_PX;
-  return RESOURCE_RECT_H + tier2Block + 2 * TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+  return (
+    RESOURCE_RECT_H + tier2Block + 2 * TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX
+  );
 }
 
 /** Minimum inner-content width to fit a row of NAT clusters (excludes zone `INNER_PAD`). */
@@ -1648,6 +1698,7 @@ type TopologySatelliteLineSpec = {
     | "topology_kms"
     | "topology_s3"
     | "topology_alb"
+    | "topology_lambda_permission"
     | "topology_sqs"
     | "topology_vpc_flow"
     | "topology_vpc_defaults"
@@ -1964,7 +2015,7 @@ function companionStackTileMetrics(
   const n = nodes[satAddr] as TerraformPlanGraphNode | undefined;
   const pr = getPrimaryResource(n);
   const t = typeof pr?.type === "string" ? pr.type : "";
-  if (t === "aws_iam_policy_document") {
+  if (t === "aws_iam_policy_document" || t === "aws_lambda_permission") {
     return {
       tileH: TOPOLOGY_TIER2_H,
       tileW: TOPOLOGY_TIER2_W,
@@ -2022,6 +2073,7 @@ function appendTopologyResourceRectangles(
   globalPlacedS3Satellites: Set<string>,
   globalPlacedSqsSatellites: Set<string>,
   globalPlacedAlbSatellites: Set<string>,
+  globalPlacedLambdaPermissionSatellites: Set<string>,
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
@@ -2089,9 +2141,16 @@ function appendTopologyResourceRectangles(
       TOPOLOGY_TIER2_H,
       TOPOLOGY_SATELLITE_GAP_PX,
     );
+    const lambdaPermissionExtra = lambdaPermissionSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
     const leftColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
-      [iamExtra, kmsPolicyExtra, s3Extra, albExtra],
+      [iamExtra, kmsPolicyExtra, s3Extra, albExtra, lambdaPermissionExtra],
     );
     const rightColumnBottom = stackSequentialSatelliteHeightsPx(
       TOPOLOGY_SATELLITE_GAP_PX,
@@ -2166,9 +2225,17 @@ function appendTopologyResourceRectangles(
 
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
     const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
-    const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
+    const sgBuild =
+      resourceType === "aws_lb"
+        ? buildLoadBalancerSgCluster(nodes, addr, arnIndex, plan)
+        : buildLambdaSgCluster(nodes, addr, arnIndex, plan);
     const s3Build = buildS3CompanionCluster(nodes, addr, arnIndex);
     const albBuild = buildAlbListenerTargetCluster(nodes, addr, arnIndex);
+    const lambdaPermissionBuild = buildLambdaPermissionCluster(
+      nodes,
+      addr,
+      arnIndex,
+    );
     const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
     const { iamW, sgW } = satelliteColumnWidths();
@@ -2209,6 +2276,13 @@ function appendTopologyResourceRectangles(
         strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
+    for (const e of lambdaPermissionBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_lambda_permission",
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
+      });
+    }
     for (const e of sqsBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
@@ -2228,7 +2302,8 @@ function appendTopologyResourceRectangles(
       Boolean(cluster) ||
       Boolean(kmsBuild.cluster) ||
       Boolean(s3Build.cluster) ||
-      Boolean(albBuild.cluster);
+      Boolean(albBuild.cluster) ||
+      Boolean(lambdaPermissionBuild.cluster);
     const hasSg = Boolean(sgBuild.cluster);
     const hasSqs = Boolean(sqsBuild.cluster);
     const cwHasAlarm = Boolean(cloudWatchBuild.cluster?.alarms.length);
@@ -2438,6 +2513,48 @@ function appendTopologyResourceRectangles(
           skeleton,
           satAddr,
           satXAlb + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+            satelliteTier: m.tier,
+          },
+        );
+        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+      }
+    }
+
+    if (lambdaPermissionBuild.cluster) {
+      if (
+        !cluster &&
+        !kmsBuild.cluster &&
+        !s3Build.cluster &&
+        !albBuild.cluster
+      ) {
+        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
+      }
+      const satXLp = rx;
+      for (const satAddr of lambdaPermissionBuild.cluster.stack) {
+        const m = companionStackTileMetrics(nodes, satAddr, iamW);
+        if (globalPlacedLambdaPermissionSatellites.has(satAddr)) {
+          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+          continue;
+        }
+        globalPlacedLambdaPermissionSatellites.add(satAddr);
+        addClusterMember(
+          satAddr,
+          satXLp + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+        );
+        pushResourceRectangleSkeleton(
+          skeleton,
+          satAddr,
+          satXLp + m.tileXOffset,
           yLeft,
           m.tileW,
           m.tileH,
@@ -2755,6 +2872,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   const globalPlacedS3Satellites = new Set<string>();
   const globalPlacedSqsSatellites = new Set<string>();
   const globalPlacedAlbSatellites = new Set<string>();
+  const globalPlacedLambdaPermissionSatellites = new Set<string>();
   const zoneRouteAnchorDebug: TerraformTopologyZoneRouteAnchorDebugRow[] = [];
 
   let accountCursorX = MARGIN;
@@ -2787,11 +2905,13 @@ export async function buildTerraformTopologyExcalidrawScene(
         accountId,
         regionName,
       );
-      const regionalAddrs = filterTopologyAddressesExcludingAlbSatellites(
-        nodes,
-        arnIndex,
-        regionalAddrsRaw,
-      ).sort((a, b) => a.localeCompare(b));
+      const regionalAddrs =
+        filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
+          nodes,
+          arnIndex,
+          regionalAddrsRaw,
+          plan,
+        ).sort((a, b) => a.localeCompare(b));
       const hasVpc = vpcEntries.length > 0;
       const hasReg = regionalAddrs.length > 0;
       if (!hasVpc && !hasReg) {
@@ -2936,7 +3056,12 @@ export async function buildTerraformTopologyExcalidrawScene(
         : { cols: 0, rows: 0 };
 
       const regDims = hasReg
-        ? zoneFrameSizeForTopologyAddresses(regionalAddrs, nodes, arnIndex, plan)
+        ? zoneFrameSizeForTopologyAddresses(
+            regionalAddrs,
+            nodes,
+            arnIndex,
+            plan,
+          )
         : { w: 0, h: 0 };
 
       let vpcGridW = 0;
@@ -2973,6 +3098,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           globalPlacedS3Satellites,
           globalPlacedSqsSatellites,
           globalPlacedAlbSatellites,
+          globalPlacedLambdaPermissionSatellites,
           satelliteLineSpecs,
           plan,
         );
@@ -3235,11 +3361,13 @@ export async function buildTerraformTopologyExcalidrawScene(
                   )
                 : [];
 
-            const addrs = filterTopologyAddressesExcludingAlbSatellites(
-              nodes,
-              arnIndex,
-              [...z.addresses],
-            ).sort((a, b) => a.localeCompare(b));
+            const addrs =
+              filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
+                nodes,
+                arnIndex,
+                [...z.addresses],
+                plan,
+              ).sort((a, b) => a.localeCompare(b));
             const rectIds = z.mergedSupplementaryComposite
               ? appendMergedSubnetCompositeRectangles(
                   skeleton,
@@ -3268,6 +3396,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                   globalPlacedS3Satellites,
                   globalPlacedSqsSatellites,
                   globalPlacedAlbSatellites,
+                  globalPlacedLambdaPermissionSatellites,
                   satelliteLineSpecs,
                   plan,
                 );

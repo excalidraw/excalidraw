@@ -25,6 +25,7 @@ import {
 import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
+import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
 
 /** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
 export type TopologyZoneSource = "primary" | "supplementary";
@@ -92,15 +93,183 @@ export type TopologyRouteTableBottomPlacements = {
   vpcBottom: RouteTableBottomVpcPlacement[];
 };
 
+type ResourceChange = {
+  address?: string;
+  mode?: string;
+  type?: string;
+  provider_name?: string;
+  change?: { actions?: string[]; before?: unknown; after?: unknown };
+};
+
 const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
 const ALB_COMPANION_TYPES = new Set([
   "aws_lb_listener",
   "aws_lb_target_group",
   "aws_lb_target_group_attachment",
-  "aws_lambda_permission",
-  "aws_security_group",
+]);
+
+const SG_RULE_TYPES_PLACEMENT = new Set([
+  "aws_vpc_security_group_ingress_rule",
+  "aws_vpc_security_group_egress_rule",
   "aws_security_group_rule",
 ]);
+
+function stripIndexesForTopologyRef(address: string): string {
+  return address.replace(/\[[^\]]+\]/g, "");
+}
+
+function isPlainObjectForPlacement(v: unknown): v is Record<string, unknown> {
+  return Boolean(v && typeof v === "object" && !Array.isArray(v));
+}
+
+function flattenStringishForPlacement(value: unknown, out: string[]): void {
+  if (typeof value === "string" && value.trim()) {
+    out.push(value.trim());
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      flattenStringishForPlacement(item, out);
+    }
+    return;
+  }
+  if (isPlainObjectForPlacement(value)) {
+    for (const v of Object.values(value)) {
+      flattenStringishForPlacement(v, out);
+    }
+  }
+}
+
+function findAwsSecurityGroupAddressForTopologyPlanRef(
+  ref: string,
+  changes: readonly ResourceChange[],
+): string | null {
+  const t = ref.trim();
+  if (!t) {
+    return null;
+  }
+  const stripT = stripIndexesForTopologyRef(t);
+
+  for (const rc of changes) {
+    if (rc.type !== "aws_security_group" || typeof rc.address !== "string") {
+      continue;
+    }
+    const addr = rc.address;
+    const stripAddr = stripIndexesForTopologyRef(addr);
+    if (
+      t === addr ||
+      stripT === stripAddr ||
+      t === stripAddr ||
+      stripT === addr
+    ) {
+      return addr;
+    }
+  }
+
+  if (t.startsWith("sg-")) {
+    for (const rc of changes) {
+      if (rc.type !== "aws_security_group" || typeof rc.address !== "string") {
+        continue;
+      }
+      const pv = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+      if (!pv) {
+        continue;
+      }
+      const id = typeof pv.id === "string" ? pv.id : "";
+      if (id === t) {
+        return rc.address;
+      }
+    }
+  }
+
+  return null;
+}
+
+function pickResourceChangeByAddress(
+  changes: readonly ResourceChange[],
+  address: string,
+): ResourceChange | null {
+  for (const rc of changes) {
+    if (rc.address === address) {
+      return rc;
+    }
+  }
+  return null;
+}
+
+function sgRuleSecurityGroupIdMatchesSgAddress(
+  sgAddress: string,
+  sgId: string,
+  sgArn: string,
+  ruleSgIdField: unknown,
+  changes: readonly ResourceChange[],
+): boolean {
+  const flat: string[] = [];
+  flattenStringishForPlacement(ruleSgIdField, flat);
+  for (const s of flat) {
+    const x = s.trim();
+    if (!x) {
+      continue;
+    }
+    if (x === sgAddress || stripIndexesForTopologyRef(x) === sgAddress) {
+      return true;
+    }
+    if (sgId && (x === sgId || x.includes(sgId))) {
+      return true;
+    }
+    if (sgArn && x === sgArn) {
+      return true;
+    }
+    const resolved = findAwsSecurityGroupAddressForTopologyPlanRef(x, changes);
+    if (resolved === sgAddress) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function collectRuleChangeAddressesForSgPlan(
+  sgAddress: string,
+  changes: readonly ResourceChange[],
+): string[] {
+  const sgRc = pickResourceChangeByAddress(changes, sgAddress);
+  if (!sgRc) {
+    return [];
+  }
+  const sgVals = pickResourceValuesForTopologyPlacement(sgRc as ResourceChange);
+  const sgId = sgVals && typeof sgVals.id === "string" ? sgVals.id : "";
+  const sgArn = sgVals && typeof sgVals.arn === "string" ? sgVals.arn : "";
+
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const rc of changes) {
+    if (!rc.type || !SG_RULE_TYPES_PLACEMENT.has(rc.type)) {
+      continue;
+    }
+    if (typeof rc.address !== "string") {
+      continue;
+    }
+    const pv = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!pv) {
+      continue;
+    }
+    if (
+      sgRuleSecurityGroupIdMatchesSgAddress(
+        sgAddress,
+        sgId,
+        sgArn,
+        pv.security_group_id,
+        changes,
+      )
+    ) {
+      if (!seen.has(rc.address)) {
+        seen.add(rc.address);
+        out.push(rc.address);
+      }
+    }
+  }
+  return out.sort((a, b) => a.localeCompare(b));
+}
 
 /** Minimum inner width for one horizontal row of route-table cluster frames (legacy helper). */
 export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
@@ -212,14 +381,6 @@ export function routeTableMaxExtentBelowAnchorForRowPx(
   return maxE;
 }
 
-type ResourceChange = {
-  address?: string;
-  mode?: string;
-  type?: string;
-  provider_name?: string;
-  change?: { actions?: string[]; before?: unknown; after?: unknown };
-};
-
 function stringArrayField(v: unknown): string[] {
   if (!Array.isArray(v)) {
     return [];
@@ -264,9 +425,7 @@ export function collectPlacementSubnetIds(
   if (Array.isArray(subnetMapping)) {
     for (const entry of subnetMapping) {
       if (entry && typeof entry === "object" && !Array.isArray(entry)) {
-        const sid = stringField(
-          (entry as Record<string, unknown>).subnet_id,
-        );
+        const sid = stringField((entry as Record<string, unknown>).subnet_id);
         if (sid) {
           ids.add(sid);
         }
@@ -288,10 +447,7 @@ function collectInferenceSubnetIdsFromResource(
   values: Record<string, unknown>,
 ): string[] {
   const ids = new Set<string>();
-  if (
-    type === "aws_instance" ||
-    type === "aws_spot_instance_request"
-  ) {
+  if (type === "aws_instance" || type === "aws_spot_instance_request") {
     const sid = stringField(values.subnet_id);
     if (sid) {
       ids.add(sid);
@@ -312,10 +468,7 @@ function collectInferenceSecurityGroupIdsFromResource(
   values: Record<string, unknown>,
 ): string[] {
   const out: string[] = [];
-  if (
-    type === "aws_instance" ||
-    type === "aws_spot_instance_request"
-  ) {
+  if (type === "aws_instance" || type === "aws_spot_instance_request") {
     out.push(...stringArrayField(values.vpc_security_group_ids));
   }
   if (type === "aws_lambda_function") {
@@ -516,6 +669,78 @@ export function extractPrimaryTopologyZones(
       continue;
     }
     accum.get(owner.key)?.addresses.add(address);
+  }
+
+  const addressToZoneRow = new Map<
+    string,
+    {
+      accountId: string;
+      region: string;
+      vpcId: string;
+      subnetSignature: string;
+      subnetIds: string[];
+      addresses: Set<string>;
+    }
+  >();
+  for (const row of accum.values()) {
+    for (const addr of row.addresses) {
+      addressToZoneRow.set(addr, row);
+    }
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_lambda_permission") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const targetLambda = resolveLambdaPermissionTargetLambdaAddressFromPlan(
+      rc,
+      changes,
+    );
+    if (!targetLambda) {
+      continue;
+    }
+    const row = addressToZoneRow.get(targetLambda);
+    if (row) {
+      row.addresses.add(address);
+    }
+  }
+
+  for (const row of accum.values()) {
+    for (const addr of [...row.addresses]) {
+      const lbRc = pickResourceChangeByAddress(changes, addr);
+      if (!lbRc || lbRc.type !== "aws_lb") {
+        continue;
+      }
+      const pv = pickResourceValuesForTopologyPlacement(lbRc as ResourceChange);
+      if (!pv) {
+        continue;
+      }
+      const refs: string[] = [];
+      flattenStringishForPlacement(pv.security_groups, refs);
+      for (const r of refs) {
+        const sgAddr = findAwsSecurityGroupAddressForTopologyPlanRef(
+          r,
+          changes,
+        );
+        if (!sgAddr) {
+          continue;
+        }
+        row.addresses.add(sgAddr);
+        for (const ruleAddr of collectRuleChangeAddressesForSgPlan(
+          sgAddr,
+          changes,
+        )) {
+          row.addresses.add(ruleAddr);
+        }
+      }
+    }
   }
 
   const out: TopologyPlacementZone[] = [...accum.values()].map((row) => ({

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildAlbListenerTargetCluster,
+  collectAlbClusterSatelliteAddressesForTopologyList,
   filterTopologyAddressesExcludingAlbSatellites,
   resolveLoadBalancerArnToLbPath,
 } from "./terraformTopologyAlbLinks";
@@ -79,13 +80,47 @@ function sampleAlbNodes(): TerraformPlanNodesMap {
   };
 }
 
+function lbWithSgOnlyNodes(): TerraformPlanNodesMap {
+  return {
+    "aws_lb.main": {
+      resources: {
+        "aws_lb.main": {
+          address: "aws_lb.main",
+          mode: "managed",
+          type: "aws_lb",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: lbArn,
+              security_groups: ["sg-only"],
+            },
+          },
+        },
+      },
+    },
+    "aws_security_group.lb": {
+      resources: {
+        "aws_security_group.lb": {
+          address: "aws_security_group.lb",
+          mode: "managed",
+          type: "aws_security_group",
+          change: {
+            actions: ["create"],
+            after: { id: "sg-only", vpc_id: "vpc-1" },
+          },
+        },
+      },
+    },
+  };
+}
+
 describe("terraformTopologyAlbLinks", () => {
   it("resolveLoadBalancerArnToLbPath resolves LB ARN to aws_lb node", () => {
     const nodes = sampleAlbNodes();
     const arnIndex = buildArnIndexForTopology(nodes);
-    expect(
-      resolveLoadBalancerArnToLbPath(nodes, lbArn, arnIndex),
-    ).toBe("aws_lb.main");
+    expect(resolveLoadBalancerArnToLbPath(nodes, lbArn, arnIndex)).toBe(
+      "aws_lb.main",
+    );
   });
 
   it("buildAlbListenerTargetCluster orders listener, target group, attachment", () => {
@@ -138,6 +173,23 @@ describe("terraformTopologyAlbLinks", () => {
       all,
     );
     expect(filtered).toEqual(["aws_lb.main"]);
+  });
+
+  it("collectAlbClusterSatelliteAddressesForTopologyList includes LB SG when no listeners", () => {
+    const nodes = lbWithSgOnlyNodes();
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const consumed = collectAlbClusterSatelliteAddressesForTopologyList(
+      nodes,
+      arnIndex,
+      ["aws_lb.main"],
+    );
+    expect([...consumed].sort()).toEqual(["aws_security_group.lb"]);
+    const filtered = filterTopologyAddressesExcludingAlbSatellites(
+      nodes,
+      arnIndex,
+      Object.keys(nodes),
+    );
+    expect(filtered.sort()).toEqual(["aws_lb.main"]);
   });
 
   it("returns null cluster for non-LB address", () => {

@@ -88,11 +88,15 @@ export function isInitiallyVisibleTerraformResource(
   );
 }
 
-/** Subnet / default-VPC / flow-log tiles in semantic topology (not ELK “primary” overview types). */
+/**
+ * Subnet / default-VPC / flow-log tiles in semantic topology (not ELK “primary” overview types).
+ * `aws_lambda_permission` is intentionally omitted: it is drawn only as a satellite under
+ * `aws_lambda_function` (see `terraformTopologyLambdaPermissionLinks` + layout), not as a
+ * standalone zone tile.
+ */
 const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
   "aws_eip",
   "aws_internet_gateway",
-  "aws_lambda_permission",
   "aws_lb",
   "aws_lb_listener",
   "aws_lb_target_group",

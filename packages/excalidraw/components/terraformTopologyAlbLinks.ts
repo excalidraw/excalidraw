@@ -13,6 +13,7 @@ import {
   mergeTerraformPlanResourceValues,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { buildLoadBalancerSgCluster } from "./terraformTopologySgLinks";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -156,9 +157,7 @@ function resolveArnLikeToNodePath(
   return null;
 }
 
-function normalizeDefaultActions(
-  values: Record<string, unknown>,
-): unknown[] {
+function normalizeDefaultActions(values: Record<string, unknown>): unknown[] {
   const da = values.default_action;
   if (da == null) {
     return [];
@@ -222,11 +221,8 @@ function collectListenerTargetGroupPaths(
   const tgPaths = new Set<string>();
   for (const act of normalizeDefaultActions(values)) {
     for (const arnStr of collectTargetGroupArnStringsFromAction(act)) {
-      const p = resolveArnLikeToNodePath(
-        nodes,
-        arnStr,
-        arnIndex,
-        (rt) => TARGET_GROUP_TYPES.has(rt),
+      const p = resolveArnLikeToNodePath(nodes, arnStr, arnIndex, (rt) =>
+        TARGET_GROUP_TYPES.has(rt),
       );
       if (p) {
         tgPaths.add(p);
@@ -417,6 +413,7 @@ export function collectAlbClusterSatelliteAddressesForTopologyList(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   addresses: readonly string[],
+  plan?: unknown,
 ): Set<string> {
   const consumed = new Set<string>();
   for (const addr of addresses) {
@@ -426,11 +423,24 @@ export function collectAlbClusterSatelliteAddressesForTopologyList(
       continue;
     }
     const { cluster } = buildAlbListenerTargetCluster(nodes, addr, arnIndex);
-    if (!cluster) {
-      continue;
+    if (cluster) {
+      for (const s of cluster.stack) {
+        consumed.add(s);
+      }
     }
-    for (const s of cluster.stack) {
-      consumed.add(s);
+    const sgCluster = buildLoadBalancerSgCluster(
+      nodes,
+      addr,
+      arnIndex,
+      plan,
+    ).cluster;
+    if (sgCluster) {
+      for (const g of sgCluster.groups) {
+        consumed.add(g.sgPath);
+        for (const r of g.rules) {
+          consumed.add(r);
+        }
+      }
     }
   }
   return consumed;
@@ -444,11 +454,13 @@ export function filterTopologyAddressesExcludingAlbSatellites(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   addresses: readonly string[],
+  plan?: unknown,
 ): string[] {
   const consumed = collectAlbClusterSatelliteAddressesForTopologyList(
     nodes,
     arnIndex,
     addresses,
+    plan,
   );
   return [...addresses].filter((a) => !consumed.has(a));
 }
