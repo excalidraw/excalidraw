@@ -54,6 +54,7 @@ import {
 import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
+  TERRAFORM_IMPORT_EDGE_LAYER_PINS,
 } from "./terraformVisibility";
 
 import { injectTerraformAwsIconsIntoElements } from "./terraformAwsIcons";
@@ -1623,8 +1624,12 @@ export async function buildTerraformElkExcalidrawScene(
   elements = applyTerraformResourceRectangleSoftDelete(elements);
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = await injectTerraformAwsIconsIntoElements(elements);
-  elements = repairTerraformEdgeBindings(
-    reconcileTerraformVisibility(elements),
+  elements = reconcileTerraformVisibility(
+    repairTerraformEdgeBindings(elements),
+    {
+      pins: TERRAFORM_IMPORT_EDGE_LAYER_PINS,
+      hoverPeekKey: null,
+    },
   );
 
   return {

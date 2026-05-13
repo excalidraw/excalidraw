@@ -434,6 +434,7 @@ import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 
 import {
+  buildTerraformReconcileOptionsForAppState,
   syncTerraformDetachedResourceLabelsWithDraggedCards,
   toggleTerraformExplode,
 } from "./terraformVisibility";
@@ -550,7 +551,14 @@ const actionToggleTerraformExplode: Action = {
     }
 
     return {
-      elements: toggleTerraformExplode(elements, terraformElement),
+      elements: toggleTerraformExplode(
+        elements,
+        terraformElement,
+        buildTerraformReconcileOptionsForAppState(
+          appState.terraformEdgeLayerPins,
+          appState.terraformEdgeHoverPeekKey,
+        ),
+      ),
       appState: null,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
