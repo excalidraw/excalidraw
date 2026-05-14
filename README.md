@@ -1,4 +1,4 @@
-# tfdraw.io
+# tfdraw.dev
 
 **A browser-only Terraform plan visualizer that turns plan output into an editable Excalidraw architecture canvas.**
 
@@ -28,9 +28,9 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
 
 ![Sample import: plan JSON and graph DOT rendered as an editable AWS-style diagram](docs/terraform-import-sample.png)
 
-## What is tfdraw.io?
+## What is tfdraw.dev?
 
-tfdraw.io is a Terraform architecture canvas built on [Excalidraw](https://excalidraw.com). It reads the files you already generate during a Terraform review:
+tfdraw.dev is a Terraform architecture canvas built on [Excalidraw](https://excalidraw.com). It reads the files you already generate during a Terraform review:
 
 - plan JSON from `terraform show -json`
 - dependency graph DOT from `terraform graph`
@@ -125,7 +125,7 @@ Everything remains editable because the output is an Excalidraw scene.
 
 ## Safety model
 
-tfdraw.io is designed as a local-file review tool:
+tfdraw.dev is designed as a local-file review tool:
 
 - The app does not request AWS, Terraform Cloud, or other cloud credentials.
 - The app does not run `terraform`, `tofu`, provider plugins, or shell commands.
@@ -154,7 +154,7 @@ Production/static builds open on a Terraform Canvas landing page with an embedde
 
 ## FAQ
 
-### Does tfdraw.io need access to my AWS account?
+### Does tfdraw.dev need access to my AWS account?
 
 No. You generate Terraform/OpenTofu outputs locally and import those files in the browser.
 
@@ -256,7 +256,7 @@ If the Cloudflare Pages project is still Git-connected, disable Cloudflare autom
 
 ## Upstream Excalidraw
 
-This repository is built on [Excalidraw](https://github.com/excalidraw/excalidraw), the open-source whiteboard with a hand-drawn look. tfdraw.io keeps the canvas, tools, local scene loading/saving, export behavior, and editor ergonomics, then adds the Terraform import pipeline and graph-to-canvas flow on top.
+This repository is built on [Excalidraw](https://github.com/excalidraw/excalidraw), the open-source whiteboard with a hand-drawn look. tfdraw.dev keeps the canvas, tools, local scene loading/saving, export behavior, and editor ergonomics, then adds the Terraform import pipeline and graph-to-canvas flow on top.
 
 - [Excalidraw](https://excalidraw.com)
 - [Excalidraw documentation](https://docs.excalidraw.com)

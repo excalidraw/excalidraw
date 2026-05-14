@@ -27,7 +27,7 @@ export const ExcalidrawLogo = ({
         alt=""
         aria-hidden="true"
       />
-      {withText && <span className="ExcalidrawLogo-text">tfdraw.io</span>}
+      {withText && <span className="ExcalidrawLogo-text">tfdraw.dev</span>}
     </div>
   );
 };

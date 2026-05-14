@@ -19,7 +19,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       <span
         class="ExcalidrawLogo-text"
       >
-        tfdraw.io
+        tfdraw.dev
       </span>
     </div>
   </div>

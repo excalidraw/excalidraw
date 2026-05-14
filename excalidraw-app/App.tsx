@@ -887,7 +887,7 @@ const ExcalidrawWrapper = ({
   }
 
   const ExcalidrawPlusCommand = {
-    label: "tfdraw.io",
+    label: "tfdraw.dev",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
@@ -1243,7 +1243,7 @@ const ExcalidrawWrapper = ({
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to tfdraw.io",
+                    label: "Sign in / Go to tfdraw.dev",
                   },
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
@@ -1326,7 +1326,7 @@ const LandingPage = () => {
   return (
     <main id="top" className="landing-page">
       <header className="landing-nav-wrap">
-        <nav className="landing-nav" aria-label="tfdraw.io">
+        <nav className="landing-nav" aria-label="tfdraw.dev">
           <a className="landing-nav__brand" href="#top">
             <img
               className="landing-nav__logo"
@@ -1334,7 +1334,7 @@ const LandingPage = () => {
               alt=""
               aria-hidden="true"
             />
-            tfdraw.io
+            tfdraw.dev
           </a>
           <div className="landing-nav__links">
             <a href="#terraform-canvas">Terraform canvas</a>
@@ -1359,7 +1359,7 @@ const LandingPage = () => {
           </p>
           <h1 id="landing-title">Terraform as a living architecture diagram</h1>
           <p className="landing-hero__lede">
-            tfdraw.io maps Terraform state, tfplan JSON, and graph data into an
+            tfdraw.dev maps Terraform state, tfplan JSON, and graph data into an
             editable architecture canvas so platform teams can visualize
             changes, review plans, and annotate the real infrastructure model.
           </p>
@@ -1382,7 +1382,7 @@ const LandingPage = () => {
               Full editor demo
             </a>
           </div>
-          <div className="landing-proof" aria-label="tfdraw.io values">
+          <div className="landing-proof" aria-label="tfdraw.dev values">
             <span>State-backed architecture view</span>
             <span>Visual plan diffs</span>
             <span>Custom annotations</span>
@@ -1532,7 +1532,7 @@ const LandingPage = () => {
       <section className="landing-features" aria-labelledby="features-title">
         <div className="landing-section-heading">
           <p>Product</p>
-          <h2 id="features-title">Why teams use tfdraw.io</h2>
+          <h2 id="features-title">Why teams use tfdraw.dev</h2>
         </div>
         <div className="landing-features__grid">
           <article>
@@ -1588,7 +1588,7 @@ const LandingPage = () => {
         </div>
         <dl className="landing-faq__list">
           <div className="landing-faq__item">
-            <dt>How do I visualize a Terraform plan in tfdraw.io?</dt>
+            <dt>How do I visualize a Terraform plan in tfdraw.dev?</dt>
             <dd>
               Save a binary plan with{" "}
               <code>terraform plan -out=tfplan.bin</code>, export JSON with{" "}
@@ -1598,7 +1598,7 @@ const LandingPage = () => {
             </dd>
           </div>
           <div className="landing-faq__item">
-            <dt>Does tfdraw.io replace Terraform or HCL?</dt>
+            <dt>Does tfdraw.dev replace Terraform or HCL?</dt>
             <dd>
               No. It is a read-and-annotate view on top of Terraform outputs.
               You keep HCL, modules, and workflows in Git; the canvas reflects
@@ -1633,7 +1633,7 @@ const LandingPage = () => {
       </section>
 
       <section className="landing-final" aria-labelledby="final-title">
-        <h2 id="final-title">Bring the next Terraform review to tfdraw.io.</h2>
+        <h2 id="final-title">Bring the next Terraform review to tfdraw.dev.</h2>
         <button type="button" className="landing-cta" onClick={scrollToCanvas}>
           Visualize Terraform changes
         </button>
