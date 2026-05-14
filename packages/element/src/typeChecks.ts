@@ -97,7 +97,7 @@ export const isFreeDrawElement = (
 };
 
 export const isFreeDrawElementType = (
-  elementType: ElementOrToolType,
+  elementType: ExcalidrawElementType,
 ): boolean => {
   return elementType === "freedraw";
 };
