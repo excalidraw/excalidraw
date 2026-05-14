@@ -642,7 +642,7 @@ export const textWysiwyg = ({
       event[KEYS.CTRL_OR_CMD] &&
       !event.shiftKey
     ) {
-      event.preventDefault();
+      onWysiwygSave(event);
       event.stopPropagation();
     }
   };
