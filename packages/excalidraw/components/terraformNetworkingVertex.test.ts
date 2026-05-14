@@ -67,7 +67,9 @@ describe("terraformNetworkingVertex", () => {
     ];
     const { dependencyEdges, networkingDependencyEdges } =
       partitionDirectedEdgesByNetworking(nodes, edges);
-    expect(networkingDependencyEdges).toEqual([{ source: "vpc", target: "sn" }]);
+    expect(networkingDependencyEdges).toEqual([
+      { source: "vpc", target: "sn" },
+    ]);
     expect(dependencyEdges).toEqual([{ source: "fn", target: "sn" }]);
   });
 });

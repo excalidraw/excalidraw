@@ -38,7 +38,9 @@ describe("TerraformImportModal", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     const planInput = screen.getByLabelText(/plan file/i);
     fireEvent.change(planInput, {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     expect(
       screen.getByRole("button", { name: /import & open/i }),
@@ -52,11 +54,15 @@ describe("TerraformImportModal", () => {
     const planInput = screen.getByLabelText(/plan file/i);
     const dotInput = screen.getByLabelText(/graph file/i);
     fireEvent.change(planInput, {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     expect(semantic).toBeDisabled();
     fireEvent.change(dotInput, {
-      target: { files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })] },
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
     });
     expect(semantic).not.toBeDisabled();
   });
@@ -71,10 +77,14 @@ describe("TerraformImportModal", () => {
     const onClose = vi.fn();
     render(<TerraformImportModal onCloseRequest={onClose} />);
     fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: { files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })] },
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
@@ -103,10 +113,14 @@ describe("TerraformImportModal", () => {
     );
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: { files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })] },
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
     });
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
@@ -126,10 +140,14 @@ describe("TerraformImportModal", () => {
     );
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: { files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })] },
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
@@ -146,10 +164,14 @@ describe("TerraformImportModal", () => {
     vi.mocked(terraformPlanParsing).mockReturnValue(pending);
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: { files: [new File(["{}"], "p.json", { type: "application/json" })] },
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
     });
     fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: { files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })] },
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     expect(await screen.findByText(/importing/i)).toBeInTheDocument();

@@ -28,7 +28,7 @@ const el = (partial: Partial<ExcalidrawElement>): ExcalidrawElement =>
     roughness: 1,
     opacity: 100,
     ...partial,
-  }) as ExcalidrawElement;
+  } as ExcalidrawElement);
 
 describe("terraformElementMetadata", () => {
   it("TERRAFORM_GROUP_FLAGS lists known group customData keys", () => {
@@ -97,9 +97,7 @@ describe("terraformElementMetadata", () => {
       ),
     ).toBe(true);
     expect(
-      isTerraformInspectableElement(
-        el({ customData: { relationship: true } }),
-      ),
+      isTerraformInspectableElement(el({ customData: { relationship: true } })),
     ).toBe(true);
   });
 

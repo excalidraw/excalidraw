@@ -27,9 +27,9 @@ describe("terraformTopologySgRulePlanConfig", () => {
   it("getSgRuleSecurityGroupIdRefIndex collects SG id expression refs by normalized address", () => {
     const idx = getSgRuleSecurityGroupIdRefIndex(planWithIngressRule);
     expect(idx).not.toBeNull();
-    expect(
-      idx!.get("aws_vpc_security_group_ingress_rule.ssh"),
-    ).toEqual(["aws_security_group.web"]);
+    expect(idx!.get("aws_vpc_security_group_ingress_rule.ssh")).toEqual([
+      "aws_security_group.web",
+    ]);
   });
 
   it("collectSgRuleSecurityGroupIdRefsFromPlanConfiguration returns refs for a rule address", () => {
