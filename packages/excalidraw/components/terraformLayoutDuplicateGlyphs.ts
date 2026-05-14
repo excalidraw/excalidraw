@@ -88,6 +88,27 @@ export async function injectTerraformLayoutDuplicateInfoGlyphs(
   const next = elements.slice() as ExcalidrawElement[];
 
   for (const { insertAt, rect } of sorted) {
+    const rcd = rect.customData ?? {};
+    const glyphIdentity: Record<string, unknown> = {
+      terraform: true,
+      terraformLayoutDuplicateGlyph: true,
+    };
+    if (typeof rcd.nodePath === "string" && rcd.nodePath.length > 0) {
+      glyphIdentity.nodePath = rcd.nodePath;
+    }
+    if (
+      typeof rcd.terraformVisibilityKey === "string" &&
+      rcd.terraformVisibilityKey.length > 0
+    ) {
+      glyphIdentity.terraformVisibilityKey = rcd.terraformVisibilityKey;
+    }
+    if (
+      typeof rcd.terraformLayoutEdgeFocusKey === "string" &&
+      rcd.terraformLayoutEdgeFocusKey.length > 0
+    ) {
+      glyphIdentity.terraformLayoutEdgeFocusKey =
+        rcd.terraformLayoutEdgeFocusKey;
+    }
     const img = newElementWith(
       newImageElement({
         type: "image",
@@ -99,10 +120,7 @@ export async function injectTerraformLayoutDuplicateInfoGlyphs(
         status: "saved",
         frameId: rect.frameId ?? null,
         opacity: rect.opacity ?? 100,
-        customData: {
-          terraform: true,
-          terraformLayoutDuplicateGlyph: true,
-        },
+        customData: glyphIdentity as ExcalidrawElement["customData"],
       }),
       { isDeleted: rect.isDeleted },
     );

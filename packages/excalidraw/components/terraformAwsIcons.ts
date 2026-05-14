@@ -266,12 +266,34 @@ export async function injectTerraformAwsIconsIntoElements(
     out[rectIdx] = newElementWith(rectInOut, { groupIds: stacked });
 
     const card = out[rectIdx]!;
+    const pcd = card.customData ?? {};
     const iconX = card.x + iconPad;
     const iconY = card.y + (card.height - iconSize) / 2;
-    const iconCustomData = {
+    /**
+     * Glyph hit targets sit on top of the card; without the same graph identity keys as the
+     * rectangle, {@link getTerraformEdgeHoverPeekKeyFromHoveredIds} returns null when only the
+     * icon is hovered and relationship focus / edge dimming never activates.
+     */
+    const iconCustomData: Record<string, unknown> = {
       terraform: true,
       terraformAwsIconGlyph: true,
     };
+    if (typeof pcd.nodePath === "string" && pcd.nodePath.length > 0) {
+      iconCustomData.nodePath = pcd.nodePath;
+    }
+    if (
+      typeof pcd.terraformVisibilityKey === "string" &&
+      pcd.terraformVisibilityKey.length > 0
+    ) {
+      iconCustomData.terraformVisibilityKey = pcd.terraformVisibilityKey;
+    }
+    if (
+      typeof pcd.terraformLayoutEdgeFocusKey === "string" &&
+      pcd.terraformLayoutEdgeFocusKey.length > 0
+    ) {
+      iconCustomData.terraformLayoutEdgeFocusKey =
+        pcd.terraformLayoutEdgeFocusKey;
+    }
 
     const icons = cloneIconElements(
       [...template],
