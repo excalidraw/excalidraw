@@ -6,6 +6,7 @@ import type { Theme } from "@excalidraw/element/types";
 
 import {
   actionClearCanvas,
+  actionCopyAsMermaid,
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
@@ -45,6 +46,7 @@ import {
   XBrandIcon,
   settingsIcon,
   emptyIcon,
+  mermaidLogoIcon,
 } from "../icons";
 import {
   boltIcon,
@@ -358,6 +360,27 @@ export const Export = () => {
   );
 };
 Export.displayName = "Export";
+
+export const CopyAsMermaid = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionCopyAsMermaid)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      icon={mermaidLogoIcon}
+      onSelect={() => actionManager.executeAction(actionCopyAsMermaid)}
+      data-testid="copy-mermaid-button"
+      aria-label={t("labels.copyAsMermaid")}
+    >
+      {t("labels.copyAsMermaid")}
+    </DropdownMenuItem>
+  );
+};
+CopyAsMermaid.displayName = "CopyAsMermaid";
 
 export const Socials = () => {
   const { t } = useI18n();

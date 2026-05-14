@@ -13,8 +13,15 @@ import {
   probablySupportsClipboardWriteText,
   readSystemClipboard,
 } from "../clipboard";
-import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import {
+  DuplicateIcon,
+  cutIcon,
+  mermaidLogoIcon,
+  pngIcon,
+  svgIcon,
+} from "../components/icons";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
+import { serializeExcalidrawToMermaid } from "../data/mermaid";
 import { t } from "../i18n";
 
 import { actionDeleteSelected } from "./actionDeleteSelected";
@@ -249,6 +256,71 @@ export const actionCopyAsPng = register({
   },
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
   keywords: ["png", "clipboard", "copy"],
+});
+
+export const actionCopyAsMermaid = register({
+  name: "copyAsMermaid",
+  label: "labels.copyAsMermaid",
+  icon: mermaidLogoIcon,
+  trackEvent: { category: "export" },
+  perform: async (elements, appState, _data, app) => {
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+
+    const { exportedElements } = prepareElementsForExport(
+      elements,
+      appState,
+      true,
+    );
+
+    try {
+      const mermaid = serializeExcalidrawToMermaid(exportedElements);
+      await copyTextToSystemClipboard(mermaid);
+
+      return {
+        appState: {
+          ...appState,
+          toast: {
+            message: t("toast.copyToClipboardAsMermaid", {
+              exportSelection: selectedElements.length
+                ? t("toast.selection")
+                : t("toast.canvas"),
+            }),
+          },
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    } catch (error: any) {
+      return {
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+  },
+  predicate: (elements, appState) => {
+    if (!probablySupportsClipboardWriteText || elements.length === 0) {
+      return false;
+    }
+
+    const { exportedElements } = prepareElementsForExport(
+      elements,
+      appState,
+      true,
+    );
+    try {
+      serializeExcalidrawToMermaid(exportedElements);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  keywords: ["mermaid", "clipboard", "copy", "diagram", "flowchart"],
 });
 
 export const copyText = register({

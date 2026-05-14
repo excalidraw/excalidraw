@@ -48,6 +48,7 @@ export type ActionName =
   | "paste"
   | "copyAsPng"
   | "copyAsSvg"
+  | "copyAsMermaid"
   | "copyText"
   | "sendBackward"
   | "bringForward"

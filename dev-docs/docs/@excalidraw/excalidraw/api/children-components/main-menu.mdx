@@ -120,6 +120,7 @@ function App() {
         <MainMenu>
           <MainMenu.DefaultItems.Socials />
           <MainMenu.DefaultItems.Export />
+          <MainMenu.DefaultItems.CopyAsMermaid />
           <MainMenu.Item onSelect={() => window.alert("Item1")}>
             Item1
           </MainMenu.Item>
@@ -134,6 +135,30 @@ function App() {
 ```
 
 Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/components/main-menu/DefaultItems.tsx) of the default items.
+
+### MainMenu.DefaultItems.CopyAsMermaid
+
+Renders the built-in action that copies the current selection, or the whole scene when nothing is selected, as Mermaid `flowchart` syntax.
+
+The current implementation is intentionally scoped:
+
+- Supports rectangles, diamonds, ellipses, standalone text, and arrows bound between supported nodes.
+- Uses bound text as Mermaid node/edge labels when present.
+- Fails instead of producing invalid Mermaid when the scene contains unsupported elements such as images, frames, embeds, or unbound arrows.
+
+```jsx live
+function App() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.DefaultItems.CopyAsMermaid />
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
+}
+```
 
 ### MainMenu.Group
 
