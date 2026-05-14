@@ -16,7 +16,7 @@
  * in the static bundle — Workers validation rejects them as an infinite loop (error 10021).
  */
 {
-  "name": "tfdraw-io",
+  "name": "ainur",
   "compatibility_date": "2025-05-12",
   "pages_build_output_dir": "./excalidraw-app/build",
   "assets": {
