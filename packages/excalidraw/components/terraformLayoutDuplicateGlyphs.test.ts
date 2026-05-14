@@ -14,8 +14,9 @@ describe("injectTerraformLayoutDuplicateInfoGlyphs", () => {
       height: 40,
       customData: { terraformSemanticLayoutDuplicate: false },
     });
-    const { elements, files } =
-      await injectTerraformLayoutDuplicateInfoGlyphs([rect]);
+    const { elements, files } = await injectTerraformLayoutDuplicateInfoGlyphs([
+      rect,
+    ]);
     expect(elements).toHaveLength(1);
     expect(Object.keys(files)).toHaveLength(0);
   });
@@ -33,8 +34,9 @@ describe("injectTerraformLayoutDuplicateInfoGlyphs", () => {
         terraformVisibilityKey: "aws_vpc_endpoint.x",
       },
     });
-    const { elements, files } =
-      await injectTerraformLayoutDuplicateInfoGlyphs([rect]);
+    const { elements, files } = await injectTerraformLayoutDuplicateInfoGlyphs([
+      rect,
+    ]);
     expect(elements).toHaveLength(2);
     const glyph = elements[1]!;
     expect(glyph.type).toBe("image");

@@ -43,9 +43,9 @@ describe("terraformPrimaryVisibility", () => {
       ).toBe(true);
     });
     it("shows non-primary types when action is a change", () => {
-      expect(isInitiallyVisibleTerraformResource("aws_iam_role", "create")).toBe(
-        true,
-      );
+      expect(
+        isInitiallyVisibleTerraformResource("aws_iam_role", "create"),
+      ).toBe(true);
     });
     it("hides non-primary unchanged resources", () => {
       expect(isInitiallyVisibleTerraformResource("aws_iam_role", "no-op")).toBe(
@@ -56,9 +56,9 @@ describe("terraformPrimaryVisibility", () => {
 
   describe("isInitiallyVisibleTerraformTopologyTile", () => {
     it("always shows semantic infra tiles such as aws_subnet", () => {
-      expect(isInitiallyVisibleTerraformTopologyTile("aws_subnet", "no-op")).toBe(
-        true,
-      );
+      expect(
+        isInitiallyVisibleTerraformTopologyTile("aws_subnet", "no-op"),
+      ).toBe(true);
     });
     it("falls back to resource visibility for non-infra types", () => {
       expect(
