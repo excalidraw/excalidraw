@@ -53,7 +53,7 @@ export const AppMainMenu: React.FC<{
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
             className=""
           >
-            tfdraw.io
+            tfdraw.dev
           </MainMenu.ItemLink>
           <MainMenu.DefaultItems.Socials />
           <MainMenu.ItemLink
