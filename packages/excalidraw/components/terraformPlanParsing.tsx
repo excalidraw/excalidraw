@@ -11,6 +11,7 @@ import {
   pickResourceValuesForTopologyPlacement,
 } from "./terraformTopologyExtract";
 import {
+  computeInterfaceVpcEndpointZonePlacements,
   computeNatGatewayZonePlacements,
   computeRouteTableBottomEdgePlacements,
   extractInterfaceEndpointSecurityGroupBuckets,
@@ -21,6 +22,7 @@ import {
   extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
+  filterVpcEndpointBucketsRemovingZonePlacedAddresses,
   mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
@@ -492,7 +494,13 @@ export const terraformPlanParsing = async (
       semPlan,
     );
     const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
-    const vpcEndpointBuckets = extractVpcEndpointsByVpc(semPlan);
+    const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(semPlan);
+    const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
+      computeInterfaceVpcEndpointZonePlacements(semPlan, zones);
+    const vpcEndpointBuckets = filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+      vpcEndpointBucketsRaw,
+      zonePlacedAddresses,
+    );
     const routeTableBuckets = extractRouteTablesByVpc(semPlan);
     const rawVpcDefaultPlumbingBuckets =
       extractVpcDefaultPlumbingBuckets(semPlan);
@@ -515,7 +523,10 @@ export const terraformPlanParsing = async (
             .filter((b) => b.addresses.length > 0);
     const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
     const endpointSecurityGroupBuckets =
-      extractInterfaceEndpointSecurityGroupBuckets(semPlan, vpcEndpointBuckets);
+      extractInterfaceEndpointSecurityGroupBuckets(
+        semPlan,
+        vpcEndpointBucketsRaw,
+      );
     const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
       zones,
       semPlan,
@@ -539,6 +550,7 @@ export const terraformPlanParsing = async (
       vpcFlowLogBuckets,
       endpointSecurityGroupBuckets,
       natZonePlacements,
+      interfaceVpcEndpointZonePlacements,
     );
     const represented = collectSemanticRepresentedResourceAddresses(
       topoScene.elements as Array<{ customData?: Record<string, any> }>,

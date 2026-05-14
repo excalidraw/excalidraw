@@ -168,6 +168,9 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
         if (path.includes("aws_nat_gateway")) {
           return false;
         }
+        if (path.includes("aws_vpc_endpoint")) {
+          return false;
+        }
         if (
           cd.terraformTopologyRole === "subnetZoneRouteTable" ||
           cd.terraformTopologyRole === "vpcRouteTable" ||
@@ -225,6 +228,7 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
       width?: number;
       height?: number;
       name?: string;
+      frameId?: string | null;
       customData?: Record<string, unknown>;
     }>;
 
@@ -267,7 +271,7 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
     });
     expect(
       vpcePrimaryClusters.length,
-      "fixture should place at least one interface VPCE primaryCluster on the VPC",
+      "fixture should place at least one interface VPCE primaryCluster (VPC strip or subnet zone)",
     ).toBeGreaterThan(0);
 
     function axisBounds(el: {
@@ -297,18 +301,39 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
         .terraformTopologyPath;
       const cVpc = vpcPrefixFromTopologyPath(cPath);
       const cb = axisBounds(c);
+
+      let vpceHostedInSubnetZone = false;
+      for (const oz of subnetZones) {
+        const ozPath = (oz.customData as { terraformTopologyPath?: string[] })
+          .terraformTopologyPath;
+        if (vpcPrefixFromTopologyPath(ozPath) !== cVpc || !oz.id) {
+          continue;
+        }
+        if (collectDescendants(elements, oz.id).some((e) => e.id === c.id)) {
+          vpceHostedInSubnetZone = true;
+          break;
+        }
+      }
+
       for (const z of subnetZones) {
         const zPath = (z.customData as { terraformTopologyPath?: string[] })
           .terraformTopologyPath;
         if (vpcPrefixFromTopologyPath(zPath) !== cVpc) {
           continue;
         }
+        if (!z.id) {
+          continue;
+        }
         pairChecks++;
+        if (vpceHostedInSubnetZone) {
+          /** VPCE lives inside some subnet zone in this VPC — skip sibling-zone bbox Y checks. */
+          continue;
+        }
         const zb = axisBounds(z);
         const overlapY = !(cb.maxY <= zb.minY + tol || cb.minY >= zb.maxY - tol);
         expect(
           overlapY,
-          `VPCE primaryCluster should sit below subnet zone band (no Y overlap); zone=${z.name ?? z.id}`,
+          `VPC-level VPCE primaryCluster should sit below subnet zone band (no Y overlap); zone=${z.name ?? z.id}`,
         ).toBe(false);
       }
     }
