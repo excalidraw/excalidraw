@@ -1135,7 +1135,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ]);
   });
 
-  it("places NAT+EIP inside the public subnet zone (semantic AZ) and IGW on the VPC left edge", async () => {
+  it("places NAT+EIP inside the public subnet zone (semantic AZ) and IGW in the VPC top plumbing row", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -1280,7 +1280,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         vpcId: "vpc-test",
         addresses: [
           "aws_internet_gateway.igw",
-          /** NAT/EIP get filtered into the zone — the right edge should only carry IGW here. */
+          /** NAT/EIP may be consumed into subnet zones; remaining ones stay on the VPC right edge. */
           ...["aws_nat_gateway.nat", "aws_eip.nat"].filter(
             (a) => !natZonePlacements.consumedAddresses.has(a),
           ),
@@ -1347,8 +1347,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ).toBe("primaryCluster");
     expect(natClusterFrame.frameId).toBe(subnetZone.id);
 
-    /** IGW remains on the VPC left edge as before. */
-    expect(igw.x).toBe(vpc.x);
+    /** IGW sits in the centered default-plumbing top row, not flush on the VPC frame left edge. */
+    expect(igw.x).toBeGreaterThan(vpc.x);
     expect(igw.frameId).toBe(vpc.id);
 
     /** Right edge no longer holds NAT/EIP tiles. */

@@ -460,6 +460,22 @@ function gridColsRows(count: number): { cols: number; rows: number } {
   return { cols, rows };
 }
 
+/**
+ * Primary resource tiles (subnet zones + regional strip): prefer a horizontal row
+ * with wrapping after {@link PRIMARY_TILE_MAX_COLS} — satellites stay columnar per tile.
+ * VPC frames still use {@link gridColsRows} (squarer multi-VPC grid).
+ */
+const PRIMARY_TILE_MAX_COLS = 16;
+
+function gridColsRowsForPrimaryTiles(count: number): { cols: number; rows: number } {
+  if (count <= 0) {
+    return { cols: 1, rows: 1 };
+  }
+  const cols = Math.min(count, PRIMARY_TILE_MAX_COLS);
+  const rows = Math.ceil(count / cols);
+  return { cols, rows };
+}
+
 /** Empty VPC shell when no placement zones. */
 function vpcEmptyShellSize(): { w: number; h: number } {
   return {
@@ -482,7 +498,7 @@ function zoneFrameSizeForTopologyAddresses(
       h: 180 + FRAME_CONTENT_SLACK_Y,
     };
   }
-  const { cols, rows } = gridColsRows(n);
+  const { cols, rows } = gridColsRowsForPrimaryTiles(n);
   const cellW = maxTopologyCellFootprintPx(
     sortedAddresses,
     nodes,
@@ -1808,7 +1824,7 @@ function splitVpcInternetEdgeAddresses(
   for (const addr of addrs) {
     const t = resourceTypeForAddress(nodes, addr);
     if (t === "aws_internet_gateway") {
-      out.left.push(addr);
+      out.defaultTop.push(addr);
     } else if (t === "aws_nat_gateway" || t === "aws_eip") {
       out.right.push(addr);
     } else {
@@ -2079,7 +2095,9 @@ function appendTopologyResourceRectangles(
 ): string[] {
   const clusterFrameIds: string[] = [];
   const sorted = [...addrs].sort();
-  const { cols: rcCols, rows: rcRows } = gridColsRows(sorted.length);
+  const { cols: rcCols, rows: rcRows } = gridColsRowsForPrimaryTiles(
+    sorted.length,
+  );
   const cellW = maxTopologyCellFootprintPx(sorted, nodes, arnIndex, plan);
 
   const rowTopBase: number[] = new Array(rcRows).fill(0);
@@ -3410,7 +3428,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             ).h;
             let routeTableRowCenterBandW: number | undefined;
             if (addrs.length > 0) {
-              const { cols: rcCols } = gridColsRows(addrs.length);
+              const { cols: rcCols } = gridColsRowsForPrimaryTiles(addrs.length);
               const cellW = maxTopologyCellFootprintPx(
                 addrs,
                 nodes,
