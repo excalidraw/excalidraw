@@ -239,6 +239,58 @@ describe("buildTerraformElkExcalidrawScene", () => {
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
+  it("pins AWS icon glyphs to resource card frame and group", async () => {
+    const nodes = {
+      "module.network.aws_vpc.main": minimalNode({
+        "module.network.aws_vpc.main": {
+          address: "module.network.aws_vpc.main",
+          type: "aws_vpc",
+        },
+      }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {
+          "module.network": {
+            path: "module.network",
+            modules: {},
+            resourceAddresses: ["module.network.aws_vpc.main"],
+          },
+        },
+        resourceAddresses: [],
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const vpcRect = getLabeledContainer(elements, "aws_vpc.main");
+    expect(vpcRect).toBeDefined();
+    expect(vpcRect!.frameId).toBeTruthy();
+
+    const label = elements.find(
+      (e) =>
+        e.type === "text" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey ===
+          vpcRect!.customData?.terraformVisibilityKey,
+    );
+    expect(label).toBeDefined();
+
+    const glyphs = elements.filter(
+      (e) =>
+        (e as { customData?: { terraformAwsIconGlyph?: boolean } }).customData
+          ?.terraformAwsIconGlyph === true,
+    );
+    expect(glyphs.length).toBeGreaterThan(0);
+
+    for (const g of glyphs) {
+      expect(g.frameId).toBe(vpcRect!.frameId);
+      expect(g.groupIds.slice(0, vpcRect!.groupIds.length)).toEqual(
+        vpcRect!.groupIds,
+      );
+    }
+    expect(label!.groupIds).toEqual(vpcRect!.groupIds);
+    expect(glyphs[0]!.opacity).toBe(vpcRect!.opacity ?? 100);
+  });
+
   it("emits data-flow lines when edges_data_flow is populated", async () => {
     const q = "aws_sqs_queue.jobs";
     const fn = "aws_lambda_function.fn";
