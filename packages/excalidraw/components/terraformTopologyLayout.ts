@@ -55,7 +55,10 @@ import {
   routeTableCompositeSlotWidthPx,
   routeTableMaxExtentBelowAnchorForRowPx,
   subnetSetForRouteTableAddress,
+  topologyZoneMapKey,
   vpcBottomRouteTablesRowSizing,
+  type InterfaceVpcEndpointZonePlacement,
+  type InterfaceVpcEndpointZonePlacementMap,
   type RouteTableBottomVpcPlacement,
   type RouteTableBottomZonePlacement,
   type RouteTableZoneBottomSizing,
@@ -732,7 +735,11 @@ function vpcFrameDimensionsForZones(
   subnetNameById: ReadonlyMap<string, string> = new Map(),
   sideGutterPx = 0,
   natZonePlacements?: TopologyNatZonePlacements,
-  vpcEndpointClusterBodyPadPx = 0,
+  vpcStripVpceClusterBodyPadPx = 0,
+  interfaceVpcEndpointZonePlacements?: ReadonlyMap<
+    string,
+    readonly InterfaceVpcEndpointZonePlacement[]
+  >,
 ): {
   w: number;
   h: number;
@@ -761,6 +768,54 @@ function vpcFrameDimensionsForZones(
   let perZoneBodyH = 0;
   let maxZoneRouteTableInset = 0;
   for (const z of vpcZs) {
+    const zk = topologyZoneMapKey(
+      z.accountId,
+      z.region,
+      z.vpcId,
+      z.subnetSignature,
+    );
+    let zoneVpceBodyPad = 0;
+    let zoneVpceMinOuterW = 0;
+    const zonePl = interfaceVpcEndpointZonePlacements?.get(zk);
+    if (zonePl && zonePl.length > 0) {
+      const zoneVpceAddrs = zonePl.map((p) => p.address);
+      const zoneVpcePart = partitionVpcEndpointsForClusterLayout(
+        zoneVpceAddrs,
+        nodes,
+        arnIndex,
+        plan,
+      );
+      zoneVpceBodyPad = vpcEndpointClusterBodyPadPx(
+        zoneVpcePart.clusterAddrs,
+        nodes,
+        arnIndex,
+        plan,
+      );
+      const wClusterZ =
+        zoneVpcePart.clusterAddrs.length > 0
+          ? vpcEndpointClusterRowMinInnerWidth(
+              zoneVpcePart.clusterAddrs,
+              nodes,
+              arnIndex,
+              plan,
+            )
+          : 0;
+      const wCompactZ =
+        zoneVpcePart.compactAddrs.length > 0
+          ? vpcEndpointSingleRowMinInnerWidth(
+              zoneVpcePart.compactAddrs.length,
+            )
+          : 0;
+      if (
+        zoneVpcePart.clusterAddrs.length > 0 ||
+        zoneVpcePart.compactAddrs.length > 0
+      ) {
+        zoneVpceMinOuterW =
+          2 * INNER_PAD +
+          FRAME_CONTENT_SLACK_X +
+          Math.max(wClusterZ, wCompactZ);
+      }
+    }
     const sortedZ =
       filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
         nodes,
@@ -788,8 +843,14 @@ function vpcFrameDimensionsForZones(
           FRAME_CONTENT_SLACK_X +
           natZoneBandMinInnerWidthPx(natClusters)
         : 0;
-    perZoneW = Math.max(perZoneW, d.w, rtMinW, natBandMinOuterW);
-    perZoneBodyH = Math.max(perZoneBodyH, d.h + natBandH);
+    perZoneW = Math.max(
+      perZoneW,
+      d.w,
+      rtMinW,
+      natBandMinOuterW,
+      zoneVpceMinOuterW,
+    );
+    perZoneBodyH = Math.max(perZoneBodyH, d.h + natBandH + zoneVpceBodyPad);
     if (sizing && sizing.tableCount > 0) {
       maxZoneRouteTableInset = Math.max(
         maxZoneRouteTableInset,
@@ -804,7 +865,7 @@ function vpcFrameDimensionsForZones(
   const innerH =
     znRows * perZoneH +
     (znRows > 0 ? znRows - 1 : 0) * ZONE_CELL_GAP +
-    vpcEndpointClusterBodyPadPx;
+    vpcStripVpceClusterBodyPadPx;
   const w = Math.max(
     MIN_VPC_W + FRAME_CONTENT_SLACK_X,
     2 * INNER_PAD + 2 * sideGutterPx + innerW + FRAME_CONTENT_SLACK_X,
@@ -1222,6 +1283,7 @@ function appendVpcEndpointEgressRectangles(
   vpcCellW: number,
   vpcCellH: number,
   nodes: TerraformPlanNodesMap,
+  vpceZoneLayout?: TopologyVpcePerZoneLayoutOpts,
 ): string[] {
   if (addrs.length === 0) {
     return [];
@@ -1251,7 +1313,11 @@ function appendVpcEndpointEgressRectangles(
       resourceType,
       action,
     );
-    rectIds.push(addr);
+    const layoutInst =
+      vpceZoneLayout?.layoutInstanceIdForAddress(addr) ?? addr;
+    const mirrorDup =
+      vpceZoneLayout?.subnetMirrorDuplicateForAddress(addr) ?? false;
+    rectIds.push(layoutInst);
     pushResourceRectangleSkeleton(
       skeleton,
       addr,
@@ -1268,6 +1334,8 @@ function appendVpcEndpointEgressRectangles(
           region: regionName,
           vpcId,
         },
+        elementId: layoutInst,
+        terraformSemanticLayoutDuplicate: mirrorDup,
       },
     );
   }
@@ -1280,6 +1348,12 @@ type TerraformVpceLayoutRegistry = {
   sgCanonicalToLayoutKeys: Map<string, string[]>;
   ruleCanonicalToLayoutKeys: Map<string, string[]>;
   layoutKeyToVpceAddress: Map<string, string>;
+};
+
+/** Distinct skeleton / edge keys when the same VPCE address is drawn in a subnet zone. */
+type TopologyVpcePerZoneLayoutOpts = {
+  layoutInstanceIdForAddress: (address: string) => string;
+  subnetMirrorDuplicateForAddress: (address: string) => boolean;
 };
 
 function registerVpceLayoutKey(
@@ -1586,10 +1660,15 @@ function appendVpcEndpointPrimaryClusters(
   arnIndex: Map<string, string>,
   plan: unknown | undefined,
   registry: TerraformVpceLayoutRegistry,
+  vpceZoneLayout?: TopologyVpcePerZoneLayoutOpts,
 ): string[] {
   if (clusterEpAddrs.length === 0) {
     return [];
   }
+  const layoutIdFor =
+    vpceZoneLayout?.layoutInstanceIdForAddress ?? ((a: string) => a);
+  const mirrorDupFor =
+    vpceZoneLayout?.subnetMirrorDuplicateForAddress ?? ((_a: string) => false);
   const sorted = [...clusterEpAddrs].sort((a, b) => a.localeCompare(b));
   const { cols, rows } = gridColsRowsForPrimaryTiles(sorted.length);
   const cellWs: number[] = [];
@@ -1649,6 +1728,8 @@ function appendVpcEndpointPrimaryClusters(
 
   for (let i = 0; i < sorted.length; i++) {
     const vpceAddr = sorted[i]!;
+    const layoutInst = layoutIdFor(vpceAddr);
+    const tier0MirrorDup = mirrorDupFor(vpceAddr);
     const col = i % cols;
     const row = Math.floor(i / cols);
     let rowTop = bandTopY;
@@ -1702,7 +1783,7 @@ function appendVpcEndpointPrimaryClusters(
       action,
     );
 
-    addClusterMember(vpceAddr, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
+    addClusterMember(layoutInst, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
     pushResourceRectangleSkeleton(
       skeleton,
       vpceAddr,
@@ -1711,17 +1792,22 @@ function appendVpcEndpointPrimaryClusters(
       RESOURCE_RECT_W,
       RESOURCE_RECT_H,
       nodes,
-      { initiallyVisible, explodeParentKeys: [] },
+      {
+        initiallyVisible,
+        explodeParentKeys: [],
+        elementId: layoutInst,
+        terraformSemanticLayoutDuplicate: tier0MirrorDup,
+      },
     );
 
     for (const e of sgBuild.edges) {
       let src = e.source;
       let tgt = e.target;
       if (src === vpceAddr && tgt !== vpceAddr) {
-        tgt = terraformVpceSgLayoutElementId(vpceAddr, tgt);
+        tgt = terraformVpceSgLayoutElementId(layoutInst, tgt);
       } else if (e.type === "sg_rule") {
-        src = terraformVpceSgLayoutElementId(vpceAddr, src);
-        tgt = terraformVpceSgRuleLayoutElementId(vpceAddr, tgt);
+        src = terraformVpceSgLayoutElementId(layoutInst, src);
+        tgt = terraformVpceSgRuleLayoutElementId(layoutInst, tgt);
       }
       satelliteLineSpecs.push({
         edge: { ...e, source: src, target: tgt },
@@ -1741,7 +1827,10 @@ function appendVpcEndpointPrimaryClusters(
       yRight += TOPOLOGY_SATELLITE_GAP_PX;
       for (let gi = 0; gi < sgBuild.cluster.groups.length; gi++) {
         const group = sgBuild.cluster.groups[gi]!;
-        const sgLayoutId = terraformVpceSgLayoutElementId(vpceAddr, group.sgPath);
+        const sgLayoutId = terraformVpceSgLayoutElementId(
+          layoutInst,
+          group.sgPath,
+        );
         const sgIsDup = (sgVpceCount.get(group.sgPath) ?? 0) > 1;
 
         registerVpceLayoutKey(
@@ -1772,7 +1861,7 @@ function appendVpcEndpointPrimaryClusters(
 
         for (const rulePath of group.rules) {
           const ruleLayoutId = terraformVpceSgRuleLayoutElementId(
-            vpceAddr,
+            layoutInst,
             rulePath,
           );
           const ruleIsDup = (ruleVpceCount.get(rulePath) ?? 0) > 1;
@@ -1816,7 +1905,7 @@ function appendVpcEndpointPrimaryClusters(
     }
 
     const b = clusterBounds!;
-    const clusterSkId = primaryClusterSkeletonId(vpceAddr);
+    const clusterSkId = primaryClusterSkeletonId(layoutInst);
     skeleton.push({
       type: "frame",
       id: clusterSkId,
@@ -3432,6 +3521,7 @@ export async function buildTerraformTopologyExcalidrawScene(
     byZone: new Map(),
     consumedAddresses: new Set(),
   },
+  interfaceVpcEndpointZonePlacements: InterfaceVpcEndpointZonePlacementMap = new Map(),
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
@@ -3611,6 +3701,8 @@ export async function buildTerraformTopologyExcalidrawScene(
             subnetNameById,
             vpcInternetSideGutterPx(internetEdges),
             natZonePlacements,
+            0,
+            interfaceVpcEndpointZonePlacements,
           );
           const wCluster =
             clusterAddrs.length > 0
@@ -3715,6 +3807,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             vpcInternetSideGutterPx(internetEdges),
             natZonePlacements,
             vpceClusterBodyPad,
+            interfaceVpcEndpointZonePlacements,
           );
           const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
             clusterAddrs2,
@@ -4044,6 +4137,12 @@ export async function buildTerraformTopologyExcalidrawScene(
           regionName,
           vpcId,
         );
+        const vpceClusterBodyPadForZoneGrid = vpcEndpointClusterBodyPadPx(
+          clusterAddrs,
+          nodes,
+          arnIndex,
+          plan,
+        );
         const vd = vpcFrameDimensionsForZones(
           vpcZs,
           nodes,
@@ -4054,6 +4153,8 @@ export async function buildTerraformTopologyExcalidrawScene(
           subnetNameById,
           vpcInternetSideGutterPx(internetEdgeAddrs),
           natZonePlacements,
+          vpceClusterBodyPadForZoneGrid,
+          interfaceVpcEndpointZonePlacements,
         );
         const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
         const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
@@ -4143,6 +4244,64 @@ export async function buildTerraformTopologyExcalidrawScene(
                   plan,
                 );
 
+            const zoneVpceKey = topologyZoneMapKey(
+              accountId,
+              regionName,
+              vpcId,
+              z.subnetSignature,
+            );
+            const zoneVpcePlacementsForZ =
+              interfaceVpcEndpointZonePlacements.get(zoneVpceKey) ?? [];
+            const zoneVpceAddrsForZ = zoneVpcePlacementsForZ.map(
+              (p) => p.address,
+            );
+            const zoneVpceDupForZ = new Map(
+              zoneVpcePlacementsForZ.map((p) => [
+                p.address,
+                p.subnetMirrorDuplicate,
+              ] as const),
+            );
+            const zoneVpcePartForZ =
+              zoneVpceAddrsForZ.length > 0
+                ? partitionVpcEndpointsForClusterLayout(
+                    zoneVpceAddrsForZ,
+                    nodes,
+                    arnIndex,
+                    plan,
+                  )
+                : { clusterAddrs: [] as string[], compactAddrs: [] as string[] };
+            let zoneVpceRowMinInnerWForRouteCenter = 0;
+            if (
+              zoneVpcePartForZ.clusterAddrs.length > 0 ||
+              zoneVpcePartForZ.compactAddrs.length > 0
+            ) {
+              const wCz =
+                zoneVpcePartForZ.clusterAddrs.length > 0
+                  ? vpcEndpointClusterRowMinInnerWidth(
+                      zoneVpcePartForZ.clusterAddrs,
+                      nodes,
+                      arnIndex,
+                      plan,
+                    )
+                  : 0;
+              const wCompz =
+                zoneVpcePartForZ.compactAddrs.length > 0
+                  ? vpcEndpointSingleRowMinInnerWidth(
+                      zoneVpcePartForZ.compactAddrs.length,
+                    )
+                  : 0;
+              zoneVpceRowMinInnerWForRouteCenter = Math.max(wCz, wCompz);
+            }
+            const zoneVpceOptsForZ: TopologyVpcePerZoneLayoutOpts | undefined =
+              zoneVpceAddrsForZ.length > 0
+                ? {
+                    layoutInstanceIdForAddress: (address) =>
+                      `${address}__zone__${encodeURIComponent(z.subnetSignature)}`,
+                    subnetMirrorDuplicateForAddress: (address) =>
+                      zoneVpceDupForZ.get(address) ?? false,
+                  }
+                : undefined;
+
             /** Primary footprint height; route anchor uses uniform `vd.perZoneBodyH` (cell bottom). */
             const zoneContentBodyHPx = zoneFrameSizeForTopologyAddresses(
               addrs,
@@ -4161,6 +4320,12 @@ export async function buildTerraformTopologyExcalidrawScene(
               );
               routeTableRowCenterBandW =
                 rcCols * cellW + Math.max(0, rcCols - 1) * RESOURCE_GAP;
+            }
+            if (zoneVpceRowMinInnerWForRouteCenter > 0) {
+              routeTableRowCenterBandW = Math.max(
+                routeTableRowCenterBandW ?? 0,
+                zoneVpceRowMinInnerWForRouteCenter,
+              );
             }
             const zoneRtRow = routeTablesZoneBottomRow(
               routeTableBottomPlacements,
@@ -4244,6 +4409,43 @@ export async function buildTerraformTopologyExcalidrawScene(
               }
             }
 
+            const zoneEpClusterIds =
+              zoneVpcePartForZ.clusterAddrs.length > 0 && zoneVpceOptsForZ
+                ? appendVpcEndpointPrimaryClusters(
+                    skeleton,
+                    satelliteLineSpecs,
+                    accountId,
+                    regionName,
+                    vpcId,
+                    zoneVpcePartForZ.clusterAddrs,
+                    zoneX,
+                    zoneY,
+                    vd.perZoneW,
+                    vd.perZoneBodyH,
+                    nodes,
+                    arnIndex,
+                    plan,
+                    vpceLayoutDuplicateRegistry,
+                    zoneVpceOptsForZ,
+                  )
+                : [];
+            const zoneEpCompactIds =
+              zoneVpcePartForZ.compactAddrs.length > 0 && zoneVpceOptsForZ
+                ? appendVpcEndpointEgressRectangles(
+                    skeleton,
+                    accountId,
+                    regionName,
+                    vpcId,
+                    zoneVpcePartForZ.compactAddrs,
+                    zoneX,
+                    zoneY,
+                    vd.perZoneW,
+                    vd.perZoneBodyH,
+                    nodes,
+                    zoneVpceOptsForZ,
+                  )
+                : [];
+
             skeleton.push({
               type: "frame",
               id: zoneSkId,
@@ -4257,6 +4459,8 @@ export async function buildTerraformTopologyExcalidrawScene(
                 ...rectIds,
                 ...zoneRtRectIds,
                 ...fanOutRtRectIds,
+                ...zoneEpClusterIds,
+                ...zoneEpCompactIds,
               ] as readonly string[],
               customData: frameCustomData(
                 "subnetZone",

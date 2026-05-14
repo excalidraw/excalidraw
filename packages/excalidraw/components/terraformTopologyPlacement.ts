@@ -58,6 +58,18 @@ export type TopologyVpcEndpointBucket = {
   addresses: string[];
 };
 
+/** One interface VPCE draw instance inside a subnet zone (mirrors use the same Terraform address). */
+export type InterfaceVpcEndpointZonePlacement = {
+  address: string;
+  /** Same logical endpoint is also drawn in another zone (subnet mirror). */
+  subnetMirrorDuplicate: boolean;
+};
+
+export type InterfaceVpcEndpointZonePlacementMap = ReadonlyMap<
+  string,
+  readonly InterfaceVpcEndpointZonePlacement[]
+>;
+
 /** Managed `aws_route_table` addresses grouped by VPC (`vpc_id` on the table). */
 export type TopologyRouteTableBucket = {
   accountId: string;
@@ -537,13 +549,22 @@ export function inferSubnetIdsForLbFromPlanSecurityGroups(
   return [...inferred].sort((a, b) => a.localeCompare(b));
 }
 
-function zoneMapKey(
+export function topologyZoneMapKey(
   account: string,
   region: string,
   vpcId: string,
   subnetSignature: string,
 ): string {
   return `${account}\0${region}\0${vpcId}\0${subnetSignature}`;
+}
+
+function zoneMapKey(
+  account: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): string {
+  return topologyZoneMapKey(account, region, vpcId, subnetSignature);
 }
 
 /**
@@ -878,6 +899,142 @@ export function extractVpcEndpointsByVpc(
   });
 
   return out;
+}
+
+function findZoneContainingSubnet(
+  zones: readonly TopologyPlacementZone[],
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetId: string,
+): TopologyPlacementZone | undefined {
+  return zones.find(
+    (z) =>
+      z.accountId === accountId &&
+      z.region === region &&
+      z.vpcId === vpcId &&
+      z.subnetIds.includes(subnetId),
+  );
+}
+
+/**
+ * Interface endpoints whose `subnet_ids` all resolve to placement zones: attach to those
+ * zones (one tile per distinct zone). If subnets map to **multiple** zones, each tile is a
+ * mirror duplicate (`subnetMirrorDuplicate`). Unmatched or Gateway endpoints are omitted
+ * here (they stay on the VPC strip via bucket filtering).
+ */
+export function computeInterfaceVpcEndpointZonePlacements(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  zones: readonly TopologyPlacementZone[],
+): {
+  byZone: Map<string, InterfaceVpcEndpointZonePlacement[]>;
+  zonePlacedAddresses: ReadonlySet<string>;
+} {
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const byZone = new Map<string, InterfaceVpcEndpointZonePlacement[]>();
+  const zonePlacedAddresses = new Set<string>();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_vpc_endpoint") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const epType = stringField(values.vpc_endpoint_type);
+    if (epType !== "Interface") {
+      continue;
+    }
+    const vpcIdRaw = stringField(values.vpc_id);
+    if (!vpcIdRaw) {
+      continue;
+    }
+    const subnetIds = collectPlacementSubnetIds(values);
+    if (subnetIds.length === 0) {
+      continue;
+    }
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const uniqZones: TopologyPlacementZone[] = [];
+    const seenSig = new Set<string>();
+    let allSubnetsResolve = true;
+    for (const sid of subnetIds) {
+      const z = findZoneContainingSubnet(
+        zones,
+        accountId,
+        region,
+        vpcIdRaw,
+        sid,
+      );
+      if (!z) {
+        allSubnetsResolve = false;
+        break;
+      }
+      if (!seenSig.has(z.subnetSignature)) {
+        seenSig.add(z.subnetSignature);
+        uniqZones.push(z);
+      }
+    }
+    if (!allSubnetsResolve || uniqZones.length === 0) {
+      continue;
+    }
+
+    const subnetMirrorDuplicate = uniqZones.length > 1;
+    for (const z of uniqZones) {
+      const zk = topologyZoneMapKey(
+        z.accountId,
+        z.region,
+        z.vpcId,
+        z.subnetSignature,
+      );
+      const row = byZone.get(zk) ?? [];
+      row.push({ address, subnetMirrorDuplicate });
+      byZone.set(zk, row);
+      zonePlacedAddresses.add(address);
+    }
+  }
+
+  return {
+    byZone,
+    zonePlacedAddresses,
+  };
+}
+
+export function filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+  buckets: readonly TopologyVpcEndpointBucket[],
+  zonePlacedAddresses: ReadonlySet<string>,
+): TopologyVpcEndpointBucket[] {
+  return buckets.map((b) => ({
+    ...b,
+    addresses: b.addresses.filter((a) => !zonePlacedAddresses.has(a)),
+  }));
 }
 
 function routeTableSortLabel(values: Record<string, unknown>): string {
