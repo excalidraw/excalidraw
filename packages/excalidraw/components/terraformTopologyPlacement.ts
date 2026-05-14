@@ -297,7 +297,6 @@ export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
 /** Same footprint as topology tier-0 primary + `TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX`. */
 const RT_CLUSTER_PRIMARY_W = tfComfortPx(200);
 const RT_CLUSTER_PRIMARY_H = tfComfortPx(88);
-const RT_CLUSTER_TIER2_W = tfComfortPx(154);
 const RT_CLUSTER_TIER2_H = tfComfortPx(44);
 const RT_CLUSTER_SAT_GAP = tfComfortPx(8);
 const RT_CLUSTER_FRAME_PAD = tfComfortPx(10);

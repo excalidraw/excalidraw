@@ -6,8 +6,6 @@ import React, { useState } from "react";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { BinaryFileData } from "../types";
-
 import { restoreElements } from "../data/restore";
 
 import { Dialog } from "./Dialog";
@@ -16,6 +14,8 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import { terraformPlanParsing } from "./terraformPlanParsing";
 
 import "./TerraformImportDialog.scss";
+
+import type { BinaryFileData } from "../types";
 
 type TerraformView = "module" | "semantic";
 

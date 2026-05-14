@@ -607,14 +607,18 @@ export function terraformVpceSgLayoutElementId(
   vpcEndpointAddress: string,
   sgPath: string,
 ): string {
-  return `tf-topo:vpce-sg:${encodeURIComponent(vpcEndpointAddress)}:${encodeURIComponent(sgPath)}`;
+  return `tf-topo:vpce-sg:${encodeURIComponent(
+    vpcEndpointAddress,
+  )}:${encodeURIComponent(sgPath)}`;
 }
 
 export function terraformVpceSgRuleLayoutElementId(
   vpcEndpointAddress: string,
   rulePath: string,
 ): string {
-  return `tf-topo:vpce-sgr:${encodeURIComponent(vpcEndpointAddress)}:${encodeURIComponent(rulePath)}`;
+  return `tf-topo:vpce-sgr:${encodeURIComponent(
+    vpcEndpointAddress,
+  )}:${encodeURIComponent(rulePath)}`;
 }
 
 /** SG id refs from `aws_vpc_endpoint.security_group_ids` (interface endpoints). */

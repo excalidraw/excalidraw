@@ -497,10 +497,11 @@ export const terraformPlanParsing = async (
     const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(semPlan);
     const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
       computeInterfaceVpcEndpointZonePlacements(semPlan, zones);
-    const vpcEndpointBuckets = filterVpcEndpointBucketsRemovingZonePlacedAddresses(
-      vpcEndpointBucketsRaw,
-      zonePlacedAddresses,
-    );
+    const vpcEndpointBuckets =
+      filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+        vpcEndpointBucketsRaw,
+        zonePlacedAddresses,
+      );
     const routeTableBuckets = extractRouteTablesByVpc(semPlan);
     const rawVpcDefaultPlumbingBuckets =
       extractVpcDefaultPlumbingBuckets(semPlan);

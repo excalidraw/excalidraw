@@ -11,9 +11,6 @@ import { terraformVpceSgLayoutElementId } from "./terraformTopologySgLinks";
 
 import { tfComfortPx } from "./terraformLayoutComfort";
 
-import type { TerraformTopologyModel } from "./terraformTopologyExtract";
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
-
 import {
   routeTableMaxExtentBelowAnchorForRowPx,
   type TopologyPlacementZone,
@@ -21,6 +18,9 @@ import {
   type TopologyRouteTableBottomPlacements,
   type TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
+
+import type { TerraformTopologyModel } from "./terraformTopologyExtract";
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 const px = tfComfortPx;
 
@@ -615,10 +615,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         accountId: "111111111111",
         region: "us-east-1",
         vpcId: "vpc-test",
-        addresses: [
-          'aws_vpc_endpoint.ep["a"]',
-          'aws_vpc_endpoint.ep["b"]',
-        ],
+        addresses: ['aws_vpc_endpoint.ep["a"]', 'aws_vpc_endpoint.ep["b"]'],
       },
     ];
 
@@ -746,8 +743,11 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const glyphs = elements.filter(
       (e) =>
         e.type === "image" &&
-        (e.customData as { terraformLayoutDuplicateGlyph?: boolean } | undefined)
-          ?.terraformLayoutDuplicateGlyph === true,
+        (
+          e.customData as
+            | { terraformLayoutDuplicateGlyph?: boolean }
+            | undefined
+        )?.terraformLayoutDuplicateGlyph === true,
     );
     expect(glyphs.length).toBe(2);
 
@@ -1701,13 +1701,11 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(vpc).toBeDefined();
     const vpcEl = vpc!;
     const tableAddr = "module.vpc.aws_route_table.main";
-    const rtExtent = routeTableMaxExtentBelowAnchorForRowPx(
-      [tableAddr],
-      { [tableAddr]: [] },
-    );
+    const rtExtent = routeTableMaxExtentBelowAnchorForRowPx([tableAddr], {
+      [tableAddr]: [],
+    });
     const stackPx = rtExtent + 8;
-    const expectedPrimaryMidY =
-      vpcEl.y + vpcEl.height! - 2 * stackPx;
+    const expectedPrimaryMidY = vpcEl.y + vpcEl.height! - 2 * stackPx;
     const eps = 40;
     const rt = rtRects[0]!;
     const clusterFrame = elements.find((e) => e.id === rt.frameId);

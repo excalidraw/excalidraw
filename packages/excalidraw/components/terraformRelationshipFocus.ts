@@ -13,7 +13,10 @@ import {
   dimmedTerraformElementOverrides,
   restoredTerraformElementOverrides,
 } from "./terraformColorWash";
-import { isTerraformExpandAllActive, getTerraformVisibilityKey } from "./terraformVisibility";
+import {
+  isTerraformExpandAllActive,
+  getTerraformVisibilityKey,
+} from "./terraformVisibility";
 
 /**
  * Semantic dim levels (0–100). Identical numeric scale to the legacy `opacity` knobs
@@ -466,10 +469,10 @@ export const applyTerraformRelationshipFocus = (
       const cardLevel = isFocusNode
         ? TERRAFORM_FOCUS_NODE_LEVEL
         : isCoDuplicate
-          ? TERRAFORM_RELATED_LEVEL
-          : isRelatedNode
-            ? TERRAFORM_RELATED_LEVEL
-            : TERRAFORM_DIM_NODE_LEVEL;
+        ? TERRAFORM_RELATED_LEVEL
+        : isRelatedNode
+        ? TERRAFORM_RELATED_LEVEL
+        : TERRAFORM_DIM_NODE_LEVEL;
       // Bound labels share the same dimming as their card and become unreadable when
       // washed toward white. Keep label text at full color so resource names stay
       // visible during hover focus.
