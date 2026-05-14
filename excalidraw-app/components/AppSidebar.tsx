@@ -39,7 +39,7 @@ export const AppSidebar = () => {
             }}
           />
           <div className="app-sidebar-promo-text">
-            Make comments with tfdraw.io
+            Make comments with tfdraw.dev
           </div>
           <LinkButton
             href={`${
@@ -63,7 +63,7 @@ export const AppSidebar = () => {
             }}
           />
           <div className="app-sidebar-promo-text">
-            Create presentations with tfdraw.io
+            Create presentations with tfdraw.dev
           </div>
           <LinkButton
             href={`${

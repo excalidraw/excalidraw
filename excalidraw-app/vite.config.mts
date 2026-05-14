@@ -128,7 +128,7 @@ export default defineConfig(({ mode }) => {
       // crawls of the marketing homepage only, consider prerendering `/` in CI and
       // merging HTML into build/index.html (see vite-plugin-prerender / react-snap).
       Sitemap({
-        hostname: "https://tfdraw.io",
+        hostname: "https://tfdraw.dev",
         outDir: "build",
         changefreq: "weekly",
         priority: 1,
@@ -227,10 +227,10 @@ export default defineConfig(({ mode }) => {
           maximumFileSizeToCacheInBytes: 4.5 * 1024 ** 2, // 4.5MB
         },
         manifest: {
-          short_name: "tfdraw.io",
-          name: "tfdraw.io",
+          short_name: "tfdraw.dev",
+          name: "tfdraw.dev",
           description:
-            "tfdraw.io maps Terraform state and plans into an editable architecture canvas for visual reviews.",
+            "tfdraw.dev maps Terraform state and plans into an editable architecture canvas for visual reviews.",
           icons: [
             {
               src: "tfdraw-logo.png",
@@ -261,7 +261,7 @@ export default defineConfig(({ mode }) => {
             },
           ],
           start_url: "/",
-          id: "tfdraw.io",
+          id: "tfdraw.dev",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",

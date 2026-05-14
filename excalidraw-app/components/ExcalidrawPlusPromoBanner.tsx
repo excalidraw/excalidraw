@@ -16,7 +16,7 @@ export const ExcalidrawPlusPromoBanner = ({
       rel="noopener"
       className="plus-banner"
     >
-      tfdraw.io
+      tfdraw.dev
     </a>
   );
 };
