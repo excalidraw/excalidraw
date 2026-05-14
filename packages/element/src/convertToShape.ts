@@ -14,7 +14,7 @@ import {
   pointDistance,
 } from "@excalidraw/math";
 import { ROUNDNESS } from "@excalidraw/common";
-import { simplifyRDP } from "@excalidraw/math/utils";
+import { simplify } from "points-on-curve";
 
 import type { Degrees, LocalPoint } from "@excalidraw/math";
 
@@ -316,7 +316,10 @@ export const recognizeShape = (
   const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
   const rdpTolerance =
     boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
-  const simplifiedPoints = simplifyRDP(points, rdpTolerance);
+  const simplifiedPoints = simplify(
+    points as unknown as Parameters<typeof simplify>[0],
+    rdpTolerance,
+  ) as unknown as readonly LocalPoint[];
 
   const isClosed = polygonIsClosed(
     points,
