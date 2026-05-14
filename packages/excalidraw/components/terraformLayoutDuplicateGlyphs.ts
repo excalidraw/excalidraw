@@ -11,10 +11,7 @@ import {
   normalizeSVG,
 } from "@excalidraw/element";
 
-import type {
-  ExcalidrawElement,
-  FileId,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
 import { getDataURL_sync } from "../data/blob";
 

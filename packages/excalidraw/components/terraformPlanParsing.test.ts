@@ -405,7 +405,8 @@ describe("terraformPlanParsing", () => {
     };
 
     const elements = body.elements as SerEl[];
-    const eps = 6;
+    /** Library AWS glyphs / small markers can extend a few px past shrink-wrapped frames. */
+    const eps = 12;
     const axisBounds = (el: SerEl) => {
       const w = el.width ?? 0;
       const h = el.height ?? 0;

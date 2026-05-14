@@ -51,7 +51,6 @@ import {
 import {
   buildRouteTableZoneSizingMapForVpc,
   computeVpcRouteTableFanOutAddressesForVpc,
-  routeTableCompositeHeightPx,
   routeTableCompositeSlotWidthPx,
   routeTableMaxExtentBelowAnchorForRowPx,
   subnetSetForRouteTableAddress,
@@ -115,9 +114,9 @@ import {
 } from "./terraformVisibility";
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
-import type { BinaryFiles } from "../types";
-
 import { natZonePlacementsKey } from "./terraformTopologyPlacement";
+
+import type { BinaryFiles } from "../types";
 
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type {
@@ -229,8 +228,6 @@ const VPC_ENDPOINT_TILE_W = px(160);
 const VPC_ENDPOINT_TILE_H = px(56);
 const VPC_ENDPOINT_TILE_GAP = px(10);
 /** Route table tiles on subnet zone / VPC bottom edge (same footprint as endpoint tiles). */
-const ROUTE_TABLE_TILE_W = VPC_ENDPOINT_TILE_W;
-const ROUTE_TABLE_TILE_H = VPC_ENDPOINT_TILE_H;
 const ROUTE_TABLE_TILE_GAP = VPC_ENDPOINT_TILE_GAP;
 const VPC_INTERNET_EDGE_TILE_W = TOPOLOGY_TIER2_W;
 const VPC_INTERNET_EDGE_TILE_H = TOPOLOGY_TIER2_H;
@@ -485,7 +482,10 @@ function gridColsRows(count: number): { cols: number; rows: number } {
  */
 const PRIMARY_TILE_MAX_COLS = 16;
 
-function gridColsRowsForPrimaryTiles(count: number): { cols: number; rows: number } {
+function gridColsRowsForPrimaryTiles(count: number): {
+  cols: number;
+  rows: number;
+} {
   if (count <= 0) {
     return { cols: 1, rows: 1 };
   }
@@ -802,9 +802,7 @@ function vpcFrameDimensionsForZones(
           : 0;
       const wCompactZ =
         zoneVpcePart.compactAddrs.length > 0
-          ? vpcEndpointSingleRowMinInnerWidth(
-              zoneVpcePart.compactAddrs.length,
-            )
+          ? vpcEndpointSingleRowMinInnerWidth(zoneVpcePart.compactAddrs.length)
           : 0;
       if (
         zoneVpcePart.clusterAddrs.length > 0 ||
@@ -1313,8 +1311,7 @@ function appendVpcEndpointEgressRectangles(
       resourceType,
       action,
     );
-    const layoutInst =
-      vpceZoneLayout?.layoutInstanceIdForAddress(addr) ?? addr;
+    const layoutInst = vpceZoneLayout?.layoutInstanceIdForAddress(addr) ?? addr;
     const mirrorDup =
       vpceZoneLayout?.subnetMirrorDuplicateForAddress(addr) ?? false;
     rectIds.push(layoutInst);
@@ -1494,7 +1491,12 @@ function vpcEndpointSgStackHeightPx(
   arnIndex: Map<string, string>,
   plan?: unknown,
 ): number {
-  const { cluster } = buildVpcEndpointSgCluster(nodes, vpceAddr, arnIndex, plan);
+  const { cluster } = buildVpcEndpointSgCluster(
+    nodes,
+    vpceAddr,
+    arnIndex,
+    plan,
+  );
   if (!cluster || cluster.groups.length === 0) {
     return 0;
   }
@@ -1519,7 +1521,12 @@ function vpcEndpointPrimaryClusterOuterFootprintPx(
 ): { w: number; h: number } {
   const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
   const { sgW } = satelliteColumnWidths();
-  const { cluster } = buildVpcEndpointSgCluster(nodes, vpceAddr, arnIndex, plan);
+  const { cluster } = buildVpcEndpointSgCluster(
+    nodes,
+    vpceAddr,
+    arnIndex,
+    plan,
+  );
   const innerW =
     cluster && cluster.groups.length > 0
       ? Math.max(RESOURCE_RECT_W, sgW, TOPOLOGY_TIER2_W)
@@ -1766,11 +1773,8 @@ function appendVpcEndpointPrimaryClusters(
     );
     const innerColumnW = footprint.w - 2 * pad;
     const contentLeft =
-      clusterLeft +
-      pad +
-      Math.floor((maxCellW - 2 * pad - innerColumnW) / 2);
-    const rx =
-      contentLeft + Math.floor((innerColumnW - RESOURCE_RECT_W) / 2);
+      clusterLeft + pad + Math.floor((maxCellW - 2 * pad - innerColumnW) / 2);
+    const rx = contentLeft + Math.floor((innerColumnW - RESOURCE_RECT_W) / 2);
     const ry = clusterTop + pad;
     const node = nodes[vpceAddr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformCardResourceType(
@@ -1816,8 +1820,7 @@ function appendVpcEndpointPrimaryClusters(
       });
     }
 
-    const sgTileX =
-      contentLeft + Math.floor((innerColumnW - sgW) / 2);
+    const sgTileX = contentLeft + Math.floor((innerColumnW - sgW) / 2);
     const ruleTileX =
       contentLeft + Math.floor((innerColumnW - TOPOLOGY_TIER2_W) / 2);
     const yAfterPrimary = ry + RESOURCE_RECT_H;
@@ -3910,12 +3913,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           vpcId,
         );
         const { clusterAddrs, compactAddrs } =
-          partitionVpcEndpointsForClusterLayout(
-            epAddrs,
-            nodes,
-            arnIndex,
-            plan,
-          );
+          partitionVpcEndpointsForClusterLayout(epAddrs, nodes, arnIndex, plan);
         const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
           clusterAddrs,
           nodes,
@@ -4256,10 +4254,9 @@ export async function buildTerraformTopologyExcalidrawScene(
               (p) => p.address,
             );
             const zoneVpceDupForZ = new Map(
-              zoneVpcePlacementsForZ.map((p) => [
-                p.address,
-                p.subnetMirrorDuplicate,
-              ] as const),
+              zoneVpcePlacementsForZ.map(
+                (p) => [p.address, p.subnetMirrorDuplicate] as const,
+              ),
             );
             const zoneVpcePartForZ =
               zoneVpceAddrsForZ.length > 0
@@ -4269,7 +4266,10 @@ export async function buildTerraformTopologyExcalidrawScene(
                     arnIndex,
                     plan,
                   )
-                : { clusterAddrs: [] as string[], compactAddrs: [] as string[] };
+                : {
+                    clusterAddrs: [] as string[],
+                    compactAddrs: [] as string[],
+                  };
             let zoneVpceRowMinInnerWForRouteCenter = 0;
             if (
               zoneVpcePartForZ.clusterAddrs.length > 0 ||
@@ -4296,7 +4296,9 @@ export async function buildTerraformTopologyExcalidrawScene(
               zoneVpceAddrsForZ.length > 0
                 ? {
                     layoutInstanceIdForAddress: (address) =>
-                      `${address}__zone__${encodeURIComponent(z.subnetSignature)}`,
+                      `${address}__zone__${encodeURIComponent(
+                        z.subnetSignature,
+                      )}`,
                     subnetMirrorDuplicateForAddress: (address) =>
                       zoneVpceDupForZ.get(address) ?? false,
                   }
@@ -4311,7 +4313,9 @@ export async function buildTerraformTopologyExcalidrawScene(
             ).h;
             let routeTableRowCenterBandW: number | undefined;
             if (addrs.length > 0) {
-              const { cols: rcCols } = gridColsRowsForPrimaryTiles(addrs.length);
+              const { cols: rcCols } = gridColsRowsForPrimaryTiles(
+                addrs.length,
+              );
               const cellW = maxTopologyCellFootprintPx(
                 addrs,
                 nodes,
@@ -4768,10 +4772,14 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   normalizeTopologyOrigin(elements);
 
-  const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(elements);
+  const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
+    elements,
+  );
   elements = glyphInjected.elements;
   const layoutGlyphFiles =
-    Object.keys(glyphInjected.files).length > 0 ? glyphInjected.files : undefined;
+    Object.keys(glyphInjected.files).length > 0
+      ? glyphInjected.files
+      : undefined;
 
   return {
     elements,

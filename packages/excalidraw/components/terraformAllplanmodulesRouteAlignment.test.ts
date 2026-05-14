@@ -280,9 +280,7 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
       width?: number;
       height?: number;
     }) {
-      const x = el.x ?? 0;
       const y = el.y ?? 0;
-      const w = el.width ?? 0;
       const h = el.height ?? 0;
       return { minY: y, maxY: y + h };
     }
@@ -330,10 +328,14 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
           continue;
         }
         const zb = axisBounds(z);
-        const overlapY = !(cb.maxY <= zb.minY + tol || cb.minY >= zb.maxY - tol);
+        const overlapY = !(
+          cb.maxY <= zb.minY + tol || cb.minY >= zb.maxY - tol
+        );
         expect(
           overlapY,
-          `VPC-level VPCE primaryCluster should sit below subnet zone band (no Y overlap); zone=${z.name ?? z.id}`,
+          `VPC-level VPCE primaryCluster should sit below subnet zone band (no Y overlap); zone=${
+            z.name ?? z.id
+          }`,
         ).toBe(false);
       }
     }

@@ -81,6 +81,9 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 
+import "./LayerUI.scss";
+import "./Toolbar.scss";
+
 import type { ActionManager } from "../actions/manager";
 
 import type { Language } from "../i18n";
@@ -92,9 +95,6 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 
 /** Same asset as {@link injectTerraformLayoutDuplicateInfoGlyphs} canvas markers. */
 const TERRAFORM_DUPLICATE_LAYOUT_INFO_SRC = new URL(
