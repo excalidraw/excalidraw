@@ -81,9 +81,6 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 
-import "./LayerUI.scss";
-import "./Toolbar.scss";
-
 import type { ActionManager } from "../actions/manager";
 
 import type { Language } from "../i18n";
@@ -95,6 +92,15 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
+
+/** Same asset as {@link injectTerraformLayoutDuplicateInfoGlyphs} canvas markers. */
+const TERRAFORM_DUPLICATE_LAYOUT_INFO_SRC = new URL(
+  "./info-circle-svgrepo-com.svg",
+  import.meta.url,
+).href;
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -687,6 +693,33 @@ const TerraformElementActions = ({
               Duplicate tile for semantic subnet-column alignment. Canonical
               address:{" "}
               {formatTerraformPanelValue(String(customData.nodePath ?? ""))}.
+            </div>
+          </div>
+        ) : null}
+        {customData.terraformSemanticLayoutDuplicate ? (
+          <div className="terraform-element-actions__row">
+            <div className="terraform-element-actions__label">Note</div>
+            <div
+              className={clsx(
+                "terraform-element-actions__value",
+                "terraform-element-actions__value--with-inline-icon",
+              )}
+            >
+              <span className="terraform-element-actions__inline-icon-wrap">
+                <img
+                  src={TERRAFORM_DUPLICATE_LAYOUT_INFO_SRC}
+                  width={16}
+                  height={16}
+                  alt=""
+                  className="terraform-element-actions__inline-icon"
+                />
+              </span>
+              <span>
+                Duplicate tile for semantic layout (same Terraform address drawn
+                again). Dependency hover uses this tile&apos;s layout id;
+                canonical address:{" "}
+                {formatTerraformPanelValue(String(customData.nodePath ?? ""))}.
+              </span>
             </div>
           </div>
         ) : null}

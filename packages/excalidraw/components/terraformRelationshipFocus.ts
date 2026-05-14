@@ -13,7 +13,7 @@ import {
   dimmedTerraformElementOverrides,
   restoredTerraformElementOverrides,
 } from "./terraformColorWash";
-import { isTerraformExpandAllActive } from "./terraformVisibility";
+import { isTerraformExpandAllActive, getTerraformVisibilityKey } from "./terraformVisibility";
 
 /**
  * Semantic dim levels (0–100). Identical numeric scale to the legacy `opacity` knobs
@@ -295,6 +295,24 @@ export const applyTerraformRelationshipFocus = (
   const { focusedNodePaths, relatedNodePaths, focusedEdgeIds } =
     getTerraformRelationshipFocus(allElements, focusNodePath);
   const elementById = new Map(allElements.map((e) => [e.id, e]));
+  const duplicateHighlightCanonical = (() => {
+    if (!focusNodePath) {
+      return null as string | null;
+    }
+    for (const el of allElements) {
+      if (el.isDeleted) {
+        continue;
+      }
+      const cd = el.customData ?? {};
+      if (
+        getTerraformVisibilityKey(el) === focusNodePath &&
+        cd.terraformSemanticLayoutDuplicate === true
+      ) {
+        return resolveTerraformFocusNodePath(el, elementById);
+      }
+    }
+    return null;
+  })();
   let didChange = false;
 
   const trackChange = (
@@ -434,13 +452,24 @@ export const applyTerraformRelationshipFocus = (
 
     if (isTerraformResourceLikeElement(element, elementById)) {
       const nodePath = resolveTerraformFocusNodePath(element, elementById);
-      const isFocusNode = nodePath === focusNodePath;
+      const vis = getTerraformVisibilityKey(element);
+      const isFocusLayout = vis === focusNodePath;
+      const isCoDuplicate =
+        duplicateHighlightCanonical != null &&
+        nodePath === duplicateHighlightCanonical &&
+        element.customData?.terraformSemanticLayoutDuplicate === true &&
+        !isFocusLayout;
+      const isFocusNode =
+        isFocusLayout ||
+        (nodePath === focusNodePath && duplicateHighlightCanonical == null);
       const isRelatedNode = Boolean(nodePath && relatedNodePaths.has(nodePath));
       const cardLevel = isFocusNode
         ? TERRAFORM_FOCUS_NODE_LEVEL
-        : isRelatedNode
-        ? TERRAFORM_RELATED_LEVEL
-        : TERRAFORM_DIM_NODE_LEVEL;
+        : isCoDuplicate
+          ? TERRAFORM_RELATED_LEVEL
+          : isRelatedNode
+            ? TERRAFORM_RELATED_LEVEL
+            : TERRAFORM_DIM_NODE_LEVEL;
       // Bound labels share the same dimming as their card and become unreadable when
       // washed toward white. Keep label text at full color so resource names stay
       // visible during hover focus.
@@ -451,9 +480,10 @@ export const applyTerraformRelationshipFocus = (
       const nextLevel = isBoundTerraformLabel
         ? TERRAFORM_FOCUS_NODE_LEVEL
         : cardLevel;
-      const shouldReveal = (isFocusNode || isRelatedNode) && element.isDeleted;
+      const shouldReveal =
+        (isFocusNode || isCoDuplicate || isRelatedNode) && element.isDeleted;
       const shouldHideExpiredPreview =
-        !isFocusNode && !isRelatedNode && isPreview;
+        !isFocusNode && !isCoDuplicate && !isRelatedNode && isPreview;
       const nextIsDeleted = shouldHideExpiredPreview
         ? true
         : shouldReveal

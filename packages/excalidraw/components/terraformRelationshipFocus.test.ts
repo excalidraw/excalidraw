@@ -6,6 +6,7 @@ import {
   applyTerraformRelationshipFocus,
   getTerraformRelationshipFocus,
 } from "./terraformRelationshipFocus";
+import { terraformVpceSgLayoutElementId } from "./terraformTopologySgLinks";
 import { washHexColor } from "./terraformColorWash";
 
 const VIEW_BG = "#ffffff";
@@ -566,6 +567,53 @@ describe("terraform relationship focus", () => {
 
     expect(focus.focusedEdgeIds.has("edge:coalesced-df")).toBe(true);
     expect(focus.relatedNodePaths.has("aws_security_group.sg")).toBe(true);
+  });
+
+  it("washes co-highlighted duplicate layout tiles that share a canonical nodePath when focus is a layout instance id", () => {
+    const layoutKeyA = terraformVpceSgLayoutElementId(
+      'aws_vpc_endpoint.ep["a"]',
+      "aws_security_group.sg",
+    );
+    const layoutKeyB = terraformVpceSgLayoutElementId(
+      'aws_vpc_endpoint.ep["b"]',
+      "aws_security_group.sg",
+    );
+    const elements = [
+      baseElement(
+        "rect:a",
+        {
+          terraform: true,
+          terraformVisibilityRole: "resource",
+          terraformVisibilityKey: layoutKeyA,
+          nodePath: "aws_security_group.sg",
+          terraformSemanticLayoutDuplicate: true,
+        },
+        { type: "rectangle" },
+      ),
+      baseElement(
+        "rect:b",
+        {
+          terraform: true,
+          terraformVisibilityRole: "resource",
+          terraformVisibilityKey: layoutKeyB,
+          nodePath: "aws_security_group.sg",
+          terraformSemanticLayoutDuplicate: true,
+        },
+        { type: "rectangle" },
+      ),
+      resource("aws_lambda_function.fn"),
+    ];
+
+    const out = applyTerraformRelationshipFocus(
+      elements,
+      layoutKeyA,
+      VIEW_BG,
+    ).elements;
+    const byId = new Map(out.map((e) => [e.id, e]));
+    expect(byId.get("rect:a")?.strokeColor).toBe("#000000");
+    expect(byId.get("rect:b")?.strokeColor).toBe(
+      expectedWashedStroke(85, "#000000"),
+    );
   });
 
   describe("semantic overview (topology) ambient washing", () => {

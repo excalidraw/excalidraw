@@ -204,4 +204,117 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
       "fixture should include at least one public or intra subnet zone with bottom route tables",
     ).toBeGreaterThan(0);
   }, 120_000);
+
+  it("S3 gateway VPCE renders as vpcEgressEndpoint; interface VPCE primaryClusters do not overlap subnet zones in Y", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const elements = body.elements as Array<{
+      id?: string;
+      type?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      name?: string;
+      customData?: Record<string, unknown>;
+    }>;
+
+    const s3Egress = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpcEgressEndpoint" &&
+        typeof (e.customData as { nodePath?: string }).nodePath === "string" &&
+        (e.customData as { nodePath: string }).nodePath.includes(
+          'aws_vpc_endpoint.this["s3"]',
+        ),
+    );
+    expect(
+      s3Egress.length,
+      "S3 gateway endpoint should appear in the compact dashed vpcEgressEndpoint row",
+    ).toBeGreaterThan(0);
+
+    const subnetZones = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZone",
+    );
+
+    const vpcePrimaryClusters = elements.filter((e) => {
+      if (e.type !== "frame") {
+        return false;
+      }
+      const cd = e.customData as {
+        terraformTopologyRole?: string;
+        terraformTopologyPath?: string[];
+      };
+      if (cd.terraformTopologyRole !== "primaryCluster") {
+        return false;
+      }
+      const p = cd.terraformTopologyPath;
+      const last = p && p.length > 0 ? p[p.length - 1] : "";
+      return typeof last === "string" && last.includes("aws_vpc_endpoint");
+    });
+    expect(
+      vpcePrimaryClusters.length,
+      "fixture should place at least one interface VPCE primaryCluster on the VPC",
+    ).toBeGreaterThan(0);
+
+    function axisBounds(el: {
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    }) {
+      const x = el.x ?? 0;
+      const y = el.y ?? 0;
+      const w = el.width ?? 0;
+      const h = el.height ?? 0;
+      return { minY: y, maxY: y + h };
+    }
+
+    function vpcPrefixFromTopologyPath(path: string[] | undefined): string {
+      if (!path || path.length < 3) {
+        return "";
+      }
+      return `${path[0]}|${path[1]}|${path[2]}`;
+    }
+
+    const tol = 6;
+    let pairChecks = 0;
+    for (const c of vpcePrimaryClusters) {
+      const cPath = (c.customData as { terraformTopologyPath?: string[] })
+        .terraformTopologyPath;
+      const cVpc = vpcPrefixFromTopologyPath(cPath);
+      const cb = axisBounds(c);
+      for (const z of subnetZones) {
+        const zPath = (z.customData as { terraformTopologyPath?: string[] })
+          .terraformTopologyPath;
+        if (vpcPrefixFromTopologyPath(zPath) !== cVpc) {
+          continue;
+        }
+        pairChecks++;
+        const zb = axisBounds(z);
+        const overlapY = !(cb.maxY <= zb.minY + tol || cb.minY >= zb.maxY - tol);
+        expect(
+          overlapY,
+          `VPCE primaryCluster should sit below subnet zone band (no Y overlap); zone=${z.name ?? z.id}`,
+        ).toBe(false);
+      }
+    }
+    expect(
+      pairChecks,
+      "each VPCE cluster should be checked against subnet zones in the same VPC",
+    ).toBeGreaterThan(0);
+  }, 120_000);
 });
