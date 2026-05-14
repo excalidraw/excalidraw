@@ -530,7 +530,7 @@
     "copyToClipboard": "Copiado ao portapapeis.",
     "copyToClipboardAsPng": "Copiar {{exportSelection}} ao portapapeis como PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Copiar {{exportSelection}} ao portapapeis como Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Copiar {{exportSelection}} ao portapapeis como Mermaid",
     "fileSaved": "Ficheiro gardado.",
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",

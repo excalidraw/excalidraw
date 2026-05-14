@@ -530,7 +530,7 @@
     "copyToClipboard": "फळी वर कॉपी झाली.",
     "copyToClipboardAsPng": "{{exportSelection}} फळी वर पी-एन-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} फळी वर एस-वी-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "{{exportSelection}} फळी वर एस-वी-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} फळी वर एस-वी-जी स्वरूपात कॉपी झाली",
     "fileSaved": "फ़ाइल जतन झाली.",
     "fileSavedToFilename": "{filename} मधे जतन झाली",
     "canvas": "पटल",

@@ -530,7 +530,7 @@
     "copyToClipboard": "Kopirano v odložišče.",
     "copyToClipboardAsPng": "Kopirano v odložišče kot PNG ({{exportSelection}}, {{exportColorScheme}})",
     "copyToClipboardAsSvg": "Kopirano v odložišče kot SVG ({{exportSelection}}, {{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Kopirano v odložišče kot Mermaid ({{exportSelection}}, {{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Kopirano v odložišče kot Mermaid ({{exportSelection}})",
     "fileSaved": "Datoteka shranjena.",
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",

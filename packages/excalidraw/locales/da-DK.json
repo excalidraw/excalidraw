@@ -530,7 +530,7 @@
     "copyToClipboard": "Kopieret til klippebord.",
     "copyToClipboardAsPng": "Kopieret {{exportSelection}} til klippebord som PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Kopieret {{exportSelection}} til klippebord som Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Kopieret {{exportSelection}} til klippebord som Mermaid",
     "fileSaved": "Fil gemt.",
     "fileSavedToFilename": "Gemt som {filename}",
     "canvas": "",

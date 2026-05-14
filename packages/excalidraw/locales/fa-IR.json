@@ -530,7 +530,7 @@
     "copyToClipboard": "در کلیپ‌بورد کپی شد.",
     "copyToClipboardAsPng": "کپی {{exportSelection}} در حافظه موقت به عنوان PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} در حافظه موقت به عنوان\n({{exportColorScheme}}) رونویسی شد",
-    "copyToClipboardAsMermaid": "{{exportSelection}} در حافظه موقت به عنوان\n({{exportColorScheme}}) رونویسی شد",
+    "copyToClipboardAsMermaid": "{{exportSelection}} در حافظه موقت به عنوان Mermaid رونویسی شد",
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",

@@ -530,7 +530,7 @@
     "copyToClipboard": "បានចម្លងទៅក្ដារតម្បៀតខ្ទាស់។",
     "copyToClipboardAsPng": "បានចម្លង {{exportSelection}} ទៅក្ដារតម្បៀតខ្ទាស់ជា PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "បានចម្លង {{exportSelection}} ទៅក្ដារតម្បៀតខ្ទាស់ជា Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "បានចម្លង {{exportSelection}} ទៅក្ដារតម្បៀតខ្ទាស់ជា Mermaid",
     "fileSaved": "ឯកសារត្រូវបានរក្សាទុក។",
     "fileSavedToFilename": "បានរក្សាទុកនៅក្នុង {filename}",
     "canvas": "តំបន់គំនូរ",

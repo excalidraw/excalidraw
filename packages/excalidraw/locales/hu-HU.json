@@ -530,7 +530,7 @@
     "copyToClipboard": "Vágólapra másolva.",
     "copyToClipboardAsPng": "Az {{exportSelection}} PNG formátumban a vágólapra másolva \n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Az {{exportSelection}} Mermaid formátumban a vágólapra másolva \n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Az {{exportSelection}} Mermaid formátumban a vágólapra másolva",
     "fileSaved": "Fájl elmentve.",
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",

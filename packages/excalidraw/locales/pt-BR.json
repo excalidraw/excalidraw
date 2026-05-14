@@ -530,7 +530,7 @@
     "copyToClipboard": "Copiado para área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Copiado {{exportSelection}} para a área de transferência com SVG ({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Copiado {{exportSelection}} para a área de transferência com Mermaid ({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Copiado {{exportSelection}} para a área de transferência com Mermaid",
     "fileSaved": "Arquivo salvo.",
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",

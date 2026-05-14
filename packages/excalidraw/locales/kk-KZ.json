@@ -530,7 +530,7 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} Mermaid ретінде алмасу буферіне көшірілді\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} Mermaid ретінде алмасу буферіне көшірілді",
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",

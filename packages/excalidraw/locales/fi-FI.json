@@ -530,7 +530,7 @@
     "copyToClipboard": "Kopioitiin leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitiin {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Kopioitiin {{exportSelection}} leikepöydälle Mermaid:nä\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Kopioitiin {{exportSelection}} leikepöydälle Mermaid:nä",
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",

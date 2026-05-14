@@ -530,7 +530,7 @@
     "copyToClipboard": "Đã sao chép vào bộ nhớ tạm.",
     "copyToClipboardAsPng": "Đã sao chép {{exportSelection}} sang bộ nhớ tạm dưới định dạng PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Đã sao chép {{exportSelection}} sang bộ nhớ tạm dưới định dạng SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Đã sao chép {{exportSelection}} sang bộ nhớ tạm dưới định dạng Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Đã sao chép {{exportSelection}} sang bộ nhớ tạm dưới định dạng Mermaid",
     "fileSaved": "Đã lưu tập tin",
     "fileSavedToFilename": "",
     "canvas": "",

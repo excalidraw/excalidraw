@@ -530,7 +530,7 @@
     "copyToClipboard": "Скопировано в буфер обмена.",
     "copyToClipboardAsPng": "{{exportSelection}} скопировано как PNG ({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} скопировано в буфер обмена как SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "{{exportSelection}} скопировано в буфер обмена как Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} скопировано в буфер обмена как Mermaid",
     "fileSaved": "Файл сохранён.",
     "fileSavedToFilename": "Сохранено в {filename}",
     "canvas": "холст",

@@ -530,7 +530,7 @@
     "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} tersalin ke papan klip sebagai SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "{{exportSelection}} tersalin ke papan klip sebagai Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} tersalin ke papan klip sebagai Mermaid",
     "fileSaved": "File tersimpan.",
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",

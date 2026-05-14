@@ -530,7 +530,7 @@
     "copyToClipboard": "تم النسخ إلى الحافظة.",
     "copyToClipboardAsPng": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة Mermaid",
     "fileSaved": "تم حفظ الملف.",
     "fileSavedToFilename": "تم الحفظ باسم {filename}",
     "canvas": "لوحة الرسم",

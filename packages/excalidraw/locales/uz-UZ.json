@@ -530,7 +530,7 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} Mermaid sifatida almashuv buferiga nusxalandi\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} Mermaid sifatida almashuv buferiga nusxalandi",
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",

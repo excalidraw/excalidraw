@@ -530,7 +530,7 @@
     "copyToClipboard": "클립보드로 복사.",
     "copyToClipboardAsPng": "{{exportSelection}}를 클립보드에 PNG로 복사했습니다\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}}를 클립보드에 Mermaid로 복사했습니다\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}}를 클립보드에 Mermaid로 복사했습니다",
     "fileSaved": "파일이 저장되었습니다.",
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",

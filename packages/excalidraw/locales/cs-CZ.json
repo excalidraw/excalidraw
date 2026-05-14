@@ -530,7 +530,7 @@
     "copyToClipboard": "Zkopírováno do schránky.",
     "copyToClipboardAsPng": "{{exportSelection}} zkopírován do schránky jako PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} zkopírován do schránky jako Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} zkopírován do schránky jako Mermaid",
     "fileSaved": "Soubor byl uložen.",
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",

@@ -530,7 +530,7 @@
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} yettwanɣel ɣer tecfawit am Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} yettwanɣel ɣer tecfawit am Mermaid",
     "fileSaved": "Afaylu yettwasekles.",
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",

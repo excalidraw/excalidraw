@@ -28,7 +28,6 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
-      <MainMenu.DefaultItems.CopyAsMermaid />
       <MainMenu.DefaultItems.SaveAsImage />
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger

@@ -530,7 +530,7 @@
     "copyToClipboard": "Copiats al quichapapièrs.",
     "copyToClipboardAsPng": "{{exportSelection}} copiat coma PNG ({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} copiat coma Mermaid ({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} copiat coma Mermaid",
     "fileSaved": "Fichièr enregistrat.",
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",

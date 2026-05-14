@@ -530,7 +530,7 @@
     "copyToClipboard": "Skopiowano do schowka.",
     "copyToClipboardAsPng": "Skopiowano {{exportSelection}} do schowka jako PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Skopiowano {{exportSelection}} do schowka jako SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Skopiowano {{exportSelection}} do schowka jako Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Skopiowano {{exportSelection}} do schowka jako Mermaid",
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",

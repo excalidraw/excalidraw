@@ -530,7 +530,7 @@
     "copyToClipboard": "הועתק ללוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} הועתקה ללוח כ-SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "{{exportSelection}} הועתקה ללוח כ-Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} הועתקה ללוח כ-Mermaid",
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "קנבאס",

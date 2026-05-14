@@ -530,7 +530,7 @@
     "copyToClipboard": "Скопіювати до буферу обміну.",
     "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Скопійовано {{exportSelection}} до буфера обміну як SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Скопійовано {{exportSelection}} до буфера обміну як Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Скопійовано {{exportSelection}} до буфера обміну як Mermaid",
     "fileSaved": "Файл збережено.",
     "fileSavedToFilename": "Збережено в {filename}",
     "canvas": "полотно",

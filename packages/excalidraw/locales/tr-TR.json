@@ -530,7 +530,7 @@
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "{{exportSelection}} panoya Mermaid olarak\n({{exportColorScheme}}) kopyalandı",
+    "copyToClipboardAsMermaid": "{{exportSelection}} panoya Mermaid olarak kopyalandı",
     "fileSaved": "Dosya kaydedildi.",
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",

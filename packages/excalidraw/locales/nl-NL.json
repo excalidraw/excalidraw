@@ -530,7 +530,7 @@
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "{{exportSelection}} gekopieerd naar klembord als SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "{{exportSelection}} gekopieerd naar klembord als Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "{{exportSelection}} gekopieerd naar klembord als Mermaid",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",

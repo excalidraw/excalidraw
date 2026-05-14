@@ -299,6 +299,7 @@ import {
   actionBringForward,
   actionBringToFront,
   actionCopy,
+  actionCopyAsMermaid,
   actionCopyAsPng,
   actionCopyAsSvg,
   copyText,
@@ -12693,7 +12694,7 @@ class App extends React.Component<AppProps, AppState> {
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
 
-    options.push(actionCopyAsPng, actionCopyAsSvg);
+    options.push(actionCopyAsPng, actionCopyAsSvg, actionCopyAsMermaid);
 
     // canvas contextMenu
     // -------------------------------------------------------------------------
@@ -12712,8 +12713,7 @@ class App extends React.Component<AppProps, AppState> {
       return [
         actionPaste,
         CONTEXT_MENU_SEPARATOR,
-        actionCopyAsPng,
-        actionCopyAsSvg,
+        ...options,
         copyText,
         CONTEXT_MENU_SEPARATOR,
         actionSelectAll,

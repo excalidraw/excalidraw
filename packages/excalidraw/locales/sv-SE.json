@@ -530,7 +530,7 @@
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Kopierade {{exportSelection}} till urklipp som SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Kopierade {{exportSelection}} till urklipp som Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Kopierade {{exportSelection}} till urklipp som Mermaid",
     "fileSaved": "Fil sparad.",
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "arbetsyta",

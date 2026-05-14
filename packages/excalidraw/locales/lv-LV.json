@@ -530,7 +530,7 @@
     "copyToClipboard": "Nokopēja starpliktuvē.",
     "copyToClipboardAsPng": "Nokopēja {{exportSelection}} starpliktuvē kā PNG ({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Nokopēja {{exportSelection}} starpliktuvē kā Mermaid ({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Nokopēja {{exportSelection}} starpliktuvē kā Mermaid",
     "fileSaved": "Datne saglabāta.",
     "fileSavedToFilename": "Saglabāts kā {filename}",
     "canvas": "tāfeli",

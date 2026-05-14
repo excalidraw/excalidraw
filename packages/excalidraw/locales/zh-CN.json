@@ -530,7 +530,7 @@
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "已将 {{exportSelection}} 作为 SVG 复制到剪贴板\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "已将 {{exportSelection}} 作为 Mermaid 复制到剪贴板\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "已将 {{exportSelection}} 作为 Mermaid 复制到剪贴板",
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",

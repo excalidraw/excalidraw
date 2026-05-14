@@ -530,7 +530,7 @@
     "copyToClipboard": "Копирано в клипборда.",
     "copyToClipboardAsPng": "Копира {{exportSelection}} в клипборда като PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
-    "copyToClipboardAsMermaid": "Копира {{exportSelection}} в клипборда като Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Копира {{exportSelection}} в клипборда като Mermaid",
     "fileSaved": "Файлът е запазен.",
     "fileSavedToFilename": "Запазен към {filename}",
     "canvas": "платно",

@@ -530,7 +530,7 @@
     "copyToClipboard": "Copiato negli appunti.",
     "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Copiato {{exportSelection}} negli appunti come SVG\n({{exportColorScheme}})",
-    "copyToClipboardAsMermaid": "Copiato {{exportSelection}} negli appunti come Mermaid\n({{exportColorScheme}})",
+    "copyToClipboardAsMermaid": "Copiato {{exportSelection}} negli appunti come Mermaid",
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
