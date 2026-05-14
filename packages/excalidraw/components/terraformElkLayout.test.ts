@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   buildTerraformElkExcalidrawScene,
   strokeColorForTerraformDependencyEdge,
@@ -77,6 +79,19 @@ function getLabeledContainer(
           element.customData.terraformVisibilityKey.endsWith(
             `.${addressOrSuffix}`,
           ))),
+  );
+}
+
+/** Detached card title; AWS icon sub-shapes may reuse visibility keys without this role. */
+function getTerraformResourceTitleLabel(
+  elements: readonly ExcalidrawElement[],
+  nodePath: string,
+): ExcalidrawElement | undefined {
+  return elements.find(
+    (e) =>
+      e.type === "text" &&
+      e.customData?.terraformVisibilityRole === "resource" &&
+      e.customData?.nodePath === nodePath,
   );
 }
 
@@ -202,11 +217,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
       nodePath: "aws_s3_bucket.root",
       resourceType: "aws_s3_bucket",
     });
-    const labelEl = elements.find(
-      (e) =>
-        e.type === "text" &&
-        (e as { customData?: { nodePath?: string } }).customData?.nodePath ===
-          resourceRect?.customData?.nodePath,
+    const labelEl = getTerraformResourceTitleLabel(
+      elements,
+      String(resourceRect?.customData?.nodePath ?? ""),
     );
     expect((labelEl as { strokeColor?: string })?.strokeColor).toBe("#1e1e1e");
     expect((labelEl as { containerId?: string | null })?.containerId).toBe(
@@ -265,12 +278,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(vpcRect).toBeDefined();
     expect(vpcRect!.frameId).toBeTruthy();
 
-    const label = elements.find(
-      (e) =>
-        e.type === "text" &&
-        (e as { customData?: { terraformVisibilityKey?: string } }).customData
-          ?.terraformVisibilityKey ===
-          vpcRect!.customData?.terraformVisibilityKey,
+    const label = getTerraformResourceTitleLabel(
+      elements,
+      String(vpcRect!.customData?.nodePath ?? ""),
     );
     expect(label).toBeDefined();
 
@@ -964,12 +974,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
         (e as { customData?: { terraformVisibilityKey?: string } }).customData
           ?.terraformVisibilityKey === address,
     );
-    const label = collapsed.find(
-      (e) =>
-        e.type === "text" &&
-        (e as { customData?: { terraformVisibilityKey?: string } }).customData
-          ?.terraformVisibilityKey === address,
-    );
+    const label = getTerraformResourceTitleLabel(collapsed, address);
 
     expect(rect?.isDeleted).toBe(false);
     expect(label?.isDeleted).toBe(false);
