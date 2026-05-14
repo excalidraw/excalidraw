@@ -101,6 +101,7 @@ function cloneIconElements(
   targetY: number,
   targetSize: number,
   parentGroupIds: string[],
+  opts: { frameId: string | null; opacity: number },
 ): ExcalidrawElement[] {
   let minX = Infinity;
   let minY = Infinity;
@@ -155,7 +156,8 @@ function cloneIconElements(
       boundElements: null,
       containerId: null,
       updated: Date.now(),
-      frameId: null,
+      frameId: opts.frameId,
+      opacity: opts.opacity,
       link: null,
       locked: false,
       isDeleted: false,
@@ -190,10 +192,9 @@ export async function injectTerraformAwsIconsIntoElements(
   const iconArea = iconSize + iconPad;
 
   type Work = {
-    nodePath: string;
     textIdx: number;
-    icons: ExcalidrawElement[];
-    rect: ExcalidrawElement;
+    rectId: string;
+    resourceType: string;
   };
   const work: Work[] = [];
 
@@ -238,48 +239,95 @@ export async function injectTerraformAwsIconsIntoElements(
       continue;
     }
 
-    const iconX = el.x + iconPad;
-    const iconY = el.y + (el.height - iconSize) / 2;
-    const iconCustomData = {
+    work.push({ textIdx, rectId: el.id, resourceType });
+  }
+
+  work.sort((a, b) => b.textIdx - a.textIdx);
+
+  const out = elements.slice() as ExcalidrawElement[];
+  for (const { textIdx, rectId, resourceType } of work) {
+    const rectIdx = out.findIndex((e) => e.id === rectId);
+    if (rectIdx < 0) {
+      continue;
+    }
+    const rectInOut = out[rectIdx];
+    if (rectInOut.type !== "rectangle") {
+      continue;
+    }
+    const template = getIconTemplateElements(resourceType);
+    if (!template?.length) {
+      continue;
+    }
+
+    const pinId = `tfpin-${rand()}`;
+    const baseGroups = rectInOut.groupIds ?? [];
+    const stacked = [...baseGroups, pinId];
+
+    out[rectIdx] = newElementWith(rectInOut, { groupIds: stacked });
+
+    const card = out[rectIdx]!;
+    const pcd = card.customData ?? {};
+    const iconX = card.x + iconPad;
+    const iconY = card.y + (card.height - iconSize) / 2;
+    /**
+     * Glyph hit targets sit on top of the card; without the same graph identity keys as the
+     * rectangle, {@link getTerraformEdgeHoverPeekKeyFromHoveredIds} returns null when only the
+     * icon is hovered and relationship focus / edge dimming never activates.
+     */
+    const iconCustomData: Record<string, unknown> = {
       terraform: true,
       terraformAwsIconGlyph: true,
     };
+    if (typeof pcd.nodePath === "string" && pcd.nodePath.length > 0) {
+      iconCustomData.nodePath = pcd.nodePath;
+    }
+    if (
+      typeof pcd.terraformVisibilityKey === "string" &&
+      pcd.terraformVisibilityKey.length > 0
+    ) {
+      iconCustomData.terraformVisibilityKey = pcd.terraformVisibilityKey;
+    }
+    if (
+      typeof pcd.terraformLayoutEdgeFocusKey === "string" &&
+      pcd.terraformLayoutEdgeFocusKey.length > 0
+    ) {
+      iconCustomData.terraformLayoutEdgeFocusKey =
+        pcd.terraformLayoutEdgeFocusKey;
+    }
 
     const icons = cloneIconElements(
       [...template],
       iconX,
       iconY,
       iconSize,
-      [],
+      stacked,
+      {
+        frameId: card.frameId ?? null,
+        opacity: card.opacity ?? 100,
+      },
     ).map((iconEl) =>
       newElementWith(iconEl, {
-        isDeleted: el.isDeleted,
+        isDeleted: card.isDeleted,
         customData: {
           ...iconCustomData,
         },
       }),
     );
 
-    work.push({ nodePath, textIdx, icons, rect: el });
-  }
-
-  work.sort((a, b) => b.textIdx - a.textIdx);
-
-  const out = elements.slice() as ExcalidrawElement[];
-  for (const { textIdx, icons, rect } of work) {
     out.splice(textIdx, 0, ...icons);
     const textEl = out[textIdx + icons.length];
     if (!textEl || textEl.type !== "text") {
       continue;
     }
     out[textIdx + icons.length] = newElementWith(textEl, {
-      x: rect.x + iconArea + px(8),
-      y: rect.y + px(10),
-      width: rect.width - iconArea - px(16),
-      height: rect.height - px(20),
+      x: card.x + iconArea + px(8),
+      y: card.y + px(10),
+      width: card.width - iconArea - px(16),
+      height: card.height - px(20),
       textAlign: "left",
       verticalAlign: "middle",
       strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
+      groupIds: stacked,
     });
   }
 

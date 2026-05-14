@@ -11,6 +11,8 @@ import {
   pickResourceValuesForTopologyPlacement,
 } from "./terraformTopologyExtract";
 import {
+  computeInterfaceVpcEndpointZonePlacements,
+  computeNatGatewayZonePlacements,
   computeRouteTableBottomEdgePlacements,
   extractInterfaceEndpointSecurityGroupBuckets,
   extractPrimaryTopologyZones,
@@ -20,6 +22,8 @@ import {
   extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
+  filterVpcEndpointBucketsRemovingZonePlacedAddresses,
+  mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -130,6 +134,13 @@ function collectSemanticRepresentedResourceAddresses(
     const cd = element.customData || {};
     if (typeof cd.nodePath === "string") {
       represented.add(cd.nodePath);
+    }
+    if (Array.isArray(cd.terraformMergedSubnetAddresses)) {
+      for (const addr of cd.terraformMergedSubnetAddresses) {
+        if (typeof addr === "string") {
+          represented.add(addr);
+        }
+      }
     }
     if (Array.isArray(cd.terraformSubnetIds)) {
       for (const subnetId of cd.terraformSubnetIds) {
@@ -456,30 +467,67 @@ export const terraformPlanParsing = async (
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const topoModel = extractTerraformTopologyFromPlan(semPlan);
-    const primaryZones = extractPrimaryTopologyZones(semPlan);
+    const primaryZones = extractPrimaryTopologyZones(semPlan).map((z) => ({
+      ...z,
+      topologyZoneSource: "primary" as const,
+    }));
     const supplementaryZones = extractSupplementarySubnetZones(
       semPlan,
       primaryZones,
+    ).map((z) => ({
+      ...z,
+      topologyZoneSource: "supplementary" as const,
+    }));
+    const zones = mergeSupplementarySubnetZonesSharedRouteTable(
+      [...primaryZones, ...supplementaryZones].sort((a, b) => {
+        if (a.accountId !== b.accountId) {
+          return a.accountId.localeCompare(b.accountId);
+        }
+        if (a.region !== b.region) {
+          return a.region.localeCompare(b.region);
+        }
+        if (a.vpcId !== b.vpcId) {
+          return a.vpcId.localeCompare(b.vpcId);
+        }
+        return a.subnetSignature.localeCompare(b.subnetSignature);
+      }),
+      semPlan,
     );
-    const zones = [...primaryZones, ...supplementaryZones].sort((a, b) => {
-      if (a.accountId !== b.accountId) {
-        return a.accountId.localeCompare(b.accountId);
-      }
-      if (a.region !== b.region) {
-        return a.region.localeCompare(b.region);
-      }
-      if (a.vpcId !== b.vpcId) {
-        return a.vpcId.localeCompare(b.vpcId);
-      }
-      return a.subnetSignature.localeCompare(b.subnetSignature);
-    });
     const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
-    const vpcEndpointBuckets = extractVpcEndpointsByVpc(semPlan);
+    const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(semPlan);
+    const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
+      computeInterfaceVpcEndpointZonePlacements(semPlan, zones);
+    const vpcEndpointBuckets =
+      filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+        vpcEndpointBucketsRaw,
+        zonePlacedAddresses,
+      );
     const routeTableBuckets = extractRouteTablesByVpc(semPlan);
-    const vpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(semPlan);
+    const rawVpcDefaultPlumbingBuckets =
+      extractVpcDefaultPlumbingBuckets(semPlan);
+    const natZonePlacements = computeNatGatewayZonePlacements(semPlan, zones);
+    /**
+     * NAT/EIP that we placed inside their public-subnet zone (semantic AZ rendering) must NOT
+     * also appear on the VPC right edge via `appendVpcInternetEdgeRectangles`. Filter them out
+     * before the buckets reach the scene builder.
+     */
+    const vpcDefaultPlumbingBuckets =
+      natZonePlacements.consumedAddresses.size === 0
+        ? rawVpcDefaultPlumbingBuckets
+        : rawVpcDefaultPlumbingBuckets
+            .map((b) => ({
+              ...b,
+              addresses: b.addresses.filter(
+                (a) => !natZonePlacements.consumedAddresses.has(a),
+              ),
+            }))
+            .filter((b) => b.addresses.length > 0);
     const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
     const endpointSecurityGroupBuckets =
-      extractInterfaceEndpointSecurityGroupBuckets(semPlan, vpcEndpointBuckets);
+      extractInterfaceEndpointSecurityGroupBuckets(
+        semPlan,
+        vpcEndpointBucketsRaw,
+      );
     const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
       zones,
       semPlan,
@@ -502,6 +550,8 @@ export const terraformPlanParsing = async (
       vpcDefaultPlumbingBuckets,
       vpcFlowLogBuckets,
       endpointSecurityGroupBuckets,
+      natZonePlacements,
+      interfaceVpcEndpointZonePlacements,
     );
     const represented = collectSemanticRepresentedResourceAddresses(
       topoScene.elements as Array<{ customData?: Record<string, any> }>,
@@ -519,10 +569,14 @@ export const terraformPlanParsing = async (
       phase: "topologyLayout",
       meta: topoScene.meta,
       elementCount: topoScene.elements.length,
+      zoneRouteAnchorDebug: topoScene.meta.zoneRouteAnchorDebug,
     });
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: topoScene.elements,
+      ...(topoScene.files && Object.keys(topoScene.files).length > 0
+        ? { files: topoScene.files }
+        : {}),
       meta: {
         ...topoScene.meta,
         representedResourceCount: represented.size,

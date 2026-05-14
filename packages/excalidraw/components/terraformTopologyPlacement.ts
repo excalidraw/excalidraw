@@ -25,6 +25,10 @@ import {
 import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
+import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
+
+/** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
+export type TopologyZoneSource = "primary" | "supplementary";
 
 export type TopologyPlacementZone = {
   accountId: string;
@@ -34,6 +38,9 @@ export type TopologyPlacementZone = {
   subnetSignature: string;
   subnetIds: string[];
   addresses: string[];
+  topologyZoneSource?: TopologyZoneSource;
+  /** Supplementary-only zones merged because subnets share one route table. */
+  mergedSupplementaryComposite?: boolean;
 };
 
 /** Primary resources with resolved account/region but no VPC (S3, SQS, …). */
@@ -51,6 +58,18 @@ export type TopologyVpcEndpointBucket = {
   addresses: string[];
 };
 
+/** One interface VPCE draw instance inside a subnet zone (mirrors use the same Terraform address). */
+export type InterfaceVpcEndpointZonePlacement = {
+  address: string;
+  /** Same logical endpoint is also drawn in another zone (subnet mirror). */
+  subnetMirrorDuplicate: boolean;
+};
+
+export type InterfaceVpcEndpointZonePlacementMap = ReadonlyMap<
+  string,
+  readonly InterfaceVpcEndpointZonePlacement[]
+>;
+
 /** Managed `aws_route_table` addresses grouped by VPC (`vpc_id` on the table). */
 export type TopologyRouteTableBucket = {
   accountId: string;
@@ -65,7 +84,10 @@ export type RouteTableBottomZonePlacement = {
   region: string;
   vpcId: string;
   subnetSignature: string;
+  /** Managed `aws_route_table` resource addresses on this row (one composite box each). */
   addresses: string[];
+  /** `aws_route` addresses nested under each route table, sorted per table. */
+  routeChildrenByTable: Record<string, string[]>;
 };
 
 /** Route tables drawn straddling the VPC bottom (no subnet-only association, or subnets span multiple zones). */
@@ -74,6 +96,7 @@ export type RouteTableBottomVpcPlacement = {
   region: string;
   vpcId: string;
   addresses: string[];
+  routeChildrenByTable: Record<string, string[]>;
 };
 
 /** Semantic bottom-edge route table layout (subnet zone vs VPC). */
@@ -82,28 +105,6 @@ export type TopologyRouteTableBottomPlacements = {
   vpcBottom: RouteTableBottomVpcPlacement[];
 };
 
-const ROUTE_TABLE_SEMANTIC_TILE_W = tfComfortPx(160);
-const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
-const ALB_COMPANION_TYPES = new Set([
-  "aws_lb_listener",
-  "aws_lb_target_group",
-  "aws_lb_target_group_attachment",
-  "aws_lambda_permission",
-  "aws_security_group",
-  "aws_security_group_rule",
-]);
-
-/** Minimum inner width for one horizontal row of route table tiles (matches layout constants). */
-export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
-  if (addrCount <= 0) {
-    return 0;
-  }
-  return (
-    addrCount * ROUTE_TABLE_SEMANTIC_TILE_W +
-    (addrCount - 1) * ROUTE_TABLE_SEMANTIC_GAP
-  );
-}
-
 type ResourceChange = {
   address?: string;
   mode?: string;
@@ -111,6 +112,285 @@ type ResourceChange = {
   provider_name?: string;
   change?: { actions?: string[]; before?: unknown; after?: unknown };
 };
+
+const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
+const ALB_COMPANION_TYPES = new Set([
+  "aws_lb_listener",
+  "aws_lb_target_group",
+  "aws_lb_target_group_attachment",
+]);
+
+const SG_RULE_TYPES_PLACEMENT = new Set([
+  "aws_vpc_security_group_ingress_rule",
+  "aws_vpc_security_group_egress_rule",
+  "aws_security_group_rule",
+]);
+
+function stripIndexesForTopologyRef(address: string): string {
+  return address.replace(/\[[^\]]+\]/g, "");
+}
+
+function isPlainObjectForPlacement(v: unknown): v is Record<string, unknown> {
+  return Boolean(v && typeof v === "object" && !Array.isArray(v));
+}
+
+function flattenStringishForPlacement(value: unknown, out: string[]): void {
+  if (typeof value === "string" && value.trim()) {
+    out.push(value.trim());
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      flattenStringishForPlacement(item, out);
+    }
+    return;
+  }
+  if (isPlainObjectForPlacement(value)) {
+    for (const v of Object.values(value)) {
+      flattenStringishForPlacement(v, out);
+    }
+  }
+}
+
+function findAwsSecurityGroupAddressForTopologyPlanRef(
+  ref: string,
+  changes: readonly ResourceChange[],
+): string | null {
+  const t = ref.trim();
+  if (!t) {
+    return null;
+  }
+  const stripT = stripIndexesForTopologyRef(t);
+
+  for (const rc of changes) {
+    if (rc.type !== "aws_security_group" || typeof rc.address !== "string") {
+      continue;
+    }
+    const addr = rc.address;
+    const stripAddr = stripIndexesForTopologyRef(addr);
+    if (
+      t === addr ||
+      stripT === stripAddr ||
+      t === stripAddr ||
+      stripT === addr
+    ) {
+      return addr;
+    }
+  }
+
+  if (t.startsWith("sg-")) {
+    for (const rc of changes) {
+      if (rc.type !== "aws_security_group" || typeof rc.address !== "string") {
+        continue;
+      }
+      const pv = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+      if (!pv) {
+        continue;
+      }
+      const id = typeof pv.id === "string" ? pv.id : "";
+      if (id === t) {
+        return rc.address;
+      }
+    }
+  }
+
+  return null;
+}
+
+function pickResourceChangeByAddress(
+  changes: readonly ResourceChange[],
+  address: string,
+): ResourceChange | null {
+  for (const rc of changes) {
+    if (rc.address === address) {
+      return rc;
+    }
+  }
+  return null;
+}
+
+function sgRuleSecurityGroupIdMatchesSgAddress(
+  sgAddress: string,
+  sgId: string,
+  sgArn: string,
+  ruleSgIdField: unknown,
+  changes: readonly ResourceChange[],
+): boolean {
+  const flat: string[] = [];
+  flattenStringishForPlacement(ruleSgIdField, flat);
+  for (const s of flat) {
+    const x = s.trim();
+    if (!x) {
+      continue;
+    }
+    if (x === sgAddress || stripIndexesForTopologyRef(x) === sgAddress) {
+      return true;
+    }
+    if (sgId && (x === sgId || x.includes(sgId))) {
+      return true;
+    }
+    if (sgArn && x === sgArn) {
+      return true;
+    }
+    const resolved = findAwsSecurityGroupAddressForTopologyPlanRef(x, changes);
+    if (resolved === sgAddress) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function collectRuleChangeAddressesForSgPlan(
+  sgAddress: string,
+  changes: readonly ResourceChange[],
+): string[] {
+  const sgRc = pickResourceChangeByAddress(changes, sgAddress);
+  if (!sgRc) {
+    return [];
+  }
+  const sgVals = pickResourceValuesForTopologyPlacement(sgRc as ResourceChange);
+  const sgId = sgVals && typeof sgVals.id === "string" ? sgVals.id : "";
+  const sgArn = sgVals && typeof sgVals.arn === "string" ? sgVals.arn : "";
+
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const rc of changes) {
+    if (!rc.type || !SG_RULE_TYPES_PLACEMENT.has(rc.type)) {
+      continue;
+    }
+    if (typeof rc.address !== "string") {
+      continue;
+    }
+    const pv = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!pv) {
+      continue;
+    }
+    if (
+      sgRuleSecurityGroupIdMatchesSgAddress(
+        sgAddress,
+        sgId,
+        sgArn,
+        pv.security_group_id,
+        changes,
+      )
+    ) {
+      if (!seen.has(rc.address)) {
+        seen.add(rc.address);
+        out.push(rc.address);
+      }
+    }
+  }
+  return out.sort((a, b) => a.localeCompare(b));
+}
+
+/** Minimum inner width for one horizontal row of route-table cluster frames (legacy helper). */
+export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
+  if (addrCount <= 0) {
+    return 0;
+  }
+  return (
+    addrCount * routeTableCompositeSlotWidthPx(0) +
+    (addrCount - 1) * ROUTE_TABLE_SEMANTIC_GAP
+  );
+}
+
+/** Same footprint as topology tier-0 primary + `TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX`. */
+const RT_CLUSTER_PRIMARY_W = tfComfortPx(200);
+const RT_CLUSTER_PRIMARY_H = tfComfortPx(88);
+const RT_CLUSTER_TIER2_H = tfComfortPx(44);
+const RT_CLUSTER_SAT_GAP = tfComfortPx(8);
+const RT_CLUSTER_FRAME_PAD = tfComfortPx(10);
+
+/** Content height (tier-0 + stacked tier-2 `aws_route` tiles) without outer cluster frame pad. */
+export function routeTableClusterContentHeightPx(routeCount: number): number {
+  if (routeCount <= 0) {
+    return RT_CLUSTER_PRIMARY_H;
+  }
+  return (
+    RT_CLUSTER_PRIMARY_H +
+    RT_CLUSTER_SAT_GAP +
+    routeCount * RT_CLUSTER_TIER2_H +
+    (routeCount - 1) * RT_CLUSTER_SAT_GAP
+  );
+}
+
+/** Full cluster frame height (matches `appendTopologyResourceRectangles` primaryCluster frame). */
+export function routeTableCompositeHeightPx(routeCount: number): number {
+  return (
+    routeTableClusterContentHeightPx(routeCount) + 2 * RT_CLUSTER_FRAME_PAD
+  );
+}
+
+/** Outer width of one route-table primaryCluster frame. */
+export function routeTableCompositeSlotWidthPx(_routeCount: number): number {
+  return RT_CLUSTER_PRIMARY_W + 2 * RT_CLUSTER_FRAME_PAD;
+}
+
+/** Sum of composite slot widths + gaps for one bottom row. */
+export function routeTableCompositeRowMinInnerWidthPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  const sorted = [...tableAddrs].sort();
+  if (sorted.length === 0) {
+    return 0;
+  }
+  let sum = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    const addr = sorted[i]!;
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    sum += routeTableCompositeSlotWidthPx(n);
+    if (i < sorted.length - 1) {
+      sum += ROUTE_TABLE_SEMANTIC_GAP;
+    }
+  }
+  return sum;
+}
+
+/** Tallest composite on a row (for zone / VPC bottom inset). */
+export function routeTableMaxCompositeHeightForRowPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  let maxH = 0;
+  for (const addr of tableAddrs) {
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    maxH = Math.max(maxH, routeTableCompositeHeightPx(n));
+  }
+  return maxH;
+}
+
+/**
+ * Vertical distance from the body-bottom anchor midline (tier-0 center) down to the outer
+ * bottom of the `primaryCluster` frame in `appendRouteTableBottomEdgeRectangles`. Using
+ * half of {@link routeTableCompositeHeightPx} is wrong when `aws_route` tiles stack below
+ * the primary — most of the composite sits under the anchor, not split evenly above/below.
+ */
+export function routeTableExtentBelowAnchorMidlinePx(
+  routeCount: number,
+): number {
+  const primaryLower =
+    RT_CLUSTER_PRIMARY_H - Math.round(RT_CLUSTER_PRIMARY_H / 2);
+  const routeBlock =
+    routeCount <= 0
+      ? 0
+      : RT_CLUSTER_SAT_GAP +
+        routeCount * RT_CLUSTER_TIER2_H +
+        (routeCount - 1) * RT_CLUSTER_SAT_GAP;
+  return primaryLower + routeBlock + RT_CLUSTER_FRAME_PAD;
+}
+
+export function routeTableMaxExtentBelowAnchorForRowPx(
+  tableAddrs: readonly string[],
+  routeChildrenByTable: Record<string, string[]>,
+): number {
+  let maxE = 0;
+  for (const addr of tableAddrs) {
+    const n = (routeChildrenByTable[addr] ?? []).length;
+    maxE = Math.max(maxE, routeTableExtentBelowAnchorMidlinePx(n));
+  }
+  return maxE;
+}
 
 function stringArrayField(v: unknown): string[] {
   if (!Array.isArray(v)) {
@@ -149,7 +429,132 @@ export function collectPlacementSubnetIds(
   for (const sid of stringArrayField(values.subnet_ids)) {
     ids.add(sid);
   }
+  for (const sid of stringArrayField(values.subnets)) {
+    ids.add(sid);
+  }
+  const subnetMapping = values.subnet_mapping;
+  if (Array.isArray(subnetMapping)) {
+    for (const entry of subnetMapping) {
+      if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+        const sid = stringField((entry as Record<string, unknown>).subnet_id);
+        if (sid) {
+          ids.add(sid);
+        }
+      }
+    }
+  }
   return [...ids].sort();
+}
+
+/** `aws_lb.security_groups` entries that are resolved SG ids in the plan JSON. */
+function parseLbSecurityGroupIds(values: Record<string, unknown>): string[] {
+  return stringArrayField(values.security_groups).filter((s) =>
+    s.startsWith("sg-"),
+  );
+}
+
+function collectInferenceSubnetIdsFromResource(
+  type: string,
+  values: Record<string, unknown>,
+): string[] {
+  const ids = new Set<string>();
+  if (type === "aws_instance" || type === "aws_spot_instance_request") {
+    const sid = stringField(values.subnet_id);
+    if (sid) {
+      ids.add(sid);
+    }
+  }
+  if (type === "aws_lambda_function") {
+    for (const block of vpcConfigBlocks(values)) {
+      for (const sid of stringArrayField(block.subnet_ids)) {
+        ids.add(sid);
+      }
+    }
+  }
+  return [...ids].sort();
+}
+
+function collectInferenceSecurityGroupIdsFromResource(
+  type: string,
+  values: Record<string, unknown>,
+): string[] {
+  const out: string[] = [];
+  if (type === "aws_instance" || type === "aws_spot_instance_request") {
+    out.push(...stringArrayField(values.vpc_security_group_ids));
+  }
+  if (type === "aws_lambda_function") {
+    for (const block of vpcConfigBlocks(values)) {
+      out.push(...stringArrayField(block.security_group_ids));
+    }
+  }
+  return out.filter((s) => s.startsWith("sg-"));
+}
+
+/**
+ * When an `aws_lb` has no `subnets` / `subnet_mapping` / `subnet_ids` in the placement snapshot,
+ * infer subnet ids from other resources in the plan that share the LB's security group ids
+ * (same VPC when `vpc_id` is known on the LB).
+ */
+export function inferSubnetIdsForLbFromPlanSecurityGroups(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  lbValues: Record<string, unknown>,
+  subnetToVpc: ReadonlyMap<string, string>,
+): string[] {
+  const lbSg = new Set(parseLbSecurityGroupIds(lbValues));
+  if (lbSg.size === 0) {
+    return [];
+  }
+  const lbVpcId = stringField(lbValues.vpc_id);
+  const inferred = new Set<string>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    const t = rc.type;
+    if (
+      t !== "aws_instance" &&
+      t !== "aws_spot_instance_request" &&
+      t !== "aws_lambda_function"
+    ) {
+      continue;
+    }
+    const v = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!v) {
+      continue;
+    }
+    const candSgs = collectInferenceSecurityGroupIdsFromResource(t, v);
+    if (!candSgs.some((sg) => lbSg.has(sg))) {
+      continue;
+    }
+    const candSubnets = collectInferenceSubnetIdsFromResource(t, v);
+    for (const sid of candSubnets) {
+      if (lbVpcId) {
+        const vpc = subnetToVpc.get(sid);
+        if (vpc === lbVpcId) {
+          inferred.add(sid);
+        }
+      } else {
+        inferred.add(sid);
+      }
+    }
+  }
+
+  return [...inferred].sort((a, b) => a.localeCompare(b));
+}
+
+export function topologyZoneMapKey(
+  account: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): string {
+  return `${account}\0${region}\0${vpcId}\0${subnetSignature}`;
 }
 
 function zoneMapKey(
@@ -158,7 +563,7 @@ function zoneMapKey(
   vpcId: string,
   subnetSignature: string,
 ): string {
-  return `${account}\0${region}\0${vpcId}\0${subnetSignature}`;
+  return topologyZoneMapKey(account, region, vpcId, subnetSignature);
 }
 
 /**
@@ -207,7 +612,14 @@ export function extractPrimaryTopologyZones(
       continue;
     }
 
-    const subnetIds = collectPlacementSubnetIds(values);
+    let subnetIds = collectPlacementSubnetIds(values);
+    if (t === "aws_lb" && subnetIds.length === 0) {
+      subnetIds = inferSubnetIdsForLbFromPlanSecurityGroups(
+        plan,
+        values,
+        subnetToVpc,
+      );
+    }
     const merged = mergeWithDefaultAwsProviderAccountRegion(
       plan,
       mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
@@ -277,6 +689,78 @@ export function extractPrimaryTopologyZones(
       continue;
     }
     accum.get(owner.key)?.addresses.add(address);
+  }
+
+  const addressToZoneRow = new Map<
+    string,
+    {
+      accountId: string;
+      region: string;
+      vpcId: string;
+      subnetSignature: string;
+      subnetIds: string[];
+      addresses: Set<string>;
+    }
+  >();
+  for (const row of accum.values()) {
+    for (const addr of row.addresses) {
+      addressToZoneRow.set(addr, row);
+    }
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_lambda_permission") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const targetLambda = resolveLambdaPermissionTargetLambdaAddressFromPlan(
+      rc,
+      changes,
+    );
+    if (!targetLambda) {
+      continue;
+    }
+    const row = addressToZoneRow.get(targetLambda);
+    if (row) {
+      row.addresses.add(address);
+    }
+  }
+
+  for (const row of accum.values()) {
+    for (const addr of [...row.addresses]) {
+      const lbRc = pickResourceChangeByAddress(changes, addr);
+      if (!lbRc || lbRc.type !== "aws_lb") {
+        continue;
+      }
+      const pv = pickResourceValuesForTopologyPlacement(lbRc as ResourceChange);
+      if (!pv) {
+        continue;
+      }
+      const refs: string[] = [];
+      flattenStringishForPlacement(pv.security_groups, refs);
+      for (const r of refs) {
+        const sgAddr = findAwsSecurityGroupAddressForTopologyPlanRef(
+          r,
+          changes,
+        );
+        if (!sgAddr) {
+          continue;
+        }
+        row.addresses.add(sgAddr);
+        for (const ruleAddr of collectRuleChangeAddressesForSgPlan(
+          sgAddr,
+          changes,
+        )) {
+          row.addresses.add(ruleAddr);
+        }
+      }
+    }
   }
 
   const out: TopologyPlacementZone[] = [...accum.values()].map((row) => ({
@@ -414,6 +898,142 @@ export function extractVpcEndpointsByVpc(
   });
 
   return out;
+}
+
+function findZoneContainingSubnet(
+  zones: readonly TopologyPlacementZone[],
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetId: string,
+): TopologyPlacementZone | undefined {
+  return zones.find(
+    (z) =>
+      z.accountId === accountId &&
+      z.region === region &&
+      z.vpcId === vpcId &&
+      z.subnetIds.includes(subnetId),
+  );
+}
+
+/**
+ * Interface endpoints whose `subnet_ids` all resolve to placement zones: attach to those
+ * zones (one tile per distinct zone). If subnets map to **multiple** zones, each tile is a
+ * mirror duplicate (`subnetMirrorDuplicate`). Unmatched or Gateway endpoints are omitted
+ * here (they stay on the VPC strip via bucket filtering).
+ */
+export function computeInterfaceVpcEndpointZonePlacements(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  zones: readonly TopologyPlacementZone[],
+): {
+  byZone: Map<string, InterfaceVpcEndpointZonePlacement[]>;
+  zonePlacedAddresses: ReadonlySet<string>;
+} {
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const byZone = new Map<string, InterfaceVpcEndpointZonePlacement[]>();
+  const zonePlacedAddresses = new Set<string>();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_vpc_endpoint") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const epType = stringField(values.vpc_endpoint_type);
+    if (epType !== "Interface") {
+      continue;
+    }
+    const vpcIdRaw = stringField(values.vpc_id);
+    if (!vpcIdRaw) {
+      continue;
+    }
+    const subnetIds = collectPlacementSubnetIds(values);
+    if (subnetIds.length === 0) {
+      continue;
+    }
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const uniqZones: TopologyPlacementZone[] = [];
+    const seenSig = new Set<string>();
+    let allSubnetsResolve = true;
+    for (const sid of subnetIds) {
+      const z = findZoneContainingSubnet(
+        zones,
+        accountId,
+        region,
+        vpcIdRaw,
+        sid,
+      );
+      if (!z) {
+        allSubnetsResolve = false;
+        break;
+      }
+      if (!seenSig.has(z.subnetSignature)) {
+        seenSig.add(z.subnetSignature);
+        uniqZones.push(z);
+      }
+    }
+    if (!allSubnetsResolve || uniqZones.length === 0) {
+      continue;
+    }
+
+    const subnetMirrorDuplicate = uniqZones.length > 1;
+    for (const z of uniqZones) {
+      const zk = topologyZoneMapKey(
+        z.accountId,
+        z.region,
+        z.vpcId,
+        z.subnetSignature,
+      );
+      const row = byZone.get(zk) ?? [];
+      row.push({ address, subnetMirrorDuplicate });
+      byZone.set(zk, row);
+      zonePlacedAddresses.add(address);
+    }
+  }
+
+  return {
+    byZone,
+    zonePlacedAddresses,
+  };
+}
+
+export function filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+  buckets: readonly TopologyVpcEndpointBucket[],
+  zonePlacedAddresses: ReadonlySet<string>,
+): TopologyVpcEndpointBucket[] {
+  return buckets.map((b) => ({
+    ...b,
+    addresses: b.addresses.filter((a) => !zonePlacedAddresses.has(a)),
+  }));
 }
 
 function routeTableSortLabel(values: Record<string, unknown>): string {
@@ -567,7 +1187,8 @@ function buildRouteTableIdToSubnetIdsFromPlan(
   return out;
 }
 
-function buildRouteTableIdToCompanionAddressesFromPlan(
+/** `aws_route` addresses keyed by route table id (`route_table_id` in plan values). */
+function buildRouteTableIdToRouteAddressesFromPlan(
   plan: TerraformPlanProviderContext & {
     resource_changes?: ResourceChange[];
   },
@@ -580,10 +1201,7 @@ function buildRouteTableIdToCompanionAddressesFromPlan(
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
     }
-    if (
-      rc.mode !== "managed" ||
-      (rc.type !== "aws_route" && rc.type !== "aws_route_table_association")
-    ) {
+    if (rc.mode !== "managed" || rc.type !== "aws_route") {
       continue;
     }
     const address = rc.address;
@@ -708,15 +1326,18 @@ export function computeRouteTableBottomEdgePlacements(
 ): TopologyRouteTableBottomPlacements {
   const buckets = extractRouteTablesByVpc(plan);
   const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
-  const rtidToCompanions = buildRouteTableIdToCompanionAddressesFromPlan(plan);
+  const rtidToRoutes = buildRouteTableIdToRouteAddressesFromPlan(plan);
   const addrToMeta = buildRouteTableAddressToMeta(plan);
 
   const zoneAccum = new Map<string, string[]>();
+  const zoneChildrenAccum = new Map<string, Map<string, string[]>>();
   const vpcAccum = new Map<string, string[]>();
+  const vpcChildrenAccum = new Map<string, Map<string, string[]>>();
 
   for (const bucket of buckets) {
     for (const addr of bucket.addresses) {
       const meta = addrToMeta.get(addr);
+
       if (!meta) {
         const vk = routeTableVpcAccumKey(
           bucket.accountId,
@@ -727,6 +1348,10 @@ export function computeRouteTableBottomEdgePlacements(
           vpcAccum.set(vk, []);
         }
         vpcAccum.get(vk)!.push(addr);
+        if (!vpcChildrenAccum.has(vk)) {
+          vpcChildrenAccum.set(vk, new Map());
+        }
+        vpcChildrenAccum.get(vk)!.set(addr, []);
         continue;
       }
       const subnetSet = rtidToSubnets.get(meta.rtbId);
@@ -743,17 +1368,20 @@ export function computeRouteTableBottomEdgePlacements(
         );
       }
 
-      const addressesForPlacement = [
-        addr,
-        ...[...(rtidToCompanions.get(meta.rtbId) ?? new Set<string>())].sort(),
-      ];
+      const routesForTable = [
+        ...(rtidToRoutes.get(meta.rtbId) ?? new Set()),
+      ].sort();
 
       if (zonePick) {
         const zk = `${meta.accountId}\0${meta.region}\0${meta.vpcId}\0${zonePick.subnetSignature}`;
         if (!zoneAccum.has(zk)) {
           zoneAccum.set(zk, []);
         }
-        zoneAccum.get(zk)!.push(...addressesForPlacement);
+        zoneAccum.get(zk)!.push(addr);
+        if (!zoneChildrenAccum.has(zk)) {
+          zoneChildrenAccum.set(zk, new Map());
+        }
+        zoneChildrenAccum.get(zk)!.set(addr, routesForTable);
       } else {
         const vk = routeTableVpcAccumKey(
           meta.accountId,
@@ -763,7 +1391,11 @@ export function computeRouteTableBottomEdgePlacements(
         if (!vpcAccum.has(vk)) {
           vpcAccum.set(vk, []);
         }
-        vpcAccum.get(vk)!.push(...addressesForPlacement);
+        vpcAccum.get(vk)!.push(addr);
+        if (!vpcChildrenAccum.has(vk)) {
+          vpcChildrenAccum.set(vk, new Map());
+        }
+        vpcChildrenAccum.get(vk)!.set(addr, routesForTable);
       }
     }
   }
@@ -774,12 +1406,19 @@ export function computeRouteTableBottomEdgePlacements(
     if (!accountId || !region || !vpcId) {
       continue;
     }
+    const sortedAddrs = [...new Set(addresses)].sort();
+    const childMap = zoneChildrenAccum.get(key);
+    const routeChildrenByTable: Record<string, string[]> = {};
+    for (const a of sortedAddrs) {
+      routeChildrenByTable[a] = [...(childMap?.get(a) ?? [])];
+    }
     zoneBottom.push({
       accountId,
       region,
       vpcId,
       subnetSignature,
-      addresses: [...new Set(addresses)].sort(),
+      addresses: sortedAddrs,
+      routeChildrenByTable,
     });
   }
   zoneBottom.sort((a, b) => {
@@ -801,11 +1440,18 @@ export function computeRouteTableBottomEdgePlacements(
     if (!accountId || !region || !vpcId) {
       continue;
     }
+    const sortedAddrs = [...new Set(addresses)].sort();
+    const childMap = vpcChildrenAccum.get(key);
+    const routeChildrenByTable: Record<string, string[]> = {};
+    for (const a of sortedAddrs) {
+      routeChildrenByTable[a] = [...(childMap?.get(a) ?? [])];
+    }
     vpcBottom.push({
       accountId,
       region,
       vpcId,
-      addresses: [...new Set(addresses)].sort(),
+      addresses: sortedAddrs,
+      routeChildrenByTable,
     });
   }
   vpcBottom.sort((a, b) => {
@@ -819,6 +1465,383 @@ export function computeRouteTableBottomEdgePlacements(
   });
 
   return { zoneBottom, vpcBottom };
+}
+
+function resourceChangeForAddress(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  address: string,
+): ResourceChange | null {
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  for (const rc of changes) {
+    if (rc.address === address) {
+      return rc as ResourceChange;
+    }
+  }
+  return null;
+}
+
+/** Each subnet id → route table ids from `aws_route_table_association` (usually size 1). */
+function buildSubnetIdToRouteTableIdsMap(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_route_table_association") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const rtid = stringField(values.route_table_id);
+    const sid = stringField(values.subnet_id);
+    if (!rtid || !sid || !rtid.startsWith("rtb-")) {
+      continue;
+    }
+    if (!out.has(sid)) {
+      out.set(sid, new Set());
+    }
+    out.get(sid)!.add(rtid);
+  }
+  return out;
+}
+
+function zoneAddressesAreAllAwsSubnet(
+  z: TopologyPlacementZone,
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): boolean {
+  if (z.addresses.length === 0) {
+    return false;
+  }
+  for (const addr of z.addresses) {
+    const rc = resourceChangeForAddress(plan, addr);
+    if (!rc || rc.type !== "aws_subnet") {
+      return false;
+    }
+  }
+  return true;
+}
+
+function singleRouteTableIdForSubnets(
+  subnetIds: readonly string[],
+  sidToRtbs: ReadonlyMap<string, Set<string>>,
+): string | null {
+  let common: string | null = null;
+  for (const sid of subnetIds) {
+    const set = sidToRtbs.get(sid);
+    if (!set || set.size !== 1) {
+      return null;
+    }
+    const rt = [...set][0]!;
+    if (common === null) {
+      common = rt;
+    } else if (common !== rt) {
+      return null;
+    }
+  }
+  return common;
+}
+
+function routeTableIdForZoneSubnets(
+  z: TopologyPlacementZone,
+  sidToRtbs: ReadonlyMap<string, Set<string>>,
+): string | null {
+  return singleRouteTableIdForSubnets(z.subnetIds, sidToRtbs);
+}
+
+function sortPlacementZones(
+  a: TopologyPlacementZone,
+  b: TopologyPlacementZone,
+): number {
+  if (a.accountId !== b.accountId) {
+    return a.accountId.localeCompare(b.accountId);
+  }
+  if (a.region !== b.region) {
+    return a.region.localeCompare(b.region);
+  }
+  if (a.vpcId !== b.vpcId) {
+    return a.vpcId.localeCompare(b.vpcId);
+  }
+  return a.subnetSignature.localeCompare(b.subnetSignature);
+}
+
+/**
+ * Merge supplementary `aws_subnet`-only zones in the same VPC when every subnet in the union
+ * associates to exactly one shared route table id (generic; not tier-specific).
+ */
+export function mergeSupplementarySubnetZonesSharedRouteTable(
+  zones: readonly TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyPlacementZone[] {
+  const sidToRtbs = buildSubnetIdToRouteTableIdsMap(plan);
+  const primary = zones.filter((z) => z.topologyZoneSource !== "supplementary");
+  const supplementary = zones.filter(
+    (z) => z.topologyZoneSource === "supplementary",
+  );
+  const byVpc = new Map<string, TopologyPlacementZone[]>();
+  for (const z of supplementary) {
+    if (!zoneAddressesAreAllAwsSubnet(z, plan)) {
+      continue;
+    }
+    const vk = `${z.accountId}\0${z.region}\0${z.vpcId}`;
+    if (!byVpc.has(vk)) {
+      byVpc.set(vk, []);
+    }
+    byVpc.get(vk)!.push(z);
+  }
+
+  const mergedSupp: TopologyPlacementZone[] = [];
+  const passthroughSupp: TopologyPlacementZone[] = [];
+
+  for (const z of supplementary) {
+    if (!zoneAddressesAreAllAwsSubnet(z, plan)) {
+      passthroughSupp.push(z);
+    }
+  }
+
+  for (const [, group] of byVpc) {
+    if (group.length < 2) {
+      mergedSupp.push(...group);
+      continue;
+    }
+    const n = group.length;
+    const adj: number[][] = Array.from({ length: n }, () => []);
+    for (let i = 0; i < n; i++) {
+      const ri = routeTableIdForZoneSubnets(group[i]!, sidToRtbs);
+      if (!ri) {
+        continue;
+      }
+      for (let j = i + 1; j < n; j++) {
+        const rj = routeTableIdForZoneSubnets(group[j]!, sidToRtbs);
+        if (rj && ri === rj) {
+          adj[i]!.push(j);
+          adj[j]!.push(i);
+        }
+      }
+    }
+    const seen = new Set<number>();
+    for (let i = 0; i < n; i++) {
+      if (seen.has(i)) {
+        continue;
+      }
+      const stack = [i];
+      const comp: number[] = [];
+      seen.add(i);
+      while (stack.length) {
+        const u = stack.pop()!;
+        comp.push(u);
+        for (const v of adj[u] ?? []) {
+          if (!seen.has(v)) {
+            seen.add(v);
+            stack.push(v);
+          }
+        }
+      }
+      if (comp.length < 2) {
+        for (const idx of comp) {
+          mergedSupp.push(group[idx]!);
+        }
+        continue;
+      }
+      const subnets = new Set<string>();
+      const addrs = new Set<string>();
+      for (const idx of comp) {
+        const zz = group[idx]!;
+        for (const sid of zz.subnetIds) {
+          subnets.add(sid);
+        }
+        for (const a of zz.addresses) {
+          addrs.add(a);
+        }
+      }
+      const subnetIds = [...subnets].sort();
+      if (singleRouteTableIdForSubnets(subnetIds, sidToRtbs) == null) {
+        for (const idx of comp) {
+          mergedSupp.push(group[idx]!);
+        }
+        continue;
+      }
+      const z0 = group[comp[0]!]!;
+      mergedSupp.push({
+        accountId: z0.accountId,
+        region: z0.region,
+        vpcId: z0.vpcId,
+        subnetSignature: subnetIds.join("|"),
+        subnetIds,
+        addresses: [...addrs].sort(),
+        topologyZoneSource: "supplementary",
+        mergedSupplementaryComposite: true,
+      });
+    }
+  }
+
+  return [...primary, ...mergedSupp, ...passthroughSupp].sort(
+    sortPlacementZones,
+  );
+}
+
+/**
+ * Route table addresses on the VPC bottom strip that should be drawn per intersecting subnet
+ * column instead (shared RT whose subnets span multiple placement zones).
+ */
+export function computeVpcRouteTableFanOutAddressesForVpc(
+  zones: readonly TopologyPlacementZone[],
+  placements: TopologyRouteTableBottomPlacements,
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): ReadonlySet<string> {
+  const row = placements.vpcBottom.find(
+    (x) =>
+      x.accountId === accountId && x.region === regionName && x.vpcId === vpcId,
+  );
+  if (!row || row.addresses.length === 0) {
+    return new Set();
+  }
+  const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const addrToMeta = buildRouteTableAddressToMeta(plan);
+  const vpcZones = zones.filter(
+    (z) =>
+      z.accountId === accountId &&
+      z.region === regionName &&
+      z.vpcId === vpcId &&
+      z.subnetIds.length > 0,
+  );
+  const out = new Set<string>();
+  for (const addr of row.addresses) {
+    const meta = addrToMeta.get(addr);
+    if (!meta) {
+      continue;
+    }
+    const subnetSet = rtidToSubnets.get(meta.rtbId);
+    if (!subnetSet || subnetSet.size === 0) {
+      continue;
+    }
+    let hit = 0;
+    for (const z of vpcZones) {
+      if (z.subnetIds.some((sid) => subnetSet.has(sid))) {
+        hit++;
+        if (hit >= 2) {
+          break;
+        }
+      }
+    }
+    if (hit >= 2) {
+      out.add(addr);
+    }
+  }
+  return out;
+}
+
+/** Subnet ids associated with this `aws_route_table` Terraform address (via RT id in plan). */
+export function subnetSetForRouteTableAddress(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  routeTableAddress: string,
+): ReadonlySet<string> | null {
+  const meta = buildRouteTableAddressToMeta(plan).get(routeTableAddress);
+  if (!meta) {
+    return null;
+  }
+  const set = buildRouteTableIdToSubnetIdsFromPlan(plan).get(meta.rtbId);
+  return set ?? null;
+}
+
+/** Per subnet-zone row: table count, min inner width, and tallest composite (for frame inset). */
+export type RouteTableZoneBottomSizing = {
+  tableCount: number;
+  minInnerWidthPx: number;
+  maxCompositeHeightPx: number;
+  /** Subnet-zone frame bottom padding so route clusters are not clipped by the parent frame. */
+  maxExtentBelowAnchorPx: number;
+};
+
+export function buildRouteTableZoneSizingMapForVpc(
+  placements: TopologyRouteTableBottomPlacements,
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): Map<string, RouteTableZoneBottomSizing> {
+  const m = new Map<string, RouteTableZoneBottomSizing>();
+  for (const z of placements.zoneBottom) {
+    if (
+      z.accountId === accountId &&
+      z.region === regionName &&
+      z.vpcId === vpcId
+    ) {
+      m.set(z.subnetSignature, {
+        tableCount: z.addresses.length,
+        minInnerWidthPx: routeTableCompositeRowMinInnerWidthPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
+        maxCompositeHeightPx: routeTableMaxCompositeHeightForRowPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
+        maxExtentBelowAnchorPx: routeTableMaxExtentBelowAnchorForRowPx(
+          z.addresses,
+          z.routeChildrenByTable,
+        ),
+      });
+    }
+  }
+  return m;
+}
+
+export function vpcBottomRouteTablesRowSizing(
+  placements: TopologyRouteTableBottomPlacements,
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): {
+  minInnerWidthPx: number;
+  maxCompositeHeightPx: number;
+  maxExtentBelowAnchorPx: number;
+  tableCount: number;
+} | null {
+  const row = placements.vpcBottom.find(
+    (x) =>
+      x.accountId === accountId && x.region === regionName && x.vpcId === vpcId,
+  );
+  if (!row || row.addresses.length === 0) {
+    return null;
+  }
+  return {
+    tableCount: row.addresses.length,
+    minInnerWidthPx: routeTableCompositeRowMinInnerWidthPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+    maxCompositeHeightPx: routeTableMaxCompositeHeightForRowPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+    maxExtentBelowAnchorPx: routeTableMaxExtentBelowAnchorForRowPx(
+      row.addresses,
+      row.routeChildrenByTable,
+    ),
+  };
 }
 
 function bucketMapKey(accountId: string, region: string): string {
@@ -1044,6 +2067,177 @@ export function extractVpcDefaultPlumbingBuckets(
   });
 
   return out;
+}
+
+/** One NAT gateway clustered with its paired EIP(s), scoped to a subnet zone. */
+export type TopologyNatZoneCluster = {
+  /** Address of the `aws_nat_gateway` primary. */
+  natAddress: string;
+  /** Paired `aws_eip` addresses (resolved by `allocation_id`); sorted for stability. */
+  eipAddresses: string[];
+};
+
+/** NAT/EIP placements broken out of default plumbing into the owning public-subnet zone. */
+export type TopologyNatZonePlacements = {
+  /** `(account, region, vpcId, subnetSignature)` zone key → list of NAT clusters in that zone. */
+  byZone: Map<string, TopologyNatZoneCluster[]>;
+  /**
+   * Plan addresses (NAT + paired EIP) successfully placed in a zone. Strip from
+   * `vpcDefaultPlumbingBuckets` so the right-edge column does not double-render them.
+   */
+  consumedAddresses: Set<string>;
+};
+
+/**
+ * Pair each `aws_nat_gateway` with the `aws_eip` referencing its `allocation_id`, and route the
+ * pair into the placement zone whose `subnetIds` contains the NAT's `subnet_id`.
+ *
+ * NATs whose `subnet_id` does not land in any zone (e.g. plan has the NAT but the public subnet
+ * is missing from the zone graph) are left **unconsumed** so they continue to fall through to
+ * `vpcDefaultPlumbingBuckets` and render on the VPC right edge.
+ */
+export function computeNatGatewayZonePlacements(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  zones: readonly TopologyPlacementZone[],
+): TopologyNatZonePlacements {
+  const empty: TopologyNatZonePlacements = {
+    byZone: new Map(),
+    consumedAddresses: new Set(),
+  };
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  if (changes.length === 0 || zones.length === 0) {
+    return empty;
+  }
+
+  /** EIP id / allocation_id → EIP address (either side of the join works). */
+  const eipByJoinKey = new Map<string, string>();
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_eip") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const id = stringField(values.id);
+    const allocationId = stringField(values.allocation_id);
+    if (id) {
+      eipByJoinKey.set(id, address);
+    }
+    if (allocationId) {
+      eipByJoinKey.set(allocationId, address);
+    }
+  }
+
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+
+  const byZone = new Map<string, TopologyNatZoneCluster[]>();
+  const consumed = new Set<string>();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_nat_gateway") {
+      continue;
+    }
+    const natAddress = rc.address;
+    if (!natAddress || typeof natAddress !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const subnetId = stringField(values.subnet_id);
+    if (!subnetId) {
+      continue;
+    }
+    const vpcId =
+      stringField(values.vpc_id) ?? subnetToVpc.get(subnetId) ?? null;
+    if (!vpcId) {
+      continue;
+    }
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          [subnetId],
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const zone = zones.find(
+      (z) =>
+        z.accountId === accountId &&
+        z.region === region &&
+        z.vpcId === vpcId &&
+        z.subnetIds.includes(subnetId),
+    );
+    if (!zone) {
+      continue;
+    }
+
+    const eipAddresses: string[] = [];
+    const allocationId = stringField(values.allocation_id);
+    if (allocationId) {
+      const eipAddr = eipByJoinKey.get(allocationId);
+      if (eipAddr) {
+        eipAddresses.push(eipAddr);
+      }
+    }
+
+    const zk = zoneMapKey(accountId, region, vpcId, zone.subnetSignature);
+    let bucket = byZone.get(zk);
+    if (!bucket) {
+      bucket = [];
+      byZone.set(zk, bucket);
+    }
+    bucket.push({
+      natAddress,
+      eipAddresses: [...new Set(eipAddresses)].sort(),
+    });
+
+    consumed.add(natAddress);
+    for (const eipAddr of eipAddresses) {
+      consumed.add(eipAddr);
+    }
+  }
+
+  for (const list of byZone.values()) {
+    list.sort((a, b) => a.natAddress.localeCompare(b.natAddress));
+  }
+
+  return { byZone, consumedAddresses: consumed };
+}
+
+/** Read-only zone lookup key for `TopologyNatZonePlacements.byZone`. */
+export function natZonePlacementsKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): string {
+  return zoneMapKey(accountId, region, vpcId, subnetSignature);
 }
 
 /**

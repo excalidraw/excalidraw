@@ -91,6 +91,13 @@ export const getTerraformEdgeHoverPeekKeyFromHoveredIds = (
     if (!hoveredElementIds[el.id] || el.isDeleted) {
       continue;
     }
+    const cd = el.customData ?? {};
+    if (
+      typeof cd.terraformLayoutEdgeFocusKey === "string" &&
+      cd.terraformLayoutEdgeFocusKey.length > 0
+    ) {
+      return cd.terraformLayoutEdgeFocusKey;
+    }
     const addr = getTerraformGraphAddressForElement(el);
     if (addr) {
       return addr;

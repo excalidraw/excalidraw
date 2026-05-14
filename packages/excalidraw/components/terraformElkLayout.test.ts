@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   buildTerraformElkExcalidrawScene,
   strokeColorForTerraformDependencyEdge,
@@ -77,6 +79,19 @@ function getLabeledContainer(
           element.customData.terraformVisibilityKey.endsWith(
             `.${addressOrSuffix}`,
           ))),
+  );
+}
+
+/** Detached card title; AWS icon sub-shapes may reuse visibility keys without this role. */
+function getTerraformResourceTitleLabel(
+  elements: readonly ExcalidrawElement[],
+  nodePath: string,
+): ExcalidrawElement | undefined {
+  return elements.find(
+    (e) =>
+      e.type === "text" &&
+      e.customData?.terraformVisibilityRole === "resource" &&
+      e.customData?.nodePath === nodePath,
   );
 }
 
@@ -202,11 +217,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
       nodePath: "aws_s3_bucket.root",
       resourceType: "aws_s3_bucket",
     });
-    const labelEl = elements.find(
-      (e) =>
-        e.type === "text" &&
-        (e as { customData?: { nodePath?: string } }).customData?.nodePath ===
-          resourceRect?.customData?.nodePath,
+    const labelEl = getTerraformResourceTitleLabel(
+      elements,
+      String(resourceRect?.customData?.nodePath ?? ""),
     );
     expect((labelEl as { strokeColor?: string })?.strokeColor).toBe("#1e1e1e");
     expect((labelEl as { containerId?: string | null })?.containerId).toBe(
@@ -237,6 +250,55 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(
       Math.max(...frames.map((frame) => elements.indexOf(frame))),
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
+  });
+
+  it("pins AWS icon glyphs to resource card frame and group", async () => {
+    const nodes = {
+      "module.network.aws_vpc.main": minimalNode({
+        "module.network.aws_vpc.main": {
+          address: "module.network.aws_vpc.main",
+          type: "aws_vpc",
+        },
+      }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {
+          "module.network": {
+            path: "module.network",
+            modules: {},
+            resourceAddresses: ["module.network.aws_vpc.main"],
+          },
+        },
+        resourceAddresses: [],
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const vpcRect = getLabeledContainer(elements, "aws_vpc.main");
+    expect(vpcRect).toBeDefined();
+    expect(vpcRect!.frameId).toBeTruthy();
+
+    const label = getTerraformResourceTitleLabel(
+      elements,
+      String(vpcRect!.customData?.nodePath ?? ""),
+    );
+    expect(label).toBeDefined();
+
+    const glyphs = elements.filter(
+      (e) =>
+        (e as { customData?: { terraformAwsIconGlyph?: boolean } }).customData
+          ?.terraformAwsIconGlyph === true,
+    );
+    expect(glyphs.length).toBeGreaterThan(0);
+
+    for (const g of glyphs) {
+      expect(g.frameId).toBe(vpcRect!.frameId);
+      expect(g.groupIds.slice(0, vpcRect!.groupIds.length)).toEqual(
+        vpcRect!.groupIds,
+      );
+    }
+    expect(label!.groupIds).toEqual(vpcRect!.groupIds);
+    expect(glyphs[0]!.opacity).toBe(vpcRect!.opacity ?? 100);
   });
 
   it("emits data-flow lines when edges_data_flow is populated", async () => {
@@ -912,12 +974,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
         (e as { customData?: { terraformVisibilityKey?: string } }).customData
           ?.terraformVisibilityKey === address,
     );
-    const label = collapsed.find(
-      (e) =>
-        e.type === "text" &&
-        (e as { customData?: { terraformVisibilityKey?: string } }).customData
-          ?.terraformVisibilityKey === address,
-    );
+    const label = getTerraformResourceTitleLabel(collapsed, address);
 
     expect(rect?.isDeleted).toBe(false);
     expect(label?.isDeleted).toBe(false);

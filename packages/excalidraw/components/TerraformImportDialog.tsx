@@ -15,6 +15,8 @@ import { terraformPlanParsing } from "./terraformPlanParsing";
 
 import "./TerraformImportDialog.scss";
 
+import type { BinaryFileData } from "../types";
+
 type TerraformView = "module" | "semantic";
 
 const VIEW_OPTIONS: ReadonlyArray<{
@@ -37,7 +39,8 @@ const VIEW_OPTIONS: ReadonlyArray<{
 /** State file upload is off for now; set to `true` to re-enable. */
 const TERRAFORM_STATE_UPLOAD_ENABLED = false;
 
-const TerraformImportModal = ({
+/** Exported for tests; dialog shell is {@link TerraformImportDialog}. */
+export const TerraformImportModal = ({
   onCloseRequest,
 }: {
   onCloseRequest: () => void;
@@ -53,7 +56,25 @@ const TerraformImportModal = ({
   const [error, setError] = useState<string | null>(null);
 
   /** Applies an Excalidraw v2 scene payload (e.g. from GET …/excalidraw or local parse). */
-  const replaceEditorWithExcalidrawScene = (scene: { elements?: unknown }) => {
+  const replaceEditorWithExcalidrawScene = (scene: {
+    elements?: unknown;
+    files?: Record<string, BinaryFileData>;
+  }) => {
+    const files = scene.files;
+    if (files && typeof files === "object") {
+      const list = Object.values(files).filter(
+        (entry): entry is BinaryFileData =>
+          Boolean(
+            entry &&
+              typeof entry === "object" &&
+              typeof (entry as BinaryFileData).id === "string" &&
+              typeof (entry as BinaryFileData).dataURL === "string",
+          ),
+      );
+      if (list.length > 0) {
+        app.addFiles(list);
+      }
+    }
     const elements = restoreElements(
       scene.elements as readonly ExcalidrawElement[] | null | undefined,
       null,
