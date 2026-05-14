@@ -39,7 +39,8 @@ const VIEW_OPTIONS: ReadonlyArray<{
 /** State file upload is off for now; set to `true` to re-enable. */
 const TERRAFORM_STATE_UPLOAD_ENABLED = false;
 
-const TerraformImportModal = ({
+/** Exported for tests; dialog shell is {@link TerraformImportDialog}. */
+export const TerraformImportModal = ({
   onCloseRequest,
 }: {
   onCloseRequest: () => void;
