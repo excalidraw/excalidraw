@@ -6,6 +6,8 @@ import React, { useState } from "react";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import type { BinaryFileData } from "../types";
+
 import { restoreElements } from "../data/restore";
 
 import { Dialog } from "./Dialog";
@@ -53,7 +55,25 @@ const TerraformImportModal = ({
   const [error, setError] = useState<string | null>(null);
 
   /** Applies an Excalidraw v2 scene payload (e.g. from GET …/excalidraw or local parse). */
-  const replaceEditorWithExcalidrawScene = (scene: { elements?: unknown }) => {
+  const replaceEditorWithExcalidrawScene = (scene: {
+    elements?: unknown;
+    files?: Record<string, BinaryFileData>;
+  }) => {
+    const files = scene.files;
+    if (files && typeof files === "object") {
+      const list = Object.values(files).filter(
+        (entry): entry is BinaryFileData =>
+          Boolean(
+            entry &&
+              typeof entry === "object" &&
+              typeof (entry as BinaryFileData).id === "string" &&
+              typeof (entry as BinaryFileData).dataURL === "string",
+          ),
+      );
+      if (list.length > 0) {
+        app.addFiles(list);
+      }
+    }
     const elements = restoreElements(
       scene.elements as readonly ExcalidrawElement[] | null | undefined,
       null,

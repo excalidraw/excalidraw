@@ -7,17 +7,19 @@ import type {
 } from "@excalidraw/element/types";
 
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import { terraformVpceSgLayoutElementId } from "./terraformTopologySgLinks";
 
 import { tfComfortPx } from "./terraformLayoutComfort";
 
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
-import type {
-  TopologyPlacementZone,
-  TopologyRegionalPrimaryBucket,
-  TopologyRouteTableBottomPlacements,
-  TopologyVpcEndpointBucket,
+import {
+  routeTableMaxExtentBelowAnchorForRowPx,
+  type TopologyPlacementZone,
+  type TopologyRegionalPrimaryBucket,
+  type TopologyRouteTableBottomPlacements,
+  type TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 
 const px = tfComfortPx;
@@ -560,6 +562,204 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       ).toBeLessThanOrEqual(eps);
       expect(r.frameId).toBe(vpcEl.id);
     }
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("renders interface VPC endpoints with shared SG as primaryClusters, distinct layout keys, duplicate flags, glyphs, and scene files", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const vpcEndpointBuckets: TopologyVpcEndpointBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        addresses: [
+          'aws_vpc_endpoint.ep["a"]',
+          'aws_vpc_endpoint.ep["b"]',
+        ],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: { actions: ["no-op"], after: {} },
+          },
+        },
+      },
+      "aws_security_group.shared": {
+        resources: {
+          "aws_security_group.shared": {
+            address: "aws_security_group.shared",
+            mode: "managed",
+            type: "aws_security_group",
+            change: {
+              actions: ["no-op"],
+              after: {
+                id: "sg-sharedvpce",
+                vpc_id: "vpc-test",
+              },
+            },
+          },
+        },
+      },
+      'aws_vpc_endpoint.ep["a"]': {
+        resources: {
+          'aws_vpc_endpoint.ep["a"]': {
+            address: 'aws_vpc_endpoint.ep["a"]',
+            mode: "managed",
+            type: "aws_vpc_endpoint",
+            change: {
+              actions: ["no-op"],
+              after: {
+                vpc_id: "vpc-test",
+                subnet_ids: ["subnet-a"],
+                security_group_ids: ["sg-sharedvpce"],
+                service_name: "com.amazonaws.us-east-1.ec2",
+              },
+            },
+          },
+        },
+      },
+      'aws_vpc_endpoint.ep["b"]': {
+        resources: {
+          'aws_vpc_endpoint.ep["b"]': {
+            address: 'aws_vpc_endpoint.ep["b"]',
+            mode: "managed",
+            type: "aws_vpc_endpoint",
+            change: {
+              actions: ["no-op"],
+              after: {
+                vpc_id: "vpc-test",
+                subnet_ids: ["subnet-b"],
+                security_group_ids: ["sg-sharedvpce"],
+                service_name: "com.amazonaws.us-east-1.ec2",
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements, files } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      undefined,
+      vpcEndpointBuckets,
+    );
+
+    expect(files).toBeDefined();
+    expect(Object.keys(files ?? {}).length).toBeGreaterThan(0);
+
+    const egressForClusterEps = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpcEgressEndpoint" &&
+        ((e.customData as { nodePath?: string } | undefined)?.nodePath ===
+          'aws_vpc_endpoint.ep["a"]' ||
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            'aws_vpc_endpoint.ep["b"]'),
+    );
+    expect(egressForClusterEps.length).toBe(0);
+
+    const sgRects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+          "aws_security_group.shared",
+    );
+    expect(sgRects.length).toBe(2);
+    const visKeys = sgRects.map(
+      (e) =>
+        (e.customData as { terraformVisibilityKey?: string } | undefined)
+          ?.terraformVisibilityKey,
+    );
+    expect(new Set(visKeys).size).toBe(2);
+    expect(visKeys).toContain(
+      terraformVpceSgLayoutElementId(
+        'aws_vpc_endpoint.ep["a"]',
+        "aws_security_group.shared",
+      ),
+    );
+    expect(visKeys).toContain(
+      terraformVpceSgLayoutElementId(
+        'aws_vpc_endpoint.ep["b"]',
+        "aws_security_group.shared",
+      ),
+    );
+    for (const r of sgRects) {
+      expect(
+        (r.customData as { terraformSemanticLayoutDuplicate?: boolean })
+          ?.terraformSemanticLayoutDuplicate,
+      ).toBe(true);
+    }
+
+    const glyphs = elements.filter(
+      (e) =>
+        e.type === "image" &&
+        (e.customData as { terraformLayoutDuplicateGlyph?: boolean } | undefined)
+          ?.terraformLayoutDuplicateGlyph === true,
+    );
+    expect(glyphs.length).toBe(2);
+
+    const vpceClusterPaths = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "primaryCluster" &&
+        (e.customData as { terraformTopologyPath?: string[] } | undefined)
+          ?.terraformTopologyPath?.[3] === 'aws_vpc_endpoint.ep["a"]',
+    );
+    expect(vpceClusterPaths.length).toBeGreaterThanOrEqual(1);
 
     assertTopologyFramesContainChildren(elements);
   });
@@ -1500,9 +1700,14 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     )!;
     expect(vpc).toBeDefined();
     const vpcEl = vpc!;
-    const vpcBodyBottom =
-      vpcEl.y + (vpcEl.height ?? 0) - TOPOLOGY_EDGE_TILE_HALF_H;
-    /** Primary tier-0 center is pinned to `vpcY + vpcCellBodyH` (same as endpoint midline); `vpcBodyBottom` is frame-heuristic. */
+    const tableAddr = "module.vpc.aws_route_table.main";
+    const rtExtent = routeTableMaxExtentBelowAnchorForRowPx(
+      [tableAddr],
+      { [tableAddr]: [] },
+    );
+    const stackPx = rtExtent + 8;
+    const expectedPrimaryMidY =
+      vpcEl.y + vpcEl.height! - 2 * stackPx;
     const eps = 40;
     const rt = rtRects[0]!;
     const clusterFrame = elements.find((e) => e.id === rt.frameId);
@@ -1516,8 +1721,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ).toBe("primaryCluster");
     const primaryMidY = rt.y + (rt.height ?? 0) / 2;
     expect(
-      Math.abs(primaryMidY - vpcBodyBottom),
-      "route table tier-0 vertical center near VPC inner-body bottom (endpoint-style pin)",
+      Math.abs(primaryMidY - expectedPrimaryMidY),
+      "route table tier-0 center matches VPC-bottom anchor (inner body bottom minus stack)",
     ).toBeLessThanOrEqual(eps);
     expect(rt.frameId).toBe(clusterFrame!.id);
     expect(clusterFrame!.frameId).toBe(vpcEl.id);

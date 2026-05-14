@@ -561,6 +561,9 @@ export const terraformPlanParsing = async (
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: topoScene.elements,
+      ...(topoScene.files && Object.keys(topoScene.files).length > 0
+        ? { files: topoScene.files }
+        : {}),
       meta: {
         ...topoScene.meta,
         representedResourceCount: represented.size,

@@ -276,6 +276,22 @@
     font-size: 0.8125rem;
     line-height: 1.35;
     overflow-wrap: anywhere;
+
+    &--with-inline-icon {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
+
+  &__inline-icon-wrap {
+    flex-shrink: 0;
+    line-height: 0;
+    padding-top: 0.1rem;
+  }
+
+  &__inline-icon {
+    display: block;
   }
 
   &__config {
