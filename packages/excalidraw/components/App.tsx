@@ -4310,6 +4310,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  togglePersistentLaser = (force: boolean | null = null) => {
+    this.setState((prevState) => {
+      return {
+        isPersistentLaser: force ?? !prevState.isPersistentLaser,
+      };
+    });
+  };
+
   onHandToolToggle = () => {
     this.actionManager.executeAction(actionToggleHandTool);
   };

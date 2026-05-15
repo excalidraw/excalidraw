@@ -354,7 +354,7 @@ export interface AppState {
   // Pen handling
   penMode: boolean;
   penDetected: boolean;
-
+  isPersistentLaser?: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -823,6 +823,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
+  togglePersistentLaser: App["togglePersistentLaser"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
