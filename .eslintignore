@@ -9,3 +9,6 @@ packages/excalidraw/types
 examples/**/public
 dev-dist
 coverage
+**/.terraform/
+# Minified terraform plan fixture (single-line JSON; tests read as-is).
+packages/backend/terraform/allplanmodules.json

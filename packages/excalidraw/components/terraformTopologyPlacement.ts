@@ -75,11 +75,12 @@ function resourceNameFromSubnetValues(
 }
 
 /** Subnet id → display name from `aws_subnet` tag `Name` (or resource `name`). */
-export function buildTopologySubnetNameMap(plan?: unknown): Map<string, string> {
+export function buildTopologySubnetNameMap(
+  plan?: unknown,
+): Map<string, string> {
   const out = new Map<string, string>();
-  const changes = (
-    plan as { resource_changes?: ResourceChange[] } | undefined
-  )?.resource_changes;
+  const changes = (plan as { resource_changes?: ResourceChange[] } | undefined)
+    ?.resource_changes;
   if (!Array.isArray(changes)) {
     return out;
   }
@@ -104,7 +105,9 @@ export function topologySubnetTierFromSubnetId(
   subnetId: string,
   subnetNameById: ReadonlyMap<string, string>,
 ): TopologySubnetTier {
-  const label = `${subnetNameById.get(subnetId) ?? ""} ${subnetId}`.toLowerCase();
+  const label = `${
+    subnetNameById.get(subnetId) ?? ""
+  } ${subnetId}`.toLowerCase();
   if (/\bpublic\b/.test(label) || label.includes("-public-")) {
     return "public";
   }

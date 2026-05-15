@@ -166,11 +166,9 @@ describe("TerraformImportModal", () => {
     fireEvent.change(screen.getByLabelText(/state file/i), {
       target: {
         files: [
-          new File(
-            [JSON.stringify({ resources: [] })],
-            "state.json",
-            { type: "application/json" },
-          ),
+          new File([JSON.stringify({ resources: [] })], "state.json", {
+            type: "application/json",
+          }),
         ],
       },
     });
@@ -181,19 +179,21 @@ describe("TerraformImportModal", () => {
 
   it("enables semantic view radio when state file only is selected", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    expect(screen.getByRole("radio", { name: /semantic view/i })).toBeDisabled();
+    expect(
+      screen.getByRole("radio", { name: /semantic view/i }),
+    ).toBeDisabled();
     fireEvent.change(screen.getByLabelText(/state file/i), {
       target: {
         files: [
-          new File(
-            [JSON.stringify({ resources: [] })],
-            "state.json",
-            { type: "application/json" },
-          ),
+          new File([JSON.stringify({ resources: [] })], "state.json", {
+            type: "application/json",
+          }),
         ],
       },
     });
-    expect(screen.getByRole("radio", { name: /semantic view/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole("radio", { name: /semantic view/i }),
+    ).not.toBeDisabled();
   });
 
   it("calls terraformPlanParsing with state only and semantic view by default", async () => {
