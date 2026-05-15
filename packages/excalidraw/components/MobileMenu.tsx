@@ -14,6 +14,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 
 import { PenModeButton } from "./PenModeButton";
+import { PersistentLaserButton } from "./PersistentLaserButton";
 
 import type { ActionManager } from "../actions/manager";
 import type {
@@ -84,6 +85,14 @@ export const MobileMenu = ({
                 isMobile
                 penDetected={appState.penDetected}
               />
+              {appState.activeTool.type === "laser" && (
+                <PersistentLaserButton
+                  checked={!!appState.isPersistentLaser}
+                  onChange={() => app.togglePersistentLaser()}
+                  title={t("toolBar.persistentLaser")}
+                  isMobile
+                />
+              )}
               <DefaultSidebarTriggerTunnel.Out />
             </>
           ))}

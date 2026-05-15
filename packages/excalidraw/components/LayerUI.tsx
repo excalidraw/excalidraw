@@ -60,6 +60,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { PersistentLaserButton } from "./PersistentLaserButton";
 import { Toast } from "./Toast";
 
 import "./LayerUI.scss";
@@ -350,6 +351,13 @@ const LayerUI = ({
                               title={t("toolBar.penMode")}
                               penDetected={appState.penDetected}
                             />
+                            {appState.activeTool.type === "laser" && (
+                              <PersistentLaserButton
+                                checked={!!appState.isPersistentLaser}
+                                onChange={() => app.togglePersistentLaser()}
+                                title={t("toolBar.persistentLaser")}
+                              />
+                            )}
                             <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}
