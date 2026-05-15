@@ -128,4 +128,27 @@ describe("laser tool interactions", () => {
     expect(h.state.scrollY).toBe(initialScrollY);
     expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("");
   });
+
+  it("sends laser mode settings in pointer updates", async () => {
+    const onPointerUpdate = vi.fn();
+    await render(<Excalidraw onPointerUpdate={onPointerUpdate} />);
+
+    API.setAppState({
+      laserMode: "annotation",
+      laserThickness: 8,
+      laserNeon: false,
+    });
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    mouse.moveTo(140, 120);
+
+    expect(onPointerUpdate).toHaveBeenCalled();
+    const payload = onPointerUpdate.mock.calls.at(-1)?.[0];
+    expect(payload.pointer.tool).toBe("laser");
+    expect(payload.pointer.laserMode).toBe("annotation");
+    expect(payload.pointer.laserThickness).toBe(8);
+    expect(payload.pointer.laserNeon).toBe(false);
+  });
 });

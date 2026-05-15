@@ -1078,6 +1078,20 @@ export const ShapesSwitcher = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
+  const setLaserMode = (mode: AppState["laserMode"]) => {
+    app.setActiveTool({ type: "laser" });
+
+    if (app.state.laserMode === mode) {
+      return;
+    }
+
+    setAppState({ laserMode: mode });
+  };
+
+  const setLaserThickness = (value: number) => {
+    setAppState({ laserThickness: Math.max(1, Math.min(10, value)) });
+  };
+
   return (
     <>
       {getToolbarTools(app).map(
@@ -1232,15 +1246,68 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
+          <DropdownMenu.Sub>
+            <DropdownMenu.Sub.Trigger icon={laserPointerToolIcon}>
+              {t("toolBar.laser")}
+            </DropdownMenu.Sub.Trigger>
+            <DropdownMenu.Sub.Content>
+              <DropdownMenu.ItemCheckbox
+                checked={laserToolSelected && app.state.laserMode === "hold"}
+                onSelect={() => setLaserMode("hold")}
+                shortcut={KEYS.K.toLocaleUpperCase()}
+                data-testid="toolbar-laser"
+              >
+                Draw
+              </DropdownMenu.ItemCheckbox>
+              <DropdownMenu.ItemCheckbox
+                checked={
+                  laserToolSelected && app.state.laserMode === "annotation"
+                }
+                onSelect={() => setLaserMode("annotation")}
+              >
+                Active
+              </DropdownMenu.ItemCheckbox>
+              <DropdownMenu.ItemCheckbox
+                checked={laserToolSelected && app.state.laserMode === "pointer"}
+                onSelect={() => setLaserMode("pointer")}
+              >
+                Pointer
+              </DropdownMenu.ItemCheckbox>
+              <DropdownMenu.ItemCheckbox
+                checked={app.state.laserNeon}
+                onSelect={() => setAppState({ laserNeon: !app.state.laserNeon })}
+              >
+                Neon glow
+              </DropdownMenu.ItemCheckbox>
+              <DropdownMenu.ItemCustom
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                }}
+              >
+                <label
+                  htmlFor="laser-thickness-range"
+                  style={{ fontSize: 12, color: "var(--color-on-surface)" }}
+                >
+                  Thickness: {app.state.laserThickness}px
+                </label>
+                <input
+                  id="laser-thickness-range"
+                  type="range"
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={app.state.laserThickness}
+                  onChange={(event) => setLaserThickness(Number(event.target.value))}
+                />
+              </DropdownMenu.ItemCustom>
+            </DropdownMenu.Sub.Content>
+          </DropdownMenu.Sub>
           {isFullStylesPanel && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}

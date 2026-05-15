@@ -24,6 +24,9 @@ export interface Trail {
 export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
+  strokeWidth?: number;
+  filter?: (trail: AnimatedTrail) => string | null;
+  opacity?: (trail: AnimatedTrail) => number;
   animateTrail?: boolean;
 }
 
@@ -122,9 +125,51 @@ export class AnimatedTrail implements Trail {
     return this.currentTrail;
   }
 
+  hasAnyTrails() {
+    return !!this.currentTrail || this.pastTrails.length > 0;
+  }
+
+  getLatestPointTimestamp() {
+    let latest = 0;
+
+    const maybeSetLatest = (points: number[][]) => {
+      for (const point of points) {
+        if (point[2] > latest) {
+          latest = point[2];
+        }
+      }
+    };
+
+    if (this.currentTrail) {
+      maybeSetLatest(this.currentTrail.originalPoints as number[][]);
+    }
+
+    for (const trail of this.pastTrails) {
+      maybeSetLatest(trail.originalPoints as number[][]);
+    }
+
+    return latest > 0 ? latest : null;
+  }
+
   clearTrails() {
     this.pastTrails = [];
     this.currentTrail = undefined;
+    this.update();
+  }
+
+  refreshTrailTimestamps(now = performance.now()) {
+    if (this.currentTrail) {
+      for (const point of this.currentTrail.originalPoints) {
+        point[2] = now;
+      }
+    }
+
+    for (const trail of this.pastTrails) {
+      for (const point of trail.originalPoints) {
+        point[2] = now;
+      }
+    }
+
     this.update();
   }
 
@@ -165,15 +210,39 @@ export class AnimatedTrail implements Trail {
         "fill",
         (this.options.fill ?? (() => "black"))(this),
       );
-      this.trailElement.setAttribute(
-        "stroke",
-        (this.options.stroke ?? (() => "black"))(this),
-      );
     } else {
       this.trailElement.setAttribute(
         "fill",
         (this.options.fill ?? (() => "black"))(this),
       );
+    }
+
+    const stroke = this.options.stroke?.(this);
+    if (stroke) {
+      this.trailElement.setAttribute("stroke", stroke);
+      if (this.options.strokeWidth !== undefined) {
+        this.trailElement.setAttribute(
+          "stroke-width",
+          this.options.strokeWidth.toString(),
+        );
+      }
+    } else {
+      this.trailElement.removeAttribute("stroke");
+      this.trailElement.removeAttribute("stroke-width");
+    }
+
+    const filter = this.options.filter?.(this);
+    if (filter) {
+      this.trailElement.style.filter = filter;
+    } else {
+      this.trailElement.style.removeProperty("filter");
+    }
+
+    const opacity = this.options.opacity?.(this);
+    if (opacity !== undefined) {
+      this.trailElement.style.opacity = `${Math.max(0, Math.min(1, opacity))}`;
+    } else {
+      this.trailElement.style.removeProperty("opacity");
     }
   }
 
