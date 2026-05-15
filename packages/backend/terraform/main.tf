@@ -133,7 +133,7 @@ module "workload_writer_lambda" {
       effect    = "Allow"
       actions   = ["sqs:SendMessage"]
       resources = [module.application_job_queue.queue_arn]
-    }
+  }
     kms_s3_data = {
       effect = "Allow"
       actions = [
@@ -145,7 +145,7 @@ module "workload_writer_lambda" {
       ]
       resources = [module.application_data_bucket.kms_key_arn]
     }
-    kms_sqs = {
+  kms_sqs = {
       effect = "Allow"
       actions = [
         "kms:Decrypt",
