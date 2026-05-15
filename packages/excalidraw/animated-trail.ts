@@ -61,6 +61,16 @@ export class AnimatedTrail implements Trail {
     return !!this.currentTrail;
   }
 
+  get firstTrailStart(): number | null {
+    if (this.pastTrails.length > 0) {
+      return this.pastTrails[0].originalPoints[0][2];
+    }
+    if (this.currentTrail) {
+      return this.currentTrail.originalPoints[0][2];
+    }
+    return 0;
+  }
+
   hasLastPoint(x: number, y: number) {
     if (this.currentTrail) {
       const len = this.currentTrail.originalPoints.length;
