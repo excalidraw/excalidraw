@@ -393,18 +393,31 @@ export function extractDefaultAwsProviderAccountRegion(
   plan: TerraformPlanProviderContext | undefined,
 ): TerraformProviderAccountRegionHint | null {
   const pc = plan?.configuration?.provider_config?.aws;
-  if (!pc || typeof pc !== "object") {
-    return null;
+  if (pc && typeof pc === "object") {
+    const expressions = (pc as { expressions?: Record<string, unknown> })
+      .expressions;
+    if (!expressions || typeof expressions !== "object") {
+      return { account: null, region: null };
+    }
+    return {
+      account: resolveProviderAssumeRoleAccount(plan, expressions.assume_role),
+      region: resolveProviderRegionFromExpressions(plan, expressions.region),
+    };
   }
-  const expressions = (pc as { expressions?: Record<string, unknown> })
-    .expressions;
-  if (!expressions || typeof expressions !== "object") {
-    return { account: null, region: null };
+
+  /** Synthetic plans from tfstate inject `variables.aws_account_id` / `aws_region`. */
+  const accountRaw = plan?.variables?.aws_account_id?.value;
+  const regionRaw = plan?.variables?.aws_region?.value;
+  const account =
+    typeof accountRaw === "string" && /^\d{12}$/.test(accountRaw.trim())
+      ? accountRaw.trim()
+      : null;
+  const region =
+    typeof regionRaw === "string" && regionRaw.trim() ? regionRaw.trim() : null;
+  if (account || region) {
+    return { account, region };
   }
-  return {
-    account: resolveProviderAssumeRoleAccount(plan, expressions.assume_role),
-    region: resolveProviderRegionFromExpressions(plan, expressions.region),
-  };
+  return null;
 }
 
 /** Fill unknown-account / unknown-region from default `aws` provider (plan JSON only). */

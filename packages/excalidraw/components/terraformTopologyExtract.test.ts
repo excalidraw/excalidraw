@@ -94,6 +94,16 @@ describe("extractDefaultAwsProviderAccountRegion", () => {
       extractDefaultAwsProviderAccountRegion({ configuration: {} }),
     ).toBeNull();
   });
+
+  it("resolves account and region from synthetic plan variables", () => {
+    const hint = extractDefaultAwsProviderAccountRegion({
+      variables: {
+        aws_account_id: { value: "123456789012" },
+        aws_region: { value: "us-west-2" },
+      },
+    });
+    expect(hint).toEqual({ account: "123456789012", region: "us-west-2" });
+  });
 });
 
 describe("mergeWithDefaultAwsProviderAccountRegion", () => {

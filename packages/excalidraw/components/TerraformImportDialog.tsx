@@ -2,7 +2,7 @@
  * Modal to upload plan JSON + graph DOT (optional raw state), or raw Terraform state alone,
  * and replace the canvas with the locally generated Excalidraw scene.
  */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -95,13 +95,8 @@ export const TerraformImportModal = ({
   const hasPlanAndDot = Boolean(planFile && dotFile);
   const stateOnly = Boolean(stateFile && !planFile && !dotFile);
   const canImport = hasPlanAndDot || stateOnly;
-  const semanticViewDisabled = loading || !hasPlanAndDot;
-
-  useEffect(() => {
-    if (stateOnly && view === "semantic") {
-      setView("module");
-    }
-  }, [stateOnly, view]);
+  const canUseSemanticView = hasPlanAndDot || stateOnly;
+  const semanticViewDisabled = loading || !canUseSemanticView;
 
   const handleImport = async () => {
     if ((planFile && !dotFile) || (!planFile && dotFile)) {
@@ -121,7 +116,7 @@ export const TerraformImportModal = ({
         hasPlanAndDot ? dotFile : null,
         stateFile,
         {
-          semanticLayout: view === "semantic" && hasPlanAndDot,
+          semanticLayout: view === "semantic" && canUseSemanticView,
         },
       );
       const scene = await res.json();
@@ -153,8 +148,8 @@ export const TerraformImportModal = ({
           <p className="TerraformImportModal__instructionsLead">
             From the same Terraform or OpenTofu working directory you can import
             plan JSON + graph DOT together (semantic or module view), optionally
-            add raw state to enrich existing resources, or import state alone
-            for a module graph.
+            add raw state to enrich existing resources, or import state alone for
+            module or semantic (current infrastructure) views.
           </p>
           <ol className="TerraformImportModal__instructionsSteps">
             <li>
@@ -192,8 +187,9 @@ terraform state pull > state.json
           <p className="TerraformImportModal__instructionsFoot">
             Plan JSON must come from <code>terraform show -json</code> /{" "}
             <code>tofu show -json</code>; DOT from{" "}
-            <code>graph -type=plan</code>. State-only imports use module view
-            (ELK graph). Semantic topology requires plan + DOT.
+            <code>graph -type=plan</code>. State-only semantic view shows
+            deployed resources (no planned-change diffs). Plan-based semantic
+            view requires plan JSON + DOT.
           </p>
         </div>
       </details>
@@ -220,8 +216,8 @@ terraform state pull > state.json
           <label>
             State file (.tfstate / state pull JSON)
             <span className="TerraformImportModal__muted">
-              Optional with plan+dot to enrich nodes; or upload alone for a
-              state-only graph (raw state with a top-level{" "}
+              Optional with plan+dot to enrich nodes; or upload alone for
+              module or semantic views (raw state with a top-level{" "}
               <code>resources</code> array).
             </span>
             <input
@@ -259,9 +255,11 @@ terraform state pull > state.json
                     : ""
                 }`}
                 title={
-                  option.value === "semantic" && !hasPlanAndDot
-                    ? "Semantic view requires plan JSON and graph DOT files."
-                    : undefined
+                  option.value === "semantic" && !canUseSemanticView
+                    ? "Semantic view requires plan JSON + graph DOT, or a state file alone."
+                    : option.value === "semantic" && stateOnly
+                      ? "Shows current infrastructure from state (no planned changes)."
+                      : undefined
                 }
               >
                 <input

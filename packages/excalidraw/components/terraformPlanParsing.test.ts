@@ -23,6 +23,61 @@ const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
 const STATE_FIXTURE = path.join(FIXTURE_DIR, "terraform_allplanmodules.tfstate");
 const hasAllplanmodulesState = fs.existsSync(STATE_FIXTURE);
 
+/** Minimal state with VPC + subnet for state-only semantic topology smoke tests. */
+const MINIMAL_TFSTATE_SEMANTIC = JSON.stringify({
+  version: 4,
+  terraform_version: "1.0.0",
+  serial: 1,
+  lineage: "fixture-semantic",
+  outputs: {},
+  resources: [
+    {
+      mode: "data",
+      type: "aws_caller_identity",
+      name: "current",
+      instances: [{ attributes: { account_id: "123456789012" } }],
+    },
+    {
+      mode: "data",
+      type: "aws_region",
+      name: "current",
+      instances: [{ attributes: { name: "us-east-1" } }],
+    },
+    {
+      mode: "managed",
+      type: "aws_vpc",
+      name: "main",
+      provider: 'provider["registry.terraform.io/hashicorp/aws"]',
+      instances: [
+        {
+          attributes: {
+            id: "vpc-fixture",
+            owner_id: "123456789012",
+            cidr_block: "10.0.0.0/16",
+          },
+        },
+      ],
+    },
+    {
+      mode: "managed",
+      type: "aws_subnet",
+      name: "public",
+      provider: 'provider["registry.terraform.io/hashicorp/aws"]',
+      instances: [
+        {
+          attributes: {
+            id: "subnet-fixture",
+            vpc_id: "vpc-fixture",
+            availability_zone: "us-east-1a",
+            cidr_block: "10.0.1.0/24",
+            tags: { Name: "public-subnet", Tier: "public" },
+          },
+        },
+      ],
+    },
+  ],
+});
+
 /** Minimal raw Terraform state (`terraform state pull` shape) for state-only import tests. */
 const MINIMAL_TFSTATE = JSON.stringify({
   version: 4,
@@ -227,19 +282,46 @@ describe("terraformPlanParsing", () => {
     ).toBe(true);
   }, 60_000);
 
-  it("state-only with semanticLayout returns 400", async () => {
+  it("state-only with semanticLayout runs topology pipeline", async () => {
     const res = await terraformPlanParsing(
       null,
       null,
-      textFileLike(MINIMAL_TFSTATE),
+      textFileLike(MINIMAL_TFSTATE_SEMANTIC),
       {
         semanticLayout: true,
       },
     );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("topology");
+    expect(body.meta?.importSource).toBe("state-only");
+    expect(body.meta?.plannedChanges).toBe(false);
+    expect(body.elements.length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("state-only semantic returns 400 when no aws resources", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(
+        JSON.stringify({
+          version: 4,
+          resources: [
+            {
+              mode: "managed",
+              type: "random_id",
+              name: "x",
+              instances: [{ attributes: { id: "abc" } }],
+            },
+          ],
+        }),
+      ),
+      { semanticLayout: true },
+    );
     expect(res.ok).toBe(false);
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toMatch(/Semantic layout requires/i);
+    expect(body.error).toMatch(/Semantic layout requires AWS/i);
   });
 
   it("plan+dot with invalid state JSON shape returns 400", async () => {
@@ -258,6 +340,30 @@ describe("terraformPlanParsing", () => {
     const body = await res.json();
     expect(body.error).toMatch(/resources/i);
   });
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules state-only semantic import runs topology pipeline",
+    async () => {
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(stateText),
+        { semanticLayout: true },
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.layoutEngine).toBe("topology");
+      expect(body.meta?.importSource).toBe("state-only");
+      expect(body.meta?.plannedChanges).toBe(false);
+      expect(body.meta?.accountCount).toBeGreaterThan(0);
+      const frames = body.elements.filter((e: any) => e.type === "frame");
+      expect(frames.length).toBeGreaterThan(0);
+    },
+    120_000,
+  );
 
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only import runs ELK pipeline",
