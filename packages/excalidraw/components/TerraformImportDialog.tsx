@@ -148,8 +148,8 @@ export const TerraformImportModal = ({
           <p className="TerraformImportModal__instructionsLead">
             From the same Terraform or OpenTofu working directory you can import
             plan JSON + graph DOT together (semantic or module view), optionally
-            add raw state to enrich existing resources, or import state alone for
-            module or semantic (current infrastructure) views.
+            add raw state to enrich existing resources, or import state alone
+            for module or semantic (current infrastructure) views.
           </p>
           <ol className="TerraformImportModal__instructionsSteps">
             <li>
@@ -186,10 +186,10 @@ terraform state pull > state.json
           </ol>
           <p className="TerraformImportModal__instructionsFoot">
             Plan JSON must come from <code>terraform show -json</code> /{" "}
-            <code>tofu show -json</code>; DOT from{" "}
-            <code>graph -type=plan</code>. State-only semantic view shows
-            deployed resources (no planned-change diffs). Plan-based semantic
-            view requires plan JSON + DOT.
+            <code>tofu show -json</code>; DOT from <code>graph -type=plan</code>
+            . State-only semantic view shows deployed resources (no
+            planned-change diffs). Plan-based semantic view requires plan JSON +
+            DOT.
           </p>
         </div>
       </details>
@@ -216,8 +216,8 @@ terraform state pull > state.json
           <label>
             State file (.tfstate / state pull JSON)
             <span className="TerraformImportModal__muted">
-              Optional with plan+dot to enrich nodes; or upload alone for
-              module or semantic views (raw state with a top-level{" "}
+              Optional with plan+dot to enrich nodes; or upload alone for module
+              or semantic views (raw state with a top-level{" "}
               <code>resources</code> array).
             </span>
             <input
@@ -258,8 +258,8 @@ terraform state pull > state.json
                   option.value === "semantic" && !canUseSemanticView
                     ? "Semantic view requires plan JSON + graph DOT, or a state file alone."
                     : option.value === "semantic" && stateOnly
-                      ? "Shows current infrastructure from state (no planned changes)."
-                      : undefined
+                    ? "Shows current infrastructure from state (no planned changes)."
+                    : undefined
                 }
               >
                 <input

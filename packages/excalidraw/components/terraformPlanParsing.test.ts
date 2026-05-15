@@ -20,7 +20,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
 const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
 const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
-const STATE_FIXTURE = path.join(FIXTURE_DIR, "terraform_allplanmodules.tfstate");
+const STATE_FIXTURE = path.join(
+  FIXTURE_DIR,
+  "terraform_allplanmodules.tfstate",
+);
 const hasAllplanmodulesState = fs.existsSync(STATE_FIXTURE);
 
 function tierFromSubnetZoneName(
@@ -40,11 +43,16 @@ function tierFromSubnetZoneName(
 }
 
 function collectSubnetZoneFrames(elements: unknown[]) {
-  return (elements as Array<{
-    type?: string;
-    name?: string;
-    customData?: { terraformTopologyRole?: string; terraformSubnetIds?: string[] };
-  }>).filter(
+  return (
+    elements as Array<{
+      type?: string;
+      name?: string;
+      customData?: {
+        terraformTopologyRole?: string;
+        terraformSubnetIds?: string[];
+      };
+    }>
+  ).filter(
     (e) =>
       e.type === "frame" &&
       e.customData?.terraformTopologyRole === "subnetZone",

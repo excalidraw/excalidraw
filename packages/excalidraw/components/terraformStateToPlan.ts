@@ -98,14 +98,10 @@ export function inferProviderVariablesFromState(
     for (const instance of resource.instances || []) {
       const attrs = instance.attributes || {};
       if (resource.type === "aws_caller_identity") {
-        accountId =
-          stringField(attrs.account_id) ?? accountId;
+        accountId = stringField(attrs.account_id) ?? accountId;
       }
       if (resource.type === "aws_region") {
-        region =
-          stringField(attrs.name) ??
-          stringField(attrs.id) ??
-          region;
+        region = stringField(attrs.name) ?? stringField(attrs.id) ?? region;
       }
     }
   }
@@ -121,9 +117,9 @@ export function inferProviderVariablesFromState(
 }
 
 /** True when no managed `aws_*` resources exist for semantic topology. */
-export function isSyntheticPlanEmptyForSemantic(
-  plan: { resource_changes?: Array<{ mode?: string; type?: string }> },
-): boolean {
+export function isSyntheticPlanEmptyForSemantic(plan: {
+  resource_changes?: Array<{ mode?: string; type?: string; name?: string }>;
+}): boolean {
   const changes = plan.resource_changes || [];
   return !changes.some(
     (rc) =>
