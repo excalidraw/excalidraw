@@ -89,7 +89,7 @@ export const MobileMenu = ({
                 <PersistentLaserButton
                   checked={!!appState.isPersistentLaser}
                   onChange={() => app.togglePersistentLaser()}
-                  title="Persistent Laser"
+                  title={t("toolBar.persistentLaser")}
                   isMobile
                 />
               )}
