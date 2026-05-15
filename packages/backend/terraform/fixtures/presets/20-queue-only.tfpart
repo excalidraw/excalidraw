@@ -1,0 +1,22 @@
+module "application_data_bucket" {
+  source = "./modules/encrypted_s3_bucket"
+
+  bucket_name = "ts-test-lambda-data"
+
+  tags = local.workload_tags
+}
+
+module "application_job_queue" {
+  source = "./modules/encrypted_sqs_queue"
+
+  queue_name = "ts-test-lambda-queue"
+  dlq_name   = "ts-test-lambda-dlq"
+  redrive_policy = {
+    maxReceiveCount = 3
+  }
+
+  visible_messages_alarm_name = "ts-test-lambda-queue-messages"
+  dlq_messages_alarm_name     = "ts-test-lambda-dlq-messages"
+
+  tags = local.workload_tags
+}

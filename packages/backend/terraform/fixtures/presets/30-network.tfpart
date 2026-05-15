@@ -1,0 +1,35 @@
+module "application_data_bucket" {
+  source = "./modules/encrypted_s3_bucket"
+
+  bucket_name = "ts-test-lambda-data"
+
+  tags = local.workload_tags
+}
+
+module "application_job_queue" {
+  source = "./modules/encrypted_sqs_queue"
+
+  queue_name = "ts-test-lambda-queue"
+  dlq_name   = "ts-test-lambda-dlq"
+  redrive_policy = {
+    maxReceiveCount = 3
+  }
+
+  visible_messages_alarm_name = "ts-test-lambda-queue-messages"
+  dlq_messages_alarm_name     = "ts-test-lambda-dlq-messages"
+
+  tags = local.workload_tags
+}
+
+module "private_workload_network" {
+  source = "./modules/private_workload_network"
+
+  vpc_name             = "ts-test-lambda"
+  vpc_cidr             = local.workload_vpc_cidr
+  public_subnet_cidrs  = local.workload_public_subnet_cidrs
+  private_subnet_cidrs = local.workload_private_subnet_cidrs
+  intra_subnet_cidrs   = local.workload_intra_subnet_cidrs
+  single_nat_gateway   = var.single_nat_gateway
+
+  tags = local.workload_tags
+}
