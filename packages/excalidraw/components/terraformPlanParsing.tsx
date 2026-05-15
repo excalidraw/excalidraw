@@ -31,6 +31,10 @@ import {
   buildDataFlowEdges,
   buildNetworkingEdges,
 } from "./terraformDataFlowEdges";
+import {
+  buildSyntheticPlanFromTfstate,
+  isSyntheticPlanEmptyForSemantic,
+} from "./terraformStateToPlan";
 
 import type { Graph } from "@dagrejs/graphlib";
 
@@ -338,6 +342,7 @@ export const terraformPlanParsing = async (
   let plan: unknown;
   let dotText: string;
   let tfstateForMerge: unknown | null = null;
+  let importSource: "plan" | "state-only" = "plan";
 
   if (planFile && dotFile) {
     const [planText, dotT, stateText] = await Promise.all([
@@ -414,9 +419,10 @@ export const terraformPlanParsing = async (
         },
       );
     }
-    plan = { resource_changes: [] };
+    plan = buildSyntheticPlanFromTfstate(parsed);
     dotText = "digraph G {}\n";
     tfstateForMerge = parsed;
+    importSource = "state-only";
   } else {
     return new Response(
       JSON.stringify({
@@ -432,11 +438,17 @@ export const terraformPlanParsing = async (
 
   if (semanticLayout) {
     const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
-    if (!Array.isArray(rc) || rc.length === 0) {
+    if (
+      !Array.isArray(rc) ||
+      rc.length === 0 ||
+      isSyntheticPlanEmptyForSemantic(
+        plan as { resource_changes?: Array<{ mode?: string; type?: string }> },
+      )
+    ) {
       return new Response(
         JSON.stringify({
           error:
-            "Semantic layout requires plan JSON with resource_changes. Upload plan+dot or turn off semantic layout for state-only imports.",
+            "Semantic layout requires AWS resources in the plan or state file. Upload plan+dot or a state file with managed aws_* resources.",
         }),
         {
           status: 400,
@@ -590,6 +602,8 @@ export const terraformPlanParsing = async (
         : {}),
       meta: {
         ...topoScene.meta,
+        importSource,
+        plannedChanges: importSource !== "state-only",
         representedResourceCount: represented.size,
         omittedResourceCount: omittedSemanticResources.length,
       },
@@ -604,7 +618,11 @@ export const terraformPlanParsing = async (
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: elkScene.elements,
-      meta: elkScene.meta,
+      meta: {
+        ...elkScene.meta,
+        importSource,
+        plannedChanges: importSource !== "state-only",
+      },
     };
   }
 

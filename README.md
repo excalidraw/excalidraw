@@ -120,7 +120,7 @@ In the hosted app, open **Import Terraform** and choose one of:
 | --- | --- |
 | Plan + graph (semantic or module view) | Plan JSON + graph DOT together |
 | Plan + graph + state | Plan JSON + graph DOT + optional state (enriches existing resources) |
-| State only | Raw state JSON alone (module view / ELK graph) |
+| State only | Raw state JSON alone (semantic topology or module / ELK graph) |
 
 | File | Expected input |
 | --- | --- |
@@ -158,15 +158,15 @@ You should still treat Terraform plan JSON as sensitive. It can contain resource
 
 The import dialog supports two diagram modes:
 
-- **Semantic view**: emphasizes account, region, VPC, subnet, and infrastructure topology.
+- **Semantic view**: emphasizes account, region, VPC, subnet, and infrastructure topology. Works with plan JSON + graph DOT (planned changes) or state alone (current infrastructure snapshot).
 - **Module view**: frames the graph around Terraform module structure.
 
 Production/static builds open on a Terraform Canvas landing page with an embedded editor. Development mode opens the standard editor directly. In public mode, drawing, local persistence, load/save from disk, image export, and Terraform import remain available.
 
 ## Current limitations
 
-- Terraform plan JSON and graph DOT must be selected together when using plan-based import; semantic topology requires both files.
-- State-only import uses module view (ELK graph) and does not produce semantic VPC/subnet topology.
+- Terraform plan JSON and graph DOT must be selected together when using plan-based import.
+- State-only semantic view shows deployed resources only (no create/update/delete diffs from a plan).
 - The importer is strongest on AWS-shaped infrastructure today; other providers may render with generic cards or less semantic grouping.
 - Public mode intentionally hides collaboration, share-link creation, Firebase-backed share loading, Excalidraw+ promotion/cloud export controls, and backend export actions.
 - The special `/excalidraw-plus-export` route is preserved for the existing Excalidraw+ iframe export behavior.
