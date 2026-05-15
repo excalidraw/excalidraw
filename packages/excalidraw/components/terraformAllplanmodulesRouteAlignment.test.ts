@@ -208,6 +208,48 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
     ).toBeGreaterThan(0);
   }, 120_000);
 
+  it("merged private subnet zone hosts per-AZ route tables on the zone bottom", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const elements = body.elements as Array<{
+      id?: string;
+      type?: string;
+      name?: string;
+      customData?: Record<string, unknown>;
+    }>;
+
+    const privateZones = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZone" &&
+        tierFromZoneName(e.name ?? "") === "private",
+    );
+    expect(privateZones).toHaveLength(1);
+    const zid = privateZones[0]!.id;
+    expect(zid).toBeTruthy();
+    const inner = collectDescendants(elements, zid!);
+    const rts = inner.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZoneRouteTable",
+    );
+    expect(
+      rts.length,
+      "each per-AZ private route table should render on the merged private zone bottom",
+    ).toBeGreaterThanOrEqual(2);
+  }, 120_000);
+
   it("S3 gateway VPCE renders as vpcEgressEndpoint; interface VPCE primaryClusters do not overlap subnet zones in Y", async () => {
     const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
     const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");

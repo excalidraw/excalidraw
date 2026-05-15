@@ -23,6 +23,7 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   filterVpcEndpointBucketsRemovingZonePlacedAddresses,
+  mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
@@ -501,19 +502,22 @@ export const terraformPlanParsing = async (
       ...z,
       topologyZoneSource: "supplementary" as const,
     }));
-    const zones = mergeSupplementarySubnetZonesSharedRouteTable(
-      [...primaryZones, ...supplementaryZones].sort((a, b) => {
-        if (a.accountId !== b.accountId) {
-          return a.accountId.localeCompare(b.accountId);
-        }
-        if (a.region !== b.region) {
-          return a.region.localeCompare(b.region);
-        }
-        if (a.vpcId !== b.vpcId) {
-          return a.vpcId.localeCompare(b.vpcId);
-        }
-        return a.subnetSignature.localeCompare(b.subnetSignature);
-      }),
+    const zones = mergeSupplementarySubnetZonesByTier(
+      mergeSupplementarySubnetZonesSharedRouteTable(
+        [...primaryZones, ...supplementaryZones].sort((a, b) => {
+          if (a.accountId !== b.accountId) {
+            return a.accountId.localeCompare(b.accountId);
+          }
+          if (a.region !== b.region) {
+            return a.region.localeCompare(b.region);
+          }
+          if (a.vpcId !== b.vpcId) {
+            return a.vpcId.localeCompare(b.vpcId);
+          }
+          return a.subnetSignature.localeCompare(b.subnetSignature);
+        }),
+        semPlan,
+      ),
       semPlan,
     );
     const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
