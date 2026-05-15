@@ -20,6 +20,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
 const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
 const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
+const STATE_FIXTURE = path.join(FIXTURE_DIR, "terraform_allplanmodules.tfstate");
+const hasAllplanmodulesState = fs.existsSync(STATE_FIXTURE);
 
 /** Minimal raw Terraform state (`terraform state pull` shape) for state-only import tests. */
 const MINIMAL_TFSTATE = JSON.stringify({
@@ -240,6 +242,78 @@ describe("terraformPlanParsing", () => {
     expect(body.error).toMatch(/Semantic layout requires/i);
   });
 
+  it("plan+dot with invalid state JSON shape returns 400", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      textFileLike("{}"),
+      {},
+    );
+
+    expect(res.ok).toBe(false);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/resources/i);
+  });
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules state-only import runs ELK pipeline",
+    async () => {
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(stateText),
+        {},
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.type).toBe("excalidraw");
+      expect(body.meta?.layoutEngine).toBe("elk");
+      expect(body.elements.length).toBeGreaterThan(0);
+    },
+    60_000,
+  );
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules plan+dot+state merge runs without throwing",
+    async () => {
+      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const planOnlyRes = await terraformPlanParsing(
+        textFileLike(planText),
+        textFileLike(dotText),
+        null,
+        {},
+      );
+      expect(planOnlyRes.ok).toBe(true);
+      const planOnlyBody = await planOnlyRes.json();
+
+      const res = await terraformPlanParsing(
+        textFileLike(planText),
+        textFileLike(dotText),
+        textFileLike(stateText),
+        {},
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.type).toBe("excalidraw");
+      expect(body.elements.length).toBeGreaterThan(0);
+      expect(body.meta?.vertexCount).toBeGreaterThanOrEqual(
+        planOnlyBody.meta?.vertexCount ?? 0,
+      );
+    },
+    120_000,
+  );
+
   it("runs full local pipeline on allplanmodules fixtures without throwing", async () => {
     const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
     const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
@@ -353,6 +427,10 @@ describe("terraformPlanParsing", () => {
     expect(omittedTypes).toEqual(
       [
         ...Array(6).fill("aws_route_table_association"),
+        "aws_sqs_queue_policy",
+        "aws_sqs_queue_policy",
+        "aws_sqs_queue_redrive_allow_policy",
+        "aws_sqs_queue_redrive_policy",
         "terraform_data",
         "terraform_data",
         "terraform_data",
