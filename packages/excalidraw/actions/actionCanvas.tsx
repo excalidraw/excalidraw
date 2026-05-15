@@ -448,16 +448,70 @@ export const actionZoomToFit = register({
   icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState, _, app) =>
-    zoomToFit({
-      targetElements: elements,
+  perform: (elements, appState, _, app) => {
+    const nonDeletedElements = getNonDeletedElements(elements);
+    if (nonDeletedElements.length === 0) {
+      return { appState, captureUpdate: CaptureUpdateAction.NEVER };
+    }
+
+    const canvasOffsets = app.getEditorUIOffsets();
+    const commonBounds = getCommonBounds(nonDeletedElements);
+    const [x1, y1, x2, y2] = commonBounds;
+    const centerX = (x1 + x2) / 2;
+    const centerY = (y1 + y2) / 2;
+
+    const canvasOffsetLeft = canvasOffsets?.left ?? 0;
+    const canvasOffsetTop = canvasOffsets?.top ?? 0;
+    const canvasOffsetRight = canvasOffsets?.right ?? 0;
+    const canvasOffsetBottom = canvasOffsets?.bottom ?? 0;
+
+    const effectiveCanvasWidth =
+      appState.width - canvasOffsetLeft - canvasOffsetRight;
+    const effectiveCanvasHeight =
+      appState.height - canvasOffsetTop - canvasOffsetBottom;
+
+    const commonBoundsWidth = x2 - x1;
+    const commonBoundsHeight = y2 - y1;
+
+    const rawZoom = Math.min(
+      effectiveCanvasWidth / commonBoundsWidth,
+      effectiveCanvasHeight / commonBoundsHeight,
+    );
+    const newZoomValue = getNormalizedZoom(
+      clamp(roundToStep(rawZoom, ZOOM_STEP, "floor"), MIN_ZOOM, MAX_ZOOM),
+    );
+
+    const centerScroll = centerScrollOn({
+      scenePoint: { x: centerX, y: centerY },
+      viewportDimensions: {
+        width: appState.width,
+        height: appState.height,
+      },
+      offsets: canvasOffsets,
+      zoom: { value: newZoomValue },
+    });
+
+    return {
       appState: {
         ...appState,
+        scrollX: centerScroll.scrollX,
+        scrollY: centerScroll.scrollY,
+        zoom: { value: newZoomValue },
         userToFollow: null,
       },
-      fitToViewport: false,
-      canvasOffsets: app.getEditorUIOffsets(),
-    }),
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      className="zoom-to-fit-button zoom-button"
+      icon={zoomAreaIcon}
+      title={`${t("helpDialog.zoomToFit")} — ${getShortcutKey("Shift+1")}`}
+      aria-label={t("helpDialog.zoomToFit")}
+      onClick={() => updateData(null)}
+    />
+  ),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
