@@ -362,6 +362,17 @@ export const terraformPlanParsing = async (
         const parsed = JSON.parse(stateText) as { resources?: unknown };
         if (parsed && Array.isArray(parsed.resources)) {
           tfstateForMerge = parsed;
+        } else {
+          return new Response(
+            JSON.stringify({
+              error:
+                'State file must be raw Terraform state JSON (top-level "resources" array), e.g. terraform state pull.',
+            }),
+            {
+              status: 400,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
         }
       } catch {
         return new Response(

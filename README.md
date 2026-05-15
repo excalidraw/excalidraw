@@ -100,16 +100,35 @@ terraform graph -type=plan > graph.dot
 tofu graph -type=plan > graph.dot
 ```
 
-### 3. Import both files
+### 3. (Optional) Export raw state
 
-In the hosted app, open **Import Terraform** and choose:
+```bash
+# Terraform
+terraform state pull > state.json
+
+# OpenTofu
+tofu state pull > state.json
+```
+
+You can also use a local `.tfstate` file. The importer expects raw state JSON with a top-level `resources` array (same shape as `terraform state pull`).
+
+### 4. Import files
+
+In the hosted app, open **Import Terraform** and choose one of:
+
+| Mode | Files |
+| --- | --- |
+| Plan + graph (semantic or module view) | Plan JSON + graph DOT together |
+| Plan + graph + state | Plan JSON + graph DOT + optional state (enriches existing resources) |
+| State only | Raw state JSON alone (module view / ELK graph) |
 
 | File | Expected input |
 | --- | --- |
 | Plan file | JSON from `terraform show -json <planfile>` or `tofu show -json <planfile>` |
 | Graph file | DOT from `terraform graph -type=plan` or `tofu graph -type=plan` |
+| State file | Raw state from `terraform state pull` or a `.tfstate` file |
 
-Try the included fixtures if you want a known-good pair: [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot).
+Try the included fixtures if you want a known-good pair: [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot). For state-only or plan+state tests locally, generate `terraform_allplanmodules.tfstate` in that directory (gitignored).
 
 ## What you get on the canvas
 
@@ -146,9 +165,9 @@ Production/static builds open on a Terraform Canvas landing page with an embedde
 
 ## Current limitations
 
-- Terraform plan JSON and graph DOT must be selected together.
+- Terraform plan JSON and graph DOT must be selected together when using plan-based import; semantic topology requires both files.
+- State-only import uses module view (ELK graph) and does not produce semantic VPC/subnet topology.
 - The importer is strongest on AWS-shaped infrastructure today; other providers may render with generic cards or less semantic grouping.
-- The parsing layer can merge optional raw `terraform.tfstate`, but the state upload control is currently disabled in the import dialog (`TERRAFORM_STATE_UPLOAD_ENABLED` in [`TerraformImportDialog.tsx`](./packages/excalidraw/components/TerraformImportDialog.tsx)).
 - Public mode intentionally hides collaboration, share-link creation, Firebase-backed share loading, Excalidraw+ promotion/cloud export controls, and backend export actions.
 - The special `/excalidraw-plus-export` route is preserved for the existing Excalidraw+ iframe export behavior.
 
