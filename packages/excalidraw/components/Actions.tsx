@@ -134,6 +134,18 @@ export const canChangeBackgroundColor = (
   );
 };
 
+const shouldShowOpacity = (appState: UIAppState) => {
+  return appState.activeTool.type !== "laser";
+};
+
+const shouldShowLayers = (appState: UIAppState) => {
+  return appState.activeTool.type !== "laser";
+};
+
+const shouldShowShapeProperties = (appState: UIAppState) => {
+  return appState.activeTool.type !== "laser";
+};
+
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -189,6 +201,10 @@ export const SelectedShapeActions = ({
   return (
     <div className="selected-shape-actions">
       <div>
+        {appState.activeTool.type === "laser" &&
+          renderAction("changeLaserColor")}
+      </div>
+      <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
@@ -241,17 +257,19 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
-      {renderAction("changeOpacity")}
+      {shouldShowOpacity(appState) && renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
+      {shouldShowLayers(appState) && (
+        <fieldset>
+          <legend>{t("labels.layers")}</legend>
+          <div className="buttonList">
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </div>
+        </fieldset>
+      )}
 
       {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
@@ -341,7 +359,6 @@ const CombinedShapeProperties = ({
     (appState.activeTool.type !== "selection" &&
       appState.activeTool.type !== "eraser" &&
       appState.activeTool.type !== "hand" &&
-      appState.activeTool.type !== "laser" &&
       appState.activeTool.type !== "lasso");
   const isOpen = appState.openPopup === "compactStrokeStyles";
 
@@ -408,7 +425,7 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
-              {renderAction("changeOpacity")}
+              {shouldShowOpacity(appState) && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
         )}
@@ -826,13 +843,22 @@ export const CompactShapeActions = ({
         </div>
       )}
 
-      <CombinedShapeProperties
-        appState={appState}
-        renderAction={renderAction}
-        setAppState={setAppState}
-        targetElements={targetElements}
-        container={container}
-      />
+      {/* Laser Color */}
+      {appState.activeTool.type === "laser" && (
+        <div className="compact-action-item">
+          {renderAction("changeLaserColor")}
+        </div>
+      )}
+
+      {shouldShowShapeProperties(appState) && (
+        <CombinedShapeProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          container={container}
+        />
+      )}
 
       <CombinedArrowProperties
         appState={appState}
@@ -962,13 +988,20 @@ export const MobileShapeActions = ({
             {renderAction("changeBackgroundColor")}
           </div>
         )}
-        <CombinedShapeProperties
-          appState={appState}
-          renderAction={renderAction}
-          setAppState={setAppState}
-          targetElements={targetElements}
-          container={container}
-        />
+        {appState.activeTool.type === "laser" && (
+          <div className="compact-action-item">
+            {renderAction("changeLaserColor")}
+          </div>
+        )}
+        {shouldShowShapeProperties(appState) && (
+          <CombinedShapeProperties
+            appState={appState}
+            renderAction={renderAction}
+            setAppState={setAppState}
+            targetElements={targetElements}
+            container={container}
+          />
+        )}
         {/* Combined Arrow Properties */}
         <CombinedArrowProperties
           appState={appState}

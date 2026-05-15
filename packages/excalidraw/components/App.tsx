@@ -12920,6 +12920,9 @@ class App extends React.Component<AppProps, AppState> {
       x: sceneX,
       y: sceneY,
       tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+      ...(this.state.activeTool.type === "laser"
+        ? { laserColor: this.state.currentLaserColor }
+        : null),
     };
 
     this.props.onPointerUpdate?.({
