@@ -12,6 +12,7 @@ import {
   extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
+  mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
   natZonePlacementsKey,
 } from "./terraformTopologyPlacement";
@@ -468,6 +469,221 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
     expect(merged).toHaveLength(1);
     expect(merged[0]!.subnetSignature).toBe("subnet-a|subnet-b");
     expect(merged[0]!.mergedSupplementaryComposite).toBe(true);
+  });
+});
+
+describe("mergeSupplementarySubnetZonesByTier", () => {
+  it("merges two supplementary private zones with different route tables", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.private_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-priv-a",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-private-us-east-1a" },
+            },
+          },
+        },
+        {
+          address: "aws_subnet.private_b",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-priv-b",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-private-us-east-1b" },
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.a",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              subnet_id: "subnet-priv-a",
+              route_table_id: "rtb-priv-a",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.b",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              subnet_id: "subnet-priv-b",
+              route_table_id: "rtb-priv-b",
+            },
+          },
+        },
+      ],
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-priv-a",
+        subnetIds: ["subnet-priv-a"],
+        addresses: ["aws_subnet.private_a"],
+        topologyZoneSource: "supplementary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-priv-b",
+        subnetIds: ["subnet-priv-b"],
+        addresses: ["aws_subnet.private_b"],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+    const afterRt = mergeSupplementarySubnetZonesSharedRouteTable(
+      zones,
+      plan as never,
+    );
+    expect(afterRt).toHaveLength(2);
+    const merged = mergeSupplementarySubnetZonesByTier(afterRt, plan as never);
+    expect(merged).toHaveLength(1);
+    expect(merged[0]!.subnetSignature).toBe("subnet-priv-a|subnet-priv-b");
+    expect(merged[0]!.mergedSupplementaryByTier).toBe(true);
+  });
+
+  it("does not merge supplementary zones of different tiers", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.private",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-priv",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-private-a" },
+            },
+          },
+        },
+        {
+          address: "aws_subnet.intra",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-intra",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-intra-a" },
+            },
+          },
+        },
+      ],
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-priv",
+        subnetIds: ["subnet-priv"],
+        addresses: ["aws_subnet.private"],
+        topologyZoneSource: "supplementary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-intra",
+        subnetIds: ["subnet-intra"],
+        addresses: ["aws_subnet.intra"],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+    const merged = mergeSupplementarySubnetZonesByTier(zones, plan as never);
+    expect(merged).toHaveLength(2);
+  });
+
+  it("does not merge other-tier or non-subnet-only supplementary zones", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.misc_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-misc-a",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-db-a" },
+            },
+          },
+        },
+        {
+          address: "aws_subnet.misc_b",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["read"],
+            after: {
+              id: "subnet-misc-b",
+              vpc_id: "vpc-1",
+              region: "us-east-1",
+              tags: { Name: "app-db-b" },
+            },
+          },
+        },
+      ],
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-misc-a",
+        subnetIds: ["subnet-misc-a"],
+        addresses: ["aws_subnet.misc_a"],
+        topologyZoneSource: "supplementary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-1",
+        subnetSignature: "subnet-misc-b",
+        subnetIds: ["subnet-misc-b"],
+        addresses: ["aws_subnet.misc_b", "aws_lambda_function.x"],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+    const merged = mergeSupplementarySubnetZonesByTier(zones, plan as never);
+    expect(merged).toHaveLength(2);
   });
 });
 

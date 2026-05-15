@@ -41,7 +41,103 @@ export type TopologyPlacementZone = {
   topologyZoneSource?: TopologyZoneSource;
   /** Supplementary-only zones merged because subnets share one route table. */
   mergedSupplementaryComposite?: boolean;
+  /** Supplementary-only zones merged by subnet tier within the same VPC. */
+  mergedSupplementaryByTier?: boolean;
 };
+
+export type TopologySubnetTier =
+  | "vpcOnly"
+  | "public"
+  | "intra"
+  | "private"
+  | "other";
+
+export const SUBNET_TIER_ORDER: Record<TopologySubnetTier, number> = {
+  vpcOnly: 0,
+  public: 1,
+  intra: 2,
+  private: 3,
+  other: 4,
+};
+
+function resourceNameFromSubnetValues(
+  values: Record<string, unknown>,
+): string | null {
+  const tags = values.tags;
+  if (tags && typeof tags === "object" && !Array.isArray(tags)) {
+    const name = (tags as Record<string, unknown>).Name;
+    if (typeof name === "string" && name.trim()) {
+      return name.trim();
+    }
+  }
+  const name = values.name;
+  return typeof name === "string" && name.trim() ? name.trim() : null;
+}
+
+/** Subnet id → display name from `aws_subnet` tag `Name` (or resource `name`). */
+export function buildTopologySubnetNameMap(plan?: unknown): Map<string, string> {
+  const out = new Map<string, string>();
+  const changes = (
+    plan as { resource_changes?: ResourceChange[] } | undefined
+  )?.resource_changes;
+  if (!Array.isArray(changes)) {
+    return out;
+  }
+  for (const rc of changes) {
+    if (rc.type !== "aws_subnet") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const id = typeof values.id === "string" ? values.id : null;
+    const name = resourceNameFromSubnetValues(values);
+    if (id && name) {
+      out.set(id, name);
+    }
+  }
+  return out;
+}
+
+export function topologySubnetTierFromSubnetId(
+  subnetId: string,
+  subnetNameById: ReadonlyMap<string, string>,
+): TopologySubnetTier {
+  const label = `${subnetNameById.get(subnetId) ?? ""} ${subnetId}`.toLowerCase();
+  if (/\bpublic\b/.test(label) || label.includes("-public-")) {
+    return "public";
+  }
+  if (/\bintra\b/.test(label) || label.includes("-intra-")) {
+    return "intra";
+  }
+  if (/\bprivate\b/.test(label) || label.includes("-private-")) {
+    return "private";
+  }
+  return "other";
+}
+
+export function topologySubnetTierFromZone(
+  z: TopologyPlacementZone,
+  subnetNameById: ReadonlyMap<string, string>,
+): TopologySubnetTier {
+  if (z.subnetIds.length === 0) {
+    return "vpcOnly";
+  }
+  const labels = z.subnetIds
+    .map((sid) => `${subnetNameById.get(sid) ?? ""} ${sid}`.toLowerCase())
+    .join(" ");
+  if (/\bpublic\b/.test(labels) || labels.includes("-public-")) {
+    return "public";
+  }
+  if (/\bintra\b/.test(labels) || labels.includes("-intra-")) {
+    return "intra";
+  }
+  if (/\bprivate\b/.test(labels) || labels.includes("-private-")) {
+    return "private";
+  }
+  return "other";
+}
 
 /** Primary resources with resolved account/region but no VPC (S3, SQS, …). */
 export type TopologyRegionalPrimaryBucket = {
@@ -1689,6 +1785,84 @@ export function mergeSupplementarySubnetZonesSharedRouteTable(
         mergedSupplementaryComposite: true,
       });
     }
+  }
+
+  return [...primary, ...mergedSupp, ...passthroughSupp].sort(
+    sortPlacementZones,
+  );
+}
+
+/**
+ * Merge supplementary `aws_subnet`-only zones in the same VPC that share a subnet tier
+ * (public / intra / private), including when per-AZ route tables differ.
+ */
+export function mergeSupplementarySubnetZonesByTier(
+  zones: readonly TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyPlacementZone[] {
+  const subnetNameById = buildTopologySubnetNameMap(plan);
+  const primary = zones.filter((z) => z.topologyZoneSource !== "supplementary");
+  const supplementary = zones.filter(
+    (z) => z.topologyZoneSource === "supplementary",
+  );
+
+  const tierEligible: TopologyPlacementZone[] = [];
+  const passthroughSupp: TopologyPlacementZone[] = [];
+
+  for (const z of supplementary) {
+    if (!zoneAddressesAreAllAwsSubnet(z, plan)) {
+      passthroughSupp.push(z);
+      continue;
+    }
+    const tier = topologySubnetTierFromZone(z, subnetNameById);
+    if (tier === "other" || tier === "vpcOnly") {
+      passthroughSupp.push(z);
+      continue;
+    }
+    tierEligible.push(z);
+  }
+
+  const byVpcTier = new Map<string, TopologyPlacementZone[]>();
+  for (const z of tierEligible) {
+    const tier = topologySubnetTierFromZone(z, subnetNameById);
+    const key = `${z.accountId}\0${z.region}\0${z.vpcId}\0${tier}`;
+    if (!byVpcTier.has(key)) {
+      byVpcTier.set(key, []);
+    }
+    byVpcTier.get(key)!.push(z);
+  }
+
+  const mergedSupp: TopologyPlacementZone[] = [];
+  for (const [, group] of byVpcTier) {
+    if (group.length < 2) {
+      mergedSupp.push(...group);
+      continue;
+    }
+    const subnets = new Set<string>();
+    const addrs = new Set<string>();
+    for (const zz of group) {
+      for (const sid of zz.subnetIds) {
+        subnets.add(sid);
+      }
+      for (const a of zz.addresses) {
+        addrs.add(a);
+      }
+    }
+    const subnetIds = [...subnets].sort();
+    const z0 = group[0]!;
+    mergedSupp.push({
+      accountId: z0.accountId,
+      region: z0.region,
+      vpcId: z0.vpcId,
+      subnetSignature: subnetIds.join("|"),
+      subnetIds,
+      addresses: [...addrs].sort(),
+      topologyZoneSource: "supplementary",
+      mergedSupplementaryComposite: true,
+      mergedSupplementaryByTier: true,
+    });
   }
 
   return [...primary, ...mergedSupp, ...passthroughSupp].sort(
