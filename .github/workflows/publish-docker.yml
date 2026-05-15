@@ -26,5 +26,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: excalidraw/excalidraw:latest
+          tags: |
+          excalidraw/excalidraw:latest
+          excalidraw/excalidraw:${{ github.sha }}
+          excalidraw/excalidraw:${{ github.run_id }}
+          excalidraw/excalidraw:$(date +%Y%m%d-%H%M%S)
           platforms: linux/amd64, linux/arm64, linux/arm/v7
