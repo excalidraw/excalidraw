@@ -50,10 +50,13 @@ import {
 
 import {
   buildRouteTableZoneSizingMapForVpc,
+  buildTopologySubnetNameMap,
   computeVpcRouteTableFanOutAddressesForVpc,
   routeTableCompositeSlotWidthPx,
   routeTableMaxExtentBelowAnchorForRowPx,
   subnetSetForRouteTableAddress,
+  SUBNET_TIER_ORDER,
+  topologySubnetTierFromZone,
   topologyZoneMapKey,
   vpcBottomRouteTablesRowSizing,
   type InterfaceVpcEndpointZonePlacement,
@@ -61,6 +64,7 @@ import {
   type RouteTableBottomVpcPlacement,
   type RouteTableBottomZonePlacement,
   type RouteTableZoneBottomSizing,
+  type TopologySubnetTier,
 } from "./terraformTopologyPlacement";
 
 import {
@@ -639,38 +643,6 @@ function zonesForVpc(
   );
 }
 
-type TopologySubnetTier = "vpcOnly" | "public" | "intra" | "private" | "other";
-
-const SUBNET_TIER_ORDER: Record<TopologySubnetTier, number> = {
-  vpcOnly: 0,
-  public: 1,
-  intra: 2,
-  private: 3,
-  other: 4,
-};
-
-function topologySubnetTierFromZone(
-  z: TopologyPlacementZone,
-  subnetNameById: ReadonlyMap<string, string>,
-): TopologySubnetTier {
-  if (z.subnetIds.length === 0) {
-    return "vpcOnly";
-  }
-  const labels = z.subnetIds
-    .map((sid) => `${subnetNameById.get(sid) ?? ""} ${sid}`.toLowerCase())
-    .join(" ");
-  if (/\bpublic\b/.test(labels) || labels.includes("-public-")) {
-    return "public";
-  }
-  if (/\bintra\b/.test(labels) || labels.includes("-intra-")) {
-    return "intra";
-  }
-  if (/\bprivate\b/.test(labels) || labels.includes("-private-")) {
-    return "private";
-  }
-  return "other";
-}
-
 function compareTopologyZonesByTier(
   subnetNameById: ReadonlyMap<string, string>,
 ): (a: TopologyPlacementZone, b: TopologyPlacementZone) => number {
@@ -953,33 +925,6 @@ function buildTopologyVpcNameMap(plan?: unknown): Map<string, string> {
   }
   for (const rc of changes) {
     if (rc.type !== "aws_vpc") {
-      continue;
-    }
-    const values = topologyPlanValues(rc);
-    if (!values) {
-      continue;
-    }
-    const id = typeof values.id === "string" ? values.id : null;
-    const name = resourceNameFromValues(values);
-    if (id && name) {
-      out.set(id, name);
-    }
-  }
-  return out;
-}
-
-export function buildTopologySubnetNameMap(
-  plan?: unknown,
-): Map<string, string> {
-  const out = new Map<string, string>();
-  const changes = (
-    plan as { resource_changes?: TopologyPlanResourceChange[] } | undefined
-  )?.resource_changes;
-  if (!Array.isArray(changes)) {
-    return out;
-  }
-  for (const rc of changes) {
-    if (rc.type !== "aws_subnet") {
       continue;
     }
     const values = topologyPlanValues(rc);

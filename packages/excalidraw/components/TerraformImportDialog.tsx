@@ -36,9 +36,6 @@ const VIEW_OPTIONS: ReadonlyArray<{
   },
 ];
 
-/** State file upload is off for now; set to `true` to re-enable. */
-const TERRAFORM_STATE_UPLOAD_ENABLED = false;
-
 /** Exported for tests; dialog shell is {@link TerraformImportDialog}. */
 export const TerraformImportModal = ({
   onCloseRequest,
@@ -95,19 +92,16 @@ export const TerraformImportModal = ({
     onCloseRequest();
   };
 
-  const effectiveStateFile = TERRAFORM_STATE_UPLOAD_ENABLED ? stateFile : null;
-
   const hasPlanAndDot = Boolean(planFile && dotFile);
-  const stateOnly = Boolean(effectiveStateFile && !planFile && !dotFile);
+  const stateOnly = Boolean(stateFile && !planFile && !dotFile);
   const canImport = hasPlanAndDot || stateOnly;
-  const semanticViewDisabled = loading || !hasPlanAndDot;
+  const canUseSemanticView = hasPlanAndDot || stateOnly;
+  const semanticViewDisabled = loading || !canUseSemanticView;
 
   const handleImport = async () => {
     if ((planFile && !dotFile) || (!planFile && dotFile)) {
       setError(
-        TERRAFORM_STATE_UPLOAD_ENABLED
-          ? "Plan JSON and graph DOT must be selected together, or clear both and upload a raw Terraform state file alone."
-          : "Plan JSON and graph DOT must be selected together.",
+        "Plan JSON and graph DOT must be selected together, or clear both and upload a raw Terraform state file alone.",
       );
       return;
     }
@@ -120,9 +114,9 @@ export const TerraformImportModal = ({
       const res = await terraformPlanParsing(
         hasPlanAndDot ? planFile : null,
         hasPlanAndDot ? dotFile : null,
-        effectiveStateFile,
+        stateFile,
         {
-          semanticLayout: view === "semantic" && hasPlanAndDot,
+          semanticLayout: view === "semantic" && canUseSemanticView,
         },
       );
       const scene = await res.json();
@@ -148,17 +142,18 @@ export const TerraformImportModal = ({
 
       <details className="TerraformImportModal__instructions">
         <summary className="TerraformImportModal__instructionsSummary">
-          How to generate plan.json and graph.dot
+          How to generate import files
         </summary>
         <div className="TerraformImportModal__instructionsBody">
           <p className="TerraformImportModal__instructionsLead">
-            From the same Terraform or OpenTofu working directory, create a
-            binary plan, export JSON from that plan, then export the plan-type
-            dependency graph. Import both files together below.
+            From the same Terraform or OpenTofu working directory you can import
+            plan JSON + graph DOT together (semantic or module view), optionally
+            add raw state to enrich existing resources, or import state alone
+            for module or semantic (current infrastructure) views.
           </p>
           <ol className="TerraformImportModal__instructionsSteps">
             <li>
-              <strong>Plan JSON</strong>
+              <strong>Plan JSON</strong> (required with graph DOT)
               <pre className="TerraformImportModal__instructionsCode">
                 <code>{`# Terraform
 terraform plan -out=tfplan
@@ -170,7 +165,7 @@ tofu show -json tfplan > plan.json`}</code>
               </pre>
             </li>
             <li>
-              <strong>Graph DOT</strong>
+              <strong>Graph DOT</strong> (required with plan JSON)
               <pre className="TerraformImportModal__instructionsCode">
                 <code>{`# Terraform
 terraform graph -type=plan > graph.dot
@@ -179,17 +174,28 @@ terraform graph -type=plan > graph.dot
 tofu graph -type=plan > graph.dot`}</code>
               </pre>
             </li>
+            <li>
+              <strong>State JSON</strong> (optional with plan+dot, or alone)
+              <pre className="TerraformImportModal__instructionsCode">
+                <code>{`# Raw state (top-level "resources" array)
+terraform state pull > state.json
+
+# Or use a local .tfstate file`}</code>
+              </pre>
+            </li>
           </ol>
           <p className="TerraformImportModal__instructionsFoot">
-            Filenames are up to you; the importer expects JSON from{" "}
-            <code>terraform show -json</code> / <code>tofu show -json</code> and
-            a DOT file from <code>graph -type=plan</code>.
+            Plan JSON must come from <code>terraform show -json</code> /{" "}
+            <code>tofu show -json</code>; DOT from <code>graph -type=plan</code>
+            . State-only semantic view shows deployed resources (no
+            planned-change diffs). Plan-based semantic view requires plan JSON +
+            DOT.
           </p>
         </div>
       </details>
 
       <div className="TerraformImportModal__section">
-        <h4>Upload new plan</h4>
+        <h4>Upload files</h4>
         <div className="TerraformImportModal__settings__inputs">
           <label>
             Plan file (.json)
@@ -207,29 +213,16 @@ tofu graph -type=plan > graph.dot`}</code>
               onChange={(e) => setDotFile(e.target.files?.[0] ?? null)}
             />
           </label>
-          <label
-            className={
-              TERRAFORM_STATE_UPLOAD_ENABLED
-                ? undefined
-                : "TerraformImportModal__inputRow--disabled"
-            }
-          >
+          <label>
             State file (.tfstate / state pull JSON)
             <span className="TerraformImportModal__muted">
-              {TERRAFORM_STATE_UPLOAD_ENABLED ? (
-                <>
-                  Optional with plan+dot to enrich nodes; or upload alone for a
-                  state-only graph (raw state with a top-level{" "}
-                  <code>resources</code> array).
-                </>
-              ) : (
-                "Temporarily unavailable."
-              )}
+              Optional with plan+dot to enrich nodes; or upload alone for module
+              or semantic views (raw state with a top-level{" "}
+              <code>resources</code> array).
             </span>
             <input
               type="file"
               accept=".tfstate,.json"
-              disabled={!TERRAFORM_STATE_UPLOAD_ENABLED}
               onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
             />
           </label>
@@ -262,8 +255,10 @@ tofu graph -type=plan > graph.dot`}</code>
                     : ""
                 }`}
                 title={
-                  option.value === "semantic" && !hasPlanAndDot
-                    ? "Semantic view requires plan JSON and graph DOT files."
+                  option.value === "semantic" && !canUseSemanticView
+                    ? "Semantic view requires plan JSON + graph DOT, or a state file alone."
+                    : option.value === "semantic" && stateOnly
+                    ? "Shows current infrastructure from state (no planned changes)."
                     : undefined
                 }
               >

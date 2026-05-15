@@ -20,6 +20,124 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
 const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
 const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
+const STATE_FIXTURE = path.join(
+  FIXTURE_DIR,
+  "terraform_allplanmodules.tfstate",
+);
+const hasAllplanmodulesState = fs.existsSync(STATE_FIXTURE);
+
+function tierFromSubnetZoneName(
+  name: string,
+): "public" | "intra" | "private" | "other" {
+  const n = name.toLowerCase();
+  if (/\bpublic\b/.test(n) || n.includes("public-")) {
+    return "public";
+  }
+  if (/\bintra\b/.test(n) || n.includes("intra")) {
+    return "intra";
+  }
+  if (/\bprivate\b/.test(n) || n.includes("private")) {
+    return "private";
+  }
+  return "other";
+}
+
+function collectSubnetZoneFrames(elements: unknown[]) {
+  return (
+    elements as Array<{
+      type?: string;
+      name?: string;
+      customData?: {
+        terraformTopologyRole?: string;
+        terraformSubnetIds?: string[];
+      };
+    }>
+  ).filter(
+    (e) =>
+      e.type === "frame" &&
+      e.customData?.terraformTopologyRole === "subnetZone",
+  );
+}
+
+function expectAllplanmodulesCoalescedSubnetZones(body: {
+  meta?: { subnetCount?: number };
+  elements: unknown[];
+}) {
+  const subnetZones = collectSubnetZoneFrames(body.elements);
+  const byTier = {
+    public: [] as typeof subnetZones,
+    intra: [] as typeof subnetZones,
+    private: [] as typeof subnetZones,
+  };
+  for (const z of subnetZones) {
+    const tier = tierFromSubnetZoneName(z.name ?? "");
+    if (tier === "public" || tier === "intra" || tier === "private") {
+      byTier[tier].push(z);
+    }
+  }
+  expect(byTier.public).toHaveLength(1);
+  expect(byTier.intra).toHaveLength(1);
+  expect(byTier.private).toHaveLength(1);
+  expect(byTier.public[0]!.customData?.terraformSubnetIds).toHaveLength(2);
+  expect(byTier.intra[0]!.customData?.terraformSubnetIds).toHaveLength(2);
+  expect(byTier.private[0]!.customData?.terraformSubnetIds).toHaveLength(2);
+  expect(body.meta?.subnetCount).toBe(6);
+}
+
+/** Minimal state with VPC + subnet for state-only semantic topology smoke tests. */
+const MINIMAL_TFSTATE_SEMANTIC = JSON.stringify({
+  version: 4,
+  terraform_version: "1.0.0",
+  serial: 1,
+  lineage: "fixture-semantic",
+  outputs: {},
+  resources: [
+    {
+      mode: "data",
+      type: "aws_caller_identity",
+      name: "current",
+      instances: [{ attributes: { account_id: "123456789012" } }],
+    },
+    {
+      mode: "data",
+      type: "aws_region",
+      name: "current",
+      instances: [{ attributes: { name: "us-east-1" } }],
+    },
+    {
+      mode: "managed",
+      type: "aws_vpc",
+      name: "main",
+      provider: 'provider["registry.terraform.io/hashicorp/aws"]',
+      instances: [
+        {
+          attributes: {
+            id: "vpc-fixture",
+            owner_id: "123456789012",
+            cidr_block: "10.0.0.0/16",
+          },
+        },
+      ],
+    },
+    {
+      mode: "managed",
+      type: "aws_subnet",
+      name: "public",
+      provider: 'provider["registry.terraform.io/hashicorp/aws"]',
+      instances: [
+        {
+          attributes: {
+            id: "subnet-fixture",
+            vpc_id: "vpc-fixture",
+            availability_zone: "us-east-1a",
+            cidr_block: "10.0.1.0/24",
+            tags: { Name: "public-subnet", Tier: "public" },
+          },
+        },
+      ],
+    },
+  ],
+});
 
 /** Minimal raw Terraform state (`terraform state pull` shape) for state-only import tests. */
 const MINIMAL_TFSTATE = JSON.stringify({
@@ -225,20 +343,180 @@ describe("terraformPlanParsing", () => {
     ).toBe(true);
   }, 60_000);
 
-  it("state-only with semanticLayout returns 400", async () => {
+  it("state-only with semanticLayout runs topology pipeline", async () => {
     const res = await terraformPlanParsing(
       null,
       null,
-      textFileLike(MINIMAL_TFSTATE),
+      textFileLike(MINIMAL_TFSTATE_SEMANTIC),
       {
         semanticLayout: true,
       },
     );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("topology");
+    expect(body.meta?.importSource).toBe("state-only");
+    expect(body.meta?.plannedChanges).toBe(false);
+    expect(body.elements.length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("state-only semantic returns 400 when no aws resources", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(
+        JSON.stringify({
+          version: 4,
+          resources: [
+            {
+              mode: "managed",
+              type: "random_id",
+              name: "x",
+              instances: [{ attributes: { id: "abc" } }],
+            },
+          ],
+        }),
+      ),
+      { semanticLayout: true },
+    );
     expect(res.ok).toBe(false);
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toMatch(/Semantic layout requires/i);
+    expect(body.error).toMatch(/Semantic layout requires AWS/i);
   });
+
+  it("plan+dot with invalid state JSON shape returns 400", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      textFileLike("{}"),
+      {},
+    );
+
+    expect(res.ok).toBe(false);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/resources/i);
+  });
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules state-only semantic import runs topology pipeline",
+    async () => {
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(stateText),
+        { semanticLayout: true },
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.layoutEngine).toBe("topology");
+      expect(body.meta?.importSource).toBe("state-only");
+      expect(body.meta?.plannedChanges).toBe(false);
+      expect(body.meta?.accountCount).toBeGreaterThan(0);
+      const frames = body.elements.filter((e: any) => e.type === "frame");
+      expect(frames.length).toBeGreaterThan(0);
+    },
+    120_000,
+  );
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules state-only semantic: one subnet zone per tier with two subnets each",
+    async () => {
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(stateText),
+        { semanticLayout: true },
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.layoutEngine).toBe("topology");
+      expectAllplanmodulesCoalescedSubnetZones(body);
+    },
+    120_000,
+  );
+
+  it("allplanmodules plan+dot semantic: one subnet zone per tier with two subnets each", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("topology");
+    expectAllplanmodulesCoalescedSubnetZones(body);
+  }, 120_000);
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules state-only import runs ELK pipeline",
+    async () => {
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        null,
+        null,
+        textFileLike(stateText),
+        {},
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.type).toBe("excalidraw");
+      expect(body.meta?.layoutEngine).toBe("elk");
+      expect(body.elements.length).toBeGreaterThan(0);
+    },
+    60_000,
+  );
+
+  it.skipIf(!hasAllplanmodulesState)(
+    "allplanmodules plan+dot+state merge runs without throwing",
+    async () => {
+      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+
+      const planOnlyRes = await terraformPlanParsing(
+        textFileLike(planText),
+        textFileLike(dotText),
+        null,
+        {},
+      );
+      expect(planOnlyRes.ok).toBe(true);
+      const planOnlyBody = await planOnlyRes.json();
+
+      const res = await terraformPlanParsing(
+        textFileLike(planText),
+        textFileLike(dotText),
+        textFileLike(stateText),
+        {},
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.type).toBe("excalidraw");
+      expect(body.elements.length).toBeGreaterThan(0);
+      expect(body.meta?.vertexCount).toBeGreaterThanOrEqual(
+        planOnlyBody.meta?.vertexCount ?? 0,
+      );
+    },
+    120_000,
+  );
 
   it("runs full local pipeline on allplanmodules fixtures without throwing", async () => {
     const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
@@ -353,6 +631,10 @@ describe("terraformPlanParsing", () => {
     expect(omittedTypes).toEqual(
       [
         ...Array(6).fill("aws_route_table_association"),
+        "aws_sqs_queue_policy",
+        "aws_sqs_queue_policy",
+        "aws_sqs_queue_redrive_allow_policy",
+        "aws_sqs_queue_redrive_policy",
         "terraform_data",
         "terraform_data",
         "terraform_data",

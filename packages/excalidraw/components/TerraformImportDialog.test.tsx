@@ -156,6 +156,134 @@ describe("TerraformImportModal", () => {
     errSpy.mockRestore();
   });
 
+  it("enables state file input", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    expect(screen.getByLabelText(/state file/i)).not.toBeDisabled();
+  });
+
+  it("enables import with state file only", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/state file/i), {
+      target: {
+        files: [
+          new File([JSON.stringify({ resources: [] })], "state.json", {
+            type: "application/json",
+          }),
+        ],
+      },
+    });
+    expect(
+      screen.getByRole("button", { name: /import & open/i }),
+    ).not.toBeDisabled();
+  });
+
+  it("enables semantic view radio when state file only is selected", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    expect(
+      screen.getByRole("radio", { name: /semantic view/i }),
+    ).toBeDisabled();
+    fireEvent.change(screen.getByLabelText(/state file/i), {
+      target: {
+        files: [
+          new File([JSON.stringify({ resources: [] })], "state.json", {
+            type: "application/json",
+          }),
+        ],
+      },
+    });
+    expect(
+      screen.getByRole("radio", { name: /semantic view/i }),
+    ).not.toBeDisabled();
+  });
+
+  it("calls terraformPlanParsing with state only and semantic view by default", async () => {
+    vi.mocked(terraformPlanParsing).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    const stateFile = new File(
+      [JSON.stringify({ resources: [] })],
+      "state.json",
+      { type: "application/json" },
+    );
+    fireEvent.change(screen.getByLabelText(/state file/i), {
+      target: { files: [stateFile] },
+    });
+    expect(screen.getByRole("radio", { name: /semantic view/i })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
+    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
+      null,
+      null,
+      stateFile,
+      { semanticLayout: true },
+    ]);
+  });
+
+  it("calls terraformPlanParsing with state only and module view when selected", async () => {
+    vi.mocked(terraformPlanParsing).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    const stateFile = new File(
+      [JSON.stringify({ resources: [] })],
+      "state.json",
+      { type: "application/json" },
+    );
+    fireEvent.change(screen.getByLabelText(/state file/i), {
+      target: { files: [stateFile] },
+    });
+    fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
+    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
+      null,
+      null,
+      stateFile,
+      { semanticLayout: false },
+    ]);
+  });
+
+  it("passes state file when plan, dot, and state are selected", async () => {
+    vi.mocked(terraformPlanParsing).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    const planFile = new File(["{}"], "p.json", { type: "application/json" });
+    const dotFile = new File(["digraph {}"], "g.dot", { type: "text/plain" });
+    const stateFile = new File(
+      [JSON.stringify({ resources: [] })],
+      "state.json",
+      { type: "application/json" },
+    );
+    fireEvent.change(screen.getByLabelText(/plan file/i), {
+      target: { files: [planFile] },
+    });
+    fireEvent.change(screen.getByLabelText(/graph file/i), {
+      target: { files: [dotFile] },
+    });
+    fireEvent.change(screen.getByLabelText(/state file/i), {
+      target: { files: [stateFile] },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
+    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
+      planFile,
+      dotFile,
+      stateFile,
+      { semanticLayout: true },
+    ]);
+  });
+
   it("shows Importing while the parse request is in flight", async () => {
     let resolveReq!: (v: Response) => void;
     const pending = new Promise<Response>((resolve) => {

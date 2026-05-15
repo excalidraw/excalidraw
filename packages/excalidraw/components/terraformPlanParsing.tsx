@@ -23,6 +23,7 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   filterVpcEndpointBucketsRemovingZonePlacedAddresses,
+  mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
@@ -31,6 +32,10 @@ import {
   buildDataFlowEdges,
   buildNetworkingEdges,
 } from "./terraformDataFlowEdges";
+import {
+  buildSyntheticPlanFromTfstate,
+  isSyntheticPlanEmptyForSemantic,
+} from "./terraformStateToPlan";
 
 import type { Graph } from "@dagrejs/graphlib";
 
@@ -338,6 +343,7 @@ export const terraformPlanParsing = async (
   let plan: unknown;
   let dotText: string;
   let tfstateForMerge: unknown | null = null;
+  let importSource: "plan" | "state-only" = "plan";
 
   if (planFile && dotFile) {
     const [planText, dotT, stateText] = await Promise.all([
@@ -362,6 +368,17 @@ export const terraformPlanParsing = async (
         const parsed = JSON.parse(stateText) as { resources?: unknown };
         if (parsed && Array.isArray(parsed.resources)) {
           tfstateForMerge = parsed;
+        } else {
+          return new Response(
+            JSON.stringify({
+              error:
+                'State file must be raw Terraform state JSON (top-level "resources" array), e.g. terraform state pull.',
+            }),
+            {
+              status: 400,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
         }
       } catch {
         return new Response(
@@ -403,9 +420,10 @@ export const terraformPlanParsing = async (
         },
       );
     }
-    plan = { resource_changes: [] };
+    plan = buildSyntheticPlanFromTfstate(parsed);
     dotText = "digraph G {}\n";
     tfstateForMerge = parsed;
+    importSource = "state-only";
   } else {
     return new Response(
       JSON.stringify({
@@ -421,11 +439,17 @@ export const terraformPlanParsing = async (
 
   if (semanticLayout) {
     const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
-    if (!Array.isArray(rc) || rc.length === 0) {
+    if (
+      !Array.isArray(rc) ||
+      rc.length === 0 ||
+      isSyntheticPlanEmptyForSemantic(
+        plan as { resource_changes?: Array<{ mode?: string; type?: string }> },
+      )
+    ) {
       return new Response(
         JSON.stringify({
           error:
-            "Semantic layout requires plan JSON with resource_changes. Upload plan+dot or turn off semantic layout for state-only imports.",
+            "Semantic layout requires AWS resources in the plan or state file. Upload plan+dot or a state file with managed aws_* resources.",
         }),
         {
           status: 400,
@@ -478,19 +502,22 @@ export const terraformPlanParsing = async (
       ...z,
       topologyZoneSource: "supplementary" as const,
     }));
-    const zones = mergeSupplementarySubnetZonesSharedRouteTable(
-      [...primaryZones, ...supplementaryZones].sort((a, b) => {
-        if (a.accountId !== b.accountId) {
-          return a.accountId.localeCompare(b.accountId);
-        }
-        if (a.region !== b.region) {
-          return a.region.localeCompare(b.region);
-        }
-        if (a.vpcId !== b.vpcId) {
-          return a.vpcId.localeCompare(b.vpcId);
-        }
-        return a.subnetSignature.localeCompare(b.subnetSignature);
-      }),
+    const zones = mergeSupplementarySubnetZonesByTier(
+      mergeSupplementarySubnetZonesSharedRouteTable(
+        [...primaryZones, ...supplementaryZones].sort((a, b) => {
+          if (a.accountId !== b.accountId) {
+            return a.accountId.localeCompare(b.accountId);
+          }
+          if (a.region !== b.region) {
+            return a.region.localeCompare(b.region);
+          }
+          if (a.vpcId !== b.vpcId) {
+            return a.vpcId.localeCompare(b.vpcId);
+          }
+          return a.subnetSignature.localeCompare(b.subnetSignature);
+        }),
+        semPlan,
+      ),
       semPlan,
     );
     const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
@@ -579,6 +606,8 @@ export const terraformPlanParsing = async (
         : {}),
       meta: {
         ...topoScene.meta,
+        importSource,
+        plannedChanges: importSource !== "state-only",
         representedResourceCount: represented.size,
         omittedResourceCount: omittedSemanticResources.length,
       },
@@ -593,7 +622,11 @@ export const terraformPlanParsing = async (
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: elkScene.elements,
-      meta: elkScene.meta,
+      meta: {
+        ...elkScene.meta,
+        importSource,
+        plannedChanges: importSource !== "state-only",
+      },
     };
   }
 
