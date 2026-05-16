@@ -488,8 +488,9 @@ describe("terraformPlanParsing", () => {
             key?: string;
             unknownAfter?: boolean;
             value?: unknown;
-            unknownAfterDependencies?: Array<{
-              reference?: string;
+            unknownAfterPreview?: Array<{
+              key?: string;
+              resolvesTo?: string | null;
               nodePath?: string | null;
             }>;
           }>;
@@ -502,10 +503,18 @@ describe("terraformPlanParsing", () => {
         value: "Known after apply",
       }),
     );
-    const queueDep = envAttr?.unknownAfterDependencies?.find((d) =>
-      String(d.reference).includes("application_job_queue"),
+    const preview = envAttr?.unknownAfterPreview ?? [];
+    expect(preview).toHaveLength(1);
+    expect(preview[0]).toEqual(
+      expect.objectContaining({
+        key: "queue_url",
+        kind: "new",
+        resolvesTo: "module.application_job_queue.queue_url",
+      }),
     );
-    expect(queueDep?.nodePath).toMatch(/aws_sqs_queue/);
+    expect(String(preview[0]?.nodePath ?? "")).toMatch(/aws_sqs_queue/);
+    expect(preview.find((r) => r.key === "DATA_BUCKET")).toBeUndefined();
+    expect(preview.find((r) => r.key === "test")).toBeUndefined();
   }, 120_000);
 
   it.skipIf(!hasAllplanmodulesState)(

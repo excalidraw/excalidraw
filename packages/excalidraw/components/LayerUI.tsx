@@ -70,7 +70,10 @@ import {
 } from "./terraformElementMetadata";
 import { UNKNOWN_VALUE_PLACEHOLDER } from "./terraformElkLayout";
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
-import type { TerraformUnknownAfterDependency } from "./terraformPlanConfigRefs";
+import type {
+  TerraformUnknownAfterDependency,
+  TerraformUnknownAfterIntentRow,
+} from "./terraformPlanConfigRefs";
 import {
   buildTerraformReconcileOptionsForAppState,
   getTerraformEdgeHoverPeekKeyFromHoveredIds,
@@ -172,6 +175,7 @@ type TerraformAttribute = {
   before?: unknown;
   after?: unknown;
   unknownAfterDependencies?: TerraformUnknownAfterDependency[];
+  unknownAfterPreview?: TerraformUnknownAfterIntentRow[];
 };
 
 type TerraformResourceDetails = {
@@ -260,6 +264,52 @@ const TerraformConfigValue = ({ value }: { value: unknown }) => {
     return <pre>{formatted}</pre>;
   }
   return <>{formatted}</>;
+};
+
+const hasUnknownAfterIntentRows = (
+  rows: TerraformUnknownAfterIntentRow[] | undefined,
+) => (rows?.length ?? 0) > 0;
+
+const TerraformUnknownAfterIntentRows = ({
+  rows,
+  onFocusTerraformNodePath,
+}: {
+  rows: TerraformUnknownAfterIntentRow[];
+  onFocusTerraformNodePath?: (nodePath: string) => void;
+}) => {
+  if (rows.length === 0) {
+    return null;
+  }
+  return (
+    <ul className="terraform-element-actions__unknown-after-intent">
+      {rows.map((row) => (
+        <li key={`${row.key}:${row.resolvesTo ?? ""}`}>
+          <code className="terraform-element-actions__intent-key">{row.key}</code>
+          <span className="terraform-element-actions__intent-badge">new</span>
+          <span className="terraform-element-actions__intent-sep">: </span>
+          <em>{formatTerraformPanelValue(UNKNOWN_VALUE_PLACEHOLDER)}</em>
+          {row.resolvesTo ? (
+            <>
+              <span className="terraform-element-actions__intent-arrow"> → </span>
+              {row.nodePath && onFocusTerraformNodePath ? (
+                <button
+                  type="button"
+                  className="terraform-element-actions__depends-on-link"
+                  onClick={() => onFocusTerraformNodePath(row.nodePath!)}
+                >
+                  {formatTerraformPanelValue(row.resolvesTo)}
+                </button>
+              ) : (
+                <span className="terraform-element-actions__intent-expr">
+                  {formatTerraformPanelValue(row.resolvesTo)}
+                </span>
+              )}
+            </>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  );
 };
 
 const getTerraformElementForSelection = (
@@ -805,15 +855,33 @@ const TerraformElementActions = ({
                               </div>
                               <div>
                                 <span>After apply</span>
-                                <div className="terraform-element-actions__value terraform-element-actions__value--config">
-                                  <em>
-                                    {formatTerraformPanelValue(
-                                      UNKNOWN_VALUE_PLACEHOLDER,
-                                    )}
-                                  </em>
-                                </div>
+                                {hasUnknownAfterIntentRows(
+                                  attribute.unknownAfterPreview,
+                                ) ? (
+                                  <TerraformUnknownAfterIntentRows
+                                    rows={attribute.unknownAfterPreview!}
+                                    onFocusTerraformNodePath={
+                                      onFocusTerraformNodePath
+                                    }
+                                  />
+                                ) : (
+                                  <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                                    <em>
+                                      {formatTerraformPanelValue(
+                                        UNKNOWN_VALUE_PLACEHOLDER,
+                                      )}
+                                    </em>
+                                  </div>
+                                )}
                               </div>
                             </div>
+                          ) : hasUnknownAfterIntentRows(
+                              attribute.unknownAfterPreview,
+                            ) ? (
+                            <TerraformUnknownAfterIntentRows
+                              rows={attribute.unknownAfterPreview!}
+                              onFocusTerraformNodePath={onFocusTerraformNodePath}
+                            />
                           ) : (
                             <div className="terraform-element-actions__value terraform-element-actions__value--config">
                               <em>
@@ -823,8 +891,9 @@ const TerraformElementActions = ({
                               </em>
                             </div>
                           )}
-                          {(attribute.unknownAfterDependencies?.length ?? 0) >
-                          0 ? (
+                          {(attribute.unknownAfterPreview?.length ?? 0) === 0 &&
+                          (attribute.unknownAfterDependencies?.length ?? 0) >
+                            0 ? (
                             <div className="terraform-element-actions__depends-on">
                               <div className="terraform-element-actions__label">
                                 Depends on

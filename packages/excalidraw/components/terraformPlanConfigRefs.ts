@@ -17,6 +17,14 @@ export type TerraformUnknownAfterDependency = {
   nodePath: string | null;
 };
 
+export type TerraformUnknownAfterIntentRow = {
+  key: string;
+  kind: "new";
+  /** HCL expression; null → plain "Known after apply" with no arrow target. */
+  resolvesTo: string | null;
+  nodePath: string | null;
+};
+
 const LAMBDA_ENVIRONMENT_MODULE_INPUT = "environment_variables";
 
 /** Resource attribute → parent module `expressions` key. */
@@ -253,16 +261,35 @@ const SECONDARY_RESOURCE_SUFFIXES = [
   "redrive",
 ];
 
+function moduleCallPrefixFromRef(ref: string): string | null {
+  const parts = stripIndexes(ref).split(".");
+  if (parts[0] !== "module" || parts.length < 3) {
+    return null;
+  }
+  return parts.slice(0, -1).join(".");
+}
+
 function scorePlanAddressMatch(entry: PlanAddressEntry, ref: string): number {
   let score = 0;
   const normRef = stripIndexes(ref);
   const normAddr = stripIndexes(entry.address);
+  const refTail = normRef.split(".").pop() || "";
   if (normAddr === normRef) {
     score += 100;
   } else if (normAddr.startsWith(`${normRef}[`) || normRef.startsWith(normAddr)) {
     score += 80;
-  } else if (normAddr.includes(normRef.split(".").pop() || "")) {
+  } else if (normAddr.includes(refTail)) {
     score += 20;
+  }
+  const modPrefix = moduleCallPrefixFromRef(normRef);
+  if (modPrefix && normAddr.startsWith(`${modPrefix}.`)) {
+    score += 50;
+    if (refTail.includes("bucket") && entry.type === "aws_s3_bucket") {
+      score += 35;
+    }
+    if (refTail.includes("queue") && entry.type === "aws_sqs_queue") {
+      score += 35;
+    }
   }
   if (entry.actions.includes("create")) {
     score += 40;
@@ -295,13 +322,15 @@ function matchRefToPlanNodePaths(
   const stripped = stripIndexes(ref);
   const candidates: PlanAddressEntry[] = [];
 
+  const modPrefix = moduleCallPrefixFromRef(stripped);
   for (const entry of addressIndex) {
     const norm = stripIndexes(entry.address);
     if (
       norm === stripped ||
       norm.startsWith(`${stripped}.`) ||
       stripped.startsWith(`${norm}.`) ||
-      norm.startsWith(stripped)
+      norm.startsWith(stripped) ||
+      (modPrefix != null && norm.startsWith(`${modPrefix}.`))
     ) {
       candidates.push(entry);
     }
@@ -358,7 +387,9 @@ export function resolveTerraformReferenceToNodePaths(
   }
 
   const paths = new Set<string>();
-  for (const r of resourceRefs) {
+  const refsToMatch = new Set<string>(resourceRefs);
+  refsToMatch.add(ref);
+  for (const r of refsToMatch) {
     for (const p of matchRefToPlanNodePaths(plan, r, addressIndex)) {
       if (typeof p === "string" && p) {
         paths.add(p);
@@ -368,11 +399,7 @@ export function resolveTerraformReferenceToNodePaths(
   return [...paths].sort();
 }
 
-/**
- * Raw `configuration` references for a resource attribute (e.g. Lambda `environment`
- * → parent module `environment_variables`).
- */
-export function resolveModuleCallExpressionRefs(
+function readRawModuleInputExpressionRefs(
   plan: unknown,
   resourceAddress: string,
   attributeKey: string,
@@ -398,10 +425,9 @@ export function resolveModuleCallExpressionRefs(
   const callExprs = found.call?.expressions as UnknownRecord | undefined;
   const callRefs = readExpressionReferences(callExprs?.[moduleInputKey]);
   const normalize = (raw: string[]) =>
-    raw
-      .filter(shouldUsePlanReference)
-      .filter((r) => !MODULE_ONLY_REF.test(r))
-      .map((r) => qualifyModuleInputReference(found.prefix, r));
+    [...new Set(raw.map((r) => qualifyModuleInputReference(found.prefix, r)))].filter(
+      (r) => r && !MODULE_ONLY_REF.test(r),
+    );
 
   if (callRefs.length > 0) {
     return normalize(callRefs);
@@ -410,6 +436,324 @@ export function resolveModuleCallExpressionRefs(
   const modExprs = found.mod.expressions as UnknownRecord | undefined;
   const modRefs = readExpressionReferences(modExprs?.[moduleInputKey]);
   return normalize(modRefs);
+}
+
+/** All expression refs for a module input (includes `var.*`, `local.*`). */
+export function readModuleInputExpressionRefs(
+  plan: unknown,
+  resourceAddress: string,
+  attributeKey: string,
+  resourceType: string,
+): string[] {
+  return readRawModuleInputExpressionRefs(
+    plan,
+    resourceAddress,
+    attributeKey,
+    resourceType,
+  );
+}
+
+/**
+ * Raw `configuration` references for a resource attribute (e.g. Lambda `environment`
+ * → parent module `environment_variables`).
+ */
+export function resolveModuleCallExpressionRefs(
+  plan: unknown,
+  resourceAddress: string,
+  attributeKey: string,
+  resourceType: string,
+): string[] {
+  return readRawModuleInputExpressionRefs(
+    plan,
+    resourceAddress,
+    attributeKey,
+    resourceType,
+  ).filter(shouldUsePlanReference);
+}
+
+function resolveNodePathForExpression(
+  plan: unknown,
+  expression: string,
+): string | null {
+  if (!shouldUsePlanReference(expression)) {
+    return null;
+  }
+  const paths = resolveTerraformReferenceToNodePaths(plan, expression);
+  return typeof paths[0] === "string" && paths[0] ? paths[0] : null;
+}
+
+/**
+ * String map from block-shaped attribute values (e.g. Lambda `environment`:
+ * `[{ variables: { KEY: value } }]`). Plain objects are treated as maps directly.
+ */
+export function extractStringMapFromBlockValue(
+  value: unknown,
+  blockKey = "variables",
+): Record<string, unknown> {
+  if (isPlainObject(value)) {
+    return { ...value };
+  }
+  if (!Array.isArray(value)) {
+    return {};
+  }
+  const out: Record<string, unknown> = {};
+  for (const block of value) {
+    if (!isPlainObject(block)) {
+      continue;
+    }
+    const map = block[blockKey];
+    if (!isPlainObject(map)) {
+      continue;
+    }
+    for (const [k, v] of Object.entries(map)) {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+/** Variables map from Lambda `environment` value `[{ variables: { … } }]`. */
+export function extractLambdaEnvironmentVariables(
+  environmentValue: unknown,
+): Record<string, unknown> {
+  return extractStringMapFromBlockValue(environmentValue, "variables");
+}
+
+/** Keys from Lambda `environment` before value `[{ variables: { … } }]`. */
+export function extractLambdaEnvironmentVariableKeys(
+  beforeValue: unknown,
+): string[] {
+  return Object.keys(extractLambdaEnvironmentVariables(beforeValue)).sort();
+}
+
+function refLastSegment(ref: string): string {
+  const parts = ref.split(".");
+  return parts[parts.length - 1] || ref;
+}
+
+/** UI row label for a new ref when configuration has no per-key env names. */
+export function labelFromModuleInputRef(ref: string): string {
+  return refLastSegment(ref);
+}
+
+/**
+ * Drop bare `module.foo` entries when a longer ref exists, then keep only the most
+ * specific ref when one is a dotted prefix of another.
+ */
+export function dedupeModuleInputRefs(refs: string[]): string[] {
+  const withoutModuleOnly = refs.filter((ref) => {
+    if (!MODULE_ONLY_REF.test(ref)) {
+      return true;
+    }
+    return !refs.some((other) => other !== ref && other.startsWith(`${ref}.`));
+  });
+  const sorted = [...withoutModuleOnly].sort((a, b) => b.length - a.length);
+  const kept: string[] = [];
+  for (const ref of sorted) {
+    if (!kept.some((k) => k.startsWith(`${ref}.`))) {
+      kept.push(ref);
+    }
+  }
+  return kept.sort();
+}
+
+function findResourceChange(
+  plan: unknown,
+  address: string,
+): UnknownRecord | null {
+  const changes = (plan as UnknownRecord).resource_changes;
+  if (!Array.isArray(changes)) {
+    return null;
+  }
+  for (const entry of changes) {
+    if (!isPlainObject(entry)) {
+      continue;
+    }
+    if (entry.address === address) {
+      return entry;
+    }
+  }
+  return null;
+}
+
+function collectScalarsFromValue(
+  value: unknown,
+  out: Set<string>,
+  depth: number,
+): void {
+  if (depth > 2) {
+    return;
+  }
+  if (value === null || value === undefined) {
+    return;
+  }
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    out.add(String(value));
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectScalarsFromValue(item, out, depth + 1);
+    }
+    return;
+  }
+  if (isPlainObject(value)) {
+    for (const v of Object.values(value)) {
+      collectScalarsFromValue(v, out, depth + 1);
+    }
+  }
+}
+
+/** Shallow scalar values from `resource_changes[].change.before` for value-based ref matching. */
+export function collectResourceBeforeScalars(
+  plan: unknown,
+  nodePath: string,
+): Set<string> {
+  const rc = findResourceChange(plan, nodePath);
+  const change = rc?.change;
+  const before =
+    isPlainObject(change) && "before" in change ? change.before : undefined;
+  const out = new Set<string>();
+  collectScalarsFromValue(before, out, 0);
+  return out;
+}
+
+/**
+ * True when a before map value equals a scalar on the resource(s) resolved from `ref`.
+ * Plan configuration only lists flat module-input refs — no env key names — so we match
+ * by value instead of name heuristics.
+ */
+export function beforeValuesSatisfyRef(
+  plan: unknown,
+  ref: string,
+  beforeVars: Record<string, unknown>,
+): boolean {
+  const beforeValues = new Set<string>();
+  for (const v of Object.values(beforeVars)) {
+    if (v === null || v === undefined) {
+      continue;
+    }
+    beforeValues.add(String(v));
+  }
+  if (beforeValues.size === 0) {
+    return false;
+  }
+
+  const paths = resolveTerraformReferenceToNodePaths(plan, ref);
+  for (const nodePath of paths) {
+    const scalars = collectResourceBeforeScalars(plan, nodePath);
+    for (const bv of beforeValues) {
+      if (scalars.has(bv)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+type IntentStrategyContext = {
+  plan: unknown;
+  resourceAddress: string;
+  attributeKey: string;
+  resourceType: string;
+  beforeValue: unknown;
+  moduleInputKey: string;
+};
+
+type UnknownAfterIntentStrategy = {
+  id: string;
+  matches: (resourceType: string, attributeKey: string) => boolean;
+  build: (ctx: IntentStrategyContext) => TerraformUnknownAfterIntentRow[];
+};
+
+function getModuleInputKey(
+  resourceType: string,
+  attributeKey: string,
+): string | null {
+  return RESOURCE_ATTR_TO_MODULE_INPUT[resourceType]?.[attributeKey] ?? null;
+}
+
+function buildMapBlockEnvIntentPreview(
+  ctx: IntentStrategyContext,
+  options: { blockKey: string },
+): TerraformUnknownAfterIntentRow[] {
+  const refs = dedupeModuleInputRefs(
+    resolveModuleCallExpressionRefs(
+      ctx.plan,
+      ctx.resourceAddress,
+      ctx.attributeKey,
+      ctx.resourceType,
+    ),
+  );
+  if (refs.length === 0) {
+    return [];
+  }
+
+  const beforeVars = extractStringMapFromBlockValue(
+    ctx.beforeValue,
+    options.blockKey,
+  );
+  const rows: TerraformUnknownAfterIntentRow[] = [];
+
+  for (const ref of refs) {
+    if (beforeValuesSatisfyRef(ctx.plan, ref, beforeVars)) {
+      continue;
+    }
+    const rowKey = labelFromModuleInputRef(ref);
+    if (rows.some((r) => r.key === rowKey)) {
+      continue;
+    }
+    rows.push({
+      key: rowKey,
+      kind: "new",
+      resolvesTo: ref,
+      nodePath: resolveNodePathForExpression(ctx.plan, ref),
+    });
+  }
+
+  return rows;
+}
+
+const mapBlockEnvStrategy: UnknownAfterIntentStrategy = {
+  id: "mapBlockEnv",
+  matches: (resourceType, attributeKey) =>
+    resourceType === "aws_lambda_function" && attributeKey === "environment",
+  build: (ctx) => buildMapBlockEnvIntentPreview(ctx, { blockKey: "variables" }),
+};
+
+const UNKNOWN_AFTER_INTENT_STRATEGIES: UnknownAfterIntentStrategy[] = [
+  mapBlockEnvStrategy,
+];
+
+export function buildUnknownAfterIntentPreview(
+  plan: unknown,
+  resourceAddress: string,
+  attributeKey: string,
+  resourceType: string,
+  beforeValue: unknown,
+): TerraformUnknownAfterIntentRow[] {
+  for (const strategy of UNKNOWN_AFTER_INTENT_STRATEGIES) {
+    if (!strategy.matches(resourceType, attributeKey)) {
+      continue;
+    }
+    const moduleInputKey = getModuleInputKey(resourceType, attributeKey);
+    if (!moduleInputKey) {
+      return [];
+    }
+    return strategy.build({
+      plan,
+      resourceAddress,
+      attributeKey,
+      resourceType,
+      beforeValue,
+      moduleInputKey,
+    });
+  }
+  return [];
 }
 
 export function buildUnknownAfterDependencies(
