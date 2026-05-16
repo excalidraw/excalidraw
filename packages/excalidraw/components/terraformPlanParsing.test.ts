@@ -478,9 +478,9 @@ describe("terraformPlanParsing", () => {
     const body = await res.json();
     const writerAddr =
       "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
-    const writerTile = (body.elements as Array<{ customData?: Record<string, unknown> }>).find(
-      (e) => e.customData?.nodePath === writerAddr,
-    );
+    const writerTile = (
+      body.elements as Array<{ customData?: Record<string, unknown> }>
+    ).find((e) => e.customData?.nodePath === writerAddr);
     expect(writerTile).toBeTruthy();
     const resources = writerTile?.customData?.terraformResources as
       | Array<{
@@ -496,7 +496,9 @@ describe("terraformPlanParsing", () => {
           }>;
         }>
       | undefined;
-    const envAttr = resources?.[0]?.attributes?.find((a) => a.key === "environment");
+    const envAttr = resources?.[0]?.attributes?.find(
+      (a) => a.key === "environment",
+    );
     expect(envAttr).toEqual(
       expect.objectContaining({
         unknownAfter: true,

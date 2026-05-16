@@ -621,9 +621,7 @@ export function buildTerraformResourcePanelDetails(
         changed: Boolean(fieldDiff),
         unknownAfter,
         before: fieldDiff?.before,
-        after: unknownAfter
-          ? UNKNOWN_VALUE_PLACEHOLDER
-          : fieldDiff?.after,
+        after: unknownAfter ? UNKNOWN_VALUE_PLACEHOLDER : fieldDiff?.after,
       };
       if (unknownAfter && plan) {
         attr.unknownAfterPreview = buildUnknownAfterIntentPreview(

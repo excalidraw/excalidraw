@@ -2261,7 +2261,11 @@ function appendMergedSubnetCompositeRectangles(
     const n = nodes[a] as TerraformPlanGraphNode | undefined;
     const r = getPrimaryResource(n) as Record<string, any> | undefined;
     return r
-      ? buildTerraformResourcePanelDetails(a, r, _plan ?? topologyResourcePanelPlan)
+      ? buildTerraformResourcePanelDetails(
+          a,
+          r,
+          _plan ?? topologyResourcePanelPlan,
+        )
       : [];
   });
 
