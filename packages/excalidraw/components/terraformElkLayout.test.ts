@@ -4,6 +4,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   buildTerraformElkExcalidrawScene,
+  buildTerraformResourcePanelDetails,
   strokeColorForTerraformDependencyEdge,
 } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -722,6 +723,36 @@ describe("buildTerraformElkExcalidrawScene", () => {
         changed: false,
       }),
     ]);
+  });
+
+  it("update with hollow environment shell uses placeholder not empty map", () => {
+    const addr =
+      "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+    const [details] = buildTerraformResourcePanelDetails(addr, {
+      type: "aws_lambda_function",
+      address: addr,
+      change: {
+        actions: ["update"],
+        before: {
+          environment: [
+            { variables: { DATA_BUCKET: "bucket", test: "test1" } },
+          ],
+        },
+        after: { environment: [{}] },
+        after_unknown: { environment: [{ variables: true }] },
+      },
+    });
+    const env = details?.attributes?.find((a) => a.key === "environment");
+    expect(env).toEqual(
+      expect.objectContaining({
+        key: "environment",
+        value: "Known after apply",
+        unknownAfter: true,
+        changed: true,
+        before: [{ variables: { DATA_BUCKET: "bucket", test: "test1" } }],
+        after: "Known after apply",
+      }),
+    );
   });
 
   it("emits unknown-after rows using the placeholder", async () => {

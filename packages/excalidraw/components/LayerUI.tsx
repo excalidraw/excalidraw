@@ -68,7 +68,9 @@ import {
   isTerraformResourceElement,
   getTerraformGraphAddressForElement,
 } from "./terraformElementMetadata";
+import { UNKNOWN_VALUE_PLACEHOLDER } from "./terraformElkLayout";
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
+import type { TerraformUnknownAfterDependency } from "./terraformPlanConfigRefs";
 import {
   buildTerraformReconcileOptionsForAppState,
   getTerraformEdgeHoverPeekKeyFromHoveredIds,
@@ -169,6 +171,7 @@ type TerraformAttribute = {
   unknownAfter?: boolean;
   before?: unknown;
   after?: unknown;
+  unknownAfterDependencies?: TerraformUnknownAfterDependency[];
 };
 
 type TerraformResourceDetails = {
@@ -620,12 +623,35 @@ const TerraformEdgeActions = ({
   );
 };
 
+const findTerraformElementByNodePath = (
+  elements: readonly ExcalidrawElement[],
+  nodePath: string,
+): ExcalidrawElement | null => {
+  let duplicateFallback: ExcalidrawElement | null = null;
+  for (const el of elements) {
+    if (el.isDeleted) {
+      continue;
+    }
+    if (getTerraformGraphAddressForElement(el) !== nodePath) {
+      continue;
+    }
+    if (el.customData?.terraformSemanticLayoutDuplicate === true) {
+      duplicateFallback = duplicateFallback ?? el;
+      continue;
+    }
+    return el;
+  }
+  return duplicateFallback;
+};
+
 const TerraformElementActions = ({
   element,
   renderAction,
+  onFocusTerraformNodePath,
 }: {
   element: NonDeletedExcalidrawElement;
   renderAction: ActionManager["renderAction"];
+  onFocusTerraformNodePath?: (nodePath: string) => void;
 }) => {
   const customData = element.customData ?? {};
 
@@ -768,8 +794,71 @@ const TerraformElementActions = ({
                         )}
                       </div>
                       {attribute.unknownAfter ? (
-                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
-                          <em>{formatTerraformPanelValue(attribute.value)}</em>
+                        <div className="terraform-element-actions__unknown-after">
+                          {attribute.changed &&
+                          attribute.before != null &&
+                          attribute.before !== "" ? (
+                            <div className="terraform-element-actions__diff">
+                              <div>
+                                <span>Before</span>
+                                <TerraformConfigValue value={attribute.before} />
+                              </div>
+                              <div>
+                                <span>After apply</span>
+                                <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                                  <em>
+                                    {formatTerraformPanelValue(
+                                      UNKNOWN_VALUE_PLACEHOLDER,
+                                    )}
+                                  </em>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                              <em>
+                                {formatTerraformPanelValue(
+                                  UNKNOWN_VALUE_PLACEHOLDER,
+                                )}
+                              </em>
+                            </div>
+                          )}
+                          {(attribute.unknownAfterDependencies?.length ?? 0) >
+                          0 ? (
+                            <div className="terraform-element-actions__depends-on">
+                              <div className="terraform-element-actions__label">
+                                Depends on
+                              </div>
+                              <ul className="terraform-element-actions__depends-on-list">
+                                {attribute.unknownAfterDependencies!.map(
+                                  (dep) => (
+                                    <li key={dep.reference}>
+                                      {dep.nodePath &&
+                                      onFocusTerraformNodePath ? (
+                                        <button
+                                          type="button"
+                                          className="terraform-element-actions__depends-on-link"
+                                          onClick={() =>
+                                            onFocusTerraformNodePath(
+                                              dep.nodePath!,
+                                            )
+                                          }
+                                        >
+                                          {formatTerraformPanelValue(
+                                            dep.reference,
+                                          )}
+                                        </button>
+                                      ) : (
+                                        formatTerraformPanelValue(
+                                          dep.reference,
+                                        )
+                                      )}
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            </div>
+                          ) : null}
                         </div>
                       ) : attribute.changed ? (
                         <div className="terraform-element-actions__diff">
@@ -997,6 +1086,22 @@ const LayerUI = ({
     </div>
   );
 
+  const focusTerraformNodePath = React.useCallback(
+    (nodePath: string) => {
+      const allElements = app.scene.getElementsIncludingDeleted();
+      const target = findTerraformElementByNodePath(allElements, nodePath);
+      if (!target) {
+        return;
+      }
+      setAppState({
+        selectedElementIds: { [target.id]: true },
+        selectedGroupIds: {},
+      });
+      app.scrollToContent([target], { animate: true });
+    },
+    [app, setAppState],
+  );
+
   const renderSelectedShapeActions = () => {
     const isCompactMode = isCompactStylesPanel;
     const terraformElement = getTerraformElementForSelection(
@@ -1029,6 +1134,7 @@ const LayerUI = ({
               <TerraformElementActions
                 element={terraformElement}
                 renderAction={actionManager.renderAction}
+                onFocusTerraformNodePath={focusTerraformNodePath}
               />
             ) : (
               <CompactShapeActions
@@ -1055,6 +1161,7 @@ const LayerUI = ({
               <TerraformElementActions
                 element={terraformElement}
                 renderAction={actionManager.renderAction}
+                onFocusTerraformNodePath={focusTerraformNodePath}
               />
             ) : (
               <SelectedShapeActions

@@ -2072,6 +2072,9 @@ function appendNatGatewayZoneClusters(
   return clusterFrameIds;
 }
 
+/** Set during {@link buildTerraformTopologyExcalidrawScene} for resource panel dependency hints. */
+let topologyResourcePanelPlan: unknown;
+
 function pushResourceRectangleSkeleton(
   skeleton: ExcalidrawElementSkeleton[],
   addr: string,
@@ -2083,6 +2086,7 @@ function pushResourceRectangleSkeleton(
   options: {
     initiallyVisible: boolean;
     explodeParentKeys: string[];
+    plan?: unknown;
     /** Semantic topology: smaller typography for satellite tiers. */
     satelliteTier?: 1 | 2;
     egress?: { accountId: string; region: string; vpcId: string };
@@ -2211,6 +2215,7 @@ function pushResourceRectangleSkeleton(
         buildTerraformResourcePanelDetails(
           addr,
           resource as Record<string, unknown>,
+          options.plan ?? topologyResourcePanelPlan,
         ),
     },
   });
@@ -2255,7 +2260,9 @@ function appendMergedSubnetCompositeRectangles(
   const terraformResourcesMerged = sorted.flatMap((a) => {
     const n = nodes[a] as TerraformPlanGraphNode | undefined;
     const r = getPrimaryResource(n) as Record<string, any> | undefined;
-    return r ? buildTerraformResourcePanelDetails(a, r) : [];
+    return r
+      ? buildTerraformResourcePanelDetails(a, r, _plan ?? topologyResourcePanelPlan)
+      : [];
   });
 
   const clusterChildIds: string[] = [];
@@ -3516,6 +3523,8 @@ export async function buildTerraformTopologyExcalidrawScene(
     };
   }
 
+  topologyResourcePanelPlan = plan;
+
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const arnIndex = buildArnIndexForTopology(nodes);
   const vpcNameById = buildTopologyVpcNameMap(plan);
@@ -4726,7 +4735,11 @@ export async function buildTerraformTopologyExcalidrawScene(
       ? glyphInjected.files
       : undefined;
 
-  return {
+  const result: {
+    elements: ExcalidrawElement[];
+    meta: TerraformTopologySceneMeta;
+    files?: BinaryFiles;
+  } = {
     elements,
     ...(layoutGlyphFiles ? { files: layoutGlyphFiles } : {}),
     meta: {
@@ -4743,4 +4756,6 @@ export async function buildTerraformTopologyExcalidrawScene(
       ...(zoneRouteAnchorDebug.length > 0 ? { zoneRouteAnchorDebug } : {}),
     },
   };
+  topologyResourcePanelPlan = undefined;
+  return result;
 }
