@@ -70,10 +70,6 @@ import {
 } from "./terraformElementMetadata";
 import { UNKNOWN_VALUE_PLACEHOLDER } from "./terraformElkLayout";
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
-import type {
-  TerraformUnknownAfterDependency,
-  TerraformUnknownAfterIntentRow,
-} from "./terraformPlanConfigRefs";
 import {
   buildTerraformReconcileOptionsForAppState,
   getTerraformEdgeHoverPeekKeyFromHoveredIds,
@@ -89,6 +85,10 @@ import { Toast } from "./Toast";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 
+import type {
+  TerraformUnknownAfterDependency,
+  TerraformUnknownAfterIntentRow,
+} from "./terraformPlanConfigRefs";
 import type { ActionManager } from "../actions/manager";
 
 import type { Language } from "../i18n";
@@ -284,13 +284,18 @@ const TerraformUnknownAfterIntentRows = ({
     <ul className="terraform-element-actions__unknown-after-intent">
       {rows.map((row) => (
         <li key={`${row.key}:${row.resolvesTo ?? ""}`}>
-          <code className="terraform-element-actions__intent-key">{row.key}</code>
+          <code className="terraform-element-actions__intent-key">
+            {row.key}
+          </code>
           <span className="terraform-element-actions__intent-badge">new</span>
           <span className="terraform-element-actions__intent-sep">: </span>
           <em>{formatTerraformPanelValue(UNKNOWN_VALUE_PLACEHOLDER)}</em>
           {row.resolvesTo ? (
             <>
-              <span className="terraform-element-actions__intent-arrow"> → </span>
+              <span className="terraform-element-actions__intent-arrow">
+                {" "}
+                →{" "}
+              </span>
               {row.nodePath && onFocusTerraformNodePath ? (
                 <button
                   type="button"
@@ -851,7 +856,9 @@ const TerraformElementActions = ({
                             <div className="terraform-element-actions__diff">
                               <div>
                                 <span>Before</span>
-                                <TerraformConfigValue value={attribute.before} />
+                                <TerraformConfigValue
+                                  value={attribute.before}
+                                />
                               </div>
                               <div>
                                 <span>After apply</span>
@@ -880,7 +887,9 @@ const TerraformElementActions = ({
                             ) ? (
                             <TerraformUnknownAfterIntentRows
                               rows={attribute.unknownAfterPreview!}
-                              onFocusTerraformNodePath={onFocusTerraformNodePath}
+                              onFocusTerraformNodePath={
+                                onFocusTerraformNodePath
+                              }
                             />
                           ) : (
                             <div className="terraform-element-actions__value terraform-element-actions__value--config">
@@ -918,9 +927,7 @@ const TerraformElementActions = ({
                                           )}
                                         </button>
                                       ) : (
-                                        formatTerraformPanelValue(
-                                          dep.reference,
-                                        )
+                                        formatTerraformPanelValue(dep.reference)
                                       )}
                                     </li>
                                   ),

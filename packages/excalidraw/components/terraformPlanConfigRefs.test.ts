@@ -154,11 +154,10 @@ describe("beforeValuesSatisfyRef", () => {
 
   it("does not match refs for resources with no overlapping before scalars", () => {
     expect(
-      beforeValuesSatisfyRef(
-        plan,
-        "module.application_job_queue.queue_url",
-        { DATA_BUCKET: "ts-test-lambda-data", test: "test1" },
-      ),
+      beforeValuesSatisfyRef(plan, "module.application_job_queue.queue_url", {
+        DATA_BUCKET: "ts-test-lambda-data",
+        test: "test1",
+      }),
     ).toBe(false);
   });
 });
@@ -178,7 +177,8 @@ describe("buildUnknownAfterIntentPreview create-only", () => {
           },
         },
         {
-          address: "module.application_job_queue.module.queue.aws_sqs_queue.this[0]",
+          address:
+            "module.application_job_queue.module.queue.aws_sqs_queue.this[0]",
           type: "aws_sqs_queue",
           change: { actions: ["create"] },
         },

@@ -139,16 +139,17 @@ function qualifyModuleInputReference(
   if (!r) {
     return r;
   }
-  if (r.startsWith("module.") || r.startsWith("aws_") || r.startsWith("data.")) {
+  if (
+    r.startsWith("module.") ||
+    r.startsWith("aws_") ||
+    r.startsWith("data.")
+  ) {
     return r;
   }
   return qualifyConfigurationReference(modulePrefix, r);
 }
 
-function tryExpandModuleOutputRef(
-  plan: unknown,
-  ref: string,
-): string[] | null {
+function tryExpandModuleOutputRef(plan: unknown, ref: string): string[] | null {
   if (!hasTerraformPlanConfiguration(plan) || !ref.startsWith("module.")) {
     return null;
   }
@@ -276,7 +277,10 @@ function scorePlanAddressMatch(entry: PlanAddressEntry, ref: string): number {
   const refTail = normRef.split(".").pop() || "";
   if (normAddr === normRef) {
     score += 100;
-  } else if (normAddr.startsWith(`${normRef}[`) || normRef.startsWith(normAddr)) {
+  } else if (
+    normAddr.startsWith(`${normRef}[`) ||
+    normRef.startsWith(normAddr)
+  ) {
     score += 80;
   } else if (normAddr.includes(refTail)) {
     score += 20;
@@ -425,9 +429,9 @@ function readRawModuleInputExpressionRefs(
   const callExprs = found.call?.expressions as UnknownRecord | undefined;
   const callRefs = readExpressionReferences(callExprs?.[moduleInputKey]);
   const normalize = (raw: string[]) =>
-    [...new Set(raw.map((r) => qualifyModuleInputReference(found.prefix, r)))].filter(
-      (r) => r && !MODULE_ONLY_REF.test(r),
-    );
+    [
+      ...new Set(raw.map((r) => qualifyModuleInputReference(found.prefix, r))),
+    ].filter((r) => r && !MODULE_ONLY_REF.test(r));
 
   if (callRefs.length > 0) {
     return normalize(callRefs);
@@ -777,8 +781,7 @@ export function buildUnknownAfterDependencies(
     }
     seen.add(reference);
     const paths = resolveTerraformReferenceToNodePaths(plan, reference);
-    const nodePath =
-      typeof paths[0] === "string" && paths[0] ? paths[0] : null;
+    const nodePath = typeof paths[0] === "string" && paths[0] ? paths[0] : null;
     out.push({ reference, nodePath });
   }
   return out;
