@@ -65,7 +65,9 @@ import {
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildUnknownAfterDependencies,
+  buildUnknownAfterIntentPreview,
   type TerraformUnknownAfterDependency,
+  type TerraformUnknownAfterIntentRow,
 } from "./terraformPlanConfigRefs";
 
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
@@ -423,7 +425,7 @@ export function getTerraformActionStyle(action: string) {
 
 export const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
 
-export type { TerraformUnknownAfterDependency };
+export type { TerraformUnknownAfterDependency, TerraformUnknownAfterIntentRow };
 
 const HIDDEN_ATTRIBUTES_BY_TYPE: Record<string, Set<string>> = {
   aws_iam_role_policy: new Set(["id", "name_prefix"]),
@@ -512,6 +514,7 @@ export type TerraformResourcePanelAttribute = {
   before?: unknown;
   after?: unknown;
   unknownAfterDependencies?: TerraformUnknownAfterDependency[];
+  unknownAfterPreview?: TerraformUnknownAfterIntentRow[];
 };
 
 function shouldHideTerraformAttribute(resourceType: string, key: string) {
@@ -623,12 +626,21 @@ export function buildTerraformResourcePanelDetails(
           : fieldDiff?.after,
       };
       if (unknownAfter && plan) {
-        attr.unknownAfterDependencies = buildUnknownAfterDependencies(
+        attr.unknownAfterPreview = buildUnknownAfterIntentPreview(
           plan,
           address,
           key,
           resourceType,
+          fieldDiff?.before,
         );
+        if ((attr.unknownAfterPreview?.length ?? 0) === 0) {
+          attr.unknownAfterDependencies = buildUnknownAfterDependencies(
+            plan,
+            address,
+            key,
+            resourceType,
+          );
+        }
       }
       return attr;
     });

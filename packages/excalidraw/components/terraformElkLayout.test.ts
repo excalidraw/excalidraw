@@ -755,6 +755,77 @@ describe("buildTerraformElkExcalidrawScene", () => {
     );
   });
 
+  it("update with hollow environment includes intent preview when plan is provided", () => {
+    const addr =
+      "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+    const [details] = buildTerraformResourcePanelDetails(
+      addr,
+      {
+        type: "aws_lambda_function",
+        address: addr,
+        change: {
+          actions: ["update"],
+          before: {
+            environment: [
+              { variables: { DATA_BUCKET: "bucket", test: "test1" } },
+            ],
+          },
+          after: { environment: [{}] },
+          after_unknown: { environment: [{ variables: true }] },
+        },
+      },
+      {
+        format_version: "1.2",
+        resource_changes: [
+          {
+            address:
+              "module.application_data_bucket.module.bucket.aws_s3_bucket.this[0]",
+            type: "aws_s3_bucket",
+            change: {
+              actions: ["no-op"],
+              before: { id: "bucket" },
+            },
+          },
+          {
+            address:
+              "module.application_job_queue.module.queue.aws_sqs_queue.this[0]",
+            type: "aws_sqs_queue",
+            change: { actions: ["create"], before: null },
+          },
+        ],
+        configuration: {
+          root_module: {
+            module_calls: {
+              workload_writer_lambda: {
+                expressions: {
+                  environment_variables: {
+                    references: [
+                      "module.application_data_bucket.s3_bucket_id",
+                      "module.application_job_queue.queue_url",
+                    ],
+                  },
+                },
+                module: { module_calls: {} },
+              },
+            },
+          },
+        },
+      },
+    );
+    const env = details?.attributes?.find((a) => a.key === "environment");
+    const preview = env?.unknownAfterPreview ?? [];
+    expect(preview).toHaveLength(1);
+    expect(preview[0]).toEqual(
+      expect.objectContaining({
+        key: "queue_url",
+        kind: "new",
+        resolvesTo: "module.application_job_queue.queue_url",
+      }),
+    );
+    expect(preview.find((r) => r.key === "DATA_BUCKET")).toBeUndefined();
+    expect(preview.find((r) => r.key === "test")).toBeUndefined();
+  });
+
   it("emits unknown-after rows using the placeholder", async () => {
     const details = await getTerraformResourceDetails(
       "aws_lambda_function.fn",
