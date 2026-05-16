@@ -1,0 +1,16 @@
+module "workload_writer_alb" {
+  source = "./modules/http_alb_lambda"
+
+  name_prefix = "ts-writer"
+
+  vpc_id               = module.private_workload_network.vpc_id
+  public_subnet_ids    = module.private_workload_network.public_subnets
+  lambda_function_arn  = module.workload_writer_lambda.lambda_function_arn
+  lambda_function_name = module.workload_writer_lambda.lambda_function_name
+
+  acm_certificate_arn = trimspace(var.alb_acm_certificate_arn) != "" ? trimspace(var.alb_acm_certificate_arn) : null
+  deletion_protection = var.alb_deletion_protection
+  idle_timeout        = var.alb_idle_timeout_seconds
+
+  tags = local.workload_tags
+}
