@@ -49,10 +49,8 @@ packages/backend/terraform/terraform.tfvars
 packages/backend/terraform/terraform.tfvars.backup
 packages/backend/terraform/*.auto.tfvars
 packages/backend/terraform/crash.*
-# Backend Terraform fixture corpus: ignore everything under `packages/backend/terraform/.corpus/`
-# (plans, graphs, per-case terraform dirs). Bare `.corpus/` + negation breaks Git — use `*` here.
-packages/backend/terraform/.corpus/*
-!packages/backend/terraform/.corpus/.gitkeep
+# Generated fixture corpus outputs (plans, graphs, per-case terraform dirs — created by fixtures:corpus).
+packages/backend/terraform/.corpus/
 packages/backend/terraform/fixtures/states/**
 !packages/backend/terraform/fixtures/states/.gitkeep
 !packages/backend/terraform/allplan.json
