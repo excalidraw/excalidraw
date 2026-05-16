@@ -463,6 +463,51 @@ describe("terraformPlanParsing", () => {
     expectAllplanmodulesCoalescedSubnetZones(body);
   }, 120_000);
 
+  it("allplanmodules semantic: writer lambda environment unknown-after lists SQS dependency", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const writerAddr =
+      "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+    const writerTile = (body.elements as Array<{ customData?: Record<string, unknown> }>).find(
+      (e) => e.customData?.nodePath === writerAddr,
+    );
+    expect(writerTile).toBeTruthy();
+    const resources = writerTile?.customData?.terraformResources as
+      | Array<{
+          attributes?: Array<{
+            key?: string;
+            unknownAfter?: boolean;
+            value?: unknown;
+            unknownAfterDependencies?: Array<{
+              reference?: string;
+              nodePath?: string | null;
+            }>;
+          }>;
+        }>
+      | undefined;
+    const envAttr = resources?.[0]?.attributes?.find((a) => a.key === "environment");
+    expect(envAttr).toEqual(
+      expect.objectContaining({
+        unknownAfter: true,
+        value: "Known after apply",
+      }),
+    );
+    const queueDep = envAttr?.unknownAfterDependencies?.find((d) =>
+      String(d.reference).includes("application_job_queue"),
+    );
+    expect(queueDep?.nodePath).toMatch(/aws_sqs_queue/);
+  }, 120_000);
+
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only import runs ELK pipeline",
     async () => {

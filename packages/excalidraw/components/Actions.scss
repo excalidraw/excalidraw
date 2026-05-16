@@ -408,4 +408,37 @@
     font-size: 0.75rem;
     line-height: 1.35;
   }
+
+  &__unknown-after {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &__depends-on {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  &__depends-on-list {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  &__depends-on-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-primary);
+    font: inherit;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: var(--color-primary-darker);
+    }
+  }
 }
