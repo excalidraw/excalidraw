@@ -5,7 +5,7 @@ Terraform modules and **fixture corpus** tooling for tfdraw. The Node HTTP API w
 ## Layout
 
 | Path | Purpose |
-|------|---------|
+| --- | --- |
 | [`terraform/`](./terraform/) | IaC root (`main.base.tf`, `artifacts.tf`, composed `main.workload.tf`) |
 | [`terraform/fixtures/presets/`](./terraform/fixtures/presets/) | HCL presets (module bundles per stack stage) |
 | [`terraform/fixtures/manifest.json`](./terraform/fixtures/manifest.json) | 100 `checkpoint-plan` recipes |
