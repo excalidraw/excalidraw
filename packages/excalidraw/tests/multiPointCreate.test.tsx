@@ -138,6 +138,35 @@ describe("multi point mode in linear elements", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
+  it("bumps arrow version when canceling with Escape", async () => {
+    const { getByToolName, container } = await render(
+      <Excalidraw handleKeyboardGlobally={true} />,
+    );
+    // select tool
+    const tool = getByToolName("arrow");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    // first point is added on pointer down
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+
+    const versionBeforeCancel = h.elements[0].version;
+
+    fireEvent.keyDown(document, {
+      key: KEYS.ESCAPE,
+    });
+
+    expect(h.elements).toEqual([
+      expect.objectContaining({
+        type: "arrow",
+        isDeleted: true,
+        version: versionBeforeCancel + 1,
+      }),
+    ]);
+  });
+
   it("line", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
