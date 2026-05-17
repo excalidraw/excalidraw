@@ -72,6 +72,7 @@ export interface ChatMessageProps {
   error?: ReactNode;
   statusLine?: ReactNode;
   actions?: ReactNode;
+  headerEnd?: ReactNode;
 
   className?: string;
   containerRef?: React.Ref<HTMLDivElement>;
@@ -91,6 +92,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   error,
   statusLine,
   actions,
+  headerEnd,
   className,
   containerRef,
 }) => {
@@ -113,6 +115,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className="ai-chat-message__bubble">
         <div className="ai-chat-message__header">
           <div className="ai-chat-message__header-label">{roleLabel}</div>
+          {headerEnd && (
+            <div className="ai-chat-message__header-end">{headerEnd}</div>
+          )}
         </div>
 
         {imageUrls.map((image, index) => (
@@ -169,10 +174,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         {error}
 
         {statusLine && (
-          <div className="ai-chat-message__status-line">
-            <br />
-            {statusLine}
-          </div>
+          <div className="ai-chat-message__status-line">{statusLine}</div>
         )}
       </div>
 

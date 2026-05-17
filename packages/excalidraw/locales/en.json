@@ -822,6 +822,11 @@
       "status": {
         "syntaxErrorFixing": "Syntax error detected. Attempting to fix...",
         "errorFixing": "Error detected. Attempting to fix...",
+        "thinking": "Thinking...",
+        "finalizing": "Finalizing response...",
+        "completedIn": "Completed in {{time}}",
+        "failedAfter": "Failed after {{time}}",
+        "stoppedAfter": "Stopped after {{time}}",
         "retrying": "Retrying...",
         "regenerating": "Regenerating...",
         "generatedResponse": "Generated response.",

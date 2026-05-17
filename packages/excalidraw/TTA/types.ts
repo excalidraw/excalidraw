@@ -11,6 +11,13 @@ export type AIAssistantLifecycleStatus =
   | "failed"
   | "aborted";
 
+export type AIStreamProgressPhase =
+  | "starting"
+  | "waiting"
+  | "thinking"
+  | "generating"
+  | "finalizing";
+
 export interface AIServerConversationMessage {
   role: AIServerMessageRole;
   content: string;
@@ -129,6 +136,9 @@ export type AssistantChatMessage = {
   role: "assistant";
   lifecycleStatus?: AIAssistantLifecycleStatus;
   statusText?: string;
+  progressPhase?: AIStreamProgressPhase;
+  generationStartedAt?: number;
+  generationElapsedMs?: number;
   // content: string;
   createdAt?: number;
   turnId?: string;
@@ -152,6 +162,9 @@ export type AssistantChatTurnMessage = {
   messageId?: string;
   lifecycleStatus?: AIAssistantLifecycleStatus;
   statusText?: string;
+  progressPhase?: AIStreamProgressPhase;
+  generationStartedAt?: number;
+  generationElapsedMs?: number;
   createdAt?: number;
   skeletons?: ReadonlyArray<ExcalidrawElementSkeleton>;
   parseError?: string;

@@ -33,6 +33,9 @@ const toAssistantTurnMessage = (
   messageId: message.messageId,
   lifecycleStatus: message.lifecycleStatus,
   statusText: message.statusText,
+  progressPhase: message.progressPhase,
+  generationStartedAt: message.generationStartedAt,
+  generationElapsedMs: message.generationElapsedMs,
   createdAt: message.createdAt,
   skeletons: message.skeletons ? [...message.skeletons] : undefined,
   parseError: message.parseError,
@@ -101,6 +104,9 @@ export const turnsToMessages = (turns: ChatTurn[]): ChatMessage[] =>
       role: "assistant",
       lifecycleStatus: assistant.lifecycleStatus,
       statusText: assistant.statusText,
+      progressPhase: assistant.progressPhase,
+      generationStartedAt: assistant.generationStartedAt,
+      generationElapsedMs: assistant.generationElapsedMs,
       createdAt: assistant.createdAt,
       turnId: turn.turnId,
       messageId: assistant.messageId,
@@ -131,6 +137,14 @@ export const stopIncompleteAssistantMessages = (
         ...message,
         lifecycleStatus: "aborted",
         statusText: undefined,
+        progressPhase: undefined,
+        generationElapsedMs:
+          message.generationElapsedMs ??
+          Math.max(
+            0,
+            Date.now() -
+              (message.generationStartedAt ?? message.createdAt ?? Date.now()),
+          ),
         isComplete: true,
         stopReason: "interrupted",
       };

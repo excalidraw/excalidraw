@@ -701,18 +701,22 @@ const TTADialogContent = ({
       };
 
       if (options?.insertAssistantMessage !== false) {
+        const generationStartedAt = Date.now();
         setChatMessages((prev) => [
           ...prev,
           {
             id: assistantId,
             role: "assistant",
             lifecycleStatus: "pending",
+            progressPhase: "starting",
             statusText: retryContext
               ? retryContext.reason === "generation_error"
                 ? t("ai.chat.status.retrying")
                 : t("ai.chat.status.regenerating")
               : "",
-            createdAt: Date.now(),
+            createdAt: generationStartedAt,
+            generationStartedAt,
+            generationElapsedMs: undefined,
             isComplete: false,
           },
         ]);
@@ -958,6 +962,7 @@ const TTADialogContent = ({
       const retryingText = isErrorRetry
         ? t("ai.chat.status.retrying")
         : t("ai.chat.status.regenerating");
+      const retryStartedAt = Date.now();
       if (isErrorRetry) {
         setChatMessages((prev) =>
           prev.map((entry) =>
@@ -965,7 +970,11 @@ const TTADialogContent = ({
               ? {
                   ...entry,
                   lifecycleStatus: "pending",
+                  progressPhase: "starting",
                   statusText: retryingText,
+                  createdAt: retryStartedAt,
+                  generationStartedAt: retryStartedAt,
+                  generationElapsedMs: undefined,
                   error: undefined,
                   isComplete: false,
                   stopReason: undefined,
@@ -983,8 +992,11 @@ const TTADialogContent = ({
             id: retryAssistantId,
             role: "assistant",
             lifecycleStatus: "pending",
+            progressPhase: "starting",
             statusText: retryingText,
-            createdAt: Date.now(),
+            createdAt: retryStartedAt,
+            generationStartedAt: retryStartedAt,
+            generationElapsedMs: undefined,
             isComplete: false,
           },
         ]);
@@ -1209,7 +1221,15 @@ const TTADialogContent = ({
           {
             ...lastMsg,
             lifecycleStatus: "aborted",
+            progressPhase: undefined,
             statusText: undefined,
+            generationElapsedMs: Math.max(
+              0,
+              Date.now() -
+                (lastMsg.generationStartedAt ??
+                  lastMsg.createdAt ??
+                  Date.now()),
+            ),
             isComplete: true,
             stopReason: "user",
           },

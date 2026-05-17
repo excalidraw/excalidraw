@@ -111,6 +111,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .ai-chat-message__header-label {
@@ -119,9 +120,19 @@
   font-weight: 600;
   font-variation-settings: "wght" 600;
   color: var(--text-primary-color);
+  flex: 1 1 auto;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ai-chat-message__header-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .ai-chat-message__header-timestamp {
@@ -324,6 +335,67 @@
   &:disabled {
     cursor: not-allowed;
     text-decoration: none;
+  }
+}
+
+.ai-chat-message__status-line {
+  margin-top: 0.35rem;
+}
+
+.tta-chat-message__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.25rem;
+  color: var(--text-secondary-color);
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.tta-chat-message__header-progress {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 2.8rem;
+  color: var(--text-secondary-color);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.tta-chat-message__progress--complete {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.tta-chat-message__progress--message {
+  min-height: auto;
+}
+
+.tta-chat-message__progress-spinner {
+  width: 0.65rem;
+  height: 0.65rem;
+  border: 1.5px solid var(--sidebar-border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  flex: 0 0 auto;
+  animation: tta-chat-progress-spin 0.9s linear infinite;
+}
+
+.tta-chat-message__progress-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tta-chat-message__progress-time {
+  color: var(--text-secondary-color);
+  white-space: nowrap;
+}
+
+@keyframes tta-chat-progress-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

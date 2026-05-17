@@ -15,6 +15,7 @@ import { getAIErrorMessageKey } from "./utils";
 import { useAIAssistantPreview } from "./useAIAssistantPreview";
 
 import type {
+  AIStreamProgressPhase,
   AssistantChatMessage,
   ChatMessage as ChatMessageType,
   TTAChatScrollOptions,
@@ -99,6 +100,65 @@ type TTAAssistantChatMessageProps = Omit<
   message: AssistantChatMessage;
 };
 
+const formatElapsedTime = (elapsedMs?: number | null) => {
+  if (elapsedMs == null || !Number.isFinite(elapsedMs)) {
+    return null;
+  }
+
+  const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
+  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const minutes = totalMinutes % 60;
+  const hours = Math.floor(totalMinutes / 60);
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(
+      seconds,
+    ).padStart(2, "0")}`;
+  }
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+};
+
+const useLiveNow = (enabled: boolean) => {
+  const [now, setNow] = useState(Date.now);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [enabled]);
+
+  return now;
+};
+
+const getProgressLabel = ({
+  message,
+  phase,
+  t,
+}: {
+  message: AssistantChatMessage;
+  phase?: AIStreamProgressPhase;
+  t: ReturnType<typeof useI18n>["t"];
+}): string | null => {
+  const statusText = message.statusText?.trim();
+  if (statusText) {
+    return statusText;
+  }
+
+  switch (phase) {
+    case "thinking":
+      return t("ai.chat.status.thinking");
+    case "finalizing":
+      return t("ai.chat.status.finalizing");
+    default:
+      return null;
+  }
+};
+
 const TTAAssistantChatMessage = ({
   message,
   onInsert,
@@ -122,6 +182,7 @@ const TTAAssistantChatMessage = ({
   const isGeneratingPreview = message.isComplete === false;
   const hasCurrentPreview = Boolean(previewSvg);
   const assistantError = message.error;
+  const liveNow = useLiveNow(isGeneratingPreview && !assistantError);
   const isRateLimitWarning = Boolean(
     assistantError?.code === 429 && message.warningType,
   );
@@ -178,11 +239,7 @@ const TTAAssistantChatMessage = ({
   if (assistantError) {
     visibleContent = undefined;
   } else if (isGeneratingPreview) {
-    const pendingText = message.statusText?.trim() || "";
-    const hasStreamingOutput = Boolean(message.skeletons?.length);
-    if (pendingText.length > 0 || !hasStreamingOutput) {
-      visibleContent = pendingText;
-    }
+    visibleContent = undefined;
   } else if (message.isComplete && !hasCurrentPreview) {
     visibleContent = message.statusText;
   }
@@ -223,6 +280,95 @@ const TTAAssistantChatMessage = ({
   const retryActionLabel = !assistantError
     ? t("ai.chat.actions.regenerate")
     : t("ai.chat.actions.retry");
+
+  const generationStartedAt =
+    message.generationStartedAt ??
+    message.createdAt ??
+    fallbackTimestampRef.current;
+  const runningElapsedMs = isGeneratingPreview
+    ? liveNow - generationStartedAt
+    : undefined;
+  const elapsedLabel = formatElapsedTime(
+    isGeneratingPreview ? runningElapsedMs : message.generationElapsedMs,
+  );
+  const stopReasonText =
+    message.stopReason === "user"
+      ? t(`ai.chat.stopReason.user`)
+      : message.stopReason === "interrupted"
+      ? t(`ai.chat.stopReason.interrupted`)
+      : undefined;
+  const activeProgressLabel =
+    isGeneratingPreview && !assistantError
+      ? getProgressLabel({
+          message,
+          phase: message.progressPhase,
+          t,
+        })
+      : null;
+  const headerProgress =
+    isGeneratingPreview && !assistantError ? (
+      <div
+        className="tta-chat-message__header-progress"
+        aria-label={
+          activeProgressLabel
+            ? `${activeProgressLabel} ${elapsedLabel ?? ""}`.trim()
+            : elapsedLabel ?? undefined
+        }
+        title={activeProgressLabel ?? undefined}
+      >
+        <span className="tta-chat-message__progress-spinner" aria-hidden />
+        {elapsedLabel && (
+          <span className="tta-chat-message__progress-time">
+            {elapsedLabel}
+          </span>
+        )}
+      </div>
+    ) : undefined;
+  const statusLine = (() => {
+    if (isGeneratingPreview && !assistantError) {
+      if (!activeProgressLabel) {
+        return undefined;
+      }
+
+      return (
+        <div
+          className="tta-chat-message__progress tta-chat-message__progress--message"
+          aria-live="polite"
+        >
+          <span className="tta-chat-message__progress-label">
+            {activeProgressLabel}
+          </span>
+        </div>
+      );
+    }
+
+    const elapsedSummary = elapsedLabel
+      ? assistantError
+        ? t("ai.chat.status.failedAfter", { time: elapsedLabel })
+        : message.stopReason
+        ? t("ai.chat.status.stoppedAfter", { time: elapsedLabel })
+        : t("ai.chat.status.completedIn", { time: elapsedLabel })
+      : undefined;
+
+    if (!stopReasonText && !elapsedSummary) {
+      return undefined;
+    }
+
+    return (
+      <div className="tta-chat-message__progress tta-chat-message__progress--complete">
+        {stopReasonText && (
+          <span className="tta-chat-message__progress-label">
+            {stopReasonText}
+          </span>
+        )}
+        {elapsedSummary && (
+          <span className="tta-chat-message__progress-time">
+            {elapsedSummary}
+          </span>
+        )}
+      </div>
+    );
+  })();
 
   if (customWarning !== undefined) {
     return <>{customWarning}</>;
@@ -303,13 +449,8 @@ const TTAAssistantChatMessage = ({
       onPreviewLoad={handleGeneratedPreviewLoad}
       previewLabel={t("ai.chat.preview")}
       error={errorNode}
-      statusLine={
-        message.stopReason === "user"
-          ? t(`ai.chat.stopReason.user`)
-          : message.stopReason === "interrupted"
-          ? t(`ai.chat.stopReason.interrupted`)
-          : undefined
-      }
+      statusLine={statusLine}
+      headerEnd={headerProgress}
       actions={actionsNode}
     />
   );

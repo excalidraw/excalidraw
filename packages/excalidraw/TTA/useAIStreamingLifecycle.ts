@@ -59,6 +59,10 @@ const isExhaustedRateLimit = (rateLimitRemaining?: number | null) =>
   Number.isFinite(rateLimitRemaining) &&
   rateLimitRemaining === 0;
 
+const STREAM_IDLE_STATUS_DELAY = 5000;
+
+const getElapsedMs = (startedAt: number) => Math.max(0, Date.now() - startedAt);
+
 export const useAIStreamingLifecycle = ({
   app,
   chatMessages,
@@ -157,6 +161,31 @@ export const useAIStreamingLifecycle = ({
     async (assistantId: string, payload: AIGenerateRequestPayload) => {
       let activeTurnId: string | null = null;
       let activeMessageId: string | null = null;
+      let idleStatusTimeout: ReturnType<typeof setTimeout> | null = null;
+      let hasReceivedRenderableChunk = false;
+      const generationStartedAt = Date.now();
+
+      const clearIdleStatusTimeout = () => {
+        if (idleStatusTimeout !== null) {
+          clearTimeout(idleStatusTimeout);
+          idleStatusTimeout = null;
+        }
+      };
+
+      const scheduleIdleStatus = () => {
+        clearIdleStatusTimeout();
+        idleStatusTimeout = setTimeout(() => {
+          if (stopRequestedRef.current) {
+            return;
+          }
+          patchAssistantMessage(assistantId, {
+            progressPhase: hasReceivedRenderableChunk
+              ? "finalizing"
+              : "thinking",
+            statusText: undefined,
+          });
+        }, STREAM_IDLE_STATUS_DELAY);
+      };
 
       try {
         const abortController = new AbortController();
@@ -166,33 +195,62 @@ export const useAIStreamingLifecycle = ({
           abortController.abort();
         }
 
+        patchAssistantMessage(assistantId, {
+          lifecycleStatus: "pending",
+          progressPhase: "starting",
+          statusText: undefined,
+          generationStartedAt,
+          generationElapsedMs: undefined,
+          isComplete: false,
+          stopReason: undefined,
+        });
+
         const { finalPayload, error, rateLimit, rateLimitRemaining } =
           await streamFetch({
             payload,
             signal: abortController.signal,
+            onStreamCreated: () => {
+              patchAssistantMessage(assistantId, {
+                progressPhase: "waiting",
+                statusText: undefined,
+              });
+              scheduleIdleStatus();
+            },
             onStarted: (startedPayload) => {
               activeTurnId = startedPayload.turnId;
               activeMessageId = startedPayload.messageId;
               applyServerChatMetadata(startedPayload);
               patchAssistantMessage(assistantId, {
                 lifecycleStatus: startedPayload.lifecycleStatus ?? "pending",
+                progressPhase: "generating",
+                statusText: undefined,
                 turnId: startedPayload.turnId,
                 messageId: startedPayload.messageId,
               });
+              scheduleIdleStatus();
             },
             onMessage: (messagePayload) => {
               patchAssistantMessage(assistantId, {
+                progressPhase: "finalizing",
                 statusText: messagePayload.message,
               });
+              scheduleIdleStatus();
             },
             onChunk: (partialPayload) => {
               if (stopRequestedRef.current) {
                 return;
               }
+              scheduleIdleStatus();
               if (!partialPayload.skeletons.length) {
+                patchAssistantMessage(assistantId, {
+                  progressPhase: "generating",
+                  statusText: undefined,
+                });
                 return;
               }
+              hasReceivedRenderableChunk = true;
               patchAssistantMessage(assistantId, {
+                progressPhase: "generating",
                 statusText: undefined,
                 skeletons: partialPayload.skeletons,
                 parseError: undefined,
@@ -216,6 +274,8 @@ export const useAIStreamingLifecycle = ({
           cancelPendingCanvasPreviewRenders();
           patchAssistantMessage(assistantId, {
             lifecycleStatus: error.lifecycleStatus ?? "failed",
+            progressPhase: undefined,
+            generationElapsedMs: getElapsedMs(generationStartedAt),
             statusText: undefined,
             error: {
               code: error.code,
@@ -260,6 +320,8 @@ export const useAIStreamingLifecycle = ({
 
         patchAssistantMessage(assistantId, {
           lifecycleStatus: finalPayload.lifecycleStatus ?? "completed",
+          progressPhase: undefined,
+          generationElapsedMs: getElapsedMs(generationStartedAt),
           statusText: finalPayload.skeletons.length
             ? t("ai.chat.status.generatedResponse")
             : t("ai.chat.status.emptyResponse"),
@@ -297,6 +359,8 @@ export const useAIStreamingLifecycle = ({
 
         patchAssistantMessage(assistantId, {
           lifecycleStatus: "failed",
+          progressPhase: undefined,
+          generationElapsedMs: getElapsedMs(generationStartedAt),
           statusText: undefined,
           error: {
             code: errorCode,
@@ -308,6 +372,7 @@ export const useAIStreamingLifecycle = ({
           handled: true,
         });
       } finally {
+        clearIdleStatusTimeout();
         cancelPendingCanvasPreviewRenders();
         resetCanvasPreviewRenderState();
         activeStreamAbortControllerRef.current = null;

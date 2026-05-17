@@ -34,6 +34,9 @@ const TestHarness = ({
 }) => {
   const [app] = useState(createMockApp);
   const [streamFetch] = useState(() => vi.fn().mockResolvedValue(streamResult));
+  const [applyServerChatMetadata] = useState(() => vi.fn());
+  const [removeGeneratedElementsByMessageId] = useState(() => vi.fn());
+  const [commitQueuedGenerationReplacements] = useState(() => vi.fn());
   const didGenerateRef = useRef(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -55,9 +58,9 @@ const TestHarness = ({
     chatMessages,
     t,
     setChatMessages,
-    applyServerChatMetadata: vi.fn(),
-    removeGeneratedElementsByMessageId: vi.fn(),
-    commitQueuedGenerationReplacements: vi.fn(),
+    applyServerChatMetadata,
+    removeGeneratedElementsByMessageId,
+    commitQueuedGenerationReplacements,
     streamFetch,
     onRateLimitInfo,
   });
@@ -123,6 +126,7 @@ describe("useAIStreamingLifecycle", () => {
       isComplete: true,
       turnId: "turn-1",
       messageId: "message-1",
+      generationElapsedMs: expect.any(Number),
     });
     expect(messages[2]).toMatchObject({
       role: "assistant",
