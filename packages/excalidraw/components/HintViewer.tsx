@@ -176,6 +176,9 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
+      if (app.scene.getNonDeletedElements().length === 0) {
+        return t("hints.selectToolOnEmptyCanvas");
+      }
       return t("hints.canvasPanning", {
         shortcut_1: getTaggedShortcutKey(t("keys.mmb")),
         shortcut_2: getTaggedShortcutKey("Space"),

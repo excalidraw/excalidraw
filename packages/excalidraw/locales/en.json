@@ -357,6 +357,7 @@
   "hints": {
     "dismissSearch": "{{shortcut}} to dismiss search",
     "canvasPanning": "To move canvas, hold {{shortcut_1}} or {{shortcut_2}} while dragging, or use the hand tool",
+    "selectToolOnEmptyCanvas": "Select a shape or drawing tool from the toolbar to start creating",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
     "arrowBindModifiers": "Hold {{shortcut_1}} to disable binding, or {{shortcut_2}} to bind at a fixed point",
