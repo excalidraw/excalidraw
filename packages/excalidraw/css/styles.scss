@@ -202,6 +202,28 @@ body.excalidraw-cursor-resize * {
       }
     }
 
+    .strokeWidth-customInput {
+      width: 3.5rem;
+      height: 2rem;
+      padding: 0 0.375rem;
+      border-radius: var(--border-radius-md, 0.5rem);
+      border: 1px solid var(--input-border-color, var(--default-border-color));
+      background-color: var(--input-bg-color, var(--island-bg-color));
+      color: var(--text-primary-color);
+      font-size: 0.75rem;
+      font-family: inherit;
+      text-align: center;
+      box-sizing: border-box;
+      appearance: textfield;
+      -moz-appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+
     fieldset {
       margin: 0;
       padding: 0;
