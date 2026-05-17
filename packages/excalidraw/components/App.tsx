@@ -7106,7 +7106,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     } else if (newElement && isFreeDrawElement(newElement)) {
-      const detectedElement = convertToShape(newElement);
+      const detectedElement = convertToShape(newElement, this.state);
       if (isBindingElement(detectedElement, false)) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           detectedElement,
@@ -10897,7 +10897,7 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         if (this.state.isConvertToShapeEnabled) {
-          const detectedElement = convertToShape(newElement);
+          const detectedElement = convertToShape(newElement, this.state);
 
           if (detectedElement !== newElement) {
             this.scene.replaceAllElements([

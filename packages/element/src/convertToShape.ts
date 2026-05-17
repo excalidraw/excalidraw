@@ -16,6 +16,8 @@ import {
 import { ROUNDNESS } from "@excalidraw/common";
 import { simplify } from "points-on-curve";
 
+import type { AppState } from "@excalidraw/excalidraw/types";
+
 import type { Degrees, LocalPoint } from "@excalidraw/math";
 
 import type { BoundingBox } from "@excalidraw/element/bounds";
@@ -349,6 +351,7 @@ export const recognizeShape = (
  */
 export const convertToShape = (
   freeDrawElement: ExcalidrawFreeDrawElement,
+  appState: AppState,
 ): ExcalidrawElement => {
   const recognizedShape = recognizeShape(freeDrawElement);
 
@@ -368,7 +371,11 @@ export const convertToShape = (
     }
     case "arrow": {
       return newArrowElement({
-        ...freeDrawElement,
+        x: freeDrawElement.x,
+        y: freeDrawElement.y,
+        strokeColor: appState.currentItemStrokeColor,
+        startArrowhead: appState.currentItemStartArrowhead,
+        endArrowhead: appState.currentItemEndArrowhead,
         type: recognizedShape.type,
         points: [
           recognizedShape.simplified[0],

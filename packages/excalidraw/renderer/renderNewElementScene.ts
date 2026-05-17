@@ -77,7 +77,7 @@ const _renderNewElementScene = ({
       );
 
       if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
-        const detectedElement = convertToShape(newElement);
+        const detectedElement = convertToShape(newElement, appState);
         if (detectedElement !== newElement) {
           renderElement(
             {
