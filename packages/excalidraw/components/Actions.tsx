@@ -203,10 +203,7 @@ export const SelectedShapeActions = ({
 
       {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) && (
-        <>
-          {renderAction("changeStrokeShape")}
-          {renderAction("toggleConvertToShape")}
-        </>
+        <>{renderAction("toggleConvertToShape")}</>
       )}
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
@@ -411,6 +408,10 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
+              {(appState.activeTool.type === "freedraw" ||
+                targetElements.some(
+                  (element) => element.type === "freedraw",
+                )) && <>{renderAction("toggleConvertToShape")}</>}
               {renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
