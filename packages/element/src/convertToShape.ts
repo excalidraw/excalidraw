@@ -32,6 +32,8 @@ import type {
   ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
+import { isUsingAdaptiveRadius } from "./typeChecks";
+
 type Shape =
   | ExcalidrawRectangleElement["type"]
   | ExcalidrawEllipseElement["type"]
@@ -354,45 +356,85 @@ export const convertToShape = (
   appState: AppState,
 ): ExcalidrawElement => {
   const recognizedShape = recognizeShape(freeDrawElement);
+  const roundness =
+    appState.currentItemRoundness === "round"
+      ? {
+          type: isUsingAdaptiveRadius(recognizedShape.type)
+            ? ROUNDNESS.ADAPTIVE_RADIUS
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null;
 
   switch (recognizedShape.type) {
     case "rectangle":
     case "diamond":
     case "ellipse": {
       return newElement({
-        ...freeDrawElement,
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
         type: recognizedShape.type,
         x: recognizedShape.boundingBox.minX,
         y: recognizedShape.boundingBox.minY,
-        width: recognizedShape.boundingBox.width!,
-        height: recognizedShape.boundingBox.height!,
+        width: recognizedShape.boundingBox.width,
+        height: recognizedShape.boundingBox.height,
+        groupIds: freeDrawElement.groupIds,
+        locked: freeDrawElement.locked,
+        angle: freeDrawElement.angle,
+        frameId: freeDrawElement.frameId,
+        roundness,
+        roughness: freeDrawElement.roughness,
+        backgroundColor: freeDrawElement.backgroundColor,
+        strokeColor: freeDrawElement.strokeColor,
+        fillStyle: freeDrawElement.fillStyle,
+        opacity: freeDrawElement.opacity,
+        strokeStyle: freeDrawElement.strokeStyle,
+        strokeWidth: freeDrawElement.strokeWidth,
       });
     }
     case "arrow": {
       return newArrowElement({
+        type: recognizedShape.type,
         x: freeDrawElement.x,
         y: freeDrawElement.y,
-        strokeColor: appState.currentItemStrokeColor,
         startArrowhead: appState.currentItemStartArrowhead,
         endArrowhead: appState.currentItemEndArrowhead,
-        type: recognizedShape.type,
         points: [
           recognizedShape.simplified[0],
           recognizedShape.simplified[recognizedShape.simplified.length - 2],
         ],
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+        groupIds: freeDrawElement.groupIds,
+        locked: freeDrawElement.locked,
+        angle: freeDrawElement.angle,
+        frameId: freeDrawElement.frameId,
+        roundness,
+        roughness: freeDrawElement.roughness,
+        backgroundColor: freeDrawElement.backgroundColor,
+        strokeColor: freeDrawElement.strokeColor,
+        fillStyle: freeDrawElement.fillStyle,
+        opacity: freeDrawElement.opacity,
+        strokeStyle: freeDrawElement.strokeStyle,
+        strokeWidth: freeDrawElement.strokeWidth,
       });
     }
     case "line": {
       return newLinearElement({
-        ...freeDrawElement,
         type: recognizedShape.type,
+        x: freeDrawElement.x,
+        y: freeDrawElement.y,
         points: [
           recognizedShape.simplified[0],
           recognizedShape.simplified[recognizedShape.simplified.length - 1],
         ],
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+        groupIds: freeDrawElement.groupIds,
+        locked: freeDrawElement.locked,
+        angle: freeDrawElement.angle,
+        frameId: freeDrawElement.frameId,
+        roundness,
+        roughness: freeDrawElement.roughness,
+        backgroundColor: freeDrawElement.backgroundColor,
+        strokeColor: freeDrawElement.strokeColor,
+        fillStyle: freeDrawElement.fillStyle,
+        opacity: freeDrawElement.opacity,
+        strokeStyle: freeDrawElement.strokeStyle,
+        strokeWidth: freeDrawElement.strokeWidth,
       });
     }
     default:
