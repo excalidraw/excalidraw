@@ -131,8 +131,8 @@ import {
   ArrowheadCardinalityOneOrManyIcon,
   ArrowheadCardinalityZeroOrManyIcon,
   ArrowheadCardinalityZeroOrOneIcon,
-  snapShapeEnabledIcon,
-  snapShapeDisabledIcon,
+  wobblyCircleIcon,
+  extraToolsIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -2068,12 +2068,12 @@ export const actionToggleConvertToShape = register({
             {
               value: false,
               text: t("labels.convertToShapeDisable"),
-              icon: snapShapeDisabledIcon,
+              icon: wobblyCircleIcon,
             },
             {
               value: true,
               text: t("labels.convertToShapeEnable"),
-              icon: snapShapeEnabledIcon,
+              icon: extraToolsIcon,
             },
           ]}
           value={appState.isConvertToShapeEnabled}

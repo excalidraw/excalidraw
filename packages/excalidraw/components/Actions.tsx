@@ -39,6 +39,7 @@ import { t } from "../i18n";
 import {
   canChangeRoundness,
   canHaveArrowheads,
+  getSelectedElements,
   getTargetElements,
   hasBackground,
   hasStrokeStyle,
@@ -146,6 +147,7 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const selectedElements = getSelectedElements(elementsMap, appState);
 
   let isSingleElementBoundContainer = false;
   if (
@@ -191,6 +193,9 @@ export const SelectedShapeActions = ({
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
+  const showLayerActions =
+    !isFreedrawActive || selectedElements.some((x) => x.type === "freedraw");
+
   return (
     <div className="selected-shape-actions">
       <div>
@@ -200,23 +205,26 @@ export const SelectedShapeActions = ({
       {canChangeBackgroundColor(appState, targetElements) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+
+      {(appState.activeTool.type === "freedraw" ||
+        targetElements.some((element) => element.type === "freedraw")) && (
+        <>{renderAction("toggleConvertToShape")}</>
+      )}
+
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) && (
-        <>{renderAction("toggleConvertToShape")}</>
-      )}
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type)) ||
         (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
+        <>{renderAction("changeStrokeStyle")}</>
+      )}
+      {(hasStrokeStyle(appState.activeTool.type) ||
+        targetElements.some((element) => hasStrokeStyle(element.type))) && (
+        <>{renderAction("changeSloppiness")}</>
       )}
 
       {(canChangeRoundness(appState.activeTool.type) ||
@@ -225,8 +233,7 @@ export const SelectedShapeActions = ({
       )}
 
       {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type)) ||
-        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
+        targetElements.some((element) => toolIsArrow(element.type))) && (
         <>{renderAction("changeArrowType")}</>
       )}
 
@@ -251,15 +258,17 @@ export const SelectedShapeActions = ({
 
       {renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
+      {showLayerActions && (
+        <fieldset>
+          <legend>{t("labels.layers")}</legend>
+          <div className="buttonList">
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </div>
+        </fieldset>
+      )}
 
       {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
@@ -401,6 +410,10 @@ const CombinedShapeProperties = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
+              {(appState.activeTool.type === "freedraw" ||
+                targetElements.some(
+                  (element) => element.type === "freedraw",
+                )) && <>{renderAction("toggleConvertToShape")}</>}
               {showFillIcons && renderAction("changeFillStyle")}
               {(hasStrokeWidth(appState.activeTool.type) ||
                 targetElements.some((element) =>
@@ -412,20 +425,17 @@ const CombinedShapeProperties = ({
                   hasStrokeStyle(element.type),
                 ) ||
                 (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
-                <>
-                  {renderAction("changeStrokeStyle")}
-                  {renderAction("changeSloppiness")}
-                </>
+                <>{renderAction("changeStrokeStyle")}</>
               )}
+              {(hasStrokeStyle(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  hasStrokeStyle(element.type),
+                )) && <>{renderAction("changeSloppiness")}</>}
               {(canChangeRoundness(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
-              {(appState.activeTool.type === "freedraw" ||
-                targetElements.some(
-                  (element) => element.type === "freedraw",
-                )) && <>{renderAction("toggleConvertToShape")}</>}
               {renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
@@ -450,19 +460,13 @@ const CombinedArrowProperties = ({
   container: HTMLDivElement | null;
   app: AppClassProperties;
 }) => {
-  const isFreedrawActive =
-    appState.activeTool.type === "freedraw" ||
-    targetElements.some((element) => element.type === "freedraw");
+  const showArrowProperties = toolIsArrow(appState.activeTool.type);
 
-  const showShowArrowProperties =
-    toolIsArrow(appState.activeTool.type) ||
-    targetElements.some((element) => toolIsArrow(element.type)) ||
-    (isFreedrawActive && appState.isConvertToShapeEnabled);
-  const isOpen = appState.openPopup === "compactArrowProperties";
-
-  if (!showShowArrowProperties) {
+  if (!showArrowProperties) {
     return null;
   }
+
+  const isOpen = appState.openPopup === "compactArrowProperties";
 
   return (
     <div className="compact-action-item">
@@ -632,6 +636,7 @@ const CombinedExtraActions = ({
   appState,
   renderAction,
   targetElements,
+  selectedElements,
   setAppState,
   container,
   app,
@@ -640,6 +645,7 @@ const CombinedExtraActions = ({
 }: {
   appState: UIAppState;
   targetElements: ExcalidrawElement[];
+  selectedElements: ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
@@ -667,6 +673,9 @@ const CombinedExtraActions = ({
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
   const isOpen = appState.openPopup === "compactOtherProperties";
+  const showLayerActions =
+    appState.activeTool.type !== "freedraw" ||
+    selectedElements.some((x) => x.type === "freedraw");
 
   if (isEditingTextOrNewElement || targetElements.length === 0) {
     return null;
@@ -714,15 +723,17 @@ const CombinedExtraActions = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              <fieldset>
-                <legend>{t("labels.layers")}</legend>
-                <div className="buttonList">
-                  {renderAction("sendToBack")}
-                  {renderAction("sendBackward")}
-                  {renderAction("bringForward")}
-                  {renderAction("bringToFront")}
-                </div>
-              </fieldset>
+              {showLayerActions && (
+                <fieldset>
+                  <legend>{t("labels.layers")}</legend>
+                  <div className="buttonList">
+                    {renderAction("sendToBack")}
+                    {renderAction("sendBackward")}
+                    {renderAction("bringForward")}
+                    {renderAction("bringToFront")}
+                  </div>
+                </fieldset>
+              )}
 
               {showAlignActions && !isSingleElementBoundContainer && (
                 <fieldset>
@@ -821,6 +832,7 @@ export const CompactShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const selectedElements = getSelectedElements(elementsMap, appState);
   const { container } = useExcalidrawContainer();
 
   const isEditingTextOrNewElement = Boolean(
@@ -908,6 +920,7 @@ export const CompactShapeActions = ({
         appState={appState}
         renderAction={renderAction}
         targetElements={targetElements}
+        selectedElements={selectedElements}
         setAppState={setAppState}
         container={container}
         app={app}
@@ -930,6 +943,7 @@ export const MobileShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const selectedElements = getSelectedElements(elementsMap, appState);
   const { container } = useExcalidrawContainer();
   const mobileActionsRef = useRef<HTMLDivElement>(null);
 
@@ -1030,6 +1044,7 @@ export const MobileShapeActions = ({
           appState={appState}
           renderAction={renderAction}
           targetElements={targetElements}
+          selectedElements={selectedElements}
           setAppState={setAppState}
           container={container}
           app={app}
