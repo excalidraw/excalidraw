@@ -239,7 +239,6 @@ function checkQuadrilateral(
 
   // Take the first 4 points as vertices (RDP might add 5th closing point)
   const vertices = points.slice(0, QUADRILATERAL_SIDES);
-  // console.log("Vertices (Quad Check):", vertices);
 
   // Calculate internal angles
   const angles: number[] = [];
