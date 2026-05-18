@@ -64,7 +64,7 @@ export const TTDDialog = (
 ) => {
   const appState = useUIAppState();
 
-  if (appState.openDialog?.name !== "ttd") {
+  if (!appState || appState.openDialog?.name !== "ttd") {
     return null;
   }
 

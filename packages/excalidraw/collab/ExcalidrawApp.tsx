@@ -175,7 +175,10 @@ if (window.self !== window.top) {
   try {
     const parentUrl = new URL(document.referrer);
     const currentUrl = new URL(window.location.href);
-    if (parentUrl.origin === currentUrl.origin) {
+    if (
+      parentUrl.origin === currentUrl.origin
+      && parentUrl.pathname === currentUrl.pathname
+    ) {
       isSelfEmbedding = true;
     }
   } catch (error) {
