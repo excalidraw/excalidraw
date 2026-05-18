@@ -251,8 +251,7 @@ export const SelectedShapeActions = ({
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type)) ||
-        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
+        targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
 
