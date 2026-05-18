@@ -161,13 +161,18 @@ export const SelectedShapeActions = ({
   const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  const isFreedrawActive =
+    appState.activeTool.type === "freedraw" ||
+    targetElements.some((element) => element.type === "freedraw");
+
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
+    ) ||
+    (isFreedrawActive && appState.isConvertToShapeEnabled);
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
@@ -206,7 +211,8 @@ export const SelectedShapeActions = ({
         <>{renderAction("toggleConvertToShape")}</>
       )}
       {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
+        targetElements.some((element) => hasStrokeStyle(element.type)) ||
+        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
         <>
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
@@ -219,7 +225,8 @@ export const SelectedShapeActions = ({
       )}
 
       {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
+        targetElements.some((element) => toolIsArrow(element.type)) ||
+        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
         <>{renderAction("changeArrowType")}</>
       )}
 
@@ -237,7 +244,8 @@ export const SelectedShapeActions = ({
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
+        targetElements.some((element) => canHaveArrowheads(element.type)) ||
+        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
         <>{renderAction("changeArrowhead")}</>
       )}
 
@@ -328,13 +336,18 @@ const CombinedShapeProperties = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
 }) => {
+  const isFreedrawActive =
+    appState.activeTool.type === "freedraw" ||
+    targetElements.some((element) => element.type === "freedraw");
+
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
+    ) ||
+    (isFreedrawActive && appState.isConvertToShapeEnabled);
 
   const shouldShowCombinedProperties =
     targetElements.length > 0 ||
@@ -397,7 +410,8 @@ const CombinedShapeProperties = ({
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
-                )) && (
+                ) ||
+                (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
                 <>
                   {renderAction("changeStrokeStyle")}
                   {renderAction("changeSloppiness")}
@@ -436,9 +450,14 @@ const CombinedArrowProperties = ({
   container: HTMLDivElement | null;
   app: AppClassProperties;
 }) => {
+  const isFreedrawActive =
+    appState.activeTool.type === "freedraw" ||
+    targetElements.some((element) => element.type === "freedraw");
+
   const showShowArrowProperties =
     toolIsArrow(appState.activeTool.type) ||
-    targetElements.some((element) => toolIsArrow(element.type));
+    targetElements.some((element) => toolIsArrow(element.type)) ||
+    (isFreedrawActive && appState.isConvertToShapeEnabled);
   const isOpen = appState.openPopup === "compactArrowProperties";
 
   if (!showShowArrowProperties) {
