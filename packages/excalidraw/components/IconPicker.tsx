@@ -157,7 +157,7 @@ function Picker<T>({
       }
       align="start"
       sideOffset={12}
-      style={{ zIndex: "var(--zIndex-popup)" }}
+      style={{ zIndex: "var(--zIndex-popup)" as any }}
       onKeyDown={handleKeyDown}
     >
       <div
