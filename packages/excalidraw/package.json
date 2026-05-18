@@ -1,6 +1,6 @@
 {
   "name": "@jitsi/excalidraw",
-  "version": "0.18.5",
+  "version": "0.18.6",
   "type": "module",
   "types": "./dist/types/packages/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
