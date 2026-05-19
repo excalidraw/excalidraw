@@ -1,59 +1,56 @@
-import { arrayToMapWithIndex } from "@excalidraw/common";
+import { arrayToMap } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "./types";
 
-const normalizeGroupElementOrder = (elements: readonly ExcalidrawElement[]) => {
-  const origElements: ExcalidrawElement[] = elements.slice();
-  const sortedElements = new Set<ExcalidrawElement>();
-
-  const orderInnerGroups = (
-    elements: readonly ExcalidrawElement[],
-  ): ExcalidrawElement[] => {
-    const firstGroupSig = elements[0]?.groupIds?.join("");
-    const aGroup: ExcalidrawElement[] = [elements[0]];
-    const bGroup: ExcalidrawElement[] = [];
-    for (const element of elements.slice(1)) {
-      if (element.groupIds?.join("") === firstGroupSig) {
-        aGroup.push(element);
-      } else {
-        bGroup.push(element);
-      }
-    }
-    return bGroup.length ? [...aGroup, ...orderInnerGroups(bGroup)] : aGroup;
+const defragmentGroups = (elements: readonly ExcalidrawElement[]) => {
+  const groupIdAtLevel = (element: ExcalidrawElement, level: number) => {
+    return element.groupIds[element.groupIds.length - level - 1];
   };
 
-  const groupHandledElements = new Map<string, true>();
+  const orderLevel = (
+    levelElements: readonly ExcalidrawElement[],
+    level: number,
+  ): ExcalidrawElement[] => {
+    const buckets = new Map<string, ExcalidrawElement[]>();
+    // Slots preserve first-occurrence order: a groupId reserves its slot
+    // the first time one of its members is seen; loose elements occupy
+    // their own slot. Groups are then expanded (and recursed into) in place.
+    const slots: (ExcalidrawElement | string)[] = [];
 
-  origElements.forEach((element, idx) => {
-    if (groupHandledElements.has(element.id)) {
-      return;
-    }
-    if (element.groupIds?.length) {
-      const topGroup = element.groupIds[element.groupIds.length - 1];
-      const groupElements = origElements.slice(idx).filter((element) => {
-        const ret = element?.groupIds?.some((id) => id === topGroup);
-        if (ret) {
-          groupHandledElements.set(element!.id, true);
-        }
-        return ret;
-      });
-
-      for (const elem of orderInnerGroups(groupElements)) {
-        sortedElements.add(elem);
+    for (const element of levelElements) {
+      const groupId = groupIdAtLevel(element, level);
+      if (groupId === undefined) {
+        slots.push(element);
+        continue;
       }
-    } else {
-      sortedElements.add(element);
+      let bucket = buckets.get(groupId);
+      if (!bucket) {
+        bucket = [];
+        buckets.set(groupId, bucket);
+        slots.push(groupId);
+      }
+      bucket.push(element);
     }
-  });
+
+    return slots.flatMap((slot) =>
+      typeof slot === "string"
+        ? orderLevel(buckets.get(slot)!, level + 1)
+        : [slot],
+    );
+  };
+
+  // `groupIds` is stored innermost-first, so the outermost group is the
+  // last entry. We recurse from level 0 (outermost) inward.
+  const sortedElements = orderLevel(elements, 0);
 
   // if there's a bug which resulted in losing some of the elements, return
   // original instead as that's better than losing data
-  if (sortedElements.size !== elements.length) {
-    console.error("normalizeGroupElementOrder: lost some elements... bailing!");
+  if (sortedElements.length !== elements.length) {
+    console.error("defragmentGroups: lost some elements... bailing!");
     return elements;
   }
 
-  return [...sortedElements];
+  return sortedElements;
 };
 
 /**
@@ -68,39 +65,40 @@ const normalizeGroupElementOrder = (elements: readonly ExcalidrawElement[]) => {
 const normalizeBoundElementsOrder = (
   elements: readonly ExcalidrawElement[],
 ) => {
-  const elementsMap = arrayToMapWithIndex(elements);
+  const elementsMap = arrayToMap(elements);
 
-  const origElements: (ExcalidrawElement | null)[] = elements.slice();
   const sortedElements = new Set<ExcalidrawElement>();
 
-  origElements.forEach((element, idx) => {
-    if (!element) {
-      return;
+  for (const element of elements) {
+    if (sortedElements.has(element)) {
+      continue;
     }
+
     if (element.boundElements?.length) {
       sortedElements.add(element);
-      origElements[idx] = null;
-      element.boundElements.forEach((boundElement) => {
+      for (const boundElement of element.boundElements) {
         const child = elementsMap.get(boundElement.id);
         if (child && boundElement.type === "text") {
-          sortedElements.add(child[0]);
-          origElements[child[1]] = null;
+          sortedElements.add(child);
         }
-      });
-    } else if (element.type === "text" && element.containerId) {
-      const parent = elementsMap.get(element.containerId);
-      if (!parent?.[0].boundElements?.find((x) => x.id === element.id)) {
-        sortedElements.add(element);
-        origElements[idx] = null;
-
-        // if element has a container and container lists it, skip this element
-        // as it'll be taken care of by the container
       }
-    } else {
-      sortedElements.add(element);
-      origElements[idx] = null;
+      continue;
     }
-  });
+
+    // if element has a container and container lists it, skip this element
+    // as it'll be taken care of by the container
+    if (
+      element.type === "text" &&
+      element.containerId &&
+      elementsMap
+        .get(element.containerId)
+        ?.boundElements?.some((el) => el.id === element.id)
+    ) {
+      continue;
+    }
+
+    sortedElements.add(element);
+  }
 
   // if there's a bug which resulted in losing some of the elements, return
   // original instead as that's better than losing data
@@ -117,5 +115,5 @@ const normalizeBoundElementsOrder = (
 export const normalizeElementOrder = (
   elements: readonly ExcalidrawElement[],
 ) => {
-  return normalizeBoundElementsOrder(normalizeGroupElementOrder(elements));
+  return normalizeBoundElementsOrder(defragmentGroups(elements));
 };

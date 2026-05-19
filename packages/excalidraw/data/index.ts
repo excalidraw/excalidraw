@@ -6,6 +6,7 @@ import {
   MIME_TYPES,
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -33,8 +34,6 @@ import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
-import type { FileSystemHandle } from "./filesystem";
-
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
@@ -51,6 +50,7 @@ export const prepareElementsForExport = (
   exportSelectionOnly: boolean,
 ) => {
   elements = getNonDeletedElements(elements);
+  const elementsMap = arrayToMap(elements);
 
   const isExportingSelection =
     exportSelectionOnly &&
@@ -73,7 +73,11 @@ export const prepareElementsForExport = (
       isFrameLikeElement(exportedElements[0])
     ) {
       exportingFrame = exportedElements[0];
-      exportedElements = getElementsOverlappingFrame(elements, exportingFrame);
+      exportedElements = getElementsOverlappingFrame(
+        elements,
+        exportingFrame,
+        elementsMap,
+      );
     } else if (exportedElements.length > 1) {
       exportedElements = getSelectedElements(
         elements,
@@ -110,7 +114,7 @@ export const exportCanvas = async (
     viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
-    fileHandle?: FileSystemHandle | null;
+    fileHandle?: FileSystemFileHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
 ) => {

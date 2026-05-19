@@ -1,6 +1,9 @@
-import { generateNKeysBetween } from "fractional-indexing";
-
 import { arrayToMap } from "@excalidraw/common";
+
+import {
+  validateOrderKey,
+  generateNKeysBetween,
+} from "@excalidraw/fractional-indexing";
 
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";
@@ -379,6 +382,13 @@ const isValidFractionalIndex = (
   successor: ExcalidrawElement["index"] | undefined,
 ) => {
   if (!index) {
+    return false;
+  }
+
+  try {
+    // Format validation
+    validateOrderKey(index);
+  } catch {
     return false;
   }
 
