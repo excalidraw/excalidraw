@@ -613,7 +613,7 @@ export const terraformPlanParsing = async (
       },
     };
   } else {
-    const elkScene = await buildTerraformElkExcalidrawScene(nodes5);
+    const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
     emitLocalParseDebug({
       phase: "elkLayout",
       meta: elkScene.meta,

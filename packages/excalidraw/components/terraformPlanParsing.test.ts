@@ -463,6 +463,62 @@ describe("terraformPlanParsing", () => {
     expectAllplanmodulesCoalescedSubnetZones(body);
   }, 120_000);
 
+  it("allplanmodules semantic: writer lambda environment unknown-after lists SQS dependency", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const writerAddr =
+      "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+    const writerTile = (
+      body.elements as Array<{ customData?: Record<string, unknown> }>
+    ).find((e) => e.customData?.nodePath === writerAddr);
+    expect(writerTile).toBeTruthy();
+    const resources = writerTile?.customData?.terraformResources as
+      | Array<{
+          attributes?: Array<{
+            key?: string;
+            unknownAfter?: boolean;
+            value?: unknown;
+            unknownAfterPreview?: Array<{
+              key?: string;
+              resolvesTo?: string | null;
+              nodePath?: string | null;
+            }>;
+          }>;
+        }>
+      | undefined;
+    const envAttr = resources?.[0]?.attributes?.find(
+      (a) => a.key === "environment",
+    );
+    expect(envAttr).toEqual(
+      expect.objectContaining({
+        unknownAfter: true,
+        value: "Known after apply",
+      }),
+    );
+    const preview = envAttr?.unknownAfterPreview ?? [];
+    expect(preview).toHaveLength(1);
+    expect(preview[0]).toEqual(
+      expect.objectContaining({
+        key: "queue_url",
+        kind: "new",
+        resolvesTo: "module.application_job_queue.queue_url",
+      }),
+    );
+    expect(String(preview[0]?.nodePath ?? "")).toMatch(/aws_sqs_queue/);
+    expect(preview.find((r) => r.key === "DATA_BUCKET")).toBeUndefined();
+    expect(preview.find((r) => r.key === "test")).toBeUndefined();
+  }, 120_000);
+
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only import runs ELK pipeline",
     async () => {

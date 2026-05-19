@@ -408,4 +408,82 @@
     font-size: 0.75rem;
     line-height: 1.35;
   }
+
+  &__unknown-after {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &__depends-on {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  &__depends-on-list {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  &__depends-on-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-primary);
+    font: inherit;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: var(--color-primary-darker);
+    }
+  }
+
+  &__unknown-after-intent {
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.75rem;
+    line-height: 1.45;
+
+    li {
+      margin-bottom: 0.375rem;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__intent-badge {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.35rem;
+    border-radius: 0.2rem;
+    background: var(--color-primary-light);
+    color: var(--color-primary-darker);
+    font-size: 0.625rem;
+    font-style: normal;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+  }
+
+  &__intent-key {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", monospace;
+    font-size: 0.6875rem;
+  }
+
+  &__intent-sep,
+  &__intent-arrow {
+    color: var(--input-label-color);
+  }
+
+  &__intent-expr {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", monospace;
+    font-size: 0.6875rem;
+  }
 }

@@ -63,6 +63,12 @@ import {
   terraformResourceCardLabel,
 } from "./terraformResourceCardLabel";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+import {
+  buildUnknownAfterDependencies,
+  buildUnknownAfterIntentPreview,
+  type TerraformUnknownAfterDependency,
+  type TerraformUnknownAfterIntentRow,
+} from "./terraformPlanConfigRefs";
 
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
@@ -417,7 +423,9 @@ export function getTerraformActionStyle(action: string) {
   return TERRAFORM_ACTION_STYLES[action] || TERRAFORM_ACTION_STYLES.existing;
 }
 
-const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
+export const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
+
+export type { TerraformUnknownAfterDependency, TerraformUnknownAfterIntentRow };
 
 const HIDDEN_ATTRIBUTES_BY_TYPE: Record<string, Set<string>> = {
   aws_iam_role_policy: new Set(["id", "name_prefix"]),
@@ -473,6 +481,42 @@ function getUnknownTopLevelKeys(afterUnknown: unknown) {
     .map(([key]) => key);
 }
 
+/** True when `after` is a hollow shell but `after_unknown` marks nested content unknown. */
+export function isUnknownAfterShellValue(
+  afterValue: unknown,
+  afterUnknownMarker: unknown,
+): boolean {
+  if (!hasUnknownAfterMarker(afterUnknownMarker)) {
+    return false;
+  }
+  if (afterValue === true || afterValue == null) {
+    return true;
+  }
+  if (Array.isArray(afterValue)) {
+    return afterValue.every(
+      (entry) =>
+        entry == null ||
+        (isPlainObject(entry) && Object.keys(entry).length === 0) ||
+        isUnknownAfterShellValue(entry, afterUnknownMarker),
+    );
+  }
+  if (isPlainObject(afterValue)) {
+    return Object.keys(afterValue).length === 0;
+  }
+  return false;
+}
+
+export type TerraformResourcePanelAttribute = {
+  key: string;
+  value: unknown;
+  changed: boolean;
+  unknownAfter: boolean;
+  before?: unknown;
+  after?: unknown;
+  unknownAfterDependencies?: TerraformUnknownAfterDependency[];
+  unknownAfterPreview?: TerraformUnknownAfterIntentRow[];
+};
+
 function shouldHideTerraformAttribute(resourceType: string, key: string) {
   const hidden = HIDDEN_ATTRIBUTES_BY_TYPE[resourceType];
   return Boolean(hidden && hidden.has(key));
@@ -525,6 +569,7 @@ function getLocalResourceDiff(change: Record<string, any>) {
 export function buildTerraformResourcePanelDetails(
   address: string,
   resource: Record<string, any>,
+  plan?: unknown,
 ) {
   const change = resource.change || {};
   const config = getCurrentResourceConfig(resource);
@@ -532,7 +577,8 @@ export function buildTerraformResourcePanelDetails(
   const resourceType =
     (typeof resource.type === "string" && resource.type) ||
     getTerraformResourceTypeFromNodePath(address);
-  const unknownAfterKeys = getUnknownTopLevelKeys(change.after_unknown || {});
+  const afterUnknownObj = change.after_unknown || {};
+  const unknownAfterKeys = getUnknownTopLevelKeys(afterUnknownObj);
   const unknownAfterSet = new Set(unknownAfterKeys);
   const keys = new Set([
     ...Object.keys(config),
@@ -564,18 +610,37 @@ export function buildTerraformResourcePanelDetails(
     .map((key) => {
       const fieldDiff = diff[key];
       const unknownAfter = unknownAfterSet.has(key);
-      return {
+      const displayValue = unknownAfter
+        ? UNKNOWN_VALUE_PLACEHOLDER
+        : Object.prototype.hasOwnProperty.call(config, key)
+        ? config[key]
+        : fieldDiff?.after ?? null;
+      const attr: TerraformResourcePanelAttribute = {
         key,
-        value: Object.prototype.hasOwnProperty.call(config, key)
-          ? config[key]
-          : unknownAfter
-          ? UNKNOWN_VALUE_PLACEHOLDER
-          : fieldDiff?.after ?? null,
+        value: displayValue,
         changed: Boolean(fieldDiff),
         unknownAfter,
         before: fieldDiff?.before,
-        after: fieldDiff?.after,
+        after: unknownAfter ? UNKNOWN_VALUE_PLACEHOLDER : fieldDiff?.after,
       };
+      if (unknownAfter && plan) {
+        attr.unknownAfterPreview = buildUnknownAfterIntentPreview(
+          plan,
+          address,
+          key,
+          resourceType,
+          fieldDiff?.before,
+        );
+        if ((attr.unknownAfterPreview?.length ?? 0) === 0) {
+          attr.unknownAfterDependencies = buildUnknownAfterDependencies(
+            plan,
+            address,
+            key,
+            resourceType,
+          );
+        }
+      }
+      return attr;
     });
 
   return [
@@ -1397,6 +1462,7 @@ export function mirrorAndDetachTerraformResourceLabels(
  */
 export async function buildTerraformElkExcalidrawScene(
   nodes: TerraformPlanNodesMap,
+  plan?: unknown,
 ): Promise<{
   elements: ReturnType<typeof convertToExcalidrawElements>;
   meta: TerraformElkSceneMeta;
@@ -1564,7 +1630,11 @@ export async function buildTerraformElkExcalidrawScene(
         resourceType,
         nodePath: id,
         action,
-        terraformResources: buildTerraformResourcePanelDetails(id, resource),
+        terraformResources: buildTerraformResourcePanelDetails(
+          id,
+          resource,
+          plan,
+        ),
       },
     });
   }
