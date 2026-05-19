@@ -4989,6 +4989,14 @@ class App extends React.Component<AppProps, AppState> {
         // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
+        // Fix #9281: Prevent browser's default save dialog when Ctrl+S is pressed in text editor
+        if (
+          isWritableElement(event.target) &&
+          event[KEYS.CTRL_OR_CMD] &&
+          event.key.toLowerCase() === KEYS.S
+        ) {
+          event.preventDefault();
+        }
         return;
       }
 
