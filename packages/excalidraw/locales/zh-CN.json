@@ -577,7 +577,7 @@
     "shades": "色调明暗",
     "hexCode": "十六进制值",
     "invalidHexLength": "十六进制颜色值必须是 3、4、6 或 8 位字符（不含 #）",
-    "invalidHexCharacters": "十六进制颜色值只能包含 0-9 和 A-F",
+    "invalidHexCharacters": "十六进制颜色值只能包含 0-9 和 a-f",
     "noShades": "此颜色没有可用的明暗变化"
   },
   "overwriteConfirm": {
