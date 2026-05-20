@@ -12,7 +12,7 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements, isArrowElement } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
 
@@ -599,6 +599,13 @@ export const actionToggleHandTool = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) =>
-    !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
+  keyTest: (event, appState, elements) => {
+    if (!event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H) {
+      const selectedElements = elements.filter(
+        (el) => appState.selectedElementIds[el.id],
+      );
+      return !selectedElements.some((el) => isArrowElement(el));
+    }
+    return false;
+  },
 });

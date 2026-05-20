@@ -48,7 +48,15 @@ export const actionFlipHorizontal = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === CODES.H,
+  keyTest: (event, appState, elements) => {
+    if (event.shiftKey && event.code === CODES.H) {
+      const selectedElements = elements.filter(
+        (el) => appState.selectedElementIds[el.id],
+      );
+      return !selectedElements.some((el) => isArrowElement(el));
+    }
+    return false;
+  },
 });
 
 export const actionFlipVertical = register({

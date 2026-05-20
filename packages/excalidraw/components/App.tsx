@@ -4747,6 +4747,7 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      console.log("KEY:", event.key, event.shiftKey);
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
@@ -5266,6 +5267,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        console.log("REACHED GS BLOCK");
         if (
           event.key === KEYS.G &&
           (hasBackground(this.state.activeTool.type) ||
@@ -5280,23 +5282,18 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      console.log("REACHED H BLOCK");
+      console.log("key check:", JSON.stringify(event.key), "toLowerCase:", JSON.stringify(event.key.toLowerCase()), "KEYS.H:", JSON.stringify(KEYS.H), "shiftKey:", event.shiftKey, "altKey:", event.altKey, "ctrlOrCmd:", event[KEYS.CTRL_OR_CMD]);
       if (
-        event.key.toLowerCase() === KEYS.H &&
+        (event.key.toLowerCase() === KEYS.H || event.key.toLowerCase() === "j") &&
         event.shiftKey &&
         !event.altKey &&
         !event[KEYS.CTRL_OR_CMD]
       ) {
-        console.log("H block hit", {
-          selected: this.scene.getSelectedElements(this.state).map(e => e.type),
-          openPopup: this.state.openPopup,
-        });
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.some((el) => isArrowElement(el))) {
-          const current = this.state.openPopup;
-          const next =
-            current === "arrowheadEnd" ? "arrowheadStart" :
-            current === "arrowheadStart" ? null :
-            "arrowheadEnd";
+          const popup = event.key.toLowerCase() === KEYS.H ? "arrowheadEnd" : "arrowheadStart";
+          const next = this.state.openPopup === popup ? null : popup;
           this.setState({ openPopup: next });
           event.stopPropagation();
         }

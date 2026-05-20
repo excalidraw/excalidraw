@@ -1740,48 +1740,52 @@ export const actionChangeArrowhead = register<{
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
         <div className="iconSelectList buttonList">
-          <IconPicker
-            visibleSections={startArrowheadOptions.visibleSections}
-            hiddenSections={startArrowheadOptions.hiddenSections}
-            label="arrowhead_start"
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              app,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? getArrowheadForPicker(element.startArrowhead)
-                  : appState.currentItemStartArrowhead,
-              true,
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemStartArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "start", type: value })}
-            open={appState.openPopup === "arrowheadStart"}
-            onOpenChange={(isOpen) =>
-              app.setAppState({ openPopup: isOpen ? "arrowheadEnd" : null })
+        <IconPicker
+          visibleSections={startArrowheadOptions.visibleSections}
+          hiddenSections={startArrowheadOptions.hiddenSections}
+          label="arrowhead_start"
+          value={getFormValue<Arrowhead | null>(
+            elements,
+            app,
+            (element) =>
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? getArrowheadForPicker(element.startArrowhead)
+                : appState.currentItemStartArrowhead,
+            true,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemStartArrowhead,
+          )}
+          onChange={(value) => updateData({ position: "start", type: value })}
+          open={appState.openPopup === "arrowheadStart"}
+          onOpenChange={(isOpen) => {
+            if (!isOpen && appState.openPopup === "arrowheadStart") {
+              app.setAppState({ openPopup: null });
             }
-          />
-          <IconPicker
-            visibleSections={endArrowheadOptions.visibleSections}
-            hiddenSections={endArrowheadOptions.hiddenSections}
-            label="arrowhead_end"
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              app,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? getArrowheadForPicker(element.endArrowhead)
-                  : appState.currentItemEndArrowhead,
-              true,
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemEndArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "end", type: value })}
-            open={appState.openPopup === "arrowheadEnd"}
-            onOpenChange={(isOpen) =>
-              app.setAppState({ openPopup: isOpen ? "arrowheadEnd" : null })
+          }}
+        />
+        <IconPicker
+          visibleSections={endArrowheadOptions.visibleSections}
+          hiddenSections={endArrowheadOptions.hiddenSections}
+          label="arrowhead_end"
+          value={getFormValue<Arrowhead | null>(
+            elements,
+            app,
+            (element) =>
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? getArrowheadForPicker(element.endArrowhead)
+                : appState.currentItemEndArrowhead,
+            true,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemEndArrowhead,
+          )}
+          onChange={(value) => updateData({ position: "end", type: value })}
+          open={appState.openPopup === "arrowheadEnd"}
+          onOpenChange={(isOpen) => {
+            if (!isOpen && appState.openPopup === "arrowheadEnd") {
+              app.setAppState({ openPopup: null });
             }
-          />
+          }}
+        />
         </div>
       </fieldset>
     );
