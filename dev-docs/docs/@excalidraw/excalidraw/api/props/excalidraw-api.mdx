@@ -1,0 +1,449 @@
+# excalidrawAPI
+
+<pre>
+  (api:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L616">
+    ExcalidrawAPI
+  </a>
+  ) => void;
+</pre>
+
+Once the callback is triggered, you will need to store the api in state to access it later.
+
+```jsx showLineNumbers
+export default function App() {
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
+}
+```
+
+You can use this prop when you want to access some [Excalidraw APIs](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L616). We expose the below APIs :point_down:
+
+| API | Signature | Usage |
+| --- | --- | --- |
+| [updateScene](#updatescene) | `function` | updates the scene with the sceneData |
+| [updateLibrary](#updatelibrary) | `function` | updates the library |
+| [addFiles](#addfiles) | `function` | add files data to the appState |
+| [resetScene](#resetscene) | `function` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
+| [getSceneElementsIncludingDeleted](#getsceneelementsincludingdeleted) | `function` | Returns all the elements including the deleted in the scene |
+| [getSceneElements](#getsceneelements) | `function` | Returns all the elements excluding the deleted in the scene |
+| [getAppState](#getappstate) | `function` | Returns current appState |
+| [history](#history) | `object` | This is the history API. `history.clear()` will clear the history |
+| [scrollToContent](#scrolltocontent) | `function` | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
+| [refresh](#refresh) | `function` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). |
+| [setToast](#settoast) | `function` | This API can be used to show the toast with custom message. |
+| [id](#id) | `string` | Unique ID for the excalidraw component. |
+| [getFiles](#getfiles) | `function` | This API can be used to get the files present in the scene. |
+| [setActiveTool](#setactivetool) | `function` | This API can be used to set the active tool |
+| [setCursor](#setcursor) | `function` | This API can be used to set customise the mouse cursor on the canvas |
+| [resetCursor](#resetcursor) | `function` | This API can be used to reset to default mouse cursor on the canvas |
+| [toggleSidebar](#toggleSidebar) | `function` | Toggles specific sidebar on/off |
+| [onChange](#onChange) | `function` | Subscribes to change events |
+| [onPointerDown](#onPointerDown) | `function` | Subscribes to `pointerdown` events |
+| [onPointerUp](#onPointerUp) | `function` | Subscribes to `pointerup` events |
+
+:::info The `Ref` support has been removed in v0.17.0 so if you are using refs, please update the integration to use the `excalidrawAPI`.
+
+Additionally `ready` and `readyPromise` from the API have been discontinued. These APIs were found to be superfluous, and as part of the effort to streamline the APIs and maintain simplicity, they were removed in version v0.17.0.
+
+:::
+
+## updateScene
+
+<pre>
+  (scene:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L339">
+    sceneData
+  </a>
+  ) => void
+</pre>
+
+You can use this function to update the scene with the sceneData. It accepts the below attributes.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
+| `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
+| `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
+| `captureUpdate` | [`CaptureUpdateAction`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/store.ts#L40) | Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes. |
+
+```jsx live
+function App() {
+  const updateScene = () => {
+    const sceneData = {
+      elements: [
+        {
+          type: "rectangle",
+          version: 141,
+          versionNonce: 361174001,
+          isDeleted: false,
+          id: "oDVXy8D6rom3H1-LLH2-f",
+          fillStyle: "hachure",
+          strokeWidth: 1,
+          strokeStyle: "solid",
+          roughness: 1,
+          opacity: 100,
+          angle: 0,
+          x: 100.50390625,
+          y: 93.67578125,
+          strokeColor: "#c92a2a",
+          backgroundColor: "transparent",
+          width: 186.47265625,
+          height: 141.9765625,
+          seed: 1968410350,
+          groupIds: [],
+          boundElements: null,
+          locked: false,
+          link: null,
+          updated: 1,
+          roundness: {
+            type: 3,
+            value: 32,
+          },
+        },
+      ],
+      appState: {
+        viewBackgroundColor: "#edf2ff",
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+    excalidrawAPI.updateScene(sceneData);
+  };
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  return (
+    <div style={{ height: "500px" }}>
+      <p style={{ fontSize: "16px" }}> Click to update the scene</p>
+      <button className="custom-button" onClick={updateScene}>
+        Update Scene
+      </button>
+      <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
+    </div>
+  );
+}
+```
+
+#### captureUpdate
+
+You can use the `captureUpdate` to influence undo / redo behaviour.
+
+> **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `captureUpdate` value.
+
+|  | `captureUpdate` value | Notes |
+| --- | --- | --- |
+| _Immediately undoable_ | `CaptureUpdateAction.IMMEDIATELY` | Use for updates which should be captured. Should be used for most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `CaptureUpdateAction.EVENTUALLY` | Use for updates which should not be captured immediately - likely exceptions which are part of some async multi-step process. Otherwise, all such updates would end up being captured with the next `CaptureUpdateAction.IMMEDIATELY` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | `CaptureUpdateAction.NEVER` | Use for updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
+
+### updateLibrary
+
+<pre>
+  (opts: &#123; <br /> libraryItems:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L249">
+    LibraryItemsSource
+  </a>
+  ;<br /> merge?: boolean; <br /> prompt?: boolean;
+  <br /> openLibraryMenu?: boolean;
+  <br /> defaultStatus?: "unpublished" | "published"; <br /> &#125;) => Promise&lt;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L246">
+    LibraryItems
+  </a>
+  &gt;
+</pre>
+
+You can use this function to update the library. It accepts the below attributes.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `libraryItems` | [LibraryItemsSource](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L249) | \_ | The `libraryItems` to be replaced/merged with current library |
+| `merge` | boolean | `false` | Whether to merge with existing library items. |
+| `prompt` | boolean | `false` | Whether to prompt user for confirmation. |
+| `openLibraryMenu` | boolean | `false` | Keep the library menu open after library is updated. |
+| `defaultStatus` | <code>"unpublished" &#124; "published"</code> | `"unpublished"` | Default library item's `status` if not present. |
+
+```tsx live
+function App() {
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    // to open the library sidebar
+    excalidrawAPI.updateScene({ appState: { openSidebar: "library" } });
+  }, [excalidrawAPI]);
+
+  return (
+    <div style={{ height: "500px" }}>
+      <p style={{ fontSize: "16px" }}> Click to update the library items</p>
+      <button
+        className="custom-button"
+        onClick={() => {
+          const libraryItems = [
+            {
+              status: "published",
+              id: "1",
+              created: 1,
+              elements: initialData.libraryItems[1],
+            },
+            {
+              status: "unpublished",
+              id: "2",
+              created: 2,
+              elements: initialData.libraryItems[1],
+            },
+          ];
+          excalidrawAPI.updateLibrary({
+            libraryItems,
+            openLibraryMenu: true,
+          });
+        }}
+      >
+        Update Library
+      </button>
+      <Excalidraw
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
+        initialData={{
+          libraryItems: initialData.libraryItems,
+          appState: { openSidebar: "library" },
+        }}
+      />
+    </div>
+  );
+}
+```
+
+### addFiles
+
+<pre>
+  (files:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L59">
+    BinaryFileData
+  </a>
+  ) => void
+</pre>
+
+Adds supplied files data to the `appState.files` cache on top of existing files present in the cache.
+
+## resetScene
+
+```tsx
+(opts?: { resetLoadingState: boolean }) => void
+```
+
+Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false.
+
+## getSceneElementsIncludingDeleted
+
+<pre>
+  () =>{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+    ExcalidrawElement[]
+  </a>
+</pre>
+
+Returns all the elements including the deleted in the scene.
+
+## getSceneElements
+
+<pre>
+  () => NonDeleted&#60;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+    ExcalidrawElement
+  </a>
+  []&#62;
+</pre>
+
+Returns all the elements excluding the deleted in the scene
+
+## getAppState
+
+<pre>
+  () =>{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
+    AppState
+  </a>
+</pre>
+
+Returns current appState.
+
+## history
+
+```tsx
+{
+  clear: () => void
+}
+```
+
+This is the history API. history.clear() will clear the history.
+
+## scrollToContent
+
+```tsx
+(
+  target?: ExcalidrawElement | ExcalidrawElement[],
+  opts?:
+      | {
+          fitToContent?: boolean;
+          animate?: boolean;
+          duration?: number;
+        }
+      | {
+          fitToViewport?: boolean;
+          viewportZoomFactor?: number;
+          animate?: boolean;
+          duration?: number;
+        }
+) => void
+```
+
+Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
+
+| Attribute | type | default | Description |
+| --- | --- | --- | --- |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
+| opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
+| opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
+| opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
+| opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
+
+## refresh
+
+```tsx
+() => void
+```
+
+Updates the `offsets` for the `Excalidraw` component so that the coordinates are computed correctly (for example the cursor position).
+
+You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves).
+
+For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API.
+
+## setToast
+
+This API can be used to show the toast with custom message.
+
+```tsx
+({ message: string, closable?:boolean,duration?:number
+  } | null) => void
+```
+
+| Attribute | type | Description |
+| --- | --- | --- |
+| message | string | The message to be shown on the toast. |
+| closable | boolean | Indicates whether to show the closable button on toast to dismiss the toast. |
+| duration | number | Determines the duration after which the toast should auto dismiss. To prevent autodimiss you can pass `Infinity`. |
+
+To dismiss an existing toast you can simple pass `null`
+
+```js
+setToast(null);
+```
+
+## id
+
+The unique id of the excalidraw component. This can be used to identify the excalidraw component, for example importing the library items to the excalidraw component from where it was initiated when you have multiple excalidraw components rendered on the same page as shown in [multiple excalidraw demo](https://codesandbox.io/s/multiple-excalidraw-k1xx5).
+
+## getFiles
+
+<pre>
+  () =>{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L82">
+    files
+  </a>
+</pre>
+
+This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements.
+
+## setActiveTool
+
+This API has the below signature. It sets the `tool` passed in param as the active tool.
+
+```ts
+(
+  tool: (
+    | { type: ToolType }
+    | { type: "custom"; customType: string }
+  ) & { locked?: boolean },
+) => {};
+```
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L91) | `selection` | The tool type which should be set as active tool |
+| `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface |
+
+## setCursor
+
+This API can be used to customise the mouse cursor on the canvas and has the below signature. It sets the mouse cursor to the cursor passed in param.
+
+```tsx
+(cursor: string) => void
+```
+
+## toggleSidebar
+
+```tsx
+(opts: { name: string; tab?: string; force?: boolean }) => boolean;
+```
+
+This API can be used to toggle sidebar, optionally opening a specific sidebar tab. It returns whether the sidebar was toggled on or off. If the `force` flag passed, it will force the sidebar to be toggled either on/off.
+
+This API is especially useful when you render a custom [`<Sidebar/>`](/docs/@excalidraw/excalidraw/api/children-components/sidebar), and you want to toggle it from your app based on a user action.
+
+## resetCursor
+
+```tsx
+() => void
+```
+
+This API can be used to reset to default mouse cursor.
+
+## onChange
+
+```tsx
+(
+  callback: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => void
+) => () => void
+```
+
+Subscribes to change events, similar to [`props.onChange`](/docs/@excalidraw/excalidraw/api/props#onchange).
+
+Returns an unsubscribe function.
+
+## onPointerDown
+
+```tsx
+(
+  callback: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+    event: React.PointerEvent<HTMLElement>,
+  ) => void,
+) => () => void
+```
+
+Subscribes to canvas `pointerdown` events.
+
+Returns an unsubscribe function.
+
+## onPointerUp
+
+```tsx
+(
+  callback: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+    event: PointerEvent,
+  ) => void,
+) => () => void
+```
+
+Subscribes to canvas `pointerup` events.
+
+Returns an unsubscribe function.

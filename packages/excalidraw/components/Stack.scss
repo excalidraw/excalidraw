@@ -1,0 +1,19 @@
+.excalidraw {
+  .Stack {
+    --gap: 0;
+    display: grid;
+    gap: calc(var(--space-factor) * var(--gap));
+  }
+
+  .Stack_vertical {
+    grid-template-columns: auto;
+    grid-auto-flow: row;
+    grid-auto-rows: min-content;
+  }
+
+  .Stack_horizontal {
+    grid-template-rows: auto;
+    grid-auto-flow: column;
+    grid-auto-columns: min-content;
+  }
+}

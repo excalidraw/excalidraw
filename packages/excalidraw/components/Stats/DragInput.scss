@@ -1,0 +1,56 @@
+.excalidraw {
+  .drag-input-container {
+    display: flex;
+    width: 100%;
+    border-radius: var(--border-radius-lg);
+
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+      border-radius: var(--border-radius-md);
+      background: transparent;
+    }
+  }
+
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .drag-input-label {
+    flex-shrink: 0;
+    border: 0;
+    padding: 0 0.5rem 0 0.25rem;
+    min-width: 1rem;
+    width: 1.5rem;
+    height: 2rem;
+    box-sizing: content-box;
+    color: var(--popup-text-color);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .drag-input {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-color: transparent;
+    color: var(--text-primary-color);
+    border: 0;
+    outline: none;
+    height: 2rem;
+    letter-spacing: 0.4px;
+
+    padding: 0.5rem;
+    padding-left: 0.25rem;
+    appearance: none;
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+  }
+}

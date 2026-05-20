@@ -1,0 +1,12 @@
+.footer-center {
+  pointer-events: none;
+
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin-inline-end: 0.6rem;
+
+  & > * {
+    pointer-events: var(--ui-pointerEvents);
+  }
+}
