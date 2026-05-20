@@ -1,5 +1,7 @@
 import { normalizeInputColor } from "@excalidraw/common";
 
+import { normalizeHexColorInput } from "../components/ColorPicker/colorPickerUtils";
+
 describe("normalizeInputColor", () => {
   describe("hex colors", () => {
     it("returns hex color with hash as-is", () => {
@@ -110,5 +112,28 @@ describe("normalizeInputColor", () => {
       expect(normalizeInputColor("#ff")).toBe(null);
       expect(normalizeInputColor("rgb(")).toBe(null);
     });
+  });
+});
+
+describe("normalizeHexColorInput", () => {
+  it("accepts optional hash and valid hex lengths only", () => {
+    expect(normalizeHexColorInput("abc")).toBe("#abc");
+    expect(normalizeHexColorInput("#abcd")).toBe("#abcd");
+    expect(normalizeHexColorInput("123456")).toBe("#123456");
+    expect(normalizeHexColorInput("#12345678")).toBe("#12345678");
+  });
+
+  it("rejects invalid hex strings and non-hex colors", () => {
+    for (const value of [
+      "1",
+      "12",
+      "12345",
+      "1234567",
+      "123456789",
+      "zzzzzz",
+      "blue",
+    ]) {
+      expect(normalizeHexColorInput(value)).toBe(null);
+    }
   });
 });
