@@ -4,7 +4,6 @@ import {
   isInvisiblySmallElement,
   renderElement,
   shouldApplyFrameClip,
-  convertToShape,
 } from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
@@ -75,25 +74,6 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
-
-      if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
-        const detectedElement = convertToShape(newElement, appState);
-        if (detectedElement !== newElement) {
-          renderElement(
-            {
-              ...detectedElement,
-              roughness: 0,
-              backgroundColor: "rgba(0,0,0,.05)",
-            },
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
-      }
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }

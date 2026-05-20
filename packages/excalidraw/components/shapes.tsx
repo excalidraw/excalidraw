@@ -114,6 +114,14 @@ export const SHAPES = [
     fillable: false,
     toolbar: false,
   },
+  {
+    icon: EraserIcon,
+    value: "drawShape",
+    key: KEYS.S,
+    numericKey: null,
+    fillable: true,
+    toolbar: false,
+  },
 ] as const;
 
 export const getToolbarTools = (app: AppClassProperties) => {

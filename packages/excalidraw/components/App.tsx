@@ -111,6 +111,7 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  getElementBoundsFromPoints,
 } from "@excalidraw/common";
 
 import {
@@ -263,7 +264,6 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   convertToShape,
-  isFreeDrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -274,6 +274,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawNonSelectionElement,
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
@@ -422,6 +423,7 @@ import {
 } from "../cursor";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laser-trails";
+import { DrawShapeTrail } from "../drawShapeTrail";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
@@ -710,6 +712,7 @@ class App extends React.Component<AppProps, AppState> {
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
+  drawShapeTrail = new DrawShapeTrail(this.animationFrameHandler, this);
   eraserTrail = new EraserTrail(this.animationFrameHandler, this);
   lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
@@ -1304,6 +1307,7 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "drawShape" ||
         this.isIframeLikeElementCenter(
           hitElement,
           moveEvent,
@@ -1332,7 +1336,12 @@ class App extends React.Component<AppProps, AppState> {
       // panning
       isHoldingSpace ||
       // wrong tool
-      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+      !oneOf(this.state.activeTool.type, [
+        "laser",
+        "drawShape",
+        "selection",
+        "lasso",
+      ])
     ) {
       return false;
     }
@@ -1378,6 +1387,7 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "drawShape" ||
         this.isIframeLikeElementCenter(
           hitElement,
           this.lastPointerUpEvent,
@@ -2134,7 +2144,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.newElement ||
           this.state.selectedElementsAreBeingDragged ||
           this.state.resizingElement ||
-          (this.state.activeTool.type === "laser" &&
+          ((this.state.activeTool.type === "laser" ||
+            this.state.activeTool.type === "drawShape") &&
             // technically we can just test on this once we make it more safe
             this.state.cursorButton === "down");
 
@@ -2229,6 +2240,7 @@ class App extends React.Component<AppProps, AppState> {
                               this.laserTrails,
                               this.lassoTrail,
                               this.eraserTrail,
+                              this.drawShapeTrail,
                             ]}
                           />
                           {selectedElements.length === 1 &&
@@ -3228,6 +3240,7 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.library.destroy();
     this.laserTrails.stop();
+    this.drawShapeTrail.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -7105,39 +7118,6 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    } else if (newElement && isFreeDrawElement(newElement)) {
-      const detectedElement = convertToShape(newElement, this.state);
-      if (isBindingElement(detectedElement, false)) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          detectedElement,
-          1,
-          this.scene.getNonDeletedElementsMap(),
-        );
-        const elementsMap = this.scene.getNonDeletedElementsMap();
-        const bindableElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(x, y),
-          this.scene.getNonDeletedElements(),
-          elementsMap,
-          maxBindingDistance_simple(this.state.zoom),
-        );
-        if (bindableElement) {
-          this.setState({
-            suggestedBinding: {
-              element: bindableElement,
-              midPoint: getSnapOutlineMidPoint(
-                pointFrom<GlobalPoint>(x, y),
-                bindableElement,
-                elementsMap,
-                this.state.zoom,
-              ),
-            },
-          });
-        } else {
-          this.setState({
-            suggestedBinding: null,
-          });
-        }
-      }
     }
 
     if (this.state.multiElement && this.state.selectedLinearElement) {
@@ -7328,11 +7308,13 @@ class App extends React.Component<AppProps, AppState> {
 
     const isPressingAnyButton = Boolean(event.buttons);
     const isLaserTool = this.state.activeTool.type === "laser";
+    const isDrawShapeTool = this.state.activeTool.type === "drawShape";
     if (
       isPressingAnyButton ||
       // checking against laser so that if you mouseover with a laser tool
       // over a link/embeddable, we change the cursor
       (!isLaserTool &&
+        !isDrawShapeTool &&
         this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
@@ -7470,7 +7452,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else {
       hideHyperlinkToolip();
-      if (isLaserTool) {
+      if (isLaserTool || isDrawShapeTool) {
         return;
       }
       if (
@@ -8132,6 +8114,11 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "drawShape") {
+      this.drawShapeTrail.startPath(
+        pointerDownState.lastCoords.x,
+        pointerDownState.lastCoords.y,
+      );
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -8170,7 +8157,11 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+    if (
+      !this.state.viewModeEnabled ||
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "drawShape"
+    ) {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -9811,6 +9802,10 @@ class App extends React.Component<AppProps, AppState> {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
+      if (this.state.activeTool.type === "drawShape") {
+        this.drawShapeTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+      }
+
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -10896,67 +10891,6 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
         });
 
-        if (this.state.isConvertToShapeEnabled) {
-          const detectedElement = convertToShape(newElement, this.state);
-
-          if (detectedElement !== newElement) {
-            this.scene.replaceAllElements([
-              ...this.scene
-                .getElementsIncludingDeleted()
-                .filter((el) => el.id !== newElement.id),
-              detectedElement,
-            ]);
-
-            if (isBindingElement(detectedElement)) {
-              const [x, y] =
-                LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                  detectedElement,
-                  1,
-                  this.scene.getNonDeletedElementsMap(),
-                );
-
-              // Set arrowhead
-              this.scene.mutateElement(detectedElement, {
-                startArrowhead: this.state.currentItemStartArrowhead,
-                endArrowhead: this.state.currentItemEndArrowhead,
-              });
-
-              // Set up selectedLinearElement se we can finalize it
-              flushSync(() => {
-                const linearElement = new LinearElementEditor(
-                  detectedElement,
-                  this.scene.getNonDeletedElementsMap(),
-                );
-                this.setState({
-                  newElement: detectedElement,
-                  selectedLinearElement: {
-                    ...linearElement,
-                    pointerOffset: {
-                      x: 0,
-                      y: 0,
-                    },
-                    initialState: {
-                      ...linearElement.initialState,
-                      lastClickedPoint: 1,
-                    },
-                    selectedPointsIndices: [1],
-                  },
-                });
-              });
-
-              this.actionManager.executeAction(actionFinalize, "ui", {
-                event: childEvent,
-                sceneCoords: { x, y },
-              });
-            }
-
-            makeNextSelectedElementIds(
-              { [detectedElement.id]: true },
-              this.state,
-            );
-          }
-        }
-
         this.actionManager.executeAction(actionFinalize);
 
         return;
@@ -11661,6 +11595,85 @@ class App extends React.Component<AppProps, AppState> {
 
       if (activeTool.type === "laser") {
         this.laserTrails.endPath();
+        return;
+      }
+
+      if (activeTool.type === "drawShape") {
+        const points = this.drawShapeTrail.getCurrentPoints();
+        this.drawShapeTrail.endPath();
+
+        if (points.length >= 3) {
+          const [minX, minY, maxX, maxY] = getElementBoundsFromPoints(points);
+          const width = maxX - minX;
+          const height = maxY - minY;
+
+          if (width > 2 && height > 2) {
+            const detectedElement = convertToShape(
+              points,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+
+            if (detectedElement) {
+              this.insertNewElement(detectedElement);
+
+              if (isBindingElement(detectedElement)) {
+                const [x, y] =
+                  LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                    detectedElement,
+                    1,
+                    this.scene.getNonDeletedElementsMap(),
+                  );
+
+                this.scene.mutateElement(detectedElement, {
+                  startArrowhead: this.state.currentItemStartArrowhead,
+                  endArrowhead: this.state.currentItemEndArrowhead,
+                });
+
+                flushSync(() => {
+                  const linearElement = new LinearElementEditor(
+                    detectedElement,
+                    this.scene.getNonDeletedElementsMap(),
+                  );
+                  this.setState({
+                    newElement: detectedElement,
+                    selectedLinearElement: {
+                      ...linearElement,
+                      pointerOffset: {
+                        x: 0,
+                        y: 0,
+                      },
+                      initialState: {
+                        ...linearElement.initialState,
+                        lastClickedPoint: 1,
+                      },
+                      selectedPointsIndices: [1],
+                    },
+                  });
+                });
+
+                this.actionManager.executeAction(actionFinalize, "ui", {
+                  event: childEvent,
+                  sceneCoords: { x, y },
+                });
+              } else {
+                flushSync(() => {
+                  this.setState({
+                    selectedElementIds: makeNextSelectedElementIds(
+                      { [detectedElement.id]: true },
+                      this.state,
+                    ),
+                    newElement:
+                      detectedElement as NonDeleted<ExcalidrawNonSelectionElement>,
+                  });
+                });
+              }
+            }
+          }
+        }
+
+        this.actionManager.executeAction(actionFinalize);
+        this.drawShapeTrail.clearTrails();
         return;
       }
 
@@ -13015,7 +13028,11 @@ class App extends React.Component<AppProps, AppState> {
     const pointer: CollaboratorPointer = {
       x: sceneX,
       y: sceneY,
-      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+      tool:
+        this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "drawShape"
+          ? "laser"
+          : "pointer",
     };
 
     this.props.onPointerUpdate?.({

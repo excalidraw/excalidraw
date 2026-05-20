@@ -1,6 +1,6 @@
 import {
   getCenterForBounds,
-  getCommonBoundingBox,
+  getElementAbsoluteCoords,
 } from "@excalidraw/element/bounds";
 import {
   newArrowElement,
@@ -13,14 +13,12 @@ import {
   degreesToRadians,
   pointDistance,
 } from "@excalidraw/math";
-import { ROUNDNESS } from "@excalidraw/common";
+import { getElementBoundsFromPoints, ROUNDNESS } from "@excalidraw/common";
 import { simplify } from "points-on-curve";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Degrees, LocalPoint } from "@excalidraw/math";
-
-import type { BoundingBox } from "@excalidraw/element/bounds";
+import type { Degrees, LocalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
 import type {
   ExcalidrawArrowElement,
@@ -30,9 +28,12 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
+  ElementsMap,
 } from "@excalidraw/element/types";
 
+import { getFrameLikeElements } from "./frame";
 import { isUsingAdaptiveRadius } from "./typeChecks";
+import { LinearElementEditor } from "./linearElementEditor";
 
 type Shape =
   | ExcalidrawRectangleElement["type"]
@@ -45,7 +46,7 @@ type Shape =
 interface ShapeRecognitionResult {
   type: Shape;
   simplified: readonly LocalPoint[];
-  boundingBox: BoundingBox;
+  boundingBox: Bounds;
 }
 
 const QUADRILATERAL_SIDES = 4;
@@ -139,19 +140,14 @@ function isAxisAligned(
  */
 function calculateRadiusVariance(
   points: readonly LocalPoint[],
-  boundingBox: BoundingBox,
+  boundingBox: Bounds,
 ): number {
   if (points.length === 0) {
     return 0; // Or handle as an error/special case
   }
 
   // Not necessarily the element rotation center - freedraw elements are not rotated by default
-  const [cx, cy] = getCenterForBounds([
-    boundingBox.minX,
-    boundingBox.minY,
-    boundingBox.maxX,
-    boundingBox.maxY,
-  ] as Bounds);
+  const [cx, cy] = getCenterForBounds(boundingBox);
 
   let totalDist = 0;
   let maxDist = 0;
@@ -278,7 +274,7 @@ function checkQuadrilateral(
 function checkEllipse(
   points: readonly LocalPoint[],
   isClosed: boolean,
-  boundingBox: BoundingBox,
+  boundingBox: Bounds,
   options: ShapeRecognitionOptions,
 ): Shape | null {
   if (!isClosed) {
@@ -304,19 +300,21 @@ function checkEllipse(
  * @returns Information about the recognized shape.
  */
 export const recognizeShape = (
-  element: ExcalidrawFreeDrawElement,
+  points: LocalPoint[],
   opts: PartialShapeRecognitionOptions = {},
 ): ShapeRecognitionResult => {
   const options = { ...DEFAULT_OPTIONS, ...opts };
-  const { points } = element;
-  const boundingBox = getCommonBoundingBox([element]);
+  const boundingBox = getElementBoundsFromPoints(points);
 
   // Need at least a few points to recognize a shape
   if (!points || points.length < 3) {
     return { type: "freedraw", simplified: points, boundingBox };
   }
 
-  const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
+  const boundingBoxDiagonal = Math.hypot(
+    boundingBox[2] - boundingBox[0],
+    boundingBox[3] - boundingBox[1],
+  );
   const rdpTolerance =
     boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
   const simplifiedPoints = simplify(
@@ -351,10 +349,21 @@ export const recognizeShape = (
  * Converts a freedraw element to the detected shape
  */
 export const convertToShape = (
-  freeDrawElement: ExcalidrawFreeDrawElement,
+  points: LocalPoint[],
   appState: AppState,
-): ExcalidrawElement => {
-  const recognizedShape = recognizeShape(freeDrawElement);
+  elementsMap: ElementsMap,
+): ExcalidrawElement | undefined => {
+  const recognizedShape = recognizeShape(points);
+
+  const boundingBox = recognizedShape.boundingBox;
+  const [minX, minY, maxX, maxY] = boundingBox;
+
+  const frameId =
+    getFrameLikeElements([...elementsMap.values()]).find((frame) => {
+      const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
+      return fx1 <= minX && fy1 <= minY && fx2 >= maxX && fy2 >= maxY;
+    })?.id ?? null;
+
   const roundness =
     appState.currentItemRoundness === "round"
       ? {
@@ -370,73 +379,110 @@ export const convertToShape = (
     case "ellipse": {
       return newElement({
         type: recognizedShape.type,
-        x: recognizedShape.boundingBox.minX,
-        y: recognizedShape.boundingBox.minY,
-        width: recognizedShape.boundingBox.width,
-        height: recognizedShape.boundingBox.height,
-        groupIds: freeDrawElement.groupIds,
-        locked: freeDrawElement.locked,
-        angle: freeDrawElement.angle,
-        frameId: freeDrawElement.frameId,
+        x: recognizedShape.boundingBox[0],
+        y: recognizedShape.boundingBox[1],
+        width: recognizedShape.boundingBox[2] - recognizedShape.boundingBox[0],
+        height: recognizedShape.boundingBox[3] - recognizedShape.boundingBox[1],
+        groupIds: [],
+        angle: 0 as Radians,
+        frameId,
         roundness,
-        roughness: freeDrawElement.roughness,
-        backgroundColor: freeDrawElement.backgroundColor,
-        strokeColor: freeDrawElement.strokeColor,
-        fillStyle: freeDrawElement.fillStyle,
-        opacity: freeDrawElement.opacity,
-        strokeStyle: freeDrawElement.strokeStyle,
-        strokeWidth: freeDrawElement.strokeWidth,
+        roughness: appState.currentItemRoughness,
+        backgroundColor: appState.currentItemBackgroundColor,
+        strokeColor: appState.currentItemStrokeColor,
+        fillStyle: appState.currentItemFillStyle,
+        opacity: appState.currentItemOpacity,
+        strokeStyle: appState.currentItemStrokeStyle,
+        strokeWidth: appState.currentItemStrokeWidth,
       });
     }
     case "arrow": {
-      return newArrowElement({
+      const [arrowMinX, arrowMinY] = recognizedShape.boundingBox;
+      const tempElement = newArrowElement({
         type: recognizedShape.type,
-        x: freeDrawElement.x,
-        y: freeDrawElement.y,
+        x: arrowMinX,
+        y: arrowMinY,
         startArrowhead: appState.currentItemStartArrowhead,
         endArrowhead: appState.currentItemEndArrowhead,
         points: [
-          recognizedShape.simplified[0],
-          recognizedShape.simplified[recognizedShape.simplified.length - 2],
+          [
+            recognizedShape.simplified[0][0] - arrowMinX,
+            recognizedShape.simplified[0][1] - arrowMinY,
+          ] as LocalPoint,
+          [
+            recognizedShape.simplified[
+              recognizedShape.simplified.length - 2
+            ][0] - arrowMinX,
+            recognizedShape.simplified[
+              recognizedShape.simplified.length - 2
+            ][1] - arrowMinY,
+          ] as LocalPoint,
         ],
-        groupIds: freeDrawElement.groupIds,
-        locked: freeDrawElement.locked,
-        angle: freeDrawElement.angle,
-        frameId: freeDrawElement.frameId,
+        groupIds: [],
+        frameId,
+        locked: false,
+        angle: 0 as Radians,
         roundness,
-        roughness: freeDrawElement.roughness,
-        backgroundColor: freeDrawElement.backgroundColor,
-        strokeColor: freeDrawElement.strokeColor,
-        fillStyle: freeDrawElement.fillStyle,
-        opacity: freeDrawElement.opacity,
-        strokeStyle: freeDrawElement.strokeStyle,
-        strokeWidth: freeDrawElement.strokeWidth,
+        roughness: appState.currentItemRoughness,
+        backgroundColor: appState.currentItemBackgroundColor,
+        strokeColor: appState.currentItemStrokeColor,
+        fillStyle: appState.currentItemFillStyle,
+        opacity: appState.currentItemOpacity,
+        strokeStyle: appState.currentItemStrokeStyle,
+        strokeWidth: appState.currentItemStrokeWidth,
+      });
+
+      const normalized =
+        LinearElementEditor.getNormalizeElementPointsAndCoords(tempElement);
+
+      return newArrowElement({
+        ...tempElement,
+        ...normalized,
       });
     }
     case "line": {
-      return newLinearElement({
+      const [lineMinX, lineMinY] = recognizedShape.boundingBox;
+      const tempElement = newLinearElement({
         type: recognizedShape.type,
-        x: freeDrawElement.x,
-        y: freeDrawElement.y,
+        x: lineMinX,
+        y: lineMinY,
         points: [
-          recognizedShape.simplified[0],
-          recognizedShape.simplified[recognizedShape.simplified.length - 1],
+          [
+            recognizedShape.simplified[0][0] - lineMinX,
+            recognizedShape.simplified[0][1] - lineMinY,
+          ] as LocalPoint,
+          [
+            recognizedShape.simplified[
+              recognizedShape.simplified.length - 1
+            ][0] - lineMinX,
+            recognizedShape.simplified[
+              recognizedShape.simplified.length - 1
+            ][1] - lineMinY,
+          ] as LocalPoint,
         ],
-        groupIds: freeDrawElement.groupIds,
-        locked: freeDrawElement.locked,
-        angle: freeDrawElement.angle,
-        frameId: freeDrawElement.frameId,
+        groupIds: [],
+        frameId,
+        locked: false,
+        angle: 0 as Radians,
         roundness,
-        roughness: freeDrawElement.roughness,
-        backgroundColor: freeDrawElement.backgroundColor,
-        strokeColor: freeDrawElement.strokeColor,
-        fillStyle: freeDrawElement.fillStyle,
-        opacity: freeDrawElement.opacity,
-        strokeStyle: freeDrawElement.strokeStyle,
-        strokeWidth: freeDrawElement.strokeWidth,
+        roughness: appState.currentItemRoughness,
+        backgroundColor: appState.currentItemBackgroundColor,
+        strokeColor: appState.currentItemStrokeColor,
+        fillStyle: appState.currentItemFillStyle,
+        opacity: appState.currentItemOpacity,
+        strokeStyle: appState.currentItemStrokeStyle,
+        strokeWidth: appState.currentItemStrokeWidth,
+      });
+
+      const normalized =
+        LinearElementEditor.getNormalizeElementPointsAndCoords(tempElement);
+
+      return newLinearElement({
+        ...tempElement,
+        ...normalized,
       });
     }
-    default:
-      return freeDrawElement;
   }
+
+  return undefined;
 };

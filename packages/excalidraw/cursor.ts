@@ -87,7 +87,10 @@ export const setCursorForShape = (
     resetCursor(interactiveCanvas);
   } else if (isHandToolActive(appState)) {
     interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
-  } else if (isEraserActive(appState)) {
+  } else if (
+    isEraserActive(appState) ||
+    appState.activeTool.type === "drawShape"
+  ) {
     setEraserCursor(interactiveCanvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor

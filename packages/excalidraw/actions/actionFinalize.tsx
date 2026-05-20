@@ -274,7 +274,8 @@ export const actionFinalize = register<FormData>({
 
     if (
       (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
+        appState.activeTool.type !== "freedraw" &&
+        appState.activeTool.type !== "drawShape") ||
       !element
     ) {
       resetCursor(interactiveCanvas);
@@ -319,9 +320,10 @@ export const actionFinalize = register<FormData>({
         ...appState,
         cursorButton: "up",
         activeTool:
-          (appState.activeTool.locked ||
+          ((appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
-          element
+            element) ||
+          appState.activeTool.type === "drawShape"
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,

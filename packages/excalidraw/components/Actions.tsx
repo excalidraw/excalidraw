@@ -73,6 +73,7 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
+  drawShapeToolIcon,
   MagicIcon,
   LassoIcon,
   sharpArrowIcon,
@@ -121,7 +122,8 @@ export const canChangeStrokeColor = (
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "magicframe") ||
-    targetElements.some((element) => hasStrokeColor(element.type))
+    targetElements.some((element) => hasStrokeColor(element.type)) ||
+    appState.activeTool.type === "drawShape"
   );
 };
 
@@ -131,7 +133,8 @@ export const canChangeBackgroundColor = (
 ) => {
   return (
     hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
+    targetElements.some((element) => hasBackground(element.type)) ||
+    appState.activeTool.type === "drawShape"
   );
 };
 
@@ -167,6 +170,8 @@ export const SelectedShapeActions = ({
     appState.activeTool.type === "freedraw" ||
     targetElements.some((element) => element.type === "freedraw");
 
+  const isDrawShapeActive = appState.activeTool.type === "drawShape";
+
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
@@ -174,7 +179,7 @@ export const SelectedShapeActions = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     ) ||
-    (isFreedrawActive && appState.isConvertToShapeEnabled);
+    isDrawShapeActive;
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
@@ -206,11 +211,6 @@ export const SelectedShapeActions = ({
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
 
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) && (
-        <>{renderAction("toggleConvertToShape")}</>
-      )}
-
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
@@ -219,9 +219,7 @@ export const SelectedShapeActions = ({
 
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type)) ||
-        (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
-        <>{renderAction("changeStrokeStyle")}</>
-      )}
+        isDrawShapeActive) && <>{renderAction("changeStrokeStyle")}</>}
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>{renderAction("changeSloppiness")}</>
@@ -344,9 +342,7 @@ const CombinedShapeProperties = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
 }) => {
-  const isFreedrawActive =
-    appState.activeTool.type === "freedraw" ||
-    targetElements.some((element) => element.type === "freedraw");
+  const isDrawShapeActive = appState.activeTool.type === "drawShape";
 
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
@@ -355,7 +351,7 @@ const CombinedShapeProperties = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     ) ||
-    (isFreedrawActive && appState.isConvertToShapeEnabled);
+    isDrawShapeActive;
 
   const shouldShowCombinedProperties =
     targetElements.length > 0 ||
@@ -409,10 +405,6 @@ const CombinedShapeProperties = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              {(appState.activeTool.type === "freedraw" ||
-                targetElements.some(
-                  (element) => element.type === "freedraw",
-                )) && <>{renderAction("toggleConvertToShape")}</>}
               {showFillIcons && renderAction("changeFillStyle")}
               {(hasStrokeWidth(appState.activeTool.type) ||
                 targetElements.some((element) =>
@@ -423,9 +415,7 @@ const CombinedShapeProperties = ({
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
                 ) ||
-                (isFreedrawActive && appState.isConvertToShapeEnabled)) && (
-                <>{renderAction("changeStrokeStyle")}</>
-              )}
+                isDrawShapeActive) && <>{renderAction("changeStrokeStyle")}</>}
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
@@ -1105,6 +1095,7 @@ export const ShapesSwitcher = ({
   ] as const;
 
   const frameToolSelected = activeTool.type === "frame";
+  const drawShapeToolSelected = activeTool.type === "drawShape";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
     isFullStylesPanel &&
@@ -1225,6 +1216,7 @@ export const ShapesSwitcher = ({
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
               embeddableToolSelected ||
+              drawShapeToolSelected ||
               lassoToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
@@ -1241,6 +1233,8 @@ export const ShapesSwitcher = ({
             ? frameToolIcon
             : embeddableToolSelected
             ? EmbedIcon
+            : drawShapeToolSelected
+            ? drawShapeToolIcon
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -1268,6 +1262,14 @@ export const ShapesSwitcher = ({
             selected={embeddableToolSelected}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "drawShape" })}
+            icon={drawShapeToolIcon}
+            data-testid="toolbar-drawShape"
+            selected={drawShapeToolSelected}
+          >
+            {t("toolBar.drawShape")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
