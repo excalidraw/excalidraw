@@ -135,6 +135,7 @@
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
+    "toggleUnderline": "Toggle underline",
     "unbindText": "Unbind text",
     "bindText": "Bind text to the container",
     "createContainerFromText": "Wrap text in a container",

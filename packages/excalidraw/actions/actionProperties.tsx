@@ -893,6 +893,55 @@ export const actionIncreaseFontSize = register({
   },
 });
 
+export const actionToggleUnderline = register({
+  name: "toggleUnderline",
+  label: "labels.toggleUnderline",
+  trackEvent: false,
+  perform: (elements, appState, _value, app) => {
+    const selectedTextElements = app.scene
+      .getSelectedElements(appState)
+      .filter(isTextElement);
+    const editingTextElement = appState.editingTextElement;
+
+    const targets = new Set<string>(
+      selectedTextElements.map((el) => el.id),
+    );
+    if (editingTextElement && isTextElement(editingTextElement)) {
+      targets.add(editingTextElement.id);
+    }
+
+    if (targets.size === 0) {
+      return false;
+    }
+
+    // toggle based on the first target: if any target is not underlined,
+    // turn all on; otherwise turn all off
+    const referenceElement =
+      (editingTextElement && isTextElement(editingTextElement)
+        ? editingTextElement
+        : null) || selectedTextElements[0];
+    const nextUnderline = !referenceElement.underline;
+
+    const nextElements = elements.map((el) => {
+      if (targets.has(el.id) && isTextElement(el)) {
+        return newElementWith(el, { underline: nextUnderline });
+      }
+      return el;
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    event.key.toLowerCase() === KEYS.U,
+});
+
 type ChangeFontFamilyData = Partial<
   Pick<
     AppState,

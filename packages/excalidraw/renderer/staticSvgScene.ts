@@ -685,6 +685,9 @@ const renderElementToSvg = (
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
           text.setAttribute("dominant-baseline", "alphabetic");
+          if (element.underline) {
+            text.setAttribute("text-decoration", "underline");
+          }
           node.appendChild(text);
         }
 

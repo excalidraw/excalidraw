@@ -247,6 +247,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    underline?: ExcalidrawTextElement["underline"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -280,6 +281,7 @@ export const newTextElement = (
     originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
+    underline: opts.underline ?? false,
   };
 
   const textElement: ExcalidrawTextElement = newElementWith(

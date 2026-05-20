@@ -120,6 +120,7 @@ export type ActionName =
   | "toggleTheme"
   | "increaseFontSize"
   | "decreaseFontSize"
+  | "toggleUnderline"
   | "unbindText"
   | "hyperlink"
   | "bindText"

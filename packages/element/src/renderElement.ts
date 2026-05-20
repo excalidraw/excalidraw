@@ -583,11 +583,26 @@ const drawElementOnCanvas = (
         );
 
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
-          );
+          const baselineY = index * lineHeightPx + verticalOffset;
+          context.fillText(lines[index], horizontalOffset, baselineY);
+
+          if (element.underline && lines[index].length > 0) {
+            const lineWidth = context.measureText(lines[index]).width;
+            const underlineThickness = Math.max(1, element.fontSize / 16);
+            const underlineY = baselineY + element.fontSize * 0.12;
+            let underlineX = horizontalOffset;
+            if (element.textAlign === "center") {
+              underlineX = horizontalOffset - lineWidth / 2;
+            } else if (element.textAlign === "right") {
+              underlineX = horizontalOffset - lineWidth;
+            }
+            context.fillRect(
+              underlineX,
+              underlineY,
+              lineWidth,
+              underlineThickness,
+            );
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {

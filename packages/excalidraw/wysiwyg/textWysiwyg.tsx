@@ -63,6 +63,7 @@ import {
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
+  actionToggleUnderline,
 } from "../actions/actionProperties";
 import {
   actionResetZoom,
@@ -398,6 +399,7 @@ export const textWysiwyg = ({
             : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
+        textDecoration: updatedTextElement.underline ? "underline" : "none",
       });
       currentTextLayout = {
         angle: angle as Radians,
@@ -643,6 +645,10 @@ export const textWysiwyg = ({
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);
+    } else if (actionToggleUnderline.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionToggleUnderline);
+      updateWysiwygStyle();
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
