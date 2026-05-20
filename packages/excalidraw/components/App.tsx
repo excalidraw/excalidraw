@@ -5280,14 +5280,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (event.key.toLowerCase() === KEYS.H || event.key.toLowerCase() === "j") &&
-        event.shiftKey &&
+        event.key.toLowerCase() === "j" &&
         !event.altKey &&
         !event[KEYS.CTRL_OR_CMD]
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.some((el) => isArrowElement(el))) {
-          const popup = event.key.toLowerCase() === KEYS.H ? "arrowheadEnd" : "arrowheadStart";
+          const popup = event.shiftKey ? "arrowheadStart" : "arrowheadEnd";
           const next = this.state.openPopup === popup ? null : popup;
           this.setState({ openPopup: next });
           event.stopPropagation();
