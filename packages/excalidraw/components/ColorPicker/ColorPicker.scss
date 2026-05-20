@@ -421,6 +421,17 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &--error {
+      border-color: var(--color-danger) !important;
+    }
+  }
+
+  .color-picker-input__error {
+    grid-column: 2 / span 2;
+    font-size: 0.75rem;
+    color: var(--color-danger);
+    margin-top: -4px;
   }
 
   .color-picker-label-swatch-container {
