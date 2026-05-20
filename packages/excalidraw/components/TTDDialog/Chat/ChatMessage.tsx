@@ -2,7 +2,6 @@ import clsx from "clsx";
 import React, { useState, useEffect } from "react";
 
 import { t } from "../../../i18n";
-import { FilledButton } from "../../FilledButton";
 import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
 import type { TChat, TTTDDialog } from "../types";
@@ -75,30 +74,11 @@ export const ChatMessage: React.FC<{
           </div>
           <div className="chat-message__body">
             <div className="chat-message__text">
-              {customOverride ? (
-                customOverride
-              ) : message.warningType === "messageLimitExceeded" ? (
-                <>
-                  {t("chat.rateLimit.messageLimit")}
-                  <div style={{ marginTop: "10px" }}>
-                    <FilledButton
-                      onClick={() => {
-                        window.open(
-                          `${
-                            import.meta.env.VITE_APP_PLUS_LP
-                          }/plus?utm_source=excalidraw&utm_medium=app&utm_content=ttdChatBanner#excalidraw-redirect`,
-                          "_blank",
-                          "noopener",
-                        );
-                      }}
-                    >
-                      {t("chat.upsellBtnLabel")}
-                    </FilledButton>
-                  </div>
-                </>
-              ) : (
-                t("chat.rateLimit.generalRateLimit")
-              )}
+              {customOverride
+                ? customOverride
+                : message.warningType === "messageLimitExceeded"
+                ? t("chat.rateLimit.messageLimit")
+                : t("chat.rateLimit.generalRateLimit")}
             </div>
           </div>
         </div>

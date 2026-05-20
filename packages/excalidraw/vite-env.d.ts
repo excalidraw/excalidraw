@@ -12,14 +12,7 @@ interface ImportMetaEnv {
   VITE_APP_LIBRARY_URL: string;
   VITE_APP_LIBRARY_BACKEND: string;
 
-  // collaboration WebSocket server (https: string
-  VITE_APP_WS_SERVER_URL: string;
-
-  // set this only if using the collaboration workflow we use on excalidraw.com
-  VITE_APP_PORTAL_URL: string;
   VITE_APP_AI_BACKEND: string;
-
-  VITE_APP_FIREBASE_CONFIG: string;
 
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
@@ -36,7 +29,6 @@ interface ImportMetaEnv {
 
   //Debug flags
 
-  VITE_APP_DISABLE_SENTRY: string;
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;
   // Enable eslint in dev server
@@ -45,9 +37,6 @@ interface ImportMetaEnv {
 
   PKG_NAME: string;
   PKG_VERSION: string;
-
-  VITE_APP_PLUS_LP: string;
-  VITE_APP_PLUS_APP: string;
 
   VITE_WORKER_ID: string;
   MODE: string;
