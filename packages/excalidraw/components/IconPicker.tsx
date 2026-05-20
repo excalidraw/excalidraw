@@ -289,14 +289,23 @@ export function IconPicker<T>({
   visibleSections,
   hiddenSections,
   onChange,
+  open,
+  onOpenChange,
 }: {
   label: string;
   value: T;
   visibleSections: readonly PickerSection<T>[];
   hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [isActive, setActive] = React.useState(false);
+  const [isActiveInternal, setActiveInternal] = React.useState(false);
+  const isActive = open !== undefined ? open : isActiveInternal;
+  const setActive = (value: boolean) => {
+    setActiveInternal(value);
+    onOpenChange?.(value);
+  };
   const selectedOption = useMemo(
     () =>
       findOption(visibleSections, (option) => option.value === value) ??
@@ -306,7 +315,7 @@ export function IconPicker<T>({
 
   return (
     <div>
-      <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
+      <Popover.Root open={isActive} onOpenChange={setActive}>
         <Popover.Trigger
           type="button"
           aria-label={label}

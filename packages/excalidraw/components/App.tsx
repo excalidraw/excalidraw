@@ -5281,6 +5281,28 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        event.key.toLowerCase() === KEYS.H &&
+        event.shiftKey &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
+        console.log("H block hit", {
+          selected: this.scene.getSelectedElements(this.state).map(e => e.type),
+          openPopup: this.state.openPopup,
+        });
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.some((el) => isArrowElement(el))) {
+          const current = this.state.openPopup;
+          const next =
+            current === "arrowheadEnd" ? "arrowheadStart" :
+            current === "arrowheadStart" ? null :
+            "arrowheadEnd";
+          this.setState({ openPopup: next });
+          event.stopPropagation();
+        }
+      }
+
+      if (
         !event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.key.toLowerCase() === KEYS.F

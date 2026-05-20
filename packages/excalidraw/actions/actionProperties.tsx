@@ -1756,6 +1756,10 @@ export const actionChangeArrowhead = register<{
                 hasSelection ? null : appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
+            open={appState.openPopup === "arrowheadStart"}
+            onOpenChange={(isOpen) =>
+              app.setAppState({ openPopup: isOpen ? "arrowheadEnd" : null })
+            }
           />
           <IconPicker
             visibleSections={endArrowheadOptions.visibleSections}
@@ -1773,6 +1777,10 @@ export const actionChangeArrowhead = register<{
                 hasSelection ? null : appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
+            open={appState.openPopup === "arrowheadEnd"}
+            onOpenChange={(isOpen) =>
+              app.setAppState({ openPopup: isOpen ? "arrowheadEnd" : null })
+            }
           />
         </div>
       </fieldset>
