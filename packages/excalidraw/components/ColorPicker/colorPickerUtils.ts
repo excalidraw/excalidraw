@@ -96,9 +96,7 @@ export type ActiveColorPickerSectionAtomType =
 export const activeColorPickerSectionAtom =
   atom<ActiveColorPickerSectionAtomType>(null);
 
-export type HexInputValidationError =
-  | "invalidHexLength"
-  | "invalidHexCharacters";
+export type HexInputValidationError = "invalidHexLength" | "invalidHexColor";
 
 const VALID_HEX_LENGTHS = new Set([3, 4, 6, 8]);
 
@@ -111,12 +109,12 @@ export const normalizeHexInputColor = (
     return { color: null, error: null };
   }
 
-  if (!/^[\da-f]+$/i.test(hex)) {
-    return { color: null, error: "invalidHexCharacters" };
-  }
-
   if (!VALID_HEX_LENGTHS.has(hex.length)) {
     return { color: null, error: "invalidHexLength" };
+  }
+
+  if (!/^[\da-f]+$/i.test(hex)) {
+    return { color: null, error: "invalidHexColor" };
   }
 
   return { color: `#${hex.toLowerCase()}`, error: null };

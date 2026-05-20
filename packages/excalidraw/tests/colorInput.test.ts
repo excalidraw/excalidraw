@@ -156,16 +156,24 @@ describe("normalizeHexInputColor", () => {
       color: null,
       error: "invalidHexLength",
     });
+    expect(normalizeHexInputColor("123asd7")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
   });
 
-  it("returns a character error for non-hex input", () => {
+  it("returns a color value error for invalid hex input with valid lengths", () => {
+    expect(normalizeHexInputColor("123asd")).toEqual({
+      color: null,
+      error: "invalidHexColor",
+    });
     expect(normalizeHexInputColor("zzzzzz")).toEqual({
       color: null,
-      error: "invalidHexCharacters",
+      error: "invalidHexColor",
     });
     expect(normalizeHexInputColor("blue")).toEqual({
       color: null,
-      error: "invalidHexCharacters",
+      error: "invalidHexColor",
     });
   });
 

@@ -26,8 +26,8 @@ const getHexInputErrorMessage = (error: HexInputValidationError) => {
   switch (error) {
     case "invalidHexLength":
       return t("colorPicker.invalidHexLength");
-    case "invalidHexCharacters":
-      return t("colorPicker.invalidHexCharacters");
+    case "invalidHexColor":
+      return t("colorPicker.invalidHexColor");
   }
 };
 
