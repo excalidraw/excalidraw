@@ -104,10 +104,6 @@ export class ActionManager {
           ),
       );
 
-      if (event.key === "H" || event.key === "h") {
-        console.log("actionManager H matched:", data.map(a => a.name));
-      }
-
     if (data.length !== 1) {
       if (data.length > 1) {
         console.warn("Canceling as multiple actions match this shortcut", data);
