@@ -96,6 +96,32 @@ export type ActiveColorPickerSectionAtomType =
 export const activeColorPickerSectionAtom =
   atom<ActiveColorPickerSectionAtomType>(null);
 
+export type HexInputValidationError =
+  | "invalidHexLength"
+  | "invalidHexCharacters";
+
+const VALID_HEX_LENGTHS = new Set([3, 4, 6, 8]);
+
+export const normalizeHexInputColor = (
+  color: string,
+): { color: string | null; error: HexInputValidationError | null } => {
+  const hex = color.trim().replace(/^#/, "");
+
+  if (!hex) {
+    return { color: null, error: null };
+  }
+
+  if (!/^[\da-f]+$/i.test(hex)) {
+    return { color: null, error: "invalidHexCharacters" };
+  }
+
+  if (!VALID_HEX_LENGTHS.has(hex.length)) {
+    return { color: null, error: "invalidHexLength" };
+  }
+
+  return { color: `#${hex.toLowerCase()}`, error: null };
+};
+
 export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"

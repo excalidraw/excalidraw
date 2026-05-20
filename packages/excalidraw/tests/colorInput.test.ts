@@ -1,5 +1,7 @@
 import { normalizeInputColor } from "@excalidraw/common";
 
+import { normalizeHexInputColor } from "../components/ColorPicker/colorPickerUtils";
+
 describe("normalizeInputColor", () => {
   describe("hex colors", () => {
     it("returns hex color with hash as-is", () => {
@@ -109,6 +111,68 @@ describe("normalizeInputColor", () => {
     it("returns null for partial/malformed colors", () => {
       expect(normalizeInputColor("#ff")).toBe(null);
       expect(normalizeInputColor("rgb(")).toBe(null);
+    });
+  });
+});
+
+describe("normalizeHexInputColor", () => {
+  it("returns normalized hex colors for valid lengths", () => {
+    expect(normalizeHexInputColor("abc")).toEqual({
+      color: "#abc",
+      error: null,
+    });
+    expect(normalizeHexInputColor("#abcd")).toEqual({
+      color: "#abcd",
+      error: null,
+    });
+    expect(normalizeHexInputColor("ff0000")).toEqual({
+      color: "#ff0000",
+      error: null,
+    });
+    expect(normalizeHexInputColor("#ff000080")).toEqual({
+      color: "#ff000080",
+      error: null,
+    });
+  });
+
+  it("returns a length error for malformed hex lengths", () => {
+    expect(normalizeHexInputColor("1")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
+    expect(normalizeHexInputColor("12")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
+    expect(normalizeHexInputColor("12345")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
+    expect(normalizeHexInputColor("1234567")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
+    expect(normalizeHexInputColor("123456789")).toEqual({
+      color: null,
+      error: "invalidHexLength",
+    });
+  });
+
+  it("returns a character error for non-hex input", () => {
+    expect(normalizeHexInputColor("zzzzzz")).toEqual({
+      color: null,
+      error: "invalidHexCharacters",
+    });
+    expect(normalizeHexInputColor("blue")).toEqual({
+      color: null,
+      error: "invalidHexCharacters",
+    });
+  });
+
+  it("does not show an error for empty input", () => {
+    expect(normalizeHexInputColor("")).toEqual({
+      color: null,
+      error: null,
     });
   });
 });
