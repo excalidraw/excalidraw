@@ -2068,7 +2068,6 @@ class App extends React.Component<AppProps, AppState> {
               : POINTER_EVENTS.enabled,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
-          onWheel={(event) => this.handleWheel(event)}
           onContextMenu={this.handleCanvasContextMenu}
           onDoubleClick={() => {
             this.setState({
@@ -12801,7 +12800,7 @@ class App extends React.Component<AppProps, AppState> {
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement ||
           (event.target instanceof HTMLElement &&
-            event.target.classList.contains(CLASSES.FRAME_NAME))
+            event.target.closest(`.${CLASSES.FRAME_NAME}`))
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
