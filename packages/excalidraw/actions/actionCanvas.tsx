@@ -10,10 +10,13 @@ import {
   updateActiveTool,
   CODES,
   KEYS,
+  applyDarkModeFilter,
+  isTransparent,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
+import { hasBackground, hasStrokeColor } from "@excalidraw/element";
 import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -85,6 +88,44 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
         updateData={updateData}
       />
     );
+  },
+});
+
+export const actionInvertColors = register({
+  name: "invertColors",
+  label: "labels.invertColors",
+  trackEvent: { category: "canvas" },
+  predicate: (_, appState) => !appState.viewModeEnabled,
+  perform: (elements, appState) => {
+    const invert = (color: string) =>
+      !color || isTransparent(color) ? color : applyDarkModeFilter(color);
+
+    const nextElements = elements.map((el) => {
+      if (el.isDeleted) {
+        return el;
+      }
+      const updates: Partial<typeof el> = {};
+      if (hasStrokeColor(el.type)) {
+        updates.strokeColor = invert(el.strokeColor);
+      }
+      if (hasBackground(el.type)) {
+        updates.backgroundColor = invert(el.backgroundColor);
+      }
+      return Object.keys(updates).length ? newElementWith(el, updates) : el;
+    });
+
+    return {
+      elements: nextElements,
+      appState: {
+        ...appState,
+        viewBackgroundColor: invert(appState.viewBackgroundColor),
+        currentItemStrokeColor: invert(appState.currentItemStrokeColor),
+        currentItemBackgroundColor: invert(
+          appState.currentItemBackgroundColor,
+        ),
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
   },
 });
 

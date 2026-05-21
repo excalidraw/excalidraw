@@ -94,6 +94,7 @@
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "clearCanvas": "Clear canvas",
+    "invertColors": "Invert colors",
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",

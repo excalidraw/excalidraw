@@ -19,6 +19,7 @@ import { ShapeCache } from "@excalidraw/element";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
+import { actionInvertColors } from "../actions/actionCanvas";
 import { trackEvent } from "../analytics";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
@@ -46,7 +47,8 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { InvertColorsIcon, sidebarRightIcon } from "./icons";
+import { ToolButton } from "./ToolButton";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -226,10 +228,27 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        gap: "0.5rem",
+        alignItems: "center",
+      }}
+    >
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
       <tunnels.MainMenuTunnel.Out />
+      {!appState.viewModeEnabled && (
+        <ToolButton
+          type="button"
+          icon={InvertColorsIcon}
+          title={t("labels.invertColors")}
+          aria-label={t("labels.invertColors")}
+          onClick={() => actionManager.executeAction(actionInvertColors)}
+          data-testid="invert-colors-button"
+        />
+      )}
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
   );

@@ -508,6 +508,14 @@ export const SunIcon = createIcon(
   { ...modifiedTablerIconProps, strokeWidth: 1.5 },
 );
 
+export const InvertColorsIcon = createIcon(
+  <g stroke="currentColor" strokeWidth="1.5">
+    <circle cx="10" cy="10" r="7.5" fill="none" />
+    <path d="M10 2.5a7.5 7.5 0 0 1 0 15V2.5Z" fill="currentColor" stroke="none" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 export const HamburgerMenuIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
