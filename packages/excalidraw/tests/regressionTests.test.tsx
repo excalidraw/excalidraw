@@ -1113,6 +1113,69 @@ describe("regression tests", () => {
     });
     assertSelectedElements(rect3);
   });
+
+  it("bring forward / send backward and bring to front / send to back keyboard shortcuts work", () => {
+    const rect1 = UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const rect2 = UI.createElement("rectangle", {
+      x: 120,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const rect3 = UI.createElement("rectangle", {
+      x: 240,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+
+    // Test sendBackward (Ctrl + [) using event.key
+    mouse.select(rect2);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("[");
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect2.id, rect1.id, rect3.id]);
+
+    // Test bringForward (Ctrl + ]) using event.key
+    mouse.select(rect2);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("]");
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+
+    // Test sendToBack (Ctrl + Shift + [) using event.key
+    mouse.select(rect3);
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("[");
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect3.id, rect1.id, rect2.id]);
+
+    // Test bringToFront (Ctrl + Shift + ]) using event.key
+    mouse.select(rect3);
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("]");
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+
+    // Test event.code physical key matching as well
+    mouse.select(rect2);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.codePress(CODES.BRACKET_LEFT);
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect2.id, rect1.id, rect3.id]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.codePress(CODES.BRACKET_RIGHT);
+    });
+    expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+  });
 });
 
 it(
