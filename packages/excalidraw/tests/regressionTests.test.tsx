@@ -7,6 +7,7 @@ import {
   KEYS,
   reseed,
   MQ_MIN_WIDTH_DESKTOP,
+  isDarwin,
 } from "@excalidraw/common";
 
 import { setDateTimeForTests } from "@excalidraw/common";
@@ -1150,19 +1151,50 @@ describe("regression tests", () => {
     });
     expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
 
-    // Test sendToBack (Ctrl + Shift + [) using event.key
-    mouse.select(rect3);
-    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-      Keyboard.keyPress("[");
-    });
-    expect(h.elements.map((e) => e.id)).toEqual([rect3.id, rect1.id, rect2.id]);
+    // Test sendToBack / bringToFront for different operating systems
+    if (isDarwin) {
+      // Test macOS specific sendToBack (Ctrl + Alt + [) using event.key
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
+        Keyboard.keyPress("[");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect3.id, rect1.id, rect2.id]);
 
-    // Test bringToFront (Ctrl + Shift + ]) using event.key
-    mouse.select(rect3);
-    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-      Keyboard.keyPress("]");
-    });
-    expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+      // Test macOS specific bringToFront (Ctrl + Alt + ]) using event.key
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
+        Keyboard.keyPress("]");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+    } else {
+      // Test Windows/Linux specific sendToBack (Ctrl + Shift + [) using event.key
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+        Keyboard.keyPress("[");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect3.id, rect1.id, rect2.id]);
+
+      // Test Windows/Linux specific sendToBack with literal '{' char (for German / non-US layout compatibility)
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+        Keyboard.keyPress("{");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect3.id, rect1.id, rect2.id]);
+
+      // Test Windows/Linux specific bringToFront (Ctrl + Shift + ]) using event.key
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+        Keyboard.keyPress("]");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+
+      // Test Windows/Linux specific bringToFront with literal '}' char (for German / non-US layout compatibility)
+      mouse.select(rect3);
+      Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+        Keyboard.keyPress("}");
+      });
+      expect(h.elements.map((e) => e.id)).toEqual([rect1.id, rect2.id, rect3.id]);
+    }
 
     // Test event.code physical key matching as well
     mouse.select(rect2);

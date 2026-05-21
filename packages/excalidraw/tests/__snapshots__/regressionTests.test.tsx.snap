@@ -2543,7 +2543,7 @@ exports[`regression tests > bring forward / send backward and bring to front / s
 
 exports[`regression tests > bring forward / send backward and bring to front / send to back keyboard shortcuts work > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > bring forward / send backward and bring to front / send to back keyboard shortcuts work > [end of test] number of renders 1`] = `28`;
+exports[`regression tests > bring forward / send backward and bring to front / send to back keyboard shortcuts work > [end of test] number of renders 1`] = `34`;
 
 exports[`regression tests > bring forward / send backward and bring to front / send to back keyboard shortcuts work > [end of test] redo stack 1`] = `[]`;
 
@@ -2851,7 +2851,7 @@ exports[`regression tests > bring forward / send backward and bring to front / s
         },
       },
     },
-    "id": "id24",
+    "id": "id25",
   },
   {
     "appState": AppStateDelta {
@@ -2873,7 +2873,7 @@ exports[`regression tests > bring forward / send backward and bring to front / s
       "removed": {},
       "updated": {},
     },
-    "id": "id27",
+    "id": "id29",
   },
   {
     "appState": AppStateDelta {
@@ -2898,7 +2898,7 @@ exports[`regression tests > bring forward / send backward and bring to front / s
         },
       },
     },
-    "id": "id29",
+    "id": "id31",
   },
   {
     "appState": AppStateDelta {
@@ -2923,7 +2923,7 @@ exports[`regression tests > bring forward / send backward and bring to front / s
         },
       },
     },
-    "id": "id31",
+    "id": "id33",
   },
 ]
 `;
