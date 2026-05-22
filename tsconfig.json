@@ -25,6 +25,8 @@
       "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
       "@excalidraw/element": ["./packages/element/src/index.ts"],
       "@excalidraw/element/*": ["./packages/element/src/*"],
+      "@excalidraw/fractional-indexing": ["./packages/fractional-indexing/src/index.ts"],
+      "@excalidraw/fractional-indexing/*": ["./packages/fractional-indexing/src/*"],
       "@excalidraw/math": ["./packages/math/src/index.ts"],
       "@excalidraw/math/*": ["./packages/math/src/*"],
       "@excalidraw/utils": ["./packages/utils/src/index.ts"],

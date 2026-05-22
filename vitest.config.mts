@@ -45,6 +45,20 @@ export default defineConfig({
         find: /^@excalidraw\/utils\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/utils/src/$1"),
       },
+      {
+        find: /^@excalidraw\/fractional-indexing$/,
+        replacement: path.resolve(
+          __dirname,
+          "./packages/fractional-indexing/src/index.ts",
+        ),
+      },
+      {
+        find: /^@excalidraw\/fractional-indexing\/(.*?)/,
+        replacement: path.resolve(
+          __dirname,
+          "./packages/fractional-indexing/src/$1",
+        ),
+      },
     ],
   },
   //@ts-ignore

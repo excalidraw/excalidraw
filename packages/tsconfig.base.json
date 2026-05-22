@@ -20,7 +20,9 @@
       "@excalidraw/math": ["./math/src/index.ts"],
       "@excalidraw/math/*": ["./math/src/*"],
       "@excalidraw/utils": ["./utils/src/index.ts"],
-      "@excalidraw/utils/*": ["./utils/src/*"]
+      "@excalidraw/utils/*": ["./utils/src/*"],
+      "@excalidraw/fractional-indexing": ["./fractional-indexing/src/index.ts"],
+      "@excalidraw/fractional-indexing/*": ["./fractional-indexing/src/*"]
     }
   }
 }
