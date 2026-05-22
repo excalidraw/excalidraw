@@ -63,19 +63,36 @@ export class LaserTrails implements Trail {
   start(container: SVGSVGElement) {
     this.container = container;
 
+    if (!AnimationController.running(this.key)) {
+      AnimationController.start<{ container: SVGSVGElement }>(
+        this.key,
+        ({ state }) => {
+          const needsMoreFrames = this.updateCollabTrails();
+          if (needsMoreFrames) {
+            if (state) {
+              return state;
+            }
+            if (this.container) {
+              return { container: this.container };
+            }
+
+            return null;
+          }
+          return null;
+        },
+      );
+    }
+
     this.localTrail.start(container);
   }
 
   stop() {
+    AnimationController.cancel(this.key);
     this.localTrail.stop();
     this.container = undefined;
   }
 
-  onFrame() {
-    return this.updateCollabTrails();
-  }
-
-  private updateCollabTrails() {
+  private updateCollabTrails(): boolean {
     if (!this.container || this.app.state.collaborators.size === 0) {
       return true; // No more animation frames needed
     }
