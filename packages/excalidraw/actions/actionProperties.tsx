@@ -2041,5 +2041,3 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
     );
   },
 });
-
-
