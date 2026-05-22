@@ -8,6 +8,7 @@ export type AnimationTarget = {
 export class AnimationFrameHandler {
   private targets = new WeakMap<object, AnimationTarget>();
   private rafIds = new WeakMap<object, number>();
+  private frameHandlers = new WeakMap<object, FrameRequestCallback>();
 
   register(key: object, callback: AnimationCallback) {
     this.targets.set(key, { callback, stopped: true });
@@ -25,6 +26,10 @@ export class AnimationFrameHandler {
     }
 
     this.targets.set(key, { ...target, stopped: false });
+
+    const frameHandler = this.constructFrameRequestCallback(key);
+    this.frameHandlers.set(key, frameHandler);
+
     this.scheduleFrame(key);
   }
 
@@ -37,7 +42,7 @@ export class AnimationFrameHandler {
     this.cancelFrame(key);
   }
 
-  private constructFrame(key: object): FrameRequestCallback {
+  private constructFrameRequestCallback(key: object): FrameRequestCallback {
     return (timestamp: number) => {
       const target = this.targets.get(key);
 
@@ -56,9 +61,11 @@ export class AnimationFrameHandler {
   }
 
   private scheduleFrame(key: object) {
-    const rafId = requestAnimationFrame(this.constructFrame(key));
-
-    this.rafIds.set(key, rafId);
+    const frameHandler = this.frameHandlers.get(key);
+    if (frameHandler) {
+      const rafId = requestAnimationFrame(frameHandler);
+      this.rafIds.set(key, rafId);
+    }
   }
 
   private cancelFrame(key: object) {

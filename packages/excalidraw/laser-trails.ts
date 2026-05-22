@@ -71,15 +71,16 @@ export class LaserTrails implements Trail {
   stop() {
     this.animationFrameHandler.stop(this);
     this.localTrail.stop();
+    this.container = undefined;
   }
 
   onFrame() {
-    this.updateCollabTrails();
+    return this.updateCollabTrails();
   }
 
   private updateCollabTrails() {
     if (!this.container || this.app.state.collaborators.size === 0) {
-      return;
+      return true; // No more animation frames needed
     }
 
     for (const [key, collaborator] of this.app.state.collaborators.entries()) {
@@ -126,5 +127,7 @@ export class LaserTrails implements Trail {
         this.collabTrails.delete(key);
       }
     }
+
+    return false; // Request more animation frames
   }
 }
