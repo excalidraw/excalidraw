@@ -26,7 +26,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animatedTrail";
-import { AnimationController } from "../renderer/animation";
 
 import { getLassoSelectedElementIds } from "./utils";
 
@@ -47,7 +46,7 @@ export class LassoTrail extends AnimatedTrail {
   private keepPreviousSelection: boolean = false;
 
   constructor(app: App) {
-    super(AnimationController, app, {
+    super(app, {
       animateTrail: true,
       streamline: 0.4,
       sizeMapping: (c) => {

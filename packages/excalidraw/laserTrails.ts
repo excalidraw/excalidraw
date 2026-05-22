@@ -4,7 +4,6 @@ import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
 import { AnimatedTrail } from "./animatedTrail";
 import { getClientColor } from "./clients";
-import { AnimationController } from "./renderer/animation";
 
 import type { Trail } from "./animatedTrail";
 import type App from "./components/App";
@@ -21,10 +20,14 @@ export class LaserTrails implements Trail {
   constructor(private app: App) {
     this.key = `laser-trails-${LaserTrails.counter++}`;
 
-    this.localTrail = new AnimatedTrail(AnimationController, app, {
-      ...this.getTrailOptions(),
-      fill: () => DEFAULT_LASER_COLOR,
-    });
+    this.localTrail = new AnimatedTrail(
+      app,
+      {
+        ...this.getTrailOptions(),
+        fill: () => DEFAULT_LASER_COLOR,
+      },
+      this.updateCollabTrails.bind(this),
+    );
   }
 
   private getTrailOptions() {
@@ -62,46 +65,24 @@ export class LaserTrails implements Trail {
 
   start(container: SVGSVGElement) {
     this.container = container;
-
-    if (!AnimationController.running(this.key)) {
-      AnimationController.start<{ container: SVGSVGElement }>(
-        this.key,
-        ({ state }) => {
-          const needsMoreFrames = this.updateCollabTrails();
-          if (needsMoreFrames) {
-            if (state) {
-              return state;
-            }
-            if (this.container) {
-              return { container: this.container };
-            }
-
-            return null;
-          }
-          return null;
-        },
-      );
-    }
-
     this.localTrail.start(container);
   }
 
   stop() {
-    AnimationController.cancel(this.key);
     this.localTrail.stop();
     this.container = undefined;
   }
 
-  private updateCollabTrails(): boolean {
+  private updateCollabTrails() {
     if (!this.container || this.app.state.collaborators.size === 0) {
-      return true; // No more animation frames needed
+      return;
     }
 
     for (const [key, collaborator] of this.app.state.collaborators.entries()) {
       let trail!: AnimatedTrail;
 
       if (!this.collabTrails.has(key)) {
-        trail = new AnimatedTrail(AnimationController, this.app, {
+        trail = new AnimatedTrail(this.app, {
           ...this.getTrailOptions(),
           fill: () =>
             collaborator.pointer?.laserColor ||
@@ -141,7 +122,5 @@ export class LaserTrails implements Trail {
         this.collabTrails.delete(key);
       }
     }
-
-    return false; // Request more animation frames
   }
 }

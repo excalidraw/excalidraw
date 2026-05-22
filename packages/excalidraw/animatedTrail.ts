@@ -40,10 +40,10 @@ export class AnimatedTrail implements Trail {
   private static counter = 0;
 
   constructor(
-    private animationController: typeof AnimationController,
     protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
+    private callbackOnFrame?: () => void,
   ) {
     this.key = `animated-trail-${AnimatedTrail.counter++}`;
     this.trailElement = document.createElementNS(SVG_NS, "path");
@@ -152,6 +152,8 @@ export class AnimatedTrail implements Trail {
 
     for (const [instanceKey, trail] of AnimatedTrail.instances) {
       const paths: string[] = [];
+
+      trail.callbackOnFrame?.();
 
       for (const t of trail.pastTrails) {
         paths.push(trail.drawTrail(t, trail.app.state));
