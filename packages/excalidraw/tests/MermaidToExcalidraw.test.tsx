@@ -5,6 +5,7 @@ import { Excalidraw } from "../index";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { render, waitFor } from "./test-utils";
+import { convertMermaidToExcalidraw } from "../components/TTDDialog/common";
 
 // Mock CodeMirror deps so the dynamic import of CodeMirrorEditor fails,
 // causing TTDDialogInput to fall back to <textarea> in tests.
@@ -121,5 +122,55 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(
       dialog.querySelector('[data-testid="mermaid-error"]'),
     ).toMatchInlineSnapshot("null");
+  });
+
+  it("should replace <br> with \n in text elements and measure new dimensions", async () => {
+    const data = {
+      current: {
+        elements: [],
+        files: null,
+      },
+    };
+    const canvasRef = {
+      current: document.createElement("div"),
+    };
+    const mockParent = document.createElement("div");
+    mockParent.appendChild(canvasRef.current);
+    Object.defineProperty(mockParent, "offsetWidth", { value: 500 });
+    Object.defineProperty(mockParent, "offsetHeight", { value: 500 });
+
+    const mockLib = {
+      api: Promise.resolve({
+        parseMermaidToExcalidraw: async () => ({
+          elements: [
+            {
+              id: "text1",
+              type: "text",
+              text: "Hello<br>World",
+              originalText: "Hello<br>World",
+              fontSize: 20,
+              fontFamily: 1,
+            },
+          ],
+        }),
+      }),
+    };
+
+    const result = await convertMermaidToExcalidraw({
+      canvasRef,
+      mermaidToExcalidrawLib: mockLib as any,
+      mermaidDefinition: "graph TD",
+      setError: () => {},
+      data: data as any,
+      theme: "light",
+    });
+
+    expect(result.success).toBe(true);
+    const textElement = data.current.elements.find((el) => el.type === "text") as any;
+    expect(textElement).not.toBeUndefined();
+    expect(textElement.text).toBe("Hello\nWorld");
+    expect(textElement.originalText).toBe("Hello\nWorld");
+    expect(textElement.width).toBeGreaterThan(0);
+    expect(textElement.height).toBeGreaterThan(0);
   });
 });
