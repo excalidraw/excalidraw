@@ -520,8 +520,9 @@ export const convertToExcalidrawElements = (
     if (element.type === "text" && typeof element.text === "string") {
       element.text = element.text.replace(/<br\s*\/?>/gi, "\n");
     }
-    if (element.label && typeof element.label.text === "string") {
-      element.label.text = element.label.text.replace(/<br\s*\/?>/gi, "\n");
+    const anyElement = element as any;
+    if (anyElement.label && typeof anyElement.label.text === "string") {
+      anyElement.label.text = anyElement.label.text.replace(/<br\s*\/?>/gi, "\n");
     }
   }
 

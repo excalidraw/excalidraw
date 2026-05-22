@@ -127,7 +127,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
   it("should replace <br> with \n in text elements and measure new dimensions", async () => {
     const data = {
       current: {
-        elements: [],
+        elements: [] as any[],
         files: null,
       },
     };

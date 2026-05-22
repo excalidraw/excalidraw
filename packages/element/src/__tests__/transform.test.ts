@@ -996,14 +996,14 @@ describe("Test Transform", () => {
     // 验证独立的普通文本元素换行转换正确
     const textElement = excalidrawElements.find(
       (e) => e.type === "text" && !e.containerId,
-    );
+    ) as any;
     expect(textElement).toBeDefined();
     expect(textElement?.text).toBe("第一行\n第二行\n第三行\n第四行");
 
     // 验证容器绑定标签的换行转换正确
     const labelElement = excalidrawElements.find(
       (e) => e.type === "text" && e.containerId,
-    );
+    ) as any;
     expect(labelElement).toBeDefined();
     expect(labelElement?.text).toBe("标签一\n标签二");
   });
