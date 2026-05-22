@@ -2,11 +2,11 @@ import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
-import { AnimatedTrail } from "./animated-trail";
+import { AnimatedTrail } from "./animatedTrail";
 import { getClientColor } from "./clients";
+import { AnimationController } from "./renderer/animation";
 
-import type { Trail } from "./animated-trail";
-import type { AnimationFrameHandler } from "./animation-frame-handler";
+import type { Trail } from "./animatedTrail";
 import type App from "./components/App";
 import type { SocketId } from "./types";
 
@@ -15,14 +15,13 @@ export class LaserTrails implements Trail {
   private collabTrails = new Map<SocketId, AnimatedTrail>();
 
   private container?: SVGSVGElement;
+  private key: string;
+  private static counter = 0;
 
-  constructor(
-    private animationFrameHandler: AnimationFrameHandler,
-    private app: App,
-  ) {
-    this.animationFrameHandler.register(this, this.onFrame.bind(this));
+  constructor(private app: App) {
+    this.key = `laser-trails-${LaserTrails.counter++}`;
 
-    this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
+    this.localTrail = new AnimatedTrail(AnimationController, app, {
       ...this.getTrailOptions(),
       fill: () => DEFAULT_LASER_COLOR,
     });
@@ -64,12 +63,10 @@ export class LaserTrails implements Trail {
   start(container: SVGSVGElement) {
     this.container = container;
 
-    this.animationFrameHandler.start(this);
     this.localTrail.start(container);
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
     this.localTrail.stop();
     this.container = undefined;
   }
@@ -87,7 +84,7 @@ export class LaserTrails implements Trail {
       let trail!: AnimatedTrail;
 
       if (!this.collabTrails.has(key)) {
-        trail = new AnimatedTrail(this.animationFrameHandler, this.app, {
+        trail = new AnimatedTrail(AnimationController, this.app, {
           ...this.getTrailOptions(),
           fill: () =>
             collaborator.pointer?.laserColor ||

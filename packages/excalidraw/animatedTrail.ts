@@ -1,5 +1,4 @@
 import { LaserPointer } from "@excalidraw/laser-pointer";
-
 import {
   SVG_NS,
   getSvgPathFromStroke,
@@ -8,7 +7,8 @@ import {
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
-import type { AnimationFrameHandler } from "./animation-frame-handler";
+import { AnimationController } from "./renderer/animation";
+
 import type App from "./components/App";
 import type { AppState } from "./types";
 
@@ -34,15 +34,18 @@ export class AnimatedTrail implements Trail {
   private container?: SVGSVGElement;
   private trailElement: SVGPathElement;
   private trailAnimation?: SVGAnimateElement;
+  private key: string;
+
+  static readonly instances = new Map<string, AnimatedTrail>();
+  private static counter = 0;
 
   constructor(
-    private animationFrameHandler: AnimationFrameHandler,
+    private animationController: typeof AnimationController,
     protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
   ) {
-    this.animationFrameHandler.register(this, this.onFrame.bind(this));
-
+    this.key = `animated-trail-${AnimatedTrail.counter++}`;
     this.trailElement = document.createElementNS(SVG_NS, "path");
     if (this.options.animateTrail) {
       this.trailAnimation = document.createElementNS(SVG_NS, "animate");
@@ -82,11 +85,18 @@ export class AnimatedTrail implements Trail {
       this.container.appendChild(this.trailElement);
     }
 
-    this.animationFrameHandler.start(this);
+    AnimatedTrail.instances.set(this.key, this);
+
+    if (!AnimationController.running(this.key)) {
+      AnimationController.start<Set<string>>(this.key, ({ state }) => {
+        return AnimatedTrail.onFrame(state ?? new Set([this.key]));
+      });
+    }
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
+    AnimatedTrail.instances.delete(this.key);
+    AnimationController.cancel(this.key);
 
     if (this.trailElement.parentNode === this.container) {
       this.container?.removeChild(this.trailElement);
@@ -136,45 +146,62 @@ export class AnimatedTrail implements Trail {
     }
   }
 
-  private onFrame() {
-    const paths: string[] = [];
+  private static onFrame(activeKeys: Set<string>): Set<string> | null {
+    const allPaths: string[] = [];
+    const keysToRemove: string[] = [];
 
-    for (const trail of this.pastTrails) {
-      paths.push(this.drawTrail(trail, this.app.state));
-    }
+    for (const [instanceKey, trail] of AnimatedTrail.instances) {
+      const paths: string[] = [];
 
-    if (this.currentTrail) {
-      const currentPath = this.drawTrail(this.currentTrail, this.app.state);
+      for (const t of trail.pastTrails) {
+        paths.push(trail.drawTrail(t, trail.app.state));
+      }
 
-      paths.push(currentPath);
-    }
+      if (trail.currentTrail) {
+        const currentPath = trail.drawTrail(
+          trail.currentTrail,
+          trail.app.state,
+        );
+        paths.push(currentPath);
+      }
 
-    this.pastTrails = this.pastTrails.filter((trail) => {
-      return trail.getStrokeOutline().length !== 0;
-    });
-
-    if (paths.length === 0) {
-      this.stop();
-    }
-
-    const svgPaths = paths.join(" ").trim();
-
-    this.trailElement.setAttribute("d", svgPaths);
-    if (this.trailAnimation) {
-      this.trailElement.setAttribute(
-        "fill",
-        (this.options.fill ?? (() => "black"))(this),
+      trail.pastTrails = trail.pastTrails.filter(
+        (t) => t.getStrokeOutline().length !== 0,
       );
-      this.trailElement.setAttribute(
-        "stroke",
-        (this.options.stroke ?? (() => "black"))(this),
-      );
-    } else {
-      this.trailElement.setAttribute(
-        "fill",
-        (this.options.fill ?? (() => "black"))(this),
-      );
+
+      if (paths.length === 0) {
+        keysToRemove.push(instanceKey);
+      }
+
+      allPaths.push(...paths);
     }
+
+    for (const instanceKey of keysToRemove) {
+      AnimatedTrail.instances.get(instanceKey)?.stop();
+    }
+
+    const svgPaths = allPaths.join(" ").trim();
+
+    for (const [, trail] of AnimatedTrail.instances) {
+      trail.trailElement.setAttribute("d", svgPaths);
+      if (trail.trailAnimation) {
+        trail.trailElement.setAttribute(
+          "fill",
+          (trail.options.fill ?? (() => "black"))(trail),
+        );
+        trail.trailElement.setAttribute(
+          "stroke",
+          (trail.options.stroke ?? (() => "black"))(trail),
+        );
+      } else {
+        trail.trailElement.setAttribute(
+          "fill",
+          (trail.options.fill ?? (() => "black"))(trail),
+        );
+      }
+    }
+
+    return AnimatedTrail.instances.size > 0 ? activeKeys : null;
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {

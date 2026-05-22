@@ -17,6 +17,10 @@ export class AnimationController {
   >();
 
   static start<R extends object>(key: string, animation: Animation<R>) {
+    if (AnimationController.animations.has(key)) {
+      return;
+    }
+
     const initialState = animation({
       deltaTime: 0,
       state: undefined,

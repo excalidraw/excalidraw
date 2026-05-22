@@ -25,9 +25,8 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { type AnimationFrameHandler } from "../animation-frame-handler";
-
-import { AnimatedTrail } from "../animated-trail";
+import { AnimatedTrail } from "../animatedTrail";
+import { AnimationController } from "../renderer/animation";
 
 import { getLassoSelectedElementIds } from "./utils";
 
@@ -47,8 +46,8 @@ export class LassoTrail extends AnimatedTrail {
   private canvasTranslate: CanvasTranslate | null = null;
   private keepPreviousSelection: boolean = false;
 
-  constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
-    super(animationFrameHandler, app, {
+  constructor(app: App) {
+    super(AnimationController, app, {
       animateTrail: true,
       streamline: 0.4,
       sizeMapping: (c) => {
