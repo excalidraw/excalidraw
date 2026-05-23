@@ -42,11 +42,14 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_THEME: "excalidraw-theme",
   LOCAL_STORAGE_DEBUG: "excalidraw-debug",
+  LOCAL_STORAGE_TABS: "excalidraw-tabs",
+  LOCAL_STORAGE_ACTIVE_TAB: "excalidraw-active-tab",
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
 
   IDB_LIBRARY: "excalidraw-library",
   IDB_TTD_CHATS: "excalidraw-ttd-chats",
+  IDB_DOCUMENTS: "excalidraw-documents",
 
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",

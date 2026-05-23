@@ -40,7 +40,9 @@ import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
+import { activeTabIdAtom } from "../tabs-atoms";
 
+import { DocumentStore } from "./DocumentStore";
 import { FileManager } from "./FileManager";
 import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
@@ -70,7 +72,8 @@ class LocalFileManager extends FileManager {
   };
 }
 
-const saveDataStateToLocalStorage = (
+const saveDataStateToTab = async (
+  tabId: string,
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -87,20 +90,16 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
-    );
+    await DocumentStore.saveDocument(tabId, {
+      elements: getNonDeletedElements(elements),
+      appState: _appState,
+    });
+
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     if (localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, false);
     }
   } catch (error: any) {
-    // Unable to access window.localStorage
     console.error(error);
     if (isQuotaExceededError(error) && !localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, true);
@@ -112,17 +111,18 @@ const isQuotaExceededError = (error: any) => {
   return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
-type SavingLockTypes = "collaboration";
+type SavingLockTypes = "collaboration" | "tabSwitch";
 
 export class LocalData {
   private static _save = debounce(
     async (
+      tabId: string,
       elements: readonly ExcalidrawElement[],
       appState: AppState,
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
+      await saveDataStateToTab(tabId, elements, appState);
 
       await this.fileStorage.saveFiles({
         elements,
@@ -142,12 +142,36 @@ export class LocalData {
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
-      this._save(elements, appState, files, onFilesSaved);
+      // Capture the tab id at enqueue time so a debounced save that fires
+      // after the user switches tabs still writes to the correct document.
+      const tabId = appJotaiStore.get(activeTabIdAtom);
+      if (!tabId) {
+        return;
+      }
+      this._save(tabId, elements, appState, files, onFilesSaved);
     }
+  };
+
+  /**
+   * Call synchronously *before* updating activeTabId (via tabsStore.activateTab).
+   * Flushes the outgoing tab's pending save and blocks new saves until App.tsx
+   * finishes updateScene.
+   */
+  static prepareForTabSwitch = () => {
+    this.flushSave();
+    this.pauseSave("tabSwitch");
   };
 
   static flushSave = () => {
     this._save.flush();
+  };
+
+  /**
+   * Drops any pending debounced save without flushing. Use when the target
+   * document is being deleted so we don't recreate it after deletion.
+   */
+  static cancelSave = () => {
+    this._save.cancel();
   };
 
   private static locker = new Locker<SavingLockTypes>();
