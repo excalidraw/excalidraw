@@ -18,8 +18,7 @@
   flex: 0 0 auto;
   background-color: var(--excalidraw-tabbar-bg);
   border-bottom: 1px solid var(--excalidraw-tabbar-border);
-  font-family:
-    Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+  font-family: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Helvetica Neue, Cantarell, Ubuntu, Roboto, Noto Sans, Oxygen, sans-serif;
   font-size: 0.8125rem;
   color: var(--excalidraw-tabbar-fg);
@@ -71,8 +70,7 @@
       background-color: var(--excalidraw-tabbar-bg-active);
       color: var(--excalidraw-tabbar-fg-active);
       font-weight: 600;
-      box-shadow:
-        inset 0 -3px 0 var(--excalidraw-tabbar-fg-active),
+      box-shadow: inset 0 -3px 0 var(--excalidraw-tabbar-fg-active),
         inset 0 1px 0 var(--excalidraw-tabbar-fg-active);
     }
 
