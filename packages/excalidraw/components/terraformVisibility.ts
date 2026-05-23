@@ -81,8 +81,7 @@ export const inferLegacyTerraformEdgePinsFromElements = (
     (e) => getTerraformEdgeLayer(e) === "dataFlow" && !e.isDeleted,
   ),
   declaredDataFlow: elements.some(
-    (e) =>
-      getTerraformEdgeLayer(e) === "declaredDataFlow" && !e.isDeleted,
+    (e) => getTerraformEdgeLayer(e) === "declaredDataFlow" && !e.isDeleted,
   ),
   networking: elements.some(
     (e) => getTerraformEdgeLayer(e) === "networking" && !e.isDeleted,
