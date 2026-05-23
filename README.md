@@ -185,6 +185,8 @@ Save as `my-stack.tfd` (any name; `.tfd` is conventional).
 
 In **Import Terraform**, upload **plan JSON + graph DOT** as usual, then choose the `.tfd` under **Dataflow links (.tfd)**. After import, enable **Terraform layers → Declared data flow edges** if the arrows are hidden (they are turned on automatically when you attach a `.tfd` file).
 
+![Semantic view with declared dataflow (blue) from allplanmodules fixtures: plan JSON, graph DOT, and allplanmodules.tfd](docs/terraform-semantic-dataflow.png)
+
 ### 100-case fixture corpus (optional)
 
 For regression testing the import pipeline, the repo can generate **100 real Terraform plan exports** (`plan.json` + `graph.dot`) from the sample stack in [`packages/backend/terraform/`](./packages/backend/terraform/). This uses a **Bootstrap · Freeze · Plan** workflow:
