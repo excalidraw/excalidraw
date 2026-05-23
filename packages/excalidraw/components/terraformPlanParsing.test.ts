@@ -20,6 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
 const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
 const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
+const TFD_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.tfd");
 const STATE_FIXTURE = path.join(
   FIXTURE_DIR,
   "terraform_allplanmodules.tfstate",
@@ -461,6 +462,69 @@ describe("terraformPlanParsing", () => {
     const body = await res.json();
     expect(body.meta?.layoutEngine).toBe("topology");
     expectAllplanmodulesCoalescedSubnetZones(body);
+  }, 120_000);
+
+  it("allplanmodules with .tfd: four declared dataflow edges in file order", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const tfdText = fs.readFileSync(TFD_FIXTURE, "utf8");
+
+    const writerAddr =
+      "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+    const readerAddr =
+      "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]";
+    const bucketAddr =
+      "module.application_data_bucket.module.bucket.aws_s3_bucket.this[0]";
+    const queueAddr =
+      "module.application_job_queue.module.queue.aws_sqs_queue.this[0]";
+
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true, dataflowLinks: tfdText },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const elements = body.elements as Array<{
+      type?: string;
+      isDeleted?: boolean;
+      customData?: {
+        terraformEdgeLayer?: string;
+        relationship?: {
+          source?: string;
+          target?: string;
+          sequence?: number;
+          origin?: string;
+        };
+      };
+    }>;
+
+    const declared = elements
+      .filter(
+        (e) =>
+          e.type === "arrow" &&
+          e.customData?.terraformEdgeLayer === "declaredDataFlow",
+      )
+      .map((e) => e.customData!.relationship!);
+
+    expect(declared).toHaveLength(4);
+    expect(declared.every((r) => r.origin === "tfd")).toBe(true);
+    expect(
+      declared.map((r) => [r.source, r.target, r.sequence] as const),
+    ).toEqual([
+      [writerAddr, bucketAddr, 0],
+      [writerAddr, queueAddr, 1],
+      [queueAddr, readerAddr, 2],
+      [bucketAddr, readerAddr, 3],
+    ]);
+
+    const iamDataFlow = elements.filter(
+      (e) =>
+        e.type === "arrow" && e.customData?.terraformEdgeLayer === "dataFlow",
+    );
+    expect(iamDataFlow.length).toBeGreaterThan(0);
   }, 120_000);
 
   it("allplanmodules semantic: writer lambda environment unknown-after lists SQS dependency", async () => {

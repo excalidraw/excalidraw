@@ -36,6 +36,7 @@ import {
   buildSyntheticPlanFromTfstate,
   isSyntheticPlanEmptyForSemantic,
 } from "./terraformStateToPlan";
+import { applyDeclaredDataFlow } from "./terraformDeclaredDataFlow";
 
 import type { Graph } from "@dagrejs/graphlib";
 
@@ -124,6 +125,8 @@ const stripTerraformAddressIndexes = (address = "") =>
 export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
+  /** Optional `.tfd` arrow-only dataflow overlay (see `terraformDeclaredDataFlow.ts`). */
+  dataflowLinks?: string;
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
@@ -311,6 +314,7 @@ export function buildTerraformLocalImportNodesMap(
   plan: unknown,
   graph: Graph,
   tfstate?: unknown | null,
+  options?: Pick<TerraformPlanParsingOptions, "dataflowLinks">,
 ): TerraformPlanNodesMap {
   const adjacency = getAdjacencyListFromDot(graph);
   const planTyped = plan as {
@@ -329,6 +333,12 @@ export function buildTerraformLocalImportNodesMap(
   const withTree = attachModuleTree(sanitizedNodes);
   buildDataFlowEdges(withTree as Record<string, unknown>);
   buildNetworkingEdges(withTree as Record<string, unknown>);
+  if (options?.dataflowLinks?.trim()) {
+    applyDeclaredDataFlow(
+      withTree as Record<string, TerraformPlanGraphNode>,
+      options.dataflowLinks,
+    );
+  }
   return withTree;
 }
 
@@ -478,6 +488,7 @@ export const terraformPlanParsing = async (
     plan,
     graph,
     tfstateForMerge,
+    { dataflowLinks: options?.dataflowLinks },
   );
   emitLocalParseDebug({
     phase: "planParsed_through_moduleTree",

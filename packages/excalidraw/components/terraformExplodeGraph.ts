@@ -3,6 +3,11 @@
  * `packages/backend/excalidraw-arrows.js` collectDataFlowEdges + buildTerraformExplodeParentMap).
  */
 
+import {
+  DECLARED_DATAFLOW_ORDERED_KEY,
+  type DeclaredDataFlowEdge,
+} from "./terraformDeclaredDataFlow";
+
 export type TerraformDataFlowEdgeRecord = {
   source: string;
   target: string;
@@ -124,6 +129,36 @@ export function collectDataFlowEdges(
   }
 
   return collected;
+}
+
+/** Declared `.tfd` edges in file order (`sequence` ascending). */
+export function collectDeclaredDataFlowEdges(
+  nodes: Record<string, unknown>,
+): TerraformDataFlowEdgeRecord[] {
+  const ordered = nodes[DECLARED_DATAFLOW_ORDERED_KEY] as
+    | DeclaredDataFlowEdge[]
+    | undefined;
+  if (!Array.isArray(ordered) || ordered.length === 0) {
+    return [];
+  }
+  const sorted = [...ordered].sort((a, b) => a.sequence - b.sequence);
+  return sorted
+    .filter(
+      (edge) =>
+        typeof edge.source === "string" &&
+        typeof edge.target === "string" &&
+        nodes[edge.source] &&
+        nodes[edge.target] &&
+        edge.source !== edge.target,
+    )
+    .map((edge) => ({
+      source: edge.source,
+      target: edge.target,
+      type: "declared_data_flow",
+      label: "data flow",
+      origin: edge.origin ?? "tfd",
+      detail: typeof edge.sequence === "number" ? String(edge.sequence) : null,
+    }));
 }
 
 /**
