@@ -17,6 +17,7 @@ import { injectTerraformLayoutDuplicateInfoGlyphs } from "./terraformLayoutDupli
 import {
   applyTerraformResourceRectangleSoftDelete,
   buildTerraformDataFlowLineSkeletons,
+  buildTerraformDeclaredDataFlowLineSkeletons,
   buildTerraformDependencyLineSkeletons,
   buildTerraformNetworkingDependencyLineSkeletons,
   buildTerraformNetworkingRecordLineSkeletons,
@@ -38,6 +39,7 @@ import {
 } from "./terraformResourceCardLabel";
 import {
   collectDataFlowEdges,
+  collectDeclaredDataFlowEdges,
   collectNetworkingEdges,
 } from "./terraformExplodeGraph";
 import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
@@ -4626,6 +4628,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   const dataFlowEdgeRecords = collectDataFlowEdges(
     nodes as Record<string, { edges_data_flow?: unknown }>,
   );
+  const declaredDataFlowEdgeRecords = collectDeclaredDataFlowEdges(nodes);
   const dataFlowUndirectedPairKeys = new Set(
     dataFlowEdgeRecords.map((e) => [e.source, e.target].sort().join("|||")),
   );
@@ -4705,6 +4708,15 @@ export async function buildTerraformTopologyExcalidrawScene(
       nodes,
       topologyLayoutBoxes,
       dataFlowEdgeRecords,
+      structuralUndirectedPairs,
+      { terraformSemanticOverview: true },
+    ),
+  );
+  skeleton.push(
+    ...buildTerraformDeclaredDataFlowLineSkeletons(
+      nodes,
+      topologyLayoutBoxes,
+      declaredDataFlowEdgeRecords,
       structuralUndirectedPairs,
       { terraformSemanticOverview: true },
     ),

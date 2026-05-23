@@ -32,6 +32,7 @@ import type { PointerDownState } from "../types";
 export type TerraformEdgeLayerPins = {
   dependency: boolean;
   dataFlow: boolean;
+  declaredDataFlow: boolean;
   networking: boolean;
 };
 
@@ -39,12 +40,14 @@ export type TerraformEdgeLayerPins = {
 export const TERRAFORM_IMPORT_EDGE_LAYER_PINS: TerraformEdgeLayerPins = {
   dependency: false,
   dataFlow: false,
+  declaredDataFlow: false,
   networking: false,
 };
 
 export type TerraformVisibilityReconcileOverrides = {
   dependencyLayerEnabled?: boolean;
   dataFlowLayerEnabled?: boolean;
+  declaredDataFlowLayerEnabled?: boolean;
   networkingLayerEnabled?: boolean;
   pins?: TerraformEdgeLayerPins;
   hoverPeekKey?: string | null;
@@ -77,6 +80,10 @@ export const inferLegacyTerraformEdgePinsFromElements = (
   dataFlow: elements.some(
     (e) => getTerraformEdgeLayer(e) === "dataFlow" && !e.isDeleted,
   ),
+  declaredDataFlow: elements.some(
+    (e) =>
+      getTerraformEdgeLayer(e) === "declaredDataFlow" && !e.isDeleted,
+  ),
   networking: elements.some(
     (e) => getTerraformEdgeLayer(e) === "networking" && !e.isDeleted,
   ),
@@ -106,11 +113,12 @@ export const getTerraformEdgeHoverPeekKeyFromHoveredIds = (
   return null;
 };
 
-/** `"dependency"` | `"dataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
+/** `"dependency"` | `"dataFlow"` | `"declaredDataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
   return layer === "dependency" ||
     layer === "dataFlow" ||
+    layer === "declaredDataFlow" ||
     layer === "networking"
     ? layer
     : null;
@@ -342,6 +350,7 @@ const deriveLayerState = (
     return {
       dependencyLayerEnabled: overrides.pins.dependency,
       dataFlowLayerEnabled: overrides.pins.dataFlow,
+      declaredDataFlowLayerEnabled: overrides.pins.declaredDataFlow,
       networkingLayerEnabled: overrides.pins.networking,
     };
   }
@@ -354,6 +363,11 @@ const deriveLayerState = (
     dataFlowLayerEnabled:
       overrides.dataFlowLayerEnabled ??
       elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
+    declaredDataFlowLayerEnabled:
+      overrides.declaredDataFlowLayerEnabled ??
+      elements.some(
+        (element) => getTerraformEdgeLayer(element) === "declaredDataFlow",
+      ),
     networkingLayerEnabled:
       overrides.networkingLayerEnabled ??
       elements.some(
@@ -701,6 +715,8 @@ export const reconcileTerraformVisibility = (
         ? layerState.dependencyLayerEnabled
         : layer === "dataFlow"
         ? layerState.dataFlowLayerEnabled
+        : layer === "declaredDataFlow"
+        ? layerState.declaredDataFlowLayerEnabled
         : layerState.networkingLayerEnabled;
 
     const relationship = getCustomData(element).relationship as

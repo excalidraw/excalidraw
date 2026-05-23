@@ -96,6 +96,7 @@ describe("TerraformImportModal", () => {
       terraformEdgeLayerPins: {
         dependency: false,
         dataFlow: false,
+        declaredDataFlow: false,
         networking: false,
       },
       terraformEdgeHoverPeekKey: null,
@@ -312,5 +313,53 @@ describe("TerraformImportModal", () => {
     await waitFor(() =>
       expect(screen.queryByText(/importing/i)).not.toBeInTheDocument(),
     );
+  });
+
+  it("passes dataflowLinks and enables declaredDataFlow pin when .tfd is selected", async () => {
+    vi.mocked(terraformPlanParsing).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const onClose = vi.fn();
+    render(<TerraformImportModal onCloseRequest={onClose} />);
+
+    const tfd = "writer -> bucket";
+    fireEvent.change(screen.getByLabelText(/plan file/i), {
+      target: {
+        files: [new File(["{}"], "p.json", { type: "application/json" })],
+      },
+    });
+    fireEvent.change(screen.getByLabelText(/graph file/i), {
+      target: {
+        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
+      },
+    });
+    fireEvent.change(screen.getByLabelText(/dataflow links/i), {
+      target: {
+        files: [
+          {
+            name: "links.tfd",
+            text: () => Promise.resolve(tfd),
+          } as unknown as File,
+        ],
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+
+    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
+    expect(vi.mocked(terraformPlanParsing).mock.calls[0][3]).toEqual(
+      expect.objectContaining({ dataflowLinks: tfd }),
+    );
+    expect(hoisted.setAppState).toHaveBeenCalledWith({
+      terraformEdgeLayerPins: {
+        dependency: false,
+        dataFlow: false,
+        declaredDataFlow: true,
+        networking: false,
+      },
+      terraformEdgeHoverPeekKey: null,
+    });
   });
 });
