@@ -85,9 +85,7 @@ describe("resolveDeclaredDataFlowEndpoint", () => {
 
 describe("applyDeclaredDataFlow", () => {
   it("stores ordered edges on nodes map", () => {
-    const nodes = minimalNodes() as Record<string, TerraformPlanGraphNode> & {
-      [DECLARED_DATAFLOW_ORDERED_KEY]?: unknown;
-    };
+    const nodes = minimalNodes();
     const text = `
 bind writer = ${WRITER}
 bind reader = ${READER}
