@@ -3,6 +3,8 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - "packages/excalidraw/**"
 jobs:
   size:
     runs-on: ubuntu-latest
