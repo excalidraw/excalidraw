@@ -26,7 +26,7 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
   <a href="https://github.com/TusharSariya/excalidraw-tf">GitHub repository</a>
 </p>
 
-![Sample import: plan JSON and graph DOT rendered as an editable diagram (semantic or module view)](docs/terraform-import-sample.png)
+![Semantic view: Terraform import with declared dataflow (blue) and IAM dataflow (grey)](docs/terraform-semantic-dataflow.png)
 
 ## How it works
 
@@ -156,8 +156,6 @@ bucket -> reader
 ### Import
 
 Upload plan JSON + graph DOT, then attach the `.tfd` under **Dataflow links (.tfd)**. **Declared data flow** is enabled automatically when you provide a links file; toggle layers under **Terraform layers** in the menu.
-
-![Semantic view with declared dataflow (blue) and IAM dataflow (grey) using allplanmodules fixtures](docs/terraform-semantic-dataflow.png)
 
 ## What you see on the canvas
 
