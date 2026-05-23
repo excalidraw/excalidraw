@@ -254,10 +254,10 @@ Output: `excalidraw-app/build`. Optional tarball: `yarn bundle:whiteboard` → `
 
 [`pages-deploy.yml`](./.github/workflows/pages-deploy.yml) deploys on pushes to `master` (or manual dispatch) with `yarn build:pages` and Wrangler.
 
-| Kind | Name |
-| --- | --- |
-| Secret | `CLOUDFLARE_API_TOKEN` |
-| Secret | `CLOUDFLARE_ACCOUNT_ID` |
+| Kind     | Name                                                      |
+| -------- | --------------------------------------------------------- |
+| Secret   | `CLOUDFLARE_API_TOKEN`                                    |
+| Secret   | `CLOUDFLARE_ACCOUNT_ID`                                   |
 | Variable | `CF_PAGES_PROJECT_NAME` (optional; skips deploy if unset) |
 
 Manual deploy after a local build:
