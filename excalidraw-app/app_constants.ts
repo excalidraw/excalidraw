@@ -56,6 +56,11 @@ export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",
 } as const;
 
+/** Public source repo for tfdraw.dev (landing page, docs links). */
+export const TFDRAW_GITHUB_REPO_URL =
+  "https://github.com/TusharSariya/excalidraw-tf";
+export const TFDRAW_GITHUB_USER_URL = "https://github.com/TusharSariya";
+
 export const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );

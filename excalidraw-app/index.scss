@@ -733,6 +733,40 @@ a.landing-cta {
   background: #f1dca8;
 }
 
+.landing-footer {
+  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1rem, 5vw, 5.5rem)
+    clamp(2rem, 4vw, 2.5rem);
+  border-top: 2px solid var(--landing-ink);
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+.landing-footer p {
+  margin: 0.4rem 0;
+  line-height: 1.5;
+}
+
+.landing-footer a {
+  color: var(--landing-ink);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.landing-footer a:hover {
+  color: var(--landing-green);
+}
+
+.landing-footer__primary {
+  font-size: 1rem;
+}
+
+.landing-footer__credit {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(22, 33, 29, 0.75);
+}
+
 .landing-final h2 {
   max-width: 820px;
 }
