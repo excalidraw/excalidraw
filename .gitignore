@@ -44,6 +44,8 @@ meta*.json
 **/terraform/.terraform.lock.hcl
 **/terraform/.terraform/
 **/terraform/builds/
+# Generated from full-stack.d2: d2 full-stack.d2 full-stack.svg
+packages/backend/terraform/full-stack.svg
 # Local account / IAM variables (secrets). Use terraform.tfvars.example as a template.
 packages/backend/terraform/terraform.tfvars
 packages/backend/terraform/terraform.tfvars.backup

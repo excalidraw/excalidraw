@@ -43,6 +43,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import {
   buildTerraformExplodeParentMap,
   collectDataFlowEdges,
+  collectDeclaredDataFlowEdges,
   collectNetworkingEdges,
   type TerraformDataFlowEdgeRecord,
 } from "./terraformExplodeGraph";
@@ -1166,7 +1167,10 @@ export function buildTerraformNetworkingDependencyLineSkeletons(
 
 /** Semantic data-flow layer — IAM policy semantics only (grey). */
 export const TERRAFORM_DATAFLOW_EDGE_STROKE = "#868e96";
+/** Declared `.tfd` dataflow layer (blue). */
+export const TERRAFORM_DECLARED_DATAFLOW_EDGE_STROKE = "#339af0";
 const TERRAFORM_DATAFLOW_OFFSET_PX = 18;
+const TERRAFORM_DECLARED_DATAFLOW_OFFSET_PX = 10;
 
 function offsetTerraformLineSegment(
   startPoint: { x: number; y: number },
@@ -1269,6 +1273,104 @@ export function buildTerraformDataFlowLineSkeletons(
           directions: edge.directions ?? [],
           directed: !bidirectional,
           bidirectional,
+        },
+        ...(options?.terraformSemanticOverview
+          ? { terraformSemanticOverview: true as const }
+          : {}),
+      },
+    });
+    edgeIndex += 1;
+  }
+  return out;
+}
+
+/**
+ * Declared `.tfd` dataflow arrows ({@link TERRAFORM_DECLARED_DATAFLOW_EDGE_STROKE}).
+ * `sequence` on each edge is stored on `relationship` for ordering tests.
+ */
+export function buildTerraformDeclaredDataFlowLineSkeletons(
+  nodes: TerraformPlanNodesMap,
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
+  declaredEdges: TerraformDataFlowEdgeRecord[],
+  dependencyUndirectedPairs: Set<string>,
+  options?: { terraformSemanticOverview?: boolean },
+): ExcalidrawElementSkeleton[] {
+  const out: ExcalidrawElementSkeleton[] = [];
+  let edgeIndex = 0;
+  for (const edge of declaredEdges) {
+    const source = resolveTerraformPlanVertexId(nodes, edge.source);
+    const target = resolveTerraformPlanVertexId(nodes, edge.target);
+    if (!source || !target || source === target) {
+      continue;
+    }
+    const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
+    const targetBox = layoutBoxes[target] as LayoutBox | undefined;
+    if (!sourceBox || !targetBox) {
+      continue;
+    }
+
+    let { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
+    const pairKey = [source, target].sort().join("|||");
+    if (dependencyUndirectedPairs.has(pairKey)) {
+      const shifted = offsetTerraformLineSegment(
+        startPoint,
+        endPoint,
+        TERRAFORM_DECLARED_DATAFLOW_OFFSET_PX,
+      );
+      startPoint = shifted.startPoint;
+      endPoint = shifted.endPoint;
+    }
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    const sequence =
+      edge.detail != null && edge.detail !== ""
+        ? Number(edge.detail)
+        : edgeIndex;
+
+    out.push({
+      type: "arrow",
+      id: `tf-declared-dataflow-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      strokeWidth: 3,
+      strokeColor: TERRAFORM_DECLARED_DATAFLOW_EDGE_STROKE,
+      strokeStyle: "solid",
+      startArrowhead: null,
+      endArrowhead: "arrow",
+      roundness: { type: 2 },
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "declaredDataFlow",
+        relationship: {
+          source,
+          target,
+          type: edge.type,
+          label: edge.label,
+          origin: edge.origin,
+          detail: edge.detail,
+          sequence,
+          directed: true,
+          bidirectional: false,
+          directions: [],
         },
         ...(options?.terraformSemanticOverview
           ? { terraformSemanticOverview: true as const }
@@ -1516,6 +1618,7 @@ export async function buildTerraformElkExcalidrawScene(
   const dataFlowEdges = collectDataFlowEdges(
     nodes as Record<string, { edges_data_flow?: unknown }>,
   );
+  const declaredDataFlowEdges = collectDeclaredDataFlowEdges(nodes);
   const networkingRecordEdges = collectNetworkingEdges(
     nodes as Record<
       string,
@@ -1672,6 +1775,14 @@ export async function buildTerraformElkExcalidrawScene(
       nodes,
       layoutBoxes,
       dataFlowEdges,
+      structuralUndirectedPairs,
+    ),
+  );
+  edgeSkeletons.push(
+    ...buildTerraformDeclaredDataFlowLineSkeletons(
+      nodes,
+      layoutBoxes,
+      declaredDataFlowEdges,
       structuralUndirectedPairs,
     ),
   );

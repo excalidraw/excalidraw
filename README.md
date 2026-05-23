@@ -119,6 +119,7 @@ In the hosted app, open **Import Terraform** and choose one of:
 | Mode | Files |
 | --- | --- |
 | Plan + graph (semantic or module view) | Plan JSON + graph DOT together |
+| Plan + graph + dataflow links | Plan JSON + graph DOT + optional `.tfd` (declared dataflow overlay) |
 | Plan + graph + state | Plan JSON + graph DOT + optional state (enriches existing resources) |
 | State only | Raw state JSON alone (semantic topology or module / ELK graph) |
 
@@ -127,8 +128,62 @@ In the hosted app, open **Import Terraform** and choose one of:
 | Plan file | JSON from `terraform show -json <planfile>` or `tofu show -json <planfile>` |
 | Graph file | DOT from `terraform graph -type=plan` or `tofu graph -type=plan` |
 | State file | Raw state from `terraform state pull` or a `.tfstate` file |
+| Dataflow links (optional) | `.tfd` text file — see [Creating `.tfd` files](#creating-tfd-files) below |
 
-Try the included fixtures if you want a known-good pair: [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot). For state-only or plan+state tests locally, generate `terraform_allplanmodules.tfstate` in that directory (gitignored).
+Try the included fixtures if you want a known-good trio: [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json), [`allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot), and [`allplanmodules.tfd`](./packages/backend/terraform/allplanmodules.tfd). For state-only or plan+state tests locally, generate `terraform_allplanmodules.tfstate` in that directory (gitignored).
+
+### Creating `.tfd` files
+
+A **`.tfd`** file is an optional, hand-authored overlay for **declared dataflow** (blue arrows on the **Declared data flow** layer). It does not replace plan JSON or graph DOT. IAM-inferred dataflow (grey **Data flow** layer) still comes from the plan; `.tfd` only adds the arrows you explicitly list.
+
+**When to use it:** document app-level flows (for example “writer Lambda writes to S3, then SQS; reader consumes from queue and bucket”) in a fixed order, without encoding IAM actions in the file.
+
+#### 1. Start from the same plan JSON you will import
+
+Generate `plan.json` as in step 1 above. Every `bind` line must use a **full Terraform resource address** exactly as it appears in that plan (same string as `resource_changes[].address`).
+
+List addresses from the plan:
+
+```bash
+# All managed resource addresses in the plan
+jq -r '.resource_changes[] | select(.mode == "managed") | .address' plan.json | sort
+
+# Narrow to Lambdas / S3 / SQS (example)
+jq -r '.resource_changes[] | select(.type == "aws_lambda_function" or .type == "aws_s3_bucket" or .type == "aws_sqs_queue") | .address' plan.json | sort
+```
+
+Copy the addresses you care about into your `.tfd` file. If an address does not exist in the plan you import, that edge is skipped (dev builds log a warning).
+
+#### 2. Syntax
+
+| Line | Meaning |
+| --- | --- |
+| `# comment` | Ignored |
+| `bind alias = <full address>` | Short name → exact plan address (RHS must contain `.`, e.g. `module.foo.aws_lambda_function.this[0]`) |
+| `alias -> other` | Directed edge; `other` can be another alias or a full address |
+| `module.a... -> module.b...` | Edge using full addresses on both sides (no `bind` required) |
+
+**Order matters:** edges are drawn in file order (first line first). Use that to show sequence (for example writer → bucket, then writer → queue).
+
+#### 3. Example (matches [`allplanmodules.tfd`](./packages/backend/terraform/allplanmodules.tfd))
+
+```tfd
+bind writer = module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]
+bind reader = module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]
+bind bucket = module.application_data_bucket.module.bucket.aws_s3_bucket.this[0]
+bind queue  = module.application_job_queue.module.queue.aws_sqs_queue.this[0]
+
+writer -> bucket
+writer -> queue
+queue -> reader
+bucket -> reader
+```
+
+Save as `my-stack.tfd` (any name; `.tfd` is conventional).
+
+#### 4. Import
+
+In **Import Terraform**, upload **plan JSON + graph DOT** as usual, then choose the `.tfd` under **Dataflow links (.tfd)**. After import, enable **Terraform layers → Declared data flow edges** if the arrows are hidden (they are turned on automatically when you attach a `.tfd` file).
 
 ### 100-case fixture corpus (optional)
 

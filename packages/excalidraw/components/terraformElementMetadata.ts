@@ -24,6 +24,7 @@ export const isTerraformLayerEdge = (
 ) =>
   element.customData?.terraformEdgeLayer === "dependency" ||
   element.customData?.terraformEdgeLayer === "dataFlow" ||
+  element.customData?.terraformEdgeLayer === "declaredDataFlow" ||
   element.customData?.terraformEdgeLayer === "networking";
 
 export const isTerraformInspectableElement = (

@@ -73,7 +73,11 @@ import {
 
 import "./DefaultItems.scss";
 
-type TerraformEdgeLayer = "dependency" | "dataFlow" | "networking";
+type TerraformEdgeLayer =
+  | "dependency"
+  | "dataFlow"
+  | "declaredDataFlow"
+  | "networking";
 
 const isTerraformDependencyPreviewEdge = (element: {
   customData?: Record<string, any>;
@@ -301,6 +305,9 @@ export const TerraformLayers = () => {
         </TerraformLayerItem>
         <TerraformLayerItem layer="dataFlow">
           Data flow edges
+        </TerraformLayerItem>
+        <TerraformLayerItem layer="declaredDataFlow">
+          Declared data flow edges
         </TerraformLayerItem>
       </DropdownMenuSub.Content>
     </DropdownMenuSub>

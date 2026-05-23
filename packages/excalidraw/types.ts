@@ -492,6 +492,7 @@ export interface AppState {
   terraformEdgeLayerPins: {
     dependency: boolean;
     dataFlow: boolean;
+    declaredDataFlow: boolean;
     networking: boolean;
   } | null;
   /** Transient graph key for revealing incident edges when `terraformEdgeLayerPins` is set. */

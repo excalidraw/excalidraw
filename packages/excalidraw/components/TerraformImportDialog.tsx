@@ -48,15 +48,19 @@ export const TerraformImportModal = ({
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [dotFile, setDotFile] = useState<File | null>(null);
   const [stateFile, setStateFile] = useState<File | null>(null);
+  const [linksFile, setLinksFile] = useState<File | null>(null);
   const [view, setView] = useState<TerraformView>("semantic");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /** Applies an Excalidraw v2 scene payload (e.g. from GET …/excalidraw or local parse). */
-  const replaceEditorWithExcalidrawScene = (scene: {
-    elements?: unknown;
-    files?: Record<string, BinaryFileData>;
-  }) => {
+  const replaceEditorWithExcalidrawScene = (
+    scene: {
+      elements?: unknown;
+      files?: Record<string, BinaryFileData>;
+    },
+    options?: { enableDeclaredDataFlow?: boolean },
+  ) => {
     const files = scene.files;
     if (files && typeof files === "object") {
       const list = Object.values(files).filter(
@@ -84,6 +88,7 @@ export const TerraformImportModal = ({
       terraformEdgeLayerPins: {
         dependency: false,
         dataFlow: false,
+        declaredDataFlow: Boolean(options?.enableDeclaredDataFlow),
         networking: false,
       },
       terraformEdgeHoverPeekKey: null,
@@ -111,12 +116,14 @@ export const TerraformImportModal = ({
     setLoading(true);
     setError(null);
     try {
+      const linksText = linksFile ? await linksFile.text() : undefined;
       const res = await terraformPlanParsing(
         hasPlanAndDot ? planFile : null,
         hasPlanAndDot ? dotFile : null,
         stateFile,
         {
           semanticLayout: view === "semantic" && canUseSemanticView,
+          dataflowLinks: linksText,
         },
       );
       const scene = await res.json();
@@ -127,7 +134,9 @@ export const TerraformImportModal = ({
             : "";
         throw new Error(err || "Local parse failed");
       }
-      replaceEditorWithExcalidrawScene(scene);
+      replaceEditorWithExcalidrawScene(scene, {
+        enableDeclaredDataFlow: Boolean(linksText?.trim()),
+      });
     } catch (err) {
       console.error("Import error:", err);
       setError(err instanceof Error ? err.message : "Request failed");
@@ -148,8 +157,9 @@ export const TerraformImportModal = ({
           <p className="TerraformImportModal__instructionsLead">
             From the same Terraform or OpenTofu working directory you can import
             plan JSON + graph DOT together (semantic or module view), optionally
-            add raw state to enrich existing resources, or import state alone
-            for module or semantic (current infrastructure) views.
+            add raw state to enrich existing resources, optionally add a{" "}
+            <code>.tfd</code> dataflow links file, or import state alone for
+            module or semantic (current infrastructure) views.
           </p>
           <ol className="TerraformImportModal__instructionsSteps">
             <li>
@@ -181,6 +191,15 @@ tofu graph -type=plan > graph.dot`}</code>
 terraform state pull > state.json
 
 # Or use a local .tfstate file`}</code>
+              </pre>
+            </li>
+            <li>
+              <strong>Dataflow links</strong> (optional, <code>.tfd</code>)
+              <pre className="TerraformImportModal__instructionsCode">
+                <code>{`# Example: packages/backend/terraform/allplanmodules.tfd
+bind writer = module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]
+writer -> bucket
+writer -> queue`}</code>
               </pre>
             </li>
           </ol>
@@ -224,6 +243,19 @@ terraform state pull > state.json
               type="file"
               accept=".tfstate,.json"
               onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <label htmlFor="terraform-import-links">
+            Dataflow links (.tfd)
+            <span className="TerraformImportModal__muted">
+              Optional arrow-only dataflow overlay (writer → bucket → queue,
+              etc.). Separate layer from IAM-inferred data flow.
+            </span>
+            <input
+              id="terraform-import-links"
+              type="file"
+              accept=".tfd,.txt"
+              onChange={(e) => setLinksFile(e.target.files?.[0] ?? null)}
             />
           </label>
         </div>
