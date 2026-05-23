@@ -13,6 +13,7 @@ import {
   isFreeDrawElement,
   isLineElement,
   isPointInElement,
+  isTextElement,
 } from "@excalidraw/element";
 import {
   lineSegment,
@@ -201,6 +202,20 @@ const eraserTest = (
   elementsMap: ElementsMap,
   zoom: number,
 ): boolean => {
+  if (isTextElement(element) && isBoundToContainer(element)) {
+    const container = elementsMap.get(element.containerId);
+    if (container) {
+      element = {
+        ...element,
+        ...computeBoundTextPosition(
+          container,
+          element as ExcalidrawTextElementWithContainer,
+          elementsMap,
+        ),
+      };
+    }
+  }
+
   const lastPoint = pathSegment[1];
 
   // PERF: Do a quick bounds intersection test first because it's cheap
