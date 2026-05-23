@@ -157,8 +157,7 @@ export function collectDeclaredDataFlowEdges(
       type: "declared_data_flow",
       label: "data flow",
       origin: edge.origin ?? "tfd",
-      detail:
-        typeof edge.sequence === "number" ? String(edge.sequence) : null,
+      detail: typeof edge.sequence === "number" ? String(edge.sequence) : null,
     }));
 }
 

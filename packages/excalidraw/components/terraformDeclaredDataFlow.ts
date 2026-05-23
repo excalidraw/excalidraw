@@ -39,7 +39,9 @@ export function resolveDeclaredDataFlowEndpoint(
 }
 
 /** Parse arrow-only `.tfd` text; preserves edge line order. */
-export function parseDeclaredDataFlowText(text: string): ParsedDeclaredDataFlow {
+export function parseDeclaredDataFlowText(
+  text: string,
+): ParsedDeclaredDataFlow {
   const binds = new Map<string, string>();
   const edgeSpecs: Array<{ source: string; target: string }> = [];
 
@@ -76,7 +78,9 @@ export function applyDeclaredDataFlow(
 
   for (const [alias, address] of binds) {
     if (!address.includes(".")) {
-      errors.push(`bind ${alias}: must be a full Terraform address (got "${address}")`);
+      errors.push(
+        `bind ${alias}: must be a full Terraform address (got "${address}")`,
+      );
       continue;
     }
     if (!resolveTerraformPlanNodeKey(nodes, address)) {

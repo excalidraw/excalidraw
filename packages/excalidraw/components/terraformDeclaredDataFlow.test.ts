@@ -15,8 +15,7 @@ const READER =
   "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]";
 const BUCKET =
   "module.application_data_bucket.module.bucket.aws_s3_bucket.this[0]";
-const QUEUE =
-  "module.application_job_queue.module.queue.aws_sqs_queue.this[0]";
+const QUEUE = "module.application_job_queue.module.queue.aws_sqs_queue.this[0]";
 
 function minimalNodes(): Record<string, TerraformPlanGraphNode> {
   const node = (address: string, type: string): TerraformPlanGraphNode => ({
@@ -70,9 +69,9 @@ describe("resolveDeclaredDataFlowEndpoint", () => {
 
   it("resolves full address on arrow without bind", () => {
     const nodes = minimalNodes();
-    expect(
-      resolveDeclaredDataFlowEndpoint(nodes, WRITER, new Map()),
-    ).toBe(WRITER);
+    expect(resolveDeclaredDataFlowEndpoint(nodes, WRITER, new Map())).toBe(
+      WRITER,
+    );
   });
 
   it("rejects bare alias without bind", () => {
@@ -114,8 +113,8 @@ bucket -> reader
     const nodes = minimalNodes();
     const { edges, errors } = applyDeclaredDataFlow(nodes, "bind bad = foo");
     expect(edges).toHaveLength(0);
-    expect(errors.some((e) => e.includes("must be a full Terraform address"))).toBe(
-      true,
-    );
+    expect(
+      errors.some((e) => e.includes("must be a full Terraform address")),
+    ).toBe(true);
   });
 });
