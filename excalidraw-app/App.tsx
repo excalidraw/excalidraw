@@ -93,6 +93,8 @@ import {
   isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
+  TFDRAW_GITHUB_REPO_URL,
+  TFDRAW_GITHUB_USER_URL,
 } from "./app_constants";
 import Collab, {
   collabAPIAtom,
@@ -1341,6 +1343,13 @@ const LandingPage = () => {
             <a href="#workflow">Workflow</a>
             <a href="#use-cases">Use cases</a>
             <a href="#faq">FAQ</a>
+            <a
+              href={TFDRAW_GITHUB_REPO_URL}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              GitHub
+            </a>
             <a href="/demo">Full editor</a>
             <button
               type="button"
@@ -1638,6 +1647,53 @@ const LandingPage = () => {
           Visualize Terraform changes
         </button>
       </section>
+
+      <footer className="landing-footer" aria-label="Project links">
+        <p className="landing-footer__primary">
+          <a
+            href={TFDRAW_GITHUB_REPO_URL}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Source on GitHub
+          </a>
+          <span aria-hidden="true"> · </span>
+          <a
+            href={`${TFDRAW_GITHUB_REPO_URL}#readme`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            README &amp; docs
+          </a>
+          <span aria-hidden="true"> · </span>
+          <a
+            href={`${TFDRAW_GITHUB_REPO_URL}/blob/master/LICENSE`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            MIT license
+          </a>
+        </p>
+        <p className="landing-footer__credit">
+          Open-source Excalidraw fork by{" "}
+          <a
+            href={TFDRAW_GITHUB_USER_URL}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Tushar Sariya
+          </a>{" "}
+          (
+          <a
+            href={TFDRAW_GITHUB_REPO_URL}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            TusharSariya/excalidraw-tf
+          </a>
+          )
+        </p>
+      </footer>
     </main>
   );
 };
