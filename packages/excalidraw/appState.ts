@@ -13,6 +13,8 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
+import { getDefaultWorkspaceLayout } from "./workspaceLayout";
+
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
@@ -128,6 +130,7 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    workspaceLayout: getDefaultWorkspaceLayout(),
   };
 };
 
@@ -254,6 +257,7 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  workspaceLayout: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

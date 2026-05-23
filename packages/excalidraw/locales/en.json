@@ -189,7 +189,19 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "workspaceLayoutEdit": "Edit workspace layout",
+    "workspaceLayoutReset": "Reset workspace layout"
+  },
+  "workspaceLayout": {
+    "drag": "Drag to move",
+    "lock": "Lock position",
+    "unlock": "Unlock position",
+    "hide": "Hide",
+    "show": "Show",
+    "reset": "Reset this zone",
+    "resize": "Drag to resize",
+    "propertiesPanelPlaceholder": "Properties panel"
   },
   "elementLink": {
     "title": "Link to object",

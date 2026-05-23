@@ -84,6 +84,10 @@ export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 
 export { actionToggleStats } from "./actionToggleStats";
+export {
+  actionToggleWorkspaceLayoutEdit,
+  actionResetWorkspaceLayout,
+} from "./actionWorkspaceLayout";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "./actionLink";
 export { actionToggleElementLock } from "./actionElementLock";

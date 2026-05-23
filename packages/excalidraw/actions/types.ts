@@ -58,6 +58,8 @@ export type ActionName =
   | "pasteStyles"
   | "gridMode"
   | "zenMode"
+  | "toggleWorkspaceLayoutEdit"
+  | "resetWorkspaceLayout"
   | "objectsSnapMode"
   | "arrowBinding"
   | "midpointSnapping"
