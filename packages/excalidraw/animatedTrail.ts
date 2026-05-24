@@ -35,7 +35,6 @@ export class AnimatedTrail implements Trail {
   private trailElement: SVGPathElement;
   private trailAnimation?: SVGAnimateElement;
   private key: string;
-  private started = false;
 
   private static counter = 0;
 
@@ -76,21 +75,15 @@ export class AnimatedTrail implements Trail {
   }
 
   private cleanup() {
-    if (this.started) {
-      this.pastTrails = [];
-      this.currentTrail = undefined;
-    }
+    this.pastTrails = [];
+    this.currentTrail = undefined;
 
     if (this.trailElement.parentNode === this.container) {
       this.container?.removeChild(this.trailElement);
     }
-
-    this.started = false;
   }
 
   start(container?: SVGSVGElement) {
-    this.started = true;
-
     if (container) {
       this.container = container;
     }
@@ -205,7 +198,7 @@ export class AnimatedTrail implements Trail {
       );
     }
 
-    return this.started;
+    return true;
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {
