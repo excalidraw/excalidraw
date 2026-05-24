@@ -1,5 +1,4 @@
 import {
-  corsHeaders,
   errorResponse,
   handleOptions,
   jsonResponse,
