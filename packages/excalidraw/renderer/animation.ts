@@ -7,6 +7,10 @@ export type Animation<R extends object> = (params: {
 
 export class AnimationController {
   private static isRunning = false;
+  private static scheduledFrame:
+    | { id: ReturnType<typeof requestAnimationFrame>; type: "raf" }
+    | { id: ReturnType<typeof setTimeout>; type: "timeout" }
+    | null = null;
   private static animations = new Map<
     string,
     {
@@ -35,17 +39,46 @@ export class AnimationController {
 
       if (!AnimationController.isRunning) {
         AnimationController.isRunning = true;
-
-        if (isRenderThrottlingEnabled()) {
-          requestAnimationFrame(AnimationController.tick);
-        } else {
-          setTimeout(AnimationController.tick, 0);
-        }
+        AnimationController.scheduleNextFrame();
       }
     }
   }
 
+  private static scheduleNextFrame() {
+    if (AnimationController.scheduledFrame) {
+      return;
+    }
+
+    if (isRenderThrottlingEnabled()) {
+      AnimationController.scheduledFrame = {
+        id: requestAnimationFrame(AnimationController.tick),
+        type: "raf",
+      };
+    } else {
+      AnimationController.scheduledFrame = {
+        id: setTimeout(AnimationController.tick, 0),
+        type: "timeout",
+      };
+    }
+  }
+
+  private static cancelScheduledFrame() {
+    if (!AnimationController.scheduledFrame) {
+      return;
+    }
+
+    if (AnimationController.scheduledFrame.type === "raf") {
+      cancelAnimationFrame(AnimationController.scheduledFrame.id);
+    } else {
+      clearTimeout(AnimationController.scheduledFrame.id);
+    }
+
+    AnimationController.scheduledFrame = null;
+  }
+
   private static tick() {
+    AnimationController.scheduledFrame = null;
+
     if (AnimationController.animations.size > 0) {
       for (const [key, animation] of AnimationController.animations) {
         const now = performance.now();
@@ -70,12 +103,16 @@ export class AnimationController {
         }
       }
 
-      if (isRenderThrottlingEnabled()) {
-        requestAnimationFrame(AnimationController.tick);
-      } else {
-        setTimeout(AnimationController.tick, 0);
+      if (AnimationController.animations.size === 0) {
+        AnimationController.isRunning = false;
+        return;
       }
+
+      AnimationController.scheduleNextFrame();
+      return;
     }
+
+    AnimationController.isRunning = false;
   }
 
   static running(key: string) {
@@ -84,5 +121,10 @@ export class AnimationController {
 
   static cancel(key: string) {
     AnimationController.animations.delete(key);
+
+    if (AnimationController.animations.size === 0) {
+      AnimationController.isRunning = false;
+      AnimationController.cancelScheduledFrame();
+    }
   }
 }
