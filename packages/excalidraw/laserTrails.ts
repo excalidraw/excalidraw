@@ -61,10 +61,24 @@ export class LaserTrails implements Trail {
 
   stop() {
     this.localTrail.stop();
+    this.stopCollabTrails();
     this.container = undefined;
   }
 
+  private stopCollabTrails(collaborators?: App["state"]["collaborators"]) {
+    for (const [key, trail] of this.collabTrails) {
+      const collaborator = collaborators?.get(key);
+
+      if (!collaborator) {
+        trail.stop();
+        this.collabTrails.delete(key);
+      }
+    }
+  }
+
   updateCollabTrails(collaborators: App["state"]["collaborators"]) {
+    this.stopCollabTrails(collaborators);
+
     if (!this.container || collaborators.size === 0) {
       return;
     }
@@ -115,18 +129,6 @@ export class LaserTrails implements Trail {
           trail.addPointToPath(collaborator.pointer.x, collaborator.pointer.y);
           trail.endPath();
         }
-      }
-    }
-
-    // Remove trails for collaborators that have left
-    for (const key of this.collabTrails.keys()) {
-      const collaboratorLeft = !collaborators.has(key);
-
-      if (collaboratorLeft) {
-        const trail = this.collabTrails.get(key)!;
-
-        trail.stop();
-        this.collabTrails.delete(key);
       }
     }
   }
