@@ -768,28 +768,81 @@ a.landing-cta {
 }
 
 .landing-email-signup {
-  padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 5vw, 5.5rem);
+  padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 5vw, 5.5rem);
   border-top: 2px solid var(--landing-ink);
-  background: rgba(255, 255, 255, 0.72);
-  max-width: 640px;
+  background: linear-gradient(165deg, rgba(15, 139, 95, 0.12) 0%, transparent 42%),
+    linear-gradient(25deg, rgba(217, 164, 47, 0.14) 0%, transparent 38%),
+    rgba(255, 255, 255, 0.55);
+}
+
+.landing-email-signup__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: clamp(1.5rem, 4vw, 2.75rem);
+  align-items: start;
+  max-width: 980px;
   margin: 0 auto;
 }
 
+.landing-email-signup__header {
+  padding-top: 0.25rem;
+}
+
+.landing-email-signup__eyebrow {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  padding: 0.28rem 0.65rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 var(--landing-green);
+  color: var(--landing-green);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .landing-email-signup__title {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.65rem;
   font-family: "Virgil", "Segoe Print", cursive;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .landing-email-signup__lede {
-  margin: 0 0 1rem;
+  margin: 0;
+  max-width: 36ch;
   color: rgba(22, 33, 29, 0.82);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.landing-email-signup__card {
+  border: 2px solid var(--landing-ink);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: clamp(1.15rem, 2.5vw, 1.5rem);
+  box-shadow: 6px 8px 0 rgba(22, 33, 29, 0.16);
 }
 
 .tfdraw-email-signup__label {
   display: block;
   margin-bottom: 0.35rem;
   font-weight: 800;
+}
+
+.tfdraw-email-signup__label--sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .tfdraw-email-signup__row {
@@ -822,6 +875,56 @@ a.landing-cta {
   cursor: not-allowed;
 }
 
+.tfdraw-email-signup--landing .tfdraw-email-signup__row {
+  flex-wrap: nowrap;
+  gap: 0.65rem;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__input {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--landing-ink);
+  font-size: 1rem;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__input::placeholder {
+  color: rgba(22, 33, 29, 0.42);
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__input:hover {
+  border-color: rgba(15, 139, 95, 0.55);
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__input:focus {
+  outline: none;
+  border-color: var(--landing-green);
+  box-shadow: 0 0 0 3px rgba(15, 139, 95, 0.22);
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__submit {
+  flex: 0 0 auto;
+  min-height: 48px;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  box-shadow: 4px 5px 0 var(--landing-ink);
+  font-size: 1rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__submit:hover:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 3px 4px 0 var(--landing-ink);
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__submit:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 3px 0 var(--landing-ink);
+}
+
 .tfdraw-email-signup__consent {
   display: flex;
   gap: 0.5rem;
@@ -830,14 +933,58 @@ a.landing-cta {
   font-size: 0.92rem;
 }
 
+.tfdraw-email-signup--landing .tfdraw-email-signup__consent {
+  gap: 0.65rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(22, 33, 29, 0.2);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__consent input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  accent-color: var(--landing-green);
+  cursor: pointer;
+}
+
 .tfdraw-email-signup__privacy {
   margin: 0.65rem 0 0;
   font-size: 0.85rem;
   color: rgba(22, 33, 29, 0.75);
 }
 
+.tfdraw-email-signup--landing .tfdraw-email-signup__privacy {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(247, 241, 228, 0.85);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__privacy a {
+  color: var(--landing-blue);
+  font-weight: 800;
+  text-underline-offset: 2px;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__privacy a:hover {
+  color: var(--landing-green);
+}
+
 .tfdraw-email-signup__turnstile {
   margin-top: 0.75rem;
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__turnstile {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .tfdraw-email-signup__message {
@@ -846,8 +993,19 @@ a.landing-cta {
   color: var(--landing-green);
 }
 
+.tfdraw-email-signup--landing .tfdraw-email-signup__message {
+  margin-top: 0.85rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  background: rgba(15, 139, 95, 0.1);
+}
+
 .tfdraw-email-signup__message--error {
   color: var(--landing-red);
+}
+
+.tfdraw-email-signup--landing .tfdraw-email-signup__message--error {
+  background: rgba(201, 87, 63, 0.1);
 }
 
 .tfdraw-post-import-prompt {
@@ -990,6 +1148,14 @@ a.landing-cta {
   .landing-canvas-instructions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .landing-email-signup__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-email-signup__lede {
+    max-width: none;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1018,6 +1184,15 @@ a.landing-cta {
 
   .landing-topology--region {
     inset: 15% 5% 11% 6%;
+  }
+
+  .tfdraw-email-signup--landing .tfdraw-email-signup__row {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .tfdraw-email-signup--landing .tfdraw-email-signup__submit {
+    width: 100%;
   }
 
   .landing-topology--vpc {
@@ -1072,6 +1247,7 @@ body.terraform-canvas-landing .landing-features,
 body.terraform-canvas-landing .landing-faq,
 body.terraform-canvas-landing .landing-use-cases,
 body.terraform-canvas-landing .landing-final,
+body.terraform-canvas-landing .landing-email-signup,
 body.terraform-canvas-landing .landing-canvas-section__header,
 body.terraform-canvas-landing .landing-canvas-instructions {
   filter: none;

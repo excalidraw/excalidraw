@@ -49,10 +49,13 @@ export const EmailSignupForm = ({
   source,
   className,
   onSubmitted,
+  showFieldLabel = true,
 }: {
   source: TfdrawSubscribeSource;
   className?: string;
   onSubmitted?: () => void;
+  /** When false, the email label is visually hidden (section title carries the heading). */
+  showFieldLabel?: boolean;
 }) => {
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
   const consentId = useId();
@@ -144,7 +147,14 @@ export const EmailSignupForm = ({
       className={className ?? "tfdraw-email-signup"}
       onSubmit={handleSubmit}
     >
-      <label className="tfdraw-email-signup__label" htmlFor={emailId}>
+      <label
+        className={
+          showFieldLabel
+            ? "tfdraw-email-signup__label"
+            : "tfdraw-email-signup__label tfdraw-email-signup__label--sr-only"
+        }
+        htmlFor={emailId}
+      >
         Email for product updates
       </label>
       <div className="tfdraw-email-signup__row">

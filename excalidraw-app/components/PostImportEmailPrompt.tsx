@@ -5,6 +5,9 @@ import { EmailSignupForm } from "./EmailSignupForm";
 export const POST_IMPORT_EMAIL_DISMISSED_KEY =
   "tfdraw-post-import-email-dismissed";
 
+/** Delay after a successful Terraform import before showing the email popup. */
+export const POST_IMPORT_EMAIL_DELAY_MS = 30_000;
+
 export const PostImportEmailPrompt = ({ onClose }: { onClose: () => void }) => {
   const dismiss = () => {
     try {
@@ -35,8 +38,8 @@ export const PostImportEmailPrompt = ({ onClose }: { onClose: () => void }) => {
           Enjoying the Terraform canvas?
         </h2>
         <p>
-          Get occasional product updates. Your import stayed in the browser — we
-          only store your email if you subscribe.
+          Get occasional product updates when you are ready. Your import stayed
+          in the browser — we only store your email if you subscribe.
         </p>
         <EmailSignupForm source="post_import" onSubmitted={dismiss} />
         <button

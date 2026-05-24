@@ -110,6 +110,7 @@ import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { LandingEmailSignup } from "./components/LandingEmailSignup";
 import {
   PostImportEmailPrompt,
+  POST_IMPORT_EMAIL_DELAY_MS,
   POST_IMPORT_EMAIL_DISMISSED_KEY,
 } from "./components/PostImportEmailPrompt";
 import {
@@ -395,18 +396,40 @@ const ExcalidrawWrapper = ({
 
   const [errorMessage, setErrorMessage] = useState("");
   const [postImportEmailOpen, setPostImportEmailOpen] = useState(false);
+  const postImportEmailTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const isCollabDisabled = frontendOnly || isRunningInIframe();
+
+  const clearPostImportEmailTimeout = useCallback(() => {
+    if (postImportEmailTimeoutRef.current !== null) {
+      clearTimeout(postImportEmailTimeoutRef.current);
+      postImportEmailTimeoutRef.current = null;
+    }
+  }, []);
+
+  const closePostImportEmailPrompt = useCallback(() => {
+    clearPostImportEmailTimeout();
+    setPostImportEmailOpen(false);
+  }, [clearPostImportEmailTimeout]);
+
+  useEffect(() => () => clearPostImportEmailTimeout(), [clearPostImportEmailTimeout]);
 
   const handleTerraformImportSuccess = useCallback(() => {
     void postImportEvent("terraform_import_success");
+    clearPostImportEmailTimeout();
     try {
-      if (sessionStorage.getItem(POST_IMPORT_EMAIL_DISMISSED_KEY) !== "1") {
-        setPostImportEmailOpen(true);
+      if (sessionStorage.getItem(POST_IMPORT_EMAIL_DISMISSED_KEY) === "1") {
+        return;
       }
     } catch {
-      setPostImportEmailOpen(true);
+      // sessionStorage unavailable — still offer signup after delay
     }
-  }, []);
+    postImportEmailTimeoutRef.current = setTimeout(() => {
+      postImportEmailTimeoutRef.current = null;
+      setPostImportEmailOpen(true);
+    }, POST_IMPORT_EMAIL_DELAY_MS);
+  }, [clearPostImportEmailTimeout]);
 
   const handleTerraformImportFail = useCallback(() => {
     void postImportEvent("terraform_import_fail");
@@ -1331,7 +1354,7 @@ const ExcalidrawWrapper = ({
         )}
       </Excalidraw>
       {postImportEmailOpen ? (
-        <PostImportEmailPrompt onClose={() => setPostImportEmailOpen(false)} />
+        <PostImportEmailPrompt onClose={closePostImportEmailPrompt} />
       ) : null}
     </div>
   );
