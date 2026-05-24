@@ -39,8 +39,12 @@ const VIEW_OPTIONS: ReadonlyArray<{
 /** Exported for tests; dialog shell is {@link TerraformImportDialog}. */
 export const TerraformImportModal = ({
   onCloseRequest,
+  onImportSuccess,
+  onImportFail,
 }: {
   onCloseRequest: () => void;
+  onImportSuccess?: () => void;
+  onImportFail?: () => void;
 }) => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
@@ -137,8 +141,10 @@ export const TerraformImportModal = ({
       replaceEditorWithExcalidrawScene(scene, {
         enableDeclaredDataFlow: Boolean(linksText?.trim()),
       });
+      onImportSuccess?.();
     } catch (err) {
       console.error("Import error:", err);
+      onImportFail?.();
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
@@ -328,12 +334,20 @@ writer -> queue`}</code>
 /** Dialog shell around `TerraformImportModal` (wide layout, no default title chrome). */
 export const TerraformImportDialog = ({
   onCloseRequest,
+  onImportSuccess,
+  onImportFail,
 }: {
   onCloseRequest: () => void;
+  onImportSuccess?: () => void;
+  onImportFail?: () => void;
 }) => {
   return (
     <Dialog onCloseRequest={onCloseRequest} size="wide" title={false}>
-      <TerraformImportModal onCloseRequest={onCloseRequest} />
+      <TerraformImportModal
+        onCloseRequest={onCloseRequest}
+        onImportSuccess={onImportSuccess}
+        onImportFail={onImportFail}
+      />
     </Dialog>
   );
 };
