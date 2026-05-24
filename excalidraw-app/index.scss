@@ -770,7 +770,11 @@ a.landing-cta {
 .landing-email-signup {
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 5vw, 5.5rem);
   border-top: 2px solid var(--landing-ink);
-  background: linear-gradient(165deg, rgba(15, 139, 95, 0.12) 0%, transparent 42%),
+  background: linear-gradient(
+      165deg,
+      rgba(15, 139, 95, 0.12) 0%,
+      transparent 42%
+    ),
     linear-gradient(25deg, rgba(217, 164, 47, 0.14) 0%, transparent 38%),
     rgba(255, 255, 255, 0.55);
 }
@@ -915,12 +919,14 @@ a.landing-cta {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__submit:hover:not(:disabled) {
+.tfdraw-email-signup--landing
+  .tfdraw-email-signup__submit:hover:not(:disabled) {
   transform: translate(1px, 1px);
   box-shadow: 3px 4px 0 var(--landing-ink);
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__submit:active:not(:disabled) {
+.tfdraw-email-signup--landing
+  .tfdraw-email-signup__submit:active:not(:disabled) {
   transform: translate(2px, 2px);
   box-shadow: 2px 3px 0 var(--landing-ink);
 }
@@ -943,7 +949,9 @@ a.landing-cta {
   cursor: pointer;
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__consent input[type="checkbox"] {
+.tfdraw-email-signup--landing
+  .tfdraw-email-signup__consent
+  input[type="checkbox"] {
   width: 1.1rem;
   height: 1.1rem;
   margin-top: 0.15rem;

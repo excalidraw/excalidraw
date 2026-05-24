@@ -396,9 +396,9 @@ const ExcalidrawWrapper = ({
 
   const [errorMessage, setErrorMessage] = useState("");
   const [postImportEmailOpen, setPostImportEmailOpen] = useState(false);
-  const postImportEmailTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const postImportEmailTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const isCollabDisabled = frontendOnly || isRunningInIframe();
 
   const clearPostImportEmailTimeout = useCallback(() => {
@@ -413,7 +413,10 @@ const ExcalidrawWrapper = ({
     setPostImportEmailOpen(false);
   }, [clearPostImportEmailTimeout]);
 
-  useEffect(() => () => clearPostImportEmailTimeout(), [clearPostImportEmailTimeout]);
+  useEffect(
+    () => () => clearPostImportEmailTimeout(),
+    [clearPostImportEmailTimeout],
+  );
 
   const handleTerraformImportSuccess = useCallback(() => {
     void postImportEvent("terraform_import_success");
