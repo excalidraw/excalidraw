@@ -12,21 +12,16 @@ import type { SocketId } from "./types";
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;
   private collabTrails = new Map<SocketId, AnimatedTrail>();
-
   private container?: SVGSVGElement;
-  private key: string;
-  private static counter = 0;
 
   constructor(private app: App) {
-    this.key = `laser-trails-${LaserTrails.counter++}`;
-
     this.localTrail = new AnimatedTrail(
       app,
       {
         ...this.getTrailOptions(),
         fill: () => DEFAULT_LASER_COLOR,
       },
-      this.updateCollabTrails.bind(this),
+      //this.updateCollabTrails.bind(this),
     );
   }
 
@@ -73,15 +68,22 @@ export class LaserTrails implements Trail {
     this.container = undefined;
   }
 
-  private updateCollabTrails() {
-    if (!this.container || this.app.state.collaborators.size === 0) {
+  updateCollabTrails(collaborators: App["state"]["collaborators"]) {
+    if (!this.container || collaborators.size === 0) {
       return;
     }
 
-    for (const [key, collaborator] of this.app.state.collaborators.entries()) {
-      let trail!: AnimatedTrail;
+    for (const [key, collaborator] of collaborators.entries()) {
+      // Current user has their own trail drawn via localTrail
+      if (collaborator.isCurrentUser) {
+        continue;
+      }
 
-      if (!this.collabTrails.has(key)) {
+      // IDEA: Use the collaborator pointer coordinates to trace out the
+      // laser pointer trail when 1) the selected collab tool is the laser
+      // pointer and 2) the collab pointer button is in the "down" state.
+      let trail = this.collabTrails.get(key);
+      if (!trail) {
         trail = new AnimatedTrail(this.app, {
           ...this.getTrailOptions(),
           fill: () =>
@@ -91,33 +93,42 @@ export class LaserTrails implements Trail {
         trail.start(this.container);
 
         this.collabTrails.set(key, trail);
-      } else {
-        trail = this.collabTrails.get(key)!;
       }
 
       if (collaborator.pointer && collaborator.pointer.tool === "laser") {
-        if (collaborator.button === "down" && !trail.hasCurrentTrail) {
+        const buttonDown = collaborator.button === "down";
+        const buttonUp = collaborator.button === "up";
+        const hasTrail = trail.hasCurrentTrail;
+
+        // Initialize a new trail
+        if (buttonDown && !hasTrail) {
           trail.startPath(collaborator.pointer.x, collaborator.pointer.y);
         }
 
-        if (
-          collaborator.button === "down" &&
-          trail.hasCurrentTrail &&
-          !trail.hasLastPoint(collaborator.pointer.x, collaborator.pointer.y)
-        ) {
+        // Add only original points
+        const lastPointOriginal = !trail.hasLastPoint(
+          collaborator.pointer.x,
+          collaborator.pointer.y,
+        );
+        if (buttonDown && lastPointOriginal) {
           trail.addPointToPath(collaborator.pointer.x, collaborator.pointer.y);
         }
 
-        if (collaborator.button === "up" && trail.hasCurrentTrail) {
+        // End the trail on button up
+        if (buttonUp && hasTrail) {
           trail.addPointToPath(collaborator.pointer.x, collaborator.pointer.y);
           trail.endPath();
         }
       }
     }
 
+    // Remove trails for collaborators that have left
     for (const key of this.collabTrails.keys()) {
-      if (!this.app.state.collaborators.has(key)) {
+      const collaboratorLeft = !collaborators.has(key);
+
+      if (collaboratorLeft) {
         const trail = this.collabTrails.get(key)!;
+
         trail.stop();
         this.collabTrails.delete(key);
       }
