@@ -34,12 +34,44 @@ npx wrangler d1 execute tfdraw-analytics --remote --command "SELECT COUNT(*) AS 
 
 ## Deploy
 
-From repo root (after `yarn build:pages`):
+From repo root:
 
 ```bash
-npx wrangler pages deploy --project-name=YOUR_PAGES_PROJECT
+yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT
 ```
 
-Use [`wrangler.jsonc`](../wrangler.jsonc) only — do **not** put an `assets` key in that file (Pages rejects it). For Workers static-asset deploy, use [`wrangler.workers.jsonc`](../wrangler.workers.jsonc) instead.
+Equivalent:
 
-GitHub Actions runs the same Pages command on pushes to `master`. See [`.github/workflows/pages-deploy.yml`](../.github/workflows/pages-deploy.yml).
+```bash
+yarn build:pages
+npx wrangler pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT
+```
+
+### Do not use `wrangler deploy` for this project
+
+If you see:
+
+```text
+Missing entry-point to Worker script or to assets directory
+```
+
+you ran **`npx wrangler deploy`** (Workers) instead of **`npx wrangler pages deploy`** (Pages). Fix the command in the Cloudflare dashboard or your shell.
+
+| Command | Use for tfdraw? |
+| --- | --- |
+| `wrangler pages deploy ./excalidraw-app/build` | Yes — static app + `/functions` API |
+| `wrangler deploy` | No — needs `main` or `assets` in config |
+| `wrangler deploy -c wrangler.workers.jsonc` | Optional — static only, **no** Pages Functions |
+
+Use [`wrangler.jsonc`](../wrangler.jsonc) for Pages — do **not** add an `assets` key there (Pages validation rejects it).
+
+### Cloudflare dashboard (Git-connected Pages)
+
+Under **Build** / **Deploy**:
+
+- **Build command:** `yarn install --frozen-lockfile && yarn build:pages`
+- **Deploy / non-Pages builders:** if Wrangler is invoked, it must be `npx wrangler pages deploy ./excalidraw-app/build`, not `npx wrangler deploy`.
+
+Or turn off Cloudflare’s Git build and deploy only via GitHub Actions ([`pages-deploy.yml`](../.github/workflows/pages-deploy.yml) on `master`).
+
+GitHub Actions runs `wrangler pages deploy ./excalidraw-app/build` on pushes to `master`.

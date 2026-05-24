@@ -263,13 +263,17 @@ Output: `excalidraw-app/build`. Optional tarball: `yarn bundle:whiteboard` → `
 | Secret   | `CLOUDFLARE_ACCOUNT_ID`                                   |
 | Variable | `CF_PAGES_PROJECT_NAME` (optional; skips deploy if unset) |
 
-Manual deploy after a local build:
+Manual deploy after a local build (from repo root):
 
 ```bash
-npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
+yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT_NAME
+# or:
+npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-See [`wrangler.jsonc`](./wrangler.jsonc) for `pages_build_output_dir`. Disable duplicate Cloudflare Git builds if GitHub Actions already deploys.
+Use **`wrangler pages deploy`**, not `wrangler deploy`. The latter fails with “Missing entry-point to Worker script or to assets directory” because [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets` / `main`).
+
+If the Cloudflare dashboard builds from Git, set the deploy command to the line above, or disable Git builds and rely on [GitHub Actions](./.github/workflows/pages-deploy.yml) only. See [docs/telemetry-setup.md](./docs/telemetry-setup.md).
 
 ## Upstream Excalidraw
 

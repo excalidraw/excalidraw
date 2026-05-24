@@ -54,7 +54,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler@4 pages deploy --project-name="${{ vars.CF_PAGES_PROJECT_NAME }}"
+        run: npx wrangler@4 pages deploy ./excalidraw-app/build --project-name="${{ vars.CF_PAGES_PROJECT_NAME }}"
 
       - name: Pages deploy skipped
         if: ${{ vars.CF_PAGES_PROJECT_NAME == '' }}
