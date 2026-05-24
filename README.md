@@ -271,9 +271,9 @@ yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT_NAME
 npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-Use **`wrangler pages deploy`**, not `wrangler deploy`. If something still runs `wrangler deploy`, [`wrangler.jsonc`](./wrangler.jsonc) must include an `assets` block (restored after the Pages Functions change).
+Use **`wrangler pages deploy`**, not `wrangler deploy`. [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets`); Workers static previews use [`wrangler.workers.jsonc`](./wrangler.workers.jsonc).
 
-If the Cloudflare dashboard builds from Git, set the deploy command to the line above, or disable Git builds and rely on [GitHub Actions](./.github/workflows/pages-deploy.yml) only. See [docs/telemetry-setup.md](./docs/telemetry-setup.md).
+**Workers `*.workers.dev` previews do not run `/api/subscribe`** — use a **Pages** URL from GitHub Actions. Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
 
 ## Upstream Excalidraw
 

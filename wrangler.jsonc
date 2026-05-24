@@ -1,12 +1,11 @@
 /**
- * Cloudflare Pages config (static app + Functions in /functions).
+ * Cloudflare Pages only (static app + Functions in /functions).
  *
- * Deploy from repo root after `yarn build:pages`:
+ * Deploy after `yarn build:pages`:
  *   npx wrangler pages deploy ./excalidraw-app/build --project-name=<name>
  *
- * `pages_build_output_dir` — used by Pages and `wrangler pages deploy`.
- * `assets` — required if any pipeline runs `wrangler deploy` (Workers static assets).
- *   Cloudflare Git/Workers builds call `wrangler deploy`, not `pages deploy`.
+ * Do NOT add an `assets` block here — Pages validation rejects it.
+ * Workers static deploys: use wrangler.workers.jsonc with `wrangler deploy -c …`.
  *
  * Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
  */
@@ -14,10 +13,6 @@
   "name": "tfdraw-io",
   "compatibility_date": "2025-05-12",
   "pages_build_output_dir": "./excalidraw-app/build",
-  "assets": {
-    "directory": "./excalidraw-app/build",
-    "not_found_handling": "single-page-application"
-  },
   "kv_namespaces": [
     {
       "binding": "STATS",
