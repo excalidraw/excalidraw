@@ -94,6 +94,7 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
+import { updateDocumentTitle } from "./appTitle";
 import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
@@ -651,6 +652,12 @@ const ExcalidrawWrapper = () => {
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
 
   useEffect(() => {
+    if (excalidrawAPI) {
+      updateDocumentTitle(excalidrawAPI.getName());
+    }
+  }, [excalidrawAPI]);
+
+  useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
       LocalData.flushSave();
 
@@ -680,6 +687,8 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    updateDocumentTitle(appState.name);
+
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
