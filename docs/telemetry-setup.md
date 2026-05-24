@@ -63,15 +63,12 @@ you ran **`npx wrangler deploy`** (Workers) instead of **`npx wrangler pages dep
 | `wrangler deploy` | No — needs `main` or `assets` in config |
 | `wrangler deploy -c wrangler.workers.jsonc` | Optional — static only, **no** Pages Functions |
 
-[`wrangler.jsonc`](../wrangler.jsonc) includes both `pages_build_output_dir` (Pages) and `assets` (so dashboard/`wrangler deploy` pipelines do not fail with “Missing entry-point”).
+[`wrangler.jsonc`](../wrangler.jsonc) is **Pages-only** (no `assets`). Workers static deploys use [`wrangler.workers.jsonc`](../wrangler.workers.jsonc).
 
-### Cloudflare dashboard (Git-connected Pages)
+**Full setup checklist:** [cloudflare-deploy.md](./cloudflare-deploy.md) (Workers vs Pages, GitHub secrets, why `workers.dev` previews skip email).
 
-Under **Build** / **Deploy**:
+### Cloudflare dashboard
 
-- **Build command:** `yarn install --frozen-lockfile && yarn build:pages`
-- **Deploy / non-Pages builders:** if Wrangler is invoked, it must be `npx wrangler pages deploy ./excalidraw-app/build`, not `npx wrangler deploy`.
-
-Or turn off Cloudflare’s Git build and deploy only via GitHub Actions ([`pages-deploy.yml`](../.github/workflows/pages-deploy.yml) on `master`).
-
-GitHub Actions runs `wrangler pages deploy ./excalidraw-app/build` on pushes to `master`.
+- Prefer **GitHub Actions** ([`pages-deploy.yml`](../.github/workflows/pages-deploy.yml)) for deploys.
+- Disable conflicting **Workers Builds** Git deploy, or use `wrangler.workers.jsonc` for Workers-only previews (no `/api/*`).
+- Do not run `wrangler deploy` against `wrangler.jsonc`.

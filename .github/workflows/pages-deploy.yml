@@ -6,10 +6,8 @@
 #   Variables: CF_PAGES_PROJECT_NAME (e.g. ainur)
 #   Variables (optional): VITE_TURNSTILE_SITE_KEY
 #
-# Cloudflare dashboard: disable automatic Git builds on the Pages project, or set
-#   Build command: yarn install --frozen-lockfile && yarn build:pages
-#   Build output directory: excalidraw-app/build
-#   (no wrangler in the dashboard build — this workflow deploys)
+# wrangler.jsonc must NOT contain "assets" (Pages rejects it). Workers Git builds
+# should use wrangler.workers.jsonc or be disabled — see docs/cloudflare-deploy.md.
 
 name: Deploy to Cloudflare Pages
 
