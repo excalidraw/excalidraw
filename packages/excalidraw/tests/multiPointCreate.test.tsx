@@ -182,4 +182,79 @@ describe("multi point mode in linear elements", () => {
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
+
+  // Regression: pen taps were previously treated as touch taps and finalized
+  // as a fixed-width 2-point line instead of entering multipoint mode.
+  it("line with pen enters multi point mode", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const tool = getByToolName("line");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // pen tap should start a multipoint line, not finalize it
+    fireEvent.pointerDown(canvas, {
+      clientX: 30,
+      clientY: 30,
+      pointerType: "pen",
+    });
+    fireEvent.pointerUp(canvas, {
+      clientX: 30,
+      clientY: 30,
+      pointerType: "pen",
+    });
+
+    expect(h.state.multiElement).not.toBeNull();
+
+    fireEvent.pointerMove(canvas, {
+      clientX: 50,
+      clientY: 60,
+      pointerType: "pen",
+    });
+    fireEvent.pointerDown(canvas, {
+      clientX: 50,
+      clientY: 60,
+      pointerType: "pen",
+    });
+    fireEvent.pointerUp(canvas, {
+      clientX: 50,
+      clientY: 60,
+      pointerType: "pen",
+    });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
+
+    expect(h.elements.length).toEqual(1);
+    const element = h.elements[0] as ExcalidrawLinearElement;
+    expect(element.type).toEqual("line");
+    expect(element.points.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // Regression: after a pen interaction, switching back to mouse used to
+  // remain stuck in touchscreen mode and finalize mouse clicks as 2-point lines.
+  it("mouse multi point works after pen interaction", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const tool = getByToolName("line");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // pen interaction first
+    fireEvent.pointerDown(canvas, {
+      clientX: 30,
+      clientY: 30,
+      pointerType: "pen",
+    });
+    fireEvent.pointerUp(canvas, {
+      clientX: 30,
+      clientY: 30,
+      pointerType: "pen",
+    });
+    fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+
+    // mouse multipoint must still work
+    fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(canvas, { clientX: 100, clientY: 100 });
+
+    expect(h.state.multiElement).not.toBeNull();
+  });
 });
