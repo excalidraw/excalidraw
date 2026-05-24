@@ -2285,6 +2285,12 @@ class App extends React.Component<AppProps, AppState> {
                             generateLinkForSelection={
                               this.props.generateLinkForSelection
                             }
+                            onTerraformImportSuccess={
+                              this.props.onTerraformImportSuccess
+                            }
+                            onTerraformImportFail={
+                              this.props.onTerraformImportFail
+                            }
                           >
                             {this.props.children}
                           </LayerUI>

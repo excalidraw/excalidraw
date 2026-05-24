@@ -1,5 +1,6 @@
 import {
   isTransparent,
+  isWritableElement,
   mapFind,
   reduceToCommonValue,
 } from "@excalidraw/common";
@@ -11,6 +12,22 @@ import { throttleRAF } from "./utils";
 type RafCallback = FrameRequestCallback;
 
 describe("@excalidraw/common/utils", () => {
+  describe("isWritableElement()", () => {
+    it("treats text-entry input types as writable", () => {
+      for (const type of ["text", "email", "url", "tel", "search", ""]) {
+        const input = document.createElement("input");
+        input.type = type;
+        expect(isWritableElement(input)).toBe(true);
+      }
+    });
+
+    it("does not treat checkbox inputs as writable", () => {
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      expect(isWritableElement(input)).toBe(false);
+    });
+  });
+
   describe("isTransparent()", () => {
     it("should return true when color is rgb transparent", () => {
       expect(isTransparent("#ff00")).toEqual(true);

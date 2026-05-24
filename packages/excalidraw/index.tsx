@@ -81,6 +81,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
     onPaste,
+    onTerraformImportSuccess,
+    onTerraformImportFail,
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
@@ -192,6 +194,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderCustomStats={renderCustomStats}
           UIOptions={UIOptions}
           onPaste={onPaste}
+          onTerraformImportSuccess={onTerraformImportSuccess}
+          onTerraformImportFail={onTerraformImportFail}
           detectScroll={detectScroll}
           handleKeyboardGlobally={handleKeyboardGlobally}
           onLibraryChange={onLibraryChange}

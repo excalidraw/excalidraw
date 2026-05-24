@@ -1,20 +1,13 @@
-# Builds excalidraw-app with CI-friendly Vite settings, then uploads static output
-# to Cloudflare Pages via Wrangler (avoids Pages Git builder OOM on large Vite graphs).
+# Builds excalidraw-app, then uploads to Cloudflare Pages with `wrangler pages deploy`.
+# Do NOT use `wrangler deploy` here — that is Workers mode and needs `main` when `assets` is absent.
 #
-# Configure in GitHub: Settings → Secrets and variables → Actions
+# GitHub: Settings → Secrets and variables → Actions
 #   Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-#   Variables: CF_PAGES_PROJECT_NAME (Cloudflare Pages project name)
+#   Variables: CF_PAGES_PROJECT_NAME (e.g. ainur)
+#   Variables (optional): VITE_TURNSTILE_SITE_KEY
 #
-# If CF_PAGES_PROJECT_NAME is unset, the workflow builds and skips deploy (green).
-# Do not reference secrets in `if:` (GitHub restriction); gate deploy on vars only.
-#
-# Turn off automatic Git builds on the Cloudflare Pages project (Builds & deployments),
-# or pushes will still trigger Cloudflare’s builder and can fail (OOM) alongside this workflow.
-#
-# Deploy runs when a commit lands on `main` or `master` — that includes merging a PR
-# into the branch (GitHub records a push to the base branch). Direct pushes to those
-# branches also trigger a deploy. Align Cloudflare production branch (if Git-connected)
-# with these names, or edit the list below.
+# wrangler.jsonc must NOT contain "assets" (Pages rejects it). Workers Git builds
+# should use wrangler.workers.jsonc or be disabled — see docs/cloudflare-deploy.md.
 
 name: Deploy to Cloudflare Pages
 
@@ -22,6 +15,7 @@ on:
   push:
     branches:
       - master
+      - terraform-feature
   workflow_dispatch:
 
 concurrency:
@@ -33,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=6144
+      GITHUB_SHA: ${{ github.sha }}
+      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,14 +44,27 @@ jobs:
       - name: Build static app
         run: yarn build:pages
 
-      # Must be `wrangler pages deploy` (Pages). Do not use `wrangler deploy` — that targets Workers and expects assets/main in wrangler.jsonc.
+      - name: Verify build output
+        run: test -f excalidraw-app/build/index.html
+
       - name: Deploy to Cloudflare Pages
         if: ${{ vars.CF_PAGES_PROJECT_NAME != '' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler@4 pages deploy excalidraw-app/build --project-name="${{ vars.CF_PAGES_PROJECT_NAME }}"
+        run: |
+          set -euo pipefail
+          PROJECT="${{ vars.CF_PAGES_PROJECT_NAME }}"
+          echo "Running: wrangler pages deploy (not wrangler deploy)"
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            npx wrangler@4 pages deploy ./excalidraw-app/build --project-name="$PROJECT"
+          else
+            npx wrangler@4 pages deploy ./excalidraw-app/build \
+              --project-name="$PROJECT" \
+              --branch="${{ github.ref_name }}"
+          fi
 
       - name: Pages deploy skipped
         if: ${{ vars.CF_PAGES_PROJECT_NAME == '' }}
-        run: echo "::notice::Set repository variable CF_PAGES_PROJECT_NAME (and secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID) to deploy."
+        run: |
+          echo "::notice::Set Actions variable CF_PAGES_PROJECT_NAME (and secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)."

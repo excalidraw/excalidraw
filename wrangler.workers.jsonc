@@ -1,0 +1,31 @@
+/**
+ * Cloudflare Workers static-asset deploy only (no Pages Functions /api/*).
+ *
+ * Use when Cloudflare “Workers Builds” runs `wrangler deploy` (e.g. script ainur).
+ * In the dashboard, set the build config file to this path if supported, or disable
+ * Workers Git builds and deploy via GitHub Actions + wrangler pages deploy instead.
+ *
+ *   yarn build:pages
+ *   npx wrangler deploy -c wrangler.workers.jsonc
+ */
+{
+  "name": "tfdraw-io",
+  "compatibility_date": "2025-05-12",
+  "assets": {
+    "directory": "./excalidraw-app/build",
+    "not_found_handling": "single-page-application"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "STATS",
+      "id": "67b24881a9a746e2bcfe4505b02ba00a"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tfdraw-analytics",
+      "database_id": "e96d1444-1a12-4937-8183-8914be898dbd"
+    }
+  ]
+}

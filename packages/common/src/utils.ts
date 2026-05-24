@@ -86,9 +86,13 @@ export const isWritableElement = (
   target instanceof HTMLTextAreaElement ||
   (target instanceof HTMLInputElement &&
     (target.type === "text" ||
+      target.type === "email" ||
+      target.type === "url" ||
+      target.type === "tel" ||
       target.type === "number" ||
       target.type === "password" ||
-      target.type === "search")) ||
+      target.type === "search" ||
+      target.type === "")) ||
   (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
 
 export const getFontFamilyString = ({

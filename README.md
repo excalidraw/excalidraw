@@ -183,7 +183,8 @@ Production builds use a Terraform Canvas landing page with an embedded editor; d
 
 - No AWS, Terraform Cloud, or other cloud credentials in the app.
 - No `terraform` / `tofu` execution in the browser.
-- Plan JSON and DOT are parsed locally; nothing is uploaded to a tfdraw backend in the normal workflow.
+- Plan JSON and DOT are parsed locally; **Terraform files are not uploaded** for import.
+- Optional email signup and **anonymous import success/fail counters** on the hosted app only (see [docs/privacy.md](./docs/privacy.md)).
 
 Treat plan JSON as sensitive (names, ARNs, tags, sometimes secrets). Review before sharing diagrams or scenes.
 
@@ -238,6 +239,10 @@ Parser tests: [`terraformPlanParsing.test.ts`](./packages/excalidraw/components/
 
 For regression testing, the repo can generate **100 real plan exports** from the sample stack in [`packages/backend/terraform/`](./packages/backend/terraform/). See [`packages/backend/README.md`](./packages/backend/README.md) for bootstrap, `yarn fixtures:*` commands, AWS prerequisites, and corpus debugging.
 
+### Hosted telemetry (maintainers)
+
+Pages Functions under [`functions/`](./functions/) provide `/api/subscribe` and `/api/event`. Setup: [docs/telemetry-setup.md](./docs/telemetry-setup.md).
+
 ## Deployment
 
 Build the static public app:
@@ -258,13 +263,17 @@ Output: `excalidraw-app/build`. Optional tarball: `yarn bundle:whiteboard` → `
 | Secret   | `CLOUDFLARE_ACCOUNT_ID`                                   |
 | Variable | `CF_PAGES_PROJECT_NAME` (optional; skips deploy if unset) |
 
-Manual deploy after a local build:
+Manual deploy after a local build (from repo root):
 
 ```bash
-npx wrangler@4 pages deploy excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
+yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT_NAME
+# or:
+npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-See [`wrangler.jsonc`](./wrangler.jsonc) for `pages_build_output_dir`. Disable duplicate Cloudflare Git builds if GitHub Actions already deploys.
+Use **`wrangler pages deploy`**, not `wrangler deploy`. [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets`); Workers static previews use [`wrangler.workers.jsonc`](./wrangler.workers.jsonc).
+
+**Workers `*.workers.dev` previews do not run `/api/subscribe`** — use a **Pages** URL from GitHub Actions. Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
 
 ## Upstream Excalidraw
 
