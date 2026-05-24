@@ -129,6 +129,8 @@ interface LayerUIProps {
   app: AppClassProperties;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  onTerraformImportSuccess?: AppProps["onTerraformImportSuccess"];
+  onTerraformImportFail?: AppProps["onTerraformImportFail"];
 }
 
 const DefaultMainMenu: React.FC<{
@@ -1019,6 +1021,8 @@ const LayerUI = ({
   app,
   isCollaborating,
   generateLinkForSelection,
+  onTerraformImportSuccess,
+  onTerraformImportFail,
 }: LayerUIProps) => {
   const editorInterface = useEditorInterface();
   const stylesPanelMode = useStylesPanelMode();
@@ -1149,6 +1153,8 @@ const LayerUI = ({
     return (
       <TerraformImportDialog
         onCloseRequest={() => setAppState({ openDialog: null })}
+        onImportSuccess={onTerraformImportSuccess}
+        onImportFail={onTerraformImportFail}
       />
     );
   };

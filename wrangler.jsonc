@@ -1,26 +1,29 @@
 /**
- * Cloudflare deploy config (Pages + Workers static assets).
+ * Cloudflare Pages config (static app + Functions in /functions).
  *
- * Pages / `wrangler pages deploy`:
- * - `pages_build_output_dir` is where Vite writes the app (`yarn build:pages`).
- * - Use `npx wrangler pages deploy excalidraw-app/build --project-name=<name>` (see `.github/workflows/pages-deploy.yml`).
+ * Deploy from repo root after `yarn build:pages`:
+ *   npx wrangler pages deploy --project-name=<name>
  *
- * Workers / `wrangler versions upload` (Cloudflare “deploy command” on some Workers builds):
- * - Ignores `pages_build_output_dir`; it needs `assets.directory` (and optional SPA routing below).
- * - Your dashboard must run a build first (e.g. `yarn build:pages`); deploy alone will not create `excalidraw-app/build`.
+ * Do not add an `assets` block here — Pages validation rejects it. For Workers
+ * static-asset deploys, use wrangler.workers.jsonc instead.
  *
  * Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
- * Static assets on Workers: https://developers.cloudflare.com/workers/static-assets/binding/
- *
- * SPA: rely on assets.not_found_handling (below). Avoid _redirects rules like /* /index.html 200
- * in the static bundle — Workers validation rejects them as an infinite loop (error 10021).
  */
 {
   "name": "tfdraw-io",
   "compatibility_date": "2025-05-12",
   "pages_build_output_dir": "./excalidraw-app/build",
-  "assets": {
-    "directory": "./excalidraw-app/build",
-    "not_found_handling": "single-page-application"
-  }
+  "kv_namespaces": [
+    {
+      "binding": "STATS",
+      "id": "67b24881a9a746e2bcfe4505b02ba00a"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tfdraw-analytics",
+      "database_id": "e96d1444-1a12-4937-8183-8914be898dbd"
+    }
+  ]
 }

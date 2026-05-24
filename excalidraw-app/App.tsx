@@ -35,6 +35,7 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { postImportEvent } from "./data/tfdrawApi";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -104,6 +105,11 @@ import Collab, {
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { LandingEmailSignup } from "./components/LandingEmailSignup";
+import {
+  PostImportEmailPrompt,
+  POST_IMPORT_EMAIL_DISMISSED_KEY,
+} from "./components/PostImportEmailPrompt";
 import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
@@ -386,7 +392,23 @@ const ExcalidrawWrapper = ({
   const excalidrawAPI = useExcalidrawAPI();
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [postImportEmailOpen, setPostImportEmailOpen] = useState(false);
   const isCollabDisabled = frontendOnly || isRunningInIframe();
+
+  const handleTerraformImportSuccess = useCallback(() => {
+    void postImportEvent("terraform_import_success");
+    try {
+      if (sessionStorage.getItem(POST_IMPORT_EMAIL_DISMISSED_KEY) !== "1") {
+        setPostImportEmailOpen(true);
+      }
+    } catch {
+      setPostImportEmailOpen(true);
+    }
+  }, []);
+
+  const handleTerraformImportFail = useCallback(() => {
+    void postImportEvent("terraform_import_fail");
+  }, []);
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -1010,6 +1032,8 @@ const ExcalidrawWrapper = ({
             excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
         }}
+        onTerraformImportSuccess={handleTerraformImportSuccess}
+        onTerraformImportFail={handleTerraformImportFail}
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1304,6 +1328,9 @@ const ExcalidrawWrapper = ({
           />
         )}
       </Excalidraw>
+      {postImportEmailOpen ? (
+        <PostImportEmailPrompt onClose={() => setPostImportEmailOpen(false)} />
+      ) : null}
     </div>
   );
 };
@@ -1633,9 +1660,12 @@ const LandingPage = () => {
           <div className="landing-faq__item">
             <dt>Is my Terraform data uploaded to a server?</dt>
             <dd>
-              Treat exports as sensitive. Redact plan JSON before sharing, and
-              follow your org data policy. Prefer local review until you confirm
-              how your deployment handles persistence and collaboration.
+              Plan JSON, graph DOT, and state files are parsed in your browser
+              and are not sent to tfdraw.dev for import. Optional email signup
+              stores only your address and how you signed up. Anonymous counters
+              record import success or failure (no file contents). Redact
+              secrets before sharing exports; follow your org data policy for
+              collaboration features.
             </dd>
           </div>
         </dl>
@@ -1647,6 +1677,8 @@ const LandingPage = () => {
           Visualize Terraform changes
         </button>
       </section>
+
+      <LandingEmailSignup />
 
       <footer className="landing-footer" aria-label="Project links">
         <p className="landing-footer__primary">

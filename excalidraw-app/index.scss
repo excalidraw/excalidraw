@@ -767,6 +767,141 @@ a.landing-cta {
   color: rgba(22, 33, 29, 0.75);
 }
 
+.landing-email-signup {
+  padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 5vw, 5.5rem);
+  border-top: 2px solid var(--landing-ink);
+  background: rgba(255, 255, 255, 0.72);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.landing-email-signup__title {
+  margin: 0 0 0.35rem;
+  font-family: "Virgil", "Segoe Print", cursive;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.landing-email-signup__lede {
+  margin: 0 0 1rem;
+  color: rgba(22, 33, 29, 0.82);
+}
+
+.tfdraw-email-signup__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 800;
+}
+
+.tfdraw-email-signup__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tfdraw-email-signup__input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.tfdraw-email-signup__submit {
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 6px;
+  background: var(--landing-green);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tfdraw-email-signup__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.tfdraw-email-signup__consent {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0.75rem 0 0;
+  font-size: 0.92rem;
+}
+
+.tfdraw-email-signup__privacy {
+  margin: 0.65rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(22, 33, 29, 0.75);
+}
+
+.tfdraw-email-signup__turnstile {
+  margin-top: 0.75rem;
+}
+
+.tfdraw-email-signup__message {
+  margin: 0.65rem 0 0;
+  font-weight: 700;
+  color: var(--landing-green);
+}
+
+.tfdraw-email-signup__message--error {
+  color: var(--landing-red);
+}
+
+.tfdraw-post-import-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(22, 33, 29, 0.45);
+}
+
+.tfdraw-post-import-prompt__panel {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 1.25rem 1.25rem 1rem;
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: #f7f1e4;
+  box-shadow: 6px 8px 0 rgba(22, 33, 29, 0.2);
+}
+
+.tfdraw-post-import-prompt__panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.tfdraw-post-import-prompt__panel p {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.tfdraw-post-import-prompt__close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tfdraw-post-import-prompt__skip {
+  margin-top: 0.5rem;
+  border: none;
+  background: transparent;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
 .landing-final h2 {
   max-width: 820px;
 }

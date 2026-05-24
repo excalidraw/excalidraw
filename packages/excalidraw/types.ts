@@ -622,6 +622,10 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
+  /** Fired after a successful Terraform import (local parse only; no file upload). */
+  onTerraformImportSuccess?: () => void;
+  /** Fired when Terraform import fails before the canvas is updated. */
+  onTerraformImportFail?: () => void;
   /**
    * Called when element(s) are duplicated so you can listen or modify as
    * needed.
