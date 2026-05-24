@@ -75,6 +75,19 @@ export class AnimatedTrail implements Trail {
     return false;
   }
 
+  private cleanup() {
+    if (this.started) {
+      this.pastTrails = [];
+      this.currentTrail = undefined;
+    }
+
+    if (this.trailElement.parentNode === this.container) {
+      this.container?.removeChild(this.trailElement);
+    }
+
+    this.started = false;
+  }
+
   start(container?: SVGSVGElement) {
     this.started = true;
 
@@ -88,24 +101,21 @@ export class AnimatedTrail implements Trail {
 
     if (!AnimationController.running(this.key)) {
       AnimationController.start(this.key, () => {
-        return this.onFrame() ? { keep: true } : null;
+        const needsNext = this.onFrame();
+        if (needsNext) {
+          return { keep: true };
+        }
+
+        this.cleanup();
+
+        return null;
       });
     }
   }
 
   stop() {
     AnimationController.cancel(this.key);
-
-    if (this.started) {
-      this.pastTrails = [];
-      this.currentTrail = undefined;
-    }
-
-    if (this.trailElement.parentNode === this.container) {
-      this.container?.removeChild(this.trailElement);
-    }
-
-    this.started = false;
+    this.cleanup();
   }
 
   startPath(x: number, y: number) {
@@ -151,11 +161,11 @@ export class AnimatedTrail implements Trail {
     }
   }
 
-  private onFrame(): boolean {
+  private onFrame() {
     const paths: string[] = [];
 
-    for (const t of this.pastTrails) {
-      paths.push(this.drawTrail(t, this.app.state));
+    for (const trail of this.pastTrails) {
+      paths.push(this.drawTrail(trail, this.app.state));
     }
 
     if (this.currentTrail) {
@@ -169,16 +179,16 @@ export class AnimatedTrail implements Trail {
           .length !== 0,
     );
 
-    if (paths.length === 0 && !this.currentTrail) {
+    if (paths.length === 0) {
+      // Clean up the SVG path if there are no trails to render
       this.trailElement.setAttribute("d", "");
+
       return false;
     }
 
     const svgPaths = paths.join(" ").trim();
+    this.trailElement.setAttribute("d", svgPaths);
 
-    if (svgPaths) {
-      this.trailElement.setAttribute("d", svgPaths);
-    }
     if (this.trailAnimation) {
       this.trailElement.setAttribute(
         "fill",
