@@ -63,7 +63,7 @@ you ran **`npx wrangler deploy`** (Workers) instead of **`npx wrangler pages dep
 | `wrangler deploy` | No — needs `main` or `assets` in config |
 | `wrangler deploy -c wrangler.workers.jsonc` | Optional — static only, **no** Pages Functions |
 
-Use [`wrangler.jsonc`](../wrangler.jsonc) for Pages — do **not** add an `assets` key there (Pages validation rejects it).
+[`wrangler.jsonc`](../wrangler.jsonc) includes both `pages_build_output_dir` (Pages) and `assets` (so dashboard/`wrangler deploy` pipelines do not fail with “Missing entry-point”).
 
 ### Cloudflare dashboard (Git-connected Pages)
 
