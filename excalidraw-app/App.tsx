@@ -35,7 +35,7 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { postImportEvent } from "./data/tfdrawApi";
+
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -80,6 +80,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
+
+import { postImportEvent } from "./data/tfdrawApi";
 
 import CustomStats from "./CustomStats";
 import {
