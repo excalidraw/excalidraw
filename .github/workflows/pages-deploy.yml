@@ -4,17 +4,18 @@
 # Configure in GitHub: Settings → Secrets and variables → Actions
 #   Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
 #   Variables: CF_PAGES_PROJECT_NAME (Cloudflare Pages project name)
+#   Variables (optional): VITE_TURNSTILE_SITE_KEY (Turnstile site key for email signup)
 #
 # If CF_PAGES_PROJECT_NAME is unset, the workflow builds and skips deploy (green).
 # Do not reference secrets in `if:` (GitHub restriction); gate deploy on vars only.
 #
-# Turn off automatic Git builds on the Cloudflare Pages project (Builds & deployments),
-# or pushes will still trigger Cloudflare’s builder and can fail (OOM) alongside this workflow.
+# Turn off automatic Git builds on the Cloudflare Pages project (Builds & deployments).
+# If the dashboard runs `wrangler deploy`, it fails with:
+#   Missing entry-point to Worker script or to assets directory
+# This repo uses Pages (`wrangler.jsonc` has pages_build_output_dir, not main/assets).
 #
-# Deploy runs when a commit lands on `main` or `master` — that includes merging a PR
-# into the branch (GitHub records a push to the base branch). Direct pushes to those
-# branches also trigger a deploy. Align Cloudflare production branch (if Git-connected)
-# with these names, or edit the list below.
+# Deploy runs when a commit lands on `master` — that includes merging a PR into master.
+# Align Cloudflare production branch with `master`, or edit the branch list below.
 
 name: Deploy to Cloudflare Pages
 
@@ -33,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=6144
+      GITHUB_SHA: ${{ github.sha }}
+      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,13 +51,20 @@ jobs:
       - name: Build static app
         run: yarn build:pages
 
-      # Deploy from repo root so wrangler.jsonc picks up pages_build_output_dir and /functions.
+      - name: Verify build output
+        run: test -f excalidraw-app/build/index.html
+
+      # Pages deploy only — NOT `wrangler deploy` (Workers). Repo root picks up
+      # wrangler.jsonc (KV/D1 bindings) and /functions (e.g. api/event, api/email).
       - name: Deploy to Cloudflare Pages
         if: ${{ vars.CF_PAGES_PROJECT_NAME != '' }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler@4 pages deploy ./excalidraw-app/build --project-name="${{ vars.CF_PAGES_PROJECT_NAME }}"
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: yarn
+          wranglerVersion: "4"
+          command: pages deploy ./excalidraw-app/build --project-name=${{ vars.CF_PAGES_PROJECT_NAME }}
 
       - name: Pages deploy skipped
         if: ${{ vars.CF_PAGES_PROJECT_NAME == '' }}
