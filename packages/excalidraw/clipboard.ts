@@ -519,6 +519,32 @@ export const parseDataTransferEvent = async (
 /**
  * Attempts to parse clipboard event.
  */
+const sanitizeClipboardObject = (obj: any, depth = 0): any => {
+  if (depth > 50) {
+    return null;
+  }
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    const len = Math.min(obj.length, 10000);
+    const arr = [];
+    for (let i = 0; i < len; i++) {
+      arr.push(sanitizeClipboardObject(obj[i], depth + 1));
+    }
+    return arr;
+  }
+
+  const result: any = {};
+  for (const key of Object.keys(obj)) {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      continue;
+    }
+    result[key] = sanitizeClipboardObject(obj[key], depth + 1);
+  }
+  return result;
+};
+
 export const parseClipboard = async (
   dataList: ParsedDataTranferList,
   isPlainPaste = false,
@@ -535,8 +561,10 @@ export const parseClipboard = async (
   }
 
   try {
-    const systemClipboardData = JSON.parse(parsedEventData.value);
+    let systemClipboardData = JSON.parse(parsedEventData.value);
+    systemClipboardData = sanitizeClipboardObject(systemClipboardData);
     const programmaticAPI =
+      systemClipboardData &&
       systemClipboardData.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI;
     if (clipboardContainsElements(systemClipboardData)) {
       return {
