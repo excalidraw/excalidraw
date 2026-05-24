@@ -271,7 +271,7 @@ yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT_NAME
 npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-Use **`wrangler pages deploy`**, not `wrangler deploy`. The latter fails with “Missing entry-point to Worker script or to assets directory” because [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets` / `main`).
+Use **`wrangler pages deploy`**, not `wrangler deploy`. If something still runs `wrangler deploy`, [`wrangler.jsonc`](./wrangler.jsonc) must include an `assets` block (restored after the Pages Functions change).
 
 If the Cloudflare dashboard builds from Git, set the deploy command to the line above, or disable Git builds and rely on [GitHub Actions](./.github/workflows/pages-deploy.yml) only. See [docs/telemetry-setup.md](./docs/telemetry-setup.md).
 
