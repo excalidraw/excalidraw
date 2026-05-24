@@ -9,31 +9,66 @@ const LOCAL_STATE_VERSIONS = {
 
 type BrowserStateTypes = keyof typeof LOCAL_STATE_VERSIONS;
 
+const getStorageTimestamp = (type: BrowserStateTypes): number => {
+  try {
+    const value = localStorage.getItem(type);
+    if (value === null) {
+      return -1;
+    }
+
+    const parsed = JSON.parse(value);
+
+    if (typeof parsed !== "number" || !Number.isFinite(parsed)) {
+      console.warn(`Invalid timestamp in localStorage for key: ${type}`);
+      return -1;
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error(`Error reading localStorage for key ${type}:`, error);
+    try {
+      localStorage.removeItem(type);
+    } catch (e) {
+      // ignore
+    }
+    return -1;
+  }
+};
+
+const setStorageTimestamp = (
+  type: BrowserStateTypes,
+  timestamp: number,
+): boolean => {
+  if (!Number.isFinite(timestamp)) {
+    console.error(`Attempted to save invalid timestamp: ${timestamp}`);
+    return false;
+  }
+  try {
+    localStorage.setItem(type, JSON.stringify(timestamp));
+    return true;
+  } catch (error) {
+    console.error("error while writing to localStorage", error);
+    return false;
+  }
+};
+
 export const isBrowserStorageStateNewer = (type: BrowserStateTypes) => {
-  const storageTimestamp = JSON.parse(localStorage.getItem(type) || "-1");
+  const storageTimestamp = getStorageTimestamp(type);
   return storageTimestamp > LOCAL_STATE_VERSIONS[type];
 };
 
 export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
   const timestamp = Date.now();
-  try {
-    localStorage.setItem(type, JSON.stringify(timestamp));
+  if (setStorageTimestamp(type, timestamp)) {
     LOCAL_STATE_VERSIONS[type] = timestamp;
-  } catch (error) {
-    console.error("error while updating browser state verison", error);
   }
 };
 
 export const resetBrowserStateVersions = () => {
-  try {
-    for (const key of Object.keys(
-      LOCAL_STATE_VERSIONS,
-    ) as BrowserStateTypes[]) {
-      const timestamp = -1;
-      localStorage.setItem(key, JSON.stringify(timestamp));
+  for (const key of Object.keys(LOCAL_STATE_VERSIONS) as BrowserStateTypes[]) {
+    const timestamp = -1;
+    if (setStorageTimestamp(key, timestamp)) {
       LOCAL_STATE_VERSIONS[key] = timestamp;
     }
-  } catch (error) {
-    console.error("error while resetting browser state verison", error);
   }
 };
