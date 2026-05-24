@@ -43,4 +43,31 @@ describe("AnimationController", () => {
     expect(secondFrames).toBe(2);
     expect(AnimationController.running(SECOND_KEY)).toBe(false);
   });
+
+  it("cancels a frame scheduled during a tick if no animations remain", async () => {
+    let firstFrames = 0;
+    let secondFrames = 0;
+
+    AnimationController.start(FIRST_KEY, ({ state }) => {
+      if (!state) {
+        return { keep: true };
+      }
+
+      firstFrames++;
+
+      AnimationController.start(SECOND_KEY, () => {
+        secondFrames++;
+        return { keep: true };
+      });
+      AnimationController.cancel(SECOND_KEY);
+
+      return null;
+    });
+
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(firstFrames).toBe(1);
+    expect(secondFrames).toBe(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

@@ -6,7 +6,6 @@ export type Animation<R extends object> = (params: {
 }) => R | null | undefined;
 
 export class AnimationController {
-  private static isRunning = false;
   private static scheduledFrame:
     | { id: ReturnType<typeof requestAnimationFrame>; type: "raf" }
     | { id: ReturnType<typeof setTimeout>; type: "timeout" }
@@ -37,10 +36,7 @@ export class AnimationController {
         state: initialState,
       });
 
-      if (!AnimationController.isRunning) {
-        AnimationController.isRunning = true;
-        AnimationController.scheduleNextFrame();
-      }
+      AnimationController.scheduleNextFrame();
     }
   }
 
@@ -76,6 +72,15 @@ export class AnimationController {
     AnimationController.scheduledFrame = null;
   }
 
+  private static cancelScheduledFrameIfIdle() {
+    if (AnimationController.animations.size > 0) {
+      return false;
+    }
+
+    AnimationController.cancelScheduledFrame();
+    return true;
+  }
+
   private static tick() {
     AnimationController.scheduledFrame = null;
 
@@ -93,8 +98,7 @@ export class AnimationController {
         if (!state) {
           AnimationController.animations.delete(key);
 
-          if (AnimationController.animations.size === 0) {
-            AnimationController.isRunning = false;
+          if (AnimationController.cancelScheduledFrameIfIdle()) {
             return;
           }
         } else {
@@ -103,16 +107,12 @@ export class AnimationController {
         }
       }
 
-      if (AnimationController.animations.size === 0) {
-        AnimationController.isRunning = false;
+      if (AnimationController.cancelScheduledFrameIfIdle()) {
         return;
       }
 
       AnimationController.scheduleNextFrame();
-      return;
     }
-
-    AnimationController.isRunning = false;
   }
 
   static running(key: string) {
@@ -121,10 +121,6 @@ export class AnimationController {
 
   static cancel(key: string) {
     AnimationController.animations.delete(key);
-
-    if (AnimationController.animations.size === 0) {
-      AnimationController.isRunning = false;
-      AnimationController.cancelScheduledFrame();
-    }
+    AnimationController.cancelScheduledFrameIfIdle();
   }
 }
