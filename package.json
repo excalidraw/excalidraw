@@ -53,6 +53,7 @@
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:pages": "yarn --cwd ./excalidraw-app build:pages",
+    "deploy:pages": "yarn build:pages && wrangler pages deploy ./excalidraw-app/build",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
     "build:common": "yarn --cwd ./packages/common build:esm",
     "build:element": "yarn --cwd ./packages/element build:esm",
