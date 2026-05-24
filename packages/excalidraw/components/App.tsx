@@ -357,6 +357,7 @@ import {
 
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import { getShapeTemplatesByIds } from "../data/shapeTemplates";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
@@ -458,7 +459,10 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
-import type { ExcalidrawLibraryIds } from "../data/types";
+import type {
+  ExcalidrawLibraryIds,
+  ExcalidrawTemplateIds,
+} from "../data/types";
 
 import type {
   RenderInteractiveSceneCallback,
@@ -12150,6 +12154,41 @@ class App extends React.Component<AppProps, AppState> {
               randomizeSeed: true,
               preserveFrameChildrenOrder: true,
             }).duplicatedElements,
+          }));
+
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        }
+      } catch (error: any) {
+        this.setState({ errorMessage: error.message });
+      }
+      return;
+    }
+
+    const excalidrawTemplate_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawTemplateIds,
+    );
+    if (excalidrawTemplate_ids) {
+      try {
+        const { templateIds } = JSON.parse(
+          excalidrawTemplate_ids,
+        ) as ExcalidrawTemplateIds;
+        const shapeTemplates = getShapeTemplatesByIds(templateIds);
+        if (shapeTemplates.length) {
+          const libraryItems = shapeTemplates.map((template) => ({
+            id: template.id,
+            status: "unpublished" as const,
+            elements: duplicateElements({
+              type: "everything",
+              elements: template.elements,
+              randomizeSeed: true,
+              preserveFrameChildrenOrder: true,
+            }).duplicatedElements,
+            created: 0,
+            name: template.name,
           }));
 
           this.addElementsFromPasteOrLibrary({

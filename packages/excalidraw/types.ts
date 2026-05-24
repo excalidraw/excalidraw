@@ -546,6 +546,17 @@ export type LibraryItemsSource =
       currentLibraryItems: LibraryItems,
     ) => MaybePromise<LibraryItems_anyVersion | Blob>)
   | MaybePromise<LibraryItems_anyVersion | Blob>;
+
+export type ShapeTemplate = {
+  id: string;
+  name: string;
+  category?: string;
+  elements: readonly NonDeleted<ExcalidrawElement>[];
+  /** built-in templates are not persisted to localStorage */
+  builtin?: boolean;
+};
+export type ShapeTemplates = readonly ShapeTemplate[];
+
 // -----------------------------------------------------------------------------
 
 export type ExcalidrawInitialDataState = Merge<
