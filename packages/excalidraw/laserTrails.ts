@@ -15,14 +15,10 @@ export class LaserTrails implements Trail {
   private container?: SVGSVGElement;
 
   constructor(private app: App) {
-    this.localTrail = new AnimatedTrail(
-      app,
-      {
-        ...this.getTrailOptions(),
-        fill: () => DEFAULT_LASER_COLOR,
-      },
-      //this.updateCollabTrails.bind(this),
-    );
+    this.localTrail = new AnimatedTrail(app, {
+      ...this.getTrailOptions(),
+      fill: () => DEFAULT_LASER_COLOR,
+    });
   }
 
   private getTrailOptions() {

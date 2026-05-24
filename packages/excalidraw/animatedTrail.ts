@@ -43,7 +43,6 @@ export class AnimatedTrail implements Trail {
     protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
-    private callbackOnFrame?: () => void,
   ) {
     this.key = `animated-trail-${AnimatedTrail.counter++}`;
     this.trailElement = document.createElementNS(SVG_NS, "path");
@@ -155,8 +154,6 @@ export class AnimatedTrail implements Trail {
   private onFrame(): boolean {
     const paths: string[] = [];
 
-    this.callbackOnFrame?.();
-
     for (const t of this.pastTrails) {
       paths.push(this.drawTrail(t, this.app.state));
     }
@@ -167,10 +164,13 @@ export class AnimatedTrail implements Trail {
     }
 
     this.pastTrails = this.pastTrails.filter(
-      (t) => t.getStrokeOutline().length !== 0,
+      (t) =>
+        t.getStrokeOutline(t.options.size / this.app.state.zoom.value)
+          .length !== 0,
     );
 
     if (paths.length === 0 && !this.currentTrail) {
+      this.trailElement.setAttribute("d", "");
       return false;
     }
 
