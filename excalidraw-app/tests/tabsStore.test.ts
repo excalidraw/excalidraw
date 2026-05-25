@@ -12,6 +12,7 @@ import {
   activateTab,
   clearLegacyLocalStorageDocument,
   createBlankTab,
+  ensureTabsReady,
   getNextDefaultTabName,
   loadActiveTabId,
   loadTabsMetadata,
@@ -24,6 +25,7 @@ import { activeTabIdAtom } from "../tabs-atoms";
 
 describe("tabsStore", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     localStorage.clear();
     resetTabsBootstrapForTests();
     appJotaiStore.set(activeTabIdAtom, null);
@@ -121,6 +123,45 @@ describe("tabsStore", () => {
     LocalData.resumeSave("tabSwitch");
   });
 
+  it("preserves legacy keys when IDB persistence fails during migration", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+    });
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      JSON.stringify([rectangle]),
+    );
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+      JSON.stringify({}),
+    );
+
+    const saveSpy = vi
+      .spyOn(DocumentStore, "saveDocument")
+      .mockRejectedValueOnce(new Error("idb unavailable"));
+
+    const result = await migrateLegacyDocumentIfNeeded();
+
+    expect(result.tabs).toHaveLength(1);
+    expect(result.activeTabId).toBe(result.tabs[0].id);
+    // Tab metadata must NOT be persisted yet, otherwise next boot would
+    // skip the migration and the legacy data would never reach IDB.
+    expect(loadTabsMetadata()).toEqual([]);
+    // Legacy keys must remain so the next boot can retry the migration.
+    expect(localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS)).not.toBe(
+      null,
+    );
+    expect(localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE)).not.toBe(
+      null,
+    );
+
+    saveSpy.mockRestore();
+  });
+
   it("clearLegacyLocalStorageDocument removes legacy keys only", () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, "[]");
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, "{}");
@@ -138,10 +179,31 @@ describe("tabsStore", () => {
       "light",
     );
   });
+
+  it("ensureTabsReady allows retry after a rejection", async () => {
+    const saveSpy = vi
+      .spyOn(DocumentStore, "saveDocument")
+      .mockRejectedValueOnce(new Error("transient idb"));
+
+    const first = await ensureTabsReady();
+    // First call returns the in-memory fallback (legacy keys preserved).
+    expect(first.tabs).toHaveLength(1);
+    expect(loadTabsMetadata()).toEqual([]);
+
+    // Second call must NOT return the cached promise; it must re-run the
+    // migration so the user's data eventually reaches IDB.
+    resetTabsBootstrapForTests();
+    saveSpy.mockRestore();
+
+    const second = await ensureTabsReady();
+    expect(second.tabs).toHaveLength(1);
+    expect(loadTabsMetadata()).toHaveLength(1);
+  });
 });
 
 describe("LocalData multitab saves", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     localStorage.clear();
     resetTabsBootstrapForTests();
     LocalData.resumeSave("tabSwitch");

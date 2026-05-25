@@ -180,7 +180,21 @@ export const migrateLegacyDocumentIfNeeded = async (): Promise<{
     console.warn("[tabsStore] failed to parse legacy appState", error);
   }
 
-  await DocumentStore.saveDocument(firstTab.id, { elements, appState });
+  // Persist into IDB *before* writing tab metadata or clearing legacy keys.
+  // If IDB fails (e.g. Safari private mode, quota), we keep the legacy data
+  // intact so the next boot can retry without losing the user's drawing.
+  try {
+    await DocumentStore.saveDocument(firstTab.id, { elements, appState });
+  } catch (error) {
+    console.error(
+      "[tabsStore] failed to persist legacy document into IDB; keeping legacy localStorage keys for retry on next boot",
+      error,
+    );
+    // Fall back to an in-memory tab so the rest of the app can still boot.
+    // The legacy keys are preserved; on the next successful boot the
+    // migration will run again and write to IDB.
+    return { tabs: [firstTab], activeTabId: firstTab.id };
+  }
 
   const tabs = [firstTab];
   saveTabsMetadata(tabs);
@@ -205,11 +219,19 @@ export const ensureTabsReady = (): Promise<{
   if (tabsReadyPromise) {
     return tabsReadyPromise;
   }
-  tabsReadyPromise = migrateLegacyDocumentIfNeeded().then((result) => {
-    appJotaiStore.set(tabsAtom, result.tabs);
-    appJotaiStore.set(activeTabIdAtom, result.activeTabId);
-    return result;
-  });
+  tabsReadyPromise = migrateLegacyDocumentIfNeeded()
+    .then((result) => {
+      appJotaiStore.set(tabsAtom, result.tabs);
+      appJotaiStore.set(activeTabIdAtom, result.activeTabId);
+      return result;
+    })
+    .catch((error) => {
+      // Allow a future call to retry instead of caching the rejection
+      // forever — important because the migration touches IDB which can
+      // fail transiently (locked DBs, private mode, quota).
+      tabsReadyPromise = null;
+      throw error;
+    });
   return tabsReadyPromise;
 };
 
