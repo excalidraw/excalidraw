@@ -1,25 +1,18 @@
 import { THEME } from "@excalidraw/common";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
-
 import type { LocalPoint } from "@excalidraw/math";
 
-import { AnimatedTrail } from "./animated-trail";
+import { AnimatedTrail } from "./animatedTrail";
 
-import type { Trail } from "./animated-trail";
-import type { AnimationFrameHandler } from "./animation-frame-handler";
 import type App from "./components/App";
+import type { Trail } from "./animatedTrail";
 
 export class DrawShapeTrail implements Trail {
   private trail: AnimatedTrail;
 
-  constructor(
-    private animationFrameHandler: AnimationFrameHandler,
-    private app: App,
-  ) {
-    this.animationFrameHandler.register(this, this.onFrame.bind(this));
-
-    this.trail = new AnimatedTrail(animationFrameHandler, app, {
+  constructor(private app: App) {
+    this.trail = new AnimatedTrail(this.app, {
       ...this.getTrailOptions(),
       fill: () =>
         app.state.theme === THEME.LIGHT
@@ -63,14 +56,10 @@ export class DrawShapeTrail implements Trail {
   }
 
   start(container: SVGSVGElement) {
-    this.animationFrameHandler.start(this);
     this.trail.start(container);
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
     this.trail.stop();
   }
-
-  onFrame() {}
 }

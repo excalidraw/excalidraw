@@ -6,7 +6,10 @@ export type Animation<R extends object> = (params: {
 }) => R | null | undefined;
 
 export class AnimationController {
-  private static isRunning = false;
+  private static scheduledFrame:
+    | { id: ReturnType<typeof requestAnimationFrame>; type: "raf" }
+    | { id: ReturnType<typeof setTimeout>; type: "timeout" }
+    | null = null;
   private static animations = new Map<
     string,
     {
@@ -17,6 +20,10 @@ export class AnimationController {
   >();
 
   static start<R extends object>(key: string, animation: Animation<R>) {
+    if (AnimationController.animations.has(key)) {
+      return;
+    }
+
     const initialState = animation({
       deltaTime: 0,
       state: undefined,
@@ -29,19 +36,54 @@ export class AnimationController {
         state: initialState,
       });
 
-      if (!AnimationController.isRunning) {
-        AnimationController.isRunning = true;
-
-        if (isRenderThrottlingEnabled()) {
-          requestAnimationFrame(AnimationController.tick);
-        } else {
-          setTimeout(AnimationController.tick, 0);
-        }
-      }
+      AnimationController.scheduleNextFrame();
     }
   }
 
+  private static scheduleNextFrame() {
+    if (AnimationController.scheduledFrame) {
+      return;
+    }
+
+    if (isRenderThrottlingEnabled()) {
+      AnimationController.scheduledFrame = {
+        id: requestAnimationFrame(AnimationController.tick),
+        type: "raf",
+      };
+    } else {
+      AnimationController.scheduledFrame = {
+        id: setTimeout(AnimationController.tick, 0),
+        type: "timeout",
+      };
+    }
+  }
+
+  private static cancelScheduledFrame() {
+    if (!AnimationController.scheduledFrame) {
+      return;
+    }
+
+    if (AnimationController.scheduledFrame.type === "raf") {
+      cancelAnimationFrame(AnimationController.scheduledFrame.id);
+    } else {
+      clearTimeout(AnimationController.scheduledFrame.id);
+    }
+
+    AnimationController.scheduledFrame = null;
+  }
+
+  private static cancelScheduledFrameIfIdle() {
+    if (AnimationController.animations.size > 0) {
+      return false;
+    }
+
+    AnimationController.cancelScheduledFrame();
+    return true;
+  }
+
   private static tick() {
+    AnimationController.scheduledFrame = null;
+
     if (AnimationController.animations.size > 0) {
       for (const [key, animation] of AnimationController.animations) {
         const now = performance.now();
@@ -56,8 +98,7 @@ export class AnimationController {
         if (!state) {
           AnimationController.animations.delete(key);
 
-          if (AnimationController.animations.size === 0) {
-            AnimationController.isRunning = false;
+          if (AnimationController.cancelScheduledFrameIfIdle()) {
             return;
           }
         } else {
@@ -66,11 +107,11 @@ export class AnimationController {
         }
       }
 
-      if (isRenderThrottlingEnabled()) {
-        requestAnimationFrame(AnimationController.tick);
-      } else {
-        setTimeout(AnimationController.tick, 0);
+      if (AnimationController.cancelScheduledFrameIfIdle()) {
+        return;
       }
+
+      AnimationController.scheduleNextFrame();
     }
   }
 
@@ -80,5 +121,6 @@ export class AnimationController {
 
   static cancel(key: string) {
     AnimationController.animations.delete(key);
+    AnimationController.cancelScheduledFrameIfIdle();
   }
 }
