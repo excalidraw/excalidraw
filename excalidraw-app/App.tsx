@@ -737,7 +737,10 @@ const ExcalidrawWrapper = () => {
     let cancelled = false;
     DocumentStore.loadDocument(activeTabId).then((doc) => {
       if (cancelled || !excalidrawAPI) {
-        LocalData.resumeSave("tabSwitch");
+        // The cleanup below already released the "tabSwitch" lock for this
+        // effect run; releasing it again here would unlock the *next* run's
+        // pause and let onChange persist the previous tab's elements into
+        // the newly-activated tab.
         return;
       }
       const elements = restoreElements(doc?.elements ?? [], null, {
