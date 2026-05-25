@@ -63,6 +63,8 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isMidpointSnappingEnabled": true,
   "isResizing": false,
   "isRotating": false,
+  "lastArabicFontFamily": 12,
+  "lastLatinFontFamily": 5,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
   "multiElement": null,
