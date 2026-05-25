@@ -34,7 +34,13 @@ import {
   isRunningInIframe,
   isDevEnv,
 } from "@excalidraw/common";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -387,10 +393,36 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
+const LANDING_CANVAS_SECTION_ID = "terraform-canvas";
+const LANDING_NAV_SCROLL_OFFSET = 82;
+
+const scrollToLandingTop = (behavior: ScrollBehavior = "auto"): void => {
+  window.scrollTo({ top: 0, left: 0, behavior });
+};
+
+const scrollToLandingCanvasSection = (
+  behavior: ScrollBehavior = "auto",
+): void => {
+  const anchor =
+    document.getElementById("terraform-canvas-heading") ??
+    document.getElementById(LANDING_CANVAS_SECTION_ID);
+  if (!anchor) {
+    return;
+  }
+
+  const top =
+    anchor.getBoundingClientRect().top +
+    window.scrollY -
+    LANDING_NAV_SCROLL_OFFSET;
+  window.scrollTo({ top: Math.max(0, top), behavior });
+};
+
 const ExcalidrawWrapper = ({
   frontendOnly = false,
+  onFrontendSceneReady,
 }: {
   frontendOnly?: boolean;
+  onFrontendSceneReady?: () => void;
 }) => {
   const excalidrawAPI = useExcalidrawAPI();
 
@@ -593,6 +625,9 @@ const ExcalidrawWrapper = ({
     }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
+      if (frontendOnly) {
+        onFrontendSceneReady?.();
+      }
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
@@ -724,6 +759,7 @@ const ExcalidrawWrapper = ({
     setLangCode,
     loadImages,
     frontendOnly,
+    onFrontendSceneReady,
   ]);
 
   useEffect(() => {
@@ -1028,7 +1064,7 @@ const ExcalidrawWrapper = ({
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
-        autoFocus={true}
+        autoFocus={!frontendOnly}
         theme={editorTheme}
         renderTopRightUI={(isMobile) => {
           if (frontendOnly || isMobile || !collabAPI || isCollabDisabled) {
@@ -1364,21 +1400,60 @@ const ExcalidrawWrapper = ({
 };
 
 const LandingPage = () => {
-  useEffect(() => {
-    document.documentElement.classList.add("terraform-canvas-landing");
-    document.body.classList.add("terraform-canvas-landing");
+  const landingScrollRestorationRef = useRef<ScrollRestoration | null>(null);
+  const landingScrollCleanupRef = useRef<(() => void) | null>(null);
 
-    return () => {
-      document.documentElement.classList.remove("terraform-canvas-landing");
-      document.body.classList.remove("terraform-canvas-landing");
+  const scrollToCanvas = useCallback((behavior: ScrollBehavior = "smooth") => {
+    scrollToLandingCanvasSection(behavior);
+  }, []);
+
+  const scheduleLandingTopScroll = useCallback(() => {
+    landingScrollCleanupRef.current?.();
+
+    if (window.location.hash) {
+      return;
+    }
+
+    const scroll = () => scrollToLandingTop("auto");
+    scroll();
+
+    const rafId = requestAnimationFrame(() => {
+      scroll();
+      requestAnimationFrame(scroll);
+    });
+    const timeoutIds = [50, 150, 400, 800, 1500].map((delay) =>
+      window.setTimeout(scroll, delay),
+    );
+
+    landingScrollCleanupRef.current = () => {
+      cancelAnimationFrame(rafId);
+      timeoutIds.forEach((id) => window.clearTimeout(id));
     };
   }, []);
 
-  const scrollToCanvas = () => {
-    document
-      .getElementById("terraform-canvas")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  useLayoutEffect(() => {
+    document.documentElement.classList.add("terraform-canvas-landing");
+    document.body.classList.add("terraform-canvas-landing");
+
+    landingScrollRestorationRef.current = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+
+    scheduleLandingTopScroll();
+
+    return () => {
+      landingScrollCleanupRef.current?.();
+      landingScrollCleanupRef.current = null;
+      document.documentElement.classList.remove("terraform-canvas-landing");
+      document.body.classList.remove("terraform-canvas-landing");
+      if (landingScrollRestorationRef.current) {
+        history.scrollRestoration = landingScrollRestorationRef.current;
+      }
+    };
+  }, [scheduleLandingTopScroll]);
+
+  const handleFrontendSceneReady = useCallback(() => {
+    scheduleLandingTopScroll();
+  }, [scheduleLandingTopScroll]);
 
   return (
     <main id="top" className="landing-page">
@@ -1409,7 +1484,7 @@ const LandingPage = () => {
             <button
               type="button"
               className="landing-cta"
-              onClick={scrollToCanvas}
+              onClick={() => scrollToCanvas()}
             >
               View changes
             </button>
@@ -1431,14 +1506,14 @@ const LandingPage = () => {
             <button
               type="button"
               className="landing-cta"
-              onClick={scrollToCanvas}
+              onClick={() => scrollToCanvas()}
             >
               Visualize a plan
             </button>
             <button
               type="button"
               className="landing-cta"
-              onClick={scrollToCanvas}
+              onClick={() => scrollToCanvas()}
             >
               Open the canvas
             </button>
@@ -1534,7 +1609,10 @@ const LandingPage = () => {
           <TopErrorBoundary>
             <Provider store={appJotaiStore}>
               <ExcalidrawAPIProvider>
-                <ExcalidrawWrapper frontendOnly />
+                <ExcalidrawWrapper
+                  frontendOnly
+                  onFrontendSceneReady={handleFrontendSceneReady}
+                />
               </ExcalidrawAPIProvider>
             </Provider>
           </TopErrorBoundary>
@@ -1701,7 +1779,11 @@ const LandingPage = () => {
 
       <section className="landing-final" aria-labelledby="final-title">
         <h2 id="final-title">Bring the next Terraform review to tfdraw.dev.</h2>
-        <button type="button" className="landing-cta" onClick={scrollToCanvas}>
+        <button
+          type="button"
+          className="landing-cta"
+          onClick={() => scrollToCanvas()}
+        >
           Visualize Terraform changes
         </button>
       </section>
@@ -1768,6 +1850,11 @@ const EditorApp = () => (
   </TopErrorBoundary>
 );
 
+const isLandingPreview = () => {
+  const landing = new URLSearchParams(window.location.search).get("landing");
+  return landing === "1" || landing === "true";
+};
+
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
@@ -1775,7 +1862,7 @@ const ExcalidrawApp = () => {
     return <ExcalidrawPlusIframeExport />;
   }
 
-  if (import.meta.env.DEV || isTestEnv()) {
+  if ((import.meta.env.DEV || isTestEnv()) && !isLandingPreview()) {
     return <EditorApp />;
   }
 
