@@ -454,6 +454,7 @@ export const MobileToolBar = ({
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "drawShape" })}
             icon={drawShapeToolIcon}
+            shortcut={KEYS.S.toLocaleUpperCase()}
             data-testid="toolbar-drawShape"
             selected={drawShapeToolSelected}
           >
