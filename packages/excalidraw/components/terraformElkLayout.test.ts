@@ -979,11 +979,11 @@ describe("buildTerraformElkExcalidrawScene", () => {
   });
 
   it("soft-hides non-primary resource rectangles and bound labels", async () => {
-    const address = "null_resource.dummy";
+    const address = "aws_iam_role.dummy";
     const { elements } = await buildTerraformElkExcalidrawScene(
       oneResourceNodes(address, {
         address,
-        type: "null_resource",
+        type: "aws_iam_role",
         change: { actions: ["no-op"] },
       }),
     );
@@ -1006,10 +1006,10 @@ describe("buildTerraformElkExcalidrawScene", () => {
     );
     expect(label?.isDeleted).toBe(true);
     expect((label as { containerId?: string | null })?.containerId).toBe(null);
-    expect(
+    const labelParents =
       (label as { customData?: { terraformExplodeParentKeys?: string[] } })
-        .customData?.terraformExplodeParentKeys,
-    ).toEqual([]);
+        .customData?.terraformExplodeParentKeys ?? [];
+    expect(labelParents).toEqual([]);
   });
 
   it("shows changed non-primary resources and labels by default", async () => {
