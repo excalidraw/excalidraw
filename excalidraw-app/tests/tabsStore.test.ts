@@ -237,6 +237,69 @@ describe("LocalData multitab saves", () => {
     expect(LocalData.isSavePaused()).toBe(false);
   });
 
+  it("deleteTabDocument undoes a save that was already in flight", async () => {
+    const tab = createBlankTab("Drawing 1");
+    saveTabsMetadata([tab]);
+    activateTab(tab.id);
+    LocalData.resumeSave("tabSwitch");
+
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+    });
+
+    LocalData.save([rectangle], getDefaultAppState() as AppState, {}, () => {});
+    // Fire the debounce immediately so the async save body starts before we
+    // delete the tab — this simulates the race where the user closes a tab
+    // while its save is mid-flight.
+    LocalData.flushSave();
+
+    await LocalData.deleteTabDocument(tab.id);
+
+    // Wait long enough for any in-flight save body to finish; it must have
+    // observed `_deletingTabIds` and undone its own write.
+    await vi.waitFor(async () => {
+      const doc = await DocumentStore.loadDocument(tab.id);
+      expect(doc).toBeNull();
+    });
+  });
+
+  it("save bails when the target tab is already being deleted", async () => {
+    const tab = createBlankTab("Drawing 1");
+    saveTabsMetadata([tab]);
+    activateTab(tab.id);
+    LocalData.resumeSave("tabSwitch");
+
+    // Mark the tab as deleting before the save fires.
+    await LocalData.deleteTabDocument(tab.id);
+
+    LocalData.save(
+      [
+        API.createElement({
+          type: "rectangle",
+          x: 0,
+          y: 0,
+          width: 10,
+          height: 10,
+        }),
+      ],
+      getDefaultAppState() as AppState,
+      {},
+      () => {},
+    );
+    LocalData.flushSave();
+
+    // Allow microtasks to drain.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const doc = await DocumentStore.loadDocument(tab.id);
+    expect(doc).toBeNull();
+  });
+
   it("save writes to the tab id captured at enqueue time", async () => {
     const tabA = createBlankTab("Drawing 1");
     const tabB = createBlankTab("Drawing 2");

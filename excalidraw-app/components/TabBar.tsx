@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "../app-jotai";
 import { activeTabIdAtom, tabsAtom } from "../tabs-atoms";
 
-import { DocumentStore } from "../data/DocumentStore";
 import { LocalData } from "../data/LocalData";
 import {
   activateTab,
@@ -71,18 +70,12 @@ export const useTabActions = () => {
 
       const remaining = tabs.filter((t) => t.id !== id);
 
-      // Drop any pending save targeted at the doc we're about to delete to
-      // avoid resurrecting it via a debounced write after deletion.
-      if (id === activeTabId) {
-        LocalData.cancelSave();
-      }
-
       // If closing the last tab, replace with a fresh empty drawing
       if (remaining.length === 0) {
         const replacement = createBlankTab("Drawing 1");
         persistTabs([replacement]);
         activateTab(replacement.id);
-        DocumentStore.deleteDocument(id);
+        LocalData.deleteTabDocument(id);
         return;
       }
 
@@ -95,7 +88,10 @@ export const useTabActions = () => {
         activateTab(nextActive.id);
       }
 
-      DocumentStore.deleteDocument(id);
+      // Routed through LocalData so any in-flight save targeted at this id
+      // (e.g. one fired by `activateTab`'s flush above) is undone instead
+      // of resurrecting the deleted document.
+      LocalData.deleteTabDocument(id);
     },
     [tabs, activeTabId, persistTabs],
   );

@@ -114,6 +114,15 @@ const isQuotaExceededError = (error: any) => {
 type SavingLockTypes = "collaboration" | "tabSwitch";
 
 export class LocalData {
+  /**
+   * Tab ids that are being (or have just been) deleted. A debounced save
+   * fired right before the deletion would otherwise complete *after* the
+   * IDB delete and resurrect the document. We hold the id long enough that
+   * any save enqueued before the delete request has had a chance to fire
+   * and observe the flag.
+   */
+  private static _deletingTabIds = new Set<string>();
+
   private static _save = debounce(
     async (
       tabId: string,
@@ -122,7 +131,15 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
+      if (this._deletingTabIds.has(tabId)) {
+        return;
+      }
       await saveDataStateToTab(tabId, elements, appState);
+      if (this._deletingTabIds.has(tabId)) {
+        // Tab was deleted while the save was in flight — undo the write.
+        await DocumentStore.deleteDocument(tabId);
+        return;
+      }
 
       await this.fileStorage.saveFiles({
         elements,
@@ -172,6 +189,27 @@ export class LocalData {
    */
   static cancelSave = () => {
     this._save.cancel();
+  };
+
+  /**
+   * Atomically discards the save for `tabId` (if any) and removes its
+   * document from IDB. Safe against the race where a save was already
+   * in flight when the user closed the tab — the in-flight write checks
+   * `_deletingTabIds` and undoes itself if the tab is gone.
+   */
+  static deleteTabDocument = async (tabId: string) => {
+    this._save.cancel();
+    this._deletingTabIds.add(tabId);
+    try {
+      await DocumentStore.deleteDocument(tabId);
+    } finally {
+      // Keep the flag long enough that any save enqueued just before the
+      // delete (and not caught by `cancel`) can still observe it. Ten
+      // debounce intervals is plenty in practice and bounded.
+      setTimeout(() => {
+        this._deletingTabIds.delete(tabId);
+      }, SAVE_TO_LOCAL_STORAGE_TIMEOUT * 10);
+    }
   };
 
   private static locker = new Locker<SavingLockTypes>();
