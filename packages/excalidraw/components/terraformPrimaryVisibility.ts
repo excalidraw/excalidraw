@@ -64,9 +64,28 @@ const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_MODULE_TYPES,
 ]);
 
+export function isGenericManagedProviderResourceType(
+  resourceType: string,
+): boolean {
+  if (!/^[a-z][a-z0-9]*_[a-z0-9_]+$/.test(resourceType)) {
+    return false;
+  }
+  if (
+    resourceType.startsWith("aws_") ||
+    resourceType.startsWith("data_") ||
+    resourceType.startsWith("terraform_")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 /** True for resource types shown in the default overview (compute/storage/messaging/module). */
 export function isPrimaryVisibleResourceType(resourceType: string): boolean {
-  return PRIMARY_VISIBLE_TYPES.has(resourceType);
+  return (
+    PRIMARY_VISIBLE_TYPES.has(resourceType) ||
+    isGenericManagedProviderResourceType(resourceType)
+  );
 }
 
 export function isChangedTerraformAction(action: string): boolean {

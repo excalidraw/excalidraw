@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getTerraformResourceTypeFromNodePath,
   isChangedTerraformAction,
+  isGenericManagedProviderResourceType,
   isInitiallyVisibleTerraformResource,
   isInitiallyVisibleTerraformTopologyTile,
   isPrimaryVisibleResourceType,
@@ -15,11 +16,42 @@ describe("terraformPrimaryVisibility", () => {
       ["aws_s3_bucket", true],
       ["aws_sqs_queue", true],
       ["aws_kms_key", true],
+      ["cloudflare_zone", true],
+      ["cloudflare_dns_record", true],
+      ["google_compute_instance", true],
+      ["azurerm_resource_group", true],
+      ["vercel_project", true],
+      ["random_id", true],
       ["terraform_module", true],
+      ["terraform_data", false],
+      ["data.aws_region", false],
+      ["data.cloudflare_zone", false],
       ["aws_vpc_security_group_ingress_rule", false],
       ["aws_iam_role", false],
+      ["", false],
+      ["cloudflare", false],
     ])("%s → %s", (type, expected) => {
       expect(isPrimaryVisibleResourceType(type)).toBe(expected);
+    });
+  });
+
+  describe("isGenericManagedProviderResourceType", () => {
+    it.each([
+      ["cloudflare_zone", true],
+      ["google_compute_instance", true],
+      ["azurerm_resource_group", true],
+      ["vercel_project", true],
+      ["random_id", true],
+      ["aws_lambda_function", false],
+      ["aws_iam_role", false],
+      ["terraform_data", false],
+      ["data.aws_region", false],
+      ["data.cloudflare_zone", false],
+      ["", false],
+      ["cloudflare", false],
+      ["Cloudflare_zone", false],
+    ])("%s → %s", (type, expected) => {
+      expect(isGenericManagedProviderResourceType(type)).toBe(expected);
     });
   });
 
