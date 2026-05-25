@@ -386,6 +386,199 @@ describe("terraformPlanParsing", () => {
     expect(body.error).toMatch(/Semantic layout requires AWS/i);
   });
 
+  it("state-only module view accepts cloudflare managed resources", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(
+        JSON.stringify({
+          version: 4,
+          resources: [
+            {
+              mode: "managed",
+              type: "cloudflare_zone",
+              name: "tfdraw_dev",
+              instances: [
+                {
+                  attributes: {
+                    id: "8aad82763aa1144a148989b4600c44f3",
+                    name: "tfdraw.dev",
+                    type: "full",
+                  },
+                },
+              ],
+            },
+            {
+              mode: "managed",
+              type: "cloudflare_dns_record",
+              name: "tfdraw_dev_root",
+              instances: [
+                {
+                  attributes: {
+                    id: "d0b1a3afb332de0311e1a45d17676c35",
+                    name: "tfdraw.dev",
+                    type: "CNAME",
+                    content: "master.ainur-chb.pages.dev",
+                    zone_id: "8aad82763aa1144a148989b4600c44f3",
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      ),
+      { semanticLayout: false },
+    );
+
+    expect(res.ok).toBe(true);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("elk");
+    expect(Array.isArray(body.elements)).toBe(true);
+    expect(body.elements.length).toBeGreaterThan(0);
+    const nodePaths = body.elements
+      .map((element: { customData?: { nodePath?: unknown } }) =>
+        typeof element.customData?.nodePath === "string"
+          ? element.customData.nodePath
+          : null,
+      )
+      .filter(Boolean);
+    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain("cloudflare_dns_record.tfdraw_dev_root");
+    const visibleCloudflareCards = body.elements.filter(
+      (element: {
+        type?: string;
+        isDeleted?: boolean;
+        customData?: { resourceType?: unknown };
+      }) =>
+        element.type === "rectangle" &&
+        element.isDeleted !== true &&
+        typeof element.customData?.resourceType === "string" &&
+        element.customData.resourceType.startsWith("cloudflare_"),
+    );
+    expect(visibleCloudflareCards.length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("plan+dot module view accepts cloudflare managed resources", async () => {
+    const plan = {
+      format_version: "1.2",
+      terraform_version: "1.11.5",
+      resource_changes: [
+        {
+          address: "cloudflare_zone.tfdraw_dev",
+          mode: "managed",
+          type: "cloudflare_zone",
+          name: "tfdraw_dev",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "8aad82763aa1144a148989b4600c44f3",
+              name: "tfdraw.dev",
+              type: "full",
+            },
+          },
+        },
+        {
+          address: "cloudflare_dns_record.tfdraw_dev_root",
+          mode: "managed",
+          type: "cloudflare_dns_record",
+          name: "tfdraw_dev_root",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "d0b1a3afb332de0311e1a45d17676c35",
+              name: "tfdraw.dev",
+              type: "CNAME",
+              content: "master.ainur-chb.pages.dev",
+              zone_id: "8aad82763aa1144a148989b4600c44f3",
+            },
+          },
+        },
+      ],
+    };
+    const dot = `digraph {
+      "[root] cloudflare_zone.tfdraw_dev (expand)" [label = "cloudflare_zone.tfdraw_dev", shape = "box"]
+      "[root] cloudflare_dns_record.tfdraw_dev_root (expand)" [label = "cloudflare_dns_record.tfdraw_dev_root", shape = "box"]
+      "[root] cloudflare_dns_record.tfdraw_dev_root (expand)" -> "[root] cloudflare_zone.tfdraw_dev (expand)"
+    }`;
+
+    const res = await terraformPlanParsing(
+      textFileLike(JSON.stringify(plan)),
+      textFileLike(dot),
+      null,
+      { semanticLayout: false },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("elk");
+    const nodePaths = body.elements
+      .map((element: { customData?: { nodePath?: unknown } }) =>
+        typeof element.customData?.nodePath === "string"
+          ? element.customData.nodePath
+          : null,
+      )
+      .filter(Boolean);
+    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain("cloudflare_dns_record.tfdraw_dev_root");
+    const visibleCloudflareCards = body.elements.filter(
+      (element: {
+        type?: string;
+        isDeleted?: boolean;
+        customData?: { resourceType?: unknown };
+      }) =>
+        element.type === "rectangle" &&
+        element.isDeleted !== true &&
+        typeof element.customData?.resourceType === "string" &&
+        element.customData.resourceType.startsWith("cloudflare_"),
+    );
+    expect(visibleCloudflareCards.length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("state-only module view shows generic non-aws managed resources", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(
+        JSON.stringify({
+          version: 4,
+          resources: [
+            {
+              mode: "managed",
+              type: "random_id",
+              name: "suffix",
+              instances: [
+                {
+                  attributes: {
+                    id: "abc123",
+                    hex: "abc123",
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      ),
+      { semanticLayout: false },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("elk");
+    const visibleGenericCards = body.elements.filter(
+      (element: {
+        type?: string;
+        isDeleted?: boolean;
+        customData?: { resourceType?: unknown; nodePath?: unknown };
+      }) =>
+        element.type === "rectangle" &&
+        element.isDeleted !== true &&
+        element.customData?.resourceType === "random_id" &&
+        element.customData?.nodePath === "random_id.suffix",
+    );
+    expect(visibleGenericCards.length).toBeGreaterThan(0);
+  }, 60_000);
+
   it("plan+dot with invalid state JSON shape returns 400", async () => {
     const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
     const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");

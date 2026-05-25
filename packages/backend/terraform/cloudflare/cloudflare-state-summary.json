@@ -1,0 +1,174 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.11.5",
+  "resources": [
+    {
+      "address": "cloudflare_d1_database.tfdraw_analytics",
+      "type": "cloudflare_d1_database",
+      "name": "tfdraw_analytics",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "e96d1444-1a12-4937-8183-8914be898dbd",
+        "zone_id": null,
+        "account_id": "456df569e19a171982d07ee7be6db716",
+        "name": "tfdraw-analytics",
+        "title": null,
+        "project_name": null,
+        "script_name": null,
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_dns_record.tfdraw_dev_root",
+      "type": "cloudflare_dns_record",
+      "name": "tfdraw_dev_root",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "d0b1a3afb332de0311e1a45d17676c35",
+        "zone_id": "8aad82763aa1144a148989b4600c44f3",
+        "account_id": null,
+        "name": "tfdraw.dev",
+        "title": null,
+        "project_name": null,
+        "script_name": null,
+        "record_type": "CNAME",
+        "content": "master.ainur-chb.pages.dev",
+        "proxied": true,
+        "ttl": 1,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_pages_domain.tfdraw_dev",
+      "type": "cloudflare_pages_domain",
+      "name": "tfdraw_dev",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "tfdraw.dev",
+        "zone_id": null,
+        "account_id": "456df569e19a171982d07ee7be6db716",
+        "name": "tfdraw.dev",
+        "title": null,
+        "project_name": "ainur",
+        "script_name": null,
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_pages_project.ainur",
+      "type": "cloudflare_pages_project",
+      "name": "ainur",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "ainur",
+        "zone_id": null,
+        "account_id": "456df569e19a171982d07ee7be6db716",
+        "name": "ainur",
+        "title": null,
+        "project_name": null,
+        "script_name": null,
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_ruleset.tfdraw_managed_waf",
+      "type": "cloudflare_ruleset",
+      "name": "tfdraw_managed_waf",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "4fb1490adec24f47aa7d823b20021806",
+        "zone_id": "8aad82763aa1144a148989b4600c44f3",
+        "account_id": null,
+        "name": "tfdraw.dev managed WAF",
+        "title": null,
+        "project_name": null,
+        "script_name": null,
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": "http_request_firewall_managed",
+        "kind": "zone"
+      }
+    },
+    {
+      "address": "cloudflare_workers_kv_namespace.tfdraw_stats",
+      "type": "cloudflare_workers_kv_namespace",
+      "name": "tfdraw_stats",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "67b24881a9a746e2bcfe4505b02ba00a",
+        "zone_id": null,
+        "account_id": "456df569e19a171982d07ee7be6db716",
+        "name": null,
+        "title": "TFDRAW_STATS",
+        "project_name": null,
+        "script_name": null,
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_workers_script.ainur",
+      "type": "cloudflare_workers_script",
+      "name": "ainur",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "ainur",
+        "zone_id": null,
+        "account_id": "456df569e19a171982d07ee7be6db716",
+        "name": null,
+        "title": null,
+        "project_name": null,
+        "script_name": "ainur",
+        "record_type": null,
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    },
+    {
+      "address": "cloudflare_zone.tfdraw_dev",
+      "type": "cloudflare_zone",
+      "name": "tfdraw_dev",
+      "provider": "registry.opentofu.org/cloudflare/cloudflare",
+      "values": {
+        "id": "8aad82763aa1144a148989b4600c44f3",
+        "zone_id": null,
+        "account_id": null,
+        "name": "tfdraw.dev",
+        "title": null,
+        "project_name": null,
+        "script_name": null,
+        "record_type": "full",
+        "content": null,
+        "proxied": null,
+        "ttl": null,
+        "phase": null,
+        "kind": null
+      }
+    }
+  ]
+}
