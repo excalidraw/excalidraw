@@ -703,16 +703,20 @@ const ExcalidrawWrapper = () => {
     if (!excalidrawAPI) {
       return;
     }
-    if (collabAPI?.isCollaborating()) {
-      // Tab switching is disabled during collab; don't fight the room state.
-      previousActiveTabIdRef.current = activeTabId;
-      return;
-    }
     const previousId = previousActiveTabIdRef.current;
     if (previousId === activeTabId) {
       return;
     }
     previousActiveTabIdRef.current = activeTabId;
+
+    if (collabAPI?.isCollaborating()) {
+      // Tab switching is disabled during collab; don't fight the room state.
+      // `activateTab` already acquired the "tabSwitch" lock — release it,
+      // otherwise saves would stay paused after collab ends because this
+      // effect's deps don't include `isCollaborating` and won't re-run.
+      LocalData.resumeSave("tabSwitch");
+      return;
+    }
     if (!activeTabId) {
       return;
     }

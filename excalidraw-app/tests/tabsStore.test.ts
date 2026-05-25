@@ -160,6 +160,21 @@ describe("LocalData multitab saves", () => {
     expect(LocalData.isSavePaused()).toBe(false);
   });
 
+  it("resumeSave releases the tabSwitch lock acquired by activateTab", () => {
+    // Regression for the collab early-return path in App.tsx: when the user
+    // switches tabs while collaborating, App.tsx bails out of the scene swap
+    // but must still release the "tabSwitch" lock that activateTab acquired,
+    // otherwise saves stay paused even after collab ends.
+    const tab = createBlankTab("Drawing 1");
+    saveTabsMetadata([tab]);
+
+    activateTab(tab.id);
+    expect(LocalData.isSavePaused()).toBe(true);
+
+    LocalData.resumeSave("tabSwitch");
+    expect(LocalData.isSavePaused()).toBe(false);
+  });
+
   it("save writes to the tab id captured at enqueue time", async () => {
     const tabA = createBlankTab("Drawing 1");
     const tabB = createBlankTab("Drawing 2");
