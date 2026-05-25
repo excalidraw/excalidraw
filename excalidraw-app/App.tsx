@@ -396,6 +396,10 @@ const initializeScene = async (opts: {
 const LANDING_CANVAS_SECTION_ID = "terraform-canvas";
 const LANDING_NAV_SCROLL_OFFSET = 82;
 
+const scrollToLandingTop = (behavior: ScrollBehavior = "auto"): void => {
+  window.scrollTo({ top: 0, left: 0, behavior });
+};
+
 const scrollToLandingCanvasSection = (
   behavior: ScrollBehavior = "auto",
 ): void => {
@@ -1403,14 +1407,14 @@ const LandingPage = () => {
     scrollToLandingCanvasSection(behavior);
   }, []);
 
-  const scheduleLandingCanvasScroll = useCallback(() => {
+  const scheduleLandingTopScroll = useCallback(() => {
     landingScrollCleanupRef.current?.();
 
     if (window.location.hash) {
       return;
     }
 
-    const scroll = () => scrollToLandingCanvasSection("auto");
+    const scroll = () => scrollToLandingTop("auto");
     scroll();
 
     const rafId = requestAnimationFrame(() => {
@@ -1421,17 +1425,9 @@ const LandingPage = () => {
       window.setTimeout(scroll, delay),
     );
 
-    const section = document.getElementById(LANDING_CANVAS_SECTION_ID);
-    let resizeObserver: ResizeObserver | undefined;
-    if (section && typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => scroll());
-      resizeObserver.observe(section);
-    }
-
     landingScrollCleanupRef.current = () => {
       cancelAnimationFrame(rafId);
       timeoutIds.forEach((id) => window.clearTimeout(id));
-      resizeObserver?.disconnect();
     };
   }, []);
 
@@ -1442,7 +1438,7 @@ const LandingPage = () => {
     landingScrollRestorationRef.current = history.scrollRestoration;
     history.scrollRestoration = "manual";
 
-    scheduleLandingCanvasScroll();
+    scheduleLandingTopScroll();
 
     return () => {
       landingScrollCleanupRef.current?.();
@@ -1453,11 +1449,11 @@ const LandingPage = () => {
         history.scrollRestoration = landingScrollRestorationRef.current;
       }
     };
-  }, [scheduleLandingCanvasScroll]);
+  }, [scheduleLandingTopScroll]);
 
   const handleFrontendSceneReady = useCallback(() => {
-    scheduleLandingCanvasScroll();
-  }, [scheduleLandingCanvasScroll]);
+    scheduleLandingTopScroll();
+  }, [scheduleLandingTopScroll]);
 
   return (
     <main id="top" className="landing-page">
