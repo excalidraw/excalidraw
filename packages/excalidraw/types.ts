@@ -368,6 +368,8 @@ export interface AppState {
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
+  lastArabicFontFamily: FontFamilyValues;
+  lastLatinFontFamily: FontFamilyValues;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
