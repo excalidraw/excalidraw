@@ -12,15 +12,13 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   applyTerraformResourceRectangleSoftDelete,
+  buildTerraformResourceCardCustomData,
   getTerraformActionStyle,
   getTerraformPlanNodeAction,
   mirrorAndDetachTerraformResourceLabels,
   TERRAFORM_RESOURCE_LABEL_STROKE,
 } from "./terraformElkLayout";
-import {
-  getTerraformCardResourceType,
-  terraformResourceCardLabel,
-} from "./terraformResourceCardLabel";
+import { terraformResourceCardLabel } from "./terraformResourceCardLabel";
 
 import {
   type TerraformProviderFamily,
@@ -159,15 +157,11 @@ function pushProviderResourceSkeleton(
   y: number,
   nodes: TerraformPlanNodesMap,
   family: TerraformProviderFamily,
+  plan?: unknown,
 ): string {
   const node = nodes[addr] as TerraformPlanGraphNode | undefined;
   const resource = getPrimaryResource(node);
-  const resourceType = getTerraformCardResourceType(
-    addr,
-    resource as Record<string, unknown> | null,
-  );
-  const action = getTerraformPlanNodeAction(node);
-  const actionStyle = getTerraformActionStyle(action);
+  const actionStyle = getTerraformActionStyle(getTerraformPlanNodeAction(node));
 
   skeleton.push({
     type: "rectangle",
@@ -199,10 +193,13 @@ function pushProviderResourceSkeleton(
       terraformExplodeParentKeys: [],
       terraformExplodeParent: null,
       terraformExpandAllView: false,
-      resourceType,
-      nodePath: addr,
-      action,
       terraformProviderFamily: family,
+      ...buildTerraformResourceCardCustomData(
+        addr,
+        resource as Record<string, unknown> | undefined,
+        node,
+        plan,
+      ),
     },
   });
   return addr;
@@ -215,6 +212,7 @@ function layoutResourceGrid(
   originY: number,
   nodes: TerraformPlanNodesMap,
   family: TerraformProviderFamily,
+  plan?: unknown,
 ): { width: number; height: number; childIds: string[] } {
   const { cols, rows } = gridColsRows(addresses.length);
   const childIds: string[] = [];
@@ -224,7 +222,15 @@ function layoutResourceGrid(
     const x = originX + col * (RESOURCE_RECT_W + RESOURCE_GAP);
     const y = originY + row * (RESOURCE_RECT_H + RESOURCE_GAP);
     childIds.push(
-      pushProviderResourceSkeleton(skeleton, addresses[i], x, y, nodes, family),
+      pushProviderResourceSkeleton(
+        skeleton,
+        addresses[i],
+        x,
+        y,
+        nodes,
+        family,
+        plan,
+      ),
     );
   }
   const width = Math.max(
@@ -383,6 +389,7 @@ async function finalizeProviderSkeleton(
 export async function buildCloudflareProviderScene(
   changes: readonly TerraformResourceChangeLike[],
   nodes: TerraformPlanNodesMap,
+  plan?: unknown,
 ): Promise<{ elements: ExcalidrawElement[]; meta: ProviderSceneMeta }> {
   if (changes.length === 0) {
     return {
@@ -441,6 +448,7 @@ export async function buildCloudflareProviderScene(
         bandCursorY,
         nodes,
         "cloudflare",
+        plan,
       );
       skeleton.push({
         type: "frame",
@@ -513,6 +521,7 @@ export async function buildGenericProviderScene(
   label: string,
   changes: readonly TerraformResourceChangeLike[],
   nodes: TerraformPlanNodesMap,
+  plan?: unknown,
 ): Promise<{ elements: ExcalidrawElement[]; meta: ProviderSceneMeta }> {
   if (changes.length === 0) {
     return {
@@ -535,6 +544,7 @@ export async function buildGenericProviderScene(
     MARGIN + INNER_PAD + PROVIDER_TITLE_PAD,
     nodes,
     family,
+    plan,
   );
 
   skeleton.push({
@@ -725,9 +735,10 @@ export async function buildProviderFamilyScene(
   label: string,
   changes: readonly TerraformResourceChangeLike[],
   nodes: TerraformPlanNodesMap,
+  plan?: unknown,
 ): Promise<{ elements: ExcalidrawElement[]; meta: ProviderSceneMeta }> {
   if (family === "cloudflare") {
-    return buildCloudflareProviderScene(changes, nodes);
+    return buildCloudflareProviderScene(changes, nodes, plan);
   }
-  return buildGenericProviderScene(family, label, changes, nodes);
+  return buildGenericProviderScene(family, label, changes, nodes, plan);
 }

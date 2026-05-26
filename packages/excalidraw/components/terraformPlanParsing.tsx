@@ -34,9 +34,10 @@ import {
 } from "./terraformDataFlowEdges";
 import {
   filterPlanByProviderFamily,
+  getProviderFamilyLabel,
   hasManagedResourcesForSemantic,
   partitionResourceChangesByProviderFamily,
-  type TerraformProviderFamily,
+  sortedNonAwsProviderFamilies,
 } from "./terraformProviderClassification";
 import {
   buildProviderFamilyScene,
@@ -699,35 +700,19 @@ export const terraformPlanParsingFromSources = async (
       }
     }
 
-    const providerLabels: Record<TerraformProviderFamily, string> = {
-      aws: "AWS",
-      cloudflare: "Cloudflare",
-      google: "GCP",
-      azurerm: "Azure",
-      other: "Other",
-    };
-
-    const nonAwsProviderFamilies: TerraformProviderFamily[] = [
-      "cloudflare",
-      "google",
-      "azurerm",
-    ];
-
-    for (const family of nonAwsProviderFamilies) {
-      const changes = providerBuckets.get(family);
-      if (!changes?.length) {
-        continue;
-      }
+    for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
+      const changes = providerBuckets.get(family)!;
       const providerScene = await buildProviderFamilyScene(
         family,
-        providerLabels[family],
+        getProviderFamilyLabel(family),
         changes,
         nodes5,
+        semPlan,
       );
       if (providerScene.elements.length > 0) {
         providerBlocks.push({
           family,
-          label: providerLabels[family],
+          label: getProviderFamilyLabel(family),
           elements: providerScene.elements,
         });
       }

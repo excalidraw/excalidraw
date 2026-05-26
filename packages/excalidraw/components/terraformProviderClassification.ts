@@ -31,6 +31,22 @@ const PROVIDER_FAMILY_LABELS: Record<TerraformProviderFamily, string> = {
   other: "Other",
 };
 
+export function getProviderFamilyLabel(
+  family: TerraformProviderFamily,
+): string {
+  return PROVIDER_FAMILY_LABELS[family];
+}
+
+export function sortedNonAwsProviderFamilies(
+  buckets: Map<TerraformProviderFamily, TerraformResourceChangeLike[]>,
+): TerraformProviderFamily[] {
+  return [...buckets.keys()]
+    .filter(
+      (family) => family !== "aws" && (buckets.get(family)?.length ?? 0) > 0,
+    )
+    .sort((a, b) => providerFamilySortOrder(a) - providerFamilySortOrder(b));
+}
+
 function familyFromProviderName(
   providerName: string,
 ): TerraformProviderFamily | null {

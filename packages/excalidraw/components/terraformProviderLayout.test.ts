@@ -37,9 +37,16 @@ describe("terraformProviderLayout", () => {
       (rc: { mode?: string }) => rc.mode !== "data",
     );
 
-    const scene = await buildCloudflareProviderScene(changes, nodes);
+    const scene = await buildCloudflareProviderScene(changes, nodes, plan);
     expect(scene.meta.resourceCount).toBeGreaterThan(0);
     expect(scene.meta.accountCount).toBe(1);
+
+    const zoneTile = scene.elements.find(
+      (e) => e.customData?.nodePath === "cloudflare_zone.tfdraw_dev",
+    );
+    expect(
+      zoneTile?.customData?.terraformResources?.[0]?.attributes?.length,
+    ).toBeGreaterThan(0);
 
     const nodePaths = scene.elements
       .map((e) => e.customData?.nodePath)

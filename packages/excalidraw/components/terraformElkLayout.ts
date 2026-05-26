@@ -656,6 +656,31 @@ export function buildTerraformResourcePanelDetails(
   ];
 }
 
+/** Shared resource-card metadata for any provider (panel fields + action/type). */
+export function buildTerraformResourceCardCustomData(
+  address: string,
+  resource: Record<string, any> | null | undefined,
+  node: TerraformPlanGraphNode | undefined,
+  plan?: unknown,
+) {
+  const resourceType = getTerraformCardResourceType(address, resource);
+  const action = getTerraformPlanNodeAction(node);
+  return {
+    resourceType,
+    nodePath: address,
+    action,
+    ...(resource
+      ? {
+          terraformResources: buildTerraformResourcePanelDetails(
+            address,
+            resource,
+            plan,
+          ),
+        }
+      : {}),
+  };
+}
+
 type LayoutBox = { x: number; y: number; width: number; height: number };
 
 /** Collects absolute layout for resource leaves and `__tf_m__:*` module compounds. */
@@ -1730,14 +1755,7 @@ export async function buildTerraformElkExcalidrawScene(
         terraformInitiallyVisible: initiallyVisible,
         terraformExplodeParentKeys: explodeKeys,
         terraformExplodeParent: explodeParent,
-        resourceType,
-        nodePath: id,
-        action,
-        terraformResources: buildTerraformResourcePanelDetails(
-          id,
-          resource,
-          plan,
-        ),
+        ...buildTerraformResourceCardCustomData(id, resource, nodes[id], plan),
       },
     });
   }
