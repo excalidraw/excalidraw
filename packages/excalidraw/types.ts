@@ -355,6 +355,12 @@ export interface AppState {
   penMode: boolean;
   penDetected: boolean;
 
+  // Freedraw sub-mode: vector (svg paths) or raster (bitmap)
+  freedrawMode: "vector" | "raster";
+
+  // Eraser sub-mode: element-level or pixel-level
+  eraserMode: "element" | "pixel";
+
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;

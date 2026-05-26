@@ -82,6 +82,8 @@ import {
   DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
+  RasterPenIcon,
+  PixelEraserIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1081,7 +1083,7 @@ export const ShapesSwitcher = ({
   return (
     <>
       {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable, toolbar }) => {
+        ({ value, icon: shapeIcon, key, numericKey, fillable, toolbar }) => {
           if (
             toolbar === false ||
             UIOptions.tools?.[
@@ -1093,6 +1095,13 @@ export const ShapesSwitcher = ({
           ) {
             return null;
           }
+
+          const icon =
+            value === "freedraw" && app.state.freedrawMode === "raster"
+              ? RasterPenIcon
+              : value === "eraser" && app.state.eraserMode === "pixel"
+              ? PixelEraserIcon
+              : shapeIcon;
 
           const label = t(`toolBar.${value}`);
           const letter =
@@ -1162,6 +1171,30 @@ export const ShapesSwitcher = ({
                   } else {
                     app.setActiveTool({ type: "selection" });
                   }
+                }
+
+                if (
+                  value === "freedraw" &&
+                  app.state.activeTool.type === "freedraw"
+                ) {
+                  app.setAppState({
+                    freedrawMode:
+                      app.state.freedrawMode === "vector"
+                        ? "raster"
+                        : "vector",
+                  });
+                }
+
+                if (
+                  value === "eraser" &&
+                  app.state.activeTool.type === "eraser"
+                ) {
+                  app.setAppState({
+                    eraserMode:
+                      app.state.eraserMode === "element"
+                        ? "pixel"
+                        : "element",
+                  });
                 }
               }}
               onChange={({ pointerType }) => {

@@ -398,6 +398,41 @@ export const FreedrawIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const RasterPenIcon = createIcon(
+  <>
+    <g strokeWidth="1.25">
+      <path
+        clipRule="evenodd"
+        d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+      />
+      <path d="m11.25 5.417 3.333 3.333" />
+    </g>
+    <rect
+      x="12"
+      y="12"
+      width="8"
+      height="8"
+      rx="2"
+      fill="var(--island-bg-color, #fff)"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <text
+      x="16"
+      y="18"
+      textAnchor="middle"
+      fontSize="6.5"
+      fontWeight="bold"
+      fill="currentColor"
+      fontFamily="system-ui, sans-serif"
+    >
+      R
+    </text>
+  </>,
+
+  modifiedTablerIconProps,
+);
+
 // tabler-icons: typography
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">
@@ -442,6 +477,38 @@ export const EraserIcon = createIcon(
     <path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3" />
     <path d="M18 13.3l-6.3 -6.3" />
   </g>,
+  tablerIconProps,
+);
+
+export const PixelEraserIcon = createIcon(
+  <>
+    <g strokeWidth="1.5">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3" />
+      <path d="M18 13.3l-6.3 -6.3" />
+    </g>
+    <rect
+      x="15"
+      y="14"
+      width="9"
+      height="9"
+      rx="2"
+      fill="var(--island-bg-color, #fff)"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <text
+      x="19.5"
+      y="21"
+      textAnchor="middle"
+      fontSize="7"
+      fontWeight="bold"
+      fill="currentColor"
+      fontFamily="system-ui, sans-serif"
+    >
+      P
+    </text>
+  </>,
   tablerIconProps,
 );
 

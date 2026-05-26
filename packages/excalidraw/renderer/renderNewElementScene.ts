@@ -22,6 +22,8 @@ const _renderNewElementScene = ({
   scale,
   appState,
   renderConfig,
+  rasterPenPreview,
+  eraserPreview,
 }: NewElementSceneRenderConfig) => {
   if (canvas) {
     const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -41,7 +43,40 @@ const _renderNewElementScene = ({
     // Apply zoom
     context.scale(appState.zoom.value, appState.zoom.value);
 
-    if (newElement && newElement.type !== "selection") {
+    if (rasterPenPreview) {
+      const { points, originX, originY, strokeWidth, strokeColor, opacity } =
+        rasterPenPreview;
+
+      context.save();
+      context.translate(appState.scrollX, appState.scrollY);
+      context.globalAlpha = opacity;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = strokeWidth;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+
+      if (points.length === 1) {
+        context.beginPath();
+        context.arc(
+          originX + points[0].dx,
+          originY + points[0].dy,
+          strokeWidth / 2,
+          0,
+          Math.PI * 2,
+        );
+        context.fillStyle = strokeColor;
+        context.fill();
+      } else if (points.length > 1) {
+        context.beginPath();
+        context.moveTo(originX + points[0].dx, originY + points[0].dy);
+        for (let i = 1; i < points.length; i++) {
+          context.lineTo(originX + points[i].dx, originY + points[i].dy);
+        }
+        context.stroke();
+      }
+
+      context.restore();
+    } else if (newElement && newElement.type !== "selection") {
       // e.g. when creating arrows and we're still below the arrow drag distance
       // threshold
       // (for now we skip render only with elements while we're creating to be
@@ -78,6 +113,23 @@ const _renderNewElementScene = ({
       );
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
+    }
+
+    // Render eraser preview on top of everything (shows cutout path during pixel erase)
+    if (eraserPreview && eraserPreview.points.length > 0) {
+      context.save();
+      context.translate(appState.scrollX, appState.scrollY);
+      context.globalAlpha = 0.5;
+      context.fillStyle =
+        appState.viewBackgroundColor === "transparent"
+          ? "#ffffff"
+          : appState.viewBackgroundColor;
+      for (const p of eraserPreview.points) {
+        context.beginPath();
+        context.arc(p.x, p.y, eraserPreview.radius / 2, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.restore();
     }
 
     context.restore();
