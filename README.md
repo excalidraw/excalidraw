@@ -93,17 +93,23 @@ Open **Import Terraform** and pick a mode:
 
 | Mode | What to upload |
 | --- | --- |
-| Plan + graph | Plan JSON and graph DOT (required together for plan-based views) |
-| Plan + graph + state | Plan JSON, graph DOT, and optional state file |
-| Plan + graph + `.tfd` | Plan JSON, graph DOT, and optional [declared dataflow file](#declared-dataflow-tfd) |
-| State only | Raw state JSON alone (semantic topology or module graph) |
+| Plan + graph | One or more plan JSON + graph DOT pairs (one pair per stack/root) |
+| Plan + graph + state | Plan pairs plus optional state file(s) to enrich nodes |
+| Plan + graph + `.tfd` | Plan pairs plus optional [declared dataflow](#declared-dataflow-tfd) file(s) |
+| State only | One or more raw state JSON files (semantic topology or module graph) |
 
 | File | Source |
 | --- | --- |
 | Plan | `terraform show -json <planfile>` or `tofu show -json <planfile>` |
 | Graph | `terraform graph -type=plan` or `tofu graph -type=plan` |
 | State | `terraform state pull` or a `.tfstate` file |
-| Dataflow links | Hand-authored `.tfd` text (optional) |
+| Dataflow links | Hand-authored `.tfd` text (optional; multiple files merged in upload order) |
+
+### Multiple stacks
+
+Use **Add plan + graph** in the import dialog for each Terraform or OpenTofu working directory (up to 10 bundles). Optionally add multiple state files and multiple `.tfd` overlays in one import.
+
+If the same resource address appears in more than one file, the **last file wins** and a non-blocking warning is shown after import. Cross-stack diagrams work best when module paths do not collide.
 
 ### Sample fixtures
 
@@ -164,7 +170,7 @@ Upload plan JSON + graph DOT, then attach the `.tfd` under **Dataflow links (.tf
 - **Data flow** (grey) from IAM policy semantics in the plan.
 - **Declared data flow** (blue) from an optional `.tfd` file.
 - **Networking** edges for security-group peers where inferred.
-- **Semantic boundaries** for account, region, VPC, and subnets (semantic view).
+- **Semantic boundaries** for account, region, VPC, and subnets (semantic view), with **provider boxes** (AWS, Cloudflare, GCP, Azure) for multi-cloud imports.
 - **Module-aware layout** in module view.
 - **Terraform metadata** on elements: diffs, known-after-apply hints, and selected fields.
 
@@ -174,7 +180,7 @@ Everything remains editable Excalidraw content.
 
 | View | Best for |
 | --- | --- |
-| **Semantic** | Account / region / VPC / subnet topology. Plan+dot shows planned changes; state-only shows what is deployed now. |
+| **Semantic** | AWS account / region / VPC / subnet topology plus sibling provider boxes for Cloudflare, GCP, and Azure. Plan+dot shows planned changes; state-only shows what is deployed now. |
 | **Module** | Terraform module structure and nested resources. |
 
 Production builds use a Terraform Canvas landing page with an embedded editor; dev mode opens the editor directly.
@@ -193,7 +199,8 @@ Treat plan JSON as sensitive (names, ARNs, tags, sometimes secrets). Review befo
 - Plan-based import requires **plan JSON and graph DOT together**.
 - `.tfd` is optional; it does not replace plan+dot.
 - State-only semantic view has no create/update/delete diffs from a plan.
-- Strongest on AWS-shaped infrastructure today; other providers may look generic.
+- Semantic view places AWS resources in account topology and other cloud providers in labeled provider boxes (Cloudflare groups by account, zone, Pages, and Workers).
+- Strongest AWS semantic detail today; GCP/Azure use account/project grids until richer topology is added.
 - Public mode hides collaboration, share links, Firebase share load, and some export/promo controls.
 
 ## FAQ

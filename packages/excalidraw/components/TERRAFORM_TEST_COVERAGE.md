@@ -15,6 +15,7 @@ Co-located tests use `terraform*.test.ts(x)` next to sources. This checklist is 
 | `terraformLayoutDuplicateGlyphs.ts` | `terraformLayoutDuplicateGlyphs.test.ts` |  |
 | `terraformNetworkingVertex.ts` | `terraformNetworkingVertex.test.ts` |  |
 | `terraformPlanMeta.ts` | imported in plan/elk tests | Constants only |
+| `terraformImportMerge.ts` | `terraformImportMerge.test.ts` | Multi-file plan/state/dot merge |
 | `terraformPlanParsing.tsx` | `terraformPlanParsing.test.ts` |  |
 | `terraformPrimaryVisibility.ts` | `terraformPrimaryVisibility.test.ts` |  |
 | `terraformRelationshipFocus.ts` | `terraformRelationshipFocus.test.ts` |  |

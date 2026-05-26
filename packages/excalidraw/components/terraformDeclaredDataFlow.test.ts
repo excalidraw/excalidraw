@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   applyDeclaredDataFlow,
+  applyDeclaredDataFlowFromMany,
   DECLARED_DATAFLOW_ORDERED_KEY,
   parseDeclaredDataFlowText,
   resolveDeclaredDataFlowEndpoint,
@@ -96,8 +97,9 @@ writer -> queue
 queue -> reader
 bucket -> reader
 `;
-    const { edges, errors } = applyDeclaredDataFlow(nodes, text);
+    const { edges, errors, warnings } = applyDeclaredDataFlow(nodes, text);
     expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
     expect(edges).toHaveLength(4);
     expect(edges.map((e) => [e.source, e.target])).toEqual([
       [WRITER, BUCKET],
@@ -116,5 +118,31 @@ bucket -> reader
     expect(
       errors.some((e) => e.includes("must be a full Terraform address")),
     ).toBe(true);
+  });
+});
+
+describe("applyDeclaredDataFlowFromMany", () => {
+  it("preserves global sequence across files", () => {
+    const nodes = minimalNodes();
+    const file1 = `bind writer = ${WRITER}\nbind bucket = ${BUCKET}\nwriter -> bucket`;
+    const file2 = `bind queue = ${QUEUE}\nbucket -> queue`;
+    const { edges, errors } = applyDeclaredDataFlowFromMany(nodes, [
+      file1,
+      file2,
+    ]);
+    expect(errors).toEqual([]);
+    expect(edges.map((e) => e.sequence)).toEqual([0, 1]);
+    expect(edges[0].source).toBe(WRITER);
+    expect(edges[1].target).toBe(QUEUE);
+  });
+
+  it("warns when bind alias is redefined across files", () => {
+    const nodes = minimalNodes();
+    const { warnings } = applyDeclaredDataFlowFromMany(
+      nodes,
+      [`bind writer = ${WRITER}`, `bind writer = ${READER}`],
+      ["a.tfd", "b.tfd"],
+    );
+    expect(warnings.some((w) => w.includes('bind "writer"'))).toBe(true);
   });
 });

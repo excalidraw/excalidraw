@@ -11,6 +11,7 @@ import {
   resolveTerraformPlanNodeKey,
   sanitizeTerraformPlanNodes,
   terraformPlanParsing,
+  terraformPlanParsingFromSources,
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
@@ -361,7 +362,7 @@ describe("terraformPlanParsing", () => {
     expect(body.elements.length).toBeGreaterThan(0);
   }, 60_000);
 
-  it("state-only semantic returns 400 when no aws resources", async () => {
+  it("state-only semantic returns 400 when no managed resources", async () => {
     const res = await terraformPlanParsing(
       null,
       null,
@@ -370,10 +371,10 @@ describe("terraformPlanParsing", () => {
           version: 4,
           resources: [
             {
-              mode: "managed",
-              type: "random_id",
-              name: "x",
-              instances: [{ attributes: { id: "abc" } }],
+              mode: "data",
+              type: "aws_caller_identity",
+              name: "current",
+              instances: [{ attributes: { account_id: "123" } }],
             },
           ],
         }),
@@ -383,7 +384,46 @@ describe("terraformPlanParsing", () => {
     expect(res.ok).toBe(false);
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toMatch(/Semantic layout requires AWS/i);
+    expect(body.error).toMatch(/managed resource/i);
+  });
+
+  it("state-only semantic accepts cloudflare managed resources", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(
+        JSON.stringify({
+          version: 4,
+          resources: [
+            {
+              mode: "managed",
+              type: "cloudflare_zone",
+              name: "tfdraw_dev",
+              instances: [
+                {
+                  attributes: {
+                    id: "8aad82763aa1144a148989b4600c44f3",
+                    name: "tfdraw.dev",
+                    account_id: "456df569e19a171982d07ee7be6db716",
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      ),
+      { semanticLayout: true },
+    );
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("topology");
+    expect(body.meta?.providerBlockCount).toBe(1);
+    const nodePaths = body.elements
+      .map(
+        (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
+      )
+      .filter(Boolean);
+    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
   });
 
   it("state-only module view accepts cloudflare managed resources", async () => {
@@ -457,6 +497,64 @@ describe("terraformPlanParsing", () => {
         element.customData.resourceType.startsWith("cloudflare_"),
     );
     expect(visibleCloudflareCards.length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("terraformPlanParsingFromSources merges two plan+dot bundles", async () => {
+    const zonePlan = {
+      resource_changes: [
+        {
+          address: "cloudflare_zone.stack_a",
+          mode: "managed",
+          type: "cloudflare_zone",
+          name: "stack_a",
+          change: {
+            actions: ["no-op"],
+            after: { id: "zone-a", name: "a.example" },
+          },
+        },
+      ],
+    };
+    const dnsPlan = {
+      resource_changes: [
+        {
+          address: "cloudflare_dns_record.stack_b",
+          mode: "managed",
+          type: "cloudflare_dns_record",
+          name: "stack_b",
+          change: {
+            actions: ["no-op"],
+            after: { id: "dns-b", name: "b.example", type: "CNAME" },
+          },
+        },
+      ],
+    };
+    const dotA = `digraph { "[root] cloudflare_zone.stack_a (expand)" [shape=box] }`;
+    const dotB = `digraph { "[root] cloudflare_dns_record.stack_b (expand)" [shape=box] }`;
+
+    const res = await terraformPlanParsingFromSources(
+      {
+        planDotBundles: [
+          { plan: zonePlan, dotText: dotA, label: "stack-a" },
+          { plan: dnsPlan, dotText: dotB, label: "stack-b" },
+        ],
+        states: [],
+        tfdTexts: [],
+      },
+      { semanticLayout: false },
+    );
+
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.importBundleCount).toBe(2);
+    const nodePaths = body.elements
+      .map((element: { customData?: { nodePath?: unknown } }) =>
+        typeof element.customData?.nodePath === "string"
+          ? element.customData.nodePath
+          : null,
+      )
+      .filter(Boolean);
+    expect(nodePaths).toContain("cloudflare_zone.stack_a");
+    expect(nodePaths).toContain("cloudflare_dns_record.stack_b");
   }, 60_000);
 
   it("plan+dot module view accepts cloudflare managed resources", async () => {

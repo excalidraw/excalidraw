@@ -19,6 +19,7 @@ export type ParsedDeclaredDataFlow = {
 export type ApplyDeclaredDataFlowResult = {
   edges: DeclaredDataFlowEdge[];
   errors: string[];
+  warnings: string[];
 };
 
 /** Resolve alias (via binds) or full Terraform address to a plan graph node path. */
@@ -66,46 +67,66 @@ export function parseDeclaredDataFlowText(
   return { binds, edgeSpecs };
 }
 
-export function applyDeclaredDataFlow(
+export function applyDeclaredDataFlowFromMany(
   nodes: Record<string, TerraformPlanGraphNode> & {
     [DECLARED_DATAFLOW_ORDERED_KEY]?: DeclaredDataFlowEdge[];
   },
-  text: string,
+  texts: string[],
+  labels?: (string | undefined)[],
 ): ApplyDeclaredDataFlowResult {
-  const { binds, edgeSpecs } = parseDeclaredDataFlowText(text);
+  const binds = new Map<string, string>();
   const errors: string[] = [];
+  const warnings: string[] = [];
   const edges: DeclaredDataFlowEdge[] = [];
-
-  for (const [alias, address] of binds) {
-    if (!address.includes(".")) {
-      errors.push(
-        `bind ${alias}: must be a full Terraform address (got "${address}")`,
-      );
-      continue;
-    }
-    if (!resolveTerraformPlanNodeKey(nodes, address)) {
-      errors.push(`bind ${alias}: address not in plan: ${address}`);
-    }
-  }
-
   let sequence = 0;
-  for (const spec of edgeSpecs) {
-    const source = resolveDeclaredDataFlowEndpoint(nodes, spec.source, binds);
-    const target = resolveDeclaredDataFlowEndpoint(nodes, spec.target, binds);
-    if (!source) {
-      errors.push(`Unresolved source: ${spec.source}`);
+
+  for (let fileIndex = 0; fileIndex < texts.length; fileIndex++) {
+    const text = texts[fileIndex];
+    if (!text?.trim()) {
       continue;
     }
-    if (!target) {
-      errors.push(`Unresolved target: ${spec.target}`);
-      continue;
+    const label = labels?.[fileIndex]?.trim() || `tfd ${fileIndex + 1}`;
+    const { binds: fileBinds, edgeSpecs } = parseDeclaredDataFlowText(text);
+
+    for (const [alias, address] of fileBinds) {
+      if (binds.has(alias) && binds.get(alias) !== address) {
+        warnings.push(
+          `bind "${alias}" in "${label}" overwrote earlier definition.`,
+        );
+      }
+      binds.set(alias, address);
     }
-    if (!nodes[source] || !nodes[target] || source === target) {
-      errors.push(`Invalid edge: ${spec.source} -> ${spec.target}`);
-      continue;
+
+    for (const [alias, address] of fileBinds) {
+      if (!address.includes(".")) {
+        errors.push(
+          `bind ${alias}: must be a full Terraform address (got "${address}")`,
+        );
+        continue;
+      }
+      if (!resolveTerraformPlanNodeKey(nodes, address)) {
+        errors.push(`bind ${alias}: address not in plan: ${address}`);
+      }
     }
-    edges.push({ source, target, sequence, origin: "tfd" });
-    sequence += 1;
+
+    for (const spec of edgeSpecs) {
+      const source = resolveDeclaredDataFlowEndpoint(nodes, spec.source, binds);
+      const target = resolveDeclaredDataFlowEndpoint(nodes, spec.target, binds);
+      if (!source) {
+        errors.push(`Unresolved source: ${spec.source}`);
+        continue;
+      }
+      if (!target) {
+        errors.push(`Unresolved target: ${spec.target}`);
+        continue;
+      }
+      if (!nodes[source] || !nodes[target] || source === target) {
+        errors.push(`Invalid edge: ${spec.source} -> ${spec.target}`);
+        continue;
+      }
+      edges.push({ source, target, sequence, origin: "tfd" });
+      sequence += 1;
+    }
   }
 
   if (edges.length > 0) {
@@ -114,10 +135,19 @@ export function applyDeclaredDataFlow(
     delete nodes[DECLARED_DATAFLOW_ORDERED_KEY];
   }
 
-  if (import.meta.env.DEV && errors.length > 0) {
+  if (import.meta.env.DEV && (errors.length > 0 || warnings.length > 0)) {
     // eslint-disable-next-line no-console -- dev-only link resolution warnings
-    console.warn("[terraform:declared-dataflow]", errors);
+    console.warn("[terraform:declared-dataflow]", { errors, warnings });
   }
 
-  return { edges, errors };
+  return { edges, errors, warnings };
+}
+
+export function applyDeclaredDataFlow(
+  nodes: Record<string, TerraformPlanGraphNode> & {
+    [DECLARED_DATAFLOW_ORDERED_KEY]?: DeclaredDataFlowEdge[];
+  },
+  text: string,
+): ApplyDeclaredDataFlowResult {
+  return applyDeclaredDataFlowFromMany(nodes, [text]);
 }

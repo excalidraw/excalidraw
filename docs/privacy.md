@@ -2,7 +2,7 @@
 
 ## Terraform imports
 
-Terraform plan JSON, graph DOT, state files, and `.tfd` dataflow links are parsed **in your browser**. They are **not** uploaded to tfdraw.dev for the import feature.
+Terraform plan JSON, graph DOT, state files, and `.tfd` dataflow links (one or more of each) are parsed **in your browser**. They are **not** uploaded to tfdraw.dev for the import feature.
 
 ## Optional email signup
 
