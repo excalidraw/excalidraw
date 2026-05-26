@@ -536,6 +536,63 @@ const collectTerraformResourceRects = (
  * bindings from current resource rectangle positions. Call after visibility toggles
  * so edges stay attached when soft-delete temporarily cleared edge bindings.
  */
+const bindingPointsEqual = (
+  a: [number, number] | undefined,
+  b: [number, number] | undefined,
+): boolean => {
+  if (!a || !b) {
+    return a === b;
+  }
+  return Math.abs(a[0] - b[0]) < 0.01 && Math.abs(a[1] - b[1]) < 0.01;
+};
+
+const arrowGeometryEqual = (
+  element: ExcalidrawElement,
+  patch: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    points: readonly (readonly [number, number])[];
+    startBinding?: { elementId: string; fixedPoint: [number, number] };
+    endBinding?: { elementId: string; fixedPoint: [number, number] };
+  },
+): boolean => {
+  if (!isLinearElement(element)) {
+    return false;
+  }
+  if (
+    Math.abs(element.x - patch.x) > 0.01 ||
+    Math.abs(element.y - patch.y) > 0.01 ||
+    Math.abs(element.width - patch.width) > 0.01 ||
+    Math.abs(element.height - patch.height) > 0.01
+  ) {
+    return false;
+  }
+  if (
+    !element.points ||
+    element.points.length !== patch.points.length ||
+    element.points.some(
+      (point, index) =>
+        Math.abs(point[0] - patch.points[index][0]) > 0.01 ||
+        Math.abs(point[1] - patch.points[index][1]) > 0.01,
+    )
+  ) {
+    return false;
+  }
+  const start = element.startBinding;
+  const end = element.endBinding;
+  if (
+    start?.elementId !== patch.startBinding?.elementId ||
+    end?.elementId !== patch.endBinding?.elementId ||
+    !bindingPointsEqual(start?.fixedPoint, patch.startBinding?.fixedPoint) ||
+    !bindingPointsEqual(end?.fixedPoint, patch.endBinding?.fixedPoint)
+  ) {
+    return false;
+  }
+  return true;
+};
+
 export const repairTerraformEdgeBindings = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
@@ -634,7 +691,7 @@ export const repairTerraformEdgeBindings = (
     addBoundEdge(rectA.id, element.id);
     addBoundEdge(rectB.id, element.id);
 
-    return newElementWith(element, {
+    const patch = {
       x: startX,
       y: startY,
       width: Math.abs(endX - startX),
@@ -646,14 +703,20 @@ export const repairTerraformEdgeBindings = (
       startBinding: {
         elementId: rectA.id,
         fixedPoint: startFixed,
-        mode: "orbit",
+        mode: "orbit" as const,
       },
       endBinding: {
         elementId: rectB.id,
         fixedPoint: endFixed,
-        mode: "orbit",
+        mode: "orbit" as const,
       },
-    });
+    };
+
+    if (arrowGeometryEqual(element, patch)) {
+      return element;
+    }
+
+    return newElementWith(element, patch);
   });
 
   return updated.map((element) => {
@@ -670,6 +733,15 @@ export const repairTerraformEdgeBindings = (
           type: "arrow",
         });
       }
+    }
+
+    if (
+      boundElements.length === (element.boundElements?.length ?? 0) &&
+      boundElements.every(
+        (entry, index) => element.boundElements?.[index]?.id === entry.id,
+      )
+    ) {
+      return element;
     }
 
     return newElementWith(element, { boundElements });

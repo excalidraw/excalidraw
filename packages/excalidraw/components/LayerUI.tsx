@@ -1079,11 +1079,19 @@ const LayerUI = ({
     let next = result.elements;
     if (pinReconcile) {
       next = reconcileTerraformVisibility(
-        repairTerraformEdgeBindings(next),
+        result.shouldRepairBindings ? repairTerraformEdgeBindings(next) : next,
         pinReconcile,
       );
     } else if (result.shouldRepairBindings) {
       next = repairTerraformEdgeBindings(next);
+    }
+
+    if (
+      !result.didChange &&
+      next.length === allElements.length &&
+      next.every((element, index) => element === allElements[index])
+    ) {
+      return;
     }
 
     if (
