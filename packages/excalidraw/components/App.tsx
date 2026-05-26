@@ -1301,7 +1301,6 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
-        this.state.activeTool.type === "drawShape" ||
         this.isIframeLikeElementCenter(
           hitElement,
           moveEvent,
@@ -1330,12 +1329,7 @@ class App extends React.Component<AppProps, AppState> {
       // panning
       isHoldingSpace ||
       // wrong tool
-      !oneOf(this.state.activeTool.type, [
-        "laser",
-        "drawShape",
-        "selection",
-        "lasso",
-      ])
+      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
     ) {
       return false;
     }
@@ -1381,7 +1375,6 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
-        this.state.activeTool.type === "drawShape" ||
         this.isIframeLikeElementCenter(
           hitElement,
           this.lastPointerUpEvent,
@@ -2138,8 +2131,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.newElement ||
           this.state.selectedElementsAreBeingDragged ||
           this.state.resizingElement ||
-          ((this.state.activeTool.type === "laser" ||
-            this.state.activeTool.type === "drawShape") &&
+          (this.state.activeTool.type === "laser" &&
             // technically we can just test on this once we make it more safe
             this.state.cursorButton === "down");
 
@@ -7079,7 +7071,6 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const { newElement } = this.state;
     if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
@@ -7303,13 +7294,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const isPressingAnyButton = Boolean(event.buttons);
     const isLaserTool = this.state.activeTool.type === "laser";
-    const isDrawShapeTool = this.state.activeTool.type === "drawShape";
     if (
       isPressingAnyButton ||
       // checking against laser so that if you mouseover with a laser tool
       // over a link/embeddable, we change the cursor
       (!isLaserTool &&
-        !isDrawShapeTool &&
         this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
@@ -7447,7 +7436,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else {
       hideHyperlinkToolip();
-      if (isLaserTool || isDrawShapeTool) {
+      if (isLaserTool) {
         return;
       }
       if (
@@ -8152,11 +8141,7 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (
-      !this.state.viewModeEnabled ||
-      this.state.activeTool.type === "laser" ||
-      this.state.activeTool.type === "drawShape"
-    ) {
+    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -13014,11 +12999,7 @@ class App extends React.Component<AppProps, AppState> {
     const pointer: CollaboratorPointer = {
       x: sceneX,
       y: sceneY,
-      tool:
-        this.state.activeTool.type === "laser" ||
-        this.state.activeTool.type === "drawShape"
-          ? "laser"
-          : "pointer",
+      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
     };
 
     this.props.onPointerUpdate?.({

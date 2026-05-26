@@ -320,9 +320,8 @@ export const actionFinalize = register<FormData>({
         ...appState,
         cursorButton: "up",
         activeTool:
-          ((appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
-            element) ||
+          appState.activeTool.locked ||
+          appState.activeTool.type === "freedraw" ||
           appState.activeTool.type === "drawShape"
             ? appState.activeTool
             : activeTool,
@@ -336,7 +335,8 @@ export const actionFinalize = register<FormData>({
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+          appState.activeTool.type !== "freedraw" &&
+          appState.activeTool.type !== "drawShape"
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,
