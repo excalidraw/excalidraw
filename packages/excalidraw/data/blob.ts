@@ -10,7 +10,7 @@ import {
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
-import { cleanAppStateForExport } from "../appState";
+import { clearAppStateForExport } from "../appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
@@ -169,7 +169,7 @@ export const loadSceneOrLibraryFromBlob = async (
             {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
-              ...cleanAppStateForExport(data.appState || {}),
+              ...clearAppStateForExport(data.appState || {}),
               ...(localAppState
                 ? calculateScrollCenter(data.elements || [], localAppState)
                 : {}),
