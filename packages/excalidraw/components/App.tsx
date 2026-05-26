@@ -272,7 +272,6 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  ExcalidrawNonSelectionElement,
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
@@ -11651,17 +11650,6 @@ class App extends React.Component<AppProps, AppState> {
                 this.actionManager.executeAction(actionFinalize, "ui", {
                   event: childEvent,
                   sceneCoords: { x, y },
-                });
-              } else {
-                flushSync(() => {
-                  this.setState({
-                    selectedElementIds: makeNextSelectedElementIds(
-                      { [detectedElement.id]: true },
-                      this.state,
-                    ),
-                    newElement:
-                      detectedElement as NonDeleted<ExcalidrawNonSelectionElement>,
-                  });
                 });
               }
             }
