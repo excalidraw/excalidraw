@@ -1046,13 +1046,10 @@ describe("terraformPlanParsing", () => {
         "aws_sqs_queue_policy",
         "aws_sqs_queue_redrive_allow_policy",
         "aws_sqs_queue_redrive_policy",
-        "terraform_data",
-        "terraform_data",
-        "terraform_data",
       ].sort(),
     );
-    expect(body.meta?.representedResourceCount).toBe(96);
-    expect(body.meta?.omittedResourceCount).toBe(3);
+    expect(body.meta?.representedResourceCount).toBe(99);
+    expect(body.meta?.omittedResourceCount).toBe(0);
 
     const zd = body.meta?.zoneRouteAnchorDebug as
       | Array<{
