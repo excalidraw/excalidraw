@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   classifyTerraformResourceChange,
   filterPlanByProviderFamily,
+  getProviderFamilyLabel,
   hasManagedResourcesForSemantic,
   partitionResourceChangesByProviderFamily,
+  sortedNonAwsProviderFamilies,
 } from "./terraformProviderClassification";
 
 describe("terraformProviderClassification", () => {
@@ -73,5 +75,24 @@ describe("terraformProviderClassification", () => {
     expect(filtered.resource_changes![0].address).toBe(
       "cloudflare_zone.example",
     );
+  });
+
+  it("sortedNonAwsProviderFamilies includes any non-AWS bucket", () => {
+    const buckets = partitionResourceChangesByProviderFamily({
+      resource_changes: [
+        { mode: "managed", type: "aws_vpc", address: "aws_vpc.main" },
+        {
+          mode: "managed",
+          type: "cloudflare_zone",
+          address: "cloudflare_zone.example",
+        },
+        { mode: "managed", type: "random_id", address: "random_id.x" },
+      ],
+    });
+    expect(sortedNonAwsProviderFamilies(buckets)).toEqual([
+      "cloudflare",
+      "other",
+    ]);
+    expect(getProviderFamilyLabel("other")).toBe("Other");
   });
 });
