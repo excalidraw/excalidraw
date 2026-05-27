@@ -70,6 +70,8 @@ import {
   actionZoomOut,
 } from "../actions/actionCanvas";
 
+import { createSuggestionEngine } from "./textAutocomplete";
+
 import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
@@ -420,8 +422,14 @@ export const textWysiwyg = ({
       }
 
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
+
+      // Keep the ghost overlay aligned with the textarea on zoom/scroll/etc.
+      // `syncGhostStyle` is defined after this function but invoked via the
+      // lazy ref so the lookup is safe.
+      syncGhostStyleRef?.();
     }
   };
+  let syncGhostStyleRef: (() => void) | null = null;
 
   const editable = document.createElement("textarea");
 
@@ -461,6 +469,131 @@ export const textWysiwyg = ({
   });
   editable.value = element.originalText;
   updateWysiwygStyle();
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Inline ghost-text autocomplete
+  //
+  // The overlay is a non-interactive <div> sitting in the same place as the
+  // textarea, with the same font/size/wrap/transform. It renders the text
+  // the user has already typed as a transparent span (taking up the same
+  // layout space), followed by a faded span containing the suggested
+  // completion — so the ghost text lines up perfectly with the cursor
+  // regardless of wrapping, RTL, or alignment.
+  // ──────────────────────────────────────────────────────────────────────
+  const suggestionEngine = createSuggestionEngine(app);
+  let currentSuggestion: string | null = null;
+  // When the user dismisses a suggestion (via Esc), we remember the textarea
+  // value at that moment so we don't immediately re-show the same suggestion
+  // from the keyup handler. The dismissal clears as soon as the value
+  // changes (a new keystroke → potentially a new suggestion).
+  let dismissedForValue: string | null = null;
+
+  const ghostOverlay = document.createElement("div");
+  ghostOverlay.classList.add("excalidraw-wysiwyg-ghost");
+  ghostOverlay.setAttribute("aria-hidden", "true");
+  Object.assign(ghostOverlay.style, {
+    position: "absolute",
+    pointerEvents: "none",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    boxSizing: "content-box",
+    display: "none",
+    zIndex: "var(--zIndex-wysiwyg)",
+  });
+
+  // Transparent span holds the already-typed text (takes layout space but
+  // is visually invisible) so the ghost span lands at the right position.
+  const ghostTypedSpan = document.createElement("span");
+  ghostTypedSpan.style.color = "transparent";
+  ghostTypedSpan.style.whiteSpace = "inherit";
+  const ghostSuggestionSpan = document.createElement("span");
+  ghostSuggestionSpan.style.opacity = "0.4";
+  ghostSuggestionSpan.style.whiteSpace = "inherit";
+  ghostOverlay.appendChild(ghostTypedSpan);
+  ghostOverlay.appendChild(ghostSuggestionSpan);
+
+  const syncGhostStyle = () => {
+    // Copy every style that influences text layout from the textarea so
+    // the ghost div lays out identically.
+    Object.assign(ghostOverlay.style, {
+      font: editable.style.font,
+      lineHeight: editable.style.lineHeight,
+      width: editable.style.width,
+      height: editable.style.height,
+      left: editable.style.left,
+      top: editable.style.top,
+      transform: editable.style.transform,
+      transformOrigin: editable.style.transformOrigin || "",
+      textAlign: editable.style.textAlign,
+      verticalAlign: editable.style.verticalAlign,
+      color: editable.style.color,
+      opacity: editable.style.opacity,
+      whiteSpace: editable.style.whiteSpace || "pre",
+      wordBreak: editable.style.wordBreak || "normal",
+      overflowWrap: editable.style.overflowWrap || "",
+      maxHeight: editable.style.maxHeight,
+      // For unbounded text the textarea is only as wide as the typed text,
+      // and `overflow: hidden` would clip our trailing ghost. We let the
+      // ghost extend visibly past the textarea's width.
+      overflow: "visible",
+    });
+    // For bounded text (wrapping), keep width strict so the ghost wraps
+    // identically. For unbounded text (single-line, no wrap) let the ghost
+    // extend past the box.
+    if (whiteSpace === "pre") {
+      ghostOverlay.style.width = "max-content";
+    }
+  };
+  syncGhostStyleRef = syncGhostStyle;
+
+  const updateGhostSuggestion = () => {
+    // Respect an explicit Esc dismissal until the user types something new.
+    if (dismissedForValue !== null && dismissedForValue === editable.value) {
+      return;
+    }
+    dismissedForValue = null;
+
+    const suggestion = suggestionEngine.getSuggestion(
+      editable.value,
+      editable.selectionStart,
+      element.id,
+    );
+    currentSuggestion = suggestion;
+    if (!suggestion) {
+      ghostOverlay.style.display = "none";
+      return;
+    }
+    syncGhostStyle();
+    ghostTypedSpan.textContent = editable.value;
+    ghostSuggestionSpan.textContent = suggestion;
+    ghostOverlay.style.display = "block";
+  };
+
+  const dismissGhostSuggestion = () => {
+    currentSuggestion = null;
+    ghostOverlay.style.display = "none";
+    dismissedForValue = editable.value;
+  };
+
+  const acceptGhostSuggestion = (): boolean => {
+    if (!currentSuggestion) {
+      return false;
+    }
+    const completion = currentSuggestion;
+    const insertAt = editable.selectionStart;
+    editable.value =
+      editable.value.slice(0, insertAt) +
+      completion +
+      editable.value.slice(insertAt);
+    const nextCaret = insertAt + completion.length;
+    editable.selectionStart = nextCaret;
+    editable.selectionEnd = nextCaret;
+    dismissGhostSuggestion();
+    // Fire input so the wysiwyg refreshes layout/onChange downstream.
+    editable.dispatchEvent(new Event("input"));
+    return true;
+  };
 
   const getCaretIndexFromInitialSceneCoords = () => {
     if (!initialCaretSceneCoords || !currentTextLayout) {
@@ -623,10 +756,38 @@ export const textWysiwyg = ({
         editable.selectionEnd = selectionStart;
       }
       onChange(editable.value);
+      updateGhostSuggestion();
     };
+
+    // Caret moves via arrow keys, mouse clicks, etc. don't fire `input`, so
+    // we listen on selection changes too — otherwise the ghost stays put
+    // when the user moves their cursor away from the end of the text.
+    editable.addEventListener("keyup", updateGhostSuggestion);
+    editable.addEventListener("mouseup", updateGhostSuggestion);
   }
 
   editable.onkeydown = (event) => {
+    // Accept an active ghost suggestion via Tab. We intercept this *before*
+    // the existing Tab→indent branch below so the indent only fires when
+    // there's no suggestion to accept.
+    if (
+      event.key === KEYS.TAB &&
+      !event.shiftKey &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      !event.isComposing &&
+      currentSuggestion
+    ) {
+      event.preventDefault();
+      acceptGhostSuggestion();
+      return;
+    }
+    // Esc dismisses the suggestion if one is showing; only when no
+    // suggestion is visible does it fall through to the existing submit.
+    if (event.key === KEYS.ESCAPE && currentSuggestion) {
+      event.preventDefault();
+      dismissGhostSuggestion();
+      return;
+    }
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
@@ -859,6 +1020,7 @@ export const textWysiwyg = ({
     unbindOnScroll();
 
     editable.remove();
+    ghostOverlay.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -1014,9 +1176,13 @@ export const textWysiwyg = ({
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
   });
   window.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+  const editorContainer = excalidrawContainer?.querySelector(
+    ".excalidraw-textEditorContainer",
+  );
+  editorContainer?.appendChild(editable);
+  // Append the ghost overlay AFTER the textarea so the textarea retains
+  // pointer interaction; the overlay has `pointer-events: none` regardless.
+  editorContainer?.appendChild(ghostOverlay);
 
   return handleSubmit;
 };
