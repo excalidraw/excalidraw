@@ -75,9 +75,6 @@ const terraformEdgesVisibilitySig = (els: readonly ExcalidrawElement[]) =>
     .sort()
     .join(";");
 
-const elementRefSig = (els: readonly ExcalidrawElement[]) =>
-  els.map((e) => `${e.id}:${e.version}`).join("|");
-
 /** Mirrors LayerUI terraform focus useEffect (pre-fix). */
 const runLayerUiTerraformPass = (
   elements: readonly ExcalidrawElement[],
@@ -114,16 +111,14 @@ const runLayerUiTerraformPass = (
     next.length === allElements.length &&
     next.every((element, index) => element === allElements[index]);
 
-  if (
-    !result.didChange &&
-    refStable
-  ) {
+  if (!result.didChange && refStable) {
     return { next, replaced: false, didChange: result.didChange };
   }
 
   if (
     !result.didChange &&
-    terraformEdgesVisibilitySig(next) === terraformEdgesVisibilitySig(allElements)
+    terraformEdgesVisibilitySig(next) ===
+      terraformEdgesVisibilitySig(allElements)
   ) {
     return { next, replaced: false, didChange: result.didChange };
   }
@@ -149,7 +144,7 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
       { semanticLayout: true },
     );
     const body = await res.json();
-    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+    const elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
       repairBindings: true,
     });
     const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };

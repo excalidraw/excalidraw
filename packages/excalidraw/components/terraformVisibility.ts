@@ -174,7 +174,8 @@ export const getTerraformPersistableElements = (
 
 export const isTerraformImportedScene = (
   elements: readonly ExcalidrawElement[],
-): boolean => elements.some((element) => element.customData?.terraform === true);
+): boolean =>
+  elements.some((element) => element.customData?.terraform === true);
 
 /** `"dependency"` | `"dataFlow"` | `"declaredDataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
