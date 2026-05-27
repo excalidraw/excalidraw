@@ -1,19 +1,23 @@
+# Manual re-run of tests only. On push/PR, tests run in ci.yml.
 name: Tests
 
 on:
-  push:
-    branches: master
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22
+          cache: yarn
+
       - name: Install and test
         run: |
-          yarn install
-          yarn test:app
+          yarn install --frozen-lockfile
+          yarn test:commit

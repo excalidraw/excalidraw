@@ -1,0 +1,126 @@
+# Mirrors local git hooks:
+#   pre-commit  → lint job (ESLint, Prettier, tsc)
+#   test:commit → test job (vitest)
+#   pre-push    → prepush job on pull requests (coverage, ESM build, size-limit)
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Prettier
+        run: yarn test:other
+
+      - name: ESLint
+        run: yarn test:code
+
+      - name: Typecheck
+        run: yarn test:typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Vitest
+        run: yarn vitest run --watch=false
+
+  terraform-presets:
+    name: Terraform preset seed
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Seed built-in presets from catalog
+        run: yarn seed:terraform-presets "${{ runner.temp }}/terraform-import-presets.db"
+
+  prepush:
+    name: Pre-push checks
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - lint
+      - test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test coverage
+        id: test_coverage
+        run: yarn test:coverage
+
+      - name: Report coverage on PR
+        if: always() && hashFiles('coverage/coverage-summary.json') != ''
+        uses: davelosert/vitest-coverage-report-action@2500dafcee7dd64f85ab689c0b83798a8359770e # v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Coverage summary missing
+        if: always() && hashFiles('coverage/coverage-summary.json') == ''
+        run: echo "::warning::coverage/coverage-summary.json was not generated (install or vitest may have failed before coverage was written)."
+
+      - name: Build @excalidraw/excalidraw ESM
+        run: yarn workspace @excalidraw/excalidraw run build:esm
+
+      - name: Bundle size limit
+        run: yarn workspace @excalidraw/excalidraw run check:size
+        env:
+          CI: true

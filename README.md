@@ -8,11 +8,8 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
   <a href="https://github.com/TusharSariya/excalidraw-tf/blob/master/LICENSE">
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg" />
   </a>
-  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml">
-    <img alt="Lint workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml/badge.svg" />
-  </a>
-  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml">
-    <img alt="Tests workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml/badge.svg" />
+  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/ci.yml/badge.svg" />
   </a>
   <img alt="Node 22+" src="https://img.shields.io/badge/node-22%2B-339933" />
   <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">

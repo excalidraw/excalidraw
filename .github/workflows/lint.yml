@@ -1,22 +1,25 @@
+# Manual re-run of lint only. On push/PR, lint runs in ci.yml.
 name: Lint
 
-on: pull_request
+on:
+  workflow_dispatch:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22
+          cache: yarn
 
       - name: Install and lint
         run: |
-          yarn install
+          yarn install --frozen-lockfile
           yarn test:other
           yarn test:code
           yarn test:typecheck
