@@ -33,12 +33,46 @@ import {
   buildNetworkingEdges,
 } from "./terraformDataFlowEdges";
 import {
-  buildSyntheticPlanFromTfstate,
-  isSyntheticPlanEmptyForSemantic,
-} from "./terraformStateToPlan";
-import { applyDeclaredDataFlow } from "./terraformDeclaredDataFlow";
+  filterPlanByProviderFamily,
+  getProviderFamilyLabel,
+  hasManagedResourcesForSemantic,
+  partitionResourceChangesByProviderFamily,
+  sortedNonAwsProviderFamilies,
+} from "./terraformProviderClassification";
+import {
+  buildProviderFamilyScene,
+  composeMultiProviderTopologyScene,
+  type ProviderTopologyBlock,
+} from "./terraformProviderLayout";
+import {
+  applyDeclaredDataFlow,
+  applyDeclaredDataFlowFromMany,
+  DECLARED_DATAFLOW_ORDERED_KEY,
+  type DeclaredDataFlowEdge,
+} from "./terraformDeclaredDataFlow";
+import {
+  mergeDotAdjacency,
+  mergePlanJsons,
+  mergePlanWithStates,
+  mergeSyntheticPlans,
+  parseRawStateJson,
+} from "./terraformImportMerge";
 
 import type { Graph } from "@dagrejs/graphlib";
+import type {
+  TerraformImportWarning,
+  TerraformPlanDotBundle,
+} from "./terraformImportMerge";
+
+export type { TerraformImportWarning, TerraformPlanDotBundle };
+
+export type TerraformPlanParsingSources = {
+  planDotBundles: TerraformPlanDotBundle[];
+  states: unknown[];
+  stateLabels?: (string | undefined)[];
+  tfdTexts: string[];
+  tfdLabels?: (string | undefined)[];
+};
 
 export { TERRAFORM_MODULE_TREE_KEY };
 
@@ -71,6 +105,7 @@ export type TerraformModuleTreeNode = {
 /** Nodes map may include {@link TERRAFORM_MODULE_TREE_KEY} alongside per-address graph nodes. */
 export type TerraformPlanNodesMap = Record<string, TerraformPlanGraphNode> & {
   [TERRAFORM_MODULE_TREE_KEY]?: TerraformModuleTreeNode;
+  [DECLARED_DATAFLOW_ORDERED_KEY]?: DeclaredDataFlowEdge[];
 };
 
 /** One semantic data-flow edge (mirrors backend `edges_data_flow` object shape). */
@@ -125,8 +160,13 @@ const stripTerraformAddressIndexes = (address = "") =>
 export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
-  /** Optional `.tfd` arrow-only dataflow overlay (see `terraformDeclaredDataFlow.ts`). */
+  /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
+};
+
+type BuildNodesMapOptions = {
+  priorStatePlans?: unknown[];
+  adjacency?: Record<string, string[]>;
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
@@ -310,141 +350,160 @@ function mergeRawTerraformStateIntoNodes(
  * Builds the same `nodes` map as local import (`loadPlan` → edges → `attachModuleTree`), for
  * tooling/tests that need vertex keys without rendering a scene.
  */
+function normalizeTfstateList(tfstate?: unknown | null | unknown[]): unknown[] {
+  if (Array.isArray(tfstate)) {
+    return tfstate;
+  }
+  if (tfstate != null) {
+    return [tfstate];
+  }
+  return [];
+}
+
 export function buildTerraformLocalImportNodesMap(
   plan: unknown,
   graph: Graph,
-  tfstate?: unknown | null,
-  options?: Pick<TerraformPlanParsingOptions, "dataflowLinks">,
+  tfstate?: unknown | null | unknown[],
+  options?: BuildNodesMapOptions,
 ): TerraformPlanNodesMap {
-  const adjacency = getAdjacencyListFromDot(graph);
+  const adjacency = options?.adjacency ?? getAdjacencyListFromDot(graph);
   const planTyped = plan as {
     resource_changes: { address: string }[];
     prior_state?: { values: { root_module: unknown } };
   };
   let nodes = loadPlan(planTyped);
-  nodes = mergeRawTerraformStateIntoNodes(nodes, tfstate);
+  for (const state of normalizeTfstateList(tfstate)) {
+    nodes = mergeRawTerraformStateIntoNodes(nodes, state);
+  }
   const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
   const nodes3 = buildNewEdges(nodes2, adjacency);
-  const nodes4 = buildExistingEdges(
-    nodes3,
-    planTyped as { prior_state: { values: { root_module: unknown } } },
-  );
+  let nodes4 = nodes3;
+  const priorPlans = options?.priorStatePlans?.length
+    ? options.priorStatePlans
+    : [planTyped];
+  for (const priorPlan of priorPlans) {
+    const root = (
+      priorPlan as { prior_state?: { values?: { root_module?: unknown } } }
+    )?.prior_state?.values?.root_module;
+    if (root) {
+      nodes4 = buildExistingEdges(
+        nodes4,
+        priorPlan as { prior_state: { values: { root_module: unknown } } },
+      );
+    }
+  }
   const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
   const withTree = attachModuleTree(sanitizedNodes);
   buildDataFlowEdges(withTree as Record<string, unknown>);
   buildNetworkingEdges(withTree as Record<string, unknown>);
-  if (options?.dataflowLinks?.trim()) {
-    applyDeclaredDataFlow(
-      withTree as Record<string, TerraformPlanGraphNode>,
-      options.dataflowLinks,
-    );
-  }
   return withTree;
 }
 
-/** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
-export const terraformPlanParsing = async (
-  planFile: File | null,
-  dotFile: File | null,
-  stateFile: File | null,
+/** Apply `.tfd` overlay after the nodes map is built; returns warning messages. */
+export function applyTfdOverlayToNodes(
+  nodes: TerraformPlanNodesMap,
+  tfdTexts: string[],
+  tfdLabels?: (string | undefined)[],
+  legacySingleText?: string,
+): string[] {
+  const texts = [
+    ...tfdTexts.filter((t) => t.trim()),
+    ...(legacySingleText?.trim() ? [legacySingleText] : []),
+  ];
+  if (texts.length === 0) {
+    return [];
+  }
+  if (texts.length === 1 && tfdTexts.length === 0 && legacySingleText) {
+    applyDeclaredDataFlow(
+      nodes as Record<string, TerraformPlanGraphNode>,
+      texts[0],
+    );
+    return [];
+  }
+  const { warnings } = applyDeclaredDataFlowFromMany(
+    nodes as Record<string, TerraformPlanGraphNode>,
+    texts,
+    tfdLabels,
+  );
+  return warnings;
+}
+
+function formatImportWarnings(
+  warnings: TerraformImportWarning[],
+  tfdWarnings: string[],
+): TerraformImportWarning[] {
+  const out = [...warnings];
+  for (const message of tfdWarnings) {
+    out.push({ code: "duplicate_tfd_bind", message });
+  }
+  return out;
+}
+
+function appendImportMeta(
+  meta: Record<string, unknown>,
+  sources: TerraformPlanParsingSources,
+  importWarnings: TerraformImportWarning[],
+) {
+  return {
+    ...meta,
+    importBundleCount: sources.planDotBundles.length,
+    importStateCount: sources.states.length,
+    importTfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
+    ...(importWarnings.length > 0 ? { importWarnings } : {}),
+  };
+}
+
+/** Multi-file local import (plans, states, `.tfd` overlays). */
+export const terraformPlanParsingFromSources = async (
+  sources: TerraformPlanParsingSources,
   options?: TerraformPlanParsingOptions,
 ) => {
   const semanticLayout = options?.semanticLayout === true;
+  const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
-  let dotText: string;
-  let tfstateForMerge: unknown | null = null;
+  let adjacency: Record<string, string[]>;
   let importSource: "plan" | "state-only" = "plan";
+  let sourcePlans: unknown[] = [];
+  const states = sources.states ?? [];
 
-  if (planFile && dotFile) {
-    const [planText, dotT, stateText] = await Promise.all([
-      planFile.text(),
-      dotFile.text(),
-      stateFile ? stateFile.text() : Promise.resolve(null),
-    ]);
-    dotText = dotT;
-    try {
-      plan = JSON.parse(planText);
-    } catch {
-      return new Response(
-        JSON.stringify({ error: "planFile must be valid JSON." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-    if (stateText) {
-      try {
-        const parsed = JSON.parse(stateText) as { resources?: unknown };
-        if (parsed && Array.isArray(parsed.resources)) {
-          tfstateForMerge = parsed;
-        } else {
-          return new Response(
-            JSON.stringify({
-              error:
-                'State file must be raw Terraform state JSON (top-level "resources" array), e.g. terraform state pull.',
-            }),
-            {
-              status: 400,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-        }
-      } catch {
-        return new Response(
-          JSON.stringify({ error: "stateFile must be valid JSON." }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
-    }
-  } else if (stateFile) {
-    const stateText = await stateFile.text();
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(stateText);
-    } catch {
-      return new Response(
-        JSON.stringify({ error: "stateFile must be valid JSON." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-    if (
-      !parsed ||
-      typeof parsed !== "object" ||
-      !Array.isArray((parsed as { resources?: unknown }).resources)
-    ) {
+  if (sources.planDotBundles.length === 0) {
+    if (states.length === 0) {
       return new Response(
         JSON.stringify({
           error:
-            'State-only import requires raw Terraform state JSON (top-level "resources" array), e.g. terraform state pull.',
+            "Upload at least one plan JSON + graph DOT pair, or one or more raw Terraform state files.",
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
-    plan = buildSyntheticPlanFromTfstate(parsed);
-    dotText = "digraph G {}\n";
-    tfstateForMerge = parsed;
+    const merged = mergeSyntheticPlans(
+      states,
+      sources.stateLabels ?? states.map((_, i) => `state ${i + 1}`),
+    );
+    plan = merged.plan;
+    importWarnings.push(...merged.warnings);
+    sourcePlans = merged.sourcePlans;
+    adjacency = {};
     importSource = "state-only";
   } else {
-    return new Response(
-      JSON.stringify({
-        error:
-          "Upload plan JSON + DOT together, or a raw Terraform state JSON file alone.",
-      }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    const plans = sources.planDotBundles.map((b) => b.plan);
+    const labels = sources.planDotBundles.map((b) => b.label);
+    const merged = mergePlanJsons(plans, labels);
+    plan = merged.plan;
+    importWarnings.push(...merged.warnings);
+    sourcePlans = merged.sourcePlans;
+    adjacency = mergeDotAdjacency(sources.planDotBundles.map((b) => b.dotText));
+    if (states.length > 0) {
+      const mergedWithState = mergePlanWithStates(
+        plan as Parameters<typeof mergePlanWithStates>[0],
+        sourcePlans,
+        states,
+        sources.stateLabels ?? states.map((_, i) => `state ${i + 1}`),
+        importWarnings,
+      );
+      plan = mergedWithState.plan;
+      sourcePlans = mergedWithState.sourcePlans;
+    }
   }
 
   if (semanticLayout) {
@@ -452,44 +511,58 @@ export const terraformPlanParsing = async (
     if (
       !Array.isArray(rc) ||
       rc.length === 0 ||
-      isSyntheticPlanEmptyForSemantic(
+      !hasManagedResourcesForSemantic(
         plan as { resource_changes?: Array<{ mode?: string; type?: string }> },
       )
     ) {
       return new Response(
         JSON.stringify({
           error:
-            "Semantic layout requires AWS resources in the plan or state file. Upload plan+dot or a state file with managed aws_* resources.",
+            "Semantic layout requires at least one managed resource in the plan or state file.",
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
   }
 
-  const graph = graphlibDot.read(dotText);
+  const graph = graphlibDot.read("digraph G {}\n");
 
   emitLocalParseDebug({
     phase: "init",
     plan,
-    state: tfstateForMerge,
-    graph,
+    states,
+    bundleCount: sources.planDotBundles.length,
   });
 
-  const adjacency = getAdjacencyListFromDot(graph);
-  emitLocalParseDebug({
-    phase: "parsedDot",
+  const tfdTexts = [
+    ...sources.tfdTexts.filter((t) => t.trim()),
+    ...(options?.dataflowLinks?.trim() ? [options.dataflowLinks] : []),
+  ];
+
+  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, states, {
     adjacency,
+    priorStatePlans: sourcePlans,
   });
 
-  const nodes5 = buildTerraformLocalImportNodesMap(
-    plan,
-    graph,
-    tfstateForMerge,
-    { dataflowLinks: options?.dataflowLinks },
+  const tfdWarnings = applyTfdOverlayToNodes(
+    nodes5,
+    sources.tfdTexts,
+    sources.tfdLabels,
+    options?.dataflowLinks,
   );
+
+  const hasTfdEdgeSyntax = tfdTexts.some((t) => /\S+\s*->\s*\S+/.test(t));
+  const declaredEdges = nodes5[DECLARED_DATAFLOW_ORDERED_KEY];
+  if (hasTfdEdgeSyntax && (!declaredEdges || declaredEdges.length === 0)) {
+    return new Response(
+      JSON.stringify({
+        error:
+          "Dataflow links (.tfd) could not be resolved to any resources in the merged import.",
+      }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   emitLocalParseDebug({
     phase: "planParsed_through_moduleTree",
     nodes: nodes5,
@@ -501,98 +574,153 @@ export const terraformPlanParsing = async (
   if (semanticLayout) {
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
-    const topoModel = extractTerraformTopologyFromPlan(semPlan);
-    const primaryZones = extractPrimaryTopologyZones(semPlan).map((z) => ({
-      ...z,
-      topologyZoneSource: "primary" as const,
-    }));
-    const supplementaryZones = extractSupplementarySubnetZones(
-      semPlan,
-      primaryZones,
-    ).map((z) => ({
-      ...z,
-      topologyZoneSource: "supplementary" as const,
-    }));
-    const zones = mergeSupplementarySubnetZonesByTier(
-      mergeSupplementarySubnetZonesSharedRouteTable(
-        [...primaryZones, ...supplementaryZones].sort((a, b) => {
-          if (a.accountId !== b.accountId) {
-            return a.accountId.localeCompare(b.accountId);
-          }
-          if (a.region !== b.region) {
-            return a.region.localeCompare(b.region);
-          }
-          if (a.vpcId !== b.vpcId) {
-            return a.vpcId.localeCompare(b.vpcId);
-          }
-          return a.subnetSignature.localeCompare(b.subnetSignature);
-        }),
-        semPlan,
-      ),
-      semPlan,
-    );
-    const regionalBuckets = extractRegionalTopologyPrimaries(semPlan);
-    const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(semPlan);
-    const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
-      computeInterfaceVpcEndpointZonePlacements(semPlan, zones);
-    const vpcEndpointBuckets =
-      filterVpcEndpointBucketsRemovingZonePlacedAddresses(
-        vpcEndpointBucketsRaw,
+    const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
+    const providerBuckets = partitionResourceChangesByProviderFamily(semPlan);
+
+    const providerBlocks: ProviderTopologyBlock[] = [];
+    let topoMeta: Record<string, unknown> = {
+      layoutEngine: "topology",
+      accountCount: 0,
+      regionCount: 0,
+      vpcCount: 0,
+      subnetCount: 0,
+      primaryResourceCount: 0,
+      regionalPrimaryCount: 0,
+      vpcEndpointCount: 0,
+      routeTableCount: 0,
+      dependencyEdgeCount: 0,
+    };
+    let layoutFiles: Record<string, unknown> | undefined;
+
+    const awsChanges = providerBuckets.get("aws") ?? [];
+    if (awsChanges.length > 0) {
+      const topoModel = extractTerraformTopologyFromPlan(awsPlan);
+      const primaryZones = extractPrimaryTopologyZones(awsPlan).map((z) => ({
+        ...z,
+        topologyZoneSource: "primary" as const,
+      }));
+      const supplementaryZones = extractSupplementarySubnetZones(
+        awsPlan,
+        primaryZones,
+      ).map((z) => ({
+        ...z,
+        topologyZoneSource: "supplementary" as const,
+      }));
+      const zones = mergeSupplementarySubnetZonesByTier(
+        mergeSupplementarySubnetZonesSharedRouteTable(
+          [...primaryZones, ...supplementaryZones].sort((a, b) => {
+            if (a.accountId !== b.accountId) {
+              return a.accountId.localeCompare(b.accountId);
+            }
+            if (a.region !== b.region) {
+              return a.region.localeCompare(b.region);
+            }
+            if (a.vpcId !== b.vpcId) {
+              return a.vpcId.localeCompare(b.vpcId);
+            }
+            return a.subnetSignature.localeCompare(b.subnetSignature);
+          }),
+          awsPlan,
+        ),
+        awsPlan,
+      );
+      const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
+      const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
+      const {
+        byZone: interfaceVpcEndpointZonePlacements,
         zonePlacedAddresses,
+      } = computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
+      const vpcEndpointBuckets =
+        filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+          vpcEndpointBucketsRaw,
+          zonePlacedAddresses,
+        );
+      const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
+      const rawVpcDefaultPlumbingBuckets =
+        extractVpcDefaultPlumbingBuckets(awsPlan);
+      const natZonePlacements = computeNatGatewayZonePlacements(awsPlan, zones);
+      const vpcDefaultPlumbingBuckets =
+        natZonePlacements.consumedAddresses.size === 0
+          ? rawVpcDefaultPlumbingBuckets
+          : rawVpcDefaultPlumbingBuckets
+              .map((b) => ({
+                ...b,
+                addresses: b.addresses.filter(
+                  (a) => !natZonePlacements.consumedAddresses.has(a),
+                ),
+              }))
+              .filter((b) => b.addresses.length > 0);
+      const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
+      const endpointSecurityGroupBuckets =
+        extractInterfaceEndpointSecurityGroupBuckets(
+          awsPlan,
+          vpcEndpointBucketsRaw,
+        );
+      const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
+        zones,
+        awsPlan,
       );
-    const routeTableBuckets = extractRouteTablesByVpc(semPlan);
-    const rawVpcDefaultPlumbingBuckets =
-      extractVpcDefaultPlumbingBuckets(semPlan);
-    const natZonePlacements = computeNatGatewayZonePlacements(semPlan, zones);
-    /**
-     * NAT/EIP that we placed inside their public-subnet zone (semantic AZ rendering) must NOT
-     * also appear on the VPC right edge via `appendVpcInternetEdgeRectangles`. Filter them out
-     * before the buckets reach the scene builder.
-     */
-    const vpcDefaultPlumbingBuckets =
-      natZonePlacements.consumedAddresses.size === 0
-        ? rawVpcDefaultPlumbingBuckets
-        : rawVpcDefaultPlumbingBuckets
-            .map((b) => ({
-              ...b,
-              addresses: b.addresses.filter(
-                (a) => !natZonePlacements.consumedAddresses.has(a),
-              ),
-            }))
-            .filter((b) => b.addresses.length > 0);
-    const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
-    const endpointSecurityGroupBuckets =
-      extractInterfaceEndpointSecurityGroupBuckets(
+      mergeTopologyModelWithPlacementZones(topoModel, zones);
+      mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
+      mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
+      mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
+      mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
+      mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
+      mergeTopologyModelWithRouteTables(
+        topoModel,
+        endpointSecurityGroupBuckets,
+      );
+
+      if (topoModel.accounts.size > 0) {
+        const topoScene = await buildTerraformTopologyExcalidrawScene(
+          topoModel,
+          zones,
+          regionalBuckets,
+          nodes5,
+          awsPlan,
+          vpcEndpointBuckets,
+          routeTableBottomPlacements,
+          vpcDefaultPlumbingBuckets,
+          vpcFlowLogBuckets,
+          endpointSecurityGroupBuckets,
+          natZonePlacements,
+          interfaceVpcEndpointZonePlacements,
+        );
+        if (topoScene.elements.length > 0) {
+          providerBlocks.push({
+            family: "aws",
+            label: "AWS",
+            elements: topoScene.elements,
+          });
+        }
+        topoMeta = { ...topoScene.meta };
+        if (topoScene.files && Object.keys(topoScene.files).length > 0) {
+          layoutFiles = topoScene.files;
+        }
+      }
+    }
+
+    for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
+      const changes = providerBuckets.get(family)!;
+      const providerScene = await buildProviderFamilyScene(
+        family,
+        getProviderFamilyLabel(family),
+        changes,
+        nodes5,
         semPlan,
-        vpcEndpointBucketsRaw,
       );
-    const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
-      zones,
-      semPlan,
-    );
-    mergeTopologyModelWithPlacementZones(topoModel, zones);
-    mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
-    mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
-    mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, endpointSecurityGroupBuckets);
-    const topoScene = await buildTerraformTopologyExcalidrawScene(
-      topoModel,
-      zones,
-      regionalBuckets,
-      nodes5,
-      semPlan,
-      vpcEndpointBuckets,
-      routeTableBottomPlacements,
-      vpcDefaultPlumbingBuckets,
-      vpcFlowLogBuckets,
-      endpointSecurityGroupBuckets,
-      natZonePlacements,
-      interfaceVpcEndpointZonePlacements,
-    );
+      if (providerScene.elements.length > 0) {
+        providerBlocks.push({
+          family,
+          label: getProviderFamilyLabel(family),
+          elements: providerScene.elements,
+        });
+      }
+    }
+
+    const composedElements = composeMultiProviderTopologyScene(providerBlocks);
     const represented = collectSemanticRepresentedResourceAddresses(
-      topoScene.elements as Array<{ customData?: Record<string, any> }>,
+      composedElements as Array<{ customData?: Record<string, any> }>,
       semPlan as {
         resource_changes?: Array<{ address?: string; type?: string }>;
       },
@@ -605,23 +733,26 @@ export const terraformPlanParsing = async (
     );
     emitLocalParseDebug({
       phase: "topologyLayout",
-      meta: topoScene.meta,
-      elementCount: topoScene.elements.length,
-      zoneRouteAnchorDebug: topoScene.meta.zoneRouteAnchorDebug,
+      meta: topoMeta,
+      elementCount: composedElements.length,
+      providerBlockCount: providerBlocks.length,
     });
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-      elements: topoScene.elements,
-      ...(topoScene.files && Object.keys(topoScene.files).length > 0
-        ? { files: topoScene.files }
-        : {}),
-      meta: {
-        ...topoScene.meta,
-        importSource,
-        plannedChanges: importSource !== "state-only",
-        representedResourceCount: represented.size,
-        omittedResourceCount: omittedSemanticResources.length,
-      },
+      elements: composedElements,
+      ...(layoutFiles ? { files: layoutFiles } : {}),
+      meta: appendImportMeta(
+        {
+          ...topoMeta,
+          importSource,
+          plannedChanges: importSource !== "state-only",
+          representedResourceCount: represented.size,
+          omittedResourceCount: omittedSemanticResources.length,
+          providerBlockCount: providerBlocks.length,
+        },
+        sources,
+        formatImportWarnings(importWarnings, tfdWarnings),
+      ),
     };
   } else {
     const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
@@ -633,11 +764,15 @@ export const terraformPlanParsing = async (
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: elkScene.elements,
-      meta: {
-        ...elkScene.meta,
-        importSource,
-        plannedChanges: importSource !== "state-only",
-      },
+      meta: appendImportMeta(
+        {
+          ...elkScene.meta,
+          importSource,
+          plannedChanges: importSource !== "state-only",
+        },
+        sources,
+        formatImportWarnings(importWarnings, tfdWarnings),
+      ),
     };
   }
 
@@ -645,6 +780,76 @@ export const terraformPlanParsing = async (
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
+};
+
+/** Single-file import API (delegates to {@link terraformPlanParsingFromSources}). */
+export const terraformPlanParsing = async (
+  planFile: File | null,
+  dotFile: File | null,
+  stateFile: File | null,
+  options?: TerraformPlanParsingOptions,
+) => {
+  const planDotBundles: TerraformPlanDotBundle[] = [];
+  const states: unknown[] = [];
+
+  if (planFile && dotFile) {
+    const [planText, dotText] = await Promise.all([
+      planFile.text(),
+      dotFile.text(),
+    ]);
+    try {
+      planDotBundles.push({
+        plan: JSON.parse(planText),
+        dotText,
+        label: planFile.name,
+      });
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "planFile must be valid JSON." }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+  } else if (planFile || dotFile) {
+    return new Response(
+      JSON.stringify({
+        error:
+          "Plan JSON and graph DOT must be selected together, or clear both and upload state file(s) alone.",
+      }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  if (stateFile) {
+    const stateText = await stateFile.text();
+    const parsed = parseRawStateJson(stateText);
+    if (!parsed.ok) {
+      return new Response(JSON.stringify({ error: parsed.error }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    states.push(parsed.state);
+  }
+
+  if (planDotBundles.length === 0 && states.length === 0) {
+    return new Response(
+      JSON.stringify({
+        error:
+          "Upload plan JSON + DOT together, or one or more raw Terraform state files.",
+      }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  return terraformPlanParsingFromSources(
+    {
+      planDotBundles,
+      states,
+      stateLabels: states.length ? [stateFile?.name] : undefined,
+      tfdTexts: [],
+    },
+    options,
+  );
 };
 
 const sanitizeDotNodeId = (nodeId = "") => {

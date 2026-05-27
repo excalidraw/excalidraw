@@ -55,6 +55,7 @@ packages/backend/terraform/terraform.tfvars.backup
 packages/backend/terraform/*.auto.tfvars
 packages/backend/terraform/crash.*
 packages/backend/terraform/cloudflare/*plan.json
+!packages/backend/terraform/cloudflare/cloudflare-plan.json
 # Generated fixture corpus outputs (plans, graphs, per-case terraform dirs — created by fixtures:corpus).
 packages/backend/terraform/.corpus/
 packages/backend/terraform/fixtures/states/**

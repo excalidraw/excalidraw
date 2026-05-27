@@ -12,22 +12,27 @@
 
 import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
 import {
+  getTerraformPersistableElements,
+  isTerraformImportedScene,
+} from "@excalidraw/excalidraw/components/terraformVisibility";
+import { stabilizeTerraformSceneAfterPersistence } from "@excalidraw/excalidraw/components/terraformRelationshipFocus";
+import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
   debounce,
 } from "@excalidraw/common";
 import {
   createStore,
-  entries,
   del,
+  entries,
+  get,
   getMany,
   set,
   setMany,
-  get,
 } from "idb-keyval";
 
-import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
 import { getNonDeletedElements } from "@excalidraw/element";
+import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -87,9 +92,18 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
+    const elementsToSave = isTerraformImportedScene(elements)
+      ? getTerraformPersistableElements(
+          stabilizeTerraformSceneAfterPersistence(
+            elements,
+            appState.viewBackgroundColor ?? "#ffffff",
+          ),
+        )
+      : getNonDeletedElements(elements);
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      JSON.stringify(elementsToSave),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,

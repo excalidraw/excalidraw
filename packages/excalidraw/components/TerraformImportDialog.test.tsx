@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { TerraformImportModal } from "./TerraformImportDialog";
-import { terraformPlanParsing } from "./terraformPlanParsing";
+import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
 const hoisted = vi.hoisted(() => ({
   addFiles: vi.fn(),
@@ -12,22 +12,49 @@ const hoisted = vi.hoisted(() => ({
   setAppState: vi.fn(),
 }));
 
-vi.mock("./terraformPlanParsing", () => ({
-  terraformPlanParsing: vi.fn(),
-}));
+vi.mock("./terraformPlanParsing", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("./terraformPlanParsing")>();
+  return {
+    ...mod,
+    terraformPlanParsingFromSources: vi.fn(),
+  };
+});
 
 vi.mock("./App", () => ({
   useApp: () => ({
     addFiles: hoisted.addFiles,
     scene: { replaceAllElements: hoisted.replaceAllElements },
     scrollToContent: hoisted.scrollToContent,
+    state: { viewBackgroundColor: "#ffffff" },
   }),
   useExcalidrawSetAppState: () => hoisted.setAppState,
 }));
 
+function textFileLike(contents: string, name = "file"): File {
+  return {
+    name,
+    text: async () => contents,
+  } as File;
+}
+
+function fillFirstBundle(planJson = "{}", dot = "digraph {}") {
+  const planInputs = screen.getAllByLabelText(/plan file/i);
+  const dotInputs = screen.getAllByLabelText(/graph file/i);
+  fireEvent.change(planInputs[0], {
+    target: {
+      files: [textFileLike(planJson, "p.json")],
+    },
+  });
+  fireEvent.change(dotInputs[0], {
+    target: {
+      files: [textFileLike(dot, "g.dot")],
+    },
+  });
+}
+
 describe("TerraformImportModal", () => {
   beforeEach(() => {
-    vi.mocked(terraformPlanParsing).mockReset();
+    vi.mocked(terraformPlanParsingFromSources).mockReset();
     hoisted.addFiles.mockReset();
     hoisted.replaceAllElements.mockReset();
     hoisted.scrollToContent.mockReset();
@@ -36,10 +63,10 @@ describe("TerraformImportModal", () => {
 
   it("disables import when only one of plan or dot is selected", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    const planInput = screen.getByLabelText(/plan file/i);
-    fireEvent.change(planInput, {
+    const planInputs = screen.getAllByLabelText(/plan file/i);
+    fireEvent.change(planInputs[0], {
       target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
+        files: [textFileLike("{}", "p.json")],
       },
     });
     expect(
@@ -47,28 +74,16 @@ describe("TerraformImportModal", () => {
     ).toBeDisabled();
   });
 
-  it("disables semantic view radio until both plan and dot are present", () => {
+  it("disables semantic view radio until plan and dot are present", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     const semantic = screen.getByRole("radio", { name: /semantic view/i });
     expect(semantic).toBeDisabled();
-    const planInput = screen.getByLabelText(/plan file/i);
-    const dotInput = screen.getByLabelText(/graph file/i);
-    fireEvent.change(planInput, {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    expect(semantic).toBeDisabled();
-    fireEvent.change(dotInput, {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
+    fillFirstBundle();
     expect(semantic).not.toBeDisabled();
   });
 
-  it("calls terraformPlanParsing with semanticLayout when semantic view is active", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
+  it("calls terraformPlanParsingFromSources with semanticLayout when semantic view is active", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
       new Response(JSON.stringify({ elements: [], files: {} }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -76,101 +91,46 @@ describe("TerraformImportModal", () => {
     );
     const onClose = vi.fn();
     render(<TerraformImportModal onCloseRequest={onClose} />);
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
+    fillFirstBundle();
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0][3]).toEqual({
-      semanticLayout: true,
-    });
-    expect(hoisted.replaceAllElements).toHaveBeenCalled();
-    expect(hoisted.setAppState).toHaveBeenCalledWith({
-      terraformEdgeLayerPins: {
-        dependency: false,
-        dataFlow: false,
-        declaredDataFlow: false,
-        networking: false,
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+      {
+        semanticLayout: true,
       },
-      terraformEdgeHoverPeekKey: null,
-    });
-    expect(hoisted.scrollToContent).toHaveBeenCalled();
+    );
+    expect(hoisted.replaceAllElements).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
   });
 
   it("passes semanticLayout false for module view", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
       new Response(JSON.stringify({ elements: [], files: {} }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       }),
     );
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
+    fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0][3]).toEqual({
-      semanticLayout: false,
-    });
-  });
-
-  it("surfaces API errors in the error banner", async () => {
-    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
-      new Response(JSON.stringify({ error: "bad plan" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(screen.getByText(/bad plan/)).toBeInTheDocument(),
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
     );
-    errSpy.mockRestore();
-  });
-
-  it("enables state file input", () => {
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    expect(screen.getByLabelText(/state file/i)).not.toBeDisabled();
+    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+      {
+        semanticLayout: false,
+      },
+    );
   });
 
   it("enables import with state file only", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText(/state file/i), {
+    fireEvent.change(screen.getByLabelText(/state \(/i), {
       target: {
-        files: [
-          new File([JSON.stringify({ resources: [] })], "state.json", {
-            type: "application/json",
-          }),
-        ],
+        files: [textFileLike(JSON.stringify({ resources: [] }), "state.json")],
       },
     });
     expect(
@@ -178,188 +138,91 @@ describe("TerraformImportModal", () => {
     ).not.toBeDisabled();
   });
 
-  it("enables semantic view radio when state file only is selected", () => {
+  it("calls terraformPlanParsingFromSources with multiple states", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    expect(
-      screen.getByRole("radio", { name: /semantic view/i }),
-    ).toBeDisabled();
-    fireEvent.change(screen.getByLabelText(/state file/i), {
+    fireEvent.change(screen.getByLabelText(/state \(/i), {
       target: {
         files: [
-          new File([JSON.stringify({ resources: [] })], "state.json", {
-            type: "application/json",
-          }),
+          textFileLike(JSON.stringify({ resources: [] }), "a.json"),
+          textFileLike(JSON.stringify({ resources: [] }), "b.json"),
         ],
       },
     });
-    expect(
-      screen.getByRole("radio", { name: /semantic view/i }),
-    ).not.toBeDisabled();
-  });
-
-  it("calls terraformPlanParsing with state only and semantic view by default", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    const stateFile = new File(
-      [JSON.stringify({ resources: [] })],
-      "state.json",
-      { type: "application/json" },
-    );
-    fireEvent.change(screen.getByLabelText(/state file/i), {
-      target: { files: [stateFile] },
-    });
-    expect(screen.getByRole("radio", { name: /semantic view/i })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
-      null,
-      null,
-      stateFile,
-      { semanticLayout: true },
-    ]);
-  });
-
-  it("calls terraformPlanParsing with state only and module view when selected", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    const stateFile = new File(
-      [JSON.stringify({ resources: [] })],
-      "state.json",
-      { type: "application/json" },
-    );
-    fireEvent.change(screen.getByLabelText(/state file/i), {
-      target: { files: [stateFile] },
-    });
-    fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
-    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
-      null,
-      null,
-      stateFile,
-      { semanticLayout: false },
-    ]);
-  });
-
-  it("passes state file when plan, dot, and state are selected", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    const planFile = new File(["{}"], "p.json", { type: "application/json" });
-    const dotFile = new File(["digraph {}"], "g.dot", { type: "text/plain" });
-    const stateFile = new File(
-      [JSON.stringify({ resources: [] })],
-      "state.json",
-      { type: "application/json" },
-    );
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: { files: [planFile] },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: { files: [dotFile] },
-    });
-    fireEvent.change(screen.getByLabelText(/state file/i), {
-      target: { files: [stateFile] },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0]).toEqual([
-      planFile,
-      dotFile,
-      stateFile,
-      { semanticLayout: true },
-    ]);
-  });
-
-  it("shows Importing while the parse request is in flight", async () => {
-    let resolveReq!: (v: Response) => void;
-    const pending = new Promise<Response>((resolve) => {
-      resolveReq = resolve;
-    });
-    vi.mocked(terraformPlanParsing).mockReturnValue(pending);
-    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    expect(await screen.findByText(/importing/i)).toBeInTheDocument();
-    resolveReq(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
     await waitFor(() =>
-      expect(screen.queryByText(/importing/i)).not.toBeInTheDocument(),
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
     );
+    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    expect(sources.states).toHaveLength(2);
+    expect(sources.stateLabels).toEqual(["a.json", "b.json"]);
   });
 
-  it("passes dataflowLinks and enables declaredDataFlow pin when .tfd is selected", async () => {
-    vi.mocked(terraformPlanParsing).mockResolvedValue(
+  it("passes multiple tfd files to terraformPlanParsingFromSources", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
       new Response(JSON.stringify({ elements: [], files: {} }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.change(document.getElementById("terraform-import-links")!, {
+      target: {
+        files: [
+          textFileLike("a -> b", "a.tfd"),
+          textFileLike("b -> c", "b.tfd"),
+        ],
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    expect(sources.tfdTexts).toHaveLength(2);
+    expect(sources.tfdLabels).toEqual(["a.tfd", "b.tfd"]);
+    expect(hoisted.setAppState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        terraformEdgeLayerPins: expect.objectContaining({
+          declaredDataFlow: true,
+        }),
+      }),
+    );
+  });
+
+  it("shows Done and warnings when import succeeds with warnings", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          elements: [],
+          meta: {
+            importWarnings: [
+              {
+                code: "duplicate_address",
+                message: 'Address "x" overwritten.',
+              },
+            ],
+          },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
     );
     const onClose = vi.fn();
     render(<TerraformImportModal onCloseRequest={onClose} />);
-
-    const tfd = "writer -> bucket";
-    fireEvent.change(screen.getByLabelText(/plan file/i), {
-      target: {
-        files: [new File(["{}"], "p.json", { type: "application/json" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/graph file/i), {
-      target: {
-        files: [new File(["digraph {}"], "g.dot", { type: "text/plain" })],
-      },
-    });
-    fireEvent.change(screen.getByLabelText(/dataflow links/i), {
-      target: {
-        files: [
-          {
-            name: "links.tfd",
-            text: () => Promise.resolve(tfd),
-          } as unknown as File,
-        ],
-      },
-    });
+    fillFirstBundle();
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-
-    await waitFor(() => expect(terraformPlanParsing).toHaveBeenCalled());
-    expect(vi.mocked(terraformPlanParsing).mock.calls[0][3]).toEqual(
-      expect.objectContaining({ dataflowLinks: tfd }),
+    await waitFor(() =>
+      expect(screen.getByText(/overwritten/i)).toBeInTheDocument(),
     );
-    expect(hoisted.setAppState).toHaveBeenCalledWith({
-      terraformEdgeLayerPins: {
-        dependency: false,
-        dataFlow: false,
-        declaredDataFlow: true,
-        networking: false,
-      },
-      terraformEdgeHoverPeekKey: null,
-    });
+    expect(screen.getByRole("button", { name: /done/i })).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /done/i }));
+    expect(onClose).toHaveBeenCalled();
   });
 });

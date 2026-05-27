@@ -435,6 +435,8 @@ import { tryParseSpreadsheet } from "../charts";
 
 import {
   buildTerraformReconcileOptionsForAppState,
+  isTerraformResourceHoverTarget,
+  shouldPreserveTerraformResourceHover,
   syncTerraformDetachedResourceLabelsWithDraggedCards,
   toggleTerraformExplode,
 } from "./terraformVisibility";
@@ -769,6 +771,7 @@ class App extends React.Component<AppProps, AppState> {
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
+  private clearTerraformHoverRafId = 0;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
@@ -3297,6 +3300,7 @@ class App extends React.Component<AppProps, AppState> {
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
+    this.cancelClearTerraformResourceHover();
     this.unmounted = true;
     this.removeEventListeners();
     this.library.destroy();
@@ -7444,19 +7448,48 @@ class App extends React.Component<AppProps, AppState> {
         hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
       }));
     } else if (
-      // Terraform cards: keep hover highlight so explode affordance stays discoverable.
-      hitElement?.customData?.terraformVisibilityRole === "resource"
+      // Terraform cards, labels, and AWS icon glyphs share hover focus.
+      isTerraformResourceHoverTarget(hitElement)
     ) {
+      this.cancelClearTerraformResourceHover();
       this.setState((prevState) => ({
         hoveredElementIds: updateStable(prevState.hoveredElementIds, {
-          [hitElement.id]: true,
+          [hitElement!.id]: true,
         }),
       }));
+    } else if (shouldPreserveTerraformResourceHover(hitElement)) {
+      this.cancelClearTerraformResourceHover();
     } else if (Object.keys(this.state.hoveredElementIds).length > 0) {
-      this.setState((prevState) => ({
-        hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
-      }));
+      this.scheduleClearTerraformResourceHover();
     }
+  };
+
+  private cancelClearTerraformResourceHover = () => {
+    if (this.clearTerraformHoverRafId) {
+      cancelAnimationFrame(this.clearTerraformHoverRafId);
+      this.clearTerraformHoverRafId = 0;
+    }
+  };
+
+  /** Defer hover clear one frame so card→card moves do not reset focus between targets. */
+  private scheduleClearTerraformResourceHover = () => {
+    if (this.clearTerraformHoverRafId) {
+      cancelAnimationFrame(this.clearTerraformHoverRafId);
+    }
+    this.clearTerraformHoverRafId = requestAnimationFrame(() => {
+      this.clearTerraformHoverRafId = 0;
+      if (this.unmounted) {
+        return;
+      }
+      this.setState((prevState) => {
+        if (Object.keys(prevState.hoveredElementIds).length === 0) {
+          return null;
+        }
+        return {
+          hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
+        };
+      });
+    });
   };
 
   private handleEraser = (
