@@ -362,19 +362,15 @@ const LayerUI = ({
                   width: "80%",
                   height: "22px",
                   borderRadius: "11px",
-                  background: appState.theme === "dark" 
-                    ? "linear-gradient(to bottom, #3b354d 0%, #2e2a3c 45%, #1d1a26 100%)" 
-                    : "linear-gradient(to bottom, #f5f4ff 0%, #e0dfff 45%, #c8c5f5 100%)",
-                  border: appState.theme === "dark" 
-                    ? "1px solid rgba(61, 56, 82, 0.8)" 
-                    : "1px solid rgba(178, 175, 240, 0.8)",
-                  boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: appState.theme === "dark" ? "#2e2a3c" : "#e0dfff",
+                  border: "none",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.06)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: isDragging ? "grabbing" : "grab",
                   userSelect: "none",
-                  color: "var(--text-primary-color)",
+                  color: appState.theme === "dark" ? "#ebdfff" : "#0d006a",
                   opacity: 0.9,
                 }}
               >
@@ -434,23 +430,19 @@ const LayerUI = ({
                 title={`Properties (Drag to move, Double click to reset)`}
                 style={{
                   width: "90%",
-                  borderRadius: "20px",
-                  background: appState.theme === "dark" 
-                    ? "linear-gradient(to bottom, #3b354d 0%, #2e2a3c 40%, #1d1a26 100%)" 
-                    : "linear-gradient(to bottom, #f5f4ff 0%, #e0dfff 40%, #c8c5f5 100%)",
-                  border: appState.theme === "dark" 
-                    ? "1px solid rgba(61, 56, 82, 0.8)" 
-                    : "1px solid rgba(178, 175, 240, 0.8)",
-                  boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)",
+                  borderRadius: "18px",
+                  backgroundColor: appState.theme === "dark" ? "#2e2a3c" : "#e0dfff",
+                  border: "none",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "5px 14px",
+                  padding: "6px 14px",
                   cursor: isDragging ? "grabbing" : "grab",
                   userSelect: "none",
                   fontSize: "0.75rem",
                   fontWeight: 700,
-                  color: appState.theme === "dark" ? "#ebdfff" : "#3b2e75",
+                  color: appState.theme === "dark" ? "#ebdfff" : "#0d006a",
                   opacity: 0.95,
                 }}
               >
@@ -494,7 +486,7 @@ const LayerUI = ({
                       opacity: 0.7,
                       padding: "1px 6px",
                       borderRadius: "10px",
-                      background: appState.theme === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)",
+                      background: appState.theme === "dark" ? "rgba(255,255,255,0.12)" : "rgba(13, 0, 106, 0.08)",
                       color: "inherit",
                       transition: "opacity 0.2s",
                     }}
