@@ -1,24 +1,15 @@
-import {
-  getCenterForBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 import {
   newArrowElement,
   newElement,
   newLinearElement,
 } from "@excalidraw/element/newElement";
-import { polygonIsClosed } from "@excalidraw/math/polygon";
-import {
-  angleBetween,
-  degreesToRadians,
-  pointDistance,
-} from "@excalidraw/math";
 import { getElementBoundsFromPoints, ROUNDNESS } from "@excalidraw/common";
-import { simplify } from "points-on-curve";
+import { pointFrom } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Degrees, LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
 import type {
   ExcalidrawArrowElement,
@@ -44,305 +35,420 @@ type Shape =
   | ExcalidrawFreeDrawElement["type"];
 
 interface ShapeRecognitionResult {
+  // The type of the recognized shape, or "freedraw" if no good match was found
   type: Shape;
-  simplified: readonly LocalPoint[];
+
+  // The original input points (not simplified)
+  points: readonly LocalPoint[];
+
+  // Bounding box of the original input points, used for positioning the converted shape
   boundingBox: Bounds;
 }
 
-const QUADRILATERAL_SIDES = 4;
-const QUADRILATERAL_MIN_POINTS = 4; // RDP simplified vertices
-const QUADRILATERAL_MAX_POINTS = 5; // RDP might include closing point
-const ARROW_EXPECTED_POINTS = 5; // RDP simplified vertices for arrow shape
-const LINE_EXPECTED_POINTS = 2; // RDP simplified vertices for line shape
+// IDEA: Protractor recognizer (Yang Li, 2010), simplified, rotation-invariant.
+//
+// We skip Golden Section Search and instead zero-out orientation by rotating
+// each stroke to its indicative angle before matching, which is sufficient
+// when no rotation invariance is required.
 
-const DEFAULT_OPTIONS = {
-  // Max distance between stroke start/end (as % of bbox diagonal) to consider closed
-  shapeIsClosedPercentThreshold: 20,
-  // Min distance (px) to consider shape closed (takes precedence if larger than %)
-  shapeIsClosedDistanceThreshold: 10,
-  // RDP simplification tolerance (% of bbox diagonal)
-  rdpTolerancePercent: 10,
-  // Arrow specific thresholds
-  arrowMinTipAngle: 30, // Min angle degrees for the tip
-  arrowMaxTipAngle: 150, // Max angle degrees for the tip
-  arrowHeadMaxShaftRatio: 0.8, // Max length ratio of arrowhead segment to shaft
-  // Quadrilateral specific thresholds
-  rectangleMinCornerAngle: 20, // Min deviation from 180 degrees for a valid corner
-  rectangleMaxCornerAngle: 160, // Max deviation from 0 degrees for a valid corner
-  rectangleOrientationAngleThreshold: 10, // Angle difference (degrees) to nearest 0/90 orientation to classify as rectangle
-  // Max variance in radius (normalized) to consider a shape an ellipse
-  ellipseRadiusVarianceThreshold: 0.5,
-} as const; // Use 'as const' for stricter typing of default values
+// Number of resampled points used for every template and candidate.
+const PROTRACTOR_N = 64;
 
-// Options for shape recognition, allowing partial overrides
-type ShapeRecognitionOptions = typeof DEFAULT_OPTIONS;
-type PartialShapeRecognitionOptions = Partial<ShapeRecognitionOptions>;
+// Side length of the reference square used for scaling.
+const PROTRACTOR_SQUARE_SIZE = 250;
 
-interface QuadrilateralSides {
-  length: number;
-  angleRad: number; // Angle in radians [0, π) representing the line's orientation
-}
+// Minimum score (0–1) required to commit to a shape; below that we assume freedraw.
+const PROTRACTOR_SCORE_THRESHOLD = 0.75;
 
-/**
- * Calculates the properties (length, angle) of segments in a polygon.
- */
-function calculateQuadrilateralSides(
-  vertices: readonly LocalPoint[],
-): QuadrilateralSides[] {
-  const segments: QuadrilateralSides[] = [];
-  const numVertices = vertices.length;
-  for (let i = 0; i < numVertices; i++) {
-    const p1 = vertices[i];
-    // Ensure wrapping for the last segment connecting back to the start
-    const p2 = vertices[(i + 1) % numVertices];
-    const dx = p2[0] - p1[0];
-    const dy = p2[1] - p1[1];
-    const length = Math.hypot(dx, dy);
+type Vec = Float64Array; // interleaved [x0, y0, x1, y1, …] of length 2*N
 
-    // Calculate angle in radians [0, 2π)
-    let angleRad = Math.atan2(dy, dx);
-    if (angleRad < 0) {
-      angleRad += 2 * Math.PI;
-    }
-
-    // Normalize angle to [0, π) for undirected line orientation
-    if (angleRad >= Math.PI) {
-      angleRad -= Math.PI;
-    }
-
-    segments.push({ length, angleRad });
-  }
-  return segments;
-}
-
-/**
- * Checks if a quadrilateral is likely axis-aligned based on its segment angles.
- */
-function isAxisAligned(
-  sides: QuadrilateralSides[],
-  orientationThreshold: number,
-): boolean {
-  return sides.some((seg) => {
-    const angle = seg.angleRad;
-    // Distance to horizontal (0 or π radians)
-    const distToHoriz = Math.min(angle, Math.PI - angle);
-    // Distance to vertical (π/2 radians)
-    const distToVert = Math.abs(angle - Math.PI / 2);
-    return (
-      distToHoriz < orientationThreshold || distToVert < orientationThreshold
+// Resample `pts` to exactly `n` evenly-spaced points along the stroke path.
+function resample(pts: readonly LocalPoint[], n: number): LocalPoint[] {
+  let totalLen = 0;
+  for (let i = 1; i < pts.length; i++) {
+    totalLen += Math.hypot(
+      pts[i][0] - pts[i - 1][0],
+      pts[i][1] - pts[i - 1][1],
     );
+  }
+
+  const interval = totalLen / (n - 1);
+  let accumulated = 0;
+  const result: LocalPoint[] = [pts[0]];
+  let prev = pts[0];
+
+  for (let i = 1; i < pts.length; i++) {
+    const curr = pts[i];
+    const segLen = Math.hypot(curr[0] - prev[0], curr[1] - prev[1]);
+    if (accumulated + segLen >= interval) {
+      // Insert interpolated points within this segment
+      let remaining = interval - accumulated;
+      while (remaining <= segLen + 1e-10) {
+        const t = remaining / segLen;
+        const newPt: LocalPoint = [
+          prev[0] + t * (curr[0] - prev[0]),
+          prev[1] + t * (curr[1] - prev[1]),
+        ] as LocalPoint;
+        result.push(newPt);
+        if (result.length === n) {
+          return result;
+        }
+        prev = newPt;
+        accumulated = 0;
+        remaining += interval;
+      }
+      accumulated = segLen - (remaining - interval);
+    } else {
+      accumulated += segLen;
+    }
+    prev = curr;
+  }
+
+  // Fill any remaining slots with the last point (rounding errors)
+  while (result.length < n) {
+    result.push(pts[pts.length - 1]);
+  }
+  return result;
+}
+
+// Translate points so their centroid is at the origin.
+function translateToOrigin(pts: LocalPoint[]): LocalPoint[] {
+  let cx = 0;
+  let cy = 0;
+  for (const p of pts) {
+    cx += p[0];
+    cy += p[1];
+  }
+  cx /= pts.length;
+  cy /= pts.length;
+  return pts.map(([x, y]) => [x - cx, y - cy] as LocalPoint);
+}
+
+// Scale points to fit inside a square of `size` centred at origin.
+function scaleTo(pts: LocalPoint[], size: number): LocalPoint[] {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of pts) {
+    if (x < minX) {
+      minX = x;
+    }
+    if (y < minY) {
+      minY = y;
+    }
+    if (x > maxX) {
+      maxX = x;
+    }
+    if (y > maxY) {
+      maxY = y;
+    }
+  }
+  const w = maxX - minX;
+  const h = maxY - minY;
+  const scale = size / Math.max(w, h);
+  return pts.map(([x, y]) => [x * scale, y * scale] as LocalPoint);
+}
+
+// Rotate points by `angle` radians around the origin.
+// Used to zero-out the indicative angle of each stroke.
+function rotateBy(pts: LocalPoint[], angle: number): LocalPoint[] {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return pts.map(
+    ([x, y]) => [x * cos - y * sin, x * sin + y * cos] as LocalPoint,
+  );
+}
+
+// Vectorise a point sequence: translate to origin, scale, optionally rotate to
+// indicative angle = 0, then flatten to an interleaved Float64Array
+// normalised to unit length (required by the Protractor distance formula).
+//
+// rotationInvariant=true zeros out the indicative angle so the match is
+// independent of drawing start position (needed for ellipses).
+// rotationInvariant=false preserves absolute orientation so that rotationally
+// distinct shapes (rectangle vs. diamond) remain distinguishable.
+function vectorise(pts: LocalPoint[], rotationInvariant = false): Vec {
+  let processed = translateToOrigin(pts);
+  processed = scaleTo(processed, PROTRACTOR_SQUARE_SIZE);
+
+  if (rotationInvariant) {
+    // Indicative angle: angle from centroid (already at origin) to first point
+    const indicativeAngle = Math.atan2(processed[0][1], processed[0][0]);
+    processed = rotateBy(processed, -indicativeAngle);
+  }
+
+  const v = new Float64Array(processed.length * 2);
+  let sum = 0;
+  for (let i = 0; i < processed.length; i++) {
+    v[2 * i] = processed[i][0];
+    v[2 * i + 1] = processed[i][1];
+    sum += processed[i][0] ** 2 + processed[i][1] ** 2;
+  }
+  const mag = Math.sqrt(sum);
+  for (let i = 0; i < v.length; i++) {
+    v[i] /= mag;
+  }
+  return v;
+}
+
+// Optimal Cosine Distance between two unit vectors.
+// Since we assume no rotation (indicative angle already zeroed out) we
+// compute only the aligned dot product — no Golden Section Search needed.
+// Returns a score in [0, 1] where 1 = perfect match.
+function optimalCosineDistance(v1: Vec, v2: Vec): number {
+  let dot = 0;
+  for (let i = 0; i < v1.length; i++) {
+    dot += v1[i] * v2[i];
+  }
+  // dot ∈ [-1, 1]; map to score in [0, 1]
+  return (dot + 1) / 2;
+}
+
+// ---------------------------------------------------------------------------
+// Template library — canonical point sequences for each shape
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a template for a rectangle drawn clockwise.
+ * startCorner selects which corner (0=TL, 1=TR, 2=BR, 3=BL) the stroke begins from.
+ */
+function makeRectangleTemplate(startCorner: number = 0): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  const allCorners: LocalPoint[] = [
+    pointFrom<LocalPoint>(-s, -s),
+    pointFrom<LocalPoint>(s, -s),
+    pointFrom<LocalPoint>(s, s),
+    pointFrom<LocalPoint>(-s, s),
+  ];
+  const corners: LocalPoint[] = [
+    ...allCorners.slice(startCorner),
+    ...allCorners.slice(0, startCorner),
+  ];
+  const pts: LocalPoint[] = [];
+  const perSide = Math.floor(PROTRACTOR_N / 4);
+  for (let side = 0; side < 4; side++) {
+    const from = corners[side];
+    const to = corners[(side + 1) % 4];
+    for (let k = 0; k < perSide; k++) {
+      const t = k / perSide;
+      pts.push([
+        from[0] + t * (to[0] - from[0]),
+        from[1] + t * (to[1] - from[1]),
+      ] as LocalPoint);
+    }
+  }
+  while (pts.length < PROTRACTOR_N) {
+    pts.push(corners[0]);
+  }
+  return pts;
+}
+
+/**
+ * Build a template for a diamond drawn clockwise.
+ * startCorner selects which vertex (0=Top, 1=Right, 2=Bottom, 3=Left) the stroke begins from.
+ */
+function makeDiamondTemplate(startCorner: number = 0): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  const allCorners: LocalPoint[] = [
+    pointFrom<LocalPoint>(0, -s),
+    pointFrom<LocalPoint>(s, 0),
+    pointFrom<LocalPoint>(0, s),
+    pointFrom<LocalPoint>(-s, 0),
+  ];
+  const corners: LocalPoint[] = [
+    ...allCorners.slice(startCorner),
+    ...allCorners.slice(0, startCorner),
+  ];
+  const pts: LocalPoint[] = [];
+  const perSide = Math.floor(PROTRACTOR_N / 4);
+  for (let side = 0; side < 4; side++) {
+    const from = corners[side];
+    const to = corners[(side + 1) % 4];
+    for (let k = 0; k < perSide; k++) {
+      const t = k / perSide;
+      pts.push([
+        from[0] + t * (to[0] - from[0]),
+        from[1] + t * (to[1] - from[1]),
+      ] as LocalPoint);
+    }
+  }
+  while (pts.length < PROTRACTOR_N) {
+    pts.push(corners[0]);
+  }
+  return pts;
+}
+
+/**
+ * Build a template for an ellipse (circle) sampled uniformly.
+ * startAngle shifts the starting position so multiple templates can cover
+ * all common drawing start positions without needing rotation normalisation.
+ */
+function makeEllipseTemplate(startAngle: number = 0): LocalPoint[] {
+  const r = PROTRACTOR_SQUARE_SIZE / 2;
+  return Array.from({ length: PROTRACTOR_N }, (_, i) => {
+    const angle = startAngle + (2 * Math.PI * i) / PROTRACTOR_N;
+    return [r * Math.cos(angle), r * Math.sin(angle)] as LocalPoint;
+  });
+}
+
+/** Build a template for a straight line (left → right). */
+function makeLineTemplate(): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  return Array.from({ length: PROTRACTOR_N }, (_, i) => {
+    const t = i / (PROTRACTOR_N - 1);
+    return [-s + t * PROTRACTOR_SQUARE_SIZE, 0] as LocalPoint;
   });
 }
 
 /**
- * Calculates the variance of the distance from points to a center point.
- * Returns a normalized variance value (0 = perfectly round).
+ * Build a template for an arrow: a shaft from left to right, then a V-shaped
+ * arrowhead pointing right.  The path is:
+ *   start → arrowhead base (on shaft, near tip)
+ *   → tip → back to arrowhead base → shaft end (tip)
+ * Drawn as a single continuous stroke: left → right, back-left-up, right-tip, back-left-down.
  */
-function calculateRadiusVariance(
-  points: readonly LocalPoint[],
-  boundingBox: Bounds,
-): number {
-  if (points.length === 0) {
-    return 0; // Or handle as an error/special case
+function makeArrowTemplate(): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  const tipX = s;
+  const headLen = s * 0.35;
+  const headAngle = Math.PI / 6; // 30°
+
+  // Shaft: from (-s, 0) to (s, 0)
+  const shaftPts = Math.floor(PROTRACTOR_N * 0.5);
+  // Arrowhead: tip→ upper base → back to tip → lower base
+  const headPts = PROTRACTOR_N - shaftPts;
+  const perHead = Math.floor(headPts / 2);
+
+  const pts: LocalPoint[] = [];
+  for (let i = 0; i < shaftPts; i++) {
+    const t = i / (shaftPts - 1);
+    pts.push([-s + t * (tipX - -s), 0] as LocalPoint);
   }
 
-  // Not necessarily the element rotation center - freedraw elements are not rotated by default
-  const [cx, cy] = getCenterForBounds(boundingBox);
-
-  let totalDist = 0;
-  let maxDist = 0;
-  let minDist = Infinity;
-
-  for (const p of points) {
-    const d = Math.hypot(p[0] - cx, p[1] - cy);
-    totalDist += d;
-    maxDist = Math.max(maxDist, d);
-    minDist = Math.min(minDist, d);
+  // Upper arm: tip → upper-left
+  const ux = tipX - headLen * Math.cos(headAngle);
+  const uy = -headLen * Math.sin(headAngle);
+  for (let i = 0; i < perHead; i++) {
+    const t = i / (perHead - 1);
+    pts.push([tipX + t * (ux - tipX), t * uy] as LocalPoint);
   }
 
-  const avgDist = totalDist / points.length;
-
-  // Avoid division by zero if avgDist is 0 (e.g., all points are at the center)
-  if (avgDist === 0) {
-    return 0;
+  // Lower arm: tip → lower-left (back to tip first)
+  const lx = tipX - headLen * Math.cos(headAngle);
+  const ly = headLen * Math.sin(headAngle);
+  const remaining = PROTRACTOR_N - pts.length;
+  for (let i = 0; i < remaining; i++) {
+    const t = i / Math.max(remaining - 1, 1);
+    pts.push([tipX + t * (lx - tipX), t * ly] as LocalPoint);
   }
 
-  const radiusVariance = (maxDist - minDist) / avgDist;
-  return radiusVariance;
+  while (pts.length < PROTRACTOR_N) {
+    pts.push(pts[pts.length - 1]);
+  }
+  return pts.slice(0, PROTRACTOR_N);
 }
 
-/** Checks if the points form a straight line. */
-function checkLine(
-  points: readonly LocalPoint[],
-  isClosed: boolean,
-): Shape | null {
-  if (!isClosed && points.length === LINE_EXPECTED_POINTS) {
-    return "line";
-  }
-  return null;
+interface Template {
+  type: Shape;
+  vec: Vec;
+  /** Whether this template was vectorised with rotation normalisation. */
+  rotationInvariant: boolean;
 }
 
-/** Checks if the points form an arrow shape. */
-function checkArrow(
-  points: readonly LocalPoint[],
-  isClosed: boolean,
-  options: ShapeRecognitionOptions,
-): Shape | null {
-  if (isClosed || points.length !== ARROW_EXPECTED_POINTS) {
-    return null;
-  }
+/** Pre-computed template library (built once). */
+const TEMPLATES: readonly Template[] = (() => {
+  const defs: Array<{
+    type: Shape;
+    pts: LocalPoint[];
+    rotationInvariant?: boolean;
+  }> = [
+    // Rectangle and diamond use fixed (non-rotated) vectorisation so their
+    // orientations remain distinguishable. Four starting corners cover common
+    // drawing start positions without needing rotation invariance.
+    { type: "rectangle", pts: makeRectangleTemplate(0) },
+    { type: "rectangle", pts: makeRectangleTemplate(1) },
+    { type: "rectangle", pts: makeRectangleTemplate(2) },
+    { type: "rectangle", pts: makeRectangleTemplate(3) },
+    { type: "diamond", pts: makeDiamondTemplate(0) },
+    { type: "diamond", pts: makeDiamondTemplate(1) },
+    { type: "diamond", pts: makeDiamondTemplate(2) },
+    { type: "diamond", pts: makeDiamondTemplate(3) },
+    // Ellipse: 8 templates at 45° increments (no rotation normalisation) so
+    // any drawing start position lands within 22.5° of a template — same
+    // coverage depth as the 4-corner rect/diamond strategy (4 × 2 directions).
+    { type: "ellipse", pts: makeEllipseTemplate(0) },
+    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 4) },
+    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
+    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 4) },
+    { type: "ellipse", pts: makeEllipseTemplate(Math.PI) },
+    { type: "ellipse", pts: makeEllipseTemplate((5 * Math.PI) / 4) },
+    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
+    { type: "ellipse", pts: makeEllipseTemplate((7 * Math.PI) / 4) },
+    { type: "line", pts: makeLineTemplate() },
+    { type: "arrow", pts: makeArrowTemplate() },
+  ];
+  return defs.map(({ type, pts, rotationInvariant = false }) => ({
+    type,
+    vec: vectorise(pts, rotationInvariant),
+    rotationInvariant,
+  }));
+})();
 
-  const shaftStart = points[0];
-  const shaftEnd = points[1]; // Assuming RDP simplifies shaft to 2 points
-  const arrowBase = points[2];
-  const arrowTip = points[3];
-  const arrowTailEnd = points[4];
-
-  const tipAngle = angleBetween(arrowTip, arrowBase, arrowTailEnd);
-
-  if (
-    tipAngle <= degreesToRadians(options.arrowMinTipAngle as Degrees) ||
-    tipAngle >= degreesToRadians(options.arrowMaxTipAngle as Degrees)
-  ) {
-    return null;
-  }
-
-  const headSegment1Len = pointDistance(arrowBase, arrowTip);
-  const headSegment2Len = pointDistance(arrowTip, arrowTailEnd);
-  const shaftLen = pointDistance(shaftStart, shaftEnd); // Approx shaft length
-
-  // Heuristic: Arrowhead segments should be significantly shorter than the shaft
-  const isHeadShortEnough =
-    headSegment1Len < shaftLen * options.arrowHeadMaxShaftRatio &&
-    headSegment2Len < shaftLen * options.arrowHeadMaxShaftRatio;
-
-  return isHeadShortEnough ? "arrow" : null;
-}
-
-/** Checks if the points form a rectangle or diamond shape. */
-function checkQuadrilateral(
-  points: readonly LocalPoint[],
-  isClosed: boolean,
-  options: ShapeRecognitionOptions,
-): Shape | null {
-  if (
-    !isClosed ||
-    points.length < QUADRILATERAL_MIN_POINTS ||
-    points.length > QUADRILATERAL_MAX_POINTS
-  ) {
-    return null;
-  }
-
-  // Take the first 4 points as vertices (RDP might add 5th closing point)
-  const vertices = points.slice(0, QUADRILATERAL_SIDES);
-
-  // Calculate internal angles
-  const angles: number[] = [];
-  for (let i = 0; i < QUADRILATERAL_SIDES; i++) {
-    const p1 = vertices[i];
-    const p2 = vertices[(i + 1) % QUADRILATERAL_SIDES];
-    const p3 = vertices[(i + 2) % QUADRILATERAL_SIDES];
-
-    angles.push(angleBetween(p1, p2, p3));
-  }
-
-  const allCornersAreValid = angles.every(
-    (a) =>
-      a > degreesToRadians(options.rectangleMinCornerAngle as Degrees) &&
-      a < degreesToRadians(options.rectangleMaxCornerAngle as Degrees),
-  );
-
-  if (!allCornersAreValid) {
-    return null;
-  }
-
-  const sides = calculateQuadrilateralSides(vertices);
-
-  if (
-    isAxisAligned(
-      sides,
-      degreesToRadians(options.rectangleOrientationAngleThreshold as Degrees),
-    )
-  ) {
-    return "rectangle";
-  }
-  // Not axis-aligned, but quadrilateral => classify as diamond
-  return "diamond";
-}
-
-/** Checks if the points form an ellipse shape. */
-function checkEllipse(
-  points: readonly LocalPoint[],
-  isClosed: boolean,
-  boundingBox: Bounds,
-  options: ShapeRecognitionOptions,
-): Shape | null {
-  if (!isClosed) {
-    return null;
-  }
-
-  // Need a minimum number of points for it to be an ellipse
-  if (points.length < QUADRILATERAL_MAX_POINTS) {
-    return null;
-  }
-
-  const radiusVariance = calculateRadiusVariance(points, boundingBox);
-
-  return radiusVariance < options.ellipseRadiusVarianceThreshold
-    ? "ellipse"
-    : null;
-}
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 /**
- * Recognizes common shapes from free-draw input points.
- * @param element The freedraw element to analyze.
- * @param opts Optional overrides for recognition thresholds.
- * @returns Information about the recognized shape.
+ * Recognizes common shapes from free-draw input points using the Protractor
+ * algorithm (Yang Li, 2010).  No rotation invariance is assumed — both the
+ * candidate and all templates are normalised to their indicative angle.
  */
 export const recognizeShape = (
   points: LocalPoint[],
-  opts: PartialShapeRecognitionOptions = {},
 ): ShapeRecognitionResult => {
-  const options = { ...DEFAULT_OPTIONS, ...opts };
   const boundingBox = getElementBoundsFromPoints(points);
 
-  // Need at least a few points to recognize a shape
   if (!points || points.length < 3) {
-    return { type: "freedraw", simplified: points, boundingBox };
+    return { type: "freedraw", points, boundingBox };
   }
 
-  const boundingBoxDiagonal = Math.hypot(
-    boundingBox[2] - boundingBox[0],
-    boundingBox[3] - boundingBox[1],
-  );
-  const rdpTolerance =
-    boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
-  const simplifiedPoints = simplify(
-    points as unknown as Parameters<typeof simplify>[0],
-    rdpTolerance,
-  ) as unknown as readonly LocalPoint[];
+  const resampled = resample(points, PROTRACTOR_N);
+  const resampledRev = [...resampled].reverse();
 
-  const isClosed = polygonIsClosed(
-    points,
-    Math.max(
-      options.shapeIsClosedDistanceThreshold,
-      boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100),
-    ),
-  );
+  // Pre-compute both fixed and rotation-invariant candidate vectors so each
+  // template is compared with a consistently vectorised candidate.
+  const candidateVecFixed = vectorise(resampled, false);
+  const candidateVecFixedRev = vectorise(resampledRev, false);
+  const candidateVecRotInv = vectorise(resampled, true);
+  const candidateVecRotInvRev = vectorise(resampledRev, true);
 
-  // --- Shape check order matters here ---
-  const recognizedType: Shape =
-    checkLine(simplifiedPoints, isClosed) ??
-    checkArrow(simplifiedPoints, isClosed, options) ??
-    checkQuadrilateral(simplifiedPoints, isClosed, options) ??
-    checkEllipse(simplifiedPoints, isClosed, boundingBox, options) ??
-    "freedraw"; // Default if no other shape matches
+  let bestScore = -1;
+  let bestType: Shape = "freedraw";
 
-  return {
-    type: recognizedType,
-    simplified: simplifiedPoints,
-    boundingBox,
-  };
+  for (const tmpl of TEMPLATES) {
+    const cv = tmpl.rotationInvariant ? candidateVecRotInv : candidateVecFixed;
+    const cvRev = tmpl.rotationInvariant
+      ? candidateVecRotInvRev
+      : candidateVecFixedRev;
+    const score = Math.max(
+      optimalCosineDistance(cv, tmpl.vec),
+      optimalCosineDistance(cvRev, tmpl.vec),
+    );
+    if (score > bestScore) {
+      bestScore = score;
+      bestType = tmpl.type;
+    }
+  }
+
+  let type: Shape;
+  if (bestScore >= PROTRACTOR_SCORE_THRESHOLD) {
+    type = bestType;
+  } else {
+    type = "freedraw";
+  }
+
+  return { type, points, boundingBox };
 };
 
 /**
@@ -406,16 +512,14 @@ export const convertToShape = (
         endArrowhead: appState.currentItemEndArrowhead,
         points: [
           [
-            recognizedShape.simplified[0][0] - arrowMinX,
-            recognizedShape.simplified[0][1] - arrowMinY,
+            recognizedShape.points[0][0] - arrowMinX,
+            recognizedShape.points[0][1] - arrowMinY,
           ] as LocalPoint,
           [
-            recognizedShape.simplified[
-              recognizedShape.simplified.length - 2
-            ][0] - arrowMinX,
-            recognizedShape.simplified[
-              recognizedShape.simplified.length - 2
-            ][1] - arrowMinY,
+            recognizedShape.points[recognizedShape.points.length - 2][0] -
+              arrowMinX,
+            recognizedShape.points[recognizedShape.points.length - 2][1] -
+              arrowMinY,
           ] as LocalPoint,
         ],
         groupIds: [],
@@ -448,16 +552,14 @@ export const convertToShape = (
         y: lineMinY,
         points: [
           [
-            recognizedShape.simplified[0][0] - lineMinX,
-            recognizedShape.simplified[0][1] - lineMinY,
+            recognizedShape.points[0][0] - lineMinX,
+            recognizedShape.points[0][1] - lineMinY,
           ] as LocalPoint,
           [
-            recognizedShape.simplified[
-              recognizedShape.simplified.length - 1
-            ][0] - lineMinX,
-            recognizedShape.simplified[
-              recognizedShape.simplified.length - 1
-            ][1] - lineMinY,
+            recognizedShape.points[recognizedShape.points.length - 1][0] -
+              lineMinX,
+            recognizedShape.points[recognizedShape.points.length - 1][1] -
+              lineMinY,
           ] as LocalPoint,
         ],
         groupIds: [],
