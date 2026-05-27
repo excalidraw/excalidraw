@@ -172,20 +172,31 @@ const LayerUI = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling to the canvas to block unintended panning or drawing!
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY };
     offsetStartRef.current = { ...dragOffset };
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
+      moveEvent.stopPropagation();
       const dx = moveEvent.clientX - dragStartRef.current.x;
       const dy = moveEvent.clientY - dragStartRef.current.y;
+      
+      const newX = offsetStartRef.current.x + dx;
+      const newY = offsetStartRef.current.y + dy;
+      
+      // Prevent dragging completely off screen (limit to 85% of screen dimensions)
+      const maxLimitX = window.innerWidth * 0.85;
+      const maxLimitY = window.innerHeight * 0.85;
+      
       setDragOffset({
-        x: offsetStartRef.current.x + dx,
-        y: offsetStartRef.current.y + dy,
+        x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
+        y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
       });
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (moveEvent: MouseEvent) => {
+      moveEvent.stopPropagation();
       setIsDragging(false);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
@@ -196,22 +207,33 @@ const LayerUI = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation(); // Prevent touch event bubbling to canvas
     const touch = e.touches[0];
     setIsDragging(true);
     dragStartRef.current = { x: touch.clientX, y: touch.clientY };
     offsetStartRef.current = { ...dragOffset };
 
     const handleTouchMove = (moveEvent: TouchEvent) => {
+      moveEvent.stopPropagation();
       const touchMove = moveEvent.touches[0];
       const dx = touchMove.clientX - dragStartRef.current.x;
       const dy = touchMove.clientY - dragStartRef.current.y;
+      
+      const newX = offsetStartRef.current.x + dx;
+      const newY = offsetStartRef.current.y + dy;
+      
+      // Prevent dragging completely off screen (limit to 85% of screen dimensions)
+      const maxLimitX = window.innerWidth * 0.85;
+      const maxLimitY = window.innerHeight * 0.85;
+      
       setDragOffset({
-        x: offsetStartRef.current.x + dx,
-        y: offsetStartRef.current.y + dy,
+        x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
+        y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
       });
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (moveEvent: TouchEvent) => {
+      moveEvent.stopPropagation();
       setIsDragging(false);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
