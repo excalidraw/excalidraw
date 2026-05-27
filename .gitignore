@@ -43,6 +43,7 @@ dev-dist
 html
 meta*.json
 .claude
+.agents/
 *.iml
 **/terraform/.terraform.lock.hcl
 **/terraform/.terraform/
