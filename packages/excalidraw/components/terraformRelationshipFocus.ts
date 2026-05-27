@@ -16,6 +16,7 @@ import {
 import {
   isTerraformExpandAllActive,
   getTerraformVisibilityKey,
+  repairTerraformEdgeBindings,
 } from "./terraformVisibility";
 
 /**
@@ -547,4 +548,17 @@ export const applyTerraformRelationshipFocus = (
   });
 
   return { elements: nextElements, didChange, shouldRepairBindings: didChange };
+};
+
+/** Clear transient focus wash / preview flags and rebind edges after reload. */
+export const stabilizeTerraformSceneAfterPersistence = (
+  elements: readonly ExcalidrawElement[],
+  viewBackgroundColor = "#ffffff",
+): ExcalidrawElement[] => {
+  const { elements: cleared } = applyTerraformRelationshipFocus(
+    elements,
+    null,
+    viewBackgroundColor,
+  );
+  return repairTerraformEdgeBindings(cleared);
 };

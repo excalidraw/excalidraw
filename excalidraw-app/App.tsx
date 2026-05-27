@@ -61,6 +61,8 @@ import {
   restoreAppState,
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
+import { isTerraformImportedScene } from "@excalidraw/excalidraw/components/terraformVisibility";
+import { stabilizeTerraformSceneAfterPersistence } from "@excalidraw/excalidraw/components/terraformRelationshipFocus";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import clsx from "clsx";
@@ -258,13 +260,24 @@ const initializeScene = async (opts: {
     "files"
   > & {
     scrollToContent?: boolean;
-  } = {
-    elements: restoreElements(localDataState?.elements, null, {
+  } = (() => {
+    const restoredElements = restoreElements(localDataState?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
-    }),
-    appState: restoreAppState(localDataState?.appState, null),
-  };
+    });
+    const viewBackgroundColor =
+      localDataState?.appState?.viewBackgroundColor ?? "#ffffff";
+    const elements = isTerraformImportedScene(restoredElements)
+      ? (stabilizeTerraformSceneAfterPersistence(
+          restoredElements,
+          viewBackgroundColor,
+        ) as typeof restoredElements)
+      : restoredElements;
+    return {
+      elements,
+      appState: restoreAppState(localDataState?.appState, null),
+    };
+  })();
 
   let roomLinkData = opts.frontendOnly
     ? null

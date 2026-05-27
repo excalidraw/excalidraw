@@ -1,4 +1,5 @@
 import {
+  getNonDeletedElements,
   isBindableElement,
   isLinearElement,
   newElementWith,
@@ -111,6 +112,69 @@ export const getTerraformEdgeHoverPeekKeyFromHoveredIds = (
   }
   return null;
 };
+
+/**
+ * Resource cards, detached labels, AWS icon glyphs, and layout-duplicate info
+ * glyphs should keep terraform hover focus active. Overlays sit above the card
+ * hit target; without this, pointer moves across them clear hover and thrash
+ * focus / reconcile / repair every frame.
+ */
+export const isTerraformResourceHoverTarget = (
+  element: ExcalidrawElement | null | undefined,
+): boolean => {
+  if (!element || element.isDeleted) {
+    return false;
+  }
+  const cd = element.customData ?? {};
+  if (cd.terraform !== true) {
+    return false;
+  }
+  if (getTerraformEdgeLayer(element)) {
+    return false;
+  }
+  if (cd.terraformVisibilityRole === "resource") {
+    return true;
+  }
+  return getTerraformGraphAddressForElement(element) != null;
+};
+
+/** Keep prior card hover while the pointer is over terraform frames/groups (not empty canvas). */
+export const shouldPreserveTerraformResourceHover = (
+  element: ExcalidrawElement | null | undefined,
+): boolean => {
+  if (!element || element.isDeleted) {
+    return false;
+  }
+  const cd = element.customData ?? {};
+  if (cd.terraform !== true || getTerraformEdgeLayer(element)) {
+    return false;
+  }
+  return !isTerraformResourceHoverTarget(element);
+};
+
+/** Keep soft-hidden terraform edges in localStorage (layer pins use isDeleted). */
+export const getTerraformPersistableElements = (
+  elements: readonly ExcalidrawElement[],
+): readonly ExcalidrawElement[] => {
+  if (!isTerraformImportedScene(elements)) {
+    return getNonDeletedElements(elements);
+  }
+  const nonDeleted = getNonDeletedElements(elements);
+  const nonDeletedIds = new Set(nonDeleted.map((element) => element.id));
+  const softHiddenEdges = elements.filter(
+    (element) =>
+      element.isDeleted &&
+      getTerraformEdgeLayer(element) &&
+      !nonDeletedIds.has(element.id),
+  );
+  return softHiddenEdges.length > 0
+    ? [...nonDeleted, ...softHiddenEdges]
+    : nonDeleted;
+};
+
+export const isTerraformImportedScene = (
+  elements: readonly ExcalidrawElement[],
+): boolean => elements.some((element) => element.customData?.terraform === true);
 
 /** `"dependency"` | `"dataFlow"` | `"declaredDataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {

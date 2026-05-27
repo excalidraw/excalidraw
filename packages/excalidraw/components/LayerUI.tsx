@@ -215,6 +215,36 @@ const terraformEdgesVisibilitySig = (
     .sort()
     .join(";");
 
+const terraformFocusSceneSig = (
+  els: readonly ExcalidrawElement[],
+  focusNodePath: string | null,
+) =>
+  `${focusNodePath ?? ""}::${els
+    .filter((e) => e.customData?.terraform)
+    .map(
+      (e) =>
+        `${e.id}:${e.isDeleted ? 1 : 0}:${e.strokeColor}:${e.backgroundColor}:${
+          e.customData?.terraformFocusPreview ? 1 : 0
+        }`,
+    )
+    .sort()
+    .join(";")}`;
+
+const terraformFocusInputsSig = (
+  activeFocusNodePath: string | null,
+  hoveredElementIds: Readonly<{ [id: string]: true }>,
+  selectedElementIds: Readonly<{ [id: string]: true }>,
+  pins: AppState["terraformEdgeLayerPins"],
+  viewBackgroundColor: string,
+) =>
+  [
+    activeFocusNodePath ?? "",
+    Object.keys(hoveredElementIds).sort().join(","),
+    Object.keys(selectedElementIds).sort().join(","),
+    pins ? JSON.stringify(pins) : "",
+    viewBackgroundColor,
+  ].join("|");
+
 const tryParseJsonString = (value: string): unknown | null => {
   const trimmed = value.trim();
   if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
@@ -1050,6 +1080,8 @@ const LayerUI = ({
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+  const lastTerraformFocusSceneSigRef = React.useRef<string | null>(null);
+  const lastTerraformFocusInputsSigRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     const allElements = app.scene.getElementsIncludingDeleted();
@@ -1066,6 +1098,24 @@ const LayerUI = ({
         ? getTerraformGraphAddressForElement(terraformElement)
         : null;
     const activeFocusNodePath = hoveredPeek || selectedGraphKey;
+    const focusInputsSig = terraformFocusInputsSig(
+      activeFocusNodePath,
+      appState.hoveredElementIds,
+      appState.selectedElementIds,
+      appState.terraformEdgeLayerPins,
+      appState.viewBackgroundColor,
+    );
+    const currentSceneSig = terraformFocusSceneSig(
+      allElements,
+      activeFocusNodePath,
+    );
+    if (
+      focusInputsSig === lastTerraformFocusInputsSigRef.current &&
+      currentSceneSig === lastTerraformFocusSceneSigRef.current
+    ) {
+      return;
+    }
+
     const result = applyTerraformRelationshipFocus(
       allElements,
       activeFocusNodePath,
@@ -1086,11 +1136,17 @@ const LayerUI = ({
       next = repairTerraformEdgeBindings(next);
     }
 
+    const commitFocusState = (sceneSig: string) => {
+      lastTerraformFocusInputsSigRef.current = focusInputsSig;
+      lastTerraformFocusSceneSigRef.current = sceneSig;
+    };
+
     if (
       !result.didChange &&
       next.length === allElements.length &&
       next.every((element, index) => element === allElements[index])
     ) {
+      commitFocusState(currentSceneSig);
       return;
     }
 
@@ -1100,13 +1156,23 @@ const LayerUI = ({
         terraformEdgesVisibilitySig(next) ===
           terraformEdgesVisibilitySig(allElements))
     ) {
+      commitFocusState(currentSceneSig);
       return;
     }
 
+    const nextFocusSceneSig = terraformFocusSceneSig(
+      next,
+      activeFocusNodePath,
+    );
+    if (nextFocusSceneSig === lastTerraformFocusSceneSigRef.current) {
+      commitFocusState(nextFocusSceneSig);
+      return;
+    }
+
+    commitFocusState(nextFocusSceneSig);
     app.scene.replaceAllElements(next);
   }, [
     app,
-    appState,
     appState.hoveredElementIds,
     appState.selectedElementIds,
     appState.terraformEdgeLayerPins,
