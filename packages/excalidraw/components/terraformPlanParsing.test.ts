@@ -1,8 +1,9 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+
+import {
+  hasTerraformBackendFile,
+  readTerraformBackendFile,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -16,17 +17,9 @@ import {
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
-const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
-const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
-const TFD_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.tfd");
-const STATE_FIXTURE = path.join(
-  FIXTURE_DIR,
+const hasAllplanmodulesState = hasTerraformBackendFile(
   "terraform_allplanmodules.tfstate",
 );
-const hasAllplanmodulesState = fs.existsSync(STATE_FIXTURE);
 
 function tierFromSubnetZoneName(
   name: string,
@@ -697,8 +690,8 @@ describe("terraformPlanParsing", () => {
   }, 60_000);
 
   it("plan+dot with invalid state JSON shape returns 400", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -716,7 +709,9 @@ describe("terraformPlanParsing", () => {
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only semantic import runs topology pipeline",
     async () => {
-      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+      const stateText = readTerraformBackendFile(
+        "terraform_allplanmodules.tfstate",
+      );
 
       const res = await terraformPlanParsing(
         null,
@@ -740,7 +735,9 @@ describe("terraformPlanParsing", () => {
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only semantic: one subnet zone per tier with two subnets each",
     async () => {
-      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+      const stateText = readTerraformBackendFile(
+        "terraform_allplanmodules.tfstate",
+      );
 
       const res = await terraformPlanParsing(
         null,
@@ -758,8 +755,8 @@ describe("terraformPlanParsing", () => {
   );
 
   it("allplanmodules plan+dot semantic: one subnet zone per tier with two subnets each", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -775,9 +772,9 @@ describe("terraformPlanParsing", () => {
   }, 120_000);
 
   it("allplanmodules with .tfd: four declared dataflow edges in file order", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
-    const tfdText = fs.readFileSync(TFD_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
+    const tfdText = readTerraformBackendFile("allplanmodules.tfd");
 
     const writerAddr =
       "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
@@ -838,8 +835,8 @@ describe("terraformPlanParsing", () => {
   }, 120_000);
 
   it("allplanmodules semantic: writer lambda environment unknown-after lists SQS dependency", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -896,7 +893,9 @@ describe("terraformPlanParsing", () => {
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules state-only import runs ELK pipeline",
     async () => {
-      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+      const stateText = readTerraformBackendFile(
+        "terraform_allplanmodules.tfstate",
+      );
 
       const res = await terraformPlanParsing(
         null,
@@ -917,9 +916,11 @@ describe("terraformPlanParsing", () => {
   it.skipIf(!hasAllplanmodulesState)(
     "allplanmodules plan+dot+state merge runs without throwing",
     async () => {
-      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
-      const stateText = fs.readFileSync(STATE_FIXTURE, "utf8");
+      const planText = readTerraformBackendFile("allplanmodules.json");
+      const dotText = readTerraformBackendFile("allplanmodules.dot");
+      const stateText = readTerraformBackendFile(
+        "terraform_allplanmodules.tfstate",
+      );
 
       const planOnlyRes = await terraformPlanParsing(
         textFileLike(planText),
@@ -949,8 +950,8 @@ describe("terraformPlanParsing", () => {
   );
 
   it("runs full local pipeline on allplanmodules fixtures without throwing", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -1004,8 +1005,8 @@ describe("terraformPlanParsing", () => {
   }, 60_000);
 
   it("semanticLayout returns topology frames and topology meta", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -1088,8 +1089,8 @@ describe("terraformPlanParsing", () => {
    * direct children or Excalidraw will clip — catches route-table / primaryCluster overflow.
    */
   it("allplanmodules semantic: topology frames contain direct children (layout sanity)", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),

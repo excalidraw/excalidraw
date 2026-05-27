@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 import "@testing-library/jest-dom";
 import { beforeEach, vi } from "vitest";
@@ -9,6 +10,17 @@ import polyfill from "./packages/excalidraw/polyfill";
 import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+
+const terraformPresetTestDb = path.join(
+  __dirname,
+  "packages/excalidraw/test-fixtures/terraform-import-presets.db",
+);
+if (
+  !process.env.TERRAFORM_IMPORT_PRESETS_DB &&
+  fs.existsSync(terraformPresetTestDb)
+) {
+  process.env.TERRAFORM_IMPORT_PRESETS_DB = terraformPresetTestDb;
+}
 
 // `vitest-canvas-mock` registers `afterAll` that deletes `global.jest`; restore before each test.
 beforeEach(() => {

@@ -126,6 +126,13 @@ yarn seed:terraform-presets
 
 Copy `terraform-import-presets.db` to share presets with another machine. In the import dialog, use **Use preset manifest** or **Sync from disk** on a single preset; `POST /api/terraform-import-presets/seed-all` re-hydrates every built-in preset without restarting the dev server.
 
+**Tests and CI** read plan/dot/tfd content from the committed SQLite file [`packages/excalidraw/test-fixtures/terraform-import-presets.db`](./packages/excalidraw/test-fixtures/terraform-import-presets.db) (not from gitignored paths on disk). After changing catalog fixtures locally, run:
+
+```bash
+yarn seed:terraform-presets
+yarn export:terraform-presets-test-db
+```
+
 ## Declared dataflow (`.tfd`)
 
 A **`.tfd`** file is an optional overlay for **declared dataflow** — blue arrows on the **Declared data flow** layer in the Terraform layers menu. It does not replace plan JSON or graph DOT. Grey **Data flow** edges still come from IAM semantics in the plan.

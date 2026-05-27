@@ -5,45 +5,64 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
-  getTerraformImportPresetFromDb,
-  getTerraformImportPresetDb,
-  listTerraformImportPresetsFromDb,
+  openTerraformImportPresetDb,
   resetTerraformImportPresetDbSingleton,
   seedAllBuiltinsFromCatalog,
+  TEST_FIXTURE_DB_PATH,
+  verifyTerraformImportPresetTestDb,
 } from "./terraformImportPresetDb.mjs";
 
 describe("terraformImportPresetDb seed", () => {
-  it("seeds all catalog presets with plan+dot content", () => {
+  it("committed test DB has all catalog presets with plan+dot content", () => {
+    if (!fs.existsSync(TEST_FIXTURE_DB_PATH)) {
+      throw new Error(
+        `Missing ${TEST_FIXTURE_DB_PATH}. Run yarn export:terraform-presets-test-db.`,
+      );
+    }
+    const { presetCount, withContent } =
+      verifyTerraformImportPresetTestDb(TEST_FIXTURE_DB_PATH);
+    expect(presetCount).toBe(10);
+    expect(withContent).toBe(10);
+  });
+
+  it("seeds all catalog presets with plan+dot content when disk files exist", () => {
     const dbPath = path.join(
       os.tmpdir(),
       `terraform-import-presets-test-${Date.now()}.db`,
     );
 
     resetTerraformImportPresetDbSingleton();
-    const db = getTerraformImportPresetDb(dbPath);
-    const { presetCount } = seedAllBuiltinsFromCatalog(db);
+    const db = openTerraformImportPresetDb(dbPath, { seed: false });
+    const { presetCount, results } = seedAllBuiltinsFromCatalog(db);
+    const missing = results.flatMap((entry) => entry.missing ?? []);
 
     expect(presetCount).toBe(10);
+    if (missing.length > 0) {
+      return;
+    }
 
-    const presets = listTerraformImportPresetsFromDb();
-    expect(presets).toHaveLength(10);
-    expect(presets.every((preset) => preset.hasContent)).toBe(true);
+    const presetCountRow = db
+      .prepare(`SELECT COUNT(*) AS count FROM terraform_import_presets`)
+      .get();
+    expect(presetCountRow.count).toBe(10);
 
-    const allplanmodules = getTerraformImportPresetFromDb("allplanmodules", {
-      includeContent: true,
-    });
-    expect(allplanmodules?.stacks[0]?.planText).toMatch(/"resource_changes"/);
-    expect(allplanmodules?.stacks[0]?.dotText).toMatch(/digraph/i);
+    const stack = db
+      .prepare(
+        `SELECT plan_text AS planText, dot_text AS dotText
+         FROM terraform_import_preset_stacks
+         WHERE preset_id = 'allplanmodules'
+         LIMIT 1`,
+      )
+      .get();
+    expect(stack.planText).toMatch(/"resource_changes"/);
+    expect(stack.dotText).toMatch(/digraph/i);
 
     resetTerraformImportPresetDbSingleton();
-    if (fs.existsSync(dbPath)) {
-      fs.unlinkSync(dbPath);
-    }
-    if (fs.existsSync(`${dbPath}-wal`)) {
-      fs.unlinkSync(`${dbPath}-wal`);
-    }
-    if (fs.existsSync(`${dbPath}-shm`)) {
-      fs.unlinkSync(`${dbPath}-shm`);
+    for (const suffix of ["", "-wal", "-shm"]) {
+      const filePath = `${dbPath}${suffix}`;
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
   });
 });

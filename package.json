@@ -64,6 +64,8 @@
     "build": "yarn --cwd ./excalidraw-app build",
     "build:preview": "yarn --cwd ./excalidraw-app build:preview",
     "seed:terraform-presets": "node excalidraw-app/dev/seedTerraformImportPresets.mjs",
+    "export:terraform-presets-test-db": "node excalidraw-app/dev/exportTerraformPresetsTestDb.mjs",
+    "verify:terraform-presets-test-db": "node excalidraw-app/dev/verifyTerraformPresetsTestDb.mjs",
     "start": "yarn --cwd ./excalidraw-app start",
     "start:production": "yarn --cwd ./excalidraw-app start:production",
     "start:example": "yarn build:packages && yarn --cwd ./examples/with-script-in-browser start",

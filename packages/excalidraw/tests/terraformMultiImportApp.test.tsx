@@ -1,10 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { loadAwsCloudflareMultiImportFixture } from "../test-fixtures/terraformPresetFixtures";
 
 import { restoreElements } from "../data/restore";
 import { Excalidraw } from "../index";
@@ -19,9 +17,6 @@ import {
 import { API } from "./helpers/api";
 import { render, unmountComponent } from "./test-utils";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TF_ROOT = path.resolve(__dirname, "../../backend/terraform");
-
 const { h } = window;
 
 describe("Terraform multi-import App integration", () => {
@@ -35,27 +30,8 @@ describe("Terraform multi-import App integration", () => {
   });
 
   it("loads merged allplanmodules + cloudflare + tfd in semantic view without update loop", async () => {
-    const awsPlan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const awsDot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
-    const cfPlan = JSON.parse(
-      fs.readFileSync(
-        path.join(TF_ROOT, "cloudflare/cloudflare-plan.json"),
-        "utf8",
-      ),
-    );
-    const cfDot = fs.readFileSync(
-      path.join(TF_ROOT, "cloudflare/cloudflare-plan.dot"),
-      "utf8",
-    );
-    const tfd = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.tfd"),
-      "utf8",
-    );
+    const { awsPlan, awsDot, cfPlan, cfDot, tfd } =
+      loadAwsCloudflareMultiImportFixture();
 
     const res = await terraformPlanParsingFromSources(
       {

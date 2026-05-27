@@ -1,7 +1,6 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
-
 import { describe, expect, it } from "vitest";
+
+import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import {
   mergeDotAdjacency,
@@ -132,18 +131,7 @@ describe("terraformImportMerge", () => {
   });
 
   it("namespaced staging multi-state merge has no duplicate_address warnings", () => {
-    const root = join(
-      import.meta.dirname,
-      "../../backend/terraform/staging-multi-state",
-    );
-    const stacks = readdirSync(root)
-      .filter((d) => statSync(join(root, d)).isDirectory() && /^\d/.test(d))
-      .sort();
-    const bundles = stacks.map((id) => ({
-      plan: JSON.parse(readFileSync(join(root, id, "plan.json"), "utf8")),
-      dotText: readFileSync(join(root, id, "graph.dot"), "utf8"),
-      label: id,
-    }));
+    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
     const { bundles: namespaced, stackIds } = namespacePlanDotBundles(bundles);
     expect(stackIds).toHaveLength(9);
     const merged = mergePlanJsons(

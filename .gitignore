@@ -9,6 +9,9 @@ graph.db-wal
 terraform-import-presets.db
 terraform-import-presets.db-shm
 terraform-import-presets.db-wal
+!packages/excalidraw/test-fixtures/terraform-import-presets.db
+packages/excalidraw/test-fixtures/terraform-import-presets.db-shm
+packages/excalidraw/test-fixtures/terraform-import-presets.db-wal
 *.tfstate
 *.tfstate.backup
 # State saved under odd names (e.g. Finder duplicates) still contain secrets — ignore all variants under terraform dirs.

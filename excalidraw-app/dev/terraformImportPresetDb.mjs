@@ -7,12 +7,19 @@ import Database from "better-sqlite3";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
 const DEFAULT_DB_PATH = path.join(REPO_ROOT, "terraform-import-presets.db");
+export const TEST_FIXTURE_DB_RELATIVE_PATH =
+  "packages/excalidraw/test-fixtures/terraform-import-presets.db";
+export const TEST_FIXTURE_DB_PATH = path.join(
+  REPO_ROOT,
+  TEST_FIXTURE_DB_RELATIVE_PATH,
+);
 const IMPORT_PRESETS_CATALOG_PATH = path.join(
   REPO_ROOT,
   "packages/backend/terraform/import-presets.catalog.json",
 );
 
 let dbSingleton = null;
+let testFixtureDbSingleton = null;
 
 function nowIso() {
   return new Date().toISOString();
@@ -398,6 +405,67 @@ export function resetTerraformImportPresetDbSingleton() {
     dbSingleton.close();
     dbSingleton = null;
   }
+  if (testFixtureDbSingleton) {
+    testFixtureDbSingleton.close();
+    testFixtureDbSingleton = null;
+  }
+}
+
+export function resolveTerraformImportPresetDbPath() {
+  const fromEnv = process.env.TERRAFORM_IMPORT_PRESETS_DB?.trim();
+  if (fromEnv) {
+    return path.isAbsolute(fromEnv)
+      ? fromEnv
+      : path.resolve(REPO_ROOT, fromEnv);
+  }
+  if (fs.existsSync(TEST_FIXTURE_DB_PATH)) {
+    return TEST_FIXTURE_DB_PATH;
+  }
+  if (fs.existsSync(DEFAULT_DB_PATH)) {
+    return DEFAULT_DB_PATH;
+  }
+  return DEFAULT_DB_PATH;
+}
+
+export function openTerraformImportPresetDb(
+  dbPath,
+  { seed = true, createIfMissing = true } = {},
+) {
+  const dir = path.dirname(dbPath);
+  if (!fs.existsSync(dir)) {
+    if (!createIfMissing) {
+      throw new Error(`Terraform import preset DB not found: ${dbPath}`);
+    }
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(dbPath) && !createIfMissing) {
+    throw new Error(`Terraform import preset DB not found: ${dbPath}`);
+  }
+  const db = new Database(dbPath);
+  db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON");
+  ensureSchema(db);
+  if (seed) {
+    seedBuiltins(db);
+  }
+  return db;
+}
+
+export function getTerraformImportPresetTestDb() {
+  if (testFixtureDbSingleton) {
+    return testFixtureDbSingleton;
+  }
+  const dbPath = resolveTerraformImportPresetDbPath();
+  if (!fs.existsSync(dbPath)) {
+    throw new Error(
+      `Terraform import preset DB not found at ${dbPath}. Run yarn seed:terraform-presets locally, then yarn export:terraform-presets-test-db.`,
+    );
+  }
+  testFixtureDbSingleton = openTerraformImportPresetDb(dbPath, {
+    seed: false,
+    createIfMissing: false,
+  });
+  return testFixtureDbSingleton;
 }
 
 export function getTerraformImportPresetDb(dbPath = DEFAULT_DB_PATH) {
@@ -408,13 +476,8 @@ export function getTerraformImportPresetDb(dbPath = DEFAULT_DB_PATH) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
-  db.pragma("foreign_keys = ON");
-  ensureSchema(db);
-  seedBuiltins(db);
-  dbSingleton = db;
-  return db;
+  dbSingleton = openTerraformImportPresetDb(dbPath, { seed: true });
+  return dbSingleton;
 }
 
 export function listTerraformImportPresetsFromDb() {
@@ -597,6 +660,149 @@ export function deleteTerraformImportPresetFromDb(presetId) {
   }
   db.prepare(`DELETE FROM terraform_import_presets WHERE id = ?`).run(presetId);
   return true;
+}
+
+function normalizeRepoRelativePath(relativePath) {
+  return String(relativePath).replace(/\\/g, "/").replace(/^\/+/, "");
+}
+
+function repoPathFromPresetParts(rootPath, filePath) {
+  return normalizeRepoRelativePath(joinRootRelative(rootPath, filePath));
+}
+
+export function hasTerraformImportRepoFileInDb(repoRelativePath) {
+  try {
+    readTerraformImportRepoFileText(repoRelativePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function readTerraformImportRepoFileText(repoRelativePath) {
+  const normalized = normalizeRepoRelativePath(repoRelativePath);
+  const db = getTerraformImportPresetTestDb();
+
+  const stackRows = db
+    .prepare(
+      `SELECT p.root_path AS rootPath, s.plan_path AS planPath, s.dot_path AS dotPath,
+              s.state_path AS statePath, s.plan_text AS planText, s.dot_text AS dotText,
+              s.state_text AS stateText
+       FROM terraform_import_preset_stacks s
+       JOIN terraform_import_presets p ON p.id = s.preset_id`,
+    )
+    .all();
+
+  for (const row of stackRows) {
+    const planRepoPath = repoPathFromPresetParts(row.rootPath, row.planPath);
+    const dotRepoPath = repoPathFromPresetParts(row.rootPath, row.dotPath);
+    if (planRepoPath === normalized) {
+      if (!row.planText) {
+        break;
+      }
+      return row.planText;
+    }
+    if (dotRepoPath === normalized) {
+      if (!row.dotText) {
+        break;
+      }
+      return row.dotText;
+    }
+    if (row.statePath) {
+      const stateRepoPath = repoPathFromPresetParts(
+        row.rootPath,
+        row.statePath,
+      );
+      if (stateRepoPath === normalized) {
+        if (!row.stateText) {
+          break;
+        }
+        return row.stateText;
+      }
+    }
+  }
+
+  const tfdRows = db
+    .prepare(
+      `SELECT p.root_path AS rootPath, t.path AS path, t.content AS content
+       FROM terraform_import_preset_tfd t
+       JOIN terraform_import_presets p ON p.id = t.preset_id`,
+    )
+    .all();
+
+  for (const row of tfdRows) {
+    const tfdRepoPath = repoPathFromPresetParts(row.rootPath, row.path);
+    if (tfdRepoPath === normalized) {
+      if (!row.content) {
+        break;
+      }
+      return row.content;
+    }
+  }
+
+  throw new Error(
+    `Terraform fixture not found in import preset DB: ${normalized}. Run yarn export:terraform-presets-test-db after yarn seed:terraform-presets.`,
+  );
+}
+
+export function loadStagingMultiStatePlanDotBundlesFromDb() {
+  const db = getTerraformImportPresetTestDb();
+  const rows = db
+    .prepare(
+      `SELECT stack_id AS id, label, plan_text AS planText, dot_text AS dotText
+       FROM terraform_import_preset_stacks
+       WHERE preset_id = 'staging-multi-state'
+       ORDER BY sort_order ASC`,
+    )
+    .all();
+
+  return rows.map((row) => {
+    if (!row.planText || !row.dotText) {
+      throw new Error(
+        `staging-multi-state stack "${row.id}" is missing plan or dot content in the preset DB.`,
+      );
+    }
+    return {
+      plan: JSON.parse(row.planText),
+      dotText: row.dotText,
+      label: row.label || row.id,
+    };
+  });
+}
+
+export function readStagingMultiStatePipelineTfdFromDb() {
+  return readTerraformImportRepoFileText(
+    "packages/backend/terraform/staging-multi-state/pipeline.tfd",
+  );
+}
+
+export function verifyTerraformImportPresetTestDb(
+  dbPath = TEST_FIXTURE_DB_PATH,
+) {
+  if (!fs.existsSync(dbPath)) {
+    throw new Error(`Missing test preset DB: ${dbPath}`);
+  }
+  const db = openTerraformImportPresetDb(dbPath, {
+    seed: false,
+    createIfMissing: false,
+  });
+  const presetCount = db
+    .prepare(`SELECT COUNT(*) AS count FROM terraform_import_presets`)
+    .get().count;
+  const withContent = db
+    .prepare(
+      `SELECT COUNT(DISTINCT preset_id) AS count
+       FROM terraform_import_preset_stacks
+       WHERE plan_text IS NOT NULL AND dot_text IS NOT NULL`,
+    )
+    .get().count;
+  db.close();
+  if (presetCount < 10 || withContent < 10) {
+    throw new Error(
+      `Test preset DB is incomplete (${withContent}/${presetCount} presets with plan+dot). Run yarn export:terraform-presets-test-db.`,
+    );
+  }
+  return { presetCount, withContent };
 }
 
 export function resolveTerraformImportFilePath(relativePath) {
