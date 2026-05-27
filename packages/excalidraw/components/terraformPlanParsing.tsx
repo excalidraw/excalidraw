@@ -55,8 +55,14 @@ import {
   mergePlanJsons,
   mergePlanWithStates,
   mergeSyntheticPlans,
+  namespacePlanDotBundles,
   parseRawStateJson,
 } from "./terraformImportMerge";
+import {
+  collectKnownStackIdsFromNodes,
+  prefixStackAddress,
+  stripStackPrefixForModuleParsing,
+} from "./terraformStackAddress";
 
 import type { Graph } from "@dagrejs/graphlib";
 import type {
@@ -443,12 +449,19 @@ function appendImportMeta(
   meta: Record<string, unknown>,
   sources: TerraformPlanParsingSources,
   importWarnings: TerraformImportWarning[],
+  stackMeta?: { stackIds: string[]; addressToStack: Record<string, string> },
 ) {
   return {
     ...meta,
     importBundleCount: sources.planDotBundles.length,
     importStateCount: sources.states.length,
     importTfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
+    ...(stackMeta?.stackIds.length
+      ? {
+          stackIds: stackMeta.stackIds,
+          addressToStack: stackMeta.addressToStack,
+        }
+      : {}),
     ...(importWarnings.length > 0 ? { importWarnings } : {}),
   };
 }
@@ -464,6 +477,8 @@ export const terraformPlanParsingFromSources = async (
   let adjacency: Record<string, string[]>;
   let importSource: "plan" | "state-only" = "plan";
   let sourcePlans: unknown[] = [];
+  let stackIds: string[] = [];
+  let addressToStack: Record<string, string> = {};
   const states = sources.states ?? [];
 
   if (sources.planDotBundles.length === 0) {
@@ -486,14 +501,27 @@ export const terraformPlanParsingFromSources = async (
     adjacency = {};
     importSource = "state-only";
   } else {
-    const plans = sources.planDotBundles.map((b) => b.plan);
-    const labels = sources.planDotBundles.map((b) => b.label);
+    let bundles = sources.planDotBundles;
+    if (bundles.length > 1) {
+      const namespaced = namespacePlanDotBundles(bundles);
+      bundles = namespaced.bundles;
+      stackIds = namespaced.stackIds;
+      addressToStack = namespaced.addressToStack;
+    }
+    const plans = bundles.map((b) => b.plan);
+    const labels = bundles.map((b) => b.label);
     const merged = mergePlanJsons(plans, labels);
     plan = merged.plan;
     importWarnings.push(...merged.warnings);
     sourcePlans = merged.sourcePlans;
-    adjacency = mergeDotAdjacency(sources.planDotBundles.map((b) => b.dotText));
-    if (states.length > 0) {
+    adjacency = mergeDotAdjacency(
+      bundles.map((b) => b.dotText),
+      stackIds.length > 0 ? stackIds : undefined,
+    );
+    // Multi-stack plan imports: each tfstate belongs to its own root. Merging many
+    // state files into one plan duplicates almost every address (hundreds of warnings)
+    // and "last wins" across stacks. Only enrich from state for single-bundle imports.
+    if (states.length > 0 && sources.planDotBundles.length === 1) {
       const mergedWithState = mergePlanWithStates(
         plan as Parameters<typeof mergePlanWithStates>[0],
         sourcePlans,
@@ -752,6 +780,7 @@ export const terraformPlanParsingFromSources = async (
         },
         sources,
         formatImportWarnings(importWarnings, tfdWarnings),
+        { stackIds, addressToStack },
       ),
     };
   } else {
@@ -898,6 +927,29 @@ export function resolveTerraformPlanNodeKey(
   if (nodes[graphId]) {
     return graphId;
   }
+
+  const knownStackIds = collectKnownStackIdsFromNodes(nodes);
+  if (knownStackIds.length > 0 && !address.includes("::")) {
+    const qualifiedMatches: string[] = [];
+    for (const stackId of knownStackIds) {
+      const qualified = prefixStackAddress(stackId, address);
+      if (nodes[qualified]) {
+        qualifiedMatches.push(qualified);
+      }
+      const qualifiedStripped = prefixStackAddress(stackId, graphId);
+      if (nodes[qualifiedStripped]) {
+        qualifiedMatches.push(qualifiedStripped);
+      }
+    }
+    const uniqueQualified = [...new Set(qualifiedMatches)];
+    if (uniqueQualified.length === 1) {
+      return uniqueQualified[0]!;
+    }
+    if (uniqueQualified.length > 1) {
+      return null;
+    }
+  }
+
   const matches: string[] = [];
   for (const k of Object.keys(nodes)) {
     if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
@@ -1056,7 +1108,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
 }
 
 function getModulePathChainFromAddress(nodePath = "") {
-  const parts = nodePath.split(".");
+  const parts = stripStackPrefixForModuleParsing(nodePath).split(".");
   const chain = [];
   let cursor = "";
 
@@ -1082,7 +1134,7 @@ function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
  * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
  */
 function getContainingModulePathForAddress(address: string): string {
-  const parts = address.split(".");
+  const parts = stripStackPrefixForModuleParsing(address).split(".");
   let index = 0;
   let modulePath = "";
   while (

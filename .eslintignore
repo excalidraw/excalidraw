@@ -1,4 +1,5 @@
 node_modules/
+.agents/
 build/
 package-lock.json
 .vscode/
@@ -10,8 +11,12 @@ examples/**/public
 dev-dist
 coverage
 **/.terraform/
-# Minified terraform plan fixture (single-line JSON; tests read as-is).
-packages/backend/terraform/allplanmodules.json
+# Terraform plan/state exports (gitignored; minified JSON — tests read as-is).
+packages/backend/terraform/**/plan.json
+packages/backend/terraform/allplan*.json
+packages/backend/terraform/*plan.json
+packages/backend/terraform/*plan2.json
+packages/backend/terraform/cloudflare/*plan.json
 # Generated corpus + checkpoint state (Terraform exports; not hand-formatted JSON).
 packages/backend/terraform/.corpus/
 packages/backend/terraform/fixtures/states/

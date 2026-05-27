@@ -2,8 +2,10 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
+import { BUILTIN_TERRAFORM_IMPORT_PRESETS } from "./terraformImportPresetsTypes";
 import { TerraformImportModal } from "./TerraformImportDialog";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
 
 const hoisted = vi.hoisted(() => ({
   addFiles: vi.fn(),
@@ -19,6 +21,25 @@ vi.mock("./terraformPlanParsing", async (importOriginal) => {
     terraformPlanParsingFromSources: vi.fn(),
   };
 });
+
+vi.mock("./terraformImportPresetLoader", () => ({
+  chooseTerraformImportPresetRootDirectory: vi.fn(),
+  loadTerraformImportPresetSources: vi.fn(),
+}));
+
+vi.mock("./terraformImportPresets", () => ({
+  BUILTIN_TERRAFORM_IMPORT_PRESETS,
+  listTerraformImportPresets: vi.fn(async () =>
+    BUILTIN_TERRAFORM_IMPORT_PRESETS.map((preset) => ({
+      ...preset,
+      hasContent: true,
+    })),
+  ),
+  getTerraformImportPreset: vi.fn(),
+  saveTerraformImportPreset: vi.fn(),
+  updateTerraformImportPreset: vi.fn(),
+  deleteTerraformImportPreset: vi.fn(),
+}));
 
 vi.mock("./App", () => ({
   useApp: () => ({
@@ -55,6 +76,7 @@ function fillFirstBundle(planJson = "{}", dot = "digraph {}") {
 describe("TerraformImportModal", () => {
   beforeEach(() => {
     vi.mocked(terraformPlanParsingFromSources).mockReset();
+    vi.mocked(loadTerraformImportPresetSources).mockReset();
     hoisted.addFiles.mockReset();
     hoisted.replaceAllElements.mockReset();
     hoisted.scrollToContent.mockReset();
@@ -224,5 +246,61 @@ describe("TerraformImportModal", () => {
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: /done/i }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("shows preset manifest table when Use preset manifest is clicked", async () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    await waitFor(() =>
+      expect(screen.getByRole("combobox")).toBeInTheDocument(),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /use preset manifest/i }),
+    );
+    expect(
+      screen.getByText(
+        /packages\/backend\/terraform\/staging-multi-state\/00-east-network\/plan\.json/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("loads selected preset and imports parsed sources", async () => {
+    vi.mocked(loadTerraformImportPresetSources).mockResolvedValue({
+      planDotBundles: [
+        {
+          plan: { resource_changes: [] },
+          dotText: "digraph {}",
+          label: "00-east-network",
+        },
+      ],
+      states: [],
+      stateLabels: [],
+      tfdTexts: ["a -> b"],
+      tfdLabels: ["pipeline.tfd"],
+      warnings: [],
+    });
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /load & import/i }),
+      ).not.toBeDisabled(),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /load & import/i }));
+
+    await waitFor(() =>
+      expect(loadTerraformImportPresetSources).toHaveBeenCalled(),
+    );
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    expect(sources.planDotBundles).toHaveLength(1);
+    expect(sources.tfdLabels).toEqual(["pipeline.tfd"]);
   });
 });

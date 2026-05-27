@@ -1,2 +1,6 @@
 #!/bin/sh
-# yarn lint-staged
+. "$(dirname "$0")/_/husky.sh"
+
+# Fast checks on staged files (ESLint + Prettier), then repo-wide typecheck.
+yarn lint-staged
+yarn test:typecheck

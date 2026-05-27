@@ -9,6 +9,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { restoreElements } from "../data/restore";
 
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { prefixStackAddress } from "./terraformStackAddress";
 
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
 import {
@@ -74,7 +75,9 @@ describe("terraform multi-import integration", () => {
         (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
       )
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain(
+      prefixStackAddress("cloudflare", "cloudflare_zone.tfdraw_dev"),
+    );
     expect(
       nodePaths.some((p: string) => p.includes("workload_writer_lambda")),
     ).toBe(true);
@@ -126,7 +129,9 @@ describe("terraform multi-import integration", () => {
         (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
       )
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain(
+      prefixStackAddress("cloudflare", "cloudflare_zone.tfdraw_dev"),
+    );
     expect(
       body.elements.some(
         (e: {

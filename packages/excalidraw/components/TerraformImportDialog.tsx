@@ -2,7 +2,7 @@
  * Modal to upload plan JSON + graph DOT bundles (optional raw state, optional .tfd),
  * or raw Terraform state alone, and replace the canvas with the locally generated scene.
  */
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -14,6 +14,7 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import {
   terraformPlanParsingFromSources,
   type TerraformImportWarning,
+  type TerraformPlanParsingSources,
   type TerraformPlanDotBundle,
 } from "./terraformPlanParsing";
 import { parseRawStateJson } from "./terraformImportMerge";
@@ -23,6 +24,23 @@ import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
+import {
+  BUILTIN_TERRAFORM_IMPORT_PRESETS,
+  deleteTerraformImportPreset,
+  listTerraformImportPresets,
+  saveTerraformImportPreset,
+  type TerraformImportPreset,
+  updateTerraformImportPreset,
+} from "./terraformImportPresets";
+import {
+  chooseTerraformImportPresetRootDirectory,
+  loadTerraformImportPresetSources,
+  type TerraformImportPresetWarning,
+} from "./terraformImportPresetLoader";
+import {
+  fetchTerraformImportPresetFromApi,
+  syncTerraformImportPresetFromDiskViaApi,
+} from "./terraformImportPresetsApi";
 
 import "./TerraformImportDialog.scss";
 
@@ -31,6 +49,24 @@ import type { BinaryFileData } from "../types";
 type TerraformView = "module" | "semantic";
 
 const MAX_PLAN_BUNDLES = 10;
+
+const joinPresetPath = (rootPath: string, relativePath: string) =>
+  `${rootPath.replace(/\/+$/, "")}/${relativePath.replace(/^\/+/, "")}`;
+
+const toPresetId = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const inferStackIdFromFileName = (name: string, fallbackIndex: number) => {
+  const trimmed = name.trim();
+  const noExt = trimmed.includes(".")
+    ? trimmed.slice(0, trimmed.lastIndexOf("."))
+    : trimmed;
+  return toPresetId(noExt) || `stack-${fallbackIndex + 1}`;
+};
 
 async function readFileText(file: File): Promise<string> {
   if (typeof file.text === "function") {
@@ -103,6 +139,61 @@ export const TerraformImportModal = ({
     TerraformImportWarning[] | null
   >(null);
   const [importDone, setImportDone] = useState(false);
+  const [selectedPresetId, setSelectedPresetId] = useState(
+    BUILTIN_TERRAFORM_IMPORT_PRESETS[0]?.id ?? "",
+  );
+  const [presetWarnings, setPresetWarnings] = useState<
+    TerraformImportPresetWarning[]
+  >([]);
+  const [availablePresets, setAvailablePresets] = useState<
+    TerraformImportPreset[]
+  >([]);
+  const [presetsLoading, setPresetsLoading] = useState(true);
+  const [activePreset, setActivePreset] =
+    useState<TerraformImportPreset | null>(null);
+
+  const refreshPresets = useCallback(async () => {
+    setPresetsLoading(true);
+    try {
+      const presets = await listTerraformImportPresets();
+      setAvailablePresets(presets);
+      setSelectedPresetId((current) => {
+        if (
+          presets.length > 0 &&
+          !presets.some((preset) => preset.id === current)
+        ) {
+          return presets[0]!.id;
+        }
+        return current;
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load import presets.",
+      );
+    } finally {
+      setPresetsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshPresets();
+  }, [refreshPresets]);
+
+  const selectedPreset = useMemo(() => {
+    const fromApi = availablePresets.find(
+      (preset) => preset.id === selectedPresetId,
+    );
+    if (fromApi) {
+      return fromApi;
+    }
+    return (
+      BUILTIN_TERRAFORM_IMPORT_PRESETS.find(
+        (preset) => preset.id === selectedPresetId,
+      ) ?? null
+    );
+  }, [availablePresets, selectedPresetId]);
+
+  const importView: TerraformView = activePreset?.view ?? view;
 
   const completeBundles = bundles.filter((b) => b.planFile && b.dotFile);
   const partialBundles = bundles.filter(
@@ -113,9 +204,11 @@ export const TerraformImportModal = ({
     stateFiles.length > 0 &&
     completeBundles.length === 0 &&
     partialBundles.length === 0;
-  const canImport = hasPlanMode || stateOnly;
-  const canUseSemanticView = hasPlanMode || stateFiles.length > 0;
+  const canImport = hasPlanMode || stateOnly || activePreset != null;
+  const canUseSemanticView =
+    hasPlanMode || stateFiles.length > 0 || activePreset != null;
   const semanticViewDisabled = loading || !canUseSemanticView;
+  const usingPresetManifest = activePreset != null;
 
   const updateBundle = (id: string, patch: Partial<PlanDotBundleRow>) => {
     setBundles((rows) =>
@@ -206,8 +299,127 @@ export const TerraformImportModal = ({
     app.scrollToContent();
   };
 
+  const runImportFromSources = async (
+    sources: TerraformPlanParsingSources,
+    opts: {
+      importedTfdTexts?: string[];
+      extraWarnings?: TerraformImportPresetWarning[];
+    } = {},
+  ) => {
+    const canUseSemanticView =
+      sources.planDotBundles.length > 0 || sources.states.length > 0;
+    const res = await terraformPlanParsingFromSources(sources, {
+      semanticLayout: importView === "semantic" && canUseSemanticView,
+    });
+    const scene = await res.json();
+    if (!res.ok) {
+      const err =
+        scene && typeof scene === "object" && "error" in scene
+          ? String((scene as { error?: unknown }).error)
+          : "";
+      throw new Error(err || "Local parse failed");
+    }
+    const warnings = (
+      scene as { meta?: { importWarnings?: TerraformImportWarning[] } }
+    ).meta?.importWarnings;
+    replaceEditorWithExcalidrawScene(scene, {
+      enableDeclaredDataFlow: (opts.importedTfdTexts ?? []).some((t) =>
+        t.trim(),
+      ),
+    });
+    onImportSuccess?.();
+    setImportDone(true);
+    setPresetWarnings(opts.extraWarnings ?? []);
+    if (warnings?.length) {
+      setImportWarnings(warnings);
+    } else if ((opts.extraWarnings ?? []).length === 0) {
+      onCloseRequest();
+    }
+  };
+
+  const buildPresetPayload = async (
+    presetId: string,
+    presetName: string,
+    rootPath: string,
+  ): Promise<TerraformImportPreset> => {
+    if (completeBundles.length > 0) {
+      const stacks = await Promise.all(
+        completeBundles.map(async (row, index) => {
+          const label = row.label.trim() || `Stack ${index + 1}`;
+          const inferredId = inferStackIdFromFileName(
+            row.planFile?.name || label,
+            index,
+          );
+          const planPath = `${inferredId}/${row.planFile?.name || "plan.json"}`;
+          const dotPath = `${inferredId}/${row.dotFile?.name || "graph.dot"}`;
+          const statePath = `${inferredId}/terraform.tfstate`;
+          const matchingState = stateFiles.find((file) =>
+            file.name.includes(inferredId),
+          );
+          return {
+            id: inferredId,
+            label,
+            planPath,
+            dotPath,
+            statePath,
+            planText: await readFileText(row.planFile!),
+            dotText: await readFileText(row.dotFile!),
+            ...(matchingState
+              ? { stateText: await readFileText(matchingState) }
+              : {}),
+          };
+        }),
+      );
+      const embeddedTfd =
+        tfdFiles.length > 0
+          ? await Promise.all(
+              tfdFiles.map(async (file) => ({
+                path: file.name,
+                text: await readFileText(file),
+              })),
+            )
+          : [];
+      return {
+        id: presetId,
+        name: presetName,
+        builtin: false,
+        description: "User-defined Terraform import preset.",
+        rootPath,
+        view,
+        stacks,
+        tfdPaths:
+          embeddedTfd.length > 0
+            ? embeddedTfd.map((file) => file.path)
+            : ["pipeline.tfd"],
+        tfdFiles: embeddedTfd,
+        hasContent: true,
+      };
+    }
+
+    const sourcePreset = activePreset ?? selectedPreset;
+    if (sourcePreset) {
+      const withContent = await fetchTerraformImportPresetFromApi(
+        sourcePreset.id,
+        { includeContent: true },
+      );
+      return {
+        ...withContent,
+        id: presetId,
+        name: presetName,
+        builtin: false,
+        rootPath,
+        view,
+        hasContent: true,
+      };
+    }
+
+    throw new Error(
+      "Add plan + graph files to store in the preset, or select a preset that already has DB content.",
+    );
+  };
+
   const handleImport = async () => {
-    if (partialBundles.length > 0) {
+    if (!usingPresetManifest && partialBundles.length > 0) {
       setError(
         "Each plan + graph row must have both files, or remove the row. You can also import state file(s) alone.",
       );
@@ -219,8 +431,30 @@ export const TerraformImportModal = ({
     setLoading(true);
     setError(null);
     setImportWarnings(null);
+    setPresetWarnings([]);
     setImportDone(false);
     try {
+      if (activePreset) {
+        const presetSources = await loadTerraformImportPresetSources(
+          activePreset,
+          { allowDirectoryHandleFallback: true },
+        );
+        await runImportFromSources(
+          {
+            planDotBundles: presetSources.planDotBundles,
+            states: presetSources.states,
+            stateLabels: presetSources.stateLabels,
+            tfdTexts: presetSources.tfdTexts,
+            tfdLabels: presetSources.tfdLabels,
+          },
+          {
+            importedTfdTexts: presetSources.tfdTexts,
+            extraWarnings: presetSources.warnings,
+          },
+        );
+        return;
+      }
+
       const planDotBundles: TerraformPlanDotBundle[] = [];
       for (const row of completeBundles) {
         const [planText, dotText] = await Promise.all([
@@ -254,7 +488,7 @@ export const TerraformImportModal = ({
       const tfdTexts = await Promise.all(tfdFiles.map((f) => readFileText(f)));
       const tfdLabels = tfdFiles.map((f) => f.name);
 
-      const res = await terraformPlanParsingFromSources(
+      await runImportFromSources(
         {
           planDotBundles,
           states,
@@ -262,37 +496,162 @@ export const TerraformImportModal = ({
           tfdTexts,
           tfdLabels,
         },
-        {
-          semanticLayout: view === "semantic" && canUseSemanticView,
-        },
+        { importedTfdTexts: tfdTexts },
       );
-      const scene = await res.json();
-      if (!res.ok) {
-        const err =
-          scene && typeof scene === "object" && "error" in scene
-            ? String((scene as { error?: unknown }).error)
-            : "";
-        throw new Error(err || "Local parse failed");
-      }
-      const warnings = (
-        scene as { meta?: { importWarnings?: TerraformImportWarning[] } }
-      ).meta?.importWarnings;
-      replaceEditorWithExcalidrawScene(scene, {
-        enableDeclaredDataFlow: tfdTexts.some((t) => t.trim()),
-      });
-      onImportSuccess?.();
-      setImportDone(true);
-      if (warnings?.length) {
-        setImportWarnings(warnings);
-      } else {
-        onCloseRequest();
-      }
     } catch (err) {
       console.error("Import error:", err);
       onImportFail?.();
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadPresetAndImport = async () => {
+    const preset = selectedPreset ?? activePreset;
+    if (!preset) {
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setImportWarnings(null);
+    setPresetWarnings([]);
+    setImportDone(false);
+    try {
+      const presetSources = await loadTerraformImportPresetSources(preset, {
+        allowDirectoryHandleFallback: true,
+      });
+      await runImportFromSources(
+        {
+          planDotBundles: presetSources.planDotBundles,
+          states: presetSources.states,
+          stateLabels: presetSources.stateLabels,
+          tfdTexts: presetSources.tfdTexts,
+          tfdLabels: presetSources.tfdLabels,
+        },
+        {
+          importedTfdTexts: presetSources.tfdTexts,
+          extraWarnings: presetSources.warnings,
+        },
+      );
+    } catch (err) {
+      console.error("Preset import error:", err);
+      onImportFail?.();
+      setError(err instanceof Error ? err.message : "Preset import failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveAsPreset = async () => {
+    const nameInput = window.prompt("Preset name");
+    if (!nameInput) {
+      return;
+    }
+    const presetName = nameInput.trim();
+    if (!presetName) {
+      return;
+    }
+    const rootPathInput = window.prompt(
+      "Preset root path",
+      selectedPreset?.rootPath ||
+        "packages/backend/terraform/staging-multi-state",
+    );
+    if (!rootPathInput) {
+      return;
+    }
+    const presetId = toPresetId(presetName);
+    if (!presetId) {
+      setError("Preset name must contain letters or numbers.");
+      return;
+    }
+    try {
+      const preset = await buildPresetPayload(
+        presetId,
+        presetName,
+        rootPathInput.trim(),
+      );
+      await saveTerraformImportPreset(preset);
+      setSelectedPresetId(preset.id);
+      await refreshPresets();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save preset.");
+    }
+  };
+
+  const handleUpdatePreset = async () => {
+    if (!selectedPreset || selectedPreset.builtin) {
+      return;
+    }
+    try {
+      const updated = await buildPresetPayload(
+        selectedPreset.id,
+        selectedPreset.name,
+        selectedPreset.rootPath,
+      );
+      await updateTerraformImportPreset(selectedPreset.id, updated);
+      await refreshPresets();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update preset.");
+    }
+  };
+
+  const handleDeletePreset = async () => {
+    if (!selectedPreset || selectedPreset.builtin) {
+      return;
+    }
+    const confirmed = window.confirm(`Delete preset "${selectedPreset.name}"?`);
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await deleteTerraformImportPreset(selectedPreset.id);
+      setSelectedPresetId(BUILTIN_TERRAFORM_IMPORT_PRESETS[0]?.id ?? "");
+      setActivePreset(null);
+      await refreshPresets();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete preset.");
+    }
+  };
+
+  const handleUsePresetManifest = () => {
+    if (!selectedPreset) {
+      return;
+    }
+    setActivePreset(selectedPreset);
+    setView(selectedPreset.view);
+    setError(null);
+  };
+
+  const handleClearPresetManifest = () => {
+    setActivePreset(null);
+  };
+
+  const handleSyncPresetFromDisk = async () => {
+    if (!selectedPreset) {
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await syncTerraformImportPresetFromDiskViaApi(selectedPreset.id);
+      await refreshPresets();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to sync preset from disk.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChoosePresetFolder = async () => {
+    try {
+      await chooseTerraformImportPresetRootDirectory();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to choose preset folder.",
+      );
     }
   };
 
@@ -349,122 +708,293 @@ writer -> bucket`}</code>
       </details>
 
       <div className="TerraformImportModal__section">
-        <h4>Plan + graph bundles</h4>
-        <p className="TerraformImportModal__muted">
-          One row per Terraform root or workspace ({MAX_PLAN_BUNDLES} max).
-        </p>
-        <div className="TerraformImportModal__bundles">
-          {bundles.map((row, index) => (
-            <div key={row.id} className="TerraformImportModal__bundle">
-              <div className="TerraformImportModal__bundleHeader">
-                <span className="TerraformImportModal__bundleTitle">
-                  Stack {index + 1}
-                </span>
-                {bundles.length > 1 && (
-                  <button
-                    type="button"
-                    className="TerraformImportModal__bundleRemove"
-                    onClick={() => removeBundle(row.id)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-              <label>
-                Label (optional)
-                <input
-                  type="text"
-                  placeholder="e.g. networking"
-                  value={row.label}
-                  onChange={(e) =>
-                    updateBundle(row.id, { label: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Plan file (.json)
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={(e) =>
-                    updateBundle(row.id, {
-                      planFile: e.target.files?.[0] ?? null,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Graph file (.dot)
-                <input
-                  type="file"
-                  accept=".dot"
-                  onChange={(e) =>
-                    updateBundle(row.id, {
-                      dotFile: e.target.files?.[0] ?? null,
-                    })
-                  }
-                />
-              </label>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          className="TerraformImportModal__addBundle"
-          disabled={bundles.length >= MAX_PLAN_BUNDLES}
-          onClick={addBundle}
-        >
-          Add plan + graph
-        </button>
-      </div>
-
-      <div className="TerraformImportModal__section">
-        <h4>State files</h4>
+        <h4>Presets</h4>
         <label>
-          State (.tfstate / state pull JSON)
-          <span className="TerraformImportModal__muted">
-            Optional with plan bundles to enrich nodes; or select one or more
-            alone for module or semantic views.
-          </span>
-          <input
-            type="file"
-            multiple
-            accept=".tfstate,.json"
-            onChange={(e) => setStateFiles(Array.from(e.target.files ?? []))}
-          />
-        </label>
-        {stateFiles.length > 0 && (
-          <ul className="TerraformImportModal__fileList">
-            {stateFiles.map((f) => (
-              <li key={`${f.name}-${f.size}`}>{f.name}</li>
+          Preset
+          <select
+            value={selectedPresetId}
+            disabled={presetsLoading || loading}
+            onChange={(event) => setSelectedPresetId(event.target.value)}
+          >
+            {availablePresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.name}
+                {preset.builtin ? " (built-in)" : ""}
+              </option>
             ))}
-          </ul>
+          </select>
+        </label>
+        {selectedPreset && (
+          <div className="TerraformImportModal__presetSummary">
+            <div>
+              <strong>Stacks:</strong> {selectedPreset.stacks.length}
+            </div>
+            <div>
+              <strong>TFD files:</strong> {selectedPreset.tfdPaths.length}
+            </div>
+            <div>
+              <strong>View:</strong> {selectedPreset.view}
+            </div>
+            <div>
+              <strong>Root:</strong> {selectedPreset.rootPath}
+            </div>
+            <div>
+              <strong>Content:</strong>{" "}
+              {selectedPreset.hasContent
+                ? "stored in SQLite (portable)"
+                : "paths only — sync from disk"}
+            </div>
+          </div>
         )}
+        {presetsLoading && (
+          <p className="TerraformImportModal__muted">
+            Loading presets from SQLite…
+          </p>
+        )}
+        <div className="TerraformImportModal__presetButtons">
+          <button
+            type="button"
+            onClick={handleLoadPresetAndImport}
+            disabled={loading || !selectedPreset}
+          >
+            Load & import
+          </button>
+          <button
+            type="button"
+            onClick={handleUsePresetManifest}
+            disabled={loading || !selectedPreset}
+          >
+            Use preset manifest
+          </button>
+          {activePreset && (
+            <button
+              type="button"
+              onClick={handleClearPresetManifest}
+              disabled={loading}
+            >
+              Clear preset manifest
+            </button>
+          )}
+          <button type="button" onClick={handleSaveAsPreset} disabled={loading}>
+            Save as new
+          </button>
+          <button
+            type="button"
+            onClick={handleUpdatePreset}
+            disabled={loading || !selectedPreset || selectedPreset.builtin}
+          >
+            Update selected
+          </button>
+          <button
+            type="button"
+            onClick={handleDeletePreset}
+            disabled={loading || !selectedPreset || selectedPreset.builtin}
+          >
+            Delete selected
+          </button>
+          <button
+            type="button"
+            onClick={handleSyncPresetFromDisk}
+            disabled={loading || !selectedPreset}
+          >
+            Sync from disk
+          </button>
+          <button
+            type="button"
+            onClick={handleChoosePresetFolder}
+            disabled={loading}
+          >
+            Choose preset folder
+          </button>
+        </div>
       </div>
 
-      <div className="TerraformImportModal__section">
-        <h4>Dataflow links</h4>
-        <label htmlFor="terraform-import-links">
-          <span className="TerraformImportModal__muted">
-            Optional arrow-only overlay; edges are applied in file order across
-            all selected <code>.tfd</code> files.
-          </span>
-          <input
-            id="terraform-import-links"
-            type="file"
-            multiple
-            accept=".tfd,.txt"
-            onChange={(e) => setTfdFiles(Array.from(e.target.files ?? []))}
-          />
-        </label>
-        {tfdFiles.length > 0 && (
-          <ul className="TerraformImportModal__fileList">
-            {tfdFiles.map((f) => (
-              <li key={`${f.name}-${f.size}`}>{f.name}</li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {usingPresetManifest && activePreset ? (
+        <div className="TerraformImportModal__section">
+          <h4>Preset manifest</h4>
+          <p className="TerraformImportModal__muted">
+            Files are loaded from the preset database (plan, graph, state, and
+            .tfd content). Use <strong>Load &amp; import</strong> or{" "}
+            <strong>Import &amp; Open</strong> below. Copy{" "}
+            <code>terraform-import-presets.db</code> to move presets between
+            machines.
+          </p>
+          <div className="TerraformImportModal__presetManifest">
+            <table>
+              <thead>
+                <tr>
+                  <th>Stack</th>
+                  <th>Plan</th>
+                  <th>Graph</th>
+                  <th>State (optional)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activePreset.stacks.map((stack) => (
+                  <tr key={stack.id}>
+                    <td>{stack.label}</td>
+                    <td>
+                      <code>
+                        {joinPresetPath(activePreset.rootPath, stack.planPath)}
+                      </code>
+                    </td>
+                    <td>
+                      <code>
+                        {joinPresetPath(activePreset.rootPath, stack.dotPath)}
+                      </code>
+                    </td>
+                    <td>
+                      {stack.statePath ? (
+                        <code>
+                          {joinPresetPath(
+                            activePreset.rootPath,
+                            stack.statePath,
+                          )}
+                        </code>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {activePreset.tfdPaths.length > 0 && (
+              <ul className="TerraformImportModal__fileList">
+                {activePreset.tfdPaths.map((tfdPath) => (
+                  <li key={tfdPath}>
+                    <code>
+                      {joinPresetPath(activePreset.rootPath, tfdPath)}
+                    </code>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="TerraformImportModal__section">
+            <h4>Plan + graph bundles</h4>
+            <p className="TerraformImportModal__muted">
+              One row per Terraform root or workspace ({MAX_PLAN_BUNDLES} max).
+            </p>
+            <div className="TerraformImportModal__bundles">
+              {bundles.map((row, index) => (
+                <div key={row.id} className="TerraformImportModal__bundle">
+                  <div className="TerraformImportModal__bundleHeader">
+                    <span className="TerraformImportModal__bundleTitle">
+                      Stack {index + 1}
+                    </span>
+                    {bundles.length > 1 && (
+                      <button
+                        type="button"
+                        className="TerraformImportModal__bundleRemove"
+                        onClick={() => removeBundle(row.id)}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <label>
+                    Label (optional)
+                    <input
+                      type="text"
+                      placeholder="e.g. networking"
+                      value={row.label}
+                      onChange={(e) =>
+                        updateBundle(row.id, { label: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Plan file (.json)
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={(e) =>
+                        updateBundle(row.id, {
+                          planFile: e.target.files?.[0] ?? null,
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Graph file (.dot)
+                    <input
+                      type="file"
+                      accept=".dot"
+                      onChange={(e) =>
+                        updateBundle(row.id, {
+                          dotFile: e.target.files?.[0] ?? null,
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="TerraformImportModal__addBundle"
+              disabled={bundles.length >= MAX_PLAN_BUNDLES}
+              onClick={addBundle}
+            >
+              Add plan + graph
+            </button>
+          </div>
+
+          <div className="TerraformImportModal__section">
+            <h4>State files</h4>
+            <label>
+              State (.tfstate / state pull JSON)
+              <span className="TerraformImportModal__muted">
+                Optional with plan bundles to enrich nodes; or select one or
+                more alone for module or semantic views.
+              </span>
+              <input
+                type="file"
+                multiple
+                accept=".tfstate,.json"
+                onChange={(e) =>
+                  setStateFiles(Array.from(e.target.files ?? []))
+                }
+              />
+            </label>
+            {stateFiles.length > 0 && (
+              <ul className="TerraformImportModal__fileList">
+                {stateFiles.map((f) => (
+                  <li key={`${f.name}-${f.size}`}>{f.name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="TerraformImportModal__section">
+            <h4>Dataflow links</h4>
+            <label htmlFor="terraform-import-links">
+              <span className="TerraformImportModal__muted">
+                Optional arrow-only overlay; edges are applied in file order
+                across all selected <code>.tfd</code> files.
+              </span>
+              <input
+                id="terraform-import-links"
+                type="file"
+                multiple
+                accept=".tfd,.txt"
+                onChange={(e) => setTfdFiles(Array.from(e.target.files ?? []))}
+              />
+            </label>
+            {tfdFiles.length > 0 && (
+              <ul className="TerraformImportModal__fileList">
+                {tfdFiles.map((f) => (
+                  <li key={`${f.name}-${f.size}`}>{f.name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="TerraformImportModal__divider" />
 
@@ -537,6 +1067,16 @@ writer -> bucket`}</code>
           <ul>
             {importWarnings.map((w, i) => (
               <li key={`${w.code}-${i}`}>{w.message}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {presetWarnings.length > 0 && (
+        <details className="TerraformImportModal__warnings" open>
+          <summary>Preset warnings ({presetWarnings.length})</summary>
+          <ul>
+            {presetWarnings.map((warning, index) => (
+              <li key={`${warning.code}-${index}`}>{warning.message}</li>
             ))}
           </ul>
         </details>

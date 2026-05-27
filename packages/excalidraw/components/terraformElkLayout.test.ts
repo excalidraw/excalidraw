@@ -978,7 +978,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(parents.sort()).toEqual([a, c].sort());
   });
 
-  it("soft-hides non-primary resource rectangles and bound labels", async () => {
+  it("shows managed no-op non-primary resources by default", async () => {
     const address = "aws_iam_role.dummy";
     const { elements } = await buildTerraformElkExcalidrawScene(
       oneResourceNodes(address, {
@@ -993,18 +993,18 @@ describe("buildTerraformElkExcalidrawScene", () => {
         (e as { customData?: { terraformVisibilityKey?: string } }).customData
           ?.terraformVisibilityKey === address,
     );
-    expect(rect?.isDeleted).toBe(true);
+    expect(rect?.isDeleted).toBe(false);
     expect(
       (rect as { customData?: { terraformInitiallyVisible?: boolean } })
         .customData?.terraformInitiallyVisible,
-    ).toBe(false);
+    ).toBe(true);
     const label = elements.find(
       (e) =>
         e.type === "text" &&
         (e as { customData?: { terraformVisibilityKey?: string } }).customData
           ?.terraformVisibilityKey === address,
     );
-    expect(label?.isDeleted).toBe(true);
+    expect(label?.isDeleted).toBe(false);
     expect((label as { containerId?: string | null })?.containerId).toBe(null);
     const labelParents =
       (label as { customData?: { terraformExplodeParentKeys?: string[] } })
@@ -1012,16 +1012,16 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(labelParents).toEqual([]);
   });
 
-  it("shows changed non-primary resources and labels by default", async () => {
+  it("shows managed non-primary resources and labels by default", async () => {
     const fixtures = [
       ["aws_iam_role_policy.created", ["create"], false],
       ["aws_iam_role_policy.updated", ["update"], false],
       ["aws_iam_role_policy.deleted", ["delete"], false],
       ["aws_iam_role_policy.replaced", ["delete", "create"], false],
-      ["aws_iam_role_policy.noop", ["no-op"], true],
-      ["aws_iam_role_policy.existing", ["existing"], true],
-      ["aws_iam_role_policy.read", ["read"], true],
-      ["aws_iam_role_policy.external", ["external"], true],
+      ["aws_iam_role_policy.noop", ["no-op"], false],
+      ["aws_iam_role_policy.existing", ["existing"], false],
+      ["aws_iam_role_policy.read", ["read"], false],
+      ["aws_iam_role_policy.external", ["external"], false],
     ] as const;
 
     for (const [address, actions, expectedDeleted] of fixtures) {

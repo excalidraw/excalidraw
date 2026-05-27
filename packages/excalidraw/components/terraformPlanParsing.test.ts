@@ -306,6 +306,25 @@ describe("resolveTerraformPlanNodeKey", () => {
     };
     expect(resolveTerraformPlanNodeKey(nodes, "aws_instance.a")).toBeNull();
   });
+
+  it("resolves unqualified refs to a single stack-qualified node key", () => {
+    const nodes: Record<string, TerraformPlanGraphNode> = {
+      "40-east-api-1::module.api.aws_ssm_parameter.api_name": { resources: {} },
+      "41-east-api-2::module.api.aws_ssm_parameter.api_name": { resources: {} },
+    };
+    expect(
+      resolveTerraformPlanNodeKey(
+        nodes,
+        "module.api.aws_ssm_parameter.api_name",
+      ),
+    ).toBeNull();
+    expect(
+      resolveTerraformPlanNodeKey(
+        nodes,
+        "40-east-api-1::module.api.aws_ssm_parameter.api_name",
+      ),
+    ).toBe("40-east-api-1::module.api.aws_ssm_parameter.api_name");
+  });
 });
 
 describe("terraformPlanParsing", () => {
@@ -553,8 +572,8 @@ describe("terraformPlanParsing", () => {
           : null,
       )
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.stack_a");
-    expect(nodePaths).toContain("cloudflare_dns_record.stack_b");
+    expect(nodePaths).toContain("stack-a::cloudflare_zone.stack_a");
+    expect(nodePaths).toContain("stack-b::cloudflare_dns_record.stack_b");
   }, 60_000);
 
   it("plan+dot module view accepts cloudflare managed resources", async () => {

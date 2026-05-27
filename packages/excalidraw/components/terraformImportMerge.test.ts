@@ -1,3 +1,6 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -5,8 +8,10 @@ import {
   mergePlanJsons,
   mergePlanWithStates,
   mergeSyntheticPlans,
+  namespacePlanDotBundles,
   parseRawStateJson,
 } from "./terraformImportMerge";
+import { prefixStackAddress } from "./terraformStackAddress";
 
 describe("terraformImportMerge", () => {
   it("parseRawStateJson accepts terraform state pull shape", () => {
@@ -124,5 +129,55 @@ describe("terraformImportMerge", () => {
     );
     expect(addresses).toContain("aws_vpc.main");
     expect(addresses).toContain("cloudflare_zone.example");
+  });
+
+  it("namespaced staging multi-state merge has no duplicate_address warnings", () => {
+    const root = join(
+      import.meta.dirname,
+      "../../backend/terraform/staging-multi-state",
+    );
+    const stacks = readdirSync(root)
+      .filter((d) => statSync(join(root, d)).isDirectory() && /^\d/.test(d))
+      .sort();
+    const bundles = stacks.map((id) => ({
+      plan: JSON.parse(readFileSync(join(root, id, "plan.json"), "utf8")),
+      dotText: readFileSync(join(root, id, "graph.dot"), "utf8"),
+      label: id,
+    }));
+    const { bundles: namespaced, stackIds } = namespacePlanDotBundles(bundles);
+    expect(stackIds).toHaveLength(9);
+    const merged = mergePlanJsons(
+      namespaced.map((b) => b.plan),
+      namespaced.map((b) => b.label),
+    );
+    expect(
+      merged.warnings.filter((w) => w.code === "duplicate_address"),
+    ).toHaveLength(0);
+    expect(merged.plan.resource_changes.length).toBeGreaterThan(150);
+
+    const apiLambdas = merged.plan.resource_changes.filter((rc) =>
+      (rc as { address?: string }).address?.includes(
+        "module.api.module.lambda_service.module.lambda.aws_lambda_function",
+      ),
+    );
+    expect(apiLambdas.length).toBe(5);
+    const stacksSeen = new Set(
+      apiLambdas.map(
+        (rc) => (rc as { address: string }).address.split("::")[0],
+      ),
+    );
+    expect(stacksSeen.size).toBe(5);
+  });
+
+  it("mergeDotAdjacency prefixes node ids per stack", () => {
+    const dotA = `digraph { "a" -> "b" }`;
+    const dotB = `digraph { "a" -> "c" }`;
+    const adj = mergeDotAdjacency([dotA, dotB], ["stack-a", "stack-b"]);
+    expect(adj[prefixStackAddress("stack-a", "a")]).toContain(
+      prefixStackAddress("stack-a", "b"),
+    );
+    expect(adj[prefixStackAddress("stack-b", "a")]).toContain(
+      prefixStackAddress("stack-b", "c"),
+    );
   });
 });

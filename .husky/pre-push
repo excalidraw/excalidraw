@@ -1,6 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Mirrors PR CI as closely as practical: typecheck, ESLint, Prettier,
-# Vitest with coverage thresholds, then @excalidraw/excalidraw ESM build + size-limit.
+# Mirrors PR CI: typecheck, ESLint, Prettier, Vitest (no watch), coverage, ESM build + size-limit.
 yarn test:prepush

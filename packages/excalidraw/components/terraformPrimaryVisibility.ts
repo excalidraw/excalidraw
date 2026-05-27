@@ -48,6 +48,12 @@ const PRIMARY_MESSAGING_TYPES = new Set([
   "aws_msk_cluster",
 ]);
 
+/** Regional API frontends (VPC-less; placed in the regional-primary strip). */
+const PRIMARY_API_TYPES = new Set([
+  "aws_api_gateway_rest_api",
+  "aws_apigatewayv2_api",
+]);
+
 const PRIMARY_SPARK_TYPES = new Set<string>();
 
 const PRIMARY_CRYPTO_TYPES = new Set(["aws_kms_key"]);
@@ -59,6 +65,7 @@ const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_COMPUTE_TYPES,
   ...PRIMARY_STORAGE_TYPES,
   ...PRIMARY_MESSAGING_TYPES,
+  ...PRIMARY_API_TYPES,
   ...PRIMARY_SPARK_TYPES,
   ...PRIMARY_CRYPTO_TYPES,
   ...PRIMARY_MODULE_TYPES,
@@ -97,14 +104,43 @@ export function isChangedTerraformAction(action: string): boolean {
   );
 }
 
+/** Managed resource types that belong on topology diagrams (not data sources / bookkeeping). */
+export function isManagedTopologyResourceType(resourceType: string): boolean {
+  if (!resourceType || resourceType === "data") {
+    return false;
+  }
+  if (resourceType === "terraform_data" || resourceType.startsWith("null_")) {
+    return false;
+  }
+  if (resourceType.startsWith("aws_")) {
+    return true;
+  }
+  return isGenericManagedProviderResourceType(resourceType);
+}
+
+/**
+ * Drawn as its own tile in VPC zones / regional strips (excludes types that are
+ * only rendered as satellites under another primary).
+ */
+export function isTopologyPlacementResourceType(resourceType: string): boolean {
+  if (!isManagedTopologyResourceType(resourceType)) {
+    return false;
+  }
+  if (resourceType === "aws_lambda_permission") {
+    return false;
+  }
+  return true;
+}
+
+/** Default import visibility: show all managed resources, including no-op plans. */
 export function isInitiallyVisibleTerraformResource(
   resourceType: string,
   action: string,
 ): boolean {
-  return (
-    isPrimaryVisibleResourceType(resourceType) ||
-    isChangedTerraformAction(action)
-  );
+  if (isManagedTopologyResourceType(resourceType)) {
+    return true;
+  }
+  return isChangedTerraformAction(action);
 }
 
 /**

@@ -451,6 +451,82 @@
       color: var(--color-gray-70);
     }
 
+    &__presetSummary {
+      display: grid;
+      gap: 4px;
+      font-family: "Assistant";
+      font-size: 0.8125rem;
+      color: var(--color-gray-70);
+    }
+
+    &__presetManifest {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--color-gray-30);
+      border-radius: 0.5rem;
+      background-color: var(--color-surface-low);
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Assistant";
+        font-size: 0.8125rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.5rem 0.625rem;
+        border-bottom: 1px solid var(--color-gray-20);
+      }
+
+      th {
+        font-weight: 600;
+        color: var(--color-on-surface);
+        background-color: var(--color-surface-lowest);
+      }
+
+      code {
+        font-family: var(--font-family);
+        font-size: 0.75rem;
+        word-break: break-all;
+      }
+    }
+
+    &__presetButtons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      button {
+        font-family: "Assistant";
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border: 1px solid var(--color-gray-30);
+        border-radius: 0.375rem;
+        background: var(--color-surface-lowest);
+        color: var(--color-on-surface);
+        padding: 0.35rem 0.6rem;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    select {
+      font-family: var(--font-family);
+      min-height: 2.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--color-primary);
+      background-color: transparent;
+      color: var(--color-on-surface);
+    }
+
     &__warnings {
       width: 100%;
       border: 1px solid var(--color-warning);

@@ -73,10 +73,11 @@ import {
 
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
-import type {
-  TerraformModuleTreeNode,
-  TerraformPlanGraphNode,
-  TerraformPlanNodesMap,
+import {
+  resolveTerraformPlanNodeKey,
+  type TerraformModuleTreeNode,
+  type TerraformPlanGraphNode,
+  type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 
 const px = tfComfortPx;
@@ -172,25 +173,11 @@ type ElkLayoutedNode = {
   children?: ElkLayoutedNode[];
 };
 
-function stripIndexes(address: string) {
-  return address.replace(/\[[^\]]+\]/g, "");
-}
-
 export function resolveTerraformPlanVertexId(
   nodes: TerraformPlanNodesMap,
   address: string,
 ): string | null {
-  if (!address || address === TERRAFORM_MODULE_TREE_KEY) {
-    return null;
-  }
-  if (nodes[address]) {
-    return address;
-  }
-  const stripped = stripIndexes(address);
-  if (nodes[stripped]) {
-    return stripped;
-  }
-  return null;
+  return resolveTerraformPlanNodeKey(nodes, address);
 }
 
 function moduleCompoundId(modulePath: string) {
