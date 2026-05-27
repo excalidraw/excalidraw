@@ -368,6 +368,17 @@
     }
   }
 
+  .color-picker__hex-error {
+    grid-column: 1 / -1;
+    color: var(--color-red);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin: 0 8px 4px;
+    background: rgba(255, 0, 0, 0.08);
+    border-radius: 4px;
+    text-align: left;
+  }
+
   .color-picker__input-label {
     display: grid;
     grid-template-columns: auto 1fr auto auto;

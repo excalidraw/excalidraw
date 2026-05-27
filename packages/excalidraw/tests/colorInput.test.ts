@@ -1,5 +1,76 @@
 import { normalizeInputColor } from "@excalidraw/common";
 
+const isValidHexColorInput = (value: string): boolean => {
+  if (value === "") return true;
+  const hex = value.replace(/^#/, "");
+  return (
+    /^[0-9a-fA-F]{3}$/.test(hex) ||
+    /^[0-9a-fA-F]{4}$/.test(hex) ||
+    /^[0-9a-fA-F]{6}$/.test(hex) ||
+    /^[0-9a-fA-F]{8}$/.test(hex)
+  );
+};
+
+describe("isValidHexColorInput", () => {
+  describe("valid inputs", () => {
+    it("accepts 3-digit hex", () => {
+      expect(isValidHexColorInput("abc")).toBe(true);
+      expect(isValidHexColorInput("ABC")).toBe(true);
+      expect(isValidHexColorInput("123")).toBe(true);
+    });
+
+    it("accepts 4-digit hex with alpha", () => {
+      expect(isValidHexColorInput("abcd")).toBe(true);
+      expect(isValidHexColorInput("ABCD")).toBe(true);
+    });
+
+    it("accepts 6-digit hex", () => {
+      expect(isValidHexColorInput("ff0000")).toBe(true);
+      expect(isValidHexColorInput("FF0000")).toBe(true);
+      expect(isValidHexColorInput("abc123")).toBe(true);
+    });
+
+    it("accepts 8-digit hex with alpha", () => {
+      expect(isValidHexColorInput("ff000080")).toBe(true);
+      expect(isValidHexColorInput("FF0000FF")).toBe(true);
+    });
+
+    it("accepts with hash prefix", () => {
+      expect(isValidHexColorInput("#ff0000")).toBe(true);
+      expect(isValidHexColorInput("#abc")).toBe(true);
+      expect(isValidHexColorInput("#ff000080")).toBe(true);
+    });
+
+    it("accepts empty string", () => {
+      expect(isValidHexColorInput("")).toBe(true);
+    });
+  });
+
+  describe("invalid inputs", () => {
+    it("rejects too few characters", () => {
+      expect(isValidHexColorInput("1")).toBe(false);
+      expect(isValidHexColorInput("12")).toBe(false);
+      expect(isValidHexColorInput("12ab")).toBe(false);
+    });
+
+    it("rejects too many characters", () => {
+      expect(isValidHexColorInput("123456789")).toBe(false);
+      expect(isValidHexColorInput("fffffffff")).toBe(false);
+    });
+
+    it("rejects non-hex characters", () => {
+      expect(isValidHexColorInput("gggggg")).toBe(false);
+      expect(isValidHexColorInput("zzzzzz")).toBe(false);
+      expect(isValidHexColorInput("xyz123")).toBe(false);
+    });
+
+    it("rejects invalid characters with hash", () => {
+      expect(isValidHexColorInput("#gggggg")).toBe(false);
+      expect(isValidHexColorInput("#zzzzzz")).toBe(false);
+    });
+  });
+});
+
 describe("normalizeInputColor", () => {
   describe("hex colors", () => {
     it("returns hex color with hash as-is", () => {
