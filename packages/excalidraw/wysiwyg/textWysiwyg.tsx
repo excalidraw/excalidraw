@@ -396,6 +396,10 @@ export const textWysiwyg = ({
           appState.theme === THEME.DARK
             ? applyDarkModeFilter(updatedTextElement.strokeColor)
             : updatedTextElement.strokeColor,
+        caretColor:
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(updatedTextElement.strokeColor)
+            : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
