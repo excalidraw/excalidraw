@@ -4,5 +4,5 @@
     "outDir": "./dist/types"
   },
   "include": ["**/*"],
-  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
+  "exclude": ["**/*.test.*", "tests", "test-fixtures", "types", "examples", "dist"]
 }
