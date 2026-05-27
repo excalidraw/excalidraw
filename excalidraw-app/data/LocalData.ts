@@ -23,15 +23,17 @@ import {
 } from "@excalidraw/common";
 import {
   createStore,
-  entries,
   del,
+  entries,
+  get,
   getMany,
   set,
   setMany,
-  get,
 } from "idb-keyval";
 
 import { getNonDeletedElements } from "@excalidraw/element";
+import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
+
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
@@ -41,7 +43,6 @@ import type {
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 import type { MaybePromise } from "@excalidraw/common/utility-types";
-import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 

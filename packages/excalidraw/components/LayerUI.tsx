@@ -1174,6 +1174,7 @@ const LayerUI = ({
     app,
     appState.hoveredElementIds,
     appState.selectedElementIds,
+    appState.selectedGroupIds,
     appState.terraformEdgeLayerPins,
     appState.viewBackgroundColor,
     elements,
