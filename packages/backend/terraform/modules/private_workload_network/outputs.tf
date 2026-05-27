@@ -33,6 +33,11 @@ output "intra_route_table_ids" {
   value       = module.vpc.intra_route_table_ids
 }
 
+output "private_route_table_ids" {
+  description = "Route tables associated with private subnets."
+  value       = module.vpc.private_route_table_ids
+}
+
 output "interface_endpoint_security_group_id" {
   description = "Security group attached to interface VPC endpoints."
   value       = module.interface_endpoint_security_group.security_group_id

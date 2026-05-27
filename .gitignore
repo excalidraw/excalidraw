@@ -80,6 +80,14 @@ packages/backend/terraform/allplan-s3kms-stage-snapshots.json
 packages/backend/terraform/allplan-s3kms-withstate-stage-snapshots.json
 **/terraform/.pluralith/
 
+# Staging multi-state local Terraform artifacts/state.
+packages/backend/terraform/staging-multi-state/**/terraform.tfvars
+packages/backend/terraform/staging-multi-state/**/terraform.tfvars.backup
+packages/backend/terraform/staging-multi-state/**/*.auto.tfvars
+packages/backend/terraform/staging-multi-state/**/crash.*
+packages/backend/terraform/staging-multi-state/**/plan.bin
+packages/backend/terraform/staging-multi-state/**/build/
+
 # Cloudflare Wrangler (local dev state, caches; not source-controlled)
 .wrangler/
 
