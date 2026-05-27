@@ -352,6 +352,7 @@ const TerraformUnknownAfterIntentRows = ({
 const getTerraformElementForSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElementIds: UIAppState["selectedElementIds"],
+  selectedGroupIdsMap: UIAppState["selectedGroupIds"],
 ) => {
   const selectedIds = Object.keys(selectedElementIds);
   if (selectedIds.length === 0) {
@@ -407,7 +408,7 @@ const getTerraformElementForSelection = (
   }
 
   const selectedGroupIds = new Set<string>([
-    ...Object.keys(appState.selectedGroupIds),
+    ...Object.keys(selectedGroupIdsMap),
     ...selectedElements.flatMap((element) => element.groupIds || []),
   ]);
 
@@ -1092,6 +1093,7 @@ const LayerUI = ({
     const terraformElement = getTerraformElementForSelection(
       elements,
       appState.selectedElementIds,
+      appState.selectedGroupIds,
     );
     const selectedGraphKey =
       terraformElement && isTerraformResourceElement(terraformElement)
@@ -1259,7 +1261,8 @@ const LayerUI = ({
     const isCompactMode = isCompactStylesPanel;
     const terraformElement = getTerraformElementForSelection(
       elements,
-      appState,
+      appState.selectedElementIds,
+      appState.selectedGroupIds,
     );
     const terraformMenuWidth = terraformElement
       ? "min(36rem, calc(100vw - 2rem))"

@@ -144,7 +144,7 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
       { semanticLayout: true },
     );
     const body = await res.json();
-    const elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
       repairBindings: true,
     });
     const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
