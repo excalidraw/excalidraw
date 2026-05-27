@@ -1,8 +1,9 @@
 name: "Bundle Size check @excalidraw/excalidraw"
+
 on:
   pull_request:
-    branches:
-      - master
+  workflow_dispatch:
+
 jobs:
   size:
     runs-on: ubuntu-latest
@@ -11,15 +12,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Install in packages/excalidraw
         run: yarn
         working-directory: packages/excalidraw
         env:
           CI: true
+
       - uses: andresz1/size-limit-action@e7493a72a44b113341c0cf6186ab49c17c4b65c1 # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
