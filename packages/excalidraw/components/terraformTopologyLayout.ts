@@ -75,7 +75,7 @@ import {
 } from "./terraformTopologyCloudWatchLinks";
 import {
   buildArnIndexForTopology,
-  buildLambdaIamCluster,
+  buildPrimaryIamCluster,
   iamSatelliteStackHeightPx,
   mergeTerraformPlanResourceValues,
   type TopologyIamEdge,
@@ -85,8 +85,7 @@ import {
   kmsPolicySatelliteStackHeightPx,
 } from "./terraformTopologyKmsLinks";
 import {
-  buildLambdaSgCluster,
-  buildLoadBalancerSgCluster,
+  buildPrimarySgCluster,
   buildVpcEndpointSgCluster,
   sgSatelliteStackHeightPx,
   terraformVpceSgLayoutElementId,
@@ -414,16 +413,13 @@ function topologyPrimaryCellFootprintPx(
       ? pr.type
       : getTerraformCardResourceType(address, pr);
 
-  const { cluster: iamCluster } = buildLambdaIamCluster(
+  const { cluster: iamCluster } = buildPrimaryIamCluster(
     nodes,
     address,
     arnIndex,
   );
   const kmsBuild = buildKmsKeyPolicyCluster(nodes, address, arnIndex);
-  const sgBuild =
-    primaryType === "aws_lb"
-      ? buildLoadBalancerSgCluster(nodes, address, arnIndex, plan)
-      : buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  const sgBuild = buildPrimarySgCluster(nodes, address, arnIndex, plan);
   const cwBuild = buildResourceCloudWatchCluster(nodes, address);
   const albFootprint = buildAlbListenerTargetCluster(nodes, address, arnIndex);
   const lambdaPermissionFootprint =
@@ -2724,35 +2720,6 @@ type TopologyPrimaryClusterPlacement = {
   vpcId: string | null;
 };
 
-function emitTerraformDebugLog(
-  location: string,
-  message: string,
-  data: Record<string, unknown>,
-  hypothesisId: string,
-) {
-  if (!import.meta.env.DEV) {
-    return;
-  }
-  // #region agent log
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "dbae01",
-    },
-    body: JSON.stringify({
-      sessionId: "dbae01",
-      runId: "repro-ecs-staging",
-      hypothesisId,
-      location,
-      message,
-      data,
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-}
-
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
@@ -2921,12 +2888,9 @@ function appendTopologyResourceRectangles(
       { initiallyVisible, explodeParentKeys: [] },
     );
 
-    const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
+    const { cluster, edges } = buildPrimaryIamCluster(nodes, addr, arnIndex);
     const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
-    const sgBuild =
-      resourceType === "aws_lb"
-        ? buildLoadBalancerSgCluster(nodes, addr, arnIndex, plan)
-        : buildLambdaSgCluster(nodes, addr, arnIndex, plan);
+    const sgBuild = buildPrimarySgCluster(nodes, addr, arnIndex, plan);
     const s3Build = buildS3CompanionCluster(nodes, addr, arnIndex);
     const albBuild = buildAlbListenerTargetCluster(nodes, addr, arnIndex);
     const lambdaPermissionBuild = buildLambdaPermissionCluster(
@@ -2936,23 +2900,6 @@ function appendTopologyResourceRectangles(
     );
     const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
-    if (resourceType === "aws_ecs_service") {
-      emitTerraformDebugLog(
-        "terraformTopologyLayout.ts:appendTopologyResourceRectangles",
-        "ECS satellite cluster composition",
-        {
-          address: addr,
-          placementVpcId: placement.vpcId,
-          iamClusterSize: cluster?.stack.length ?? 0,
-          sgClusterSize: sgBuild.cluster?.groups.length ?? 0,
-          cloudWatchAlarmCount: cloudWatchBuild.cluster?.alarms.length ?? 0,
-          cloudWatchLogGroupCount:
-            cloudWatchBuild.cluster?.logGroups.length ?? 0,
-          sqsClusterSize: sqsBuild.cluster?.stack.length ?? 0,
-        },
-        "H3",
-      );
-    }
     const { iamW, sgW } = satelliteColumnWidths();
     const { alarmW, logGroupW } = cloudWatchColumnWidths();
 

@@ -1140,6 +1140,67 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
     ).toEqual(["subnet-nlb-1", "subnet-nlb-2"]);
   });
 
+  it("collectPlacementSubnetIds includes aws_ecs_service network_configuration subnets", () => {
+    expect(
+      collectPlacementSubnetIds({
+        network_configuration: [
+          {
+            subnets: ["subnet-private-a", "subnet-private-b"],
+            security_groups: ["sg-ecs"],
+          },
+        ],
+      }),
+    ).toEqual(["subnet-private-a", "subnet-private-b"]);
+  });
+
+  it("places aws_ecs_service in VPC zone from network_configuration subnets", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.private_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-private-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_ecs_service.producer",
+          mode: "managed",
+          type: "aws_ecs_service",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              name: "staging-producer",
+              region: "us-east-1",
+              network_configuration: [
+                {
+                  subnets: ["subnet-private-a"],
+                  security_groups: ["sg-ecs"],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    const ecsZone = zones.find((z) =>
+      z.addresses.includes("aws_ecs_service.producer"),
+    );
+    expect(ecsZone).toBeDefined();
+    expect(ecsZone!.vpcId).toBe("vpc-east");
+    expect(ecsZone!.subnetIds).toContain("subnet-private-a");
+  });
+
   it("places aws_lb in subnet zone inferred from aws_instance sharing security_groups", () => {
     const subnetArn = "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-0work";
     const plan = {
