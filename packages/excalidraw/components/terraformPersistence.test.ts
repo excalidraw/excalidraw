@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { getTerraformEdgeLayer, getTerraformPersistableElements } from "./terraformVisibility";
+import {
+  getTerraformEdgeLayer,
+  getTerraformPersistableElements,
+} from "./terraformVisibility";
 
 describe("terraform persistence", () => {
   it("keeps soft-deleted terraform edges in localStorage payload", () => {

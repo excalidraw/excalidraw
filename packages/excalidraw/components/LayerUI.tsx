@@ -351,15 +351,15 @@ const TerraformUnknownAfterIntentRows = ({
 
 const getTerraformElementForSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: UIAppState,
+  selectedElementIds: UIAppState["selectedElementIds"],
 ) => {
-  const selectedIds = Object.keys(appState.selectedElementIds);
+  const selectedIds = Object.keys(selectedElementIds);
   if (selectedIds.length === 0) {
     return null;
   }
 
   const selectedElements = elements.filter(
-    (element) => appState.selectedElementIds[element.id],
+    (element) => selectedElementIds[element.id],
   );
 
   const selectedTerraformNode = selectedElements.find((element) =>
@@ -1091,7 +1091,7 @@ const LayerUI = ({
     );
     const terraformElement = getTerraformElementForSelection(
       elements,
-      appState,
+      appState.selectedElementIds,
     );
     const selectedGraphKey =
       terraformElement && isTerraformResourceElement(terraformElement)
@@ -1160,10 +1160,7 @@ const LayerUI = ({
       return;
     }
 
-    const nextFocusSceneSig = terraformFocusSceneSig(
-      next,
-      activeFocusNodePath,
-    );
+    const nextFocusSceneSig = terraformFocusSceneSig(next, activeFocusNodePath);
     if (nextFocusSceneSig === lastTerraformFocusSceneSigRef.current) {
       commitFocusState(nextFocusSceneSig);
       return;
