@@ -18,6 +18,7 @@ locals {
     state       = "01-west-network"
     managed_by  = "terraform"
   }
+
 }
 
 provider "aws" {
@@ -148,18 +149,16 @@ resource "aws_ec2_transit_gateway_route" "east_to_west" {
 
 resource "aws_route" "west_private_to_tgw" {
   provider = aws.west
-  for_each = toset(module.west_network.private_route_table_ids)
 
-  route_table_id         = each.value
+  route_table_id         = module.west_network.private_route_table_ids[0]
   destination_cidr_block = data.terraform_remote_state.east_network.outputs.vpc_cidr
   transit_gateway_id     = aws_ec2_transit_gateway.west.id
 }
 
 resource "aws_route" "west_intra_to_tgw" {
   provider = aws.west
-  for_each = toset(module.west_network.intra_route_table_ids)
 
-  route_table_id         = each.value
+  route_table_id         = module.west_network.intra_route_table_ids[0]
   destination_cidr_block = data.terraform_remote_state.east_network.outputs.vpc_cidr
   transit_gateway_id     = aws_ec2_transit_gateway.west.id
 }

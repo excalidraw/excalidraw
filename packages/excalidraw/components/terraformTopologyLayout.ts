@@ -1800,8 +1800,7 @@ function appendVpcEndpointPrimaryClusters(
           TOPOLOGY_TIER1_H,
           nodes,
           {
-            initiallyVisible: false,
-            explodeParentKeys: [vpceAddr],
+            explodeParentKeys: [layoutInst],
             satelliteTier: 1,
             elementId: sgLayoutId,
             terraformSemanticLayoutDuplicate: sgIsDup,
@@ -1838,8 +1837,7 @@ function appendVpcEndpointPrimaryClusters(
             TOPOLOGY_TIER2_H,
             nodes,
             {
-              initiallyVisible: false,
-              explodeParentKeys: [vpceAddr],
+              explodeParentKeys: [layoutInst],
               satelliteTier: 2,
               elementId: ruleLayoutId,
               terraformSemanticLayoutDuplicate: ruleIsDup,
@@ -2086,7 +2084,8 @@ function pushResourceRectangleSkeleton(
   height: number,
   nodes: TerraformPlanNodesMap,
   options: {
-    initiallyVisible: boolean;
+    /** Defaults to {@link isInitiallyVisibleTerraformTopologyTile} (all managed types on no-op). */
+    initiallyVisible?: boolean;
     explodeParentKeys: string[];
     plan?: unknown;
     /** Semantic topology: smaller typography for satellite tiers. */
@@ -2134,6 +2133,9 @@ function pushResourceRectangleSkeleton(
 
   const elementId = options.elementId ?? addr;
   const visibilityKey = elementId;
+  const initiallyVisible =
+    options.initiallyVisible ??
+    isInitiallyVisibleTerraformTopologyTile(resourceType, action);
 
   skeleton.push({
     type: "rectangle",
@@ -2163,7 +2165,7 @@ function pushResourceRectangleSkeleton(
       terraformVisibilityRole: "resource",
       terraformVisibilityKey: visibilityKey,
       terraformNodeKind: "resource",
-      terraformInitiallyVisible: options.initiallyVisible,
+      terraformInitiallyVisible: initiallyVisible,
       terraformExplodeParentKeys: explodeKeys,
       terraformExplodeParent: explodeParent,
       terraformExpandAllView: false,
@@ -2722,6 +2724,35 @@ type TopologyPrimaryClusterPlacement = {
   vpcId: string | null;
 };
 
+function emitTerraformDebugLog(
+  location: string,
+  message: string,
+  data: Record<string, unknown>,
+  hypothesisId: string,
+) {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "dbae01",
+    },
+    body: JSON.stringify({
+      sessionId: "dbae01",
+      runId: "repro-ecs-staging",
+      hypothesisId,
+      location,
+      message,
+      data,
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+}
+
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
@@ -2905,6 +2936,23 @@ function appendTopologyResourceRectangles(
     );
     const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
+    if (resourceType === "aws_ecs_service") {
+      emitTerraformDebugLog(
+        "terraformTopologyLayout.ts:appendTopologyResourceRectangles",
+        "ECS satellite cluster composition",
+        {
+          address: addr,
+          placementVpcId: placement.vpcId,
+          iamClusterSize: cluster?.stack.length ?? 0,
+          sgClusterSize: sgBuild.cluster?.groups.length ?? 0,
+          cloudWatchAlarmCount: cloudWatchBuild.cluster?.alarms.length ?? 0,
+          cloudWatchLogGroupCount:
+            cloudWatchBuild.cluster?.logGroups.length ?? 0,
+          sqsClusterSize: sqsBuild.cluster?.stack.length ?? 0,
+        },
+        "H3",
+      );
+    }
     const { iamW, sgW } = satelliteColumnWidths();
     const { alarmW, logGroupW } = cloudWatchColumnWidths();
 
@@ -3006,7 +3054,6 @@ function appendTopologyResourceRectangles(
             TOPOLOGY_TIER1_H,
             nodes,
             {
-              initiallyVisible: false,
               explodeParentKeys: [addr],
               satelliteTier: 1,
             },
@@ -3035,7 +3082,6 @@ function appendTopologyResourceRectangles(
             TOPOLOGY_TIER1_H,
             nodes,
             {
-              initiallyVisible: false,
               explodeParentKeys: [addr],
               satelliteTier: 1,
             },
@@ -3074,7 +3120,6 @@ function appendTopologyResourceRectangles(
           tileH,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: isRoleTile ? 1 : 2,
           },
@@ -3104,7 +3149,6 @@ function appendTopologyResourceRectangles(
           TOPOLOGY_TIER1_H,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: 1,
           },
@@ -3141,7 +3185,6 @@ function appendTopologyResourceRectangles(
           m.tileH,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: m.tier,
           },
@@ -3185,7 +3228,6 @@ function appendTopologyResourceRectangles(
           m.tileH,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: m.tier,
           },
@@ -3227,7 +3269,6 @@ function appendTopologyResourceRectangles(
           m.tileH,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: m.tier,
           },
@@ -3267,7 +3308,6 @@ function appendTopologyResourceRectangles(
             TOPOLOGY_TIER1_H,
             nodes,
             {
-              initiallyVisible: false,
               explodeParentKeys: [addr],
               satelliteTier: 1,
             },
@@ -3294,7 +3334,6 @@ function appendTopologyResourceRectangles(
               TOPOLOGY_TIER2_H,
               nodes,
               {
-                initiallyVisible: false,
                 explodeParentKeys: [addr],
                 satelliteTier: 2,
               },
@@ -3336,7 +3375,6 @@ function appendTopologyResourceRectangles(
           m.tileH,
           nodes,
           {
-            initiallyVisible: false,
             explodeParentKeys: [addr],
             satelliteTier: m.tier,
           },
@@ -3410,7 +3448,22 @@ function collectTopologyRectangleLayoutFromSkeleton(
  * being hidden behind edges that route across them, while orbit binding still anchors the
  * arrowhead to the card boundary so endpoints stay legible.
  */
-function reorderTopologyElementsZStack(
+const topologyFrameZPriority = (el: ExcalidrawElement): number => {
+  const role = (el.customData as { terraformTopologyRole?: string } | undefined)
+    ?.terraformTopologyRole;
+  switch (role) {
+    case "provider":
+    case "providerBand":
+      return 1;
+    case "providerAccount":
+      return 2;
+    default:
+      return role ? 3 : 4;
+  }
+};
+
+/** Shared z-order for topology scenes: edges → frames (outer→inner) → resources/labels. */
+export function reorderTopologyElementsZStack(
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] {
   const isTopologyFrame = (el: ExcalidrawElement) =>
@@ -3432,7 +3485,12 @@ function reorderTopologyElementsZStack(
 
   const withIndex = elements.map((el, index) => ({ el, index }));
   const lines = withIndex.filter(({ el }) => isTerraformTopologyEdge(el));
-  const frames = withIndex.filter(({ el }) => isTopologyFrame(el));
+  const frames = withIndex
+    .filter(({ el }) => isTopologyFrame(el))
+    .sort((a, b) => {
+      const dz = topologyFrameZPriority(a.el) - topologyFrameZPriority(b.el);
+      return dz !== 0 ? dz : a.index - b.index;
+    });
   const rest = withIndex.filter(
     ({ el }) => !isTopologyFrame(el) && !isTerraformTopologyEdge(el),
   );

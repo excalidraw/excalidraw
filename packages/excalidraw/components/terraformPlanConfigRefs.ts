@@ -9,6 +9,7 @@ import {
   shouldUsePlanReference,
 } from "./terraformTopologyLambdaSgPlanConfig";
 import { resolveTerraformPlanNodeKey } from "./terraformPlanParsing";
+import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -60,7 +61,7 @@ const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
 /** Deepest module path owning a resource address (`module.a.module.b` for `module.a.module.b.aws_x.y`). */
 function getContainingModulePathForAddress(address: string): string {
-  const parts = address.split(".");
+  const parts = stripStackPrefixForModuleParsing(address).split(".");
   let index = 0;
   let modulePath = "";
   while (

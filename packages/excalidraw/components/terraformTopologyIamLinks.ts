@@ -20,6 +20,35 @@ function isEmptyObject(rec: Record<string, unknown>): boolean {
   return Object.keys(rec).length === 0;
 }
 
+function emitTerraformDebugLog(
+  location: string,
+  message: string,
+  data: Record<string, unknown>,
+  hypothesisId: string,
+) {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "dbae01",
+    },
+    body: JSON.stringify({
+      sessionId: "dbae01",
+      runId: "repro-ecs-staging",
+      hypothesisId,
+      location,
+      message,
+      data,
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+}
+
 /** Mirrors topology placement: prefer `before` on delete / empty `after`. */
 export function mergeTerraformPlanResourceValues(
   resource: Record<string, unknown> | undefined,
@@ -464,6 +493,17 @@ export function buildLambdaIamCluster(
   const node = nodes[lambdaAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
   if (!primary || primary.type !== "aws_lambda_function") {
+    if (primary?.type === "aws_ecs_service") {
+      emitTerraformDebugLog(
+        "terraformTopologyIamLinks.ts:buildLambdaIamCluster",
+        "ECS service skipped by lambda-only IAM cluster builder",
+        {
+          address: lambdaAddress,
+          primaryType: primary.type,
+        },
+        "H4",
+      );
+    }
     return { cluster: null, edges: [] };
   }
   const values = mergeTerraformPlanResourceValues(primary);

@@ -498,6 +498,35 @@ function stringArrayField(v: unknown): string[] {
   return v.filter((x): x is string => typeof x === "string" && x.length > 0);
 }
 
+function emitTerraformDebugLog(
+  location: string,
+  message: string,
+  data: Record<string, unknown>,
+  hypothesisId: string,
+) {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "dbae01",
+    },
+    body: JSON.stringify({
+      sessionId: "dbae01",
+      runId: "repro-ecs-staging",
+      hypothesisId,
+      location,
+      message,
+      data,
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+}
+
 function vpcConfigBlocks(
   values: Record<string, unknown>,
 ): Record<string, unknown>[] {
@@ -541,6 +570,31 @@ export function collectPlacementSubnetIds(
         }
       }
     }
+  }
+  const networkConfiguration = values.network_configuration;
+  if (Array.isArray(networkConfiguration)) {
+    const networkConfigSubnetIds: string[] = [];
+    for (const entry of networkConfiguration) {
+      if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+        for (const sid of stringArrayField(
+          (entry as Record<string, unknown>).subnets,
+        )) {
+          networkConfigSubnetIds.push(sid);
+        }
+      }
+    }
+    emitTerraformDebugLog(
+      "terraformTopologyPlacement.ts:collectPlacementSubnetIds",
+      "ECS network_configuration subnet extraction",
+      {
+        topLevelSubnetIds: stringArrayField(values.subnet_ids),
+        topLevelSubnets: stringArrayField(values.subnets),
+        networkConfigurationEntries: networkConfiguration.length,
+        networkConfigurationSubnets: networkConfigSubnetIds.sort(),
+        extractedSubnetIds: [...ids].sort(),
+      },
+      "H1",
+    );
   }
   return [...ids].sort();
 }
@@ -741,11 +795,43 @@ export function extractPrimaryTopologyZones(
       vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
     if (!vpcId) {
+      if (t === "aws_ecs_service") {
+        emitTerraformDebugLog(
+          "terraformTopologyPlacement.ts:extractPrimaryTopologyZones",
+          "ECS service omitted from VPC zone",
+          {
+            address,
+            subnetIds,
+            explicitVpcId:
+              typeof values.vpc_id === "string" ? values.vpc_id : null,
+            subnetToVpcSample:
+              subnetIds.length > 0
+                ? subnetToVpc.get(subnetIds[0]!) ?? null
+                : null,
+          },
+          "H2",
+        );
+      }
       continue;
     }
-
     const subnetSignature = subnetIds.join("|");
     const key = zoneMapKey(accountId, region, vpcId, subnetSignature);
+
+    if (t === "aws_ecs_service") {
+      emitTerraformDebugLog(
+        "terraformTopologyPlacement.ts:extractPrimaryTopologyZones",
+        "ECS service placed in VPC zone",
+        {
+          address,
+          subnetIds,
+          vpcId,
+          accountId,
+          region,
+          zoneKey: key,
+        },
+        "H2",
+      );
+    }
     let row = accum.get(key);
     if (!row) {
       row = {

@@ -6,7 +6,9 @@ import {
   isGenericManagedProviderResourceType,
   isInitiallyVisibleTerraformResource,
   isInitiallyVisibleTerraformTopologyTile,
+  isManagedTopologyResourceType,
   isPrimaryVisibleResourceType,
+  isTopologyPlacementResourceType,
 } from "./terraformPrimaryVisibility";
 
 describe("terraformPrimaryVisibility", () => {
@@ -15,6 +17,8 @@ describe("terraformPrimaryVisibility", () => {
       ["aws_lambda_function", true],
       ["aws_s3_bucket", true],
       ["aws_sqs_queue", true],
+      ["aws_api_gateway_rest_api", true],
+      ["aws_apigatewayv2_api", true],
       ["aws_kms_key", true],
       ["cloudflare_zone", true],
       ["cloudflare_dns_record", true],
@@ -68,21 +72,59 @@ describe("terraformPrimaryVisibility", () => {
     });
   });
 
+  describe("isManagedTopologyResourceType", () => {
+    it.each([
+      ["aws_api_gateway_rest_api", true],
+      ["aws_iam_role", true],
+      ["aws_lambda_permission", true],
+      ["cloudflare_zone", true],
+      ["terraform_data", false],
+      ["data", false],
+    ])("%s → %s", (type, expected) => {
+      expect(isManagedTopologyResourceType(type)).toBe(expected);
+    });
+  });
+
+  describe("isTopologyPlacementResourceType", () => {
+    it("excludes lambda permission tiles (satellite-only)", () => {
+      expect(isTopologyPlacementResourceType("aws_lambda_permission")).toBe(
+        false,
+      );
+    });
+    it("includes primary API Gateway types", () => {
+      expect(isTopologyPlacementResourceType("aws_api_gateway_rest_api")).toBe(
+        true,
+      );
+      expect(isPrimaryVisibleResourceType("aws_api_gateway_rest_api")).toBe(
+        true,
+      );
+    });
+  });
+
   describe("isInitiallyVisibleTerraformResource", () => {
-    it("shows primary types even on no-op", () => {
+    it("shows managed types on no-op (staging plans)", () => {
       expect(
         isInitiallyVisibleTerraformResource("aws_lambda_function", "no-op"),
       ).toBe(true);
+      expect(
+        isInitiallyVisibleTerraformResource(
+          "aws_api_gateway_rest_api",
+          "no-op",
+        ),
+      ).toBe(true);
+      expect(isInitiallyVisibleTerraformResource("aws_iam_role", "no-op")).toBe(
+        true,
+      );
     });
-    it("shows non-primary types when action is a change", () => {
+    it("shows non-aws types when action is a change", () => {
       expect(
         isInitiallyVisibleTerraformResource("aws_iam_role", "create"),
       ).toBe(true);
     });
-    it("hides non-primary unchanged resources", () => {
-      expect(isInitiallyVisibleTerraformResource("aws_iam_role", "no-op")).toBe(
-        false,
-      );
+    it("hides bookkeeping types on no-op", () => {
+      expect(
+        isInitiallyVisibleTerraformResource("terraform_data", "no-op"),
+      ).toBe(false);
     });
   });
 
@@ -95,7 +137,7 @@ describe("terraformPrimaryVisibility", () => {
     it("falls back to resource visibility for non-infra types", () => {
       expect(
         isInitiallyVisibleTerraformTopologyTile("aws_iam_role", "no-op"),
-      ).toBe(false);
+      ).toBe(true);
       expect(
         isInitiallyVisibleTerraformTopologyTile("aws_iam_role", "create"),
       ).toBe(true);

@@ -113,13 +113,21 @@ If the same resource address appears in more than one file, the **last file wins
 
 ### Sample fixtures
 
-Try the committed trio under [`packages/backend/terraform/`](./packages/backend/terraform/):
+Example import bundles live under [`packages/backend/terraform/`](./packages/backend/terraform/) (`allplanmodules.json` / `.dot` / `.tfd`, staging `plan.json` + `graph.dot` per stack, etc.). Those files are **gitignored**; hydrate them locally with `yarn seed:terraform-presets` (see dev presets below) or generate plans from your own Terraform roots.
 
-- [`allplanmodules.json`](./packages/backend/terraform/allplanmodules.json)
-- [`allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot)
-- [`allplanmodules.tfd`](./packages/backend/terraform/allplanmodules.tfd) (optional declared dataflow)
+For state-only tests locally, generate `terraform_allplanmodules.tfstate` in that directory (also gitignored).
 
-For state-only tests locally, generate `terraform_allplanmodules.tfstate` in that directory (gitignored).
+### Dev import presets (SQLite)
+
+Local dev (`yarn start`) loads Terraform import **presets** from `terraform-import-presets.db` at the repo root (gitignored). The catalog is [`packages/backend/terraform/import-presets.catalog.json`](./packages/backend/terraform/import-presets.catalog.json) (staging multi-state, allplanmodules, cloudflare, add/del/new plans, AWS+Cloudflare combo, etc.).
+
+After adding or updating plan/dot/state files under `packages/backend/terraform/`, re-seed the database:
+
+```bash
+yarn seed:terraform-presets
+```
+
+Copy `terraform-import-presets.db` to share presets with another machine. In the import dialog, use **Use preset manifest** or **Sync from disk** on a single preset; `POST /api/terraform-import-presets/seed-all` re-hydrates every built-in preset without restarting the dev server.
 
 ## Declared dataflow (`.tfd`)
 

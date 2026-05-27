@@ -100,7 +100,7 @@ describe("Terraform multi-import App integration", () => {
     const nodePaths = h.elements
       .map((e) => e.customData?.nodePath)
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain("cloudflare::cloudflare_zone.tfdraw_dev");
     expect(
       nodePaths.some(
         (p) => typeof p === "string" && p.includes("workload_writer_lambda"),
