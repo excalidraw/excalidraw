@@ -435,6 +435,9 @@ import { tryParseSpreadsheet } from "../charts";
 
 import {
   buildTerraformReconcileOptionsForAppState,
+  getInvalidTerraformDraggedElementIds,
+  repairTerraformEdgeBindings,
+  restoreInvalidTerraformDraggedElements,
   isTerraformResourceHoverTarget,
   shouldPreserveTerraformResourceHover,
   syncTerraformDetachedResourceLabelsWithDraggedCards,
@@ -11029,6 +11032,23 @@ class App extends React.Component<AppProps, AppState> {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
           const selectedElements = this.scene.getSelectedElements(this.state);
+          const invalidTerraformDraggedElementIds =
+            getInvalidTerraformDraggedElementIds(
+              this.scene,
+              pointerDownState,
+              selectedElements,
+            );
+          const hasInvalidTerraformDrop =
+            invalidTerraformDraggedElementIds.size > 0;
+          if (invalidTerraformDraggedElementIds.size > 0) {
+            restoreInvalidTerraformDraggedElements(
+              this.scene,
+              pointerDownState,
+              invalidTerraformDraggedElementIds,
+              selectedElements,
+            );
+          }
+
           let nextElements = this.scene.getElementsMapIncludingDeleted();
 
           const updateGroupIdsAfterEditingGroup = (
@@ -11074,6 +11094,7 @@ class App extends React.Component<AppProps, AppState> {
           };
 
           if (
+            !hasInvalidTerraformDrop &&
             topLayerFrame &&
             !this.state.selectedElementIds[topLayerFrame.id]
           ) {
@@ -11093,7 +11114,7 @@ class App extends React.Component<AppProps, AppState> {
               topLayerFrame,
               this.state,
             );
-          } else if (!topLayerFrame) {
+          } else if (!hasInvalidTerraformDrop && !topLayerFrame) {
             if (this.state.editingGroupId) {
               const elementsToRemove = selectedElements.filter(
                 (element) =>
@@ -11105,13 +11126,22 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          nextElements = updateFrameMembershipOfSelectedElements(
-            nextElements,
-            this.state,
-            this,
-          );
+          if (!hasInvalidTerraformDrop) {
+            nextElements = updateFrameMembershipOfSelectedElements(
+              nextElements,
+              this.state,
+              this,
+            );
+          }
 
-          this.scene.replaceAllElements(nextElements);
+          if (hasInvalidTerraformDrop) {
+            const reboundElements = repairTerraformEdgeBindings(
+              this.scene.getElementsIncludingDeleted(),
+            );
+            this.scene.replaceAllElements(reboundElements);
+          } else {
+            this.scene.replaceAllElements(nextElements);
+          }
         }
       }
 
