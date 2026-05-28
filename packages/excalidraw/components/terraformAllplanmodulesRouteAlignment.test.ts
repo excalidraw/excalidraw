@@ -1,15 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
 
-import { terraformPlanParsing } from "./terraformPlanParsing";
+import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FIXTURE_DIR = path.resolve(__dirname, "../../backend/terraform");
-const PLAN_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.json");
-const DOT_FIXTURE = path.join(FIXTURE_DIR, "allplanmodules.dot");
+import { terraformPlanParsing } from "./terraformPlanParsing";
 
 function textFileLike(contents: string): File {
   return { text: async () => contents } as File;
@@ -81,8 +74,8 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
    * alignment.
    */
   it("route table tier-0 center X tracks primary grid center X in public + intra subnet zones", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -209,8 +202,8 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
   }, 120_000);
 
   it("merged private subnet zone hosts per-AZ route tables on the zone bottom", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),
@@ -251,8 +244,8 @@ describe("allplanmodules semantic route ↔ primary horizontal alignment", () =>
   }, 120_000);
 
   it("S3 gateway VPCE renders as vpcEgressEndpoint; interface VPCE primaryClusters do not overlap subnet zones in Y", async () => {
-    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+    const planText = readTerraformBackendFile("allplanmodules.json");
+    const dotText = readTerraformBackendFile("allplanmodules.dot");
 
     const res = await terraformPlanParsing(
       textFileLike(planText),

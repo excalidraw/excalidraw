@@ -8,11 +8,8 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
   <a href="https://github.com/TusharSariya/excalidraw-tf/blob/master/LICENSE">
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue.svg" />
   </a>
-  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml">
-    <img alt="Lint workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/lint.yml/badge.svg" />
-  </a>
-  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml">
-    <img alt="Tests workflow" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/test.yml/badge.svg" />
+  <a href="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/ci.yml/badge.svg" />
   </a>
   <img alt="Node 22+" src="https://img.shields.io/badge/node-22%2B-339933" />
   <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">
@@ -113,13 +110,57 @@ If the same resource address appears in more than one file, the **last file wins
 
 ### Sample fixtures
 
-Try the committed trio under [`packages/backend/terraform/`](./packages/backend/terraform/):
+Example import bundles live under [`packages/backend/terraform/`](./packages/backend/terraform/) (`allplanmodules.json` / `.dot` / `.tfd`, staging `plan.json` + `graph.dot` per stack, etc.). Those files are **gitignored**; hydrate them locally with `yarn seed:terraform-presets` (see dev presets below) or generate plans from your own Terraform roots.
 
-- [`allplanmodules.json`](./packages/backend/terraform/allplanmodules.json)
-- [`allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot)
-- [`allplanmodules.tfd`](./packages/backend/terraform/allplanmodules.tfd) (optional declared dataflow)
+For state-only tests locally, generate `terraform_allplanmodules.tfstate` in that directory (also gitignored).
 
-For state-only tests locally, generate `terraform_allplanmodules.tfstate` in that directory (gitignored).
+### Dev import presets (SQLite)
+
+Local dev (`yarn start`) loads Terraform import **presets** from `terraform-import-presets.db` at the repo root (gitignored). The catalog is [`packages/backend/terraform/import-presets.catalog.json`](./packages/backend/terraform/import-presets.catalog.json) (staging multi-state, allplanmodules, cloudflare, add/del/new plans, AWS+Cloudflare combo, etc.).
+
+After adding or updating plan/dot/state files under `packages/backend/terraform/`, re-seed the database:
+
+```bash
+yarn seed:terraform-presets
+```
+
+Copy `terraform-import-presets.db` to share presets with another machine. In the import dialog, use **Use preset manifest** or **Sync from disk** on a single preset; `POST /api/terraform-import-presets/seed-all` re-hydrates every built-in preset without restarting the dev server.
+
+### Hosted Pages (Cloudflare D1)
+
+On **Cloudflare Pages** (not local dev), built-in presets are served read-only from D1 via `GET /api/terraform-import-presets`. Production and branch previews use **separate databases** ([`wrangler.jsonc`](./wrangler.jsonc): top-level bindings = preview, `env.production` = prod when the production branch deploys):
+
+| Binding | Production (`master` / tfdraw.dev) | Preview (other branches / `*.pages.dev`) |
+| --- | --- | --- |
+| `PRESETS_DB` | `tfdraw-presets` | `tfdraw-presets-preview` |
+| `DB` (email signups) | `tfdraw-analytics` | `tfdraw-analytics-preview` |
+
+**What CI does automatically**
+
+| Workflow | Triggers | Effect |
+| --- | --- | --- |
+| [Deploy to Cloudflare Pages](./.github/workflows/pages-deploy.yml) | Push to `master` or `terraform-feature`, or manual | Builds and deploys the static app + Functions. Picks prod vs preview D1 **bindings** from `wrangler.jsonc`. **Does not** upload preset data. |
+| [Push Terraform presets to D1](./.github/workflows/push-presets-d1.yml) | **Manual only** (Actions → Run workflow) | Exports SQL and runs `wrangler d1 execute` to prod and/or preview preset DBs. |
+
+Preset data does **not** update on every deploy (large SQL import). After you change fixtures, `pipeline.tfd`, or the catalog, push data yourself:
+
+```bash
+yarn seed:terraform-presets
+yarn push:terraform-presets-d1:prod      # production only
+yarn push:terraform-presets-d1:preview   # branch previews only
+# yarn push:terraform-presets-d1         # both
+```
+
+Or in GitHub: **Actions → Push Terraform presets to D1** → choose `prod`, `preview`, or `both`.
+
+Deploy the app when code or Functions change ([`pages-deploy.yml`](./.github/workflows/pages-deploy.yml) or `yarn deploy:pages`). Full setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
+
+**Tests and CI** read plan/dot/tfd content from the committed SQLite file [`packages/excalidraw/test-fixtures/terraform-import-presets.db`](./packages/excalidraw/test-fixtures/terraform-import-presets.db) (not from gitignored paths on disk). After changing catalog fixtures locally, run:
+
+```bash
+yarn seed:terraform-presets
+yarn export:terraform-presets-test-db
+```
 
 ## Declared dataflow (`.tfd`)
 
@@ -262,7 +303,7 @@ Output: `excalidraw-app/build`. Optional tarball: `yarn bundle:whiteboard` → `
 
 ### Cloudflare Pages
 
-[`pages-deploy.yml`](./.github/workflows/pages-deploy.yml) deploys on pushes to `master` (or manual dispatch) with `yarn build:pages` and Wrangler.
+[`pages-deploy.yml`](./.github/workflows/pages-deploy.yml) runs on push to `master` or `terraform-feature` (and on manual dispatch). It builds with `yarn build:pages` and runs `wrangler pages deploy`. That deploys the app and Pages Functions only; it does **not** push Terraform preset rows into D1 (see [Hosted Pages (Cloudflare D1)](#hosted-pages-cloudflare-d1) above).
 
 | Kind     | Name                                                      |
 | -------- | --------------------------------------------------------- |
@@ -280,7 +321,9 @@ npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PRO
 
 Use **`wrangler pages deploy`**, not `wrangler deploy`. [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets`); Workers static previews use [`wrangler.workers.jsonc`](./wrangler.workers.jsonc).
 
-**Workers `*.workers.dev` previews do not run `/api/subscribe`** — use a **Pages** URL from GitHub Actions. Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
+Ensure **Pages → Settings → Production branch** is `master` (or your prod branch) so production uses `env.production` D1 bindings.
+
+**Workers `*.workers.dev` previews do not run Pages Functions** (`/api/subscribe`, `/api/terraform-import-presets`, etc.) — use a **Pages** URL from GitHub Actions. Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
 
 ## Upstream Excalidraw
 

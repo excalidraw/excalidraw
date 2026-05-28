@@ -1,14 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import { loadAwsCloudflareMultiImportFixture } from "../test-fixtures/terraformPresetFixtures";
+
 import { restoreElements } from "../data/restore";
 
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { prefixStackAddress } from "./terraformStackAddress";
 
 import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
 import {
@@ -16,9 +15,6 @@ import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TF_ROOT = path.resolve(__dirname, "../../backend/terraform");
 
 describe("terraform multi-import integration", () => {
   beforeAll(() => {
@@ -28,27 +24,8 @@ describe("terraform multi-import integration", () => {
   });
 
   it("merges allplanmodules + cloudflare plan+dot with tfd (module view)", async () => {
-    const awsPlan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const awsDot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
-    const cfPlan = JSON.parse(
-      fs.readFileSync(
-        path.join(TF_ROOT, "cloudflare/cloudflare-plan.json"),
-        "utf8",
-      ),
-    );
-    const cfDot = fs.readFileSync(
-      path.join(TF_ROOT, "cloudflare/cloudflare-plan.dot"),
-      "utf8",
-    );
-    const tfd = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.tfd"),
-      "utf8",
-    );
+    const { awsPlan, awsDot, cfPlan, cfDot, tfd } =
+      loadAwsCloudflareMultiImportFixture();
 
     const res = await terraformPlanParsingFromSources(
       {
@@ -74,34 +51,17 @@ describe("terraform multi-import integration", () => {
         (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
       )
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain(
+      prefixStackAddress("cloudflare", "cloudflare_zone.tfdraw_dev"),
+    );
     expect(
       nodePaths.some((p: string) => p.includes("workload_writer_lambda")),
     ).toBe(true);
   }, 120_000);
 
   it("merges allplanmodules + cloudflare with tfd (semantic view)", async () => {
-    const awsPlan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const awsDot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
-    const cfPlan = JSON.parse(
-      fs.readFileSync(
-        path.join(TF_ROOT, "cloudflare/cloudflare-plan.json"),
-        "utf8",
-      ),
-    );
-    const cfDot = fs.readFileSync(
-      path.join(TF_ROOT, "cloudflare/cloudflare-plan.dot"),
-      "utf8",
-    );
-    const tfd = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.tfd"),
-      "utf8",
-    );
+    const { awsPlan, awsDot, cfPlan, cfDot, tfd } =
+      loadAwsCloudflareMultiImportFixture();
 
     const res = await terraformPlanParsingFromSources(
       {
@@ -126,7 +86,9 @@ describe("terraform multi-import integration", () => {
         (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
       )
       .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+    expect(nodePaths).toContain(
+      prefixStackAddress("cloudflare", "cloudflare_zone.tfdraw_dev"),
+    );
     expect(
       body.elements.some(
         (e: {
@@ -142,27 +104,8 @@ describe("terraform multi-import integration", () => {
   }, 180_000);
 
   it("layer reconcile stabilizes after import pins (no infinite replace loop)", async () => {
-    const awsPlan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const awsDot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
-    const cfPlan = JSON.parse(
-      fs.readFileSync(
-        path.join(TF_ROOT, "cloudflare/cloudflare-plan.json"),
-        "utf8",
-      ),
-    );
-    const cfDot = fs.readFileSync(
-      path.join(TF_ROOT, "cloudflare/cloudflare-plan.dot"),
-      "utf8",
-    );
-    const tfd = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.tfd"),
-      "utf8",
-    );
+    const { awsPlan, awsDot, cfPlan, cfDot, tfd } =
+      loadAwsCloudflareMultiImportFixture();
 
     const res = await terraformPlanParsingFromSources(
       {

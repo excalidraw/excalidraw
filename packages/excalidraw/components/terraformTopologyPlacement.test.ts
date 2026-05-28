@@ -12,6 +12,7 @@ import {
   extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
+  mergePrimaryTopologyZonesByTier,
   mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
   natZonePlacementsKey,
@@ -449,7 +450,7 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
         vpcId: "vpc-1",
         subnetSignature: "subnet-a",
         subnetIds: ["subnet-a"],
-        addresses: ["aws_subnet.a"],
+        addresses: [],
         topologyZoneSource: "supplementary",
       },
       {
@@ -458,7 +459,7 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
         vpcId: "vpc-1",
         subnetSignature: "subnet-b",
         subnetIds: ["subnet-b"],
-        addresses: ["aws_subnet.b"],
+        addresses: [],
         topologyZoneSource: "supplementary",
       },
     ];
@@ -468,7 +469,8 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
     );
     expect(merged).toHaveLength(1);
     expect(merged[0]!.subnetSignature).toBe("subnet-a|subnet-b");
-    expect(merged[0]!.mergedSupplementaryComposite).toBe(true);
+    expect(merged[0]!.addresses).toEqual([]);
+    expect(merged[0]!.mergedSupplementaryComposite).toBeUndefined();
   });
 });
 
@@ -563,7 +565,9 @@ describe("mergeSupplementarySubnetZonesByTier", () => {
     const merged = mergeSupplementarySubnetZonesByTier(afterRt, plan as never);
     expect(merged).toHaveLength(1);
     expect(merged[0]!.subnetSignature).toBe("subnet-priv-a|subnet-priv-b");
+    expect(merged[0]!.addresses).toEqual([]);
     expect(merged[0]!.mergedSupplementaryByTier).toBe(true);
+    expect(merged[0]!.mergedSupplementaryComposite).toBeUndefined();
   });
 
   it("does not merge supplementary zones of different tiers", () => {
@@ -1033,11 +1037,64 @@ describe("extractSupplementarySubnetZones", () => {
     const sup = extractSupplementarySubnetZones(plan, primaryZones);
     expect(sup).toHaveLength(1);
     expect(sup[0]!.subnetIds).toEqual(["subnet-b"]);
-    expect(sup[0]!.addresses).toEqual(["aws_subnet.intra"]);
+    expect(sup[0]!.addresses).toEqual([]);
   });
 });
 
 describe("extractVpcFlowLogBundles", () => {
+  it("merges same-module companions with stack-qualified addresses", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address:
+            "00-east-network::module.east_network.module.vpc_flow_logs.aws_flow_log.this",
+          mode: "managed",
+          type: "aws_flow_log",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address:
+            "00-east-network::module.east_network.module.vpc_flow_logs.aws_cloudwatch_log_group.flow",
+          mode: "managed",
+          type: "aws_cloudwatch_log_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: { region: "us-east-1" },
+          },
+        },
+        {
+          address:
+            "00-east-network::module.east_network.module.vpc_flow_logs.aws_iam_role.publish",
+          mode: "managed",
+          type: "aws_iam_role",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: { region: "us-east-1" },
+          },
+        },
+      ],
+    };
+    const buckets = extractVpcFlowLogBundles(plan);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0]!.addresses).toEqual(
+      expect.arrayContaining([
+        "00-east-network::module.east_network.module.vpc_flow_logs.aws_flow_log.this",
+        "00-east-network::module.east_network.module.vpc_flow_logs.aws_cloudwatch_log_group.flow",
+        "00-east-network::module.east_network.module.vpc_flow_logs.aws_iam_role.publish",
+      ]),
+    );
+  });
+
   it("merges same-module companions into the VPC flow log bucket", () => {
     const plan = {
       ...planWithDefaultAwsAccountRegion,
@@ -1123,6 +1180,215 @@ describe("extractInterfaceEndpointSecurityGroupBuckets", () => {
   });
 });
 
+describe("extractPrimaryTopologyZones subnet coalescing", () => {
+  const basePlan = {
+    ...planWithDefaultAwsAccountRegion,
+    resource_changes: [
+      {
+        address: "aws_vpc.main",
+        mode: "managed",
+        type: "aws_vpc",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: { id: "vpc-aaa", region: "us-east-1" },
+        },
+      },
+      {
+        address: "aws_subnet.private_a",
+        mode: "managed",
+        type: "aws_subnet",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "subnet-private-a",
+            vpc_id: "vpc-aaa",
+            region: "us-east-1",
+          },
+        },
+      },
+      {
+        address: "aws_subnet.private_b",
+        mode: "managed",
+        type: "aws_subnet",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "subnet-private-b",
+            vpc_id: "vpc-aaa",
+            region: "us-east-1",
+          },
+        },
+      },
+      {
+        address: "aws_subnet.private_c",
+        mode: "managed",
+        type: "aws_subnet",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "subnet-private-c",
+            vpc_id: "vpc-aaa",
+            region: "us-east-1",
+          },
+        },
+      },
+      {
+        address: "aws_subnet.intra_a",
+        mode: "managed",
+        type: "aws_subnet",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "subnet-intra-a",
+            vpc_id: "vpc-aaa",
+            region: "us-east-1",
+          },
+        },
+      },
+      {
+        address: "aws_vpc_endpoint.execute_api",
+        mode: "managed",
+        type: "aws_vpc_endpoint",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "vpce-api",
+            vpc_id: "vpc-aaa",
+            subnet_ids: ["subnet-intra-a"],
+            region: "us-east-1",
+          },
+        },
+      },
+    ],
+  };
+
+  it("places private API in intra tier and Lambda in private tier (separate columns)", () => {
+    const plan = {
+      ...basePlan,
+      resource_changes: [
+        ...basePlan.resource_changes,
+        {
+          address: "module.api.aws_lambda_function.fn",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              vpc_id: "vpc-aaa",
+              subnet_ids: ["subnet-private-a", "subnet-private-b"],
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "module.api.aws_api_gateway_rest_api.private",
+          mode: "managed",
+          type: "aws_api_gateway_rest_api",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              id: "api-1",
+              region: "us-east-1",
+              endpoint_configuration: [
+                {
+                  types: ["PRIVATE"],
+                  vpc_endpoint_ids: ["vpce-api"],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+    const zones = mergePrimaryTopologyZonesByTier(
+      extractPrimaryTopologyZones(plan).map((z) => ({
+        ...z,
+        topologyZoneSource: "primary" as const,
+      })),
+      plan,
+    );
+    const withPrimaries = zones.filter((z) => z.addresses.length > 0);
+    expect(withPrimaries).toHaveLength(2);
+    const intraZone = withPrimaries.find((z) =>
+      z.addresses.includes("module.api.aws_api_gateway_rest_api.private"),
+    );
+    const privateZone = withPrimaries.find((z) =>
+      z.addresses.includes("module.api.aws_lambda_function.fn"),
+    );
+    expect(intraZone).toBeDefined();
+    expect(privateZone).toBeDefined();
+    expect(intraZone!.subnetIds).toEqual(["subnet-intra-a"]);
+    expect(privateZone!.subnetSignature).toBe(
+      "subnet-private-a|subnet-private-b",
+    );
+    expect(intraZone!.mergedPrimaryByTier).toBeUndefined();
+  });
+
+  it("coalesces same-tier primaries with different subnet multisets into one zone", () => {
+    const plan = {
+      ...basePlan,
+      resource_changes: [
+        ...basePlan.resource_changes,
+        {
+          address: "aws_lambda_function.ab",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              vpc_id: "vpc-aaa",
+              subnet_ids: ["subnet-private-a", "subnet-private-b"],
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lambda_function.bc",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              vpc_id: "vpc-aaa",
+              subnet_ids: ["subnet-private-b", "subnet-private-c"],
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones = mergePrimaryTopologyZonesByTier(
+      extractPrimaryTopologyZones(plan).map((z) => ({
+        ...z,
+        topologyZoneSource: "primary" as const,
+      })),
+      plan,
+    );
+    const withPrimaries = zones.filter((z) => z.addresses.length > 0);
+    expect(withPrimaries).toHaveLength(1);
+    expect(withPrimaries[0]!.subnetSignature).toBe(
+      "subnet-private-a|subnet-private-b|subnet-private-c",
+    );
+    expect(withPrimaries[0]!.mergedPrimaryByTier).toBe(true);
+    expect(withPrimaries[0]!.addresses).toEqual(
+      expect.arrayContaining([
+        "aws_lambda_function.ab",
+        "aws_lambda_function.bc",
+      ]),
+    );
+  });
+});
+
 describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
   it("collectPlacementSubnetIds includes aws_lb subnets and subnet_mapping subnet_id", () => {
     expect(
@@ -1138,6 +1404,67 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
         ],
       }),
     ).toEqual(["subnet-nlb-1", "subnet-nlb-2"]);
+  });
+
+  it("collectPlacementSubnetIds includes aws_ecs_service network_configuration subnets", () => {
+    expect(
+      collectPlacementSubnetIds({
+        network_configuration: [
+          {
+            subnets: ["subnet-private-a", "subnet-private-b"],
+            security_groups: ["sg-ecs"],
+          },
+        ],
+      }),
+    ).toEqual(["subnet-private-a", "subnet-private-b"]);
+  });
+
+  it("places aws_ecs_service in VPC zone from network_configuration subnets", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.private_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-private-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_ecs_service.producer",
+          mode: "managed",
+          type: "aws_ecs_service",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              name: "staging-producer",
+              region: "us-east-1",
+              network_configuration: [
+                {
+                  subnets: ["subnet-private-a"],
+                  security_groups: ["sg-ecs"],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    const ecsZone = zones.find((z) =>
+      z.addresses.includes("aws_ecs_service.producer"),
+    );
+    expect(ecsZone).toBeDefined();
+    expect(ecsZone!.vpcId).toBe("vpc-east");
+    expect(ecsZone!.subnetIds).toContain("subnet-private-a");
   });
 
   it("places aws_lb in subnet zone inferred from aws_instance sharing security_groups", () => {
@@ -1465,5 +1792,127 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
     expect(lbZone).toBeDefined();
     expect(lbZone!.addresses).toContain("aws_security_group.lb");
     expect(lbZone!.addresses).toContain("aws_security_group_rule.https");
+  });
+
+  it("places ALB listener and target group in the same zone as aws_lb (staging-like)", () => {
+    const lbArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/ecs/abc";
+    const tgArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/ecs/xyz";
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.public_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-public-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_subnet.private_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-private-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb.ecs",
+          mode: "managed",
+          type: "aws_lb",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: lbArn,
+              vpc_id: "vpc-east",
+              subnets: ["subnet-public-a"],
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb_listener.http",
+          mode: "managed",
+          type: "aws_lb_listener",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              load_balancer_arn: lbArn,
+              port: 80,
+              protocol: "HTTP",
+              default_action: {
+                type: "forward",
+                target_group_arn: tgArn,
+              },
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb_target_group.ecs",
+          mode: "managed",
+          type: "aws_lb_target_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: tgArn,
+              port: 8080,
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_ecs_service.producer",
+          mode: "managed",
+          type: "aws_ecs_service",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              name: "staging-producer",
+              network_configuration: [
+                {
+                  subnets: ["subnet-private-a"],
+                  security_groups: ["sg-ecs"],
+                },
+              ],
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    const lbZone = zones.find((z) => z.addresses.includes("aws_lb.ecs"));
+    expect(lbZone).toBeDefined();
+    expect(lbZone!.subnetIds).toContain("subnet-public-a");
+    expect(lbZone!.addresses).toContain("aws_lb_listener.http");
+    expect(lbZone!.addresses).toContain("aws_lb_target_group.ecs");
+
+    const ecsZone = zones.find((z) =>
+      z.addresses.includes("aws_ecs_service.producer"),
+    );
+    expect(ecsZone).toBeDefined();
+    expect(ecsZone!.subnetIds).toContain("subnet-private-a");
+    expect(ecsZone!.addresses).not.toContain("aws_lb_listener.http");
+    expect(ecsZone!.addresses).not.toContain("aws_lb_target_group.ecs");
   });
 });

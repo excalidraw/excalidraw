@@ -6,7 +6,9 @@ import {
   isGenericManagedProviderResourceType,
   isInitiallyVisibleTerraformResource,
   isInitiallyVisibleTerraformTopologyTile,
+  isManagedTopologyResourceType,
   isPrimaryVisibleResourceType,
+  isTopologyPlacementResourceType,
 } from "./terraformPrimaryVisibility";
 
 describe("terraformPrimaryVisibility", () => {
@@ -15,6 +17,8 @@ describe("terraformPrimaryVisibility", () => {
       ["aws_lambda_function", true],
       ["aws_s3_bucket", true],
       ["aws_sqs_queue", true],
+      ["aws_api_gateway_rest_api", true],
+      ["aws_apigatewayv2_api", true],
       ["aws_kms_key", true],
       ["cloudflare_zone", true],
       ["cloudflare_dns_record", true],
@@ -68,34 +72,93 @@ describe("terraformPrimaryVisibility", () => {
     });
   });
 
-  describe("isInitiallyVisibleTerraformResource", () => {
-    it("shows primary types even on no-op", () => {
-      expect(
-        isInitiallyVisibleTerraformResource("aws_lambda_function", "no-op"),
-      ).toBe(true);
+  describe("isManagedTopologyResourceType", () => {
+    it.each([
+      ["aws_api_gateway_rest_api", true],
+      ["aws_iam_role", true],
+      ["aws_lambda_permission", true],
+      ["cloudflare_zone", true],
+      ["terraform_data", false],
+      ["data", false],
+    ])("%s → %s", (type, expected) => {
+      expect(isManagedTopologyResourceType(type)).toBe(expected);
     });
-    it("shows non-primary types when action is a change", () => {
-      expect(
-        isInitiallyVisibleTerraformResource("aws_iam_role", "create"),
-      ).toBe(true);
-    });
-    it("hides non-primary unchanged resources", () => {
-      expect(isInitiallyVisibleTerraformResource("aws_iam_role", "no-op")).toBe(
+  });
+
+  describe("isTopologyPlacementResourceType", () => {
+    it("excludes lambda permission tiles (satellite-only)", () => {
+      expect(isTopologyPlacementResourceType("aws_lambda_permission")).toBe(
         false,
+      );
+    });
+    it("excludes ALB listener / target group / attachment tiles (satellite-only)", () => {
+      expect(isTopologyPlacementResourceType("aws_lb_listener")).toBe(false);
+      expect(isTopologyPlacementResourceType("aws_lb_target_group")).toBe(
+        false,
+      );
+      expect(
+        isTopologyPlacementResourceType("aws_lb_target_group_attachment"),
+      ).toBe(false);
+    });
+    it("excludes ECS task definition and IAM role satellites", () => {
+      expect(isTopologyPlacementResourceType("aws_ecs_task_definition")).toBe(
+        false,
+      );
+      expect(isTopologyPlacementResourceType("aws_iam_role")).toBe(false);
+      expect(
+        isTopologyPlacementResourceType("aws_iam_role_policy_attachment"),
+      ).toBe(false);
+    });
+    it("excludes aws_subnet (structural subnet zones only)", () => {
+      expect(isTopologyPlacementResourceType("aws_subnet")).toBe(false);
+    });
+    it("includes primary API Gateway types", () => {
+      expect(isTopologyPlacementResourceType("aws_api_gateway_rest_api")).toBe(
+        true,
+      );
+      expect(isPrimaryVisibleResourceType("aws_api_gateway_rest_api")).toBe(
+        true,
       );
     });
   });
 
-  describe("isInitiallyVisibleTerraformTopologyTile", () => {
-    it("always shows semantic infra tiles such as aws_subnet", () => {
+  describe("isInitiallyVisibleTerraformResource", () => {
+    it("shows managed types on no-op (staging plans)", () => {
       expect(
-        isInitiallyVisibleTerraformTopologyTile("aws_subnet", "no-op"),
+        isInitiallyVisibleTerraformResource("aws_lambda_function", "no-op"),
+      ).toBe(true);
+      expect(
+        isInitiallyVisibleTerraformResource(
+          "aws_api_gateway_rest_api",
+          "no-op",
+        ),
+      ).toBe(true);
+      expect(isInitiallyVisibleTerraformResource("aws_iam_role", "no-op")).toBe(
+        true,
+      );
+    });
+    it("shows non-aws types when action is a change", () => {
+      expect(
+        isInitiallyVisibleTerraformResource("aws_iam_role", "create"),
+      ).toBe(true);
+    });
+    it("hides bookkeeping types on no-op", () => {
+      expect(
+        isInitiallyVisibleTerraformResource("terraform_data", "no-op"),
+      ).toBe(false);
+    });
+  });
+
+  describe("isInitiallyVisibleTerraformTopologyTile", () => {
+    it("always shows semantic infra tiles such as aws_nat_gateway", () => {
+      expect(
+        isInitiallyVisibleTerraformTopologyTile("aws_nat_gateway", "no-op"),
       ).toBe(true);
     });
     it("falls back to resource visibility for non-infra types", () => {
       expect(
         isInitiallyVisibleTerraformTopologyTile("aws_iam_role", "no-op"),
-      ).toBe(false);
+      ).toBe(true);
       expect(
         isInitiallyVisibleTerraformTopologyTile("aws_iam_role", "create"),
       ).toBe(true);

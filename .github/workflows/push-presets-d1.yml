@@ -1,0 +1,73 @@
+# Manual push of Terraform import presets from local/exported SQL into Cloudflare D1.
+# Does not run on every deploy (large SQL); use workflow_dispatch when presets change.
+
+name: Push Terraform presets to D1
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which D1 database(s) to update"
+        required: true
+        default: both
+        type: choice
+        options:
+          - prod
+          - preview
+          - both
+      source_db:
+        description: "Optional path to SQLite source (default: terraform-import-presets.db at repo root)"
+        required: false
+        type: string
+
+jobs:
+  push-presets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Prepare source SQLite
+        run: |
+          if [ -n "${{ inputs.source_db }}" ]; then
+            echo "Using source_db=${{ inputs.source_db }}"
+          elif [ -f terraform-import-presets.db ]; then
+            echo "Using repo-root terraform-import-presets.db"
+          else
+            cp packages/excalidraw/test-fixtures/terraform-import-presets.db terraform-import-presets.db
+            echo "Using test-fixtures/terraform-import-presets.db"
+          fi
+
+      - name: Export presets SQL
+        run: |
+          if [ -n "${{ inputs.source_db }}" ]; then
+            node excalidraw-app/dev/exportTerraformPresetsToD1.mjs "${{ inputs.source_db }}"
+          else
+            yarn export:terraform-presets-d1
+          fi
+
+      - name: Push to production D1
+        if: ${{ inputs.target == 'prod' || inputs.target == 'both' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler@4 d1 execute tfdraw-presets --remote \
+            --file=./functions/generated/presets-data.sql
+
+      - name: Push to preview D1
+        if: ${{ inputs.target == 'preview' || inputs.target == 'both' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler@4 d1 execute tfdraw-presets-preview --remote \
+            --file=./functions/generated/presets-data.sql

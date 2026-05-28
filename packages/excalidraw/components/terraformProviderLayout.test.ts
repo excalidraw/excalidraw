@@ -1,19 +1,14 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it, vi } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
+
+import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
 
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import {
   buildCloudflareProviderScene,
   composeMultiProviderTopologyScene,
 } from "./terraformProviderLayout";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TF_ROOT = path.resolve(__dirname, "../../backend/terraform");
 
 describe("terraformProviderLayout", () => {
   it("groups cloudflare fixture into zone/pages/workers bands", async () => {
@@ -22,15 +17,9 @@ describe("terraformProviderLayout", () => {
     }
 
     const plan = JSON.parse(
-      fs.readFileSync(
-        path.join(TF_ROOT, "cloudflare/cloudflare-plan.json"),
-        "utf8",
-      ),
+      readTerraformBackendFile("cloudflare/cloudflare-plan.json"),
     );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "cloudflare/cloudflare-plan.dot"),
-      "utf8",
-    );
+    const dot = readTerraformBackendFile("cloudflare/cloudflare-plan.dot");
     const graph = graphlibDot.read(dot);
     const nodes = buildTerraformLocalImportNodesMap(plan, graph, null);
     const changes = (plan.resource_changes || []).filter(

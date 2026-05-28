@@ -350,6 +350,40 @@ function resolveLogGroupLambdaPath(
   );
 }
 
+function resolveLogGroupEcsServicePath(
+  nodes: TerraformPlanNodesMap,
+  logGroupPath: string,
+  values: Record<string, unknown>,
+  identityIndex: Map<string, Set<string>>,
+): string | null {
+  const names: string[] = [];
+  collectStringish(values.name, names);
+  collectStringish(values.name_prefix, names);
+
+  for (const raw of names) {
+    const text = raw.trim();
+    if (!text.startsWith("/aws/ecs/")) {
+      continue;
+    }
+    const suffix = text.slice("/aws/ecs/".length).replace(/[:*]+$/g, "");
+    const path = resourcePathFromText(
+      nodes,
+      identityIndex,
+      suffix,
+      "aws_ecs_service",
+    );
+    if (path) {
+      return path;
+    }
+  }
+
+  return inferSoleResourceInModuleFamily(
+    nodes,
+    logGroupPath,
+    "aws_ecs_service",
+  );
+}
+
 export type ResourceCloudWatchCluster = {
   resource: string;
   alarms: string[];
@@ -407,12 +441,9 @@ function buildCloudWatchAttachmentIndex(
     if (type === "aws_cloudwatch_metric_alarm" && target) {
       addAttachment(attachmentIndex, target, "alarms", path);
     } else if (type === "aws_cloudwatch_log_group") {
-      const logGroupTarget = resolveLogGroupLambdaPath(
-        nodes,
-        path,
-        values,
-        identityIndex,
-      );
+      const logGroupTarget =
+        resolveLogGroupLambdaPath(nodes, path, values, identityIndex) ??
+        resolveLogGroupEcsServicePath(nodes, path, values, identityIndex);
       if (logGroupTarget) {
         addAttachment(attachmentIndex, logGroupTarget, "logGroups", path);
       }
@@ -422,7 +453,7 @@ function buildCloudWatchAttachmentIndex(
   return attachmentIndex;
 }
 
-function getCloudWatchAttachmentIndex(
+export function getCloudWatchAttachmentIndex(
   nodes: TerraformPlanNodesMap,
 ): CloudWatchAttachmentIndex {
   const cached = cloudWatchAttachmentIndexCache.get(nodes);

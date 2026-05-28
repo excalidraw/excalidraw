@@ -1,4 +1,5 @@
 import { getTerraformResourceTypeFromNodePath } from "./terraformPrimaryVisibility";
+import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 
 import { terraformHumanNameFromPlanResource } from "./terraformResourceHumanName";
 
@@ -24,7 +25,9 @@ export function getTerraformCardResourceType(
   if (t) {
     return t;
   }
-  const fromPath = getTerraformResourceTypeFromNodePath(address);
+  const fromPath = getTerraformResourceTypeFromNodePath(
+    stripStackPrefixForModuleParsing(address),
+  );
   if (fromPath === "data") {
     const parts = address.replace(/\[[^\]]+\]/g, "").split(".");
     let i = 0;
@@ -60,7 +63,10 @@ export function terraformInstanceNameFromAddress(
   address: string,
   resourceType: string,
 ): string {
-  const stripped = address.replace(/\[[^\]]+\]/g, "");
+  const stripped = stripStackPrefixForModuleParsing(address).replace(
+    /\[[^\]]+\]/g,
+    "",
+  );
   const parts = stripped.split(".");
   let i = 0;
   while (i < parts.length && parts[i] === "module" && parts[i + 1]) {

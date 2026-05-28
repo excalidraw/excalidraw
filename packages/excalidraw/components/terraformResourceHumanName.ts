@@ -51,6 +51,8 @@ export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELDS: Record<
   aws_launch_template: ["name", "name_prefix"],
   aws_autoscaling_group: ["name"],
   aws_lb: ["name"],
+  aws_lb_listener: ["port", "protocol"],
+  aws_lb_target_group: ["name", "name_prefix", "port"],
   aws_alb: ["name"],
   aws_elb: ["name"],
   aws_alb_target_group: ["name"],

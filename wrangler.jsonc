@@ -4,6 +4,9 @@
  * Deploy after `yarn build:pages`:
  *   npx wrangler pages deploy ./excalidraw-app/build --project-name=<name>
  *
+ * Top-level D1 bindings = Preview (branch deployments).
+ * env.production = Production (master / production branch in Pages dashboard).
+ *
  * Do NOT add an `assets` block here — Pages validation rejects it.
  * Workers static deploys: use wrangler.workers.jsonc with `wrangler deploy -c …`.
  *
@@ -22,8 +25,29 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "tfdraw-analytics",
-      "database_id": "e96d1444-1a12-4937-8183-8914be898dbd"
+      "database_name": "tfdraw-analytics-preview",
+      "database_id": "b48e58a9-6e7d-4056-939b-afd8ecb812b6"
+    },
+    {
+      "binding": "PRESETS_DB",
+      "database_name": "tfdraw-presets-preview",
+      "database_id": "25e64da4-ab27-459b-916a-addfe0c90e63"
     }
-  ]
+  ],
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "tfdraw-analytics",
+          "database_id": "e96d1444-1a12-4937-8183-8914be898dbd"
+        },
+        {
+          "binding": "PRESETS_DB",
+          "database_name": "tfdraw-presets",
+          "database_id": "0b6a8b84-a24c-47ea-970b-9c47f7ebb4d3"
+        }
+      ]
+    }
+  }
 }

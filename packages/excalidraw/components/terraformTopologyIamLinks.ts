@@ -335,8 +335,8 @@ function resolveRoleReferenceOnPolicyNode(
 }
 
 /**
- * Inline `aws_iam_role_policy` and managed `aws_iam_policy` (via `aws_iam_role_policy_attachment`)
- * attached to `rolePath`.
+ * Inline `aws_iam_role_policy`, `aws_iam_role_policy_attachment`, and managed `aws_iam_policy`
+ * (when the policy resource is in the plan) attached to `rolePath`.
  */
 /** `data.aws_iam_policy_document` addresses referenced from merged IAM role policy blobs. */
 export function collectDataIamPolicyDocumentsForRole(
@@ -426,6 +426,7 @@ export function collectPoliciesForIamRole(
       if (resolved !== rolePath) {
         continue;
       }
+      out.add(path);
       const policyArn = values.policy_arn;
       if (typeof policyArn === "string" && policyArn.startsWith("arn:")) {
         const policyPath = arnIndex.get(policyArn);
@@ -508,6 +509,186 @@ export function buildLambdaIamCluster(
   return { cluster: { lambda: lambdaAddress, stack }, edges };
 }
 
+export function resolveEcsTaskDefinitionPath(
+  nodes: TerraformPlanNodesMap,
+  serviceAddress: string,
+  taskDefinitionValue: unknown,
+  arnIndex: Map<string, string>,
+): string | null {
+  const strings: string[] = [];
+  flattenStringish(taskDefinitionValue, strings);
+  const modulePrefix = terraformModulePrefixForAddress(serviceAddress);
+
+  for (const raw of strings) {
+    const text = raw.trim();
+    if (!text) {
+      continue;
+    }
+
+    for (const candidate of [text, stripIndexes(text)]) {
+      const direct = resolveTerraformPlanNodeKey(
+        nodes as Record<string, TerraformPlanGraphNode>,
+        candidate,
+      );
+      if (
+        direct &&
+        getResourceTypeFromPath(direct, nodes[direct]) ===
+          "aws_ecs_task_definition"
+      ) {
+        return direct;
+      }
+    }
+
+    if (text.startsWith("arn:aws:ecs:") && text.includes(":task-definition/")) {
+      const byArn = arnIndex.get(text);
+      if (
+        byArn &&
+        getResourceTypeFromPath(byArn, nodes[byArn]) ===
+          "aws_ecs_task_definition"
+      ) {
+        return byArn;
+      }
+    }
+
+    const qualified =
+      text.startsWith("module.") || text.startsWith("aws_")
+        ? text
+        : modulePrefix
+        ? `${modulePrefix}.${text}`
+        : text;
+    const resolved = resolveTerraformPlanNodeKey(
+      nodes as Record<string, TerraformPlanGraphNode>,
+      stripIndexes(qualified),
+    );
+    if (
+      resolved &&
+      getResourceTypeFromPath(resolved, nodes[resolved]) ===
+        "aws_ecs_task_definition"
+    ) {
+      return resolved;
+    }
+  }
+
+  const taskDefPaths: string[] = [];
+  for (const path of Object.keys(nodes)) {
+    if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
+      continue;
+    }
+    if (terraformModulePrefixForAddress(path) !== modulePrefix) {
+      continue;
+    }
+    if (
+      getResourceTypeFromPath(path, nodes[path]) === "aws_ecs_task_definition"
+    ) {
+      taskDefPaths.push(path);
+    }
+  }
+  return taskDefPaths.length === 1 ? taskDefPaths[0]! : null;
+}
+
+/**
+ * Build IAM stack for Fargate ECS: task execution role + task role from the linked task definition.
+ */
+export function buildEcsServiceIamCluster(
+  nodes: TerraformPlanNodesMap,
+  serviceAddress: string,
+  arnIndex: Map<string, string>,
+): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
+  const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  if (!primary || primary.type !== "aws_ecs_service") {
+    return { cluster: null, edges: [] };
+  }
+  const serviceValues = mergeTerraformPlanResourceValues(primary);
+  const taskDefPath = resolveEcsTaskDefinitionPath(
+    nodes,
+    serviceAddress,
+    serviceValues.task_definition,
+    arnIndex,
+  );
+  if (!taskDefPath) {
+    return { cluster: null, edges: [] };
+  }
+
+  const taskDefPrimary = getPrimaryResource(nodes[taskDefPath]);
+  if (!taskDefPrimary) {
+    return { cluster: null, edges: [] };
+  }
+  const taskDefValues = mergeTerraformPlanResourceValues(taskDefPrimary);
+
+  const stack: string[] = [];
+  const edges: TopologyIamEdge[] = [];
+  const seenRoles = new Set<string>();
+
+  const appendRole = (roleValue: unknown, edgeType: string, label: string) => {
+    const rolePath = resolveLambdaExecutionRolePath(
+      nodes,
+      serviceAddress,
+      roleValue,
+      arnIndex,
+    );
+    if (!rolePath || seenRoles.has(rolePath)) {
+      return;
+    }
+    seenRoles.add(rolePath);
+    stack.push(rolePath);
+    edges.push({
+      source: serviceAddress,
+      target: rolePath,
+      type: edgeType,
+      label,
+    });
+    const policies = collectPoliciesForIamRole(nodes, rolePath, arnIndex);
+    const policyDocs = collectDataIamPolicyDocumentsForRole(nodes, rolePath);
+    for (const p of policies) {
+      stack.push(p);
+      edges.push({
+        source: rolePath,
+        target: p,
+        type: "iam_policy",
+        label: "policy",
+      });
+    }
+    for (const d of policyDocs) {
+      stack.push(d);
+      edges.push({
+        source: rolePath,
+        target: d,
+        type: "iam_policy_document",
+        label: "policy document",
+      });
+    }
+  };
+
+  appendRole(
+    taskDefValues.execution_role_arn,
+    "execution_role",
+    "execution role",
+  );
+  appendRole(taskDefValues.task_role_arn, "task_role", "task role");
+
+  if (stack.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  return { cluster: { lambda: serviceAddress, stack }, edges };
+}
+
+/** Lambda or ECS service IAM satellites for topology layout. */
+export function buildPrimaryIamCluster(
+  nodes: TerraformPlanNodesMap,
+  primaryAddress: string,
+  arnIndex: Map<string, string>,
+): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
+  const node = nodes[primaryAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  const type = typeof primary?.type === "string" ? primary.type : "";
+  if (type === "aws_ecs_service") {
+    return buildEcsServiceIamCluster(nodes, primaryAddress, arnIndex);
+  }
+  return buildLambdaIamCluster(nodes, primaryAddress, arnIndex);
+}
+
 /**
  * Per-primary-address IAM stack height in pixels (0 when no IAM cluster).
  * First stack entry is the execution role (tier-1 height); remaining entries are policies (tier-2 height).
@@ -520,7 +701,7 @@ export function iamSatelliteStackHeightPx(
   tier2SatelliteH: number,
   satelliteGap: number,
 ): number {
-  const { cluster } = buildLambdaIamCluster(nodes, address, arnIndex);
+  const { cluster } = buildPrimaryIamCluster(nodes, address, arnIndex);
   if (!cluster || cluster.stack.length === 0) {
     return 0;
   }

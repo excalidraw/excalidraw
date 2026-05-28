@@ -468,6 +468,7 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  TERRAFORM_IMPORT_PRESETS: "excalidraw-terraform-import-presets",
 } as const;
 
 /**

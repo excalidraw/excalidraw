@@ -10,7 +10,6 @@ const PRIMARY_COMPUTE_TYPES = new Set([
   "aws_lambda_function",
   "aws_ecs_cluster",
   "aws_ecs_service",
-  "aws_ecs_task_definition",
   "aws_instance",
   "aws_ec2_instance_state",
   "aws_emr_cluster",
@@ -48,9 +47,18 @@ const PRIMARY_MESSAGING_TYPES = new Set([
   "aws_msk_cluster",
 ]);
 
+/** Regional API frontends (VPC-less; placed in the regional-primary strip). */
+const PRIMARY_API_TYPES = new Set([
+  "aws_api_gateway_rest_api",
+  "aws_apigatewayv2_api",
+]);
+
 const PRIMARY_SPARK_TYPES = new Set<string>();
 
 const PRIMARY_CRYPTO_TYPES = new Set(["aws_kms_key"]);
+
+/** Regional networking primaries (no VPC/subnet placement). */
+const PRIMARY_NETWORKING_TYPES = new Set(["aws_ec2_transit_gateway"]);
 
 /** Synthetic Terraform module call nodes (pipeline injects for graph semantics). */
 const PRIMARY_MODULE_TYPES = new Set(["terraform_module"]);
@@ -59,8 +67,10 @@ const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_COMPUTE_TYPES,
   ...PRIMARY_STORAGE_TYPES,
   ...PRIMARY_MESSAGING_TYPES,
+  ...PRIMARY_API_TYPES,
   ...PRIMARY_SPARK_TYPES,
   ...PRIMARY_CRYPTO_TYPES,
+  ...PRIMARY_NETWORKING_TYPES,
   ...PRIMARY_MODULE_TYPES,
 ]);
 
@@ -97,14 +107,100 @@ export function isChangedTerraformAction(action: string): boolean {
   );
 }
 
+/** Managed resource types that belong on topology diagrams (not data sources / bookkeeping). */
+export function isManagedTopologyResourceType(resourceType: string): boolean {
+  if (!resourceType || resourceType === "data") {
+    return false;
+  }
+  if (resourceType === "terraform_data" || resourceType.startsWith("null_")) {
+    return false;
+  }
+  if (resourceType.startsWith("aws_")) {
+    return true;
+  }
+  return isGenericManagedProviderResourceType(resourceType);
+}
+
+/**
+ * Drawn as its own tile in VPC zones / regional strips (excludes types that are
+ * only rendered as satellites under another primary).
+ */
+export function isTopologyPlacementResourceType(resourceType: string): boolean {
+  if (!isManagedTopologyResourceType(resourceType)) {
+    return false;
+  }
+  if (resourceType === "aws_lambda_permission") {
+    return false;
+  }
+  /** Drawn only as satellites under `aws_ecs_service` (see `terraformTopologyEcsLinks`). */
+  if (resourceType === "aws_ecs_task_definition") {
+    return false;
+  }
+  /**
+   * Drawn only as satellites under compute primaries (Lambda / ECS IAM stacks).
+   * See `terraformTopologyIamLinks`.
+   */
+  if (
+    resourceType === "aws_iam_role" ||
+    resourceType === "aws_iam_role_policy" ||
+    resourceType === "aws_iam_role_policy_attachment" ||
+    resourceType === "aws_iam_policy"
+  ) {
+    return false;
+  }
+  /** Drawn only as satellites under `aws_lb` (see `terraformTopologyAlbLinks`). */
+  if (
+    resourceType === "aws_lb_listener" ||
+    resourceType === "aws_lb_target_group" ||
+    resourceType === "aws_lb_target_group_attachment"
+  ) {
+    return false;
+  }
+  /** Drawn only as satellites under `aws_ec2_transit_gateway`. */
+  if (
+    resourceType === "aws_ec2_transit_gateway_vpc_attachment" ||
+    resourceType === "aws_ec2_transit_gateway_peering_attachment" ||
+    resourceType === "aws_ec2_transit_gateway_peering_attachment_accepter" ||
+    resourceType === "aws_ec2_transit_gateway_connect_attachment" ||
+    resourceType === "aws_ec2_transit_gateway_vpn_attachment" ||
+    resourceType === "aws_ec2_transit_gateway_route" ||
+    resourceType === "aws_ec2_transit_gateway_route_table" ||
+    resourceType === "aws_ec2_transit_gateway_route_table_association" ||
+    resourceType === "aws_ec2_transit_gateway_route_table_propagation"
+  ) {
+    return false;
+  }
+  /** Subnets are structural (`subnetZone` frames), not resource tiles. */
+  if (resourceType === "aws_subnet") {
+    return false;
+  }
+  /**
+   * Relationship resources; route tables are placed on zone/VPC bottom edges
+   * (`terraformTopologyPlacement.ts`).
+   */
+  if (resourceType === "aws_route_table_association") {
+    return false;
+  }
+  /** Drawn only as satellites under `aws_sqs_queue` (see `terraformTopologySqsLinks`). */
+  if (
+    resourceType === "aws_sqs_queue_policy" ||
+    resourceType === "aws_sqs_queue_redrive_policy" ||
+    resourceType === "aws_sqs_queue_redrive_allow_policy"
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/** Default import visibility: show all managed resources, including no-op plans. */
 export function isInitiallyVisibleTerraformResource(
   resourceType: string,
   action: string,
 ): boolean {
-  return (
-    isPrimaryVisibleResourceType(resourceType) ||
-    isChangedTerraformAction(action)
-  );
+  if (isManagedTopologyResourceType(resourceType)) {
+    return true;
+  }
+  return isChangedTerraformAction(action);
 }
 
 /**
@@ -123,11 +219,11 @@ const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
   "aws_nat_gateway",
   "aws_route",
   "aws_route_table_association",
-  "aws_subnet",
   "aws_default_network_acl",
   "aws_default_route_table",
   "aws_default_security_group",
   "aws_flow_log",
+  "aws_ec2_transit_gateway",
 ]);
 
 /** Visibility for topology resource rectangles (includes semantic-only infra types). */

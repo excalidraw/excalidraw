@@ -2,6 +2,7 @@
  * Semantic topology: resolve Lambda `vpc_config.security_group_ids` and per-SG rule resources.
  */
 
+import { canonicalTopologyNodeKey } from "./terraformTopologyAddress";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   resolveTerraformPlanNodeKey,
@@ -13,6 +14,7 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { collectEcsServiceNetworkFieldIds } from "./terraformTopologyPlacement";
 import {
   collectLambdaVpcSecurityGroupRefsFromPlanConfiguration,
   qualifyConfigurationReference,
@@ -355,6 +357,31 @@ function resolveSecurityGroupRefToPath(
   return null;
 }
 
+/** Unique ordered refs from `network_configuration[*].security_groups` on ECS services. */
+export function collectEcsServiceSecurityGroupRefs(
+  nodes: TerraformPlanNodesMap,
+  serviceAddress: string,
+): string[] {
+  const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  if (!primary || primary.type !== "aws_ecs_service") {
+    return [];
+  }
+  const values = mergeTerraformPlanResourceValues(primary);
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const sid of collectEcsServiceNetworkFieldIds(
+    values,
+    "security_groups",
+  )) {
+    if (!seen.has(sid)) {
+      seen.add(sid);
+      out.push(sid);
+    }
+  }
+  return out;
+}
+
 /** Unique ordered refs from `vpc_config[*].security_group_ids`. */
 export function collectLambdaVpcSecurityGroupRefs(
   nodes: TerraformPlanNodesMap,
@@ -564,28 +591,29 @@ export function buildLoadBalancerSgCluster(
       arnIndex,
       idToPath,
     );
-    if (!sgPath || seenSg.has(sgPath)) {
+    const canonicalSg = sgPath ? canonicalTopologyNodeKey(nodes, sgPath) : null;
+    if (!canonicalSg || seenSg.has(canonicalSg)) {
       continue;
     }
-    seenSg.add(sgPath);
+    seenSg.add(canonicalSg);
     const rules = collectSecurityGroupRulesForSg(
       nodes,
-      sgPath,
+      canonicalSg,
       arnIndex,
       idToPath,
       plan,
     );
-    groups.push({ sgPath, rules });
+    groups.push({ sgPath: canonicalSg, rules });
     edges.push({
-      source: lbAddress,
-      target: sgPath,
+      source: canonicalTopologyNodeKey(nodes, lbAddress),
+      target: canonicalSg,
       type: "security_group",
       label: "security group",
     });
     for (const r of rules) {
       edges.push({
-        source: sgPath,
-        target: r,
+        source: canonicalSg,
+        target: canonicalTopologyNodeKey(nodes, r),
         type: "sg_rule",
         label: "rule",
       });
@@ -597,7 +625,10 @@ export function buildLoadBalancerSgCluster(
   }
 
   return {
-    cluster: { lambda: lbAddress, groups },
+    cluster: {
+      lambda: canonicalTopologyNodeKey(nodes, lbAddress),
+      groups,
+    },
     edges,
   };
 }
@@ -772,6 +803,87 @@ export function buildLambdaSgCluster(
   };
 }
 
+export function buildEcsServiceSgCluster(
+  nodes: TerraformPlanNodesMap,
+  serviceAddress: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
+  const refs = collectEcsServiceSecurityGroupRefs(nodes, serviceAddress);
+  if (refs.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const groups: LambdaSgGroup[] = [];
+  const edges: TopologyIamEdge[] = [];
+  const seenSg = new Set<string>();
+
+  for (const ref of refs) {
+    const sgPath = resolveSecurityGroupRefToPath(
+      nodes,
+      serviceAddress,
+      ref,
+      arnIndex,
+      idToPath,
+    );
+    if (!sgPath || seenSg.has(sgPath)) {
+      continue;
+    }
+    seenSg.add(sgPath);
+    const rules = collectSecurityGroupRulesForSg(
+      nodes,
+      sgPath,
+      arnIndex,
+      idToPath,
+      plan,
+    );
+    groups.push({ sgPath, rules });
+    edges.push({
+      source: serviceAddress,
+      target: sgPath,
+      type: "security_group",
+      label: "security group",
+    });
+    for (const r of rules) {
+      edges.push({
+        source: sgPath,
+        target: r,
+        type: "sg_rule",
+        label: "rule",
+      });
+    }
+  }
+
+  if (groups.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  return {
+    cluster: { lambda: serviceAddress, groups },
+    edges,
+  };
+}
+
+/** Lambda, ECS service, or ALB security-group satellites for topology layout. */
+export function buildPrimarySgCluster(
+  nodes: TerraformPlanNodesMap,
+  address: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
+  const node = nodes[address] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  const t = typeof primary?.type === "string" ? primary.type : "";
+  if (t === "aws_lb") {
+    return buildLoadBalancerSgCluster(nodes, address, arnIndex, plan);
+  }
+  if (t === "aws_ecs_service") {
+    return buildEcsServiceSgCluster(nodes, address, arnIndex, plan);
+  }
+  return buildLambdaSgCluster(nodes, address, arnIndex, plan);
+}
+
 /** Vertical gap between stacked SG groups under one Lambda (layout must match). */
 export const TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX = 4;
 
@@ -787,13 +899,7 @@ export function sgSatelliteStackHeightPx(
   gap: number,
   plan?: unknown,
 ): number {
-  const node = nodes[address] as TerraformPlanGraphNode | undefined;
-  const primary = getPrimaryResource(node);
-  const t = typeof primary?.type === "string" ? primary.type : "";
-  const { cluster } =
-    t === "aws_lb"
-      ? buildLoadBalancerSgCluster(nodes, address, arnIndex, plan)
-      : buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  const { cluster } = buildPrimarySgCluster(nodes, address, arnIndex, plan);
   if (!cluster || cluster.groups.length === 0) {
     return 0;
   }

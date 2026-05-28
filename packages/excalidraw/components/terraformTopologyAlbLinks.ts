@@ -5,15 +5,30 @@
 
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
+  canonicalTopologyNodeKey,
+  dedupeTopologyAddressesByBareKey,
+  topologyAddressesMatch,
+  topologyBareAddressKey,
+} from "./terraformTopologyAddress";
+import {
+  parseStackAddress,
+  prefixStackAddress,
+  stripStackPrefixForModuleParsing,
+} from "./terraformStackAddress";
+import {
   resolveTerraformPlanNodeKey,
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 import {
   mergeTerraformPlanResourceValues,
+  terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
 import { buildLoadBalancerSgCluster } from "./terraformTopologySgLinks";
+
+type PlanRc = Parameters<typeof pickResourceValuesForTopologyPlacement>[0];
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -26,6 +41,19 @@ const ATTACHMENT_TYPES = new Set([
   "aws_lb_target_group_attachment",
   "aws_alb_target_group_attachment",
 ]);
+
+/** Types drawn only under `aws_lb` when cluster resolution succeeds. */
+export const ALB_TOPOLOGY_SATELLITE_TYPES = new Set([
+  ...LISTENER_TYPES,
+  ...TARGET_GROUP_TYPES,
+  ...ATTACHMENT_TYPES,
+]);
+
+export function isAlbTopologySatelliteResourceType(
+  resourceType: string,
+): boolean {
+  return ALB_TOPOLOGY_SATELLITE_TYPES.has(resourceType);
+}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -83,6 +111,11 @@ function isAwsLbNode(nodes: TerraformPlanNodesMap, path: string): boolean {
   return primary?.type === "aws_lb";
 }
 
+export {
+  canonicalTopologyNodeKey,
+  topologyBareAddressKey,
+} from "./terraformTopologyAddress";
+
 /**
  * Resolve `load_balancer_arn` / LB ARN strings to a `nodes` key for `aws_lb`.
  */
@@ -128,6 +161,306 @@ export function resolveLoadBalancerArnToLbPath(
     }
   }
 
+  return null;
+}
+
+function planRefMatchesResourceAddress(
+  ref: string,
+  resourceAddress: string,
+): boolean {
+  const t = ref.trim();
+  const addr = resourceAddress.trim();
+  if (!t || !addr) {
+    return false;
+  }
+  const stripT = stripIndexes(t);
+  const stripAddr = stripIndexes(addr);
+  if (
+    t === addr ||
+    stripT === stripAddr ||
+    t === stripAddr ||
+    stripT === addr
+  ) {
+    return true;
+  }
+  const bareAddr = parseStackAddress(addr)?.address ?? addr;
+  const stripBare = stripIndexes(bareAddr);
+  return (
+    t === bareAddr ||
+    stripT === stripBare ||
+    t === stripBare ||
+    stripT === bareAddr
+  );
+}
+
+function collectStackIdsFromPlanChanges(changes: readonly PlanRc[]): string[] {
+  const stackIds = new Set<string>();
+  for (const rc of changes) {
+    if (typeof rc.address !== "string") {
+      continue;
+    }
+    const parsed = parseStackAddress(rc.address);
+    if (parsed) {
+      stackIds.add(parsed.stackId);
+    }
+  }
+  return [...stackIds];
+}
+
+function findAwsLbAddressForPlanRef(
+  ref: string,
+  changes: readonly PlanRc[],
+): string | null {
+  const t = ref.trim();
+  if (!t) {
+    return null;
+  }
+  if (t.endsWith(".arn")) {
+    const withoutArn = findAwsLbAddressForPlanRef(t.slice(0, -4), changes);
+    if (withoutArn) {
+      return withoutArn;
+    }
+  }
+  for (const rc of changes) {
+    if (rc.type !== "aws_lb" || !rc.address) {
+      continue;
+    }
+    if (planRefMatchesResourceAddress(t, rc.address)) {
+      return rc.address;
+    }
+    const lv = pickResourceValuesForTopologyPlacement(rc);
+    if (!lv) {
+      continue;
+    }
+    const arn = typeof lv.arn === "string" ? lv.arn : "";
+    if (arn && t === arn) {
+      return rc.address;
+    }
+  }
+  if (!t.includes("::")) {
+    const stackIds = collectStackIdsFromPlanChanges(changes);
+    const qualifiedMatches: string[] = [];
+    for (const stackId of stackIds) {
+      const qualified = prefixStackAddress(stackId, stripIndexes(t));
+      for (const rc of changes) {
+        if (rc.type === "aws_lb" && rc.address === qualified) {
+          qualifiedMatches.push(qualified);
+        }
+      }
+    }
+    const unique = [...new Set(qualifiedMatches)];
+    if (unique.length === 1) {
+      return unique[0]!;
+    }
+  }
+  return null;
+}
+
+function findTargetGroupAddressForPlanRef(
+  ref: string,
+  changes: readonly PlanRc[],
+): string | null {
+  const t = ref.trim();
+  if (!t) {
+    return null;
+  }
+  for (const rc of changes) {
+    if (!rc.type || !TARGET_GROUP_TYPES.has(rc.type) || !rc.address) {
+      continue;
+    }
+    if (planRefMatchesResourceAddress(t, rc.address)) {
+      return rc.address;
+    }
+    const pv = pickResourceValuesForTopologyPlacement(rc);
+    if (!pv) {
+      continue;
+    }
+    const arn = typeof pv.arn === "string" ? pv.arn : "";
+    const name = typeof pv.name === "string" ? pv.name : "";
+    const namePrefix = typeof pv.name_prefix === "string" ? pv.name_prefix : "";
+    if (arn && t === arn) {
+      return rc.address;
+    }
+    if (name && t === name) {
+      return rc.address;
+    }
+    if (namePrefix && t.includes(namePrefix)) {
+      return rc.address;
+    }
+  }
+  if (!t.includes("::")) {
+    const stackIds = collectStackIdsFromPlanChanges(changes);
+    const qualifiedMatches: string[] = [];
+    for (const stackId of stackIds) {
+      const qualified = prefixStackAddress(stackId, stripIndexes(t));
+      for (const rc of changes) {
+        if (
+          rc.type &&
+          TARGET_GROUP_TYPES.has(rc.type) &&
+          rc.address === qualified
+        ) {
+          qualifiedMatches.push(qualified);
+        }
+      }
+    }
+    const unique = [...new Set(qualifiedMatches)];
+    if (unique.length === 1) {
+      return unique[0]!;
+    }
+  }
+  return null;
+}
+
+function listenerPlanValuesForwardToTargetGroup(
+  listenerValues: Record<string, unknown>,
+  tgAddress: string,
+  tgArn: string,
+  changes: readonly PlanRc[],
+): boolean {
+  for (const act of normalizeDefaultActions(listenerValues)) {
+    for (const arnStr of collectTargetGroupArnStringsFromAction(act)) {
+      if (tgArn && arnStr === tgArn) {
+        return true;
+      }
+      const resolved = findTargetGroupAddressForPlanRef(arnStr, changes);
+      if (resolved === tgAddress) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Plan-only resolver for [`extractPrimaryTopologyZones`](terraformTopologyPlacement.ts).
+ */
+export function resolveListenerParentLbAddressFromPlan(
+  listenerRc: PlanRc,
+  changes: readonly PlanRc[],
+): string | null {
+  if (
+    !listenerRc.type ||
+    !LISTENER_TYPES.has(listenerRc.type) ||
+    !listenerRc.address
+  ) {
+    return null;
+  }
+  const pv = pickResourceValuesForTopologyPlacement(listenerRc);
+  if (!pv) {
+    return null;
+  }
+  const strings: string[] = [];
+  flattenStringish(pv.load_balancer_arn, strings);
+
+  for (const raw of strings) {
+    const lb = findAwsLbAddressForPlanRef(raw, changes);
+    if (lb) {
+      return lb;
+    }
+  }
+
+  const listenerMod = terraformModulePrefixForAddress(
+    stripStackPrefixForModuleParsing(listenerRc.address),
+  );
+  for (const rc of changes) {
+    if (rc.type !== "aws_lb" || !rc.address) {
+      continue;
+    }
+    if (
+      terraformModulePrefixForAddress(
+        stripStackPrefixForModuleParsing(rc.address),
+      ) !== listenerMod
+    ) {
+      continue;
+    }
+    const lv = pickResourceValuesForTopologyPlacement(rc);
+    if (!lv) {
+      continue;
+    }
+    const arn = typeof lv.arn === "string" ? lv.arn : "";
+    for (const raw of strings) {
+      const t = raw.trim();
+      if (!t || !arn) {
+        continue;
+      }
+      if (
+        t.endsWith(".arn") &&
+        planRefMatchesResourceAddress(t.slice(0, -4), rc.address)
+      ) {
+        return rc.address;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Plan-only: resolve parent `aws_lb` for a target group via listener `default_action` refs.
+ */
+export function resolveTargetGroupParentLbAddressFromPlan(
+  tgRc: PlanRc,
+  changes: readonly PlanRc[],
+): string | null {
+  if (!tgRc.type || !TARGET_GROUP_TYPES.has(tgRc.type) || !tgRc.address) {
+    return null;
+  }
+  const pv = pickResourceValuesForTopologyPlacement(tgRc);
+  const tgArn = pv && typeof pv.arn === "string" ? pv.arn : "";
+
+  for (const rc of changes) {
+    if (!rc.type || !LISTENER_TYPES.has(rc.type) || !rc.address) {
+      continue;
+    }
+    const lv = pickResourceValuesForTopologyPlacement(rc);
+    if (!lv) {
+      continue;
+    }
+    if (
+      listenerPlanValuesForwardToTargetGroup(lv, tgRc.address, tgArn, changes)
+    ) {
+      return resolveListenerParentLbAddressFromPlan(rc, changes);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Plan-only: parent `aws_lb` for listener, target group, or target group attachment.
+ */
+export function resolveAlbCompanionParentLbAddressFromPlan(
+  companionRc: PlanRc,
+  changes: readonly PlanRc[],
+): string | null {
+  const t = companionRc.type;
+  if (!t || !companionRc.address) {
+    return null;
+  }
+  if (LISTENER_TYPES.has(t)) {
+    return resolveListenerParentLbAddressFromPlan(companionRc, changes);
+  }
+  if (TARGET_GROUP_TYPES.has(t)) {
+    return resolveTargetGroupParentLbAddressFromPlan(companionRc, changes);
+  }
+  if (ATTACHMENT_TYPES.has(t)) {
+    const pv = pickResourceValuesForTopologyPlacement(companionRc);
+    if (!pv) {
+      return null;
+    }
+    const strings: string[] = [];
+    flattenStringish(pv.target_group_arn, strings);
+    for (const raw of strings) {
+      const tgAddr = findTargetGroupAddressForPlanRef(raw, changes);
+      if (!tgAddr) {
+        continue;
+      }
+      const tgRc = changes.find((c) => c.address === tgAddr);
+      if (tgRc) {
+        return resolveTargetGroupParentLbAddressFromPlan(tgRc, changes);
+      }
+    }
+  }
   return null;
 }
 
@@ -281,12 +614,14 @@ export function buildAlbListenerTargetCluster(
   lbAddress: string,
   arnIndex: Map<string, string>,
 ): { cluster: AlbListenerTargetCluster | null; edges: TopologyIamEdge[] } {
-  const lbNode = nodes[lbAddress] as TerraformPlanGraphNode | undefined;
+  const canonicalLb = canonicalTopologyNodeKey(nodes, lbAddress);
+  const lbNode = nodes[canonicalLb] as TerraformPlanGraphNode | undefined;
   const lbPrimary = getPrimaryResource(lbNode);
   if (!lbPrimary || lbPrimary.type !== "aws_lb") {
     return { cluster: null, edges: [] };
   }
 
+  const listenerBareSeen = new Set<string>();
   const listenerPaths: string[] = [];
   for (const path of Object.keys(nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
@@ -302,41 +637,55 @@ export function buildAlbListenerTargetCluster(
       continue;
     }
     const values = mergeTerraformPlanResourceValues(pr);
-    if (
-      resolveLoadBalancerArnToLbPath(
-        nodes,
-        values.load_balancer_arn,
-        arnIndex,
-      ) !== lbAddress
-    ) {
+    const listenerLb = resolveLoadBalancerArnToLbPath(
+      nodes,
+      values.load_balancer_arn,
+      arnIndex,
+    );
+    if (!listenerLb || !topologyAddressesMatch(listenerLb, canonicalLb)) {
       continue;
     }
-    listenerPaths.push(path);
+    const canonicalListener = canonicalTopologyNodeKey(nodes, path);
+    const listenerBare = topologyBareAddressKey(canonicalListener);
+    if (listenerBareSeen.has(listenerBare)) {
+      continue;
+    }
+    listenerBareSeen.add(listenerBare);
+    listenerPaths.push(canonicalListener);
   }
   listenerPaths.sort((a, b) => a.localeCompare(b));
 
+  const tgBareSeen = new Set<string>();
   const tgOrdered: string[] = [];
   const tgSet = new Set<string>();
   const listenerToTgs = new Map<string, string[]>();
 
   for (const lp of listenerPaths) {
-    const tgs = collectListenerTargetGroupPaths(nodes, lp, arnIndex);
-    listenerToTgs.set(lp, tgs);
-    for (const tg of tgs) {
-      if (!tgSet.has(tg)) {
+    const tgs = collectListenerTargetGroupPaths(nodes, lp, arnIndex).map((tg) =>
+      canonicalTopologyNodeKey(nodes, tg),
+    );
+    const dedupedTgs = dedupeTopologyAddressesByBareKey(nodes, tgs);
+    listenerToTgs.set(lp, dedupedTgs);
+    for (const tg of dedupedTgs) {
+      const tgBare = topologyBareAddressKey(tg);
+      if (!tgBareSeen.has(tgBare)) {
+        tgBareSeen.add(tgBare);
         tgSet.add(tg);
         tgOrdered.push(tg);
       }
     }
   }
 
-  const attachmentPaths = collectAttachmentPathsForTargetGroups(
+  const attachmentPaths = dedupeTopologyAddressesByBareKey(
     nodes,
-    tgSet,
-    arnIndex,
+    collectAttachmentPathsForTargetGroups(nodes, tgSet, arnIndex),
   );
 
-  const stack = [...listenerPaths, ...tgOrdered, ...attachmentPaths];
+  const stack = dedupeTopologyAddressesByBareKey(nodes, [
+    ...listenerPaths,
+    ...tgOrdered,
+    ...attachmentPaths,
+  ]);
   if (stack.length === 0) {
     return { cluster: null, edges: [] };
   }
@@ -344,7 +693,7 @@ export function buildAlbListenerTargetCluster(
   const edges: TopologyIamEdge[] = [];
   for (const lp of listenerPaths) {
     edges.push({
-      source: lbAddress,
+      source: canonicalLb,
       target: lp,
       type: "alb_listener",
       label: "listener",
@@ -380,7 +729,7 @@ export function buildAlbListenerTargetCluster(
     }
   }
 
-  return { cluster: { lb: lbAddress, stack }, edges };
+  return { cluster: { lb: canonicalLb, stack }, edges };
 }
 
 /** Fill in heights using layout constants (keeps alb module free of layout px imports). */
@@ -450,6 +799,33 @@ export function collectAlbClusterSatelliteAddressesForTopologyList(
  * Drop listener / target group / attachment addresses that are rendered under an `aws_lb`
  * in the same list (same zone or regional column).
  */
+/** True when some `aws_lb` cluster in `nodes` already lists `address` as a satellite. */
+export function isAlbCompanionConsumedAsSatellite(
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  address: string,
+): boolean {
+  const targetBare = topologyBareAddressKey(address);
+  for (const path of Object.keys(nodes)) {
+    if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
+      continue;
+    }
+    const pr = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
+    if (!pr || pr.type !== "aws_lb") {
+      continue;
+    }
+    const { cluster } = buildAlbListenerTargetCluster(
+      nodes,
+      canonicalTopologyNodeKey(nodes, path),
+      arnIndex,
+    );
+    if (cluster?.stack.some((s) => topologyBareAddressKey(s) === targetBare)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function filterTopologyAddressesExcludingAlbSatellites(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,

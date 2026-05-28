@@ -295,8 +295,12 @@ export async function injectTerraformAwsIconsIntoElements(
         pcd.terraformLayoutEdgeFocusKey;
     }
 
+    // Icon library items often include a background rectangle with their own stroke
+    // (e.g. pink `#e64980` on IAM). The resource card already carries Terraform action
+    // colors — cloning that rectangle overlays and hides delete/update/create styling.
+    const iconShapes = template.filter((e) => e.type !== "rectangle");
     const icons = cloneIconElements(
-      [...template],
+      iconShapes,
       iconX,
       iconY,
       iconSize,

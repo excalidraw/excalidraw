@@ -1,8 +1,6 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
+
+import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
 
 import {
   beforeValuesSatisfyRef,
@@ -13,14 +11,8 @@ import {
   resolveTerraformReferenceToNodePaths,
 } from "./terraformPlanConfigRefs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PLAN_FIXTURE = path.resolve(
-  __dirname,
-  "../../backend/terraform/allplanmodules.json",
-);
-
 describe("terraformPlanConfigRefs (allplanmodules)", () => {
-  const plan = JSON.parse(fs.readFileSync(PLAN_FIXTURE, "utf8"));
+  const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
 
   it("resolves writer lambda environment_variables module refs", () => {
     const addr =

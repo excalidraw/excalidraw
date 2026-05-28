@@ -1342,6 +1342,108 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ]);
   });
 
+  it("sizes each subnet zone to its own content instead of sharing the widest VPC column", async () => {
+    const manyPrivate = Array.from(
+      { length: 6 },
+      (_, i) => `aws_instance.w${i}`,
+    );
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-123",
+                      {
+                        vpcId: "vpc-123",
+                        subnets: new Map([
+                          ["subnet-pub-a", { subnetId: "subnet-pub-a" }],
+                          ["subnet-priv-a", { subnetId: "subnet-priv-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: ["aws_nat_gateway.nat"],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-priv-a",
+        subnetIds: ["subnet-priv-a"],
+        addresses: manyPrivate,
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          type: "aws_subnet",
+          change: {
+            after: { id: "subnet-pub-a", tags: { Name: "app-public-a" } },
+          },
+        },
+        {
+          type: "aws_subnet",
+          change: {
+            after: { id: "subnet-priv-a", tags: { Name: "app-private-a" } },
+          },
+        },
+        ...manyPrivate.map((address) => ({
+          type: "aws_instance",
+          address,
+          change: { actions: ["no-op"] },
+        })),
+        {
+          type: "aws_nat_gateway",
+          address: "aws_nat_gateway.nat",
+          change: { actions: ["no-op"] },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      {},
+      plan,
+    );
+    const publicZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-public-a",
+    );
+    const privateZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-private-a",
+    );
+    expect(publicZone).toBeDefined();
+    expect(privateZone).toBeDefined();
+    expect(publicZone!.width).toBeLessThan(privateZone!.width!);
+    expect(publicZone!.width).toBeLessThan(px(480));
+  });
+
   it("places NAT+EIP inside the public subnet zone (semantic AZ) and IGW in the VPC top plumbing row", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
@@ -1955,6 +2057,195 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           r?.type === "sg_rule" &&
           r?.source === "aws_security_group.app" &&
           r?.target === "aws_vpc_security_group_ingress_rule.ssh",
+      ),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("places ALB listener stack (tier-1 listener, tier-2 target group) in primaryCluster", async () => {
+    const lbArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/ecs/abc";
+    const tgArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/ecs/xyz";
+
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-east",
+                      {
+                        vpcId: "vpc-east",
+                        subnets: new Map([
+                          ["subnet-public-a", { subnetId: "subnet-public-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-east",
+        subnetSignature: "subnet-public-a",
+        subnetIds: ["subnet-public-a"],
+        addresses: [
+          "aws_lb.ecs",
+          "aws_lb_listener.http",
+          "aws_lb_target_group.ecs",
+        ],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lb.ecs": {
+        resources: {
+          "aws_lb.ecs": {
+            address: "aws_lb.ecs",
+            mode: "managed",
+            type: "aws_lb",
+            change: {
+              actions: ["create"],
+              after: {
+                arn: lbArn,
+                vpc_id: "vpc-east",
+                subnets: ["subnet-public-a"],
+              },
+            },
+          },
+        },
+      },
+      "aws_lb_listener.http": {
+        resources: {
+          "aws_lb_listener.http": {
+            address: "aws_lb_listener.http",
+            mode: "managed",
+            type: "aws_lb_listener",
+            change: {
+              actions: ["create"],
+              after: {
+                load_balancer_arn: lbArn,
+                port: 80,
+                protocol: "HTTP",
+                default_action: {
+                  type: "forward",
+                  target_group_arn: tgArn,
+                },
+              },
+            },
+          },
+        },
+      },
+      "aws_lb_target_group.ecs": {
+        resources: {
+          "aws_lb_target_group.ecs": {
+            address: "aws_lb_target_group.ecs",
+            mode: "managed",
+            type: "aws_lb_target_group",
+            change: {
+              actions: ["create"],
+              after: { arn: tgArn, port: 8080, vpc_id: "vpc-east" },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
+      );
+
+    const lb = rectByPath("aws_lb.ecs");
+    const listener = rectByPath("aws_lb_listener.http");
+    const tg = rectByPath("aws_lb_target_group.ecs");
+    expect(lb && listener && tg).toBeTruthy();
+
+    const clusterId = lb!.frameId;
+    expect(clusterId).toBeTruthy();
+    expect(listener!.frameId).toBe(clusterId);
+    expect(tg!.frameId).toBe(clusterId);
+
+    const clusterFrame = elements.find(
+      (e) => e.type === "frame" && e.id === clusterId,
+    );
+    expect(
+      (
+        clusterFrame?.customData as
+          | { terraformTopologyRole?: string }
+          | undefined
+      )?.terraformTopologyRole,
+    ).toBe("primaryCluster");
+
+    expect(lb!.width).toBe(px(200));
+    expect(lb!.height).toBe(px(88));
+
+    expect(listener!.x).toBe(lb!.x);
+    expect(listener!.width).toBe(px(176));
+    expect(listener!.height).toBe(px(52));
+
+    expect(tg!.width).toBe(px(154));
+    expect(tg!.height).toBeLessThanOrEqual(listener!.height ?? 0);
+    expect(tg!.y).toBeGreaterThanOrEqual(
+      listener!.y + (listener!.height ?? 0) - 2,
+    );
+
+    const rels = elements
+      .filter(
+        (e) =>
+          e.type === "arrow" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      );
+
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_alb" &&
+          r?.type === "alb_listener" &&
+          r?.source === "aws_lb.ecs" &&
+          r?.target === "aws_lb_listener.http",
+      ),
+    ).toBe(true);
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_alb" &&
+          r?.type === "alb_forward" &&
+          r?.source === "aws_lb_listener.http" &&
+          r?.target === "aws_lb_target_group.ecs",
       ),
     ).toBe(true);
 
@@ -2582,5 +2873,162 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     );
 
     assertTopologyFramesContainChildren(elements);
+  });
+
+  it("does not render aws_subnet as resource tiles; orphan subnets get empty subnetZone frames", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-aaa",
+                      {
+                        vpcId: "vpc-aaa",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.workload"],
+        topologyZoneSource: "primary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-b",
+        subnetIds: ["subnet-b"],
+        addresses: [],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.workload": {
+        resources: {
+          "aws_lambda_function.workload": {
+            address: "aws_lambda_function.workload",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: {
+              actions: ["no-op"],
+              after: {
+                id: "fn-1",
+                vpc_config: { subnet_ids: ["subnet-a"] },
+              },
+            },
+          },
+        },
+      },
+      "aws_subnet.intra": {
+        resources: {
+          "aws_subnet.intra": {
+            address: "aws_subnet.intra",
+            mode: "managed",
+            type: "aws_subnet",
+            change: {
+              actions: ["no-op"],
+              after: { id: "subnet-b", vpc_id: "vpc-aaa" },
+            },
+          },
+        },
+      },
+    };
+
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_lambda_function.workload",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "fn-1",
+              vpc_config: { subnet_ids: ["subnet-a"] },
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_subnet.intra",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-b",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      plan,
+      [],
+      { zoneBottom: [], vpcBottom: [] },
+    );
+
+    const subnetResourceRects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityRole?: string } | undefined)
+          ?.terraformVisibilityRole === "resource" &&
+        (e.customData as { resourceType?: string } | undefined)
+          ?.resourceType === "aws_subnet",
+    );
+    expect(subnetResourceRects).toHaveLength(0);
+
+    const orphanZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") &&
+        (
+          e.customData as { terraformSubnetIds?: string[] } | undefined
+        )?.terraformSubnetIds?.includes("subnet-b"),
+    );
+    expect(orphanZone).toBeDefined();
+
+    const lambdaRect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+          "aws_lambda_function.workload",
+    );
+    expect(lambdaRect).toBeDefined();
   });
 });

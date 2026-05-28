@@ -1,10 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
 
 import { restoreElements } from "../data/restore";
 
@@ -20,9 +18,6 @@ import {
   repairTerraformEdgeBindings,
   TERRAFORM_IMPORT_EDGE_LAYER_PINS,
 } from "./terraformVisibility";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TF_ROOT = path.resolve(__dirname, "../../backend/terraform");
 
 describe("terraform resource hover targets", () => {
   it("treats AWS icon glyphs with nodePath as hover targets", () => {
@@ -128,13 +123,8 @@ const runLayerUiTerraformPass = (
 
 describe("terraform focus hover loop (LayerUI effect simulation)", () => {
   it("stabilizes when hovering one semantic resource with default pins", async () => {
-    const plan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
+    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+    const dot = readTerraformBackendFile("allplanmodules.dot");
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: [{ plan, dotText: dot }],
@@ -174,13 +164,8 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
   });
 
   it("is idempotent on consecutive passes with the same hover target", async () => {
-    const plan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
+    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+    const dot = readTerraformBackendFile("allplanmodules.dot");
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: [{ plan, dotText: dot }],
@@ -233,13 +218,8 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
   });
 
   it("each hover switch updates scene but same target is idempotent", async () => {
-    const plan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
+    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+    const dot = readTerraformBackendFile("allplanmodules.dot");
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: [{ plan, dotText: dot }],
@@ -303,13 +283,8 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
   });
 
   it("does not loop when focus toggles null between hovers (gap flicker)", async () => {
-    const plan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
+    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+    const dot = readTerraformBackendFile("allplanmodules.dot");
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: [{ plan, dotText: dot }],
@@ -357,13 +332,8 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
   });
 
   it("does not replace across 50 consecutive passes after settle (appState churn)", async () => {
-    const plan = JSON.parse(
-      fs.readFileSync(path.join(TF_ROOT, "allplanmodules.json"), "utf8"),
-    );
-    const dot = fs.readFileSync(
-      path.join(TF_ROOT, "allplanmodules.dot"),
-      "utf8",
-    );
+    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+    const dot = readTerraformBackendFile("allplanmodules.dot");
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: [{ plan, dotText: dot }],

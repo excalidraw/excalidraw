@@ -76,20 +76,73 @@ You likely have **Workers Builds** on script **ainur** connected to GitHub. That
 
 ## Step 4 — D1 + secrets (first time)
 
+[`wrangler.jsonc`](../wrangler.jsonc) uses **separate D1 databases** for production vs preview:
+
+| Binding      | Production (`master`) | Preview (branch deploys)   |
+| ------------ | --------------------- | -------------------------- |
+| `DB`         | `tfdraw-analytics`    | `tfdraw-analytics-preview` |
+| `PRESETS_DB` | `tfdraw-presets`      | `tfdraw-presets-preview`   |
+
+Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs when Pages deploys the **production branch** (set in dashboard, usually `master`).
+
+**One-time prod schemas:**
+
 ```bash
 npx wrangler d1 execute tfdraw-analytics --remote --file=./functions/schema.sql
+npx wrangler d1 execute tfdraw-presets --remote --file=./functions/presets-schema.sql
+```
+
+**One-time preview schemas** (after `wrangler d1 create …-preview`):
+
+```bash
+npx wrangler d1 execute tfdraw-analytics-preview --remote --file=./functions/schema.sql
+npx wrangler d1 execute tfdraw-presets-preview --remote --file=./functions/presets-schema.sql
+```
+
+```bash
 npx wrangler pages secret put TURNSTILE_SECRET_KEY --project-name=ainur
 ```
 
-See [telemetry-setup.md](./telemetry-setup.md) for Turnstile and stats.
+See [telemetry-setup.md](./telemetry-setup.md) for Turnstile and stats. Preview analytics starts empty (test signups do not hit prod emails).
+
+### Terraform import presets (read-only, D1)
+
+The Pages app calls `GET /api/terraform-import-presets` and `GET /api/terraform-import-presets/:id/sources`. Which database is used depends on the deployment environment (prod vs preview).
+
+**Push local SQLite** (after `yarn seed:terraform-presets`):
+
+```bash
+yarn push:terraform-presets-d1:prod      # production only (tfdraw.dev)
+yarn push:terraform-presets-d1:preview   # branch previews only
+yarn push:terraform-presets-d1           # both
+```
+
+Or use GitHub Actions → **Push Terraform presets to D1** (`workflow_dispatch`, target `prod` / `preview` / `both`).
+
+Large plan/dot payloads are gzip-compressed and split into `terraform_import_preset_blob_chunks` so each SQL statement stays under D1 limits.
+
+**Verify presets API** (use the host that matches the environment):
+
+```bash
+# Production
+curl -sS "https://tfdraw.dev/api/terraform-import-presets" | head -c 200
+
+# Preview (example)
+curl -sS "https://terraform-feature.YOUR.pages.dev/api/terraform-import-presets" | head -c 200
+```
+
+In the app: **Import Terraform** → preset dropdown → **Load & import**.
+
+**Dashboard:** Pages → Settings → ensure **Production branch** = `master` (or your prod branch).
 
 ---
 
 ## Step 5 — Verify
 
-1. **Actions** → “Deploy to Cloudflare Pages” → green on your branch.
+1. **Actions** → “Deploy to Cloudflare Pages” → green on your branch (required after `wrangler.jsonc` env changes so prod/preview bindings apply).
 2. Open the **Pages** deployment URL (not `workers.dev`).
-3. DevTools → Network → submit email → `POST /api/subscribe` should be **200** JSON `{ "ok": true }`.
+3. DevTools → Network → submit email → `POST /api/subscribe` should be **200** JSON `{ "ok": true }` (preview signups go to `tfdraw-analytics-preview`, prod to `tfdraw-analytics`).
+4. DevTools → `GET /api/terraform-import-presets` → **200** with a `presets` array (after D1 data import to the matching environment).
 
 ---
 

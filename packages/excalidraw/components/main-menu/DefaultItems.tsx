@@ -168,8 +168,8 @@ export const ImportTerraform = () => {
   const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItem
-      icon={ExportImageIcon}
-      data-testid="image-export-button"
+      icon={LoadIcon}
+      data-testid="terraform-import-button"
       onSelect={() => setAppState({ openDialog: { name: "terraformImport" } })}
       shortcut={getShortcutFromShortcutName("terraformImport")}
       aria-label="Import Terraform"

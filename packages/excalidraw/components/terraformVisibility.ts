@@ -1,5 +1,10 @@
 import {
+  boundsContainBounds,
+  doBoundsIntersect,
   getNonDeletedElements,
+  getFrameDescendants,
+  getElementBounds,
+  isFrameLikeElement,
   isBindableElement,
   isLinearElement,
   newElementWith,
@@ -67,6 +72,55 @@ export const buildTerraformReconcileOptionsForAppState = (
     : undefined;
 
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
+
+const isTerraformResourceRectangle = (
+  element: ExcalidrawElement | null | undefined,
+): element is NonDeletedExcalidrawElement => {
+  if (!element || element.isDeleted || element.type !== "rectangle") {
+    return false;
+  }
+  const cd = getCustomData(element);
+  return cd.terraform === true && cd.terraformVisibilityRole === "resource";
+};
+
+const isTerraformDraggableNode = (
+  element: ExcalidrawElement | null | undefined,
+): element is NonDeletedExcalidrawElement => {
+  if (!element || element.isDeleted) {
+    return false;
+  }
+  const cd = getCustomData(element);
+  if (cd.terraform !== true || getTerraformEdgeLayer(element)) {
+    return false;
+  }
+  if (isFrameLikeElement(element)) {
+    return true;
+  }
+  return (
+    cd.terraformVisibilityRole === "resource" ||
+    cd.terraformVisibilityRole === "group"
+  );
+};
+
+const isTerraformConstraintBox = (
+  element: ExcalidrawElement | null | undefined,
+): element is NonDeletedExcalidrawElement => {
+  if (!element || element.isDeleted) {
+    return false;
+  }
+  const cd = getCustomData(element);
+  if (cd.terraform !== true || getTerraformEdgeLayer(element)) {
+    return false;
+  }
+  if (isFrameLikeElement(element)) {
+    return true;
+  }
+  return (
+    element.type === "rectangle" &&
+    (cd.terraformVisibilityRole === "resource" ||
+      cd.terraformVisibilityRole === "group")
+  );
+};
 
 /** Infer pin snapshot from current edge visibility (legacy scenes, first menu interaction). */
 export const inferLegacyTerraformEdgePinsFromElements = (
@@ -267,6 +321,222 @@ export const syncTerraformDetachedResourceLabelsWithDraggedCards = (
     scene.mutateElement(label, {
       x: origLabel.x + dx,
       y: origLabel.y + dy,
+    });
+  }
+};
+
+const getMovedTerraformElements = (
+  pointerDownState: PointerDownState,
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+) =>
+  selectedElements.filter((element) => {
+    if (!isTerraformDraggableNode(element)) {
+      return false;
+    }
+    const orig = pointerDownState.originalElements.get(element.id);
+    if (!orig || orig.isDeleted) {
+      return false;
+    }
+    return orig.x !== element.x || orig.y !== element.y;
+  });
+
+/**
+ * Returns Terraform elements that should snap back because the drop violates:
+ * - parent containment (element leaves its original parent frame), or
+ * - sibling overlap (resource rectangles overlap siblings in same parent).
+ */
+export const getInvalidTerraformDraggedElementIds = (
+  scene: Scene,
+  pointerDownState: PointerDownState,
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+): Set<string> => {
+  const invalidElementIds = new Set<string>();
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const movedTerraformElements = getMovedTerraformElements(
+    pointerDownState,
+    selectedElements,
+  );
+
+  for (const element of movedTerraformElements) {
+    const orig = pointerDownState.originalElements.get(element.id);
+    if (!orig || orig.isDeleted) {
+      continue;
+    }
+
+    // Keep nested Terraform nodes inside the same original parent container.
+    if (orig.frameId) {
+      const parent = elementsMap.get(orig.frameId);
+      if (!parent || parent.isDeleted) {
+        continue;
+      }
+
+      const elementBounds = getElementBounds(element, elementsMap);
+      const parentBounds = getElementBounds(parent, elementsMap);
+
+      const origElementBounds = getElementBounds(
+        orig,
+        pointerDownState.originalElements,
+      );
+      const origParent =
+        pointerDownState.originalElements.get(orig.frameId) ?? parent;
+      const origParentBounds = getElementBounds(
+        origParent,
+        pointerDownState.originalElements,
+      );
+      const wasInsideParent = boundsContainBounds(
+        origParentBounds,
+        origElementBounds,
+      );
+      const isOutsideParent = !boundsContainBounds(parentBounds, elementBounds);
+
+      if (wasInsideParent && isOutsideParent) {
+        invalidElementIds.add(element.id);
+        continue;
+      }
+    }
+
+    // Prevent Terraform boxes/resources from overlapping sibling boxes/resources
+    // within the same parent container.
+    if (!isTerraformConstraintBox(element)) {
+      continue;
+    }
+
+    const elementBounds = getElementBounds(element, elementsMap);
+    const parentFrameId = orig.frameId ?? null;
+    const origElementBounds = getElementBounds(
+      orig,
+      pointerDownState.originalElements,
+    );
+
+    for (const sibling of elementsMap.values()) {
+      if (
+        sibling.isDeleted ||
+        sibling.id === element.id ||
+        sibling.frameId !== parentFrameId ||
+        !isTerraformConstraintBox(sibling)
+      ) {
+        continue;
+      }
+
+      const siblingBounds = getElementBounds(sibling, elementsMap);
+      if (!doBoundsIntersect(elementBounds, siblingBounds)) {
+        continue;
+      }
+
+      const origSibling =
+        pointerDownState.originalElements.get(sibling.id) ?? sibling;
+      const origSiblingBounds = getElementBounds(
+        origSibling,
+        pointerDownState.originalElements,
+      );
+
+      if (!doBoundsIntersect(origElementBounds, origSiblingBounds)) {
+        invalidElementIds.add(element.id);
+        break;
+      }
+    }
+  }
+
+  return invalidElementIds;
+};
+
+/**
+ * Snap invalid Terraform drops to pointer-down coordinates and restore detached labels.
+ */
+export const restoreInvalidTerraformDraggedElements = (
+  scene: Scene,
+  pointerDownState: PointerDownState,
+  invalidElementIds: ReadonlySet<string>,
+  selectedElements: readonly NonDeletedExcalidrawElement[] = [],
+): void => {
+  if (invalidElementIds.size === 0) {
+    return;
+  }
+
+  const labelByVisibilityKey = new Map<string, NonDeletedExcalidrawElement>();
+  for (const element of scene.getNonDeletedElements()) {
+    if (element.type !== "text") {
+      continue;
+    }
+    const cd = getCustomData(element);
+    if (
+      cd.terraform === true &&
+      cd.terraformVisibilityRole === "resource" &&
+      typeof cd.nodePath === "string"
+    ) {
+      const key = getTerraformVisibilityKey(element);
+      if (key) {
+        labelByVisibilityKey.set(key, element);
+      }
+    }
+  }
+
+  for (const elementId of invalidElementIds) {
+    const element = scene.getElement(elementId);
+    const orig = pointerDownState.originalElements.get(elementId);
+    if (!element || !orig || element.isDeleted || orig.isDeleted) {
+      continue;
+    }
+
+    const dx = orig.x - element.x;
+    const dy = orig.y - element.y;
+    scene.mutateElement(element, {
+      x: orig.x,
+      y: orig.y,
+    });
+
+    if (isFrameLikeElement(element)) {
+      const descendants = getFrameDescendants(
+        scene.getNonDeletedElementsMap(),
+        element.id,
+      );
+      for (const descendant of descendants) {
+        scene.mutateElement(descendant, {
+          x: descendant.x + dx,
+          y: descendant.y + dy,
+        });
+      }
+    }
+
+    if (!isTerraformResourceRectangle(element)) {
+      continue;
+    }
+
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      continue;
+    }
+    const label = labelByVisibilityKey.get(key);
+    if (!label || label.id === element.id) {
+      continue;
+    }
+    const origLabel = pointerDownState.originalElements.get(label.id);
+    if (!origLabel || origLabel.isDeleted) {
+      continue;
+    }
+    scene.mutateElement(label, { x: origLabel.x, y: origLabel.y });
+  }
+
+  // Restore all selected Terraform companion glyphs/text that moved with the card.
+  for (const selectedElement of selectedElements) {
+    const orig = pointerDownState.originalElements.get(selectedElement.id);
+    if (!orig || orig.isDeleted || selectedElement.isDeleted) {
+      continue;
+    }
+    if (selectedElement.customData?.terraform !== true) {
+      continue;
+    }
+    if (
+      selectedElement.x === orig.x &&
+      selectedElement.y === orig.y &&
+      selectedElement.frameId === orig.frameId
+    ) {
+      continue;
+    }
+    scene.mutateElement(selectedElement, {
+      x: orig.x,
+      y: orig.y,
+      frameId: orig.frameId ?? null,
     });
   }
 };

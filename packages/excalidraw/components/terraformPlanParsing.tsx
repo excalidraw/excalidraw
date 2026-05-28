@@ -23,9 +23,12 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   filterVpcEndpointBucketsRemovingZonePlacedAddresses,
+  mergePrimaryTopologyZonesByTier,
+  reconcileTopologyPlacementZonesAfterEnrich,
   mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
+import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
@@ -55,8 +58,19 @@ import {
   mergePlanJsons,
   mergePlanWithStates,
   mergeSyntheticPlans,
+  namespacePlanDotBundles,
   parseRawStateJson,
 } from "./terraformImportMerge";
+import {
+  collectKnownStackIdsFromNodes,
+  isStackQualifiedAddress,
+  parseStackAddress,
+  preferTopologyNodeKeyAmongAliases,
+  prefixStackAddress,
+  stripStackPrefixForModuleParsing,
+  topologyBareAddressKey,
+} from "./terraformStackAddress";
+import { dedupeTerraformPlanNodesByBareAddress } from "./terraformTopologyAddress";
 
 import type { Graph } from "@dagrejs/graphlib";
 import type {
@@ -167,6 +181,8 @@ export type TerraformPlanParsingOptions = {
 type BuildNodesMapOptions = {
   priorStatePlans?: unknown[];
   adjacency?: Record<string, string[]>;
+  /** Parallel to `tfstate` files when multi-stack; used to avoid unqualified ghost nodes. */
+  stackIds?: string[];
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
@@ -275,10 +291,33 @@ function getStateResourceAddress(
   return address;
 }
 
+const STATE_MERGE_PLACEHOLDER_ACTIONS = new Set(["existing", "read"]);
+
+/** Keep real plan `change.actions` when enriching nodes from raw tfstate. */
+function preferPlanChangeForStateMerge(existingChange: unknown): {
+  actions: string[];
+} {
+  const change = existingChange as { actions?: unknown } | undefined;
+  const actions = Array.isArray(change?.actions)
+    ? change.actions.filter(
+        (action): action is string =>
+          typeof action === "string" && action.length > 0,
+      )
+    : [];
+  if (
+    actions.length > 0 &&
+    !actions.every((action) => STATE_MERGE_PLACEHOLDER_ACTIONS.has(action))
+  ) {
+    return change as { actions: string[] };
+  }
+  return { actions: ["existing"] };
+}
+
 /** Merges raw tfstate `resources` into nodes (same semantics as backend `mergeTerraformState`). */
 function mergeRawTerraformStateIntoNodes(
   nodes: Record<string, TerraformPlanGraphNode>,
   state: unknown,
+  stackId?: string,
 ): Record<string, TerraformPlanGraphNode> {
   if (!state || typeof state !== "object") {
     return nodes;
@@ -298,7 +337,11 @@ function mergeRawTerraformStateIntoNodes(
     }
 
     for (const instance of resource.instances || []) {
-      const address = getStateResourceAddress(resource, instance);
+      const rawAddress = getStateResourceAddress(resource, instance);
+      const address =
+        stackId?.trim() && !isStackQualifiedAddress(rawAddress)
+          ? prefixStackAddress(stackId.trim(), rawAddress)
+          : rawAddress;
       const nodePath = address;
 
       if (!nodes[nodePath]) {
@@ -318,7 +361,7 @@ function mergeRawTerraformStateIntoNodes(
           ...((instance.attributes || {}) as Record<string, unknown>),
           ...(existingResource.values as Record<string, unknown> | undefined),
         },
-        change: existingResource.change || { actions: ["existing"] },
+        change: preferPlanChangeForStateMerge(existingResource.change),
         terraform_state: {
           schema_version: instance.schema_version,
           private: Boolean(instance.private),
@@ -331,7 +374,11 @@ function mergeRawTerraformStateIntoNodes(
         if (!dependency || isExcludedDataSourceAddressForGraph(dependency)) {
           continue;
         }
-        const target = resolveTerraformPlanNodeKey(nodes, dependency);
+        const qualifiedDep =
+          stackId?.trim() && !isStackQualifiedAddress(dependency)
+            ? prefixStackAddress(stackId.trim(), dependency)
+            : dependency;
+        const target = resolveTerraformPlanNodeKey(nodes, qualifiedDep);
         if (
           target &&
           target !== nodePath &&
@@ -372,9 +419,17 @@ export function buildTerraformLocalImportNodesMap(
     prior_state?: { values: { root_module: unknown } };
   };
   let nodes = loadPlan(planTyped);
-  for (const state of normalizeTfstateList(tfstate)) {
-    nodes = mergeRawTerraformStateIntoNodes(nodes, state);
+  const stackIds = options?.stackIds ?? [];
+  const stateList = normalizeTfstateList(tfstate);
+  for (let si = 0; si < stateList.length; si++) {
+    const stackId = stackIds[si]?.trim();
+    nodes = mergeRawTerraformStateIntoNodes(
+      nodes,
+      stateList[si]!,
+      stackId || undefined,
+    );
   }
+  nodes = dedupeTerraformPlanNodesByBareAddress(nodes);
   const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
   const nodes3 = buildNewEdges(nodes2, adjacency);
   let nodes4 = nodes3;
@@ -443,12 +498,19 @@ function appendImportMeta(
   meta: Record<string, unknown>,
   sources: TerraformPlanParsingSources,
   importWarnings: TerraformImportWarning[],
+  stackMeta?: { stackIds: string[]; addressToStack: Record<string, string> },
 ) {
   return {
     ...meta,
     importBundleCount: sources.planDotBundles.length,
     importStateCount: sources.states.length,
     importTfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
+    ...(stackMeta?.stackIds.length
+      ? {
+          stackIds: stackMeta.stackIds,
+          addressToStack: stackMeta.addressToStack,
+        }
+      : {}),
     ...(importWarnings.length > 0 ? { importWarnings } : {}),
   };
 }
@@ -464,6 +526,8 @@ export const terraformPlanParsingFromSources = async (
   let adjacency: Record<string, string[]>;
   let importSource: "plan" | "state-only" = "plan";
   let sourcePlans: unknown[] = [];
+  let stackIds: string[] = [];
+  let addressToStack: Record<string, string> = {};
   const states = sources.states ?? [];
 
   if (sources.planDotBundles.length === 0) {
@@ -486,14 +550,27 @@ export const terraformPlanParsingFromSources = async (
     adjacency = {};
     importSource = "state-only";
   } else {
-    const plans = sources.planDotBundles.map((b) => b.plan);
-    const labels = sources.planDotBundles.map((b) => b.label);
+    let bundles = sources.planDotBundles;
+    if (bundles.length > 1) {
+      const namespaced = namespacePlanDotBundles(bundles);
+      bundles = namespaced.bundles;
+      stackIds = namespaced.stackIds;
+      addressToStack = namespaced.addressToStack;
+    }
+    const plans = bundles.map((b) => b.plan);
+    const labels = bundles.map((b) => b.label);
     const merged = mergePlanJsons(plans, labels);
     plan = merged.plan;
     importWarnings.push(...merged.warnings);
     sourcePlans = merged.sourcePlans;
-    adjacency = mergeDotAdjacency(sources.planDotBundles.map((b) => b.dotText));
-    if (states.length > 0) {
+    adjacency = mergeDotAdjacency(
+      bundles.map((b) => b.dotText),
+      stackIds.length > 0 ? stackIds : undefined,
+    );
+    // Multi-stack plan imports: each tfstate belongs to its own root. Merging many
+    // state files into one plan duplicates almost every address (hundreds of warnings)
+    // and "last wins" across stacks. Only enrich from state for single-bundle imports.
+    if (states.length > 0 && sources.planDotBundles.length === 1) {
       const mergedWithState = mergePlanWithStates(
         plan as Parameters<typeof mergePlanWithStates>[0],
         sourcePlans,
@@ -542,6 +619,7 @@ export const terraformPlanParsingFromSources = async (
   const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, states, {
     adjacency,
     priorStatePlans: sourcePlans,
+    stackIds,
   });
 
   const tfdWarnings = applyTfdOverlayToNodes(
@@ -595,10 +673,13 @@ export const terraformPlanParsingFromSources = async (
     const awsChanges = providerBuckets.get("aws") ?? [];
     if (awsChanges.length > 0) {
       const topoModel = extractTerraformTopologyFromPlan(awsPlan);
-      const primaryZones = extractPrimaryTopologyZones(awsPlan).map((z) => ({
-        ...z,
-        topologyZoneSource: "primary" as const,
-      }));
+      const primaryZones = mergePrimaryTopologyZonesByTier(
+        extractPrimaryTopologyZones(awsPlan).map((z) => ({
+          ...z,
+          topologyZoneSource: "primary" as const,
+        })),
+        awsPlan,
+      );
       const supplementaryZones = extractSupplementarySubnetZones(
         awsPlan,
         primaryZones,
@@ -670,6 +751,60 @@ export const terraformPlanParsingFromSources = async (
         topoModel,
         endpointSecurityGroupBuckets,
       );
+
+      const enrichPreplaced = new Set<string>();
+      for (const z of zones) {
+        for (const a of z.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of regionalBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcEndpointBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of routeTableBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcDefaultPlumbingBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcFlowLogBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of endpointSecurityGroupBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const a of natZonePlacements.consumedAddresses) {
+        enrichPreplaced.add(a);
+      }
+      for (const p of zonePlacedAddresses) {
+        enrichPreplaced.add(p);
+      }
+      enrichTopologyPlacementsWithManagedResources(
+        awsPlan,
+        zones,
+        regionalBuckets,
+        {
+          nodes: nodes5,
+          plan: awsPlan,
+          preplacedAddresses: enrichPreplaced,
+        },
+      );
+      reconcileTopologyPlacementZonesAfterEnrich(zones, awsPlan);
 
       if (topoModel.accounts.size > 0) {
         const topoScene = await buildTerraformTopologyExcalidrawScene(
@@ -752,6 +887,7 @@ export const terraformPlanParsingFromSources = async (
         },
         sources,
         formatImportWarnings(importWarnings, tfdWarnings),
+        { stackIds, addressToStack },
       ),
     };
   } else {
@@ -891,13 +1027,75 @@ export function resolveTerraformPlanNodeKey(
   ) {
     return null;
   }
-  if (nodes[address]) {
-    return address;
+
+  const parsed = parseStackAddress(address);
+  const bareKey = topologyBareAddressKey(address);
+
+  if (parsed) {
+    const stackAliases: string[] = [];
+    for (const k of Object.keys(nodes)) {
+      if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+        continue;
+      }
+      const kParsed = parseStackAddress(k);
+      if (
+        kParsed?.stackId === parsed.stackId &&
+        topologyBareAddressKey(k) === bareKey
+      ) {
+        stackAliases.push(k);
+      } else if (!kParsed && topologyBareAddressKey(k) === bareKey) {
+        stackAliases.push(k);
+      }
+    }
+    if (stackAliases.length > 0) {
+      return preferTopologyNodeKeyAmongAliases(stackAliases);
+    }
+  } else {
+    const qualifiedMatches: string[] = [];
+    for (const k of Object.keys(nodes)) {
+      if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+        continue;
+      }
+      const kParsed = parseStackAddress(k);
+      if (kParsed && topologyBareAddressKey(k) === bareKey) {
+        qualifiedMatches.push(k);
+      }
+    }
+    if (qualifiedMatches.length === 1) {
+      return qualifiedMatches[0]!;
+    }
+    if (qualifiedMatches.length > 1) {
+      return null;
+    }
+    if (nodes[address]) {
+      return address;
+    }
   }
+
   const graphId = stripTerraformAddressIndexes(address);
-  if (nodes[graphId]) {
-    return graphId;
+
+  const knownStackIds = collectKnownStackIdsFromNodes(nodes);
+  if (knownStackIds.length > 0 && !address.includes("::")) {
+    const qualifiedMatches: string[] = [];
+    for (const stackId of knownStackIds) {
+      const qualified = prefixStackAddress(stackId, address);
+      if (nodes[qualified]) {
+        qualifiedMatches.push(qualified);
+      }
+      const qualifiedStripped = prefixStackAddress(stackId, graphId);
+      if (nodes[qualifiedStripped]) {
+        qualifiedMatches.push(qualifiedStripped);
+      }
+    }
+    const uniqueQualified = [...new Set(qualifiedMatches)];
+    if (uniqueQualified.length === 1) {
+      return uniqueQualified[0]!;
+    }
+    if (uniqueQualified.length > 1) {
+      return null;
+    }
   }
+
   const matches: string[] = [];
   for (const k of Object.keys(nodes)) {
     if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
@@ -910,8 +1108,8 @@ export function resolveTerraformPlanNodeKey(
   if (matches.length === 1) {
     return matches[0];
   }
-  if (matches.length > 1 && matches.includes(address)) {
-    return address;
+  if (matches.length > 1) {
+    return null;
   }
   return null;
 }
@@ -1056,7 +1254,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
 }
 
 function getModulePathChainFromAddress(nodePath = "") {
-  const parts = nodePath.split(".");
+  const parts = stripStackPrefixForModuleParsing(nodePath).split(".");
   const chain = [];
   let cursor = "";
 
@@ -1082,7 +1280,7 @@ function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
  * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
  */
 function getContainingModulePathForAddress(address: string): string {
-  const parts = address.split(".");
+  const parts = stripStackPrefixForModuleParsing(address).split(".");
   let index = 0;
   let modulePath = "";
   while (
@@ -1267,10 +1465,11 @@ function buildExistingEdges(
         continue;
       }
 
-      nodes[address] ||= { resources: {} };
+      const nodePath = resolveTerraformPlanNodeKey(nodes, address) ?? address;
+      nodes[nodePath] ||= { resources: {} };
 
-      if (!nodes[address].resources[address]) {
-        nodes[address].resources[address] = {
+      if (!nodes[nodePath].resources[address]) {
+        nodes[nodePath].resources[address] = {
           ...resource,
           change: { actions: ["existing"] },
         };

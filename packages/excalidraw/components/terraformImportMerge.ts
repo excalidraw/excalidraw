@@ -4,6 +4,10 @@
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
+import {
+  prefixStackAddress,
+  stackIdFromBundleLabel,
+} from "./terraformStackAddress";
 import { buildSyntheticPlanFromTfstate } from "./terraformStateToPlan";
 
 export type TerraformImportWarning = {
@@ -70,14 +74,23 @@ function sourceLabel(label: string | undefined, index: number): string {
 /** Union dependency-graph adjacency from multiple `terraform graph` DOT exports. */
 export function mergeDotAdjacency(
   dotTexts: string[],
+  stackIds?: (string | undefined)[],
 ): Record<string, string[]> {
   const adjacency: Record<string, string[]> = {};
 
-  for (const dotText of dotTexts) {
+  for (let i = 0; i < dotTexts.length; i++) {
+    const dotText = dotTexts[i]!;
+    const stackId = stackIds?.[i]?.trim();
     const graph = graphlibDot.read(dotText);
     for (const { v, w } of graph.edges()) {
-      const source = sanitizeDotNodeId(v);
-      const target = sanitizeDotNodeId(w);
+      const rawSource = sanitizeDotNodeId(v);
+      const rawTarget = sanitizeDotNodeId(w);
+      const source = stackId
+        ? prefixStackAddress(stackId, rawSource)
+        : rawSource;
+      const target = stackId
+        ? prefixStackAddress(stackId, rawTarget)
+        : rawTarget;
       if (!adjacency[source]) {
         adjacency[source] = [];
       }
@@ -88,6 +101,102 @@ export function mergeDotAdjacency(
   }
 
   return adjacency;
+}
+
+function prefixDependsOnList(
+  deps: unknown,
+  stackId: string,
+): string[] | undefined {
+  if (!Array.isArray(deps)) {
+    return undefined;
+  }
+  return deps.map((dep) =>
+    typeof dep === "string" ? prefixStackAddress(stackId, dep) : String(dep),
+  );
+}
+
+function namespacePriorStateModule(
+  module: Record<string, unknown>,
+  stackId: string,
+): void {
+  for (const resource of (module.resources as unknown[]) || []) {
+    if (!resource || typeof resource !== "object") {
+      continue;
+    }
+    const res = resource as Record<string, unknown>;
+    if (typeof res.address === "string") {
+      res.address = prefixStackAddress(stackId, res.address);
+    }
+    const prefixed = prefixDependsOnList(res.depends_on, stackId);
+    if (prefixed) {
+      res.depends_on = prefixed;
+    }
+  }
+  for (const child of (module.child_modules as unknown[]) || []) {
+    if (child && typeof child === "object") {
+      namespacePriorStateModule(child as Record<string, unknown>, stackId);
+    }
+  }
+}
+
+/** Prefix all Terraform addresses in one plan JSON object for multi-stack merge. */
+export function namespacePlanForStack(plan: unknown, stackId: string): unknown {
+  if (!plan || typeof plan !== "object") {
+    return plan;
+  }
+  const cloned = structuredClone(plan) as Record<string, unknown>;
+  const resourceChanges = cloned.resource_changes;
+  if (Array.isArray(resourceChanges)) {
+    for (const rc of resourceChanges) {
+      if (
+        rc &&
+        typeof rc === "object" &&
+        typeof (rc as { address?: string }).address === "string"
+      ) {
+        const entry = rc as { address: string };
+        entry.address = prefixStackAddress(stackId, entry.address);
+      }
+    }
+  }
+  const priorState = cloned.prior_state as
+    | { values?: { root_module?: Record<string, unknown> } }
+    | undefined;
+  const rootModule = priorState?.values?.root_module;
+  if (rootModule && typeof rootModule === "object") {
+    namespacePriorStateModule(rootModule, stackId);
+  }
+  return cloned;
+}
+
+export type NamespacePlanDotBundlesResult = {
+  bundles: TerraformPlanDotBundle[];
+  stackIds: string[];
+  addressToStack: Record<string, string>;
+};
+
+/** Apply stack namespace to each bundle when importing multiple Terraform roots. */
+export function namespacePlanDotBundles(
+  bundles: TerraformPlanDotBundle[],
+): NamespacePlanDotBundlesResult {
+  if (bundles.length <= 1) {
+    return { bundles, stackIds: [], addressToStack: {} };
+  }
+  const stackIds: string[] = [];
+  const addressToStack: Record<string, string> = {};
+  const namespaced = bundles.map((bundle, index) => {
+    const stackId = stackIdFromBundleLabel(bundle.label, index);
+    stackIds.push(stackId);
+    const plan = namespacePlanForStack(bundle.plan, stackId) as {
+      resource_changes?: Array<{ address?: string }>;
+    };
+    for (const rc of plan.resource_changes || []) {
+      if (typeof rc.address === "string") {
+        addressToStack[rc.address] = stackId;
+      }
+    }
+    return { ...bundle, plan, label: stackId };
+  });
+  return { bundles: namespaced, stackIds, addressToStack };
 }
 
 const VARIABLE_KEYS = ["aws_account_id", "aws_region"] as const;
@@ -171,11 +280,18 @@ function mergePlanConfigurations(
   return { provider_config: providerConfig };
 }
 
+export type MergePlanJsonsOptions = {
+  /** Emit duplicate_address warnings when later imports overwrite (default true). */
+  warnOnOverwrite?: boolean;
+};
+
 /** Concatenate `resource_changes` from multiple plan JSON objects (last wins on duplicate address). */
 export function mergePlanJsons(
   plans: unknown[],
   labels?: (string | undefined)[],
+  options: MergePlanJsonsOptions = {},
 ): MergePlanJsonsResult {
+  const warnOnOverwrite = options.warnOnOverwrite !== false;
   if (plans.length === 1) {
     return {
       plan: plans[0] as MergePlanJsonsResult["plan"],
@@ -199,13 +315,15 @@ export function mergePlanJsons(
       }
       const existingIdx = addressIndex.get(address);
       if (existingIdx != null) {
-        const prevLabel = sourceLabel(labelList[existingIdx], existingIdx);
-        warnings.push({
-          code: "duplicate_address",
-          message: `Address "${address}" overwritten by "${label}" (was "${prevLabel}").`,
-          address,
-          source: label,
-        });
+        if (warnOnOverwrite) {
+          const prevLabel = sourceLabel(labelList[existingIdx], existingIdx);
+          warnings.push({
+            code: "duplicate_address",
+            message: `Address "${address}" overwritten by "${label}" (was "${prevLabel}").`,
+            address,
+            source: label,
+          });
+        }
         resourceChanges[existingIdx] = rc;
       } else {
         addressIndex.set(address, resourceChanges.length);
@@ -245,10 +363,15 @@ export function mergePlanWithStates(
   if (states.length === 0) {
     return { plan, sourcePlans };
   }
-  const stateMerged = mergeSyntheticPlans(states, stateLabels);
+  const stateMerged = mergeSyntheticPlans(states, stateLabels, {
+    warnOnOverwrite: true,
+  });
+  // State synthetic plans use `read` for every resource; merge state first so real
+  // plan `create` / `update` / `delete` actions win on duplicate addresses.
   const combined = mergePlanJsons(
-    [plan, stateMerged.plan],
-    ["plan", stateLabels[0] ?? "state"],
+    [stateMerged.plan, plan],
+    [stateLabels[0] ?? "state", "plan"],
+    { warnOnOverwrite: false },
   );
   warnings.push(...stateMerged.warnings, ...combined.warnings);
   return {
@@ -261,9 +384,10 @@ export function mergePlanWithStates(
 export function mergeSyntheticPlans(
   states: unknown[],
   labels?: (string | undefined)[],
+  options: MergePlanJsonsOptions = {},
 ): MergePlanJsonsResult {
   const syntheticPlans = states.map((state) =>
     buildSyntheticPlanFromTfstate(state),
   );
-  return mergePlanJsons(syntheticPlans, labels);
+  return mergePlanJsons(syntheticPlans, labels, options);
 }
