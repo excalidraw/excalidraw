@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
@@ -36,6 +36,31 @@ export const ColorInput = ({
   useEffect(() => {
     setInnerValue(color);
   }, [color]);
+
+  const validationError = useMemo(() => {
+    const trimmed = (innerValue || "").replace(/^#/, "").trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    // Only show validation error when there's actual content and it's not valid
+    const normalized = normalizeInputColor(innerValue);
+    if (normalized) {
+      return null;
+    }
+
+    // Determine the specific error
+    if (!/^[0-9a-fA-F#]+$/.test(innerValue.replace(/\s/g, ""))) {
+      return t("colorPicker.invalidHexChars");
+    }
+
+    const hex = innerValue.replace(/^#/, "").trim();
+    if (hex.length > 0 && ![3, 4, 6, 8].includes(hex.length)) {
+      return t("colorPicker.invalidHexLength");
+    }
+
+    return t("colorPicker.invalidHex");
+  }, [innerValue]);
 
   const changeColor = useCallback(
     (inputValue: string) => {
@@ -74,8 +99,11 @@ export const ColorInput = ({
         ref={activeSection === "hex" ? inputRef : undefined}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
-        className="color-picker-input"
+        className={clsx("color-picker-input", {
+          "color-picker-input--error": validationError,
+        })}
         aria-label={label}
+        aria-invalid={!!validationError}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
@@ -95,6 +123,11 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {validationError && (
+        <div className="color-picker__input-error" role="alert">
+          {validationError}
+        </div>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>

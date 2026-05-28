@@ -421,6 +421,18 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &.color-picker-input--error {
+      color: var(--color-danger-color);
+    }
+  }
+
+  .color-picker__input-error {
+    grid-column: 1 / -1;
+    font-size: 0.6875rem;
+    color: var(--color-danger-color);
+    padding: 0 0.25rem 0.25rem;
+    line-height: 1.2;
   }
 
   .color-picker-label-swatch-container {
