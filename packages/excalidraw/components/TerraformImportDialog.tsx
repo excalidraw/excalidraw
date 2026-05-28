@@ -4,26 +4,16 @@
  */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
-
-import { restoreElements } from "../data/restore";
-
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import {
-  terraformPlanParsingFromSources,
   type TerraformImportWarning,
   type TerraformPlanParsingSources,
   type TerraformPlanDotBundle,
 } from "./terraformPlanParsing";
 import { parseRawStateJson } from "./terraformImportMerge";
-import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
-import {
-  buildTerraformReconcileOptionsForAppState,
-  reconcileTerraformVisibility,
-  repairTerraformEdgeBindings,
-} from "./terraformVisibility";
+import { runTerraformImportFromSources } from "./terraformSceneApply";
 import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
   deleteTerraformImportPreset,
@@ -43,8 +33,6 @@ import {
 } from "./terraformImportPresetsApi";
 
 import "./TerraformImportDialog.scss";
-
-import type { BinaryFileData } from "../types";
 
 type TerraformView = "module" | "semantic";
 
@@ -230,103 +218,26 @@ export const TerraformImportModal = ({
     });
   };
 
-  /** Applies an Excalidraw v2 scene payload (e.g. from GET …/excalidraw or local parse). */
-  const replaceEditorWithExcalidrawScene = (
-    scene: {
-      elements?: unknown;
-      files?: Record<string, BinaryFileData>;
-      meta?: { importWarnings?: TerraformImportWarning[] };
-    },
-    options?: { enableDeclaredDataFlow?: boolean },
-  ) => {
-    const files = scene.files;
-    if (files && typeof files === "object") {
-      const list = Object.values(files).filter(
-        (entry): entry is BinaryFileData =>
-          Boolean(
-            entry &&
-              typeof entry === "object" &&
-              typeof (entry as BinaryFileData).id === "string" &&
-              typeof (entry as BinaryFileData).dataURL === "string",
-          ),
-      );
-      if (list.length > 0) {
-        app.addFiles(list);
-      }
-    }
-    const elements = restoreElements(
-      scene.elements as readonly ExcalidrawElement[] | null | undefined,
-      null,
-      {
-        repairBindings: true,
-      },
-    );
-    const focus = applyTerraformRelationshipFocus(
-      elements,
-      null,
-      app.state.viewBackgroundColor ?? "#ffffff",
-    );
-    const pinReconcile = buildTerraformReconcileOptionsForAppState(
-      {
-        dependency: false,
-        dataFlow: false,
-        declaredDataFlow: Boolean(options?.enableDeclaredDataFlow),
-        networking: false,
-      },
-      null,
-    );
-    let nextElements = focus.elements;
-    if (pinReconcile) {
-      nextElements = reconcileTerraformVisibility(
-        focus.shouldRepairBindings
-          ? repairTerraformEdgeBindings(nextElements)
-          : nextElements,
-        pinReconcile,
-      );
-    } else if (focus.shouldRepairBindings) {
-      nextElements = repairTerraformEdgeBindings(nextElements);
-    }
-    app.scene.replaceAllElements(nextElements);
-    setAppState({
-      terraformEdgeLayerPins: {
-        dependency: false,
-        dataFlow: false,
-        declaredDataFlow: Boolean(options?.enableDeclaredDataFlow),
-        networking: false,
-      },
-      terraformEdgeHoverPeekKey: null,
-    });
-    app.scrollToContent();
-  };
-
   const runImportFromSources = async (
     sources: TerraformPlanParsingSources,
     opts: {
       importedTfdTexts?: string[];
       extraWarnings?: TerraformImportPresetWarning[];
+      preset?: TerraformImportPreset | null;
     } = {},
   ) => {
     const canUseSemanticView =
       sources.planDotBundles.length > 0 || sources.states.length > 0;
-    const res = await terraformPlanParsingFromSources(sources, {
-      semanticLayout: importView === "semantic" && canUseSemanticView,
-    });
-    const scene = await res.json();
-    if (!res.ok) {
-      const err =
-        scene && typeof scene === "object" && "error" in scene
-          ? String((scene as { error?: unknown }).error)
-          : "";
-      throw new Error(err || "Local parse failed");
-    }
-    const warnings = (
-      scene as { meta?: { importWarnings?: TerraformImportWarning[] } }
-    ).meta?.importWarnings;
-    replaceEditorWithExcalidrawScene(scene, {
-      enableDeclaredDataFlow: (opts.importedTfdTexts ?? []).some((t) =>
-        t.trim(),
-      ),
-    });
+    const { importWarnings: warnings } = await runTerraformImportFromSources(
+      app,
+      setAppState,
+      sources,
+      {
+        semanticLayout: importView === "semantic" && canUseSemanticView,
+        importedTfdTexts: opts.importedTfdTexts,
+        preset: opts.preset ?? null,
+      },
+    );
     onImportSuccess?.();
     setImportDone(true);
     setPresetWarnings(opts.extraWarnings ?? []);
@@ -450,6 +361,7 @@ export const TerraformImportModal = ({
           {
             importedTfdTexts: presetSources.tfdTexts,
             extraWarnings: presetSources.warnings,
+            preset: activePreset,
           },
         );
         return;
@@ -532,6 +444,7 @@ export const TerraformImportModal = ({
         {
           importedTfdTexts: presetSources.tfdTexts,
           extraWarnings: presetSources.warnings,
+          preset,
         },
       );
     } catch (err) {

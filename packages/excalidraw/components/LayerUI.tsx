@@ -61,6 +61,7 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import { TerraformDebugToolbar } from "./TerraformDebugToolbar";
 import {
   isTerraformGroupElement,
   isTerraformInspectableElement,
@@ -1658,6 +1659,13 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
+            {!appState.viewModeEnabled && (
+              <TerraformDebugToolbar
+                app={app}
+                actionManager={actionManager}
+                elements={elements}
+              />
+            )}
             {(appState.toast || appState.scrolledOutside) && (
               <div className="floating-status-stack">
                 {appState.toast && (
