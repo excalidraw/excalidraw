@@ -33,3 +33,11 @@
   style: normal;
   display: swap;
 }
+
+@font-face {
+  font-family: "Italic";
+  src: local("Helvetica-Oblique"), local("Helvetica Oblique"), local("Arial-ItalicMT"), local("Arial Italic"), local("sans-serif");
+  font-weight: 400;
+  font-style: normal;
+  display: swap;
+}
