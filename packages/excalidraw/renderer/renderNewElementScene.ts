@@ -67,8 +67,12 @@ const _renderNewElementScene = ({
         }
       }
 
+      const renderTargetElement = renderConfig.pendingDrawShapeElement
+        ? { ...renderConfig.pendingDrawShapeElement, seed: 1 }
+        : newElement;
+
       renderElement(
-        newElement,
+        renderTargetElement,
         elementsMap,
         allElementsMap,
         rc,

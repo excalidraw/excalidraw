@@ -290,6 +290,7 @@ import type {
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   ExcalidrawBindableElement,
+  ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -664,6 +665,8 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+
+  private pendingDrawShapeElement: ExcalidrawElement | null = null;
 
   private _initialized = false;
 
@@ -1769,6 +1772,7 @@ class App extends React.Component<AppProps, AppState> {
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                   null,
+                  null,
                   this.state.openDialog?.name === "elementLinkSelector"
                     ? DEFAULT_REDUCED_GLOBAL_ALPHA
                     : 1,
@@ -2355,6 +2359,8 @@ class App extends React.Component<AppProps, AppState> {
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes:
                                 this.flowChartCreator.pendingNodes,
+                              pendingDrawShapeElement:
+                                this.pendingDrawShapeElement,
                               theme: this.state.theme,
                             }}
                           />
@@ -2377,6 +2383,8 @@ class App extends React.Component<AppProps, AppState> {
                                 elementsPendingErasure:
                                   this.elementsPendingErasure,
                                 pendingFlowchartNodes: null,
+                                pendingDrawShapeElement:
+                                  this.pendingDrawShapeElement,
                                 theme: this.state.theme,
                               }}
                             />
@@ -9786,6 +9794,44 @@ class App extends React.Component<AppProps, AppState> {
         this.drawShapeTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
+      // Set up drawShape tool preview
+      if (this.state.activeTool.type === "drawShape") {
+        const drawShapeTrailPoints = this.drawShapeTrail.getCurrentPoints();
+        if (drawShapeTrailPoints.length >= 3) {
+          const [minX, minY, maxX, maxY] =
+            getElementBoundsFromPoints(drawShapeTrailPoints);
+          const width = maxX - minX;
+          const height = maxY - minY;
+
+          if (width > 2 && height > 2) {
+            const shapePreview = convertToShape(
+              drawShapeTrailPoints,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            ) as ExcalidrawNonSelectionElement | undefined;
+            if (shapePreview) {
+              this.pendingDrawShapeElement = shapePreview;
+
+              this.setState({
+                newElement: shapePreview,
+              });
+            } else {
+              this.pendingDrawShapeElement = null;
+              this.setState({
+                newElement: null,
+              });
+            }
+          } else {
+            this.pendingDrawShapeElement = null;
+            this.setState({
+              newElement: null,
+            });
+          }
+        }
+
+        return;
+      }
+
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -10876,7 +10922,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (isLinearElement(newElement)) {
+      if (
+        isLinearElement(newElement) &&
+        this.state.activeTool.type !== "drawShape"
+      ) {
         if (
           newElement!.points.length > 1 &&
           newElement.points[1][0] !== 0 &&
@@ -11579,6 +11628,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "drawShape") {
+        this.pendingDrawShapeElement = null;
         const points = this.drawShapeTrail.getCurrentPoints();
         this.drawShapeTrail.endPath();
 
@@ -11588,11 +11638,13 @@ class App extends React.Component<AppProps, AppState> {
           const height = maxY - minY;
 
           if (width > 2 && height > 2) {
-            const detectedElement = convertToShape(
-              points,
-              this.state,
-              this.scene.getNonDeletedElementsMap(),
-            );
+            const detectedElement =
+              this.state.newElement ||
+              convertToShape(
+                points,
+                this.state,
+                this.scene.getNonDeletedElementsMap(),
+              );
 
             if (detectedElement) {
               this.insertNewElement(detectedElement);

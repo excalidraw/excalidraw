@@ -35,6 +35,7 @@ export type StaticCanvasRenderConfig = {
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
+  pendingDrawShapeElement: ExcalidrawElement | null;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
 };
