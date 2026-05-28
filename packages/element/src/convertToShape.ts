@@ -9,7 +9,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
 import type {
   ExcalidrawArrowElement,
@@ -26,6 +26,13 @@ import { getFrameLikeElements } from "./frame";
 import { isUsingAdaptiveRadius } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 
+// A simplified Protractor recognizer (Yang Li, 2010) customized forour specific
+// shape set and use case.
+//
+// NOTE: We skip Golden Section Search and instead zero-out orientation by rotating
+// each stroke to its indicative angle before matching, which is sufficient
+// when no rotation invariance is required.
+
 type Shape =
   | ExcalidrawRectangleElement["type"]
   | ExcalidrawEllipseElement["type"]
@@ -34,22 +41,24 @@ type Shape =
   | ExcalidrawLinearElement["type"]
   | ExcalidrawFreeDrawElement["type"];
 
-interface ShapeRecognitionResult {
+interface Template {
+  type: Shape;
+  vec: Vec;
+  // Whether this template was vectorised with rotation normalisation.
+  rotationInvariant: boolean;
+}
+
+interface ShapeRecognitionResult<P extends LocalPoint | GlobalPoint> {
   // The type of the recognized shape, or "freedraw" if no good match was found
   type: Shape;
 
   // The original input points (not simplified)
-  points: readonly LocalPoint[];
+  points: readonly P[];
 
-  // Bounding box of the original input points, used for positioning the converted shape
+  // Bounding box of the original input points, used for positioning the
+  // converted shape
   boundingBox: Bounds;
 }
-
-// IDEA: Protractor recognizer (Yang Li, 2010), simplified, rotation-invariant.
-//
-// We skip Golden Section Search and instead zero-out orientation by rotating
-// each stroke to its indicative angle before matching, which is sufficient
-// when no rotation invariance is required.
 
 // Number of resampled points used for every template and candidate.
 const PROTRACTOR_N = 64;
@@ -57,13 +66,21 @@ const PROTRACTOR_N = 64;
 // Side length of the reference square used for scaling.
 const PROTRACTOR_SQUARE_SIZE = 250;
 
-// Minimum score (0–1) required to commit to a shape; below that we assume freedraw.
+// Minimum score (0–1) required to commit to a shape; below that we assume
+// freedraw.
 const PROTRACTOR_SCORE_THRESHOLD = 0.75;
 
 type Vec = Float64Array; // interleaved [x0, y0, x1, y1, …] of length 2*N
 
+// =============================================================================
+// Protractor recognizer helpers
+// =============================================================================
+
 // Resample `pts` to exactly `n` evenly-spaced points along the stroke path.
-function resample(pts: readonly LocalPoint[], n: number): LocalPoint[] {
+function resample<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+  n: number,
+): P[] {
   let totalLen = 0;
   for (let i = 1; i < pts.length; i++) {
     totalLen += Math.hypot(
@@ -74,7 +91,7 @@ function resample(pts: readonly LocalPoint[], n: number): LocalPoint[] {
 
   const interval = totalLen / (n - 1);
   let accumulated = 0;
-  const result: LocalPoint[] = [pts[0]];
+  const result: P[] = [pts[0]];
   let prev = pts[0];
 
   for (let i = 1; i < pts.length; i++) {
@@ -85,10 +102,10 @@ function resample(pts: readonly LocalPoint[], n: number): LocalPoint[] {
       let remaining = interval - accumulated;
       while (remaining <= segLen + 1e-10) {
         const t = remaining / segLen;
-        const newPt: LocalPoint = [
+        const newPt: P = [
           prev[0] + t * (curr[0] - prev[0]),
           prev[1] + t * (curr[1] - prev[1]),
-        ] as LocalPoint;
+        ] as P;
         result.push(newPt);
         if (result.length === n) {
           return result;
@@ -112,7 +129,7 @@ function resample(pts: readonly LocalPoint[], n: number): LocalPoint[] {
 }
 
 // Translate points so their centroid is at the origin.
-function translateToOrigin(pts: LocalPoint[]): LocalPoint[] {
+function translateToOrigin<P extends LocalPoint | GlobalPoint>(pts: P[]): P[] {
   let cx = 0;
   let cy = 0;
   for (const p of pts) {
@@ -121,11 +138,14 @@ function translateToOrigin(pts: LocalPoint[]): LocalPoint[] {
   }
   cx /= pts.length;
   cy /= pts.length;
-  return pts.map(([x, y]) => [x - cx, y - cy] as LocalPoint);
+  return pts.map(([x, y]) => [x - cx, y - cy] as P);
 }
 
 // Scale points to fit inside a square of `size` centred at origin.
-function scaleTo(pts: LocalPoint[], size: number): LocalPoint[] {
+function scaleTo<P extends LocalPoint | GlobalPoint>(
+  pts: P[],
+  size: number,
+): P[] {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -147,28 +167,32 @@ function scaleTo(pts: LocalPoint[], size: number): LocalPoint[] {
   const w = maxX - minX;
   const h = maxY - minY;
   const scale = size / Math.max(w, h);
-  return pts.map(([x, y]) => [x * scale, y * scale] as LocalPoint);
+  return pts.map(([x, y]) => [x * scale, y * scale] as P);
 }
 
 // Rotate points by `angle` radians around the origin.
 // Used to zero-out the indicative angle of each stroke.
-function rotateBy(pts: LocalPoint[], angle: number): LocalPoint[] {
+function rotateBy<P extends LocalPoint | GlobalPoint>(
+  pts: P[],
+  angle: number,
+): P[] {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  return pts.map(
-    ([x, y]) => [x * cos - y * sin, x * sin + y * cos] as LocalPoint,
-  );
+  return pts.map(([x, y]) => [x * cos - y * sin, x * sin + y * cos] as P);
 }
 
 // Vectorise a point sequence: translate to origin, scale, optionally rotate to
 // indicative angle = 0, then flatten to an interleaved Float64Array
 // normalised to unit length (required by the Protractor distance formula).
 //
-// rotationInvariant=true zeros out the indicative angle so the match is
-// independent of drawing start position (needed for ellipses).
-// rotationInvariant=false preserves absolute orientation so that rotationally
-// distinct shapes (rectangle vs. diamond) remain distinguishable.
-function vectorise(pts: LocalPoint[], rotationInvariant = false): Vec {
+// rotationInvariant: True zeros out the indicative angle so the match is
+// independent of drawing start position (needed for ellipses). False preserves
+// absolute orientation so that rotationally distinct shapes (rectangle vs.
+// diamond) remain distinguishable.
+function vectorise<P extends LocalPoint | GlobalPoint>(
+  pts: P[],
+  rotationInvariant = false,
+): Vec {
   let processed = translateToOrigin(pts);
   processed = scaleTo(processed, PROTRACTOR_SQUARE_SIZE);
 
@@ -205,21 +229,86 @@ function optimalCosineDistance(v1: Vec, v2: Vec): number {
   return (dot + 1) / 2;
 }
 
-// ---------------------------------------------------------------------------
-// Template library — canonical point sequences for each shape
-// ---------------------------------------------------------------------------
+// =============================================================================
+// Template — canonical point sequences for each shape
+// =============================================================================
 
-/**
- * Build a template for a rectangle drawn clockwise.
- * startCorner selects which corner (0=TL, 1=TR, 2=BR, 3=BL) the stroke begins from.
- */
-function makeRectangleTemplate(startCorner: number = 0): LocalPoint[] {
+// Build a template for a rectangle drawn clockwise.
+//
+// startCorner selects which corner (0=TL, 1=TR, 2=BR, 3=BL) the stroke begins
+// from.
+//
+// aspectRatio is width/height (>1 = wide, <1 = tall, 1 = square).Points
+// are distributed proportionally to side length to match the arc-length uniform
+// resampling of a real user stroke.
+function makeRectangleTemplate(
+  startCorner: number = 0,
+  aspectRatio: number = 1,
+): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
+  // Scale axes to produce the target aspect ratio while keeping the longer
+  // axis at s so scaleTo() in vectorise() normalises to a consistent size.
+  const w = aspectRatio >= 1 ? s * aspectRatio : s;
+  const h = aspectRatio >= 1 ? s : s / aspectRatio;
   const allCorners: LocalPoint[] = [
-    pointFrom<LocalPoint>(-s, -s),
-    pointFrom<LocalPoint>(s, -s),
-    pointFrom<LocalPoint>(s, s),
-    pointFrom<LocalPoint>(-s, s),
+    pointFrom<LocalPoint>(-w, -h),
+    pointFrom<LocalPoint>(w, -h),
+    pointFrom<LocalPoint>(w, h),
+    pointFrom<LocalPoint>(-w, h),
+  ];
+  const corners: LocalPoint[] = [
+    ...allCorners.slice(startCorner),
+    ...allCorners.slice(0, startCorner),
+  ];
+  // Compute side lengths for proportional point distribution.
+  // resample() spaces points by arc length, so the template must mirror that
+  // distribution — long sides get more points than short sides.
+  const sideLengths = corners.map((c, i) => {
+    const next = corners[(i + 1) % 4];
+    return Math.hypot(next[0] - c[0], next[1] - c[1]);
+  });
+  const perimeter = sideLengths.reduce((a, b) => a + b, 0);
+  const pts: LocalPoint[] = [];
+  for (let side = 0; side < 4; side++) {
+    const from = corners[side];
+    const to = corners[(side + 1) % 4];
+    const pointsForSide = Math.round(
+      (sideLengths[side] / perimeter) * PROTRACTOR_N,
+    );
+    for (let k = 0; k < pointsForSide; k++) {
+      const t = k / pointsForSide;
+      pts.push([
+        from[0] + t * (to[0] - from[0]),
+        from[1] + t * (to[1] - from[1]),
+      ] as LocalPoint);
+    }
+  }
+  while (pts.length < PROTRACTOR_N) {
+    pts.push(corners[0]);
+  }
+  return pts.slice(0, PROTRACTOR_N);
+}
+
+// Build a template for a diamond drawn clockwise.
+//
+// startCorner selects which vertex (0=Top, 1=Right, 2=Bottom, 3=Left) the
+// stroke begins from.
+//
+// aspectRatio is width/height of the bounding box (>1 = wide, <1 = tall,
+// 1 = square). All four sides of a diamond are always equal in length so equal
+// point distribution per side is already arc-length proportional.
+function makeDiamondTemplate(
+  startCorner: number = 0,
+  aspectRatio: number = 1,
+): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  const hw = aspectRatio >= 1 ? s * aspectRatio : s; // half-width
+  const hh = aspectRatio >= 1 ? s : s / aspectRatio; // half-height
+  const allCorners: LocalPoint[] = [
+    pointFrom<LocalPoint>(0, -hh),
+    pointFrom<LocalPoint>(hw, 0),
+    pointFrom<LocalPoint>(0, hh),
+    pointFrom<LocalPoint>(-hw, 0),
   ];
   const corners: LocalPoint[] = [
     ...allCorners.slice(startCorner),
@@ -244,46 +333,10 @@ function makeRectangleTemplate(startCorner: number = 0): LocalPoint[] {
   return pts;
 }
 
-/**
- * Build a template for a diamond drawn clockwise.
- * startCorner selects which vertex (0=Top, 1=Right, 2=Bottom, 3=Left) the stroke begins from.
- */
-function makeDiamondTemplate(startCorner: number = 0): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  const allCorners: LocalPoint[] = [
-    pointFrom<LocalPoint>(0, -s),
-    pointFrom<LocalPoint>(s, 0),
-    pointFrom<LocalPoint>(0, s),
-    pointFrom<LocalPoint>(-s, 0),
-  ];
-  const corners: LocalPoint[] = [
-    ...allCorners.slice(startCorner),
-    ...allCorners.slice(0, startCorner),
-  ];
-  const pts: LocalPoint[] = [];
-  const perSide = Math.floor(PROTRACTOR_N / 4);
-  for (let side = 0; side < 4; side++) {
-    const from = corners[side];
-    const to = corners[(side + 1) % 4];
-    for (let k = 0; k < perSide; k++) {
-      const t = k / perSide;
-      pts.push([
-        from[0] + t * (to[0] - from[0]),
-        from[1] + t * (to[1] - from[1]),
-      ] as LocalPoint);
-    }
-  }
-  while (pts.length < PROTRACTOR_N) {
-    pts.push(corners[0]);
-  }
-  return pts;
-}
-
-/**
- * Build a template for an ellipse (circle) sampled uniformly.
- * startAngle shifts the starting position so multiple templates can cover
- * all common drawing start positions without needing rotation normalisation.
- */
+//  Build a template for an ellipse (circle) sampled uniformly.
+//
+//  startAngle shifts the starting position so multiple templates can cover
+//  all common drawing start positions without needing rotation normalisation.
 function makeEllipseTemplate(startAngle: number = 0): LocalPoint[] {
   const r = PROTRACTOR_SQUARE_SIZE / 2;
   return Array.from({ length: PROTRACTOR_N }, (_, i) => {
@@ -292,7 +345,7 @@ function makeEllipseTemplate(startAngle: number = 0): LocalPoint[] {
   });
 }
 
-/** Build a template for a straight line (left → right). */
+// Build a template for a straight line (left to right).
 function makeLineTemplate(): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
   return Array.from({ length: PROTRACTOR_N }, (_, i) => {
@@ -301,13 +354,9 @@ function makeLineTemplate(): LocalPoint[] {
   });
 }
 
-/**
- * Build a template for an arrow: a shaft from left to right, then a V-shaped
- * arrowhead pointing right.  The path is:
- *   start → arrowhead base (on shaft, near tip)
- *   → tip → back to arrowhead base → shaft end (tip)
- * Drawn as a single continuous stroke: left → right, back-left-up, right-tip, back-left-down.
- */
+// Build a template for an arrow: a shaft from left to right, then a V-shaped
+// arrowhead pointing right. Drawn as a single continuous stroke: left -> right,
+// back-left-up, right-tip, back-left-down.
 function makeArrowTemplate(): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
   const tipX = s;
@@ -316,7 +365,7 @@ function makeArrowTemplate(): LocalPoint[] {
 
   // Shaft: from (-s, 0) to (s, 0)
   const shaftPts = Math.floor(PROTRACTOR_N * 0.5);
-  // Arrowhead: tip→ upper base → back to tip → lower base
+  // Arrowhead: tip to upper base to back to tip to lower base
   const headPts = PROTRACTOR_N - shaftPts;
   const perHead = Math.floor(headPts / 2);
 
@@ -326,7 +375,7 @@ function makeArrowTemplate(): LocalPoint[] {
     pts.push([-s + t * (tipX - -s), 0] as LocalPoint);
   }
 
-  // Upper arm: tip → upper-left
+  // Upper arm: tip to upper-left
   const ux = tipX - headLen * Math.cos(headAngle);
   const uy = -headLen * Math.sin(headAngle);
   for (let i = 0; i < perHead; i++) {
@@ -334,7 +383,7 @@ function makeArrowTemplate(): LocalPoint[] {
     pts.push([tipX + t * (ux - tipX), t * uy] as LocalPoint);
   }
 
-  // Lower arm: tip → lower-left (back to tip first)
+  // Lower arm: tip to lower-left (back to tip first)
   const lx = tipX - headLen * Math.cos(headAngle);
   const ly = headLen * Math.sin(headAngle);
   const remaining = PROTRACTOR_N - pts.length;
@@ -349,34 +398,45 @@ function makeArrowTemplate(): LocalPoint[] {
   return pts.slice(0, PROTRACTOR_N);
 }
 
-interface Template {
-  type: Shape;
-  vec: Vec;
-  /** Whether this template was vectorised with rotation normalisation. */
-  rotationInvariant: boolean;
-}
-
-/** Pre-computed template library (built once). */
+// Pre-computed template library. We need mutiple templates per shape to cover
+// different drawing start positions and configurations.
 const TEMPLATES: readonly Template[] = (() => {
   const defs: Array<{
     type: Shape;
     pts: LocalPoint[];
     rotationInvariant?: boolean;
   }> = [
-    // Rectangle and diamond use fixed (non-rotated) vectorisation so their
-    // orientations remain distinguishable. Four starting corners cover common
-    // drawing start positions without needing rotation invariance.
+    // Square (1:1) templates
     { type: "rectangle", pts: makeRectangleTemplate(0) },
     { type: "rectangle", pts: makeRectangleTemplate(1) },
     { type: "rectangle", pts: makeRectangleTemplate(2) },
     { type: "rectangle", pts: makeRectangleTemplate(3) },
+    // Wide (3:1) rectangle templates — thin horizontal shape
+    { type: "rectangle", pts: makeRectangleTemplate(0, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(1, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(2, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(3, 3) },
+    // Tall (1:3) rectangle templates — thin vertical shape
+    { type: "rectangle", pts: makeRectangleTemplate(0, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(1, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(2, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(3, 1 / 3) },
+    // Square (1:1) diamond templates
     { type: "diamond", pts: makeDiamondTemplate(0) },
     { type: "diamond", pts: makeDiamondTemplate(1) },
     { type: "diamond", pts: makeDiamondTemplate(2) },
     { type: "diamond", pts: makeDiamondTemplate(3) },
-    // Ellipse: 8 templates at 45° increments (no rotation normalisation) so
-    // any drawing start position lands within 22.5° of a template — same
-    // coverage depth as the 4-corner rect/diamond strategy (4 × 2 directions).
+    // Wide (3:1) diamond templates: thin horizontal diamond
+    { type: "diamond", pts: makeDiamondTemplate(0, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(1, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(2, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(3, 3) },
+    // Tall (1:3) diamond templates: thin vertical diamond
+    { type: "diamond", pts: makeDiamondTemplate(0, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(1, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(2, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(3, 1 / 3) },
+    // Ellipse: 8 templates at 45° increments
     { type: "ellipse", pts: makeEllipseTemplate(0) },
     { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 4) },
     { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
@@ -386,7 +446,8 @@ const TEMPLATES: readonly Template[] = (() => {
     { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
     { type: "ellipse", pts: makeEllipseTemplate((7 * Math.PI) / 4) },
     { type: "line", pts: makeLineTemplate() },
-    { type: "arrow", pts: makeArrowTemplate() },
+    // Arrow templates
+    { type: "arrow", pts: makeArrowTemplate(), rotationInvariant: true },
   ];
   return defs.map(({ type, pts, rotationInvariant = false }) => ({
     type,
@@ -395,18 +456,14 @@ const TEMPLATES: readonly Template[] = (() => {
   }));
 })();
 
-// ---------------------------------------------------------------------------
+// =============================================================================
 // Public API
-// ---------------------------------------------------------------------------
+// =============================================================================
 
-/**
- * Recognizes common shapes from free-draw input points using the Protractor
- * algorithm (Yang Li, 2010).  No rotation invariance is assumed — both the
- * candidate and all templates are normalised to their indicative angle.
- */
-export const recognizeShape = (
-  points: LocalPoint[],
-): ShapeRecognitionResult => {
+// Recognizes common shapes from free-draw input points
+export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
+  points: P[],
+): ShapeRecognitionResult<P> => {
   const boundingBox = getElementBoundsFromPoints(points);
 
   if (!points || points.length < 3) {
@@ -451,9 +508,7 @@ export const recognizeShape = (
   return { type, points, boundingBox };
 };
 
-/**
- * Converts a freedraw element to the detected shape
- */
+// Converts a freedraw element to the detected shape
 export const convertToShape = (
   points: LocalPoint[],
   appState: AppState,

@@ -81,8 +81,8 @@ export const getGridPoint = (
   return [x, y];
 };
 
-export const getElementBoundsFromPoints = (
-  points: readonly LocalPoint[],
+export const getElementBoundsFromPoints = <P extends LocalPoint | GlobalPoint>(
+  points: readonly P[],
 ): Bounds => {
   let minX = Infinity;
   let minY = Infinity;
