@@ -139,35 +139,6 @@ export const runTerraformImportFromSources = async (
     semanticLayout: options.semanticLayout,
   });
   const scene = await res.json();
-  // #region agent log
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "36bd3e",
-    },
-    body: JSON.stringify({
-      sessionId: "36bd3e",
-      location: "terraformSceneApply.ts:runTerraformImportFromSources",
-      message: "import parse finished",
-      data: {
-        ok: res.ok,
-        semanticLayout: options.semanticLayout,
-        layoutEngine: (scene as { meta?: { layoutEngine?: string } }).meta
-          ?.layoutEngine,
-        elementCount: Array.isArray(
-          (scene as { elements?: unknown[] }).elements,
-        )
-          ? (scene as { elements: unknown[] }).elements.length
-          : 0,
-        elkFastPath: (scene as { meta?: { elkFastPath?: boolean } }).meta
-          ?.elkFastPath,
-      },
-      hypothesisId: "I",
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
   if (!res.ok) {
     const err =
       scene && typeof scene === "object" && "error" in scene

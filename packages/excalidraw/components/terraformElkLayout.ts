@@ -74,6 +74,12 @@ import {
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
 import {
+  isStackGroupModulePath,
+  parseStackAddress,
+  parseStackGroupModulePath,
+} from "./terraformStackAddress";
+
+import {
   resolveTerraformPlanNodeKey,
   type TerraformModuleTreeNode,
   type TerraformPlanGraphNode,
@@ -130,6 +136,63 @@ const SUBMODULE_GAP_Y = px(32);
 const MODULE_CONTENT_PAD_L = px(28);
 const MODULE_CONTENT_PAD_T = px(40);
 const MODULE_SHRINK_WRAP_PAD = px(24);
+const MODULE_GRID_SEED_SIZE = px(8000);
+
+function submoduleColumnCount(
+  subPaths: string[],
+  innerWidth: number,
+  parentPath: string,
+): number {
+  if (subPaths.length === 0) {
+    return 1;
+  }
+  const stackGroups = subPaths.filter(isStackGroupModulePath);
+  if (
+    parentPath === "root" &&
+    stackGroups.length >= 2 &&
+    stackGroups.length === subPaths.length
+  ) {
+    const minCell = px(360);
+    return Math.max(
+      1,
+      Math.min(subPaths.length, Math.floor(innerWidth / minCell) || 1),
+    );
+  }
+  if (subPaths.length <= 4) {
+    return subPaths.length;
+  }
+  return Math.max(1, Math.ceil(Math.sqrt(subPaths.length)));
+}
+
+/** Seed placeholder compound boxes so grid layout can run without ELK coordinates. */
+function seedModuleCompoundBoxes(
+  mod: TerraformModuleTreeNode,
+  vertexSet: Set<string>,
+  layoutBoxes: Record<string, LayoutBox>,
+) {
+  const compoundId = moduleCompoundId(mod.path);
+  if (!layoutBoxes[compoundId]) {
+    layoutBoxes[compoundId] = {
+      x: 0,
+      y: 0,
+      width: MODULE_GRID_SEED_SIZE,
+      height: MODULE_GRID_SEED_SIZE,
+    };
+  }
+  for (const addr of mod.resourceAddresses) {
+    if (vertexSet.has(addr) && !layoutBoxes[addr]) {
+      layoutBoxes[addr] = {
+        x: 0,
+        y: 0,
+        width: DEFAULT_RESOURCE_RECT.w,
+        height: DEFAULT_RESOURCE_RECT.h,
+      };
+    }
+  }
+  for (const child of Object.values(mod.modules)) {
+    seedModuleCompoundBoxes(child, vertexSet, layoutBoxes);
+  }
+}
 
 /** Excalidraw frame id for a Terraform module path (`root`, `module.a`, …). */
 function moduleFrameSkeletonId(modulePath: string) {
@@ -154,6 +217,7 @@ export type TerraformElkSceneMeta = {
   edgeCount: number;
   elkLayoutEdgeCount?: number;
   elkFastPath?: boolean;
+  moduleGridLayout?: boolean;
   skippedLayout?: boolean;
   skipReason?: string;
 };
@@ -782,7 +846,7 @@ function applyModuleGridLayout(
   let cursorX = innerLeft;
   let cursorY = innerTop;
   let subRowMaxH = 0;
-  const submoduleCols = Math.max(1, Math.ceil(Math.sqrt(subPaths.length)));
+  const submoduleCols = submoduleColumnCount(subPaths, innerWidth, mod.path);
   let submoduleCol = 0;
 
   for (const p of subPaths) {
@@ -901,7 +965,17 @@ function frameTitleForModulePath(modulePath: string): string {
   if (modulePath === "root") {
     return "Root module";
   }
-  return modulePath.length > 56 ? `${modulePath.slice(0, 53)}…` : modulePath;
+  const stackGroup = parseStackGroupModulePath(modulePath);
+  if (stackGroup) {
+    return stackGroup.stackId;
+  }
+  const parsed = parseStackAddress(modulePath);
+  const label = parsed
+    ? parsed.address === "root"
+      ? `${parsed.stackId} / root`
+      : `${parsed.stackId} / ${parsed.address}`
+    : modulePath;
+  return label.length > 56 ? `${label.slice(0, 53)}…` : label;
 }
 
 /** Direct frame children: resources in this module, then nested module frames (sorted). */
@@ -1801,64 +1875,37 @@ export async function buildTerraformElkExcalidrawScene(
   const elkFastPath = directedEdges.length > TERRAFORM_ELK_FAST_PATH_EDGE_COUNT;
   const elkLayoutEdges = elkFastPath ? [] : elkEdges;
 
-  const elkGraph = {
-    id: "terraform_elk_root",
-    layoutOptions: { ...ELK_ROOT_LAYOUT_OPTIONS },
-    children: [moduleRoot],
-    edges: elkLayoutEdges,
-  };
-
-  const elk = new ELK();
-  // #region agent log
-  const elkLayoutStartedAt = Date.now();
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "36bd3e",
-    },
-    body: JSON.stringify({
-      sessionId: "36bd3e",
-      location: "terraformElkLayout.ts:beforeElkLayout",
-      message: "starting elk.layout",
-      data: { vertexCount, edgeCount: directedEdges.length, elkFastPath },
-      hypothesisId: "H",
-      timestamp: elkLayoutStartedAt,
-    }),
-  }).catch(() => {});
-  // #endregion
-  const laidOut = (await elk.layout(elkGraph)) as ElkLayoutedNode;
-  // #region agent log
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "36bd3e",
-    },
-    body: JSON.stringify({
-      sessionId: "36bd3e",
-      location: "terraformElkLayout.ts:afterElkLayout",
-      message: "elk.layout finished",
-      data: {
-        vertexCount,
-        edgeCount: directedEdges.length,
-        elkFastPath,
-        elkMs: Date.now() - elkLayoutStartedAt,
-      },
-      hypothesisId: "H",
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   const layoutBoxes: Record<string, LayoutBox> = {};
-  const rootBaseX = laidOut.x ?? 0;
-  const rootBaseY = laidOut.y ?? 0;
-  for (const child of laidOut.children || []) {
-    collectElkLayoutBoxes(child, rootBaseX, rootBaseY, vertexSet, layoutBoxes);
+
+  if (elkFastPath) {
+    seedModuleCompoundBoxes(tree, vertexSet, layoutBoxes);
+    layoutModuleGeometryDeep(tree, vertexSet, layoutBoxes);
+    normalizeOrigin(layoutBoxes);
+  } else {
+    const elkGraph = {
+      id: "terraform_elk_root",
+      layoutOptions: { ...ELK_ROOT_LAYOUT_OPTIONS },
+      children: [moduleRoot],
+      edges: elkLayoutEdges,
+    };
+
+    const elk = new ELK();
+    const laidOut = (await elk.layout(elkGraph)) as ElkLayoutedNode;
+
+    const rootBaseX = laidOut.x ?? 0;
+    const rootBaseY = laidOut.y ?? 0;
+    for (const child of laidOut.children || []) {
+      collectElkLayoutBoxes(
+        child,
+        rootBaseX,
+        rootBaseY,
+        vertexSet,
+        layoutBoxes,
+      );
+    }
+    layoutModuleGeometryDeep(tree, vertexSet, layoutBoxes);
+    normalizeOrigin(layoutBoxes);
   }
-  layoutModuleGeometryDeep(tree, vertexSet, layoutBoxes);
-  normalizeOrigin(layoutBoxes);
 
   const resourceSkeletons: ExcalidrawElementSkeleton[] = [];
   const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
@@ -1985,7 +2032,7 @@ export async function buildTerraformElkExcalidrawScene(
       vertexCount,
       edgeCount: directedEdges.length,
       elkLayoutEdgeCount: elkLayoutEdges.length,
-      ...(elkFastPath ? { elkFastPath: true } : {}),
+      ...(elkFastPath ? { elkFastPath: true, moduleGridLayout: true } : {}),
     },
   };
 }

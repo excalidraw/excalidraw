@@ -67,7 +67,8 @@ import {
   parseStackAddress,
   preferTopologyNodeKeyAmongAliases,
   prefixStackAddress,
-  stripStackPrefixForModuleParsing,
+  stackGroupModulePath,
+  stackQualifiedModulePath,
   topologyBareAddressKey,
 } from "./terraformStackAddress";
 import { dedupeTerraformPlanNodesByBareAddress } from "./terraformTopologyAddress";
@@ -521,28 +522,6 @@ export const terraformPlanParsingFromSources = async (
   options?: TerraformPlanParsingOptions,
 ) => {
   const semanticLayout = options?.semanticLayout === true;
-  // #region agent log
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "36bd3e",
-    },
-    body: JSON.stringify({
-      sessionId: "36bd3e",
-      location: "terraformPlanParsing.tsx:terraformPlanParsingFromSources",
-      message: "parse entry",
-      data: {
-        semanticLayout,
-        planBundleCount: sources.planDotBundles.length,
-        stateCount: sources.states.length,
-        tfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
-      },
-      hypothesisId: "B",
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -643,29 +622,6 @@ export const terraformPlanParsingFromSources = async (
     priorStatePlans: sourcePlans,
     stackIds,
   });
-  // #region agent log
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "36bd3e",
-    },
-    body: JSON.stringify({
-      sessionId: "36bd3e",
-      location: "terraformPlanParsing.tsx:afterNodesMap",
-      message: "nodes map built",
-      data: {
-        semanticLayout,
-        vertexCount: Object.keys(nodes5).filter((k) => !k.startsWith("__"))
-          .length,
-        stateCount: states.length,
-        stackIdCount: stackIds.length,
-      },
-      hypothesisId: "F",
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   const tfdWarnings = applyTfdOverlayToNodes(
     nodes5,
@@ -695,23 +651,6 @@ export const terraformPlanParsingFromSources = async (
   let sceneBody: Record<string, unknown>;
 
   if (semanticLayout) {
-    // #region agent log
-    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "36bd3e",
-      },
-      body: JSON.stringify({
-        sessionId: "36bd3e",
-        location: "terraformPlanParsing.tsx:semanticBranch",
-        message: "entering semantic topology layout",
-        data: { stackIds: stackIds.length },
-        hypothesisId: "G",
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
@@ -954,45 +893,6 @@ export const terraformPlanParsingFromSources = async (
     };
   } else {
     const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
-    // #region agent log
-    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "36bd3e",
-      },
-      body: JSON.stringify({
-        sessionId: "36bd3e",
-        location: "terraformPlanParsing.tsx:elkLayout",
-        message: "module layout result",
-        data: {
-          layoutEngine: elkScene.meta.layoutEngine,
-          skippedLayout: elkScene.meta.skippedLayout ?? null,
-          skipReason: elkScene.meta.skipReason ?? null,
-          elementCount: elkScene.elements.length,
-          visibleRects: elkScene.elements.filter(
-            (e) =>
-              e.type === "rectangle" &&
-              !e.isDeleted &&
-              (e.customData as { terraformVisibilityRole?: string } | undefined)
-                ?.terraformVisibilityRole === "resource",
-          ).length,
-          deletedRects: elkScene.elements.filter(
-            (e) =>
-              e.type === "rectangle" &&
-              e.isDeleted &&
-              (e.customData as { terraformVisibilityRole?: string } | undefined)
-                ?.terraformVisibilityRole === "resource",
-          ).length,
-          frameCount: elkScene.elements.filter(
-            (e) => e.type === "frame" && !e.isDeleted,
-          ).length,
-        },
-        hypothesisId: "C-D",
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     emitLocalParseDebug({
       phase: "elkLayout",
       meta: elkScene.meta,
@@ -1355,8 +1255,12 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
 }
 
 function getModulePathChainFromAddress(nodePath = "") {
-  const parts = stripStackPrefixForModuleParsing(nodePath).split(".");
-  const chain = [];
+  const parsed = parseStackAddress(nodePath);
+  const parts = (parsed?.address ?? nodePath).split(".");
+  const chain: string[] = [];
+  if (parsed?.stackId) {
+    chain.push(stackGroupModulePath(parsed.stackId));
+  }
   let cursor = "";
 
   for (let index = 0; index < parts.length - 1; ) {
@@ -1365,7 +1269,7 @@ function getModulePathChainFromAddress(nodePath = "") {
     }
     const segment = `module.${parts[index + 1]}`;
     cursor = cursor ? `${cursor}.${segment}` : segment;
-    chain.push(cursor);
+    chain.push(stackQualifiedModulePath(parsed?.stackId, cursor));
     index += 2;
   }
 
@@ -1381,7 +1285,8 @@ function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
  * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
  */
 function getContainingModulePathForAddress(address: string): string {
-  const parts = stripStackPrefixForModuleParsing(address).split(".");
+  const parsed = parseStackAddress(address);
+  const parts = (parsed?.address ?? address).split(".");
   let index = 0;
   let modulePath = "";
   while (
@@ -1393,7 +1298,7 @@ function getContainingModulePathForAddress(address: string): string {
     modulePath = modulePath ? `${modulePath}.${segment}` : segment;
     index += 2;
   }
-  return modulePath || "root";
+  return stackQualifiedModulePath(parsed?.stackId, modulePath || "root");
 }
 
 /**
@@ -1407,6 +1312,18 @@ function ensureModulePathInTree(
   if (!fullModulePath || fullModulePath === "root") {
     return root;
   }
+  const parsed = parseStackAddress(fullModulePath);
+  if (parsed?.address === "root") {
+    const stackGroup = stackGroupModulePath(parsed.stackId);
+    if (!root.modules[stackGroup]) {
+      root.modules[stackGroup] = emptyModuleTreeNode(stackGroup);
+    }
+    const stackNode = root.modules[stackGroup]!;
+    if (!stackNode.modules[fullModulePath]) {
+      stackNode.modules[fullModulePath] = emptyModuleTreeNode(fullModulePath);
+    }
+    return stackNode.modules[fullModulePath]!;
+  }
   const sentinel = `${fullModulePath}.aws_instance.__module_tree__`;
   const chain = getModulePathChainFromAddress(sentinel);
   let cursor = root;
@@ -1414,7 +1331,7 @@ function ensureModulePathInTree(
     if (!cursor.modules[segment]) {
       cursor.modules[segment] = emptyModuleTreeNode(segment);
     }
-    cursor = cursor.modules[segment];
+    cursor = cursor.modules[segment]!;
   }
   return cursor;
 }

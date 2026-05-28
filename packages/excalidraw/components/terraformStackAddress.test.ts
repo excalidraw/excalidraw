@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   isStackQualifiedAddress,
   parseStackAddress,
+  parseStackGroupModulePath,
   prefixStackAddress,
+  stackGroupModulePath,
   stackIdFromBundleLabel,
+  stackQualifiedModulePath,
   stripStackPrefixForModuleParsing,
 } from "./terraformStackAddress";
 
@@ -35,5 +38,26 @@ describe("terraformStackAddress", () => {
       "10-east-ecs-edge",
     );
     expect(stackIdFromBundleLabel(undefined, 2)).toBe("stack-3");
+  });
+
+  it("builds stack-qualified module paths", () => {
+    expect(stackQualifiedModulePath("40-east-api-1", "root")).toBe(
+      "40-east-api-1::root",
+    );
+    expect(stackQualifiedModulePath("40-east-api-1", "module.api")).toBe(
+      "40-east-api-1::module.api",
+    );
+    expect(stackQualifiedModulePath(undefined, "module.api")).toBe(
+      "module.api",
+    );
+  });
+
+  it("builds synthetic stack group module paths", () => {
+    expect(stackGroupModulePath("40-east-api-1")).toBe(
+      "__stack__::40-east-api-1",
+    );
+    expect(parseStackGroupModulePath("__stack__::40-east-api-1")).toEqual({
+      stackId: "40-east-api-1",
+    });
   });
 });
