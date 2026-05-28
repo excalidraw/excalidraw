@@ -540,7 +540,7 @@ const LayerUI = ({
               style={{
                 transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
                 transition: isDragging ? "none" : "transform 0.15s cubic-bezier(0.1, 0.8, 0.25, 1)",
-                zIndex: 9999,
+                zIndex: 100,
                 position: "relative",
               }}
             >
