@@ -8,8 +8,6 @@ import {
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
-import { debugTopologyLog } from "./terraformTopologyDebugLog";
-
 export { topologyBareAddressKey, preferTopologyNodeKeyAmongAliases };
 
 function isTopologyMetaNodeKey(key: string): boolean {
@@ -87,12 +85,10 @@ export function dedupeTerraformPlanNodesByBareAddress(
     byBare.set(bare, row);
   }
 
-  let collapsedGroupCount = 0;
   for (const [, aliases] of byBare) {
     if (aliases.length <= 1) {
       continue;
     }
-    collapsedGroupCount++;
     const canonical = preferTopologyNodeKeyAmongAliases(aliases);
     const dropped = aliases.filter((a) => a !== canonical);
     for (const alias of dropped) {
@@ -116,17 +112,6 @@ export function dedupeTerraformPlanNodesByBareAddress(
       }
       delete nodes[alias];
     }
-  }
-
-  if (collapsedGroupCount > 0) {
-    // #region agent log
-    debugTopologyLog(
-      "terraformTopologyAddress.ts:dedupeTerraformPlanNodesByBareAddress",
-      "collapsed duplicate node key groups",
-      { collapsedGroupCount },
-      "F",
-    );
-    // #endregion
   }
 
   return nodes;

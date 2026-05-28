@@ -103,7 +103,6 @@ import {
   isAlbCompanionConsumedAsSatellite,
   isAlbTopologySatelliteResourceType,
 } from "./terraformTopologyAlbLinks";
-import { debugTopologyLog } from "./terraformTopologyDebugLog";
 import {
   buildLambdaPermissionCluster,
   filterTopologyAddressesExcludingLambdaPermissionSatellites,
@@ -206,6 +205,9 @@ const FRAME_CONTENT_SLACK_X = px(24);
 const FRAME_CONTENT_SLACK_Y = px(28);
 const MIN_VPC_W = px(480);
 const MIN_VPC_H = px(360);
+/** Empty or label-only subnet zone — much smaller than a full VPC column. */
+const MIN_SUBNET_ZONE_W = px(168);
+const MIN_SUBNET_ZONE_H = px(140);
 const CANVAS_EDGE_PAD = MARGIN;
 
 /** Tier 0: primary resources (matches ELK module resource leaf). */
@@ -520,8 +522,8 @@ function zoneFrameSizeForTopologyAddresses(
   const n = sortedAddresses.length;
   if (n <= 0) {
     return {
-      w: MIN_VPC_W + FRAME_CONTENT_SLACK_X,
-      h: 180 + FRAME_CONTENT_SLACK_Y,
+      w: MIN_SUBNET_ZONE_W + FRAME_CONTENT_SLACK_X,
+      h: MIN_SUBNET_ZONE_H + FRAME_CONTENT_SLACK_Y,
     };
   }
   const { cols, rows } = gridColsRowsForPrimaryTiles(n);
@@ -627,11 +629,127 @@ function zoneFrameSizeForTopologyAddresses(
     FRAME_CONTENT_SLACK_X;
   const h = VPC_TOP_PAD + 2 * INNER_PAD + innerBodyH + FRAME_CONTENT_SLACK_Y;
   return {
-    w: Math.max(MIN_VPC_W * 0.55 + FRAME_CONTENT_SLACK_X, w),
+    w: Math.max(MIN_SUBNET_ZONE_W + FRAME_CONTENT_SLACK_X, w),
     h: Math.max(
       RESOURCE_RECT_H + VPC_TOP_PAD + 2 * INNER_PAD + FRAME_CONTENT_SLACK_Y,
       h,
     ),
+  };
+}
+
+type VpcZoneGridDimensions = {
+  w: number;
+  h: number;
+  /** Widest zone in this VPC (legacy); prefer `zoneWBySignature`. */
+  perZoneW: number;
+  perZoneH: number;
+  perZoneBodyH: number;
+  znCols: number;
+  znRows: number;
+  zoneWBySignature: ReadonlyMap<string, number>;
+  columnOriginX: readonly number[];
+};
+
+function placementZoneWidthKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetSignature: string,
+): string {
+  return topologyZoneMapKey(accountId, region, vpcId, subnetSignature);
+}
+
+function outerWidthForPlacementZone(
+  z: TopologyPlacementZone,
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  plan: unknown | undefined,
+  routeTableZoneSizing:
+    | ReadonlyMap<string, RouteTableZoneBottomSizing>
+    | undefined,
+  natZonePlacements: TopologyNatZonePlacements | undefined,
+  interfaceVpcEndpointZonePlacements:
+    | ReadonlyMap<string, readonly InterfaceVpcEndpointZonePlacement[]>
+    | undefined,
+): { outerW: number; bodyH: number; routeInset: number } {
+  const zk = topologyZoneMapKey(
+    z.accountId,
+    z.region,
+    z.vpcId,
+    z.subnetSignature,
+  );
+  let zoneVpceBodyPad = 0;
+  let zoneVpceMinOuterW = 0;
+  const zonePl = interfaceVpcEndpointZonePlacements?.get(zk);
+  if (zonePl && zonePl.length > 0) {
+    const zoneVpceAddrs = zonePl.map((p) => p.address);
+    const zoneVpcePart = partitionVpcEndpointsForClusterLayout(
+      zoneVpceAddrs,
+      nodes,
+      arnIndex,
+      plan,
+    );
+    zoneVpceBodyPad = vpcEndpointClusterBodyPadPx(
+      zoneVpcePart.clusterAddrs,
+      nodes,
+      arnIndex,
+      plan,
+    );
+    const wClusterZ =
+      zoneVpcePart.clusterAddrs.length > 0
+        ? vpcEndpointClusterRowMinInnerWidth(
+            zoneVpcePart.clusterAddrs,
+            nodes,
+            arnIndex,
+            plan,
+          )
+        : 0;
+    const wCompactZ =
+      zoneVpcePart.compactAddrs.length > 0
+        ? vpcEndpointSingleRowMinInnerWidth(zoneVpcePart.compactAddrs.length)
+        : 0;
+    if (
+      zoneVpcePart.clusterAddrs.length > 0 ||
+      zoneVpcePart.compactAddrs.length > 0
+    ) {
+      zoneVpceMinOuterW =
+        2 * INNER_PAD + FRAME_CONTENT_SLACK_X + Math.max(wClusterZ, wCompactZ);
+    }
+  }
+  const sortedZ =
+    filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
+      nodes,
+      arnIndex,
+      [...z.addresses],
+      plan,
+    ).sort((a, b) => a.localeCompare(b));
+  const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
+  const sizing = routeTableZoneSizing?.get(z.subnetSignature);
+  const rtMinW =
+    sizing && sizing.tableCount > 0
+      ? 2 * INNER_PAD + FRAME_CONTENT_SLACK_X + sizing.minInnerWidthPx
+      : 0;
+  const natClusters = natClustersForZone(
+    natZonePlacements,
+    z.accountId,
+    z.region,
+    z.vpcId,
+    z.subnetSignature,
+  );
+  const natBandH = natZoneBandTotalHeightPx(natClusters);
+  const natBandMinOuterW =
+    natClusters.length > 0
+      ? 2 * INNER_PAD +
+        FRAME_CONTENT_SLACK_X +
+        natZoneBandMinInnerWidthPx(natClusters)
+      : 0;
+  const outerW = Math.max(d.w, rtMinW, natBandMinOuterW, zoneVpceMinOuterW);
+  const routeInset =
+    sizing && sizing.tableCount > 0 ? sizing.maxExtentBelowAnchorPx : 0;
+  return {
+    outerW,
+    bodyH: d.h + natBandH + zoneVpceBodyPad,
+    routeInset,
   };
 }
 
@@ -716,15 +834,7 @@ function vpcFrameDimensionsForZones(
     string,
     readonly InterfaceVpcEndpointZonePlacement[]
   >,
-): {
-  w: number;
-  h: number;
-  perZoneW: number;
-  perZoneH: number;
-  perZoneBodyH: number;
-  znCols: number;
-  znRows: number;
-} {
+): VpcZoneGridDimensions {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
     return {
@@ -735,107 +845,65 @@ function vpcFrameDimensionsForZones(
       perZoneBodyH: 0,
       znCols: 0,
       znRows: 0,
+      zoneWBySignature: new Map(),
+      columnOriginX: [],
     };
   }
   const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
   const znCols = Math.max(1, zoneColumns.length);
   const znRows = Math.max(1, ...zoneColumns.map((col) => col.length));
+  const zoneWBySignature = new Map<string, number>();
   let perZoneW = 0;
   let perZoneBodyH = 0;
   let maxZoneRouteTableInset = 0;
   for (const z of vpcZs) {
-    const zk = topologyZoneMapKey(
-      z.accountId,
-      z.region,
-      z.vpcId,
-      z.subnetSignature,
-    );
-    let zoneVpceBodyPad = 0;
-    let zoneVpceMinOuterW = 0;
-    const zonePl = interfaceVpcEndpointZonePlacements?.get(zk);
-    if (zonePl && zonePl.length > 0) {
-      const zoneVpceAddrs = zonePl.map((p) => p.address);
-      const zoneVpcePart = partitionVpcEndpointsForClusterLayout(
-        zoneVpceAddrs,
-        nodes,
-        arnIndex,
-        plan,
-      );
-      zoneVpceBodyPad = vpcEndpointClusterBodyPadPx(
-        zoneVpcePart.clusterAddrs,
-        nodes,
-        arnIndex,
-        plan,
-      );
-      const wClusterZ =
-        zoneVpcePart.clusterAddrs.length > 0
-          ? vpcEndpointClusterRowMinInnerWidth(
-              zoneVpcePart.clusterAddrs,
-              nodes,
-              arnIndex,
-              plan,
-            )
-          : 0;
-      const wCompactZ =
-        zoneVpcePart.compactAddrs.length > 0
-          ? vpcEndpointSingleRowMinInnerWidth(zoneVpcePart.compactAddrs.length)
-          : 0;
-      if (
-        zoneVpcePart.clusterAddrs.length > 0 ||
-        zoneVpcePart.compactAddrs.length > 0
-      ) {
-        zoneVpceMinOuterW =
-          2 * INNER_PAD +
-          FRAME_CONTENT_SLACK_X +
-          Math.max(wClusterZ, wCompactZ);
-      }
-    }
-    const sortedZ =
-      filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
-        nodes,
-        arnIndex,
-        [...z.addresses],
-        plan,
-      ).sort((a, b) => a.localeCompare(b));
-    const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
-    const sizing = routeTableZoneSizing?.get(z.subnetSignature);
-    const rtMinW =
-      sizing && sizing.tableCount > 0
-        ? 2 * INNER_PAD + FRAME_CONTENT_SLACK_X + sizing.minInnerWidthPx
-        : 0;
-    const natClusters = natClustersForZone(
+    const { outerW, bodyH, routeInset } = outerWidthForPlacementZone(
+      z,
+      nodes,
+      arnIndex,
+      plan,
+      routeTableZoneSizing,
       natZonePlacements,
+      interfaceVpcEndpointZonePlacements,
+    );
+    const widthKey = placementZoneWidthKey(
       z.accountId,
       z.region,
       z.vpcId,
       z.subnetSignature,
     );
-    const natBandH = natZoneBandTotalHeightPx(natClusters);
-    const natBandMinOuterW =
-      natClusters.length > 0
-        ? 2 * INNER_PAD +
-          FRAME_CONTENT_SLACK_X +
-          natZoneBandMinInnerWidthPx(natClusters)
-        : 0;
-    perZoneW = Math.max(
-      perZoneW,
-      d.w,
-      rtMinW,
-      natBandMinOuterW,
-      zoneVpceMinOuterW,
-    );
-    perZoneBodyH = Math.max(perZoneBodyH, d.h + natBandH + zoneVpceBodyPad);
-    if (sizing && sizing.tableCount > 0) {
-      maxZoneRouteTableInset = Math.max(
-        maxZoneRouteTableInset,
-        sizing.maxExtentBelowAnchorPx,
-      );
-    }
+    zoneWBySignature.set(widthKey, outerW);
+    perZoneW = Math.max(perZoneW, outerW);
+    perZoneBodyH = Math.max(perZoneBodyH, bodyH);
+    maxZoneRouteTableInset = Math.max(maxZoneRouteTableInset, routeInset);
   }
+  const columnWidths = zoneColumns.map((col) =>
+    Math.max(
+      0,
+      ...col.map(
+        (z) =>
+          zoneWBySignature.get(
+            placementZoneWidthKey(
+              z.accountId,
+              z.region,
+              z.vpcId,
+              z.subnetSignature,
+            ),
+          ) ?? 0,
+      ),
+    ),
+  );
+  const columnOriginX: number[] = [];
+  let columnX = 0;
+  for (let ci = 0; ci < columnWidths.length; ci++) {
+    columnOriginX.push(columnX);
+    columnX += columnWidths[ci]! + ZONE_CELL_GAP;
+  }
+  const innerW =
+    columnWidths.length > 0 ? Math.max(0, columnX - ZONE_CELL_GAP) : 0;
+
   const zoneRtInset = maxZoneRouteTableInset;
   const perZoneH = perZoneBodyH + zoneRtInset;
-  const innerW =
-    znCols * perZoneW + (znCols > 0 ? znCols - 1 : 0) * ZONE_CELL_GAP;
   const innerH =
     znRows * perZoneH +
     (znRows > 0 ? znRows - 1 : 0) * ZONE_CELL_GAP +
@@ -852,7 +920,17 @@ function vpcFrameDimensionsForZones(
       innerH +
       FRAME_CONTENT_SLACK_Y,
   );
-  return { w, h, perZoneW, perZoneH, perZoneBodyH, znCols, znRows };
+  return {
+    w,
+    h,
+    perZoneW,
+    perZoneH,
+    perZoneBodyH,
+    znCols,
+    znRows,
+    zoneWBySignature,
+    columnOriginX,
+  };
 }
 
 function countTopology(model: TerraformTopologyModel): {
@@ -3232,29 +3310,6 @@ function appendTopologyResourceRectangles(
     const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
     const b = clusterBounds!;
     const clusterSkId = primaryClusterSkeletonId(addr);
-    if (resourceType === "aws_lb" && addr.includes("ecs")) {
-      // #region agent log
-      debugTopologyLog(
-        "terraformTopologyLayout.ts:appendTopologyResourceRectangles",
-        "aws_lb primaryCluster assembled",
-        {
-          addr,
-          clusterChildCount: clusterChildIds.length,
-          clusterChildren: [...clusterChildIds],
-          albStack: albBuild.cluster?.stack ?? [],
-          sgGroups: sgBuild.cluster?.groups.map((g) => ({
-            sg: g.sgPath,
-            rules: g.rules.length,
-          })),
-          hasAlbCluster: Boolean(albBuild.cluster),
-          hasSgCluster: Boolean(sgBuild.cluster),
-          frameW: b.maxX - b.minX + 2 * pad,
-          frameH: b.maxY - b.minY + 2 * pad,
-        },
-        "D",
-      );
-      // #endregion
-    }
     skeleton.push({
       type: "frame",
       id: clusterSkId,
@@ -4051,8 +4106,14 @@ export async function buildTerraformTopologyExcalidrawScene(
           const column = zoneColumns[zcol]!;
           for (let zrow = 0; zrow < column.length; zrow++) {
             const z = column[zrow]!;
-            const zoneX =
-              zoneGridOriginX + zcol * (vd.perZoneW + ZONE_CELL_GAP);
+            const zoneWidthKey = placementZoneWidthKey(
+              accountId,
+              regionName,
+              vpcId,
+              z.subnetSignature,
+            );
+            const zoneW = vd.zoneWBySignature.get(zoneWidthKey) ?? vd.perZoneW;
+            const zoneX = zoneGridOriginX + (vd.columnOriginX[zcol] ?? 0);
             const zoneY =
               zoneGridOriginY + zrow * (vd.perZoneH + ZONE_CELL_GAP);
 
@@ -4083,7 +4144,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                     natClusters,
                     zoneX,
                     zoneY,
-                    Math.max(0, vd.perZoneW - 2 * INNER_PAD),
+                    Math.max(0, zoneW - 2 * INNER_PAD),
                     zoneY + VPC_TOP_PAD,
                     nodes,
                   )
@@ -4097,24 +4158,6 @@ export async function buildTerraformTopologyExcalidrawScene(
                 zoneAddrsRaw,
                 plan,
               ).sort((a, b) => a.localeCompare(b));
-            if (
-              zoneAddrsRaw.some(
-                (a) => a.includes("ecs") && a.includes("aws_lb"),
-              )
-            ) {
-              // #region agent log
-              debugTopologyLog(
-                "terraformTopologyLayout.ts:zoneGrid",
-                "ecs-edge zone address filter",
-                {
-                  zoneAddrsRaw,
-                  addrsAfterFilter: addrs,
-                  subnetSignature: z.subnetSignature,
-                },
-                "B",
-              );
-              // #endregion
-            }
             const rectIds = appendTopologyResourceRectangles(
               skeleton,
               { accountId, region: regionName, vpcId },
@@ -4254,7 +4297,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                       zoneRtRow.routeChildrenByTable,
                       zoneX,
                       zoneY,
-                      vd.perZoneW,
+                      zoneW,
                       vd.perZoneBodyH,
                       nodes,
                       z.subnetSignature,
@@ -4289,7 +4332,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                     { [addr]: [...routes] },
                     zoneX,
                     zoneY,
-                    vd.perZoneW,
+                    zoneW,
                     vd.perZoneBodyH,
                     nodes,
                     z.subnetSignature,
@@ -4317,7 +4360,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                     zoneVpcePartForZ.clusterAddrs,
                     zoneX,
                     zoneY,
-                    vd.perZoneW,
+                    zoneW,
                     vd.perZoneBodyH,
                     nodes,
                     arnIndex,
@@ -4336,7 +4379,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                     zoneVpcePartForZ.compactAddrs,
                     zoneX,
                     zoneY,
-                    vd.perZoneW,
+                    zoneW,
                     vd.perZoneBodyH,
                     nodes,
                     zoneVpceOptsForZ,
@@ -4349,7 +4392,7 @@ export async function buildTerraformTopologyExcalidrawScene(
               name: zoneDisplayName(z, subnetNameById),
               x: zoneX,
               y: zoneY,
-              width: vd.perZoneW,
+              width: zoneW,
               height: vd.perZoneH,
               children: [
                 ...natRectIds,
@@ -4674,47 +4717,6 @@ export async function buildTerraformTopologyExcalidrawScene(
   elements = reorderTopologyElementsZStack(elements);
 
   normalizeTopologyOrigin(elements);
-
-  {
-    const ecsLb = elements.filter(
-      (e) =>
-        (e.customData as { nodePath?: string } | undefined)?.nodePath?.includes(
-          "aws_lb",
-        ) &&
-        (e.customData as { nodePath?: string } | undefined)?.nodePath?.includes(
-          "ecs",
-        ),
-    );
-    const ecsCluster = elements.find(
-      (e) =>
-        e.type === "frame" &&
-        (e.customData as { terraformTopologyRole?: string } | undefined)
-          ?.terraformTopologyRole === "primaryCluster" &&
-        (
-          e.customData as { terraformPrimaryAddress?: string } | undefined
-        )?.terraformPrimaryAddress?.includes("ecs"),
-    );
-    // #region agent log
-    debugTopologyLog(
-      "terraformTopologyLayout.ts:buildTerraformTopologyExcalidrawScene",
-      "scene elements for ecs ALB",
-      {
-        ecsLbRects: ecsLb.map((e) => ({
-          nodePath: (e.customData as { nodePath?: string })?.nodePath,
-          frameId: e.frameId,
-          type: e.type,
-          isDeleted: e.isDeleted,
-        })),
-        clusterFrameId: ecsCluster?.id,
-        clusterChildIds:
-          ecsCluster?.type === "frame"
-            ? (ecsCluster as { children?: readonly string[] }).children
-            : undefined,
-      },
-      "E",
-    );
-    // #endregion
-  }
 
   const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
     elements,

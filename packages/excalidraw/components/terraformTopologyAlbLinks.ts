@@ -26,7 +26,6 @@ import {
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
-import { debugTopologyLog } from "./terraformTopologyDebugLog";
 import { buildLoadBalancerSgCluster } from "./terraformTopologySgLinks";
 
 type PlanRc = Parameters<typeof pickResourceValuesForTopologyPlacement>[0];
@@ -687,24 +686,6 @@ export function buildAlbListenerTargetCluster(
     ...tgOrdered,
     ...attachmentPaths,
   ]);
-  if (lbAddress.includes("aws_lb") || lbAddress.includes("ecs")) {
-    // #region agent log
-    debugTopologyLog(
-      "terraformTopologyAlbLinks.ts:buildAlbListenerTargetCluster",
-      "ALB listener/TG cluster build",
-      {
-        lbAddress,
-        canonicalLb,
-        listenerCount: listenerPaths.length,
-        tgCount: tgOrdered.length,
-        attachmentCount: attachmentPaths.length,
-        stack,
-        listenerPaths,
-      },
-      stack.length === 0 ? "A" : "A-ok",
-    );
-    // #endregion
-  }
   if (stack.length === 0) {
     return { cluster: null, edges: [] };
   }

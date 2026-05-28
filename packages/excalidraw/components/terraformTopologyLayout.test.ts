@@ -1342,6 +1342,108 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ]);
   });
 
+  it("sizes each subnet zone to its own content instead of sharing the widest VPC column", async () => {
+    const manyPrivate = Array.from(
+      { length: 6 },
+      (_, i) => `aws_instance.w${i}`,
+    );
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-123",
+                      {
+                        vpcId: "vpc-123",
+                        subnets: new Map([
+                          ["subnet-pub-a", { subnetId: "subnet-pub-a" }],
+                          ["subnet-priv-a", { subnetId: "subnet-priv-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: ["aws_nat_gateway.nat"],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-priv-a",
+        subnetIds: ["subnet-priv-a"],
+        addresses: manyPrivate,
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          type: "aws_subnet",
+          change: {
+            after: { id: "subnet-pub-a", tags: { Name: "app-public-a" } },
+          },
+        },
+        {
+          type: "aws_subnet",
+          change: {
+            after: { id: "subnet-priv-a", tags: { Name: "app-private-a" } },
+          },
+        },
+        ...manyPrivate.map((address) => ({
+          type: "aws_instance",
+          address,
+          change: { actions: ["no-op"] },
+        })),
+        {
+          type: "aws_nat_gateway",
+          address: "aws_nat_gateway.nat",
+          change: { actions: ["no-op"] },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      {},
+      plan,
+    );
+    const publicZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-public-a",
+    );
+    const privateZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-private-a",
+    );
+    expect(publicZone).toBeDefined();
+    expect(privateZone).toBeDefined();
+    expect(publicZone!.width).toBeLessThan(privateZone!.width!);
+    expect(publicZone!.width).toBeLessThan(px(480));
+  });
+
   it("places NAT+EIP inside the public subnet zone (semantic AZ) and IGW in the VPC top plumbing row", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

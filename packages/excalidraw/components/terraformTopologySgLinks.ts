@@ -3,7 +3,6 @@
  */
 
 import { canonicalTopologyNodeKey } from "./terraformTopologyAddress";
-import { debugTopologyLog } from "./terraformTopologyDebugLog";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   resolveTerraformPlanNodeKey,
@@ -575,16 +574,6 @@ export function buildLoadBalancerSgCluster(
   plan?: unknown,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   const refs = collectLoadBalancerSecurityGroupRefs(nodes, lbAddress, plan);
-  if (lbAddress.includes("ecs")) {
-    // #region agent log
-    debugTopologyLog(
-      "terraformTopologySgLinks.ts:buildLoadBalancerSgCluster",
-      "LB SG refs",
-      { lbAddress, refs },
-      refs.length === 0 ? "C" : "C-ok",
-    );
-    // #endregion
-  }
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
