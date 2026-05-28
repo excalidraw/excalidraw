@@ -362,7 +362,7 @@ const LayerUI = ({
                   width: "80%",
                   height: "22px",
                   borderRadius: "11px",
-                  backgroundColor: appState.theme === "dark" ? "#403e6a" : "#e0dfff",
+                  backgroundColor: appState.theme === "dark" ? "#e0dfff" : "#403e6a",
                   border: "none",
                   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.06)",
                   display: "flex",
