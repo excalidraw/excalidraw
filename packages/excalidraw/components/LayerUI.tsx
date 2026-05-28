@@ -181,14 +181,14 @@ const LayerUI = ({
       moveEvent.stopPropagation();
       const dx = moveEvent.clientX - dragStartRef.current.x;
       const dy = moveEvent.clientY - dragStartRef.current.y;
-      
+
       const newX = offsetStartRef.current.x + dx;
       const newY = offsetStartRef.current.y + dy;
-      
+
       // Prevent dragging completely off screen (limit to 85% of screen dimensions)
       const maxLimitX = window.innerWidth * 0.85;
       const maxLimitY = window.innerHeight * 0.85;
-      
+
       setDragOffset({
         x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
         y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
@@ -218,14 +218,14 @@ const LayerUI = ({
       const touchMove = moveEvent.touches[0];
       const dx = touchMove.clientX - dragStartRef.current.x;
       const dy = touchMove.clientY - dragStartRef.current.y;
-      
+
       const newX = offsetStartRef.current.x + dx;
       const newY = offsetStartRef.current.y + dy;
-      
+
       // Prevent dragging completely off screen (limit to 85% of screen dimensions)
       const maxLimitX = window.innerWidth * 0.85;
       const maxLimitY = window.innerHeight * 0.85;
-      
+
       setDragOffset({
         x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
         y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
@@ -362,7 +362,7 @@ const LayerUI = ({
                   width: "80%",
                   height: "22px",
                   borderRadius: "11px",
-                  backgroundColor: appState.theme === "dark" ? "#2e2a3c" : "#e0dfff",
+                  backgroundColor: appState.theme === "dark" ? "#403e6a" : "#e0dfff",
                   border: "none",
                   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.06)",
                   display: "flex",
@@ -431,7 +431,7 @@ const LayerUI = ({
                 style={{
                   width: "90%",
                   borderRadius: "18px",
-                  backgroundColor: appState.theme === "dark" ? "#2e2a3c" : "#e0dfff",
+                  backgroundColor: appState.theme === "dark" ? "#403e6a" : "#e0dfff",
                   border: "none",
                   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
                   display: "flex",
