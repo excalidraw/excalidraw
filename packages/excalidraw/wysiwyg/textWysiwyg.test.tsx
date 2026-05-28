@@ -1,4 +1,5 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
@@ -379,6 +380,130 @@ describe("textWysiwyg", () => {
 
       expect(h.state.editingTextElement).toBe(null);
       expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+    });
+
+    it("should keep editor open when window loses focus (e.g. Alt+Tab)", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      const hasFocusSpy = vi.spyOn(document, "hasFocus").mockReturnValue(false);
+
+      try {
+        fireEvent.blur(editor);
+
+        expect(await getTextEditor({ waitForEditor: false })).not.toBe(null);
+        expect(h.state.editingTextElement?.id).toBe(text.id);
+      } finally {
+        hasFocusSpy.mockRestore();
+      }
+    });
+
+    it("should still submit the editor on blur while the window keeps focus", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      const hasFocusSpy = vi.spyOn(document, "hasFocus").mockReturnValue(true);
+
+      try {
+        // a genuine blur (window still focused) must still commit and close
+        fireEvent.blur(editor);
+
+        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+        expect(h.state.editingTextElement).toBe(null);
+      } finally {
+        hasFocusSpy.mockRestore();
+      }
+    });
+
+    it("should keep editor open on window blur after a properties-menu interaction", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      // the window pointerdown listener is registered inside a rAF; flush it
+      await act(async () => {
+        await new Promise((resolve) =>
+          requestAnimationFrame(() => resolve(null)),
+        );
+      });
+
+      // Simulate interacting with the shape-actions / properties menu. This
+      // runs temporarilyDisableSubmit(), which nulls the textarea's own blur
+      // submit and arms a window "blur" listener as the fallback teardown path.
+      const propertiesEl = document.createElement("div");
+      propertiesEl.classList.add("properties-content");
+      document.body.appendChild(propertiesEl);
+
+      try {
+        fireEvent.pointerDown(propertiesEl);
+
+        // sanity: the interaction disabled the textarea's own onblur, so the
+        // window-blur listener is now the only remaining teardown path — this
+        // is what guarantees the assertion below exercises that second path.
+        expect(editor.onblur).toBe(null);
+
+        const hasFocusSpy = vi
+          .spyOn(document, "hasFocus")
+          .mockReturnValue(false);
+
+        try {
+          fireEvent.blur(window);
+
+          expect(await getTextEditor({ waitForEditor: false })).not.toBe(null);
+          expect(h.state.editingTextElement?.id).toBe(text.id);
+        } finally {
+          hasFocusSpy.mockRestore();
+        }
+      } finally {
+        propertiesEl.remove();
+      }
     });
 
     // FIXME too flaky. No one knows why.

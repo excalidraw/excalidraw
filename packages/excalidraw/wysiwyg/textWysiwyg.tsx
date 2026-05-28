@@ -838,6 +838,16 @@ export const textWysiwyg = ({
     });
   };
 
+  // If the window itself lost focus (e.g. Alt+Tab, switching tabs), the
+  // textarea also blurs; in that case preserve the editor so the user can
+  // resume typing on return instead of having to click the text again.
+  const handleBlur = () => {
+    if (!document.hasFocus()) {
+      return;
+    }
+    handleSubmit();
+  };
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -852,7 +862,7 @@ export const textWysiwyg = ({
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", bindBlurEvent);
-    window.removeEventListener("blur", handleSubmit);
+    window.removeEventListener("blur", handleBlur);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -888,7 +898,7 @@ export const textWysiwyg = ({
       }
 
       // Otherwise, re-enable submit on blur and refocus the editor.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus();
       if (pendingInitialSelection) {
         editable.setSelectionRange(
@@ -903,9 +913,12 @@ export const textWysiwyg = ({
   const temporarilyDisableSubmit = () => {
     editable.onblur = null;
     window.addEventListener("pointerup", bindBlurEvent);
-    // handle edge-case where pointerup doesn't fire e.g. due to user
-    // alt-tabbing away
-    window.addEventListener("blur", handleSubmit);
+    // Handle the edge-case where pointerup doesn't fire e.g. because the user
+    // alt-tabbed away mid-interaction. Route through handleBlur (not
+    // handleSubmit) so a genuine window blur (document.hasFocus() === false)
+    // preserves the editor instead of destroying it — otherwise this second
+    // blur path would re-break #9304 after any properties-menu interaction.
+    window.addEventListener("blur", handleBlur);
   };
 
   // prevent blur when changing properties from the menu
