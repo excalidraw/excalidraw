@@ -26,7 +26,14 @@ export const actionToggleSearchMenu = register({
   },
   perform(elements, appState, _, app) {
     if (appState.openDialog) {
-      return false;
+      return {
+        appState: {
+          ...appState,
+          openSidebar: { name: DEFAULT_SIDEBAR.name, tab: CANVAS_SEARCH_TAB },
+          openDialog: null,
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
     }
 
     if (
