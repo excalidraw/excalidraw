@@ -130,6 +130,50 @@ describe("terraformImportMerge", () => {
     expect(addresses).toContain("cloudflare_zone.example");
   });
 
+  it("mergePlanWithStates keeps plan change actions over state synthetic read", () => {
+    const plan = {
+      resource_changes: [
+        {
+          address: "module.app.aws_lambda_function.this[0]",
+          mode: "managed",
+          type: "aws_lambda_function",
+          change: { actions: ["update"], before: { x: 1 }, after: { x: 2 } },
+        },
+      ],
+    };
+    const state = {
+      resources: [
+        {
+          mode: "managed",
+          type: "aws_lambda_function",
+          name: "this",
+          module: "module.app",
+          instances: [
+            {
+              index_key: 0,
+              attributes: { function_name: "app" },
+            },
+          ],
+        },
+      ],
+    };
+    const warnings: import("./terraformImportMerge").TerraformImportWarning[] =
+      [];
+    const merged = mergePlanWithStates(
+      plan,
+      [plan],
+      [state],
+      ["state"],
+      warnings,
+    );
+    const writer = merged.plan.resource_changes.find(
+      (rc) =>
+        (rc as { address?: string }).address ===
+        "module.app.aws_lambda_function.this[0]",
+    ) as { change?: { actions?: string[] } } | undefined;
+    expect(writer?.change?.actions).toContain("update");
+  });
+
   it("namespaced staging multi-state merge has no duplicate_address warnings", () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
     const { bundles: namespaced, stackIds } = namespacePlanDotBundles(bundles);

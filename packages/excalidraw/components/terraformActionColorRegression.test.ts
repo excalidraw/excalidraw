@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
+import {
+  hasTerraformBackendFile,
+  readTerraformBackendFile,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
@@ -77,4 +80,47 @@ describe("terraform action colors regression", () => {
     expect(cards[0].strokeColor).toBe("#e67700");
     expect(cards[0].customData?.action).toBe("update");
   }, 60_000);
+
+  it.skipIf(!hasTerraformBackendFile("terraform_allplanmodules.tfstate"))(
+    "allplanmodules test-writer lambda stays yellow with plan+state merge",
+    async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const tfd = readTerraformBackendFile("allplanmodules.tfd");
+      const state = JSON.parse(
+        readTerraformBackendFile("terraform_allplanmodules.tfstate"),
+      );
+      const writerAddr =
+        "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [state],
+          tfdTexts: [tfd],
+        },
+        { semanticLayout: true },
+      );
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      const cards = body.elements.filter(
+        (e: {
+          type?: string;
+          customData?: {
+            nodePath?: string;
+            terraformVisibilityRole?: string;
+          };
+        }) =>
+          e.type === "rectangle" &&
+          e.customData?.terraformVisibilityRole === "resource" &&
+          e.customData?.nodePath === writerAddr,
+      );
+      expect(cards).toHaveLength(1);
+      expect(cards[0].strokeColor).toBe("#e67700");
+      expect(cards[0].customData?.action).toBe("update");
+      const attrs = cards[0].customData?.terraformResources?.[0]?.attributes;
+      expect(attrs?.some((a: { changed?: boolean }) => a.changed)).toBe(true);
+    },
+    60_000,
+  );
 });

@@ -1,6 +1,9 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+import {
+  buildTerraformElkExcalidrawScene,
+  getTerraformPlanNodeAction,
+} from "./terraformElkLayout";
 import {
   extractTerraformTopologyFromPlan,
   mergeTopologyModelWithPlacementZones,
@@ -288,6 +291,28 @@ function getStateResourceAddress(
   return address;
 }
 
+const STATE_MERGE_PLACEHOLDER_ACTIONS = new Set(["existing", "read"]);
+
+/** Keep real plan `change.actions` when enriching nodes from raw tfstate. */
+function preferPlanChangeForStateMerge(existingChange: unknown): {
+  actions: string[];
+} {
+  const change = existingChange as { actions?: unknown } | undefined;
+  const actions = Array.isArray(change?.actions)
+    ? change.actions.filter(
+        (action): action is string =>
+          typeof action === "string" && action.length > 0,
+      )
+    : [];
+  if (
+    actions.length > 0 &&
+    !actions.every((action) => STATE_MERGE_PLACEHOLDER_ACTIONS.has(action))
+  ) {
+    return change as { actions: string[] };
+  }
+  return { actions: ["existing"] };
+}
+
 /** Merges raw tfstate `resources` into nodes (same semantics as backend `mergeTerraformState`). */
 function mergeRawTerraformStateIntoNodes(
   nodes: Record<string, TerraformPlanGraphNode>,
@@ -336,7 +361,7 @@ function mergeRawTerraformStateIntoNodes(
           ...((instance.attributes || {}) as Record<string, unknown>),
           ...(existingResource.values as Record<string, unknown> | undefined),
         },
-        change: existingResource.change || { actions: ["existing"] },
+        change: preferPlanChangeForStateMerge(existingResource.change),
         terraform_state: {
           schema_version: instance.schema_version,
           private: Boolean(instance.private),
@@ -597,6 +622,35 @@ export const terraformPlanParsingFromSources = async (
     stackIds,
   });
 
+  // #region agent log
+  const debugWriterAddr =
+    "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
+  const debugWriterNode = nodes5[debugWriterAddr];
+  const debugWriterResourceChange = debugWriterNode?.resources?.[
+    debugWriterAddr
+  ] as { change?: { actions?: string[] } } | undefined;
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "b3f9b8",
+    },
+    body: JSON.stringify({
+      sessionId: "b3f9b8",
+      runId: "post-fix",
+      hypothesisId: "B",
+      location: "terraformPlanParsing.tsx:nodes5",
+      message: "writer node action after plan+state node build",
+      data: {
+        nodeAction: getTerraformPlanNodeAction(debugWriterNode),
+        resourceActions: debugWriterResourceChange?.change?.actions ?? null,
+        hasNode: Boolean(debugWriterNode),
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   const tfdWarnings = applyTfdOverlayToNodes(
     nodes5,
     sources.tfdTexts,
@@ -808,6 +862,38 @@ export const terraformPlanParsingFromSources = async (
         { stackIds, addressToStack },
       ),
     };
+    // #region agent log
+    const debugWriterCard = (
+      composedElements as Array<{
+        type?: string;
+        strokeColor?: string;
+        customData?: { nodePath?: string; action?: string };
+      }>
+    ).find(
+      (el) =>
+        el.type === "rectangle" && el.customData?.nodePath === debugWriterAddr,
+    );
+    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "b3f9b8",
+      },
+      body: JSON.stringify({
+        sessionId: "b3f9b8",
+        runId: "post-fix",
+        hypothesisId: "C",
+        location: "terraformPlanParsing.tsx:semanticScene",
+        message: "writer resource card stroke/action",
+        data: {
+          strokeColor: debugWriterCard?.strokeColor ?? null,
+          action: debugWriterCard?.customData?.action ?? null,
+          foundCard: Boolean(debugWriterCard),
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
   } else {
     const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
     emitLocalParseDebug({
