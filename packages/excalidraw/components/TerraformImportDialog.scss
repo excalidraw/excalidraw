@@ -2,6 +2,25 @@
 
 .excalidraw {
   .TerraformImportModal {
+    // Shared interactive control tokens (modern-web-guidance: explicit states)
+    --tf-control-radius: 0.5rem;
+    --tf-control-min-height: 2.5rem;
+    --tf-control-border: var(--color-gray-30);
+    --tf-control-border-hover: var(--color-brand-hover);
+    --tf-control-border-active: var(--color-brand-active);
+    --tf-control-border-focus: var(--color-primary);
+    --tf-control-bg: var(--color-surface-lowest);
+    --tf-control-bg-hover: var(--color-primary-light);
+    --tf-control-text: var(--color-on-surface);
+    --tf-control-text-muted: var(--color-gray-60);
+    --tf-control-focus-ring: 0 0 0 2px var(--color-surface-lowest),
+      0 0 0 4px var(--color-primary);
+    --tf-file-btn-bg: var(--color-primary);
+    --tf-file-btn-bg-hover: var(--color-brand-hover);
+    --tf-file-btn-bg-active: var(--color-brand-active);
+    --tf-file-btn-text: var(--color-on-primary, var(--color-surface-lowest));
+    --tf-transition: 150ms ease-out;
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -15,6 +34,211 @@
       line-height: 130%;
       padding: 0;
       margin: 0;
+    }
+
+    // Labels wrapping form controls
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: "Assistant";
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--tf-control-text);
+    }
+
+    input[type="text"],
+    select {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 0.875rem;
+      min-height: var(--tf-control-min-height);
+      padding: 0.5rem 0.875rem;
+      border-radius: var(--tf-control-radius);
+      border: 1px solid var(--tf-control-border);
+      background-color: var(--tf-control-bg);
+      color: var(--tf-control-text);
+      transition: border-color var(--tf-transition),
+        box-shadow var(--tf-transition), background-color var(--tf-transition);
+
+      &::placeholder {
+        color: var(--color-gray-40);
+        font-weight: 400;
+      }
+
+      &:hover:not(:disabled) {
+        border-color: var(--tf-control-border-hover);
+      }
+
+      &:focus-visible {
+        outline: none;
+        border-color: var(--tf-control-border-focus);
+        box-shadow: var(--tf-control-focus-ring);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        border-color: var(--color-gray-20);
+        background-color: var(--color-surface-low);
+        color: var(--tf-control-text-muted);
+      }
+    }
+
+    select {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    // —— File input (Choose File) ——
+    input[type="file"] {
+      font-family: var(--font-family);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      width: 100%;
+      max-width: 100%;
+      min-height: var(--tf-control-min-height);
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--tf-control-radius);
+      border: 1px solid var(--tf-control-border);
+      background-color: var(--tf-control-bg);
+      color: var(--tf-control-text);
+      cursor: pointer;
+      transition: border-color var(--tf-transition),
+        background-color var(--tf-transition), box-shadow var(--tf-transition);
+
+      &:hover:not(:disabled) {
+        border-color: var(--tf-control-border-hover);
+        background-color: var(--tf-control-bg-hover);
+      }
+
+      &:active:not(:disabled) {
+        border-color: var(--tf-control-border-active);
+      }
+
+      &:focus-visible {
+        outline: none;
+        border-color: var(--tf-control-border-focus);
+        box-shadow: var(--tf-control-focus-ring);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        border-color: var(--color-gray-20);
+        background-color: var(--color-surface-low);
+        color: var(--tf-control-text-muted);
+      }
+
+      &::file-selector-button {
+        font-family: var(--font-family);
+        font-weight: 600;
+        font-size: 0.8125rem;
+        line-height: 1.25;
+        padding: 0.4rem 0.875rem;
+        margin-right: 0.75rem;
+        border-radius: calc(var(--tf-control-radius) - 2px);
+        border: none;
+        background-color: var(--tf-file-btn-bg);
+        color: var(--tf-file-btn-text);
+        cursor: pointer;
+        transition: background-color var(--tf-transition),
+          transform var(--tf-transition);
+      }
+
+      &:hover:not(:disabled)::file-selector-button {
+        background-color: var(--tf-file-btn-bg-hover);
+      }
+
+      &:active:not(:disabled)::file-selector-button {
+        background-color: var(--tf-file-btn-bg-active);
+      }
+
+      &:disabled::file-selector-button {
+        background-color: var(--color-gray-40);
+        color: var(--color-surface-lowest);
+        cursor: not-allowed;
+      }
+    }
+
+    // Secondary / tertiary text buttons
+    &__addBundle,
+    &__bundleRemove {
+      font-family: "Assistant";
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.35rem;
+      border-radius: 0.25rem;
+      transition: color var(--tf-transition),
+        background-color var(--tf-transition);
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: var(--tf-control-focus-ring);
+      }
+    }
+
+    &__addBundle {
+      align-self: flex-start;
+      color: var(--color-primary);
+      padding: 0.35rem 0.5rem;
+
+      &:hover:not(:disabled) {
+        text-decoration: underline;
+        background-color: var(--tf-control-bg-hover);
+      }
+
+      &:disabled {
+        color: var(--tf-control-text-muted);
+        cursor: not-allowed;
+        text-decoration: none;
+      }
+    }
+
+    &__bundleRemove {
+      color: var(--color-danger);
+      padding: 0.25rem 0.5rem;
+
+      &:hover:not(:disabled) {
+        text-decoration: underline;
+        background-color: var(--color-danger-background, #ffe3e3);
+      }
+    }
+
+    &__presetButtons button {
+      font-family: "Assistant";
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border: 1px solid var(--tf-control-border);
+      border-radius: 0.375rem;
+      background: var(--tf-control-bg);
+      color: var(--tf-control-text);
+      padding: 0.4rem 0.65rem;
+      cursor: pointer;
+      transition: border-color var(--tf-transition),
+        background-color var(--tf-transition), box-shadow var(--tf-transition);
+
+      &:hover:not(:disabled) {
+        border-color: var(--tf-control-border-hover);
+        background-color: var(--tf-control-bg-hover);
+      }
+
+      &:active:not(:disabled) {
+        border-color: var(--tf-control-border-active);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: var(--tf-control-focus-ring);
+      }
+
+      &:disabled {
+        border-color: var(--color-gray-20);
+        background-color: var(--color-surface-low);
+        color: var(--tf-control-text-muted);
+        cursor: not-allowed;
+      }
     }
 
     &__section {
@@ -52,14 +276,14 @@
         flex-direction: column;
         gap: 2px;
         padding: 0.625rem 0.875rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--color-gray-30);
+        border-radius: var(--tf-control-radius);
+        border: 1px solid var(--tf-control-border);
         background-color: transparent;
         font-family: "Assistant";
         cursor: pointer;
         user-select: none;
-        transition: border-color 150ms ease-out, background-color 150ms ease-out,
-          color 150ms ease-out;
+        transition: border-color var(--tf-transition),
+          background-color var(--tf-transition), box-shadow var(--tf-transition);
 
         input[type="radio"] {
           position: absolute;
@@ -69,13 +293,19 @@
           height: 0;
         }
 
-        &:hover {
-          border-color: var(--color-brand-hover);
-          background-color: var(--color-primary-light);
+        &:hover:not(&--disabled) {
+          border-color: var(--tf-control-border-hover);
+          background-color: var(--tf-control-bg-hover);
+        }
+
+        &:has(input[type="radio"]:focus-visible) {
+          outline: none;
+          border-color: var(--tf-control-border-focus);
+          box-shadow: var(--tf-control-focus-ring);
         }
 
         &--checked,
-        &--checked:hover {
+        &--checked:hover:not(&--disabled) {
           border-color: var(--color-primary);
           background-color: var(--color-primary-light);
           box-shadow: 0 0 0 1px var(--color-primary) inset;
@@ -84,10 +314,14 @@
         &--disabled,
         &--disabled:hover {
           border-color: var(--color-gray-20);
-          background-color: transparent;
+          background-color: var(--color-surface-low);
           box-shadow: none;
           cursor: not-allowed;
-          opacity: 0.55;
+
+          .TerraformImportModal__viewSelector__label,
+          .TerraformImportModal__viewSelector__description {
+            color: var(--tf-control-text-muted);
+          }
         }
       }
 
@@ -107,7 +341,7 @@
     &__error {
       width: 100%;
       padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
+      border-radius: var(--tf-control-radius);
       background-color: #ffe3e3;
       color: #c92a2a;
       font-family: "Assistant";
@@ -115,143 +349,17 @@
       font-weight: 600;
     }
 
-    &__settings {
-      &__buttons {
-        display: flex;
-        flex-direction: row;
-        gap: 11px;
+    &__settings__buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 11px;
 
-        .ExcButton[disabled] {
-          &.ExcButton--variant-filled,
-          &:hover {
-            --back-color: var(--color-primary) !important;
-            --text-color: var(--color-on-primary) !important;
-            opacity: 0.5;
-          }
-        }
-      }
-
-      &__inputs {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-
-        input[type="file"] {
-          font-family: var(--font-family);
-          font-weight: 600;
-          font-size: 0.75rem;
-          letter-spacing: normal;
-
-          min-height: 2.5rem;
-          padding: 0.5rem 1rem;
-
-          border-radius: 0.5rem;
-          border: 1px solid var(--color-primary);
-          background-color: transparent;
-          color: var(--color-primary);
-
-          cursor: pointer;
-          user-select: none;
-          transition: all 150ms ease-out;
-
-          &:hover {
-            border-color: var(--color-brand-hover);
-            color: var(--color-brand-hover);
-            background-color: var(--color-primary-light);
-          }
-
-          &:active {
-            border-color: var(--color-brand-active);
-            color: var(--color-brand-active);
-          }
-
-          &::file-selector-button {
-            font-family: var(--font-family);
-            font-weight: 600;
-            font-size: 0.75rem;
-
-            padding: 0.35rem 0.75rem;
-            margin-right: 0.75rem;
-
-            border-radius: 0.5rem;
-            border: none;
-            background-color: var(--color-primary);
-            color: var(--color-surface-lowest);
-
-            cursor: pointer;
-            transition: all 150ms ease-out;
-
-            &:hover {
-              background-color: var(--color-brand-hover);
-            }
-          }
-        }
-
-        input[type="text"] {
-          font-family: var(--font-family);
-          font-weight: 600;
-          font-size: 0.875rem;
-
-          min-height: 2.5rem;
-          padding: 0.5rem 1rem;
-
-          border-radius: 0.5rem;
-          border: 1px solid var(--color-primary);
-          background-color: transparent;
-          color: var(--color-on-surface);
-
-          transition: all 150ms ease-out;
-
-          &:focus {
-            outline: none;
-            border-color: var(--color-brand-hover);
-            box-shadow: 0 0 0 1px var(--color-brand-hover);
-          }
-
-          &::placeholder {
-            color: var(--color-gray-40);
-            font-weight: 400;
-          }
-        }
-
-        label {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          font-family: "Assistant";
-          font-weight: 600;
-          font-size: 0.875rem;
-          color: var(--color-on-surface);
-        }
-
-        label.TerraformImportModal__inputRow--disabled {
-          opacity: 0.55;
-          cursor: not-allowed;
-          color: var(--color-gray-60);
-
-          input[type="file"] {
-            pointer-events: none;
-            cursor: not-allowed;
-            border-color: var(--color-gray-30);
-            color: var(--color-gray-60);
-
-            &:hover,
-            &:active {
-              border-color: var(--color-gray-30);
-              color: var(--color-gray-60);
-              background-color: transparent;
-            }
-
-            &::file-selector-button {
-              background-color: var(--color-gray-40);
-              color: var(--color-surface-lowest);
-              cursor: not-allowed;
-
-              &:hover {
-                background-color: var(--color-gray-40);
-              }
-            }
-          }
+      .ExcButton[disabled] {
+        &.ExcButton--variant-filled,
+        &:hover {
+          --back-color: var(--color-primary) !important;
+          --text-color: var(--color-on-primary) !important;
+          opacity: 0.5;
         }
       }
     }
@@ -272,7 +380,7 @@
     &__instructions {
       width: 100%;
       border: 1px solid var(--color-gray-30);
-      border-radius: 0.5rem;
+      border-radius: var(--tf-control-radius);
       background-color: var(--color-surface-low);
 
       &Summary {
@@ -285,10 +393,11 @@
         color: var(--color-on-surface);
         cursor: pointer;
         user-select: none;
+        border-radius: var(--tf-control-radius);
 
         &:focus-visible {
-          outline: 2px solid var(--color-primary);
-          outline-offset: 2px;
+          outline: none;
+          box-shadow: var(--tf-control-focus-ring);
         }
 
         &::-webkit-details-marker {
@@ -388,10 +497,10 @@
     &__bundle {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       padding: 12px;
       border: 1px solid var(--color-gray-30);
-      border-radius: 0.5rem;
+      border-radius: var(--tf-control-radius);
       background-color: var(--color-surface-low);
     }
 
@@ -406,41 +515,6 @@
       font-family: "Assistant";
       font-weight: 600;
       font-size: 0.875rem;
-    }
-
-    &__bundleRemove {
-      font-family: "Assistant";
-      font-size: 0.8125rem;
-      color: var(--color-danger);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    &__addBundle {
-      align-self: flex-start;
-      font-family: "Assistant";
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--color-primary);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      &:hover:not(:disabled) {
-        text-decoration: underline;
-      }
     }
 
     &__fileList {
@@ -463,7 +537,7 @@
       width: 100%;
       overflow-x: auto;
       border: 1px solid var(--color-gray-30);
-      border-radius: 0.5rem;
+      border-radius: var(--tf-control-radius);
       background-color: var(--color-surface-low);
 
       table {
@@ -498,39 +572,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-
-      button {
-        font-family: "Assistant";
-        font-size: 0.8125rem;
-        font-weight: 600;
-        border: 1px solid var(--color-gray-30);
-        border-radius: 0.375rem;
-        background: var(--color-surface-lowest);
-        color: var(--color-on-surface);
-        padding: 0.35rem 0.6rem;
-        cursor: pointer;
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    select {
-      font-family: var(--font-family);
-      min-height: 2.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid var(--color-primary);
-      background-color: transparent;
-      color: var(--color-on-surface);
     }
 
     &__warnings {
       width: 100%;
       border: 1px solid var(--color-warning);
-      border-radius: 0.5rem;
+      border-radius: var(--tf-control-radius);
       background-color: var(
         --color-warning-background,
         var(--color-surface-low)
@@ -543,6 +590,13 @@
       summary {
         cursor: pointer;
         font-weight: 600;
+        border-radius: 0.25rem;
+        padding: 0.125rem 0.25rem;
+
+        &:focus-visible {
+          outline: none;
+          box-shadow: var(--tf-control-focus-ring);
+        }
       }
 
       ul {
