@@ -1,10 +1,11 @@
-import { readFileSync } from "fs";
-
 import { describe, expect, it } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import {
+  loadStagingMultiStatePlanDotBundlesFromDb,
+  readStagingMultiStatePipelineTfdFromDb,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 import {
@@ -28,10 +29,7 @@ describe("staging pipeline.tfd resolution", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readFileSync(
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-      "utf8",
-    );
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     const { edges, errors } = applyDeclaredDataFlowFromMany(nodes, [tfd]);
     expect(errors).toEqual([]);
     expect(edges).toHaveLength(20);
@@ -39,10 +37,7 @@ describe("staging pipeline.tfd resolution", () => {
 
   it("new pipeline.tfd draws all 20 declared arrows in semantic layout", async () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readFileSync(
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-      "utf8",
-    );
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     const res = await terraformPlanParsingFromSources(
       {
         planDotBundles: bundles,
