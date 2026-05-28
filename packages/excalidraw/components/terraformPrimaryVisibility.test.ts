@@ -91,6 +91,9 @@ describe("terraformPrimaryVisibility", () => {
         false,
       );
     });
+    it("excludes aws_subnet (structural subnet zones only)", () => {
+      expect(isTopologyPlacementResourceType("aws_subnet")).toBe(false);
+    });
     it("includes primary API Gateway types", () => {
       expect(isTopologyPlacementResourceType("aws_api_gateway_rest_api")).toBe(
         true,
@@ -129,9 +132,9 @@ describe("terraformPrimaryVisibility", () => {
   });
 
   describe("isInitiallyVisibleTerraformTopologyTile", () => {
-    it("always shows semantic infra tiles such as aws_subnet", () => {
+    it("always shows semantic infra tiles such as aws_nat_gateway", () => {
       expect(
-        isInitiallyVisibleTerraformTopologyTile("aws_subnet", "no-op"),
+        isInitiallyVisibleTerraformTopologyTile("aws_nat_gateway", "no-op"),
       ).toBe(true);
     });
     it("falls back to resource visibility for non-infra types", () => {

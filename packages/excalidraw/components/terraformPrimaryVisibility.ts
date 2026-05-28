@@ -129,6 +129,10 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
   if (resourceType === "aws_lambda_permission") {
     return false;
   }
+  /** Subnets are structural (`subnetZone` frames), not resource tiles. */
+  if (resourceType === "aws_subnet") {
+    return false;
+  }
   return true;
 }
 
@@ -159,7 +163,6 @@ const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
   "aws_nat_gateway",
   "aws_route",
   "aws_route_table_association",
-  "aws_subnet",
   "aws_default_network_acl",
   "aws_default_route_table",
   "aws_default_security_group",

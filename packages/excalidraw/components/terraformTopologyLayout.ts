@@ -43,7 +43,10 @@ import {
   collectNetworkingEdges,
 } from "./terraformExplodeGraph";
 import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
-import { isInitiallyVisibleTerraformTopologyTile } from "./terraformPrimaryVisibility";
+import {
+  isInitiallyVisibleTerraformTopologyTile,
+  isTopologyPlacementResourceType,
+} from "./terraformPrimaryVisibility";
 import {
   TERRAFORM_MODULE_TREE_KEY,
   type TerraformPlanGraphNode,
@@ -2113,6 +2116,9 @@ function pushResourceRectangleSkeleton(
     addr,
     resource as Record<string, unknown> | null,
   );
+  if (resourceType === "aws_subnet") {
+    return;
+  }
   const action = getTerraformPlanNodeAction(node);
   const actionStyle = getTerraformActionStyle(action);
   const explodeKeys = [...options.explodeParentKeys].sort();
@@ -2219,132 +2225,6 @@ function pushResourceRectangleSkeleton(
         ),
     },
   });
-}
-
-/** One composite `aws_subnet` tile for merged supplementary zones (shared route table). */
-function appendMergedSubnetCompositeRectangles(
-  skeleton: ExcalidrawElementSkeleton[],
-  accountTuple: { accountId: string; region: string; vpcId: string },
-  sortedAddrs: readonly string[],
-  z: TopologyPlacementZone,
-  contentOriginX: number,
-  contentOriginY: number,
-  nodes: TerraformPlanNodesMap,
-  _arnIndex: Map<string, string>,
-  _plan: unknown,
-  subnetNameById: ReadonlyMap<string, string>,
-): string[] {
-  const sorted = [...sortedAddrs].sort();
-  if (sorted.length === 0) {
-    return [];
-  }
-  const addr0 = sorted[0]!;
-  const rx = contentOriginX;
-  const ry = contentOriginY;
-  const compositeId = `tf-topo:merged-subnet:${encodeURIComponent(
-    z.subnetSignature,
-  )}`;
-  const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
-  const node0 = nodes[addr0] as TerraformPlanGraphNode | undefined;
-  const resource0 = getPrimaryResource(node0);
-  const resourceType = getTerraformCardResourceType(
-    addr0,
-    resource0 as Record<string, unknown> | null,
-  );
-  const action = getTerraformPlanNodeAction(node0);
-  const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
-    resourceType,
-    action,
-  );
-  const actionStyle = getTerraformActionStyle(action);
-  const terraformResourcesMerged = sorted.flatMap((a) => {
-    const n = nodes[a] as TerraformPlanGraphNode | undefined;
-    const r = getPrimaryResource(n) as Record<string, any> | undefined;
-    return r
-      ? buildTerraformResourcePanelDetails(
-          a,
-          r,
-          _plan ?? topologyResourcePanelPlan,
-        )
-      : [];
-  });
-
-  const clusterChildIds: string[] = [];
-  let clusterBounds: {
-    minX: number;
-    minY: number;
-    maxX: number;
-    maxY: number;
-  } | null = null;
-  const addClusterMember = (
-    id: string,
-    bx: number,
-    by: number,
-    bw: number,
-    bh: number,
-  ) => {
-    clusterChildIds.push(id);
-    clusterBounds = growClusterBounds(clusterBounds, bx, by, bw, bh);
-  };
-
-  addClusterMember(compositeId, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
-  skeleton.push({
-    type: "rectangle",
-    id: compositeId,
-    x: rx,
-    y: ry,
-    width: RESOURCE_RECT_W,
-    height: RESOURCE_RECT_H,
-    strokeWidth: 1.5,
-    strokeColor: actionStyle.strokeColor,
-    backgroundColor: actionStyle.backgroundColor,
-    strokeStyle: "solid",
-    roundness: { type: 3, value: px(10) },
-    label: {
-      text: zoneDisplayName(z, subnetNameById),
-      fontSize: tfComfortFontSize(11),
-      strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
-    },
-    customData: {
-      terraform: true,
-      terraformSemanticOverview: true,
-      terraformVisibilityRole: "resource",
-      terraformVisibilityKey: compositeId,
-      terraformNodeKind: "resource",
-      terraformInitiallyVisible: initiallyVisible,
-      terraformExplodeParentKeys: [],
-      terraformExplodeParent: null,
-      terraformExpandAllView: false,
-      resourceType: "aws_subnet",
-      nodePath: addr0,
-      action,
-      terraformMergedSubnetComposite: true,
-      terraformMergedSubnetAddresses: sorted,
-      terraformResources: terraformResourcesMerged,
-    },
-  });
-
-  const b = clusterBounds!;
-  const clusterSkId = primaryClusterSkeletonId(compositeId);
-  skeleton.push({
-    type: "frame",
-    id: clusterSkId,
-    name: zoneDisplayName(z, subnetNameById).slice(0, 48),
-    x: b.minX - pad,
-    y: b.minY - pad,
-    width: b.maxX - b.minX + 2 * pad,
-    height: b.maxY - b.minY + 2 * pad,
-    children: clusterChildIds as readonly string[],
-    customData: frameCustomData(
-      "primaryCluster",
-      accountTuple.accountId,
-      accountTuple.region,
-      accountTuple.vpcId,
-      clusterSkId,
-      { terraformPrimaryAddress: addr0 },
-    ),
-  });
-  return [clusterSkId];
 }
 
 type TopologySatelliteLineSpec = {
@@ -2741,7 +2621,16 @@ function appendTopologyResourceRectangles(
   plan?: unknown,
 ): string[] {
   const clusterFrameIds: string[] = [];
-  const sorted = [...addrs].sort();
+  const sorted = [...addrs]
+    .filter((addr) => {
+      const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+      const resourceType = getTerraformCardResourceType(
+        addr,
+        getPrimaryResource(node) as Record<string, unknown> | null,
+      );
+      return isTopologyPlacementResourceType(resourceType);
+    })
+    .sort();
   const { cols: rcCols, rows: rcRows } = gridColsRowsForPrimaryTiles(
     sorted.length,
   );
@@ -4174,38 +4063,25 @@ export async function buildTerraformTopologyExcalidrawScene(
                 [...z.addresses],
                 plan,
               ).sort((a, b) => a.localeCompare(b));
-            const rectIds = z.mergedSupplementaryComposite
-              ? appendMergedSubnetCompositeRectangles(
-                  skeleton,
-                  { accountId, region: regionName, vpcId },
-                  addrs,
-                  z,
-                  zoneX + INNER_PAD,
-                  zoneY + VPC_TOP_PAD + natBandHeight,
-                  nodes,
-                  arnIndex,
-                  plan,
-                  subnetNameById,
-                )
-              : appendTopologyResourceRectangles(
-                  skeleton,
-                  { accountId, region: regionName, vpcId },
-                  addrs,
-                  zoneX + INNER_PAD,
-                  zoneY + VPC_TOP_PAD + natBandHeight,
-                  nodes,
-                  arnIndex,
-                  globalPlacedIamSatellites,
-                  globalPlacedKmsPolicySatellites,
-                  globalPlacedSgSatellites,
-                  globalPlacedCloudWatchSatellites,
-                  globalPlacedS3Satellites,
-                  globalPlacedSqsSatellites,
-                  globalPlacedAlbSatellites,
-                  globalPlacedLambdaPermissionSatellites,
-                  satelliteLineSpecs,
-                  plan,
-                );
+            const rectIds = appendTopologyResourceRectangles(
+              skeleton,
+              { accountId, region: regionName, vpcId },
+              addrs,
+              zoneX + INNER_PAD,
+              zoneY + VPC_TOP_PAD + natBandHeight,
+              nodes,
+              arnIndex,
+              globalPlacedIamSatellites,
+              globalPlacedKmsPolicySatellites,
+              globalPlacedSgSatellites,
+              globalPlacedCloudWatchSatellites,
+              globalPlacedS3Satellites,
+              globalPlacedSqsSatellites,
+              globalPlacedAlbSatellites,
+              globalPlacedLambdaPermissionSatellites,
+              satelliteLineSpecs,
+              plan,
+            );
 
             const zoneVpceKey = topologyZoneMapKey(
               accountId,

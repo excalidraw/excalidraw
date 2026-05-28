@@ -2583,4 +2583,161 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     assertTopologyFramesContainChildren(elements);
   });
+
+  it("does not render aws_subnet as resource tiles; orphan subnets get empty subnetZone frames", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-aaa",
+                      {
+                        vpcId: "vpc-aaa",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.workload"],
+        topologyZoneSource: "primary",
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-b",
+        subnetIds: ["subnet-b"],
+        addresses: [],
+        topologyZoneSource: "supplementary",
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.workload": {
+        resources: {
+          "aws_lambda_function.workload": {
+            address: "aws_lambda_function.workload",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: {
+              actions: ["no-op"],
+              after: {
+                id: "fn-1",
+                vpc_config: { subnet_ids: ["subnet-a"] },
+              },
+            },
+          },
+        },
+      },
+      "aws_subnet.intra": {
+        resources: {
+          "aws_subnet.intra": {
+            address: "aws_subnet.intra",
+            mode: "managed",
+            type: "aws_subnet",
+            change: {
+              actions: ["no-op"],
+              after: { id: "subnet-b", vpc_id: "vpc-aaa" },
+            },
+          },
+        },
+      },
+    };
+
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_lambda_function.workload",
+          mode: "managed",
+          type: "aws_lambda_function",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "fn-1",
+              vpc_config: { subnet_ids: ["subnet-a"] },
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_subnet.intra",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-b",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      plan,
+      [],
+      { zoneBottom: [], vpcBottom: [] },
+    );
+
+    const subnetResourceRects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityRole?: string } | undefined)
+          ?.terraformVisibilityRole === "resource" &&
+        (e.customData as { resourceType?: string } | undefined)
+          ?.resourceType === "aws_subnet",
+    );
+    expect(subnetResourceRects).toHaveLength(0);
+
+    const orphanZone = elements.find(
+      (e) =>
+        isTopologyFrame(e, "subnetZone") &&
+        (
+          e.customData as { terraformSubnetIds?: string[] } | undefined
+        )?.terraformSubnetIds?.includes("subnet-b"),
+    );
+    expect(orphanZone).toBeDefined();
+
+    const lambdaRect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+          "aws_lambda_function.workload",
+    );
+    expect(lambdaRect).toBeDefined();
+  });
 });

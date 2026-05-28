@@ -449,7 +449,7 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
         vpcId: "vpc-1",
         subnetSignature: "subnet-a",
         subnetIds: ["subnet-a"],
-        addresses: ["aws_subnet.a"],
+        addresses: [],
         topologyZoneSource: "supplementary",
       },
       {
@@ -458,7 +458,7 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
         vpcId: "vpc-1",
         subnetSignature: "subnet-b",
         subnetIds: ["subnet-b"],
-        addresses: ["aws_subnet.b"],
+        addresses: [],
         topologyZoneSource: "supplementary",
       },
     ];
@@ -468,7 +468,8 @@ describe("mergeSupplementarySubnetZonesSharedRouteTable", () => {
     );
     expect(merged).toHaveLength(1);
     expect(merged[0]!.subnetSignature).toBe("subnet-a|subnet-b");
-    expect(merged[0]!.mergedSupplementaryComposite).toBe(true);
+    expect(merged[0]!.addresses).toEqual([]);
+    expect(merged[0]!.mergedSupplementaryComposite).toBeUndefined();
   });
 });
 
@@ -563,7 +564,9 @@ describe("mergeSupplementarySubnetZonesByTier", () => {
     const merged = mergeSupplementarySubnetZonesByTier(afterRt, plan as never);
     expect(merged).toHaveLength(1);
     expect(merged[0]!.subnetSignature).toBe("subnet-priv-a|subnet-priv-b");
+    expect(merged[0]!.addresses).toEqual([]);
     expect(merged[0]!.mergedSupplementaryByTier).toBe(true);
+    expect(merged[0]!.mergedSupplementaryComposite).toBeUndefined();
   });
 
   it("does not merge supplementary zones of different tiers", () => {
@@ -1033,7 +1036,7 @@ describe("extractSupplementarySubnetZones", () => {
     const sup = extractSupplementarySubnetZones(plan, primaryZones);
     expect(sup).toHaveLength(1);
     expect(sup[0]!.subnetIds).toEqual(["subnet-b"]);
-    expect(sup[0]!.addresses).toEqual(["aws_subnet.intra"]);
+    expect(sup[0]!.addresses).toEqual([]);
   });
 });
 

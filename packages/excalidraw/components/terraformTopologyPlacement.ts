@@ -1661,6 +1661,9 @@ function zoneAddressesAreAllAwsSubnet(
     resource_changes?: ResourceChange[];
   },
 ): boolean {
+  if (z.topologyZoneSource === "supplementary" && z.addresses.length === 0) {
+    return true;
+  }
   if (z.addresses.length === 0) {
     return false;
   }
@@ -1797,14 +1800,10 @@ export function mergeSupplementarySubnetZonesSharedRouteTable(
         continue;
       }
       const subnets = new Set<string>();
-      const addrs = new Set<string>();
       for (const idx of comp) {
         const zz = group[idx]!;
         for (const sid of zz.subnetIds) {
           subnets.add(sid);
-        }
-        for (const a of zz.addresses) {
-          addrs.add(a);
         }
       }
       const subnetIds = [...subnets].sort();
@@ -1821,9 +1820,8 @@ export function mergeSupplementarySubnetZonesSharedRouteTable(
         vpcId: z0.vpcId,
         subnetSignature: subnetIds.join("|"),
         subnetIds,
-        addresses: [...addrs].sort(),
+        addresses: [],
         topologyZoneSource: "supplementary",
-        mergedSupplementaryComposite: true,
       });
     }
   }
@@ -1882,13 +1880,9 @@ export function mergeSupplementarySubnetZonesByTier(
       continue;
     }
     const subnets = new Set<string>();
-    const addrs = new Set<string>();
     for (const zz of group) {
       for (const sid of zz.subnetIds) {
         subnets.add(sid);
-      }
-      for (const a of zz.addresses) {
-        addrs.add(a);
       }
     }
     const subnetIds = [...subnets].sort();
@@ -1899,9 +1893,8 @@ export function mergeSupplementarySubnetZonesByTier(
       vpcId: z0.vpcId,
       subnetSignature: subnetIds.join("|"),
       subnetIds,
-      addresses: [...addrs].sort(),
+      addresses: [],
       topologyZoneSource: "supplementary",
-      mergedSupplementaryComposite: true,
       mergedSupplementaryByTier: true,
     });
   }
@@ -2456,7 +2449,8 @@ export function natZonePlacementsKey(
 }
 
 /**
- * `aws_subnet` resources not covered by any primary zone’s subnet multiset (e.g. intra subnets).
+ * Subnet IDs not covered by any primary zone’s subnet multiset (e.g. intra subnets).
+ * Emits structural placement zones only — `addresses` stay empty; subnets are not graph resources.
  */
 export function extractSupplementarySubnetZones(
   plan: TerraformPlanProviderContext & {
@@ -2484,7 +2478,6 @@ export function extractSupplementarySubnetZones(
       vpcId: string;
       subnetSignature: string;
       subnetIds: string[];
-      addresses: Set<string>;
     }
   >();
 
@@ -2493,10 +2486,6 @@ export function extractSupplementarySubnetZones(
       continue;
     }
     if (rc.mode !== "managed" || rc.type !== "aws_subnet") {
-      continue;
-    }
-    const address = rc.address;
-    if (!address || typeof address !== "string") {
       continue;
     }
     const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
@@ -2539,11 +2528,9 @@ export function extractSupplementarySubnetZones(
         vpcId: vpcIdRaw,
         subnetSignature,
         subnetIds: [subnetId],
-        addresses: new Set(),
       };
       accum.set(key, row);
     }
-    row.addresses.add(address);
   }
 
   const out: TopologyPlacementZone[] = [...accum.values()].map((row) => ({
@@ -2552,7 +2539,7 @@ export function extractSupplementarySubnetZones(
     vpcId: row.vpcId,
     subnetSignature: row.subnetSignature,
     subnetIds: row.subnetIds,
-    addresses: [...row.addresses].sort(),
+    addresses: [],
   }));
 
   out.sort((a, b) => {
