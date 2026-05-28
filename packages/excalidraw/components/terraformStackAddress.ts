@@ -79,3 +79,26 @@ export function collectKnownStackIdsFromNodes(
   }
   return [...stackIds];
 }
+
+const stripInstanceIndexes = (address: string) =>
+  address.replace(/\[[^\]]+\]/g, "");
+
+/** Strip stack prefix and instance indexes for stable cross-key matching. */
+export function topologyBareAddressKey(address: string): string {
+  const bare = parseStackAddress(address)?.address ?? address;
+  return stripInstanceIndexes(bare);
+}
+
+/** When bare keys collide, prefer `stackId::resource` over unqualified duplicates. */
+export function preferTopologyNodeKeyAmongAliases(
+  keys: readonly string[],
+): string {
+  const qualified = keys.filter((k) => parseStackAddress(k));
+  if (qualified.length === 1) {
+    return qualified[0]!;
+  }
+  if (qualified.length > 1) {
+    return [...qualified].sort((a, b) => a.localeCompare(b))[0]!;
+  }
+  return [...keys].sort((a, b) => a.localeCompare(b))[0]!;
+}

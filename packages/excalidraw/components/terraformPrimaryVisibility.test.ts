@@ -91,6 +91,15 @@ describe("terraformPrimaryVisibility", () => {
         false,
       );
     });
+    it("excludes ALB listener / target group / attachment tiles (satellite-only)", () => {
+      expect(isTopologyPlacementResourceType("aws_lb_listener")).toBe(false);
+      expect(isTopologyPlacementResourceType("aws_lb_target_group")).toBe(
+        false,
+      );
+      expect(
+        isTopologyPlacementResourceType("aws_lb_target_group_attachment"),
+      ).toBe(false);
+    });
     it("excludes aws_subnet (structural subnet zones only)", () => {
       expect(isTopologyPlacementResourceType("aws_subnet")).toBe(false);
     });

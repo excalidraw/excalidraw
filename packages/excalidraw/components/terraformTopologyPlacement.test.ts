@@ -1530,4 +1530,126 @@ describe("extractPrimaryTopologyZones aws_lb subnets and SG inference", () => {
     expect(lbZone!.addresses).toContain("aws_security_group.lb");
     expect(lbZone!.addresses).toContain("aws_security_group_rule.https");
   });
+
+  it("places ALB listener and target group in the same zone as aws_lb (staging-like)", () => {
+    const lbArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/ecs/abc";
+    const tgArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/ecs/xyz";
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.public_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-public-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_subnet.private_a",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-private-a",
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb.ecs",
+          mode: "managed",
+          type: "aws_lb",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: lbArn,
+              vpc_id: "vpc-east",
+              subnets: ["subnet-public-a"],
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb_listener.http",
+          mode: "managed",
+          type: "aws_lb_listener",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              load_balancer_arn: lbArn,
+              port: 80,
+              protocol: "HTTP",
+              default_action: {
+                type: "forward",
+                target_group_arn: tgArn,
+              },
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_lb_target_group.ecs",
+          mode: "managed",
+          type: "aws_lb_target_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              arn: tgArn,
+              port: 8080,
+              vpc_id: "vpc-east",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_ecs_service.producer",
+          mode: "managed",
+          type: "aws_ecs_service",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              name: "staging-producer",
+              network_configuration: [
+                {
+                  subnets: ["subnet-private-a"],
+                  security_groups: ["sg-ecs"],
+                },
+              ],
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const zones = extractPrimaryTopologyZones(plan);
+    const lbZone = zones.find((z) => z.addresses.includes("aws_lb.ecs"));
+    expect(lbZone).toBeDefined();
+    expect(lbZone!.subnetIds).toContain("subnet-public-a");
+    expect(lbZone!.addresses).toContain("aws_lb_listener.http");
+    expect(lbZone!.addresses).toContain("aws_lb_target_group.ecs");
+
+    const ecsZone = zones.find((z) =>
+      z.addresses.includes("aws_ecs_service.producer"),
+    );
+    expect(ecsZone).toBeDefined();
+    expect(ecsZone!.subnetIds).toContain("subnet-private-a");
+    expect(ecsZone!.addresses).not.toContain("aws_lb_listener.http");
+    expect(ecsZone!.addresses).not.toContain("aws_lb_target_group.ecs");
+  });
 });

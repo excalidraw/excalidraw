@@ -129,6 +129,14 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
   if (resourceType === "aws_lambda_permission") {
     return false;
   }
+  /** Drawn only as satellites under `aws_lb` (see `terraformTopologyAlbLinks`). */
+  if (
+    resourceType === "aws_lb_listener" ||
+    resourceType === "aws_lb_target_group" ||
+    resourceType === "aws_lb_target_group_attachment"
+  ) {
+    return false;
+  }
   /** Subnets are structural (`subnetZone` frames), not resource tiles. */
   if (resourceType === "aws_subnet") {
     return false;

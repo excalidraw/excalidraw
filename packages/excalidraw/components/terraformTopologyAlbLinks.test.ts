@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
 
+import { namespacePlanForStack } from "./terraformImportMerge";
+import { prefixStackAddress } from "./terraformStackAddress";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildAlbListenerTargetCluster,
   collectAlbClusterSatelliteAddressesForTopologyList,
   filterTopologyAddressesExcludingAlbSatellites,
+  resolveAlbCompanionParentLbAddressFromPlan,
+  resolveListenerParentLbAddressFromPlan,
   resolveLoadBalancerArnToLbPath,
+  resolveTargetGroupParentLbAddressFromPlan,
 } from "./terraformTopologyAlbLinks";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
@@ -201,5 +206,175 @@ describe("terraformTopologyAlbLinks", () => {
       arnIndex,
     );
     expect(cluster).toBeNull();
+  });
+
+  describe("plan resolvers", () => {
+    const planChanges = () => [
+      {
+        address: "aws_lb.ecs",
+        mode: "managed",
+        type: "aws_lb",
+        change: {
+          actions: ["create"],
+          after: {
+            arn: lbArn,
+            subnets: ["subnet-public-a"],
+            vpc_id: "vpc-east",
+          },
+        },
+      },
+      {
+        address: "aws_lb_listener.http",
+        mode: "managed",
+        type: "aws_lb_listener",
+        change: {
+          actions: ["create"],
+          after: {
+            load_balancer_arn: lbArn,
+            port: 80,
+            protocol: "HTTP",
+            default_action: {
+              type: "forward",
+              target_group_arn: tgArn,
+            },
+          },
+        },
+      },
+      {
+        address: "aws_lb_target_group.ecs",
+        mode: "managed",
+        type: "aws_lb_target_group",
+        change: {
+          actions: ["create"],
+          after: { arn: tgArn, port: 8080, vpc_id: "vpc-east" },
+        },
+      },
+      {
+        address: "aws_lb_target_group_attachment.ecs",
+        mode: "managed",
+        type: "aws_lb_target_group_attachment",
+        change: {
+          actions: ["create"],
+          after: { target_group_arn: tgArn },
+        },
+      },
+    ];
+
+    it("resolveListenerParentLbAddressFromPlan matches LB ARN", () => {
+      const changes = planChanges();
+      expect(resolveListenerParentLbAddressFromPlan(changes[1]!, changes)).toBe(
+        "aws_lb.ecs",
+      );
+    });
+
+    it("resolveTargetGroupParentLbAddressFromPlan finds LB via listener forward", () => {
+      const changes = planChanges();
+      expect(
+        resolveTargetGroupParentLbAddressFromPlan(changes[2]!, changes),
+      ).toBe("aws_lb.ecs");
+    });
+
+    it("resolveAlbCompanionParentLbAddressFromPlan resolves attachment via target group", () => {
+      const changes = planChanges();
+      expect(
+        resolveAlbCompanionParentLbAddressFromPlan(changes[3]!, changes),
+      ).toBe("aws_lb.ecs");
+    });
+
+    it("resolveListenerParentLbAddressFromPlan matches unqualified ref to stack-qualified LB", () => {
+      const stackId = "10-east-ecs-edge";
+      const lbAddr = prefixStackAddress(stackId, "aws_lb.ecs");
+      const listenerAddr = prefixStackAddress(stackId, "aws_lb_listener.http");
+      const changes = [
+        {
+          address: lbAddr,
+          mode: "managed",
+          type: "aws_lb",
+          change: {
+            actions: ["create"],
+            after: { arn: lbArn, subnets: ["subnet-public-a"] },
+          },
+        },
+        {
+          address: listenerAddr,
+          mode: "managed",
+          type: "aws_lb_listener",
+          change: {
+            actions: ["create"],
+            after: {
+              load_balancer_arn: "aws_lb.ecs",
+              default_action: { target_group_arn: tgArn },
+            },
+          },
+        },
+      ];
+      expect(resolveListenerParentLbAddressFromPlan(changes[1]!, changes)).toBe(
+        lbAddr,
+      );
+    });
+  });
+
+  it("buildAlbListenerTargetCluster links stack-qualified staging addresses", () => {
+    const stackId = "10-east-ecs-edge";
+    const plan = namespacePlanForStack(
+      {
+        resource_changes: [
+          {
+            address: "aws_lb.ecs",
+            mode: "managed",
+            type: "aws_lb",
+            change: {
+              actions: ["create"],
+              after: { arn: lbArn, subnets: ["subnet-public-a"] },
+            },
+          },
+          {
+            address: "aws_lb_listener.http",
+            mode: "managed",
+            type: "aws_lb_listener",
+            change: {
+              actions: ["create"],
+              after: {
+                load_balancer_arn: lbArn,
+                default_action: {
+                  type: "forward",
+                  target_group_arn: tgArn,
+                },
+              },
+            },
+          },
+          {
+            address: "aws_lb_target_group.ecs",
+            mode: "managed",
+            type: "aws_lb_target_group",
+            change: {
+              actions: ["create"],
+              after: { arn: tgArn },
+            },
+          },
+        ],
+      },
+      stackId,
+    ) as { resource_changes: Array<{ address: string }> };
+
+    const nodes: TerraformPlanNodesMap = {};
+    for (const rc of plan.resource_changes) {
+      nodes[rc.address] = {
+        resources: {
+          [rc.address]: rc as never,
+        },
+      };
+    }
+
+    const lbAddr = prefixStackAddress(stackId, "aws_lb.ecs");
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const { cluster } = buildAlbListenerTargetCluster(nodes, lbAddr, arnIndex);
+    expect(cluster).not.toBeNull();
+    expect(cluster!.stack).toEqual(
+      expect.arrayContaining([
+        prefixStackAddress(stackId, "aws_lb_listener.http"),
+        prefixStackAddress(stackId, "aws_lb_target_group.ecs"),
+      ]),
+    );
   });
 });

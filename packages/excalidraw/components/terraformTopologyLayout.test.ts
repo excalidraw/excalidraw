@@ -1961,6 +1961,195 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("places ALB listener stack (tier-1 listener, tier-2 target group) in primaryCluster", async () => {
+    const lbArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/app/ecs/abc";
+    const tgArn =
+      "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/ecs/xyz";
+
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-east",
+                      {
+                        vpcId: "vpc-east",
+                        subnets: new Map([
+                          ["subnet-public-a", { subnetId: "subnet-public-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-east",
+        subnetSignature: "subnet-public-a",
+        subnetIds: ["subnet-public-a"],
+        addresses: [
+          "aws_lb.ecs",
+          "aws_lb_listener.http",
+          "aws_lb_target_group.ecs",
+        ],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lb.ecs": {
+        resources: {
+          "aws_lb.ecs": {
+            address: "aws_lb.ecs",
+            mode: "managed",
+            type: "aws_lb",
+            change: {
+              actions: ["create"],
+              after: {
+                arn: lbArn,
+                vpc_id: "vpc-east",
+                subnets: ["subnet-public-a"],
+              },
+            },
+          },
+        },
+      },
+      "aws_lb_listener.http": {
+        resources: {
+          "aws_lb_listener.http": {
+            address: "aws_lb_listener.http",
+            mode: "managed",
+            type: "aws_lb_listener",
+            change: {
+              actions: ["create"],
+              after: {
+                load_balancer_arn: lbArn,
+                port: 80,
+                protocol: "HTTP",
+                default_action: {
+                  type: "forward",
+                  target_group_arn: tgArn,
+                },
+              },
+            },
+          },
+        },
+      },
+      "aws_lb_target_group.ecs": {
+        resources: {
+          "aws_lb_target_group.ecs": {
+            address: "aws_lb_target_group.ecs",
+            mode: "managed",
+            type: "aws_lb_target_group",
+            change: {
+              actions: ["create"],
+              after: { arn: tgArn, port: 8080, vpc_id: "vpc-east" },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
+      );
+
+    const lb = rectByPath("aws_lb.ecs");
+    const listener = rectByPath("aws_lb_listener.http");
+    const tg = rectByPath("aws_lb_target_group.ecs");
+    expect(lb && listener && tg).toBeTruthy();
+
+    const clusterId = lb!.frameId;
+    expect(clusterId).toBeTruthy();
+    expect(listener!.frameId).toBe(clusterId);
+    expect(tg!.frameId).toBe(clusterId);
+
+    const clusterFrame = elements.find(
+      (e) => e.type === "frame" && e.id === clusterId,
+    );
+    expect(
+      (
+        clusterFrame?.customData as
+          | { terraformTopologyRole?: string }
+          | undefined
+      )?.terraformTopologyRole,
+    ).toBe("primaryCluster");
+
+    expect(lb!.width).toBe(px(200));
+    expect(lb!.height).toBe(px(88));
+
+    expect(listener!.x).toBe(lb!.x);
+    expect(listener!.width).toBe(px(176));
+    expect(listener!.height).toBe(px(52));
+
+    expect(tg!.width).toBe(px(154));
+    expect(tg!.height).toBeLessThanOrEqual(listener!.height ?? 0);
+    expect(tg!.y).toBeGreaterThanOrEqual(
+      listener!.y + (listener!.height ?? 0) - 2,
+    );
+
+    const rels = elements
+      .filter(
+        (e) =>
+          e.type === "arrow" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      );
+
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_alb" &&
+          r?.type === "alb_listener" &&
+          r?.source === "aws_lb.ecs" &&
+          r?.target === "aws_lb_listener.http",
+      ),
+    ).toBe(true);
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_alb" &&
+          r?.type === "alb_forward" &&
+          r?.source === "aws_lb_listener.http" &&
+          r?.target === "aws_lb_target_group.ecs",
+      ),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("places Lambda CloudWatch alarms above-left and log groups above-right", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

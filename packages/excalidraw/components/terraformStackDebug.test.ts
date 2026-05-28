@@ -47,5 +47,67 @@ describe("staging multi-state import", () => {
     expect(apiGateways.some((e: { isDeleted?: boolean }) => !e.isDeleted)).toBe(
       true,
     );
+
+    const ecsEdgeLb = body.elements.filter(
+      (e: { customData?: { nodePath?: string; resourceType?: string } }) =>
+        e.customData?.nodePath?.startsWith("10-east-ecs-edge::aws_lb.") &&
+        e.customData?.resourceType === "aws_lb",
+    );
+    expect(ecsEdgeLb.length).toBeGreaterThanOrEqual(1);
+
+    const ecsEdgeListener = body.elements.find(
+      (e: { customData?: { nodePath?: string } }) =>
+        e.customData?.nodePath === "10-east-ecs-edge::aws_lb_listener.http",
+    );
+    const ecsEdgeTg = body.elements.find(
+      (e: { customData?: { nodePath?: string } }) =>
+        e.customData?.nodePath === "10-east-ecs-edge::aws_lb_target_group.ecs",
+    );
+    expect(ecsEdgeListener).toBeDefined();
+    expect(ecsEdgeTg).toBeDefined();
+    expect(ecsEdgeListener!.isDeleted).not.toBe(true);
+    expect(ecsEdgeTg!.isDeleted).not.toBe(true);
+    expect(ecsEdgeListener!.frameId).toBe(ecsEdgeLb[0]!.frameId);
+    expect(ecsEdgeTg!.frameId).toBe(ecsEdgeLb[0]!.frameId);
+
+    const ecsEdgeSg = body.elements.find(
+      (e: { customData?: { nodePath?: string } }) =>
+        e.customData?.nodePath === "10-east-ecs-edge::aws_security_group.alb",
+    );
+    expect(ecsEdgeSg).toBeDefined();
+    expect(ecsEdgeSg!.frameId).toBe(ecsEdgeLb[0]!.frameId);
+
+    const duplicateUnqualifiedSg = body.elements.filter(
+      (e: { customData?: { nodePath?: string; resourceType?: string } }) =>
+        e.customData?.nodePath === "aws_security_group.alb" &&
+        e.customData?.resourceType === "aws_security_group",
+    );
+    expect(duplicateUnqualifiedSg).toHaveLength(0);
+
+    const stackIds: string[] = body.meta?.stackIds ?? [];
+    const qualifiedPaths = new Set(
+      body.elements
+        .map(
+          (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
+        )
+        .filter(
+          (p: unknown): p is string =>
+            typeof p === "string" && p.includes("::"),
+        ),
+    );
+    const barePaths = body.elements
+      .map(
+        (e: { customData?: { nodePath?: string } }) => e.customData?.nodePath,
+      )
+      .filter(
+        (p: unknown): p is string =>
+          typeof p === "string" && !p.includes("::") && /^aws_/.test(p),
+      );
+    for (const bare of barePaths) {
+      const hasQualifiedAlias = stackIds.some((stackId) =>
+        qualifiedPaths.has(`${stackId}::${bare}`),
+      );
+      expect(hasQualifiedAlias).toBe(false);
+    }
   }, 180_000);
 });

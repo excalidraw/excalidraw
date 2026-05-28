@@ -25,6 +25,7 @@ import {
 import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
+import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
 import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
 
 /** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
@@ -718,6 +719,7 @@ export function extractPrimaryTopologyZones(
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
+  const lbAddressToZoneKey = new Map<string, string>();
 
   const accum = new Map<
     string,
@@ -798,6 +800,7 @@ export function extractPrimaryTopologyZones(
     }
     row.addresses.add(address);
     if (t === "aws_lb") {
+      lbAddressToZoneKey.set(address, key);
       albModulePrefixes.push({
         prefix: terraformModulePrefixForAddress(address),
         key,
@@ -818,6 +821,14 @@ export function extractPrimaryTopologyZones(
     }
     const address = rc.address;
     if (!address || typeof address !== "string") {
+      continue;
+    }
+    const parentLb = resolveAlbCompanionParentLbAddressFromPlan(rc, changes);
+    if (parentLb) {
+      const zoneKey = lbAddressToZoneKey.get(parentLb);
+      if (zoneKey) {
+        accum.get(zoneKey)?.addresses.add(address);
+      }
       continue;
     }
     const prefix = terraformModulePrefixForAddress(address);

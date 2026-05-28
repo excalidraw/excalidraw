@@ -100,7 +100,10 @@ import {
   albSatelliteStackHeightPx,
   buildAlbListenerTargetCluster,
   filterTopologyAddressesExcludingAlbSatellites,
+  isAlbCompanionConsumedAsSatellite,
+  isAlbTopologySatelliteResourceType,
 } from "./terraformTopologyAlbLinks";
+import { debugTopologyLog } from "./terraformTopologyDebugLog";
 import {
   buildLambdaPermissionCluster,
   filterTopologyAddressesExcludingLambdaPermissionSatellites,
@@ -2628,7 +2631,14 @@ function appendTopologyResourceRectangles(
         addr,
         getPrimaryResource(node) as Record<string, unknown> | null,
       );
-      return isTopologyPlacementResourceType(resourceType);
+      if (isTopologyPlacementResourceType(resourceType)) {
+        return true;
+      }
+      /** Orphan fallback when LB cluster resolution fails (e.g. stack-qualified refs). */
+      return (
+        isAlbTopologySatelliteResourceType(resourceType) &&
+        !isAlbCompanionConsumedAsSatellite(nodes, arnIndex, addr)
+      );
     })
     .sort();
   const { cols: rcCols, rows: rcRows } = gridColsRowsForPrimaryTiles(
@@ -3222,6 +3232,29 @@ function appendTopologyResourceRectangles(
     const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
     const b = clusterBounds!;
     const clusterSkId = primaryClusterSkeletonId(addr);
+    if (resourceType === "aws_lb" && addr.includes("ecs")) {
+      // #region agent log
+      debugTopologyLog(
+        "terraformTopologyLayout.ts:appendTopologyResourceRectangles",
+        "aws_lb primaryCluster assembled",
+        {
+          addr,
+          clusterChildCount: clusterChildIds.length,
+          clusterChildren: [...clusterChildIds],
+          albStack: albBuild.cluster?.stack ?? [],
+          sgGroups: sgBuild.cluster?.groups.map((g) => ({
+            sg: g.sgPath,
+            rules: g.rules.length,
+          })),
+          hasAlbCluster: Boolean(albBuild.cluster),
+          hasSgCluster: Boolean(sgBuild.cluster),
+          frameW: b.maxX - b.minX + 2 * pad,
+          frameH: b.maxY - b.minY + 2 * pad,
+        },
+        "D",
+      );
+      // #endregion
+    }
     skeleton.push({
       type: "frame",
       id: clusterSkId,
@@ -4056,13 +4089,32 @@ export async function buildTerraformTopologyExcalidrawScene(
                   )
                 : [];
 
+            const zoneAddrsRaw = [...z.addresses];
             const addrs =
               filterTopologyAddressesExcludingAlbAndLambdaPermissionSatellites(
                 nodes,
                 arnIndex,
-                [...z.addresses],
+                zoneAddrsRaw,
                 plan,
               ).sort((a, b) => a.localeCompare(b));
+            if (
+              zoneAddrsRaw.some(
+                (a) => a.includes("ecs") && a.includes("aws_lb"),
+              )
+            ) {
+              // #region agent log
+              debugTopologyLog(
+                "terraformTopologyLayout.ts:zoneGrid",
+                "ecs-edge zone address filter",
+                {
+                  zoneAddrsRaw,
+                  addrsAfterFilter: addrs,
+                  subnetSignature: z.subnetSignature,
+                },
+                "B",
+              );
+              // #endregion
+            }
             const rectIds = appendTopologyResourceRectangles(
               skeleton,
               { accountId, region: regionName, vpcId },
@@ -4622,6 +4674,47 @@ export async function buildTerraformTopologyExcalidrawScene(
   elements = reorderTopologyElementsZStack(elements);
 
   normalizeTopologyOrigin(elements);
+
+  {
+    const ecsLb = elements.filter(
+      (e) =>
+        (e.customData as { nodePath?: string } | undefined)?.nodePath?.includes(
+          "aws_lb",
+        ) &&
+        (e.customData as { nodePath?: string } | undefined)?.nodePath?.includes(
+          "ecs",
+        ),
+    );
+    const ecsCluster = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "primaryCluster" &&
+        (
+          e.customData as { terraformPrimaryAddress?: string } | undefined
+        )?.terraformPrimaryAddress?.includes("ecs"),
+    );
+    // #region agent log
+    debugTopologyLog(
+      "terraformTopologyLayout.ts:buildTerraformTopologyExcalidrawScene",
+      "scene elements for ecs ALB",
+      {
+        ecsLbRects: ecsLb.map((e) => ({
+          nodePath: (e.customData as { nodePath?: string })?.nodePath,
+          frameId: e.frameId,
+          type: e.type,
+          isDeleted: e.isDeleted,
+        })),
+        clusterFrameId: ecsCluster?.id,
+        clusterChildIds:
+          ecsCluster?.type === "frame"
+            ? (ecsCluster as { children?: readonly string[] }).children
+            : undefined,
+      },
+      "E",
+    );
+    // #endregion
+  }
 
   const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
     elements,

@@ -60,9 +60,13 @@ import {
 } from "./terraformImportMerge";
 import {
   collectKnownStackIdsFromNodes,
+  isStackQualifiedAddress,
+  preferTopologyNodeKeyAmongAliases,
   prefixStackAddress,
   stripStackPrefixForModuleParsing,
+  topologyBareAddressKey,
 } from "./terraformStackAddress";
+import { dedupeTerraformPlanNodesByBareAddress } from "./terraformTopologyAddress";
 
 import type { Graph } from "@dagrejs/graphlib";
 import type {
@@ -173,6 +177,8 @@ export type TerraformPlanParsingOptions = {
 type BuildNodesMapOptions = {
   priorStatePlans?: unknown[];
   adjacency?: Record<string, string[]>;
+  /** Parallel to `tfstate` files when multi-stack; used to avoid unqualified ghost nodes. */
+  stackIds?: string[];
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
@@ -285,6 +291,7 @@ function getStateResourceAddress(
 function mergeRawTerraformStateIntoNodes(
   nodes: Record<string, TerraformPlanGraphNode>,
   state: unknown,
+  stackId?: string,
 ): Record<string, TerraformPlanGraphNode> {
   if (!state || typeof state !== "object") {
     return nodes;
@@ -304,7 +311,11 @@ function mergeRawTerraformStateIntoNodes(
     }
 
     for (const instance of resource.instances || []) {
-      const address = getStateResourceAddress(resource, instance);
+      const rawAddress = getStateResourceAddress(resource, instance);
+      const address =
+        stackId?.trim() && !isStackQualifiedAddress(rawAddress)
+          ? prefixStackAddress(stackId.trim(), rawAddress)
+          : rawAddress;
       const nodePath = address;
 
       if (!nodes[nodePath]) {
@@ -337,7 +348,11 @@ function mergeRawTerraformStateIntoNodes(
         if (!dependency || isExcludedDataSourceAddressForGraph(dependency)) {
           continue;
         }
-        const target = resolveTerraformPlanNodeKey(nodes, dependency);
+        const qualifiedDep =
+          stackId?.trim() && !isStackQualifiedAddress(dependency)
+            ? prefixStackAddress(stackId.trim(), dependency)
+            : dependency;
+        const target = resolveTerraformPlanNodeKey(nodes, qualifiedDep);
         if (
           target &&
           target !== nodePath &&
@@ -378,9 +393,17 @@ export function buildTerraformLocalImportNodesMap(
     prior_state?: { values: { root_module: unknown } };
   };
   let nodes = loadPlan(planTyped);
-  for (const state of normalizeTfstateList(tfstate)) {
-    nodes = mergeRawTerraformStateIntoNodes(nodes, state);
+  const stackIds = options?.stackIds ?? [];
+  const stateList = normalizeTfstateList(tfstate);
+  for (let si = 0; si < stateList.length; si++) {
+    const stackId = stackIds[si]?.trim();
+    nodes = mergeRawTerraformStateIntoNodes(
+      nodes,
+      stateList[si]!,
+      stackId || undefined,
+    );
   }
+  nodes = dedupeTerraformPlanNodesByBareAddress(nodes);
   const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
   const nodes3 = buildNewEdges(nodes2, adjacency);
   let nodes4 = nodes3;
@@ -570,6 +593,7 @@ export const terraformPlanParsingFromSources = async (
   const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, states, {
     adjacency,
     priorStatePlans: sourcePlans,
+    stackIds,
   });
 
   const tfdWarnings = applyTfdOverlayToNodes(
@@ -920,13 +944,22 @@ export function resolveTerraformPlanNodeKey(
   ) {
     return null;
   }
-  if (nodes[address]) {
-    return address;
+
+  const bareKey = topologyBareAddressKey(address);
+  const bareAliases: string[] = [];
+  for (const k of Object.keys(nodes)) {
+    if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+      continue;
+    }
+    if (topologyBareAddressKey(k) === bareKey) {
+      bareAliases.push(k);
+    }
   }
+  if (bareAliases.length > 0) {
+    return preferTopologyNodeKeyAmongAliases(bareAliases);
+  }
+
   const graphId = stripTerraformAddressIndexes(address);
-  if (nodes[graphId]) {
-    return graphId;
-  }
 
   const knownStackIds = collectKnownStackIdsFromNodes(nodes);
   if (knownStackIds.length > 0 && !address.includes("::")) {
@@ -962,8 +995,8 @@ export function resolveTerraformPlanNodeKey(
   if (matches.length === 1) {
     return matches[0];
   }
-  if (matches.length > 1 && matches.includes(address)) {
-    return address;
+  if (matches.length > 1) {
+    return preferTopologyNodeKeyAmongAliases(matches);
   }
   return null;
 }

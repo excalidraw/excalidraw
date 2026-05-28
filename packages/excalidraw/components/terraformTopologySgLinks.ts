@@ -2,6 +2,8 @@
  * Semantic topology: resolve Lambda `vpc_config.security_group_ids` and per-SG rule resources.
  */
 
+import { canonicalTopologyNodeKey } from "./terraformTopologyAddress";
+import { debugTopologyLog } from "./terraformTopologyDebugLog";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   resolveTerraformPlanNodeKey,
@@ -573,6 +575,16 @@ export function buildLoadBalancerSgCluster(
   plan?: unknown,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   const refs = collectLoadBalancerSecurityGroupRefs(nodes, lbAddress, plan);
+  if (lbAddress.includes("ecs")) {
+    // #region agent log
+    debugTopologyLog(
+      "terraformTopologySgLinks.ts:buildLoadBalancerSgCluster",
+      "LB SG refs",
+      { lbAddress, refs },
+      refs.length === 0 ? "C" : "C-ok",
+    );
+    // #endregion
+  }
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
@@ -590,28 +602,29 @@ export function buildLoadBalancerSgCluster(
       arnIndex,
       idToPath,
     );
-    if (!sgPath || seenSg.has(sgPath)) {
+    const canonicalSg = sgPath ? canonicalTopologyNodeKey(nodes, sgPath) : null;
+    if (!canonicalSg || seenSg.has(canonicalSg)) {
       continue;
     }
-    seenSg.add(sgPath);
+    seenSg.add(canonicalSg);
     const rules = collectSecurityGroupRulesForSg(
       nodes,
-      sgPath,
+      canonicalSg,
       arnIndex,
       idToPath,
       plan,
     );
-    groups.push({ sgPath, rules });
+    groups.push({ sgPath: canonicalSg, rules });
     edges.push({
-      source: lbAddress,
-      target: sgPath,
+      source: canonicalTopologyNodeKey(nodes, lbAddress),
+      target: canonicalSg,
       type: "security_group",
       label: "security group",
     });
     for (const r of rules) {
       edges.push({
-        source: sgPath,
-        target: r,
+        source: canonicalSg,
+        target: canonicalTopologyNodeKey(nodes, r),
         type: "sg_rule",
         label: "rule",
       });
@@ -623,7 +636,10 @@ export function buildLoadBalancerSgCluster(
   }
 
   return {
-    cluster: { lambda: lbAddress, groups },
+    cluster: {
+      lambda: canonicalTopologyNodeKey(nodes, lbAddress),
+      groups,
+    },
     edges,
   };
 }
