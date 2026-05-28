@@ -1296,6 +1296,115 @@ export function buildTerraformDataFlowLineSkeletons(
   return out;
 }
 
+const DECLARED_DATAFLOW_ORPHAN_W = () => tfComfortPx(128);
+const DECLARED_DATAFLOW_ORPHAN_H = () => tfComfortPx(40);
+const DECLARED_DATAFLOW_ORPHAN_GAP = () => tfComfortPx(10);
+
+function collectSkeletonRectangleLayoutBoxes(
+  skeleton: readonly ExcalidrawElementSkeleton[],
+): Record<string, LayoutBox> {
+  const layoutBoxes: Record<string, LayoutBox> = {};
+  for (const el of skeleton) {
+    if (el.type !== "rectangle" || typeof el.id !== "string" || !el.id) {
+      continue;
+    }
+    layoutBoxes[el.id] = {
+      x: typeof el.x === "number" ? el.x : 0,
+      y: typeof el.y === "number" ? el.y : 0,
+      width: typeof el.width === "number" ? el.width : 0,
+      height: typeof el.height === "number" ? el.height : 0,
+    };
+  }
+  return layoutBoxes;
+}
+
+/**
+ * Place small resource cards for declared `.tfd` endpoints that are not part of the
+ * semantic topology grid (e.g. `aws_ssm_parameter` outputs next to a Lambda).
+ */
+export function appendDeclaredDataFlowMissingEndpointRectangles(
+  skeleton: ExcalidrawElementSkeleton[],
+  nodes: TerraformPlanNodesMap,
+  declaredEdges: TerraformDataFlowEdgeRecord[],
+  plan?: unknown,
+): void {
+  const placed = new Set<string>();
+  for (const el of skeleton) {
+    if (el.type === "rectangle" && typeof el.id === "string") {
+      placed.add(el.id);
+    }
+  }
+  const layoutBoxes = collectSkeletonRectangleLayoutBoxes(skeleton);
+  const orphansPerPeer = new Map<string, number>();
+
+  for (const edge of declaredEdges) {
+    const source =
+      resolveTerraformPlanVertexId(nodes, edge.source) ?? edge.source;
+    const target =
+      resolveTerraformPlanVertexId(nodes, edge.target) ?? edge.target;
+    const pairs: Array<{ id: string; peer: string }> = [
+      { id: source, peer: target },
+      { id: target, peer: source },
+    ];
+    for (const { id, peer } of pairs) {
+      if (placed.has(id) || !nodes[id]) {
+        continue;
+      }
+      const peerId = resolveTerraformPlanVertexId(nodes, peer) ?? peer;
+      const peerBox = layoutBoxes[peerId];
+      if (!peerBox) {
+        continue;
+      }
+      const orphanIndex = orphansPerPeer.get(peerId) ?? 0;
+      orphansPerPeer.set(peerId, orphanIndex + 1);
+      const w = DECLARED_DATAFLOW_ORPHAN_W();
+      const h = DECLARED_DATAFLOW_ORPHAN_H();
+      const gap = DECLARED_DATAFLOW_ORPHAN_GAP();
+      const x = peerBox.x + (peerBox.width - w) / 2;
+      const y = peerBox.y + peerBox.height + gap + orphanIndex * (h + gap);
+      const node = nodes[id];
+      const resource = getPrimaryResource(node);
+      const resourceType = getTerraformCardResourceType(id, resource);
+      const action = getTerraformPlanNodeAction(node);
+      const actionStyle = getTerraformActionStyle(action);
+      skeleton.push({
+        type: "rectangle",
+        id,
+        x,
+        y,
+        width: w,
+        height: h,
+        strokeWidth: 1.5,
+        strokeColor: actionStyle.strokeColor,
+        backgroundColor: actionStyle.backgroundColor,
+        roundness: { type: 3, value: px(10) },
+        label: {
+          text: terraformResourceCardLabel(id, resource),
+          fontSize: tfComfortFontSize(10),
+          strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
+        },
+        customData: {
+          terraform: true,
+          terraformSemanticOverview: true,
+          terraformVisibilityRole: "resource",
+          terraformVisibilityKey: id,
+          terraformNodeKind: "resource",
+          terraformInitiallyVisible: isInitiallyVisibleTerraformResource(
+            resourceType,
+            action,
+          ),
+          terraformExplodeParentKeys: [],
+          terraformExplodeParent: null,
+          terraformDeclaredDataFlowOrphan: true,
+          ...buildTerraformResourceCardCustomData(id, resource, node, plan),
+        },
+      });
+      placed.add(id);
+      layoutBoxes[id] = { x, y, width: w, height: h };
+    }
+  }
+}
+
 /**
  * Declared `.tfd` dataflow arrows ({@link TERRAFORM_DECLARED_DATAFLOW_EDGE_STROKE}).
  * `sequence` on each edge is stored on `relationship` for ordering tests.

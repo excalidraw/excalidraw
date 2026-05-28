@@ -162,6 +162,7 @@ describe("terraformTopologyIamLinks", () => {
     );
     expect(policies).toContain("aws_iam_role_policy.inline_logs");
     expect(policies).toContain("aws_iam_policy.managed");
+    expect(policies).toContain("aws_iam_role_policy_attachment.attach");
 
     const { cluster, edges } = buildLambdaIamCluster(
       nodes,
@@ -172,9 +173,10 @@ describe("terraformTopologyIamLinks", () => {
       "aws_iam_role.lambda_role",
       "aws_iam_policy.managed",
       "aws_iam_role_policy.inline_logs",
+      "aws_iam_role_policy_attachment.attach",
     ]);
     expect(edges.some((e) => e.type === "execution_role")).toBe(true);
-    expect(edges.filter((e) => e.type === "iam_policy").length).toBe(2);
+    expect(edges.filter((e) => e.type === "iam_policy").length).toBe(3);
   });
 
   it("buildEcsServiceIamCluster links execution and task roles from task definition", () => {
@@ -276,6 +278,9 @@ describe("terraformTopologyIamLinks", () => {
     );
     expect(cluster?.stack[0]).toBe("aws_iam_role.ecs_task_execution");
     expect(cluster?.stack).toContain("aws_iam_role.ecs_task");
+    expect(cluster?.stack).toContain(
+      "aws_iam_role_policy_attachment.ecs_task_execution_managed",
+    );
     expect(edges.some((e) => e.type === "execution_role")).toBe(true);
     expect(edges.some((e) => e.type === "task_role")).toBe(true);
   });

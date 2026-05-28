@@ -335,8 +335,8 @@ function resolveRoleReferenceOnPolicyNode(
 }
 
 /**
- * Inline `aws_iam_role_policy` and managed `aws_iam_policy` (via `aws_iam_role_policy_attachment`)
- * attached to `rolePath`.
+ * Inline `aws_iam_role_policy`, `aws_iam_role_policy_attachment`, and managed `aws_iam_policy`
+ * (when the policy resource is in the plan) attached to `rolePath`.
  */
 /** `data.aws_iam_policy_document` addresses referenced from merged IAM role policy blobs. */
 export function collectDataIamPolicyDocumentsForRole(
@@ -426,6 +426,7 @@ export function collectPoliciesForIamRole(
       if (resolved !== rolePath) {
         continue;
       }
+      out.add(path);
       const policyArn = values.policy_arn;
       if (typeof policyArn === "string" && policyArn.startsWith("arn:")) {
         const policyPath = arnIndex.get(policyArn);
@@ -508,7 +509,7 @@ export function buildLambdaIamCluster(
   return { cluster: { lambda: lambdaAddress, stack }, edges };
 }
 
-function resolveEcsTaskDefinitionPath(
+export function resolveEcsTaskDefinitionPath(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   taskDefinitionValue: unknown,

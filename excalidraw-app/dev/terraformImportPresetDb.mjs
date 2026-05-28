@@ -349,15 +349,12 @@ function hydratePresetContentsFromDisk(db, presetId) {
   );
 
   for (const tfdRow of tfdRows) {
-    if (tfdRow.content) {
-      continue;
-    }
     const fullPath = joinRootRelative(row.rootPath, tfdRow.path);
     const text = readTextFileAtRepoPath(fullPath);
     if (text) {
       updateTfd.run(text, presetId, tfdRow.sortOrder);
       hydrated += 1;
-    } else {
+    } else if (!tfdRow.content) {
       missing.push(fullPath);
     }
   }

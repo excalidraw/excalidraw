@@ -1,6 +1,7 @@
 interface Env {
   STATS: KVNamespace;
   DB: D1Database;
+  PRESETS_DB: D1Database;
   TURNSTILE_SECRET_KEY?: string;
 }
 

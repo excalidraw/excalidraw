@@ -43,7 +43,7 @@
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true vite build",
-    "build:app:pages": "cross-env VITE_APP_DISABLE_SENTRY=true cross-env VITE_APP_ENABLE_TRACKING=false cross-env VITE_TFDRAW_TELEMETRY_ENABLED=true cross-env VITE_APP_GIT_SHA=${GITHUB_SHA:-} vite build",
+    "build:app:pages": "cross-env VITE_APP_DISABLE_SENTRY=true cross-env VITE_APP_ENABLE_TRACKING=false cross-env VITE_TFDRAW_TELEMETRY_ENABLED=true cross-env VITE_TERRAFORM_PRESETS_API=true cross-env VITE_APP_GIT_SHA=${GITHUB_SHA:-} vite build",
     "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA cross-env VITE_APP_ENABLE_TRACKING=true vite build",
     "build:version": "node ../scripts/build-version.js",
     "build:pages": "yarn build:app:pages && yarn build:version",

@@ -45,12 +45,14 @@ export function jsonResponse(
   request: Request,
   body: unknown,
   status = 200,
+  extraHeaders?: HeadersInit,
 ): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json",
       ...corsHeaders(request),
+      ...extraHeaders,
     },
   });
 }
@@ -81,10 +83,13 @@ export async function parseJsonBody<T extends Record<string, unknown>>(
   }
 }
 
-export function handleOptions(request: Request): Response {
+export function handleOptions(
+  request: Request,
+  methods = "POST, OPTIONS",
+): Response {
   return new Response(null, {
     status: 204,
-    headers: corsHeaders(request),
+    headers: corsHeaders(request, methods),
   });
 }
 

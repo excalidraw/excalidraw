@@ -23,9 +23,12 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   filterVpcEndpointBucketsRemovingZonePlacedAddresses,
+  mergePrimaryTopologyZonesByTier,
+  reconcileTopologyPlacementZonesAfterEnrich,
   mergeSupplementarySubnetZonesByTier,
   mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
+import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
@@ -670,10 +673,13 @@ export const terraformPlanParsingFromSources = async (
     const awsChanges = providerBuckets.get("aws") ?? [];
     if (awsChanges.length > 0) {
       const topoModel = extractTerraformTopologyFromPlan(awsPlan);
-      const primaryZones = extractPrimaryTopologyZones(awsPlan).map((z) => ({
-        ...z,
-        topologyZoneSource: "primary" as const,
-      }));
+      const primaryZones = mergePrimaryTopologyZonesByTier(
+        extractPrimaryTopologyZones(awsPlan).map((z) => ({
+          ...z,
+          topologyZoneSource: "primary" as const,
+        })),
+        awsPlan,
+      );
       const supplementaryZones = extractSupplementarySubnetZones(
         awsPlan,
         primaryZones,
@@ -745,6 +751,60 @@ export const terraformPlanParsingFromSources = async (
         topoModel,
         endpointSecurityGroupBuckets,
       );
+
+      const enrichPreplaced = new Set<string>();
+      for (const z of zones) {
+        for (const a of z.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of regionalBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcEndpointBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of routeTableBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcDefaultPlumbingBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of vpcFlowLogBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const b of endpointSecurityGroupBuckets) {
+        for (const a of b.addresses) {
+          enrichPreplaced.add(a);
+        }
+      }
+      for (const a of natZonePlacements.consumedAddresses) {
+        enrichPreplaced.add(a);
+      }
+      for (const p of zonePlacedAddresses) {
+        enrichPreplaced.add(p);
+      }
+      enrichTopologyPlacementsWithManagedResources(
+        awsPlan,
+        zones,
+        regionalBuckets,
+        {
+          nodes: nodes5,
+          plan: awsPlan,
+          preplacedAddresses: enrichPreplaced,
+        },
+      );
+      reconcileTopologyPlacementZonesAfterEnrich(zones, awsPlan);
 
       if (topoModel.accounts.size > 0) {
         const topoScene = await buildTerraformTopologyExcalidrawScene(

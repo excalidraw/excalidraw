@@ -53,6 +53,8 @@ interface ImportMetaEnv {
 
   /** Legacy env hook; Terraform import runs client-side (see `terraformPlanParsing`). */
   VITE_TERRAFORM_BACKEND_URL?: string;
+  /** When `"true"`, load built-in presets from `/api/terraform-import-presets` (Cloudflare Pages). */
+  VITE_TERRAFORM_PRESETS_API?: string;
 
   MODE: string;
   DEV: string;

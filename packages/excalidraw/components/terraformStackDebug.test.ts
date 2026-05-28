@@ -48,6 +48,46 @@ describe("staging multi-state import", () => {
       true,
     );
 
+    const framesById = new Map<
+      string,
+      {
+        terraformTopologyRole?: string;
+        terraformTopologyPath?: string[];
+      }
+    >(
+      body.elements
+        .filter(
+          (e: { type?: string; id?: string }) => e.type === "frame" && e.id,
+        )
+        .map(
+          (e: {
+            id: string;
+            customData?: {
+              terraformTopologyRole?: string;
+              terraformTopologyPath?: string[];
+            };
+          }) => [e.id, e.customData ?? {}],
+        ),
+    );
+    const privateApiTiles = apiGateways.filter(
+      (e: { customData?: { nodePath?: string }; isDeleted?: boolean }) =>
+        !e.isDeleted &&
+        typeof e.customData?.nodePath === "string" &&
+        e.customData.nodePath.endsWith(
+          "module.api.aws_api_gateway_rest_api.private",
+        ),
+    );
+    expect(privateApiTiles.length).toBeGreaterThanOrEqual(5);
+    for (const api of privateApiTiles) {
+      const clusterFrame = framesById.get(
+        (api as { frameId?: string }).frameId ?? "",
+      );
+      expect(clusterFrame?.terraformTopologyRole).toBe("primaryCluster");
+      const path = clusterFrame?.terraformTopologyPath ?? [];
+      expect(path.length).toBeGreaterThanOrEqual(4);
+      expect(path[2]).toMatch(/^vpc-/);
+    }
+
     const ecsEdgeLb = body.elements.filter(
       (e: { customData?: { nodePath?: string; resourceType?: string } }) =>
         e.customData?.nodePath?.startsWith("10-east-ecs-edge::aws_lb.") &&
@@ -109,5 +149,12 @@ describe("staging multi-state import", () => {
       );
       expect(hasQualifiedAlias).toBe(false);
     }
+
+    const declared = body.elements.filter(
+      (e: { type?: string; customData?: { terraformEdgeLayer?: string } }) =>
+        e.type === "arrow" &&
+        e.customData?.terraformEdgeLayer === "declaredDataFlow",
+    );
+    expect(declared).toHaveLength(20);
   }, 180_000);
 });

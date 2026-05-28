@@ -205,16 +205,26 @@ function fullPathForPresetFile(
   );
 }
 
+const isTerraformPresetsApiEnabled = () =>
+  import.meta.env.DEV || import.meta.env.VITE_TERRAFORM_PRESETS_API === "true";
+
 export async function loadTerraformImportPresetSources(
   preset: TerraformImportPreset,
   options: TerraformImportPresetLoadOptions = {},
 ): Promise<TerraformImportPresetSources> {
-  const allowApiFetch = options.allowApiFetch ?? import.meta.env.DEV;
+  const allowApiFetch = options.allowApiFetch ?? isTerraformPresetsApiEnabled();
   if (allowApiFetch && (preset.hasContent ?? true)) {
     try {
       return await fetchTerraformImportPresetSourcesFromApi(preset.id);
     } catch (apiError) {
       if (preset.hasContent === true) {
+        const message =
+          apiError instanceof Error ? apiError.message : "Preset API failed.";
+        if (!import.meta.env.DEV) {
+          throw new Error(
+            `${message} Presets may be unavailable until D1 is imported (see docs/cloudflare-deploy.md).`,
+          );
+        }
         throw apiError;
       }
     }

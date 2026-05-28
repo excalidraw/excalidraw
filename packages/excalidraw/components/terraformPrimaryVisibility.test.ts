@@ -100,6 +100,15 @@ describe("terraformPrimaryVisibility", () => {
         isTopologyPlacementResourceType("aws_lb_target_group_attachment"),
       ).toBe(false);
     });
+    it("excludes ECS task definition and IAM role satellites", () => {
+      expect(isTopologyPlacementResourceType("aws_ecs_task_definition")).toBe(
+        false,
+      );
+      expect(isTopologyPlacementResourceType("aws_iam_role")).toBe(false);
+      expect(
+        isTopologyPlacementResourceType("aws_iam_role_policy_attachment"),
+      ).toBe(false);
+    });
     it("excludes aws_subnet (structural subnet zones only)", () => {
       expect(isTopologyPlacementResourceType("aws_subnet")).toBe(false);
     });

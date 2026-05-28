@@ -20,6 +20,15 @@ export type TerraformPlanProviderContext = {
   variables?: Record<string, { value?: unknown }>;
 };
 
+/** Merged/imported plan JSON with topology-compatible `resource_changes`. */
+export type TerraformTopologyPlan = TerraformPlanProviderContext & {
+  resource_changes?: ResourceChange[];
+};
+
+export function asTerraformTopologyPlan(plan: unknown): TerraformTopologyPlan {
+  return plan as TerraformTopologyPlan;
+}
+
 export type TerraformProviderAccountRegionHint = {
   account: string | null;
   region: string | null;
@@ -51,7 +60,7 @@ export type TerraformTopologyModel = {
   sawAwsResourceChanges: boolean;
 };
 
-type ResourceChange = {
+export type ResourceChange = {
   address?: string;
   mode?: string;
   type?: string;

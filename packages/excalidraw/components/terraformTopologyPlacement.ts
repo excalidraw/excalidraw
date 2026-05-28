@@ -25,6 +25,17 @@ import {
 import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
+import {
+  API_GATEWAY_TOPOLOGY_SATELLITE_TYPES,
+  resolveApiGatewayCompanionParentRestApiAddressFromPlan,
+  resolveVpcPlacementFromPrivateRestApi,
+} from "./terraformTopologyApiGatewayLinks";
+import {
+  TGW_TOPOLOGY_SATELLITE_TYPES,
+  resolveTransitGatewayCompanionParentFromPlan,
+  tgwModulePrefixForAddress,
+} from "./terraformTopologyTransitGatewayLinks";
+import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
 import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
 
@@ -44,6 +55,8 @@ export type TopologyPlacementZone = {
   mergedSupplementaryComposite?: boolean;
   /** Supplementary-only zones merged by subnet tier within the same VPC. */
   mergedSupplementaryByTier?: boolean;
+  /** Primary zones merged by subnet tier (public / intra / private) within the same VPC. */
+  mergedPrimaryByTier?: boolean;
 };
 
 export type TopologySubnetTier =
@@ -127,6 +140,10 @@ export function topologySubnetTierFromZone(
 ): TopologySubnetTier {
   if (z.subnetIds.length === 0) {
     return "vpcOnly";
+  }
+  // Private REST APIs are laid out in the intra strip (execute-api VPCE subnets).
+  if (z.addresses.some((a) => a.includes("aws_api_gateway_rest_api"))) {
+    return "intra";
   }
   const labels = z.subnetIds
     .map((sid) => `${subnetNameById.get(sid) ?? ""} ${sid}`.toLowerCase())
@@ -558,6 +575,68 @@ export function collectPlacementSubnetIds(
   return [...ids].sort();
 }
 
+function bareAddressInTerraformModule(
+  modulePrefix: string,
+  address: string,
+): boolean {
+  const bare = stripStackPrefixForModuleParsing(address);
+  return bare === modulePrefix || bare.startsWith(`${modulePrefix}.`);
+}
+
+/**
+ * Union of `subnet_ids` / `subnets` on managed resources in the same Terraform module
+ * as `anchorAddress` (e.g. Lambda subnets for `module.api` when placing a private API).
+ * Satellites and the anchor itself are skipped; only resources with placement subnets count.
+ */
+export function inferSubnetIdsForModuleColocatedPrimaries(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  anchorAddress: string,
+): string[] {
+  const modulePrefix = terraformModulePrefixForAddress(
+    stripStackPrefixForModuleParsing(anchorAddress),
+  );
+  if (!modulePrefix) {
+    return [];
+  }
+  const skipTypes = new Set<string>([
+    ...API_GATEWAY_TOPOLOGY_SATELLITE_TYPES,
+    "aws_cloudwatch_log_group",
+    "aws_lambda_permission",
+  ]);
+  const ids = new Set<string>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc) || rc.mode !== "managed") {
+      continue;
+    }
+    const addr = rc.address;
+    if (!addr || typeof addr !== "string") {
+      continue;
+    }
+    if (!bareAddressInTerraformModule(modulePrefix, addr)) {
+      continue;
+    }
+    const t = rc.type;
+    if (!t || skipTypes.has(t) || t === "aws_api_gateway_rest_api") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    for (const sid of collectPlacementSubnetIds(values)) {
+      ids.add(sid);
+    }
+  }
+
+  return [...ids].sort();
+}
+
 /** `aws_lb.security_groups` entries that are resolved SG ids in the plan JSON. */
 function parseLbSecurityGroupIds(values: Record<string, unknown>): string[] {
   return stringArrayField(values.security_groups).filter((s) =>
@@ -719,7 +798,9 @@ export function extractPrimaryTopologyZones(
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
+  const apiModulePrefixes: Array<{ prefix: string; key: string }> = [];
   const lbAddressToZoneKey = new Map<string, string>();
+  const restApiAddressToZoneKey = new Map<string, string>();
 
   const accum = new Map<
     string,
@@ -777,6 +858,19 @@ export function extractPrimaryTopologyZones(
 
     let vpcId =
       typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    if (!vpcId && t === "aws_api_gateway_rest_api") {
+      const vpcePlacement = resolveVpcPlacementFromPrivateRestApi(
+        plan,
+        values,
+        subnetToVpc,
+      );
+      if (vpcePlacement) {
+        vpcId = vpcePlacement.vpcId;
+        if (subnetIds.length === 0) {
+          subnetIds = vpcePlacement.subnetIds;
+        }
+      }
+    }
     if (!vpcId && subnetIds.length > 0) {
       vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
@@ -805,6 +899,46 @@ export function extractPrimaryTopologyZones(
         prefix: terraformModulePrefixForAddress(address),
         key,
       });
+    }
+    if (t === "aws_api_gateway_rest_api") {
+      restApiAddressToZoneKey.set(address, key);
+      apiModulePrefixes.push({
+        prefix: terraformModulePrefixForAddress(address),
+        key,
+      });
+    }
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (
+      rc.mode !== "managed" ||
+      !rc.type ||
+      !API_GATEWAY_TOPOLOGY_SATELLITE_TYPES.has(rc.type)
+    ) {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const parentApi = resolveApiGatewayCompanionParentRestApiAddressFromPlan(
+      rc as ResourceChange,
+      changes,
+    );
+    if (parentApi) {
+      const zoneKey = restApiAddressToZoneKey.get(parentApi);
+      if (zoneKey) {
+        accum.get(zoneKey)?.addresses.add(address);
+      }
+      continue;
+    }
+    const prefix = terraformModulePrefixForAddress(address);
+    const owner = apiModulePrefixes.find((x) => x.prefix === prefix);
+    if (owner) {
+      accum.get(owner.key)?.addresses.add(address);
     }
   }
 
@@ -1843,6 +1977,130 @@ export function mergeSupplementarySubnetZonesSharedRouteTable(
 }
 
 /**
+ * Merge primary placement zones in the same VPC when every subnet in each zone belongs to
+ * the same tier (public, intra, or private). Unions subnet ids and primary addresses.
+ */
+export function mergePrimaryTopologyZonesByTier(
+  zones: readonly TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyPlacementZone[] {
+  const subnetNameById = buildTopologySubnetNameMap(plan);
+  const passthrough: TopologyPlacementZone[] = [];
+  const byVpcTier = new Map<string, TopologyPlacementZone[]>();
+
+  for (const z of zones) {
+    if (z.topologyZoneSource === "supplementary") {
+      passthrough.push(z);
+      continue;
+    }
+    if (z.subnetIds.length === 0) {
+      passthrough.push(z);
+      continue;
+    }
+    const tier = topologySubnetTierFromZone(z, subnetNameById);
+    if (tier === "other" || tier === "vpcOnly") {
+      passthrough.push(z);
+      continue;
+    }
+    const key = `${z.accountId}\0${z.region}\0${z.vpcId}\0${tier}`;
+    if (!byVpcTier.has(key)) {
+      byVpcTier.set(key, []);
+    }
+    byVpcTier.get(key)!.push(z);
+  }
+
+  const mergedPrimary: TopologyPlacementZone[] = [];
+  for (const [, group] of byVpcTier) {
+    if (group.length < 2) {
+      mergedPrimary.push(...group);
+      continue;
+    }
+    const tier = topologySubnetTierFromZone(group[0]!, subnetNameById);
+    const homogeneous = group.every((z) => {
+      if (topologySubnetTierFromZone(z, subnetNameById) !== tier) {
+        return false;
+      }
+      return z.subnetIds.every(
+        (sid) => topologySubnetTierFromSubnetId(sid, subnetNameById) === tier,
+      );
+    });
+    if (!homogeneous) {
+      mergedPrimary.push(...group);
+      continue;
+    }
+    const subnets = new Set<string>();
+    const addresses = new Set<string>();
+    for (const zz of group) {
+      for (const sid of zz.subnetIds) {
+        subnets.add(sid);
+      }
+      for (const addr of zz.addresses) {
+        addresses.add(addr);
+      }
+    }
+    const subnetIds = [...subnets].sort();
+    const z0 = group[0]!;
+    mergedPrimary.push({
+      accountId: z0.accountId,
+      region: z0.region,
+      vpcId: z0.vpcId,
+      subnetSignature: subnetIds.join("|"),
+      subnetIds,
+      addresses: [...addresses].sort(),
+      topologyZoneSource: z0.topologyZoneSource ?? "primary",
+      mergedPrimaryByTier: true,
+    });
+  }
+
+  return [...mergedPrimary, ...passthrough].sort(sortPlacementZones);
+}
+
+function sortTopologyPlacementZones(
+  a: TopologyPlacementZone,
+  b: TopologyPlacementZone,
+): number {
+  if (a.accountId !== b.accountId) {
+    return a.accountId.localeCompare(b.accountId);
+  }
+  if (a.region !== b.region) {
+    return a.region.localeCompare(b.region);
+  }
+  if (a.vpcId !== b.vpcId) {
+    return a.vpcId.localeCompare(b.vpcId);
+  }
+  return a.subnetSignature.localeCompare(b.subnetSignature);
+}
+
+/**
+ * Re-run tier / route-table coalescing after {@link enrichTopologyPlacementsWithManagedResources}
+ * may have appended per-subnet placement zones.
+ */
+export function reconcileTopologyPlacementZonesAfterEnrich(
+  zones: TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): void {
+  const reconciled = mergeSupplementarySubnetZonesByTier(
+    mergeSupplementarySubnetZonesSharedRouteTable(
+      mergePrimaryTopologyZonesByTier(
+        zones.map((z) => ({
+          ...z,
+          topologyZoneSource: z.topologyZoneSource ?? "primary",
+        })),
+        plan,
+      ).sort(sortTopologyPlacementZones),
+      plan,
+    ),
+    plan,
+  );
+  zones.length = 0;
+  zones.push(...reconciled);
+}
+
+/**
  * Merge supplementary `aws_subnet`-only zones in the same VPC that share a subnet tier
  * (public / intra / private), including when per-AZ route tables differ.
  */
@@ -2085,6 +2343,8 @@ export function extractRegionalTopologyPrimaries(
     string,
     { accountId: string; region: string; addresses: Set<string> }
   >();
+  const tgwAddressToRegionalKey = new Map<string, string>();
+  const tgwModulePrefixes: Array<{ prefix: string; key: string }> = [];
 
   for (const rc of changes) {
     if (!isAwsTerraformResourceChange(rc)) {
@@ -2123,6 +2383,16 @@ export function extractRegionalTopologyPrimaries(
 
     let vpcId =
       typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    if (!vpcId && t === "aws_api_gateway_rest_api") {
+      const vpcePlacement = resolveVpcPlacementFromPrivateRestApi(
+        plan,
+        values,
+        subnetToVpc,
+      );
+      if (vpcePlacement) {
+        vpcId = vpcePlacement.vpcId;
+      }
+    }
     if (!vpcId && subnetIds.length > 0) {
       vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
@@ -2137,6 +2407,46 @@ export function extractRegionalTopologyPrimaries(
       accum.set(key, row);
     }
     row.addresses.add(address);
+    if (t === "aws_ec2_transit_gateway") {
+      tgwAddressToRegionalKey.set(address, key);
+      const pref = tgwModulePrefixForAddress(address);
+      if (pref) {
+        tgwModulePrefixes.push({ prefix: pref, key });
+      }
+    }
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (
+      rc.mode !== "managed" ||
+      !rc.type ||
+      !TGW_TOPOLOGY_SATELLITE_TYPES.has(rc.type)
+    ) {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const parentTgw = resolveTransitGatewayCompanionParentFromPlan(
+      rc as ResourceChange,
+      changes,
+    );
+    if (parentTgw) {
+      const regionalKey = tgwAddressToRegionalKey.get(parentTgw);
+      if (regionalKey) {
+        accum.get(regionalKey)?.addresses.add(address);
+      }
+      continue;
+    }
+    const prefix = tgwModulePrefixForAddress(address);
+    const owner = tgwModulePrefixes.find((x) => x.prefix === prefix);
+    if (owner) {
+      accum.get(owner.key)?.addresses.add(address);
+    }
   }
 
   const out: TopologyRegionalPrimaryBucket[] = [...accum.values()].map(
@@ -2569,6 +2879,41 @@ export function extractSupplementarySubnetZones(
   return out;
 }
 
+const VPC_FLOW_LOGS_MODULE_MARKER = ".module.vpc_flow_logs";
+
+/**
+ * Full Terraform submodule prefix for `modules/vpc_flow_logs` resources, e.g.
+ * `module.east_network.module.vpc_flow_logs` (stack prefix stripped).
+ */
+export function vpcFlowLogsModulePrefixForAddress(
+  address: string,
+): string | null {
+  const bare = stripStackPrefixForModuleParsing(address);
+  const markerIdx = bare.indexOf(VPC_FLOW_LOGS_MODULE_MARKER);
+  if (markerIdx === -1) {
+    return null;
+  }
+  return bare.slice(0, markerIdx + VPC_FLOW_LOGS_MODULE_MARKER.length);
+}
+
+/** Module prefix for a VPC flow log bundle (nested `vpc_flow_logs` or inline `aws_flow_log`). */
+export function flowLogModuleBundlePrefixForAddress(
+  address: string,
+): string | null {
+  const nested = vpcFlowLogsModulePrefixForAddress(address);
+  if (nested) {
+    return nested;
+  }
+  const bare = stripStackPrefixForModuleParsing(address);
+  const parts = bare.split(".");
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i]!.startsWith("aws_flow_log")) {
+      return parts.slice(0, i).join(".");
+    }
+  }
+  return null;
+}
+
 /** VPC-scoped flow log module resources. */
 export type TopologyVpcFlowLogBucket = {
   accountId: string;
@@ -2635,9 +2980,13 @@ export function extractVpcFlowLogBundles(
     if (!shouldEmitTopologyPlacement(accountId, region)) {
       continue;
     }
+    const flowModulePrefix = flowLogModuleBundlePrefixForAddress(address);
+    if (!flowModulePrefix) {
+      continue;
+    }
     flowRows.push({
       address,
-      modulePrefix: terraformModulePrefixForAddress(address),
+      modulePrefix: flowModulePrefix,
       accountId,
       region,
       vpcId: vpcIdRaw,
@@ -2689,7 +3038,9 @@ export function extractVpcFlowLogBundles(
     if (!allowedCompanion(rc)) {
       continue;
     }
-    const pref = terraformModulePrefixForAddress(addr);
+    const pref =
+      flowLogModuleBundlePrefixForAddress(addr) ||
+      terraformModulePrefixForAddress(stripStackPrefixForModuleParsing(addr));
     if (!pref) {
       continue;
     }

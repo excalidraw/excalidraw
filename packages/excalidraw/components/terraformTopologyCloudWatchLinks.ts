@@ -453,7 +453,7 @@ function buildCloudWatchAttachmentIndex(
   return attachmentIndex;
 }
 
-function getCloudWatchAttachmentIndex(
+export function getCloudWatchAttachmentIndex(
   nodes: TerraformPlanNodesMap,
 ): CloudWatchAttachmentIndex {
   const cached = cloudWatchAttachmentIndexCache.get(nodes);
