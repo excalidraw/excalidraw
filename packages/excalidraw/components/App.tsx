@@ -4987,6 +4987,10 @@ class App extends React.Component<AppProps, AppState> {
         // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
+        // Prevent Ctrl+S from triggering browser save-as when editing text
+        if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === "s") {
+          event.preventDefault();
+        }
         return;
       }
 
