@@ -1,17 +1,54 @@
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
+  parseStackAddress,
   preferTopologyNodeKeyAmongAliases,
   topologyBareAddressKey,
+  topologyNodeDedupeKey,
 } from "./terraformStackAddress";
 import {
   resolveTerraformPlanNodeKey,
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
-export { topologyBareAddressKey, preferTopologyNodeKeyAmongAliases };
+
+export {
+  topologyBareAddressKey,
+  topologyNodeDedupeKey,
+  preferTopologyNodeKeyAmongAliases,
+};
 
 function isTopologyMetaNodeKey(key: string): boolean {
   return key === TERRAFORM_MODULE_TREE_KEY || key.startsWith("__");
+}
+
+function collectTopologyNodeAliases(
+  nodes: TerraformPlanNodesMap,
+  address: string,
+): string[] {
+  const parsed = parseStackAddress(address);
+  const bare = topologyBareAddressKey(address);
+  const aliases: string[] = [];
+
+  for (const key of Object.keys(nodes)) {
+    if (isTopologyMetaNodeKey(key)) {
+      continue;
+    }
+    const keyParsed = parseStackAddress(key);
+    if (parsed) {
+      if (
+        keyParsed?.stackId === parsed.stackId &&
+        topologyBareAddressKey(key) === bare
+      ) {
+        aliases.push(key);
+      } else if (!keyParsed && topologyBareAddressKey(key) === bare) {
+        aliases.push(key);
+      }
+    } else if (!keyParsed && topologyBareAddressKey(key) === bare) {
+      aliases.push(key);
+    }
+  }
+
+  return aliases;
 }
 
 /** Prefer an existing `nodes` key (qualified over duplicate unqualified aliases). */
@@ -19,25 +56,20 @@ export function canonicalTopologyNodeKey(
   nodes: TerraformPlanNodesMap,
   address: string,
 ): string {
-  const bare = topologyBareAddressKey(address);
-  const aliases: string[] = [];
-  for (const key of Object.keys(nodes)) {
-    if (isTopologyMetaNodeKey(key)) {
-      continue;
-    }
-    if (topologyBareAddressKey(key) === bare) {
-      aliases.push(key);
-    }
-  }
+  const aliases = collectTopologyNodeAliases(nodes, address);
   if (aliases.length > 0) {
     return preferTopologyNodeKeyAmongAliases(aliases);
   }
   const graphNodes = nodes as Record<string, TerraformPlanGraphNode>;
   const resolved = resolveTerraformPlanNodeKey(
     graphNodes,
-    topologyBareAddressKey(address),
+    stripIndexesForResolve(address),
   );
   return resolved ?? address;
+}
+
+function stripIndexesForResolve(address: string): string {
+  return topologyBareAddressKey(address);
 }
 
 function rewriteNodeEdgeAliases(
@@ -67,50 +99,78 @@ function rewriteNodeEdgeAliases(
   }
 }
 
+function mergeAliasNodeIntoCanonical(
+  nodes: TerraformPlanNodesMap,
+  alias: string,
+  canonical: string,
+): void {
+  const aliasNode = nodes[alias] as TerraformPlanGraphNode | undefined;
+  const canonNode = nodes[canonical] as TerraformPlanGraphNode | undefined;
+  if (aliasNode && canonNode && aliasNode.resources) {
+    for (const [resAddr, res] of Object.entries(aliasNode.resources)) {
+      if (!canonNode.resources[resAddr]) {
+        canonNode.resources[resAddr] = res;
+      }
+    }
+  }
+  for (const node of Object.values(nodes)) {
+    if (node && typeof node === "object") {
+      rewriteNodeEdgeAliases(node as TerraformPlanGraphNode, alias, canonical);
+    }
+  }
+  delete nodes[alias];
+}
+
 /**
- * Drop unqualified ghost nodes when a stack-qualified alias exists for the same
- * Terraform resource (multi-stack plan + unqualified tfstate merge).
+ * Collapse duplicate node keys within the same stack (or unqualified ghosts when
+ * only one stack owns that bare address). Never merges across different stackIds.
  */
 export function dedupeTerraformPlanNodesByBareAddress(
   nodes: TerraformPlanNodesMap,
 ): TerraformPlanNodesMap {
-  const byBare = new Map<string, string[]>();
+  const byDedupeKey = new Map<string, string[]>();
+  const unqualifiedKeys: string[] = [];
+
   for (const key of Object.keys(nodes)) {
     if (isTopologyMetaNodeKey(key)) {
       continue;
     }
-    const bare = topologyBareAddressKey(key);
-    const row = byBare.get(bare) ?? [];
+    if (!parseStackAddress(key)) {
+      unqualifiedKeys.push(key);
+      continue;
+    }
+    const dedupeKey = topologyNodeDedupeKey(key);
+    const row = byDedupeKey.get(dedupeKey) ?? [];
     row.push(key);
-    byBare.set(bare, row);
+    byDedupeKey.set(dedupeKey, row);
   }
 
-  for (const [, aliases] of byBare) {
+  for (const [, aliases] of byDedupeKey) {
     if (aliases.length <= 1) {
       continue;
     }
     const canonical = preferTopologyNodeKeyAmongAliases(aliases);
-    const dropped = aliases.filter((a) => a !== canonical);
-    for (const alias of dropped) {
-      const aliasNode = nodes[alias] as TerraformPlanGraphNode | undefined;
-      const canonNode = nodes[canonical] as TerraformPlanGraphNode | undefined;
-      if (aliasNode && canonNode && aliasNode.resources) {
-        for (const [resAddr, res] of Object.entries(aliasNode.resources)) {
-          if (!canonNode.resources[resAddr]) {
-            canonNode.resources[resAddr] = res;
-          }
-        }
+    for (const alias of aliases) {
+      if (alias === canonical) {
+        continue;
       }
-      for (const node of Object.values(nodes)) {
-        if (node && typeof node === "object") {
-          rewriteNodeEdgeAliases(
-            node as TerraformPlanGraphNode,
-            alias,
-            canonical,
-          );
-        }
-      }
-      delete nodes[alias];
+      mergeAliasNodeIntoCanonical(nodes, alias, canonical);
+    }
+  }
+
+  for (const u of unqualifiedKeys) {
+    if (!nodes[u]) {
+      continue;
+    }
+    const bare = topologyBareAddressKey(u);
+    const qualifiedOwners = Object.keys(nodes).filter((k) => {
+      const p = parseStackAddress(k);
+      return p != null && topologyBareAddressKey(k) === bare;
+    });
+    if (qualifiedOwners.length === 1) {
+      mergeAliasNodeIntoCanonical(nodes, u, qualifiedOwners[0]!);
+    } else if (qualifiedOwners.length > 1) {
+      delete nodes[u];
     }
   }
 
@@ -118,6 +178,14 @@ export function dedupeTerraformPlanNodesByBareAddress(
 }
 
 export function topologyAddressesMatch(a: string, b: string): boolean {
+  const pa = parseStackAddress(a);
+  const pb = parseStackAddress(b);
+  if (pa && pb) {
+    return (
+      pa.stackId === pb.stackId &&
+      topologyBareAddressKey(a) === topologyBareAddressKey(b)
+    );
+  }
   return topologyBareAddressKey(a) === topologyBareAddressKey(b);
 }
 
@@ -128,11 +196,11 @@ export function dedupeTopologyAddressesByBareKey(
   const seen = new Set<string>();
   const out: string[] = [];
   for (const addr of addresses) {
-    const bare = topologyBareAddressKey(addr);
-    if (seen.has(bare)) {
+    const key = topologyNodeDedupeKey(addr);
+    if (seen.has(key)) {
       continue;
     }
-    seen.add(bare);
+    seen.add(key);
     out.push(canonicalTopologyNodeKey(nodes, addr));
   }
   return out;

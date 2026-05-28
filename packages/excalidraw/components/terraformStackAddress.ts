@@ -89,6 +89,21 @@ export function topologyBareAddressKey(address: string): string {
   return stripInstanceIndexes(bare);
 }
 
+const DEDUPE_KEY_SEP = "\0";
+
+/**
+ * Key for node deduplication: same stack + same bare resource collapse; different
+ * stacks never share a key even when module paths match (e.g. five `module.api` stacks).
+ */
+export function topologyNodeDedupeKey(address: string): string {
+  const parsed = parseStackAddress(address);
+  const bare = topologyBareAddressKey(address);
+  if (parsed) {
+    return `${parsed.stackId}${DEDUPE_KEY_SEP}${bare}`;
+  }
+  return bare;
+}
+
 /** When bare keys collide, prefer `stackId::resource` over unqualified duplicates. */
 export function preferTopologyNodeKeyAmongAliases(
   keys: readonly string[],

@@ -61,6 +61,7 @@ import {
 import {
   collectKnownStackIdsFromNodes,
   isStackQualifiedAddress,
+  parseStackAddress,
   preferTopologyNodeKeyAmongAliases,
   prefixStackAddress,
   stripStackPrefixForModuleParsing,
@@ -945,18 +946,48 @@ export function resolveTerraformPlanNodeKey(
     return null;
   }
 
+  const parsed = parseStackAddress(address);
   const bareKey = topologyBareAddressKey(address);
-  const bareAliases: string[] = [];
-  for (const k of Object.keys(nodes)) {
-    if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
-      continue;
+
+  if (parsed) {
+    const stackAliases: string[] = [];
+    for (const k of Object.keys(nodes)) {
+      if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+        continue;
+      }
+      const kParsed = parseStackAddress(k);
+      if (
+        kParsed?.stackId === parsed.stackId &&
+        topologyBareAddressKey(k) === bareKey
+      ) {
+        stackAliases.push(k);
+      } else if (!kParsed && topologyBareAddressKey(k) === bareKey) {
+        stackAliases.push(k);
+      }
     }
-    if (topologyBareAddressKey(k) === bareKey) {
-      bareAliases.push(k);
+    if (stackAliases.length > 0) {
+      return preferTopologyNodeKeyAmongAliases(stackAliases);
     }
-  }
-  if (bareAliases.length > 0) {
-    return preferTopologyNodeKeyAmongAliases(bareAliases);
+  } else {
+    const qualifiedMatches: string[] = [];
+    for (const k of Object.keys(nodes)) {
+      if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+        continue;
+      }
+      const kParsed = parseStackAddress(k);
+      if (kParsed && topologyBareAddressKey(k) === bareKey) {
+        qualifiedMatches.push(k);
+      }
+    }
+    if (qualifiedMatches.length === 1) {
+      return qualifiedMatches[0]!;
+    }
+    if (qualifiedMatches.length > 1) {
+      return null;
+    }
+    if (nodes[address]) {
+      return address;
+    }
   }
 
   const graphId = stripTerraformAddressIndexes(address);
