@@ -109,7 +109,7 @@ export const SearchMenu = () => {
       searchedQueryRef.current = null;
       handleSearch(searchQuery, app, (matchItems, index) => {
         setSearchMatches({
-          nonce: randomInteger(),
+          nonce: app.scene.getSceneNonce(),
           items: matchItems,
         });
         searchedQueryRef.current = searchQuery;
@@ -431,6 +431,7 @@ export const SearchMenu = () => {
         onItemClick={setFocusIndex}
         focusIndex={focusIndex}
         searchQuery={searchQuery}
+        key={searchQuery}
       />
     </div>
   );
