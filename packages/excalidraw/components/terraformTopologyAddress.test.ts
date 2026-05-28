@@ -74,4 +74,39 @@ describe("terraformTopologyAddress", () => {
       ),
     ).toBe(false);
   });
+
+  it("does not collapse count/for_each instance indexes during dedupe", () => {
+    const nodes = {
+      "00-east-network::module.east_network.module.vpc.aws_subnet.public[0]": {
+        resources: {
+          "00-east-network::module.east_network.module.vpc.aws_subnet.public[0]":
+            noopChange,
+        },
+      },
+      "00-east-network::module.east_network.module.vpc.aws_subnet.public[1]": {
+        resources: {
+          "00-east-network::module.east_network.module.vpc.aws_subnet.public[1]":
+            noopChange,
+        },
+      },
+    } as TerraformPlanNodesMap;
+    dedupeTerraformPlanNodesByBareAddress(nodes);
+    expect(
+      nodes[
+        "00-east-network::module.east_network.module.vpc.aws_subnet.public[0]"
+      ],
+    ).toBeDefined();
+    expect(
+      nodes[
+        "00-east-network::module.east_network.module.vpc.aws_subnet.public[1]"
+      ],
+    ).toBeDefined();
+    expect(
+      getTerraformPlanNodeAction(
+        nodes[
+          "00-east-network::module.east_network.module.vpc.aws_subnet.public[1]"
+        ],
+      ),
+    ).toBe("no-op");
+  });
 });

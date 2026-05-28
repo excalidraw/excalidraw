@@ -33,5 +33,10 @@ describe("staging API stacks node actions", () => {
       expect(nodes[prefix]).toBeDefined();
       expect(getTerraformPlanNodeAction(nodes[prefix])).toBe("no-op");
     }
+
+    const westSubnetOne =
+      "01-west-network::module.west_network.module.vpc.aws_subnet.public[1]";
+    expect(nodes[westSubnetOne]).toBeDefined();
+    expect(getTerraformPlanNodeAction(nodes[westSubnetOne])).toBe("no-op");
   });
 });

@@ -92,16 +92,18 @@ export function topologyBareAddressKey(address: string): string {
 const DEDUPE_KEY_SEP = "\0";
 
 /**
- * Key for node deduplication: same stack + same bare resource collapse; different
- * stacks never share a key even when module paths match (e.g. five `module.api` stacks).
+ * Key for node deduplication: same stack + same Terraform address (including
+ * `count`/`for_each` instance indexes). Different stacks never share a key even
+ * when module paths match (e.g. five `module.api` stacks). Unqualified ghosts
+ * still collapse via {@link topologyBareAddressKey} in dedupeTerraformPlanNodesByBareAddress.
  */
 export function topologyNodeDedupeKey(address: string): string {
   const parsed = parseStackAddress(address);
-  const bare = topologyBareAddressKey(address);
+  const terraformAddress = parsed?.address ?? address.trim();
   if (parsed) {
-    return `${parsed.stackId}${DEDUPE_KEY_SEP}${bare}`;
+    return `${parsed.stackId}${DEDUPE_KEY_SEP}${terraformAddress}`;
   }
-  return bare;
+  return terraformAddress;
 }
 
 /** When bare keys collide, prefer `stackId::resource` over unqualified duplicates. */

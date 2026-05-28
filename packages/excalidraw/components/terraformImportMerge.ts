@@ -374,32 +374,6 @@ export function mergePlanWithStates(
     { warnOnOverwrite: false },
   );
   warnings.push(...stateMerged.warnings, ...combined.warnings);
-  // #region agent log
-  const writerAddr =
-    "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]";
-  const writerRc = combined.plan.resource_changes.find(
-    (rc) => (rc as { address?: string }).address === writerAddr,
-  ) as { change?: { actions?: string[] } } | undefined;
-  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "b3f9b8",
-    },
-    body: JSON.stringify({
-      sessionId: "b3f9b8",
-      runId: "post-fix",
-      hypothesisId: "A",
-      location: "terraformImportMerge.ts:mergePlanWithStates",
-      message: "merged plan writer change.actions",
-      data: {
-        writerActions: writerRc?.change?.actions ?? null,
-        stateCount: states.length,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
   return {
     plan: combined.plan,
     sourcePlans: [...sourcePlans, ...stateMerged.sourcePlans],
