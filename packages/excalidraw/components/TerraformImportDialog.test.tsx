@@ -148,6 +148,48 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("passes semanticLayout false for module view with active preset manifest", async () => {
+    vi.mocked(loadTerraformImportPresetSources).mockResolvedValue({
+      planDotBundles: [
+        {
+          plan: { resource_changes: [] },
+          dotText: "digraph {}",
+          label: "00-east-network",
+        },
+      ],
+      states: [],
+      stateLabels: [],
+      tfdTexts: [],
+      tfdLabels: [],
+      warnings: [],
+    });
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /use preset manifest/i }),
+      ).not.toBeDisabled(),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /use preset manifest/i }),
+    );
+    fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+      {
+        semanticLayout: false,
+      },
+    );
+  });
+
   it("enables import with state file only", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/state \(/i), {

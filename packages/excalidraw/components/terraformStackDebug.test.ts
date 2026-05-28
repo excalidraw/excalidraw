@@ -157,4 +157,27 @@ describe("staging multi-state import", () => {
     );
     expect(declared).toHaveLength(20);
   }, 180_000);
+
+  it("imports module layout quickly via ELK fast path for dense multi-stack graph", async () => {
+    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
+    const t0 = performance.now();
+    const res = await terraformPlanParsingFromSources(
+      {
+        planDotBundles: bundles,
+        states: [],
+        stateLabels: [],
+        tfdTexts: [tfd],
+        tfdLabels: ["pipeline.tfd"],
+      },
+      { semanticLayout: false },
+    );
+    const ms = performance.now() - t0;
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("elk");
+    expect(body.meta?.elkFastPath).toBe(true);
+    expect(body.elements.length).toBeGreaterThan(0);
+    expect(ms).toBeLessThan(15_000);
+  }, 60_000);
 });

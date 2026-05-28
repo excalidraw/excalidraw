@@ -521,6 +521,28 @@ export const terraformPlanParsingFromSources = async (
   options?: TerraformPlanParsingOptions,
 ) => {
   const semanticLayout = options?.semanticLayout === true;
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "36bd3e",
+    },
+    body: JSON.stringify({
+      sessionId: "36bd3e",
+      location: "terraformPlanParsing.tsx:terraformPlanParsingFromSources",
+      message: "parse entry",
+      data: {
+        semanticLayout,
+        planBundleCount: sources.planDotBundles.length,
+        stateCount: sources.states.length,
+        tfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
+      },
+      hypothesisId: "B",
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -621,6 +643,29 @@ export const terraformPlanParsingFromSources = async (
     priorStatePlans: sourcePlans,
     stackIds,
   });
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "36bd3e",
+    },
+    body: JSON.stringify({
+      sessionId: "36bd3e",
+      location: "terraformPlanParsing.tsx:afterNodesMap",
+      message: "nodes map built",
+      data: {
+        semanticLayout,
+        vertexCount: Object.keys(nodes5).filter((k) => !k.startsWith("__"))
+          .length,
+        stateCount: states.length,
+        stackIdCount: stackIds.length,
+      },
+      hypothesisId: "F",
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
 
   const tfdWarnings = applyTfdOverlayToNodes(
     nodes5,
@@ -650,6 +695,23 @@ export const terraformPlanParsingFromSources = async (
   let sceneBody: Record<string, unknown>;
 
   if (semanticLayout) {
+    // #region agent log
+    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "36bd3e",
+      },
+      body: JSON.stringify({
+        sessionId: "36bd3e",
+        location: "terraformPlanParsing.tsx:semanticBranch",
+        message: "entering semantic topology layout",
+        data: { stackIds: stackIds.length },
+        hypothesisId: "G",
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
@@ -892,6 +954,45 @@ export const terraformPlanParsingFromSources = async (
     };
   } else {
     const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
+    // #region agent log
+    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "36bd3e",
+      },
+      body: JSON.stringify({
+        sessionId: "36bd3e",
+        location: "terraformPlanParsing.tsx:elkLayout",
+        message: "module layout result",
+        data: {
+          layoutEngine: elkScene.meta.layoutEngine,
+          skippedLayout: elkScene.meta.skippedLayout ?? null,
+          skipReason: elkScene.meta.skipReason ?? null,
+          elementCount: elkScene.elements.length,
+          visibleRects: elkScene.elements.filter(
+            (e) =>
+              e.type === "rectangle" &&
+              !e.isDeleted &&
+              (e.customData as { terraformVisibilityRole?: string } | undefined)
+                ?.terraformVisibilityRole === "resource",
+          ).length,
+          deletedRects: elkScene.elements.filter(
+            (e) =>
+              e.type === "rectangle" &&
+              e.isDeleted &&
+              (e.customData as { terraformVisibilityRole?: string } | undefined)
+                ?.terraformVisibilityRole === "resource",
+          ).length,
+          frameCount: elkScene.elements.filter(
+            (e) => e.type === "frame" && !e.isDeleted,
+          ).length,
+        },
+        hypothesisId: "C-D",
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     emitLocalParseDebug({
       phase: "elkLayout",
       meta: elkScene.meta,

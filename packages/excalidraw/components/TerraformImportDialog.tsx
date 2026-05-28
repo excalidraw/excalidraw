@@ -181,7 +181,7 @@ export const TerraformImportModal = ({
     );
   }, [availablePresets, selectedPresetId]);
 
-  const importView: TerraformView = activePreset?.view ?? view;
+  const importView: TerraformView = view;
 
   const completeBundles = bundles.filter((b) => b.planFile && b.dotFile);
   const partialBundles = bundles.filter(
@@ -228,12 +228,39 @@ export const TerraformImportModal = ({
   ) => {
     const canUseSemanticView =
       sources.planDotBundles.length > 0 || sources.states.length > 0;
+    const semanticLayout = importView === "semantic" && canUseSemanticView;
+    // #region agent log
+    fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "36bd3e",
+      },
+      body: JSON.stringify({
+        sessionId: "36bd3e",
+        location: "TerraformImportDialog.tsx:runImportFromSources",
+        message: "import layout decision",
+        data: {
+          importView,
+          view,
+          activePresetView: activePreset?.view ?? null,
+          activePresetId: activePreset?.id ?? null,
+          presetId: opts.preset?.id ?? null,
+          semanticLayout,
+          canUseSemanticView,
+          bundleCount: sources.planDotBundles.length,
+        },
+        hypothesisId: "A",
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     const { importWarnings: warnings } = await runTerraformImportFromSources(
       app,
       setAppState,
       sources,
       {
-        semanticLayout: importView === "semantic" && canUseSemanticView,
+        semanticLayout,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
       },

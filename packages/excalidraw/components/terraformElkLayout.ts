@@ -139,6 +139,12 @@ function moduleFrameSkeletonId(modulePath: string) {
 /** Above this many graph vertices, skip ELK to avoid long main-thread stalls. */
 export const TERRAFORM_ELK_MAX_VERTICES = 600;
 
+/**
+ * Above this many directed edges, run ELK on module hierarchy only (no dependency
+ * edges). Dense multi-stack imports otherwise block the main thread for ~60s+.
+ */
+export const TERRAFORM_ELK_FAST_PATH_EDGE_COUNT = 400;
+
 /** Bound label fill uses `strokeColor`; must stay dark (backend `excalidraw.js` uses `#1e1e1e`). */
 export const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 
@@ -146,6 +152,8 @@ export type TerraformElkSceneMeta = {
   layoutEngine: "elk";
   vertexCount: number;
   edgeCount: number;
+  elkLayoutEdgeCount?: number;
+  elkFastPath?: boolean;
   skippedLayout?: boolean;
   skipReason?: string;
 };
@@ -1790,15 +1798,58 @@ export async function buildTerraformElkExcalidrawScene(
     });
   }
 
+  const elkFastPath = directedEdges.length > TERRAFORM_ELK_FAST_PATH_EDGE_COUNT;
+  const elkLayoutEdges = elkFastPath ? [] : elkEdges;
+
   const elkGraph = {
     id: "terraform_elk_root",
     layoutOptions: { ...ELK_ROOT_LAYOUT_OPTIONS },
     children: [moduleRoot],
-    edges: elkEdges,
+    edges: elkLayoutEdges,
   };
 
   const elk = new ELK();
+  // #region agent log
+  const elkLayoutStartedAt = Date.now();
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "36bd3e",
+    },
+    body: JSON.stringify({
+      sessionId: "36bd3e",
+      location: "terraformElkLayout.ts:beforeElkLayout",
+      message: "starting elk.layout",
+      data: { vertexCount, edgeCount: directedEdges.length, elkFastPath },
+      hypothesisId: "H",
+      timestamp: elkLayoutStartedAt,
+    }),
+  }).catch(() => {});
+  // #endregion
   const laidOut = (await elk.layout(elkGraph)) as ElkLayoutedNode;
+  // #region agent log
+  fetch("http://127.0.0.1:7923/ingest/de798ee9-b1d9-4571-a526-b10e653d3365", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "36bd3e",
+    },
+    body: JSON.stringify({
+      sessionId: "36bd3e",
+      location: "terraformElkLayout.ts:afterElkLayout",
+      message: "elk.layout finished",
+      data: {
+        vertexCount,
+        edgeCount: directedEdges.length,
+        elkFastPath,
+        elkMs: Date.now() - elkLayoutStartedAt,
+      },
+      hypothesisId: "H",
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
 
   const layoutBoxes: Record<string, LayoutBox> = {};
   const rootBaseX = laidOut.x ?? 0;
@@ -1933,6 +1984,8 @@ export async function buildTerraformElkExcalidrawScene(
       layoutEngine: "elk",
       vertexCount,
       edgeCount: directedEdges.length,
+      elkLayoutEdgeCount: elkLayoutEdges.length,
+      ...(elkFastPath ? { elkFastPath: true } : {}),
     },
   };
 }
