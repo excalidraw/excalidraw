@@ -35,15 +35,23 @@ export const actionSendBackward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_LEFT,
+    isDarwin
+      ? event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.code === CODES.BRACKET_LEFT
+      : event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
-      title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
+      title={`${t("labels.sendBackward")} — ${
+        isDarwin
+          ? getShortcutKey("CtrlOrCmd+Shift+[")
+          : getShortcutKey("CtrlOrCmd+[")
+      }`}
     >
       {SendBackwardIcon}
     </button>
@@ -65,15 +73,23 @@ export const actionBringForward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_RIGHT,
+    isDarwin
+      ? event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.code === CODES.BRACKET_RIGHT
+      : event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
-      title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
+      title={`${t("labels.bringForward")} — ${
+        isDarwin
+          ? getShortcutKey("CtrlOrCmd+Shift+]")
+          : getShortcutKey("CtrlOrCmd+]")
+      }`}
     >
       {BringForwardIcon}
     </button>

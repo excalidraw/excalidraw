@@ -79,8 +79,16 @@ const shortcutMap: Record<ShortcutName, string[]> = {
     getShortcutKey("CtrlOrCmd+D"),
     getShortcutKey(`Alt+${t("helpDialog.drag")}`),
   ],
-  sendBackward: [getShortcutKey("CtrlOrCmd+[")],
-  bringForward: [getShortcutKey("CtrlOrCmd+]")],
+  sendBackward: [
+    isDarwin
+      ? getShortcutKey("CtrlOrCmd+Shift+[")
+      : getShortcutKey("CtrlOrCmd+["),
+  ],
+  bringForward: [
+    isDarwin
+      ? getShortcutKey("CtrlOrCmd+Shift+]")
+      : getShortcutKey("CtrlOrCmd+]"),
+  ],
   sendToBack: [
     isDarwin
       ? getShortcutKey("CtrlOrCmd+Alt+[")

@@ -422,11 +422,19 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("labels.sendBackward")}
-              shortcuts={[getShortcutKey("CtrlOrCmd+[")]}
+              shortcuts={[
+                isDarwin
+                  ? getShortcutKey("CtrlOrCmd+Shift+[")
+                  : getShortcutKey("CtrlOrCmd+["),
+              ]}
             />
             <Shortcut
               label={t("labels.bringForward")}
-              shortcuts={[getShortcutKey("CtrlOrCmd+]")]}
+              shortcuts={[
+                isDarwin
+                  ? getShortcutKey("CtrlOrCmd+Shift+]")
+                  : getShortcutKey("CtrlOrCmd+]"),
+              ]}
             />
             <Shortcut
               label={t("labels.alignTop")}
