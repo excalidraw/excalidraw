@@ -108,8 +108,8 @@ export function normalizeTerraformImportPreset(
     value.view === "module"
       ? "module"
       : value.view === "pipeline"
-        ? "pipeline"
-        : "semantic";
+      ? "pipeline"
+      : "semantic";
   const rootPath =
     typeof value.rootPath === "string" ? value.rootPath.trim() : "";
   const stacksRaw = Array.isArray(value.stacks) ? value.stacks : [];

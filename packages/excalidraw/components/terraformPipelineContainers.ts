@@ -9,7 +9,10 @@ import {
   type PipelineGeoPath,
 } from "./terraformPipelineGeo";
 
-import type { PipelineAtomEdge, PipelineAtomGraph } from "./terraformPipelineAtoms";
+import type {
+  PipelineAtomEdge,
+  PipelineAtomGraph,
+} from "./terraformPipelineAtoms";
 
 export type PipelineAtomPlacement = {
   primaryAddress: string;
@@ -126,12 +129,65 @@ function buildColumnsFromEdges(
   return columns;
 }
 
+/**
+ * Merge consecutive single-lane columns whose atoms are 1:1 children of lanes
+ * in the previous multi-lane column (e.g. api1..5 -> lambda1..5 -> ssm1..5).
+ */
+export function mergeParallelFanoutColumns(
+  columns: readonly string[][],
+  edges: readonly PipelineAtomEdge[],
+): string[][] {
+  const parentOf = new Map<string, string>();
+  for (const e of edges) {
+    if (!parentOf.has(e.target)) {
+      parentOf.set(e.target, e.source);
+    }
+  }
+
+  const result: string[][] = [];
+
+  for (let i = 0; i < columns.length; i++) {
+    const prevCol = result[result.length - 1];
+    const prevLaneCount = prevCol?.length ?? 0;
+
+    if (
+      prevCol &&
+      prevLaneCount > 1 &&
+      columns[i]?.length === 1 &&
+      i + prevLaneCount <= columns.length
+    ) {
+      const run = columns.slice(i, i + prevLaneCount);
+      const isSingleLaneRun = run.every((col) => col.length === 1);
+
+      if (isSingleLaneRun) {
+        const children = run.map((col) => col[0]!);
+        const aligned = children.every(
+          (child, laneIdx) => parentOf.get(child) === prevCol[laneIdx],
+        );
+
+        if (aligned) {
+          result.push(children);
+          i += prevLaneCount - 1;
+          continue;
+        }
+      }
+    }
+
+    result.push([...columns[i]!]);
+  }
+
+  return result;
+}
+
 /** Order atom edges into pipeline columns following TFD sequence with fanout grouping. */
 export function buildPipelineLayoutPlan(
   atomGraph: PipelineAtomGraph,
   geoMap: PipelineAtomGeoMap,
 ): PipelineLayoutPlan {
-  const columnAtomLists = buildColumnsFromEdges(atomGraph, atomGraph.edges);
+  const columnAtomLists = mergeParallelFanoutColumns(
+    buildColumnsFromEdges(atomGraph, atomGraph.edges),
+    atomGraph.edges,
+  );
 
   const placements: PipelineAtomPlacement[] = [];
   let prevGeo: PipelineGeoPath | null = null;
@@ -141,10 +197,11 @@ export function buildPipelineLayoutPlan(
 
   for (let colIdx = 0; colIdx < columnAtomLists.length; colIdx++) {
     const colAtoms = columnAtomLists[colIdx]!;
-    colAtoms.forEach((primaryAddress, laneIdx) => {
+    for (let laneIdx = 0; laneIdx < colAtoms.length; laneIdx++) {
+      const primaryAddress = colAtoms[laneIdx]!;
       const geo = geoMap.get(primaryAddress);
       if (!geo) {
-        return;
+        continue;
       }
       const reenteringVpc = wasRegional && geo.vpcId != null;
       let instanceId = geoNeedsNewInstance(
@@ -153,11 +210,7 @@ export function buildPipelineLayoutPlan(
         geo,
         reenteringVpc,
       );
-      if (
-        prevGeo &&
-        samePipelineGeoPlacement(prevGeo, geo) &&
-        !reenteringVpc
-      ) {
+      if (prevGeo && samePipelineGeoPlacement(prevGeo, geo) && !reenteringVpc) {
         instanceId = prevInstanceId;
       }
       if (
@@ -185,14 +238,16 @@ export function buildPipelineLayoutPlan(
       prevGeo = geo;
       prevInstanceId = instanceId;
       wasRegional = geo.tier === "regional";
-    });
+    }
   }
 
-  const columns: PipelineColumn[] = columnAtomLists.map((atoms, columnIndex) => ({
-    columnIndex,
-    atoms,
-    laneCount: atoms.length,
-  }));
+  const columns: PipelineColumn[] = columnAtomLists.map(
+    (atoms, columnIndex) => ({
+      columnIndex,
+      atoms,
+      laneCount: atoms.length,
+    }),
+  );
 
   return {
     placements,

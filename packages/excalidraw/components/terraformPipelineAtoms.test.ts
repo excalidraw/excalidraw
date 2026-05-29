@@ -8,9 +8,7 @@ import {
 } from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
-import {
-  buildPipelineAtomGraph,
-} from "./terraformPipelineAtoms";
+import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { buildPipelineAtomGeoMap } from "./terraformPipelineGeo";
 import { buildPipelineLayoutPlan } from "./terraformPipelineContainers";
 import {
@@ -63,7 +61,9 @@ describe("terraformPipelineAtoms", () => {
       ),
     ).toBe(false);
 
-    const fanout = collapsed.filter((e) => e.source.includes("consumer_lambda"));
+    const fanout = collapsed.filter((e) =>
+      e.source.includes("consumer_lambda"),
+    );
     expect(fanout.length).toBe(5);
   }, 120_000);
 
@@ -87,8 +87,10 @@ describe("terraformPipelineAtoms", () => {
     const geoMap = buildPipelineAtomGeoMap(atomGraph, nodes, merged.plan);
     const layoutPlan = buildPipelineLayoutPlan(atomGraph, geoMap);
 
-    expect(
-      layoutPlan.columns.some((c) => c.laneCount >= 5),
-    ).toBe(true);
+    expect(layoutPlan.columns.some((c) => c.laneCount >= 5)).toBe(true);
+    expect(layoutPlan.columns).toHaveLength(7);
+
+    const fanoutColumns = layoutPlan.columns.filter((c) => c.laneCount === 5);
+    expect(fanoutColumns).toHaveLength(3);
   }, 120_000);
 });

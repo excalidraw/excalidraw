@@ -966,10 +966,10 @@ writer -> bucket`}</code>
                   option.value === "semantic" && !canUseSemanticView
                     ? "Semantic view requires at least one plan+graph pair or a state file."
                     : option.value === "semantic" && stateOnly
-                      ? "Shows current infrastructure from state (no planned changes)."
-                      : option.value === "pipeline" && !canUsePipelineView
-                        ? "Pipeline view requires plan/state plus a .tfd dataflow file."
-                        : undefined
+                    ? "Shows current infrastructure from state (no planned changes)."
+                    : option.value === "pipeline" && !canUsePipelineView
+                    ? "Pipeline view requires plan/state plus a .tfd dataflow file."
+                    : undefined
                 }
               >
                 <input

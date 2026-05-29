@@ -4161,7 +4161,8 @@ export function buildTopologyPrimaryClusterSkeletonForPipeline(
   const frame = skeleton.find(
     (el) => el.type === "frame" && el.id === clusterFrameId,
   );
-  const width = typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
+  const width =
+    typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
   const height =
     typeof frame?.height === "number" ? frame.height : RESOURCE_RECT_H;
 

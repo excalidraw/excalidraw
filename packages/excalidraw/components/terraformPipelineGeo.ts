@@ -32,16 +32,6 @@ export type PipelineGeoPath = {
 
 export type PipelineAtomGeoMap = Map<string, PipelineGeoPath>;
 
-const REGIONAL_BUCKET_KEY = "\0";
-
-function zoneKey(z: TopologyPlacementZone): string {
-  return `${z.accountId}\0${z.region}\0${z.vpcId}\0${z.subnetSignature}`;
-}
-
-function regionalKey(accountId: string, region: string): string {
-  return `${accountId}${REGIONAL_BUCKET_KEY}${region}`;
-}
-
 function buildPlacementLookups(
   plan: unknown,
   nodes: TerraformPlanNodesMap,
@@ -82,7 +72,11 @@ function buildPlacementLookups(
     }
   }
 
-  return { addressToZone, addressToRegional, subnetNameById: buildTopologySubnetNameMap(plan) };
+  return {
+    addressToZone,
+    addressToRegional,
+    subnetNameById: buildTopologySubnetNameMap(plan),
+  };
 }
 
 export function buildPipelineAtomGeoMap(
@@ -138,7 +132,10 @@ export function buildPipelineAtomGeoMap(
   return out;
 }
 
-export function pipelineGeoInstanceKey(geo: PipelineGeoPath, instanceId: number): string {
+export function pipelineGeoInstanceKey(
+  geo: PipelineGeoPath,
+  instanceId: number,
+): string {
   return [
     geo.accountId,
     geo.region,
@@ -149,11 +146,19 @@ export function pipelineGeoInstanceKey(geo: PipelineGeoPath, instanceId: number)
   ].join("|");
 }
 
-export function pipelineGeoPrefixKey(geo: PipelineGeoPath, instanceId: number): string {
-  return `${geo.accountId}|${geo.region}|${geo.vpcId ?? "regional"}|${instanceId}`;
+export function pipelineGeoPrefixKey(
+  geo: PipelineGeoPath,
+  instanceId: number,
+): string {
+  return `${geo.accountId}|${geo.region}|${
+    geo.vpcId ?? "regional"
+  }|${instanceId}`;
 }
 
-export function samePipelineGeoPlacement(a: PipelineGeoPath, b: PipelineGeoPath): boolean {
+export function samePipelineGeoPlacement(
+  a: PipelineGeoPath,
+  b: PipelineGeoPath,
+): boolean {
   return (
     a.accountId === b.accountId &&
     a.region === b.region &&

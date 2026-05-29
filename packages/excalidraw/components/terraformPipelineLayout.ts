@@ -17,7 +17,11 @@ import { tfComfortPx } from "./terraformLayoutComfort";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { buildPipelineLayoutPlan } from "./terraformPipelineContainers";
-import { buildPipelineAtomGeoMap, pipelineGeoTierLabel } from "./terraformPipelineGeo";
+import {
+  buildPipelineAtomGeoMap,
+  pipelineGeoTierLabel,
+  type PipelineGeoPath,
+} from "./terraformPipelineGeo";
 import {
   buildTopologyPrimaryClusterSkeletonForPipeline,
   reorderTopologyElementsZStack,
@@ -29,9 +33,7 @@ import {
 } from "./terraformVisibility";
 
 import type { BinaryFiles } from "../types";
-import type {
-  TerraformPlanNodesMap,
-} from "./terraformPlanParsing";
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 const px = tfComfortPx;
 
@@ -60,6 +62,19 @@ type ClusterBuild = {
   width: number;
   height: number;
   clusterFrameId: string;
+};
+
+type Bounds = { x: number; y: number; width: number; height: number };
+
+type ZoneFrameSpec = {
+  id: string;
+  label: string;
+  role: string;
+  path: string[];
+  bounds: Bounds;
+  clusterFrameIds: string[];
+  vpcKey: string | null;
+  regionalBandKey: string | null;
 };
 
 function translateSkeleton(
@@ -101,6 +116,34 @@ function frameSkeleton(
       terraformTopologyPath: path,
     },
   };
+}
+
+function unionBounds(items: readonly Bounds[], pad: number): Bounds {
+  if (items.length === 0) {
+    return { x: 0, y: 0, width: MIN_FRAME_W, height: MIN_FRAME_H };
+  }
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const b of items) {
+    minX = Math.min(minX, b.x);
+    minY = Math.min(minY, b.y);
+    maxX = Math.max(maxX, b.x + b.width);
+    maxY = Math.max(maxY, b.y + b.height);
+  }
+  return {
+    x: minX - pad,
+    y: minY - pad,
+    width: maxX - minX + 2 * pad,
+    height: maxY - minY + 2 * pad,
+  };
+}
+
+function zoneLabelForGeo(geo: PipelineGeoPath): string {
+  return geo.tier === "regional"
+    ? "Regional"
+    : `${geo.vpcId ? "VPC" : "Zone"} · ${pipelineGeoTierLabel(geo.tier)}`;
 }
 
 function collectLayoutBoxesFromSkeleton(
@@ -224,17 +267,25 @@ export async function buildTerraformPipelineExcalidrawScene(
   });
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
-  const zoneFrameIds = new Map<string, string>();
-  const vpcFrameIds = new Map<string, string>();
-  const regionalFrameIds = new Map<string, string>();
+  const zoneSpecs = new Map<string, ZoneFrameSpec>();
 
   let columnX = AWS_FRAME_PAD;
   const contentTop = AWS_FRAME_PAD;
 
+  // Pass 1: place primaryCluster skeletons; accumulate zone frame specs.
   for (const col of layoutPlan.columns) {
     const colW = columnWidths[col.columnIndex] ?? MIN_FRAME_W;
     const colH = columnHeights[col.columnIndex] ?? MIN_FRAME_H;
     let laneY = contentTop + INNER_PAD;
+
+    const columnPlacement = layoutPlan.placements.find(
+      (p) => p.columnIndex === col.columnIndex,
+    );
+    const zoneKey =
+      columnPlacement != null
+        ? `${columnPlacement.geoInstanceKey}|col${col.columnIndex}`
+        : `col${col.columnIndex}`;
+    const zoneFrameId = `tf-pipe-zone:${zoneKey}`;
 
     for (let lane = 0; lane < col.atoms.length; lane++) {
       const addr = col.atoms[lane]!;
@@ -252,65 +303,45 @@ export async function buildTerraformPipelineExcalidrawScene(
       const clusterX = columnX + INNER_PAD;
       const clusterY = laneY;
 
-      const zoneKey = `${placement.geoInstanceKey}|col${col.columnIndex}`;
-      let zoneFrameId = zoneFrameIds.get(zoneKey);
-      if (!zoneFrameId) {
-        zoneFrameId = `tf-pipe-zone:${zoneKey}`;
-        zoneFrameIds.set(zoneKey, zoneFrameId);
-      }
+      skeleton.push(...translateSkeleton(build.skeleton, clusterX, clusterY));
 
-      const translated = translateSkeleton(build.skeleton, clusterX, clusterY);
-      skeleton.push(...translated);
-
-      const zoneLabel =
+      const vpcKey = placement.geo.vpcId
+        ? `${placement.geo.accountId}|${placement.geo.region}|${placement.geo.vpcId}|${placement.geoInstanceId}`
+        : null;
+      const regionalBandKey =
         placement.geo.tier === "regional"
-          ? "Regional"
-          : `${placement.geo.vpcId ? "VPC" : "Zone"} · ${pipelineGeoTierLabel(placement.geo.tier)}`;
+          ? `${placement.geo.accountId}|${placement.geo.region}|regional|${placement.geoInstanceId}`
+          : null;
 
-      const zoneChildren = translated
-        .filter((el) => el.type === "frame" && el.id === build.clusterFrameId)
-        .map((el) => el.id!)
-        .concat(
-          translated
-            .filter(
-              (el) =>
-                el.type === "rectangle" &&
-                typeof el.id === "string" &&
-                el.id !== build.clusterFrameId,
-            )
-            .map((el) => el.id!),
-        );
-
-      skeleton.push(
-        frameSkeleton(
-          zoneFrameId,
-          zoneLabel,
-          columnX,
-          clusterY - FRAME_PAD,
-          colW,
-          build.height + 2 * FRAME_PAD,
-          [build.clusterFrameId],
-          placement.geo.tier === "regional" ? "regionalBand" : "subnetZone",
-          [
+      let spec = zoneSpecs.get(zoneKey);
+      if (!spec) {
+        spec = {
+          id: zoneFrameId,
+          label: zoneLabelForGeo(placement.geo),
+          role:
+            placement.geo.tier === "regional" ? "regionalBand" : "subnetZone",
+          path: [
             placement.geo.accountId,
             placement.geo.region,
             placement.geo.vpcId ?? "regional",
             String(placement.geoInstanceId),
             String(col.columnIndex),
           ],
-        ),
-      );
+          bounds: {
+            x: columnX,
+            y: contentTop,
+            width: colW,
+            height: colH,
+          },
+          clusterFrameIds: [],
+          vpcKey,
+          regionalBandKey,
+        };
+        zoneSpecs.set(zoneKey, spec);
+      }
 
-      if (placement.geo.vpcId) {
-        const vpcKey = `${placement.geo.accountId}|${placement.geo.region}|${placement.geo.vpcId}|${placement.geoInstanceId}`;
-        if (!vpcFrameIds.has(vpcKey)) {
-          vpcFrameIds.set(vpcKey, `tf-pipe-vpc:${vpcKey}`);
-        }
-      } else {
-        const regKey = `${placement.geo.accountId}|${placement.geo.region}|regional|${placement.geoInstanceId}`;
-        if (!regionalFrameIds.has(regKey)) {
-          regionalFrameIds.set(regKey, `tf-pipe-regional:${regKey}`);
-        }
+      if (!spec.clusterFrameIds.includes(build.clusterFrameId)) {
+        spec.clusterFrameIds.push(build.clusterFrameId);
       }
 
       laneY += build.height + LANE_GAP;
@@ -319,44 +350,141 @@ export async function buildTerraformPipelineExcalidrawScene(
     columnX += colW + COLUMN_GAP;
   }
 
+  // Pass 2: emit zone → vpc/regional → region → account frames (one id each).
+  const zoneFrames: ExcalidrawElementSkeleton[] = [];
+  for (const spec of zoneSpecs.values()) {
+    zoneFrames.push(
+      frameSkeleton(
+        spec.id,
+        spec.label,
+        spec.bounds.x,
+        spec.bounds.y,
+        spec.bounds.width,
+        spec.bounds.height,
+        spec.clusterFrameIds,
+        spec.role,
+        spec.path,
+      ),
+    );
+  }
+
+  const vpcZoneGroups = new Map<string, ZoneFrameSpec[]>();
+  const regionalZoneGroups = new Map<string, ZoneFrameSpec[]>();
+  for (const spec of zoneSpecs.values()) {
+    if (spec.vpcKey && spec.role !== "regionalBand") {
+      const list = vpcZoneGroups.get(spec.vpcKey) ?? [];
+      list.push(spec);
+      vpcZoneGroups.set(spec.vpcKey, list);
+    } else if (spec.regionalBandKey) {
+      const list = regionalZoneGroups.get(spec.regionalBandKey) ?? [];
+      list.push(spec);
+      regionalZoneGroups.set(spec.regionalBandKey, list);
+    }
+  }
+
+  const vpcFrames: ExcalidrawElementSkeleton[] = [];
+  const vpcFrameIdByKey = new Map<string, string>();
+  for (const [vpcKey, zones] of vpcZoneGroups) {
+    const vpcFrameId = `tf-pipe-vpc:${vpcKey}`;
+    vpcFrameIdByKey.set(vpcKey, vpcFrameId);
+    const bounds = unionBounds(
+      zones.map((z) => z.bounds),
+      FRAME_PAD,
+    );
+    const parts = vpcKey.split("|");
+    const vpcId = parts[2] ?? "vpc";
+    vpcFrames.push(
+      frameSkeleton(
+        vpcFrameId,
+        `VPC ${vpcId.slice(0, 16)}`,
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        zones.map((z) => z.id),
+        "vpc",
+        [parts[0] ?? "", parts[1] ?? "", vpcId, parts[3] ?? "0"],
+      ),
+    );
+  }
+
+  const regionalBandFrames: ExcalidrawElementSkeleton[] = [];
+  const regionalBandIdByKey = new Map<string, string>();
+  for (const [regKey, zones] of regionalZoneGroups) {
+    const bandId = `tf-pipe-regional:${regKey}`;
+    regionalBandIdByKey.set(regKey, bandId);
+    const bounds = unionBounds(
+      zones.map((z) => z.bounds),
+      FRAME_PAD,
+    );
+    const parts = regKey.split("|");
+    regionalBandFrames.push(
+      frameSkeleton(
+        bandId,
+        "Regional",
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        zones.map((z) => z.id),
+        "regionalBand",
+        [parts[0] ?? "", parts[1] ?? "", "regional", parts[3] ?? "0"],
+      ),
+    );
+  }
+
   const accountId =
     layoutPlan.placements[0]?.geo.accountId ?? "unknown-account";
   const region = layoutPlan.placements[0]?.geo.region ?? "unknown-region";
 
+  const regionChildIds = [
+    ...vpcFrames.map((f) => f.id!),
+    ...regionalBandFrames.map((f) => f.id!),
+  ];
+  const regionBounds = unionBounds(
+    [...vpcFrames, ...regionalBandFrames].map((f) => ({
+      x: f.x ?? 0,
+      y: f.y ?? 0,
+      width: f.width ?? MIN_FRAME_W,
+      height: f.height ?? MIN_FRAME_H,
+    })),
+    AWS_FRAME_PAD / 2,
+  );
+
   const regionFrameId = `tf-pipe-region:${accountId}/${region}`;
   const accountFrameId = `tf-pipe-account:${accountId}`;
 
-  const allZoneIds = [...zoneFrameIds.values()];
-  const contentWidth = columnX - COLUMN_GAP + AWS_FRAME_PAD;
-  const contentHeight =
-    Math.max(...columnHeights, MIN_FRAME_H) + 2 * AWS_FRAME_PAD;
-
-  skeleton.push(
-    frameSkeleton(
-      regionFrameId,
-      region,
-      MARGIN,
-      MARGIN,
-      contentWidth,
-      contentHeight,
-      allZoneIds,
-      "region",
-      [accountId, region],
-    ),
+  const regionFrame = frameSkeleton(
+    regionFrameId,
+    region,
+    regionBounds.x,
+    regionBounds.y,
+    regionBounds.width,
+    regionBounds.height,
+    regionChildIds,
+    "region",
+    [accountId, region],
   );
 
-  skeleton.push(
-    frameSkeleton(
-      accountFrameId,
-      `Account ${accountId}`,
-      MARGIN - AWS_FRAME_PAD / 2,
-      MARGIN - AWS_FRAME_PAD / 2,
-      contentWidth + AWS_FRAME_PAD,
-      contentHeight + AWS_FRAME_PAD,
-      [regionFrameId],
-      "account",
-      [accountId],
-    ),
+  const accountBounds = unionBounds([regionBounds], AWS_FRAME_PAD / 2);
+  const accountFrame = frameSkeleton(
+    accountFrameId,
+    `Account ${accountId}`,
+    accountBounds.x,
+    accountBounds.y,
+    accountBounds.width,
+    accountBounds.height,
+    [regionFrameId],
+    "account",
+    [accountId],
+  );
+
+  skeleton.unshift(
+    accountFrame,
+    regionFrame,
+    ...vpcFrames,
+    ...regionalBandFrames,
+    ...zoneFrames,
   );
 
   const layoutBoxes = collectLayoutBoxesFromSkeleton(skeleton);
@@ -367,7 +495,7 @@ export async function buildTerraformPipelineExcalidrawScene(
     target: e.target,
     type: "declared_dataflow",
     label: "declared",
-    origin: "tfd",
+    origin: "tfd" as const,
     detail: String(e.sequence),
   }));
 
@@ -396,13 +524,16 @@ export async function buildTerraformPipelineExcalidrawScene(
 
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = await injectTerraformAwsIconsIntoElements(elements);
-  elements = reconcileTerraformVisibility(repairTerraformEdgeBindings(elements), {
-    pins: {
-      ...TERRAFORM_IMPORT_EDGE_LAYER_PINS,
-      declaredDataFlow: true,
+  elements = reconcileTerraformVisibility(
+    repairTerraformEdgeBindings(elements),
+    {
+      pins: {
+        ...TERRAFORM_IMPORT_EDGE_LAYER_PINS,
+        declaredDataFlow: true,
+      },
+      hoverPeekKey: null,
     },
-    hoverPeekKey: null,
-  });
+  );
   elements = reorderTopologyElementsZStack(elements);
   normalizeOrigin(elements);
 

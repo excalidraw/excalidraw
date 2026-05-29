@@ -166,7 +166,7 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
-      pipelineLayout: false,
+        pipelineLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );
@@ -204,7 +204,7 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
-      pipelineLayout: false,
+        pipelineLayout: false,
         moduleLayoutOptions: rectpackingOptions,
       },
     );

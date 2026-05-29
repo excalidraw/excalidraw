@@ -4,19 +4,14 @@
 
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
 import { resolveApiGatewayCompanionParentRestApiAddressFromPlan } from "./terraformTopologyApiGatewayLinks";
-import {
-  collectTopologySatelliteAddressesFromRegistry,
-} from "./terraformTopologySatelliteRegistry";
+import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
 import "./terraformTopologySatelliteRegistry";
 import {
   isTopologyPlacementResourceType,
   isPrimaryVisibleResourceType,
 } from "./terraformPrimaryVisibility";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
-import {
-  getTopologyPrimaryResource,
-  getTopologyResourceType,
-} from "./terraformTopologySatelliteResolve";
+import { getTopologyResourceType } from "./terraformTopologySatelliteResolve";
 import {
   DECLARED_DATAFLOW_ORDERED_KEY,
   parseDeclaredDataFlowText,
@@ -216,10 +211,14 @@ function collapseAtomEdges(
     seen.add(key);
     out.push({ source, target, sequence: e.sequence });
   }
-  return out.sort((a, b) => a.sequence - b.sequence || a.source.localeCompare(b.source));
+  return out.sort(
+    (a, b) => a.sequence - b.sequence || a.source.localeCompare(b.source),
+  );
 }
 
-function dedupeAtomEdges(edges: readonly PipelineAtomEdge[]): PipelineAtomEdge[] {
+function dedupeAtomEdges(
+  edges: readonly PipelineAtomEdge[],
+): PipelineAtomEdge[] {
   const out: PipelineAtomEdge[] = [];
   const seen = new Set<string>();
   for (const e of edges) {
@@ -288,13 +287,7 @@ export function buildPipelineAtomGraph(
   );
 
   const resolveAtom = (address: string) =>
-    resolvePipelineAtomPrimary(
-      address,
-      nodes,
-      arnIndex,
-      satelliteOwner,
-      plan,
-    );
+    resolvePipelineAtomPrimary(address, nodes, arnIndex, satelliteOwner, plan);
 
   const atomAddresses = new Set<string>();
   const memberByAtom = new Map<string, Set<string>>();
@@ -326,7 +319,9 @@ export function buildPipelineAtomGraph(
     atoms.set(primaryAddress, {
       primaryAddress,
       resourceType,
-      memberAddresses: [...(memberByAtom.get(primaryAddress) ?? [primaryAddress])].sort(),
+      memberAddresses: [
+        ...(memberByAtom.get(primaryAddress) ?? [primaryAddress]),
+      ].sort(),
     });
   }
 

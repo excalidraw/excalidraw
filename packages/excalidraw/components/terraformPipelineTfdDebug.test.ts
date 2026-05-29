@@ -91,7 +91,7 @@ describe("staging pipeline.tfd resolution", () => {
         e.customData?.terraformVisibilityRole === "resource" &&
         typeof e.customData?.nodePath === "string",
     );
-    const nodePaths = new Set(
+    const nodePaths = new Set<string>(
       resourceRects.map(
         (e: { customData: { nodePath: string } }) => e.customData.nodePath,
       ),
@@ -117,13 +117,54 @@ describe("staging pipeline.tfd resolution", () => {
     );
     expect(apiPrimaries).toHaveLength(5);
 
-    const ssmRects = resourceRects.filter((e: {
-      customData: { nodePath: string };
-    }) => e.customData.nodePath.includes("aws_ssm_parameter"));
+    const ssmRects = resourceRects.filter(
+      (e: { customData: { nodePath: string } }) =>
+        e.customData.nodePath.includes("aws_ssm_parameter"),
+    );
     expect(ssmRects).toHaveLength(5);
 
     expect(body.meta?.geoInstanceCount).toBeGreaterThanOrEqual(2);
     expect(body.meta?.atomCount).toBe(19);
     expect(body.meta?.declaredEdgeCount).toBe(20);
+    expect(body.meta?.columnCount).toBe(7);
+
+    const frames = body.elements.filter(
+      (e: { type?: string; id?: string }) => e.type === "frame",
+    );
+    const frameIds = frames.map((e: { id: string }) => e.id);
+    expect(frameIds.length).toBe(new Set(frameIds).size);
+
+    const vpcFrames = frames.filter(
+      (e: { customData?: { terraformTopologyRole?: string } }) =>
+        e.customData?.terraformTopologyRole === "vpc",
+    );
+    expect(vpcFrames.length).toBeGreaterThanOrEqual(1);
+
+    const lambdaRects = resourceRects.filter(
+      (e: { customData: { nodePath: string } }) =>
+        e.customData.nodePath.includes("aws_lambda_function") &&
+        e.customData.nodePath.includes("api"),
+    );
+    expect(lambdaRects.length).toBe(5);
+    const lambdaXs = lambdaRects.map((e: { x: number }) => e.x);
+    expect(Math.max(...lambdaXs) - Math.min(...lambdaXs)).toBeLessThan(8);
+
+    const ssmXs = ssmRects.map((e: { x: number }) => e.x);
+    expect(Math.max(...ssmXs) - Math.min(...ssmXs)).toBeLessThan(8);
+
+    const zoneFrames = frames.filter(
+      (e: {
+        customData?: { terraformTopologyRole?: string };
+        height?: number;
+      }) =>
+        e.customData?.terraformTopologyRole === "subnetZone" ||
+        e.customData?.terraformTopologyRole === "regionalBand",
+    );
+    for (const zf of zoneFrames) {
+      if (zf.customData?.terraformTopologyRole === "regionalBand") {
+        continue;
+      }
+      expect(zf.height ?? 0).toBeGreaterThanOrEqual(80);
+    }
   }, 180_000);
 });
