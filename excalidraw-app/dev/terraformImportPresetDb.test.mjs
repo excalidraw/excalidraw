@@ -21,8 +21,8 @@ describe("terraformImportPresetDb seed", () => {
     }
     const { presetCount, withContent } =
       verifyTerraformImportPresetTestDb(TEST_FIXTURE_DB_PATH);
-    expect(presetCount).toBe(10);
-    expect(withContent).toBe(10);
+    expect(presetCount).toBe(11);
+    expect(withContent).toBe(11);
   });
 
   it("seeds all catalog presets with plan+dot content when disk files exist", () => {
@@ -36,7 +36,7 @@ describe("terraformImportPresetDb seed", () => {
     const { presetCount, results } = seedAllBuiltinsFromCatalog(db);
     const missing = results.flatMap((entry) => entry.missing ?? []);
 
-    expect(presetCount).toBe(10);
+    expect(presetCount).toBe(11);
     if (missing.length > 0) {
       return;
     }
@@ -44,7 +44,7 @@ describe("terraformImportPresetDb seed", () => {
     const presetCountRow = db
       .prepare(`SELECT COUNT(*) AS count FROM terraform_import_presets`)
       .get();
-    expect(presetCountRow.count).toBe(10);
+    expect(presetCountRow.count).toBe(11);
 
     const stack = db
       .prepare(

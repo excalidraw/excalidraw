@@ -28,6 +28,35 @@ function nowIso() {
 const joinRootRelative = (rootPath, relativePath) =>
   `${rootPath.replace(/\/+$/, "")}/${relativePath.replace(/^\/+/, "")}`;
 
+function migratePresetViewConstraint(db) {
+  const row = db
+    .prepare(
+      `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'terraform_import_presets'`,
+    )
+    .get();
+  const ddl = typeof row?.sql === "string" ? row.sql : "";
+  if (ddl.includes("'pipeline'")) {
+    return;
+  }
+  db.exec(`
+    CREATE TABLE terraform_import_presets__new (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      builtin INTEGER NOT NULL DEFAULT 0,
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
+      root_path TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    INSERT INTO terraform_import_presets__new
+      SELECT id, name, description, builtin, view, root_path, created_at, updated_at
+      FROM terraform_import_presets;
+    DROP TABLE terraform_import_presets;
+    ALTER TABLE terraform_import_presets__new RENAME TO terraform_import_presets;
+  `);
+}
+
 function ensureSchema(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS terraform_import_presets (
@@ -35,7 +64,7 @@ function ensureSchema(db) {
       name TEXT NOT NULL,
       description TEXT,
       builtin INTEGER NOT NULL DEFAULT 0,
-      view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
       root_path TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -89,6 +118,8 @@ function ensureSchema(db) {
   if (!tfdColumns.includes("content")) {
     db.exec(`ALTER TABLE terraform_import_preset_tfd ADD COLUMN content TEXT`);
   }
+
+  migratePresetViewConstraint(db);
 }
 
 function presetHasStoredContent(db, presetId) {
@@ -318,8 +349,10 @@ function hydratePresetContentsFromDisk(db, presetId) {
   for (const stack of stacks) {
     const planFullPath = joinRootRelative(row.rootPath, stack.planPath);
     const dotFullPath = joinRootRelative(row.rootPath, stack.dotPath);
-    const planText = stack.planText ?? readTextFileAtRepoPath(planFullPath);
-    const dotText = stack.dotText ?? readTextFileAtRepoPath(dotFullPath);
+    const planFromDisk = readTextFileAtRepoPath(planFullPath);
+    const dotFromDisk = readTextFileAtRepoPath(dotFullPath);
+    const planText = planFromDisk ?? stack.planText;
+    const dotText = dotFromDisk ?? stack.dotText;
     let stateText = stack.stateText ?? null;
     if (stack.statePath) {
       const stateFullPath = joinRootRelative(row.rootPath, stack.statePath);
@@ -771,6 +804,55 @@ export function readStagingMultiStatePipelineTfdFromDb() {
   return readTerraformImportRepoFileText(
     "packages/backend/terraform/staging-multi-state/pipeline.tfd",
   );
+}
+
+export function loadLocalstackGeoFanoutPlanDotBundlesFromDb() {
+  const db = getTerraformImportPresetTestDb();
+  const rows = db
+    .prepare(
+      `SELECT stack_id AS id, label, plan_text AS planText, dot_text AS dotText
+       FROM terraform_import_preset_stacks
+       WHERE preset_id = 'localstack-geo-fanout'
+       ORDER BY sort_order ASC`,
+    )
+    .all();
+
+  return rows.map((row) => {
+    if (!row.planText || !row.dotText) {
+      throw new Error(
+        `localstack-geo-fanout stack "${row.id}" is missing plan or dot content in the preset DB.`,
+      );
+    }
+    return {
+      plan: JSON.parse(row.planText),
+      dotText: row.dotText,
+      label: row.label || row.id,
+    };
+  });
+}
+
+export function readLocalstackGeoFanoutPipelineTfdFromDb() {
+  return readTerraformImportRepoFileText(
+    "packages/backend/terraform/localstack-geo-fanout/pipeline.tfd",
+  );
+}
+
+export function hasLocalstackGeoFanoutPresetInDb() {
+  try {
+    const db = getTerraformImportPresetTestDb();
+    const row = db
+      .prepare(
+        `SELECT COUNT(*) AS count
+         FROM terraform_import_preset_stacks
+         WHERE preset_id = 'localstack-geo-fanout'
+           AND plan_text IS NOT NULL
+           AND dot_text IS NOT NULL`,
+      )
+      .get();
+    return (row?.count ?? 0) >= 7;
+  } catch {
+    return false;
+  }
 }
 
 export function verifyTerraformImportPresetTestDb(

@@ -35,6 +35,33 @@ export type PipelineColumn = {
   laneCount: number;
 };
 
+export type PipelineAccountLaneBand = {
+  accountId: string;
+  laneIndices: ReadonlySet<number>;
+  minLane: number;
+};
+
+/** Lane indices per account for pipeline geo band wrappers (e.g. 111… lanes 0–2). */
+export function buildPipelineAccountLaneBands(
+  placements: readonly PipelineAtomPlacement[],
+): PipelineAccountLaneBand[] {
+  const byAccount = new Map<string, Set<number>>();
+  for (const placement of placements) {
+    const lanes = byAccount.get(placement.geo.accountId) ?? new Set<number>();
+    lanes.add(placement.laneIndex);
+    byAccount.set(placement.geo.accountId, lanes);
+  }
+  return [...byAccount.entries()]
+    .map(([accountId, laneIndices]) => ({
+      accountId,
+      laneIndices,
+      minLane: Math.min(...laneIndices),
+    }))
+    .sort(
+      (a, b) => a.minLane - b.minLane || a.accountId.localeCompare(b.accountId),
+    );
+}
+
 function geoNeedsNewInstance(
   prev: PipelineGeoPath | null,
   prevInstanceId: number,

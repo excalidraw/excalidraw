@@ -16,7 +16,10 @@ import { tfComfortPx } from "./terraformLayoutComfort";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import {
+  buildPipelineAccountLaneBands,
   buildPipelineLayoutPlan,
+  type PipelineAccountLaneBand,
+  type PipelineAtomPlacement,
   type PipelineColumn,
 } from "./terraformPipelineContainers";
 import { buildPipelineDeclaredDataFlowLineSkeletons } from "./terraformPipelineEdges";
@@ -46,6 +49,8 @@ const LANE_GAP = px(24);
 const INNER_PAD = px(28);
 const FRAME_PAD = px(20);
 const AWS_FRAME_PAD = px(32);
+/** Extra vertical gap between multi-account lane bands (region padding on both sides). */
+const ACCOUNT_BAND_GAP = LANE_GAP + 2 * INNER_PAD;
 const MIN_FRAME_W = px(200);
 const MIN_FRAME_H = px(160);
 
@@ -78,6 +83,26 @@ type ZoneFrameSpec = {
   clusterFrameIds: string[];
   vpcKey: string | null;
   regionalBandKey: string | null;
+  accountId: string;
+  region: string;
+  columnIndex: number;
+  laneIndex: number;
+};
+
+type ClusterPlacementDraft = {
+  col: PipelineColumn;
+  lane: number;
+  placement: PipelineAtomPlacement;
+  build: ClusterBuild;
+  columnX: number;
+  clusterX: number;
+  clusterY: number;
+  bounds: Bounds;
+  vpcKey: string | null;
+  regionalBandKey: string | null;
+  zoneKey: string;
+  zoneFrameId: string;
+  preFanoutColumn: boolean;
 };
 
 type PipelineRowGeometry = {
@@ -87,43 +112,216 @@ type PipelineRowGeometry = {
   sharedColumnHeight: number;
 };
 
+function computeRowTops(
+  rowHeights: readonly number[],
+  contentTop: number,
+  accountBands?: readonly PipelineAccountLaneBand[],
+  multiAccountBandLayout = false,
+): { rowTops: number[]; sharedColumnHeight: number } {
+  if (!multiAccountBandLayout || !accountBands || accountBands.length <= 1) {
+    const rowTops: number[] = [];
+    let y = contentTop + INNER_PAD;
+    for (let i = 0; i < rowHeights.length; i++) {
+      rowTops[i] = y;
+      y += rowHeights[i]! + LANE_GAP;
+    }
+    return { rowTops, sharedColumnHeight: y - contentTop + INNER_PAD };
+  }
+
+  const rowTops: number[] = [];
+  const sortedBands = [...accountBands].sort((a, b) => a.minLane - b.minLane);
+  let y = contentTop + INNER_PAD;
+
+  for (let bi = 0; bi < sortedBands.length; bi++) {
+    const band = sortedBands[bi]!;
+    const lanes = [...band.laneIndices].sort((a, b) => a - b);
+    if (bi > 0) {
+      const prevBand = sortedBands[bi - 1]!;
+      const prevMaxLane = Math.max(...prevBand.laneIndices);
+      y = rowTops[prevMaxLane]! + rowHeights[prevMaxLane]! + ACCOUNT_BAND_GAP;
+    }
+    for (const lane of lanes) {
+      rowTops[lane] = y;
+      y += rowHeights[lane]! + LANE_GAP;
+    }
+  }
+
+  for (let i = 0; i < rowHeights.length; i++) {
+    if (rowTops[i] == null) {
+      rowTops[i] = y;
+      y += rowHeights[i]! + LANE_GAP;
+    }
+  }
+
+  return { rowTops, sharedColumnHeight: y - contentTop + INNER_PAD };
+}
+
 function computePipelineRowGeometry(
   layoutPlan: { columns: PipelineColumn[] },
   clusterBuilds: Map<string, ClusterBuild>,
   contentTop: number,
+  rowHeightsOverride?: readonly number[],
+  accountBands?: readonly PipelineAccountLaneBand[],
+  multiAccountBandLayout = false,
 ): PipelineRowGeometry {
   const maxLaneCount = Math.max(
     1,
     ...layoutPlan.columns.map((c) => c.laneCount),
   );
-  const rowHeights = Array.from({ length: maxLaneCount }, () => px(88));
+  const rowHeights =
+    rowHeightsOverride != null
+      ? [...rowHeightsOverride]
+      : Array.from({ length: maxLaneCount }, () => px(88));
 
-  for (const col of layoutPlan.columns) {
-    for (let lane = 0; lane < col.atoms.length; lane++) {
-      const addr = col.atoms[lane];
-      const build = addr ? clusterBuilds.get(addr) : undefined;
-      if (build) {
-        rowHeights[lane] = Math.max(
-          rowHeights[lane]!,
-          minRowHeightForPrimaryCenteredCluster(build),
-        );
+  if (rowHeightsOverride == null) {
+    for (const col of layoutPlan.columns) {
+      for (let lane = 0; lane < col.atoms.length; lane++) {
+        const addr = col.atoms[lane];
+        const build = addr ? clusterBuilds.get(addr) : undefined;
+        if (build) {
+          rowHeights[lane] = Math.max(
+            rowHeights[lane]!,
+            minRowHeightForPrimaryCenteredCluster(build),
+          );
+        }
       }
     }
   }
 
-  const rowTops: number[] = [];
-  let y = contentTop + INNER_PAD;
-  for (let i = 0; i < maxLaneCount; i++) {
-    rowTops[i] = y;
-    y += rowHeights[i]! + LANE_GAP;
-  }
+  const { rowTops, sharedColumnHeight } = computeRowTops(
+    rowHeights,
+    contentTop,
+    accountBands,
+    multiAccountBandLayout,
+  );
 
   return {
     maxLaneCount,
     rowHeights,
     rowTops,
-    sharedColumnHeight: y - contentTop + INNER_PAD,
+    sharedColumnHeight,
   };
+}
+
+function inflateRowHeightsFromZoneBounds(
+  rowHeights: number[],
+  drafts: readonly ClusterPlacementDraft[],
+  contentTop: number,
+  accountLaneIndicesByAccount: ReadonlyMap<string, readonly number[]>,
+  multiAccountBandLayout: boolean,
+  accountBands?: readonly PipelineAccountLaneBand[],
+): boolean {
+  let changed = false;
+  for (const draft of drafts) {
+    const needed = draft.bounds.height + 2 * FRAME_PAD + INNER_PAD;
+    const accountLanes = accountLaneIndicesByAccount.get(
+      draft.placement.geo.accountId,
+    );
+    const maxBandLane =
+      multiAccountBandLayout && accountLanes?.length
+        ? Math.max(...accountLanes)
+        : rowHeights.length - 1;
+
+    if (draft.preFanoutColumn && multiAccountBandLayout) {
+      const targetBottom = draft.bounds.y + draft.bounds.height + FRAME_PAD;
+      const tops = computeRowTops(
+        rowHeights,
+        contentTop,
+        accountBands,
+        multiAccountBandLayout,
+      ).rowTops;
+      let startLane = draft.lane;
+      for (let i = 0; i <= maxBandLane; i++) {
+        const laneBottom = tops[i]! + rowHeights[i]!;
+        if (draft.bounds.y < laneBottom + LANE_GAP) {
+          startLane = i;
+          break;
+        }
+      }
+      for (let lane = startLane; lane <= maxBandLane; lane++) {
+        const laneTops = computeRowTops(
+          rowHeights,
+          contentTop,
+          accountBands,
+          multiAccountBandLayout,
+        ).rowTops;
+        const laneBottom = laneTops[lane]! + rowHeights[lane]!;
+        if (targetBottom <= laneBottom + 0.5) {
+          break;
+        }
+        const laneNeeded = targetBottom - laneTops[lane]! + FRAME_PAD;
+        if (laneNeeded > rowHeights[lane]!) {
+          rowHeights[lane] = laneNeeded;
+          changed = true;
+        }
+      }
+      continue;
+    }
+
+    if (needed > rowHeights[draft.lane]!) {
+      rowHeights[draft.lane] = needed;
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function inflateRowHeightsFromZoneSpecBounds(
+  rowHeights: number[],
+  zoneSpecs: ReadonlyMap<string, ZoneFrameSpec>,
+  contentTop: number,
+  accountBands?: readonly PipelineAccountLaneBand[],
+  multiAccountBandLayout = false,
+): boolean {
+  let changed = false;
+  const tops = computeRowTops(
+    rowHeights,
+    contentTop,
+    accountBands,
+    multiAccountBandLayout,
+  ).rowTops;
+  for (const spec of zoneSpecs.values()) {
+    const targetBottom =
+      spec.bounds.y + spec.bounds.height + FRAME_PAD + INNER_PAD;
+    const laneBottom = tops[spec.laneIndex]! + rowHeights[spec.laneIndex]!;
+    if (targetBottom > laneBottom + 0.5) {
+      rowHeights[spec.laneIndex]! += targetBottom - laneBottom;
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function populateSkeletonFromDrafts(
+  drafts: readonly ClusterPlacementDraft[],
+  skeleton: ExcalidrawElementSkeleton[],
+  zoneSpecs: Map<string, ZoneFrameSpec>,
+): void {
+  for (const draft of drafts) {
+    const { placement, build, clusterX, clusterY } = draft;
+    skeleton.push(...translateSkeleton(build.skeleton, clusterX, clusterY));
+    zoneSpecs.set(draft.zoneKey, {
+      id: draft.zoneFrameId,
+      label: zoneLabelForGeo(placement.geo),
+      role: "subnetZone",
+      path: [
+        placement.geo.accountId,
+        placement.geo.region,
+        placement.geo.vpcId ?? "regional",
+        String(placement.geoInstanceId),
+        String(draft.col.columnIndex),
+        String(draft.lane),
+      ],
+      bounds: clusterBoundsForZone(clusterX, clusterY, build),
+      clusterFrameIds: [build.clusterFrameId],
+      vpcKey: draft.vpcKey,
+      regionalBandKey: draft.regionalBandKey,
+      accountId: placement.geo.accountId,
+      region: placement.geo.region,
+      columnIndex: draft.col.columnIndex,
+      laneIndex: draft.lane,
+    });
+  }
 }
 
 function primaryResourceCenterYInCluster(build: ClusterBuild): number {
@@ -165,6 +363,8 @@ function clusterYForPlacement(
   build: ClusterBuild,
   rowGeo: PipelineRowGeometry,
   columns: readonly PipelineColumn[],
+  accountLaneIndices?: readonly number[],
+  multiAccountBandLayout = false,
 ): number {
   const { rowHeights, rowTops, maxLaneCount } = rowGeo;
   const primaryCy = primaryResourceCenterYInCluster(build);
@@ -172,7 +372,12 @@ function clusterYForPlacement(
 
   let rowCenterY: number;
   if (col.laneCount === 1 && firstFanoutCol >= 0 && colIdx < firstFanoutCol) {
-    rowCenterY = fanoutSpanCenterY(rowGeo);
+    if (multiAccountBandLayout && accountLaneIndices?.length) {
+      const minLane = Math.min(...accountLaneIndices);
+      rowCenterY = rowTops[minLane]! + primaryCy;
+    } else {
+      rowCenterY = fanoutSpanCenterY(rowGeo);
+    }
   } else if (col.laneCount === maxLaneCount) {
     rowCenterY = rowTops[lane]! + rowHeights[lane]! / 2;
   } else {
@@ -194,7 +399,7 @@ function translateSkeleton(
   }));
 }
 
-function frameSkeleton(
+function leafZoneFrameSkeleton(
   id: string,
   name: string,
   x: number,
@@ -202,7 +407,6 @@ function frameSkeleton(
   width: number,
   height: number,
   children: readonly string[],
-  role: string,
   path: string[],
 ): ExcalidrawElementSkeleton {
   return {
@@ -211,31 +415,269 @@ function frameSkeleton(
     name: name.slice(0, 48),
     x,
     y,
-    width: Math.max(width, MIN_FRAME_W),
-    height: Math.max(height, MIN_FRAME_H),
+    width,
+    height,
+    children,
+    customData: {
+      terraform: true,
+      terraformPipelineOverview: true,
+      terraformTopologyRole: "subnetZone",
+      terraformTopologyPath: path,
+    },
+  };
+}
+
+/** Container frames: omit x/y/width/height so convert sizes from children (inner → outer order). */
+function containerFrameSkeleton(
+  id: string,
+  name: string,
+  children: readonly string[],
+  role: string,
+  path: string[],
+  customDataExtras?: Record<string, unknown>,
+): ExcalidrawElementSkeleton {
+  return {
+    type: "frame",
+    id,
+    name: name.slice(0, 48),
     children,
     customData: {
       terraform: true,
       terraformPipelineOverview: true,
       terraformTopologyRole: role,
       terraformTopologyPath: path,
+      ...customDataExtras,
     },
   };
 }
 
-function unionBounds(items: readonly Bounds[], pad: number): Bounds {
-  if (items.length === 0) {
-    return { x: 0, y: 0, width: MIN_FRAME_W, height: MIN_FRAME_H };
+function pipelineContainerPad(role: string): number {
+  switch (role) {
+    case "vpc":
+      return FRAME_PAD;
+    case "region":
+      return INNER_PAD;
+    case "account":
+      return AWS_FRAME_PAD / 2;
+    case "provider":
+      return AWS_FRAME_PAD;
+    default:
+      return FRAME_PAD;
   }
+}
+
+function setFrameBounds(
+  frame: ExcalidrawElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): void {
+  const mutable = frame as ExcalidrawElement & {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  mutable.x = x;
+  mutable.y = y;
+  mutable.width = width;
+  mutable.height = height;
+}
+
+function resizePipelineContainerFrames(elements: ExcalidrawElement[]): void {
+  const roles = ["vpc", "region", "account", "provider"] as const;
+  for (const role of roles) {
+    const pad = pipelineContainerPad(role);
+    for (const frame of elements) {
+      if (frame.type !== "frame" || frame.isDeleted) {
+        continue;
+      }
+      const cd = frame.customData as Record<string, unknown> | undefined;
+      if (cd?.terraformTopologyRole !== role) {
+        continue;
+      }
+      const children = elements.filter(
+        (el) => !el.isDeleted && el.frameId === frame.id,
+      );
+      if (children.length === 0) {
+        continue;
+      }
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const child of children) {
+        minX = Math.min(minX, child.x);
+        minY = Math.min(minY, child.y);
+        maxX = Math.max(maxX, child.x + child.width);
+        maxY = Math.max(maxY, child.y + child.height);
+      }
+      setFrameBounds(
+        frame,
+        minX - pad,
+        minY - pad,
+        maxX - minX + 2 * pad,
+        maxY - minY + 2 * pad,
+      );
+    }
+  }
+}
+
+function childBounds(
+  elements: ExcalidrawElement[],
+  frameId: string,
+): { minX: number; minY: number; maxX: number; maxY: number } | null {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
-  for (const b of items) {
-    minX = Math.min(minX, b.x);
-    minY = Math.min(minY, b.y);
-    maxX = Math.max(maxX, b.x + b.width);
-    maxY = Math.max(maxY, b.y + b.height);
+  for (const child of elements) {
+    if (child.isDeleted || child.frameId !== frameId) {
+      continue;
+    }
+    minX = Math.min(minX, child.x);
+    minY = Math.min(minY, child.y);
+    maxX = Math.max(maxX, child.x + child.width);
+    maxY = Math.max(maxY, child.y + child.height);
+  }
+  if (!Number.isFinite(minX)) {
+    return null;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+function translateElementsForAccount(
+  elements: ExcalidrawElement[],
+  accountId: string,
+  dx: number,
+  dy: number,
+): void {
+  if (dx === 0 && dy === 0) {
+    return;
+  }
+  for (const el of elements) {
+    if (el.isDeleted) {
+      continue;
+    }
+    const path = (el.customData as Record<string, unknown> | undefined)
+      ?.terraformTopologyPath;
+    if (!Array.isArray(path) || path[0] !== accountId) {
+      continue;
+    }
+    (el as { x: number; y: number }).x += dx;
+    (el as { y: number }).y += dy;
+  }
+}
+
+function alignMultiAccountPipelineFrames(
+  elements: ExcalidrawElement[],
+  accountBands: readonly PipelineAccountLaneBand[],
+): void {
+  const frameRole = (el: ExcalidrawElement) =>
+    String(
+      (el.customData as Record<string, unknown> | undefined)
+        ?.terraformTopologyRole ?? "",
+    );
+
+  const sortedBands = [...accountBands].sort(
+    (a, b) => a.minLane - b.minLane || a.accountId.localeCompare(b.accountId),
+  );
+
+  let prevAccountBottom = -Infinity;
+  for (const band of sortedBands) {
+    const accountFrame = elements.find((e) => {
+      if (e.isDeleted || e.type !== "frame" || frameRole(e) !== "account") {
+        return false;
+      }
+      const path = (e.customData as Record<string, unknown> | undefined)
+        ?.terraformTopologyPath as string[] | undefined;
+      return path?.[0] === band.accountId;
+    });
+    if (!accountFrame) {
+      continue;
+    }
+
+    const bounds = childBounds(elements, accountFrame.id);
+    if (!bounds) {
+      continue;
+    }
+
+    const pad = pipelineContainerPad("account");
+    const targetTop = Math.max(bounds.minY - pad, prevAccountBottom + LANE_GAP);
+    const dy = targetTop - (bounds.minY - pad);
+    if (dy > 0.5) {
+      translateElementsForAccount(elements, band.accountId, 0, dy);
+      bounds.minY += dy;
+      bounds.maxY += dy;
+    }
+
+    setFrameBounds(
+      accountFrame,
+      bounds.minX - pad,
+      bounds.minY - pad,
+      bounds.maxX - bounds.minX + 2 * pad,
+      bounds.maxY - bounds.minY + 2 * pad,
+    );
+    prevAccountBottom = accountFrame.y + accountFrame.height;
+  }
+
+  const awsFrame = elements.find(
+    (e) => !e.isDeleted && e.type === "frame" && frameRole(e) === "provider",
+  );
+  if (awsFrame) {
+    const bounds = childBounds(elements, awsFrame.id);
+    if (bounds) {
+      const pad = pipelineContainerPad("provider");
+      setFrameBounds(
+        awsFrame,
+        bounds.minX - pad,
+        bounds.minY - pad,
+        bounds.maxX - bounds.minX + 2 * pad,
+        bounds.maxY - bounds.minY + 2 * pad,
+      );
+    }
+  }
+}
+
+function specInAccountBand(
+  spec: ZoneFrameSpec,
+  accountBands: readonly {
+    accountId: string;
+    laneIndices: ReadonlySet<number>;
+  }[],
+  multiAccountBandLayout: boolean,
+): boolean {
+  if (!multiAccountBandLayout) {
+    return true;
+  }
+  const band = accountBands.find((b) => b.accountId === spec.accountId);
+  return band ? band.laneIndices.has(spec.laneIndex) : true;
+}
+
+function skeletonUnionBounds(
+  skeleton: readonly ExcalidrawElementSkeleton[],
+  pad: number,
+): Bounds {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const el of skeleton) {
+    const x = el.x ?? 0;
+    const y = el.y ?? 0;
+    const w = el.width ?? 0;
+    const h = el.height ?? 0;
+    if (w <= 0 && h <= 0) {
+      continue;
+    }
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + w);
+    maxY = Math.max(maxY, y + h);
+  }
+  if (!Number.isFinite(minX)) {
+    return { x: 0, y: 0, width: MIN_FRAME_W, height: MIN_FRAME_H };
   }
   return {
     x: minX - pad,
@@ -243,6 +685,21 @@ function unionBounds(items: readonly Bounds[], pad: number): Bounds {
     width: maxX - minX + 2 * pad,
     height: maxY - minY + 2 * pad,
   };
+}
+
+function clusterBoundsForZone(
+  clusterX: number,
+  clusterY: number,
+  build: ClusterBuild,
+): Bounds {
+  return skeletonUnionBounds(
+    translateSkeleton(build.skeleton, clusterX, clusterY),
+    FRAME_PAD,
+  );
+}
+
+function regionGroupKey(accountId: string, region: string): string {
+  return `${accountId}|${region}`;
 }
 
 function zoneLabelForGeo(geo: PipelineGeoPath): string {
@@ -362,105 +819,145 @@ export async function buildTerraformPipelineExcalidrawScene(
   });
 
   const contentTop = AWS_FRAME_PAD;
-  const rowGeo = computePipelineRowGeometry(
+  const accountBands = buildPipelineAccountLaneBands(layoutPlan.placements);
+  const multiAccountBandLayout = accountBands.length > 1;
+  let rowGeo = computePipelineRowGeometry(
     layoutPlan,
     clusterBuilds,
     contentTop,
+    undefined,
+    accountBands,
+    multiAccountBandLayout,
   );
-  const sharedColumnHeight = rowGeo.sharedColumnHeight;
+
+  const columnXByIndex = new Map<number, number>();
+  let columnX = AWS_FRAME_PAD;
+  for (const col of layoutPlan.columns) {
+    columnXByIndex.set(col.columnIndex, columnX);
+    columnX += (columnWidths[col.columnIndex] ?? MIN_FRAME_W) + COLUMN_GAP;
+  }
+
+  const accountLaneIndicesByAccount = new Map(
+    accountBands.map((band) => [
+      band.accountId,
+      [...band.laneIndices].sort((a, b) => a - b),
+    ]),
+  );
+  const firstFanoutCol = firstMultiLaneColumnIndex(layoutPlan.columns);
+
+  const buildDrafts = (geo: PipelineRowGeometry): ClusterPlacementDraft[] => {
+    const drafts: ClusterPlacementDraft[] = [];
+    for (const col of layoutPlan.columns) {
+      const colX = columnXByIndex.get(col.columnIndex) ?? AWS_FRAME_PAD;
+      const preFanoutColumn =
+        col.laneCount === 1 &&
+        firstFanoutCol >= 0 &&
+        col.columnIndex < firstFanoutCol;
+      for (let lane = 0; lane < col.atoms.length; lane++) {
+        const addr = col.atoms[lane]!;
+        const placement = layoutPlan.placements.find(
+          (p) => p.primaryAddress === addr && p.columnIndex === col.columnIndex,
+        );
+        if (!placement) {
+          continue;
+        }
+        const build = clusterBuilds.get(addr);
+        if (!build) {
+          continue;
+        }
+        const clusterX = colX + INNER_PAD;
+        const clusterY = clusterYForPlacement(
+          col,
+          col.columnIndex,
+          lane,
+          build,
+          geo,
+          layoutPlan.columns,
+          accountLaneIndicesByAccount.get(placement.geo.accountId),
+          multiAccountBandLayout,
+        );
+        const vpcKey = placement.geo.vpcId
+          ? `${placement.geo.accountId}|${placement.geo.region}|${placement.geo.vpcId}|${placement.geoInstanceId}`
+          : null;
+        const regionalBandKey =
+          placement.geo.tier === "regional"
+            ? `${placement.geo.accountId}|${placement.geo.region}|regional|${placement.geoInstanceId}`
+            : null;
+        const zoneKey = `${placement.geoInstanceKey}|col${col.columnIndex}|lane${lane}`;
+        drafts.push({
+          col,
+          lane,
+          placement,
+          build,
+          columnX: colX,
+          clusterX,
+          clusterY,
+          bounds: clusterBoundsForZone(clusterX, clusterY, build),
+          vpcKey,
+          regionalBandKey,
+          zoneKey,
+          zoneFrameId: `tf-pipe-zone:${zoneKey}`,
+          preFanoutColumn,
+        });
+      }
+    }
+    return drafts;
+  };
+
+  let drafts = buildDrafts(rowGeo);
+  if (
+    inflateRowHeightsFromZoneBounds(
+      rowGeo.rowHeights,
+      drafts,
+      contentTop,
+      accountLaneIndicesByAccount,
+      multiAccountBandLayout,
+      accountBands,
+    )
+  ) {
+    rowGeo = computePipelineRowGeometry(
+      layoutPlan,
+      clusterBuilds,
+      contentTop,
+      rowGeo.rowHeights,
+      accountBands,
+      multiAccountBandLayout,
+    );
+    drafts = buildDrafts(rowGeo);
+  }
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const zoneSpecs = new Map<string, ZoneFrameSpec>();
 
-  let columnX = AWS_FRAME_PAD;
-
-  // Pass 1: place primaryCluster skeletons; accumulate zone frame specs.
-  for (const col of layoutPlan.columns) {
-    const colW = columnWidths[col.columnIndex] ?? MIN_FRAME_W;
-    const colH = sharedColumnHeight;
-
-    const columnPlacement = layoutPlan.placements.find(
-      (p) => p.columnIndex === col.columnIndex,
+  populateSkeletonFromDrafts(drafts, skeleton, zoneSpecs);
+  if (
+    inflateRowHeightsFromZoneSpecBounds(
+      rowGeo.rowHeights,
+      zoneSpecs,
+      contentTop,
+      accountBands,
+      multiAccountBandLayout,
+    )
+  ) {
+    rowGeo = computePipelineRowGeometry(
+      layoutPlan,
+      clusterBuilds,
+      contentTop,
+      rowGeo.rowHeights,
+      accountBands,
+      multiAccountBandLayout,
     );
-    const zoneKey =
-      columnPlacement != null
-        ? `${columnPlacement.geoInstanceKey}|col${col.columnIndex}`
-        : `col${col.columnIndex}`;
-    const zoneFrameId = `tf-pipe-zone:${zoneKey}`;
-
-    for (let lane = 0; lane < col.atoms.length; lane++) {
-      const addr = col.atoms[lane]!;
-      const placement = layoutPlan.placements.find(
-        (p) => p.primaryAddress === addr && p.columnIndex === col.columnIndex,
-      );
-      if (!placement) {
-        continue;
-      }
-      const build = clusterBuilds.get(addr);
-      if (!build) {
-        continue;
-      }
-
-      const clusterX = columnX + INNER_PAD;
-      const clusterY = clusterYForPlacement(
-        col,
-        col.columnIndex,
-        lane,
-        build,
-        rowGeo,
-        layoutPlan.columns,
-      );
-
-      skeleton.push(...translateSkeleton(build.skeleton, clusterX, clusterY));
-
-      const vpcKey = placement.geo.vpcId
-        ? `${placement.geo.accountId}|${placement.geo.region}|${placement.geo.vpcId}|${placement.geoInstanceId}`
-        : null;
-      const regionalBandKey =
-        placement.geo.tier === "regional"
-          ? `${placement.geo.accountId}|${placement.geo.region}|regional|${placement.geoInstanceId}`
-          : null;
-
-      let spec = zoneSpecs.get(zoneKey);
-      if (!spec) {
-        spec = {
-          id: zoneFrameId,
-          label: zoneLabelForGeo(placement.geo),
-          role:
-            placement.geo.tier === "regional" ? "regionalBand" : "subnetZone",
-          path: [
-            placement.geo.accountId,
-            placement.geo.region,
-            placement.geo.vpcId ?? "regional",
-            String(placement.geoInstanceId),
-            String(col.columnIndex),
-          ],
-          bounds: {
-            x: columnX,
-            y: contentTop,
-            width: colW,
-            height: colH,
-          },
-          clusterFrameIds: [],
-          vpcKey,
-          regionalBandKey,
-        };
-        zoneSpecs.set(zoneKey, spec);
-      }
-
-      if (!spec.clusterFrameIds.includes(build.clusterFrameId)) {
-        spec.clusterFrameIds.push(build.clusterFrameId);
-      }
-    }
-
-    columnX += colW + COLUMN_GAP;
+    skeleton.length = 0;
+    zoneSpecs.clear();
+    drafts = buildDrafts(rowGeo);
+    populateSkeletonFromDrafts(drafts, skeleton, zoneSpecs);
   }
 
-  // Pass 2: emit zone → vpc/regional → region → account frames (one id each).
+  // Pass 2: AWS → account → region → vpc → subnetZone (container bounds from children post-convert).
   const zoneFrames: ExcalidrawElementSkeleton[] = [];
   for (const spec of zoneSpecs.values()) {
     zoneFrames.push(
-      frameSkeleton(
+      leafZoneFrameSkeleton(
         spec.id,
         spec.label,
         spec.bounds.x,
@@ -468,129 +965,155 @@ export async function buildTerraformPipelineExcalidrawScene(
         spec.bounds.width,
         spec.bounds.height,
         spec.clusterFrameIds,
-        spec.role,
         spec.path,
       ),
     );
   }
 
-  const vpcZoneGroups = new Map<string, ZoneFrameSpec[]>();
-  const regionalZoneGroups = new Map<string, ZoneFrameSpec[]>();
+  const vpcGroups = new Map<string, ZoneFrameSpec[]>();
   for (const spec of zoneSpecs.values()) {
-    if (spec.vpcKey && spec.role !== "regionalBand") {
-      const list = vpcZoneGroups.get(spec.vpcKey) ?? [];
-      list.push(spec);
-      vpcZoneGroups.set(spec.vpcKey, list);
-    } else if (spec.regionalBandKey) {
-      const list = regionalZoneGroups.get(spec.regionalBandKey) ?? [];
-      list.push(spec);
-      regionalZoneGroups.set(spec.regionalBandKey, list);
+    if (!spec.vpcKey) {
+      continue;
     }
+    if (!specInAccountBand(spec, accountBands, multiAccountBandLayout)) {
+      continue;
+    }
+    const groupKey = `${spec.vpcKey}|lane${spec.laneIndex}`;
+    const list = vpcGroups.get(groupKey) ?? [];
+    list.push(spec);
+    vpcGroups.set(groupKey, list);
+  }
+
+  const regionalZonesByRegion = new Map<string, ZoneFrameSpec[]>();
+  for (const spec of zoneSpecs.values()) {
+    if (spec.vpcKey) {
+      continue;
+    }
+    if (!specInAccountBand(spec, accountBands, multiAccountBandLayout)) {
+      continue;
+    }
+    const key = regionGroupKey(spec.accountId, spec.region);
+    const list = regionalZonesByRegion.get(key) ?? [];
+    list.push(spec);
+    regionalZonesByRegion.set(key, list);
   }
 
   const vpcFrames: ExcalidrawElementSkeleton[] = [];
-  const vpcFrameIdByKey = new Map<string, string>();
-  for (const [vpcKey, zones] of vpcZoneGroups) {
-    const vpcFrameId = `tf-pipe-vpc:${vpcKey}`;
-    vpcFrameIdByKey.set(vpcKey, vpcFrameId);
-    const bounds = unionBounds(
-      zones.map((z) => z.bounds),
-      FRAME_PAD,
-    );
-    const parts = vpcKey.split("|");
+  for (const [groupKey, zones] of vpcGroups) {
+    const parts = zones[0]!.vpcKey!.split("|");
     const vpcId = parts[2] ?? "vpc";
+    const accountId = parts[0] ?? "unknown-account";
+    const regionName = parts[1] ?? "unknown-region";
     vpcFrames.push(
-      frameSkeleton(
-        vpcFrameId,
+      containerFrameSkeleton(
+        `tf-pipe-vpc:${groupKey}`,
         `VPC ${vpcId.slice(0, 16)}`,
-        bounds.x,
-        bounds.y,
-        bounds.width,
-        bounds.height,
         zones.map((z) => z.id),
         "vpc",
-        [parts[0] ?? "", parts[1] ?? "", vpcId, parts[3] ?? "0"],
+        [accountId, regionName, vpcId, parts[3] ?? "0"],
       ),
     );
   }
 
-  const regionalBandFrames: ExcalidrawElementSkeleton[] = [];
-  const regionalBandIdByKey = new Map<string, string>();
-  for (const [regKey, zones] of regionalZoneGroups) {
-    const bandId = `tf-pipe-regional:${regKey}`;
-    regionalBandIdByKey.set(regKey, bandId);
-    const bounds = unionBounds(
-      zones.map((z) => z.bounds),
-      FRAME_PAD,
+  const regionKeys = new Set<string>([
+    ...regionalZonesByRegion.keys(),
+    ...[...vpcGroups.values()].map((zones) =>
+      regionGroupKey(zones[0]!.accountId, zones[0]!.region),
+    ),
+  ]);
+
+  const regionFrames: ExcalidrawElementSkeleton[] = [];
+  const accountRegionIds = new Map<string, string[]>();
+
+  for (const key of regionKeys) {
+    const [accountId, regionName] = key.split("|");
+    if (!accountId || !regionName) {
+      continue;
+    }
+    const childIds: string[] = [];
+
+    for (const [groupKey, zones] of vpcGroups) {
+      const sample = zones[0]!;
+      if (sample.accountId !== accountId || sample.region !== regionName) {
+        continue;
+      }
+      childIds.push(`tf-pipe-vpc:${groupKey}`);
+    }
+
+    for (const spec of regionalZonesByRegion.get(key) ?? []) {
+      childIds.push(spec.id);
+    }
+
+    if (childIds.length === 0) {
+      continue;
+    }
+
+    const regionFrameId = `tf-pipe-region:${accountId}/${regionName}`;
+    regionFrames.push(
+      containerFrameSkeleton(regionFrameId, regionName, childIds, "region", [
+        accountId,
+        regionName,
+      ]),
     );
-    const parts = regKey.split("|");
-    regionalBandFrames.push(
-      frameSkeleton(
-        bandId,
-        "Regional",
-        bounds.x,
-        bounds.y,
-        bounds.width,
-        bounds.height,
-        zones.map((z) => z.id),
-        "regionalBand",
-        [parts[0] ?? "", parts[1] ?? "", "regional", parts[3] ?? "0"],
+    const regionIds = accountRegionIds.get(accountId) ?? [];
+    regionIds.push(regionFrameId);
+    accountRegionIds.set(accountId, regionIds);
+  }
+
+  const accountFrames: ExcalidrawElementSkeleton[] = [];
+  for (const band of accountBands) {
+    const regionIds = (accountRegionIds.get(band.accountId) ?? []).filter(
+      (regionFrameId) => {
+        if (!multiAccountBandLayout) {
+          return true;
+        }
+        const suffix = regionFrameId.replace(
+          `tf-pipe-region:${band.accountId}/`,
+          "",
+        );
+        return [...zoneSpecs.values()].some(
+          (z) =>
+            z.accountId === band.accountId &&
+            z.region === suffix &&
+            band.laneIndices.has(z.laneIndex),
+        );
+      },
+    );
+    if (regionIds.length === 0) {
+      continue;
+    }
+    accountFrames.push(
+      containerFrameSkeleton(
+        `tf-pipe-account:${band.accountId}`,
+        `Account ${band.accountId}`,
+        regionIds,
+        "account",
+        [band.accountId],
       ),
     );
   }
 
-  const accountId =
-    layoutPlan.placements[0]?.geo.accountId ?? "unknown-account";
-  const region = layoutPlan.placements[0]?.geo.region ?? "unknown-region";
+  const awsFrames: ExcalidrawElementSkeleton[] = [];
+  if (accountFrames.length > 0) {
+    awsFrames.push(
+      containerFrameSkeleton(
+        "tf-pipe-provider:aws",
+        "AWS",
+        accountFrames.map((f) => f.id!),
+        "provider",
+        ["aws"],
+        { terraformProviderFamily: "aws" },
+      ),
+    );
+  }
 
-  const regionChildIds = [
-    ...vpcFrames.map((f) => f.id!),
-    ...regionalBandFrames.map((f) => f.id!),
-  ];
-  const regionBounds = unionBounds(
-    [...vpcFrames, ...regionalBandFrames].map((f) => ({
-      x: f.x ?? 0,
-      y: f.y ?? 0,
-      width: f.width ?? MIN_FRAME_W,
-      height: f.height ?? MIN_FRAME_H,
-    })),
-    AWS_FRAME_PAD / 2,
-  );
-
-  const regionFrameId = `tf-pipe-region:${accountId}/${region}`;
-  const accountFrameId = `tf-pipe-account:${accountId}`;
-
-  const regionFrame = frameSkeleton(
-    regionFrameId,
-    region,
-    regionBounds.x,
-    regionBounds.y,
-    regionBounds.width,
-    regionBounds.height,
-    regionChildIds,
-    "region",
-    [accountId, region],
-  );
-
-  const accountBounds = unionBounds([regionBounds], AWS_FRAME_PAD / 2);
-  const accountFrame = frameSkeleton(
-    accountFrameId,
-    `Account ${accountId}`,
-    accountBounds.x,
-    accountBounds.y,
-    accountBounds.width,
-    accountBounds.height,
-    [regionFrameId],
-    "account",
-    [accountId],
-  );
-
-  skeleton.unshift(
-    accountFrame,
-    regionFrame,
-    ...vpcFrames,
-    ...regionalBandFrames,
+  // Inner → outer so convertToExcalidrawElements sizes parents from sized children.
+  skeleton.push(
     ...zoneFrames,
+    ...vpcFrames,
+    ...regionFrames,
+    ...accountFrames,
+    ...awsFrames,
   );
 
   const layoutBoxes = collectLayoutBoxesFromSkeleton(skeleton);
@@ -625,6 +1148,11 @@ export async function buildTerraformPipelineExcalidrawScene(
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,
   }) as ExcalidrawElement[];
+
+  resizePipelineContainerFrames(elements);
+  if (multiAccountBandLayout) {
+    alignMultiAccountPipelineFrames(elements, accountBands);
+  }
 
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = await injectTerraformAwsIconsIntoElements(elements);

@@ -214,6 +214,66 @@
       "tfdPaths": []
     },
     {
+      "id": "localstack-geo-fanout",
+      "name": "LocalStack geo fanout",
+      "description": "Consumer Lambda fanout to 6 APIs across two accounts, regions, and VPCs (LocalStack fixture).",
+      "builtin": true,
+      "view": "pipeline",
+      "rootPath": "packages/backend/terraform/localstack-geo-fanout",
+      "stacks": [
+        {
+          "id": "00-consumer",
+          "label": "00-consumer",
+          "planPath": "stacks/00-consumer/plan.json",
+          "dotPath": "stacks/00-consumer/graph.dot",
+          "statePath": "stacks/00-consumer/terraform.tfstate"
+        },
+        {
+          "id": "10-a-api-1",
+          "label": "10-a-api-1",
+          "planPath": "stacks/10-a-api-1/plan.json",
+          "dotPath": "stacks/10-a-api-1/graph.dot",
+          "statePath": "stacks/10-a-api-1/terraform.tfstate"
+        },
+        {
+          "id": "11-a-api-2",
+          "label": "11-a-api-2",
+          "planPath": "stacks/11-a-api-2/plan.json",
+          "dotPath": "stacks/11-a-api-2/graph.dot",
+          "statePath": "stacks/11-a-api-2/terraform.tfstate"
+        },
+        {
+          "id": "12-a-api-3",
+          "label": "12-a-api-3",
+          "planPath": "stacks/12-a-api-3/plan.json",
+          "dotPath": "stacks/12-a-api-3/graph.dot",
+          "statePath": "stacks/12-a-api-3/terraform.tfstate"
+        },
+        {
+          "id": "20-b-api-4",
+          "label": "20-b-api-4",
+          "planPath": "stacks/20-b-api-4/plan.json",
+          "dotPath": "stacks/20-b-api-4/graph.dot",
+          "statePath": "stacks/20-b-api-4/terraform.tfstate"
+        },
+        {
+          "id": "21-b-api-5",
+          "label": "21-b-api-5",
+          "planPath": "stacks/21-b-api-5/plan.json",
+          "dotPath": "stacks/21-b-api-5/graph.dot",
+          "statePath": "stacks/21-b-api-5/terraform.tfstate"
+        },
+        {
+          "id": "22-b-api-6",
+          "label": "22-b-api-6",
+          "planPath": "stacks/22-b-api-6/plan.json",
+          "dotPath": "stacks/22-b-api-6/graph.dot",
+          "statePath": "stacks/22-b-api-6/terraform.tfstate"
+        }
+      ],
+      "tfdPaths": ["pipeline.tfd"]
+    },
+    {
       "id": "aws-cloudflare-modules",
       "name": "AWS + Cloudflare modules",
       "description": "Multi-provider: allplanmodules + Cloudflare plan/dot, with allplanmodules.tfd.",

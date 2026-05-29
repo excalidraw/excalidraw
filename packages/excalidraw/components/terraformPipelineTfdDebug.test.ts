@@ -367,7 +367,9 @@ describe("staging pipeline.tfd resolution", () => {
     const api5ClusterCx = api5Cluster!.x + api5Cluster!.width / 2;
     const api5Zone = subnetZones.find(
       (z: { x: number; width: number; y: number; height: number }) =>
-        api5ClusterCx >= z.x && api5ClusterCx <= z.x + z.width,
+        api5ClusterCx >= z.x &&
+        api5ClusterCx <= z.x + z.width &&
+        insideVertically(api5Cluster!, z),
     );
     expect(api5Zone).toBeTruthy();
     expect(insideVertically(api5Permission!, api5Zone!)).toBe(true);

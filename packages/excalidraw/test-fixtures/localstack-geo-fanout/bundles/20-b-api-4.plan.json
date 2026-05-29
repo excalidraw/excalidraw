@@ -1,0 +1,1864 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.14.7",
+  "variables": {
+    "environment": {
+      "value": "local"
+    },
+    "aws_account_id": {
+      "value": "222222222222"
+    },
+    "aws_region": {
+      "value": "eu-west-1"
+    }
+  },
+  "planned_values": {
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.api.aws_api_gateway_deployment.this",
+              "mode": "managed",
+              "type": "aws_api_gateway_deployment",
+              "name": "this",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "canary_settings": [],
+                "description": null,
+                "stage_description": null,
+                "stage_name": null,
+                "variables": null
+              },
+              "sensitive_values": {
+                "canary_settings": [],
+                "triggers": {}
+              }
+            },
+            {
+              "address": "module.api.aws_api_gateway_integration.proxy",
+              "mode": "managed",
+              "type": "aws_api_gateway_integration",
+              "name": "proxy",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "cache_key_parameters": null,
+                "connection_id": null,
+                "connection_type": "INTERNET",
+                "content_handling": null,
+                "credentials": null,
+                "http_method": "GET",
+                "integration_http_method": "POST",
+                "request_parameters": null,
+                "request_templates": null,
+                "timeout_milliseconds": 29000,
+                "tls_config": [],
+                "type": "AWS_PROXY"
+              },
+              "sensitive_values": {
+                "tls_config": []
+              }
+            },
+            {
+              "address": "module.api.aws_api_gateway_method.proxy",
+              "mode": "managed",
+              "type": "aws_api_gateway_method",
+              "name": "proxy",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "api_key_required": false,
+                "authorization": "NONE",
+                "authorization_scopes": null,
+                "authorizer_id": null,
+                "http_method": "GET",
+                "operation_name": null,
+                "request_models": null,
+                "request_parameters": null,
+                "request_validator_id": null
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.api.aws_api_gateway_resource.proxy",
+              "mode": "managed",
+              "type": "aws_api_gateway_resource",
+              "name": "proxy",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "path_part": "invoke"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.api.aws_api_gateway_rest_api.main",
+              "mode": "managed",
+              "type": "aws_api_gateway_rest_api",
+              "name": "main",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "body": null,
+                "description": "Regional API for api-4",
+                "endpoint_configuration": [
+                  {
+                    "types": ["REGIONAL"]
+                  }
+                ],
+                "fail_on_warnings": null,
+                "name": "local-api-4",
+                "parameters": null,
+                "put_rest_api_mode": null,
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                }
+              },
+              "sensitive_values": {
+                "binary_media_types": [],
+                "endpoint_configuration": [
+                  {
+                    "types": [false],
+                    "vpc_endpoint_ids": []
+                  }
+                ],
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.api.aws_api_gateway_stage.v1",
+              "mode": "managed",
+              "type": "aws_api_gateway_stage",
+              "name": "v1",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "access_log_settings": [],
+                "cache_cluster_enabled": null,
+                "cache_cluster_size": null,
+                "canary_settings": [],
+                "client_certificate_id": null,
+                "description": null,
+                "documentation_version": null,
+                "stage_name": "v1",
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                },
+                "variables": null,
+                "xray_tracing_enabled": null
+              },
+              "sensitive_values": {
+                "access_log_settings": [],
+                "canary_settings": [],
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.api.aws_iam_role.lambda",
+              "mode": "managed",
+              "type": "aws_iam_role",
+              "name": "lambda",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "description": null,
+                "force_detach_policies": false,
+                "max_session_duration": 3600,
+                "name": "local-api-4-lambda",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                }
+              },
+              "sensitive_values": {
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.api.aws_iam_role_policy_attachment.lambda_basic",
+              "mode": "managed",
+              "type": "aws_iam_role_policy_attachment",
+              "name": "lambda_basic",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                "role": "local-api-4-lambda"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.api.aws_iam_role_policy_attachment.lambda_vpc",
+              "mode": "managed",
+              "type": "aws_iam_role_policy_attachment",
+              "name": "lambda_vpc",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+                "role": "local-api-4-lambda"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.api.aws_lambda_function.this",
+              "mode": "managed",
+              "type": "aws_lambda_function",
+              "name": "this",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "code_signing_config_arn": null,
+                "dead_letter_config": [],
+                "description": null,
+                "environment": [
+                  {
+                    "variables": {
+                      "APP_CONFIG_PATH": "/local/api-4"
+                    }
+                  }
+                ],
+                "file_system_config": [],
+                "filename": "../../modules/mini_api_stack/.build/api-4.zip",
+                "function_name": "local-api-4",
+                "handler": "handler.handler",
+                "image_config": [],
+                "image_uri": null,
+                "kms_key_arn": null,
+                "layers": null,
+                "memory_size": 128,
+                "package_type": "Zip",
+                "publish": false,
+                "replace_security_groups_on_destroy": null,
+                "replacement_security_group_ids": null,
+                "reserved_concurrent_executions": -1,
+                "runtime": "python3.12",
+                "s3_bucket": null,
+                "s3_key": null,
+                "s3_object_version": null,
+                "skip_destroy": false,
+                "snap_start": [],
+                "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                },
+                "timeout": 3,
+                "timeouts": null,
+                "vpc_config": [
+                  {
+                    "ipv6_allowed_for_dual_stack": false
+                  }
+                ]
+              },
+              "sensitive_values": {
+                "architectures": [],
+                "dead_letter_config": [],
+                "environment": [
+                  {
+                    "variables": {}
+                  }
+                ],
+                "ephemeral_storage": [],
+                "file_system_config": [],
+                "image_config": [],
+                "logging_config": [],
+                "snap_start": [],
+                "tags_all": {},
+                "tracing_config": [],
+                "vpc_config": [
+                  {
+                    "security_group_ids": [],
+                    "subnet_ids": []
+                  }
+                ]
+              }
+            },
+            {
+              "address": "module.api.aws_lambda_permission.apigw",
+              "mode": "managed",
+              "type": "aws_lambda_permission",
+              "name": "apigw",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "action": "lambda:InvokeFunction",
+                "event_source_token": null,
+                "function_name": "local-api-4",
+                "function_url_auth_type": null,
+                "principal": "apigateway.amazonaws.com",
+                "principal_org_id": null,
+                "qualifier": null,
+                "source_account": null,
+                "statement_id": "AllowAPIGatewayInvoke"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.api.aws_ssm_parameter.api_name",
+              "mode": "managed",
+              "type": "aws_ssm_parameter",
+              "name": "api_name",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "allowed_pattern": null,
+                "description": null,
+                "name": "/local/api-4/name",
+                "overwrite": null,
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                },
+                "type": "String",
+                "value": "api-4",
+                "value_wo": null,
+                "value_wo_version": null
+              },
+              "sensitive_values": {
+                "tags_all": {},
+                "value": true,
+                "value_wo": true
+              }
+            }
+          ],
+          "address": "module.api"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.network.aws_security_group.lambda",
+              "mode": "managed",
+              "type": "aws_security_group",
+              "name": "lambda",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "description": "Lambda security group for api-4",
+                "egress": [
+                  {
+                    "cidr_blocks": ["0.0.0.0/0"],
+                    "description": "",
+                    "from_port": 0,
+                    "ipv6_cidr_blocks": [],
+                    "prefix_list_ids": [],
+                    "protocol": "-1",
+                    "security_groups": [],
+                    "self": false,
+                    "to_port": 0
+                  }
+                ],
+                "name": "local-api-4-lambda-sg",
+                "revoke_rules_on_delete": false,
+                "tags": {
+                  "Name": "local-api-4-lambda-sg"
+                },
+                "tags_all": {
+                  "Name": "local-api-4-lambda-sg",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                },
+                "timeouts": null
+              },
+              "sensitive_values": {
+                "egress": [
+                  {
+                    "cidr_blocks": [false],
+                    "ipv6_cidr_blocks": [],
+                    "prefix_list_ids": [],
+                    "security_groups": []
+                  }
+                ],
+                "ingress": [],
+                "tags": {},
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.network.aws_subnet.private",
+              "mode": "managed",
+              "type": "aws_subnet",
+              "name": "private",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "assign_ipv6_address_on_creation": false,
+                "cidr_block": "10.4.1.0/24",
+                "customer_owned_ipv4_pool": null,
+                "enable_dns64": false,
+                "enable_lni_at_device_index": null,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "ipv6_cidr_block": null,
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": null,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": null,
+                "tags": {
+                  "Name": "local-api-4-private"
+                },
+                "tags_all": {
+                  "Name": "local-api-4-private",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                },
+                "timeouts": null
+              },
+              "sensitive_values": {
+                "tags": {},
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.network.aws_vpc.this",
+              "mode": "managed",
+              "type": "aws_vpc",
+              "name": "this",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "assign_generated_ipv6_cidr_block": null,
+                "cidr_block": "10.4.0.0/16",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_ipam_pool_id": null,
+                "ipv6_netmask_length": null,
+                "tags": {
+                  "Name": "local-api-4-vpc"
+                },
+                "tags_all": {
+                  "Name": "local-api-4-vpc",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "20-b-api-4"
+                }
+              },
+              "sensitive_values": {
+                "tags": {},
+                "tags_all": {}
+              }
+            }
+          ],
+          "address": "module.network"
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "module.api.aws_api_gateway_deployment.this",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_deployment",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "canary_settings": [],
+          "description": null,
+          "stage_description": null,
+          "stage_name": null,
+          "variables": null
+        },
+        "after_unknown": {
+          "canary_settings": [],
+          "created_date": true,
+          "execution_arn": true,
+          "id": true,
+          "invoke_url": true,
+          "rest_api_id": true,
+          "triggers": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "canary_settings": [],
+          "triggers": {}
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_api_gateway_integration.proxy",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_integration",
+      "name": "proxy",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "cache_key_parameters": null,
+          "connection_id": null,
+          "connection_type": "INTERNET",
+          "content_handling": null,
+          "credentials": null,
+          "http_method": "GET",
+          "integration_http_method": "POST",
+          "request_parameters": null,
+          "request_templates": null,
+          "timeout_milliseconds": 29000,
+          "tls_config": [],
+          "type": "AWS_PROXY"
+        },
+        "after_unknown": {
+          "cache_namespace": true,
+          "id": true,
+          "passthrough_behavior": true,
+          "resource_id": true,
+          "rest_api_id": true,
+          "tls_config": [],
+          "uri": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tls_config": []
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_api_gateway_method.proxy",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_method",
+      "name": "proxy",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "api_key_required": false,
+          "authorization": "NONE",
+          "authorization_scopes": null,
+          "authorizer_id": null,
+          "http_method": "GET",
+          "operation_name": null,
+          "request_models": null,
+          "request_parameters": null,
+          "request_validator_id": null
+        },
+        "after_unknown": {
+          "id": true,
+          "resource_id": true,
+          "rest_api_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.api.aws_api_gateway_resource.proxy",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_resource",
+      "name": "proxy",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "path_part": "invoke"
+        },
+        "after_unknown": {
+          "id": true,
+          "parent_id": true,
+          "path": true,
+          "rest_api_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.api.aws_api_gateway_rest_api.main",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_rest_api",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "body": null,
+          "description": "Regional API for api-4",
+          "endpoint_configuration": [
+            {
+              "types": ["REGIONAL"]
+            }
+          ],
+          "fail_on_warnings": null,
+          "name": "api-4",
+          "parameters": null,
+          "put_rest_api_mode": null,
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "id": "api-api-4",
+          "region": "eu-west-1",
+          "arn": "arn:aws:apigateway:eu-west-1:222222222222:/restapis/api-api-4"
+        },
+        "after_unknown": {
+          "api_key_source": true,
+          "arn": true,
+          "binary_media_types": true,
+          "created_date": true,
+          "disable_execute_api_endpoint": true,
+          "endpoint_configuration": [
+            {
+              "ip_address_type": true,
+              "types": [false],
+              "vpc_endpoint_ids": true
+            }
+          ],
+          "execution_arn": true,
+          "id": true,
+          "minimum_compression_size": true,
+          "policy": true,
+          "root_resource_id": true,
+          "tags_all": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "binary_media_types": [],
+          "endpoint_configuration": [
+            {
+              "types": [false],
+              "vpc_endpoint_ids": []
+            }
+          ],
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_api_gateway_stage.v1",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_api_gateway_stage",
+      "name": "v1",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "access_log_settings": [],
+          "cache_cluster_enabled": null,
+          "cache_cluster_size": null,
+          "canary_settings": [],
+          "client_certificate_id": null,
+          "description": null,
+          "documentation_version": null,
+          "stage_name": "v1",
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "variables": null,
+          "xray_tracing_enabled": null
+        },
+        "after_unknown": {
+          "access_log_settings": [],
+          "arn": true,
+          "canary_settings": [],
+          "deployment_id": true,
+          "execution_arn": true,
+          "id": true,
+          "invoke_url": true,
+          "rest_api_id": true,
+          "tags_all": {},
+          "web_acl_arn": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "access_log_settings": [],
+          "canary_settings": [],
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_iam_role.lambda",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "lambda",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+          "description": null,
+          "force_detach_policies": false,
+          "max_session_duration": 3600,
+          "name": "local-api-4-lambda",
+          "path": "/",
+          "permissions_boundary": null,
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          }
+        },
+        "after_unknown": {
+          "arn": true,
+          "create_date": true,
+          "id": true,
+          "inline_policy": true,
+          "managed_policy_arns": true,
+          "name_prefix": true,
+          "tags_all": {},
+          "unique_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "inline_policy": [],
+          "managed_policy_arns": [],
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_iam_role_policy_attachment.lambda_basic",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_basic",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "role": "local-api-4-lambda"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.api.aws_iam_role_policy_attachment.lambda_vpc",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_vpc",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          "role": "local-api-4-lambda"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.api.aws_lambda_function.this",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "code_signing_config_arn": null,
+          "dead_letter_config": [],
+          "description": null,
+          "environment": [
+            {
+              "variables": {
+                "APP_CONFIG_PATH": "/local/api-4"
+              }
+            }
+          ],
+          "file_system_config": [],
+          "filename": "../../modules/mini_api_stack/.build/api-4.zip",
+          "function_name": "local-api-4",
+          "handler": "handler.handler",
+          "image_config": [],
+          "image_uri": null,
+          "kms_key_arn": null,
+          "layers": null,
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "timeout": 3,
+          "timeouts": null,
+          "vpc_config": [
+            {
+              "subnet_ids": ["subnet-c1"]
+            }
+          ],
+          "arn": "arn:aws:lambda:eu-west-1:222222222222:function:local-api-4",
+          "region": "eu-west-1"
+        },
+        "after_unknown": {
+          "architectures": true,
+          "arn": true,
+          "code_sha256": true,
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": true,
+          "file_system_config": [],
+          "id": true,
+          "image_config": [],
+          "invoke_arn": true,
+          "last_modified": true,
+          "logging_config": true,
+          "qualified_arn": true,
+          "qualified_invoke_arn": true,
+          "role": true,
+          "signing_job_arn": true,
+          "signing_profile_version_arn": true,
+          "snap_start": [],
+          "source_code_size": true,
+          "tags_all": {},
+          "tracing_config": true,
+          "version": true,
+          "vpc_config": [
+            {
+              "security_group_ids": true,
+              "subnet_ids": true,
+              "vpc_id": true
+            }
+          ]
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "architectures": [],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [],
+          "file_system_config": [],
+          "image_config": [],
+          "logging_config": [],
+          "snap_start": [],
+          "tags_all": {},
+          "tracing_config": [],
+          "vpc_config": [
+            {
+              "security_group_ids": [],
+              "subnet_ids": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.api.aws_lambda_permission.apigw",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_lambda_permission",
+      "name": "apigw",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "action": "lambda:InvokeFunction",
+          "event_source_token": null,
+          "function_name": "local-api-4",
+          "function_url_auth_type": null,
+          "principal": "apigateway.amazonaws.com",
+          "principal_org_id": null,
+          "qualifier": null,
+          "source_account": null,
+          "statement_id": "AllowAPIGatewayInvoke",
+          "region": "eu-west-1"
+        },
+        "after_unknown": {
+          "id": true,
+          "source_arn": true,
+          "statement_id_prefix": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.api.aws_ssm_parameter.api_name",
+      "module_address": "module.api",
+      "mode": "managed",
+      "type": "aws_ssm_parameter",
+      "name": "api_name",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "allowed_pattern": null,
+          "description": null,
+          "name": "/local/api-4/name",
+          "overwrite": null,
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "type": "String",
+          "value": "api-4",
+          "value_wo": null,
+          "value_wo_version": null,
+          "region": "eu-west-1",
+          "arn": "arn:aws:ssm:eu-west-1:222222222222:parameter/local/api-4/name"
+        },
+        "after_unknown": {
+          "arn": true,
+          "data_type": true,
+          "has_value_wo": true,
+          "id": true,
+          "insecure_value": true,
+          "key_id": true,
+          "tags_all": {},
+          "tier": true,
+          "version": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags_all": {},
+          "value": true,
+          "value_wo": true
+        }
+      }
+    },
+    {
+      "address": "module.network.aws_security_group.lambda",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "lambda",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "description": "Lambda security group for api-4",
+          "egress": [
+            {
+              "cidr_blocks": ["0.0.0.0/0"],
+              "description": "",
+              "from_port": 0,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "-1",
+              "security_groups": [],
+              "self": false,
+              "to_port": 0
+            }
+          ],
+          "name": "local-api-4-lambda-sg",
+          "revoke_rules_on_delete": false,
+          "tags": {
+            "Name": "local-api-4-lambda-sg"
+          },
+          "tags_all": {
+            "Name": "local-api-4-lambda-sg",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "timeouts": null
+        },
+        "after_unknown": {
+          "arn": true,
+          "egress": [
+            {
+              "cidr_blocks": [false],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "id": true,
+          "ingress": true,
+          "name_prefix": true,
+          "owner_id": true,
+          "tags": {},
+          "tags_all": {},
+          "vpc_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "egress": [
+            {
+              "cidr_blocks": [false],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "ingress": [],
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.network.aws_subnet.private",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "assign_ipv6_address_on_creation": false,
+          "cidr_block": "10.4.1.0/24",
+          "customer_owned_ipv4_pool": null,
+          "enable_dns64": false,
+          "enable_lni_at_device_index": null,
+          "enable_resource_name_dns_a_record_on_launch": false,
+          "enable_resource_name_dns_aaaa_record_on_launch": false,
+          "ipv6_cidr_block": null,
+          "ipv6_native": false,
+          "map_customer_owned_ip_on_launch": null,
+          "map_public_ip_on_launch": false,
+          "outpost_arn": null,
+          "tags": {
+            "Name": "local-api-4-private"
+          },
+          "tags_all": {
+            "Name": "local-api-4-private",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "timeouts": null,
+          "id": "subnet-c1",
+          "vpc_id": "vpc-c1",
+          "owner_id": "222222222222",
+          "availability_zone": "eu-west-1a",
+          "arn": "arn:aws:ec2:eu-west-1:222222222222:subnet/subnet-c1",
+          "region": "eu-west-1"
+        },
+        "after_unknown": {
+          "arn": true,
+          "availability_zone": true,
+          "availability_zone_id": true,
+          "id": true,
+          "ipv6_cidr_block_association_id": true,
+          "owner_id": true,
+          "private_dns_hostname_type_on_launch": true,
+          "tags": {},
+          "tags_all": {},
+          "vpc_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.network.aws_vpc.this",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "assign_generated_ipv6_cidr_block": null,
+          "cidr_block": "10.4.0.0/16",
+          "enable_dns_hostnames": true,
+          "enable_dns_support": true,
+          "instance_tenancy": "default",
+          "ipv4_ipam_pool_id": null,
+          "ipv4_netmask_length": null,
+          "ipv6_ipam_pool_id": null,
+          "ipv6_netmask_length": null,
+          "tags": {
+            "Name": "local-api-4-vpc"
+          },
+          "tags_all": {
+            "Name": "local-api-4-vpc",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "20-b-api-4"
+          },
+          "id": "vpc-c1",
+          "owner_id": "222222222222",
+          "arn": "arn:aws:ec2:eu-west-1:222222222222:vpc/vpc-c1",
+          "region": "eu-west-1"
+        },
+        "after_unknown": {
+          "arn": true,
+          "default_network_acl_id": true,
+          "default_route_table_id": true,
+          "default_security_group_id": true,
+          "dhcp_options_id": true,
+          "enable_network_address_usage_metrics": true,
+          "id": true,
+          "ipv6_association_id": true,
+          "ipv6_cidr_block": true,
+          "ipv6_cidr_block_network_border_group": true,
+          "main_route_table_id": true,
+          "owner_id": true,
+          "tags": {},
+          "tags_all": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    }
+  ],
+  "prior_state": {
+    "format_version": "1.0",
+    "terraform_version": "1.14.7",
+    "values": {
+      "root_module": {
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.api.data.archive_file.lambda_zip",
+                "mode": "data",
+                "type": "archive_file",
+                "name": "lambda_zip",
+                "provider_name": "registry.terraform.io/hashicorp/archive",
+                "schema_version": 0,
+                "values": {
+                  "exclude_symlink_directories": null,
+                  "excludes": null,
+                  "id": "b6b8799ad73fd5eb2efbc2c401f55b4ba514aab3",
+                  "output_base64sha256": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                  "output_base64sha512": "G4AP+rSfiRQCDF/61gVVm4SCzAnM5UQqZoKwacaHbIiDQn4fxIhQAsRyRqWtoLu3Zne3bY8OPPUPoSga1QD82A==",
+                  "output_file_mode": null,
+                  "output_md5": "a778db4bc02a5bd309863302eb0b4b7e",
+                  "output_path": "../../modules/mini_api_stack/.build/api-4.zip",
+                  "output_sha": "b6b8799ad73fd5eb2efbc2c401f55b4ba514aab3",
+                  "output_sha256": "e50aba92278384381c8a666bb15d72c3b7e6a1670d2e5a0aa987a86958a92acc",
+                  "output_sha512": "1b800ffab49f8914020c5ffad605559b8482cc09cce5442a6682b069c6876c8883427e1fc4885002c47246a5ada0bbb76677b76d8f0e3cf50fa1281ad500fcd8",
+                  "output_size": 363,
+                  "source": [],
+                  "source_content": null,
+                  "source_content_filename": null,
+                  "source_dir": null,
+                  "source_file": "./../../shared/handler.py",
+                  "type": "zip"
+                },
+                "sensitive_values": {
+                  "source": []
+                }
+              }
+            ],
+            "address": "module.api"
+          }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "archive": {
+        "name": "archive",
+        "full_name": "registry.terraform.io/hashicorp/archive",
+        "version_constraint": "~> 2.4"
+      },
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws",
+        "version_constraint": "~> 5.0",
+        "expressions": {
+          "access_key": {
+            "constant_value": "test"
+          },
+          "default_tags": [
+            {
+              "tags": {
+                "references": ["var.environment"]
+              }
+            }
+          ],
+          "endpoints": [
+            {
+              "apigateway": {
+                "references": ["local.localstack_base"]
+              },
+              "ec2": {
+                "references": ["local.localstack_base"]
+              },
+              "iam": {
+                "references": ["local.localstack_base"]
+              },
+              "lambda": {
+                "references": ["local.localstack_base"]
+              },
+              "logs": {
+                "references": ["local.localstack_base"]
+              },
+              "s3": {
+                "references": ["local.localstack_base"]
+              },
+              "ssm": {
+                "references": ["local.localstack_base"]
+              },
+              "sts": {
+                "references": ["local.localstack_base"]
+              }
+            }
+          ],
+          "region": {
+            "references": ["local.aws_region"]
+          },
+          "s3_use_path_style": {
+            "constant_value": true
+          },
+          "secret_key": {
+            "constant_value": "test"
+          },
+          "skip_credentials_validation": {
+            "constant_value": true
+          },
+          "skip_metadata_api_check": {
+            "constant_value": true
+          },
+          "skip_requesting_account_id": {
+            "constant_value": true
+          }
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "api": {
+          "source": "../../modules/mini_api_stack",
+          "expressions": {
+            "aws_account_id": {
+              "references": ["local.aws_account_id"]
+            },
+            "aws_region": {
+              "references": ["local.aws_region"]
+            },
+            "environment": {
+              "references": ["var.environment"]
+            },
+            "lambda_security_group_id": {
+              "references": ["module.network.lambda_security_group_id", "module.network"]
+            },
+            "lambda_source_file": {
+              "references": ["path.module"]
+            },
+            "name": {
+              "references": ["local.api_name"]
+            },
+            "private_subnet_ids": {
+              "references": ["module.network.private_subnet_ids", "module.network"]
+            },
+            "vpc_id": {
+              "references": ["module.network.vpc_id", "module.network"]
+            }
+          },
+          "module": {
+            "outputs": {
+              "api_gateway_id": {
+                "expression": {
+                  "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                }
+              },
+              "lambda_function_arn": {
+                "expression": {
+                  "references": ["aws_lambda_function.this.arn", "aws_lambda_function.this"]
+                }
+              },
+              "lambda_function_name": {
+                "expression": {
+                  "references": ["aws_lambda_function.this.function_name", "aws_lambda_function.this"]
+                }
+              }
+            },
+            "resources": [
+              {
+                "address": "aws_api_gateway_deployment.this",
+                "mode": "managed",
+                "type": "aws_api_gateway_deployment",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "rest_api_id": {
+                    "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                  },
+                  "triggers": {
+                    "references": ["aws_api_gateway_resource.proxy.id", "aws_api_gateway_resource.proxy", "aws_api_gateway_method.proxy.id", "aws_api_gateway_method.proxy", "aws_api_gateway_integration.proxy.id", "aws_api_gateway_integration.proxy"]
+                  }
+                },
+                "schema_version": 0,
+                "depends_on": ["aws_api_gateway_integration.proxy"]
+              },
+              {
+                "address": "aws_api_gateway_integration.proxy",
+                "mode": "managed",
+                "type": "aws_api_gateway_integration",
+                "name": "proxy",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "http_method": {
+                    "references": ["aws_api_gateway_method.proxy.http_method", "aws_api_gateway_method.proxy"]
+                  },
+                  "integration_http_method": {
+                    "constant_value": "POST"
+                  },
+                  "resource_id": {
+                    "references": ["aws_api_gateway_resource.proxy.id", "aws_api_gateway_resource.proxy"]
+                  },
+                  "rest_api_id": {
+                    "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                  },
+                  "type": {
+                    "constant_value": "AWS_PROXY"
+                  },
+                  "uri": {
+                    "references": ["local.lambda_invoke_uri"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_api_gateway_method.proxy",
+                "mode": "managed",
+                "type": "aws_api_gateway_method",
+                "name": "proxy",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "authorization": {
+                    "constant_value": "NONE"
+                  },
+                  "http_method": {
+                    "constant_value": "GET"
+                  },
+                  "resource_id": {
+                    "references": ["aws_api_gateway_resource.proxy.id", "aws_api_gateway_resource.proxy"]
+                  },
+                  "rest_api_id": {
+                    "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_api_gateway_resource.proxy",
+                "mode": "managed",
+                "type": "aws_api_gateway_resource",
+                "name": "proxy",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "parent_id": {
+                    "references": ["aws_api_gateway_rest_api.main.root_resource_id", "aws_api_gateway_rest_api.main"]
+                  },
+                  "path_part": {
+                    "constant_value": "invoke"
+                  },
+                  "rest_api_id": {
+                    "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_api_gateway_rest_api.main",
+                "mode": "managed",
+                "type": "aws_api_gateway_rest_api",
+                "name": "main",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "description": {
+                    "references": ["var.name"]
+                  },
+                  "endpoint_configuration": [
+                    {
+                      "types": {
+                        "constant_value": ["REGIONAL"]
+                      }
+                    }
+                  ],
+                  "name": {
+                    "references": ["var.environment", "var.name"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_api_gateway_stage.v1",
+                "mode": "managed",
+                "type": "aws_api_gateway_stage",
+                "name": "v1",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "deployment_id": {
+                    "references": ["aws_api_gateway_deployment.this.id", "aws_api_gateway_deployment.this"]
+                  },
+                  "rest_api_id": {
+                    "references": ["aws_api_gateway_rest_api.main.id", "aws_api_gateway_rest_api.main"]
+                  },
+                  "stage_name": {
+                    "constant_value": "v1"
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_iam_role.lambda",
+                "mode": "managed",
+                "type": "aws_iam_role",
+                "name": "lambda",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "assume_role_policy": {},
+                  "name": {
+                    "references": ["var.environment", "var.name"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_iam_role_policy_attachment.lambda_basic",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_basic",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "policy_arn": {
+                    "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.name", "aws_iam_role.lambda"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_iam_role_policy_attachment.lambda_vpc",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_vpc",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "policy_arn": {
+                    "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.name", "aws_iam_role.lambda"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_lambda_function.this",
+                "mode": "managed",
+                "type": "aws_lambda_function",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "environment": [
+                    {
+                      "variables": {
+                        "references": ["local.ssm_prefix"]
+                      }
+                    }
+                  ],
+                  "filename": {
+                    "references": ["data.archive_file.lambda_zip.output_path", "data.archive_file.lambda_zip"]
+                  },
+                  "function_name": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "handler": {
+                    "constant_value": "handler.handler"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.arn", "aws_iam_role.lambda"]
+                  },
+                  "runtime": {
+                    "constant_value": "python3.12"
+                  },
+                  "source_code_hash": {
+                    "references": ["data.archive_file.lambda_zip.output_base64sha256", "data.archive_file.lambda_zip"]
+                  },
+                  "vpc_config": [
+                    {
+                      "security_group_ids": {
+                        "references": ["var.lambda_security_group_id"]
+                      },
+                      "subnet_ids": {
+                        "references": ["var.private_subnet_ids"]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_lambda_permission.apigw",
+                "mode": "managed",
+                "type": "aws_lambda_permission",
+                "name": "apigw",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "action": {
+                    "constant_value": "lambda:InvokeFunction"
+                  },
+                  "function_name": {
+                    "references": ["aws_lambda_function.this.function_name", "aws_lambda_function.this"]
+                  },
+                  "principal": {
+                    "constant_value": "apigateway.amazonaws.com"
+                  },
+                  "source_arn": {
+                    "references": ["aws_api_gateway_rest_api.main.execution_arn", "aws_api_gateway_rest_api.main"]
+                  },
+                  "statement_id": {
+                    "constant_value": "AllowAPIGatewayInvoke"
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_ssm_parameter.api_name",
+                "mode": "managed",
+                "type": "aws_ssm_parameter",
+                "name": "api_name",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "name": {
+                    "references": ["local.ssm_prefix"]
+                  },
+                  "type": {
+                    "constant_value": "String"
+                  },
+                  "value": {
+                    "references": ["var.name"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "data.archive_file.lambda_zip",
+                "mode": "data",
+                "type": "archive_file",
+                "name": "lambda_zip",
+                "provider_config_key": "archive",
+                "expressions": {
+                  "output_path": {
+                    "references": ["path.module", "var.name"]
+                  },
+                  "source_file": {
+                    "references": ["var.lambda_source_file"]
+                  },
+                  "type": {
+                    "constant_value": "zip"
+                  }
+                },
+                "schema_version": 0
+              }
+            ],
+            "variables": {
+              "aws_account_id": {},
+              "aws_region": {},
+              "environment": {},
+              "lambda_security_group_id": {},
+              "lambda_source_file": {},
+              "name": {},
+              "private_subnet_ids": {},
+              "ssm_prefix": {
+                "default": null
+              },
+              "vpc_id": {}
+            }
+          }
+        },
+        "network": {
+          "source": "../../modules/mini_vpc",
+          "expressions": {
+            "environment": {
+              "references": ["var.environment"]
+            },
+            "name": {
+              "references": ["local.api_name"]
+            },
+            "subnet_cidr": {
+              "constant_value": "10.4.1.0/24"
+            },
+            "vpc_cidr": {
+              "constant_value": "10.4.0.0/16"
+            }
+          },
+          "module": {
+            "outputs": {
+              "lambda_security_group_id": {
+                "expression": {
+                  "references": ["aws_security_group.lambda.id", "aws_security_group.lambda"]
+                }
+              },
+              "private_subnet_ids": {
+                "expression": {
+                  "references": ["aws_subnet.private.id", "aws_subnet.private"]
+                }
+              },
+              "vpc_cidr": {
+                "expression": {
+                  "references": ["aws_vpc.this.cidr_block", "aws_vpc.this"]
+                }
+              },
+              "vpc_id": {
+                "expression": {
+                  "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                }
+              }
+            },
+            "resources": [
+              {
+                "address": "aws_security_group.lambda",
+                "mode": "managed",
+                "type": "aws_security_group",
+                "name": "lambda",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "description": {
+                    "references": ["var.name"]
+                  },
+                  "egress": {
+                    "constant_value": [
+                      {
+                        "cidr_blocks": ["0.0.0.0/0"],
+                        "description": null,
+                        "from_port": 0,
+                        "ipv6_cidr_blocks": null,
+                        "prefix_list_ids": null,
+                        "protocol": "-1",
+                        "security_groups": null,
+                        "self": null,
+                        "to_port": 0
+                      }
+                    ]
+                  },
+                  "name": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "vpc_id": {
+                    "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                  }
+                },
+                "schema_version": 1
+              },
+              {
+                "address": "aws_subnet.private",
+                "mode": "managed",
+                "type": "aws_subnet",
+                "name": "private",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "cidr_block": {
+                    "references": ["var.subnet_cidr"]
+                  },
+                  "map_public_ip_on_launch": {
+                    "constant_value": false
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "vpc_id": {
+                    "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                  }
+                },
+                "schema_version": 1
+              },
+              {
+                "address": "aws_vpc.this",
+                "mode": "managed",
+                "type": "aws_vpc",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "cidr_block": {
+                    "references": ["var.vpc_cidr"]
+                  },
+                  "enable_dns_hostnames": {
+                    "constant_value": true
+                  },
+                  "enable_dns_support": {
+                    "constant_value": true
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  }
+                },
+                "schema_version": 1
+              }
+            ],
+            "variables": {
+              "environment": {},
+              "name": {},
+              "subnet_cidr": {
+                "default": "10.0.1.0/24"
+              },
+              "vpc_cidr": {
+                "default": "10.0.0.0/16"
+              }
+            }
+          }
+        }
+      },
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  },
+  "relevant_attributes": [
+    {
+      "resource": "module.api.data.archive_file.lambda_zip",
+      "attribute": ["output_base64sha256"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_resource.proxy",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_rest_api.main",
+      "attribute": ["root_resource_id"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_method.proxy",
+      "attribute": ["http_method"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_rest_api.main",
+      "attribute": ["execution_arn"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_method.proxy",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_rest_api.main",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.network.aws_security_group.lambda",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.api.aws_iam_role.lambda",
+      "attribute": ["arn"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_integration.proxy",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.api.aws_lambda_function.this",
+      "attribute": ["function_name"]
+    },
+    {
+      "resource": "module.api.aws_iam_role.lambda",
+      "attribute": ["name"]
+    },
+    {
+      "resource": "module.api.aws_lambda_function.this",
+      "attribute": ["arn"]
+    },
+    {
+      "resource": "module.network.aws_vpc.this",
+      "attribute": ["cidr_block"]
+    },
+    {
+      "resource": "module.api.data.archive_file.lambda_zip",
+      "attribute": ["output_path"]
+    },
+    {
+      "resource": "module.network.aws_vpc.this",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.api.aws_api_gateway_deployment.this",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.network.aws_subnet.private",
+      "attribute": ["id"]
+    }
+  ],
+  "timestamp": "2026-05-29T22:31:55Z",
+  "applyable": true,
+  "complete": true,
+  "errored": false
+}
