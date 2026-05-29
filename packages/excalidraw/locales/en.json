@@ -364,6 +364,7 @@
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
+    "drawShape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
