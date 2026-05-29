@@ -1,5 +1,6 @@
 {
   "primaryType": "aws_s3_bucket",
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "s3_companions", "kms_policies", "sqs_companions"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },

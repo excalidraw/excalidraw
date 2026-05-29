@@ -84,22 +84,20 @@ import {
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
 import {
-  filterTopologyAddressesExcludingAlbSatellites,
   isAlbCompanionConsumedAsSatellite,
   isAlbTopologySatelliteResourceType,
 } from "./terraformTopologyAlbLinks";
 import {
-  filterTopologyAddressesExcludingEcsSatellites,
   isEcsCompanionConsumedAsSatellite,
   isEcsTopologySatelliteResourceType,
 } from "./terraformTopologyEcsLinks";
-import { filterTopologyAddressesExcludingLambdaPermissionSatellites } from "./terraformTopologyLambdaPermissionLinks";
 import {
-  filterTopologyAddressesExcludingApiGatewaySatellites,
   isApiGatewayCompanionConsumedAsSatellite,
   isApiGatewayTopologySatelliteResourceType,
 } from "./terraformTopologyApiGatewayLinks";
-import { filterTopologyAddressesExcludingTgwSatellites } from "./terraformTopologyTransitGatewayLinks";
+import { filterAddressesExcludingRegistrySatellites } from "./terraformTopologySatelliteRegistry";
+
+import "./terraformTopologySatelliteRegistry";
 import {
   getTerraformEdgeLayer,
   reconcileTerraformVisibility,
@@ -138,29 +136,11 @@ function filterTopologyAddressesExcludingPrimarySatellites(
   addresses: readonly string[],
   plan?: unknown,
 ): string[] {
-  return filterTopologyAddressesExcludingTgwSatellites(
+  return filterAddressesExcludingRegistrySatellites(
     nodes,
-    filterTopologyAddressesExcludingApiGatewaySatellites(
-      nodes,
-      filterTopologyAddressesExcludingLambdaPermissionSatellites(
-        nodes,
-        arnIndex,
-        filterTopologyAddressesExcludingEcsSatellites(
-          nodes,
-          arnIndex,
-          filterTopologyAddressesExcludingAlbSatellites(
-            nodes,
-            arnIndex,
-            addresses,
-            plan,
-          ),
-        ),
-      ),
-    ),
-    Array.isArray((plan as { resource_changes?: unknown })?.resource_changes)
-      ? (plan as { resource_changes?: Array<{ address?: string }> })
-          .resource_changes ?? []
-      : undefined,
+    arnIndex,
+    addresses,
+    plan,
   );
 }
 

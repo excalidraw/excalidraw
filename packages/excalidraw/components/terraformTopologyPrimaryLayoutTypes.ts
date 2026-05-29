@@ -42,6 +42,8 @@ export type TopologyPrimaryLayoutSlotJson = {
 
 export type TopologyPrimaryLayoutJson = {
   primaryType: string;
+  /** Satellite kinds whose attachment rules run for this primary type. */
+  attachments: TopologySatelliteKind[];
   tierBase: {
     tier0: TopologyTierBasePx;
     tier1: TopologyTierBasePx;
@@ -73,6 +75,8 @@ export type ResolvedTopologyTiers = {
 
 export type ResolvedPrimaryLayoutConfig = {
   primaryType: string;
+  attachments: TopologySatelliteKind[];
+  enabledKinds: ReadonlySet<TopologySatelliteKind>;
   tiers: ResolvedTopologyTiers;
   padding: {
     sgRight: number;
@@ -175,12 +179,31 @@ export function validateTopologyPrimaryLayoutJson(
   ) {
     throw new Error("topology primary layout: invalid gaps");
   }
+  if (!Array.isArray(raw.attachments) || raw.attachments.length === 0) {
+    throw new Error("topology primary layout: attachments required");
+  }
+  const attachmentSet = new Set<TopologySatelliteKind>();
+  for (const k of raw.attachments) {
+    if (typeof k !== "string" || !KIND_SET.has(k)) {
+      throw new Error(
+        `topology primary layout: invalid attachment kind ${String(k)}`,
+      );
+    }
+    attachmentSet.add(k as TopologySatelliteKind);
+  }
   if (!Array.isArray(raw.slots) || raw.slots.length === 0) {
     throw new Error("topology primary layout: slots required");
   }
   for (const slot of raw.slots) {
     if (!isSlot(slot)) {
       throw new Error(`topology primary layout: invalid slot ${String(slot)}`);
+    }
+    for (const k of slot.kinds) {
+      if (!attachmentSet.has(k)) {
+        throw new Error(
+          `topology primary layout: slot ${slot.id} kind ${k} not in attachments`,
+        );
+      }
     }
   }
   return raw as TopologyPrimaryLayoutJson;

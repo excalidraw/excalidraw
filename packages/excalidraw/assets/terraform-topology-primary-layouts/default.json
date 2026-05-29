@@ -1,5 +1,6 @@
 {
   "primaryType": "default",
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "iam", "kms_policies", "s3_companions", "alb_companions", "ecs_companions", "api_gateway_companions", "tgw_companions", "lambda_permission", "security_groups", "sqs_companions"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },

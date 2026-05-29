@@ -1,5 +1,6 @@
 {
   "primaryType": "aws_lambda_function",
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "iam", "lambda_permission", "security_groups"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },

@@ -1,5 +1,6 @@
 {
   "primaryType": "aws_api_gateway_rest_api",
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "api_gateway_companions", "security_groups"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },

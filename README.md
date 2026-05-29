@@ -226,7 +226,12 @@ Everything remains editable Excalidraw content.
 
 ### Semantic primary satellite layouts (JSON)
 
-In **semantic view**, each primary resource (Lambda, ECS service, S3 bucket, ALB, API Gateway, and others) is drawn as a tier-0 card with **satellites** in fixed slots (CloudWatch above, IAM and companions below-left, security groups below-right). Slot order and which companion **kinds** appear per service are defined in JSON under [`packages/excalidraw/assets/terraform-topology-primary-layouts/`](./packages/excalidraw/assets/terraform-topology-primary-layouts/) (for example [`aws_lambda_function.json`](./packages/excalidraw/assets/terraform-topology-primary-layouts/aws_lambda_function.json)). Unknown primary types use [`default.json`](./packages/excalidraw/assets/terraform-topology-primary-layouts/default.json). Terraform plan parsing (which resources attach to which primary) stays in TypeScript; the JSON only controls placement.
+In **semantic view**, each primary resource (Lambda, ECS service, S3 bucket, ALB, API Gateway, and others) is drawn as a tier-0 card with **satellites** in fixed slots (CloudWatch above, IAM and companions below-left, security groups below-right).
+
+- [`packages/excalidraw/assets/terraform-topology-satellite-kinds.json`](./packages/excalidraw/assets/terraform-topology-satellite-kinds.json) — global catalog: each satellite **kind** has an attachment rule (`reverseRef`, `companions`, `forwardRef`, or `plugin` for complex discovery).
+- [`packages/excalidraw/assets/terraform-topology-primary-layouts/`](./packages/excalidraw/assets/terraform-topology-primary-layouts/) — per primary type: `attachments` (which kinds run) and `slots` (where they are drawn). Example: [`aws_lambda_function.json`](./packages/excalidraw/assets/terraform-topology-primary-layouts/aws_lambda_function.json). Unknown primary types use [`default.json`](./packages/excalidraw/assets/terraform-topology-primary-layouts/default.json).
+
+Every kind listed in `slots[].kinds` must also appear in `attachments`. Runtime code in `terraformTopologySatelliteEngine.ts` and `terraformTopologySatelliteRegistry.ts` resolves attachments from the Terraform plan; add a declarative rule when the pattern is simple (reverse reference or companion link field), or a registered **plugin** when discovery needs custom logic (IAM chains, security groups, API Gateway stages, and similar).
 
 Production builds use a Terraform Canvas landing page with an embedded editor; dev mode opens the editor directly.
 

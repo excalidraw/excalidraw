@@ -12,6 +12,8 @@ import {
   getTopologyPrimaryLayoutJson,
 } from "./terraformTopologyPrimaryLayoutConfig";
 
+import "./terraformTopologySatelliteRegistry";
+
 describe("terraformTopologyPrimaryLayoutConfig", () => {
   it("registers default and per-type layouts", () => {
     const types = getRegisteredTopologyPrimaryLayoutTypes();
@@ -38,6 +40,23 @@ describe("terraformTopologyPrimaryLayoutConfig", () => {
     expect(bottomStart?.kinds).toContain("iam");
     expect(bottomStart?.kinds).toContain("lambda_permission");
     expect(bottomStart?.kinds).not.toContain("s3_companions");
+  });
+
+  it("validates slot kinds are listed in attachments", () => {
+    const lambda = getTopologyPrimaryLayoutJson("aws_lambda_function");
+    const attachmentSet = new Set(lambda.attachments);
+    for (const slot of lambda.slots) {
+      for (const k of slot.kinds) {
+        expect(attachmentSet.has(k)).toBe(true);
+      }
+    }
+    expect(attachmentSet.has("s3_companions")).toBe(false);
+  });
+
+  it("resolved config exposes enabledKinds", () => {
+    const cfg = getPrimaryLayoutConfig("aws_lambda_function");
+    expect(cfg.enabledKinds.has("lambda_permission")).toBe(true);
+    expect(cfg.enabledKinds.has("alb_companions")).toBe(false);
   });
 
   it("validates every bundled JSON layout", () => {

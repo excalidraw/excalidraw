@@ -2,61 +2,40 @@
  * Load per–primary-type JSON slot configs for semantic topology satellite placement.
  */
 
-import defaultLayoutJson from "../assets/terraform-topology-primary-layouts/default.json";
-import awsLambdaLayoutJson from "../assets/terraform-topology-primary-layouts/aws_lambda_function.json";
-import awsEcsServiceLayoutJson from "../assets/terraform-topology-primary-layouts/aws_ecs_service.json";
-import awsApiGatewayLayoutJson from "../assets/terraform-topology-primary-layouts/aws_api_gateway_rest_api.json";
-import awsS3BucketLayoutJson from "../assets/terraform-topology-primary-layouts/aws_s3_bucket.json";
-import awsTgwLayoutJson from "../assets/terraform-topology-primary-layouts/aws_ec2_transit_gateway.json";
-import awsLbLayoutJson from "../assets/terraform-topology-primary-layouts/aws_lb.json";
-
 import { tfComfortPx } from "./terraformLayoutComfort";
 import {
-  validateTopologyPrimaryLayoutJson,
+  getTopologyPrimaryLayoutJson,
+  __topologyPrimaryLayoutsForTest,
+  getRegisteredTopologyPrimaryLayoutTypes,
+} from "./terraformTopologyPrimaryLayoutLoader";
+import {
   type ResolvedPrimaryLayoutConfig,
   type ResolvedTopologyTiers,
   type TopologyPrimaryLayoutJson,
   type TopologySatelliteKind,
 } from "./terraformTopologyPrimaryLayoutTypes";
-
-import { albSatelliteStackHeightPx } from "./terraformTopologyAlbLinks";
+import { buildSatelliteClusterForKind } from "./terraformTopologySatelliteEngine";
 import {
-  buildResourceCloudWatchCluster,
-  cloudWatchSatelliteStackHeightPx,
-} from "./terraformTopologyCloudWatchLinks";
-import { ecsSatelliteStackHeightPx } from "./terraformTopologyEcsLinks";
-import { iamSatelliteStackHeightPx } from "./terraformTopologyIamLinks";
-import { kmsPolicySatelliteStackHeightPx } from "./terraformTopologyKmsLinks";
-import { lambdaPermissionSatelliteStackHeightPx } from "./terraformTopologyLambdaPermissionLinks";
-import { apiGatewaySatelliteStackHeightPx } from "./terraformTopologyApiGatewayLinks";
-import { s3SatelliteStackHeightPx } from "./terraformTopologyS3Links";
-import { sgSatelliteStackHeightPx } from "./terraformTopologySgLinks";
-import { sqsSatelliteStackHeightPx } from "./terraformTopologySqsLinks";
-import { transitGatewaySatelliteStackHeightPx } from "./terraformTopologyTransitGatewayLinks";
+  buildSatelliteContext,
+  satelliteStackHeightPxForKind,
+} from "./terraformTopologySatelliteRegistry";
 
 import { getTerraformCardResourceType } from "./terraformResourceCardLabel";
+
+import "./terraformTopologySatelliteRegistry";
 
 import type {
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 
+export {
+  getTopologyPrimaryLayoutJson,
+  __topologyPrimaryLayoutsForTest,
+  getRegisteredTopologyPrimaryLayoutTypes,
+};
+
 export type { ResolvedPrimaryLayoutConfig, ResolvedTopologyTiers };
-
-const RAW_LAYOUTS: TopologyPrimaryLayoutJson[] = [
-  validateTopologyPrimaryLayoutJson(defaultLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsLambdaLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsEcsServiceLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsApiGatewayLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsS3BucketLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsTgwLayoutJson),
-  validateTopologyPrimaryLayoutJson(awsLbLayoutJson),
-];
-
-const LAYOUT_BY_PRIMARY_TYPE = new Map<string, TopologyPrimaryLayoutJson>();
-for (const layout of RAW_LAYOUTS) {
-  LAYOUT_BY_PRIMARY_TYPE.set(layout.primaryType, layout);
-}
 
 function resolveTiers(json: TopologyPrimaryLayoutJson): ResolvedTopologyTiers {
   const b = json.tierBase;
@@ -75,6 +54,8 @@ function resolveConfig(
 ): ResolvedPrimaryLayoutConfig {
   return {
     primaryType: json.primaryType,
+    attachments: [...json.attachments],
+    enabledKinds: new Set(json.attachments),
     tiers: resolveTiers(json),
     padding: {
       sgRight: tfComfortPx(json.padding.sgRight),
@@ -94,20 +75,7 @@ function resolveConfig(
   };
 }
 
-const DEFAULT_RESOLVED = resolveConfig(LAYOUT_BY_PRIMARY_TYPE.get("default")!);
-
-export function getRegisteredTopologyPrimaryLayoutTypes(): string[] {
-  return [...LAYOUT_BY_PRIMARY_TYPE.keys()].sort();
-}
-
-export function getTopologyPrimaryLayoutJson(
-  primaryType: string,
-): TopologyPrimaryLayoutJson {
-  return (
-    LAYOUT_BY_PRIMARY_TYPE.get(primaryType) ??
-    LAYOUT_BY_PRIMARY_TYPE.get("default")!
-  );
-}
+const DEFAULT_RESOLVED = resolveConfig(getTopologyPrimaryLayoutJson("default"));
 
 /** Resolved layout for a Terraform primary resource type (`default` fallback). */
 export function getPrimaryLayoutConfig(
@@ -183,115 +151,14 @@ export function satelliteKindStackHeightPx(
   kind: TopologySatelliteKind,
   ctx: SatelliteKindHeightContext,
 ): number {
-  const { nodes, address, arnIndex, plan, tiers, gaps } = ctx;
-  const tier1H = tiers.tier1H;
-  const tier2H = tiers.tier2H;
-  const gap = gaps.satellite;
-
-  switch (kind) {
-    case "cloudwatch_alarms":
-    case "cloudwatch_log_groups":
-      return cloudWatchSatelliteStackHeightPx(nodes, address, tier1H, gap);
-    case "iam":
-      return iamSatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        tier2H,
-        gap,
-      );
-    case "kms_policies":
-      return kmsPolicySatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        gap,
-      );
-    case "security_groups":
-      return sgSatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        tier2H,
-        gap,
-        plan,
-      );
-    case "s3_companions":
-      return s3SatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        tier2H,
-        gap,
-      );
-    case "alb_companions":
-      return albSatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        tier2H,
-        gap,
-      );
-    case "ecs_companions":
-      return ctx.primaryType === "aws_ecs_service"
-        ? ecsSatelliteStackHeightPx(
-            nodes,
-            address,
-            arnIndex,
-            tier1H,
-            tier2H,
-            gap,
-          )
-        : 0;
-    case "api_gateway_companions":
-      return ctx.primaryType === "aws_api_gateway_rest_api"
-        ? apiGatewaySatelliteStackHeightPx(nodes, address, tier1H, tier2H, gap)
-        : 0;
-    case "tgw_companions": {
-      const planChanges = Array.isArray(
-        (plan as { resource_changes?: unknown })?.resource_changes,
-      )
-        ? (plan as { resource_changes: Array<{ address?: string }> })
-            .resource_changes ?? []
-        : undefined;
-      return ctx.primaryType === "aws_ec2_transit_gateway"
-        ? transitGatewaySatelliteStackHeightPx(
-            nodes,
-            address,
-            tier1H,
-            tier2H,
-            gap,
-            planChanges,
-          )
-        : 0;
-    }
-    case "lambda_permission":
-      return ctx.primaryType === "aws_lambda_function"
-        ? lambdaPermissionSatelliteStackHeightPx(
-            nodes,
-            address,
-            arnIndex,
-            tier2H,
-            gap,
-          )
-        : 0;
-    case "sqs_companions":
-      return sqsSatelliteStackHeightPx(
-        nodes,
-        address,
-        arnIndex,
-        tier1H,
-        tier2H,
-        gap,
-      );
-    default:
-      return 0;
-  }
+  const config = getPrimaryLayoutConfig(ctx.primaryType);
+  const satCtx = buildSatelliteContext(
+    ctx.nodes,
+    ctx.address,
+    ctx.arnIndex,
+    ctx.plan,
+  );
+  return satelliteStackHeightPxForKind(kind, config, satCtx);
 }
 
 /** Top margin above tier-0 primary (CloudWatch band). */
@@ -362,9 +229,25 @@ export function topologyPrimaryCellFootprintPx(
     w = Math.max(w, tiers.tier1W * 2 + gaps.iamSgColumn);
   }
 
-  const cwBuild = buildResourceCloudWatchCluster(ctx.nodes, ctx.address);
-  const hasAlarm = Boolean(cwBuild.cluster?.alarms.length);
-  const hasLog = Boolean(cwBuild.cluster?.logGroups.length);
+  const satCtx = buildSatelliteContext(
+    ctx.nodes,
+    ctx.address,
+    ctx.arnIndex,
+    ctx.plan,
+  );
+  const cwBuild = config.enabledKinds.has("cloudwatch_alarms")
+    ? buildSatelliteClusterForKind("cloudwatch_alarms", satCtx)
+    : { cluster: null };
+  const cwCluster = cwBuild.cluster as {
+    alarms?: string[];
+    logGroups?: string[];
+  } | null;
+  const hasAlarm =
+    config.enabledKinds.has("cloudwatch_alarms") &&
+    Boolean(cwCluster?.alarms?.length);
+  const hasLog =
+    config.enabledKinds.has("cloudwatch_log_groups") &&
+    Boolean(cwCluster?.logGroups?.length);
   if (hasAlarm && hasLog) {
     const cwSpan =
       padding.cloudwatchLeft +
@@ -442,6 +325,3 @@ export function primaryVerticalMarginsForAddress(
   const bottomEnd = primaryBottomColumnMarginPx(config, ctx, "bottom", "end");
   return { top, bottom: Math.max(bottomStart, bottomEnd) };
 }
-
-/** @internal tests */
-export const __topologyPrimaryLayoutsForTest = RAW_LAYOUTS;
