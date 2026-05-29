@@ -216,17 +216,57 @@ function vectorise<P extends LocalPoint | GlobalPoint>(
   return v;
 }
 
-// Optimal Cosine Distance between two unit vectors.
-// Since we assume no rotation (indicative angle already zeroed out) we
-// compute only the aligned dot product — no Golden Section Search needed.
-// Returns a score in [0, 1] where 1 = perfect match.
-function optimalCosineDistance(v1: Vec, v2: Vec): number {
-  let dot = 0;
-  for (let i = 0; i < v1.length; i++) {
-    dot += v1[i] * v2[i];
+// Discrete Fréchet distance between two parameterized curves.
+//
+// This is curve-aware (not just point-to-point), so it penalizes structural
+// mismatches like direction reversal in the arrow template vs a monotonic line.
+//
+// Returns a raw distance in [0, 2*sqrt(2)] for unit-magnitude vectors.
+function frechetDistance(v1: Vec, v2: Vec): number {
+  const n = v1.length / 2;
+  const INF = Infinity;
+
+  // F[i][j] = min Fréchet distance aligning v1[0..i] with v2[0..j]
+  const F: number[][] = Array.from({ length: n }, () => new Array(n).fill(INF));
+
+  // Base case
+  F[0][0] = Math.hypot(v1[0] - v2[0], v1[1] - v2[1]);
+
+  // First column: v1[0..i] aligned with v2[0]
+  for (let i = 1; i < n; i++) {
+    const ptDist = Math.hypot(v1[2 * i] - v2[0], v1[2 * i + 1] - v2[1]);
+    F[i][0] = Math.max(F[i - 1][0], ptDist);
   }
-  // dot ∈ [-1, 1]; map to score in [0, 1]
-  return (dot + 1) / 2;
+
+  // First row: v1[0] aligned with v2[0..j]
+  for (let j = 1; j < n; j++) {
+    const ptDist = Math.hypot(v1[0] - v2[2 * j], v1[1] - v2[2 * j + 1]);
+    F[0][j] = Math.max(F[0][j - 1], ptDist);
+  }
+
+  // Fill the DP table
+  for (let i = 1; i < n; i++) {
+    for (let j = 1; j < n; j++) {
+      const ptDist = Math.hypot(
+        v1[2 * i] - v2[2 * j],
+        v1[2 * i + 1] - v2[2 * j + 1],
+      );
+      F[i][j] = Math.max(
+        Math.min(F[i - 1][j], F[i][j - 1], F[i - 1][j - 1]),
+        ptDist,
+      );
+    }
+  }
+
+  return F[n - 1][n - 1];
+}
+
+// Convert a Fréchet distance to a similarity score in [0, 1].
+//
+// For unit-magnitude vectors, the maximum point-to-point distance is 2,
+// so the maximum Fréchet distance is also bounded by 2.
+function frechetScore(distance: number): number {
+  return Math.max(0, 1 - distance / 2);
 }
 
 // =============================================================================
@@ -345,12 +385,21 @@ function makeEllipseTemplate(startAngle: number = 0): LocalPoint[] {
   });
 }
 
-// Build a template for a straight line (left to right).
-function makeLineTemplate(): LocalPoint[] {
+// Build a template for a straight line at the given angle (radians).
+function makeLineTemplate(angle: number = 0): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
-  return Array.from({ length: PROTRACTOR_N }, (_, i) => {
+  const basePts: LocalPoint[] = [];
+  for (let i = 0; i < PROTRACTOR_N; i++) {
     const t = i / (PROTRACTOR_N - 1);
-    return [-s + t * PROTRACTOR_SQUARE_SIZE, 0] as LocalPoint;
+    basePts.push([-s + t * PROTRACTOR_SQUARE_SIZE, 0] as LocalPoint);
+  }
+  if (angle === 0) {
+    return basePts;
+  }
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return basePts.map(([x, y]) => {
+    return [x * cos - y * sin, x * sin + y * cos] as LocalPoint;
   });
 }
 
@@ -445,7 +494,15 @@ const TEMPLATES: readonly Template[] = (() => {
     { type: "ellipse", pts: makeEllipseTemplate((5 * Math.PI) / 4) },
     { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
     { type: "ellipse", pts: makeEllipseTemplate((7 * Math.PI) / 4) },
-    { type: "line", pts: makeLineTemplate() },
+    // Line: 8 templates at 45° increments
+    { type: "line", pts: makeLineTemplate(0) },
+    { type: "line", pts: makeLineTemplate(Math.PI / 4) },
+    { type: "line", pts: makeLineTemplate(Math.PI / 2) },
+    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 4) },
+    { type: "line", pts: makeLineTemplate(Math.PI) },
+    { type: "line", pts: makeLineTemplate((5 * Math.PI) / 4) },
+    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 2) },
+    { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
     // Arrow templates
     { type: "arrow", pts: makeArrowTemplate(), rotationInvariant: true },
   ];
@@ -489,8 +546,8 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
       ? candidateVecRotInvRev
       : candidateVecFixedRev;
     const score = Math.max(
-      optimalCosineDistance(cv, tmpl.vec),
-      optimalCosineDistance(cvRev, tmpl.vec),
+      frechetScore(frechetDistance(cv, tmpl.vec)),
+      frechetScore(frechetDistance(cvRev, tmpl.vec)),
     );
     if (score > bestScore) {
       bestScore = score;
