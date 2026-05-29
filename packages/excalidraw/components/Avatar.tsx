@@ -25,7 +25,19 @@ export const Avatar = ({
   const loadImg = !error && src;
   const style = loadImg ? undefined : { background: color };
   return (
-    <div className={clsx("Avatar", className)} style={style} onClick={onClick}>
+    <div
+      className={clsx("Avatar", className)}
+      style={style}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(e as any);
+        }
+      }}
+    >
       {loadImg ? (
         <img
           className="Avatar-img"
