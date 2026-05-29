@@ -261,11 +261,11 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">
-        {color ? (
+        {color === "transparent" ? (
           slashIcon
-        ) : (
+        ) : color === null ? (
           <span className="mixed-color-placeholder">/</span>
-        )}
+        ) : null}
       </div>
 
       {isCompactMode && color && mode === "stroke" && (
