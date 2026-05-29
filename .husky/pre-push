@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Mirrors PR CI: typecheck, ESLint, Prettier, Vitest (no watch), coverage, ESM build + size-limit.
+# Lint, typecheck, tests, coverage, ESM build, and size-limit (formerly split across pre-commit + pre-push).
 yarn test:prepush

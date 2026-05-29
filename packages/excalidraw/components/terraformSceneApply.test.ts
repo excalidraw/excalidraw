@@ -100,7 +100,11 @@ describe("terraformSceneApply", () => {
 
     expect(terraformPlanParsingFromSources).toHaveBeenCalledWith(
       expect.anything(),
-      { semanticLayout: true },
+      {
+        semanticLayout: true,
+        pipelineLayout: false,
+        moduleLayoutOptions: undefined,
+      },
     );
     const session = getTerraformImportSession();
     expect(session).not.toBeNull();
@@ -112,6 +116,7 @@ describe("terraformSceneApply", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: true,
+      pipelineLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
@@ -141,6 +146,7 @@ describe("terraformSceneApply", () => {
         tfdTexts: [],
       },
       semanticLayout: false,
+      pipelineLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
@@ -160,6 +166,7 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
+      pipelineLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );
@@ -177,6 +184,7 @@ describe("terraformSceneApply", () => {
         tfdTexts: [],
       },
       semanticLayout: false,
+      pipelineLayout: false,
       moduleLayoutOptions: rectpackingOptions,
       preset: null,
       importedTfdTexts: [],
@@ -196,6 +204,7 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
+      pipelineLayout: false,
         moduleLayoutOptions: rectpackingOptions,
       },
     );

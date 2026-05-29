@@ -122,6 +122,8 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
       {
         semanticLayout: true,
+        pipelineLayout: false,
+        moduleLayoutOptions: undefined,
       },
     );
     expect(hoisted.replaceAllElements).toHaveBeenCalled();
@@ -145,6 +147,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
+        pipelineLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );
@@ -179,6 +182,7 @@ describe("TerraformImportModal", () => {
     );
     const options = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1];
     expect(options?.semanticLayout).toBe(false);
+    expect(options?.pipelineLayout).toBe(false);
     expect(options?.moduleLayoutOptions?.mode).toBe("rectpacking");
   });
 
@@ -220,6 +224,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
+        pipelineLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );

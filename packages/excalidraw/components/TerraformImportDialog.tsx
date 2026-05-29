@@ -36,7 +36,7 @@ import {
 
 import "./TerraformImportDialog.scss";
 
-type TerraformView = "module" | "semantic";
+type TerraformView = "module" | "semantic" | "pipeline";
 
 const MAX_PLAN_BUNDLES = 10;
 
@@ -93,6 +93,12 @@ const VIEW_OPTIONS: ReadonlyArray<{
     value: "module",
     label: "Module view",
     description: "Module-framed infrastructure graph.",
+  },
+  {
+    value: "pipeline",
+    label: "Pipeline view",
+    description:
+      "TFD dataflow left-to-right with geographic frames (requires .tfd).",
   },
 ];
 
@@ -200,7 +206,13 @@ export const TerraformImportModal = ({
   const canImport = hasPlanMode || stateOnly || activePreset != null;
   const canUseSemanticView =
     hasPlanMode || stateFiles.length > 0 || activePreset != null;
+  const canUsePipelineView =
+    canUseSemanticView &&
+    (tfdFiles.length > 0 ||
+      (activePreset?.tfdPaths?.length ?? 0) > 0 ||
+      (activePreset?.tfdFiles?.length ?? 0) > 0);
   const semanticViewDisabled = loading || !canUseSemanticView;
+  const pipelineViewDisabled = loading || !canUsePipelineView;
   const usingPresetManifest = activePreset != null;
 
   const updateBundle = (id: string, patch: Partial<PlanDotBundleRow>) => {
@@ -233,14 +245,22 @@ export const TerraformImportModal = ({
   ) => {
     const canUseSemanticView =
       sources.planDotBundles.length > 0 || sources.states.length > 0;
-    const semanticLayout = importView === "semantic" && canUseSemanticView;
+    const hasTfd =
+      (opts.importedTfdTexts?.some((t) => t.trim()) ?? false) ||
+      sources.tfdTexts.some((t) => t.trim());
+    const pipelineLayout =
+      importView === "pipeline" && canUseSemanticView && hasTfd;
+    const semanticLayout =
+      importView === "semantic" && canUseSemanticView && !pipelineLayout;
     const { importWarnings: warnings } = await runTerraformImportFromSources(
       app,
       setAppState,
       sources,
       {
         semanticLayout,
-        moduleLayoutOptions: semanticLayout ? undefined : moduleLayoutOptions,
+        pipelineLayout,
+        moduleLayoutOptions:
+          semanticLayout || pipelineLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
       },
@@ -928,7 +948,8 @@ writer -> bucket`}</code>
           {VIEW_OPTIONS.map((option) => {
             const checked = view === option.value;
             const disabled =
-              option.value === "semantic" && semanticViewDisabled;
+              (option.value === "semantic" && semanticViewDisabled) ||
+              (option.value === "pipeline" && pipelineViewDisabled);
             return (
               <label
                 key={option.value}
@@ -945,8 +966,10 @@ writer -> bucket`}</code>
                   option.value === "semantic" && !canUseSemanticView
                     ? "Semantic view requires at least one plan+graph pair or a state file."
                     : option.value === "semantic" && stateOnly
-                    ? "Shows current infrastructure from state (no planned changes)."
-                    : undefined
+                      ? "Shows current infrastructure from state (no planned changes)."
+                      : option.value === "pipeline" && !canUsePipelineView
+                        ? "Pipeline view requires plan/state plus a .tfd dataflow file."
+                        : undefined
                 }
               >
                 <input

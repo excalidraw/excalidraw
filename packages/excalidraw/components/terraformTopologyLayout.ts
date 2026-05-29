@@ -4104,3 +4104,66 @@ export async function buildTerraformTopologyExcalidrawScene(
   topologyResourcePanelPlan = undefined;
   return result;
 }
+
+export type PipelinePrimaryClusterBuildResult = {
+  skeleton: ExcalidrawElementSkeleton[];
+  width: number;
+  height: number;
+  clusterFrameId: string;
+};
+
+/** Build one primaryCluster skeleton at origin for pipeline layout sizing/placement. */
+export function buildTopologyPrimaryClusterSkeletonForPipeline(
+  primaryAddr: string,
+  nodes: TerraformPlanNodesMap,
+  plan: unknown,
+  placement: TopologyPrimaryClusterPlacement,
+): PipelinePrimaryClusterBuildResult {
+  const skeleton: ExcalidrawElementSkeleton[] = [];
+  const arnIndex = buildArnIndexForTopology(nodes);
+  const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
+  const globalPlacedIamSatellites = new Set<string>();
+  const globalPlacedKmsPolicySatellites = new Set<string>();
+  const globalPlacedSgSatellites = new Set<string>();
+  const globalPlacedCloudWatchSatellites = new Set<string>();
+  const globalPlacedS3Satellites = new Set<string>();
+  const globalPlacedSqsSatellites = new Set<string>();
+  const globalPlacedAlbSatellites = new Set<string>();
+  const globalPlacedEcsSatellites = new Set<string>();
+  const globalPlacedApiGatewaySatellites = new Set<string>();
+  const globalPlacedTgwSatellites = new Set<string>();
+  const globalPlacedLambdaPermissionSatellites = new Set<string>();
+
+  appendTopologyResourceRectangles(
+    skeleton,
+    placement,
+    [primaryAddr],
+    0,
+    0,
+    nodes,
+    arnIndex,
+    globalPlacedIamSatellites,
+    globalPlacedKmsPolicySatellites,
+    globalPlacedSgSatellites,
+    globalPlacedCloudWatchSatellites,
+    globalPlacedS3Satellites,
+    globalPlacedSqsSatellites,
+    globalPlacedAlbSatellites,
+    globalPlacedEcsSatellites,
+    globalPlacedApiGatewaySatellites,
+    globalPlacedTgwSatellites,
+    globalPlacedLambdaPermissionSatellites,
+    satelliteLineSpecs,
+    plan,
+  );
+
+  const clusterFrameId = primaryClusterSkeletonId(primaryAddr);
+  const frame = skeleton.find(
+    (el) => el.type === "frame" && el.id === clusterFrameId,
+  );
+  const width = typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
+  const height =
+    typeof frame?.height === "number" ? frame.height : RESOURCE_RECT_H;
+
+  return { skeleton, width, height, clusterFrameId };
+}

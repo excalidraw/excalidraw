@@ -31,6 +31,8 @@ import {
 } from "./terraformTopologyPlacement";
 import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
+import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildDataFlowEdges,
@@ -178,9 +180,11 @@ const stripTerraformAddressIndexes = (address = "") =>
 export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
+  /** When true, emit TFD-driven pipeline layout (requires `.tfd` with resolved edges). */
+  pipelineLayout?: boolean;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
-  /** Module-view intra-module packing (ignored when semanticLayout is true). */
+  /** Module-view intra-module packing (ignored when semanticLayout or pipelineLayout is true). */
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
 };
 
@@ -526,7 +530,9 @@ export const terraformPlanParsingFromSources = async (
   sources: TerraformPlanParsingSources,
   options?: TerraformPlanParsingOptions,
 ) => {
-  const semanticLayout = options?.semanticLayout === true;
+  const semanticLayout =
+    options?.semanticLayout === true && options?.pipelineLayout !== true;
+  const pipelineLayout = options?.pipelineLayout === true;
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -589,7 +595,7 @@ export const terraformPlanParsingFromSources = async (
     }
   }
 
-  if (semanticLayout) {
+  if (semanticLayout || pipelineLayout) {
     const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
     if (
       !Array.isArray(rc) ||
@@ -601,7 +607,7 @@ export const terraformPlanParsingFromSources = async (
       return new Response(
         JSON.stringify({
           error:
-            "Semantic layout requires at least one managed resource in the plan or state file.",
+            "Semantic and pipeline layout require at least one managed resource in the plan or state file.",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } },
       );
@@ -655,7 +661,56 @@ export const terraformPlanParsingFromSources = async (
 
   let sceneBody: Record<string, unknown>;
 
-  if (semanticLayout) {
+  if (pipelineLayout) {
+    const declaredEdges = nodes5[DECLARED_DATAFLOW_ORDERED_KEY];
+    if (!declaredEdges || declaredEdges.length === 0) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Pipeline layout requires a `.tfd` file with at least one resolved dataflow edge.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+    const atomGraph = buildPipelineAtomGraph(nodes5, plan, tfdTexts);
+    if (!atomGraph || atomGraph.atoms.size === 0) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Pipeline layout could not resolve any layout atoms from the `.tfd` binds.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    const pipelineScene = await buildTerraformPipelineExcalidrawScene(
+      nodes5,
+      plan,
+      tfdTexts,
+    );
+    emitLocalParseDebug({
+      phase: "pipelineLayout",
+      meta: pipelineScene.meta,
+      elementCount: pipelineScene.elements.length,
+    });
+    sceneBody = {
+      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+      elements: pipelineScene.elements,
+      ...(pipelineScene.files ? { files: pipelineScene.files } : {}),
+      meta: appendImportMeta(
+        {
+          ...pipelineScene.meta,
+          importSource,
+          plannedChanges: importSource !== "state-only",
+          representedResourceCount: pipelineScene.meta.atomCount,
+          omittedResourceCount: 0,
+        },
+        sources,
+        formatImportWarnings(importWarnings, tfdWarnings),
+        { stackIds, addressToStack },
+      ),
+    };
+  } else if (semanticLayout) {
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
