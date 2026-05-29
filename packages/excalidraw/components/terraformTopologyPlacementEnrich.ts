@@ -10,20 +10,10 @@ import {
   parseStackAddress,
   stripStackPrefixForModuleParsing,
 } from "./terraformStackAddress";
-import { collectAlbClusterSatelliteAddressesForTopologyList } from "./terraformTopologyAlbLinks";
-import { collectEcsClusterSatelliteAddressesForTopologyList } from "./terraformTopologyEcsLinks";
-import { collectApiGatewayClusterSatelliteAddressesForTopologyList } from "./terraformTopologyApiGatewayLinks";
-import { buildResourceCloudWatchCluster } from "./terraformTopologyCloudWatchLinks";
-import {
-  buildArnIndexForTopology,
-  buildPrimaryIamCluster,
-} from "./terraformTopologyIamLinks";
-import { buildKmsKeyPolicyCluster } from "./terraformTopologyKmsLinks";
-import { collectLambdaPermissionSatelliteAddressesForTopologyList } from "./terraformTopologyLambdaPermissionLinks";
-import { collectTransitGatewayClusterSatelliteAddressesForTopologyList } from "./terraformTopologyTransitGatewayLinks";
-import { buildPrimarySgCluster } from "./terraformTopologySgLinks";
-import { buildS3CompanionCluster } from "./terraformTopologyS3Links";
-import { buildSqsCompanionCluster } from "./terraformTopologySqsLinks";
+import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
+import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
+
+import "./terraformTopologySatelliteRegistry";
 import {
   buildSubnetOwnerHintsFromPlan,
   buildSubnetToVpcMapFromPlan,
@@ -165,107 +155,12 @@ export function collectTopologySatelliteAddressesForPrimaries(
   primaryAddresses: readonly string[],
   plan?: unknown,
 ): Set<string> {
-  const out = new Set<string>();
-
-  for (const addr of collectAlbClusterSatelliteAddressesForTopologyList(
+  return collectTopologySatelliteAddressesFromRegistry(
     nodes,
     arnIndex,
     primaryAddresses,
     plan,
-  )) {
-    out.add(addr);
-  }
-  for (const addr of collectEcsClusterSatelliteAddressesForTopologyList(
-    nodes,
-    arnIndex,
-    primaryAddresses,
-  )) {
-    out.add(addr);
-  }
-  for (const addr of collectApiGatewayClusterSatelliteAddressesForTopologyList(
-    nodes,
-    primaryAddresses,
-  )) {
-    out.add(addr);
-  }
-  for (const addr of collectLambdaPermissionSatelliteAddressesForTopologyList(
-    nodes,
-    arnIndex,
-    primaryAddresses,
-  )) {
-    out.add(addr);
-  }
-  for (const addr of collectTransitGatewayClusterSatelliteAddressesForTopologyList(
-    nodes,
-    primaryAddresses,
-    Array.isArray((plan as { resource_changes?: unknown })?.resource_changes)
-      ? (plan as { resource_changes: ResourceChange[] }).resource_changes ?? []
-      : undefined,
-  )) {
-    out.add(addr);
-  }
-
-  for (const addr of primaryAddresses) {
-    const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const pr = getPrimaryResource(node);
-    const type = typeof pr?.type === "string" ? pr.type : "";
-
-    const cw = buildResourceCloudWatchCluster(nodes, addr);
-    if (cw.cluster) {
-      for (const a of cw.cluster.alarms) {
-        out.add(a);
-      }
-      for (const lg of cw.cluster.logGroups) {
-        out.add(lg);
-      }
-    }
-
-    const iam = buildPrimaryIamCluster(nodes, addr, arnIndex);
-    if (iam.cluster) {
-      for (const s of iam.cluster.stack) {
-        out.add(s);
-      }
-    }
-
-    if (type === "aws_kms_key") {
-      const kms = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
-      if (kms.cluster) {
-        for (const p of kms.cluster.policies) {
-          out.add(p);
-        }
-      }
-    }
-
-    const sg = buildPrimarySgCluster(nodes, addr, arnIndex, plan);
-    if (sg.cluster) {
-      for (const g of sg.cluster.groups) {
-        out.add(g.sgPath);
-        for (const r of g.rules) {
-          out.add(r);
-        }
-      }
-    }
-
-    if (type === "aws_s3_bucket") {
-      const s3 = buildS3CompanionCluster(nodes, addr, arnIndex);
-      if (s3.cluster) {
-        for (const s of s3.cluster.stack) {
-          out.add(s);
-        }
-      }
-    }
-
-    if (type === "aws_sqs_queue") {
-      const sqs = buildSqsCompanionCluster(nodes, addr, arnIndex);
-      if (sqs.cluster) {
-        for (const s of sqs.cluster.stack) {
-          out.add(s);
-        }
-      }
-    }
-  }
-
-  return out;
+  );
 }
 
 function collectPrimaryAnchorAddresses(

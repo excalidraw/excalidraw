@@ -2,7 +2,7 @@ import importPresetsCatalog from "../../backend/terraform/import-presets.catalog
 
 import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 
-export type TerraformImportPresetView = "semantic" | "module";
+export type TerraformImportPresetView = "semantic" | "module" | "pipeline";
 
 export type TerraformImportPresetWarning = {
   code: "missing_state_file" | "missing_optional_tfd";
@@ -104,7 +104,12 @@ export function normalizeTerraformImportPreset(
   }
   const id = typeof value.id === "string" ? value.id.trim() : "";
   const name = typeof value.name === "string" ? value.name.trim() : "";
-  const view = value.view === "module" ? "module" : "semantic";
+  const view =
+    value.view === "module"
+      ? "module"
+      : value.view === "pipeline"
+      ? "pipeline"
+      : "semantic";
   const rootPath =
     typeof value.rootPath === "string" ? value.rootPath.trim() : "";
   const stacksRaw = Array.isArray(value.stacks) ? value.stacks : [];

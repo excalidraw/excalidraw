@@ -1081,4 +1081,54 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(rect?.isDeleted).toBe(false);
     expect(label?.isDeleted).toBe(false);
   });
+
+  it("supports ELK box and rectpacking module packing modes", async () => {
+    const nodes = {
+      "aws_s3_bucket.root": minimalNode({
+        "aws_s3_bucket.root": { address: "aws_s3_bucket.root" },
+      }),
+      "module.network.aws_vpc.main": minimalNode({
+        "module.network.aws_vpc.main": {
+          address: "module.network.aws_vpc.main",
+        },
+      }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {
+          "module.network": {
+            path: "module.network",
+            modules: {},
+            resourceAddresses: ["module.network.aws_vpc.main"],
+          },
+        },
+        resourceAddresses: ["aws_s3_bucket.root"],
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    for (const mode of ["box", "rectpacking"] as const) {
+      const { elements, meta } = await buildTerraformElkExcalidrawScene(
+        nodes,
+        undefined,
+        { mode },
+      );
+      expect(meta.modulePacking?.mode).toBe(mode);
+      expect(elements.filter((e) => e.type === "frame").length).toBeGreaterThan(
+        1,
+      );
+
+      const rootBucket = getLabeledContainer(elements, "aws_s3_bucket.root");
+      const nestedVpc = getLabeledContainer(elements, "aws_vpc.main");
+      const networkFrame = elements.find(
+        (e) => e.type === "frame" && e.name === "module.network",
+      );
+      expect(rootBucket).toBeDefined();
+      expect(nestedVpc).toBeDefined();
+      expect(networkFrame).toBeDefined();
+      if (rootBucket && nestedVpc && networkFrame) {
+        expect(rootBucket.y).toBeGreaterThanOrEqual(
+          networkFrame.y + networkFrame.height,
+        );
+      }
+    }
+  });
 });

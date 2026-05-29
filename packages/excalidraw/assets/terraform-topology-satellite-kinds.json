@@ -1,0 +1,67 @@
+{
+  "kinds": [
+    {
+      "kind": "cloudwatch_alarms",
+      "attachment": { "mode": "plugin", "plugin": "cloudwatch_resource" }
+    },
+    {
+      "kind": "cloudwatch_log_groups",
+      "attachment": { "mode": "plugin", "plugin": "cloudwatch_resource" }
+    },
+    {
+      "kind": "iam",
+      "attachment": { "mode": "plugin", "plugin": "iam_execution_role" }
+    },
+    {
+      "kind": "kms_policies",
+      "attachment": {
+        "mode": "companions",
+        "primaryTypes": ["aws_kms_key"],
+        "satelliteTypes": ["aws_kms_key_policy"],
+        "linkFields": ["key_id"],
+        "edgeType": "kms_key_policy",
+        "edgeLabel": "policy"
+      }
+    },
+    {
+      "kind": "security_groups",
+      "attachment": { "mode": "plugin", "plugin": "security_groups" }
+    },
+    {
+      "kind": "s3_companions",
+      "attachment": { "mode": "plugin", "plugin": "s3_companions" }
+    },
+    {
+      "kind": "alb_companions",
+      "attachment": { "mode": "plugin", "plugin": "alb_companions" }
+    },
+    {
+      "kind": "ecs_companions",
+      "attachment": { "mode": "plugin", "plugin": "ecs_companions" }
+    },
+    {
+      "kind": "api_gateway_companions",
+      "attachment": { "mode": "plugin", "plugin": "api_gateway_companions" }
+    },
+    {
+      "kind": "tgw_companions",
+      "attachment": { "mode": "plugin", "plugin": "tgw_companions" }
+    },
+    {
+      "kind": "lambda_permission",
+      "attachment": {
+        "mode": "reverseRef",
+        "satelliteTypes": ["aws_lambda_permission"],
+        "primaryTypes": ["aws_lambda_function"],
+        "linkField": "function_name",
+        "match": ["arn", "planAddress", "functionName"],
+        "edgeType": "lambda_permission",
+        "edgeLabel": "permission"
+      }
+    },
+    {
+      "kind": "sqs_companions",
+      "attachment": { "mode": "plugin", "plugin": "sqs_companions" }
+    }
+  ]
+}

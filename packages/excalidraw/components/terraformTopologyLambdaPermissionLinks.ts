@@ -15,6 +15,8 @@ import {
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
+import { buildSatelliteClusterForKind } from "./terraformTopologySatelliteEngine";
+import { installSatellitePlugins } from "./terraformTopologySatellitePlugins";
 
 type PlanRc = Parameters<typeof pickResourceValuesForTopologyPlacement>[0];
 
@@ -230,40 +232,20 @@ export function buildLambdaPermissionCluster(
   nodes: TerraformPlanNodesMap,
   lambdaAddress: string,
   arnIndex: Map<string, string>,
+  plan?: unknown,
 ): { cluster: LambdaPermissionCluster | null; edges: TopologyIamEdge[] } {
-  const ln = nodes[lambdaAddress] as TerraformPlanGraphNode | undefined;
-  const lp = getPrimaryResource(ln);
-  if (!lp || lp.type !== "aws_lambda_function") {
-    return { cluster: null, edges: [] };
-  }
-
-  const paths: string[] = [];
-  for (const path of Object.keys(nodes)) {
-    if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
-      continue;
-    }
-    const resolved = resolveLambdaPermissionTargetLambdaAddress(
-      nodes,
-      path,
-      arnIndex,
-    );
-    if (resolved === lambdaAddress) {
-      paths.push(path);
-    }
-  }
-  paths.sort((a, b) => a.localeCompare(b));
-  if (paths.length === 0) {
-    return { cluster: null, edges: [] };
-  }
-
-  const edges: TopologyIamEdge[] = paths.map((p) => ({
-    source: lambdaAddress,
-    target: p,
-    type: "lambda_permission",
-    label: "permission",
-  }));
-
-  return { cluster: { lambda: lambdaAddress, stack: paths }, edges };
+  installSatellitePlugins();
+  const result = buildSatelliteClusterForKind("lambda_permission", {
+    nodes,
+    primaryAddress: lambdaAddress,
+    primaryType: "aws_lambda_function",
+    arnIndex,
+    plan,
+  });
+  return {
+    cluster: result.cluster as LambdaPermissionCluster | null,
+    edges: result.edges,
+  };
 }
 
 export function lambdaPermissionSatelliteStackHeightPx(

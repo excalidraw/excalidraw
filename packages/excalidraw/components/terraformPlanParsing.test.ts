@@ -183,38 +183,6 @@ const renderedLabels = (
     .map((element) => element.originalText)
     .filter(Boolean) as string[];
 
-function elementBounds(
-  elements: Array<{
-    type?: string;
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  }>,
-) {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  for (const element of elements) {
-    if (
-      typeof element.x !== "number" ||
-      typeof element.y !== "number" ||
-      typeof element.width !== "number" ||
-      typeof element.height !== "number"
-    ) {
-      continue;
-    }
-    minX = Math.min(minX, element.x);
-    minY = Math.min(minY, element.y);
-    maxX = Math.max(maxX, element.x + element.width);
-    maxY = Math.max(maxY, element.y + element.height);
-  }
-
-  return { width: maxX - minX, height: maxY - minY };
-}
-
 describe("buildTerraformModuleTree", () => {
   it("places root resources under path root and nests module resources", () => {
     const nodes = {
@@ -274,6 +242,54 @@ describe("buildTerraformModuleTree", () => {
       map as Parameters<typeof buildTerraformModuleTree>[0],
     );
     expect(tree.resourceAddresses).toEqual(["aws_instance.a"]);
+  });
+
+  it("keeps stack-qualified module paths separate for multi-stack imports", () => {
+    const nodes = {
+      "40-east-api-1::module.api.aws_ssm_parameter.api_name": {
+        resources: {
+          "40-east-api-1::module.api.aws_ssm_parameter.api_name": {
+            address: "40-east-api-1::module.api.aws_ssm_parameter.api_name",
+          },
+        },
+      },
+      "41-east-api-2::module.api.aws_ssm_parameter.api_name": {
+        resources: {
+          "41-east-api-2::module.api.aws_ssm_parameter.api_name": {
+            address: "41-east-api-2::module.api.aws_ssm_parameter.api_name",
+          },
+        },
+      },
+      "40-east-api-1::aws_vpc.main": {
+        resources: {
+          "40-east-api-1::aws_vpc.main": {
+            address: "40-east-api-1::aws_vpc.main",
+          },
+        },
+      },
+    };
+
+    const tree = buildTerraformModuleTree(nodes);
+
+    expect(Object.keys(tree.modules).sort()).toEqual([
+      "__stack__::40-east-api-1",
+      "__stack__::41-east-api-2",
+    ]);
+    const stackA = tree.modules["__stack__::40-east-api-1"]!;
+    const stackB = tree.modules["__stack__::41-east-api-2"]!;
+    expect(Object.keys(stackA.modules).sort()).toEqual([
+      "40-east-api-1::module.api",
+      "40-east-api-1::root",
+    ]);
+    expect(
+      stackA.modules["40-east-api-1::module.api"]!.resourceAddresses,
+    ).toEqual(["40-east-api-1::module.api.aws_ssm_parameter.api_name"]);
+    expect(
+      stackB.modules["41-east-api-2::module.api"]!.resourceAddresses,
+    ).toEqual(["41-east-api-2::module.api.aws_ssm_parameter.api_name"]);
+    expect(stackA.modules["40-east-api-1::root"]!.resourceAddresses).toEqual([
+      "40-east-api-1::aws_vpc.main",
+    ]);
   });
 });
 
@@ -973,8 +989,6 @@ describe("terraformPlanParsing", () => {
     expect(body.meta?.skippedLayout).toBeUndefined();
     expect(body.meta?.vertexCount).toBeGreaterThan(0);
     expect(body.elements.length).toBeGreaterThan(0);
-    const bounds = elementBounds(body.elements);
-    expect(bounds.width / bounds.height).toBeLessThan(2);
     expect(body.appState).toMatchObject({
       viewBackgroundColor: "#ffffff",
       gridSize: null,

@@ -73,68 +73,31 @@ import {
 } from "./terraformTopologyPlacement";
 
 import {
-  buildResourceCloudWatchCluster,
-  cloudWatchSatelliteStackHeightPx,
-} from "./terraformTopologyCloudWatchLinks";
-import {
   buildArnIndexForTopology,
-  buildPrimaryIamCluster,
-  iamSatelliteStackHeightPx,
   mergeTerraformPlanResourceValues,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import {
-  buildKmsKeyPolicyCluster,
-  kmsPolicySatelliteStackHeightPx,
-} from "./terraformTopologyKmsLinks";
-import {
-  buildPrimarySgCluster,
   buildVpcEndpointSgCluster,
-  sgSatelliteStackHeightPx,
   terraformVpceSgLayoutElementId,
   terraformVpceSgRuleLayoutElementId,
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
 import {
-  albCompanionDrawMetrics,
-  albSatelliteStackHeightPx,
-  buildAlbListenerTargetCluster,
-  filterTopologyAddressesExcludingAlbSatellites,
   isAlbCompanionConsumedAsSatellite,
   isAlbTopologySatelliteResourceType,
 } from "./terraformTopologyAlbLinks";
 import {
-  buildEcsServiceCompanionCluster,
-  ecsSatelliteStackHeightPx,
-  filterTopologyAddressesExcludingEcsSatellites,
   isEcsCompanionConsumedAsSatellite,
   isEcsTopologySatelliteResourceType,
 } from "./terraformTopologyEcsLinks";
 import {
-  buildLambdaPermissionCluster,
-  filterTopologyAddressesExcludingLambdaPermissionSatellites,
-  lambdaPermissionSatelliteStackHeightPx,
-} from "./terraformTopologyLambdaPermissionLinks";
-import {
-  buildS3CompanionCluster,
-  s3SatelliteStackHeightPx,
-} from "./terraformTopologyS3Links";
-import {
-  apiGatewaySatelliteStackHeightPx,
-  buildApiGatewayCompanionCluster,
-  filterTopologyAddressesExcludingApiGatewaySatellites,
   isApiGatewayCompanionConsumedAsSatellite,
   isApiGatewayTopologySatelliteResourceType,
 } from "./terraformTopologyApiGatewayLinks";
-import {
-  buildTransitGatewayCompanionCluster,
-  filterTopologyAddressesExcludingTgwSatellites,
-  transitGatewaySatelliteStackHeightPx,
-} from "./terraformTopologyTransitGatewayLinks";
-import {
-  buildSqsCompanionCluster,
-  sqsSatelliteStackHeightPx,
-} from "./terraformTopologySqsLinks";
+import { filterAddressesExcludingRegistrySatellites } from "./terraformTopologySatelliteRegistry";
+
+import "./terraformTopologySatelliteRegistry";
 import {
   getTerraformEdgeLayer,
   reconcileTerraformVisibility,
@@ -142,6 +105,13 @@ import {
   TERRAFORM_IMPORT_EDGE_LAYER_PINS,
 } from "./terraformVisibility";
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
+import {
+  getPrimaryLayoutConfig,
+  primaryCellFootprintForAddress,
+  primaryVerticalMarginsForAddress,
+} from "./terraformTopologyPrimaryLayoutConfig";
+import { buildTopologyPrimarySatelliteBundles } from "./terraformTopologyPrimarySatelliteBundles";
+import { renderPrimarySatellitesFromConfig } from "./terraformTopologySatelliteRenderers";
 
 import { natZonePlacementsKey } from "./terraformTopologyPlacement";
 
@@ -166,29 +136,11 @@ function filterTopologyAddressesExcludingPrimarySatellites(
   addresses: readonly string[],
   plan?: unknown,
 ): string[] {
-  return filterTopologyAddressesExcludingTgwSatellites(
+  return filterAddressesExcludingRegistrySatellites(
     nodes,
-    filterTopologyAddressesExcludingApiGatewaySatellites(
-      nodes,
-      filterTopologyAddressesExcludingLambdaPermissionSatellites(
-        nodes,
-        arnIndex,
-        filterTopologyAddressesExcludingEcsSatellites(
-          nodes,
-          arnIndex,
-          filterTopologyAddressesExcludingAlbSatellites(
-            nodes,
-            arnIndex,
-            addresses,
-            plan,
-          ),
-        ),
-      ),
-    ),
-    Array.isArray((plan as { resource_changes?: unknown })?.resource_changes)
-      ? (plan as { resource_changes?: Array<{ address?: string }> })
-          .resource_changes ?? []
-      : undefined,
+    arnIndex,
+    addresses,
+    plan,
   );
 }
 
@@ -259,12 +211,6 @@ const RESOURCE_RECT_W = TOPOLOGY_TIER0_W;
 const RESOURCE_RECT_H = TOPOLOGY_TIER0_H;
 const RESOURCE_GAP = px(16);
 const TOPOLOGY_DATAFLOW_STROKE = TERRAFORM_DATAFLOW_EDGE_STROKE;
-const SG_RIGHT_PAD = px(6);
-const CLOUDWATCH_LEFT_PAD = px(6);
-const CLOUDWATCH_RIGHT_PAD = px(6);
-/** Horizontal gap between IAM/KMS-left column and SG column (tier-1 widths). */
-const IAM_SG_COLUMN_GAP_PX = px(8);
-const CLOUDWATCH_COLUMN_GAP_PX = px(8);
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = px(20);
 /** Gap between regional-primary column and VPC grid inside one region frame. */
@@ -417,103 +363,6 @@ function satelliteColumnWidths(): { iamW: number; sgW: number } {
   return { iamW: TOPOLOGY_TIER1_W, sgW: TOPOLOGY_TIER1_W };
 }
 
-function cloudWatchColumnWidths(): { alarmW: number; logGroupW: number } {
-  return { alarmW: TOPOLOGY_TIER1_W, logGroupW: TOPOLOGY_TIER1_W };
-}
-
-/**
- * Sum vertical space for satellite stacks drawn one after another below a primary, without
- * double-counting the gap between stacks (each stack’s height already includes a leading gap).
- */
-function stackSequentialSatelliteHeightsPx(
-  satelliteGap: number,
-  heights: readonly number[],
-): number {
-  const positive = heights.filter((h) => h > 0);
-  if (positive.length === 0) {
-    return 0;
-  }
-  let sum = positive[0]!;
-  for (let i = 1; i < positive.length; i++) {
-    sum += positive[i]! - satelliteGap;
-  }
-  return sum;
-}
-
-/** Minimum horizontal span for one primary cell so satellites are not clipped. */
-function topologyPrimaryCellFootprintPx(
-  nodes: TerraformPlanNodesMap,
-  address: string,
-  arnIndex: Map<string, string>,
-  plan?: unknown,
-): number {
-  const node = nodes[address] as TerraformPlanGraphNode | undefined;
-  const pr = getPrimaryResource(node) as Record<string, unknown> | null;
-  const primaryType =
-    typeof pr?.type === "string"
-      ? pr.type
-      : getTerraformCardResourceType(address, pr);
-
-  const { cluster: iamCluster } = buildPrimaryIamCluster(
-    nodes,
-    address,
-    arnIndex,
-  );
-  const kmsBuild = buildKmsKeyPolicyCluster(nodes, address, arnIndex);
-  const sgBuild = buildPrimarySgCluster(nodes, address, arnIndex, plan);
-  const cwBuild = buildResourceCloudWatchCluster(nodes, address);
-  const albFootprint = buildAlbListenerTargetCluster(nodes, address, arnIndex);
-  const ecsFootprint =
-    primaryType === "aws_ecs_service"
-      ? buildEcsServiceCompanionCluster(nodes, address, arnIndex)
-      : { cluster: null };
-  const apiFootprint =
-    primaryType === "aws_api_gateway_rest_api"
-      ? buildApiGatewayCompanionCluster(nodes, address)
-      : { cluster: null };
-  const planChanges = Array.isArray(
-    (plan as { resource_changes?: unknown })?.resource_changes,
-  )
-    ? (plan as { resource_changes: Array<{ address?: string; type?: string }> })
-        .resource_changes ?? []
-    : undefined;
-  const tgwFootprint =
-    primaryType === "aws_ec2_transit_gateway"
-      ? buildTransitGatewayCompanionCluster(nodes, address, planChanges)
-      : { cluster: null };
-  const lambdaPermissionFootprint =
-    primaryType === "aws_lambda_function"
-      ? buildLambdaPermissionCluster(nodes, address, arnIndex)
-      : { cluster: null };
-
-  const hasLeft =
-    Boolean(iamCluster) ||
-    Boolean(kmsBuild.cluster) ||
-    Boolean(albFootprint.cluster) ||
-    Boolean(ecsFootprint.cluster) ||
-    Boolean(apiFootprint.cluster) ||
-    Boolean(tgwFootprint.cluster) ||
-    Boolean(lambdaPermissionFootprint.cluster);
-  const hasSg = Boolean(sgBuild.cluster);
-  let w = TOPOLOGY_TIER0_W;
-  if (hasLeft && hasSg) {
-    w = Math.max(w, TOPOLOGY_TIER1_W * 2 + IAM_SG_COLUMN_GAP_PX);
-  }
-
-  const hasAlarm = Boolean(cwBuild.cluster?.alarms.length);
-  const hasLog = Boolean(cwBuild.cluster?.logGroups.length);
-  if (hasAlarm && hasLog) {
-    const cwSpan =
-      CLOUDWATCH_LEFT_PAD +
-      TOPOLOGY_TIER1_W +
-      CLOUDWATCH_COLUMN_GAP_PX +
-      TOPOLOGY_TIER1_W +
-      CLOUDWATCH_RIGHT_PAD;
-    w = Math.max(w, cwSpan);
-  }
-  return w;
-}
-
 function maxTopologyCellFootprintPx(
   sortedAddresses: readonly string[],
   nodes: TerraformPlanNodesMap,
@@ -524,7 +373,7 @@ function maxTopologyCellFootprintPx(
   for (const addr of sortedAddresses) {
     maxW = Math.max(
       maxW,
-      topologyPrimaryCellFootprintPx(nodes, addr, arnIndex, plan),
+      primaryCellFootprintForAddress(nodes, addr, arnIndex, plan),
     );
   }
   return maxW;
@@ -592,145 +441,14 @@ function zoneFrameSizeForTopologyAddresses(
   for (let i = 0; i < sortedAddresses.length; i++) {
     const addr = sortedAddresses[i]!;
     const r = Math.floor(i / cols);
-    const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
-      nodes,
-      addr,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const iamExtra = iamSatelliteStackHeightPx(
+    const margins = primaryVerticalMarginsForAddress(
       nodes,
       addr,
       arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const sgExtra = sgSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
-    const s3Extra = s3SatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const albExtra = albSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const ecsExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_ecs_service"
-        ? ecsSatelliteStackHeightPx(
-            nodes,
-            addr,
-            arnIndex,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-          )
-        : 0;
-    const apiExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_api_gateway_rest_api"
-        ? apiGatewaySatelliteStackHeightPx(
-            nodes,
-            addr,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-          )
-        : 0;
-    const tgwExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_ec2_transit_gateway"
-        ? transitGatewaySatelliteStackHeightPx(
-            nodes,
-            addr,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-            Array.isArray(
-              (plan as { resource_changes?: unknown })?.resource_changes,
-            )
-              ? (plan as { resource_changes: Array<{ address?: string }> })
-                  .resource_changes ?? []
-              : undefined,
-          )
-        : 0;
-    const sqsExtra = sqsSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const lambdaPermissionExtra = lambdaPermissionSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const leftColumnBottom = stackSequentialSatelliteHeightsPx(
-      TOPOLOGY_SATELLITE_GAP_PX,
-      [
-        iamExtra,
-        kmsPolicyExtra,
-        s3Extra,
-        albExtra,
-        ecsExtra,
-        apiExtra,
-        tgwExtra,
-        lambdaPermissionExtra,
-      ],
-    );
-    const rightColumnBottom = stackSequentialSatelliteHeightsPx(
-      TOPOLOGY_SATELLITE_GAP_PX,
-      [sgExtra, sqsExtra],
-    );
-    rowTopBase[r] = Math.max(rowTopBase[r]!, cloudWatchExtra);
-    rowBottomBase[r] = Math.max(
-      rowBottomBase[r]!,
-      leftColumnBottom,
-      rightColumnBottom,
-    );
+    rowTopBase[r] = Math.max(rowTopBase[r]!, margins.top);
+    rowBottomBase[r] = Math.max(rowBottomBase[r]!, margins.bottom);
   }
   let innerBodyH = 0;
   for (let r = 0; r < rows; r++) {
@@ -2751,30 +2469,6 @@ function appendVpcInfrastructureStrips(
   return out;
 }
 
-function companionStackTileMetrics(
-  nodes: TerraformPlanNodesMap,
-  satAddr: string,
-  tier1W: number,
-): { tileH: number; tileW: number; tileXOffset: number; tier: 1 | 2 } {
-  const n = nodes[satAddr] as TerraformPlanGraphNode | undefined;
-  const pr = getPrimaryResource(n);
-  const t = typeof pr?.type === "string" ? pr.type : "";
-  if (t === "aws_iam_policy_document" || t === "aws_lambda_permission") {
-    return {
-      tileH: TOPOLOGY_TIER2_H,
-      tileW: TOPOLOGY_TIER2_W,
-      tileXOffset: Math.floor((tier1W - TOPOLOGY_TIER2_W) / 2),
-      tier: 2,
-    };
-  }
-  return {
-    tileH: TOPOLOGY_TIER1_H,
-    tileW: tier1W,
-    tileXOffset: 0,
-    tier: 1,
-  };
-}
-
 function growClusterBounds(
   prev: { minX: number; minY: number; maxX: number; maxY: number } | null,
   x: number,
@@ -2824,12 +2518,6 @@ function appendTopologyResourceRectangles(
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
-  const planChanges = Array.isArray(
-    (plan as { resource_changes?: unknown })?.resource_changes,
-  )
-    ? (plan as { resource_changes: Array<{ address?: string; type?: string }> })
-        .resource_changes ?? []
-    : undefined;
   const clusterFrameIds: string[] = [];
   const sorted = [...addrs]
     .filter((addr) => {
@@ -2862,145 +2550,14 @@ function appendTopologyResourceRectangles(
   for (let ri = 0; ri < sorted.length; ri++) {
     const addr = sorted[ri]!;
     const rr = Math.floor(ri / rcCols);
-    const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
-      nodes,
-      addr,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const iamExtra = iamSatelliteStackHeightPx(
+    const margins = primaryVerticalMarginsForAddress(
       nodes,
       addr,
       arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const sgExtra = sgSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
-    const s3Extra = s3SatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const albExtra = albSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const ecsExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_ecs_service"
-        ? ecsSatelliteStackHeightPx(
-            nodes,
-            addr,
-            arnIndex,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-          )
-        : 0;
-    const apiExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_api_gateway_rest_api"
-        ? apiGatewaySatelliteStackHeightPx(
-            nodes,
-            addr,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-          )
-        : 0;
-    const tgwExtra =
-      getTerraformCardResourceType(
-        addr,
-        getPrimaryResource(nodes[addr] as TerraformPlanGraphNode) as Record<
-          string,
-          unknown
-        > | null,
-      ) === "aws_ec2_transit_gateway"
-        ? transitGatewaySatelliteStackHeightPx(
-            nodes,
-            addr,
-            TOPOLOGY_TIER1_H,
-            TOPOLOGY_TIER2_H,
-            TOPOLOGY_SATELLITE_GAP_PX,
-            Array.isArray(
-              (plan as { resource_changes?: unknown })?.resource_changes,
-            )
-              ? (plan as { resource_changes: Array<{ address?: string }> })
-                  .resource_changes ?? []
-              : undefined,
-          )
-        : 0;
-    const sqsExtra = sqsSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER1_H,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const lambdaPermissionExtra = lambdaPermissionSatelliteStackHeightPx(
-      nodes,
-      addr,
-      arnIndex,
-      TOPOLOGY_TIER2_H,
-      TOPOLOGY_SATELLITE_GAP_PX,
-    );
-    const leftColumnBottom = stackSequentialSatelliteHeightsPx(
-      TOPOLOGY_SATELLITE_GAP_PX,
-      [
-        iamExtra,
-        kmsPolicyExtra,
-        s3Extra,
-        albExtra,
-        ecsExtra,
-        apiExtra,
-        tgwExtra,
-        lambdaPermissionExtra,
-      ],
-    );
-    const rightColumnBottom = stackSequentialSatelliteHeightsPx(
-      TOPOLOGY_SATELLITE_GAP_PX,
-      [sgExtra, sqsExtra],
-    );
-    rowTopBase[rr] = Math.max(rowTopBase[rr]!, cloudWatchExtra);
-    rowBottomBase[rr] = Math.max(
-      rowBottomBase[rr]!,
-      leftColumnBottom,
-      rightColumnBottom,
-    );
+    rowTopBase[rr] = Math.max(rowTopBase[rr]!, margins.top);
+    rowBottomBase[rr] = Math.max(rowBottomBase[rr]!, margins.bottom);
   }
 
   const rowOriginY: number[] = [];
@@ -3062,720 +2619,45 @@ function appendTopologyResourceRectangles(
       { initiallyVisible, explodeParentKeys: [] },
     );
 
-    const { cluster, edges } = buildPrimaryIamCluster(nodes, addr, arnIndex);
-    const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
-    const sgBuild = buildPrimarySgCluster(nodes, addr, arnIndex, plan);
-    const s3Build = buildS3CompanionCluster(nodes, addr, arnIndex);
-    const albBuild = buildAlbListenerTargetCluster(nodes, addr, arnIndex);
-    const ecsBuild = buildEcsServiceCompanionCluster(nodes, addr, arnIndex);
-    const apiBuild = buildApiGatewayCompanionCluster(nodes, addr);
-    const tgwBuild =
-      resourceType === "aws_ec2_transit_gateway"
-        ? buildTransitGatewayCompanionCluster(nodes, addr, planChanges)
-        : { cluster: null, edges: [] as TopologyIamEdge[] };
-    const lambdaPermissionBuild = buildLambdaPermissionCluster(
+    const layoutConfig = getPrimaryLayoutConfig(resourceType);
+    const bundles = buildTopologyPrimarySatelliteBundles(
       nodes,
       addr,
       arnIndex,
+      plan,
     );
-    const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
-    const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
-    const { iamW, sgW } = satelliteColumnWidths();
-    const { alarmW, logGroupW } = cloudWatchColumnWidths();
 
-    for (const e of edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_iam",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of kmsBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_kms",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of sgBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_sg",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of s3Build.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_s3",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of albBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_alb",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of ecsBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_ecs",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of apiBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_api_gateway",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of tgwBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_tgw",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of lambdaPermissionBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_lambda_permission",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of sqsBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_sqs",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
-    for (const e of cloudWatchBuild.edges) {
-      satelliteLineSpecs.push({
-        edge: e,
-        origin: "topology_cloudwatch",
-        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
-      });
-    }
+    renderPrimarySatellitesFromConfig({
+      skeleton,
+      nodes,
+      arnIndex,
+      plan,
+      primaryAddr: addr,
+      rx,
+      ry,
+      config: layoutConfig,
+      bundles,
+      globalPlaced: {
+        iam: globalPlacedIamSatellites,
+        kmsPolicy: globalPlacedKmsPolicySatellites,
+        sg: globalPlacedSgSatellites,
+        cloudWatch: globalPlacedCloudWatchSatellites,
+        s3: globalPlacedS3Satellites,
+        sqs: globalPlacedSqsSatellites,
+        alb: globalPlacedAlbSatellites,
+        ecs: globalPlacedEcsSatellites,
+        apiGateway: globalPlacedApiGatewaySatellites,
+        tgw: globalPlacedTgwSatellites,
+        lambdaPermission: globalPlacedLambdaPermissionSatellites,
+      },
+      satelliteLineSpecs,
+      dataflowStroke: TOPOLOGY_DATAFLOW_STROKE,
+      pushRect: (sk, a, x, y, w, h, n, opts) =>
+        pushResourceRectangleSkeleton(sk, a, x, y, w, h, n, opts),
+      addClusterMember,
+    });
 
-    const hasLeft =
-      Boolean(cluster) ||
-      Boolean(kmsBuild.cluster) ||
-      Boolean(s3Build.cluster) ||
-      Boolean(albBuild.cluster) ||
-      Boolean(ecsBuild.cluster) ||
-      Boolean(apiBuild.cluster) ||
-      Boolean(tgwBuild.cluster) ||
-      Boolean(lambdaPermissionBuild.cluster);
-    const hasSg = Boolean(sgBuild.cluster);
-    const hasSqs = Boolean(sqsBuild.cluster);
-    const cwHasAlarm = Boolean(cloudWatchBuild.cluster?.alarms.length);
-    const cwHasLog = Boolean(cloudWatchBuild.cluster?.logGroups.length);
-    const logGroupX =
-      cwHasAlarm && cwHasLog
-        ? rx + CLOUDWATCH_LEFT_PAD + TOPOLOGY_TIER1_W + CLOUDWATCH_COLUMN_GAP_PX
-        : rx + TOPOLOGY_TIER0_W - logGroupW - CLOUDWATCH_RIGHT_PAD;
-
-    if (cloudWatchBuild.cluster) {
-      const cloudWatchTop =
-        ry -
-        cloudWatchSatelliteStackHeightPx(
-          nodes,
-          addr,
-          TOPOLOGY_TIER1_H,
-          TOPOLOGY_SATELLITE_GAP_PX,
-        ) +
-        TOPOLOGY_SATELLITE_GAP_PX;
-
-      let yAlarm = cloudWatchTop;
-      const alarmX = rx + CLOUDWATCH_LEFT_PAD;
-      for (const alarmPath of cloudWatchBuild.cluster.alarms) {
-        if (!globalPlacedCloudWatchSatellites.has(alarmPath)) {
-          globalPlacedCloudWatchSatellites.add(alarmPath);
-          addClusterMember(alarmPath, alarmX, yAlarm, alarmW, TOPOLOGY_TIER1_H);
-          pushResourceRectangleSkeleton(
-            skeleton,
-            alarmPath,
-            alarmX,
-            yAlarm,
-            alarmW,
-            TOPOLOGY_TIER1_H,
-            nodes,
-            {
-              explodeParentKeys: [addr],
-              satelliteTier: 1,
-            },
-          );
-        }
-        yAlarm += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-
-      const ecsOwnedLogGroups = new Set(
-        ecsBuild.cluster?.stack.filter(
-          (satAddr) =>
-            getTerraformCardResourceType(
-              satAddr,
-              getPrimaryResource(
-                nodes[satAddr] as TerraformPlanGraphNode,
-              ) as Record<string, unknown> | null,
-            ) === "aws_cloudwatch_log_group",
-        ) ?? [],
-      );
-      let yLogGroup = cloudWatchTop;
-      for (const logGroupPath of cloudWatchBuild.cluster.logGroups) {
-        if (ecsOwnedLogGroups.has(logGroupPath)) {
-          continue;
-        }
-        if (!globalPlacedCloudWatchSatellites.has(logGroupPath)) {
-          globalPlacedCloudWatchSatellites.add(logGroupPath);
-          addClusterMember(
-            logGroupPath,
-            logGroupX,
-            yLogGroup,
-            logGroupW,
-            TOPOLOGY_TIER1_H,
-          );
-          pushResourceRectangleSkeleton(
-            skeleton,
-            logGroupPath,
-            logGroupX,
-            yLogGroup,
-            logGroupW,
-            TOPOLOGY_TIER1_H,
-            nodes,
-            {
-              explodeParentKeys: [addr],
-              satelliteTier: 1,
-            },
-          );
-        }
-        yLogGroup += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    const yAfterPrimary = ry + RESOURCE_RECT_H;
-    let yLeft = yAfterPrimary;
-
-    if (cluster) {
-      yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      const satXIam = rx;
-      for (let si = 0; si < cluster.stack.length; si++) {
-        const satAddr = cluster.stack[si]!;
-        const isRoleTile = si === 0;
-        const tileH = isRoleTile ? TOPOLOGY_TIER1_H : TOPOLOGY_TIER2_H;
-        const tileW = isRoleTile ? iamW : TOPOLOGY_TIER2_W;
-        const tileX = isRoleTile
-          ? satXIam
-          : satXIam + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
-        if (globalPlacedIamSatellites.has(satAddr)) {
-          yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedIamSatellites.add(satAddr);
-        addClusterMember(satAddr, tileX, yLeft, tileW, tileH);
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          tileX,
-          yLeft,
-          tileW,
-          tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: isRoleTile ? 1 : 2,
-          },
-        );
-        yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (kmsBuild.cluster) {
-      if (!cluster) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXKms = rx;
-      for (const policyPath of kmsBuild.cluster.policies) {
-        if (globalPlacedKmsPolicySatellites.has(policyPath)) {
-          yLeft += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedKmsPolicySatellites.add(policyPath);
-        addClusterMember(policyPath, satXKms, yLeft, iamW, TOPOLOGY_TIER1_H);
-        pushResourceRectangleSkeleton(
-          skeleton,
-          policyPath,
-          satXKms,
-          yLeft,
-          iamW,
-          TOPOLOGY_TIER1_H,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: 1,
-          },
-        );
-        yLeft += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (s3Build.cluster) {
-      if (!cluster && !kmsBuild.cluster) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXS3 = rx;
-      for (const satAddr of s3Build.cluster.stack) {
-        const m = companionStackTileMetrics(nodes, satAddr, iamW);
-        if (globalPlacedS3Satellites.has(satAddr)) {
-          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedS3Satellites.add(satAddr);
-        addClusterMember(
-          satAddr,
-          satXS3 + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-        );
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          satXS3 + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: m.tier,
-          },
-        );
-        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (ecsBuild.cluster) {
-      if (
-        !cluster &&
-        !kmsBuild.cluster &&
-        !s3Build.cluster &&
-        !albBuild.cluster
-      ) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXEcs = rx;
-      const ruleTileXEcs = satXEcs + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
-      for (const satAddr of ecsBuild.cluster.stack) {
-        const satType = getTerraformCardResourceType(
-          satAddr,
-          getPrimaryResource(
-            nodes[satAddr] as TerraformPlanGraphNode,
-          ) as Record<string, unknown> | null,
-        );
-        const isTaskDef = satType === "aws_ecs_task_definition";
-        const tileH = isTaskDef ? TOPOLOGY_TIER1_H : TOPOLOGY_TIER2_H;
-        const tileW = isTaskDef ? iamW : TOPOLOGY_TIER2_W;
-        const tileX = isTaskDef ? satXEcs : ruleTileXEcs;
-        if (globalPlacedEcsSatellites.has(satAddr)) {
-          yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedEcsSatellites.add(satAddr);
-        addClusterMember(satAddr, tileX, yLeft, tileW, tileH);
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          tileX,
-          yLeft,
-          tileW,
-          tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: isTaskDef ? 1 : 2,
-          },
-        );
-        yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (albBuild.cluster) {
-      if (
-        !cluster &&
-        !kmsBuild.cluster &&
-        !s3Build.cluster &&
-        !ecsBuild.cluster
-      ) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXAlb = rx;
-      for (const satAddr of albBuild.cluster.stack) {
-        const m = albCompanionDrawMetrics(
-          nodes,
-          satAddr,
-          iamW,
-          TOPOLOGY_TIER2_W,
-          TOPOLOGY_TIER1_H,
-          TOPOLOGY_TIER2_H,
-        );
-        if (globalPlacedAlbSatellites.has(satAddr)) {
-          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedAlbSatellites.add(satAddr);
-        addClusterMember(
-          satAddr,
-          satXAlb + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-        );
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          satXAlb + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: m.tier,
-          },
-        );
-        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (apiBuild.cluster) {
-      if (
-        !cluster &&
-        !kmsBuild.cluster &&
-        !s3Build.cluster &&
-        !albBuild.cluster &&
-        !ecsBuild.cluster
-      ) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXApi = rx;
-      const ruleTileXApi = satXApi + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
-      const drawApiSatellite = (
-        satAddr: string,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        tier: 1 | 2,
-        explodeKeys: string[],
-      ): number => {
-        if (globalPlacedApiGatewaySatellites.has(satAddr)) {
-          return h;
-        }
-        globalPlacedApiGatewaySatellites.add(satAddr);
-        addClusterMember(satAddr, x, y, w, h);
-        pushResourceRectangleSkeleton(skeleton, satAddr, x, y, w, h, nodes, {
-          explodeParentKeys: explodeKeys,
-          satelliteTier: tier,
-        });
-        return h;
-      };
-
-      for (const stageEntry of apiBuild.cluster.stages) {
-        yLeft +=
-          drawApiSatellite(
-            stageEntry.stage,
-            satXApi,
-            yLeft,
-            iamW,
-            TOPOLOGY_TIER1_H,
-            1,
-            [addr],
-          ) + TOPOLOGY_SATELLITE_GAP_PX;
-
-        if (stageEntry.deployment) {
-          yLeft +=
-            drawApiSatellite(
-              stageEntry.deployment,
-              ruleTileXApi,
-              yLeft,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-              2,
-              [addr, stageEntry.stage],
-            ) + TOPOLOGY_SATELLITE_GAP_PX;
-        }
-        if (stageEntry.logGroup) {
-          yLeft +=
-            drawApiSatellite(
-              stageEntry.logGroup,
-              ruleTileXApi,
-              yLeft,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-              2,
-              [addr, stageEntry.stage],
-            ) + TOPOLOGY_SATELLITE_GAP_PX;
-        }
-      }
-
-      for (const msPath of apiBuild.cluster.methodSettings) {
-        yLeft +=
-          drawApiSatellite(msPath, satXApi, yLeft, iamW, TOPOLOGY_TIER1_H, 1, [
-            addr,
-          ]) + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (tgwBuild.cluster) {
-      if (
-        !cluster &&
-        !kmsBuild.cluster &&
-        !s3Build.cluster &&
-        !albBuild.cluster &&
-        !ecsBuild.cluster &&
-        !apiBuild.cluster
-      ) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXTgw = rx;
-      const ruleTileXTgw = satXTgw + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
-      const drawTgwSatellite = (
-        satAddr: string,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        tier: 1 | 2,
-        explodeKeys: string[],
-      ): number => {
-        if (globalPlacedTgwSatellites.has(satAddr)) {
-          return h;
-        }
-        globalPlacedTgwSatellites.add(satAddr);
-        addClusterMember(satAddr, x, y, w, h);
-        pushResourceRectangleSkeleton(skeleton, satAddr, x, y, w, h, nodes, {
-          explodeParentKeys: explodeKeys,
-          satelliteTier: tier,
-        });
-        return h;
-      };
-
-      for (const vpcAtt of tgwBuild.cluster.vpcAttachments) {
-        yLeft +=
-          drawTgwSatellite(vpcAtt, satXTgw, yLeft, iamW, TOPOLOGY_TIER1_H, 1, [
-            addr,
-          ]) + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      for (const p of tgwBuild.cluster.peering) {
-        yLeft +=
-          drawTgwSatellite(
-            p.peering,
-            satXTgw,
-            yLeft,
-            iamW,
-            TOPOLOGY_TIER1_H,
-            1,
-            [addr],
-          ) + TOPOLOGY_SATELLITE_GAP_PX;
-        if (p.accepter) {
-          yLeft +=
-            drawTgwSatellite(
-              p.accepter,
-              ruleTileXTgw,
-              yLeft,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-              2,
-              [addr, p.peering],
-            ) + TOPOLOGY_SATELLITE_GAP_PX;
-        }
-        for (const route of p.routes) {
-          yLeft +=
-            drawTgwSatellite(
-              route,
-              ruleTileXTgw,
-              yLeft,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-              2,
-              [addr, p.peering],
-            ) + TOPOLOGY_SATELLITE_GAP_PX;
-        }
-      }
-      for (const rt of tgwBuild.cluster.routeTables) {
-        yLeft +=
-          drawTgwSatellite(rt, satXTgw, yLeft, iamW, TOPOLOGY_TIER1_H, 1, [
-            addr,
-          ]) + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      for (const route of tgwBuild.cluster.standaloneRoutes) {
-        yLeft +=
-          drawTgwSatellite(
-            route,
-            ruleTileXTgw,
-            yLeft,
-            TOPOLOGY_TIER2_W,
-            TOPOLOGY_TIER2_H,
-            2,
-            [addr],
-          ) + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    if (lambdaPermissionBuild.cluster) {
-      if (
-        !cluster &&
-        !kmsBuild.cluster &&
-        !s3Build.cluster &&
-        !albBuild.cluster &&
-        !apiBuild.cluster &&
-        !tgwBuild.cluster
-      ) {
-        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      const satXLp = rx;
-      for (const satAddr of lambdaPermissionBuild.cluster.stack) {
-        const m = companionStackTileMetrics(nodes, satAddr, iamW);
-        if (globalPlacedLambdaPermissionSatellites.has(satAddr)) {
-          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedLambdaPermissionSatellites.add(satAddr);
-        addClusterMember(
-          satAddr,
-          satXLp + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-        );
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          satXLp + m.tileXOffset,
-          yLeft,
-          m.tileW,
-          m.tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: m.tier,
-          },
-        );
-        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    const hasRight = hasSg || hasSqs;
-    const satXRight =
-      hasLeft && hasRight
-        ? rx + TOPOLOGY_TIER1_W + IAM_SG_COLUMN_GAP_PX
-        : rx + TOPOLOGY_TIER0_W - sgW - SG_RIGHT_PAD;
-    const ruleTileX = satXRight + Math.floor((sgW - TOPOLOGY_TIER2_W) / 2);
-    let yRight = yAfterPrimary;
-
-    if (sgBuild.cluster) {
-      yRight += TOPOLOGY_SATELLITE_GAP_PX;
-      for (let gi = 0; gi < sgBuild.cluster.groups.length; gi++) {
-        const group = sgBuild.cluster.groups[gi]!;
-
-        if (!globalPlacedSgSatellites.has(group.sgPath)) {
-          globalPlacedSgSatellites.add(group.sgPath);
-          addClusterMember(
-            group.sgPath,
-            satXRight,
-            yRight,
-            sgW,
-            TOPOLOGY_TIER1_H,
-          );
-          pushResourceRectangleSkeleton(
-            skeleton,
-            group.sgPath,
-            satXRight,
-            yRight,
-            sgW,
-            TOPOLOGY_TIER1_H,
-            nodes,
-            {
-              explodeParentKeys: [addr],
-              satelliteTier: 1,
-            },
-          );
-        }
-        yRight += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
-
-        for (const rulePath of group.rules) {
-          if (!globalPlacedSgSatellites.has(rulePath)) {
-            globalPlacedSgSatellites.add(rulePath);
-            addClusterMember(
-              rulePath,
-              ruleTileX,
-              yRight,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-            );
-            pushResourceRectangleSkeleton(
-              skeleton,
-              rulePath,
-              ruleTileX,
-              yRight,
-              TOPOLOGY_TIER2_W,
-              TOPOLOGY_TIER2_H,
-              nodes,
-              {
-                explodeParentKeys: [addr],
-                satelliteTier: 2,
-              },
-            );
-          }
-          yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
-        }
-
-        if (gi < sgBuild.cluster.groups.length - 1) {
-          yRight += TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX;
-        }
-      }
-    }
-
-    if (sqsBuild.cluster) {
-      if (!sgBuild.cluster) {
-        yRight += TOPOLOGY_SATELLITE_GAP_PX;
-      }
-      for (const satAddr of sqsBuild.cluster.stack) {
-        const m = companionStackTileMetrics(nodes, satAddr, sgW);
-        if (globalPlacedSqsSatellites.has(satAddr)) {
-          yRight += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-          continue;
-        }
-        globalPlacedSqsSatellites.add(satAddr);
-        addClusterMember(
-          satAddr,
-          satXRight + m.tileXOffset,
-          yRight,
-          m.tileW,
-          m.tileH,
-        );
-        pushResourceRectangleSkeleton(
-          skeleton,
-          satAddr,
-          satXRight + m.tileXOffset,
-          yRight,
-          m.tileW,
-          m.tileH,
-          nodes,
-          {
-            explodeParentKeys: [addr],
-            satelliteTier: m.tier,
-          },
-        );
-        yRight += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
-      }
-    }
-
-    const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+    const pad = layoutConfig.padding.primaryClusterFrame;
     const b = clusterBounds!;
     const clusterSkId = primaryClusterSkeletonId(addr);
     skeleton.push({
@@ -3802,10 +2684,6 @@ function appendTopologyResourceRectangles(
   return clusterFrameIds;
 }
 
-/**
- * Terraform topology rectangles use skeleton `id` = resource address. Used to scope dependency
- * edges to resources that received a layout box (same filter idea as ELK `vertexSet`).
- */
 function collectTopologyRectangleLayoutFromSkeleton(
   skeleton: readonly ExcalidrawElementSkeleton[],
 ): {
@@ -5225,4 +4103,68 @@ export async function buildTerraformTopologyExcalidrawScene(
   };
   topologyResourcePanelPlan = undefined;
   return result;
+}
+
+export type PipelinePrimaryClusterBuildResult = {
+  skeleton: ExcalidrawElementSkeleton[];
+  width: number;
+  height: number;
+  clusterFrameId: string;
+};
+
+/** Build one primaryCluster skeleton at origin for pipeline layout sizing/placement. */
+export function buildTopologyPrimaryClusterSkeletonForPipeline(
+  primaryAddr: string,
+  nodes: TerraformPlanNodesMap,
+  plan: unknown,
+  placement: TopologyPrimaryClusterPlacement,
+): PipelinePrimaryClusterBuildResult {
+  const skeleton: ExcalidrawElementSkeleton[] = [];
+  const arnIndex = buildArnIndexForTopology(nodes);
+  const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
+  const globalPlacedIamSatellites = new Set<string>();
+  const globalPlacedKmsPolicySatellites = new Set<string>();
+  const globalPlacedSgSatellites = new Set<string>();
+  const globalPlacedCloudWatchSatellites = new Set<string>();
+  const globalPlacedS3Satellites = new Set<string>();
+  const globalPlacedSqsSatellites = new Set<string>();
+  const globalPlacedAlbSatellites = new Set<string>();
+  const globalPlacedEcsSatellites = new Set<string>();
+  const globalPlacedApiGatewaySatellites = new Set<string>();
+  const globalPlacedTgwSatellites = new Set<string>();
+  const globalPlacedLambdaPermissionSatellites = new Set<string>();
+
+  appendTopologyResourceRectangles(
+    skeleton,
+    placement,
+    [primaryAddr],
+    0,
+    0,
+    nodes,
+    arnIndex,
+    globalPlacedIamSatellites,
+    globalPlacedKmsPolicySatellites,
+    globalPlacedSgSatellites,
+    globalPlacedCloudWatchSatellites,
+    globalPlacedS3Satellites,
+    globalPlacedSqsSatellites,
+    globalPlacedAlbSatellites,
+    globalPlacedEcsSatellites,
+    globalPlacedApiGatewaySatellites,
+    globalPlacedTgwSatellites,
+    globalPlacedLambdaPermissionSatellites,
+    satelliteLineSpecs,
+    plan,
+  );
+
+  const clusterFrameId = primaryClusterSkeletonId(primaryAddr);
+  const frame = skeleton.find(
+    (el) => el.type === "frame" && el.id === clusterFrameId,
+  );
+  const width =
+    typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
+  const height =
+    typeof frame?.height === "number" ? frame.height : RESOURCE_RECT_H;
+
+  return { skeleton, width, height, clusterFrameId };
 }

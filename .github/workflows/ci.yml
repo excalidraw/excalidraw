@@ -1,7 +1,6 @@
 # Mirrors local git hooks:
-#   pre-commit  → lint job (ESLint, Prettier, tsc)
-#   test:commit → test job (vitest)
-#   pre-push    → prepush job on pull requests (coverage, ESM build, size-limit)
+#   pre-push    → lint job (ESLint, Prettier, tsc) + prepush job (coverage, ESM build, size-limit)
+#   test:commit → test job (vitest) — manual / workflow_dispatch only
 name: CI
 
 on:

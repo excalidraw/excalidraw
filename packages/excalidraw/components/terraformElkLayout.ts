@@ -72,6 +72,21 @@ import {
 } from "./terraformPlanConfigRefs";
 
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
+import {
+  buildElkBoxLayoutOptions,
+  buildElkRectPackingLayoutOptions,
+  moduleLayoutOptionsToMeta,
+  resolveTerraformModuleLayoutOptions,
+  type PartialTerraformModuleLayoutOptions,
+  type TerraformModuleLayoutOptions,
+  type TerraformModulePackingMeta,
+} from "./terraformModuleLayoutOptions";
+
+import {
+  isStackGroupModulePath,
+  parseStackAddress,
+  parseStackGroupModulePath,
+} from "./terraformStackAddress";
 
 import {
   resolveTerraformPlanNodeKey,
@@ -123,13 +138,67 @@ const MODULE_COMPOUND_PREFIX = "__tf_m__:";
 
 const DEFAULT_RESOURCE_RECT = { w: px(200), h: px(88) };
 
-const GRID_GAP_X = px(20);
-const GRID_GAP_Y = px(20);
-const SUBMODULE_GAP_X = px(32);
-const SUBMODULE_GAP_Y = px(32);
 const MODULE_CONTENT_PAD_L = px(28);
 const MODULE_CONTENT_PAD_T = px(40);
 const MODULE_SHRINK_WRAP_PAD = px(24);
+const MODULE_GRID_SEED_SIZE = px(8000);
+
+function submoduleColumnCount(
+  subPaths: string[],
+  innerWidth: number,
+  parentPath: string,
+  rootStackMinCellWidth: number,
+): number {
+  if (subPaths.length === 0) {
+    return 1;
+  }
+  const stackGroups = subPaths.filter(isStackGroupModulePath);
+  if (
+    parentPath === "root" &&
+    stackGroups.length >= 2 &&
+    stackGroups.length === subPaths.length
+  ) {
+    const minCell = rootStackMinCellWidth;
+    return Math.max(
+      1,
+      Math.min(subPaths.length, Math.floor(innerWidth / minCell) || 1),
+    );
+  }
+  if (subPaths.length <= 4) {
+    return subPaths.length;
+  }
+  return Math.max(1, Math.ceil(Math.sqrt(subPaths.length)));
+}
+
+/** Seed placeholder compound boxes so grid layout can run without ELK coordinates. */
+function seedModuleCompoundBoxes(
+  mod: TerraformModuleTreeNode,
+  vertexSet: Set<string>,
+  layoutBoxes: Record<string, LayoutBox>,
+) {
+  const compoundId = moduleCompoundId(mod.path);
+  if (!layoutBoxes[compoundId]) {
+    layoutBoxes[compoundId] = {
+      x: 0,
+      y: 0,
+      width: MODULE_GRID_SEED_SIZE,
+      height: MODULE_GRID_SEED_SIZE,
+    };
+  }
+  for (const addr of mod.resourceAddresses) {
+    if (vertexSet.has(addr) && !layoutBoxes[addr]) {
+      layoutBoxes[addr] = {
+        x: 0,
+        y: 0,
+        width: DEFAULT_RESOURCE_RECT.w,
+        height: DEFAULT_RESOURCE_RECT.h,
+      };
+    }
+  }
+  for (const child of Object.values(mod.modules)) {
+    seedModuleCompoundBoxes(child, vertexSet, layoutBoxes);
+  }
+}
 
 /** Excalidraw frame id for a Terraform module path (`root`, `module.a`, …). */
 function moduleFrameSkeletonId(modulePath: string) {
@@ -139,6 +208,12 @@ function moduleFrameSkeletonId(modulePath: string) {
 /** Above this many graph vertices, skip ELK to avoid long main-thread stalls. */
 export const TERRAFORM_ELK_MAX_VERTICES = 600;
 
+/**
+ * Above this many directed edges, run ELK on module hierarchy only (no dependency
+ * edges). Dense multi-stack imports otherwise block the main thread for ~60s+.
+ */
+export const TERRAFORM_ELK_FAST_PATH_EDGE_COUNT = 400;
+
 /** Bound label fill uses `strokeColor`; must stay dark (backend `excalidraw.js` uses `#1e1e1e`). */
 export const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 
@@ -146,8 +221,31 @@ export type TerraformElkSceneMeta = {
   layoutEngine: "elk";
   vertexCount: number;
   edgeCount: number;
+  elkLayoutEdgeCount?: number;
+  elkFastPath?: boolean;
+  /** @deprecated Use `modulePacking.mode === "default"` */
+  moduleGridLayout?: boolean;
+  modulePacking?: TerraformModulePackingMeta;
   skippedLayout?: boolean;
   skipReason?: string;
+};
+
+let elkRectpackInstance: InstanceType<typeof ELK> | null = null;
+
+const getElkRectpackInstance = () => {
+  if (!elkRectpackInstance) {
+    elkRectpackInstance = new ELK({ algorithms: ["rectpacking"] });
+  }
+  return elkRectpackInstance;
+};
+
+let elkBoxInstance: InstanceType<typeof ELK> | null = null;
+
+const getElkBoxInstance = () => {
+  if (!elkBoxInstance) {
+    elkBoxInstance = new ELK();
+  }
+  return elkBoxInstance;
 };
 
 type ElkJsonNode = {
@@ -754,12 +852,18 @@ function applyModuleGridLayout(
   mod: TerraformModuleTreeNode,
   vertexSet: Set<string>,
   layoutBoxes: Record<string, LayoutBox>,
+  gridParams: TerraformModuleLayoutOptions["defaultGrid"],
 ) {
   const compoundId = moduleCompoundId(mod.path);
   const compound = layoutBoxes[compoundId];
   if (!compound) {
     return;
   }
+
+  const gridGapX = gridParams.resourceGap;
+  const gridGapY = gridParams.resourceGap;
+  const submoduleGapX = gridParams.submoduleGap;
+  const submoduleGapY = gridParams.submoduleGap;
 
   const innerLeft = compound.x + MODULE_CONTENT_PAD_L;
   const innerTop = compound.y + MODULE_CONTENT_PAD_T;
@@ -774,7 +878,12 @@ function applyModuleGridLayout(
   let cursorX = innerLeft;
   let cursorY = innerTop;
   let subRowMaxH = 0;
-  const submoduleCols = Math.max(1, Math.ceil(Math.sqrt(subPaths.length)));
+  const submoduleCols = submoduleColumnCount(
+    subPaths,
+    innerWidth,
+    mod.path,
+    gridParams.rootStackMinCellWidth,
+  );
   let submoduleCol = 0;
 
   for (const p of subPaths) {
@@ -789,20 +898,20 @@ function applyModuleGridLayout(
       cursorX > innerLeft
     ) {
       cursorX = innerLeft;
-      cursorY += subRowMaxH + SUBMODULE_GAP_Y;
+      cursorY += subRowMaxH + submoduleGapY;
       subRowMaxH = 0;
       submoduleCol = 0;
     }
     const dx = cursorX - cb.x;
     const dy = cursorY - cb.y;
     translateModuleSubtree(layoutBoxes, mod.modules[p], dx, dy, vertexSet);
-    cursorX += cb.width + SUBMODULE_GAP_X;
+    cursorX += cb.width + submoduleGapX;
     subRowMaxH = Math.max(subRowMaxH, cb.height);
     submoduleCol += 1;
   }
 
   const resourceStartY =
-    subPaths.length > 0 ? cursorY + subRowMaxH + SUBMODULE_GAP_Y : innerTop;
+    subPaths.length > 0 ? cursorY + subRowMaxH + submoduleGapY : innerTop;
 
   const cellW = DEFAULT_RESOURCE_RECT.w;
   const cellH = DEFAULT_RESOURCE_RECT.h;
@@ -819,10 +928,156 @@ function applyModuleGridLayout(
     if (!b) {
       continue;
     }
-    b.x = innerLeft + col * (cellW + GRID_GAP_X);
-    b.y = resourceStartY + row * (cellH + GRID_GAP_Y);
+    b.x = innerLeft + col * (cellW + gridGapX);
+    b.y = resourceStartY + row * (cellH + gridGapY);
     b.width = cellW;
     b.height = cellH;
+  }
+}
+
+type ElkPackBox = { id: string; width: number; height: number };
+
+async function elkPackBoxes(
+  elk: InstanceType<typeof ELK>,
+  layoutOptions: Record<string, string>,
+  boxes: ElkPackBox[],
+  originX: number,
+  originY: number,
+): Promise<{
+  positions: Map<string, { x: number; y: number }>;
+  bandHeight: number;
+}> {
+  if (boxes.length === 0) {
+    return { positions: new Map(), bandHeight: 0 };
+  }
+
+  const graph = {
+    id: "tf_module_pack",
+    layoutOptions,
+    children: boxes.map((box) => ({
+      id: box.id,
+      width: box.width,
+      height: box.height,
+    })),
+    edges: [] as ElkJsonEdge[],
+  };
+
+  const laidOut = (await elk.layout(graph)) as ElkLayoutedNode;
+  const positions = new Map<string, { x: number; y: number }>();
+  let bandHeight = 0;
+
+  for (const child of laidOut.children || []) {
+    const id = child.id || "";
+    const relX = child.x ?? 0;
+    const relY = child.y ?? 0;
+    positions.set(id, { x: originX + relX, y: originY + relY });
+    bandHeight = Math.max(bandHeight, relY + (child.height ?? 0));
+  }
+
+  return { positions, bandHeight };
+}
+
+/** ELK box / rectpacking: submodules band, then resources band below. */
+async function applyModuleElkPackingLayout(
+  mod: TerraformModuleTreeNode,
+  vertexSet: Set<string>,
+  layoutBoxes: Record<string, LayoutBox>,
+  algorithm: "box" | "rectpacking",
+  moduleLayoutOptions: TerraformModuleLayoutOptions,
+) {
+  const compoundId = moduleCompoundId(mod.path);
+  const compound = layoutBoxes[compoundId];
+  if (!compound) {
+    return;
+  }
+
+  const layoutOptions =
+    algorithm === "box"
+      ? buildElkBoxLayoutOptions(moduleLayoutOptions.box)
+      : buildElkRectPackingLayoutOptions(moduleLayoutOptions.rectpacking);
+  const bandGap =
+    algorithm === "box"
+      ? moduleLayoutOptions.box.nodeSpacing
+      : moduleLayoutOptions.rectpacking.nodeSpacing;
+  const elk =
+    algorithm === "box" ? getElkBoxInstance() : getElkRectpackInstance();
+
+  const innerLeft = compound.x + MODULE_CONTENT_PAD_L;
+  const innerTop = compound.y + MODULE_CONTENT_PAD_T;
+
+  const subPaths = Object.keys(mod.modules).sort();
+  const submoduleBoxes: ElkPackBox[] = [];
+  for (const p of subPaths) {
+    const cb = layoutBoxes[moduleCompoundId(p)];
+    if (cb) {
+      submoduleBoxes.push({
+        id: p,
+        width: cb.width,
+        height: cb.height,
+      });
+    }
+  }
+
+  const { positions: submodulePositions, bandHeight: submoduleBandHeight } =
+    await elkPackBoxes(elk, layoutOptions, submoduleBoxes, innerLeft, innerTop);
+
+  for (const p of subPaths) {
+    const pos = submodulePositions.get(p);
+    const cb = layoutBoxes[moduleCompoundId(p)];
+    if (!pos || !cb) {
+      continue;
+    }
+    translateModuleSubtree(
+      layoutBoxes,
+      mod.modules[p],
+      pos.x - cb.x,
+      pos.y - cb.y,
+      vertexSet,
+    );
+  }
+
+  const resourceAddrs = mod.resourceAddresses
+    .filter((a) => vertexSet.has(a))
+    .sort();
+  if (resourceAddrs.length === 0) {
+    return;
+  }
+
+  const resourceStartY =
+    submoduleBoxes.length > 0
+      ? innerTop + submoduleBandHeight + bandGap
+      : innerTop;
+
+  const resourceBoxes: ElkPackBox[] = resourceAddrs
+    .map((addr) => {
+      const b = layoutBoxes[addr];
+      if (!b) {
+        return null;
+      }
+      return {
+        id: addr,
+        width: b.width,
+        height: b.height,
+      };
+    })
+    .filter((box): box is ElkPackBox => box != null);
+
+  const { positions: resourcePositions } = await elkPackBoxes(
+    elk,
+    layoutOptions,
+    resourceBoxes,
+    innerLeft,
+    resourceStartY,
+  );
+
+  for (const addr of resourceAddrs) {
+    const pos = resourcePositions.get(addr);
+    const b = layoutBoxes[addr];
+    if (!pos || !b) {
+      continue;
+    }
+    b.x = pos.x;
+    b.y = pos.y;
   }
 }
 
@@ -876,16 +1131,48 @@ function shrinkWrapModuleCompound(
   c.height = maxY - minY + 2 * pad;
 }
 
-/** Deepest modules first: grid children, then shrink-wrap compound to fit. */
-function layoutModuleGeometryDeep(
+/** Deepest modules first: pack children, then shrink-wrap compound to fit. */
+async function layoutModuleGeometryDeep(
   mod: TerraformModuleTreeNode,
   vertexSet: Set<string>,
   layoutBoxes: Record<string, LayoutBox>,
+  moduleLayoutOptions: TerraformModuleLayoutOptions,
 ) {
   for (const path of Object.keys(mod.modules).sort()) {
-    layoutModuleGeometryDeep(mod.modules[path], vertexSet, layoutBoxes);
+    await layoutModuleGeometryDeep(
+      mod.modules[path],
+      vertexSet,
+      layoutBoxes,
+      moduleLayoutOptions,
+    );
   }
-  applyModuleGridLayout(mod, vertexSet, layoutBoxes);
+  switch (moduleLayoutOptions.mode) {
+    case "box":
+      await applyModuleElkPackingLayout(
+        mod,
+        vertexSet,
+        layoutBoxes,
+        "box",
+        moduleLayoutOptions,
+      );
+      break;
+    case "rectpacking":
+      await applyModuleElkPackingLayout(
+        mod,
+        vertexSet,
+        layoutBoxes,
+        "rectpacking",
+        moduleLayoutOptions,
+      );
+      break;
+    default:
+      applyModuleGridLayout(
+        mod,
+        vertexSet,
+        layoutBoxes,
+        moduleLayoutOptions.defaultGrid,
+      );
+  }
   shrinkWrapModuleCompound(mod, vertexSet, layoutBoxes);
 }
 
@@ -893,7 +1180,17 @@ function frameTitleForModulePath(modulePath: string): string {
   if (modulePath === "root") {
     return "Root module";
   }
-  return modulePath.length > 56 ? `${modulePath.slice(0, 53)}…` : modulePath;
+  const stackGroup = parseStackGroupModulePath(modulePath);
+  if (stackGroup) {
+    return stackGroup.stackId;
+  }
+  const parsed = parseStackAddress(modulePath);
+  const label = parsed
+    ? parsed.address === "root"
+      ? `${parsed.stackId} / root`
+      : `${parsed.stackId} / ${parsed.address}`
+    : modulePath;
+  return label.length > 56 ? `${label.slice(0, 53)}…` : label;
 }
 
 /** Direct frame children: resources in this module, then nested module frames (sorted). */
@@ -996,7 +1293,7 @@ const getEdgePointTowardTarget = (
   };
 };
 
-const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
+export const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
   const posA = { x: boxA.x, y: boxA.y };
   const posB = { x: boxB.x, y: boxB.y };
   const centerA = { x: boxA.x + boxA.width / 2, y: boxA.y + boxA.height / 2 };
@@ -1017,7 +1314,7 @@ const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
   return { startPoint, endPoint };
 };
 
-const fixedPointForLayoutPoint = (
+export const fixedPointForLayoutPoint = (
   box: LayoutBox,
   point: { x: number; y: number },
 ): [number, number] => [
@@ -1686,10 +1983,15 @@ export function mirrorAndDetachTerraformResourceLabels(
 export async function buildTerraformElkExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan?: unknown,
+  moduleLayoutOptionsInput?: PartialTerraformModuleLayoutOptions,
 ): Promise<{
   elements: ReturnType<typeof convertToExcalidrawElements>;
   meta: TerraformElkSceneMeta;
 }> {
+  const moduleLayoutOptions = resolveTerraformModuleLayoutOptions(
+    moduleLayoutOptionsInput,
+  );
+  const modulePackingMeta = moduleLayoutOptionsToMeta(moduleLayoutOptions);
   const vertexSet = collectGraphVertexIds(nodes);
   const vertexCount = vertexSet.size;
 
@@ -1790,24 +2092,50 @@ export async function buildTerraformElkExcalidrawScene(
     });
   }
 
-  const elkGraph = {
-    id: "terraform_elk_root",
-    layoutOptions: { ...ELK_ROOT_LAYOUT_OPTIONS },
-    children: [moduleRoot],
-    edges: elkEdges,
-  };
-
-  const elk = new ELK();
-  const laidOut = (await elk.layout(elkGraph)) as ElkLayoutedNode;
+  const elkFastPath = directedEdges.length > TERRAFORM_ELK_FAST_PATH_EDGE_COUNT;
+  const elkLayoutEdges = elkFastPath ? [] : elkEdges;
 
   const layoutBoxes: Record<string, LayoutBox> = {};
-  const rootBaseX = laidOut.x ?? 0;
-  const rootBaseY = laidOut.y ?? 0;
-  for (const child of laidOut.children || []) {
-    collectElkLayoutBoxes(child, rootBaseX, rootBaseY, vertexSet, layoutBoxes);
+
+  if (elkFastPath) {
+    seedModuleCompoundBoxes(tree, vertexSet, layoutBoxes);
+    await layoutModuleGeometryDeep(
+      tree,
+      vertexSet,
+      layoutBoxes,
+      moduleLayoutOptions,
+    );
+    normalizeOrigin(layoutBoxes);
+  } else {
+    const elkGraph = {
+      id: "terraform_elk_root",
+      layoutOptions: { ...ELK_ROOT_LAYOUT_OPTIONS },
+      children: [moduleRoot],
+      edges: elkLayoutEdges,
+    };
+
+    const elk = new ELK();
+    const laidOut = (await elk.layout(elkGraph)) as ElkLayoutedNode;
+
+    const rootBaseX = laidOut.x ?? 0;
+    const rootBaseY = laidOut.y ?? 0;
+    for (const child of laidOut.children || []) {
+      collectElkLayoutBoxes(
+        child,
+        rootBaseX,
+        rootBaseY,
+        vertexSet,
+        layoutBoxes,
+      );
+    }
+    await layoutModuleGeometryDeep(
+      tree,
+      vertexSet,
+      layoutBoxes,
+      moduleLayoutOptions,
+    );
+    normalizeOrigin(layoutBoxes);
   }
-  layoutModuleGeometryDeep(tree, vertexSet, layoutBoxes);
-  normalizeOrigin(layoutBoxes);
 
   const resourceSkeletons: ExcalidrawElementSkeleton[] = [];
   const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
@@ -1933,6 +2261,13 @@ export async function buildTerraformElkExcalidrawScene(
       layoutEngine: "elk",
       vertexCount,
       edgeCount: directedEdges.length,
+      elkLayoutEdgeCount: elkLayoutEdges.length,
+      modulePacking: modulePackingMeta,
+      ...(elkFastPath && moduleLayoutOptions.mode === "default"
+        ? { elkFastPath: true, moduleGridLayout: true }
+        : elkFastPath
+        ? { elkFastPath: true }
+        : {}),
     },
   };
 }

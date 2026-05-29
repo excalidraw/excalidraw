@@ -5,6 +5,9 @@
 
 export const STACK_ADDRESS_SEP = "::";
 
+/** Synthetic module-tree path segment grouping all modules for one Terraform state/stack. */
+export const STACK_GROUP_PREFIX = "__stack__::";
+
 const STACK_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 
 export function isValidStackId(stackId: string): boolean {
@@ -54,6 +57,43 @@ export function parseStackAddress(
 /** Strip stack prefix before Terraform module-path parsing (`module.foo.bar`). */
 export function stripStackPrefixForModuleParsing(address: string): string {
   return parseStackAddress(address)?.address ?? address;
+}
+
+export function stackGroupModulePath(stackId: string): string {
+  return `${STACK_GROUP_PREFIX}${stackId.trim()}`;
+}
+
+export function parseStackGroupModulePath(
+  modulePath: string,
+): { stackId: string } | null {
+  if (!modulePath.startsWith(STACK_GROUP_PREFIX)) {
+    return null;
+  }
+  const stackId = modulePath.slice(STACK_GROUP_PREFIX.length);
+  if (!isValidStackId(stackId)) {
+    return null;
+  }
+  return { stackId };
+}
+
+export function isStackGroupModulePath(modulePath: string): boolean {
+  return parseStackGroupModulePath(modulePath) != null;
+}
+
+/** Prefix a bare Terraform module path with stack namespace for multi-root imports. */
+export function stackQualifiedModulePath(
+  stackId: string | undefined,
+  bareModulePath: string,
+): string {
+  const bare = bareModulePath || "root";
+  const trimmedStack = stackId?.trim();
+  if (!trimmedStack) {
+    return bare;
+  }
+  if (bare === "root") {
+    return `${trimmedStack}${STACK_ADDRESS_SEP}root`;
+  }
+  return prefixStackAddress(trimmedStack, bare);
 }
 
 export function stackIdFromBundleLabel(

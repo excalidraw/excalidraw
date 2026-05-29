@@ -43,6 +43,11 @@ export const isTerraformSemanticOverviewScene = (
   elements: readonly ExcalidrawElement[],
 ) => elements.some((e) => e.customData?.terraformSemanticOverview === true);
 
+/** True when the scene was built as TFD pipeline layout. */
+export const isTerraformPipelineOverviewScene = (
+  elements: readonly ExcalidrawElement[],
+) => elements.some((e) => e.customData?.terraformPipelineOverview === true);
+
 /** Graph address for Terraform focus / edges (`nodePath`, else `terraformVisibilityKey`). */
 export const getTerraformGraphAddressForElement = (
   element: ExcalidrawElement | NonDeletedExcalidrawElement | undefined,
