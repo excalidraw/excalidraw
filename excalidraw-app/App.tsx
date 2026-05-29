@@ -305,7 +305,12 @@ const initializeScene = async (opts: {
 
     const url = externalUrlMatch[1];
     try {
-      const request = await fetch(window.decodeURIComponent(url));
+      const decodedUrl = window.decodeURIComponent(url);
+      const parsedUrl = new URL(decodedUrl);
+      if (parsedUrl.protocol !== "https:") {
+        throw new Error("Only HTTPS URLs are allowed for external scenes");
+      }
+      const request = await fetch(decodedUrl);
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
