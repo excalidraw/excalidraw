@@ -9,14 +9,17 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { injectTerraformAwsIconsIntoElements } from "./terraformAwsIcons";
 import {
-  buildTerraformDeclaredDataFlowLineSkeletons,
   mirrorAndDetachTerraformResourceLabels,
   type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
-import { buildPipelineLayoutPlan } from "./terraformPipelineContainers";
+import {
+  buildPipelineLayoutPlan,
+  type PipelineColumn,
+} from "./terraformPipelineContainers";
+import { buildPipelineDeclaredDataFlowLineSkeletons } from "./terraformPipelineEdges";
 import {
   buildPipelineAtomGeoMap,
   pipelineGeoTierLabel,
@@ -76,6 +79,108 @@ type ZoneFrameSpec = {
   vpcKey: string | null;
   regionalBandKey: string | null;
 };
+
+type PipelineRowGeometry = {
+  maxLaneCount: number;
+  rowHeights: number[];
+  rowTops: number[];
+  sharedColumnHeight: number;
+};
+
+function computePipelineRowGeometry(
+  layoutPlan: { columns: PipelineColumn[] },
+  clusterBuilds: Map<string, ClusterBuild>,
+  contentTop: number,
+): PipelineRowGeometry {
+  const maxLaneCount = Math.max(
+    1,
+    ...layoutPlan.columns.map((c) => c.laneCount),
+  );
+  const rowHeights = Array.from({ length: maxLaneCount }, () => px(88));
+
+  for (const col of layoutPlan.columns) {
+    for (let lane = 0; lane < col.atoms.length; lane++) {
+      const addr = col.atoms[lane];
+      const build = addr ? clusterBuilds.get(addr) : undefined;
+      if (build) {
+        rowHeights[lane] = Math.max(
+          rowHeights[lane]!,
+          minRowHeightForPrimaryCenteredCluster(build),
+        );
+      }
+    }
+  }
+
+  const rowTops: number[] = [];
+  let y = contentTop + INNER_PAD;
+  for (let i = 0; i < maxLaneCount; i++) {
+    rowTops[i] = y;
+    y += rowHeights[i]! + LANE_GAP;
+  }
+
+  return {
+    maxLaneCount,
+    rowHeights,
+    rowTops,
+    sharedColumnHeight: y - contentTop + INNER_PAD,
+  };
+}
+
+function primaryResourceCenterYInCluster(build: ClusterBuild): number {
+  for (const el of build.skeleton) {
+    if (el.type !== "rectangle") {
+      continue;
+    }
+    const cd = el.customData as Record<string, unknown> | undefined;
+    if (
+      cd?.terraformVisibilityRole === "resource" &&
+      cd.nodePath === build.primaryAddress
+    ) {
+      return (el.y ?? 0) + (el.height ?? 0) / 2;
+    }
+  }
+  return build.height / 2;
+}
+
+function minRowHeightForPrimaryCenteredCluster(build: ClusterBuild): number {
+  const primaryCy = primaryResourceCenterYInCluster(build);
+  return 2 * Math.max(primaryCy, build.height - primaryCy);
+}
+
+function firstMultiLaneColumnIndex(columns: readonly PipelineColumn[]): number {
+  return columns.findIndex((c) => c.laneCount > 1);
+}
+
+function fanoutSpanCenterY(rowGeo: PipelineRowGeometry): number {
+  const { rowHeights, rowTops, maxLaneCount } = rowGeo;
+  const spanTop = rowTops[0]!;
+  const spanBottom = rowTops[maxLaneCount - 1]! + rowHeights[maxLaneCount - 1]!;
+  return (spanTop + spanBottom) / 2;
+}
+
+function clusterYForPlacement(
+  col: PipelineColumn,
+  colIdx: number,
+  lane: number,
+  build: ClusterBuild,
+  rowGeo: PipelineRowGeometry,
+  columns: readonly PipelineColumn[],
+): number {
+  const { rowHeights, rowTops, maxLaneCount } = rowGeo;
+  const primaryCy = primaryResourceCenterYInCluster(build);
+  const firstFanoutCol = firstMultiLaneColumnIndex(columns);
+
+  let rowCenterY: number;
+  if (col.laneCount === 1 && firstFanoutCol >= 0 && colIdx < firstFanoutCol) {
+    rowCenterY = fanoutSpanCenterY(rowGeo);
+  } else if (col.laneCount === maxLaneCount) {
+    rowCenterY = rowTops[lane]! + rowHeights[lane]! / 2;
+  } else {
+    rowCenterY = rowTops[0]! + rowHeights[0]! / 2;
+  }
+
+  return rowCenterY - primaryCy;
+}
 
 function translateSkeleton(
   skeleton: readonly ExcalidrawElementSkeleton[],
@@ -256,27 +361,23 @@ export async function buildTerraformPipelineExcalidrawScene(
     return maxW + 2 * INNER_PAD;
   });
 
-  const columnHeights: number[] = layoutPlan.columns.map((col) => {
-    let totalH = INNER_PAD;
-    for (let lane = 0; lane < col.laneCount; lane++) {
-      const addr = col.atoms[lane];
-      const b = addr ? clusterBuilds.get(addr) : undefined;
-      totalH += (b?.height ?? px(88)) + LANE_GAP;
-    }
-    return totalH + INNER_PAD;
-  });
+  const contentTop = AWS_FRAME_PAD;
+  const rowGeo = computePipelineRowGeometry(
+    layoutPlan,
+    clusterBuilds,
+    contentTop,
+  );
+  const sharedColumnHeight = rowGeo.sharedColumnHeight;
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const zoneSpecs = new Map<string, ZoneFrameSpec>();
 
   let columnX = AWS_FRAME_PAD;
-  const contentTop = AWS_FRAME_PAD;
 
   // Pass 1: place primaryCluster skeletons; accumulate zone frame specs.
   for (const col of layoutPlan.columns) {
     const colW = columnWidths[col.columnIndex] ?? MIN_FRAME_W;
-    const colH = columnHeights[col.columnIndex] ?? MIN_FRAME_H;
-    let laneY = contentTop + INNER_PAD;
+    const colH = sharedColumnHeight;
 
     const columnPlacement = layoutPlan.placements.find(
       (p) => p.columnIndex === col.columnIndex,
@@ -301,7 +402,14 @@ export async function buildTerraformPipelineExcalidrawScene(
       }
 
       const clusterX = columnX + INNER_PAD;
-      const clusterY = laneY;
+      const clusterY = clusterYForPlacement(
+        col,
+        col.columnIndex,
+        lane,
+        build,
+        rowGeo,
+        layoutPlan.columns,
+      );
 
       skeleton.push(...translateSkeleton(build.skeleton, clusterX, clusterY));
 
@@ -343,8 +451,6 @@ export async function buildTerraformPipelineExcalidrawScene(
       if (!spec.clusterFrameIds.includes(build.clusterFrameId)) {
         spec.clusterFrameIds.push(build.clusterFrameId);
       }
-
-      laneY += build.height + LANE_GAP;
     }
 
     columnX += colW + COLUMN_GAP;
@@ -500,12 +606,10 @@ export async function buildTerraformPipelineExcalidrawScene(
   }));
 
   skeleton.push(
-    ...buildTerraformDeclaredDataFlowLineSkeletons(
+    ...buildPipelineDeclaredDataFlowLineSkeletons(
       nodes,
       layoutBoxes,
       declaredEdgeRecords,
-      new Set(),
-      { terraformSemanticOverview: true },
     ),
   );
 

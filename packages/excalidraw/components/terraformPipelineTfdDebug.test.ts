@@ -166,5 +166,210 @@ describe("staging pipeline.tfd resolution", () => {
       }
       expect(zf.height ?? 0).toBeGreaterThanOrEqual(80);
     }
+
+    const rectByPath = new Map<
+      string,
+      { id: string; y: number; height: number }
+    >(
+      resourceRects.map(
+        (e: {
+          id: string;
+          y: number;
+          height: number;
+          customData: { nodePath: string };
+        }) => [e.customData.nodePath, { id: e.id, y: e.y, height: e.height }],
+      ),
+    );
+
+    const midY = (e: { y: number; height: number }) => e.y + e.height / 2;
+
+    const trunkPaths = [
+      "10-east-ecs-edge::aws_lb.ecs",
+      "10-east-ecs-edge::aws_ecs_service.producer",
+      "20-east-messaging::module.queue.module.queue.aws_sqs_queue.this[0]",
+      "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
+    ];
+    const trunkMidYs = trunkPaths.map((p) => midY(rectByPath.get(p)!));
+    expect(Math.max(...trunkMidYs) - Math.min(...trunkMidYs)).toBeLessThan(4);
+
+    const apiRects = [...nodePaths]
+      .filter((p) => p.includes("aws_api_gateway_rest_api"))
+      .map((p) => rectByPath.get(p)!)
+      .sort((a, b) => midY(a) - midY(b));
+    const apiLambdaRects = resourceRects
+      .filter(
+        (e: { customData: { nodePath: string } }) =>
+          e.customData.nodePath.includes("aws_lambda_function") &&
+          e.customData.nodePath.includes("api"),
+      )
+      .sort(
+        (a: { y: number; height: number }, b: { y: number; height: number }) =>
+          midY(a) - midY(b),
+      );
+    const ssmSorted = [...ssmRects].sort(
+      (a: { y: number; height: number }, b: { y: number; height: number }) =>
+        midY(a) - midY(b),
+    );
+
+    expect(apiRects.length).toBe(5);
+    expect(apiLambdaRects.length).toBe(5);
+    for (let lane = 0; lane < 5; lane++) {
+      expect(
+        Math.abs(midY(apiRects[lane]!) - midY(apiLambdaRects[lane]!)),
+      ).toBeLessThan(4);
+      expect(
+        Math.abs(midY(apiLambdaRects[lane]!) - midY(ssmSorted[lane]!)),
+      ).toBeLessThan(4);
+    }
+
+    const findArrow = (sourcePath: string, targetPath: string) => {
+      const src = rectByPath.get(sourcePath);
+      const tgt = rectByPath.get(targetPath);
+      if (!src || !tgt) {
+        return undefined;
+      }
+      return declared.find(
+        (a: {
+          startBinding?: { elementId?: string };
+          endBinding?: { elementId?: string };
+          points?: readonly (readonly number[])[];
+        }) =>
+          a.startBinding?.elementId === src.id &&
+          a.endBinding?.elementId === tgt.id,
+      );
+    };
+
+    const arrowDeltaY = (arrow: {
+      points?: readonly (readonly number[])[];
+    }) => {
+      const pts = arrow.points;
+      if (!pts || pts.length < 2) {
+        return Infinity;
+      }
+      const end = pts[pts.length - 1]!;
+      return Math.abs(end[1] ?? 0);
+    };
+
+    const horizontalPairs: [string, string][] = [
+      [
+        "10-east-ecs-edge::aws_ecs_service.producer",
+        "20-east-messaging::module.queue.module.queue.aws_sqs_queue.this[0]",
+      ],
+      [
+        "40-east-api-1::module.api.aws_api_gateway_rest_api.private",
+        "40-east-api-1::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+      ],
+      [
+        "41-east-api-2::module.api.aws_api_gateway_rest_api.private",
+        "41-east-api-2::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+      ],
+      [
+        "40-east-api-1::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+        "40-east-api-1::module.api.aws_ssm_parameter.api_name",
+      ],
+    ];
+
+    for (const [src, tgt] of horizontalPairs) {
+      const arrow = findArrow(src, tgt);
+      expect(arrow).toBeTruthy();
+      expect(arrowDeltaY(arrow!)).toBeLessThan(4);
+    }
+
+    const fanoutArrow = findArrow(
+      "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "40-east-api-1::module.api.aws_api_gateway_rest_api.private",
+    );
+    expect(fanoutArrow).toBeTruthy();
+    expect(arrowDeltaY(fanoutArrow!)).toBeGreaterThan(4);
+
+    const insideVertically = (
+      inner: { y: number; height: number },
+      outer: { y: number; height: number },
+      tolerance = 1,
+    ) =>
+      inner.y >= outer.y - tolerance &&
+      inner.y + inner.height <= outer.y + outer.height + tolerance;
+
+    const lambdaPrimaryFromApiPermission = (nodePath: string) => {
+      const stack = nodePath.split("::")[0] ?? nodePath;
+      return `${stack}::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]`;
+    };
+
+    const permissionRects = body.elements.filter(
+      (e: {
+        type?: string;
+        y: number;
+        height: number;
+        customData?: { resourceType?: string; nodePath?: string };
+      }) =>
+        e.type === "rectangle" &&
+        e.customData?.resourceType === "aws_lambda_permission" &&
+        typeof e.customData?.nodePath === "string" &&
+        e.customData.nodePath.includes("east-api"),
+    );
+    expect(permissionRects.length).toBeGreaterThanOrEqual(5);
+
+    const clusterPrimaryAddress = (frame: {
+      customData?: { terraformTopologyPath?: string[] };
+    }) => {
+      const path = frame.customData?.terraformTopologyPath;
+      return path?.[path.length - 1];
+    };
+
+    for (const perm of permissionRects) {
+      const lambdaPrimary = lambdaPrimaryFromApiPermission(
+        perm.customData.nodePath,
+      );
+      const cluster = frames.find(
+        (e: {
+          customData?: {
+            terraformTopologyRole?: string;
+            terraformTopologyPath?: string[];
+          };
+          y: number;
+          height: number;
+        }) =>
+          e.customData?.terraformTopologyRole === "primaryCluster" &&
+          clusterPrimaryAddress(e) === lambdaPrimary,
+      );
+      expect(cluster).toBeTruthy();
+      expect(insideVertically(perm, cluster!)).toBe(true);
+    }
+
+    const api5Permission = permissionRects.find(
+      (p: { customData: { nodePath: string } }) =>
+        p.customData.nodePath.startsWith("44-east-api-5::"),
+    );
+    expect(api5Permission).toBeTruthy();
+
+    const api5LambdaPrimary =
+      "44-east-api-5::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]";
+    const api5Cluster = frames.find(
+      (e: {
+        customData?: {
+          terraformTopologyRole?: string;
+          terraformTopologyPath?: string[];
+        };
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      }) =>
+        e.customData?.terraformTopologyRole === "primaryCluster" &&
+        clusterPrimaryAddress(e) === api5LambdaPrimary,
+    );
+    expect(api5Cluster).toBeTruthy();
+
+    const subnetZones = zoneFrames.filter(
+      (e: { customData?: { terraformTopologyRole?: string } }) =>
+        e.customData?.terraformTopologyRole === "subnetZone",
+    );
+    const api5ClusterCx = api5Cluster!.x + api5Cluster!.width / 2;
+    const api5Zone = subnetZones.find(
+      (z: { x: number; width: number; y: number; height: number }) =>
+        api5ClusterCx >= z.x && api5ClusterCx <= z.x + z.width,
+    );
+    expect(api5Zone).toBeTruthy();
+    expect(insideVertically(api5Permission!, api5Zone!)).toBe(true);
   }, 180_000);
 });

@@ -179,13 +179,65 @@ export function mergeParallelFanoutColumns(
   return result;
 }
 
+/** Sort multi-lane columns by average parent lane index (TALA-style barycenter). */
+function barycenterSortFanoutColumns(
+  columnAtomLists: string[][],
+  edges: readonly PipelineAtomEdge[],
+): string[][] {
+  const parentOf = new Map<string, string>();
+  for (const e of edges) {
+    if (!parentOf.has(e.target)) {
+      parentOf.set(e.target, e.source);
+    }
+  }
+
+  const laneByAtom = new Map<string, number>();
+  const result: string[][] = [];
+
+  for (let colIdx = 0; colIdx < columnAtomLists.length; colIdx++) {
+    const atoms = [...columnAtomLists[colIdx]!];
+
+    if (atoms.length > 1) {
+      const barycenter = (atom: string): number => {
+        const incoming = edges.filter((e) => e.target === atom);
+        const parents =
+          incoming.length > 0
+            ? [...new Set(incoming.map((e) => e.source))]
+            : parentOf.has(atom)
+            ? [parentOf.get(atom)!]
+            : [];
+        let sum = 0;
+        let count = 0;
+        for (const p of parents) {
+          const lane = laneByAtom.get(p);
+          if (lane !== undefined) {
+            sum += lane;
+            count += 1;
+          }
+        }
+        return count > 0 ? sum / count : Number.MAX_SAFE_INTEGER;
+      };
+
+      atoms.sort((a, b) => barycenter(a) - barycenter(b) || a.localeCompare(b));
+    }
+
+    atoms.forEach((atom, lane) => laneByAtom.set(atom, lane));
+    result.push(atoms);
+  }
+
+  return result;
+}
+
 /** Order atom edges into pipeline columns following TFD sequence with fanout grouping. */
 export function buildPipelineLayoutPlan(
   atomGraph: PipelineAtomGraph,
   geoMap: PipelineAtomGeoMap,
 ): PipelineLayoutPlan {
-  const columnAtomLists = mergeParallelFanoutColumns(
-    buildColumnsFromEdges(atomGraph, atomGraph.edges),
+  const columnAtomLists = barycenterSortFanoutColumns(
+    mergeParallelFanoutColumns(
+      buildColumnsFromEdges(atomGraph, atomGraph.edges),
+      atomGraph.edges,
+    ),
     atomGraph.edges,
   );
 

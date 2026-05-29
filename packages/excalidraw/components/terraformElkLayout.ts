@@ -1293,7 +1293,7 @@ const getEdgePointTowardTarget = (
   };
 };
 
-const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
+export const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
   const posA = { x: boxA.x, y: boxA.y };
   const posB = { x: boxB.x, y: boxB.y };
   const centerA = { x: boxA.x + boxA.width / 2, y: boxA.y + boxA.height / 2 };
@@ -1314,7 +1314,7 @@ const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
   return { startPoint, endPoint };
 };
 
-const fixedPointForLayoutPoint = (
+export const fixedPointForLayoutPoint = (
   box: LayoutBox,
   point: { x: number; y: number },
 ): [number, number] => [
