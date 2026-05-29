@@ -4,6 +4,14 @@
     "vertexCount": 118,
     "edgeCount": 433,
     "elkLayoutEdgeCount": 0,
+    "modulePacking": {
+      "mode": "default",
+      "params": {
+        "resourceGap": 27,
+        "submoduleGap": 43,
+        "rootStackMinCellWidth": 486
+      }
+    },
     "elkFastPath": true,
     "moduleGridLayout": true,
     "importSource": "plan",

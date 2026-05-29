@@ -178,6 +178,7 @@ describe("staging multi-state import", () => {
     expect(body.meta?.layoutEngine).toBe("elk");
     expect(body.meta?.elkFastPath).toBe(true);
     expect(body.meta?.moduleGridLayout).toBe(true);
+    expect(body.meta?.modulePacking?.mode).toBe("default");
     expect(body.elements.length).toBeGreaterThan(0);
     expect(ms).toBeLessThan(15_000);
 

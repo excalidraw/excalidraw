@@ -338,6 +338,118 @@
       }
     }
 
+    &__modulePacking {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--tf-control-border);
+      border-radius: var(--tf-control-radius);
+      background-color: var(--color-surface-low);
+
+      h5 {
+        margin: 0;
+        font-family: "Assistant";
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-on-surface);
+      }
+
+      &__modes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      &__params {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      &__paramsHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      &__paramsTitle {
+        font-family: "Assistant";
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--color-gray-70);
+      }
+
+      &__reset {
+        border: none;
+        background: none;
+        padding: 0;
+        font-family: "Assistant";
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        cursor: pointer;
+        text-decoration: underline;
+
+        &:hover {
+          color: var(--color-primary-darker);
+        }
+      }
+
+      &__paramGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+        gap: 0.625rem 0.75rem;
+      }
+
+      &__param {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-family: "Assistant";
+        font-size: 0.75rem;
+        color: var(--color-on-surface);
+
+        span:first-child {
+          font-weight: 600;
+        }
+
+        input[type="number"],
+        select {
+          width: 100%;
+          padding: 0.35rem 0.5rem;
+          border: 1px solid var(--tf-control-border);
+          border-radius: var(--tf-control-radius);
+          font-family: "Assistant";
+          font-size: 0.8125rem;
+          background-color: var(--color-surface-high);
+          color: var(--color-on-surface);
+        }
+
+        &--checkbox {
+          flex-direction: row;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.35rem;
+
+          input[type="checkbox"] {
+            margin: 0;
+          }
+        }
+      }
+
+      &__hint {
+        display: block;
+        width: 100%;
+        font-weight: 400;
+        font-size: 0.6875rem;
+        color: var(--color-gray-60);
+        line-height: 1.3;
+      }
+    }
+
     &__error {
       width: 100%;
       padding: 0.75rem 1rem;

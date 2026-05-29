@@ -14,6 +14,8 @@ import {
 } from "./terraformPlanParsing";
 import { parseRawStateJson } from "./terraformImportMerge";
 import { runTerraformImportFromSources } from "./terraformSceneApply";
+import { TerraformModulePackingSettings } from "./TerraformModulePackingSettings";
+import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
   deleteTerraformImportPreset,
@@ -121,6 +123,9 @@ export const TerraformImportModal = ({
   const [stateFiles, setStateFiles] = useState<File[]>([]);
   const [tfdFiles, setTfdFiles] = useState<File[]>([]);
   const [view, setView] = useState<TerraformView>("semantic");
+  const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
+    DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [importWarnings, setImportWarnings] = useState<
@@ -235,6 +240,7 @@ export const TerraformImportModal = ({
       sources,
       {
         semanticLayout,
+        moduleLayoutOptions: semanticLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
       },
@@ -962,6 +968,13 @@ writer -> bucket`}</code>
           })}
         </div>
       </div>
+
+      {view === "module" ? (
+        <TerraformModulePackingSettings
+          options={moduleLayoutOptions}
+          onChange={setModuleLayoutOptions}
+        />
+      ) : null}
 
       <div className="TerraformImportModal__settings__buttons">
         {importDone ? (

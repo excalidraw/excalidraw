@@ -5,6 +5,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { BUILTIN_TERRAFORM_IMPORT_PRESETS } from "./terraformImportPresetsTypes";
 import { TerraformImportModal } from "./TerraformImportDialog";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
 
 const hoisted = vi.hoisted(() => ({
@@ -144,8 +145,41 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
+        moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );
+  });
+
+  it("shows module packing settings when module view is selected", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    expect(
+      screen.queryByTestId("terraform-module-packing-settings"),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
+    expect(
+      screen.getByTestId("terraform-module-packing-settings"),
+    ).toBeTruthy();
+    expect(screen.getByRole("radio", { name: /default grid/i })).toBeChecked();
+  });
+
+  it("passes selected rectpacking mode on module import", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
+    fireEvent.click(screen.getByRole("radio", { name: /elk rectpacking/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+    const options = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1];
+    expect(options?.semanticLayout).toBe(false);
+    expect(options?.moduleLayoutOptions?.mode).toBe("rectpacking");
   });
 
   it("passes semanticLayout false for module view with active preset manifest", async () => {
@@ -186,6 +220,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
+        moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
     );
   });

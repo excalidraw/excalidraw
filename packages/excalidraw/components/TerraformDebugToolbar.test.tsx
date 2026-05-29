@@ -9,6 +9,7 @@ import {
   clearTerraformImportSession,
   setTerraformImportSession,
 } from "./terraformImportSession";
+import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 
 import {
   resetTerraformLayout,
@@ -77,6 +78,7 @@ describe("TerraformDebugToolbar", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: true,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
       snapshot: {
@@ -117,6 +119,7 @@ describe("TerraformDebugToolbar", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: true,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
       snapshot: {

@@ -8,6 +8,7 @@ import {
   getTerraformImportSession,
   setTerraformImportSession,
 } from "./terraformImportSession";
+import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 
 describe("terraformImportSession", () => {
   beforeEach(() => {
@@ -25,6 +26,7 @@ describe("terraformImportSession", () => {
     setTerraformImportSession({
       sources,
       semanticLayout: true,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
       snapshot: {
@@ -52,6 +54,7 @@ describe("terraformImportSession", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: false,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
       snapshot: {

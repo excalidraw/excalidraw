@@ -9,6 +9,10 @@ import {
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
 import {
+  DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  type TerraformModuleLayoutOptions,
+} from "./terraformModuleLayoutOptions";
+import {
   terraformPlanParsingFromSources,
   type TerraformImportWarning,
   type TerraformPlanParsingSources,
@@ -119,6 +123,7 @@ export const applyTerraformExcalidrawScene = (
 
 export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
+  moduleLayoutOptions?: TerraformModuleLayoutOptions;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   updateSession?: boolean;
@@ -135,8 +140,13 @@ export const runTerraformImportFromSources = async (
   sources: TerraformPlanParsingSources,
   options: RunTerraformImportFromSourcesOptions,
 ): Promise<RunTerraformImportFromSourcesResult> => {
+  const moduleLayoutOptions =
+    options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
   const res = await terraformPlanParsingFromSources(sources, {
     semanticLayout: options.semanticLayout,
+    moduleLayoutOptions: options.semanticLayout
+      ? undefined
+      : moduleLayoutOptions,
   });
   const scene = await res.json();
   if (!res.ok) {
@@ -163,6 +173,7 @@ export const runTerraformImportFromSources = async (
     setTerraformImportSession({
       sources,
       semanticLayout: options.semanticLayout,
+      moduleLayoutOptions,
       preset: options.preset ?? null,
       importedTfdTexts,
       snapshot: {
@@ -231,6 +242,7 @@ export const refreshTerraformLayout = async (
 
   return runTerraformImportFromSources(app, setAppState, sources, {
     semanticLayout: session.semanticLayout,
+    moduleLayoutOptions: session.moduleLayoutOptions,
     importedTfdTexts,
     preset: session.preset,
   });

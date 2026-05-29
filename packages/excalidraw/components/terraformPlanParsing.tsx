@@ -1,6 +1,7 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+
 import {
   extractTerraformTopologyFromPlan,
   mergeTopologyModelWithPlacementZones,
@@ -72,6 +73,8 @@ import {
   topologyBareAddressKey,
 } from "./terraformStackAddress";
 import { dedupeTerraformPlanNodesByBareAddress } from "./terraformTopologyAddress";
+
+import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 
 import type { Graph } from "@dagrejs/graphlib";
 import type {
@@ -177,6 +180,8 @@ export type TerraformPlanParsingOptions = {
   semanticLayout?: boolean;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
+  /** Module-view intra-module packing (ignored when semanticLayout is true). */
+  moduleLayoutOptions?: TerraformModuleLayoutOptions;
 };
 
 type BuildNodesMapOptions = {
@@ -892,7 +897,11 @@ export const terraformPlanParsingFromSources = async (
       ),
     };
   } else {
-    const elkScene = await buildTerraformElkExcalidrawScene(nodes5, plan);
+    const elkScene = await buildTerraformElkExcalidrawScene(
+      nodes5,
+      plan,
+      options?.moduleLayoutOptions,
+    );
     emitLocalParseDebug({
       phase: "elkLayout",
       meta: elkScene.meta,
