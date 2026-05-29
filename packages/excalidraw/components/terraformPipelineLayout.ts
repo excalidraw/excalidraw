@@ -978,7 +978,9 @@ export async function buildTerraformPipelineExcalidrawScene(
     if (!specInAccountBand(spec, accountBands, multiAccountBandLayout)) {
       continue;
     }
-    const groupKey = `${spec.vpcKey}|lane${spec.laneIndex}`;
+    const groupKey = multiAccountBandLayout
+      ? `${spec.vpcKey}|lane${spec.laneIndex}`
+      : spec.vpcKey!;
     const list = vpcGroups.get(groupKey) ?? [];
     list.push(spec);
     vpcGroups.set(groupKey, list);

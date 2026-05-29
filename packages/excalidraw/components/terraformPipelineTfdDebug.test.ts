@@ -138,7 +138,7 @@ describe("staging pipeline.tfd resolution", () => {
       (e: { customData?: { terraformTopologyRole?: string } }) =>
         e.customData?.terraformTopologyRole === "vpc",
     );
-    expect(vpcFrames.length).toBeGreaterThanOrEqual(1);
+    expect(vpcFrames.length).toBe(2);
 
     const lambdaRects = resourceRects.filter(
       (e: { customData: { nodePath: string } }) =>
