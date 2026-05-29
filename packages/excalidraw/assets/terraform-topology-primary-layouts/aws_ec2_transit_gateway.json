@@ -1,0 +1,45 @@
+{
+  "primaryType": "aws_ec2_transit_gateway",
+  "tierBase": {
+    "tier0": { "w": 200, "h": 88 },
+    "tier1": { "w": 176, "h": 52 },
+    "tier2": { "w": 154, "h": 44 }
+  },
+  "padding": {
+    "sgRight": 6,
+    "cloudwatchLeft": 6,
+    "cloudwatchRight": 6,
+    "primaryClusterFrame": 10
+  },
+  "gaps": {
+    "satellite": 8,
+    "iamSgColumn": 8,
+    "cloudwatchColumn": 8,
+    "sgBetweenGroups": 4
+  },
+  "slots": [
+    {
+      "id": "top_observability",
+      "anchor": "top",
+      "align": "start",
+      "kinds": ["cloudwatch_alarms"],
+      "layout": "stack"
+    },
+    {
+      "id": "top_logging",
+      "anchor": "top",
+      "align": "end",
+      "kinds": ["cloudwatch_log_groups"],
+      "layout": "stack",
+      "excludeRef": "ecs_owned_log_groups"
+    },
+    {
+      "id": "bottom_tgw",
+      "anchor": "bottom",
+      "align": "start",
+      "kinds": ["tgw_companions"],
+      "layout": "stack",
+      "groupLayout": "tgw_peering"
+    }
+  ]
+}
