@@ -18,7 +18,7 @@ export const ProjectName = (props: Props) => {
   const { id } = useExcalidrawContainer();
   const [fileName, setFileName] = useState<string>(props.value);
 
-  const handleBlur = (event: any) => {
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     if (!props.ignoreFocus) {
       focusNearestParent(event.target);
     }

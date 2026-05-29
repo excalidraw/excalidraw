@@ -248,7 +248,7 @@ const PublishLibrary = ({
     setClonedLibItems(libraryItems.slice());
   }, [libraryItems]);
 
-  const onInputChange = (event: any) => {
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLibraryData({
       ...libraryData,
       [event.target.name]: event.target.value,
