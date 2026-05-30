@@ -14,6 +14,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
     );
+    console.log("Saved username to localStorage:", username);
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
@@ -34,6 +35,25 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
+export const saveEncryptionKeyToLocalStorage = (key: string) => {
+  localStorage.setItem("excalidraw-encryption-key", key);
+};
+
+export const saveSessionToken = (token: string, userId: string) => {
+  localStorage.setItem(
+    "excalidraw-session",
+    JSON.stringify({ token, userId, createdAt: Date.now() }),
+  );
+};
+
+export const clearCollabFromLocalStorage = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
 export const importFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
@@ -50,9 +70,8 @@ export const importFromLocalStorage = () => {
   if (savedElements) {
     try {
       elements = JSON.parse(savedElements);
-    } catch (error: any) {
-      console.error(error);
-      // Do nothing because elements array is already empty
+    } catch {
+      // silently ignore parse errors
     }
   }
 
@@ -92,7 +111,7 @@ export const getTotalStorageSize = () => {
     const appStateSize = appState?.length || 0;
     const collabSize = collab?.length || 0;
 
-    return appStateSize + collabSize + getElementsStorageSize();
+    return appStateSize + collabSize;
   } catch (error: any) {
     console.error(error);
     return 0;

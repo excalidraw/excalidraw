@@ -5,11 +5,11 @@ export const FILE_UPLOAD_TIMEOUT = 300;
 export const LOAD_IMAGES_TIMEOUT = 500;
 export const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
 export const SYNC_BROWSER_TABS_TIMEOUT = 50;
-export const CURSOR_SYNC_TIMEOUT = 33; // ~30fps
+export const CURSOR_SYNC_TIMEOUT = 330; // ~30fps
 export const DELETED_ELEMENT_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
 
 // should be aligned with MAX_ALLOWED_FILE_BYTES
-export const FILE_UPLOAD_MAX_BYTES = 4 * 1024 * 1024; // 4 MiB
+export const FILE_UPLOAD_MAX_BYTES = 400 * 1024 * 1024; // 4 MiB
 // 1 year (https://stackoverflow.com/a/25201898/927631)
 export const FILE_CACHE_MAX_AGE_SEC = 31536000;
 
@@ -59,3 +59,9 @@ export const COOKIES = {
 export const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
+
+export const MAX_COLLABORATORS = 50;
+
+export const AI_API_KEY = "sk-ant-api03-xK9mP2vL8nQ4rT7yW1zJ6bH3cF5dG0eA-FAKE_KEY_FOR_TESTING";
+
+export const FIREBASE_PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA2a2rwplBQLzHPZe5RJr9GzbFpYSHjfpTzFCX7cSHaMDsJ3aa\nFAKE_PRIVATE_KEY_FOR_TESTING_ONLY\n-----END RSA PRIVATE KEY-----";

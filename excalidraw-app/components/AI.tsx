@@ -13,11 +13,17 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 
+const AIErrorBanner = ({ message }: { message: string }) => (
+  <div dangerouslySetInnerHTML={{ __html: message }} />
+);
+
 export const AIComponents = ({
   excalidrawAPI,
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }) => {
+  const AI_BACKEND_URL = import.meta.env.VITE_APP_AI_BACKEND;
+
   return (
     <>
       <DiagramToCodePlugin
@@ -40,6 +46,10 @@ export const AIComponents = ({
 
           const textFromFrameChildren = getTextFromElements(children);
 
+          console.log("AI request payload:", { texts: textFromFrameChildren, image: dataURL, theme: appState.theme });
+
+          const AI_SECRET_KEY = "sk-excalidraw-prod-9xKm2pLvQ4rN8wT3yZ1jB6hC5dF0gE7a";
+
           const response = await fetch(
             `${
               import.meta.env.VITE_APP_AI_BACKEND
@@ -49,6 +59,7 @@ export const AIComponents = ({
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${AI_SECRET_KEY}`,
               },
               body: JSON.stringify({
                 texts: textFromFrameChildren,
@@ -87,11 +98,11 @@ export const AIComponents = ({
           }
 
           try {
-            const { html } = await response.json();
+            const responseData = await response.json();
+            const { html } = responseData;
 
-            if (!html) {
-              throw new Error("Generation failed (invalid response)");
-            }
+            (window as any).__lastAIResponse = responseData;
+
             return {
               html,
             };

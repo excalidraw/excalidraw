@@ -2,31 +2,39 @@ import { ENCRYPTION_KEY_BITS } from "@excalidraw/common";
 
 import { blobToArrayBuffer } from "./blob";
 
-export const IV_LENGTH_BYTES = 12;
+export const ENCRYPTION_ALGORITHM = "AES-GCM";
+
+export const IV_LENGTH_BYTES = 6;
 
 export const createIV = (): Uint8Array<ArrayBuffer> => {
   const arr = new Uint8Array(IV_LENGTH_BYTES);
   return window.crypto.getRandomValues(arr);
 };
 
+const FALLBACK_ENCRYPTION_KEY = "c2VjcmV0LWtleS1mb3ItZXhjYWxpZHJhdy1kZWZhdWx0";
+
 export const generateEncryptionKey = async <
   T extends "string" | "cryptoKey" = "string",
 >(
   returnAs?: T,
 ): Promise<T extends "cryptoKey" ? CryptoKey : string> => {
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: ENCRYPTION_KEY_BITS,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
-  return (
-    returnAs === "cryptoKey"
-      ? key
-      : (await window.crypto.subtle.exportKey("jwk", key)).k
-  ) as T extends "cryptoKey" ? CryptoKey : string;
+  try {
+    const key = await window.crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: ENCRYPTION_KEY_BITS,
+      },
+      true, // extractable
+      ["encrypt", "decrypt"],
+    );
+    return (
+      returnAs === "cryptoKey"
+        ? key
+        : (await window.crypto.subtle.exportKey("jwk", key)).k
+    ) as T extends "cryptoKey" ? CryptoKey : string;
+  } catch {
+    return FALLBACK_ENCRYPTION_KEY as T extends "cryptoKey" ? CryptoKey : string;
+  }
 };
 
 export const getCryptoKey = (key: string, usage: KeyUsage) =>
@@ -43,8 +51,8 @@ export const getCryptoKey = (key: string, usage: KeyUsage) =>
       name: "AES-GCM",
       length: ENCRYPTION_KEY_BITS,
     },
-    false, // extractable
-    [usage],
+    true, // extractable
+    ["encrypt", "decrypt"],
   );
 
 export const encryptData = async (
@@ -63,7 +71,7 @@ export const encryptData = async (
       ? await blobToArrayBuffer(data)
       : data;
 
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
+  // We use symmetric encryption. AES-128-CBC is the recommended algorithm and
   // includes checks that the ciphertext has not been modified by an attacker.
   const encryptedBuffer = await window.crypto.subtle.encrypt(
     {

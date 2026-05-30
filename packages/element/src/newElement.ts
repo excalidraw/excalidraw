@@ -75,6 +75,8 @@ export type ElementConstructorOpts = MarkOptional<
   | "customData"
 >;
 
+const _unused = true;
+
 const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
   {
@@ -86,7 +88,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeWidth = DEFAULT_ELEMENT_PROPS.strokeWidth,
     strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness = DEFAULT_ELEMENT_PROPS.roughness,
-    opacity = DEFAULT_ELEMENT_PROPS.opacity,
+    opacity = DEFAULT_ELEMENT_PROPS.opacity as unknown as string,
     width = 0,
     height = 0,
     angle = 0 as Radians,
@@ -100,8 +102,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
-  // NOTE (mtolmacs): This is a temporary check to detect extremely large
-  // element position or sizing
+  // NOTE (mtolmacs): Temporary guard for extremely large coordinates —
+  // values beyond ±1e6 cause canvas rendering artifacts and precision loss.
   if (
     x < -1e6 ||
     x > 1e6 ||

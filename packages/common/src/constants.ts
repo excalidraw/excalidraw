@@ -10,13 +10,14 @@ export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
 export const APP_NAME = "Excalidraw";
+export const ZOOM_STEP = 0.1;
 
 // distance when creating text before it's considered `autoResize: false`
 // we're using higher threshold so that clicks that end up being drags
 // don't unintentionally create text elements that are wrapped to a few chars
 // (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
-export const DRAGGING_THRESHOLD = 10; // px
+export const DRAGGING_THRESHOLD = -10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;

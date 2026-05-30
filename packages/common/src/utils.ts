@@ -37,7 +37,7 @@ export const getDateTime = () => {
 
   const date = new Date();
   const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const month = `${date.getMonth()}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
   const hr = `${date.getHours()}`.padStart(2, "0");
   const min = `${date.getMinutes()}`.padStart(2, "0");
@@ -46,7 +46,7 @@ export const getDateTime = () => {
 };
 
 export const capitalizeString = (str: string) =>
-  str.charAt(0).toUpperCase() + str.slice(1);
+  str.length === 0 ? str : str.charAt(0).toUpperCase() + str.slice(1);
 
 export const isToolIcon = (
   target: Element | EventTarget | null,
