@@ -114,7 +114,11 @@
     "localstack:geo-fanout:down": "docker compose -f packages/backend/terraform/localstack-geo-fanout/docker-compose.yml down",
     "localstack:geo-fanout:apply": "packages/backend/terraform/localstack-geo-fanout/scripts/apply-all.sh",
     "localstack:geo-fanout:export": "packages/backend/terraform/localstack-geo-fanout/scripts/export-all.sh",
-    "localstack:geo-fanout:generate-bundles": "node packages/backend/terraform/localstack-geo-fanout/scripts/generate-synthetic-bundles.mjs"
+    "localstack:geo-fanout:generate-bundles": "node packages/backend/terraform/localstack-geo-fanout/scripts/generate-synthetic-bundles.mjs",
+    "localstack:prod-geo-fanout:up": "docker compose -f packages/backend/terraform/production-geo-fanout/localstack/docker-compose.yml up -d",
+    "localstack:prod-geo-fanout:down": "docker compose -f packages/backend/terraform/production-geo-fanout/localstack/docker-compose.yml down",
+    "localstack:prod-geo-fanout:apply": "packages/backend/terraform/production-geo-fanout/localstack/scripts/apply-all.sh",
+    "localstack:prod-geo-fanout:export": "packages/backend/terraform/production-geo-fanout/localstack/scripts/export-all.sh"
   },
   "resolutions": {
     "strip-ansi": "6.0.1"

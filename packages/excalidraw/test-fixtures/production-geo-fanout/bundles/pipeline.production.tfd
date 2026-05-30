@@ -1,0 +1,49 @@
+# Pipeline-wide declared dataflow for production-geo-fanout.
+# Binds use stack-qualified Terraform addresses (stackId::resource.address).
+
+bind event_queue    = 30-a-messaging::module.queue.module.queue.aws_sqs_queue.this[0]
+bind queue_consumer = 30-a-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]
+
+bind api1_gateway = 10-a-api-1::module.api.aws_api_gateway_rest_api.private
+bind api2_gateway = 11-a-api-2::module.api.aws_api_gateway_rest_api.private
+bind api3_gateway = 12-a-api-3::module.api.aws_api_gateway_rest_api.private
+bind api4_gateway = 20-b-api-4::module.api.aws_api_gateway_rest_api.private
+bind api5_gateway = 21-b-api-5::module.api.aws_api_gateway_rest_api.private
+bind api6_gateway = 22-b-api-6::module.api.aws_api_gateway_rest_api.private
+
+bind api1_lambda = 10-a-api-1::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api2_lambda = 11-a-api-2::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api3_lambda = 12-a-api-3::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api4_lambda = 20-b-api-4::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api5_lambda = 21-b-api-5::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api6_lambda = 22-b-api-6::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+
+bind api1_ssm = 10-a-api-1::module.api.aws_ssm_parameter.api_name
+bind api2_ssm = 11-a-api-2::module.api.aws_ssm_parameter.api_name
+bind api3_ssm = 12-a-api-3::module.api.aws_ssm_parameter.api_name
+bind api4_ssm = 20-b-api-4::module.api.aws_ssm_parameter.api_name
+bind api5_ssm = 21-b-api-5::module.api.aws_ssm_parameter.api_name
+bind api6_ssm = 22-b-api-6::module.api.aws_ssm_parameter.api_name
+
+event_queue -> queue_consumer
+
+queue_consumer -> api1_gateway
+queue_consumer -> api2_gateway
+queue_consumer -> api3_gateway
+queue_consumer -> api4_gateway
+queue_consumer -> api5_gateway
+queue_consumer -> api6_gateway
+
+api1_gateway -> api1_lambda
+api2_gateway -> api2_lambda
+api3_gateway -> api3_lambda
+api4_gateway -> api4_lambda
+api5_gateway -> api5_lambda
+api6_gateway -> api6_lambda
+
+api1_lambda -> api1_ssm
+api2_lambda -> api2_ssm
+api3_lambda -> api3_ssm
+api4_lambda -> api4_ssm
+api5_lambda -> api5_ssm
+api6_lambda -> api6_ssm

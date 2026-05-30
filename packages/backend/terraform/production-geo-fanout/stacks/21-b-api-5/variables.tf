@@ -1,0 +1,40 @@
+variable "aws_region" {
+  type    = string
+  default = "eu-central-1"
+}
+
+variable "aws_profile" {
+  type    = string
+  default = "admin-account-b"
+}
+
+variable "terraform_deploy_role_name" {
+  type    = string
+  default = "TerraformDeploy"
+}
+
+variable "terraform_deploy_role_arn" {
+  type    = string
+  default = ""
+}
+
+variable "aws_account_id" {
+  type    = string
+  default = ""
+}
+
+variable "environment" {
+  type    = string
+  default = "production"
+}
+
+variable "network_state_path" {
+  type    = string
+  default = "../03-b-network-eu-central/terraform.tfstate"
+}
+
+variable "consumer_lambda_role_arn" {
+  type        = string
+  default     = ""
+  description = "IAM role ARN of the account-A consumer Lambda allowed to invoke this API cross-account."
+}

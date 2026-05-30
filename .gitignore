@@ -113,6 +113,14 @@ packages/backend/terraform/localstack-geo-fanout/**/tfplan
 packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.plan.json
 packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.graph.dot
 
+# Production geo fanout generated apply/export artifacts (not source-controlled).
+packages/backend/terraform/production-geo-fanout/stacks/**/.terraform/
+packages/backend/terraform/production-geo-fanout/stacks/**/.terraform.lock.hcl
+packages/backend/terraform/production-geo-fanout/**/.build/
+packages/backend/terraform/production-geo-fanout/**/tfplan
+packages/excalidraw/test-fixtures/production-geo-fanout/bundles/*.plan.json
+packages/excalidraw/test-fixtures/production-geo-fanout/bundles/*.graph.dot
+
 # Cloudflare Wrangler (local dev state, caches; not source-controlled)
 .wrangler/
 

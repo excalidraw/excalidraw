@@ -274,6 +274,94 @@
       "tfdPaths": ["pipeline.tfd"]
     },
     {
+      "id": "production-geo-fanout",
+      "name": "Production geo fanout",
+      "description": "Production AWS geo fanout: KMS SQS consumer fans out to 6 private APIs across two accounts and four regional VPCs.",
+      "builtin": true,
+      "view": "pipeline",
+      "rootPath": "packages/backend/terraform/production-geo-fanout",
+      "stacks": [
+        {
+          "id": "00-a-network-east",
+          "label": "00-a-network-east",
+          "planPath": "localstack/stacks/00-a-network-east/plan.json",
+          "dotPath": "localstack/stacks/00-a-network-east/graph.dot",
+          "statePath": "stacks/00-a-network-east/terraform.tfstate"
+        },
+        {
+          "id": "01-a-network-west",
+          "label": "01-a-network-west",
+          "planPath": "localstack/stacks/01-a-network-west/plan.json",
+          "dotPath": "localstack/stacks/01-a-network-west/graph.dot",
+          "statePath": "stacks/01-a-network-west/terraform.tfstate"
+        },
+        {
+          "id": "02-b-network-eu-west",
+          "label": "02-b-network-eu-west",
+          "planPath": "localstack/stacks/02-b-network-eu-west/plan.json",
+          "dotPath": "localstack/stacks/02-b-network-eu-west/graph.dot",
+          "statePath": "stacks/02-b-network-eu-west/terraform.tfstate"
+        },
+        {
+          "id": "03-b-network-eu-central",
+          "label": "03-b-network-eu-central",
+          "planPath": "localstack/stacks/03-b-network-eu-central/plan.json",
+          "dotPath": "localstack/stacks/03-b-network-eu-central/graph.dot",
+          "statePath": "stacks/03-b-network-eu-central/terraform.tfstate"
+        },
+        {
+          "id": "10-a-api-1",
+          "label": "10-a-api-1",
+          "planPath": "localstack/stacks/10-a-api-1/plan.json",
+          "dotPath": "localstack/stacks/10-a-api-1/graph.dot",
+          "statePath": "stacks/10-a-api-1/terraform.tfstate"
+        },
+        {
+          "id": "11-a-api-2",
+          "label": "11-a-api-2",
+          "planPath": "localstack/stacks/11-a-api-2/plan.json",
+          "dotPath": "localstack/stacks/11-a-api-2/graph.dot",
+          "statePath": "stacks/11-a-api-2/terraform.tfstate"
+        },
+        {
+          "id": "12-a-api-3",
+          "label": "12-a-api-3",
+          "planPath": "localstack/stacks/12-a-api-3/plan.json",
+          "dotPath": "localstack/stacks/12-a-api-3/graph.dot",
+          "statePath": "stacks/12-a-api-3/terraform.tfstate"
+        },
+        {
+          "id": "20-b-api-4",
+          "label": "20-b-api-4",
+          "planPath": "localstack/stacks/20-b-api-4/plan.json",
+          "dotPath": "localstack/stacks/20-b-api-4/graph.dot",
+          "statePath": "stacks/20-b-api-4/terraform.tfstate"
+        },
+        {
+          "id": "21-b-api-5",
+          "label": "21-b-api-5",
+          "planPath": "localstack/stacks/21-b-api-5/plan.json",
+          "dotPath": "localstack/stacks/21-b-api-5/graph.dot",
+          "statePath": "stacks/21-b-api-5/terraform.tfstate"
+        },
+        {
+          "id": "22-b-api-6",
+          "label": "22-b-api-6",
+          "planPath": "localstack/stacks/22-b-api-6/plan.json",
+          "dotPath": "localstack/stacks/22-b-api-6/graph.dot",
+          "statePath": "stacks/22-b-api-6/terraform.tfstate"
+        },
+        {
+          "id": "30-a-messaging",
+          "label": "30-a-messaging",
+          "planPath": "localstack/stacks/30-a-messaging/plan.json",
+          "dotPath": "localstack/stacks/30-a-messaging/graph.dot",
+          "statePath": "stacks/30-a-messaging/terraform.tfstate"
+        }
+      ],
+      "tfdPaths": ["localstack/pipeline.tfd", "pipeline.tfd"]
+    },
+    {
       "id": "aws-cloudflare-modules",
       "name": "AWS + Cloudflare modules",
       "description": "Multi-provider: allplanmodules + Cloudflare plan/dot, with allplanmodules.tfd.",

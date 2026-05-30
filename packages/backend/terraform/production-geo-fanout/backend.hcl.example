@@ -1,0 +1,17 @@
+bucket         = "YOUR-TERRAFORM-STATE-BUCKET"
+region         = "us-east-1"
+dynamodb_table = "terraform-state-lock"
+encrypt        = true
+
+# Per-stack keys (pass via -backend-config=key=... when initing each stack):
+#   production-geo-fanout/00-a-network-east/terraform.tfstate
+#   production-geo-fanout/01-a-network-west/terraform.tfstate
+#   production-geo-fanout/02-b-network-eu-west/terraform.tfstate
+#   production-geo-fanout/03-b-network-eu-central/terraform.tfstate
+#   production-geo-fanout/10-a-api-1/terraform.tfstate
+#   production-geo-fanout/11-a-api-2/terraform.tfstate
+#   production-geo-fanout/12-a-api-3/terraform.tfstate
+#   production-geo-fanout/20-b-api-4/terraform.tfstate
+#   production-geo-fanout/21-b-api-5/terraform.tfstate
+#   production-geo-fanout/22-b-api-6/terraform.tfstate
+#   production-geo-fanout/30-a-messaging/terraform.tfstate
