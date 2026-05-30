@@ -80,6 +80,7 @@ module "api3_aurora" {
   vpc_id                     = data.terraform_remote_state.east_network.outputs.vpc_id
   database_subnet_ids        = data.terraform_remote_state.east_network.outputs.database_subnet_ids
   allowed_security_group_ids = []
+  peer_vpc_cidr_blocks       = [data.terraform_remote_state.east_network.outputs.vpc_cidr]
   db_name                    = "api3"
   tags                       = local.tags
 }
@@ -119,6 +120,7 @@ module "api7_aurora" {
   vpc_id                     = data.terraform_remote_state.east_network.outputs.vpc_id
   database_subnet_ids        = data.terraform_remote_state.east_network.outputs.database_subnet_ids
   allowed_security_group_ids = []
+  peer_vpc_cidr_blocks       = [data.terraform_remote_state.east_network.outputs.vpc_cidr]
   db_name                    = "api7"
   tags                       = local.tags
 }

@@ -3,6 +3,11 @@
  * Terraform plan-shaped `nodes` map (no backend pipeline).
  */
 
+import { buildEcsEc2CapacityChainsForService } from "./terraformTopologyEcsLinks";
+import {
+  groupIamStackIntoRoleStacks,
+  nestedIamRoleStacksExtraHeightPx,
+} from "./terraformTopologySatelliteLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   resolveTerraformPlanNodeKey,
@@ -593,6 +598,7 @@ export function buildEcsServiceIamCluster(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   arnIndex: Map<string, string>,
+  plan?: unknown,
 ): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -667,6 +673,66 @@ export function buildEcsServiceIamCluster(
   );
   appendRole(taskDefValues.task_role_arn, "task_role", "task role");
 
+  const ec2Chains = buildEcsEc2CapacityChainsForService(
+    nodes,
+    serviceAddress,
+    arnIndex,
+    plan,
+  );
+  for (const chain of ec2Chains) {
+    if (!chain.instanceProfile) {
+      continue;
+    }
+    const profilePrimary = getPrimaryResource(nodes[chain.instanceProfile]);
+    if (!profilePrimary) {
+      continue;
+    }
+    const profileValues = mergeTerraformPlanResourceValues(profilePrimary);
+    const hostRolePath = resolveLambdaExecutionRolePath(
+      nodes,
+      serviceAddress,
+      profileValues.role,
+      arnIndex,
+    );
+    if (!hostRolePath) {
+      continue;
+    }
+    if (seenRoles.has(hostRolePath)) {
+      continue;
+    }
+    seenRoles.add(hostRolePath);
+    stack.push(hostRolePath);
+    edges.push({
+      source: serviceAddress,
+      target: hostRolePath,
+      type: "ecs_instance_role",
+      label: "instance role",
+    });
+    const policies = collectPoliciesForIamRole(nodes, hostRolePath, arnIndex);
+    const policyDocs = collectDataIamPolicyDocumentsForRole(
+      nodes,
+      hostRolePath,
+    );
+    for (const p of policies) {
+      stack.push(p);
+      edges.push({
+        source: hostRolePath,
+        target: p,
+        type: "iam_policy",
+        label: "policy",
+      });
+    }
+    for (const d of policyDocs) {
+      stack.push(d);
+      edges.push({
+        source: hostRolePath,
+        target: d,
+        type: "iam_policy_document",
+        label: "policy document",
+      });
+    }
+  }
+
   if (stack.length === 0) {
     return { cluster: null, edges: [] };
   }
@@ -679,12 +745,13 @@ export function buildPrimaryIamCluster(
   nodes: TerraformPlanNodesMap,
   primaryAddress: string,
   arnIndex: Map<string, string>,
+  plan?: unknown,
 ): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[primaryAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
   const type = typeof primary?.type === "string" ? primary.type : "";
   if (type === "aws_ecs_service") {
-    return buildEcsServiceIamCluster(nodes, primaryAddress, arnIndex);
+    return buildEcsServiceIamCluster(nodes, primaryAddress, arnIndex, plan);
   }
   return buildLambdaIamCluster(nodes, primaryAddress, arnIndex);
 }
@@ -700,17 +767,21 @@ export function iamSatelliteStackHeightPx(
   tier1SatelliteH: number,
   tier2SatelliteH: number,
   satelliteGap: number,
+  plan?: unknown,
 ): number {
-  const { cluster } = buildPrimaryIamCluster(nodes, address, arnIndex);
+  const { cluster } = buildPrimaryIamCluster(nodes, address, arnIndex, plan);
   if (!cluster || cluster.stack.length === 0) {
     return 0;
   }
+  const roleStacks = groupIamStackIntoRoleStacks(nodes, cluster.stack);
   let h = satelliteGap;
-  for (let i = 0; i < cluster.stack.length; i++) {
-    const tileH = i === 0 ? tier1SatelliteH : tier2SatelliteH;
-    h += tileH + satelliteGap;
+  for (const stack of roleStacks) {
+    for (let i = 0; i < stack.length; i++) {
+      const tileH = i === 0 ? tier1SatelliteH : tier2SatelliteH;
+      h += tileH + satelliteGap;
+    }
   }
-  return h;
+  return h + nestedIamRoleStacksExtraHeightPx(roleStacks.length);
 }
 
 export function buildArnIndexForTopology(

@@ -96,6 +96,7 @@ function buildSatelliteOwnerMap(
 function resolveSpecialCompanionPrimary(
   address: string,
   plan?: unknown,
+  nodes?: TerraformPlanNodesMap,
 ): string | null {
   const changes = getPlanChanges(plan);
   const rc = changes.find((c) => c.address === address);
@@ -116,6 +117,7 @@ function resolveSpecialCompanionPrimary(
     changes as Parameters<
       typeof resolveApiGatewayCompanionParentRestApiAddressFromPlan
     >[1],
+    nodes,
   );
   return parentApi ?? null;
 }
@@ -132,7 +134,7 @@ export function resolvePipelineAtomPrimary(
   if (fromRegistry) {
     return fromRegistry;
   }
-  const special = resolveSpecialCompanionPrimary(address, plan);
+  const special = resolveSpecialCompanionPrimary(address, plan, nodes);
   if (special) {
     return special;
   }

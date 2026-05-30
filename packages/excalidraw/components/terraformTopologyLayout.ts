@@ -92,6 +92,10 @@ import {
   isEcsTopologySatelliteResourceType,
 } from "./terraformTopologyEcsLinks";
 import {
+  isDatastoreCompanionConsumedAsSatellite,
+  isDatastoreTopologySatelliteResourceType,
+} from "./terraformTopologyDatastoreLinks";
+import {
   isApiGatewayCompanionConsumedAsSatellite,
   isApiGatewayTopologySatelliteResourceType,
 } from "./terraformTopologyApiGatewayLinks";
@@ -107,7 +111,9 @@ import {
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 import {
   getPrimaryLayoutConfig,
+  buildSatelliteKindHeightContext,
   primaryCellFootprintForAddress,
+  primaryLeftMarginPx,
   primaryVerticalMarginsForAddress,
 } from "./terraformTopologyPrimaryLayoutConfig";
 import { buildTopologyPrimarySatelliteBundles } from "./terraformTopologyPrimarySatelliteBundles";
@@ -1752,13 +1758,13 @@ function appendVpcEndpointPrimaryClusters(
             TOPOLOGY_TIER2_H,
             nodes,
             {
-              explodeParentKeys: [layoutInst],
-              satelliteTier: 2,
-              elementId: ruleLayoutId,
-              terraformSemanticLayoutDuplicate: ruleIsDup,
-            },
-          );
-          yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
+            explodeParentKeys: [sgLayoutId],
+            satelliteTier: 2,
+            elementId: ruleLayoutId,
+            terraformSemanticLayoutDuplicate: ruleIsDup,
+          },
+        );
+        yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
         }
 
         if (gi < sgBuild.cluster.groups.length - 1) {
@@ -2536,7 +2542,9 @@ function appendTopologyResourceRectangles(
         (isApiGatewayTopologySatelliteResourceType(resourceType) &&
           !isApiGatewayCompanionConsumedAsSatellite(nodes, addr)) ||
         (isEcsTopologySatelliteResourceType(resourceType) &&
-          !isEcsCompanionConsumedAsSatellite(nodes, arnIndex, addr))
+          !isEcsCompanionConsumedAsSatellite(nodes, arnIndex, addr, plan)) ||
+        (isDatastoreTopologySatelliteResourceType(resourceType) &&
+          !isDatastoreCompanionConsumedAsSatellite(nodes, addr))
       );
     })
     .sort();
@@ -2607,11 +2615,21 @@ function appendTopologyResourceRectangles(
       action,
     );
 
-    addClusterMember(addr, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
+    const layoutConfig = getPrimaryLayoutConfig(resourceType);
+    const satHeightCtx = buildSatelliteKindHeightContext(
+      nodes,
+      addr,
+      arnIndex,
+      plan,
+    );
+    const leftPad = primaryLeftMarginPx(layoutConfig, satHeightCtx);
+    const primaryX = rx + leftPad;
+
+    addClusterMember(addr, primaryX, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
     pushResourceRectangleSkeleton(
       skeleton,
       addr,
-      rx,
+      primaryX,
       ry,
       RESOURCE_RECT_W,
       RESOURCE_RECT_H,
@@ -2619,7 +2637,6 @@ function appendTopologyResourceRectangles(
       { initiallyVisible, explodeParentKeys: [] },
     );
 
-    const layoutConfig = getPrimaryLayoutConfig(resourceType);
     const bundles = buildTopologyPrimarySatelliteBundles(
       nodes,
       addr,
@@ -2634,13 +2651,14 @@ function appendTopologyResourceRectangles(
       plan,
       primaryAddr: addr,
       rx,
+      primaryX,
       ry,
       config: layoutConfig,
       bundles,
       globalPlaced: {
-        iam: globalPlacedIamSatellites,
+        iam: new Set<string>(),
         kmsPolicy: globalPlacedKmsPolicySatellites,
-        sg: globalPlacedSgSatellites,
+        sg: new Set<string>(),
         cloudWatch: globalPlacedCloudWatchSatellites,
         s3: globalPlacedS3Satellites,
         sqs: globalPlacedSqsSatellites,
@@ -2649,12 +2667,14 @@ function appendTopologyResourceRectangles(
         apiGateway: globalPlacedApiGatewaySatellites,
         tgw: globalPlacedTgwSatellites,
         lambdaPermission: globalPlacedLambdaPermissionSatellites,
+        datastore: new Set<string>(),
       },
       satelliteLineSpecs,
       dataflowStroke: TOPOLOGY_DATAFLOW_STROKE,
       pushRect: (sk, a, x, y, w, h, n, opts) =>
         pushResourceRectangleSkeleton(sk, a, x, y, w, h, n, opts),
       addClusterMember,
+      placement,
     });
 
     const pad = layoutConfig.padding.primaryClusterFrame;

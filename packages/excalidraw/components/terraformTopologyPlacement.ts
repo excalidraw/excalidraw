@@ -37,7 +37,12 @@ import {
 } from "./terraformTopologyTransitGatewayLinks";
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
+import {
+  isEcsTopologySatelliteResourceType,
+  resolveEcsCompanionParentServiceAddressFromPlan,
+} from "./terraformTopologyEcsLinks";
 import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
+import { resolveDbSubnetGroupSubnetIds } from "./terraformTopologyDatastoreLinks";
 
 /** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
 export type TopologyZoneSource = "primary" | "supplementary";
@@ -799,8 +804,10 @@ export function extractPrimaryTopologyZones(
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
   const apiModulePrefixes: Array<{ prefix: string; key: string }> = [];
+  const ecsModulePrefixes: Array<{ prefix: string; key: string }> = [];
   const lbAddressToZoneKey = new Map<string, string>();
   const restApiAddressToZoneKey = new Map<string, string>();
+  const ecsServiceAddressToZoneKey = new Map<string, string>();
 
   const accum = new Map<
     string,
@@ -839,6 +846,12 @@ export function extractPrimaryTopologyZones(
         values,
         subnetToVpc,
       );
+    }
+    if (
+      (t === "aws_rds_cluster" || t === "aws_db_instance") &&
+      subnetIds.length === 0
+    ) {
+      subnetIds = resolveDbSubnetGroupSubnetIds(plan, address, values);
     }
     const merged = mergeWithDefaultAwsProviderAccountRegion(
       plan,
@@ -903,7 +916,18 @@ export function extractPrimaryTopologyZones(
     if (t === "aws_api_gateway_rest_api") {
       restApiAddressToZoneKey.set(address, key);
       apiModulePrefixes.push({
-        prefix: terraformModulePrefixForAddress(address),
+        prefix: terraformModulePrefixForAddress(
+          stripStackPrefixForModuleParsing(address),
+        ),
+        key,
+      });
+    }
+    if (t === "aws_ecs_service") {
+      ecsServiceAddressToZoneKey.set(address, key);
+      ecsModulePrefixes.push({
+        prefix: terraformModulePrefixForAddress(
+          stripStackPrefixForModuleParsing(address),
+        ),
         key,
       });
     }
@@ -935,7 +959,9 @@ export function extractPrimaryTopologyZones(
       }
       continue;
     }
-    const prefix = terraformModulePrefixForAddress(address);
+    const prefix = terraformModulePrefixForAddress(
+      stripStackPrefixForModuleParsing(address),
+    );
     const owner = apiModulePrefixes.find((x) => x.prefix === prefix);
     if (owner) {
       accum.get(owner.key)?.addresses.add(address);
@@ -971,6 +997,41 @@ export function extractPrimaryTopologyZones(
       continue;
     }
     accum.get(owner.key)?.addresses.add(address);
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (
+      rc.mode !== "managed" ||
+      !rc.type ||
+      !isEcsTopologySatelliteResourceType(rc.type)
+    ) {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const parentService = resolveEcsCompanionParentServiceAddressFromPlan(
+      rc,
+      changes,
+    );
+    if (parentService) {
+      const zoneKey = ecsServiceAddressToZoneKey.get(parentService);
+      if (zoneKey) {
+        accum.get(zoneKey)?.addresses.add(address);
+      }
+      continue;
+    }
+    const prefix = terraformModulePrefixForAddress(
+      stripStackPrefixForModuleParsing(address),
+    );
+    const owner = ecsModulePrefixes.find((x) => x.prefix === prefix);
+    if (owner) {
+      accum.get(owner.key)?.addresses.add(address);
+    }
   }
 
   const addressToZoneRow = new Map<

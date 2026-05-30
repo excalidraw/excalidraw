@@ -9,6 +9,9 @@ import awsApiGatewayLayoutJson from "../assets/terraform-topology-primary-layout
 import awsS3BucketLayoutJson from "../assets/terraform-topology-primary-layouts/aws_s3_bucket.json";
 import awsTgwLayoutJson from "../assets/terraform-topology-primary-layouts/aws_ec2_transit_gateway.json";
 import awsLbLayoutJson from "../assets/terraform-topology-primary-layouts/aws_lb.json";
+import awsRdsClusterLayoutJson from "../assets/terraform-topology-primary-layouts/aws_rds_cluster.json";
+import awsDbInstanceLayoutJson from "../assets/terraform-topology-primary-layouts/aws_db_instance.json";
+import awsDynamodbTableLayoutJson from "../assets/terraform-topology-primary-layouts/aws_dynamodb_table.json";
 
 import {
   validateTopologyPrimaryLayoutJson,
@@ -23,6 +26,9 @@ const RAW_LAYOUTS: TopologyPrimaryLayoutJson[] = [
   validateTopologyPrimaryLayoutJson(awsS3BucketLayoutJson),
   validateTopologyPrimaryLayoutJson(awsTgwLayoutJson),
   validateTopologyPrimaryLayoutJson(awsLbLayoutJson),
+  validateTopologyPrimaryLayoutJson(awsRdsClusterLayoutJson),
+  validateTopologyPrimaryLayoutJson(awsDbInstanceLayoutJson),
+  validateTopologyPrimaryLayoutJson(awsDynamodbTableLayoutJson),
 ];
 
 const LAYOUT_BY_PRIMARY_TYPE = new Map<string, TopologyPrimaryLayoutJson>();

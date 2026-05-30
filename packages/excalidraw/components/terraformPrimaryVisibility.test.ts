@@ -120,6 +120,11 @@ describe("terraformPrimaryVisibility", () => {
         true,
       );
     });
+    it("excludes API Gateway VPC link (left satellite under REST API)", () => {
+      expect(isTopologyPlacementResourceType("aws_api_gateway_vpc_link")).toBe(
+        false,
+      );
+    });
   });
 
   describe("isInitiallyVisibleTerraformResource", () => {

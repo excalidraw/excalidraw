@@ -1,6 +1,6 @@
 {
   "primaryType": "aws_ecs_service",
-  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "iam", "ecs_companions", "security_groups"],
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "iam", "ecs_cluster_companions", "ecs_companions", "ecs_ec2_capacity_companions", "security_groups"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },
@@ -38,7 +38,7 @@
       "id": "bottom_companions_start",
       "anchor": "bottom",
       "align": "start",
-      "kinds": ["iam", "ecs_companions"],
+      "kinds": ["iam", "ecs_cluster_companions", "ecs_companions", "ecs_ec2_capacity_companions"],
       "layout": "stack"
     },
     {

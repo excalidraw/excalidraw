@@ -4,6 +4,7 @@ import {
   apiGatewayCompanionSatellitePaths,
   buildApiGatewayCompanionCluster,
   isPrivateVpcEndpointBoundRestApi,
+  resolveApiGatewayCompanionParentRestApiAddressFromPlan,
   resolveVpcPlacementFromPrivateRestApi,
 } from "./terraformTopologyApiGatewayLinks";
 import {
@@ -200,6 +201,22 @@ describe("terraformTopologyApiGatewayLinks", () => {
           },
         },
       },
+      {
+        address: "module.api.aws_api_gateway_vpc_link.this",
+        mode: "managed",
+        type: "aws_api_gateway_vpc_link",
+        provider_name: "registry.terraform.io/hashicorp/aws",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "vpclink-abc",
+            target_arns: [
+              "arn:aws:elasticloadbalancing:us-east-1:111111111111:loadbalancer/net/internal/abc",
+            ],
+            region: "us-east-1",
+          },
+        },
+      },
     ],
   };
 
@@ -276,6 +293,9 @@ describe("terraformTopologyApiGatewayLinks", () => {
     expect(apiZone!.addresses).toContain(
       "module.api.aws_api_gateway_stage.stage",
     );
+    expect(apiZone!.addresses).toContain(
+      "module.api.aws_api_gateway_vpc_link.this",
+    );
   });
 
   it("buildApiGatewayCompanionCluster nests deployment and logs under stage", () => {
@@ -300,7 +320,11 @@ describe("terraformTopologyApiGatewayLinks", () => {
     expect(cluster?.methodSettings).toEqual([
       "module.api.aws_api_gateway_method_settings.all",
     ]);
+    expect(cluster?.vpcLinks).toEqual([
+      "module.api.aws_api_gateway_vpc_link.this",
+    ]);
     expect(apiGatewayCompanionSatellitePaths(cluster!)).toEqual([
+      "module.api.aws_api_gateway_vpc_link.this",
       "module.api.aws_api_gateway_stage.stage",
       "module.api.aws_api_gateway_deployment.this",
       "module.api.aws_cloudwatch_log_group.api_access",
@@ -308,5 +332,27 @@ describe("terraformTopologyApiGatewayLinks", () => {
     ]);
     expect(edges.some((e) => e.type === "api_gateway_deployment")).toBe(true);
     expect(edges.some((e) => e.type === "api_gateway_access_log")).toBe(true);
+    expect(edges.some((e) => e.type === "api_gateway_vpc_link")).toBe(true);
+  });
+
+  it("resolves vpc link parent REST API from module scope", () => {
+    const vpcRc = plan.resource_changes.find(
+      (rc) => rc.address === "module.api.aws_api_gateway_vpc_link.this",
+    )!;
+    const nodes: TerraformPlanNodesMap = {};
+    for (const rc of plan.resource_changes) {
+      if (rc.address) {
+        nodes[rc.address] = {
+          resources: { [rc.address]: rc },
+        } as TerraformPlanNodesMap[string];
+      }
+    }
+    expect(
+      resolveApiGatewayCompanionParentRestApiAddressFromPlan(
+        vpcRc,
+        plan.resource_changes,
+        nodes,
+      ),
+    ).toBe("module.api.aws_api_gateway_rest_api.private");
   });
 });

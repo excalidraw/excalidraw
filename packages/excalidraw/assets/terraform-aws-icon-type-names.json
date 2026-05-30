@@ -10,6 +10,7 @@
   "aws_api_gateway_authorizer": "API Gateway",
   "aws_api_gateway_deployment": "API Gateway",
   "aws_api_gateway_integration": "API Gateway",
+  "aws_api_gateway_vpc_link": "API Gateway",
   "aws_api_gateway_method": "API Gateway",
   "aws_api_gateway_resource": "API Gateway",
   "aws_api_gateway_rest_api": "API Gateway",

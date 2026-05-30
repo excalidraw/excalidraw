@@ -136,6 +136,12 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
   if (resourceType === "aws_ecs_task_definition") {
     return false;
   }
+  if (
+    resourceType === "aws_ecs_capacity_provider" ||
+    resourceType === "aws_ecs_cluster_capacity_providers"
+  ) {
+    return false;
+  }
   /**
    * Drawn only as satellites under compute primaries (Lambda / ECS IAM stacks).
    * See `terraformTopologyIamLinks`.
@@ -154,6 +160,10 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
     resourceType === "aws_lb_target_group" ||
     resourceType === "aws_lb_target_group_attachment"
   ) {
+    return false;
+  }
+  /** Drawn to the left of `aws_api_gateway_rest_api` (see `terraformTopologyApiGatewayLinks`). */
+  if (resourceType === "aws_api_gateway_vpc_link") {
     return false;
   }
   /** Drawn only as satellites under `aws_ec2_transit_gateway`. */
@@ -187,6 +197,14 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
     resourceType === "aws_sqs_queue_redrive_policy" ||
     resourceType === "aws_sqs_queue_redrive_allow_policy"
   ) {
+    return false;
+  }
+  /** Drawn only as satellites under `aws_rds_cluster` (see `terraformTopologyDatastoreLinks`). */
+  if (resourceType === "aws_rds_cluster_instance") {
+    return false;
+  }
+  /** Drawn only as satellites under RDS/Aurora primaries. */
+  if (resourceType === "aws_db_subnet_group") {
     return false;
   }
   return true;

@@ -40,8 +40,20 @@
       "attachment": { "mode": "plugin", "plugin": "ecs_companions" }
     },
     {
+      "kind": "ecs_cluster_companions",
+      "attachment": { "mode": "plugin", "plugin": "ecs_cluster_companions" }
+    },
+    {
+      "kind": "ecs_ec2_capacity_companions",
+      "attachment": { "mode": "plugin", "plugin": "ecs_ec2_capacity_companions" }
+    },
+    {
       "kind": "api_gateway_companions",
       "attachment": { "mode": "plugin", "plugin": "api_gateway_companions" }
+    },
+    {
+      "kind": "api_gateway_vpc_links",
+      "attachment": { "mode": "plugin", "plugin": "api_gateway_vpc_links" }
     },
     {
       "kind": "tgw_companions",
@@ -62,6 +74,14 @@
     {
       "kind": "sqs_companions",
       "attachment": { "mode": "plugin", "plugin": "sqs_companions" }
+    },
+    {
+      "kind": "aurora_companions",
+      "attachment": { "mode": "plugin", "plugin": "aurora_companions" }
+    },
+    {
+      "kind": "rds_companions",
+      "attachment": { "mode": "plugin", "plugin": "rds_companions" }
     }
   ]
 }

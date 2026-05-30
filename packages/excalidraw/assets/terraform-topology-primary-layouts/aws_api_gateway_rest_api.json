@@ -1,6 +1,6 @@
 {
   "primaryType": "aws_api_gateway_rest_api",
-  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "api_gateway_companions", "security_groups"],
+  "attachments": ["cloudwatch_alarms", "cloudwatch_log_groups", "api_gateway_vpc_links", "api_gateway_companions", "security_groups"],
   "tierBase": {
     "tier0": { "w": 200, "h": 88 },
     "tier1": { "w": 176, "h": 52 },
@@ -33,6 +33,13 @@
       "kinds": ["cloudwatch_log_groups"],
       "layout": "stack",
       "excludeRef": "ecs_owned_log_groups"
+    },
+    {
+      "id": "left_vpc_link",
+      "anchor": "left",
+      "align": "center",
+      "kinds": ["api_gateway_vpc_links"],
+      "layout": "stack"
     },
     {
       "id": "bottom_api",

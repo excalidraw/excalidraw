@@ -412,6 +412,19 @@ Import **Staging multi-state** in the app (semantic view) to render the full top
 
 ## Operations
 
+### Teardown (zero ongoing cost)
+
+To remove all billable AWS resources while keeping Terraform code and local state for redeploy:
+
+```bash
+cd packages/backend/terraform/staging-multi-state
+TF_VAR_aws_account_id=<account-id> AWS_PROFILE=admin ./scripts/destroy-all-stacks.sh
+```
+
+The script destroys in four **parallel waves** (apps → datastores → west network → east network). EC2-backed API stacks (42, 46, 51) may need a second run if ECS drain times out; scale ASGs to zero and `aws ecs delete-service --force` if needed.
+
+After destroy, ongoing cost is **$0** (empty tfstate files remain gitignored locally).
+
 ### Apply and export all stacks
 
 ```bash

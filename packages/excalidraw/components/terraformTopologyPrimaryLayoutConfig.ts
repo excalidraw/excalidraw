@@ -15,6 +15,7 @@ import {
   type TopologySatelliteKind,
 } from "./terraformTopologyPrimaryLayoutTypes";
 import { buildSatelliteClusterForKind } from "./terraformTopologySatelliteEngine";
+import { apiGatewayVpcLinkLeftSpanPx } from "./terraformTopologyApiGatewayLinks";
 import {
   buildSatelliteContext,
   satelliteStackHeightPxForKind,
@@ -105,6 +106,24 @@ export function kindsForColumn(
     if (slot.anchor === anchor && slot.align === align) {
       kinds.push(...slot.kinds);
     }
+  }
+  return kinds;
+}
+
+export function kindsForSideAnchor(
+  config: ResolvedPrimaryLayoutConfig,
+  anchor: "left" | "right",
+  align?: "start" | "center" | "end",
+): TopologySatelliteKind[] {
+  const kinds: TopologySatelliteKind[] = [];
+  for (const slot of config.slots) {
+    if (slot.anchor !== anchor) {
+      continue;
+    }
+    if (align != null && slot.align !== align) {
+      continue;
+    }
+    kinds.push(...slot.kinds);
   }
   return kinds;
 }
@@ -216,6 +235,33 @@ export function primaryBottomHasEndContent(
   );
 }
 
+/** Horizontal space reserved left of tier-0 (e.g. API Gateway VPC link). */
+export function primaryLeftMarginPx(
+  config: ResolvedPrimaryLayoutConfig,
+  ctx: SatelliteKindHeightContext,
+): number {
+  if (ctx.primaryType !== "aws_api_gateway_rest_api") {
+    return 0;
+  }
+  if (!config.enabledKinds.has("api_gateway_vpc_links")) {
+    return 0;
+  }
+  return apiGatewayVpcLinkLeftSpanPx(
+    ctx.nodes,
+    ctx.address,
+    config.tiers.tier1W,
+    config.gaps.satellite,
+    ctx.plan,
+  );
+}
+
+export function primaryHasLeftSideContent(
+  config: ResolvedPrimaryLayoutConfig,
+  ctx: SatelliteKindHeightContext,
+): boolean {
+  return primaryLeftMarginPx(config, ctx) > 0;
+}
+
 /** Minimum horizontal span for one primary cell so satellites are not clipped. */
 export function topologyPrimaryCellFootprintPx(
   config: ResolvedPrimaryLayoutConfig,
@@ -224,9 +270,10 @@ export function topologyPrimaryCellFootprintPx(
   const { tiers, gaps, padding } = config;
   const hasLeft = primaryBottomHasStartContent(config, ctx);
   const hasRight = primaryBottomHasEndContent(config, ctx);
-  let w = tiers.tier0W;
+  const leftSide = primaryLeftMarginPx(config, ctx);
+  let w = tiers.tier0W + leftSide;
   if (hasLeft && hasRight) {
-    w = Math.max(w, tiers.tier1W * 2 + gaps.iamSgColumn);
+    w = Math.max(w, leftSide + tiers.tier1W * 2 + gaps.iamSgColumn);
   }
 
   const satCtx = buildSatelliteContext(

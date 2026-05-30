@@ -112,6 +112,7 @@ module "api11_aurora" {
   vpc_id                     = data.terraform_remote_state.west_network.outputs.vpc_id
   database_subnet_ids        = data.terraform_remote_state.west_network.outputs.database_subnet_ids
   allowed_security_group_ids = []
+  peer_vpc_cidr_blocks       = [data.terraform_remote_state.west_network.outputs.vpc_cidr]
   db_name                    = "api11"
   tags                       = local.tags
 }

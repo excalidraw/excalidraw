@@ -29,6 +29,8 @@ Or apply stacks individually in dependency order (see script).
 
 Each stack exports `plan.json`, `graph.dot`, and keeps `terraform.tfstate` after apply.
 
+**Teardown (zero cost):** `./scripts/destroy-all-stacks.sh` — parallel destroy in reverse dependency order. See [ARCHITECTURE.md](./ARCHITECTURE.md#teardown-zero-ongoing-cost).
+
 Pipeline dataflow: `pipeline.tfd` (imported via terraform import presets).
 
 All states default to AWS profile `admin` and support optional assume-role via `terraform_deploy_role_arn`.

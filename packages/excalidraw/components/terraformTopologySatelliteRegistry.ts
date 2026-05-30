@@ -9,7 +9,11 @@ import {
   cloudWatchSatelliteStackHeightPx,
 } from "./terraformTopologyCloudWatchLinks";
 import {
+  buildEcsClusterCompanionCluster,
+  buildEcsEc2CapacityCompanionCluster,
   buildEcsServiceCompanionCluster,
+  ecsClusterSatelliteStackHeightPx,
+  ecsEc2SatelliteStackHeightPx,
   ecsSatelliteStackHeightPx,
 } from "./terraformTopologyEcsLinks";
 import {
@@ -17,8 +21,11 @@ import {
   iamSatelliteStackHeightPx,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
-import { buildApiGatewayCompanionCluster } from "./terraformTopologyApiGatewayLinks";
-import { apiGatewaySatelliteStackHeightPx } from "./terraformTopologyApiGatewayLinks";
+import {
+  apiGatewaySatelliteStackHeightPx,
+  buildApiGatewayCompanionCluster,
+  buildApiGatewayVpcLinkCluster,
+} from "./terraformTopologyApiGatewayLinks";
 import { buildTransitGatewayCompanionCluster } from "./terraformTopologyTransitGatewayLinks";
 import { transitGatewaySatelliteStackHeightPx } from "./terraformTopologyTransitGatewayLinks";
 import { sgSatelliteStackHeightPx } from "./terraformTopologySgLinks";
@@ -31,6 +38,12 @@ import {
   buildSqsCompanionCluster,
   sqsSatelliteStackHeightPx,
 } from "./terraformTopologySqsLinks";
+import {
+  auroraSatelliteStackHeightPx,
+  buildAuroraCompanionCluster,
+  buildRdsCompanionCluster,
+  rdsSatelliteStackHeightPx,
+} from "./terraformTopologyDatastoreLinks";
 
 import { buildLambdaPermissionCluster } from "./terraformTopologyLambdaPermissionLinks";
 import { getTerraformCardResourceType } from "./terraformResourceCardLabel";
@@ -62,10 +75,15 @@ export function assertAllCatalogPluginsRegistered(): void {
     "security_groups",
     "alb_companions",
     "ecs_companions",
+    "ecs_cluster_companions",
+    "ecs_ec2_capacity_companions",
     "api_gateway_companions",
+    "api_gateway_vpc_links",
     "tgw_companions",
     "s3_companions",
     "sqs_companions",
+    "aurora_companions",
+    "rds_companions",
   ]);
   for (const id of getAllCatalogPluginIds()) {
     if (!registered.has(id)) {
@@ -138,10 +156,15 @@ export type TopologyPrimarySatelliteBundles = {
   s3: ReturnType<typeof buildS3CompanionCluster>;
   alb: ReturnType<typeof buildAlbListenerTargetCluster>;
   ecs: ReturnType<typeof buildEcsServiceCompanionCluster>;
+  ecsCluster: ReturnType<typeof buildEcsClusterCompanionCluster>;
+  ecsEc2: ReturnType<typeof buildEcsEc2CapacityCompanionCluster>;
   api: ReturnType<typeof buildApiGatewayCompanionCluster>;
+  apiVpc: ReturnType<typeof buildApiGatewayVpcLinkCluster>;
   tgw: ReturnType<typeof buildTransitGatewayCompanionCluster>;
   lambdaPermission: ReturnType<typeof buildLambdaPermissionCluster>;
   sqs: ReturnType<typeof buildSqsCompanionCluster>;
+  aurora: ReturnType<typeof buildAuroraCompanionCluster>;
+  rds: ReturnType<typeof buildRdsCompanionCluster>;
   cloudWatch: ReturnType<typeof buildResourceCloudWatchCluster>;
 };
 
@@ -179,8 +202,17 @@ export function buildTopologyPrimarySatelliteBundles(
     ecs: enabled.has("ecs_companions")
       ? buildEcsServiceCompanionCluster(nodes, address, arnIndex)
       : empty,
+    ecsCluster: enabled.has("ecs_cluster_companions")
+      ? buildEcsClusterCompanionCluster(nodes, address, plan)
+      : empty,
+    ecsEc2: enabled.has("ecs_ec2_capacity_companions")
+      ? buildEcsEc2CapacityCompanionCluster(nodes, address, arnIndex, plan)
+      : empty,
     api: enabled.has("api_gateway_companions")
-      ? buildApiGatewayCompanionCluster(nodes, address)
+      ? buildApiGatewayCompanionCluster(nodes, address, plan)
+      : empty,
+    apiVpc: enabled.has("api_gateway_vpc_links")
+      ? buildApiGatewayVpcLinkCluster(nodes, address, plan)
       : empty,
     tgw:
       enabled.has("tgw_companions") && primaryType === "aws_ec2_transit_gateway"
@@ -191,6 +223,12 @@ export function buildTopologyPrimarySatelliteBundles(
       : empty,
     sqs: enabled.has("sqs_companions")
       ? buildSqsCompanionCluster(nodes, address, arnIndex)
+      : empty,
+    aurora: enabled.has("aurora_companions")
+      ? buildAuroraCompanionCluster(nodes, address)
+      : empty,
+    rds: enabled.has("rds_companions")
+      ? buildRdsCompanionCluster(nodes, address)
       : empty,
     cloudWatch:
       enabled.has("cloudwatch_alarms") || enabled.has("cloudwatch_log_groups")
@@ -230,6 +268,7 @@ export function satelliteStackHeightPxForKind(
         tier1H,
         tier2H,
         gap,
+        ctx.plan,
       );
     case "kms_policies": {
       installSatellitePlugins();
@@ -283,6 +322,29 @@ export function satelliteStackHeightPxForKind(
             gap,
           )
         : 0;
+    case "ecs_cluster_companions":
+      return primaryType === "aws_ecs_service"
+        ? ecsClusterSatelliteStackHeightPx(
+            nodes,
+            primaryAddress,
+            tier1H,
+            tier2H,
+            gap,
+            ctx.plan,
+          )
+        : 0;
+    case "ecs_ec2_capacity_companions":
+      return primaryType === "aws_ecs_service"
+        ? ecsEc2SatelliteStackHeightPx(
+            nodes,
+            primaryAddress,
+            arnIndex,
+            tier1H,
+            tier2H,
+            gap,
+            ctx.plan,
+          )
+        : 0;
     case "api_gateway_companions":
       return primaryType === "aws_api_gateway_rest_api"
         ? apiGatewaySatelliteStackHeightPx(
@@ -293,6 +355,9 @@ export function satelliteStackHeightPxForKind(
             gap,
           )
         : 0;
+    case "api_gateway_vpc_links":
+      /** Left column; width handled by {@link primaryLeftMarginPx}. */
+      return 0;
     case "tgw_companions":
       return primaryType === "aws_ec2_transit_gateway"
         ? transitGatewaySatelliteStackHeightPx(
@@ -332,6 +397,26 @@ export function satelliteStackHeightPxForKind(
         tier2H,
         gap,
       );
+    case "aurora_companions":
+      return primaryType === "aws_rds_cluster"
+        ? auroraSatelliteStackHeightPx(
+            nodes,
+            primaryAddress,
+            tier1H,
+            tier2H,
+            gap,
+          )
+        : 0;
+    case "rds_companions":
+      return primaryType === "aws_db_instance"
+        ? rdsSatelliteStackHeightPx(
+            nodes,
+            primaryAddress,
+            tier1H,
+            tier2H,
+            gap,
+          )
+        : 0;
     default:
       return 0;
   }

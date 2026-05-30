@@ -11,6 +11,7 @@ import {
 } from "./terraformPlanParsing";
 import {
   mergeTerraformPlanResourceValues,
+  terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import {
@@ -18,6 +19,10 @@ import {
   type TerraformPlanProviderContext,
 } from "./terraformTopologyExtract";
 import { topologyBareAddressKey } from "./terraformTopologyAddress";
+import {
+  parseStackAddress,
+  stripStackPrefixForModuleParsing,
+} from "./terraformStackAddress";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -88,7 +93,27 @@ export const API_GATEWAY_TOPOLOGY_SATELLITE_TYPES = new Set([
   "aws_api_gateway_deployment",
   "aws_api_gateway_stage",
   "aws_api_gateway_method_settings",
+  "aws_api_gateway_vpc_link",
 ]);
+
+export type TopologyModuleScope = {
+  stackId: string | null;
+  modulePrefix: string;
+};
+
+export function topologyModuleScopeForAddress(
+  address: string,
+): TopologyModuleScope {
+  const bare = stripStackPrefixForModuleParsing(address);
+  return {
+    stackId: parseStackAddress(address)?.stackId ?? null,
+    modulePrefix: terraformModulePrefixForAddress(bare),
+  };
+}
+
+function moduleScopesMatch(a: TopologyModuleScope, b: TopologyModuleScope): boolean {
+  return a.stackId === b.stackId && a.modulePrefix === b.modulePrefix;
+}
 
 export function isApiGatewayTopologySatelliteResourceType(
   resourceType: string,
@@ -257,17 +282,178 @@ function findRestApiAddressForPlanRef(
   return null;
 }
 
+function isVpcLinkConnectionType(value: unknown): boolean {
+  const strings: string[] = [];
+  flattenStringish(value, strings);
+  return strings.some((s) => s.toUpperCase().includes("VPC_LINK"));
+}
+
+function resolveVpcLinkIdToVpcLinkPath(
+  nodes: TerraformPlanNodesMap,
+  linkRef: unknown,
+): string | null {
+  const strings: string[] = [];
+  flattenStringish(linkRef, strings);
+  const graphNodes = nodes as Record<string, TerraformPlanGraphNode>;
+
+  for (const text of strings) {
+    const s = text.trim();
+    if (!s) {
+      continue;
+    }
+    for (const candidate of [s, stripIndexes(s)]) {
+      const key = resolveTerraformPlanNodeKey(graphNodes, candidate);
+      if (key && isAwsVpcLinkNode(nodes, key)) {
+        return key;
+      }
+    }
+  }
+
+  for (const [path, node] of Object.entries(nodes)) {
+    if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
+      continue;
+    }
+    if (!isAwsVpcLinkNode(nodes, path)) {
+      continue;
+    }
+    const v = mergeTerraformPlanResourceValues(
+      getPrimaryResource(node as TerraformPlanGraphNode),
+    );
+    const id = typeof v.id === "string" ? v.id : "";
+    if (id && strings.some((x) => x === id)) {
+      return path;
+    }
+  }
+
+  return null;
+}
+
+function isAwsVpcLinkNode(nodes: TerraformPlanNodesMap, path: string): boolean {
+  const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
+  return primary?.type === "aws_api_gateway_vpc_link";
+}
+
+export function resolveVpcLinksForRestApi(
+  nodes: TerraformPlanNodesMap,
+  restApiAddress: string,
+  changes?: readonly PlanRc[],
+): string[] {
+  const apiScope = topologyModuleScopeForAddress(restApiAddress);
+  const vpcLinks: string[] = [];
+
+  for (const path of Object.keys(nodes)) {
+    if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
+      continue;
+    }
+    if (!isAwsVpcLinkNode(nodes, path)) {
+      continue;
+    }
+    if (!moduleScopesMatch(topologyModuleScopeForAddress(path), apiScope)) {
+      continue;
+    }
+    vpcLinks.push(path);
+  }
+
+  if (vpcLinks.length > 0) {
+    return vpcLinks.sort((a, b) => a.localeCompare(b));
+  }
+
+  if (!changes?.length) {
+    return vpcLinks;
+  }
+
+  const linked = new Set<string>();
+  for (const rc of changes) {
+    if (rc.type !== "aws_api_gateway_integration" || !rc.address) {
+      continue;
+    }
+    const pv = pickResourceValuesForTopologyPlacement(rc);
+    if (!pv || !isVpcLinkConnectionType(pv.connection_type)) {
+      continue;
+    }
+    const parent = findRestApiAddressForPlanRef(
+      String(pv.rest_api_id ?? ""),
+      changes,
+    );
+    if (parent !== restApiAddress) {
+      continue;
+    }
+    const linkPath = resolveVpcLinkIdToVpcLinkPath(nodes, pv.connection_id);
+    if (linkPath) {
+      linked.add(linkPath);
+    }
+  }
+
+  return [...linked].sort((a, b) => a.localeCompare(b));
+}
+
+/** Resolve parent REST API for a vpc link (module scope, then integration refs). */
+export function resolveVpcLinkParentRestApiAddressFromPlan(
+  vpcLinkRc: PlanRc,
+  changes: readonly PlanRc[],
+  nodes?: TerraformPlanNodesMap,
+): string | null {
+  if (vpcLinkRc.type !== "aws_api_gateway_vpc_link" || !vpcLinkRc.address) {
+    return null;
+  }
+  const linkScope = topologyModuleScopeForAddress(vpcLinkRc.address);
+  const candidates: string[] = [];
+  for (const rc of changes) {
+    if (rc.type !== "aws_api_gateway_rest_api" || !rc.address) {
+      continue;
+    }
+    if (moduleScopesMatch(topologyModuleScopeForAddress(rc.address), linkScope)) {
+      candidates.push(rc.address);
+    }
+  }
+  if (candidates.length === 1) {
+    return candidates[0]!;
+  }
+
+  if (nodes) {
+    for (const rc of changes) {
+      if (rc.type !== "aws_api_gateway_integration" || !rc.address) {
+        continue;
+      }
+      const pv = pickResourceValuesForTopologyPlacement(rc);
+      if (!pv || !isVpcLinkConnectionType(pv.connection_type)) {
+        continue;
+      }
+      const linkPath = resolveVpcLinkIdToVpcLinkPath(nodes, pv.connection_id);
+      if (linkPath !== vpcLinkRc.address) {
+        continue;
+      }
+      const parent = findRestApiAddressForPlanRef(
+        String(pv.rest_api_id ?? ""),
+        changes,
+      );
+      if (parent) {
+        return parent;
+      }
+    }
+  }
+
+  return candidates.length > 0 ? candidates[0]! : null;
+}
+
 /** Resolve `rest_api_id` on deployment / stage / method_settings to parent REST API address. */
 export function resolveApiGatewayCompanionParentRestApiAddressFromPlan(
   companionRc: PlanRc,
   changes: readonly PlanRc[],
+  nodes?: TerraformPlanNodesMap,
 ): string | null {
   const t = companionRc.type;
-  if (
-    !t ||
-    !companionRc.address ||
-    !API_GATEWAY_TOPOLOGY_SATELLITE_TYPES.has(t)
-  ) {
+  if (!t || !companionRc.address) {
+    return null;
+  }
+  if (t === "aws_api_gateway_vpc_link") {
+    return resolveVpcLinkParentRestApiAddressFromPlan(
+      companionRc,
+      changes,
+      nodes,
+    );
+  }
+  if (!API_GATEWAY_TOPOLOGY_SATELLITE_TYPES.has(t)) {
     return null;
   }
   const pv = pickResourceValuesForTopologyPlacement(companionRc);
@@ -464,11 +650,17 @@ export type ApiGatewayStageCluster = {
 
 export type ApiGatewayCompanionCluster = {
   restApi: string;
+  vpcLinks: string[];
   stages: ApiGatewayStageCluster[];
   methodSettings: string[];
 };
 
-export function apiGatewayCompanionSatellitePaths(
+export type ApiGatewayVpcLinkCluster = {
+  restApi: string;
+  vpcLinks: string[];
+};
+
+export function apiGatewayBottomCompanionSatellitePaths(
   cluster: ApiGatewayCompanionCluster,
 ): string[] {
   const out: string[] = [];
@@ -485,9 +677,16 @@ export function apiGatewayCompanionSatellitePaths(
   return out;
 }
 
+export function apiGatewayCompanionSatellitePaths(
+  cluster: ApiGatewayCompanionCluster,
+): string[] {
+  return [...cluster.vpcLinks, ...apiGatewayBottomCompanionSatellitePaths(cluster)];
+}
+
 export function buildApiGatewayCompanionCluster(
   nodes: TerraformPlanNodesMap,
   restApiAddress: string,
+  plan?: unknown,
 ): { cluster: ApiGatewayCompanionCluster | null; edges: TopologyIamEdge[] } {
   const apiNode = nodes[restApiAddress] as TerraformPlanGraphNode | undefined;
   const apiPrimary = getPrimaryResource(apiNode);
@@ -495,6 +694,13 @@ export function buildApiGatewayCompanionCluster(
     return { cluster: null, edges: [] };
   }
 
+  const changes = Array.isArray(
+    (plan as { resource_changes?: PlanRc[] } | undefined)?.resource_changes,
+  )
+    ? ((plan as { resource_changes: PlanRc[] }).resource_changes ?? [])
+    : undefined;
+
+  const vpcLinks = resolveVpcLinksForRestApi(nodes, restApiAddress, changes);
   const stages: ApiGatewayStageCluster[] = [];
   const methodSettings: string[] = [];
 
@@ -540,17 +746,26 @@ export function buildApiGatewayCompanionCluster(
   stages.sort((a, b) => a.stage.localeCompare(b.stage));
   methodSettings.sort((a, b) => a.localeCompare(b));
 
-  if (stages.length === 0 && methodSettings.length === 0) {
+  if (stages.length === 0 && methodSettings.length === 0 && vpcLinks.length === 0) {
     return { cluster: null, edges: [] };
   }
 
   const cluster: ApiGatewayCompanionCluster = {
     restApi: restApiAddress,
+    vpcLinks,
     stages,
     methodSettings,
   };
 
   const edges: TopologyIamEdge[] = [];
+  for (const linkPath of vpcLinks) {
+    edges.push({
+      source: restApiAddress,
+      target: linkPath,
+      type: "api_gateway_vpc_link",
+      label: "VPC link",
+    });
+  }
   for (const s of stages) {
     edges.push({
       source: restApiAddress,
@@ -605,6 +820,7 @@ export function apiGatewaySatelliteStackHeightPx(
   const addTier2 = () => {
     h += satelliteGap + tier2SatelliteH;
   };
+  /** VPC links render to the left of tier-0, not in the bottom stack. */
   for (const s of cluster.stages) {
     addTier1();
     if (s.deployment) {
@@ -676,4 +892,41 @@ export function isApiGatewayCompanionConsumedAsSatellite(
     }
   }
   return false;
+}
+
+export function apiGatewayVpcLinkLeftSpanPx(
+  nodes: TerraformPlanNodesMap,
+  restApiAddress: string,
+  tier1W: number,
+  satelliteGap: number,
+  plan?: unknown,
+): number {
+  const { cluster } = buildApiGatewayCompanionCluster(
+    nodes,
+    restApiAddress,
+    plan,
+  );
+  if (!cluster?.vpcLinks.length) {
+    return 0;
+  }
+  return tier1W + satelliteGap;
+}
+
+export function buildApiGatewayVpcLinkCluster(
+  nodes: TerraformPlanNodesMap,
+  restApiAddress: string,
+  plan?: unknown,
+): { cluster: ApiGatewayVpcLinkCluster | null; edges: TopologyIamEdge[] } {
+  const { cluster, edges } = buildApiGatewayCompanionCluster(
+    nodes,
+    restApiAddress,
+    plan,
+  );
+  if (!cluster?.vpcLinks.length) {
+    return { cluster: null, edges: [] };
+  }
+  return {
+    cluster: { restApi: cluster.restApi, vpcLinks: cluster.vpcLinks },
+    edges: edges.filter((e) => e.type === "api_gateway_vpc_link"),
+  };
 }

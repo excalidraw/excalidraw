@@ -353,12 +353,28 @@ export function collectSatelliteAddressesForKind(
           out.add(a);
         }
       }
-    } else if (Array.isArray(c.stack)) {
+    } else     if (Array.isArray(c.stack)) {
       for (const a of c.stack) {
         if (typeof a === "string") {
           out.add(a);
         }
       }
+    }
+    if (Array.isArray(c.instances)) {
+      for (const a of c.instances) {
+        if (typeof a === "string") {
+          out.add(a);
+        }
+      }
+    }
+    if (typeof c.subnetGroup === "string") {
+      out.add(c.subnetGroup);
+    }
+    if (typeof c.secret === "string") {
+      out.add(c.secret);
+    }
+    if (typeof c.secretVersion === "string") {
+      out.add(c.secretVersion);
     }
     if (Array.isArray(c.policies)) {
       for (const a of c.policies) {
@@ -379,6 +395,21 @@ export function collectSatelliteAddressesForKind(
           out.add(r);
         }
       }
+    }
+    if (Array.isArray(c.chains)) {
+      for (const chain of c.chains as Array<Record<string, string | null>>) {
+        for (const v of Object.values(chain)) {
+          if (typeof v === "string") {
+            out.add(v);
+          }
+        }
+      }
+    }
+    if (typeof c.clusterPath === "string") {
+      out.add(c.clusterPath);
+    }
+    if (typeof c.clusterCapacityProvidersPath === "string") {
+      out.add(c.clusterCapacityProvidersPath);
     }
     if (Array.isArray(c.stages)) {
       for (const s of c.stages as Array<Record<string, string | undefined>>) {

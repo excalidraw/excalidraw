@@ -4,13 +4,24 @@
 
 import { buildAlbListenerTargetCluster } from "./terraformTopologyAlbLinks";
 import { buildResourceCloudWatchCluster } from "./terraformTopologyCloudWatchLinks";
-import { buildEcsServiceCompanionCluster } from "./terraformTopologyEcsLinks";
+import {
+  buildEcsClusterCompanionCluster,
+  buildEcsEc2CapacityCompanionCluster,
+  buildEcsServiceCompanionCluster,
+} from "./terraformTopologyEcsLinks";
 import { buildPrimaryIamCluster } from "./terraformTopologyIamLinks";
-import { buildApiGatewayCompanionCluster } from "./terraformTopologyApiGatewayLinks";
+import {
+  buildApiGatewayCompanionCluster,
+  buildApiGatewayVpcLinkCluster,
+} from "./terraformTopologyApiGatewayLinks";
 import { buildTransitGatewayCompanionCluster } from "./terraformTopologyTransitGatewayLinks";
 import { buildPrimarySgCluster } from "./terraformTopologySgLinks";
 import { buildS3CompanionCluster } from "./terraformTopologyS3Links";
 import { buildSqsCompanionCluster } from "./terraformTopologySqsLinks";
+import {
+  buildAuroraCompanionCluster,
+  buildRdsCompanionCluster,
+} from "./terraformTopologyDatastoreLinks";
 import {
   registerSatellitePlugins,
   type SatelliteClusterBuildResult,
@@ -33,7 +44,12 @@ export function installSatellitePlugins(): void {
       buildResourceCloudWatchCluster(ctx.nodes, ctx.primaryAddress),
 
     iam_execution_role: (_kind, ctx) =>
-      buildPrimaryIamCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
+      buildPrimaryIamCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.arnIndex,
+        ctx.plan,
+      ),
 
     security_groups: (_kind, ctx) =>
       buildPrimarySgCluster(
@@ -57,8 +73,30 @@ export function installSatellitePlugins(): void {
         ctx.arnIndex,
       ),
 
+    ecs_cluster_companions: (_kind, ctx) =>
+      buildEcsClusterCompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.plan,
+      ),
+
+    ecs_ec2_capacity_companions: (_kind, ctx) =>
+      buildEcsEc2CapacityCompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.arnIndex,
+        ctx.plan,
+      ),
+
     api_gateway_companions: (_kind, ctx) =>
-      buildApiGatewayCompanionCluster(ctx.nodes, ctx.primaryAddress),
+      buildApiGatewayCompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.plan,
+      ),
+
+    api_gateway_vpc_links: (_kind, ctx) =>
+      buildApiGatewayVpcLinkCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
 
     tgw_companions: (_kind, ctx) =>
       ctx.primaryType === "aws_ec2_transit_gateway"
@@ -74,5 +112,11 @@ export function installSatellitePlugins(): void {
 
     sqs_companions: (_kind, ctx) =>
       buildSqsCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
+
+    aurora_companions: (_kind, ctx) =>
+      buildAuroraCompanionCluster(ctx.nodes, ctx.primaryAddress),
+
+    rds_companions: (_kind, ctx) =>
+      buildRdsCompanionCluster(ctx.nodes, ctx.primaryAddress),
   });
 }

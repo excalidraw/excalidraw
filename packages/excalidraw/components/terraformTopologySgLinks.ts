@@ -21,6 +21,11 @@ import {
   shouldUsePlanReference,
 } from "./terraformTopologyLambdaSgPlanConfig";
 import { collectSgRuleSecurityGroupIdRefsFromPlanConfiguration } from "./terraformTopologySgRulePlanConfig";
+import {
+  nestedSgGroupsExtraHeightPx,
+  terraformSatelliteLayoutElementId,
+  terraformSatelliteSgRuleLayoutElementId,
+} from "./terraformTopologySatelliteLayout";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -193,11 +198,12 @@ function lambdaVpcConfigHasSubnets(values: Record<string, unknown>): boolean {
   return false;
 }
 
-function inferLambdaVpcSecurityGroupRefs(
+/** Sibling `aws_security_group` resources under the same Terraform module prefix as `anchorAddress`. */
+function inferModuleColocatedSecurityGroupRefs(
   nodes: TerraformPlanNodesMap,
-  lambdaAddress: string,
+  anchorAddress: string,
 ): string[] {
-  const modPref = terraformModulePrefixForAddress(lambdaAddress);
+  const modPref = terraformModulePrefixForAddress(anchorAddress);
   if (!modPref) {
     return [];
   }
@@ -213,6 +219,13 @@ function inferLambdaVpcSecurityGroupRefs(
     }
   }
   return [];
+}
+
+function inferLambdaVpcSecurityGroupRefs(
+  nodes: TerraformPlanNodesMap,
+  lambdaAddress: string,
+): string[] {
+  return inferModuleColocatedSecurityGroupRefs(nodes, lambdaAddress);
 }
 
 /** When a rule omits `security_group_id` in `change.after`, the lone SG in the same module is the target. */
@@ -423,6 +436,34 @@ export function collectLambdaVpcSecurityGroupRefs(
     return [];
   }
   return inferLambdaVpcSecurityGroupRefs(nodes, lambdaAddress);
+}
+
+/** Unique ordered refs from `vpc_security_group_ids` on `aws_rds_cluster` / `aws_db_instance`. */
+export function collectDatastoreVpcSecurityGroupRefs(
+  nodes: TerraformPlanNodesMap,
+  primaryAddress: string,
+): string[] {
+  const node = nodes[primaryAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  if (!primary) {
+    return [];
+  }
+  const t = typeof primary.type === "string" ? primary.type : "";
+  if (t !== "aws_rds_cluster" && t !== "aws_db_instance") {
+    return [];
+  }
+  const values = mergeTerraformPlanResourceValues(primary);
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const flat: string[] = [];
+  flattenStringish(values.vpc_security_group_ids, flat);
+  for (const sid of flat) {
+    if (!seen.has(sid)) {
+      seen.add(sid);
+      out.push(sid);
+    }
+  }
+  return out;
 }
 
 const SG_RULE_TYPES = new Set([
@@ -638,18 +679,14 @@ export function terraformVpceSgLayoutElementId(
   vpcEndpointAddress: string,
   sgPath: string,
 ): string {
-  return `tf-topo:vpce-sg:${encodeURIComponent(
-    vpcEndpointAddress,
-  )}:${encodeURIComponent(sgPath)}`;
+  return terraformSatelliteLayoutElementId(vpcEndpointAddress, sgPath);
 }
 
 export function terraformVpceSgRuleLayoutElementId(
   vpcEndpointAddress: string,
   rulePath: string,
 ): string {
-  return `tf-topo:vpce-sgr:${encodeURIComponent(
-    vpcEndpointAddress,
-  )}:${encodeURIComponent(rulePath)}`;
+  return terraformSatelliteSgRuleLayoutElementId(vpcEndpointAddress, rulePath);
 }
 
 /** SG id refs from `aws_vpc_endpoint.security_group_ids` (interface endpoints). */
@@ -865,7 +902,74 @@ export function buildEcsServiceSgCluster(
   };
 }
 
-/** Lambda, ECS service, or ALB security-group satellites for topology layout. */
+/** Aurora / RDS Postgres security-group satellites (`vpc_security_group_ids`). */
+export function buildDatastorePrimarySgCluster(
+  nodes: TerraformPlanNodesMap,
+  primaryAddress: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
+  let refs = collectDatastoreVpcSecurityGroupRefs(nodes, primaryAddress);
+  if (refs.length === 0) {
+    refs = inferModuleColocatedSecurityGroupRefs(nodes, primaryAddress);
+  }
+  if (refs.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const groups: LambdaSgGroup[] = [];
+  const edges: TopologyIamEdge[] = [];
+  const seenSg = new Set<string>();
+  const canonicalPrimary = canonicalTopologyNodeKey(nodes, primaryAddress);
+
+  for (const ref of refs) {
+    const sgPath = resolveSecurityGroupRefToPath(
+      nodes,
+      primaryAddress,
+      ref,
+      arnIndex,
+      idToPath,
+    );
+    if (!sgPath || seenSg.has(sgPath)) {
+      continue;
+    }
+    seenSg.add(sgPath);
+    const rules = collectSecurityGroupRulesForSg(
+      nodes,
+      sgPath,
+      arnIndex,
+      idToPath,
+      plan,
+    );
+    groups.push({ sgPath, rules });
+    edges.push({
+      source: canonicalPrimary,
+      target: sgPath,
+      type: "security_group",
+      label: "security group",
+    });
+    for (const r of rules) {
+      edges.push({
+        source: sgPath,
+        target: r,
+        type: "sg_rule",
+        label: "rule",
+      });
+    }
+  }
+
+  if (groups.length === 0) {
+    return { cluster: null, edges: [] };
+  }
+
+  return {
+    cluster: { lambda: canonicalPrimary, groups },
+    edges,
+  };
+}
+
+/** Lambda, ECS service, ALB, or RDS/Aurora security-group satellites for topology layout. */
 export function buildPrimarySgCluster(
   nodes: TerraformPlanNodesMap,
   address: string,
@@ -880,6 +984,9 @@ export function buildPrimarySgCluster(
   }
   if (t === "aws_ecs_service") {
     return buildEcsServiceSgCluster(nodes, address, arnIndex, plan);
+  }
+  if (t === "aws_rds_cluster" || t === "aws_db_instance") {
+    return buildDatastorePrimarySgCluster(nodes, address, arnIndex, plan);
   }
   return buildLambdaSgCluster(nodes, address, arnIndex, plan);
 }
@@ -912,5 +1019,5 @@ export function sgSatelliteStackHeightPx(
       h += TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX;
     }
   }
-  return h;
+  return h + nestedSgGroupsExtraHeightPx(cluster.groups.length);
 }

@@ -14,7 +14,18 @@ import {
   buildSatelliteKindHeightContext,
 } from "./terraformTopologyPrimaryLayoutConfig";
 
+import { shortTerraformResourceLabel } from "./terraformElkLayout";
 import { getTerraformCardResourceType } from "./terraformResourceCardLabel";
+import {
+  growSatelliteClusterBounds,
+  groupIamStackIntoRoleStacks,
+  pushSatelliteClusterFrame,
+  remapScopedSatelliteEdges,
+  satelliteClusterSkeletonId,
+  terraformSatelliteLayoutElementId,
+  terraformSatelliteSgRuleLayoutElementId,
+  type SatelliteClusterBounds,
+} from "./terraformTopologySatelliteLayout";
 
 import type { TopologyIamEdge } from "./terraformTopologyIamLinks";
 import type { ResolvedPrimaryLayoutConfig } from "./terraformTopologyPrimaryLayoutTypes";
@@ -43,6 +54,8 @@ export type PushResourceRectangleFn = (
   options: {
     explodeParentKeys: string[];
     satelliteTier?: 1 | 2;
+    elementId?: string;
+    terraformSemanticLayoutDuplicate?: boolean;
   },
 ) => void;
 
@@ -58,6 +71,7 @@ export type TopologyGlobalPlacedSatellites = {
   apiGateway: Set<string>;
   tgw: Set<string>;
   lambdaPermission: Set<string>;
+  datastore: Set<string>;
 };
 
 export type RenderPrimarySatellitesParams = {
@@ -66,7 +80,10 @@ export type RenderPrimarySatellitesParams = {
   arnIndex: Map<string, string>;
   plan?: unknown;
   primaryAddr: string;
+  /** Cell origin (left column anchor for side satellites). */
   rx: number;
+  /** Tier-0 primary tile X (may be offset right of `rx` when left satellites exist). */
+  primaryX: number;
   ry: number;
   config: ResolvedPrimaryLayoutConfig;
   bundles: TopologyPrimarySatelliteBundles;
@@ -81,6 +98,13 @@ export type RenderPrimarySatellitesParams = {
     boxW: number,
     boxH: number,
   ) => void;
+  placement: TopologyPrimaryClusterPlacement;
+};
+
+export type TopologyPrimaryClusterPlacement = {
+  accountId: string;
+  region: string;
+  vpcId: string | null;
 };
 
 function getPrimaryResource(
@@ -147,14 +171,28 @@ function kindHasCluster(
       return Boolean(bundles.alb.cluster);
     case "ecs_companions":
       return Boolean(bundles.ecs.cluster);
+    case "ecs_cluster_companions":
+      return Boolean(bundles.ecsCluster.cluster?.clusterPath);
+    case "ecs_ec2_capacity_companions":
+      return Boolean(bundles.ecsEc2.cluster?.chains.length);
     case "api_gateway_companions":
-      return Boolean(bundles.api.cluster);
+      return Boolean(
+        bundles.api.cluster &&
+          (bundles.api.cluster.stages.length > 0 ||
+            bundles.api.cluster.methodSettings.length > 0),
+      );
+    case "api_gateway_vpc_links":
+      return Boolean(bundles.apiVpc.cluster?.vpcLinks.length);
     case "tgw_companions":
       return Boolean(bundles.tgw.cluster);
     case "lambda_permission":
       return Boolean(bundles.lambdaPermission.cluster);
     case "sqs_companions":
       return Boolean(bundles.sqs.cluster);
+    case "aurora_companions":
+      return Boolean(bundles.aurora.cluster);
+    case "rds_companions":
+      return Boolean(bundles.rds.cluster);
     case "cloudwatch_alarms":
     case "cloudwatch_log_groups":
       return Boolean(bundles.cloudWatch.cluster);
@@ -173,6 +211,7 @@ export function renderPrimarySatellitesFromConfig(
     plan,
     primaryAddr: addr,
     rx,
+    primaryX = rx,
     ry,
     config,
     bundles,
@@ -181,6 +220,7 @@ export function renderPrimarySatellitesFromConfig(
     dataflowStroke,
     pushRect,
     addClusterMember,
+    placement,
   } = params;
 
   const { tiers, gaps, padding } = config;
@@ -198,7 +238,7 @@ export function renderPrimarySatellitesFromConfig(
 
   pushEdges(
     satelliteLineSpecs,
-    bundles.iam.edges,
+    remapScopedSatelliteEdges(bundles.iam.edges, addr, nodes),
     "topology_iam",
     dataflowStroke,
   );
@@ -210,7 +250,7 @@ export function renderPrimarySatellitesFromConfig(
   );
   pushEdges(
     satelliteLineSpecs,
-    bundles.sg.edges,
+    remapScopedSatelliteEdges(bundles.sg.edges, addr, nodes),
     "topology_sg",
     dataflowStroke,
   );
@@ -240,6 +280,12 @@ export function renderPrimarySatellitesFromConfig(
   );
   pushEdges(
     satelliteLineSpecs,
+    bundles.apiVpc.edges,
+    "topology_api_gateway_vpc_link",
+    dataflowStroke,
+  );
+  pushEdges(
+    satelliteLineSpecs,
     bundles.tgw.edges,
     "topology_tgw",
     dataflowStroke,
@@ -254,6 +300,18 @@ export function renderPrimarySatellitesFromConfig(
     satelliteLineSpecs,
     bundles.sqs.edges,
     "topology_sqs",
+    dataflowStroke,
+  );
+  pushEdges(
+    satelliteLineSpecs,
+    bundles.aurora.edges,
+    "topology_aurora",
+    dataflowStroke,
+  );
+  pushEdges(
+    satelliteLineSpecs,
+    bundles.rds.edges,
+    "topology_rds",
     dataflowStroke,
   );
   pushEdges(
@@ -282,11 +340,11 @@ export function renderPrimarySatellitesFromConfig(
     const cwHasLog = Boolean(bundles.cloudWatch.cluster.logGroups.length);
     const logGroupX =
       cwHasAlarm && cwHasLog
-        ? rx + padding.cloudwatchLeft + tier1W + gaps.cloudwatchColumn
-        : rx + tier0W - logGroupW - padding.cloudwatchRight;
+        ? primaryX + padding.cloudwatchLeft + tier1W + gaps.cloudwatchColumn
+        : primaryX + tier0W - logGroupW - padding.cloudwatchRight;
 
     let yAlarm = cloudWatchTop;
-    const alarmX = rx + padding.cloudwatchLeft;
+    const alarmX = primaryX + padding.cloudwatchLeft;
     for (const alarmPath of bundles.cloudWatch.cluster.alarms) {
       if (!globalPlaced.cloudWatch.has(alarmPath)) {
         globalPlaced.cloudWatch.add(alarmPath);
@@ -336,6 +394,23 @@ export function renderPrimarySatellitesFromConfig(
     }
   }
 
+  const vpcCluster = bundles.apiVpc.cluster;
+  if (vpcCluster?.vpcLinks.length) {
+    let yVpc = ry;
+    for (const linkPath of vpcCluster.vpcLinks) {
+      const satY = ry + Math.floor((tier0H - tier1H) / 2);
+      if (!globalPlaced.apiGateway.has(linkPath)) {
+        globalPlaced.apiGateway.add(linkPath);
+        addClusterMember(linkPath, rx, satY, tier1W, tier1H);
+        pushRect(skeleton, linkPath, rx, satY, tier1W, tier1H, nodes, {
+          explodeParentKeys: [addr],
+          satelliteTier: 1,
+        });
+      }
+      yVpc = satY + tier1H + satelliteGap;
+    }
+  }
+
   const yAfterPrimary = ry + tier0H;
   let yLeft = yAfterPrimary;
   let yRight = yAfterPrimary;
@@ -353,7 +428,7 @@ export function renderPrimarySatellitesFromConfig(
     }
     yLeft = renderBottomKind({
       kind,
-      columnX: rx,
+      columnX: primaryX,
       y: yLeft,
       addr,
       skeleton,
@@ -368,13 +443,14 @@ export function renderPrimarySatellitesFromConfig(
       tier2H,
       satelliteGap,
       sgW,
+      placement,
     });
   }
 
   const satXRight =
     hasLeft && hasRight
-      ? rx + tier1W + gaps.iamSgColumn
-      : rx + tier0W - sgW - padding.sgRight;
+      ? primaryX + tier1W + gaps.iamSgColumn
+      : primaryX + tier0W - sgW - padding.sgRight;
   const ruleTileX = satXRight + Math.floor((sgW - tier2W) / 2);
 
   const bottomEndKinds = kindsForColumn(config, "bottom", "end");
@@ -405,6 +481,7 @@ export function renderPrimarySatellitesFromConfig(
       sgW,
       ruleTileX,
       sgBetweenGroupsGap: gaps.sgBetweenGroups,
+      placement,
     });
   }
 }
@@ -428,7 +505,33 @@ type RenderBottomKindParams = {
   sgW: number;
   ruleTileX?: number;
   sgBetweenGroupsGap?: number;
+  placement: TopologyPrimaryClusterPlacement;
 };
+
+type DrawScopedTileParams = {
+  nodePath: string;
+  layoutId: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  tier: 1 | 2;
+  explodeParentKeys: string[];
+  skeleton: ExcalidrawElementSkeleton[];
+  nodes: TerraformPlanNodesMap;
+  pushRect: PushResourceRectangleFn;
+  addClusterMember: RenderBottomKindParams["addClusterMember"];
+};
+
+function drawScopedSatelliteTile(p: DrawScopedTileParams): void {
+  p.addClusterMember(p.layoutId, p.x, p.y, p.w, p.h);
+  p.pushRect(p.skeleton, p.nodePath, p.x, p.y, p.w, p.h, p.nodes, {
+    explodeParentKeys: p.explodeParentKeys,
+    satelliteTier: p.tier,
+    elementId: p.layoutId,
+    terraformSemanticLayoutDuplicate: true,
+  });
+}
 
 function renderBottomKind(p: RenderBottomKindParams): number {
   let y = p.y;
@@ -456,25 +559,60 @@ function renderBottomKind(p: RenderBottomKindParams): number {
       if (!cluster) {
         return y;
       }
-      for (let si = 0; si < cluster.stack.length; si++) {
-        const satAddr = cluster.stack[si]!;
-        const isRoleTile = si === 0;
-        const tileH = isRoleTile ? tier1H : tier2H;
-        const tileW = isRoleTile ? iamW : tier2W;
-        const tileX = isRoleTile
-          ? columnX
-          : columnX + Math.floor((iamW - tier2W) / 2);
-        if (globalPlaced.iam.has(satAddr)) {
+      const roleStacks = groupIamStackIntoRoleStacks(nodes, cluster.stack);
+      const policyTileX = columnX + Math.floor((iamW - tier2W) / 2);
+
+      for (const roleStack of roleStacks) {
+        const rolePath = roleStack[0]!;
+        const roleLayoutId = terraformSatelliteLayoutElementId(addr, rolePath);
+        let bounds: SatelliteClusterBounds | null = null;
+        const frameChildIds: string[] = [];
+
+        for (let si = 0; si < roleStack.length; si++) {
+          const satAddr = roleStack[si]!;
+          const isRoleTile = si === 0;
+          const tileH = isRoleTile ? tier1H : tier2H;
+          const tileW = isRoleTile ? iamW : tier2W;
+          const tileX = isRoleTile ? columnX : policyTileX;
+          const layoutId = isRoleTile
+            ? roleLayoutId
+            : terraformSatelliteLayoutElementId(addr, satAddr);
+          const explodeKeys = isRoleTile ? [addr] : [roleLayoutId];
+
+          drawScopedSatelliteTile({
+            nodePath: satAddr,
+            layoutId,
+            x: tileX,
+            y,
+            w: tileW,
+            h: tileH,
+            tier: isRoleTile ? 1 : 2,
+            explodeParentKeys: explodeKeys,
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          frameChildIds.push(layoutId);
+          bounds = growSatelliteClusterBounds(bounds, tileX, y, tileW, tileH);
           y += tileH + satelliteGap;
-          continue;
         }
-        globalPlaced.iam.add(satAddr);
-        addClusterMember(satAddr, tileX, y, tileW, tileH);
-        pushRect(skeleton, satAddr, tileX, y, tileW, tileH, nodes, {
-          explodeParentKeys: [addr],
-          satelliteTier: isRoleTile ? 1 : 2,
-        });
-        y += tileH + satelliteGap;
+
+        if (bounds && frameChildIds.length > 0) {
+          pushSatelliteClusterFrame({
+            skeleton,
+            frameId: satelliteClusterSkeletonId(addr, rolePath),
+            bounds,
+            childIds: frameChildIds,
+            name: shortTerraformResourceLabel(rolePath),
+            parentPrimary: addr,
+            rootNodePath: rolePath,
+            accountId: p.placement.accountId,
+            region: p.placement.region,
+            vpcId: p.placement.vpcId,
+            addClusterMember,
+          });
+        }
       }
       return y;
     }
@@ -535,6 +673,54 @@ function renderBottomKind(p: RenderBottomKindParams): number {
       }
       return y;
     }
+    case "ecs_cluster_companions": {
+      const clusterBand = bundles.ecsCluster.cluster;
+      if (!clusterBand?.clusterPath) {
+        return y;
+      }
+      const ruleTileXEcsCluster = columnX + Math.floor((iamW - tier2W) / 2);
+      const drawEcsSat = (
+        satAddr: string,
+        x: number,
+        w: number,
+        h: number,
+        tier: 1 | 2,
+        explodeKeys: string[],
+      ): void => {
+        if (globalPlaced.ecs.has(satAddr)) {
+          return;
+        }
+        globalPlaced.ecs.add(satAddr);
+        addClusterMember(satAddr, x, y, w, h);
+        pushRect(skeleton, satAddr, x, y, w, h, nodes, {
+          explodeParentKeys: explodeKeys,
+          satelliteTier: tier,
+        });
+      };
+      if (!globalPlaced.ecs.has(clusterBand.clusterPath)) {
+        drawEcsSat(clusterBand.clusterPath, columnX, iamW, tier1H, 1, [addr]);
+        y += tier1H + satelliteGap;
+      } else {
+        y += tier1H + satelliteGap;
+      }
+      if (clusterBand.clusterCapacityProvidersPath) {
+        const cpReg = clusterBand.clusterCapacityProvidersPath;
+        if (!globalPlaced.ecs.has(cpReg)) {
+          drawEcsSat(
+            cpReg,
+            ruleTileXEcsCluster,
+            tier2W,
+            tier2H,
+            2,
+            [addr, clusterBand.clusterPath],
+          );
+          y += tier2H + satelliteGap;
+        } else {
+          y += tier2H + satelliteGap;
+        }
+      }
+      return y;
+    }
     case "ecs_companions": {
       const cluster = bundles.ecs.cluster;
       if (!cluster) {
@@ -563,6 +749,83 @@ function renderBottomKind(p: RenderBottomKindParams): number {
           satelliteTier: isTaskDef ? 1 : 2,
         });
         y += tileH + satelliteGap;
+      }
+      return y;
+    }
+    case "ecs_ec2_capacity_companions": {
+      const ec2Cluster = bundles.ecsEc2.cluster;
+      if (!ec2Cluster?.chains.length) {
+        return y;
+      }
+      const ruleTileXEc2 = columnX + Math.floor((iamW - tier2W) / 2);
+      for (const chain of ec2Cluster.chains) {
+        const drawChainSat = (
+          satAddr: string,
+          x: number,
+          w: number,
+          h: number,
+          tier: 1 | 2,
+          explodeKeys: string[],
+        ): number => {
+          if (globalPlaced.ecs.has(satAddr)) {
+            return h;
+          }
+          globalPlaced.ecs.add(satAddr);
+          addClusterMember(satAddr, x, y, w, h);
+          pushRect(skeleton, satAddr, x, y, w, h, nodes, {
+            explodeParentKeys: explodeKeys,
+            satelliteTier: tier,
+          });
+          return h;
+        };
+
+        y +=
+          drawChainSat(chain.capacityProvider, columnX, iamW, tier1H, 1, [
+            addr,
+          ]) + satelliteGap;
+
+        if (chain.autoscalingGroup) {
+          y +=
+            drawChainSat(
+              chain.autoscalingGroup,
+              ruleTileXEc2,
+              tier2W,
+              tier2H,
+              2,
+              [addr, chain.capacityProvider],
+            ) + satelliteGap;
+        }
+        if (chain.launchTemplate) {
+          y +=
+            drawChainSat(
+              chain.launchTemplate,
+              ruleTileXEc2,
+              tier2W,
+              tier2H,
+              2,
+              [
+                addr,
+                chain.capacityProvider,
+                ...(chain.autoscalingGroup ? [chain.autoscalingGroup] : []),
+              ],
+            ) + satelliteGap;
+        }
+        if (chain.instanceProfile) {
+          y +=
+            drawChainSat(
+              chain.instanceProfile,
+              ruleTileXEc2,
+              tier2W,
+              tier2H,
+              2,
+              [
+                addr,
+                chain.capacityProvider,
+                ...(chain.autoscalingGroup ? [chain.autoscalingGroup] : []),
+                ...(chain.launchTemplate ? [chain.launchTemplate] : []),
+              ],
+            ) + satelliteGap;
+        }
       }
       return y;
     }
@@ -738,6 +1001,285 @@ function renderBottomKind(p: RenderBottomKindParams): number {
       }
       return y;
     }
+    case "aurora_companions": {
+      const cluster = bundles.aurora.cluster;
+      if (!cluster) {
+        return y;
+      }
+      const policyTileX = columnX + Math.floor((iamW - tier2W) / 2);
+
+      if (cluster.instances.length > 0) {
+        let instBounds: SatelliteClusterBounds | null = null;
+        const instFrameChildIds: string[] = [];
+        for (const instPath of cluster.instances) {
+          const layoutId = terraformSatelliteLayoutElementId(addr, instPath);
+          if (globalPlaced.datastore.has(instPath)) {
+            y += tier1H + satelliteGap;
+            continue;
+          }
+          globalPlaced.datastore.add(instPath);
+          drawScopedSatelliteTile({
+            nodePath: instPath,
+            layoutId,
+            x: columnX,
+            y,
+            w: iamW,
+            h: tier1H,
+            tier: 1,
+            explodeParentKeys: [addr],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          instFrameChildIds.push(layoutId);
+          instBounds = growSatelliteClusterBounds(
+            instBounds,
+            columnX,
+            y,
+            iamW,
+            tier1H,
+          );
+          y += tier1H + satelliteGap;
+        }
+        if (instBounds && instFrameChildIds.length > 0) {
+          pushSatelliteClusterFrame({
+            skeleton,
+            frameId: satelliteClusterSkeletonId(addr, `${addr}::instances`),
+            bounds: instBounds,
+            childIds: instFrameChildIds,
+            name: "Aurora instances",
+            parentPrimary: addr,
+            rootNodePath: cluster.instances[0]!,
+            accountId: p.placement.accountId,
+            region: p.placement.region,
+            vpcId: p.placement.vpcId,
+            addClusterMember,
+          });
+        }
+      }
+
+      if (cluster.secret) {
+        const secretPath = cluster.secret;
+        const secretLayoutId = terraformSatelliteLayoutElementId(
+          addr,
+          secretPath,
+        );
+        let credBounds: SatelliteClusterBounds | null = null;
+        const credFrameChildIds: string[] = [];
+        if (!globalPlaced.datastore.has(secretPath)) {
+          globalPlaced.datastore.add(secretPath);
+          drawScopedSatelliteTile({
+            nodePath: secretPath,
+            layoutId: secretLayoutId,
+            x: columnX,
+            y,
+            w: iamW,
+            h: tier1H,
+            tier: 1,
+            explodeParentKeys: [addr],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          credFrameChildIds.push(secretLayoutId);
+          credBounds = growSatelliteClusterBounds(
+            credBounds,
+            columnX,
+            y,
+            iamW,
+            tier1H,
+          );
+          y += tier1H + satelliteGap;
+        }
+
+        if (cluster.secretVersion) {
+          const verPath = cluster.secretVersion;
+          const verLayoutId = terraformSatelliteLayoutElementId(addr, verPath);
+          if (!globalPlaced.datastore.has(verPath)) {
+            globalPlaced.datastore.add(verPath);
+            drawScopedSatelliteTile({
+              nodePath: verPath,
+              layoutId: verLayoutId,
+              x: policyTileX,
+              y,
+              w: tier2W,
+              h: tier2H,
+              tier: 2,
+              explodeParentKeys: [secretLayoutId],
+              skeleton,
+              nodes,
+              pushRect,
+              addClusterMember,
+            });
+            credFrameChildIds.push(verLayoutId);
+            credBounds = growSatelliteClusterBounds(
+              credBounds,
+              policyTileX,
+              y,
+              tier2W,
+              tier2H,
+            );
+            y += tier2H + satelliteGap;
+          }
+        }
+
+        if (credBounds && credFrameChildIds.length > 0) {
+          pushSatelliteClusterFrame({
+            skeleton,
+            frameId: satelliteClusterSkeletonId(addr, `${addr}::credentials`),
+            bounds: credBounds,
+            childIds: credFrameChildIds,
+            name: "Credentials",
+            parentPrimary: addr,
+            rootNodePath: secretPath,
+            accountId: p.placement.accountId,
+            region: p.placement.region,
+            vpcId: p.placement.vpcId,
+            addClusterMember,
+          });
+        }
+      }
+
+      if (cluster.subnetGroup) {
+        const sgPath = cluster.subnetGroup;
+        const sgLayoutId = terraformSatelliteLayoutElementId(addr, sgPath);
+        if (!globalPlaced.datastore.has(sgPath)) {
+          globalPlaced.datastore.add(sgPath);
+          drawScopedSatelliteTile({
+            nodePath: sgPath,
+            layoutId: sgLayoutId,
+            x: policyTileX,
+            y,
+            w: tier2W,
+            h: tier2H,
+            tier: 2,
+            explodeParentKeys: [addr],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          y += tier2H + satelliteGap;
+        }
+      }
+      return y;
+    }
+    case "rds_companions": {
+      const cluster = bundles.rds.cluster;
+      if (!cluster) {
+        return y;
+      }
+      const policyTileX = columnX + Math.floor((iamW - tier2W) / 2);
+
+      if (cluster.secret) {
+        const secretPath = cluster.secret;
+        const secretLayoutId = terraformSatelliteLayoutElementId(
+          addr,
+          secretPath,
+        );
+        let credBounds: SatelliteClusterBounds | null = null;
+        const credFrameChildIds: string[] = [];
+        if (!globalPlaced.datastore.has(secretPath)) {
+          globalPlaced.datastore.add(secretPath);
+          drawScopedSatelliteTile({
+            nodePath: secretPath,
+            layoutId: secretLayoutId,
+            x: columnX,
+            y,
+            w: iamW,
+            h: tier1H,
+            tier: 1,
+            explodeParentKeys: [addr],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          credFrameChildIds.push(secretLayoutId);
+          credBounds = growSatelliteClusterBounds(
+            credBounds,
+            columnX,
+            y,
+            iamW,
+            tier1H,
+          );
+          y += tier1H + satelliteGap;
+        }
+
+        if (cluster.secretVersion) {
+          const verPath = cluster.secretVersion;
+          const verLayoutId = terraformSatelliteLayoutElementId(addr, verPath);
+          if (!globalPlaced.datastore.has(verPath)) {
+            globalPlaced.datastore.add(verPath);
+            drawScopedSatelliteTile({
+              nodePath: verPath,
+              layoutId: verLayoutId,
+              x: policyTileX,
+              y,
+              w: tier2W,
+              h: tier2H,
+              tier: 2,
+              explodeParentKeys: [secretLayoutId],
+              skeleton,
+              nodes,
+              pushRect,
+              addClusterMember,
+            });
+            credFrameChildIds.push(verLayoutId);
+            credBounds = growSatelliteClusterBounds(
+              credBounds,
+              policyTileX,
+              y,
+              tier2W,
+              tier2H,
+            );
+            y += tier2H + satelliteGap;
+          }
+        }
+
+        if (credBounds && credFrameChildIds.length > 0) {
+          pushSatelliteClusterFrame({
+            skeleton,
+            frameId: satelliteClusterSkeletonId(addr, `${addr}::credentials`),
+            bounds: credBounds,
+            childIds: credFrameChildIds,
+            name: "Credentials",
+            parentPrimary: addr,
+            rootNodePath: secretPath,
+            accountId: p.placement.accountId,
+            region: p.placement.region,
+            vpcId: p.placement.vpcId,
+            addClusterMember,
+          });
+        }
+      }
+
+      if (cluster.subnetGroup) {
+        const sgPath = cluster.subnetGroup;
+        const sgLayoutId = terraformSatelliteLayoutElementId(addr, sgPath);
+        if (!globalPlaced.datastore.has(sgPath)) {
+          globalPlaced.datastore.add(sgPath);
+          drawScopedSatelliteTile({
+            nodePath: sgPath,
+            layoutId: sgLayoutId,
+            x: policyTileX,
+            y,
+            w: tier2W,
+            h: tier2H,
+            tier: 2,
+            explodeParentKeys: [addr],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          y += tier2H + satelliteGap;
+        }
+      }
+      return y;
+    }
     case "lambda_permission": {
       const cluster = bundles.lambdaPermission.cluster;
       if (!cluster) {
@@ -787,27 +1329,75 @@ function renderBottomKind(p: RenderBottomKindParams): number {
 
       for (let gi = 0; gi < cluster.groups.length; gi++) {
         const group = cluster.groups[gi]!;
+        const sgLayoutId = terraformSatelliteLayoutElementId(
+          addr,
+          group.sgPath,
+        );
+        let bounds: SatelliteClusterBounds | null = null;
+        const frameChildIds: string[] = [];
 
-        if (!globalPlaced.sg.has(group.sgPath)) {
-          globalPlaced.sg.add(group.sgPath);
-          addClusterMember(group.sgPath, satXRight, y, sgW, tier1H);
-          pushRect(skeleton, group.sgPath, satXRight, y, sgW, tier1H, nodes, {
-            explodeParentKeys: [addr],
-            satelliteTier: 1,
-          });
-        }
+        drawScopedSatelliteTile({
+          nodePath: group.sgPath,
+          layoutId: sgLayoutId,
+          x: satXRight,
+          y,
+          w: sgW,
+          h: tier1H,
+          tier: 1,
+          explodeParentKeys: [addr],
+          skeleton,
+          nodes,
+          pushRect,
+          addClusterMember,
+        });
+        frameChildIds.push(sgLayoutId);
+        bounds = growSatelliteClusterBounds(bounds, satXRight, y, sgW, tier1H);
         y += tier1H + satelliteGap;
 
         for (const rulePath of group.rules) {
-          if (!globalPlaced.sg.has(rulePath)) {
-            globalPlaced.sg.add(rulePath);
-            addClusterMember(rulePath, ruleTileX, y, tier2W, tier2H);
-            pushRect(skeleton, rulePath, ruleTileX, y, tier2W, tier2H, nodes, {
-              explodeParentKeys: [addr],
-              satelliteTier: 2,
-            });
-          }
+          const ruleLayoutId = terraformSatelliteSgRuleLayoutElementId(
+            addr,
+            rulePath,
+          );
+          drawScopedSatelliteTile({
+            nodePath: rulePath,
+            layoutId: ruleLayoutId,
+            x: ruleTileX,
+            y,
+            w: tier2W,
+            h: tier2H,
+            tier: 2,
+            explodeParentKeys: [sgLayoutId],
+            skeleton,
+            nodes,
+            pushRect,
+            addClusterMember,
+          });
+          frameChildIds.push(ruleLayoutId);
+          bounds = growSatelliteClusterBounds(
+            bounds,
+            ruleTileX,
+            y,
+            tier2W,
+            tier2H,
+          );
           y += tier2H + satelliteGap;
+        }
+
+        if (bounds && frameChildIds.length > 0) {
+          pushSatelliteClusterFrame({
+            skeleton,
+            frameId: satelliteClusterSkeletonId(addr, group.sgPath),
+            bounds,
+            childIds: frameChildIds,
+            name: shortTerraformResourceLabel(group.sgPath),
+            parentPrimary: addr,
+            rootNodePath: group.sgPath,
+            accountId: p.placement.accountId,
+            region: p.placement.region,
+            vpcId: p.placement.vpcId,
+            addClusterMember,
+          });
         }
 
         if (gi < cluster.groups.length - 1) {

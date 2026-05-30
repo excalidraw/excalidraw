@@ -2,13 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
+  buildDatastorePrimarySgCluster,
   buildLambdaSgCluster,
   buildLoadBalancerSgCluster,
+  buildPrimarySgCluster,
   buildSecurityGroupIdToPathIndex,
+  collectDatastoreVpcSecurityGroupRefs,
   collectLambdaVpcSecurityGroupRefs,
   collectSecurityGroupRulesForSg,
   stripLastTerraformModuleSegment,
 } from "./terraformTopologySgLinks";
+import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
@@ -711,5 +715,134 @@ describe("terraformTopologySgLinks", () => {
     expect(
       collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, plan),
     ).toEqual([rulePath]);
+  });
+
+  it("buildDatastorePrimarySgCluster attaches module SG and rules under aws_rds_cluster", () => {
+    const clusterPath = "module.api7_aurora.aws_rds_cluster.this";
+    const sgPath =
+      "module.api7_aurora.module.security_group.aws_security_group.this_name_prefix[0]";
+    const egressPath =
+      "module.api7_aurora.module.security_group.aws_security_group_rule.egress_rules[0]";
+    const ingressPath =
+      "module.api7_aurora.module.security_group.aws_security_group_rule.ingress_with_cidr_blocks[0]";
+    const nodes: TerraformPlanNodesMap = {
+      [clusterPath]: {
+        resources: {
+          [clusterPath]: {
+            address: clusterPath,
+            mode: "managed",
+            type: "aws_rds_cluster",
+            change: {
+              actions: ["create"],
+              after: {
+                vpc_security_group_ids: ["sg-aurora"],
+              },
+            },
+          },
+        },
+      },
+      [sgPath]: {
+        resources: {
+          [sgPath]: {
+            address: sgPath,
+            mode: "managed",
+            type: "aws_security_group",
+            change: {
+              actions: ["create"],
+              after: { id: "sg-aurora" },
+            },
+          },
+        },
+      },
+      [egressPath]: {
+        resources: {
+          [egressPath]: {
+            address: egressPath,
+            mode: "managed",
+            type: "aws_security_group_rule",
+            change: { actions: ["create"], after: { type: "egress" } },
+          },
+        },
+      },
+      [ingressPath]: {
+        resources: {
+          [ingressPath]: {
+            address: ingressPath,
+            mode: "managed",
+            type: "aws_security_group_rule",
+            change: { actions: ["create"], after: { type: "ingress" } },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    expect(collectDatastoreVpcSecurityGroupRefs(nodes, clusterPath)).toEqual([
+      "sg-aurora",
+    ]);
+    const { cluster, edges } = buildDatastorePrimarySgCluster(
+      nodes,
+      clusterPath,
+      arnIndex,
+    );
+    expect(cluster?.groups).toHaveLength(1);
+    expect(cluster!.groups[0]!.sgPath).toBe(sgPath);
+    expect(cluster!.groups[0]!.rules.sort()).toEqual(
+      [egressPath, ingressPath].sort(),
+    );
+    expect(edges.some((e) => e.source === clusterPath && e.target === sgPath)).toBe(
+      true,
+    );
+    const { cluster: viaPrimary } = buildPrimarySgCluster(
+      nodes,
+      clusterPath,
+      arnIndex,
+    );
+    expect(viaPrimary?.groups[0]?.sgPath).toBe(sgPath);
+    const consumed = collectTopologySatelliteAddressesFromRegistry(
+      nodes,
+      arnIndex,
+      [clusterPath],
+    );
+    expect(consumed.has(sgPath)).toBe(true);
+    expect(consumed.has(egressPath)).toBe(true);
+    expect(consumed.has(ingressPath)).toBe(true);
+  });
+
+  it("infers module security group when vpc_security_group_ids is empty on create", () => {
+    const instancePath = "module.api2_rds.aws_db_instance.this";
+    const sgPath =
+      "module.api2_rds.module.security_group.aws_security_group.this_name_prefix[0]";
+    const nodes: TerraformPlanNodesMap = {
+      [instancePath]: {
+        resources: {
+          [instancePath]: {
+            address: instancePath,
+            mode: "managed",
+            type: "aws_db_instance",
+            change: {
+              actions: ["create"],
+              after: { vpc_security_group_ids: [] },
+            },
+          },
+        },
+      },
+      [sgPath]: {
+        resources: {
+          [sgPath]: {
+            address: sgPath,
+            mode: "managed",
+            type: "aws_security_group",
+            change: { actions: ["create"], after: {} },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const { cluster } = buildDatastorePrimarySgCluster(
+      nodes,
+      instancePath,
+      arnIndex,
+    );
+    expect(cluster?.groups[0]?.sgPath).toBe(sgPath);
   });
 });
