@@ -15,6 +15,114 @@ import {
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
+type SceneElement = {
+  id: string;
+  type?: string;
+  frameId?: string | null;
+  children?: readonly string[];
+  customData?: {
+    terraformTopologyRole?: string;
+    terraformTopologyPath?: string[];
+    terraformVisibilityRole?: string;
+    nodePath?: string;
+  };
+};
+
+function parentFrameId(
+  elements: SceneElement[],
+  childId: string,
+): string | null {
+  for (const el of elements) {
+    if (el.type !== "frame" || !el.children) {
+      continue;
+    }
+    if (el.children.includes(childId)) {
+      return el.id;
+    }
+  }
+  return null;
+}
+
+function ancestorFrameWithRole(
+  elements: SceneElement[],
+  startId: string,
+  role: string,
+): SceneElement | null {
+  const byId = new Map(elements.map((e) => [e.id, e]));
+  let current: string | null | undefined = startId;
+  const seen = new Set<string>();
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    const el = byId.get(current);
+    if (el?.type === "frame" && el.customData?.terraformTopologyRole === role) {
+      return el;
+    }
+    current = el?.frameId ?? parentFrameId(elements, current);
+  }
+  return null;
+}
+
+function primaryResourceForNodePath(
+  elements: SceneElement[],
+  nodePathSuffix: string,
+): SceneElement | undefined {
+  return elements.find(
+    (e) =>
+      e.type === "rectangle" &&
+      e.customData?.terraformVisibilityRole === "resource" &&
+      typeof e.customData.nodePath === "string" &&
+      e.customData.nodePath.endsWith(nodePathSuffix),
+  );
+}
+
+function expectSameSubnetZone(
+  elements: SceneElement[],
+  nodePathSuffixA: string,
+  nodePathSuffixB: string,
+): void {
+  const a = primaryResourceForNodePath(elements, nodePathSuffixA);
+  const b = primaryResourceForNodePath(elements, nodePathSuffixB);
+  expect(a).toBeDefined();
+  expect(b).toBeDefined();
+  const zoneA = ancestorFrameWithRole(
+    elements,
+    a!.frameId ?? a!.id,
+    "subnetZone",
+  );
+  const zoneB = ancestorFrameWithRole(
+    elements,
+    b!.frameId ?? b!.id,
+    "subnetZone",
+  );
+  expect(zoneA).toBeDefined();
+  expect(zoneB).toBeDefined();
+  expect(zoneA!.id).toBe(zoneB!.id);
+}
+
+function expectDifferentSubnetZone(
+  elements: SceneElement[],
+  nodePathSuffixA: string,
+  nodePathSuffixB: string,
+): void {
+  const a = primaryResourceForNodePath(elements, nodePathSuffixA);
+  const b = primaryResourceForNodePath(elements, nodePathSuffixB);
+  expect(a).toBeDefined();
+  expect(b).toBeDefined();
+  const zoneA = ancestorFrameWithRole(
+    elements,
+    a!.frameId ?? a!.id,
+    "subnetZone",
+  );
+  const zoneB = ancestorFrameWithRole(
+    elements,
+    b!.frameId ?? b!.id,
+    "subnetZone",
+  );
+  expect(zoneA).toBeDefined();
+  expect(zoneB).toBeDefined();
+  expect(zoneA!.id).not.toBe(zoneB!.id);
+}
+
 describe("staging pipeline.tfd resolution", () => {
   it("new stack-qualified pipeline.tfd resolves all 20 edges", async () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
@@ -373,5 +481,35 @@ describe("staging pipeline.tfd resolution", () => {
     );
     expect(api5Zone).toBeTruthy();
     expect(insideVertically(api5Permission!, api5Zone!)).toBe(true);
+
+    const sceneElements = body.elements as SceneElement[];
+    const subnetZoneFrames = sceneElements.filter(
+      (e) =>
+        e.type === "frame" &&
+        e.customData?.terraformTopologyRole === "subnetZone",
+    );
+    expect(subnetZoneFrames.length).toBeLessThan(body.meta?.atomCount ?? 0);
+
+    // Shared east-network VPC: fanout lanes coalesce per column and tier.
+    expectSameSubnetZone(
+      sceneElements,
+      "41-east-api-2::module.api.aws_api_gateway_rest_api.private",
+      "42-east-api-3::module.api.aws_api_gateway_rest_api.private",
+    );
+    expectSameSubnetZone(
+      sceneElements,
+      "40-east-api-1::module.api.aws_api_gateway_rest_api.private",
+      "44-east-api-5::module.api.aws_api_gateway_rest_api.private",
+    );
+    expectSameSubnetZone(
+      sceneElements,
+      "41-east-api-2::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+      "42-east-api-3::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+    );
+    expectDifferentSubnetZone(
+      sceneElements,
+      "41-east-api-2::module.api.aws_api_gateway_rest_api.private",
+      "41-east-api-2::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]",
+    );
   }, 180_000);
 });

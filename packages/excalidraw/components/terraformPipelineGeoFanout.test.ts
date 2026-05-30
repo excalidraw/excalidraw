@@ -108,6 +108,50 @@ function insideFrame(
   );
 }
 
+function subnetZoneAncestor(
+  elements: SceneElement[],
+  primary: SceneElement,
+): SceneElement | null {
+  return ancestorFrameWithRole(
+    elements,
+    primary.frameId ?? primary.id,
+    "subnetZone",
+  );
+}
+
+function expectSameRegionalSubnetZone(
+  elements: SceneElement[],
+  nodePathSuffixA: string,
+  nodePathSuffixB: string,
+): void {
+  const a = primaryResourceForNodePath(elements, nodePathSuffixA);
+  const b = primaryResourceForNodePath(elements, nodePathSuffixB);
+  expect(a).toBeDefined();
+  expect(b).toBeDefined();
+  const zoneA = subnetZoneAncestor(elements, a!);
+  const zoneB = subnetZoneAncestor(elements, b!);
+  expect(zoneA).toBeDefined();
+  expect(zoneB).toBeDefined();
+  expect(zoneA!.id).toBe(zoneB!.id);
+  expect(zoneA!.customData?.terraformTopologyPath?.[2]).toBe("regional");
+}
+
+function expectDifferentSubnetZone(
+  elements: SceneElement[],
+  nodePathSuffixA: string,
+  nodePathSuffixB: string,
+): void {
+  const a = primaryResourceForNodePath(elements, nodePathSuffixA);
+  const b = primaryResourceForNodePath(elements, nodePathSuffixB);
+  expect(a).toBeDefined();
+  expect(b).toBeDefined();
+  const zoneA = subnetZoneAncestor(elements, a!);
+  const zoneB = subnetZoneAncestor(elements, b!);
+  expect(zoneA).toBeDefined();
+  expect(zoneB).toBeDefined();
+  expect(zoneA!.id).not.toBe(zoneB!.id);
+}
+
 describe("localstack geo fanout pipeline layout", () => {
   it.skipIf(!hasLocalstackGeoFanoutFixtures())(
     "renders 20 declared pipeline arrows across mixed account/region/VPC fanout",
@@ -201,7 +245,13 @@ describe("localstack geo fanout pipeline layout", () => {
           e.type === "frame" &&
           e.customData?.terraformTopologyRole === "subnetZone",
       );
-      expect(zoneFrames.length).toBeGreaterThanOrEqual(body.meta?.atomCount);
+      expect(zoneFrames.length).toBeGreaterThanOrEqual(10);
+      expect(zoneFrames.length).toBeLessThan(body.meta?.atomCount ?? 0);
+
+      const regionalZoneFrames = zoneFrames.filter(
+        (z) => z.customData?.terraformTopologyPath?.[2] === "regional",
+      );
+      expect(regionalZoneFrames.length).toBeGreaterThanOrEqual(6);
 
       for (let i = 0; i < zoneFrames.length; i++) {
         for (let j = i + 1; j < zoneFrames.length; j++) {
@@ -258,6 +308,33 @@ describe("localstack geo fanout pipeline layout", () => {
       if (api1Zone) {
         expect(insideFrame(api1Lambda!, api1Zone)).toBe(true);
       }
+
+      // Regional-tier zones coalesce vertically when lanes share account/region/column.
+      expectSameRegionalSubnetZone(
+        elements,
+        "21-b-api-5::module.api.aws_api_gateway_rest_api.main",
+        "22-b-api-6::module.api.aws_api_gateway_rest_api.main",
+      );
+      expectSameRegionalSubnetZone(
+        elements,
+        "21-b-api-5::module.api.aws_ssm_parameter.api_name",
+        "22-b-api-6::module.api.aws_ssm_parameter.api_name",
+      );
+      expectSameRegionalSubnetZone(
+        elements,
+        "11-a-api-2::module.api.aws_api_gateway_rest_api.main",
+        "12-a-api-3::module.api.aws_api_gateway_rest_api.main",
+      );
+      expectDifferentSubnetZone(
+        elements,
+        "10-a-api-1::module.api.aws_api_gateway_rest_api.main",
+        "11-a-api-2::module.api.aws_api_gateway_rest_api.main",
+      );
+      expectDifferentSubnetZone(
+        elements,
+        "21-b-api-5::module.api.aws_lambda_function.this",
+        "22-b-api-6::module.api.aws_lambda_function.this",
+      );
     },
     180_000,
   );

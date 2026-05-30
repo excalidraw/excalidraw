@@ -74,7 +74,7 @@ type ClusterBuild = {
 
 type Bounds = { x: number; y: number; width: number; height: number };
 
-type ZoneFrameSpec = {
+export type PipelineZoneFrameSpec = {
   id: string;
   label: string;
   role: string;
@@ -88,6 +88,8 @@ type ZoneFrameSpec = {
   columnIndex: number;
   laneIndex: number;
 };
+
+type ZoneFrameSpec = PipelineZoneFrameSpec;
 
 type ClusterPlacementDraft = {
   col: PipelineColumn;
@@ -708,6 +710,120 @@ function zoneLabelForGeo(geo: PipelineGeoPath): string {
     : `${geo.vpcId ? "VPC" : "Zone"} · ${pipelineGeoTierLabel(geo.tier)}`;
 }
 
+function unionZoneBounds(a: Bounds, b: Bounds): Bounds {
+  const minX = Math.min(a.x, b.x);
+  const minY = Math.min(a.y, b.y);
+  const maxX = Math.max(a.x + a.width, b.x + b.width);
+  const maxY = Math.max(a.y + a.height, b.y + b.height);
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
+/** Coalesce key when fanout lanes share the same geo parent bucket, tier label, and column. */
+export function pipelineZoneCoalesceKey(
+  spec: PipelineZoneFrameSpec,
+): string | null {
+  const parentBucket = spec.vpcKey ?? spec.regionalBandKey;
+  if (!parentBucket) {
+    return null;
+  }
+  return `${parentBucket}|${spec.label}|col${spec.columnIndex}`;
+}
+
+function pipelineZoneFrameIdFromCoalesceKey(coalesceKey: string): string {
+  return `tf-pipe-zone:${coalesceKey.replace(/\|/g, ":")}`;
+}
+
+function mergedZonePath(first: ZoneFrameSpec): string[] {
+  if (first.vpcKey) {
+    const parts = first.vpcKey.split("|");
+    return [
+      parts[0] ?? first.accountId,
+      parts[1] ?? first.region,
+      parts[2] ?? "vpc",
+      parts[3] ?? "0",
+      String(first.columnIndex),
+    ];
+  }
+  const bandParts = first.regionalBandKey?.split("|");
+  const geoInstanceId = bandParts?.[3] ?? "0";
+  return [
+    first.accountId,
+    first.region,
+    "regional",
+    geoInstanceId,
+    String(first.columnIndex),
+  ];
+}
+
+/** Merge leaf subnetZone specs that share the same geographic parent and pipeline column. */
+export function coalescePipelineZoneSpecs(
+  zoneSpecs: Map<string, ZoneFrameSpec>,
+): Map<string, ZoneFrameSpec> {
+  const groups = new Map<string, ZoneFrameSpec[]>();
+
+  for (const spec of zoneSpecs.values()) {
+    const coalesceKey = pipelineZoneCoalesceKey(spec);
+    if (!coalesceKey) {
+      continue;
+    }
+    const group = groups.get(coalesceKey) ?? [];
+    group.push(spec);
+    groups.set(coalesceKey, group);
+  }
+
+  const out = new Map<string, ZoneFrameSpec>();
+
+  for (const [coalesceKey, group] of groups) {
+    if (group.length === 1) {
+      const only = group[0]!;
+      out.set(only.id, only);
+      continue;
+    }
+
+    const sorted = [...group].sort((a, b) => a.laneIndex - b.laneIndex);
+    const first = sorted[0]!;
+    let bounds = first.bounds;
+    const clusterFrameIds: string[] = [...first.clusterFrameIds];
+    let minLane = first.laneIndex;
+
+    for (let i = 1; i < sorted.length; i++) {
+      const spec = sorted[i]!;
+      bounds = unionZoneBounds(bounds, spec.bounds);
+      clusterFrameIds.push(...spec.clusterFrameIds);
+      minLane = Math.min(minLane, spec.laneIndex);
+    }
+
+    const id = pipelineZoneFrameIdFromCoalesceKey(coalesceKey);
+    out.set(id, {
+      id,
+      label: first.label,
+      role: "subnetZone",
+      path: mergedZonePath(first),
+      bounds,
+      clusterFrameIds,
+      vpcKey: first.vpcKey,
+      regionalBandKey: first.regionalBandKey,
+      accountId: first.accountId,
+      region: first.region,
+      columnIndex: first.columnIndex,
+      laneIndex: minLane,
+    });
+  }
+
+  return out;
+}
+
+/** @deprecated Use {@link pipelineZoneCoalesceKey}. */
+export const regionalZoneCoalesceKey = pipelineZoneCoalesceKey;
+
+/** @deprecated Use {@link coalescePipelineZoneSpecs}. */
+export const coalesceRegionalZoneSpecs = coalescePipelineZoneSpecs;
+
 function collectLayoutBoxesFromSkeleton(
   skeleton: readonly ExcalidrawElementSkeleton[],
 ): Record<string, TerraformDependencyLayoutBox> {
@@ -954,8 +1070,9 @@ export async function buildTerraformPipelineExcalidrawScene(
   }
 
   // Pass 2: AWS → account → region → vpc → subnetZone (container bounds from children post-convert).
+  const coalescedZoneSpecs = coalescePipelineZoneSpecs(zoneSpecs);
   const zoneFrames: ExcalidrawElementSkeleton[] = [];
-  for (const spec of zoneSpecs.values()) {
+  for (const spec of coalescedZoneSpecs.values()) {
     zoneFrames.push(
       leafZoneFrameSkeleton(
         spec.id,
@@ -971,7 +1088,7 @@ export async function buildTerraformPipelineExcalidrawScene(
   }
 
   const vpcGroups = new Map<string, ZoneFrameSpec[]>();
-  for (const spec of zoneSpecs.values()) {
+  for (const spec of coalescedZoneSpecs.values()) {
     if (!spec.vpcKey) {
       continue;
     }
@@ -987,7 +1104,7 @@ export async function buildTerraformPipelineExcalidrawScene(
   }
 
   const regionalZonesByRegion = new Map<string, ZoneFrameSpec[]>();
-  for (const spec of zoneSpecs.values()) {
+  for (const spec of coalescedZoneSpecs.values()) {
     if (spec.vpcKey) {
       continue;
     }
@@ -1073,7 +1190,7 @@ export async function buildTerraformPipelineExcalidrawScene(
           `tf-pipe-region:${band.accountId}/`,
           "",
         );
-        return [...zoneSpecs.values()].some(
+        return [...coalescedZoneSpecs.values()].some(
           (z) =>
             z.accountId === band.accountId &&
             z.region === suffix &&
