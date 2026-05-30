@@ -1,15 +1,29 @@
-import React from "react";
+import React, { Suspense } from "react";
+
+const HeroTopologyScene = React.lazy(() =>
+  import("./HeroTopologyScene").then((module) => ({
+    default: module.HeroTopologyScene,
+  })),
+);
 
 type LandingHeroProps = {
   onScrollToCanvas: () => void;
 };
 
+const HeroSceneFallback = () => (
+  <div className="lp-hero-scene-wrap lp-hero-scene-wrap--fallback" aria-hidden="true">
+    <img
+      className="lp-hero-scene__fallback-img"
+      src="/og-image.png"
+      alt=""
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+);
+
 export const LandingHero = ({ onScrollToCanvas }: LandingHeroProps) => (
-  <section
-    className="lp-hero"
-    aria-labelledby="landing-title"
-    data-lp-hero-parallax
-  >
+  <section className="lp-hero" aria-labelledby="landing-title">
     <div className="lp-hero__bg" aria-hidden="true" />
     <div className="lp-hero__inner">
       <div className="lp-hero__copy">
@@ -42,35 +56,10 @@ export const LandingHero = ({ onScrollToCanvas }: LandingHeroProps) => (
         </div>
       </div>
 
-      <div className="hero-parallax" aria-hidden="true">
-        <div className="hero-parallax__wrapper">
-          <div className="hero-parallax__layer hero-parallax__layer--account">
-            <span className="lp-topology__label">aws account</span>
-            <div className="hero-parallax__layer hero-parallax__layer--region">
-              <span className="lp-topology__label">region</span>
-              <div className="hero-parallax__layer hero-parallax__layer--vpc">
-                <span className="lp-topology__label">vpc</span>
-                <span className="lp-service lp-service--igw">igw</span>
-                <span className="lp-link lp-link--a" />
-                <span className="lp-service lp-service--alb">alb</span>
-                <span className="lp-link lp-link--b" />
-                <span className="lp-service lp-service--lambda">lambda</span>
-                <span className="lp-link lp-link--c" />
-                <span className="lp-service lp-service--s3">s3</span>
-                <span className="lp-link lp-link--d" />
-                <span className="lp-service lp-service--sqs">sqs</span>
-                <span className="lp-link lp-link--e" />
-                <span className="lp-service lp-service--nat">nat</span>
-              </div>
-            </div>
-          </div>
-          <span className="lp-topology-note lp-topology-note--top">
-            semantic view
-          </span>
-          <span className="lp-topology-note lp-topology-note--bottom">
-            allplanmodules.json
-          </span>
-        </div>
+      <div className="lp-hero__visual" aria-hidden="true">
+        <Suspense fallback={<HeroSceneFallback />}>
+          <HeroTopologyScene />
+        </Suspense>
       </div>
     </div>
   </section>

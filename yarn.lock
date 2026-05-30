@@ -6579,6 +6579,15 @@ fractional-indexing@3.2.0:
   resolved "https://registry.yarnpkg.com/fractional-indexing/-/fractional-indexing-3.2.0.tgz#1193e63d54ff4e0cbe0c79a9ed6cfbab25d91628"
   integrity sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==
 
+framer-motion@^12.23.12:
+  version "12.40.0"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.40.0.tgz#68e53aecd51c8a8a62b565f059b418bef2add0e2"
+  integrity sha512-uaBd3qC1v3KQqBEjwTUd183K6PbS+j0yR9w9VmEOLWA/tnUcSn8Xa3uck7t4dgpDoUss8xQTcj8W2L07lrnLFg==
+  dependencies:
+    motion-dom "^12.40.0"
+    motion-utils "^12.39.0"
+    tslib "^2.4.0"
+
 fs-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs-constants/-/fs-constants-1.0.0.tgz#6be0de9be998ce16af8afc24497b9ee9b7ccd9ad"
@@ -7983,6 +7992,26 @@ moo-color@^1.0.2:
   integrity sha512-i/+ZKXMDf6aqYtBhuOcej71YSlbjT3wCO/4H1j8rPvxDJEifdwgg5MaFyu6iYAT8GBZJg2z0dkgK4YMzvURALQ==
   dependencies:
     color-name "^1.1.4"
+
+motion-dom@^12.40.0:
+  version "12.40.0"
+  resolved "https://registry.yarnpkg.com/motion-dom/-/motion-dom-12.40.0.tgz#95fb411ac72e8adbaf5f1b17b8f07783da223bee"
+  integrity sha512-HxU3ZaBwNPVQUBQf1xxgq+7JrPNZvjLVxgbpEZL7RrWJnsxOf0/OM+yrHG9ogLQ31Do/r57Oz2gQWPK+6q62mg==
+  dependencies:
+    motion-utils "^12.39.0"
+
+motion-utils@^12.39.0:
+  version "12.39.0"
+  resolved "https://registry.yarnpkg.com/motion-utils/-/motion-utils-12.39.0.tgz#e1c66f0e912999804bc5e69b4630c3bc794ef29f"
+  integrity sha512-8nadJAJjTtqRkmRF36FoJTrywK9nnFmnPwnSMyxaOCU7GDjN9RTMJIxx9De8ErM+vpPhMccr/6fo5WciyQLnMQ==
+
+motion@12.23.12:
+  version "12.23.12"
+  resolved "https://registry.yarnpkg.com/motion/-/motion-12.23.12.tgz#9f3552636c1e94911eee42e6f85db8f60db83c19"
+  integrity sha512-8jCD8uW5GD1csOoqh1WhH1A6j5APHVE15nuBkFeRiMzYBdRwyAHmSP/oXSuW0WJPZRXTFdBoG4hY9TFWNhhwng==
+  dependencies:
+    framer-motion "^12.23.12"
+    tslib "^2.4.0"
 
 mrmime@^2.0.0:
   version "2.0.1"

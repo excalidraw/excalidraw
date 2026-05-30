@@ -260,8 +260,6 @@ body.terraform-canvas-landing #root {
 .lp-hero {
   position: relative;
   overflow: clip;
-  view-timeline-name: --lp-hero;
-  view-timeline-axis: block;
 }
 
 .lp-hero__bg {
@@ -358,163 +356,228 @@ body.terraform-canvas-landing #root {
   font-weight: 600;
 }
 
-// ─── Hero parallax topology ────────────────────────────────────────────────
+// ─── Hero product mock (split inspector + canvas) ───────────────────────────
 
-.hero-parallax {
-  position: relative;
-  overflow: clip;
-  height: min(520px, 70vh);
-  min-height: 360px;
+.lp-hero__visual {
+  perspective: 1200px;
+  min-height: min(480px, 62vh);
 }
 
-.hero-parallax__wrapper {
+.lp-hero-scene-wrap {
   position: relative;
   width: 100%;
   height: 100%;
-  view-timeline-name: --lp-hero-parallax;
-  view-timeline-axis: block;
+  min-height: min(480px, 62vh);
 }
 
-.hero-parallax__layer {
-  position: absolute;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--lp-radius);
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--lp-shadow-sm);
-}
-
-.hero-parallax__layer--account {
-  inset: 8% 2% 10% 0;
-}
-
-.hero-parallax__layer--region {
-  inset: 12% 6% 8% 8%;
-  border-color: rgba(61, 110, 168, 0.45);
-}
-
-.hero-parallax__layer--vpc {
-  inset: 26% 4% 14% 5%;
+.lp-hero-scene-wrap--fallback {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto auto;
-  gap: 0.5rem;
-  align-content: center;
-  padding: 1.75rem 0.65rem 0.65rem;
-  border-color: rgba(15, 139, 95, 0.45);
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--lp-radius);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: var(--lp-shadow);
 }
 
-.lp-topology__label {
-  position: absolute;
-  top: -0.65rem;
-  left: 0.75rem;
-  padding: 0.15rem 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.lp-hero-scene__fallback-img {
+  width: 100%;
+  height: auto;
+  opacity: 0.92;
+  object-fit: cover;
+}
+
+.lp-hero-scene {
+  display: grid;
+  grid-template-columns: minmax(148px, 0.38fr) minmax(0, 1fr);
+  gap: 0;
+  overflow: hidden;
+  min-height: min(480px, 62vh);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--lp-radius);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.lp-hero-scene__inspector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border-right: 1px solid rgba(15, 23, 20, 0.08);
+  background: #f8faf9;
+  color: var(--lp-ink);
+}
+
+.lp-hero-scene__inspector-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lp-hero-scene__inspector-type {
+  font: 700 0.78rem var(--lp-font-mono);
+  line-height: 1.3;
+}
+
+.lp-hero-scene__inspector-badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.15rem 0.45rem;
   border-radius: 999px;
-  background: rgba(15, 23, 20, 0.85);
-  color: var(--lp-ink-on-dark);
-  font: 600 0.68rem var(--lp-font-mono);
-  letter-spacing: 0.04em;
+  background: #fef3c7;
+  color: #92400e;
+  font: 700 0.62rem var(--lp-font-body);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.lp-service {
-  z-index: 2;
-  position: relative;
+.lp-hero-scene__inspector-path {
+  margin: 0;
+  color: var(--lp-muted);
+  font: 500 0.58rem/1.35 var(--lp-font-mono);
+  overflow-wrap: anywhere;
+}
+
+.lp-hero-scene__diff {
   display: grid;
-  place-items: center;
-  min-height: 46px;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.lp-hero-scene__diff-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.lp-hero-scene__diff-head strong {
+  font-weight: 700;
+}
+
+.lp-hero-scene__diff-head span {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: #fef9c3;
+  color: #854d0e;
+  font: 700 0.58rem var(--lp-font-body);
+  text-transform: uppercase;
+}
+
+.lp-hero-scene__diff-row {
+  display: grid;
+  gap: 0.15rem;
   padding: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--lp-radius-sm);
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--lp-ink-on-dark);
-  font: 600 0.72rem var(--lp-font-mono);
-  text-transform: lowercase;
+  border: 1px solid var(--lp-line);
+  border-radius: 6px;
+  background: #fff;
 }
 
-.lp-service--alb {
-  background: rgba(15, 139, 95, 0.25);
+.lp-hero-scene__diff-row--after {
+  border-color: #fde68a;
+  background: #fefce8;
 }
 
-.lp-service--lambda {
-  background: rgba(201, 151, 42, 0.22);
+.lp-hero-scene__diff-label {
+  color: var(--lp-muted);
+  font: 700 0.58rem var(--lp-font-body);
+  text-transform: uppercase;
 }
 
-.lp-service--sqs {
-  background: rgba(201, 87, 63, 0.2);
+.lp-hero-scene__diff-row code {
+  font: 500 0.56rem/1.35 var(--lp-font-mono);
+  overflow-wrap: anywhere;
 }
 
-.lp-service--nat {
-  background: rgba(61, 110, 168, 0.22);
+.lp-hero-scene__canvas {
+  position: relative;
+  min-width: 0;
+  background: #ffffff;
 }
 
-.lp-link {
-  z-index: 1;
-  align-self: center;
+.lp-hero-scene__canvas-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  padding: 0.45rem 0.55rem 0;
+  color: var(--lp-muted);
+  font: 600 0.58rem var(--lp-font-mono);
+}
+
+.lp-hero-scene__svg {
+  display: block;
   width: 100%;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.35);
+  height: auto;
 }
 
-.lp-topology-note {
+.lp-hero-scene__frame {
+  fill: rgba(15, 139, 95, 0.04);
+  stroke: rgba(15, 139, 95, 0.35);
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+}
+
+.lp-hero-scene__frame-label {
+  fill: var(--lp-muted);
+  font: 600 9px var(--lp-font-mono);
+  text-transform: uppercase;
+}
+
+.lp-hero-scene__edge {
+  stroke: #2563eb;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.lp-hero-scene__node {
+  fill: #ffffff;
+  stroke: rgba(15, 23, 20, 0.18);
+  stroke-width: 1;
+}
+
+.lp-hero-scene__node--satellite {
+  fill: #f8fafc;
+}
+
+.lp-hero-scene__node--selected {
+  stroke: #16a34a;
+  stroke-width: 1.5;
+}
+
+.lp-hero-scene__node-pulse {
+  fill: none;
+  stroke: #22c55e;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
+.lp-hero-scene__node-icon {
+  fill: var(--lp-accent);
+}
+
+.lp-hero-scene__node-label {
+  fill: var(--lp-ink);
+  font: 600 8.5px var(--lp-font-mono);
+}
+
+.lp-hero-scene__canvas-tag {
   position: absolute;
-  z-index: 3;
-  color: rgba(255, 255, 255, 0.45);
-  font: italic 600 0.78rem var(--lp-font-mono);
-}
-
-.lp-topology-note--top {
-  top: 2%;
-  right: 4%;
-}
-
-.lp-topology-note--bottom {
-  right: 2%;
-  bottom: 2%;
-}
-
-@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-  .landing-page {
-    timeline-scope: --lp-hero, --lp-hero-parallax;
-  }
-
-  @keyframes lp-parallax-account {
-    from {
-      transform: translateY(36px);
-    }
-  }
-
-  @keyframes lp-parallax-region {
-    from {
-      transform: translateY(56px);
-    }
-  }
-
-  @keyframes lp-parallax-vpc {
-    from {
-      transform: translateY(76px);
-    }
-  }
-
-  .hero-parallax__layer--account {
-    animation: lp-parallax-account linear both;
-    animation-timeline: --lp-hero-parallax;
-    animation-range: entry 0% cover 85%;
-  }
-
-  .hero-parallax__layer--region {
-    animation: lp-parallax-region linear both;
-    animation-timeline: --lp-hero-parallax;
-    animation-range: entry 5% cover 90%;
-  }
-
-  .hero-parallax__layer--vpc {
-    animation: lp-parallax-vpc linear both;
-    animation-timeline: --lp-hero-parallax;
-    animation-range: entry 10% cover 95%;
-  }
+  right: 0.55rem;
+  bottom: 0.45rem;
+  color: var(--lp-muted);
+  font: italic 600 0.62rem var(--lp-font-mono);
 }
 
 // ─── Section headings ──────────────────────────────────────────────────────
@@ -589,13 +652,15 @@ body.terraform-canvas-landing #root {
 
 @media (prefers-reduced-motion: reduce) {
   .landing-page [data-lp-reveal],
-  .landing-page .hero-parallax *,
-  .landing-page .hero-parallax__layer,
   .landing-page .lp-hero__copy {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  .lp-hero-scene {
+    transform: none !important;
   }
 
   .lp-reveal-fallback {
@@ -1168,9 +1233,19 @@ body.terraform-canvas-landing #root {
     max-width: none;
   }
 
-  .hero-parallax {
-    min-height: 300px;
-    height: 320px;
+  .lp-hero-scene {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .lp-hero-scene__inspector {
+    border-right: none;
+    border-bottom: 1px solid rgba(15, 23, 20, 0.08);
+  }
+
+  .lp-hero-scene-wrap,
+  .lp-hero__visual {
+    min-height: 360px;
   }
 
   .lp-final {
