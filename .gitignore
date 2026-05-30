@@ -110,6 +110,8 @@ packages/backend/terraform/staging-multi-state/**/.build/
 # LocalStack geo fanout generated apply/export artifacts (not source-controlled).
 packages/backend/terraform/localstack-geo-fanout/**/.build/
 packages/backend/terraform/localstack-geo-fanout/**/tfplan
+packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.plan.json
+packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.graph.dot
 
 # Cloudflare Wrangler (local dev state, caches; not source-controlled)
 .wrangler/
