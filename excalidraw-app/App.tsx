@@ -37,7 +37,6 @@ import {
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -104,8 +103,6 @@ import {
   isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
-  TFDRAW_GITHUB_REPO_URL,
-  TFDRAW_GITHUB_USER_URL,
 } from "./app_constants";
 import Collab, {
   collabAPIAtom,
@@ -115,7 +112,7 @@ import Collab, {
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
-import { LandingEmailSignup } from "./components/LandingEmailSignup";
+import { LandingPage } from "./components/landing/LandingPage";
 import {
   PostImportEmailPrompt,
   POST_IMPORT_EMAIL_DELAY_MS,
@@ -404,30 +401,6 @@ const initializeScene = async (opts: {
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
-};
-
-const LANDING_CANVAS_SECTION_ID = "terraform-canvas";
-const LANDING_NAV_SCROLL_OFFSET = 82;
-
-const scrollToLandingTop = (behavior: ScrollBehavior = "auto"): void => {
-  window.scrollTo({ top: 0, left: 0, behavior });
-};
-
-const scrollToLandingCanvasSection = (
-  behavior: ScrollBehavior = "auto",
-): void => {
-  const anchor =
-    document.getElementById("terraform-canvas-heading") ??
-    document.getElementById(LANDING_CANVAS_SECTION_ID);
-  if (!anchor) {
-    return;
-  }
-
-  const top =
-    anchor.getBoundingClientRect().top +
-    window.scrollY -
-    LANDING_NAV_SCROLL_OFFSET;
-  window.scrollTo({ top: Math.max(0, top), behavior });
 };
 
 const ExcalidrawWrapper = ({
@@ -1412,447 +1385,6 @@ const ExcalidrawWrapper = ({
   );
 };
 
-const LandingPage = () => {
-  const landingScrollRestorationRef = useRef<ScrollRestoration | null>(null);
-  const landingScrollCleanupRef = useRef<(() => void) | null>(null);
-
-  const scrollToCanvas = useCallback((behavior: ScrollBehavior = "smooth") => {
-    scrollToLandingCanvasSection(behavior);
-  }, []);
-
-  const scheduleLandingTopScroll = useCallback(() => {
-    landingScrollCleanupRef.current?.();
-
-    if (window.location.hash) {
-      return;
-    }
-
-    const scroll = () => scrollToLandingTop("auto");
-    scroll();
-
-    const rafId = requestAnimationFrame(() => {
-      scroll();
-      requestAnimationFrame(scroll);
-    });
-    const timeoutIds = [50, 150, 400, 800, 1500].map((delay) =>
-      window.setTimeout(scroll, delay),
-    );
-
-    landingScrollCleanupRef.current = () => {
-      cancelAnimationFrame(rafId);
-      timeoutIds.forEach((id) => window.clearTimeout(id));
-    };
-  }, []);
-
-  useLayoutEffect(() => {
-    document.documentElement.classList.add("terraform-canvas-landing");
-    document.body.classList.add("terraform-canvas-landing");
-
-    landingScrollRestorationRef.current = history.scrollRestoration;
-    history.scrollRestoration = "manual";
-
-    scheduleLandingTopScroll();
-
-    return () => {
-      landingScrollCleanupRef.current?.();
-      landingScrollCleanupRef.current = null;
-      document.documentElement.classList.remove("terraform-canvas-landing");
-      document.body.classList.remove("terraform-canvas-landing");
-      if (landingScrollRestorationRef.current) {
-        history.scrollRestoration = landingScrollRestorationRef.current;
-      }
-    };
-  }, [scheduleLandingTopScroll]);
-
-  const handleFrontendSceneReady = useCallback(() => {
-    scheduleLandingTopScroll();
-  }, [scheduleLandingTopScroll]);
-
-  return (
-    <main id="top" className="landing-page">
-      <header className="landing-nav-wrap">
-        <nav className="landing-nav" aria-label="tfdraw.dev">
-          <a className="landing-nav__brand" href="#top">
-            <img
-              className="landing-nav__logo"
-              src="/tfdraw-logo.png"
-              alt=""
-              aria-hidden="true"
-            />
-            tfdraw.dev
-          </a>
-          <div className="landing-nav__links">
-            <a href="#terraform-canvas">Terraform canvas</a>
-            <a href="#workflow">Workflow</a>
-            <a href="#use-cases">Use cases</a>
-            <a href="#faq">FAQ</a>
-            <a
-              href={TFDRAW_GITHUB_REPO_URL}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              GitHub
-            </a>
-            <a href="/demo">Full editor</a>
-            <button
-              type="button"
-              className="landing-cta"
-              onClick={() => scrollToCanvas()}
-            >
-              View changes
-            </button>
-          </div>
-        </nav>
-      </header>
-      <section className="landing-hero" aria-labelledby="landing-title">
-        <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">
-            Keep your architecture diagram in sync with your Terraform.
-          </p>
-          <h1 id="landing-title">Terraform as a living architecture diagram</h1>
-          <p className="landing-hero__lede">
-            tfdraw.dev maps Terraform state, tfplan JSON, and graph data into an
-            editable architecture canvas so platform teams can visualize
-            changes, review plans, and annotate the real infrastructure model.
-          </p>
-          <div className="landing-hero__actions">
-            <button
-              type="button"
-              className="landing-cta"
-              onClick={() => scrollToCanvas()}
-            >
-              Visualize a plan
-            </button>
-            <button
-              type="button"
-              className="landing-cta"
-              onClick={() => scrollToCanvas()}
-            >
-              Open the canvas
-            </button>
-            <a href="/demo" className="landing-cta">
-              Full editor demo
-            </a>
-          </div>
-          <div className="landing-proof" aria-label="tfdraw.dev values">
-            <span>State-backed architecture view</span>
-            <span>Visual plan diffs</span>
-            <span>Custom annotations</span>
-            <span>Shareable review canvas</span>
-          </div>
-        </div>
-        <div className="landing-hero__sketch" aria-hidden="true">
-          <div className="landing-topology landing-topology--account">
-            <span className="landing-topology__label">aws account</span>
-            <div className="landing-topology landing-topology--region">
-              <span className="landing-topology__label">region</span>
-              <div className="landing-topology landing-topology--vpc">
-                <span className="landing-topology__label">vpc</span>
-                <span className="landing-service landing-service--igw">
-                  igw
-                </span>
-                <span className="landing-link landing-link--a" />
-                <span className="landing-service landing-service--alb">
-                  alb
-                </span>
-                <span className="landing-link landing-link--b" />
-                <span className="landing-service landing-service--lambda">
-                  lambda
-                </span>
-                <span className="landing-link landing-link--c" />
-                <span className="landing-service landing-service--s3">s3</span>
-                <span className="landing-link landing-link--d" />
-                <span className="landing-service landing-service--sqs">
-                  sqs
-                </span>
-                <span className="landing-link landing-link--e" />
-                <span className="landing-service landing-service--nat">
-                  nat
-                </span>
-              </div>
-            </div>
-          </div>
-          <span className="landing-note landing-note--top">semantic view</span>
-          <span className="landing-note landing-note--bottom">
-            allplanmodules.json
-          </span>
-        </div>
-      </section>
-
-      <section
-        id="terraform-canvas"
-        className="landing-canvas-section"
-        aria-labelledby="terraform-canvas-heading"
-      >
-        <div className="landing-canvas-section__header">
-          <p>Live architecture view</p>
-          <h2 id="terraform-canvas-heading">
-            See what is built. See what will change.
-          </h2>
-        </div>
-        <div
-          className="landing-canvas-instructions"
-          aria-label="Terraform input instructions"
-        >
-          <article>
-            <strong>1. Save a plan</strong>
-            <code>terraform plan -out=tfplan.bin</code>
-          </article>
-          <article>
-            <strong>2. Export plan JSON</strong>
-            <code>terraform show -json tfplan.bin &gt; tfplan.json</code>
-          </article>
-          <article>
-            <strong>3. Export state JSON</strong>
-            <code>terraform show -json &gt; tfstate.json</code>
-          </article>
-          <article>
-            <strong>4. Export graph DOT</strong>
-            <code>terraform graph -plan=tfplan.bin &gt; graph.dot</code>
-          </article>
-          <article>
-            <strong>5. Redact before upload</strong>
-            <code>
-              jq 'walk(if type == "object" and .sensitive == true then .value =
-              "[redacted]" else . end)' tfplan.json &gt; tfplan.redacted.json
-            </code>
-          </article>
-        </div>
-        <div className="landing-canvas-shell">
-          <TopErrorBoundary>
-            <Provider store={appJotaiStore}>
-              <ExcalidrawAPIProvider>
-                <ExcalidrawWrapper
-                  frontendOnly
-                  onFrontendSceneReady={handleFrontendSceneReady}
-                />
-              </ExcalidrawAPIProvider>
-            </Provider>
-          </TopErrorBoundary>
-        </div>
-      </section>
-
-      <section className="landing-strip" aria-labelledby="landing-strip-title">
-        <h2 id="landing-strip-title" className="landing-strip__heading">
-          Source-backed view for platform teams
-        </h2>
-        <p>
-          Turn Terraform state, plans, and reviews into one architecture canvas
-          your team can read together.
-        </p>
-        <div>
-          <span>Terraform state</span>
-          <span>Plan semantics</span>
-          <span>Dependency impact</span>
-          <span>Hosted review ready</span>
-        </div>
-      </section>
-
-      <section
-        id="workflow"
-        className="landing-workflow"
-        aria-labelledby="workflow-title"
-      >
-        <div className="landing-section-heading">
-          <p>Workflow</p>
-          <h2 id="workflow-title">
-            From Terraform truth to a readable canvas.
-          </h2>
-        </div>
-        <ol className="landing-steps">
-          <li>
-            <strong>Load state and plan</strong>
-            <span>
-              Map actual Terraform state and tfplan output into the visual
-              model.
-            </span>
-          </li>
-          <li>
-            <strong>Read the change</strong>
-            <span>
-              See creates, deletes, replacements, and dependency impact in the
-              architecture view.
-            </span>
-          </li>
-          <li>
-            <strong>Annotate the truth</strong>
-            <span>
-              Customize and annotate the view without forking it from the
-              underlying infrastructure model.
-            </span>
-          </li>
-        </ol>
-      </section>
-
-      <section className="landing-features" aria-labelledby="features-title">
-        <div className="landing-section-heading">
-          <p>Product</p>
-          <h2 id="features-title">Why teams use tfdraw.dev</h2>
-        </div>
-        <div className="landing-features__grid">
-          <article>
-            <span>01</span>
-            <h3>The diagram is the source-backed view</h3>
-            <p>
-              There is no separate architecture diagram to keep in sync with
-              what Terraform actually manages.
-            </p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Plan semantics at a glance</h3>
-            <p>
-              Replace Terraform plan noise with visual architecture changes your
-              team can scan and discuss.
-            </p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Ready for shared reviews</h3>
-            <p>
-              Hosted review mode can synchronize the actual built and changing
-              view for multiple users.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section
-        id="use-cases"
-        className="landing-use-cases"
-        aria-labelledby="use-cases-title"
-      >
-        <div className="landing-section-heading">
-          <p>Use cases</p>
-          <h2 id="use-cases-title">
-            Review the real infrastructure model together.
-          </h2>
-        </div>
-        <div className="landing-use-case-grid">
-          <span>Plan reviews</span>
-          <span>Drift investigations</span>
-          <span>Architecture reviews</span>
-          <span>Change approvals</span>
-        </div>
-      </section>
-
-      <section id="faq" className="landing-faq" aria-labelledby="faq-title">
-        <div className="landing-section-heading">
-          <p>FAQ</p>
-          <h2 id="faq-title">Terraform visualization questions</h2>
-        </div>
-        <dl className="landing-faq__list">
-          <div className="landing-faq__item">
-            <dt>How do I visualize a Terraform plan in tfdraw.dev?</dt>
-            <dd>
-              Save a binary plan with{" "}
-              <code>terraform plan -out=tfplan.bin</code>, export JSON with{" "}
-              <code>terraform show -json tfplan.bin</code>, optionally export
-              matching state and graph files, redact secrets, then import the
-              files into the on-page canvas.
-            </dd>
-          </div>
-          <div className="landing-faq__item">
-            <dt>Does tfdraw.dev replace Terraform or HCL?</dt>
-            <dd>
-              No. It is a read-and-annotate view on top of Terraform outputs.
-              You keep HCL, modules, and workflows in Git; the canvas reflects
-              what state and plans say is true in the environment.
-            </dd>
-          </div>
-          <div className="landing-faq__item">
-            <dt>What files does the canvas use?</dt>
-            <dd>
-              Typical imports include Terraform state JSON, plan JSON, and a DOT
-              graph from <code>terraform graph</code>. Exact formats can evolve;
-              the instructions above the canvas list the current export steps.
-            </dd>
-          </div>
-          <div className="landing-faq__item">
-            <dt>Can I share a diagram with my team?</dt>
-            <dd>
-              The product supports collaboration and shareable review flows so
-              multiple people can inspect the same architecture view. Use the
-              in-app sharing options when you are in the full editor experience.
-            </dd>
-          </div>
-          <div className="landing-faq__item">
-            <dt>Is my Terraform data uploaded to a server?</dt>
-            <dd>
-              Plan JSON, graph DOT, and state files are parsed in your browser
-              and are not sent to tfdraw.dev for import. Optional email signup
-              stores only your address and how you signed up. Anonymous counters
-              record import success or failure (no file contents). Redact
-              secrets before sharing exports; follow your org data policy for
-              collaboration features.
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      <section className="landing-final" aria-labelledby="final-title">
-        <h2 id="final-title">Bring the next Terraform review to tfdraw.dev.</h2>
-        <button
-          type="button"
-          className="landing-cta"
-          onClick={() => scrollToCanvas()}
-        >
-          Visualize Terraform changes
-        </button>
-      </section>
-
-      <LandingEmailSignup />
-
-      <footer className="landing-footer" aria-label="Project links">
-        <p className="landing-footer__primary">
-          <a
-            href={TFDRAW_GITHUB_REPO_URL}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Source on GitHub
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href={`${TFDRAW_GITHUB_REPO_URL}#readme`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            README &amp; docs
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href={`${TFDRAW_GITHUB_REPO_URL}/blob/master/LICENSE`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            MIT license
-          </a>
-        </p>
-        <p className="landing-footer__credit">
-          Open-source Excalidraw fork by{" "}
-          <a
-            href={TFDRAW_GITHUB_USER_URL}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Tushar Sariya
-          </a>{" "}
-          (
-          <a
-            href={TFDRAW_GITHUB_REPO_URL}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            TusharSariya/excalidraw-tf
-          </a>
-          )
-        </p>
-      </footer>
-    </main>
-  );
-};
-
 const EditorApp = () => (
   <TopErrorBoundary>
     <Provider store={appJotaiStore}>
@@ -1884,7 +1416,19 @@ const ExcalidrawApp = () => {
     return <EditorApp />;
   }
 
-  return <LandingPage />;
+  return (
+    <LandingPage
+      renderCanvas={(onReady) => (
+        <TopErrorBoundary>
+          <Provider store={appJotaiStore}>
+            <ExcalidrawAPIProvider>
+              <ExcalidrawWrapper frontendOnly onFrontendSceneReady={onReady} />
+            </ExcalidrawAPIProvider>
+          </Provider>
+        </TopErrorBoundary>
+      )}
+    />
+  );
 };
 
 export default ExcalidrawApp;
