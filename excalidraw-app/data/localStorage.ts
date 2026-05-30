@@ -14,7 +14,6 @@ export const saveUsernameToLocalStorage = (username: string) => {
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
     );
-    console.log("Saved username to localStorage:", username);
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
@@ -35,15 +34,16 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const saveEncryptionKeyToLocalStorage = (key: string) => {
-  localStorage.setItem("excalidraw-encryption-key", key);
+let _encryptionKey: string | null = null;
+
+export const saveEncryptionKeyToMemory = (key: string) => {
+  _encryptionKey = key;
 };
 
-export const saveSessionToken = (token: string, userId: string) => {
-  localStorage.setItem(
-    "excalidraw-session",
-    JSON.stringify({ token, userId, createdAt: Date.now() }),
-  );
+export const getEncryptionKeyFromMemory = (): string | null => _encryptionKey;
+
+export const clearEncryptionKeyFromMemory = () => {
+  _encryptionKey = null;
 };
 
 export const clearCollabFromLocalStorage = () => {

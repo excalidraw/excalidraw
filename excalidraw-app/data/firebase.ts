@@ -146,7 +146,7 @@ export const isSavedToFirebase = (
   if (portal.socket && portal.roomId && portal.roomKey) {
     const sceneVersion = getSceneVersion(elements);
 
-    return FirebaseSceneVersionCache.get(portal.socket) !== sceneVersion;
+    return FirebaseSceneVersionCache.get(portal.socket) === sceneVersion;
   }
   // if no room exists, consider the room saved so that we don't unnecessarily
   // prevent unload (there's nothing we could do at that point anyway)

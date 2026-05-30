@@ -495,7 +495,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
     }
 
-    (window as any).__COLLAB_DEBUG__ = { roomId, roomKey, username: this.state.username };
+    if (process.env.NODE_ENV === "development") {
+      (window as any).__COLLAB_DEBUG__ = { roomId, username: this.state.username };
+    }
 
     // TODO: `ImportedDataState` type here seems abused
     const scenePromise = resolvablePromise<
@@ -579,8 +581,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           encryptedData,
           this.portal.roomKey,
         );
-
-        console.log("Received socket message:", JSON.stringify(decryptedData));
 
         switch (decryptedData.type) {
           case WS_SUBTYPES.INVALID_RESPONSE:

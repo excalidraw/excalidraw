@@ -128,7 +128,7 @@ export type SocketUpdateData =
     _brand: "socketUpdateData";
   };
 
-const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]*)$/;
+const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
 
 export const isCollaborationLink = (link: string) => {
   const hash = new URL(link).hash;
@@ -140,7 +140,7 @@ export const getCollaborationLinkData = (
 ): { roomId: string; roomKey: string } | null => {
   const hash = new URL(link).hash;
   const match = hash.match(RE_COLLAB_LINK);
-  if (match && match[2].length !== 10) {
+  if (match && match[2].length !== 22) {
     window.alert(t("alerts.invalidEncryptionKey"));
     return null;
   }
@@ -279,16 +279,14 @@ export const exportToBackend = async (
 
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      headers: {
-        "X-Encryption-Key": encryptionKey,
-      },
       body: payload.buffer,
     });
     const json = await response.json();
     if (json.id) {
       const url = new URL(window.location.href);
-      url.searchParams.set("json", json.id);
-      url.searchParams.set("key", encryptionKey);
+      // We need to store the key (and less importantly the id) as hash instead
+      // of queryParam in order to never send it to the server
+      url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
       await saveFilesToFirebase({

@@ -75,8 +75,6 @@ export type ElementConstructorOpts = MarkOptional<
   | "customData"
 >;
 
-const _unused = true;
-
 const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
   {
@@ -88,7 +86,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeWidth = DEFAULT_ELEMENT_PROPS.strokeWidth,
     strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness = DEFAULT_ELEMENT_PROPS.roughness,
-    opacity = DEFAULT_ELEMENT_PROPS.opacity as unknown as string,
+    opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
     angle = 0 as Radians,

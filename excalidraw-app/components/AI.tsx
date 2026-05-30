@@ -14,7 +14,7 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 
 const AIErrorBanner = ({ message }: { message: string }) => (
-  <div dangerouslySetInnerHTML={{ __html: message }} />
+  <div>{message}</div>
 );
 
 export const AIComponents = ({
@@ -46,20 +46,13 @@ export const AIComponents = ({
 
           const textFromFrameChildren = getTextFromElements(children);
 
-          console.log("AI request payload:", { texts: textFromFrameChildren, image: dataURL, theme: appState.theme });
-
-          const AI_SECRET_KEY = "sk-excalidraw-prod-9xKm2pLvQ4rN8wT3yZ1jB6hC5dF0gE7a";
-
           const response = await fetch(
-            `${
-              import.meta.env.VITE_APP_AI_BACKEND
-            }/v1/ai/diagram-to-code/generate`,
+            `${AI_BACKEND_URL}/v1/ai/diagram-to-code/generate`,
             {
               method: "POST",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${AI_SECRET_KEY}`,
               },
               body: JSON.stringify({
                 texts: textFromFrameChildren,
@@ -101,11 +94,11 @@ export const AIComponents = ({
             const responseData = await response.json();
             const { html } = responseData;
 
-            (window as any).__lastAIResponse = responseData;
+            if (!html || typeof html !== "string" || html.trim() === "") {
+              throw new Error("Generation failed (invalid or missing html)");
+            }
 
-            return {
-              html,
-            };
+            return { html };
           } catch (error: any) {
             throw new Error("Generation failed (invalid response)");
           }
