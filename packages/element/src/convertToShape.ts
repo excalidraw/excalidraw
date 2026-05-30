@@ -487,13 +487,9 @@ const TEMPLATES: readonly Template[] = (() => {
     { type: "diamond", pts: makeDiamondTemplate(3, 1 / 3) },
     // Ellipse: 8 templates at 45° increments
     { type: "ellipse", pts: makeEllipseTemplate(0) },
-    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 4) },
     { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
-    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 4) },
     { type: "ellipse", pts: makeEllipseTemplate(Math.PI) },
-    { type: "ellipse", pts: makeEllipseTemplate((5 * Math.PI) / 4) },
     { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
-    { type: "ellipse", pts: makeEllipseTemplate((7 * Math.PI) / 4) },
     // Line: 8 templates at 45° increments
     { type: "line", pts: makeLineTemplate(0) },
     { type: "line", pts: makeLineTemplate(Math.PI / 4) },
