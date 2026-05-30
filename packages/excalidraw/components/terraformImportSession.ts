@@ -6,6 +6,7 @@ import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { AppState } from "../types";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
+import type { TerraformPipelineLayoutMode } from "./terraformPipelineLayoutMode";
 
 export type TerraformImportSessionSnapshot = {
   elements: readonly ExcalidrawElement[];
@@ -17,6 +18,7 @@ export type TerraformImportSession = {
   sources: TerraformPlanParsingSources;
   semanticLayout: boolean;
   pipelineLayout: boolean;
+  pipelineLayoutMode?: TerraformPipelineLayoutMode;
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   preset: TerraformImportPreset | null;
   importedTfdTexts: string[];

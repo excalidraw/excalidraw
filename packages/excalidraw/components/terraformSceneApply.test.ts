@@ -209,4 +209,40 @@ describe("terraformSceneApply", () => {
       },
     );
   });
+
+  it("refreshTerraformLayout preserves pipeline layout mode from session", async () => {
+    setTerraformImportSession({
+      sources: {
+        planDotBundles: [{ plan: {}, dotText: "digraph {}", label: "s" }],
+        states: [],
+        tfdTexts: ["a -> b"],
+      },
+      semanticLayout: false,
+      pipelineLayout: true,
+      pipelineLayoutMode: "global-relayer",
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+      preset: null,
+      importedTfdTexts: ["a -> b"],
+      snapshot: {
+        elements: [],
+        terraformEdgeLayerPins: null,
+        enableDeclaredDataFlow: true,
+      },
+    });
+
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [] }), { status: 200 }),
+    );
+
+    await refreshTerraformLayout(mockApp(), hoisted.setAppState);
+    expect(terraformPlanParsingFromSources).toHaveBeenCalledWith(
+      expect.anything(),
+      {
+        semanticLayout: false,
+        pipelineLayout: true,
+        pipelineLayoutMode: "global-relayer",
+        moduleLayoutOptions: undefined,
+      },
+    );
+  });
 });

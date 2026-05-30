@@ -15,11 +15,14 @@ import {
 import { minimizePipelineCrossings } from "./terraformPipelineCrossing";
 import {
   buildPipelineColumnsFromTfdDepth,
+  buildTfdEdgeAdvances,
+  buildTfdEdgeAdvancesV2,
   buildTfdLaneIndexMap,
   buildTfdPrimaryParentMap,
 } from "./terraformPipelineTfd";
 
 import type { PipelineAtomGraph } from "./terraformPipelineAtoms";
+import type { TerraformPipelineLayoutMode } from "./terraformPipelineLayoutMode";
 
 export type PipelineAtomPlacement = {
   primaryAddress: string;
@@ -51,6 +54,154 @@ export type PipelineAccountLaneBand = {
   laneIndices: ReadonlySet<number>;
   minLane: number;
 };
+
+type HierarchyColumnAtom = {
+  atom: string;
+  originalColumn: number;
+  originalLane: number;
+  groupKey: string;
+};
+
+function hierarchyGroupKey(geo: PipelineGeoPath | undefined): string {
+  if (!geo) {
+    return "__unknown";
+  }
+  const networkKey = geo.vpcId ? `vpc:${geo.vpcId}` : `regional:${geo.region}`;
+  return [
+    geo.accountId || "account",
+    geo.region || "region",
+    networkKey,
+    geo.tier || "tier",
+    geo.subnetSignature || "subnet",
+  ].join("|");
+}
+
+function columnHasFragmentedHierarchyRuns(
+  atoms: readonly string[],
+  geoMap: PipelineAtomGeoMap,
+): boolean {
+  const seen = new Set<string>();
+  let prevKey: string | null = null;
+  for (const atom of atoms) {
+    const key = hierarchyGroupKey(geoMap.get(atom));
+    if (key === prevKey) {
+      continue;
+    }
+    if (seen.has(key)) {
+      return true;
+    }
+    seen.add(key);
+    prevKey = key;
+  }
+  return false;
+}
+
+function compactColumnIndexes(colByAtom: Map<string, number>): void {
+  const sorted = [...new Set(colByAtom.values())].sort((a, b) => a - b);
+  const compact = new Map(sorted.map((col, index) => [col, index]));
+  for (const [atom, col] of colByAtom) {
+    colByAtom.set(atom, compact.get(col) ?? col);
+  }
+}
+
+function relaxColumnIndexesForEdges(
+  atomGraph: PipelineAtomGraph,
+  colByAtom: Map<string, number>,
+): void {
+  const advances =
+    atomGraph.tfdVersion === 2
+      ? buildTfdEdgeAdvancesV2(atomGraph.edges)
+      : buildTfdEdgeAdvances(atomGraph.edges);
+  for (let pass = 0; pass < advances.length + atomGraph.atoms.size; pass++) {
+    let changed = false;
+    for (const { source, target, advance } of advances) {
+      const sourceCol = colByAtom.get(source);
+      if (sourceCol === undefined) {
+        continue;
+      }
+      const required = sourceCol + advance;
+      const current = colByAtom.get(target) ?? 0;
+      if (required > current) {
+        colByAtom.set(target, required);
+        changed = true;
+      }
+    }
+    if (!changed) {
+      break;
+    }
+  }
+}
+
+function rebuildColumnsFromIndexMap(
+  atoms: readonly HierarchyColumnAtom[],
+  colByAtom: ReadonlyMap<string, number>,
+): string[][] {
+  const byCol = new Map<number, HierarchyColumnAtom[]>();
+  for (const item of atoms) {
+    const col = colByAtom.get(item.atom) ?? item.originalColumn;
+    const list = byCol.get(col) ?? [];
+    list.push(item);
+    byCol.set(col, list);
+  }
+  return [...byCol.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([, list]) =>
+      list
+        .sort(
+          (a, b) =>
+            a.originalColumn - b.originalColumn ||
+            a.originalLane - b.originalLane ||
+            a.atom.localeCompare(b.atom),
+        )
+        .map((item) => item.atom),
+    );
+}
+
+export function normalizePipelineColumnsForHierarchy(
+  columnAtomLists: readonly string[][],
+  atomGraph: PipelineAtomGraph,
+  geoMap: PipelineAtomGeoMap,
+  mode: TerraformPipelineLayoutMode = "legacy",
+): string[][] {
+  if (mode === "legacy") {
+    return columnAtomLists.map((col) => [...col]);
+  }
+
+  const atoms: HierarchyColumnAtom[] = [];
+  const colByAtom = new Map<string, number>();
+  let globalColumnOffset = 0;
+
+  for (let colIdx = 0; colIdx < columnAtomLists.length; colIdx++) {
+    const columnAtoms = columnAtomLists[colIdx]!;
+    const fragmented =
+      mode === "global-relayer" ||
+      columnHasFragmentedHierarchyRuns(columnAtoms, geoMap);
+    const groupOrder = new Map<string, number>();
+
+    for (let lane = 0; lane < columnAtoms.length; lane++) {
+      const atom = columnAtoms[lane]!;
+      const groupKey = hierarchyGroupKey(geoMap.get(atom));
+      if (!groupOrder.has(groupKey)) {
+        groupOrder.set(groupKey, groupOrder.size);
+      }
+      const item = {
+        atom,
+        originalColumn: colIdx,
+        originalLane: lane,
+        groupKey,
+      };
+      atoms.push(item);
+      const subColumn = fragmented ? groupOrder.get(groupKey)! : 0;
+      colByAtom.set(atom, globalColumnOffset + subColumn);
+    }
+
+    globalColumnOffset += fragmented ? Math.max(1, groupOrder.size) : 1;
+  }
+
+  relaxColumnIndexesForEdges(atomGraph, colByAtom);
+  compactColumnIndexes(colByAtom);
+  return rebuildColumnsFromIndexMap(atoms, colByAtom);
+}
 
 /** Track-band indices per account for pipeline geo band wrappers. */
 export function buildPipelineAccountLaneBands(
@@ -117,6 +268,7 @@ function geoNeedsNewInstance(
 export function buildPipelineLayoutPlan(
   atomGraph: PipelineAtomGraph,
   geoMap: PipelineAtomGeoMap,
+  mode: TerraformPipelineLayoutMode = "legacy",
 ): PipelineLayoutPlan {
   const edges = atomGraph.edges;
   const primaryParent = buildTfdPrimaryParentMap(edges);
@@ -135,6 +287,12 @@ export function buildPipelineLayoutPlan(
       useMedian: false,
       enableSifting: true,
     },
+  );
+  columnAtomLists = normalizePipelineColumnsForHierarchy(
+    columnAtomLists,
+    atomGraph,
+    geoMap,
+    mode,
   );
   const laneByAtom = buildTfdLaneIndexMap(columnAtomLists, primaryParent);
 

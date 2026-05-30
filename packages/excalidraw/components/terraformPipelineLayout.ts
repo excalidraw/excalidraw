@@ -33,6 +33,10 @@ import {
   type PipelineGeoPath,
 } from "./terraformPipelineGeo";
 import {
+  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  type TerraformPipelineLayoutMode,
+} from "./terraformPipelineLayoutMode";
+import {
   buildTopologyPrimaryClusterSkeletonForPipeline,
   reorderTopologyElementsZStack,
 } from "./terraformTopologyLayout";
@@ -60,6 +64,7 @@ const MIN_FRAME_H = px(160);
 
 export type TerraformPipelineSceneMeta = {
   layoutEngine: "pipeline";
+  pipelineLayoutMode: TerraformPipelineLayoutMode;
   atomCount: number;
   columnCount: number;
   geoInstanceCount: number;
@@ -196,8 +201,7 @@ function computePipelineRowGeometry(
           continue;
         }
         const lane =
-          placementByAddr.get(addr)?.laneIndex ??
-          col.atoms.indexOf(addr);
+          placementByAddr.get(addr)?.laneIndex ?? col.atoms.indexOf(addr);
         rowHeights[lane] = Math.max(
           rowHeights[lane]!,
           rowHeightForClusterSlot(build),
@@ -886,7 +890,10 @@ export function buildPipelineGeoColumnRuns(
   );
 }
 
-function pipelineVpcFrameIdForRun(vpcKey: string, run: PipelineGeoColumnRun): string {
+function pipelineVpcFrameIdForRun(
+  vpcKey: string,
+  run: PipelineGeoColumnRun,
+): string {
   return `tf-pipe-vpc:${vpcKey}|c${run.minColumn}-${run.maxColumn}`;
 }
 
@@ -1067,17 +1074,21 @@ export async function buildTerraformPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
   tfdTexts: readonly string[],
+  options: { pipelineLayoutMode?: TerraformPipelineLayoutMode } = {},
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformPipelineSceneMeta;
   files?: BinaryFiles;
 }> {
   const atomGraph = buildPipelineAtomGraph(nodes, plan, tfdTexts);
+  const pipelineLayoutMode =
+    options.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
   if (!atomGraph || atomGraph.atoms.size === 0) {
     return {
       elements: [],
       meta: {
         layoutEngine: "pipeline",
+        pipelineLayoutMode,
         atomCount: 0,
         columnCount: 0,
         geoInstanceCount: 0,
@@ -1089,7 +1100,11 @@ export async function buildTerraformPipelineExcalidrawScene(
   }
 
   const geoMap = buildPipelineAtomGeoMap(atomGraph, nodes, plan);
-  const layoutPlan = buildPipelineLayoutPlan(atomGraph, geoMap);
+  const layoutPlan = buildPipelineLayoutPlan(
+    atomGraph,
+    geoMap,
+    pipelineLayoutMode,
+  );
 
   const clusterBuilds = new Map<string, ClusterBuild>();
   for (const placement of layoutPlan.placements) {
@@ -1142,10 +1157,7 @@ export async function buildTerraformPipelineExcalidrawScene(
     colByAtom,
   );
 
-  const packedSpanCenter = packedSpanCenterY(
-    layoutPlan.placements,
-    contentTop,
-  );
+  const packedSpanCenter = packedSpanCenterY(layoutPlan.placements, contentTop);
   const accountBands = buildPipelineAccountLaneBands(layoutPlan.placements);
   const multiAccountBandLayout = accountBands.length > 1;
   let rowGeo = computePipelineRowGeometry(
@@ -1488,6 +1500,7 @@ export async function buildTerraformPipelineExcalidrawScene(
     elements,
     meta: {
       layoutEngine: "pipeline",
+      pipelineLayoutMode,
       atomCount: atomGraph.atoms.size,
       columnCount: layoutPlan.columns.length,
       geoInstanceCount: layoutPlan.geoInstanceCount,

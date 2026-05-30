@@ -339,11 +339,10 @@ describe("staging pipeline.tfd resolution", () => {
       .map((p) => rectByPath.get(p)!)
       .sort((a, b) => midY(a) - midY(b));
     const entryLambdaRects = resourceRects
-      .filter(
-        (e: { customData: { nodePath: string } }) =>
-          /(?:40-east-api-1|43-east-api-4)::.*aws_lambda_function/.test(
-            e.customData.nodePath,
-          ),
+      .filter((e: { customData: { nodePath: string } }) =>
+        /(?:40-east-api-1|43-east-api-4)::.*aws_lambda_function/.test(
+          e.customData.nodePath,
+        ),
       )
       .sort(
         (a: { y: number; height: number }, b: { y: number; height: number }) =>
@@ -453,4 +452,41 @@ describe("staging pipeline.tfd resolution", () => {
       "41-east-api-2::module.api.aws_ecs_service.api",
     );
   }, 180_000);
+
+  it.each(["local-shims", "global-relayer"] as const)(
+    "pipeline layout coalesces shared datastore hierarchy in %s mode",
+    async (pipelineLayoutMode) => {
+      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+      const tfd = readStagingMultiStatePipelineTfdFromDb();
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        { pipelineLayout: true, pipelineLayoutMode },
+      );
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.pipelineLayoutMode).toBe(pipelineLayoutMode);
+      expect(body.meta?.atomCount).toBe(50);
+      expect(body.meta?.declaredEdgeCount).toBe(57);
+
+      const declared = body.elements.filter(
+        (e: { type?: string; customData?: { terraformEdgeLayer?: string } }) =>
+          e.type === "arrow" &&
+          e.customData?.terraformEdgeLayer === "declaredDataFlow",
+      );
+      expect(declared).toHaveLength(57);
+
+      expectSameSubnetZone(
+        body.elements as SceneElement[],
+        "02-east-datastores::module.api6_rds.aws_db_instance.this",
+        "02-east-datastores::module.api7_aurora.aws_rds_cluster.this",
+      );
+    },
+    180_000,
+  );
 });

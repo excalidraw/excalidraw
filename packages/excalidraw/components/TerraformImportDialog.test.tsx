@@ -300,6 +300,40 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("passes selected pipeline layout mode for pipeline imports", async () => {
+    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
+      new Response(JSON.stringify({ elements: [], files: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.change(document.getElementById("terraform-import-links")!, {
+      target: {
+        files: [textFileLike("a -> b", "pipeline.tfd")],
+      },
+    });
+    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
+    expect(
+      screen.getByRole("radio", { name: /global relayer/i }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /local shims/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() =>
+      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+    );
+
+    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+      {
+        semanticLayout: false,
+        pipelineLayout: true,
+        pipelineLayoutMode: "local-shims",
+        moduleLayoutOptions: undefined,
+      },
+    );
+  });
+
   it("shows Done and warnings when import succeeds with warnings", async () => {
     vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
       new Response(

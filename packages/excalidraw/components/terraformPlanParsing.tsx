@@ -33,6 +33,10 @@ import {
 import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
+import {
+  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  type TerraformPipelineLayoutMode,
+} from "./terraformPipelineLayoutMode";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
@@ -183,6 +187,8 @@ export type TerraformPlanParsingOptions = {
   semanticLayout?: boolean;
   /** When true, emit TFD-driven pipeline layout (requires `.tfd` with resolved edges). */
   pipelineLayout?: boolean;
+  /** Pipeline column normalization mode. Defaults to legacy for compatibility. */
+  pipelineLayoutMode?: TerraformPipelineLayoutMode;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
   /** Module-view intra-module packing (ignored when semanticLayout or pipelineLayout is true). */
@@ -534,6 +540,8 @@ export const terraformPlanParsingFromSources = async (
   const semanticLayout =
     options?.semanticLayout === true && options?.pipelineLayout !== true;
   const pipelineLayout = options?.pipelineLayout === true;
+  const pipelineLayoutMode =
+    options?.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -688,6 +696,7 @@ export const terraformPlanParsingFromSources = async (
       nodes5,
       plan,
       tfdTexts,
+      { pipelineLayoutMode },
     );
     emitLocalParseDebug({
       phase: "pipelineLayout",

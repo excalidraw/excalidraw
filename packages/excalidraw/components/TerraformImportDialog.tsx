@@ -17,6 +17,10 @@ import { runTerraformImportFromSources } from "./terraformSceneApply";
 import { TerraformModulePackingSettings } from "./TerraformModulePackingSettings";
 import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import {
+  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  type TerraformPipelineLayoutMode,
+} from "./terraformPipelineLayoutMode";
+import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
   deleteTerraformImportPreset,
   listTerraformImportPresets,
@@ -102,6 +106,28 @@ const VIEW_OPTIONS: ReadonlyArray<{
   },
 ];
 
+const PIPELINE_LAYOUT_MODE_OPTIONS: ReadonlyArray<{
+  value: TerraformPipelineLayoutMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "legacy",
+    label: "Legacy",
+    description: "Current TFD depth columns.",
+  },
+  {
+    value: "local-shims",
+    label: "Local shims",
+    description: "Splits fragmented hierarchy runs near their TFD column.",
+  },
+  {
+    value: "global-relayer",
+    label: "Global relayer",
+    description: "Re-layers columns with hierarchy grouping constraints.",
+  },
+];
+
 let bundleRowCounter = 0;
 const newBundleRow = (): PlanDotBundleRow => ({
   id: `bundle-${++bundleRowCounter}`,
@@ -132,6 +158,10 @@ export const TerraformImportModal = ({
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
+  const [pipelineLayoutMode, setPipelineLayoutMode] =
+    useState<TerraformPipelineLayoutMode>(
+      DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+    );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [importWarnings, setImportWarnings] = useState<
@@ -259,6 +289,7 @@ export const TerraformImportModal = ({
       {
         semanticLayout,
         pipelineLayout,
+        pipelineLayoutMode,
         moduleLayoutOptions:
           semanticLayout || pipelineLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
@@ -997,6 +1028,46 @@ writer -> bucket`}</code>
           options={moduleLayoutOptions}
           onChange={setModuleLayoutOptions}
         />
+      ) : null}
+
+      {view === "pipeline" ? (
+        <div
+          className="TerraformImportModal__section TerraformImportModal__viewSelector"
+          role="radiogroup"
+          aria-label="Pipeline layout"
+        >
+          <h4>Pipeline layout</h4>
+          <div className="TerraformImportModal__viewSelector__options">
+            {PIPELINE_LAYOUT_MODE_OPTIONS.map((option) => {
+              const checked = pipelineLayoutMode === option.value;
+              return (
+                <label
+                  key={option.value}
+                  className={`TerraformImportModal__viewSelector__option${
+                    checked
+                      ? " TerraformImportModal__viewSelector__option--checked"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="terraform-pipeline-layout-mode"
+                    value={option.value}
+                    checked={checked}
+                    disabled={loading}
+                    onChange={() => setPipelineLayoutMode(option.value)}
+                  />
+                  <span className="TerraformImportModal__viewSelector__label">
+                    {option.label}
+                  </span>
+                  <span className="TerraformImportModal__viewSelector__description">
+                    {option.description}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
       ) : null}
 
       <div className="TerraformImportModal__settings__buttons">
