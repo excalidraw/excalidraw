@@ -8,6 +8,8 @@ import React, {
 
 import { LandingEmailSignup } from "../LandingEmailSignup";
 
+import "../../landing.scss";
+
 import { LandingCanvasSection } from "./LandingCanvasSection";
 import { LandingHero } from "./LandingHero";
 import { LandingNav } from "./LandingNav";
@@ -23,8 +25,6 @@ import { LandingFooter } from "./sections/LandingFooter";
 import { LandingStrip } from "./sections/LandingStrip";
 import { LandingUseCases } from "./sections/LandingUseCases";
 import { LandingWorkflow } from "./sections/LandingWorkflow";
-
-import "../../landing.scss";
 
 type LandingPageProps = {
   renderCanvas: (onReady: () => void) => React.ReactNode;

@@ -1,5 +1,6 @@
 const SCROLL_ANIMATION_SUPPORTS =
   typeof CSS !== "undefined" &&
+  typeof CSS.supports === "function" &&
   CSS.supports("(animation-timeline: scroll())") &&
   CSS.supports("(animation-range: 0% 100%)");
 

@@ -8,11 +8,13 @@ import {
 } from "motion/react";
 
 import {
+  HERO_CHANGE_STYLES,
+  HERO_EDGE_STROKE,
   HERO_INSPECTOR,
   HERO_SCENE_EDGES,
   HERO_SCENE_FRAMES,
-  HERO_SCENE_META,
   HERO_SCENE_NODES,
+  HERO_SCENE_SATELLITE_LINKS,
   HERO_SCENE_VIEWBOX,
 } from "./heroSceneLayout";
 
@@ -72,11 +74,6 @@ const HeroInspector = () => (
 
 const HeroCanvas = ({ animateEdges }: { animateEdges: boolean }) => (
   <div className="lp-hero-scene__canvas">
-    <div className="lp-hero-scene__canvas-meta">
-      <span>{HERO_SCENE_META.account}</span>
-      <span>{HERO_SCENE_META.region}</span>
-      <span>{HERO_SCENE_META.vpc}</span>
-    </div>
     <svg
       className="lp-hero-scene__svg"
       viewBox={`0 0 ${HERO_SCENE_VIEWBOX.width} ${HERO_SCENE_VIEWBOX.height}`}
@@ -110,16 +107,25 @@ const HeroCanvas = ({ animateEdges }: { animateEdges: boolean }) => (
             y={frame.y}
             width={frame.width}
             height={frame.height}
-            className="lp-hero-scene__frame"
+            className={`lp-hero-scene__frame lp-hero-scene__frame--${frame.level}`}
           />
           <text
             x={frame.x + 8}
             y={frame.y - 6}
-            className="lp-hero-scene__frame-label"
+            className={`lp-hero-scene__frame-label lp-hero-scene__frame-label--${frame.level}`}
           >
             {frame.label}
           </text>
         </g>
+      ))}
+
+      {HERO_SCENE_SATELLITE_LINKS.map((link) => (
+        <path
+          key={link.id}
+          d={link.path}
+          className="lp-hero-scene__satellite-link"
+          fill="none"
+        />
       ))}
 
       {HERO_SCENE_EDGES.map((edge, index) => (
@@ -128,6 +134,7 @@ const HeroCanvas = ({ animateEdges }: { animateEdges: boolean }) => (
           d={edge.path}
           className="lp-hero-scene__edge"
           fill="none"
+          stroke={HERO_EDGE_STROKE[edge.changeState]}
           initial={animateEdges ? { pathLength: 0, opacity: 0.4 } : false}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{
@@ -141,63 +148,77 @@ const HeroCanvas = ({ animateEdges }: { animateEdges: boolean }) => (
         />
       ))}
 
-      {HERO_SCENE_NODES.map((node, index) => (
-        <motion.g
-          key={node.id}
-          custom={index}
-          variants={nodeVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <rect
-            x={node.x}
-            y={node.y}
-            width={node.width}
-            height={node.height}
-            rx={6}
-            className={
-              node.selected
-                ? "lp-hero-scene__node lp-hero-scene__node--selected"
-                : node.satellite
+      {HERO_SCENE_NODES.map((node, index) => {
+        const style = HERO_CHANGE_STYLES[node.changeState];
+        const nodeHeight = node.satellite ? node.height : node.height;
+        const iconR = node.satellite ? 2.5 : 3;
+        const labelX = node.satellite ? node.x + 14 : node.x + 18;
+        const iconCx = node.satellite ? node.x + 8 : node.x + 10;
+
+        return (
+          <motion.g
+            key={node.id}
+            custom={index}
+            variants={nodeVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <rect
+              x={node.x}
+              y={node.y}
+              width={node.width}
+              height={nodeHeight}
+              rx={node.satellite ? 4 : 6}
+              fill={style.fill}
+              stroke={style.stroke}
+              strokeWidth={node.selected ? 1.5 : 1}
+              className={
+                node.satellite
                   ? "lp-hero-scene__node lp-hero-scene__node--satellite"
                   : "lp-hero-scene__node"
-            }
-          />
-          {node.selected ? (
-            <motion.rect
-              x={node.x - 2}
-              y={node.y - 2}
-              width={node.width + 4}
-              height={node.height + 4}
-              rx={8}
-              className="lp-hero-scene__node-pulse"
-              animate={
-                animateEdges
-                  ? { opacity: [0.35, 0.85, 0.35] }
-                  : { opacity: 0.6 }
-              }
-              transition={
-                animateEdges
-                  ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
-                  : undefined
               }
             />
-          ) : null}
-          <circle
-            cx={node.x + 10}
-            cy={node.y + node.height / 2}
-            r={3}
-            className="lp-hero-scene__node-icon"
-          />
-          <text
-            x={node.x + 18}
-            y={node.y + node.height / 2 + 4}
-            className="lp-hero-scene__node-label"
-          >
-            {node.shortLabel}
-          </text>
-        </motion.g>
-      ))}
+            {node.selected ? (
+              <motion.rect
+                x={node.x - 2}
+                y={node.y - 2}
+                width={node.width + 4}
+                height={node.height + 4}
+                rx={8}
+                className="lp-hero-scene__node-pulse"
+                stroke={style.stroke}
+                animate={
+                  animateEdges
+                    ? { opacity: [0.35, 0.85, 0.35] }
+                    : { opacity: 0.6 }
+                }
+                transition={
+                  animateEdges
+                    ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+                    : undefined
+                }
+              />
+            ) : null}
+            <circle
+              cx={iconCx}
+              cy={node.y + node.height / 2}
+              r={iconR}
+              fill={style.stroke}
+            />
+            <text
+              x={labelX}
+              y={node.y + node.height / 2 + (node.satellite ? 3 : 4)}
+              className={
+                node.satellite
+                  ? "lp-hero-scene__node-label lp-hero-scene__node-label--satellite"
+                  : "lp-hero-scene__node-label"
+              }
+            >
+              {node.shortLabel}
+            </text>
+          </motion.g>
+        );
+      })}
     </svg>
     <span className="lp-hero-scene__canvas-tag">semantic view</span>
   </div>
@@ -259,7 +280,11 @@ export const HeroTopologyScene = () => {
     >
       <motion.div
         className="lp-hero-scene"
-        style={reduceMotion ? undefined : { transform, transformStyle: "preserve-3d" }}
+        style={
+          reduceMotion
+            ? undefined
+            : { transform, transformStyle: "preserve-3d" }
+        }
         variants={cardVariants}
         initial="hidden"
         animate="visible"

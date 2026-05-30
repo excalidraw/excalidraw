@@ -73,10 +73,7 @@ body.terraform-canvas-landing #root {
   cursor: pointer;
   font: 600 0.95rem var(--lp-font-body);
   text-decoration: none;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease,
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
     border-color 0.15s ease;
 }
 
@@ -265,10 +262,22 @@ body.terraform-canvas-landing #root {
 .lp-hero__bg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(15, 139, 95, 0.22), transparent 42%),
-    radial-gradient(circle at 85% 15%, rgba(61, 110, 168, 0.18), transparent 38%),
-    linear-gradient(165deg, var(--lp-bg-hero) 0%, var(--lp-bg-hero-mid) 55%, #0d1612 100%);
+  background: radial-gradient(
+      circle at 20% 20%,
+      rgba(15, 139, 95, 0.22),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(61, 110, 168, 0.18),
+      transparent 38%
+    ),
+    linear-gradient(
+      165deg,
+      var(--lp-bg-hero) 0%,
+      var(--lp-bg-hero-mid) 55%,
+      #0d1612 100%
+    );
 }
 
 .lp-hero__bg::after {
@@ -276,8 +285,10 @@ body.terraform-canvas-landing #root {
   position: absolute;
   inset: 0;
   opacity: 0.35;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px
+    ),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: linear-gradient(to bottom, black 40%, transparent);
@@ -295,9 +306,7 @@ body.terraform-canvas-landing #root {
 
 .lp-hero__copy {
   color: var(--lp-ink-on-dark);
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
   transition-behavior: allow-discrete;
 }
 
@@ -400,8 +409,7 @@ body.terraform-canvas-landing #root {
     rgba(255, 255, 255, 0.12) 0%,
     rgba(255, 255, 255, 0.04) 100%
   );
-  box-shadow:
-    0 32px 80px rgba(0, 0, 0, 0.35),
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(14px);
   transform-style: preserve-3d;
@@ -506,15 +514,6 @@ body.terraform-canvas-landing #root {
   background: #ffffff;
 }
 
-.lp-hero-scene__canvas-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.55rem;
-  padding: 0.45rem 0.55rem 0;
-  color: var(--lp-muted);
-  font: 600 0.58rem var(--lp-font-mono);
-}
-
 .lp-hero-scene__svg {
   display: block;
   width: 100%;
@@ -522,9 +521,28 @@ body.terraform-canvas-landing #root {
 }
 
 .lp-hero-scene__frame {
-  fill: rgba(15, 139, 95, 0.04);
-  stroke: rgba(15, 139, 95, 0.35);
+  fill: none;
   stroke-width: 1;
+}
+
+.lp-hero-scene__frame--account {
+  fill: rgba(25, 113, 194, 0.03);
+  stroke: rgba(25, 113, 194, 0.22);
+}
+
+.lp-hero-scene__frame--region {
+  fill: rgba(25, 113, 194, 0.04);
+  stroke: rgba(25, 113, 194, 0.32);
+}
+
+.lp-hero-scene__frame--vpc {
+  fill: rgba(15, 139, 95, 0.03);
+  stroke: rgba(15, 139, 95, 0.38);
+}
+
+.lp-hero-scene__frame--subnet {
+  fill: rgba(15, 23, 20, 0.015);
+  stroke: rgba(15, 23, 20, 0.18);
   stroke-dasharray: 5 4;
 }
 
@@ -534,42 +552,53 @@ body.terraform-canvas-landing #root {
   text-transform: uppercase;
 }
 
+.lp-hero-scene__frame-label--account {
+  fill: #1971c2;
+  font-weight: 700;
+}
+
+.lp-hero-scene__frame-label--region {
+  fill: #1c7ed6;
+}
+
+.lp-hero-scene__frame-label--vpc {
+  fill: #0f8b5f;
+}
+
+.lp-hero-scene__satellite-link {
+  stroke: rgba(15, 23, 20, 0.2);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  stroke-linecap: round;
+}
+
 .lp-hero-scene__edge {
-  stroke: #2563eb;
   stroke-width: 1.5;
   stroke-linecap: round;
 }
 
 .lp-hero-scene__node {
-  fill: #ffffff;
-  stroke: rgba(15, 23, 20, 0.18);
   stroke-width: 1;
 }
 
 .lp-hero-scene__node--satellite {
-  fill: #f8fafc;
-}
-
-.lp-hero-scene__node--selected {
-  stroke: #16a34a;
-  stroke-width: 1.5;
+  stroke-width: 1;
 }
 
 .lp-hero-scene__node-pulse {
   fill: none;
-  stroke: #22c55e;
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
   pointer-events: none;
 }
 
-.lp-hero-scene__node-icon {
-  fill: var(--lp-accent);
-}
-
 .lp-hero-scene__node-label {
   fill: var(--lp-ink);
   font: 600 8.5px var(--lp-font-mono);
+}
+
+.lp-hero-scene__node-label--satellite {
+  font-size: 7.5px;
 }
 
 .lp-hero-scene__canvas-tag {
@@ -639,9 +668,7 @@ body.terraform-canvas-landing #root {
 .lp-reveal-fallback {
   opacity: 0;
   transform: translateY(24px);
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
   transition-delay: calc(var(--lp-stagger, 0) * 80ms);
 }
 
@@ -682,8 +709,11 @@ body.terraform-canvas-landing #root {
   scroll-margin-top: var(--lp-nav-height);
   padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
   border-top: 1px solid var(--lp-line);
-  background:
-    radial-gradient(circle at 10% 0%, rgba(61, 110, 168, 0.08), transparent 40%),
+  background: radial-gradient(
+      circle at 10% 0%,
+      rgba(61, 110, 168, 0.08),
+      transparent 40%
+    ),
     radial-gradient(circle at 90% 20%, rgba(15, 139, 95, 0.1), transparent 35%),
     var(--lp-bg);
 }
@@ -868,8 +898,11 @@ body.terraform-canvas-landing #root {
 
 .lp-features {
   padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem);
-  background:
-    radial-gradient(circle at 15% 20%, rgba(15, 139, 95, 0.2), transparent 45%),
+  background: radial-gradient(
+      circle at 15% 20%,
+      rgba(15, 139, 95, 0.2),
+      transparent 45%
+    ),
     linear-gradient(160deg, #0b1210 0%, #152019 100%);
 }
 
@@ -984,7 +1017,11 @@ body.terraform-canvas-landing #root {
   justify-content: space-between;
   padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
   border-top: 1px solid var(--lp-line);
-  background: linear-gradient(135deg, rgba(201, 151, 42, 0.12), rgba(15, 139, 95, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(201, 151, 42, 0.12),
+    rgba(15, 139, 95, 0.1)
+  );
 }
 
 .lp-final h2 {
@@ -998,8 +1035,11 @@ body.terraform-canvas-landing #root {
 .lp-email-signup {
   padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
   border-top: 1px solid var(--lp-line);
-  background:
-    radial-gradient(circle at 80% 20%, rgba(15, 139, 95, 0.1), transparent 40%),
+  background: radial-gradient(
+      circle at 80% 20%,
+      rgba(15, 139, 95, 0.1),
+      transparent 40%
+    ),
     var(--lp-bg);
 }
 

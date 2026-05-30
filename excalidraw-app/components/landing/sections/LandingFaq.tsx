@@ -38,9 +38,9 @@ const FAQ_ITEMS = [
     question: "Can I share a diagram with my team?",
     answer: (
       <>
-        The product supports collaboration and shareable review flows so multiple
-        people can inspect the same architecture view. Use the in-app sharing
-        options when you are in the full editor experience.
+        The product supports collaboration and shareable review flows so
+        multiple people can inspect the same architecture view. Use the in-app
+        sharing options when you are in the full editor experience.
       </>
     ),
   },
@@ -49,10 +49,10 @@ const FAQ_ITEMS = [
     answer: (
       <>
         Plan JSON, graph DOT, and state files are parsed in your browser and are
-        not sent to tfdraw.dev for import. Optional email signup stores only your
-        address and how you signed up. Anonymous counters record import success
-        or failure (no file contents). Redact secrets before sharing exports;
-        follow your org data policy for collaboration features.
+        not sent to tfdraw.dev for import. Optional email signup stores only
+        your address and how you signed up. Anonymous counters record import
+        success or failure (no file contents). Redact secrets before sharing
+        exports; follow your org data policy for collaboration features.
       </>
     ),
   },

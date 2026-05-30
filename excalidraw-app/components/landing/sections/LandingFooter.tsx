@@ -34,11 +34,19 @@ export const LandingFooter = () => (
     </p>
     <p className="lp-footer__credit">
       Open-source Excalidraw fork by{" "}
-      <a href={TFDRAW_GITHUB_USER_URL} rel="noopener noreferrer" target="_blank">
+      <a
+        href={TFDRAW_GITHUB_USER_URL}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
         Tushar Sariya
       </a>{" "}
       (
-      <a href={TFDRAW_GITHUB_REPO_URL} rel="noopener noreferrer" target="_blank">
+      <a
+        href={TFDRAW_GITHUB_REPO_URL}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
         TusharSariya/excalidraw-tf
       </a>
       )

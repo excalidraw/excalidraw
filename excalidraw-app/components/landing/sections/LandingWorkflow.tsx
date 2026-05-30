@@ -30,8 +30,14 @@ export const LandingWorkflow = () => (
     />
     <ol className="lp-steps">
       {STEPS.map(({ title, body }, index) => (
-        <li key={title} data-lp-reveal style={{ "--lp-stagger": index } as React.CSSProperties}>
-          <span className="lp-steps__num">{String(index + 1).padStart(2, "0")}</span>
+        <li
+          key={title}
+          data-lp-reveal
+          style={{ "--lp-stagger": index } as React.CSSProperties}
+        >
+          <span className="lp-steps__num">
+            {String(index + 1).padStart(2, "0")}
+          </span>
           <strong>{title}</strong>
           <span>{body}</span>
         </li>

@@ -11,10 +11,7 @@ export const LandingEmailSignup = () => (
     <div className="lp-email-signup__inner">
       <header className="lp-email-signup__header">
         <p className="lp-email-signup__eyebrow">Newsletter</p>
-        <h2
-          id="landing-email-signup-title"
-          className="lp-email-signup__title"
-        >
+        <h2 id="landing-email-signup-title" className="lp-email-signup__title">
           Stay in the loop
         </h2>
         <p className="lp-email-signup__lede">

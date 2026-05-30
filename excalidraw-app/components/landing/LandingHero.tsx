@@ -11,7 +11,10 @@ type LandingHeroProps = {
 };
 
 const HeroSceneFallback = () => (
-  <div className="lp-hero-scene-wrap lp-hero-scene-wrap--fallback" aria-hidden="true">
+  <div
+    className="lp-hero-scene-wrap lp-hero-scene-wrap--fallback"
+    aria-hidden="true"
+  >
     <img
       className="lp-hero-scene__fallback-img"
       src="/og-image.png"

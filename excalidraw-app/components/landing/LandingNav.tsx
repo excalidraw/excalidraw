@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 
-import {
-  TFDRAW_GITHUB_REPO_URL,
-} from "../../app_constants";
+import { TFDRAW_GITHUB_REPO_URL } from "../../app_constants";
 
 type LandingNavProps = {
   onScrollToCanvas: () => void;
