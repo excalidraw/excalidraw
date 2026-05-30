@@ -45,8 +45,7 @@ function vpcSpec(
     label?: string;
   },
 ): PipelineZoneFrameSpec {
-  const [accountId, region, vpcId, geoInstanceId] =
-    overrides.vpcKey.split("|");
+  const [accountId, region, vpcId, geoInstanceId] = overrides.vpcKey.split("|");
   return {
     label: overrides.label ?? "VPC · Private",
     role: "subnetZone",
@@ -127,13 +126,7 @@ describe("coalescePipelineZoneSpecs", () => {
     expect(merged.clusterFrameIds).toEqual(["cluster-z-a5", "cluster-z-a6"]);
     expect(merged.bounds).toEqual({ x: 10, y: 400, width: 80, height: 160 });
     expect(merged.laneIndex).toBe(4);
-    expect(merged.path).toEqual([
-      "222",
-      "eu-central-1",
-      "regional",
-      "3",
-      "1",
-    ]);
+    expect(merged.path).toEqual(["222", "eu-central-1", "regional", "3", "1"]);
   });
 
   it("merges VPC specs in the same parent, tier, and column", () => {
@@ -170,13 +163,7 @@ describe("coalescePipelineZoneSpecs", () => {
     expect(merged.vpcKey).toBe(vpcKey);
     expect(merged.clusterFrameIds).toEqual(["cluster-api2", "cluster-api3"]);
     expect(merged.bounds).toEqual({ x: 100, y: 200, width: 120, height: 180 });
-    expect(merged.path).toEqual([
-      "111",
-      "us-east-1",
-      "vpc-shared",
-      "0",
-      "3",
-    ]);
+    expect(merged.path).toEqual(["111", "us-east-1", "vpc-shared", "0", "3"]);
   });
 
   it("leaves specs in different columns separate", () => {
