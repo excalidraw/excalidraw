@@ -509,6 +509,63 @@ const TEMPLATES: readonly Template[] = (() => {
   }));
 })();
 
+// Arrow endpoint selection
+
+// When an arrow is recognized, the original input's last point may not
+// correspond to the actual arrow tip. The tip must lie on the bounding-box
+// perimeter and is the perimeter point farthest from the start (first input
+// point). We find the closest original input point to that ideal tip.
+function getArrowEndpoint<P extends LocalPoint | GlobalPoint>(
+  points: readonly P[],
+  boundingBox: Bounds,
+  startPoint: P,
+): P {
+  const [minX, minY, maxX, maxY] = boundingBox;
+  const w = maxX - minX;
+  const h = maxY - minY;
+
+  // Degenerate bounding box – fall back to last point
+  if (w === 0 && h === 0) {
+    return points[points.length - 1];
+  }
+
+  // Perimeter corners / edge points to check (4 corners + 4 edge midpoints
+  // give good coverage of the perimeter).
+  const perimeterPoints: LocalPoint[] = [
+    pointFrom(minX, minY),
+    pointFrom((minX + maxX) / 2, minY),
+    pointFrom(maxX, minY),
+    pointFrom(maxX, (minY + maxY) / 2),
+    pointFrom(maxX, maxY),
+    pointFrom((minX + maxX) / 2, maxY),
+    pointFrom(minX, maxY),
+    pointFrom(minX, (minY + maxY) / 2),
+  ];
+
+  // Ideal endpoint = perimeter point farthest from start.
+  let idealDist = -1;
+  let idealEndpoint: LocalPoint = pointFrom(maxX, maxY);
+  for (const pp of perimeterPoints) {
+    const d = Math.hypot(pp[0] - startPoint[0], pp[1] - startPoint[1]);
+    if (d > idealDist) {
+      idealDist = d;
+      idealEndpoint = pp;
+    }
+  }
+
+  // Find the original input point closest to the ideal endpoint.
+  let bestDist = Infinity;
+  let bestPoint: P = points[points.length - 1];
+  for (const pt of points) {
+    const d = Math.hypot(pt[0] - idealEndpoint[0], pt[1] - idealEndpoint[1]);
+    if (d < bestDist) {
+      bestDist = d;
+      bestPoint = pt;
+    }
+  }
+  return bestPoint;
+}
+
 // =============================================================================
 // Public API
 // =============================================================================
@@ -612,8 +669,51 @@ export const convertToShape = (
     }
     case "arrow": {
       const [arrowMinX, arrowMinY] = recognizedShape.boundingBox;
+      const endPoint = getArrowEndpoint(
+        recognizedShape.points,
+        recognizedShape.boundingBox,
+        recognizedShape.points[0],
+      );
+      const arrowLen = Math.hypot(
+        endPoint[0] - recognizedShape.points[0][0],
+        endPoint[1] - recognizedShape.points[0][1],
+      );
+      if (arrowLen < 60) {
+        const tempElement = newLinearElement({
+          type: "line",
+          x: arrowMinX,
+          y: arrowMinY,
+          points: [
+            [
+              recognizedShape.points[0][0] - arrowMinX,
+              recognizedShape.points[0][1] - arrowMinY,
+            ] as LocalPoint,
+            [endPoint[0] - arrowMinX, endPoint[1] - arrowMinY] as LocalPoint,
+          ],
+          groupIds: [],
+          frameId,
+          locked: false,
+          angle: 0 as Radians,
+          roundness,
+          roughness: appState.currentItemRoughness,
+          backgroundColor: appState.currentItemBackgroundColor,
+          strokeColor: appState.currentItemStrokeColor,
+          fillStyle: appState.currentItemFillStyle,
+          opacity: appState.currentItemOpacity,
+          strokeStyle: appState.currentItemStrokeStyle,
+          strokeWidth: appState.currentItemStrokeWidth,
+        });
+
+        const normalized =
+          LinearElementEditor.getNormalizeElementPointsAndCoords(tempElement);
+
+        return newLinearElement({
+          ...tempElement,
+          ...normalized,
+        });
+      }
       const tempElement = newArrowElement({
-        type: recognizedShape.type,
+        type: "arrow",
         x: arrowMinX,
         y: arrowMinY,
         startArrowhead: appState.currentItemStartArrowhead,
@@ -623,12 +723,7 @@ export const convertToShape = (
             recognizedShape.points[0][0] - arrowMinX,
             recognizedShape.points[0][1] - arrowMinY,
           ] as LocalPoint,
-          [
-            recognizedShape.points[recognizedShape.points.length - 2][0] -
-              arrowMinX,
-            recognizedShape.points[recognizedShape.points.length - 2][1] -
-              arrowMinY,
-          ] as LocalPoint,
+          [endPoint[0] - arrowMinX, endPoint[1] - arrowMinY] as LocalPoint,
         ],
         groupIds: [],
         frameId,
