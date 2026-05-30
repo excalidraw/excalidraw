@@ -88,9 +88,32 @@ describe("terraformPipelineAtoms", () => {
     const layoutPlan = buildPipelineLayoutPlan(atomGraph, geoMap);
 
     expect(layoutPlan.columns.some((c) => c.laneCount >= 5)).toBe(true);
-    expect(layoutPlan.columns).toHaveLength(7);
 
-    const fanoutColumns = layoutPlan.columns.filter((c) => c.laneCount === 5);
-    expect(fanoutColumns).toHaveLength(3);
+    const consumer = [...atomGraph.atoms.keys()].find((a) =>
+      a.includes("consumer_lambda"),
+    )!;
+    const entryGateway = [...atomGraph.atoms.keys()].find((a) =>
+      a.includes("40-east-api-1") && a.includes("aws_api_gateway_rest_api"),
+    )!;
+    const entryCompute = [...atomGraph.atoms.keys()].find((a) =>
+      a.includes("40-east-api-1") &&
+      a.includes("aws_lambda_function"),
+    )!;
+
+    const consumerCol = layoutPlan.placements.find(
+      (p) => p.primaryAddress === consumer,
+    )!.columnIndex;
+    const gatewayCol = layoutPlan.placements.find(
+      (p) => p.primaryAddress === entryGateway,
+    )!.columnIndex;
+    const computeCol = layoutPlan.placements.find(
+      (p) => p.primaryAddress === entryCompute,
+    )!.columnIndex;
+
+    expect(gatewayCol).toBeGreaterThan(consumerCol);
+    expect(computeCol).toBe(gatewayCol + 1);
+    expect(
+      layoutPlan.columns.find((c) => c.columnIndex === gatewayCol)?.laneCount,
+    ).toBeGreaterThanOrEqual(5);
   }, 120_000);
 });

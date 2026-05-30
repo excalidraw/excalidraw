@@ -36,6 +36,8 @@ export type PipelineAtomEdge = {
   source: string;
   target: string;
   sequence: number;
+  /** When set, reduces column advance for this edge (e.g. same-column hops). */
+  columnBackoff?: number;
 };
 
 export type PipelineAtomGraph = {

@@ -234,7 +234,7 @@ describe("staging pipeline.tfd resolution", () => {
     expect(body.meta?.geoInstanceCount).toBeGreaterThanOrEqual(2);
     expect(body.meta?.atomCount).toBe(50);
     expect(body.meta?.declaredEdgeCount).toBe(57);
-    expect(body.meta?.columnCount).toBe(23);
+    expect(body.meta?.columnCount).toBe(20);
 
     const frames = body.elements.filter(
       (e: { type?: string; id?: string }) => e.type === "frame",
@@ -243,17 +243,18 @@ describe("staging pipeline.tfd resolution", () => {
     expect(frameIds.length).toBe(new Set(frameIds).size);
 
     const regionFrames = frames.filter(
-      (e: { customData?: { terraformTopologyRole?: string; terraformTopologyPath?: string[] } }) =>
-        e.customData?.terraformTopologyRole === "region",
+      (e: SceneElement) => e.customData?.terraformTopologyRole === "region",
     );
     expect(
       regionFrames.filter(
-        (f) => f.customData?.terraformTopologyPath?.[1] === "us-east-1",
+        (f: SceneElement) =>
+          f.customData?.terraformTopologyPath?.[1] === "us-east-1",
       ).length,
     ).toBeGreaterThanOrEqual(2);
     expect(
       regionFrames.some(
-        (f) => f.customData?.terraformTopologyPath?.[1] === "us-west-2",
+        (f: SceneElement) =>
+          f.customData?.terraformTopologyPath?.[1] === "us-west-2",
       ),
     ).toBe(true);
 
