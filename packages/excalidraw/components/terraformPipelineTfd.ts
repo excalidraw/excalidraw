@@ -36,6 +36,17 @@ export type TfdEdgeAdvance = {
   advance: number;
 };
 
+/** Precompute per-edge column advance for TFD v2 (uniform +1 per edge). */
+export function buildTfdEdgeAdvancesV2(
+  edges: readonly PipelineAtomEdge[],
+): TfdEdgeAdvance[] {
+  return edges.map((e) => ({
+    source: e.source,
+    target: e.target,
+    advance: tfdEdgeColumnAdvance(e.columnBackoff),
+  }));
+}
+
 /** Precompute per-edge column advance from TFD contiguous runs (independent of source column). */
 export function buildTfdEdgeAdvances(
   edges: readonly PipelineAtomEdge[],
@@ -115,7 +126,10 @@ export function buildPipelineColumnIndexMap(
     colByAtom.set([...atomGraph.atoms.keys()].sort()[0]!, 0);
   }
 
-  const advances = buildTfdEdgeAdvances(sorted);
+  const advances =
+    atomGraph.tfdVersion === 2
+      ? buildTfdEdgeAdvancesV2(sorted)
+      : buildTfdEdgeAdvances(sorted);
   relaxPipelineColumnIndexMap(
     colByAtom,
     advances,

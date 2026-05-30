@@ -4,6 +4,11 @@ import type { TerraformPlanGraphNode } from "./terraformPlanParsing";
 
 export const DECLARED_DATAFLOW_ORDERED_KEY = "__declaredDataFlowOrdered";
 
+export const TFD_HOP_ADDRESS = "@hop";
+export const TFD_DUMMY_ADDRESS = "@dummy";
+
+export type TfdVersion = 1 | 2;
+
 export type DeclaredDataFlowEdge = {
   source: string;
   target: string;
@@ -11,16 +16,46 @@ export type DeclaredDataFlowEdge = {
   origin: "tfd";
 };
 
+export type ParsedDeclaredDataFlowEdgeSpec = {
+  source: string;
+  target: string;
+  columnBackoff?: number;
+};
+
 export type ParsedDeclaredDataFlow = {
+  version: TfdVersion;
   binds: Map<string, string>;
-  edgeSpecs: Array<{ source: string; target: string }>;
+  edgeSpecs: ParsedDeclaredDataFlowEdgeSpec[];
+  hopAliases: Set<string>;
 };
 
 export type ApplyDeclaredDataFlowResult = {
   edges: DeclaredDataFlowEdge[];
   errors: string[];
   warnings: string[];
+  tfdVersion: TfdVersion;
 };
+
+export function isTfdHopSentinel(address: string): boolean {
+  return address === TFD_HOP_ADDRESS || address === TFD_DUMMY_ADDRESS;
+}
+
+/** True for hop sentinels and auto-generated `__tfd_hop_*` aliases. */
+export function isTfdHopAddress(address: string): boolean {
+  return isTfdHopSentinel(address) || /^__tfd_hop_\d+$/.test(address);
+}
+
+export function isTfdHopAlias(
+  ref: string,
+  hopAliases: ReadonlySet<string>,
+  binds: ReadonlyMap<string, string>,
+): boolean {
+  if (hopAliases.has(ref)) {
+    return true;
+  }
+  const bound = binds.get(ref);
+  return bound != null && isTfdHopSentinel(bound);
+}
 
 /** Resolve alias (via binds) or full Terraform address to a plan graph node path. */
 export function resolveDeclaredDataFlowEndpoint(
@@ -33,18 +68,70 @@ export function resolveDeclaredDataFlowEndpoint(
     return null;
   }
   const address = (binds.get(trimmed) ?? trimmed).trim();
+  if (isTfdHopSentinel(address)) {
+    return null;
+  }
   if (!address.includes(".")) {
     return null;
   }
   return resolveTerraformPlanNodeKey(nodes, address);
 }
 
-/** Parse arrow-only `.tfd` text; preserves edge line order. */
+function parseTfdVersionHeader(line: string): TfdVersion | null {
+  const match = line.match(/^tfd\s+(\d+)\s*$/i);
+  if (!match) {
+    return null;
+  }
+  const n = Number(match[1]);
+  if (n === 2) {
+    return 2;
+  }
+  if (n === 1) {
+    return 1;
+  }
+  return null;
+}
+
+function splitEdgeTargets(rhs: string): string[] {
+  return rhs
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function pushEdgeSpecs(
+  edgeSpecs: ParsedDeclaredDataFlowEdgeSpec[],
+  binds: Map<string, string>,
+  hopAliases: Set<string>,
+  source: string,
+  targets: readonly string[],
+  useDummyHop: boolean,
+  hopSeq: { value: number },
+): void {
+  for (const target of targets) {
+    if (useDummyHop) {
+      const hopAlias = `__tfd_hop_${hopSeq.value}`;
+      hopSeq.value += 1;
+      binds.set(hopAlias, TFD_HOP_ADDRESS);
+      hopAliases.add(hopAlias);
+      edgeSpecs.push({ source, target: hopAlias });
+      edgeSpecs.push({ source: hopAlias, target });
+    } else {
+      edgeSpecs.push({ source, target });
+    }
+  }
+}
+
+/** Parse `.tfd` text; preserves edge line order. */
 export function parseDeclaredDataFlowText(
   text: string,
 ): ParsedDeclaredDataFlow {
   const binds = new Map<string, string>();
-  const edgeSpecs: Array<{ source: string; target: string }> = [];
+  const edgeSpecs: ParsedDeclaredDataFlowEdgeSpec[] = [];
+  const hopAliases = new Set<string>();
+  let version: TfdVersion = 1;
+  let sawVersionHeader = false;
+  const hopSeq = { value: 0 };
 
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.trim();
@@ -52,19 +139,59 @@ export function parseDeclaredDataFlowText(
       continue;
     }
 
+    if (!sawVersionHeader) {
+      const headerVersion = parseTfdVersionHeader(line);
+      if (headerVersion != null) {
+        version = headerVersion;
+        sawVersionHeader = true;
+        continue;
+      }
+    }
+
     const bindMatch = line.match(/^bind\s+([A-Za-z_][\w]*)\s*=?\s+(.+)$/i);
     if (bindMatch) {
-      binds.set(bindMatch[1], bindMatch[2].trim());
+      const alias = bindMatch[1]!;
+      const address = bindMatch[2]!.trim();
+      binds.set(alias, address);
+      if (isTfdHopSentinel(address)) {
+        hopAliases.add(alias);
+      }
       continue;
     }
 
-    const edgeMatch = line.match(/^([^\s#]+)\s*->\s*([^\s#]+)$/);
+    const longArrowMatch = line.match(/^([^\s#]+)\s*-->\s*(.+)$/);
+    if (longArrowMatch) {
+      const source = longArrowMatch[1]!;
+      const targets = splitEdgeTargets(longArrowMatch[2]!);
+      pushEdgeSpecs(
+        edgeSpecs,
+        binds,
+        hopAliases,
+        source,
+        targets,
+        true,
+        hopSeq,
+      );
+      continue;
+    }
+
+    const edgeMatch = line.match(/^([^\s#]+)\s*->\s*(.+)$/);
     if (edgeMatch) {
-      edgeSpecs.push({ source: edgeMatch[1], target: edgeMatch[2] });
+      const source = edgeMatch[1]!;
+      const targets = splitEdgeTargets(edgeMatch[2]!);
+      pushEdgeSpecs(
+        edgeSpecs,
+        binds,
+        hopAliases,
+        source,
+        targets,
+        false,
+        hopSeq,
+      );
     }
   }
 
-  return { binds, edgeSpecs };
+  return { version, binds, edgeSpecs, hopAliases };
 }
 
 export function applyDeclaredDataFlowFromMany(
@@ -75,10 +202,13 @@ export function applyDeclaredDataFlowFromMany(
   labels?: (string | undefined)[],
 ): ApplyDeclaredDataFlowResult {
   const binds = new Map<string, string>();
+  const hopAliases = new Set<string>();
   const errors: string[] = [];
   const warnings: string[] = [];
   const edges: DeclaredDataFlowEdge[] = [];
   let sequence = 0;
+  let tfdVersion: TfdVersion = 1;
+  const seenVersions = new Set<TfdVersion>();
 
   for (let fileIndex = 0; fileIndex < texts.length; fileIndex++) {
     const text = texts[fileIndex];
@@ -86,9 +216,11 @@ export function applyDeclaredDataFlowFromMany(
       continue;
     }
     const label = labels?.[fileIndex]?.trim() || `tfd ${fileIndex + 1}`;
-    const { binds: fileBinds, edgeSpecs } = parseDeclaredDataFlowText(text);
+    const parsed = parseDeclaredDataFlowText(text);
+    seenVersions.add(parsed.version);
+    tfdVersion = Math.max(tfdVersion, parsed.version) as TfdVersion;
 
-    for (const [alias, address] of fileBinds) {
+    for (const [alias, address] of parsed.binds) {
       if (binds.has(alias) && binds.get(alias) !== address) {
         warnings.push(
           `bind "${alias}" in "${label}" overwrote earlier definition.`,
@@ -96,8 +228,14 @@ export function applyDeclaredDataFlowFromMany(
       }
       binds.set(alias, address);
     }
+    for (const alias of parsed.hopAliases) {
+      hopAliases.add(alias);
+    }
 
-    for (const [alias, address] of fileBinds) {
+    for (const [alias, address] of parsed.binds) {
+      if (isTfdHopSentinel(address)) {
+        continue;
+      }
       if (!address.includes(".")) {
         errors.push(
           `bind ${alias}: must be a full Terraform address (got "${address}")`,
@@ -109,7 +247,13 @@ export function applyDeclaredDataFlowFromMany(
       }
     }
 
-    for (const spec of edgeSpecs) {
+    for (const spec of parsed.edgeSpecs) {
+      if (
+        isTfdHopAlias(spec.source, hopAliases, binds) ||
+        isTfdHopAlias(spec.target, hopAliases, binds)
+      ) {
+        continue;
+      }
       const source = resolveDeclaredDataFlowEndpoint(nodes, spec.source, binds);
       const target = resolveDeclaredDataFlowEndpoint(nodes, spec.target, binds);
       if (!source) {
@@ -129,6 +273,12 @@ export function applyDeclaredDataFlowFromMany(
     }
   }
 
+  if (seenVersions.size > 1) {
+    warnings.push(
+      "Mixed TFD v1 and v2 files in one import; using v2 pipeline depth semantics.",
+    );
+  }
+
   if (edges.length > 0) {
     nodes[DECLARED_DATAFLOW_ORDERED_KEY] = edges;
   } else {
@@ -140,7 +290,7 @@ export function applyDeclaredDataFlowFromMany(
     console.warn("[terraform:declared-dataflow]", { errors, warnings });
   }
 
-  return { edges, errors, warnings };
+  return { edges, errors, warnings, tfdVersion };
 }
 
 export function applyDeclaredDataFlow(

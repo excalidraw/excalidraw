@@ -1,3 +1,4 @@
+tfd 2
 # Pipeline-wide declared dataflow for production-geo-fanout (LocalStack export).
 # Resource addresses match localstack/stacks/* Terraform modules.
 

@@ -14,7 +14,7 @@ import {
 } from "./terraformElkLayout";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
-import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
+import { buildPipelineAtomGraph, isTfdHopAtom } from "./terraformPipelineAtoms";
 import {
   buildPipelineAccountLaneBands,
   buildPipelineLayoutPlan,
@@ -1069,6 +1069,9 @@ export async function buildTerraformPipelineExcalidrawScene(
   const columnWidths: number[] = layoutPlan.columns.map((col) => {
     let maxW = 0;
     for (const addr of col.atoms) {
+      if (isTfdHopAtom(atomGraph, addr)) {
+        continue;
+      }
       const b = clusterBuilds.get(addr);
       if (b) {
         maxW = Math.max(maxW, b.width);
@@ -1114,6 +1117,9 @@ export async function buildTerraformPipelineExcalidrawScene(
         col.columnIndex < firstFanoutCol;
       for (let lane = 0; lane < col.atoms.length; lane++) {
         const addr = col.atoms[lane]!;
+        if (isTfdHopAtom(atomGraph, addr)) {
+          continue;
+        }
         const placement = layoutPlan.placements.find(
           (p) => p.primaryAddress === addr && p.columnIndex === col.columnIndex,
         );

@@ -39,6 +39,7 @@ function mockAtomGraph(
     sequence: number;
     columnBackoff?: number;
   }>,
+  tfdVersion: 1 | 2 = 1,
 ) {
   return {
     atoms: new Map(
@@ -53,11 +54,12 @@ function mockAtomGraph(
     ),
     edges,
     closureAddresses: new Set(ids),
+    tfdVersion,
   };
 }
 
 describe("buildPipelineColumnIndexMap", () => {
-  it("places parallel fanout in one column and sequential runs further right", () => {
+  it("places parallel fanout in one column and sequential runs further right (v1)", () => {
     const edges = [
       { source: "a", target: "b", sequence: 0, columnBackoff: 0 },
       { source: "a", target: "c", sequence: 1, columnBackoff: 0 },
@@ -65,7 +67,11 @@ describe("buildPipelineColumnIndexMap", () => {
       { source: "a", target: "d", sequence: 3, columnBackoff: 0 },
       { source: "a", target: "e", sequence: 4, columnBackoff: 1 },
     ];
-    const atomGraph = mockAtomGraph(["a", "b", "c", "d", "e", "x", "y"], edges);
+    const atomGraph = mockAtomGraph(
+      ["a", "b", "c", "d", "e", "x", "y"],
+      edges,
+      1,
+    );
     const colByAtom = buildPipelineColumnIndexMap(atomGraph, edges);
     expect(colByAtom.get("a")).toBe(0);
     expect(colByAtom.get("b")).toBe(colByAtom.get("c"));
@@ -73,16 +79,28 @@ describe("buildPipelineColumnIndexMap", () => {
     expect(colByAtom.get("e")).toBe(colByAtom.get("b"));
   });
 
-  it("assigns separate sequential runs when same-source edges are not contiguous", () => {
+  it("assigns separate sequential runs when same-source edges are not contiguous (v1)", () => {
     const edges = [
       { source: "a", target: "b", sequence: 0, columnBackoff: 0 },
       { source: "x", target: "y", sequence: 1, columnBackoff: 0 },
       { source: "a", target: "d", sequence: 2, columnBackoff: 0 },
     ];
-    const atomGraph = mockAtomGraph(["a", "b", "d", "x", "y"], edges);
+    const atomGraph = mockAtomGraph(["a", "b", "d", "x", "y"], edges, 1);
     const colByAtom = buildPipelineColumnIndexMap(atomGraph, edges);
     expect(colByAtom.get("b")).toBe(1);
     expect(colByAtom.get("d")).toBe(2);
+  });
+
+  it("places all sibling outputs at source+1 under v2 adjacency", () => {
+    const edges = [
+      { source: "a", target: "b", sequence: 0 },
+      { source: "x", target: "y", sequence: 1 },
+      { source: "a", target: "d", sequence: 2 },
+    ];
+    const atomGraph = mockAtomGraph(["a", "b", "d", "x", "y"], edges, 2);
+    const colByAtom = buildPipelineColumnIndexMap(atomGraph, edges);
+    expect(colByAtom.get("b")).toBe(1);
+    expect(colByAtom.get("d")).toBe(1);
   });
 
   it("applies gateway-to-compute after cascade when gateway edge is declared first", () => {
@@ -91,17 +109,38 @@ describe("buildPipelineColumnIndexMap", () => {
       { source: "gw", target: "compute", sequence: 1 },
       { source: "b", target: "gw", sequence: 2 },
     ];
-    const atomGraph = mockAtomGraph(["a", "b", "gw", "compute"], edges);
+    const atomGraph = mockAtomGraph(["a", "b", "gw", "compute"], edges, 2);
     const colByAtom = buildPipelineColumnIndexMap(atomGraph, edges);
     expect(colByAtom.get("a")).toBe(0);
     expect(colByAtom.get("b")).toBe(1);
     expect(colByAtom.get("gw")).toBe(2);
     expect(colByAtom.get("compute")).toBe(3);
   });
+
+  it("adds +2 depth for --> hop chain under v2", () => {
+    const edges = [
+      { source: "a", target: "__tfd_hop_0", sequence: 0 },
+      { source: "__tfd_hop_0", target: "b", sequence: 1 },
+      { source: "a", target: "c", sequence: 2 },
+    ];
+    const atomGraph = mockAtomGraph(
+      ["a", "b", "c", "__tfd_hop_0"],
+      edges,
+      2,
+    );
+    atomGraph.atoms.set("__tfd_hop_0", {
+      primaryAddress: "__tfd_hop_0",
+      resourceType: "__tfd_hop",
+      memberAddresses: [],
+    });
+    const colByAtom = buildPipelineColumnIndexMap(atomGraph, edges);
+    expect(colByAtom.get("c")).toBe(1);
+    expect(colByAtom.get("b")).toBe(2);
+  });
 });
 
 describe("staging pipeline TFD depth layout", () => {
-  it("places api2 store at compute+2, ssm at compute+1, with shared lane", async () => {
+  it("places api2 ssm and store at compute+1 with shared lane under v2", async () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
     const { bundles: namespaced, stackIds } = namespacePlanDotBundles(bundles);
     const merged = mergePlanJsons(
@@ -118,6 +157,8 @@ describe("staging pipeline TFD depth layout", () => {
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;
+    expect(atomGraph.tfdVersion).toBe(2);
+
     const geoMap = buildPipelineAtomGeoMap(atomGraph, nodes, merged.plan);
     const layoutPlan = buildPipelineLayoutPlan(atomGraph, geoMap);
 
@@ -145,15 +186,44 @@ describe("staging pipeline TFD depth layout", () => {
 
     expect(computePlacement).toBeDefined();
     expect(ssmPlacement!.columnIndex).toBe(computePlacement!.columnIndex + 1);
-    expect(storePlacement!.columnIndex).toBe(computePlacement!.columnIndex + 2);
-    expect(ssmPlacement!.laneIndex).toBe(computePlacement!.laneIndex);
-    expect(storePlacement!.laneIndex).toBe(computePlacement!.laneIndex);
+    expect(storePlacement!.columnIndex).toBe(computePlacement!.columnIndex + 1);
+    expect(ssmPlacement!.columnIndex).toBe(storePlacement!.columnIndex);
 
     const primaryParent = buildTfdPrimaryParentMap(atomGraph.edges);
     expect(primaryParent.get(api2Store)).toBe(api2Compute);
 
     expect(layoutPlan.columns.some((c) => c.laneCount >= 5)).toBe(true);
     expect(layoutPlan.columns.length).toBeGreaterThanOrEqual(10);
+
+    const api6Compute = [...atomGraph.atoms.keys()].find(
+      (a) =>
+        a.includes("45-east-api-6") &&
+        a.includes("aws_lambda_function"),
+    )!;
+    const api6Ssm = [...atomGraph.atoms.keys()].find(
+      (a) =>
+        a.includes("45-east-api-6") && a.includes("aws_ssm_parameter"),
+    )!;
+    const api6Store = [...atomGraph.atoms.keys()].find(
+      (a) => a.includes("api6_rds") && a.includes("aws_db_instance"),
+    )!;
+
+    const api6ComputePlacement = layoutPlan.placements.find(
+      (p) => p.primaryAddress === api6Compute,
+    );
+    const api6SsmPlacement = layoutPlan.placements.find(
+      (p) => p.primaryAddress === api6Ssm,
+    );
+    const api6StorePlacement = layoutPlan.placements.find(
+      (p) => p.primaryAddress === api6Store,
+    );
+
+    expect(api6SsmPlacement!.columnIndex).toBe(
+      api6ComputePlacement!.columnIndex + 1,
+    );
+    expect(api6StorePlacement!.columnIndex).toBe(
+      api6ComputePlacement!.columnIndex + 1,
+    );
 
     const api7Gateway = [...atomGraph.atoms.keys()].find(
       (a) =>
@@ -168,6 +238,9 @@ describe("staging pipeline TFD depth layout", () => {
       (a) =>
         a.includes("46-east-api-7") && a.includes("aws_ssm_parameter"),
     )!;
+    const api7Store = [...atomGraph.atoms.keys()].find(
+      (a) => a.includes("api7_aurora") && a.includes("aws_rds_cluster"),
+    )!;
 
     const gwPlacement = layoutPlan.placements.find(
       (p) => p.primaryAddress === api7Gateway,
@@ -178,12 +251,18 @@ describe("staging pipeline TFD depth layout", () => {
     const api7SsmPlacement = layoutPlan.placements.find(
       (p) => p.primaryAddress === api7Ssm,
     );
+    const api7StorePlacement = layoutPlan.placements.find(
+      (p) => p.primaryAddress === api7Store,
+    );
 
     expect(gwPlacement).toBeDefined();
     expect(api7ComputePlacement!.columnIndex).toBe(
       gwPlacement!.columnIndex + 1,
     );
     expect(api7SsmPlacement!.columnIndex).toBe(
+      api7ComputePlacement!.columnIndex + 1,
+    );
+    expect(api7StorePlacement!.columnIndex).toBe(
       api7ComputePlacement!.columnIndex + 1,
     );
     expect(api7ComputePlacement!.laneIndex).toBe(gwPlacement!.laneIndex);

@@ -1,3 +1,4 @@
+tfd 2
 # Pipeline-wide declared dataflow for staging-multi-state (11 APIs).
 # Binds use stack-qualified Terraform addresses (stackId::resource.address).
 
@@ -69,13 +70,9 @@ ecs_listener -> ecs_target_group
 ecs_target_group -> ecs_producer
 ecs_producer -> event_queue
 event_queue -> queue_consumer
-queue_consumer -> api1_gateway
-queue_consumer -> api2_gateway
-queue_consumer -> api3_gateway
-queue_consumer -> api4_gateway
-queue_consumer -> api5_gateway
+queue_consumer -> api1_gateway, api2_gateway, api3_gateway, api4_gateway, api5_gateway
 
-# Gateway -> compute -> SSM
+# Gateway -> compute -> SSM + store
 api1_gateway -> api1_compute
 api2_gateway -> api2_compute
 api3_gateway -> api3_compute
@@ -88,43 +85,22 @@ api9_gateway -> api9_compute
 api10_gateway -> api10_compute
 api11_gateway -> api11_compute
 
-api1_compute -> api1_ssm_name
-api2_compute -> api2_ssm_name
-api3_compute -> api3_ssm_name
-api4_compute -> api4_ssm_name
-api5_compute -> api5_ssm_name
-api6_compute -> api6_ssm_name
-api7_compute -> api7_ssm_name
-api8_compute -> api8_ssm_name
-api9_compute -> api9_ssm_name
-api10_compute -> api10_ssm_name
-api11_compute -> api11_ssm_name
-
-# Compute -> dedicated stores
-api1_compute -> api1_store
-api2_compute -> api2_store
-api3_compute -> api3_store
-api4_compute -> api4_store
-api5_compute -> api5_store
-api6_compute -> api6_store
-api7_compute -> api7_store
-api8_compute -> api8_store_west
-api8_compute -> api8_store_east
-api9_compute -> api9_store_west
-api9_compute -> api9_store_east
-api10_compute -> api10_store
-api11_compute -> api11_store
+api1_compute -> api1_ssm_name, api1_store
+api2_compute -> api2_ssm_name, api2_store
+api3_compute -> api3_ssm_name, api3_store
+api4_compute -> api4_ssm_name, api4_store
+api5_compute -> api5_ssm_name, api5_store
+api6_compute -> api6_ssm_name, api6_store
+api7_compute -> api7_ssm_name, api7_store
+api8_compute -> api8_ssm_name, api8_store_west, api8_store_east
+api9_compute -> api9_ssm_name, api9_store_west, api9_store_east
+api10_compute -> api10_ssm_name, api10_store
+api11_compute -> api11_ssm_name, api11_store
 
 # Cascade: entry tier -> mid tier -> west tier -> tail tier
-api4_compute -> api6_gateway
-api4_compute -> api7_gateway
-api5_compute -> api6_gateway
-api5_compute -> api7_gateway
-api6_compute -> api8_gateway
-api6_compute -> api9_gateway
-api7_compute -> api8_gateway
-api7_compute -> api9_gateway
-api8_compute -> api10_gateway
-api8_compute -> api11_gateway
-api9_compute -> api10_gateway
-api9_compute -> api11_gateway
+api4_compute -> api6_gateway, api7_gateway
+api5_compute -> api6_gateway, api7_gateway
+api6_compute -> api8_gateway, api9_gateway
+api7_compute -> api8_gateway, api9_gateway
+api8_compute -> api10_gateway, api11_gateway
+api9_compute -> api10_gateway, api11_gateway

@@ -362,7 +362,25 @@ bind api2_compute = 41-east-api-2::module.api.aws_ecs_service.api
 bind api2_store   = 02-east-datastores::module.api2_rds.aws_db_instance.this
 ```
 
-### Edge categories (~130 lines)
+### TFD v2 syntax
+
+The file starts with `tfd 2` so pipeline column depth uses **adjacency-list semantics** (each edge advances one column; sibling targets from the same source share depth). Files without that header keep legacy v1 run-ordinal grouping.
+
+| Form | Meaning |
+|------|---------|
+| `src -> dst` | One column hop |
+| `src -> a, b` | Parallel fanout (same depth for `a` and `b`) |
+| `src --> dst` | Extra depth via auto dummy hop (`src -> __tfd_hop_N -> dst`) |
+| `bind mid = @hop` | Explicit dummy node for manual `a -> mid -> b` chains |
+
+Example:
+
+```text
+tfd 2
+api6_compute -> api6_ssm_name, api6_store
+```
+
+### Edge categories
 
 | Category | Example |
 |----------|---------|

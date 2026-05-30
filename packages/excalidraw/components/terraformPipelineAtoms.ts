@@ -14,9 +14,13 @@ import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import { getTopologyResourceType } from "./terraformTopologySatelliteResolve";
 import {
   DECLARED_DATAFLOW_ORDERED_KEY,
+  isTfdHopAddress,
+  isTfdHopAlias,
+  isTfdHopSentinel,
   parseDeclaredDataFlowText,
   resolveDeclaredDataFlowEndpoint,
   type DeclaredDataFlowEdge,
+  type TfdVersion,
 } from "./terraformDeclaredDataFlow";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
 
@@ -45,7 +49,18 @@ export type PipelineAtomGraph = {
   edges: PipelineAtomEdge[];
   /** Plan addresses included in the pipeline closure. */
   closureAddresses: Set<string>;
+  tfdVersion?: TfdVersion;
 };
+
+export { isTfdHopAddress };
+
+export function isTfdHopAtom(
+  atomGraph: PipelineAtomGraph,
+  atom: string,
+): boolean {
+  const meta = atomGraph.atoms.get(atom);
+  return meta?.resourceType === "__tfd_hop" || isTfdHopAddress(atom);
+}
 
 function getPlanChanges(plan?: unknown): Array<{
   address?: string;
@@ -157,6 +172,9 @@ function collectBindClosureAddresses(
 ): Set<string> {
   const out = new Set<string>();
   for (const address of binds.values()) {
+    if (isTfdHopSentinel(address)) {
+      continue;
+    }
     const resolved = resolveDeclaredDataFlowEndpoint(nodes, address, binds);
     if (resolved) {
       out.add(resolved);
@@ -194,6 +212,74 @@ function expandClosureWithSatellites(
     }
   }
   return out;
+}
+
+function resolvePipelineEndpointAtom(
+  ref: string,
+  binds: Map<string, string>,
+  hopAliases: Set<string>,
+  nodes: TerraformPlanNodesMap,
+  resolveAtom: (address: string) => string,
+): string | null {
+  if (isTfdHopAlias(ref, hopAliases, binds)) {
+    return ref;
+  }
+  const resolved = resolveDeclaredDataFlowEndpoint(nodes, ref, binds);
+  if (!resolved) {
+    return null;
+  }
+  return resolveAtom(resolved);
+}
+
+function buildPipelineEdgesFromParsedTfd(
+  tfdTexts: readonly string[],
+  nodes: TerraformPlanNodesMap,
+  resolveAtom: (address: string) => string,
+): { edges: PipelineAtomEdge[]; tfdVersion: TfdVersion; hopAliases: Set<string> } {
+  const binds = new Map<string, string>();
+  const hopAliases = new Set<string>();
+  let tfdVersion: TfdVersion = 1;
+  const rawEdges: PipelineAtomEdge[] = [];
+  let sequence = 0;
+
+  for (const text of tfdTexts) {
+    const parsed = parseDeclaredDataFlowText(text);
+    tfdVersion = Math.max(tfdVersion, parsed.version) as TfdVersion;
+    for (const [k, v] of parsed.binds) {
+      binds.set(k, v);
+    }
+    for (const alias of parsed.hopAliases) {
+      hopAliases.add(alias);
+    }
+    for (const spec of parsed.edgeSpecs) {
+      const source = resolvePipelineEndpointAtom(
+        spec.source,
+        binds,
+        hopAliases,
+        nodes,
+        resolveAtom,
+      );
+      const target = resolvePipelineEndpointAtom(
+        spec.target,
+        binds,
+        hopAliases,
+        nodes,
+        resolveAtom,
+      );
+      if (!source || !target || source === target) {
+        continue;
+      }
+      rawEdges.push({
+        source,
+        target,
+        sequence,
+        columnBackoff: spec.columnBackoff,
+      });
+      sequence += 1;
+    }
+  }
+
+  return { edges: dedupeAtomEdges(rawEdges), tfdVersion, hopAliases };
 }
 
 function collapseAtomEdges(
@@ -257,10 +343,16 @@ export function buildPipelineAtomGraph(
   }
 
   const binds = new Map<string, string>();
+  const hopAliases = new Set<string>();
+  let tfdVersion: TfdVersion = 1;
   for (const text of tfdTexts ?? []) {
     const parsed = parseDeclaredDataFlowText(text);
+    tfdVersion = Math.max(tfdVersion, parsed.version) as TfdVersion;
     for (const [k, v] of parsed.binds) {
       binds.set(k, v);
+    }
+    for (const alias of parsed.hopAliases) {
+      hopAliases.add(alias);
     }
   }
 
@@ -313,11 +405,43 @@ export function buildPipelineAtomGraph(
     addMember(e.target);
   }
 
-  const collapsedEdges = collapseAtomEdges(declared, resolveAtom);
-  const edges = dedupeAtomEdges(collapsedEdges);
+  let edges: PipelineAtomEdge[];
+  if (tfdTexts?.length) {
+    const parsed = buildPipelineEdgesFromParsedTfd(
+      tfdTexts,
+      nodes,
+      resolveAtom,
+    );
+    edges = parsed.edges;
+    tfdVersion = parsed.tfdVersion;
+    for (const alias of parsed.hopAliases) {
+      hopAliases.add(alias);
+    }
+  } else {
+    const collapsedEdges = collapseAtomEdges(declared, resolveAtom);
+    edges = dedupeAtomEdges(collapsedEdges);
+  }
+
+  for (const alias of hopAliases) {
+    atomAddresses.add(alias);
+    memberByAtom.set(alias, new Set());
+  }
+
+  for (const e of edges) {
+    atomAddresses.add(e.source);
+    atomAddresses.add(e.target);
+  }
 
   const atoms = new Map<string, PipelineAtomMeta>();
   for (const primaryAddress of atomAddresses) {
+    if (hopAliases.has(primaryAddress) || isTfdHopAddress(primaryAddress)) {
+      atoms.set(primaryAddress, {
+        primaryAddress,
+        resourceType: "__tfd_hop",
+        memberAddresses: [],
+      });
+      continue;
+    }
     const node = nodes[primaryAddress] as TerraformPlanGraphNode | undefined;
     const resourceType = getTopologyResourceType(primaryAddress, node);
     atoms.set(primaryAddress, {
@@ -331,7 +455,7 @@ export function buildPipelineAtomGraph(
 
   closureAddresses = new Set([...closureAddresses, ...atomAddresses]);
 
-  return { atoms, edges, closureAddresses };
+  return { atoms, edges, closureAddresses, tfdVersion };
 }
 
 export function pipelineAtomResourceValues(

@@ -44,11 +44,64 @@ describe("parseDeclaredDataFlowText", () => {
       writer -> queue
       bind bucket = ${BUCKET}
     `);
+    expect(parsed.version).toBe(1);
     expect(parsed.binds.get("writer")).toBe(WRITER);
     expect(parsed.binds.get("bucket")).toBe(BUCKET);
     expect(parsed.edgeSpecs).toEqual([
       { source: "writer", target: "bucket" },
       { source: "writer", target: "queue" },
+    ]);
+  });
+
+  it("detects tfd 2 version header", () => {
+    const parsed = parseDeclaredDataFlowText(`
+      tfd 2
+      bind writer = ${WRITER}
+      writer -> bucket
+    `);
+    expect(parsed.version).toBe(2);
+  });
+
+  it("parses comma fanout as parallel edges", () => {
+    const parsed = parseDeclaredDataFlowText(`
+      tfd 2
+      writer -> bucket, queue
+    `);
+    expect(parsed.edgeSpecs).toEqual([
+      { source: "writer", target: "bucket" },
+      { source: "writer", target: "queue" },
+    ]);
+  });
+
+  it("expands --> into hop alias edges", () => {
+    const parsed = parseDeclaredDataFlowText(`
+      tfd 2
+      writer --> reader
+    `);
+    expect(parsed.edgeSpecs).toHaveLength(2);
+    expect(parsed.edgeSpecs[0]).toEqual({
+      source: "writer",
+      target: "__tfd_hop_0",
+    });
+    expect(parsed.edgeSpecs[1]).toEqual({
+      source: "__tfd_hop_0",
+      target: "reader",
+    });
+    expect(parsed.hopAliases.has("__tfd_hop_0")).toBe(true);
+    expect(parsed.binds.get("__tfd_hop_0")).toBe("@hop");
+  });
+
+  it("registers explicit @hop bind alias", () => {
+    const parsed = parseDeclaredDataFlowText(`
+      tfd 2
+      bind mid = @hop
+      writer -> mid
+      mid -> reader
+    `);
+    expect(parsed.hopAliases.has("mid")).toBe(true);
+    expect(parsed.edgeSpecs).toEqual([
+      { source: "writer", target: "mid" },
+      { source: "mid", target: "reader" },
     ]);
   });
 });

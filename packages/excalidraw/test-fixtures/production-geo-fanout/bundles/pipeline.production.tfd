@@ -1,3 +1,4 @@
+tfd 2
 # Pipeline-wide declared dataflow for production-geo-fanout.
 # Binds use stack-qualified Terraform addresses (stackId::resource.address).
 
