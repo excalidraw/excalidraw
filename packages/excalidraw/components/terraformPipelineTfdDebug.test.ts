@@ -234,7 +234,7 @@ describe("staging pipeline.tfd resolution", () => {
     expect(body.meta?.geoInstanceCount).toBeGreaterThanOrEqual(2);
     expect(body.meta?.atomCount).toBe(50);
     expect(body.meta?.declaredEdgeCount).toBe(57);
-    expect(body.meta?.columnCount).toBe(20);
+    expect(body.meta?.columnCount).toBe(13);
 
     const frames = body.elements.filter(
       (e: { type?: string; id?: string }) => e.type === "frame",
@@ -372,7 +372,7 @@ describe("staging pipeline.tfd resolution", () => {
       "40-east-api-1::module.api.aws_api_gateway_rest_api.private",
     );
     expect(fanoutArrow).toBeTruthy();
-    expect(arrowDeltaY(fanoutArrow!)).toBeGreaterThan(4);
+    expect(arrowDeltaY(fanoutArrow!)).toBeLessThan(4);
 
     const insideVertically = (
       inner: { y: number; height: number },

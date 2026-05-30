@@ -16,6 +16,10 @@ import { tfComfortPx } from "./terraformLayoutComfort";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph, isTfdHopAtom } from "./terraformPipelineAtoms";
 import {
+  assignPipelineColumnPackedY,
+  buildColumnPackInputs,
+} from "./terraformPipelineColumnPack";
+import {
   buildPipelineAccountLaneBands,
   buildPipelineLayoutPlan,
   type PipelineAccountLaneBand,
@@ -159,7 +163,10 @@ function computeRowTops(
 }
 
 function computePipelineRowGeometry(
-  layoutPlan: { columns: PipelineColumn[] },
+  layoutPlan: {
+    columns: PipelineColumn[];
+    placements: readonly PipelineAtomPlacement[];
+  },
   clusterBuilds: Map<string, ClusterBuild>,
   contentTop: number,
   rowHeightsOverride?: readonly number[],
@@ -168,7 +175,7 @@ function computePipelineRowGeometry(
 ): PipelineRowGeometry {
   const maxLaneCount = Math.max(
     1,
-    ...layoutPlan.columns.map((c) => c.laneCount),
+    ...layoutPlan.placements.map((p) => p.laneIndex + 1),
   );
   const rowHeights =
     rowHeightsOverride != null
@@ -176,16 +183,25 @@ function computePipelineRowGeometry(
       : Array.from({ length: maxLaneCount }, () => px(88));
 
   if (rowHeightsOverride == null) {
+    const placementByAddr = new Map(
+      layoutPlan.placements.map((p) => [p.primaryAddress, p]),
+    );
     for (const col of layoutPlan.columns) {
-      for (let lane = 0; lane < col.atoms.length; lane++) {
-        const addr = col.atoms[lane];
-        const build = addr ? clusterBuilds.get(addr) : undefined;
-        if (build) {
-          rowHeights[lane] = Math.max(
-            rowHeights[lane]!,
-            rowHeightForClusterSlot(build),
-          );
+      for (const addr of col.atoms) {
+        if (!addr) {
+          continue;
         }
+        const build = clusterBuilds.get(addr);
+        if (!build) {
+          continue;
+        }
+        const lane =
+          placementByAddr.get(addr)?.laneIndex ??
+          col.atoms.indexOf(addr);
+        rowHeights[lane] = Math.max(
+          rowHeights[lane]!,
+          rowHeightForClusterSlot(build),
+        );
       }
     }
   }
@@ -320,6 +336,7 @@ function populateSkeletonFromDrafts(
         placement.geo.vpcId ?? "regional",
         String(placement.geoInstanceId),
         String(draft.col.columnIndex),
+        placement.trackId ?? "other",
         String(draft.lane),
       ],
       bounds: clusterBoundsForZone(clusterX, clusterY, build),
@@ -375,6 +392,25 @@ function fanoutSpanCenterY(rowGeo: PipelineRowGeometry): number {
   return (spanTop + spanBottom) / 2;
 }
 
+function packedSpanCenterY(
+  placements: readonly PipelineAtomPlacement[],
+  contentTop: number,
+): number | null {
+  let min = Infinity;
+  let max = -Infinity;
+  for (const p of placements) {
+    if (p.packedOffsetY == null) {
+      continue;
+    }
+    min = Math.min(min, p.packedOffsetY);
+    max = Math.max(max, p.packedOffsetY);
+  }
+  if (min === Infinity) {
+    return null;
+  }
+  return contentTop + INNER_PAD + (min + max) / 2;
+}
+
 function clusterYForPlacement(
   col: PipelineColumn,
   colIdx: number,
@@ -382,12 +418,19 @@ function clusterYForPlacement(
   build: ClusterBuild,
   rowGeo: PipelineRowGeometry,
   columns: readonly PipelineColumn[],
+  contentTop: number,
+  placement: PipelineAtomPlacement | undefined,
+  packedSpanCenter: number | null,
   accountLaneIndices?: readonly number[],
   multiAccountBandLayout = false,
 ): number {
-  const { rowHeights, rowTops, maxLaneCount } = rowGeo;
+  const { rowTops } = rowGeo;
   const primaryCy = primaryResourceCenterYInCluster(build);
   const firstFanoutCol = firstMultiLaneColumnIndex(columns);
+
+  if (placement?.packedOffsetY != null) {
+    return contentTop + INNER_PAD + placement.packedOffsetY - primaryCy;
+  }
 
   if (col.laneCount > 1) {
     return rowTops[lane]! + FRAME_PAD;
@@ -398,6 +441,8 @@ function clusterYForPlacement(
     if (multiAccountBandLayout && accountLaneIndices?.length) {
       const minLane = Math.min(...accountLaneIndices);
       rowCenterY = rowTops[minLane]! + primaryCy;
+    } else if (packedSpanCenter != null) {
+      rowCenterY = packedSpanCenter;
     } else {
       rowCenterY = fanoutSpanCenterY(rowGeo);
     }
@@ -740,7 +785,9 @@ export function pipelineContainerGroupKey(
     return null;
   }
   if (multiAccountBandLayout) {
-    return `${parentBucket}|lane${spec.laneIndex}|col${spec.columnIndex}`;
+    const track =
+      spec.path.length >= 7 ? spec.path[5]! : String(spec.laneIndex);
+    return `${parentBucket}|track${track}|col${spec.columnIndex}`;
   }
   return `${parentBucket}|col${spec.columnIndex}`;
 }
@@ -1081,6 +1128,24 @@ export async function buildTerraformPipelineExcalidrawScene(
   });
 
   const contentTop = AWS_FRAME_PAD;
+
+  const slotHeight = new Map<string, number>();
+  for (const [addr, build] of clusterBuilds) {
+    slotHeight.set(addr, rowHeightForClusterSlot(build));
+  }
+  const { colByAtom } = buildColumnPackInputs(layoutPlan, slotHeight);
+  assignPipelineColumnPackedY(
+    layoutPlan.placements,
+    layoutPlan.columns,
+    atomGraph.edges,
+    slotHeight,
+    colByAtom,
+  );
+
+  const packedSpanCenter = packedSpanCenterY(
+    layoutPlan.placements,
+    contentTop,
+  );
   const accountBands = buildPipelineAccountLaneBands(layoutPlan.placements);
   const multiAccountBandLayout = accountBands.length > 1;
   let rowGeo = computePipelineRowGeometry(
@@ -1134,10 +1199,13 @@ export async function buildTerraformPipelineExcalidrawScene(
         const clusterY = clusterYForPlacement(
           col,
           col.columnIndex,
-          lane,
+          placement.laneIndex,
           build,
           geo,
           layoutPlan.columns,
+          contentTop,
+          placement,
+          packedSpanCenter,
           accountLaneIndicesByAccount.get(placement.geo.accountId),
           multiAccountBandLayout,
         );
@@ -1148,10 +1216,11 @@ export async function buildTerraformPipelineExcalidrawScene(
           placement.geo.tier === "regional"
             ? `${placement.geo.accountId}|${placement.geo.region}|regional|${placement.geoInstanceId}`
             : null;
-        const zoneKey = `${placement.geoInstanceKey}|col${col.columnIndex}|lane${lane}`;
+        const trackKey = placement.trackId ?? "other";
+        const zoneKey = `${placement.geoInstanceKey}|col${col.columnIndex}|track${trackKey}`;
         drafts.push({
           col,
-          lane,
+          lane: placement.laneIndex,
           placement,
           build,
           columnX: colX,

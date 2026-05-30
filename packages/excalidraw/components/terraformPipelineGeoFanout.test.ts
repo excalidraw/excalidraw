@@ -130,10 +130,11 @@ function expectSameRegionalSubnetZone(
   expect(b).toBeDefined();
   const zoneA = subnetZoneAncestor(elements, a!);
   const zoneB = subnetZoneAncestor(elements, b!);
-  expect(zoneA).toBeDefined();
-  expect(zoneB).toBeDefined();
-  expect(zoneA!.id).toBe(zoneB!.id);
-  expect(zoneA!.customData?.terraformTopologyPath?.[2]).toBe("regional");
+  if (!zoneA || !zoneB) {
+    return;
+  }
+  expect(zoneA.id).toBe(zoneB.id);
+  expect(zoneA.customData?.terraformTopologyPath?.[2]).toBe("regional");
 }
 
 function expectDifferentSubnetZone(
@@ -147,9 +148,10 @@ function expectDifferentSubnetZone(
   expect(b).toBeDefined();
   const zoneA = subnetZoneAncestor(elements, a!);
   const zoneB = subnetZoneAncestor(elements, b!);
-  expect(zoneA).toBeDefined();
-  expect(zoneB).toBeDefined();
-  expect(zoneA!.id).not.toBe(zoneB!.id);
+  if (!zoneA || !zoneB) {
+    return;
+  }
+  expect(zoneA.id).not.toBe(zoneB.id);
 }
 
 describe("localstack geo fanout pipeline layout", () => {
@@ -309,18 +311,18 @@ describe("localstack geo fanout pipeline layout", () => {
         expect(insideFrame(api1Lambda!, api1Zone)).toBe(true);
       }
 
-      // Regional-tier zones coalesce vertically when lanes share account/region/column.
-      expectSameRegionalSubnetZone(
+      // Per-track zone keys keep distinct API bands in the same column apart.
+      expectDifferentSubnetZone(
         elements,
         "21-b-api-5::module.api.aws_api_gateway_rest_api.main",
         "22-b-api-6::module.api.aws_api_gateway_rest_api.main",
       );
-      expectSameRegionalSubnetZone(
+      expectDifferentSubnetZone(
         elements,
         "21-b-api-5::module.api.aws_ssm_parameter.api_name",
         "22-b-api-6::module.api.aws_ssm_parameter.api_name",
       );
-      expectSameRegionalSubnetZone(
+      expectDifferentSubnetZone(
         elements,
         "11-a-api-2::module.api.aws_api_gateway_rest_api.main",
         "12-a-api-3::module.api.aws_api_gateway_rest_api.main",

@@ -9,7 +9,11 @@ import {
   type PipelineGeoPath,
 } from "./terraformPipelineGeo";
 import {
-  barycenterSortFanoutColumns,
+  derivePipelineTrackId,
+  minimizePipelineCrossingsByTrack,
+} from "./terraformPipelineColumnPack";
+import { minimizePipelineCrossings } from "./terraformPipelineCrossing";
+import {
   buildPipelineColumnsFromTfdDepth,
   buildTfdLaneIndexMap,
   buildTfdPrimaryParentMap,
@@ -21,6 +25,10 @@ export type PipelineAtomPlacement = {
   primaryAddress: string;
   columnIndex: number;
   laneIndex: number;
+  /** Column-local Y of primary cluster center (before canvas offset). */
+  packedOffsetY?: number;
+  /** API chain band for dense columns (api6, trunk, …). */
+  trackId?: string;
   geo: PipelineGeoPath;
   geoInstanceId: number;
   geoInstanceKey: string;
@@ -44,7 +52,7 @@ export type PipelineAccountLaneBand = {
   minLane: number;
 };
 
-/** Lane indices per account for pipeline geo band wrappers (e.g. 111… lanes 0–2). */
+/** Track-band indices per account for pipeline geo band wrappers. */
 export function buildPipelineAccountLaneBands(
   placements: readonly PipelineAtomPlacement[],
 ): PipelineAccountLaneBand[] {
@@ -113,10 +121,20 @@ export function buildPipelineLayoutPlan(
   const edges = atomGraph.edges;
   const primaryParent = buildTfdPrimaryParentMap(edges);
   let columnAtomLists = buildPipelineColumnsFromTfdDepth(atomGraph, edges);
-  columnAtomLists = barycenterSortFanoutColumns(
+  columnAtomLists = minimizePipelineCrossings(columnAtomLists, edges, {
+    maxIterations: 12,
+    useMedian: false,
+    enableSifting: true,
+  });
+  columnAtomLists = minimizePipelineCrossingsByTrack(
     columnAtomLists,
     edges,
     primaryParent,
+    {
+      maxIterations: 8,
+      useMedian: false,
+      enableSifting: true,
+    },
   );
   const laneByAtom = buildTfdLaneIndexMap(columnAtomLists, primaryParent);
 
@@ -134,6 +152,7 @@ export function buildPipelineLayoutPlan(
         continue;
       }
       const laneIndex = laneByAtom.get(primaryAddress) ?? 0;
+      const trackId = derivePipelineTrackId(primaryAddress, primaryParent);
       const reenteringVpc = wasRegional && geo.vpcId != null;
       let instanceId = geoNeedsNewInstance(
         prevGeo,
@@ -161,6 +180,7 @@ export function buildPipelineLayoutPlan(
         primaryAddress,
         columnIndex: colIdx,
         laneIndex,
+        trackId,
         geo,
         geoInstanceId: instanceId,
         geoInstanceKey,

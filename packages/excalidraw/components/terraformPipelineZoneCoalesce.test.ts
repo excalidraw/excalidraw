@@ -269,7 +269,7 @@ describe("pipelineContainerGroupKey", () => {
       vpcKey: "111|us-west-2|vpc-b|1",
     });
     expect(pipelineContainerGroupKey(spec, true)).toBe(
-      "111|us-west-2|vpc-b|1|lane2|col3",
+      "111|us-west-2|vpc-b|1|track2|col3",
     );
   });
 });
