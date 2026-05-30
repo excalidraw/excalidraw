@@ -215,14 +215,14 @@ describe("localstack geo fanout pipeline layout", () => {
       expect(frameBottom(acctA!)).toBeLessThanOrEqual((acctB!.y ?? 0) + 4);
 
       const regionFrames = framesByRole(elements, "region");
-      const regionByPath = new Map(
-        regionFrames.map((f) => [
-          f.customData?.terraformTopologyPath?.join("/"),
-          f,
-        ]),
-      );
-      const rUsw2 = regionByPath.get("111111111111/us-west-2");
-      const rEuw1 = regionByPath.get("222222222222/eu-west-1");
+      const regionByAccountAndName = (accountId: string, regionName: string) =>
+        regionFrames.find(
+          (f) =>
+            f.customData?.terraformTopologyPath?.[0] === accountId &&
+            f.customData?.terraformTopologyPath?.[1] === regionName,
+        );
+      const rUsw2 = regionByAccountAndName("111111111111", "us-west-2");
+      const rEuw1 = regionByAccountAndName("222222222222", "eu-west-1");
       if (rUsw2 && rEuw1) {
         expect(frameBottom(rUsw2)).toBeLessThanOrEqual((rEuw1.y ?? 0) + 4);
       }

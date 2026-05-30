@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildPipelineGeoColumnRuns,
   coalescePipelineZoneSpecs,
+  pipelineContainerGroupKey,
   pipelineZoneCoalesceKey,
   type PipelineZoneFrameSpec,
 } from "./terraformPipelineLayout";
@@ -243,5 +245,86 @@ describe("coalescePipelineZoneSpecs", () => {
     ]);
 
     expect(coalescePipelineZoneSpecs(input).size).toBe(2);
+  });
+});
+
+describe("pipelineContainerGroupKey", () => {
+  it("includes column index for single-account layout", () => {
+    const spec = vpcSpec({
+      id: "v1",
+      laneIndex: 1,
+      columnIndex: 4,
+      vpcKey: "111|us-east-1|vpc-a|0",
+    });
+    expect(pipelineContainerGroupKey(spec, false)).toBe(
+      "111|us-east-1|vpc-a|0|col4",
+    );
+  });
+
+  it("includes lane and column for multi-account layout", () => {
+    const spec = vpcSpec({
+      id: "v1",
+      laneIndex: 2,
+      columnIndex: 3,
+      vpcKey: "111|us-west-2|vpc-b|1",
+    });
+    expect(pipelineContainerGroupKey(spec, true)).toBe(
+      "111|us-west-2|vpc-b|1|lane2|col3",
+    );
+  });
+});
+
+describe("buildPipelineGeoColumnRuns", () => {
+  it("splits non-contiguous columns into separate runs", () => {
+    const specs = [
+      vpcSpec({ id: "a", laneIndex: 0, columnIndex: 0, vpcKey: "111|us-east-1|vpc-a|0" }),
+      vpcSpec({ id: "b", laneIndex: 0, columnIndex: 1, vpcKey: "111|us-east-1|vpc-a|0" }),
+      vpcSpec({ id: "c", laneIndex: 0, columnIndex: 2, vpcKey: "111|us-east-1|vpc-a|0" }),
+      vpcSpec({ id: "d", laneIndex: 0, columnIndex: 5, vpcKey: "111|us-east-1|vpc-a|0" }),
+      vpcSpec({ id: "e", laneIndex: 0, columnIndex: 6, vpcKey: "111|us-east-1|vpc-a|0" }),
+    ];
+    const runs = buildPipelineGeoColumnRuns(specs);
+    expect(runs).toHaveLength(2);
+    expect(runs[0]).toMatchObject({
+      accountId: "111",
+      region: "us-east-1",
+      minColumn: 0,
+      maxColumn: 2,
+    });
+    expect(runs[1]).toMatchObject({
+      minColumn: 5,
+      maxColumn: 6,
+    });
+  });
+
+  it("isolates multi-region columns into separate single-column runs", () => {
+    const east = vpcSpec({
+      id: "e10",
+      laneIndex: 0,
+      columnIndex: 10,
+      vpcKey: "111|us-east-1|vpc-a|0",
+    });
+    const west = vpcSpec({
+      id: "w10",
+      laneIndex: 0,
+      columnIndex: 10,
+      vpcKey: "111|us-west-2|vpc-b|0",
+    });
+    const eastOnly = vpcSpec({
+      id: "e9",
+      laneIndex: 0,
+      columnIndex: 9,
+      vpcKey: "111|us-east-1|vpc-a|0",
+    });
+    const all = [eastOnly, east, west];
+    const runs = buildPipelineGeoColumnRuns(all, all);
+    const eastRuns = runs.filter((r) => r.region === "us-east-1");
+    expect(eastRuns.some((r) => r.minColumn === 9 && r.maxColumn === 9)).toBe(
+      true,
+    );
+    expect(eastRuns.some((r) => r.minColumn === 10 && r.maxColumn === 10)).toBe(
+      true,
+    );
+    expect(eastRuns.find((r) => r.minColumn === 10)?.specs).toHaveLength(1);
   });
 });

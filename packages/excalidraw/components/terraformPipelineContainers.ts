@@ -74,10 +74,13 @@ function geoNeedsNewInstance(
   if (samePipelineGeoPlacement(prev, next) && !reenteringVpcAfterRegional) {
     return prevInstanceId;
   }
+  if (prev.region !== next.region) {
+    return prevInstanceId + 1;
+  }
   if (prev.tier === "regional" && next.vpcId) {
     return prevInstanceId + 1;
   }
-  if (prev.vpcId && next.tier === "regional") {
+  if (prev.vpcId && next.tier === "regional" && prev.region === next.region) {
     return prevInstanceId;
   }
   if (

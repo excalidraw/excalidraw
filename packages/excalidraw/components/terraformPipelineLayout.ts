@@ -722,6 +722,131 @@ function regionGroupKey(accountId: string, region: string): string {
   return `${accountId}|${region}`;
 }
 
+export type PipelineGeoColumnRun = {
+  accountId: string;
+  region: string;
+  minColumn: number;
+  maxColumn: number;
+  specs: PipelineZoneFrameSpec[];
+};
+
+/** Group key for per-column VPC/regional leaf specs before run-scoped VPC merge. */
+export function pipelineContainerGroupKey(
+  spec: PipelineZoneFrameSpec,
+  multiAccountBandLayout: boolean,
+): string | null {
+  const parentBucket = spec.vpcKey ?? spec.regionalBandKey;
+  if (!parentBucket) {
+    return null;
+  }
+  if (multiAccountBandLayout) {
+    return `${parentBucket}|lane${spec.laneIndex}|col${spec.columnIndex}`;
+  }
+  return `${parentBucket}|col${spec.columnIndex}`;
+}
+
+/** Split zone specs into contiguous pipeline-column runs per account and region. */
+export function buildPipelineGeoColumnRuns(
+  specs: readonly PipelineZoneFrameSpec[],
+  allSpecs?: readonly PipelineZoneFrameSpec[],
+): PipelineGeoColumnRun[] {
+  const universe = allSpecs ?? specs;
+  const multiRegionColumns = new Set<number>();
+
+  const regionsByAccountColumn = new Map<string, Map<number, Set<string>>>();
+  for (const spec of universe) {
+    let colMap = regionsByAccountColumn.get(spec.accountId);
+    if (!colMap) {
+      colMap = new Map();
+      regionsByAccountColumn.set(spec.accountId, colMap);
+    }
+    const regions = colMap.get(spec.columnIndex) ?? new Set<string>();
+    regions.add(spec.region);
+    colMap.set(spec.columnIndex, regions);
+    if (regions.size > 1) {
+      multiRegionColumns.add(spec.columnIndex);
+    }
+  }
+
+  const byAccountRegion = new Map<
+    string,
+    Map<number, PipelineZoneFrameSpec[]>
+  >();
+
+  for (const spec of specs) {
+    const arKey = regionGroupKey(spec.accountId, spec.region);
+    let colMap = byAccountRegion.get(arKey);
+    if (!colMap) {
+      colMap = new Map();
+      byAccountRegion.set(arKey, colMap);
+    }
+    const list = colMap.get(spec.columnIndex) ?? [];
+    list.push(spec);
+    colMap.set(spec.columnIndex, list);
+  }
+
+  const runs: PipelineGeoColumnRun[] = [];
+
+  for (const [arKey, colMap] of byAccountRegion) {
+    const sep = arKey.indexOf("|");
+    const accountId = sep >= 0 ? arKey.slice(0, sep) : arKey;
+    const region = sep >= 0 ? arKey.slice(sep + 1) : "unknown-region";
+    const columns = [...colMap.keys()].sort((a, b) => a - b);
+
+    for (let i = 0; i < columns.length; ) {
+      const col = columns[i]!;
+      if (multiRegionColumns.has(col)) {
+        runs.push({
+          accountId,
+          region,
+          minColumn: col,
+          maxColumn: col,
+          specs: [...(colMap.get(col) ?? [])],
+        });
+        i += 1;
+        continue;
+      }
+
+      const runCols: number[] = [col];
+      while (i + 1 < columns.length) {
+        const nextCol = columns[i + 1]!;
+        if (
+          nextCol !== runCols[runCols.length - 1]! + 1 ||
+          multiRegionColumns.has(nextCol)
+        ) {
+          break;
+        }
+        i += 1;
+        runCols.push(nextCol);
+      }
+
+      const minColumn = runCols[0]!;
+      const maxColumn = runCols[runCols.length - 1]!;
+      const runSpecs: PipelineZoneFrameSpec[] = [];
+      for (const runCol of runCols) {
+        runSpecs.push(...(colMap.get(runCol) ?? []));
+      }
+      runs.push({ accountId, region, minColumn, maxColumn, specs: runSpecs });
+      i += 1;
+    }
+  }
+
+  return runs.sort(
+    (a, b) =>
+      a.accountId.localeCompare(b.accountId) ||
+      a.region.localeCompare(b.region) ||
+      a.minColumn - b.minColumn,
+  );
+}
+
+function pipelineVpcFrameIdForRun(vpcKey: string, run: PipelineGeoColumnRun): string {
+  return `tf-pipe-vpc:${vpcKey}|c${run.minColumn}-${run.maxColumn}`;
+}
+
+function pipelineRegionFrameIdForRun(run: PipelineGeoColumnRun): string {
+  return `tf-pipe-region:${run.accountId}/${run.region}/c${run.minColumn}-${run.maxColumn}`;
+}
+
 function zoneLabelForGeo(geo: PipelineGeoPath): string {
   return geo.tier === "regional"
     ? "Regional"
@@ -1105,96 +1230,80 @@ export async function buildTerraformPipelineExcalidrawScene(
     );
   }
 
-  const vpcGroups = new Map<string, ZoneFrameSpec[]>();
-  for (const spec of coalescedZoneSpecs.values()) {
-    if (!spec.vpcKey) {
-      continue;
-    }
-    if (!specInAccountBand(spec, accountBands, multiAccountBandLayout)) {
-      continue;
-    }
-    const groupKey = multiAccountBandLayout
-      ? `${spec.vpcKey}|lane${spec.laneIndex}`
-      : spec.vpcKey!;
-    const list = vpcGroups.get(groupKey) ?? [];
-    list.push(spec);
-    vpcGroups.set(groupKey, list);
-  }
-
-  const regionalZonesByRegion = new Map<string, ZoneFrameSpec[]>();
-  for (const spec of coalescedZoneSpecs.values()) {
-    if (spec.vpcKey) {
-      continue;
-    }
-    if (!specInAccountBand(spec, accountBands, multiAccountBandLayout)) {
-      continue;
-    }
-    const key = regionGroupKey(spec.accountId, spec.region);
-    const list = regionalZonesByRegion.get(key) ?? [];
-    list.push(spec);
-    regionalZonesByRegion.set(key, list);
-  }
+  const bandFilteredSpecs = [...coalescedZoneSpecs.values()].filter((spec) =>
+    specInAccountBand(spec, accountBands, multiAccountBandLayout),
+  );
+  const columnRuns = buildPipelineGeoColumnRuns(
+    bandFilteredSpecs,
+    bandFilteredSpecs,
+  );
 
   const vpcFrames: ExcalidrawElementSkeleton[] = [];
-  for (const [groupKey, zones] of vpcGroups) {
-    const parts = zones[0]!.vpcKey!.split("|");
-    const vpcId = parts[2] ?? "vpc";
-    const accountId = parts[0] ?? "unknown-account";
-    const regionName = parts[1] ?? "unknown-region";
-    vpcFrames.push(
-      containerFrameSkeleton(
-        `tf-pipe-vpc:${groupKey}`,
-        `VPC ${vpcId.slice(0, 16)}`,
-        zones.map((z) => z.id),
-        "vpc",
-        [accountId, regionName, vpcId, parts[3] ?? "0"],
-      ),
-    );
-  }
-
-  const regionKeys = new Set<string>([
-    ...regionalZonesByRegion.keys(),
-    ...[...vpcGroups.values()].map((zones) =>
-      regionGroupKey(zones[0]!.accountId, zones[0]!.region),
-    ),
-  ]);
-
   const regionFrames: ExcalidrawElementSkeleton[] = [];
   const accountRegionIds = new Map<string, string[]>();
+  const regionRunByFrameId = new Map<string, PipelineGeoColumnRun>();
 
-  for (const key of regionKeys) {
-    const [accountId, regionName] = key.split("|");
-    if (!accountId || !regionName) {
-      continue;
-    }
-    const childIds: string[] = [];
+  for (const run of columnRuns) {
+    const vpcByKey = new Map<string, ZoneFrameSpec[]>();
+    const regionalZoneIds: string[] = [];
 
-    for (const [groupKey, zones] of vpcGroups) {
-      const sample = zones[0]!;
-      if (sample.accountId !== accountId || sample.region !== regionName) {
-        continue;
+    for (const spec of run.specs) {
+      if (spec.vpcKey) {
+        const list = vpcByKey.get(spec.vpcKey) ?? [];
+        list.push(spec);
+        vpcByKey.set(spec.vpcKey, list);
+      } else {
+        regionalZoneIds.push(spec.id);
       }
-      childIds.push(`tf-pipe-vpc:${groupKey}`);
     }
 
-    for (const spec of regionalZonesByRegion.get(key) ?? []) {
-      childIds.push(spec.id);
+    const vpcFrameIds: string[] = [];
+    for (const [vpcKey, zones] of vpcByKey) {
+      const parts = vpcKey.split("|");
+      const vpcId = parts[2] ?? "vpc";
+      const vpcFrameId = pipelineVpcFrameIdForRun(vpcKey, run);
+      vpcFrameIds.push(vpcFrameId);
+      vpcFrames.push(
+        containerFrameSkeleton(
+          vpcFrameId,
+          `VPC ${vpcId.slice(0, 16)}`,
+          zones.map((z) => z.id),
+          "vpc",
+          [
+            run.accountId,
+            run.region,
+            vpcId,
+            parts[3] ?? "0",
+            String(run.minColumn),
+          ],
+        ),
+      );
     }
 
-    if (childIds.length === 0) {
+    const regionChildIds = [...vpcFrameIds, ...regionalZoneIds];
+    if (regionChildIds.length === 0) {
       continue;
     }
 
-    const regionFrameId = `tf-pipe-region:${accountId}/${regionName}`;
+    const regionFrameId = pipelineRegionFrameIdForRun(run);
+    regionRunByFrameId.set(regionFrameId, run);
     regionFrames.push(
-      containerFrameSkeleton(regionFrameId, regionName, childIds, "region", [
-        accountId,
-        regionName,
-      ]),
+      containerFrameSkeleton(
+        regionFrameId,
+        run.region,
+        regionChildIds,
+        "region",
+        [
+          run.accountId,
+          run.region,
+          String(run.minColumn),
+          String(run.maxColumn),
+        ],
+      ),
     );
-    const regionIds = accountRegionIds.get(accountId) ?? [];
+    const regionIds = accountRegionIds.get(run.accountId) ?? [];
     regionIds.push(regionFrameId);
-    accountRegionIds.set(accountId, regionIds);
+    accountRegionIds.set(run.accountId, regionIds);
   }
 
   const accountFrames: ExcalidrawElementSkeleton[] = [];
@@ -1204,15 +1313,9 @@ export async function buildTerraformPipelineExcalidrawScene(
         if (!multiAccountBandLayout) {
           return true;
         }
-        const suffix = regionFrameId.replace(
-          `tf-pipe-region:${band.accountId}/`,
-          "",
-        );
-        return [...coalescedZoneSpecs.values()].some(
-          (z) =>
-            z.accountId === band.accountId &&
-            z.region === suffix &&
-            band.laneIndices.has(z.laneIndex),
+        const run = regionRunByFrameId.get(regionFrameId);
+        return (
+          run?.specs.some((z) => band.laneIndices.has(z.laneIndex)) ?? false
         );
       },
     );

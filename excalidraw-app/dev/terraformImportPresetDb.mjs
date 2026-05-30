@@ -801,9 +801,21 @@ export function loadStagingMultiStatePlanDotBundlesFromDb() {
 }
 
 export function readStagingMultiStatePipelineTfdFromDb() {
-  return readTerraformImportRepoFileText(
-    "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-  );
+  const db = getTerraformImportPresetTestDb();
+  const row = db
+    .prepare(
+      `SELECT content FROM terraform_import_preset_tfd
+       WHERE preset_id = 'staging-multi-state' AND path = 'pipeline.tfd'
+       ORDER BY sort_order ASC
+       LIMIT 1`,
+    )
+    .get();
+  if (!row?.content) {
+    return readTerraformImportRepoFileText(
+      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
+    );
+  }
+  return row.content;
 }
 
 export function loadLocalstackGeoFanoutPlanDotBundlesFromDb() {
