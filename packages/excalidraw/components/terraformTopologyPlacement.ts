@@ -43,6 +43,7 @@ import {
 } from "./terraformTopologyEcsLinks";
 import { resolveLambdaPermissionTargetLambdaAddressFromPlan } from "./terraformTopologyLambdaPermissionLinks";
 import { resolveDbSubnetGroupSubnetIds } from "./terraformTopologyDatastoreLinks";
+import { buildRouteTableIdToRouteAddressesFromPlan } from "./terraformTopologyRouteLinks";
 
 /** Provenance for semantic merge / placement (set in `terraformPlanParsing` semantic path). */
 export type TopologyZoneSource = "primary" | "supplementary";
@@ -1530,43 +1531,6 @@ function buildRouteTableIdToSubnetIdsFromPlan(
   return out;
 }
 
-/** `aws_route` addresses keyed by route table id (`route_table_id` in plan values). */
-function buildRouteTableIdToRouteAddressesFromPlan(
-  plan: TerraformPlanProviderContext & {
-    resource_changes?: ResourceChange[];
-  },
-): Map<string, Set<string>> {
-  const out = new Map<string, Set<string>>();
-  const changes = Array.isArray(plan.resource_changes)
-    ? plan.resource_changes
-    : [];
-  for (const rc of changes) {
-    if (!isAwsTerraformResourceChange(rc)) {
-      continue;
-    }
-    if (rc.mode !== "managed" || rc.type !== "aws_route") {
-      continue;
-    }
-    const address = rc.address;
-    if (!address || typeof address !== "string") {
-      continue;
-    }
-    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
-    if (!values) {
-      continue;
-    }
-    const rtid = stringField(values.route_table_id);
-    if (!rtid || !rtid.startsWith("rtb-")) {
-      continue;
-    }
-    if (!out.has(rtid)) {
-      out.set(rtid, new Set());
-    }
-    out.get(rtid)!.add(address);
-  }
-  return out;
-}
-
 function buildRouteTableAddressToMeta(
   plan: TerraformPlanProviderContext & {
     resource_changes?: ResourceChange[];
@@ -1808,6 +1772,28 @@ export function computeRouteTableBottomEdgePlacements(
   });
 
   return { zoneBottom, vpcBottom };
+}
+
+/** Route addresses already drawn as tier-2 tiles under route-table bottom rows. */
+export function collectRouteAddressesFromBottomPlacements(
+  placements: TopologyRouteTableBottomPlacements,
+): readonly string[] {
+  const out = new Set<string>();
+  for (const row of placements.zoneBottom) {
+    for (const addrs of Object.values(row.routeChildrenByTable)) {
+      for (const a of addrs) {
+        out.add(a);
+      }
+    }
+  }
+  for (const row of placements.vpcBottom) {
+    for (const addrs of Object.values(row.routeChildrenByTable)) {
+      for (const a of addrs) {
+        out.add(a);
+      }
+    }
+  }
+  return [...out];
 }
 
 function resourceChangeForAddress(

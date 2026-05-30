@@ -5,8 +5,8 @@
     "regionCount": 1,
     "vpcCount": 1,
     "subnetCount": 6,
-    "primaryResourceCount": 19,
-    "regionalPrimaryCount": 11,
+    "primaryResourceCount": 16,
+    "regionalPrimaryCount": 8,
     "vpcEndpointCount": 1,
     "routeTableCount": 4,
     "dependencyEdgeCount": 95,
@@ -630,7 +630,7 @@
     {
       "key": "arrow:orphan:13",
       "type": "arrow",
-      "x": 3241.98,
+      "x": 2365.98,
       "y": 2584,
       "width": 1.67,
       "height": 11,
@@ -817,7 +817,7 @@
     {
       "key": "arrow:orphan:14",
       "type": "arrow",
-      "x": 3235,
+      "x": 2359,
       "y": 2665,
       "width": 0,
       "height": 11,
@@ -987,9 +987,9 @@
     {
       "key": "arrow:orphan:149",
       "type": "arrow",
-      "x": 2151.74,
+      "x": 2152.19,
       "y": 1900,
-      "width": 355.44,
+      "width": 355.88,
       "height": 1542,
       "angle": 0,
       "isDeleted": true,
@@ -1004,7 +1004,7 @@
     {
       "key": "arrow:orphan:15",
       "type": "arrow",
-      "x": 3235,
+      "x": 2359,
       "y": 2665,
       "width": 0,
       "height": 81,
@@ -1021,9 +1021,9 @@
     {
       "key": "arrow:orphan:150",
       "type": "arrow",
-      "x": 2457.61,
+      "x": 2458.44,
       "y": 1900,
-      "width": 655.57,
+      "width": 656.39,
       "height": 1542,
       "angle": 0,
       "isDeleted": true,
@@ -1038,9 +1038,9 @@
     {
       "key": "arrow:orphan:151",
       "type": "arrow",
-      "x": 499.36,
+      "x": 497.75,
       "y": 1900,
-      "width": 1265.92,
+      "width": 1267.5,
       "height": 1542,
       "angle": 0,
       "isDeleted": true,
@@ -1074,7 +1074,7 @@
       "type": "arrow",
       "x": 466,
       "y": 2542.5,
-      "width": 2650,
+      "width": 1774,
       "height": 0,
       "angle": 0,
       "isDeleted": true,
@@ -1108,7 +1108,7 @@
       "type": "arrow",
       "x": 2218,
       "y": 2542.5,
-      "width": 898,
+      "width": 22,
       "height": 0,
       "angle": 0,
       "isDeleted": true,
@@ -1140,7 +1140,7 @@
     {
       "key": "arrow:orphan:157",
       "type": "arrow",
-      "x": 3271.69,
+      "x": 2395.69,
       "y": 2465.82,
       "width": 3.69,
       "height": 81,
@@ -1191,7 +1191,7 @@
     {
       "key": "arrow:orphan:16",
       "type": "arrow",
-      "x": 3235,
+      "x": 2359,
       "y": 2665,
       "width": 0,
       "height": 151,
@@ -2766,9 +2766,9 @@
     {
       "key": "arrow:orphan:97",
       "type": "arrow",
-      "x": 3116,
+      "x": 2240,
       "y": 2524.5,
-      "width": 2650,
+      "width": 1774,
       "height": 0,
       "angle": 0,
       "isDeleted": true,
@@ -2783,9 +2783,9 @@
     {
       "key": "arrow:orphan:98",
       "type": "arrow",
-      "x": 3116,
+      "x": 2240,
       "y": 2524.5,
-      "width": 898,
+      "width": 22,
       "height": 0,
       "angle": 0,
       "isDeleted": true,
@@ -2800,7 +2800,7 @@
     {
       "key": "arrow:orphan:99",
       "type": "arrow",
-      "x": 3253.71,
+      "x": 2377.71,
       "y": 2465,
       "width": 3.69,
       "height": 81,
@@ -2951,7 +2951,7 @@
       "type": "frame",
       "x": 82,
       "y": 122,
-      "width": 3552,
+      "width": 2860,
       "height": 3139,
       "angle": 0,
       "isDeleted": false,
@@ -2971,7 +2971,7 @@
       "type": "frame",
       "x": 120,
       "y": 181,
-      "width": 3406,
+      "width": 2714,
       "height": 2966,
       "angle": 0,
       "isDeleted": false,
@@ -3142,75 +3142,9 @@
       "backgroundColor": "transparent"
     },
     {
-      "key": "frame:992382747916/us-east-1/module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "frame",
-      "x": 2230,
-      "y": 2455,
-      "width": 290,
-      "height": 139,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_route.private_nat_gateway[0]",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "frame:992382747916/us-east-1/module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "frame",
-      "x": 2522,
-      "y": 2455,
-      "width": 290,
-      "height": 139,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_route.private_nat_gateway[1]",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "frame:992382747916/us-east-1/module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "frame",
-      "x": 2814,
-      "y": 2455,
-      "width": 290,
-      "height": 139,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_route.public_internet_gateway[0]",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
       "key": "frame:992382747916/us-east-1/module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "frame",
-      "x": 3098,
+      "x": 2222,
       "y": 2304,
       "width": 298,
       "height": 589,
@@ -3232,7 +3166,7 @@
     {
       "key": "frame:992382747916/us-east-1/module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]/module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda[0]",
       "type": "frame",
-      "x": 3108,
+      "x": 2232,
       "y": 2587,
       "width": 254,
       "height": 296,
@@ -3741,7 +3675,7 @@
       "type": "frame",
       "x": 50,
       "y": 50,
-      "width": 3616,
+      "width": 2924,
       "height": 3243,
       "angle": 0,
       "isDeleted": false,
@@ -3756,7 +3690,7 @@
     {
       "key": "frame:Other",
       "type": "frame",
-      "x": 3762,
+      "x": 3070,
       "y": 122,
       "width": 536,
       "height": 288,
@@ -3774,7 +3708,7 @@
     {
       "key": "frame:Other",
       "type": "frame",
-      "x": 3730,
+      "x": 3038,
       "y": 50,
       "width": 600,
       "height": 392,
@@ -9577,30 +9511,10 @@
     {
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
       "type": "rectangle",
-      "x": 2240,
-      "y": 2465,
-      "width": 270,
-      "height": 119,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#e7f5ff"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "rectangle",
       "x": 2055,
       "y": 1900,
       "width": 208,
-      "height": 63,
+      "height": 59,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -9621,7 +9535,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
       "type": "text",
       "x": 2071,
-      "y": 1936.88,
+      "y": 1934.88,
       "width": 49,
       "height": 10.21,
       "angle": 0,
@@ -9639,7 +9553,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
       "type": "text",
       "x": 2086.95,
-      "y": 1915.91,
+      "y": 1913.91,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9657,7 +9571,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
       "type": "text",
       "x": 2086.89,
-      "y": 1923.28,
+      "y": 1921.28,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9675,7 +9589,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
       "type": "text",
       "x": 2086.88,
-      "y": 1930.53,
+      "y": 1928.53,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9695,95 +9609,7 @@
       "x": 2131,
       "y": 1914,
       "width": 121,
-      "height": 36,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "text",
-      "x": 2271.95,
-      "y": 2508.91,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "text",
-      "x": 2271.89,
-      "y": 2516.28,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "text",
-      "x": 2271.88,
-      "y": 2523.53,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "text",
-      "x": 2316,
-      "y": 2479,
-      "width": 183,
-      "height": 92,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[0]",
-      "type": "text",
-      "x": 2064,
-      "y": 1905.25,
-      "width": 190,
-      "height": 52.5,
+      "height": 32,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -9796,28 +9622,9 @@
         ]
       },
       "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.private_workload_network.module.vpc.aws_route_table.private[0]",
+      "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "rectangle",
-      "x": 2532,
-      "y": 2465,
-      "width": 270,
-      "height": 119,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#e7f5ff"
     },
     {
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
@@ -9825,7 +9632,7 @@
       "x": 2367,
       "y": 1900,
       "width": 208,
-      "height": 63,
+      "height": 59,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -9846,7 +9653,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
       "type": "text",
       "x": 2383,
-      "y": 1936.88,
+      "y": 1934.88,
       "width": 49,
       "height": 10.21,
       "angle": 0,
@@ -9864,7 +9671,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
       "type": "text",
       "x": 2398.95,
-      "y": 1915.91,
+      "y": 1913.91,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9882,7 +9689,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
       "type": "text",
       "x": 2398.89,
-      "y": 1923.28,
+      "y": 1921.28,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9900,7 +9707,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
       "type": "text",
       "x": 2398.88,
-      "y": 1930.53,
+      "y": 1928.53,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -9920,95 +9727,7 @@
       "x": 2443,
       "y": 1914,
       "width": 121,
-      "height": 36,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]"
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "text",
-      "x": 2563.95,
-      "y": 2508.91,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "text",
-      "x": 2563.89,
-      "y": 2516.28,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "text",
-      "x": 2563.88,
-      "y": 2523.53,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "text",
-      "x": 2608,
-      "y": 2479,
-      "width": 183,
-      "height": 92,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.private_nat_gateway[1]",
-      "type": "text",
-      "x": 2376,
-      "y": 1905.25,
-      "width": 190,
-      "height": 52.5,
+      "height": 32,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -10021,28 +9740,9 @@
         ]
       },
       "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.private_workload_network.module.vpc.aws_route_table.private[1]",
+      "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "rectangle",
-      "x": 2824,
-      "y": 2465,
-      "width": 270,
-      "height": 119,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#e7f5ff"
     },
     {
       "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
@@ -10050,7 +9750,7 @@
       "x": 369.5,
       "y": 1900,
       "width": 208,
-      "height": 63,
+      "height": 59,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -10071,7 +9771,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
       "type": "text",
       "x": 385.5,
-      "y": 1936.88,
+      "y": 1934.88,
       "width": 49,
       "height": 10.21,
       "angle": 0,
@@ -10089,7 +9789,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
       "type": "text",
       "x": 401.45,
-      "y": 1915.91,
+      "y": 1913.91,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -10107,7 +9807,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
       "type": "text",
       "x": 401.39,
-      "y": 1923.28,
+      "y": 1921.28,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -10125,7 +9825,7 @@
       "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
       "type": "text",
       "x": 401.38,
-      "y": 1930.53,
+      "y": 1928.53,
       "width": 17.56,
       "height": 4.49,
       "angle": 0,
@@ -10145,95 +9845,7 @@
       "x": 445.5,
       "y": 1914,
       "width": 121,
-      "height": 36,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "text",
-      "x": 2855.95,
-      "y": 2508.91,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "text",
-      "x": 2855.89,
-      "y": 2516.28,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "text",
-      "x": 2855.88,
-      "y": 2523.53,
-      "width": 17.56,
-      "height": 4.49,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]"
-      },
-      "groupIds": [],
-      "strokeColor": "#7950f2",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "text",
-      "x": 2900,
-      "y": 2479,
-      "width": 183,
-      "height": 92,
-      "angle": 0,
-      "isDeleted": false,
-      "customData": {
-        "nodePath": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityKey": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-        "terraformVisibilityRole": "resource",
-        "resourceType": "aws_route",
-        "terraformExplodeParentKeys": []
-      },
-      "groupIds": [],
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "module.private_workload_network.module.vpc.aws_route.public_internet_gateway[0]",
-      "type": "text",
-      "x": 378.5,
-      "y": 1905.25,
-      "width": 190,
-      "height": 52.5,
+      "height": 32,
       "angle": 0,
       "isDeleted": false,
       "customData": {
@@ -10246,13 +9858,14 @@
         ]
       },
       "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.private_workload_network.module.vpc.aws_route_table.public[0]",
+      "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3161.73,
+      "x": 2285.73,
       "y": 2324.5,
       "width": 19.04,
       "height": 0,
@@ -10270,7 +9883,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3161.73,
+      "x": 2285.73,
       "y": 2349.74,
       "width": 15.05,
       "height": 0,
@@ -10288,7 +9901,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3161.73,
+      "x": 2285.73,
       "y": 2331.13,
       "width": 8.85,
       "height": 0,
@@ -10306,7 +9919,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3161.73,
+      "x": 2285.73,
       "y": 2343.1,
       "width": 8.85,
       "height": 0,
@@ -10324,7 +9937,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3161.73,
+      "x": 2285.73,
       "y": 2337.78,
       "width": 22.58,
       "height": 0.44,
@@ -10342,7 +9955,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3176.86,
+      "x": 2300.86,
       "y": 2334.51,
       "width": 16.31,
       "height": 16.53,
@@ -10360,7 +9973,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3180.18,
+      "x": 2304.18,
       "y": 2334.94,
       "width": 9.8,
       "height": 10.56,
@@ -10378,7 +9991,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "line",
-      "x": 3192.18,
+      "x": 2316.18,
       "y": 2341.59,
       "width": 7.08,
       "height": 7.08,
@@ -10396,7 +10009,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "rectangle",
-      "x": 3140,
+      "x": 2264,
       "y": 2314,
       "width": 238,
       "height": 70,
@@ -10419,7 +10032,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "text",
-      "x": 3163.47,
+      "x": 2287.47,
       "y": 2356.5,
       "width": 31.13,
       "height": 17,
@@ -10437,7 +10050,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
       "type": "text",
-      "x": 3216,
+      "x": 2340,
       "y": 2328,
       "width": 151,
       "height": 43,
@@ -10460,7 +10073,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "line",
-      "x": 3148.15,
+      "x": 2272.15,
       "y": 2506.06,
       "width": 10.68,
       "height": 14.89,
@@ -10478,7 +10091,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "line",
-      "x": 3161.71,
+      "x": 2285.71,
       "y": 2514.86,
       "width": 19.29,
       "height": 24.35,
@@ -10496,7 +10109,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "rectangle",
-      "x": 3116,
+      "x": 2240,
       "y": 2465,
       "width": 270,
       "height": 119,
@@ -10517,7 +10130,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "text",
-      "x": 3132,
+      "x": 2256,
       "y": 2529.65,
       "width": 40.32,
       "height": 13.28,
@@ -10535,7 +10148,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this[0]",
       "type": "text",
-      "x": 3192,
+      "x": 2316,
       "y": 2479,
       "width": 183,
       "height": 92,
@@ -10556,7 +10169,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "rectangle",
-      "x": 3790,
+      "x": 3098,
       "y": 190,
       "width": 200,
       "height": 88,
@@ -10577,7 +10190,7 @@
     {
       "key": "module.workload_monitoring_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "text",
-      "x": 3795,
+      "x": 3103,
       "y": 219,
       "width": 190,
       "height": 30,
@@ -11019,7 +10632,7 @@
     {
       "key": "module.workload_reader_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "rectangle",
-      "x": 4006,
+      "x": 3314,
       "y": 190,
       "width": 200,
       "height": 88,
@@ -11040,7 +10653,7 @@
     {
       "key": "module.workload_reader_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "text",
-      "x": 4011,
+      "x": 3319,
       "y": 219,
       "width": 190,
       "height": 30,
@@ -12192,7 +11805,7 @@
     {
       "key": "module.workload_writer_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "rectangle",
-      "x": 3790,
+      "x": 3098,
       "y": 294,
       "width": 200,
       "height": 88,
@@ -12213,7 +11826,7 @@
     {
       "key": "module.workload_writer_lambda.module.lambda.terraform_data.package_filename_for_hash[0]",
       "type": "text",
-      "x": 3795,
+      "x": 3103,
       "y": 323,
       "width": 190,
       "height": 30,
@@ -14339,7 +13952,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "image",
-      "x": 3322,
+      "x": 2446,
       "y": 2679,
       "width": 14,
       "height": 14,
@@ -14356,7 +13969,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2689.77,
       "width": 5.44,
       "height": 3.59,
@@ -14374,7 +13987,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2696.45,
       "width": 5.44,
       "height": 3.59,
@@ -14392,7 +14005,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "line",
-      "x": 3164.67,
+      "x": 2288.67,
       "y": 2701.78,
       "width": 3.83,
       "height": 3.83,
@@ -14410,7 +14023,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "line",
-      "x": 3168.5,
+      "x": 2292.5,
       "y": 2701.78,
       "width": 3.83,
       "height": 3.83,
@@ -14428,7 +14041,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "rectangle",
-      "x": 3131,
+      "x": 2255,
       "y": 2676,
       "width": 208,
       "height": 59,
@@ -14451,7 +14064,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "text",
-      "x": 3147,
+      "x": 2271,
       "y": 2710.26,
       "width": 49,
       "height": 10.97,
@@ -14469,7 +14082,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D",
       "type": "text",
-      "x": 3207,
+      "x": 2331,
       "y": 2690,
       "width": 121,
       "height": 32,
@@ -14492,7 +14105,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "image",
-      "x": 3322,
+      "x": 2446,
       "y": 2749,
       "width": 14,
       "height": 14,
@@ -14509,7 +14122,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2759.77,
       "width": 5.44,
       "height": 3.59,
@@ -14527,7 +14140,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2766.45,
       "width": 5.44,
       "height": 3.59,
@@ -14545,7 +14158,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "line",
-      "x": 3164.67,
+      "x": 2288.67,
       "y": 2771.78,
       "width": 3.83,
       "height": 3.83,
@@ -14563,7 +14176,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "line",
-      "x": 3168.5,
+      "x": 2292.5,
       "y": 2771.78,
       "width": 3.83,
       "height": 3.83,
@@ -14581,7 +14194,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "rectangle",
-      "x": 3131,
+      "x": 2255,
       "y": 2746,
       "width": 208,
       "height": 59,
@@ -14604,7 +14217,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "text",
-      "x": 3147,
+      "x": 2271,
       "y": 2780.26,
       "width": 49,
       "height": 10.97,
@@ -14622,7 +14235,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D",
       "type": "text",
-      "x": 3207,
+      "x": 2331,
       "y": 2760,
       "width": 121,
       "height": 32,
@@ -14645,7 +14258,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "image",
-      "x": 3322,
+      "x": 2446,
       "y": 2819,
       "width": 14,
       "height": 14,
@@ -14662,7 +14275,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2829.77,
       "width": 5.44,
       "height": 3.59,
@@ -14680,7 +14293,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "line",
-      "x": 3164.11,
+      "x": 2288.11,
       "y": 2836.45,
       "width": 5.44,
       "height": 3.59,
@@ -14698,7 +14311,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "line",
-      "x": 3164.67,
+      "x": 2288.67,
       "y": 2841.78,
       "width": 3.83,
       "height": 3.83,
@@ -14716,7 +14329,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "line",
-      "x": 3168.5,
+      "x": 2292.5,
       "y": 2841.78,
       "width": 3.83,
       "height": 3.83,
@@ -14734,7 +14347,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "rectangle",
-      "x": 3131,
+      "x": 2255,
       "y": 2816,
       "width": 208,
       "height": 59,
@@ -14757,7 +14370,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "text",
-      "x": 3147,
+      "x": 2271,
       "y": 2850.26,
       "width": 49,
       "height": 10.97,
@@ -14775,7 +14388,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D",
       "type": "text",
-      "x": 3207,
+      "x": 2331,
       "y": 2830,
       "width": 121,
       "height": 32,
@@ -14798,7 +14411,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "image",
-      "x": 3337,
+      "x": 2461,
       "y": 2598,
       "width": 14,
       "height": 14,
@@ -14815,7 +14428,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3134.56,
+      "x": 2258.56,
       "y": 2618.46,
       "width": 44.2,
       "height": 22.16,
@@ -14833,7 +14446,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3138.32,
+      "x": 2262.32,
       "y": 2605.5,
       "width": 33.99,
       "height": 13.31,
@@ -14851,7 +14464,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3134.25,
+      "x": 2258.25,
       "y": 2618.58,
       "width": 17.01,
       "height": 6.6,
@@ -14869,7 +14482,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3134.91,
+      "x": 2258.91,
       "y": 2618.8,
       "width": 43.6,
       "height": 8.73,
@@ -14887,7 +14500,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3146.19,
+      "x": 2270.19,
       "y": 2615.2,
       "width": 28.3,
       "height": 4.47,
@@ -14905,7 +14518,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "line",
-      "x": 3175.08,
+      "x": 2299.08,
       "y": 2617.4,
       "width": 3.23,
       "height": 2.42,
@@ -14923,7 +14536,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "rectangle",
-      "x": 3116,
+      "x": 2240,
       "y": 2595,
       "width": 238,
       "height": 70,
@@ -14946,7 +14559,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "text",
-      "x": 3135.77,
+      "x": 2259.77,
       "y": 2634.55,
       "width": 34.78,
       "height": 19.95,
@@ -14964,7 +14577,7 @@
     {
       "key": "tf-topo:sat:module.workload_monitoring_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_monitoring_lambda.module.lambda.aws_iam_role.lambda%5B0%5D",
       "type": "text",
-      "x": 3192,
+      "x": 2316,
       "y": 2609,
       "width": 151,
       "height": 43,

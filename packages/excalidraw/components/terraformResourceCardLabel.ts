@@ -2,6 +2,7 @@ import { getTerraformResourceTypeFromNodePath } from "./terraformPrimaryVisibili
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 
 import { terraformHumanNameFromPlanResource } from "./terraformResourceHumanName";
+import { formatAwsRouteSemanticLabelFromPlanResource } from "./terraformTopologyRouteLinks";
 
 const MAX_CARD_LINE_LEN = 52;
 
@@ -98,6 +99,14 @@ export function terraformResourceCardLabel(
   resource?: Record<string, unknown> | null,
 ): string {
   const resourceType = getTerraformCardResourceType(address, resource);
+  if (resourceType === "aws_route") {
+    const routeLabel = formatAwsRouteSemanticLabelFromPlanResource(
+      resource as Record<string, unknown> | null,
+    );
+    if (routeLabel) {
+      return truncateLine(routeLabel);
+    }
+  }
   const fromPlanHuman = terraformHumanNameFromPlanResource(
     resource as Record<string, unknown> | null,
   );

@@ -191,6 +191,10 @@ export function isTopologyPlacementResourceType(resourceType: string): boolean {
   if (resourceType === "aws_route_table_association") {
     return false;
   }
+  /** Drawn only as tier-2 satellites under `aws_route_table` (see `terraformTopologyRouteLinks`). */
+  if (resourceType === "aws_route") {
+    return false;
+  }
   /** Drawn only as satellites under `aws_sqs_queue` (see `terraformTopologySqsLinks`). */
   if (
     resourceType === "aws_sqs_queue_policy" ||
@@ -235,7 +239,6 @@ const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
   "aws_lb_target_group",
   "aws_lb_target_group_attachment",
   "aws_nat_gateway",
-  "aws_route",
   "aws_route_table_association",
   "aws_default_network_acl",
   "aws_default_route_table",

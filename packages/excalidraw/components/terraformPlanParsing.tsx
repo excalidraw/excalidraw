@@ -14,6 +14,7 @@ import {
 import {
   computeInterfaceVpcEndpointZonePlacements,
   computeNatGatewayZonePlacements,
+  collectRouteAddressesFromBottomPlacements,
   computeRouteTableBottomEdgePlacements,
   extractInterfaceEndpointSecurityGroupBuckets,
   extractPrimaryTopologyZones,
@@ -854,6 +855,11 @@ export const terraformPlanParsingFromSources = async (
       }
       for (const p of zonePlacedAddresses) {
         enrichPreplaced.add(p);
+      }
+      for (const a of collectRouteAddressesFromBottomPlacements(
+        routeTableBottomPlacements,
+      )) {
+        enrichPreplaced.add(a);
       }
       enrichTopologyPlacementsWithManagedResources(
         awsPlan,

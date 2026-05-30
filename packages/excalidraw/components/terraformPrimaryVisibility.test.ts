@@ -112,6 +112,9 @@ describe("terraformPrimaryVisibility", () => {
     it("excludes aws_subnet (structural subnet zones only)", () => {
       expect(isTopologyPlacementResourceType("aws_subnet")).toBe(false);
     });
+    it("excludes aws_route (tier-2 under route table only)", () => {
+      expect(isTopologyPlacementResourceType("aws_route")).toBe(false);
+    });
     it("includes primary API Gateway types", () => {
       expect(isTopologyPlacementResourceType("aws_api_gateway_rest_api")).toBe(
         true,

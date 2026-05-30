@@ -47,6 +47,21 @@ describe("terraformResourceCardLabel", () => {
     ).toBe("fn");
   });
 
+  it("uses semantic destination → next-hop label for aws_route", () => {
+    const label = terraformResourceCardLabel("aws_route.to_tgw", {
+      type: "aws_route",
+      mode: "managed",
+      name: "to_tgw",
+      change: {
+        after: {
+          destination_cidr_block: "10.0.0.0/16",
+          transit_gateway_id: "tgw-abc",
+        },
+      },
+    });
+    expect(label).toBe("10.0.0.0/16 → TGW");
+  });
+
   it("uses data source instance label from address when no values", () => {
     expect(
       terraformResourceCardLabel("data.aws_caller_identity.current", {
