@@ -183,7 +183,7 @@ function computePipelineRowGeometry(
         if (build) {
           rowHeights[lane] = Math.max(
             rowHeights[lane]!,
-            minRowHeightForPrimaryCenteredCluster(build),
+            rowHeightForClusterSlot(build),
           );
         }
       }
@@ -285,10 +285,18 @@ function inflateRowHeightsFromZoneSpecBounds(
   for (const spec of zoneSpecs.values()) {
     const targetBottom =
       spec.bounds.y + spec.bounds.height + FRAME_PAD + INNER_PAD;
-    const laneBottom = tops[spec.laneIndex]! + rowHeights[spec.laneIndex]!;
-    if (targetBottom > laneBottom + 0.5) {
-      rowHeights[spec.laneIndex]! += targetBottom - laneBottom;
-      changed = true;
+    const specTop = spec.bounds.y - FRAME_PAD;
+
+    for (let lane = 0; lane < rowHeights.length; lane++) {
+      const laneTop = tops[lane]!;
+      const laneBottom = laneTop + rowHeights[lane]!;
+      if (laneBottom < specTop - 0.5 || laneTop > targetBottom + 0.5) {
+        continue;
+      }
+      if (targetBottom > laneBottom + 0.5) {
+        rowHeights[lane] = targetBottom - laneTop + FRAME_PAD;
+        changed = true;
+      }
     }
   }
   return changed;
@@ -347,6 +355,15 @@ function minRowHeightForPrimaryCenteredCluster(build: ClusterBuild): number {
   return 2 * Math.max(primaryCy, build.height - primaryCy);
 }
 
+/** Full primaryCluster height plus padding so top-aligned lanes do not overlap. */
+function rowHeightForClusterSlot(build: ClusterBuild): number {
+  return (
+    Math.max(build.height, minRowHeightForPrimaryCenteredCluster(build)) +
+    2 * FRAME_PAD +
+    INNER_PAD
+  );
+}
+
 function firstMultiLaneColumnIndex(columns: readonly PipelineColumn[]): number {
   return columns.findIndex((c) => c.laneCount > 1);
 }
@@ -372,21 +389,22 @@ function clusterYForPlacement(
   const primaryCy = primaryResourceCenterYInCluster(build);
   const firstFanoutCol = firstMultiLaneColumnIndex(columns);
 
-  let rowCenterY: number;
+  if (col.laneCount > 1) {
+    return rowTops[lane]! + FRAME_PAD;
+  }
+
   if (col.laneCount === 1 && firstFanoutCol >= 0 && colIdx < firstFanoutCol) {
+    let rowCenterY: number;
     if (multiAccountBandLayout && accountLaneIndices?.length) {
       const minLane = Math.min(...accountLaneIndices);
       rowCenterY = rowTops[minLane]! + primaryCy;
     } else {
       rowCenterY = fanoutSpanCenterY(rowGeo);
     }
-  } else if (col.laneCount === maxLaneCount) {
-    rowCenterY = rowTops[lane]! + rowHeights[lane]! / 2;
-  } else {
-    rowCenterY = rowTops[0]! + rowHeights[0]! / 2;
+    return rowCenterY - primaryCy;
   }
 
-  return rowCenterY - primaryCy;
+  return rowTops[lane]! + FRAME_PAD;
 }
 
 function translateSkeleton(
@@ -931,7 +949,7 @@ export async function buildTerraformPipelineExcalidrawScene(
         maxW = Math.max(maxW, b.width);
       }
     }
-    return maxW + 2 * INNER_PAD;
+    return maxW + 2 * INNER_PAD + COLUMN_GAP / 2;
   });
 
   const contentTop = AWS_FRAME_PAD;
