@@ -4,9 +4,8 @@ import { EmailSignupForm } from "./EmailSignupForm";
 
 export const LandingEmailSignup = () => (
   <section
-    className="lp-email-signup lp-section--defer"
+    className="lp-email-signup"
     aria-labelledby="landing-email-signup-title"
-    data-lp-reveal
   >
     <div className="lp-email-signup__inner">
       <header className="lp-email-signup__header">

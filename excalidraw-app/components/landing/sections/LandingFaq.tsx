@@ -61,7 +61,7 @@ const FAQ_ITEMS = [
 export const LandingFaq = () => (
   <section
     id="faq"
-    className="lp-faq lp-section--defer"
+    className="lp-faq lp-section--defer lp-section--defer-faq"
     aria-labelledby="faq-title"
   >
     <LandingSectionHeading

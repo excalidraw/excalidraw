@@ -2,7 +2,7 @@ import React from "react";
 
 export const LandingStrip = () => (
   <section
-    className="lp-strip lp-section--defer"
+    className="lp-strip lp-section--defer lp-section--defer-strip"
     aria-labelledby="landing-strip-title"
     data-lp-reveal
   >

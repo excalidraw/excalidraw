@@ -20,7 +20,7 @@ const STEPS = [
 export const LandingWorkflow = () => (
   <section
     id="workflow"
-    className="lp-workflow lp-section--defer"
+    className="lp-workflow lp-section--defer lp-section--defer-workflow"
     aria-labelledby="workflow-title"
   >
     <LandingSectionHeading

@@ -640,6 +640,11 @@ body.terraform-canvas-landing #root {
 
 // ─── Scroll reveals ────────────────────────────────────────────────────────
 
+.landing-page [data-lp-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
 @keyframes lp-reveal-in {
   from {
     opacity: 0;
@@ -651,17 +656,23 @@ body.terraform-canvas-landing #root {
   }
 }
 
-@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
   .landing-page [data-lp-reveal] {
-    animation: lp-reveal-in linear both;
+    animation: lp-reveal-in linear backwards;
     animation-timeline: view();
-    animation-range: entry 10% cover 35%;
+    animation-range: entry 0% entry 100%;
   }
 
   .landing-page [data-lp-reveal] .lp-steps li,
   .landing-page .lp-steps [data-lp-reveal],
   .landing-page .lp-features__grid [data-lp-reveal] {
     animation-delay: calc(var(--lp-stagger, 0) * 80ms);
+  }
+
+  .landing-page [data-lp-reveal].is-visible {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -700,7 +711,27 @@ body.terraform-canvas-landing #root {
 
 .lp-section--defer {
   content-visibility: auto;
-  contain-intrinsic-size: auto 480px;
+}
+
+.lp-section--defer-strip {
+  contain-intrinsic-size: auto 200px;
+}
+
+.lp-section--defer-canvas {
+  contain-intrinsic-size: auto 720px;
+}
+
+.lp-section--defer-workflow,
+.lp-section--defer-features {
+  contain-intrinsic-size: auto 400px;
+}
+
+.lp-section--defer-use-cases {
+  contain-intrinsic-size: auto 280px;
+}
+
+.lp-section--defer-faq {
+  contain-intrinsic-size: auto 520px;
 }
 
 // ─── Canvas section ────────────────────────────────────────────────────────
@@ -1015,32 +1046,30 @@ body.terraform-canvas-landing #root {
   gap: 1.25rem;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
-  border-top: 1px solid var(--lp-line);
-  background: linear-gradient(
-    135deg,
-    rgba(201, 151, 42, 0.12),
-    rgba(15, 139, 95, 0.1)
-  );
+  padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
+  border-top: 1px solid var(--lp-line-dark);
+  background: radial-gradient(
+      circle at 15% 20%,
+      rgba(15, 139, 95, 0.2),
+      transparent 45%
+    ),
+    linear-gradient(160deg, #0b1210 0%, #152019 100%);
+  color: var(--lp-ink-on-dark);
 }
 
 .lp-final h2 {
   max-width: 20ch;
   margin: 0;
+  color: var(--lp-ink-on-dark);
   font: 700 clamp(1.5rem, 3vw, 2.25rem) / 1.15 var(--lp-font-display);
 }
 
 // ─── Email signup ──────────────────────────────────────────────────────────
 
 .lp-email-signup {
-  padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+  padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
   border-top: 1px solid var(--lp-line);
-  background: radial-gradient(
-      circle at 80% 20%,
-      rgba(15, 139, 95, 0.1),
-      transparent 40%
-    ),
-    var(--lp-bg);
+  background: var(--lp-bg);
 }
 
 .lp-email-signup__inner {
@@ -1066,6 +1095,7 @@ body.terraform-canvas-landing #root {
 
 .lp-email-signup__title {
   margin: 0 0 0.65rem;
+  color: var(--lp-ink);
   font: 700 clamp(1.75rem, 3vw, 2.5rem) / 1.1 var(--lp-font-display);
 }
 
@@ -1084,21 +1114,29 @@ body.terraform-canvas-landing #root {
   box-shadow: var(--lp-shadow-sm);
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__input {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__input {
   min-height: 48px;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--lp-line);
   border-radius: var(--lp-radius-sm);
+  background: #fff;
+  color: var(--lp-ink);
   font-family: var(--lp-font-body);
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__input:focus {
+.landing-page
+  .tfdraw-email-signup--landing
+  .tfdraw-email-signup__input::placeholder {
+  color: var(--lp-muted);
+}
+
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__input:focus {
   outline: none;
   border-color: var(--lp-accent);
   box-shadow: 0 0 0 3px var(--lp-accent-soft);
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__submit {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__submit {
   min-height: 48px;
   padding: 0.7rem 1.25rem;
   border: none;
@@ -1108,32 +1146,43 @@ body.terraform-canvas-landing #root {
   font-weight: 600;
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__consent {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__consent {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px dashed var(--lp-line);
+  color: var(--lp-ink-soft);
   font-size: 0.88rem;
+  line-height: 1.45;
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__privacy {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__privacy {
   margin-top: 0.75rem;
   padding: 0.65rem;
   border-radius: var(--lp-radius-sm);
   background: var(--lp-accent-soft);
+  color: var(--lp-ink-soft);
   font-size: 0.82rem;
+  line-height: 1.45;
 }
 
-.tfdraw-email-signup--landing .tfdraw-email-signup__privacy a {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__privacy a {
   color: var(--lp-blue);
   font-weight: 600;
 }
 
-.tfdraw-email-signup__message {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__turnstile {
+  margin-top: 0.75rem;
+}
+
+.landing-page .tfdraw-email-signup__message {
   color: var(--lp-accent);
   font-weight: 600;
 }
 
-.tfdraw-email-signup__message--error {
+.landing-page .tfdraw-email-signup__message--error {
   color: #c9573f;
 }
 
@@ -1149,13 +1198,8 @@ body.terraform-canvas-landing #root {
   border: 0;
 }
 
-.tfdraw-email-signup__row {
+.landing-page .tfdraw-email-signup--landing .tfdraw-email-signup__row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tfdraw-email-signup--landing .tfdraw-email-signup__row {
   flex-wrap: nowrap;
   gap: 0.65rem;
 }
@@ -1217,8 +1261,8 @@ body.terraform-canvas-landing #root {
 // ─── Footer ────────────────────────────────────────────────────────────────
 
 .lp-footer {
-  padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 4vw, 3rem)
-    clamp(2rem, 4vw, 2.5rem);
+  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(1rem, 4vw, 3rem)
+    clamp(1.5rem, 3vw, 2rem);
   border-top: 1px solid var(--lp-line);
   background: var(--lp-surface-solid);
   text-align: center;

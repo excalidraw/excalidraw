@@ -5,11 +5,7 @@ type LandingFinalProps = {
 };
 
 export const LandingFinal = ({ onScrollToCanvas }: LandingFinalProps) => (
-  <section
-    className="lp-final lp-section--defer"
-    aria-labelledby="final-title"
-    data-lp-reveal
-  >
+  <section className="lp-final" aria-labelledby="final-title">
     <h2 id="final-title">Bring the next Terraform review to tfdraw.dev.</h2>
     <button
       type="button"

@@ -10,10 +10,6 @@ export const landingPageSupportsScrollAnimations = (): boolean =>
 export const initLandingScrollRevealFallback = (
   root: HTMLElement,
 ): (() => void) => {
-  if (SCROLL_ANIMATION_SUPPORTS) {
-    return () => {};
-  }
-
   const targets = root.querySelectorAll<HTMLElement>("[data-lp-reveal]");
   if (targets.length === 0) {
     return () => {};
@@ -23,7 +19,7 @@ export const initLandingScrollRevealFallback = (
     (entries) => {
       entries.forEach((entry) => {
         const el = entry.target as HTMLElement;
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
           el.classList.add("is-visible");
           el.style.setProperty(
             "--lp-reveal-progress",
@@ -32,11 +28,13 @@ export const initLandingScrollRevealFallback = (
         }
       });
     },
-    { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1], rootMargin: "0px 0px -8% 0px" },
+    { threshold: [0, 0.15, 0.25, 0.5, 0.75, 1], rootMargin: "0px 0px -5% 0px" },
   );
 
   targets.forEach((el) => {
-    el.classList.add("lp-reveal-fallback");
+    if (!SCROLL_ANIMATION_SUPPORTS) {
+      el.classList.add("lp-reveal-fallback");
+    }
     observer.observe(el);
   });
 

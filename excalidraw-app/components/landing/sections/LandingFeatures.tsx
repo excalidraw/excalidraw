@@ -22,7 +22,7 @@ const FEATURES = [
 
 export const LandingFeatures = () => (
   <section
-    className="lp-features lp-section--defer"
+    className="lp-features lp-section--defer lp-section--defer-features"
     aria-labelledby="features-title"
   >
     <LandingSectionHeading

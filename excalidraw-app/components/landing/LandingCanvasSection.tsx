@@ -77,7 +77,7 @@ export const LandingCanvasSection = ({
     <section
       ref={sectionRef}
       id={LANDING_CANVAS_SECTION_ID}
-      className="lp-canvas-section"
+      className="lp-canvas-section lp-section--defer lp-section--defer-canvas"
       aria-labelledby="terraform-canvas-heading"
     >
       <div className="lp-canvas-section__header" data-lp-reveal>

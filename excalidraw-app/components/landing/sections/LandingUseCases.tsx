@@ -12,7 +12,7 @@ const USE_CASES = [
 export const LandingUseCases = () => (
   <section
     id="use-cases"
-    className="lp-use-cases lp-section--defer"
+    className="lp-use-cases lp-section--defer lp-section--defer-use-cases"
     aria-labelledby="use-cases-title"
   >
     <LandingSectionHeading
