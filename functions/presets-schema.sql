@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS terraform_import_presets (
   name TEXT NOT NULL,
   description TEXT,
   builtin INTEGER NOT NULL DEFAULT 0,
-  view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
+  view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
   root_path TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL

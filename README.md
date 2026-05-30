@@ -300,6 +300,10 @@ For regression testing, the repo can generate **100 real plan exports** from the
 
 Pages Functions under [`functions/`](./functions/) provide `/api/subscribe` and `/api/event`. Setup: [docs/telemetry-setup.md](./docs/telemetry-setup.md).
 
+## Local fixtures
+
+For pipeline geo fanout testing without AWS, use the LocalStack fixture under [`packages/backend/terraform/localstack-geo-fanout/`](packages/backend/terraform/localstack-geo-fanout/README.md): `yarn localstack:geo-fanout:generate-bundles` (offline CI) or `yarn localstack:geo-fanout:up`, `yarn localstack:geo-fanout:apply`, `yarn localstack:geo-fanout:export` (real LocalStack).
+
 ## Deployment
 
 Build the static public app:

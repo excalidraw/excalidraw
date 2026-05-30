@@ -1,0 +1,90 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] module.consumer.aws_iam_role.lambda (expand)" [label = "module.consumer.aws_iam_role.lambda", shape = "box"]
+		"[root] module.consumer.aws_iam_role_policy_attachment.lambda_basic (expand)" [label = "module.consumer.aws_iam_role_policy_attachment.lambda_basic", shape = "box"]
+		"[root] module.consumer.aws_iam_role_policy_attachment.lambda_vpc (expand)" [label = "module.consumer.aws_iam_role_policy_attachment.lambda_vpc", shape = "box"]
+		"[root] module.consumer.aws_lambda_function.consumer (expand)" [label = "module.consumer.aws_lambda_function.consumer", shape = "box"]
+		"[root] module.consumer.data.archive_file.lambda_zip (expand)" [label = "module.consumer.data.archive_file.lambda_zip", shape = "box"]
+		"[root] module.network.aws_security_group.lambda (expand)" [label = "module.network.aws_security_group.lambda", shape = "box"]
+		"[root] module.network.aws_subnet.private (expand)" [label = "module.network.aws_subnet.private", shape = "box"]
+		"[root] module.network.aws_vpc.this (expand)" [label = "module.network.aws_vpc.this", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/archive\"]" [label = "provider[\"registry.terraform.io/hashicorp/archive\"]", shape = "diamond"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] var.aws_account_id" [label = "var.aws_account_id", shape = "note"]
+		"[root] var.aws_region" [label = "var.aws_region", shape = "note"]
+		"[root] var.environment" [label = "var.environment", shape = "note"]
+		"[root] var.localstack_port" [label = "var.localstack_port", shape = "note"]
+		"[root] local.localstack_base (expand)" -> "[root] var.localstack_port"
+		"[root] module.consumer (close)" -> "[root] module.consumer.aws_iam_role_policy_attachment.lambda_basic (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.aws_iam_role_policy_attachment.lambda_vpc (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.output.lambda_function_arn (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.output.lambda_function_name (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.var.aws_account_id (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.var.aws_region (expand)"
+		"[root] module.consumer (close)" -> "[root] module.consumer.var.vpc_id (expand)"
+		"[root] module.consumer.aws_iam_role.lambda (expand)" -> "[root] module.consumer.var.environment (expand)"
+		"[root] module.consumer.aws_iam_role.lambda (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] module.consumer.aws_iam_role_policy_attachment.lambda_basic (expand)" -> "[root] module.consumer.aws_iam_role.lambda (expand)"
+		"[root] module.consumer.aws_iam_role_policy_attachment.lambda_vpc (expand)" -> "[root] module.consumer.aws_iam_role.lambda (expand)"
+		"[root] module.consumer.aws_lambda_function.consumer (expand)" -> "[root] module.consumer.aws_iam_role.lambda (expand)"
+		"[root] module.consumer.aws_lambda_function.consumer (expand)" -> "[root] module.consumer.data.archive_file.lambda_zip (expand)"
+		"[root] module.consumer.aws_lambda_function.consumer (expand)" -> "[root] module.consumer.var.lambda_security_group_id (expand)"
+		"[root] module.consumer.aws_lambda_function.consumer (expand)" -> "[root] module.consumer.var.private_subnet_ids (expand)"
+		"[root] module.consumer.data.archive_file.lambda_zip (expand)" -> "[root] module.consumer.var.lambda_source_file (expand)"
+		"[root] module.consumer.data.archive_file.lambda_zip (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/archive\"]"
+		"[root] module.consumer.output.lambda_function_arn (expand)" -> "[root] module.consumer.aws_lambda_function.consumer (expand)"
+		"[root] module.consumer.output.lambda_function_name (expand)" -> "[root] module.consumer.aws_lambda_function.consumer (expand)"
+		"[root] module.consumer.var.aws_account_id (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.aws_account_id (expand)" -> "[root] var.aws_account_id"
+		"[root] module.consumer.var.aws_region (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.aws_region (expand)" -> "[root] var.aws_region"
+		"[root] module.consumer.var.environment (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.environment (expand)" -> "[root] var.environment"
+		"[root] module.consumer.var.lambda_security_group_id (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.lambda_security_group_id (expand)" -> "[root] module.network.output.lambda_security_group_id (expand)"
+		"[root] module.consumer.var.lambda_source_file (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.private_subnet_ids (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.private_subnet_ids (expand)" -> "[root] module.network.output.private_subnet_ids (expand)"
+		"[root] module.consumer.var.vpc_id (expand)" -> "[root] module.consumer (expand)"
+		"[root] module.consumer.var.vpc_id (expand)" -> "[root] module.network.output.vpc_id (expand)"
+		"[root] module.network (close)" -> "[root] module.network.output.lambda_security_group_id (expand)"
+		"[root] module.network (close)" -> "[root] module.network.output.private_subnet_ids (expand)"
+		"[root] module.network (close)" -> "[root] module.network.output.vpc_cidr (expand)"
+		"[root] module.network (close)" -> "[root] module.network.output.vpc_id (expand)"
+		"[root] module.network.aws_security_group.lambda (expand)" -> "[root] module.network.aws_vpc.this (expand)"
+		"[root] module.network.aws_subnet.private (expand)" -> "[root] module.network.aws_vpc.this (expand)"
+		"[root] module.network.aws_subnet.private (expand)" -> "[root] module.network.var.subnet_cidr (expand)"
+		"[root] module.network.aws_vpc.this (expand)" -> "[root] module.network.var.environment (expand)"
+		"[root] module.network.aws_vpc.this (expand)" -> "[root] module.network.var.name (expand)"
+		"[root] module.network.aws_vpc.this (expand)" -> "[root] module.network.var.vpc_cidr (expand)"
+		"[root] module.network.aws_vpc.this (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] module.network.output.lambda_security_group_id (expand)" -> "[root] module.network.aws_security_group.lambda (expand)"
+		"[root] module.network.output.private_subnet_ids (expand)" -> "[root] module.network.aws_subnet.private (expand)"
+		"[root] module.network.output.vpc_cidr (expand)" -> "[root] module.network.aws_vpc.this (expand)"
+		"[root] module.network.output.vpc_id (expand)" -> "[root] module.network.aws_vpc.this (expand)"
+		"[root] module.network.var.environment (expand)" -> "[root] module.network (expand)"
+		"[root] module.network.var.environment (expand)" -> "[root] var.environment"
+		"[root] module.network.var.name (expand)" -> "[root] module.network (expand)"
+		"[root] module.network.var.subnet_cidr (expand)" -> "[root] module.network (expand)"
+		"[root] module.network.var.vpc_cidr (expand)" -> "[root] module.network (expand)"
+		"[root] output.aws_account_id (expand)" -> "[root] var.aws_account_id"
+		"[root] output.aws_region (expand)" -> "[root] var.aws_region"
+		"[root] output.vpc_id (expand)" -> "[root] module.network.output.vpc_id (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/archive\"] (close)" -> "[root] module.consumer.data.archive_file.lambda_zip (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.consumer.aws_iam_role_policy_attachment.lambda_basic (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.consumer.aws_iam_role_policy_attachment.lambda_vpc (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] module.consumer.aws_lambda_function.consumer (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] local.localstack_base (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.aws_region"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.environment"
+		"[root] root" -> "[root] module.consumer (close)"
+		"[root] root" -> "[root] module.network (close)"
+		"[root] root" -> "[root] output.aws_account_id (expand)"
+		"[root] root" -> "[root] output.aws_region (expand)"
+		"[root] root" -> "[root] output.vpc_id (expand)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/archive\"] (close)"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+	}
+}

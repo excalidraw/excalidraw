@@ -109,7 +109,12 @@
     "fixtures:corpus": "node packages/backend/terraform/scripts/fixture-corpus/run-recipes.mjs",
     "fixtures:corpus:serial": "node packages/backend/terraform/scripts/fixture-corpus/run-recipes.mjs --serial --skip-missing-state",
     "fixtures:corpus:validate": "node packages/backend/terraform/scripts/fixture-corpus/validate-corpus.mjs",
-    "fixtures:seed-state-070": "node packages/backend/terraform/scripts/fixture-corpus/seed-state-070.mjs"
+    "fixtures:seed-state-070": "node packages/backend/terraform/scripts/fixture-corpus/seed-state-070.mjs",
+    "localstack:geo-fanout:up": "docker compose -f packages/backend/terraform/localstack-geo-fanout/docker-compose.yml up -d",
+    "localstack:geo-fanout:down": "docker compose -f packages/backend/terraform/localstack-geo-fanout/docker-compose.yml down",
+    "localstack:geo-fanout:apply": "packages/backend/terraform/localstack-geo-fanout/scripts/apply-all.sh",
+    "localstack:geo-fanout:export": "packages/backend/terraform/localstack-geo-fanout/scripts/export-all.sh",
+    "localstack:geo-fanout:generate-bundles": "node packages/backend/terraform/localstack-geo-fanout/scripts/generate-synthetic-bundles.mjs"
   },
   "resolutions": {
     "strip-ansi": "6.0.1"

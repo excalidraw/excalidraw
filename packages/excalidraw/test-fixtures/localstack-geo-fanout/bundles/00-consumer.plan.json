@@ -1,0 +1,2086 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.14.7",
+  "variables": {
+    "aws_account_id": {
+      "value": "111111111111"
+    },
+    "aws_region": {
+      "value": "us-east-1"
+    },
+    "environment": {
+      "value": "local"
+    },
+    "localstack_port": {
+      "value": 4566
+    }
+  },
+  "planned_values": {
+    "outputs": {
+      "aws_account_id": {
+        "sensitive": false,
+        "type": "string",
+        "value": "111111111111"
+      },
+      "aws_region": {
+        "sensitive": false,
+        "type": "string",
+        "value": "us-east-1"
+      },
+      "vpc_id": {
+        "sensitive": false,
+        "type": "string",
+        "value": "vpc-29bae85ac60ba3a34"
+      }
+    },
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.consumer.aws_iam_role.lambda",
+              "mode": "managed",
+              "type": "aws_iam_role",
+              "name": "lambda",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-05-29T22:27:28Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "local-consumer-lambda",
+                "inline_policy": [],
+                "managed_policy_arns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"],
+                "max_session_duration": 3600,
+                "name": "local-consumer-lambda",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": {},
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "00-consumer"
+                },
+                "unique_id": "AROAQAAAAAAADMTZYJKM4"
+              },
+              "sensitive_values": {
+                "inline_policy": [],
+                "managed_policy_arns": [false, false],
+                "tags": {},
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.consumer.aws_iam_role_policy_attachment.lambda_basic",
+              "mode": "managed",
+              "type": "aws_iam_role_policy_attachment",
+              "name": "lambda_basic",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "id": "local-consumer-lambda-20260529222728258900000002",
+                "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                "role": "local-consumer-lambda"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.consumer.aws_iam_role_policy_attachment.lambda_vpc",
+              "mode": "managed",
+              "type": "aws_iam_role_policy_attachment",
+              "name": "lambda_vpc",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "id": "local-consumer-lambda-20260529222728257400000001",
+                "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+                "role": "local-consumer-lambda"
+              },
+              "sensitive_values": {}
+            },
+            {
+              "address": "module.consumer.aws_lambda_function.consumer",
+              "mode": "managed",
+              "type": "aws_lambda_function",
+              "name": "consumer",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 0,
+              "values": {
+                "code_signing_config_arn": null,
+                "dead_letter_config": [],
+                "description": null,
+                "environment": [
+                  {
+                    "variables": {
+                      "APP_CONFIG_PATH": "/local/consumer"
+                    }
+                  }
+                ],
+                "file_system_config": [],
+                "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+                "function_name": "local-consumer",
+                "handler": "handler.handler",
+                "image_config": [],
+                "image_uri": null,
+                "kms_key_arn": null,
+                "layers": null,
+                "memory_size": 128,
+                "package_type": "Zip",
+                "publish": false,
+                "replace_security_groups_on_destroy": null,
+                "replacement_security_group_ids": null,
+                "reserved_concurrent_executions": -1,
+                "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+                "runtime": "python3.12",
+                "s3_bucket": null,
+                "s3_key": null,
+                "s3_object_version": null,
+                "skip_destroy": false,
+                "snap_start": [],
+                "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                "tags": null,
+                "tags_all": {
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "00-consumer"
+                },
+                "timeout": 3,
+                "timeouts": null,
+                "vpc_config": [
+                  {
+                    "ipv6_allowed_for_dual_stack": false,
+                    "security_group_ids": ["sg-ad095eefd914f5d70"],
+                    "subnet_ids": ["subnet-f17f4a9a20cf04042"]
+                  }
+                ]
+              },
+              "sensitive_values": {
+                "architectures": [],
+                "dead_letter_config": [],
+                "environment": [
+                  {
+                    "variables": {}
+                  }
+                ],
+                "ephemeral_storage": [],
+                "file_system_config": [],
+                "image_config": [],
+                "logging_config": [],
+                "snap_start": [],
+                "tags_all": {},
+                "tracing_config": [],
+                "vpc_config": [
+                  {
+                    "security_group_ids": [false],
+                    "subnet_ids": [false]
+                  }
+                ]
+              }
+            }
+          ],
+          "address": "module.consumer"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.network.aws_security_group.lambda",
+              "mode": "managed",
+              "type": "aws_security_group",
+              "name": "lambda",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "arn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-ad095eefd914f5d70",
+                "description": "Lambda security group for consumer",
+                "egress": [
+                  {
+                    "cidr_blocks": ["0.0.0.0/0"],
+                    "description": "",
+                    "from_port": 0,
+                    "ipv6_cidr_blocks": [],
+                    "prefix_list_ids": [],
+                    "protocol": "-1",
+                    "security_groups": [],
+                    "self": false,
+                    "to_port": 0
+                  }
+                ],
+                "id": "sg-ad095eefd914f5d70",
+                "ingress": [],
+                "name": "local-consumer-lambda-sg",
+                "name_prefix": "",
+                "owner_id": "000000000000",
+                "revoke_rules_on_delete": false,
+                "tags": {
+                  "Name": "local-consumer-lambda-sg"
+                },
+                "tags_all": {
+                  "Name": "local-consumer-lambda-sg",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "00-consumer"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-29bae85ac60ba3a34"
+              },
+              "sensitive_values": {
+                "egress": [
+                  {
+                    "cidr_blocks": [false],
+                    "ipv6_cidr_blocks": [],
+                    "prefix_list_ids": [],
+                    "security_groups": []
+                  }
+                ],
+                "ingress": [],
+                "tags": {},
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.network.aws_subnet.private",
+              "mode": "managed",
+              "type": "aws_subnet",
+              "name": "private",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "arn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-f17f4a9a20cf04042",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1e",
+                "availability_zone_id": "use1-az3",
+                "cidr_block": "10.0.1.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-f17f4a9a20cf04042",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "000000000000",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": {
+                  "Name": "local-consumer-private"
+                },
+                "tags_all": {
+                  "Name": "local-consumer-private",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "00-consumer"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-29bae85ac60ba3a34"
+              },
+              "sensitive_values": {
+                "tags": {},
+                "tags_all": {}
+              }
+            },
+            {
+              "address": "module.network.aws_vpc.this",
+              "mode": "managed",
+              "type": "aws_vpc",
+              "name": "this",
+              "provider_name": "registry.terraform.io/hashicorp/aws",
+              "schema_version": 1,
+              "values": {
+                "arn": "arn:aws:ec2:us-east-1:000000000000:vpc/vpc-29bae85ac60ba3a34",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-0e564d0487fee5458",
+                "default_route_table_id": "rtb-849e884ec9a979381",
+                "default_security_group_id": "sg-ca47a9d73708b72d3",
+                "dhcp_options_id": "default",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-29bae85ac60ba3a34",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-849e884ec9a979381",
+                "owner_id": "000000000000",
+                "tags": {
+                  "Name": "local-consumer-vpc"
+                },
+                "tags_all": {
+                  "Name": "local-consumer-vpc",
+                  "environment": "local",
+                  "fixture": "localstack-geo-fanout",
+                  "stack": "00-consumer"
+                }
+              },
+              "sensitive_values": {
+                "tags": {},
+                "tags_all": {}
+              }
+            }
+          ],
+          "address": "module.network"
+        }
+      ]
+    }
+  },
+  "resource_drift": [
+    {
+      "address": "module.consumer.aws_iam_role.lambda",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "lambda",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["update"],
+        "before": {
+          "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+          "create_date": "2026-05-29T22:27:28Z",
+          "description": "",
+          "force_detach_policies": false,
+          "id": "local-consumer-lambda",
+          "inline_policy": [],
+          "managed_policy_arns": [],
+          "max_session_duration": 3600,
+          "name": "local-consumer-lambda",
+          "name_prefix": "",
+          "path": "/",
+          "permissions_boundary": "",
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "unique_id": "AROAQAAAAAAADMTZYJKM4"
+        },
+        "after": {
+          "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+          "create_date": "2026-05-29T22:27:28Z",
+          "description": "",
+          "force_detach_policies": false,
+          "id": "local-consumer-lambda",
+          "inline_policy": [],
+          "managed_policy_arns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"],
+          "max_session_duration": 3600,
+          "name": "local-consumer-lambda",
+          "name_prefix": "",
+          "path": "/",
+          "permissions_boundary": "",
+          "tags": {},
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "unique_id": "AROAQAAAAAAADMTZYJKM4"
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "inline_policy": [],
+          "managed_policy_arns": [],
+          "tags_all": {}
+        },
+        "after_sensitive": {
+          "inline_policy": [],
+          "managed_policy_arns": [false, false],
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.consumer.aws_lambda_function.consumer",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "consumer",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["update"],
+        "before": {
+          "architectures": null,
+          "arn": null,
+          "code_sha256": null,
+          "code_signing_config_arn": null,
+          "dead_letter_config": [],
+          "description": null,
+          "environment": [
+            {
+              "variables": {
+                "APP_CONFIG_PATH": "/local/consumer"
+              }
+            }
+          ],
+          "ephemeral_storage": [],
+          "file_system_config": [],
+          "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+          "function_name": "local-consumer",
+          "handler": "handler.handler",
+          "id": "local-consumer",
+          "image_config": [],
+          "image_uri": null,
+          "invoke_arn": null,
+          "kms_key_arn": null,
+          "last_modified": null,
+          "layers": null,
+          "logging_config": [],
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "qualified_arn": null,
+          "qualified_invoke_arn": null,
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "signing_job_arn": null,
+          "signing_profile_version_arn": null,
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "source_code_size": null,
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeout": 3,
+          "timeouts": null,
+          "tracing_config": [],
+          "version": null,
+          "vpc_config": [
+            {
+              "ipv6_allowed_for_dual_stack": false,
+              "security_group_ids": ["sg-ad095eefd914f5d70"],
+              "subnet_ids": ["subnet-f17f4a9a20cf04042"],
+              "vpc_id": ""
+            }
+          ]
+        },
+        "after": {
+          "architectures": ["x86_64"],
+          "arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer",
+          "code_sha256": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "code_signing_config_arn": "",
+          "dead_letter_config": [],
+          "description": "",
+          "environment": [
+            {
+              "variables": {
+                "APP_CONFIG_PATH": "/local/consumer"
+              }
+            }
+          ],
+          "ephemeral_storage": [
+            {
+              "size": 512
+            }
+          ],
+          "file_system_config": [],
+          "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+          "function_name": "local-consumer",
+          "handler": "handler.handler",
+          "id": "local-consumer",
+          "image_config": [],
+          "image_uri": "",
+          "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer/invocations",
+          "kms_key_arn": "",
+          "last_modified": "2026-05-29T22:27:39.347689+0000",
+          "layers": [],
+          "logging_config": [
+            {
+              "application_log_level": "",
+              "log_format": "Text",
+              "log_group": "/aws/lambda/local-consumer",
+              "system_log_level": ""
+            }
+          ],
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "qualified_arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST",
+          "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST/invocations",
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "signing_job_arn": "",
+          "signing_profile_version_arn": "",
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "source_code_size": 363,
+          "tags": {},
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeout": 3,
+          "timeouts": null,
+          "tracing_config": [
+            {
+              "mode": "PassThrough"
+            }
+          ],
+          "version": "$LATEST",
+          "vpc_config": [
+            {
+              "ipv6_allowed_for_dual_stack": false,
+              "security_group_ids": ["sg-ad095eefd914f5d70"],
+              "subnet_ids": ["subnet-f17f4a9a20cf04042"],
+              "vpc_id": "vpc-29bae85ac60ba3a34"
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [],
+          "file_system_config": [],
+          "image_config": [],
+          "logging_config": [],
+          "snap_start": [],
+          "tags_all": {},
+          "tracing_config": [],
+          "vpc_config": [
+            {
+              "security_group_ids": [false],
+              "subnet_ids": [false]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "architectures": [false],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [{}],
+          "file_system_config": [],
+          "image_config": [],
+          "layers": [],
+          "logging_config": [{}],
+          "snap_start": [],
+          "tags": {},
+          "tags_all": {},
+          "tracing_config": [{}],
+          "vpc_config": [
+            {
+              "security_group_ids": [false],
+              "subnet_ids": [false]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "resource_changes": [
+    {
+      "address": "module.consumer.aws_iam_role.lambda",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "lambda",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+          "create_date": "2026-05-29T22:27:28Z",
+          "description": "",
+          "force_detach_policies": false,
+          "id": "local-consumer-lambda",
+          "inline_policy": [],
+          "managed_policy_arns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"],
+          "max_session_duration": 3600,
+          "name": "local-consumer-lambda",
+          "name_prefix": "",
+          "path": "/",
+          "permissions_boundary": "",
+          "tags": {},
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "unique_id": "AROAQAAAAAAADMTZYJKM4"
+        },
+        "after": {
+          "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+          "create_date": "2026-05-29T22:27:28Z",
+          "description": "",
+          "force_detach_policies": false,
+          "id": "local-consumer-lambda",
+          "inline_policy": [],
+          "managed_policy_arns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"],
+          "max_session_duration": 3600,
+          "name": "local-consumer-lambda",
+          "name_prefix": "",
+          "path": "/",
+          "permissions_boundary": "",
+          "tags": {},
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "unique_id": "AROAQAAAAAAADMTZYJKM4"
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "inline_policy": [],
+          "managed_policy_arns": [false, false],
+          "tags": {},
+          "tags_all": {}
+        },
+        "after_sensitive": {
+          "inline_policy": [],
+          "managed_policy_arns": [false, false],
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.consumer.aws_iam_role_policy_attachment.lambda_basic",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_basic",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "id": "local-consumer-lambda-20260529222728258900000002",
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "role": "local-consumer-lambda"
+        },
+        "after": {
+          "id": "local-consumer-lambda-20260529222728258900000002",
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "role": "local-consumer-lambda"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.consumer.aws_iam_role_policy_attachment.lambda_vpc",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_vpc",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "id": "local-consumer-lambda-20260529222728257400000001",
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          "role": "local-consumer-lambda"
+        },
+        "after": {
+          "id": "local-consumer-lambda-20260529222728257400000001",
+          "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+          "role": "local-consumer-lambda"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.consumer.aws_lambda_function.consumer",
+      "module_address": "module.consumer",
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "consumer",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["delete", "create"],
+        "before": {
+          "architectures": ["x86_64"],
+          "arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer",
+          "code_sha256": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "code_signing_config_arn": "",
+          "dead_letter_config": [],
+          "description": "",
+          "environment": [
+            {
+              "variables": {
+                "APP_CONFIG_PATH": "/local/consumer"
+              }
+            }
+          ],
+          "ephemeral_storage": [
+            {
+              "size": 512
+            }
+          ],
+          "file_system_config": [],
+          "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+          "function_name": "local-consumer",
+          "handler": "handler.handler",
+          "id": "local-consumer",
+          "image_config": [],
+          "image_uri": "",
+          "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer/invocations",
+          "kms_key_arn": "",
+          "last_modified": "2026-05-29T22:27:39.347689+0000",
+          "layers": [],
+          "logging_config": [
+            {
+              "application_log_level": "",
+              "log_format": "Text",
+              "log_group": "/aws/lambda/local-consumer",
+              "system_log_level": ""
+            }
+          ],
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "qualified_arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST",
+          "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST/invocations",
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "signing_job_arn": "",
+          "signing_profile_version_arn": "",
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "source_code_size": 363,
+          "tags": {},
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeout": 3,
+          "timeouts": null,
+          "tracing_config": [
+            {
+              "mode": "PassThrough"
+            }
+          ],
+          "version": "$LATEST",
+          "vpc_config": [
+            {
+              "ipv6_allowed_for_dual_stack": false,
+              "security_group_ids": ["sg-ad095eefd914f5d70"],
+              "subnet_ids": ["subnet-f17f4a9a20cf04042"],
+              "vpc_id": "vpc-29bae85ac60ba3a34"
+            }
+          ]
+        },
+        "after": {
+          "code_signing_config_arn": null,
+          "dead_letter_config": [],
+          "description": null,
+          "environment": [
+            {
+              "variables": {
+                "APP_CONFIG_PATH": "/local/consumer"
+              }
+            }
+          ],
+          "file_system_config": [],
+          "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+          "function_name": "local-consumer",
+          "handler": "handler.handler",
+          "image_config": [],
+          "image_uri": null,
+          "kms_key_arn": null,
+          "layers": null,
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+          "tags": null,
+          "tags_all": {
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeout": 3,
+          "timeouts": null,
+          "vpc_config": [
+            {
+              "subnet_ids": ["subnet-consumer"]
+            }
+          ],
+          "arn": "arn:aws:lambda:us-east-1:111111111111:function:local-consumer",
+          "region": "us-east-1"
+        },
+        "after_unknown": {
+          "architectures": true,
+          "arn": true,
+          "code_sha256": true,
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": true,
+          "file_system_config": [],
+          "id": true,
+          "image_config": [],
+          "invoke_arn": true,
+          "last_modified": true,
+          "logging_config": true,
+          "qualified_arn": true,
+          "qualified_invoke_arn": true,
+          "signing_job_arn": true,
+          "signing_profile_version_arn": true,
+          "snap_start": [],
+          "source_code_size": true,
+          "tags_all": {},
+          "tracing_config": true,
+          "version": true,
+          "vpc_config": [
+            {
+              "security_group_ids": [false],
+              "subnet_ids": [false],
+              "vpc_id": true
+            }
+          ]
+        },
+        "before_sensitive": {
+          "architectures": [false],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [{}],
+          "file_system_config": [],
+          "image_config": [],
+          "layers": [],
+          "logging_config": [{}],
+          "snap_start": [],
+          "tags": {},
+          "tags_all": {},
+          "tracing_config": [{}],
+          "vpc_config": [
+            {
+              "security_group_ids": [false],
+              "subnet_ids": [false]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "architectures": [],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [],
+          "file_system_config": [],
+          "image_config": [],
+          "logging_config": [],
+          "snap_start": [],
+          "tags_all": {},
+          "tracing_config": [],
+          "vpc_config": [
+            {
+              "security_group_ids": [false],
+              "subnet_ids": [false]
+            }
+          ]
+        }
+      },
+      "action_reason": "replace_because_tainted"
+    },
+    {
+      "address": "module.network.aws_security_group.lambda",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "lambda",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "arn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-ad095eefd914f5d70",
+          "description": "Lambda security group for consumer",
+          "egress": [
+            {
+              "cidr_blocks": ["0.0.0.0/0"],
+              "description": "",
+              "from_port": 0,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "-1",
+              "security_groups": [],
+              "self": false,
+              "to_port": 0
+            }
+          ],
+          "id": "sg-ad095eefd914f5d70",
+          "ingress": [],
+          "name": "local-consumer-lambda-sg",
+          "name_prefix": "",
+          "owner_id": "000000000000",
+          "revoke_rules_on_delete": false,
+          "tags": {
+            "Name": "local-consumer-lambda-sg"
+          },
+          "tags_all": {
+            "Name": "local-consumer-lambda-sg",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeouts": null,
+          "vpc_id": "vpc-29bae85ac60ba3a34"
+        },
+        "after": {
+          "arn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-ad095eefd914f5d70",
+          "description": "Lambda security group for consumer",
+          "egress": [
+            {
+              "cidr_blocks": ["0.0.0.0/0"],
+              "description": "",
+              "from_port": 0,
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "protocol": "-1",
+              "security_groups": [],
+              "self": false,
+              "to_port": 0
+            }
+          ],
+          "id": "sg-ad095eefd914f5d70",
+          "ingress": [],
+          "name": "local-consumer-lambda-sg",
+          "name_prefix": "",
+          "owner_id": "000000000000",
+          "revoke_rules_on_delete": false,
+          "tags": {
+            "Name": "local-consumer-lambda-sg"
+          },
+          "tags_all": {
+            "Name": "local-consumer-lambda-sg",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeouts": null,
+          "vpc_id": "vpc-29bae85ac60ba3a34"
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "egress": [
+            {
+              "cidr_blocks": [false],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "ingress": [],
+          "tags": {},
+          "tags_all": {}
+        },
+        "after_sensitive": {
+          "egress": [
+            {
+              "cidr_blocks": [false],
+              "ipv6_cidr_blocks": [],
+              "prefix_list_ids": [],
+              "security_groups": []
+            }
+          ],
+          "ingress": [],
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.network.aws_subnet.private",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "arn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-f17f4a9a20cf04042",
+          "assign_ipv6_address_on_creation": false,
+          "availability_zone": "us-east-1e",
+          "availability_zone_id": "use1-az3",
+          "cidr_block": "10.0.1.0/24",
+          "customer_owned_ipv4_pool": "",
+          "enable_dns64": false,
+          "enable_lni_at_device_index": 0,
+          "enable_resource_name_dns_a_record_on_launch": false,
+          "enable_resource_name_dns_aaaa_record_on_launch": false,
+          "id": "subnet-f17f4a9a20cf04042",
+          "ipv6_cidr_block": "",
+          "ipv6_cidr_block_association_id": "",
+          "ipv6_native": false,
+          "map_customer_owned_ip_on_launch": false,
+          "map_public_ip_on_launch": false,
+          "outpost_arn": "",
+          "owner_id": "000000000000",
+          "private_dns_hostname_type_on_launch": "ip-name",
+          "tags": {
+            "Name": "local-consumer-private"
+          },
+          "tags_all": {
+            "Name": "local-consumer-private",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeouts": null,
+          "vpc_id": "vpc-29bae85ac60ba3a34"
+        },
+        "after": {
+          "arn": "arn:aws:ec2:us-east-1:111111111111:subnet/subnet-consumer",
+          "assign_ipv6_address_on_creation": false,
+          "availability_zone": "us-east-1a",
+          "availability_zone_id": "use1-az3",
+          "cidr_block": "10.0.1.0/24",
+          "customer_owned_ipv4_pool": "",
+          "enable_dns64": false,
+          "enable_lni_at_device_index": 0,
+          "enable_resource_name_dns_a_record_on_launch": false,
+          "enable_resource_name_dns_aaaa_record_on_launch": false,
+          "id": "subnet-consumer",
+          "ipv6_cidr_block": "",
+          "ipv6_cidr_block_association_id": "",
+          "ipv6_native": false,
+          "map_customer_owned_ip_on_launch": false,
+          "map_public_ip_on_launch": false,
+          "outpost_arn": "",
+          "owner_id": "111111111111",
+          "private_dns_hostname_type_on_launch": "ip-name",
+          "tags": {
+            "Name": "local-consumer-private"
+          },
+          "tags_all": {
+            "Name": "local-consumer-private",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "timeouts": null,
+          "vpc_id": "vpc-consumer",
+          "region": "us-east-1"
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        },
+        "after_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "module.network.aws_vpc.this",
+      "module_address": "module.network",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["no-op"],
+        "before": {
+          "arn": "arn:aws:ec2:us-east-1:000000000000:vpc/vpc-29bae85ac60ba3a34",
+          "assign_generated_ipv6_cidr_block": false,
+          "cidr_block": "10.0.0.0/16",
+          "default_network_acl_id": "acl-0e564d0487fee5458",
+          "default_route_table_id": "rtb-849e884ec9a979381",
+          "default_security_group_id": "sg-ca47a9d73708b72d3",
+          "dhcp_options_id": "default",
+          "enable_dns_hostnames": true,
+          "enable_dns_support": true,
+          "enable_network_address_usage_metrics": false,
+          "id": "vpc-29bae85ac60ba3a34",
+          "instance_tenancy": "default",
+          "ipv4_ipam_pool_id": null,
+          "ipv4_netmask_length": null,
+          "ipv6_association_id": "",
+          "ipv6_cidr_block": "",
+          "ipv6_cidr_block_network_border_group": "",
+          "ipv6_ipam_pool_id": "",
+          "ipv6_netmask_length": 0,
+          "main_route_table_id": "rtb-849e884ec9a979381",
+          "owner_id": "000000000000",
+          "tags": {
+            "Name": "local-consumer-vpc"
+          },
+          "tags_all": {
+            "Name": "local-consumer-vpc",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          }
+        },
+        "after": {
+          "arn": "arn:aws:ec2:us-east-1:111111111111:vpc/vpc-consumer",
+          "assign_generated_ipv6_cidr_block": false,
+          "cidr_block": "10.0.0.0/16",
+          "default_network_acl_id": "acl-0e564d0487fee5458",
+          "default_route_table_id": "rtb-849e884ec9a979381",
+          "default_security_group_id": "sg-ca47a9d73708b72d3",
+          "dhcp_options_id": "default",
+          "enable_dns_hostnames": true,
+          "enable_dns_support": true,
+          "enable_network_address_usage_metrics": false,
+          "id": "vpc-consumer",
+          "instance_tenancy": "default",
+          "ipv4_ipam_pool_id": null,
+          "ipv4_netmask_length": null,
+          "ipv6_association_id": "",
+          "ipv6_cidr_block": "",
+          "ipv6_cidr_block_network_border_group": "",
+          "ipv6_ipam_pool_id": "",
+          "ipv6_netmask_length": 0,
+          "main_route_table_id": "rtb-849e884ec9a979381",
+          "owner_id": "111111111111",
+          "tags": {
+            "Name": "local-consumer-vpc"
+          },
+          "tags_all": {
+            "Name": "local-consumer-vpc",
+            "environment": "local",
+            "fixture": "localstack-geo-fanout",
+            "stack": "00-consumer"
+          },
+          "region": "us-east-1"
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        },
+        "after_sensitive": {
+          "tags": {},
+          "tags_all": {}
+        }
+      }
+    }
+  ],
+  "output_changes": {
+    "aws_account_id": {
+      "actions": ["no-op"],
+      "before": "111111111111",
+      "after": "111111111111",
+      "after_unknown": false,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "aws_region": {
+      "actions": ["no-op"],
+      "before": "us-east-1",
+      "after": "us-east-1",
+      "after_unknown": false,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "vpc_id": {
+      "actions": ["no-op"],
+      "before": "vpc-29bae85ac60ba3a34",
+      "after": "vpc-29bae85ac60ba3a34",
+      "after_unknown": false,
+      "before_sensitive": false,
+      "after_sensitive": false
+    }
+  },
+  "prior_state": {
+    "format_version": "1.0",
+    "terraform_version": "1.14.7",
+    "values": {
+      "outputs": {
+        "aws_account_id": {
+          "sensitive": false,
+          "value": "111111111111",
+          "type": "string"
+        },
+        "aws_region": {
+          "sensitive": false,
+          "value": "us-east-1",
+          "type": "string"
+        },
+        "vpc_id": {
+          "sensitive": false,
+          "value": "vpc-29bae85ac60ba3a34",
+          "type": "string"
+        }
+      },
+      "root_module": {
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.consumer.data.archive_file.lambda_zip",
+                "mode": "data",
+                "type": "archive_file",
+                "name": "lambda_zip",
+                "provider_name": "registry.terraform.io/hashicorp/archive",
+                "schema_version": 0,
+                "values": {
+                  "exclude_symlink_directories": null,
+                  "excludes": null,
+                  "id": "b6b8799ad73fd5eb2efbc2c401f55b4ba514aab3",
+                  "output_base64sha256": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                  "output_base64sha512": "G4AP+rSfiRQCDF/61gVVm4SCzAnM5UQqZoKwacaHbIiDQn4fxIhQAsRyRqWtoLu3Zne3bY8OPPUPoSga1QD82A==",
+                  "output_file_mode": null,
+                  "output_md5": "a778db4bc02a5bd309863302eb0b4b7e",
+                  "output_path": "../../modules/consumer_lambda/.build/consumer.zip",
+                  "output_sha": "b6b8799ad73fd5eb2efbc2c401f55b4ba514aab3",
+                  "output_sha256": "e50aba92278384381c8a666bb15d72c3b7e6a1670d2e5a0aa987a86958a92acc",
+                  "output_sha512": "1b800ffab49f8914020c5ffad605559b8482cc09cce5442a6682b069c6876c8883427e1fc4885002c47246a5ada0bbb76677b76d8f0e3cf50fa1281ad500fcd8",
+                  "output_size": 363,
+                  "source": [],
+                  "source_content": null,
+                  "source_content_filename": null,
+                  "source_dir": null,
+                  "source_file": "./../../shared/handler.py",
+                  "type": "zip"
+                },
+                "sensitive_values": {
+                  "source": []
+                }
+              },
+              {
+                "address": "module.consumer.aws_iam_role.lambda",
+                "mode": "managed",
+                "type": "aws_iam_role",
+                "name": "lambda",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 0,
+                "values": {
+                  "arn": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+                  "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                  "create_date": "2026-05-29T22:27:28Z",
+                  "description": "",
+                  "force_detach_policies": false,
+                  "id": "local-consumer-lambda",
+                  "inline_policy": [],
+                  "managed_policy_arns": ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"],
+                  "max_session_duration": 3600,
+                  "name": "local-consumer-lambda",
+                  "name_prefix": "",
+                  "path": "/",
+                  "permissions_boundary": "",
+                  "tags": {},
+                  "tags_all": {
+                    "environment": "local",
+                    "fixture": "localstack-geo-fanout",
+                    "stack": "00-consumer"
+                  },
+                  "unique_id": "AROAQAAAAAAADMTZYJKM4"
+                },
+                "sensitive_values": {
+                  "inline_policy": [],
+                  "managed_policy_arns": [false, false],
+                  "tags": {},
+                  "tags_all": {}
+                }
+              },
+              {
+                "address": "module.consumer.aws_iam_role_policy_attachment.lambda_basic",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_basic",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 0,
+                "values": {
+                  "id": "local-consumer-lambda-20260529222728258900000002",
+                  "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                  "role": "local-consumer-lambda"
+                },
+                "sensitive_values": {},
+                "depends_on": ["module.consumer.aws_iam_role.lambda"]
+              },
+              {
+                "address": "module.consumer.aws_iam_role_policy_attachment.lambda_vpc",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_vpc",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 0,
+                "values": {
+                  "id": "local-consumer-lambda-20260529222728257400000001",
+                  "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+                  "role": "local-consumer-lambda"
+                },
+                "sensitive_values": {},
+                "depends_on": ["module.consumer.aws_iam_role.lambda"]
+              },
+              {
+                "address": "module.consumer.aws_lambda_function.consumer",
+                "mode": "managed",
+                "type": "aws_lambda_function",
+                "name": "consumer",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 0,
+                "values": {
+                  "architectures": ["x86_64"],
+                  "arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer",
+                  "code_sha256": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                  "code_signing_config_arn": "",
+                  "dead_letter_config": [],
+                  "description": "",
+                  "environment": [
+                    {
+                      "variables": {
+                        "APP_CONFIG_PATH": "/local/consumer"
+                      }
+                    }
+                  ],
+                  "ephemeral_storage": [
+                    {
+                      "size": 512
+                    }
+                  ],
+                  "file_system_config": [],
+                  "filename": "../../modules/consumer_lambda/.build/consumer.zip",
+                  "function_name": "local-consumer",
+                  "handler": "handler.handler",
+                  "id": "local-consumer",
+                  "image_config": [],
+                  "image_uri": "",
+                  "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer/invocations",
+                  "kms_key_arn": "",
+                  "last_modified": "2026-05-29T22:27:39.347689+0000",
+                  "layers": [],
+                  "logging_config": [
+                    {
+                      "application_log_level": "",
+                      "log_format": "Text",
+                      "log_group": "/aws/lambda/local-consumer",
+                      "system_log_level": ""
+                    }
+                  ],
+                  "memory_size": 128,
+                  "package_type": "Zip",
+                  "publish": false,
+                  "qualified_arn": "arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST",
+                  "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:local-consumer:$LATEST/invocations",
+                  "replace_security_groups_on_destroy": null,
+                  "replacement_security_group_ids": null,
+                  "reserved_concurrent_executions": -1,
+                  "role": "arn:aws:iam::000000000000:role/local-consumer-lambda",
+                  "runtime": "python3.12",
+                  "s3_bucket": null,
+                  "s3_key": null,
+                  "s3_object_version": null,
+                  "signing_job_arn": "",
+                  "signing_profile_version_arn": "",
+                  "skip_destroy": false,
+                  "snap_start": [],
+                  "source_code_hash": "5Qq6kieDhDgcimZrsV1yw7fmoWcNLloKqYeoaVipKsw=",
+                  "source_code_size": 363,
+                  "tags": {},
+                  "tags_all": {
+                    "environment": "local",
+                    "fixture": "localstack-geo-fanout",
+                    "stack": "00-consumer"
+                  },
+                  "timeout": 3,
+                  "timeouts": null,
+                  "tracing_config": [
+                    {
+                      "mode": "PassThrough"
+                    }
+                  ],
+                  "version": "$LATEST",
+                  "vpc_config": [
+                    {
+                      "ipv6_allowed_for_dual_stack": false,
+                      "security_group_ids": ["sg-ad095eefd914f5d70"],
+                      "subnet_ids": ["subnet-f17f4a9a20cf04042"],
+                      "vpc_id": "vpc-29bae85ac60ba3a34"
+                    }
+                  ]
+                },
+                "sensitive_values": {
+                  "architectures": [false],
+                  "dead_letter_config": [],
+                  "environment": [
+                    {
+                      "variables": {}
+                    }
+                  ],
+                  "ephemeral_storage": [{}],
+                  "file_system_config": [],
+                  "image_config": [],
+                  "layers": [],
+                  "logging_config": [{}],
+                  "snap_start": [],
+                  "tags": {},
+                  "tags_all": {},
+                  "tracing_config": [{}],
+                  "vpc_config": [
+                    {
+                      "security_group_ids": [false],
+                      "subnet_ids": [false]
+                    }
+                  ]
+                },
+                "depends_on": ["module.consumer.aws_iam_role.lambda", "module.consumer.data.archive_file.lambda_zip", "module.network.aws_security_group.lambda", "module.network.aws_subnet.private", "module.network.aws_vpc.this"],
+                "tainted": true
+              }
+            ],
+            "address": "module.consumer"
+          },
+          {
+            "resources": [
+              {
+                "address": "module.network.aws_security_group.lambda",
+                "mode": "managed",
+                "type": "aws_security_group",
+                "name": "lambda",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 1,
+                "values": {
+                  "arn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-ad095eefd914f5d70",
+                  "description": "Lambda security group for consumer",
+                  "egress": [
+                    {
+                      "cidr_blocks": ["0.0.0.0/0"],
+                      "description": "",
+                      "from_port": 0,
+                      "ipv6_cidr_blocks": [],
+                      "prefix_list_ids": [],
+                      "protocol": "-1",
+                      "security_groups": [],
+                      "self": false,
+                      "to_port": 0
+                    }
+                  ],
+                  "id": "sg-ad095eefd914f5d70",
+                  "ingress": [],
+                  "name": "local-consumer-lambda-sg",
+                  "name_prefix": "",
+                  "owner_id": "000000000000",
+                  "revoke_rules_on_delete": false,
+                  "tags": {
+                    "Name": "local-consumer-lambda-sg"
+                  },
+                  "tags_all": {
+                    "Name": "local-consumer-lambda-sg",
+                    "environment": "local",
+                    "fixture": "localstack-geo-fanout",
+                    "stack": "00-consumer"
+                  },
+                  "timeouts": null,
+                  "vpc_id": "vpc-29bae85ac60ba3a34"
+                },
+                "sensitive_values": {
+                  "egress": [
+                    {
+                      "cidr_blocks": [false],
+                      "ipv6_cidr_blocks": [],
+                      "prefix_list_ids": [],
+                      "security_groups": []
+                    }
+                  ],
+                  "ingress": [],
+                  "tags": {},
+                  "tags_all": {}
+                },
+                "depends_on": ["module.network.aws_vpc.this"]
+              },
+              {
+                "address": "module.network.aws_subnet.private",
+                "mode": "managed",
+                "type": "aws_subnet",
+                "name": "private",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 1,
+                "values": {
+                  "arn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-f17f4a9a20cf04042",
+                  "assign_ipv6_address_on_creation": false,
+                  "availability_zone": "us-east-1e",
+                  "availability_zone_id": "use1-az3",
+                  "cidr_block": "10.0.1.0/24",
+                  "customer_owned_ipv4_pool": "",
+                  "enable_dns64": false,
+                  "enable_lni_at_device_index": 0,
+                  "enable_resource_name_dns_a_record_on_launch": false,
+                  "enable_resource_name_dns_aaaa_record_on_launch": false,
+                  "id": "subnet-f17f4a9a20cf04042",
+                  "ipv6_cidr_block": "",
+                  "ipv6_cidr_block_association_id": "",
+                  "ipv6_native": false,
+                  "map_customer_owned_ip_on_launch": false,
+                  "map_public_ip_on_launch": false,
+                  "outpost_arn": "",
+                  "owner_id": "000000000000",
+                  "private_dns_hostname_type_on_launch": "ip-name",
+                  "tags": {
+                    "Name": "local-consumer-private"
+                  },
+                  "tags_all": {
+                    "Name": "local-consumer-private",
+                    "environment": "local",
+                    "fixture": "localstack-geo-fanout",
+                    "stack": "00-consumer"
+                  },
+                  "timeouts": null,
+                  "vpc_id": "vpc-29bae85ac60ba3a34"
+                },
+                "sensitive_values": {
+                  "tags": {},
+                  "tags_all": {}
+                },
+                "depends_on": ["module.network.aws_vpc.this"]
+              },
+              {
+                "address": "module.network.aws_vpc.this",
+                "mode": "managed",
+                "type": "aws_vpc",
+                "name": "this",
+                "provider_name": "registry.terraform.io/hashicorp/aws",
+                "schema_version": 1,
+                "values": {
+                  "arn": "arn:aws:ec2:us-east-1:000000000000:vpc/vpc-29bae85ac60ba3a34",
+                  "assign_generated_ipv6_cidr_block": false,
+                  "cidr_block": "10.0.0.0/16",
+                  "default_network_acl_id": "acl-0e564d0487fee5458",
+                  "default_route_table_id": "rtb-849e884ec9a979381",
+                  "default_security_group_id": "sg-ca47a9d73708b72d3",
+                  "dhcp_options_id": "default",
+                  "enable_dns_hostnames": true,
+                  "enable_dns_support": true,
+                  "enable_network_address_usage_metrics": false,
+                  "id": "vpc-29bae85ac60ba3a34",
+                  "instance_tenancy": "default",
+                  "ipv4_ipam_pool_id": null,
+                  "ipv4_netmask_length": null,
+                  "ipv6_association_id": "",
+                  "ipv6_cidr_block": "",
+                  "ipv6_cidr_block_network_border_group": "",
+                  "ipv6_ipam_pool_id": "",
+                  "ipv6_netmask_length": 0,
+                  "main_route_table_id": "rtb-849e884ec9a979381",
+                  "owner_id": "000000000000",
+                  "tags": {
+                    "Name": "local-consumer-vpc"
+                  },
+                  "tags_all": {
+                    "Name": "local-consumer-vpc",
+                    "environment": "local",
+                    "fixture": "localstack-geo-fanout",
+                    "stack": "00-consumer"
+                  }
+                },
+                "sensitive_values": {
+                  "tags": {},
+                  "tags_all": {}
+                }
+              }
+            ],
+            "address": "module.network"
+          }
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "archive": {
+        "name": "archive",
+        "full_name": "registry.terraform.io/hashicorp/archive",
+        "version_constraint": "~> 2.4"
+      },
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws",
+        "version_constraint": "~> 5.0",
+        "expressions": {
+          "access_key": {
+            "constant_value": "test"
+          },
+          "default_tags": [
+            {
+              "tags": {
+                "references": ["var.environment"]
+              }
+            }
+          ],
+          "endpoints": [
+            {
+              "apigateway": {
+                "references": ["local.localstack_base"]
+              },
+              "ec2": {
+                "references": ["local.localstack_base"]
+              },
+              "iam": {
+                "references": ["local.localstack_base"]
+              },
+              "lambda": {
+                "references": ["local.localstack_base"]
+              },
+              "logs": {
+                "references": ["local.localstack_base"]
+              },
+              "s3": {
+                "references": ["local.localstack_base"]
+              },
+              "ssm": {
+                "references": ["local.localstack_base"]
+              },
+              "sts": {
+                "references": ["local.localstack_base"]
+              }
+            }
+          ],
+          "region": {
+            "references": ["var.aws_region"]
+          },
+          "s3_use_path_style": {
+            "constant_value": true
+          },
+          "secret_key": {
+            "constant_value": "test"
+          },
+          "skip_credentials_validation": {
+            "constant_value": true
+          },
+          "skip_metadata_api_check": {
+            "constant_value": true
+          },
+          "skip_requesting_account_id": {
+            "constant_value": true
+          }
+        }
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "aws_account_id": {
+          "expression": {
+            "references": ["var.aws_account_id"]
+          }
+        },
+        "aws_region": {
+          "expression": {
+            "references": ["var.aws_region"]
+          }
+        },
+        "vpc_id": {
+          "expression": {
+            "references": ["module.network.vpc_id", "module.network"]
+          }
+        }
+      },
+      "module_calls": {
+        "consumer": {
+          "source": "../../modules/consumer_lambda",
+          "expressions": {
+            "aws_account_id": {
+              "references": ["var.aws_account_id"]
+            },
+            "aws_region": {
+              "references": ["var.aws_region"]
+            },
+            "environment": {
+              "references": ["var.environment"]
+            },
+            "lambda_security_group_id": {
+              "references": ["module.network.lambda_security_group_id", "module.network"]
+            },
+            "lambda_source_file": {
+              "references": ["path.module"]
+            },
+            "private_subnet_ids": {
+              "references": ["module.network.private_subnet_ids", "module.network"]
+            },
+            "vpc_id": {
+              "references": ["module.network.vpc_id", "module.network"]
+            }
+          },
+          "module": {
+            "outputs": {
+              "lambda_function_arn": {
+                "expression": {
+                  "references": ["aws_lambda_function.consumer.arn", "aws_lambda_function.consumer"]
+                }
+              },
+              "lambda_function_name": {
+                "expression": {
+                  "references": ["aws_lambda_function.consumer.function_name", "aws_lambda_function.consumer"]
+                }
+              }
+            },
+            "resources": [
+              {
+                "address": "aws_iam_role.lambda",
+                "mode": "managed",
+                "type": "aws_iam_role",
+                "name": "lambda",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "assume_role_policy": {},
+                  "name": {
+                    "references": ["var.environment"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_iam_role_policy_attachment.lambda_basic",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_basic",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "policy_arn": {
+                    "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.name", "aws_iam_role.lambda"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_iam_role_policy_attachment.lambda_vpc",
+                "mode": "managed",
+                "type": "aws_iam_role_policy_attachment",
+                "name": "lambda_vpc",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "policy_arn": {
+                    "constant_value": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.name", "aws_iam_role.lambda"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "aws_lambda_function.consumer",
+                "mode": "managed",
+                "type": "aws_lambda_function",
+                "name": "consumer",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "environment": [
+                    {
+                      "variables": {
+                        "references": ["var.environment"]
+                      }
+                    }
+                  ],
+                  "filename": {
+                    "references": ["data.archive_file.lambda_zip.output_path", "data.archive_file.lambda_zip"]
+                  },
+                  "function_name": {
+                    "references": ["var.environment"]
+                  },
+                  "handler": {
+                    "constant_value": "handler.handler"
+                  },
+                  "role": {
+                    "references": ["aws_iam_role.lambda.arn", "aws_iam_role.lambda"]
+                  },
+                  "runtime": {
+                    "constant_value": "python3.12"
+                  },
+                  "source_code_hash": {
+                    "references": ["data.archive_file.lambda_zip.output_base64sha256", "data.archive_file.lambda_zip"]
+                  },
+                  "vpc_config": [
+                    {
+                      "security_group_ids": {
+                        "references": ["var.lambda_security_group_id"]
+                      },
+                      "subnet_ids": {
+                        "references": ["var.private_subnet_ids"]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "data.archive_file.lambda_zip",
+                "mode": "data",
+                "type": "archive_file",
+                "name": "lambda_zip",
+                "provider_config_key": "archive",
+                "expressions": {
+                  "output_path": {
+                    "references": ["path.module"]
+                  },
+                  "source_file": {
+                    "references": ["var.lambda_source_file"]
+                  },
+                  "type": {
+                    "constant_value": "zip"
+                  }
+                },
+                "schema_version": 0
+              }
+            ],
+            "variables": {
+              "aws_account_id": {},
+              "aws_region": {},
+              "environment": {},
+              "lambda_security_group_id": {},
+              "lambda_source_file": {},
+              "private_subnet_ids": {},
+              "vpc_id": {}
+            }
+          }
+        },
+        "network": {
+          "source": "../../modules/mini_vpc",
+          "expressions": {
+            "environment": {
+              "references": ["var.environment"]
+            },
+            "name": {
+              "constant_value": "consumer"
+            },
+            "subnet_cidr": {
+              "constant_value": "10.0.1.0/24"
+            },
+            "vpc_cidr": {
+              "constant_value": "10.0.0.0/16"
+            }
+          },
+          "module": {
+            "outputs": {
+              "lambda_security_group_id": {
+                "expression": {
+                  "references": ["aws_security_group.lambda.id", "aws_security_group.lambda"]
+                }
+              },
+              "private_subnet_ids": {
+                "expression": {
+                  "references": ["aws_subnet.private.id", "aws_subnet.private"]
+                }
+              },
+              "vpc_cidr": {
+                "expression": {
+                  "references": ["aws_vpc.this.cidr_block", "aws_vpc.this"]
+                }
+              },
+              "vpc_id": {
+                "expression": {
+                  "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                }
+              }
+            },
+            "resources": [
+              {
+                "address": "aws_security_group.lambda",
+                "mode": "managed",
+                "type": "aws_security_group",
+                "name": "lambda",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "description": {
+                    "references": ["var.name"]
+                  },
+                  "egress": {
+                    "constant_value": [
+                      {
+                        "cidr_blocks": ["0.0.0.0/0"],
+                        "description": null,
+                        "from_port": 0,
+                        "ipv6_cidr_blocks": null,
+                        "prefix_list_ids": null,
+                        "protocol": "-1",
+                        "security_groups": null,
+                        "self": null,
+                        "to_port": 0
+                      }
+                    ]
+                  },
+                  "name": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "vpc_id": {
+                    "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                  }
+                },
+                "schema_version": 1
+              },
+              {
+                "address": "aws_subnet.private",
+                "mode": "managed",
+                "type": "aws_subnet",
+                "name": "private",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "cidr_block": {
+                    "references": ["var.subnet_cidr"]
+                  },
+                  "map_public_ip_on_launch": {
+                    "constant_value": false
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  },
+                  "vpc_id": {
+                    "references": ["aws_vpc.this.id", "aws_vpc.this"]
+                  }
+                },
+                "schema_version": 1
+              },
+              {
+                "address": "aws_vpc.this",
+                "mode": "managed",
+                "type": "aws_vpc",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "cidr_block": {
+                    "references": ["var.vpc_cidr"]
+                  },
+                  "enable_dns_hostnames": {
+                    "constant_value": true
+                  },
+                  "enable_dns_support": {
+                    "constant_value": true
+                  },
+                  "tags": {
+                    "references": ["var.environment", "var.name"]
+                  }
+                },
+                "schema_version": 1
+              }
+            ],
+            "variables": {
+              "environment": {},
+              "name": {},
+              "subnet_cidr": {
+                "default": "10.0.1.0/24"
+              },
+              "vpc_cidr": {
+                "default": "10.0.0.0/16"
+              }
+            }
+          }
+        }
+      },
+      "variables": {
+        "aws_account_id": {
+          "default": "111111111111"
+        },
+        "aws_region": {
+          "default": "us-east-1"
+        },
+        "environment": {
+          "default": "local"
+        },
+        "localstack_port": {
+          "default": 4566
+        }
+      }
+    }
+  },
+  "relevant_attributes": [
+    {
+      "resource": "module.consumer.data.archive_file.lambda_zip",
+      "attribute": ["output_path"]
+    },
+    {
+      "resource": "module.consumer.aws_iam_role.lambda",
+      "attribute": ["arn"]
+    },
+    {
+      "resource": "module.consumer.data.archive_file.lambda_zip",
+      "attribute": ["output_base64sha256"]
+    },
+    {
+      "resource": "module.consumer.aws_lambda_function.consumer",
+      "attribute": ["arn"]
+    },
+    {
+      "resource": "module.network.aws_subnet.private",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.network.aws_vpc.this",
+      "attribute": ["cidr_block"]
+    },
+    {
+      "resource": "module.network.aws_vpc.this",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.consumer.aws_lambda_function.consumer",
+      "attribute": ["function_name"]
+    },
+    {
+      "resource": "module.network.aws_security_group.lambda",
+      "attribute": ["id"]
+    }
+  ],
+  "timestamp": "2026-05-29T22:31:28Z",
+  "applyable": true,
+  "complete": true,
+  "errored": false
+}
