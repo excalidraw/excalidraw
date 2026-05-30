@@ -24,9 +24,21 @@ import {
 } from "./terraformImportMerge";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 
-import type { PipelineAtomPlacement } from "./terraformPipelineContainers";
+import type {
+  PipelineAtomPlacement,
+  PipelineColumn,
+} from "./terraformPipelineContainers";
+import type { PipelineGeoPath } from "./terraformPipelineGeo";
 
 const NOMINAL_SLOT = 96;
+
+const REGIONAL_GEO: PipelineGeoPath = {
+  accountId: "1",
+  region: "us-east-1",
+  vpcId: null,
+  tier: "regional",
+  subnetSignature: "",
+};
 const PACK_GAP = 24;
 /** Matches pipeline declared-edge horizontal attachment tolerance. */
 const Y_ALIGN_EPS = 2;
@@ -52,7 +64,7 @@ function boundsOverlap(
 function packPlacements(
   layoutPlan: {
     placements: PipelineAtomPlacement[];
-    columns: { columnIndex: number; atoms: string[] }[];
+    columns: PipelineColumn[];
   },
   edges: Parameters<typeof assignPipelineColumnPackedY>[2],
   slotHeight?: ReadonlyMap<string, number>,
@@ -137,11 +149,7 @@ describe("assignPipelineColumnPackedY", () => {
         columnIndex: 1,
         laneIndex: 0,
         trackId: "api1",
-        geo: {
-          accountId: "1",
-          region: "us-east-1",
-          tier: "regional",
-        },
+        geo: REGIONAL_GEO,
         geoInstanceId: 0,
         geoInstanceKey: "k0",
       },
@@ -150,11 +158,7 @@ describe("assignPipelineColumnPackedY", () => {
         columnIndex: 1,
         laneIndex: 1,
         trackId: "api2",
-        geo: {
-          accountId: "1",
-          region: "us-east-1",
-          tier: "regional",
-        },
+        geo: REGIONAL_GEO,
         geoInstanceId: 0,
         geoInstanceKey: "k0",
       },
@@ -163,11 +167,7 @@ describe("assignPipelineColumnPackedY", () => {
         columnIndex: 1,
         laneIndex: 2,
         trackId: "api3",
-        geo: {
-          accountId: "1",
-          region: "us-east-1",
-          tier: "regional",
-        },
+        geo: REGIONAL_GEO,
         geoInstanceId: 0,
         geoInstanceKey: "k0",
       },
@@ -194,11 +194,7 @@ describe("assignPipelineColumnPackedY", () => {
   });
 
   it("pins gateway → compute → ssm on forward edges within one chain", () => {
-    const geo = {
-      accountId: "1",
-      region: "us-east-1",
-      tier: "regional" as const,
-    };
+    const geo = REGIONAL_GEO;
     const placements: PipelineAtomPlacement[] = [
       {
         primaryAddress: "gw",
@@ -257,11 +253,7 @@ describe("assignPipelineColumnPackedY", () => {
         columnIndex: 0,
         laneIndex: 0,
         trackId: "trunk",
-        geo: {
-          accountId: "1",
-          region: "us-east-1",
-          tier: "regional",
-        },
+        geo: REGIONAL_GEO,
         geoInstanceId: 0,
         geoInstanceKey: "k0",
       },
@@ -270,11 +262,7 @@ describe("assignPipelineColumnPackedY", () => {
         columnIndex: 1,
         laneIndex: 0,
         trackId: "api1",
-        geo: {
-          accountId: "1",
-          region: "us-east-1",
-          tier: "regional",
-        },
+        geo: REGIONAL_GEO,
         geoInstanceId: 0,
         geoInstanceKey: "k0",
       },
