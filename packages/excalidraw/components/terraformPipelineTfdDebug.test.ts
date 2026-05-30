@@ -18,6 +18,10 @@ import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 type SceneElement = {
   id: string;
   type?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
   frameId?: string | null;
   children?: readonly string[];
   customData?: {
@@ -27,6 +31,37 @@ type SceneElement = {
     nodePath?: string;
   };
 };
+
+function expectNoPrimaryClusterOverlapWithinPipelineColumn(
+  elements: SceneElement[],
+): void {
+  const clusters = elements.filter(
+    (e) =>
+      e.type === "frame" &&
+      e.customData?.terraformTopologyRole === "primaryCluster" &&
+      typeof e.x === "number" &&
+      typeof e.y === "number" &&
+      typeof e.width === "number" &&
+      typeof e.height === "number",
+  );
+  const byColumn = new Map<number, SceneElement[]>();
+  for (const cluster of clusters) {
+    const key = Math.round((cluster.x ?? 0) / 10) * 10;
+    const list = byColumn.get(key) ?? [];
+    list.push(cluster);
+    byColumn.set(key, list);
+  }
+  for (const column of byColumn.values()) {
+    const sorted = [...column].sort((a, b) => (a.y ?? 0) - (b.y ?? 0));
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1]!;
+      const next = sorted[i]!;
+      expect(
+        (next.y ?? 0) - ((prev.y ?? 0) + (prev.height ?? 0)),
+      ).toBeGreaterThanOrEqual(-0.5);
+    }
+  }
+}
 
 function parentFrameId(
   elements: SceneElement[],
@@ -485,6 +520,45 @@ describe("staging pipeline.tfd resolution", () => {
         body.elements as SceneElement[],
         "02-east-datastores::module.api6_rds.aws_db_instance.this",
         "02-east-datastores::module.api7_aurora.aws_rds_cluster.this",
+      );
+    },
+    180_000,
+  );
+
+  it.each(["none", "constrained-ls", "elk", "exact-qp"] as const)(
+    "pipeline vertical %s preserves staging arrows, atoms, and column spacing",
+    async (pipelineVerticalSolverMode) => {
+      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+      const tfd = readStagingMultiStatePipelineTfdFromDb();
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        {
+          pipelineLayout: true,
+          pipelineLayoutMode: "global-relayer",
+          pipelineVerticalSolverMode,
+        },
+      );
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.pipelineVerticalSolverMode).toBe(
+        pipelineVerticalSolverMode,
+      );
+      expect(body.meta?.atomCount).toBe(50);
+      expect(body.meta?.declaredEdgeCount).toBe(57);
+      const declared = body.elements.filter(
+        (e: { type?: string; customData?: { terraformEdgeLayer?: string } }) =>
+          e.type === "arrow" &&
+          e.customData?.terraformEdgeLayer === "declaredDataFlow",
+      );
+      expect(declared).toHaveLength(57);
+      expectNoPrimaryClusterOverlapWithinPipelineColumn(
+        body.elements as SceneElement[],
       );
     },
     180_000,

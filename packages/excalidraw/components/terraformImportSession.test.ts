@@ -26,7 +26,9 @@ describe("terraformImportSession", () => {
     setTerraformImportSession({
       sources,
       semanticLayout: true,
-      pipelineLayout: false,
+      pipelineLayout: true,
+      pipelineLayoutMode: "global-relayer",
+      pipelineVerticalSolverMode: "exact-qp",
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
@@ -44,6 +46,8 @@ describe("terraformImportSession", () => {
 
     const session = getTerraformImportSession();
     expect(session?.semanticLayout).toBe(true);
+    expect(session?.pipelineLayoutMode).toBe("global-relayer");
+    expect(session?.pipelineVerticalSolverMode).toBe("exact-qp");
     expect(session?.snapshot.elements).toHaveLength(1);
     expect(session?.snapshot.elements[0]).not.toBe(el);
     const snap0 = session!.snapshot.elements[0]!;

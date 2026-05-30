@@ -35,7 +35,9 @@ import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout
 import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
 import {
   DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
   type TerraformPipelineLayoutMode,
+  type TerraformPipelineVerticalSolverMode,
 } from "./terraformPipelineLayoutMode";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -189,6 +191,8 @@ export type TerraformPlanParsingOptions = {
   pipelineLayout?: boolean;
   /** Pipeline column normalization mode. Defaults to legacy for compatibility. */
   pipelineLayoutMode?: TerraformPipelineLayoutMode;
+  /** Pipeline vertical coordinate solver. Defaults to none for compatibility. */
+  pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
   /** Module-view intra-module packing (ignored when semanticLayout or pipelineLayout is true). */
@@ -542,6 +546,9 @@ export const terraformPlanParsingFromSources = async (
   const pipelineLayout = options?.pipelineLayout === true;
   const pipelineLayoutMode =
     options?.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
+  const pipelineVerticalSolverMode =
+    options?.pipelineVerticalSolverMode ??
+    DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE;
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -696,7 +703,7 @@ export const terraformPlanParsingFromSources = async (
       nodes5,
       plan,
       tfdTexts,
-      { pipelineLayoutMode },
+      { pipelineLayoutMode, pipelineVerticalSolverMode },
     );
     emitLocalParseDebug({
       phase: "pipelineLayout",

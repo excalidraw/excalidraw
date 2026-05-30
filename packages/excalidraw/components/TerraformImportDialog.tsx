@@ -18,7 +18,9 @@ import { TerraformModulePackingSettings } from "./TerraformModulePackingSettings
 import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import {
   DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
   type TerraformPipelineLayoutMode,
+  type TerraformPipelineVerticalSolverMode,
 } from "./terraformPipelineLayoutMode";
 import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
@@ -128,6 +130,33 @@ const PIPELINE_LAYOUT_MODE_OPTIONS: ReadonlyArray<{
   },
 ];
 
+const PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS: ReadonlyArray<{
+  value: TerraformPipelineVerticalSolverMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "none",
+    label: "None",
+    description: "Use current packed vertical placement.",
+  },
+  {
+    value: "constrained-ls",
+    label: "Constrained LS",
+    description: "Weighted global edge-length smoothing with column spacing.",
+  },
+  {
+    value: "elk",
+    label: "ELK",
+    description: "Use ELK as a desired-Y generator, then keep fixed columns.",
+  },
+  {
+    value: "exact-qp",
+    label: "Exact QP",
+    description: "Deterministic quadratic solver for global edge length.",
+  },
+];
+
 let bundleRowCounter = 0;
 const newBundleRow = (): PlanDotBundleRow => ({
   id: `bundle-${++bundleRowCounter}`,
@@ -161,6 +190,10 @@ export const TerraformImportModal = ({
   const [pipelineLayoutMode, setPipelineLayoutMode] =
     useState<TerraformPipelineLayoutMode>(
       DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+    );
+  const [pipelineVerticalSolverMode, setPipelineVerticalSolverMode] =
+    useState<TerraformPipelineVerticalSolverMode>(
+      DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
     );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -290,6 +323,7 @@ export const TerraformImportModal = ({
         semanticLayout,
         pipelineLayout,
         pipelineLayoutMode,
+        pipelineVerticalSolverMode,
         moduleLayoutOptions:
           semanticLayout || pipelineLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
@@ -1056,6 +1090,46 @@ writer -> bucket`}</code>
                     checked={checked}
                     disabled={loading}
                     onChange={() => setPipelineLayoutMode(option.value)}
+                  />
+                  <span className="TerraformImportModal__viewSelector__label">
+                    {option.label}
+                  </span>
+                  <span className="TerraformImportModal__viewSelector__description">
+                    {option.description}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      {view === "pipeline" ? (
+        <div
+          className="TerraformImportModal__section TerraformImportModal__viewSelector"
+          role="radiogroup"
+          aria-label="Pipeline vertical positioning"
+        >
+          <h4>Pipeline vertical positioning</h4>
+          <div className="TerraformImportModal__viewSelector__options">
+            {PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS.map((option) => {
+              const checked = pipelineVerticalSolverMode === option.value;
+              return (
+                <label
+                  key={option.value}
+                  className={`TerraformImportModal__viewSelector__option${
+                    checked
+                      ? " TerraformImportModal__viewSelector__option--checked"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="terraform-pipeline-vertical-solver-mode"
+                    value={option.value}
+                    checked={checked}
+                    disabled={loading}
+                    onChange={() => setPipelineVerticalSolverMode(option.value)}
                   />
                   <span className="TerraformImportModal__viewSelector__label">
                     {option.label}

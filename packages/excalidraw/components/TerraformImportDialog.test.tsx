@@ -318,7 +318,11 @@ describe("TerraformImportModal", () => {
     expect(
       screen.getByRole("radio", { name: /global relayer/i }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /exact qp/i }),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /local shims/i }));
+    fireEvent.click(screen.getByRole("radio", { name: /exact qp/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
       expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
@@ -329,6 +333,7 @@ describe("TerraformImportModal", () => {
         semanticLayout: false,
         pipelineLayout: true,
         pipelineLayoutMode: "local-shims",
+        pipelineVerticalSolverMode: "exact-qp",
         moduleLayoutOptions: undefined,
       },
     );

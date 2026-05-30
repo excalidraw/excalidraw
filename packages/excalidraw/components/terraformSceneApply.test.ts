@@ -220,6 +220,7 @@ describe("terraformSceneApply", () => {
       semanticLayout: false,
       pipelineLayout: true,
       pipelineLayoutMode: "global-relayer",
+      pipelineVerticalSolverMode: "constrained-ls",
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: ["a -> b"],
@@ -241,6 +242,7 @@ describe("terraformSceneApply", () => {
         semanticLayout: false,
         pipelineLayout: true,
         pipelineLayoutMode: "global-relayer",
+        pipelineVerticalSolverMode: "constrained-ls",
         moduleLayoutOptions: undefined,
       },
     );

@@ -34,8 +34,11 @@ import {
 } from "./terraformPipelineGeo";
 import {
   DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
+  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
   type TerraformPipelineLayoutMode,
+  type TerraformPipelineVerticalSolverMode,
 } from "./terraformPipelineLayoutMode";
+import { applyPipelineVerticalSolver } from "./terraformPipelineVerticalSolver";
 import {
   buildTopologyPrimaryClusterSkeletonForPipeline,
   reorderTopologyElementsZStack,
@@ -65,12 +68,14 @@ const MIN_FRAME_H = px(160);
 export type TerraformPipelineSceneMeta = {
   layoutEngine: "pipeline";
   pipelineLayoutMode: TerraformPipelineLayoutMode;
+  pipelineVerticalSolverMode: TerraformPipelineVerticalSolverMode;
   atomCount: number;
   columnCount: number;
   geoInstanceCount: number;
   declaredEdgeCount: number;
   skippedLayout?: boolean;
   skipReason?: string;
+  warnings?: string[];
 };
 
 type ClusterBuild = {
@@ -1074,7 +1079,10 @@ export async function buildTerraformPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
   tfdTexts: readonly string[],
-  options: { pipelineLayoutMode?: TerraformPipelineLayoutMode } = {},
+  options: {
+    pipelineLayoutMode?: TerraformPipelineLayoutMode;
+    pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
+  } = {},
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformPipelineSceneMeta;
@@ -1083,12 +1091,16 @@ export async function buildTerraformPipelineExcalidrawScene(
   const atomGraph = buildPipelineAtomGraph(nodes, plan, tfdTexts);
   const pipelineLayoutMode =
     options.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
+  const pipelineVerticalSolverMode =
+    options.pipelineVerticalSolverMode ??
+    DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE;
   if (!atomGraph || atomGraph.atoms.size === 0) {
     return {
       elements: [],
       meta: {
         layoutEngine: "pipeline",
         pipelineLayoutMode,
+        pipelineVerticalSolverMode,
         atomCount: 0,
         columnCount: 0,
         geoInstanceCount: 0,
@@ -1155,6 +1167,14 @@ export async function buildTerraformPipelineExcalidrawScene(
     atomGraph.edges,
     slotHeight,
     colByAtom,
+  );
+  const verticalSolverResult = await applyPipelineVerticalSolver(
+    layoutPlan.placements,
+    layoutPlan.columns,
+    atomGraph.edges,
+    slotHeight,
+    colByAtom,
+    { mode: pipelineVerticalSolverMode },
   );
 
   const packedSpanCenter = packedSpanCenterY(layoutPlan.placements, contentTop);
@@ -1501,10 +1521,18 @@ export async function buildTerraformPipelineExcalidrawScene(
     meta: {
       layoutEngine: "pipeline",
       pipelineLayoutMode,
+      pipelineVerticalSolverMode: verticalSolverResult.appliedMode,
       atomCount: atomGraph.atoms.size,
       columnCount: layoutPlan.columns.length,
       geoInstanceCount: layoutPlan.geoInstanceCount,
       declaredEdgeCount: declaredEdges.length,
+      ...(verticalSolverResult.warnings.length > 0
+        ? {
+            warnings: verticalSolverResult.warnings.map(
+              (w) => `Pipeline vertical ${w.mode}: ${w.message}`,
+            ),
+          }
+        : {}),
     },
   };
 }
