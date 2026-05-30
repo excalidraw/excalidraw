@@ -53,6 +53,11 @@ variable "intra_subnet_cidrs" {
   default = ["10.60.20.0/24", "10.60.21.0/24"]
 }
 
+variable "database_subnet_cidrs" {
+  type    = list(string)
+  default = ["10.60.30.0/24", "10.60.31.0/24"]
+}
+
 variable "single_nat_gateway" {
   type    = bool
   default = true

@@ -46,3 +46,33 @@ variable "stage_name" {
   type    = string
   default = "v1"
 }
+
+variable "dynamodb_table_arn" {
+  type    = string
+  default = ""
+}
+
+variable "s3_bucket_arns" {
+  type    = list(string)
+  default = []
+}
+
+variable "db_secret_arn" {
+  type    = string
+  default = ""
+}
+
+variable "additional_db_secret_arns" {
+  type    = list(string)
+  default = []
+}
+
+variable "downstream_api_urls" {
+  type    = map(string)
+  default = {}
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
+}

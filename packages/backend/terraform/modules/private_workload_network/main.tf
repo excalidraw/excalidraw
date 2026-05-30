@@ -22,9 +22,12 @@ module "vpc" {
   cidr = var.vpc_cidr
 
   azs             = local.azs
-  public_subnets  = var.public_subnet_cidrs
-  private_subnets = var.private_subnet_cidrs
-  intra_subnets   = var.intra_subnet_cidrs
+  public_subnets   = var.public_subnet_cidrs
+  private_subnets  = var.private_subnet_cidrs
+  intra_subnets    = var.intra_subnet_cidrs
+  database_subnets = var.database_subnet_cidrs
+
+  create_database_subnet_route_table = true
 
   enable_nat_gateway   = true
   single_nat_gateway   = var.single_nat_gateway
@@ -81,7 +84,23 @@ module "managed_service_endpoints" {
       route_table_ids = distinct(concat(
         module.vpc.intra_route_table_ids,
         module.vpc.private_route_table_ids,
+        module.vpc.database_route_table_ids,
       ))
+    }
+    dynamodb = {
+      service         = "dynamodb"
+      service_type    = "Gateway"
+      route_table_ids = distinct(concat(
+        module.vpc.intra_route_table_ids,
+        module.vpc.private_route_table_ids,
+        module.vpc.database_route_table_ids,
+      ))
+    }
+    secretsmanager = {
+      service             = "secretsmanager"
+      subnet_ids          = module.vpc.intra_subnets
+      security_group_ids  = [module.interface_endpoint_security_group.security_group_id]
+      private_dns_enabled = true
     }
     sqs = {
       service             = "sqs"

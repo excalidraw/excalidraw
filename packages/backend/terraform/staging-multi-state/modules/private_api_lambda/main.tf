@@ -14,6 +14,90 @@ locals {
   ssm_prefix        = "/${var.environment}/${var.name}"
   lambda_invoke_uri = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${module.lambda_service.lambda_function_arn}/invocations"
 
+  downstream_env = {
+    for key, url in var.downstream_api_urls :
+    "DOWNSTREAM_${upper(replace(key, "-", "_"))}_URL" => url
+  }
+
+  secret_env = merge(
+    trimspace(var.db_secret_arn) != "" ? { DB_SECRET_ARN = var.db_secret_arn } : {},
+    {
+      for idx, arn in var.additional_db_secret_arns :
+      "DB_SECRET_ARN_${idx + 2}" => arn
+    },
+  )
+
+  lambda_environment = merge(
+    {
+      APP_CONFIG_PATH = local.ssm_prefix
+    },
+    local.secret_env,
+    local.downstream_env,
+  )
+
+  lambda_policy_statements = merge(
+    {
+      ssm_read = {
+        effect  = "Allow"
+        actions = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath"]
+        resources = [
+          "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.ssm_prefix}*",
+          "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.environment}/shared/*",
+        ]
+      }
+    },
+    trimspace(var.dynamodb_table_arn) != "" ? {
+      dynamodb = {
+        effect = "Allow"
+        actions = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+        ]
+        resources = [var.dynamodb_table_arn, "${var.dynamodb_table_arn}/index/*"]
+      }
+    } : {},
+    length(var.s3_bucket_arns) > 0 ? {
+      s3 = {
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+        ]
+        resources = flatten([
+          for arn in var.s3_bucket_arns : [arn, "${arn}/*"]
+        ])
+      }
+    } : {},
+    trimspace(var.db_secret_arn) != "" || length(var.additional_db_secret_arns) > 0 ? {
+      secrets = {
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+        ]
+        resources = compact(concat(
+          trimspace(var.db_secret_arn) != "" ? [var.db_secret_arn] : [],
+          var.additional_db_secret_arns,
+        ))
+      }
+    } : {},
+    length(var.downstream_api_urls) > 0 ? {
+      downstream_invoke = {
+        effect    = "Allow"
+        actions   = ["execute-api:Invoke"]
+        resources = ["arn:aws:execute-api:${var.aws_region}:${var.aws_account_id}:*/*"]
+      }
+    } : {},
+  )
+
   openapi_body = templatefile(var.openapi_template_path, {
     api_name          = "${var.environment}-${var.name}"
     operation_suffix  = replace(var.name, "-", "")
@@ -56,21 +140,10 @@ module "lambda_service" {
   security_group_name            = "${var.environment}-${var.name}-sg"
   vpc_cidr_for_restricted_egress = var.vpc_cidr
 
-  environment_variables = {
-    APP_CONFIG_PATH = local.ssm_prefix
-  }
+  environment_variables = local.lambda_environment
 
   attach_policy_statements = true
-  policy_statements = {
-    ssm_read = {
-      effect  = "Allow"
-      actions = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath"]
-      resources = [
-        "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.ssm_prefix}*",
-        "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.environment}/shared/*"
-      ]
-    }
-  }
+  policy_statements        = local.lambda_policy_statements
 }
 
 resource "aws_ssm_parameter" "api_name" {

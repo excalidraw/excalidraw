@@ -18,6 +18,16 @@ output "private_subnets" {
   value       = module.vpc.private_subnets
 }
 
+output "database_subnets" {
+  description = "Database subnet IDs for RDS/Aurora subnet groups."
+  value       = module.vpc.database_subnets
+}
+
+output "database_route_table_ids" {
+  description = "Route tables associated with database subnets."
+  value       = module.vpc.database_route_table_ids
+}
+
 output "public_subnets" {
   description = "Public subnet IDs for internet-facing load balancers and NAT gateways."
   value       = module.vpc.public_subnets

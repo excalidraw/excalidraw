@@ -10,8 +10,8 @@ output "api_invoke_url" {
   value = module.api.api_invoke_url
 }
 
-output "lambda_function_name" {
-  value = module.api.lambda_function_name
+output "ecs_service_name" {
+  value = module.api.ecs_service_name
 }
 
 output "ssm_prefix" {

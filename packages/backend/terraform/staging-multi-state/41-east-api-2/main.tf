@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.5"
     }
-    archive = {
-      source  = "hashicorp/archive"
-      version = "~> 2.4"
-    }
   }
 }
 
@@ -52,20 +48,27 @@ data "terraform_remote_state" "east_network" {
   }
 }
 
+data "terraform_remote_state" "east_datastores" {
+  backend = "local"
+  config = {
+    path = var.east_datastores_state_path
+  }
+}
+
 module "api" {
-  source = "../modules/private_api_lambda"
+  source = "../modules/private_api_ecs"
 
-  name                = "api-2"
-  environment         = var.environment
-  aws_region          = var.aws_region
-  aws_account_id      = data.terraform_remote_state.east_network.outputs.aws_account_id
-  vpc_id              = data.terraform_remote_state.east_network.outputs.vpc_id
-  vpc_cidr            = data.terraform_remote_state.east_network.outputs.vpc_cidr
-  private_subnet_ids  = data.terraform_remote_state.east_network.outputs.private_subnet_ids
-  execute_api_vpce_id = data.terraform_remote_state.east_network.outputs.execute_api_vpce_id
-
-  artifact_bucket_id    = data.terraform_remote_state.east_network.outputs.lambda_artifacts_bucket_id
-  lambda_source_file    = "${path.module}/../shared/api_handler.py"
-  openapi_template_path = "${path.module}/openapi.tftpl"
-  stage_name            = "v1"
+  name                   = "api-2"
+  environment            = var.environment
+  aws_region             = var.aws_region
+  aws_account_id         = data.terraform_remote_state.east_network.outputs.aws_account_id
+  vpc_id                 = data.terraform_remote_state.east_network.outputs.vpc_id
+  vpc_cidr               = data.terraform_remote_state.east_network.outputs.vpc_cidr
+  private_subnet_ids     = data.terraform_remote_state.east_network.outputs.private_subnet_ids
+  execute_api_vpce_id    = data.terraform_remote_state.east_network.outputs.execute_api_vpce_id
+  execute_api_vpce_sg_id = data.terraform_remote_state.east_network.outputs.execute_api_vpce_sg_id
+  launch_type            = "FARGATE"
+  db_secret_arn          = data.terraform_remote_state.east_datastores.outputs.api2_secret_arn
+  stage_name             = "v1"
+  tags                   = local.tags
 }

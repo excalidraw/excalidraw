@@ -79,6 +79,7 @@ packages/backend/terraform/allplanmodules.dot
 packages/backend/terraform/cloudflare/*plan.json
 packages/backend/terraform/cloudflare/*plan.dot
 packages/backend/terraform/**/*.tfd
+!packages/backend/terraform/staging-multi-state/pipeline.tfd
 packages/backend/terraform/cloudflare/cloudflare-state-summary.json
 packages/backend/terraform/cloudflare/cloudflare.dot
 # Generated fixture corpus outputs (plans, graphs, per-case terraform dirs — created by fixtures:corpus).
@@ -106,6 +107,8 @@ packages/backend/terraform/staging-multi-state/**/*.auto.tfvars
 packages/backend/terraform/staging-multi-state/**/crash.*
 packages/backend/terraform/staging-multi-state/**/build/
 packages/backend/terraform/staging-multi-state/**/.build/
+packages/backend/terraform/staging-multi-state/**/.terraform/
+packages/backend/terraform/staging-multi-state/**/tfplan
 
 # LocalStack geo fanout generated apply/export artifacts (not source-controlled).
 packages/backend/terraform/localstack-geo-fanout/**/.build/

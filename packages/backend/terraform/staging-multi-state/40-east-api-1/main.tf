@@ -52,6 +52,13 @@ data "terraform_remote_state" "east_network" {
   }
 }
 
+data "terraform_remote_state" "east_datastores" {
+  backend = "local"
+  config = {
+    path = var.east_datastores_state_path
+  }
+}
+
 module "api" {
   source = "../modules/private_api_lambda"
 
@@ -68,4 +75,6 @@ module "api" {
   lambda_source_file    = "${path.module}/../shared/api_handler.py"
   openapi_template_path = "${path.module}/openapi.tftpl"
   stage_name            = "v1"
+  dynamodb_table_arn    = data.terraform_remote_state.east_datastores.outputs.api1_table_arn
+  tags                  = local.tags
 }

@@ -50,8 +50,9 @@ module "east_network" {
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
-  intra_subnet_cidrs   = var.intra_subnet_cidrs
-  single_nat_gateway   = var.single_nat_gateway
+  intra_subnet_cidrs     = var.intra_subnet_cidrs
+  database_subnet_cidrs  = var.database_subnet_cidrs
+  single_nat_gateway     = var.single_nat_gateway
 
   interface_endpoint_security_group_name = "${var.vpc_name}-vpce-sg"
   flow_logs_log_group_name               = "/aws/vpc/${var.vpc_name}/flow"

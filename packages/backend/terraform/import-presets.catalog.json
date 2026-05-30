@@ -23,6 +23,20 @@
           "statePath": "01-west-network/terraform.tfstate"
         },
         {
+          "id": "02-east-datastores",
+          "label": "02-east-datastores",
+          "planPath": "02-east-datastores/plan.json",
+          "dotPath": "02-east-datastores/graph.dot",
+          "statePath": "02-east-datastores/terraform.tfstate"
+        },
+        {
+          "id": "03-west-datastores",
+          "label": "03-west-datastores",
+          "planPath": "03-west-datastores/plan.json",
+          "dotPath": "03-west-datastores/graph.dot",
+          "statePath": "03-west-datastores/terraform.tfstate"
+        },
+        {
           "id": "10-east-ecs-edge",
           "label": "10-east-ecs-edge",
           "planPath": "10-east-ecs-edge/plan.json",
@@ -70,6 +84,48 @@
           "planPath": "44-east-api-5/plan.json",
           "dotPath": "44-east-api-5/graph.dot",
           "statePath": "44-east-api-5/terraform.tfstate"
+        },
+        {
+          "id": "45-east-api-6",
+          "label": "45-east-api-6",
+          "planPath": "45-east-api-6/plan.json",
+          "dotPath": "45-east-api-6/graph.dot",
+          "statePath": "45-east-api-6/terraform.tfstate"
+        },
+        {
+          "id": "46-east-api-7",
+          "label": "46-east-api-7",
+          "planPath": "46-east-api-7/plan.json",
+          "dotPath": "46-east-api-7/graph.dot",
+          "statePath": "46-east-api-7/terraform.tfstate"
+        },
+        {
+          "id": "50-west-api-8",
+          "label": "50-west-api-8",
+          "planPath": "50-west-api-8/plan.json",
+          "dotPath": "50-west-api-8/graph.dot",
+          "statePath": "50-west-api-8/terraform.tfstate"
+        },
+        {
+          "id": "51-west-api-9",
+          "label": "51-west-api-9",
+          "planPath": "51-west-api-9/plan.json",
+          "dotPath": "51-west-api-9/graph.dot",
+          "statePath": "51-west-api-9/terraform.tfstate"
+        },
+        {
+          "id": "52-west-api-10",
+          "label": "52-west-api-10",
+          "planPath": "52-west-api-10/plan.json",
+          "dotPath": "52-west-api-10/graph.dot",
+          "statePath": "52-west-api-10/terraform.tfstate"
+        },
+        {
+          "id": "53-west-api-11",
+          "label": "53-west-api-11",
+          "planPath": "53-west-api-11/plan.json",
+          "dotPath": "53-west-api-11/graph.dot",
+          "statePath": "53-west-api-11/terraform.tfstate"
         }
       ],
       "tfdPaths": ["pipeline.tfd"]

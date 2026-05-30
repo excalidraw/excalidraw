@@ -18,6 +18,14 @@ output "intra_subnet_ids" {
   value = module.east_network.intra_subnets
 }
 
+output "database_subnet_ids" {
+  value = module.east_network.database_subnets
+}
+
+output "database_route_table_ids" {
+  value = module.east_network.database_route_table_ids
+}
+
 output "private_route_table_ids" {
   value = module.east_network.private_route_table_ids
 }

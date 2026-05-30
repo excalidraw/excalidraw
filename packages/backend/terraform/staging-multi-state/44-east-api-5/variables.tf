@@ -20,7 +20,7 @@ variable "terraform_deploy_role_arn" {
 
 variable "aws_account_id" {
   type    = string
-  default = ""
+  default = "992382747916"
 }
 
 variable "environment" {
@@ -31,4 +31,19 @@ variable "environment" {
 variable "east_network_state_path" {
   type    = string
   default = "../00-east-network/terraform.tfstate"
+}
+
+variable "east_datastores_state_path" {
+  type    = string
+  default = "../02-east-datastores/terraform.tfstate"
+}
+
+variable "east_api6_state_path" {
+  type    = string
+  default = "../45-east-api-6/terraform.tfstate"
+}
+
+variable "east_api7_state_path" {
+  type    = string
+  default = "../46-east-api-7/terraform.tfstate"
 }

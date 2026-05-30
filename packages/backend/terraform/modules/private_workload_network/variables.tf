@@ -26,10 +26,16 @@ variable "intra_subnet_cidrs" {
     condition = (
       length(var.intra_subnet_cidrs) > 0 &&
       length(var.intra_subnet_cidrs) == length(var.public_subnet_cidrs) &&
-      length(var.intra_subnet_cidrs) == length(var.private_subnet_cidrs)
+      length(var.intra_subnet_cidrs) == length(var.private_subnet_cidrs) &&
+      length(var.intra_subnet_cidrs) == length(var.database_subnet_cidrs)
     )
-    error_message = "public_subnet_cidrs, private_subnet_cidrs, and intra_subnet_cidrs must be the same non-zero length (one CIDR per AZ)."
+    error_message = "public_subnet_cidrs, private_subnet_cidrs, intra_subnet_cidrs, and database_subnet_cidrs must be the same non-zero length (one CIDR per AZ)."
   }
+}
+
+variable "database_subnet_cidrs" {
+  type        = list(string)
+  description = "One database subnet CIDR per AZ for RDS/Aurora subnet groups."
 }
 
 variable "single_nat_gateway" {
