@@ -33,6 +33,11 @@ import {
   type PipelineGeoPath,
 } from "./terraformPipelineGeo";
 import {
+  buildColumnOccupancy,
+  mergeAdjacentColumnRunsIteratively,
+  seedColumnRunsFromSpecs,
+} from "./terraformPipelineGeoColumnMerge";
+import {
   DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
   DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
   type TerraformPipelineLayoutMode,
@@ -308,20 +313,17 @@ function inflateRowHeightsFromZoneSpecBounds(
     multiAccountBandLayout,
   ).rowTops;
   for (const spec of zoneSpecs.values()) {
+    const lane = spec.laneIndex;
+    if (lane < 0 || lane >= rowHeights.length) {
+      continue;
+    }
     const targetBottom =
       spec.bounds.y + spec.bounds.height + FRAME_PAD + INNER_PAD;
-    const specTop = spec.bounds.y - FRAME_PAD;
-
-    for (let lane = 0; lane < rowHeights.length; lane++) {
-      const laneTop = tops[lane]!;
-      const laneBottom = laneTop + rowHeights[lane]!;
-      if (laneBottom < specTop - 0.5 || laneTop > targetBottom + 0.5) {
-        continue;
-      }
-      if (targetBottom > laneBottom + 0.5) {
-        rowHeights[lane] = targetBottom - laneTop + FRAME_PAD;
-        changed = true;
-      }
+    const laneTop = tops[lane]!;
+    const laneBottom = laneTop + rowHeights[lane]!;
+    if (targetBottom > laneBottom + 0.5) {
+      rowHeights[lane] = targetBottom - laneTop + FRAME_PAD;
+      changed = true;
     }
   }
   return changed;
@@ -559,6 +561,114 @@ function setFrameBounds(
   mutable.height = height;
 }
 
+function parseContainerColumnSpan(
+  path: readonly string[],
+  role: string,
+): { minColumn: number; maxColumn: number } | null {
+  if (role === "region" && path.length >= 4) {
+    const minColumn = Number(path[2]);
+    const maxColumn = Number(path[3]);
+    if (Number.isFinite(minColumn) && Number.isFinite(maxColumn)) {
+      return { minColumn, maxColumn };
+    }
+  }
+  if (role === "vpc" && path.length >= 5) {
+    const minColumn = Number(path[3]);
+    const maxColumn = Number(path[4]);
+    if (Number.isFinite(minColumn) && Number.isFinite(maxColumn)) {
+      return { minColumn, maxColumn };
+    }
+  }
+  return null;
+}
+
+function elementColumnSpan(
+  el: ExcalidrawElement,
+): { minColumn: number; maxColumn: number } | null {
+  const cd = el.customData as Record<string, unknown> | undefined;
+  const role = String(cd?.terraformTopologyRole ?? "");
+  const path = cd?.terraformTopologyPath;
+  if (!Array.isArray(path)) {
+    return null;
+  }
+  const span = parseContainerColumnSpan(path.map(String), role);
+  if (span) {
+    return span;
+  }
+  if (role === "subnetZone" && path.length >= 5) {
+    const columnIndex = Number(path[4]);
+    if (Number.isFinite(columnIndex)) {
+      return { minColumn: columnIndex, maxColumn: columnIndex };
+    }
+  }
+  return null;
+}
+
+function columnSpansOverlap(
+  a: { minColumn: number; maxColumn: number },
+  b: { minColumn: number; maxColumn: number },
+): boolean {
+  return a.minColumn <= b.maxColumn && b.minColumn <= a.maxColumn;
+}
+
+function childIncludedInContainerResize(
+  child: ExcalidrawElement,
+  frame: ExcalidrawElement,
+  role: string,
+): boolean {
+  const frameCd = frame.customData as Record<string, unknown> | undefined;
+  const childCd = child.customData as Record<string, unknown> | undefined;
+  const framePath = frameCd?.terraformTopologyPath;
+  const childPath = childCd?.terraformTopologyPath;
+  const childRole = String(childCd?.terraformTopologyRole ?? "");
+
+  if (!Array.isArray(framePath)) {
+    return true;
+  }
+  const framePathStr = framePath.map(String);
+  const frameSpan = parseContainerColumnSpan(framePathStr, role);
+
+  if (role === "account") {
+    if (Array.isArray(childPath) && childRole === "region") {
+      return String(childPath[0]) === framePathStr[0];
+    }
+    return true;
+  }
+
+  if (role === "provider") {
+    return true;
+  }
+
+  if (Array.isArray(childPath)) {
+    const childPathStr = childPath.map(String);
+    if (role === "region") {
+      if (
+        childPathStr[0] !== framePathStr[0] ||
+        childPathStr[1] !== framePathStr[1]
+      ) {
+        return false;
+      }
+    } else if (role === "vpc") {
+      if (
+        childPathStr[0] !== framePathStr[0] ||
+        childPathStr[1] !== framePathStr[1] ||
+        childPathStr[2] !== framePathStr[2]
+      ) {
+        return false;
+      }
+    }
+  }
+
+  if (frameSpan) {
+    const childSpan = elementColumnSpan(child);
+    if (childSpan && !columnSpansOverlap(frameSpan, childSpan)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function resizePipelineContainerFrames(elements: ExcalidrawElement[]): void {
   const roles = ["vpc", "region", "account", "provider"] as const;
   for (const role of roles) {
@@ -571,9 +681,12 @@ function resizePipelineContainerFrames(elements: ExcalidrawElement[]): void {
       if (cd?.terraformTopologyRole !== role) {
         continue;
       }
-      const children = elements.filter(
-        (el) => !el.isDeleted && el.frameId === frame.id,
-      );
+      const children = elements.filter((el) => {
+        if (el.isDeleted || el.frameId !== frame.id) {
+          return false;
+        }
+        return childIncludedInContainerResize(el, frame, role);
+      });
       if (children.length === 0) {
         continue;
       }
@@ -807,99 +920,39 @@ export function buildPipelineGeoColumnRuns(
   allSpecs?: readonly PipelineZoneFrameSpec[],
 ): PipelineGeoColumnRun[] {
   const universe = allSpecs ?? specs;
-  const multiRegionColumns = new Set<number>();
+  const regionKeyFn = (spec: PipelineZoneFrameSpec) =>
+    regionGroupKey(spec.accountId, spec.region);
+  const occupancy = buildColumnOccupancy(universe, regionKeyFn);
+  const seedRuns = seedColumnRunsFromSpecs(specs, regionKeyFn);
+  const merged = mergeAdjacentColumnRunsIteratively(seedRuns, occupancy);
 
-  const regionsByAccountColumn = new Map<string, Map<number, Set<string>>>();
-  for (const spec of universe) {
-    let colMap = regionsByAccountColumn.get(spec.accountId);
-    if (!colMap) {
-      colMap = new Map();
-      regionsByAccountColumn.set(spec.accountId, colMap);
-    }
-    const regions = colMap.get(spec.columnIndex) ?? new Set<string>();
-    regions.add(spec.region);
-    colMap.set(spec.columnIndex, regions);
-    if (regions.size > 1) {
-      multiRegionColumns.add(spec.columnIndex);
-    }
-  }
-
-  const byAccountRegion = new Map<
-    string,
-    Map<number, PipelineZoneFrameSpec[]>
-  >();
-
-  for (const spec of specs) {
-    const arKey = regionGroupKey(spec.accountId, spec.region);
-    let colMap = byAccountRegion.get(arKey);
-    if (!colMap) {
-      colMap = new Map();
-      byAccountRegion.set(arKey, colMap);
-    }
-    const list = colMap.get(spec.columnIndex) ?? [];
-    list.push(spec);
-    colMap.set(spec.columnIndex, list);
-  }
-
-  const runs: PipelineGeoColumnRun[] = [];
-
-  for (const [arKey, colMap] of byAccountRegion) {
-    const sep = arKey.indexOf("|");
-    const accountId = sep >= 0 ? arKey.slice(0, sep) : arKey;
-    const region = sep >= 0 ? arKey.slice(sep + 1) : "unknown-region";
-    const columns = [...colMap.keys()].sort((a, b) => a - b);
-
-    for (let i = 0; i < columns.length; ) {
-      const col = columns[i]!;
-      if (multiRegionColumns.has(col)) {
-        runs.push({
-          accountId,
-          region,
-          minColumn: col,
-          maxColumn: col,
-          specs: [...(colMap.get(col) ?? [])],
-        });
-        i += 1;
-        continue;
-      }
-
-      const runCols: number[] = [col];
-      while (i + 1 < columns.length) {
-        const nextCol = columns[i + 1]!;
-        if (
-          nextCol !== runCols[runCols.length - 1]! + 1 ||
-          multiRegionColumns.has(nextCol)
-        ) {
-          break;
-        }
-        i += 1;
-        runCols.push(nextCol);
-      }
-
-      const minColumn = runCols[0]!;
-      const maxColumn = runCols[runCols.length - 1]!;
-      const runSpecs: PipelineZoneFrameSpec[] = [];
-      for (const runCol of runCols) {
-        runSpecs.push(...(colMap.get(runCol) ?? []));
-      }
-      runs.push({ accountId, region, minColumn, maxColumn, specs: runSpecs });
-      i += 1;
-    }
-  }
-
-  return runs.sort(
-    (a, b) =>
-      a.accountId.localeCompare(b.accountId) ||
-      a.region.localeCompare(b.region) ||
-      a.minColumn - b.minColumn,
-  );
+  return merged
+    .map((run) => {
+      const sep = run.key.indexOf("|");
+      const accountId = sep >= 0 ? run.key.slice(0, sep) : run.key;
+      const region = sep >= 0 ? run.key.slice(sep + 1) : "unknown-region";
+      return {
+        accountId,
+        region,
+        minColumn: run.minColumn,
+        maxColumn: run.maxColumn,
+        specs: run.items,
+      };
+    })
+    .sort(
+      (a, b) =>
+        a.accountId.localeCompare(b.accountId) ||
+        a.region.localeCompare(b.region) ||
+        a.minColumn - b.minColumn,
+    );
 }
 
 function pipelineVpcFrameIdForRun(
   vpcKey: string,
-  run: PipelineGeoColumnRun,
+  minColumn: number,
+  maxColumn: number,
 ): string {
-  return `tf-pipe-vpc:${vpcKey}|c${run.minColumn}-${run.maxColumn}`;
+  return `tf-pipe-vpc:${vpcKey}|c${minColumn}-${maxColumn}`;
 }
 
 function pipelineRegionFrameIdForRun(run: PipelineGeoColumnRun): string {
@@ -1342,7 +1395,7 @@ export async function buildTerraformPipelineExcalidrawScene(
   );
   const columnRuns = buildPipelineGeoColumnRuns(
     bandFilteredSpecs,
-    bandFilteredSpecs,
+    [...coalescedZoneSpecs.values()],
   );
 
   const vpcFrames: ExcalidrawElementSkeleton[] = [];
@@ -1351,37 +1404,48 @@ export async function buildTerraformPipelineExcalidrawScene(
   const regionRunByFrameId = new Map<string, PipelineGeoColumnRun>();
 
   for (const run of columnRuns) {
-    const vpcByKey = new Map<string, ZoneFrameSpec[]>();
     const regionalZoneIds: string[] = [];
+    const vpcSpecs: ZoneFrameSpec[] = [];
 
     for (const spec of run.specs) {
       if (spec.vpcKey) {
-        const list = vpcByKey.get(spec.vpcKey) ?? [];
-        list.push(spec);
-        vpcByKey.set(spec.vpcKey, list);
+        vpcSpecs.push(spec);
       } else {
         regionalZoneIds.push(spec.id);
       }
     }
 
+    const vpcKeyFn = (spec: ZoneFrameSpec) => spec.vpcKey!;
+    const vpcOccupancy = buildColumnOccupancy(vpcSpecs, vpcKeyFn);
+    const vpcSeedRuns = seedColumnRunsFromSpecs(vpcSpecs, vpcKeyFn);
+    const vpcMergedRuns = mergeAdjacentColumnRunsIteratively(
+      vpcSeedRuns,
+      vpcOccupancy,
+    );
+
     const vpcFrameIds: string[] = [];
-    for (const [vpcKey, zones] of vpcByKey) {
+    for (const vpcRun of vpcMergedRuns) {
+      const vpcKey = vpcRun.key;
       const parts = vpcKey.split("|");
       const vpcId = parts[2] ?? "vpc";
-      const vpcFrameId = pipelineVpcFrameIdForRun(vpcKey, run);
+      const vpcFrameId = pipelineVpcFrameIdForRun(
+        vpcKey,
+        vpcRun.minColumn,
+        vpcRun.maxColumn,
+      );
       vpcFrameIds.push(vpcFrameId);
       vpcFrames.push(
         containerFrameSkeleton(
           vpcFrameId,
           `VPC ${vpcId.slice(0, 16)}`,
-          zones.map((z) => z.id),
+          vpcRun.items.map((z) => z.id),
           "vpc",
           [
             run.accountId,
             run.region,
             vpcId,
-            parts[3] ?? "0",
-            String(run.minColumn),
+            String(vpcRun.minColumn),
+            String(vpcRun.maxColumn),
           ],
         ),
       );
