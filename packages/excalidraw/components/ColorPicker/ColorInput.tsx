@@ -29,6 +29,7 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
@@ -44,6 +45,11 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setError(null);
+      } else if (value.trim() !== "") {
+        setError(t("errors.invalidHexColor"));
+      } else {
+        setError(null);
       }
       setInnerValue(value);
     },
@@ -74,7 +80,9 @@ export const ColorInput = ({
         ref={activeSection === "hex" ? inputRef : undefined}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
-        className="color-picker-input"
+        className={clsx("color-picker-input", {
+          "color-picker-input--invalid": error,
+        })}
         aria-label={label}
         onChange={(event) => {
           changeColor(event.target.value);
@@ -82,6 +90,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setError(null);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -95,6 +104,9 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {error && (
+        <div className="color-picker__input-error">{error}</div>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>

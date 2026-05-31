@@ -421,6 +421,23 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &--invalid {
+      border-color: #e03131;
+      background-color: rgba(224, 49, 49, 0.05);
+
+      &:focus-visible {
+        box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
+      }
+    }
+  }
+
+  .color-picker__input-error {
+    grid-column: 1 / -1;
+    font-size: 0.75rem;
+    color: #e03131;
+    margin-top: -0.25rem;
+    padding-left: 0.25rem;
   }
 
   .color-picker-label-swatch-container {
