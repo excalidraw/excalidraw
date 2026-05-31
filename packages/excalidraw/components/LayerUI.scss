@@ -168,4 +168,50 @@
       }
     }
   }
+
+  .QuickExport-button {
+    margin-inline-end: 0 !important;
+    margin-inline-start: 0 !important;
+    height: 2.25rem !important;
+    width: 2.25rem !important;
+    min-width: 2.25rem !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+
+    padding: 0 !important;
+    border: none !important;
+
+    background-color: var(--color-surface-low) !important;
+    box-shadow: var(--button-shadow, 0 1px 3px rgba(0, 0, 0, 0.1)) !important;
+
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      background-color: var(--button-hover-bg) !important;
+    }
+
+    div,
+    span,
+    .ToolIcon__icon {
+      background: transparent !important;
+      background-color: transparent !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &:active {
+      background-color: var(--button-active-bg) !important;
+    }
+
+    svg {
+      width: 1.15rem !important;
+      height: 1.15rem !important;
+    }
+  }
+
 }
