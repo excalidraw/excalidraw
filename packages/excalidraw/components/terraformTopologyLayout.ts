@@ -45,6 +45,7 @@ import {
 import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
 import {
   isInitiallyVisibleTerraformTopologyTile,
+  isPrimaryVisibleResourceType,
   isTopologyPlacementResourceType,
 } from "./terraformPrimaryVisibility";
 import {
@@ -54,6 +55,7 @@ import {
 } from "./terraformPlanParsing";
 
 import {
+  buildRouteTablePlanIndexes,
   buildRouteTableZoneSizingMapForVpc,
   buildTopologySubnetNameMap,
   computeVpcRouteTableFanOutAddressesForVpc,
@@ -68,6 +70,7 @@ import {
   type InterfaceVpcEndpointZonePlacementMap,
   type RouteTableBottomVpcPlacement,
   type RouteTableBottomZonePlacement,
+  type RouteTablePlanIndexes,
   type RouteTableZoneBottomSizing,
   type TopologySubnetTier,
 } from "./terraformTopologyPlacement";
@@ -99,7 +102,10 @@ import {
   isApiGatewayCompanionConsumedAsSatellite,
   isApiGatewayTopologySatelliteResourceType,
 } from "./terraformTopologyApiGatewayLinks";
-import { filterAddressesExcludingRegistrySatellites } from "./terraformTopologySatelliteRegistry";
+import {
+  collectTopologySatelliteAddressesFromRegistry,
+  filterAddressesExcludingRegistrySatellites,
+} from "./terraformTopologySatelliteRegistry";
 
 import "./terraformTopologySatelliteRegistry";
 import {
@@ -141,13 +147,94 @@ function filterTopologyAddressesExcludingPrimarySatellites(
   arnIndex: Map<string, string>,
   addresses: readonly string[],
   plan?: unknown,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): string[] {
   return filterAddressesExcludingRegistrySatellites(
     nodes,
     arnIndex,
     addresses,
     plan,
+    precomputedSatelliteAddresses,
   );
+}
+
+type TopologyLayoutCaches = {
+  zonesByVpc: Map<string, TopologyPlacementZone[]>;
+  satelliteAddresses: ReadonlySet<string>;
+  routeTableIndexes: RouteTablePlanIndexes | null;
+};
+
+function vpcZonesCacheKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+): string {
+  return `${accountId}\0${region}\0${vpcId}`;
+}
+
+function buildTopologyLayoutCaches(
+  zones: readonly TopologyPlacementZone[],
+  regionalBuckets: readonly TopologyRegionalPrimaryBucket[],
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): TopologyLayoutCaches {
+  const zonesByVpc = new Map<string, TopologyPlacementZone[]>();
+  for (const z of zones) {
+    const key = vpcZonesCacheKey(z.accountId, z.region, z.vpcId);
+    const list = zonesByVpc.get(key);
+    if (list) {
+      list.push(z);
+    } else {
+      zonesByVpc.set(key, [z]);
+    }
+  }
+
+  const primaryAnchors: string[] = [];
+  const primarySeen = new Set<string>();
+  const considerPrimary = (addr: string) => {
+    if (primarySeen.has(addr)) {
+      return;
+    }
+    const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+    const first = Object.values(node?.resources || {})[0];
+    const type =
+      first && typeof first === "object" && typeof (first as { type?: string }).type === "string"
+        ? (first as { type: string }).type
+        : "";
+    if (!type || !isPrimaryVisibleResourceType(type)) {
+      return;
+    }
+    primarySeen.add(addr);
+    primaryAnchors.push(addr);
+  };
+  for (const zone of zones) {
+    for (const addr of zone.addresses) {
+      considerPrimary(addr);
+    }
+  }
+  for (const bucket of regionalBuckets) {
+    for (const addr of bucket.addresses) {
+      considerPrimary(addr);
+    }
+  }
+
+  const satelliteAddresses = collectTopologySatelliteAddressesFromRegistry(
+    nodes,
+    arnIndex,
+    primaryAnchors,
+    plan,
+  );
+
+  let routeTableIndexes: RouteTablePlanIndexes | null = null;
+  const planCtx = plan as { resource_changes?: unknown[] } | undefined;
+  if (planCtx && Array.isArray(planCtx.resource_changes)) {
+    routeTableIndexes = buildRouteTablePlanIndexes(
+      plan as Parameters<typeof buildRouteTablePlanIndexes>[0],
+    );
+  }
+
+  return { zonesByVpc, satelliteAddresses, routeTableIndexes };
 }
 
 const px = tfComfortPx;
@@ -316,10 +403,19 @@ function topologyPathFrame(
   region: string,
   vpcId: string | null,
   primaryAddress?: string | null,
+  zonePath?: { tier?: string; subnetSignature?: string },
 ): string[] {
   if (role === "primaryCluster") {
     const p = primaryAddress || "";
-    return vpcId ? [accountId, region, vpcId, p] : [accountId, region, p];
+    const parts = vpcId ? [accountId, region, vpcId] : [accountId, region];
+    if (zonePath?.tier) {
+      parts.push(zonePath.tier);
+    }
+    if (zonePath?.subnetSignature) {
+      parts.push(zonePath.subnetSignature);
+    }
+    parts.push(p);
+    return parts;
   }
   if (role === "account") {
     return [accountId];
@@ -345,6 +441,8 @@ function frameCustomData(
   extras?: {
     terraformSubnetIds?: string[];
     terraformPrimaryAddress?: string;
+    terraformSubnetTier?: string;
+    terraformSubnetSignature?: string;
   },
 ) {
   return {
@@ -358,6 +456,12 @@ function frameCustomData(
       region,
       vpcId,
       extras?.terraformPrimaryAddress,
+      role === "primaryCluster"
+        ? {
+            tier: extras?.terraformSubnetTier,
+            subnetSignature: extras?.terraformSubnetSignature,
+          }
+        : undefined,
     ),
     ...(extras?.terraformSubnetIds
       ? { terraformSubnetIds: extras.terraformSubnetIds }
@@ -513,6 +617,7 @@ function outerWidthForPlacementZone(
   interfaceVpcEndpointZonePlacements:
     | ReadonlyMap<string, readonly InterfaceVpcEndpointZonePlacement[]>
     | undefined,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): { outerW: number; bodyH: number; routeInset: number } {
   const zk = topologyZoneMapKey(
     z.accountId,
@@ -563,6 +668,7 @@ function outerWidthForPlacementZone(
     arnIndex,
     [...z.addresses],
     plan,
+    precomputedSatelliteAddresses,
   ).sort((a, b) => a.localeCompare(b));
   const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
   const sizing = routeTableZoneSizing?.get(z.subnetSignature);
@@ -675,6 +781,7 @@ function vpcFrameDimensionsForZones(
     string,
     readonly InterfaceVpcEndpointZonePlacement[]
   >,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): VpcZoneGridDimensions {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
@@ -706,6 +813,7 @@ function vpcFrameDimensionsForZones(
       routeTableZoneSizing,
       natZonePlacements,
       interfaceVpcEndpointZonePlacements,
+      precomputedSatelliteAddresses,
     );
     const widthKey = placementZoneWidthKey(
       z.accountId,
@@ -870,11 +978,26 @@ function zoneDisplayName(
   if (z.subnetIds.length === 0) {
     return "VPC-only placement";
   }
+  const tier = topologySubnetTierFromZone(z, subnetNameById);
   const labels = z.subnetIds.map((sid) => subnetNameById.get(sid) ?? sid);
+  const labelBlob = labels.join(" ").toLowerCase();
+  const isDatabaseZone =
+    /\bdatabase\b/.test(labelBlob) ||
+    labelBlob.includes("-database-") ||
+    z.addresses.some(
+      (a) =>
+        a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
+    );
+  const tierPrefix =
+    tier === "public" || tier === "intra" || tier === "private"
+      ? `${tier.charAt(0).toUpperCase()}${tier.slice(1)} · `
+      : isDatabaseZone
+        ? "Database · "
+        : "";
   if (z.subnetIds.length <= 2) {
-    return `Subnets: ${labels.join(", ")}`;
+    return `${tierPrefix}Subnets: ${labels.join(", ")}`;
   }
-  return `Subnets (${z.subnetIds.length})`;
+  return `${tierPrefix}Subnets (${z.subnetIds.length})`;
 }
 
 function getPrimaryResource(
@@ -2499,6 +2622,8 @@ type TopologyPrimaryClusterPlacement = {
   accountId: string;
   region: string;
   vpcId: string | null;
+  subnetTier?: string;
+  subnetSignature?: string;
 };
 
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
@@ -2695,7 +2820,11 @@ function appendTopologyResourceRectangles(
         placement.region,
         placement.vpcId,
         clusterSkId,
-        { terraformPrimaryAddress: addr },
+        {
+          terraformPrimaryAddress: addr,
+          terraformSubnetTier: placement.subnetTier,
+          terraformSubnetSignature: placement.subnetSignature,
+        },
       ),
     });
     clusterFrameIds.push(clusterSkId);
@@ -2881,6 +3010,21 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const arnIndex = buildArnIndexForTopology(nodes);
+  const layoutCaches = buildTopologyLayoutCaches(
+    zones,
+    regionalBuckets,
+    nodes,
+    arnIndex,
+    plan,
+  );
+  const zonesForVpcCached = (
+    accountId: string,
+    region: string,
+    vpcId: string,
+  ): TopologyPlacementZone[] =>
+    layoutCaches.zonesByVpc.get(vpcZonesCacheKey(accountId, region, vpcId)) ??
+    [];
+  const { satelliteAddresses, routeTableIndexes } = layoutCaches;
   const vpcNameById = buildTopologyVpcNameMap(plan);
   const subnetNameById = buildTopologySubnetNameMap(plan);
   const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
@@ -2937,6 +3081,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         arnIndex,
         regionalAddrsRaw,
         plan,
+        satelliteAddresses,
       ).sort((a, b) => a.localeCompare(b));
       const hasVpc = vpcEntries.length > 0;
       const hasReg = regionalAddrs.length > 0;
@@ -2952,7 +3097,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       let maxVpcBottomStripInset = 0;
       if (hasVpc) {
         for (const [vpcId] of vpcEntries) {
-          const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
+          const vpcZs = zonesForVpcCached(accountId, regionName, vpcId);
           const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
             routeTableBottomPlacements,
             accountId,
@@ -3016,6 +3161,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             natZonePlacements,
             0,
             interfaceVpcEndpointZonePlacements,
+            satelliteAddresses,
           );
           const wCluster =
             clusterAddrs.length > 0
@@ -3051,7 +3197,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           vpcCellW = Math.max(vpcCellW, vd.w, epMinOuter, rtMinOuter);
         }
         for (const [vpcId] of vpcEntries) {
-          const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
+          const vpcZs = zonesForVpcCached(accountId, regionName, vpcId);
           const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
             routeTableBottomPlacements,
             accountId,
@@ -3121,6 +3267,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             natZonePlacements,
             vpceClusterBodyPad,
             interfaceVpcEndpointZonePlacements,
+            satelliteAddresses,
           );
           const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
             clusterAddrs2,
@@ -3215,7 +3362,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         const vpcSkId = skeletonId("vpc", accountId, regionName, vpcId);
         vpcFrameIds.push(vpcSkId);
 
-        const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId).sort(
+        const vpcZs = zonesForVpcCached(accountId, regionName, vpcId).sort(
           compareTopologyZonesByTier(subnetNameById),
         );
 
@@ -3248,6 +3395,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                 accountId,
                 regionName,
                 vpcId,
+                routeTableIndexes ?? undefined,
               )
             : new Set<string>();
         const vpcBottomRtRow =
@@ -3466,6 +3614,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           natZonePlacements,
           vpceClusterBodyPadForZoneGrid,
           interfaceVpcEndpointZonePlacements,
+          satelliteAddresses,
         );
         const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
         const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
@@ -3527,10 +3676,17 @@ export async function buildTerraformTopologyExcalidrawScene(
               arnIndex,
               zoneAddrsRaw,
               plan,
+              satelliteAddresses,
             ).sort((a, b) => a.localeCompare(b));
             const rectIds = appendTopologyResourceRectangles(
               skeleton,
-              { accountId, region: regionName, vpcId },
+              {
+                accountId,
+                region: regionName,
+                vpcId,
+                subnetTier: topologySubnetTierFromZone(z, subnetNameById),
+                subnetSignature: z.subnetSignature,
+              },
               addrs,
               zoneX + INNER_PAD,
               zoneY + VPC_TOP_PAD + natBandHeight,

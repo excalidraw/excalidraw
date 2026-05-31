@@ -12,8 +12,9 @@ import {
   DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   type TerraformModuleLayoutOptions,
 } from "./terraformModuleLayoutOptions";
+import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
+import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 import {
-  terraformPlanParsingFromSources,
   type TerraformImportWarning,
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
@@ -137,6 +138,8 @@ export type RunTerraformImportFromSourcesOptions = {
   preset?: TerraformImportPreset | null;
   updateSession?: boolean;
   scrollToContent?: boolean;
+  onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
+  signal?: AbortSignal;
 };
 
 export type RunTerraformImportFromSourcesResult = {
@@ -157,25 +160,24 @@ export const runTerraformImportFromSources = async (
   const pipelineVerticalSolverMode =
     options.pipelineVerticalSolverMode ??
     DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE;
-  const res = await terraformPlanParsingFromSources(sources, {
-    semanticLayout: options.semanticLayout,
-    pipelineLayout,
-    ...(pipelineLayout
-      ? { pipelineLayoutMode, pipelineVerticalSolverMode }
-      : {}),
-    moduleLayoutOptions:
-      options.semanticLayout || pipelineLayout
-        ? undefined
-        : moduleLayoutOptions,
-  });
-  const scene = await res.json();
-  if (!res.ok) {
-    const err =
-      scene && typeof scene === "object" && "error" in scene
-        ? String((scene as { error?: unknown }).error)
-        : "";
-    throw new Error(err || "Local parse failed");
-  }
+  const scene = await layoutTerraformViaWorkers(
+    sources,
+    {
+      semanticLayout: options.semanticLayout,
+      pipelineLayout,
+      ...(pipelineLayout
+        ? { pipelineLayoutMode, pipelineVerticalSolverMode }
+        : {}),
+      moduleLayoutOptions:
+        options.semanticLayout || pipelineLayout
+          ? undefined
+          : moduleLayoutOptions,
+    },
+    {
+      onProgress: options.onLayoutProgress,
+      signal: options.signal,
+    },
+  );
 
   const importedTfdTexts = options.importedTfdTexts ?? [];
   const enableDeclaredDataFlow = importedTfdTexts.some((t) => t.trim());

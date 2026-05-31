@@ -115,6 +115,8 @@ packages/backend/terraform/staging-multi-state/**/graph.dot
 packages/backend/terraform/staging-multi-state/**/plan.bin
 packages/backend/terraform/staging-multi-state/**/terraform.tfstate
 packages/backend/terraform/staging-multi-state/**/terraform.tfstate.backup
+packages/backend/terraform/staging-multi-state/**/.terraform.tfstate.lock.info
+**/.terraform.tfstate.lock.info
 
 # LocalStack geo fanout generated apply/export artifacts (not source-controlled).
 packages/backend/terraform/localstack-geo-fanout/**/.build/

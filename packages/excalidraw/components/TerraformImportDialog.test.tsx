@@ -4,7 +4,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { BUILTIN_TERRAFORM_IMPORT_PRESETS } from "./terraformImportPresetsTypes";
 import { TerraformImportModal } from "./TerraformImportDialog";
-import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
 
@@ -15,13 +15,9 @@ const hoisted = vi.hoisted(() => ({
   setAppState: vi.fn(),
 }));
 
-vi.mock("./terraformPlanParsing", async (importOriginal) => {
-  const mod = await importOriginal<typeof import("./terraformPlanParsing")>();
-  return {
-    ...mod,
-    terraformPlanParsingFromSources: vi.fn(),
-  };
-});
+vi.mock("./terraformLayoutWorkerClient", () => ({
+  layoutTerraformViaWorkers: vi.fn(),
+}));
 
 vi.mock("./terraformImportPresetLoader", () => ({
   chooseTerraformImportPresetRootDirectory: vi.fn(),
@@ -76,7 +72,7 @@ function fillFirstBundle(planJson = "{}", dot = "digraph {}") {
 
 describe("TerraformImportModal", () => {
   beforeEach(() => {
-    vi.mocked(terraformPlanParsingFromSources).mockReset();
+    vi.mocked(layoutTerraformViaWorkers).mockReset();
     vi.mocked(loadTerraformImportPresetSources).mockReset();
     hoisted.addFiles.mockReset();
     hoisted.replaceAllElements.mockReset();
@@ -105,21 +101,19 @@ describe("TerraformImportModal", () => {
     expect(semantic).not.toBeDisabled();
   });
 
-  it("calls terraformPlanParsingFromSources with semanticLayout when semantic view is active", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+  it("calls layoutTerraformViaWorkers with semanticLayout when semantic view is active", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     const onClose = vi.fn();
     render(<TerraformImportModal onCloseRequest={onClose} />);
     fillFirstBundle();
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       {
         semanticLayout: true,
         pipelineLayout: false,
@@ -131,20 +125,18 @@ describe("TerraformImportModal", () => {
   });
 
   it("passes semanticLayout false for module view", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
         pipelineLayout: false,
@@ -166,21 +158,19 @@ describe("TerraformImportModal", () => {
   });
 
   it("passes selected rectpacking mode on module import", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("radio", { name: /elk rectpacking/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    const options = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1];
+    const options = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1];
     expect(options?.semanticLayout).toBe(false);
     expect(options?.pipelineLayout).toBe(false);
     expect(options?.moduleLayoutOptions?.mode).toBe("rectpacking");
@@ -201,12 +191,10 @@ describe("TerraformImportModal", () => {
       tfdLabels: [],
       warnings: [],
     });
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
       expect(
@@ -219,9 +207,9 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
         pipelineLayout: false,
@@ -242,13 +230,11 @@ describe("TerraformImportModal", () => {
     ).not.toBeDisabled();
   });
 
-  it("calls terraformPlanParsingFromSources with multiple states", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+  it("calls layoutTerraformViaWorkers with multiple states", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/state \(/i), {
       target: {
@@ -260,20 +246,18 @@ describe("TerraformImportModal", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.states).toHaveLength(2);
     expect(sources.stateLabels).toEqual(["a.json", "b.json"]);
   });
 
-  it("passes multiple tfd files to terraformPlanParsingFromSources", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+  it("passes multiple tfd files to layoutTerraformViaWorkers", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fillFirstBundle();
     fireEvent.change(document.getElementById("terraform-import-links")!, {
@@ -286,9 +270,9 @@ describe("TerraformImportModal", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.tfdTexts).toHaveLength(2);
     expect(sources.tfdLabels).toEqual(["a.tfd", "b.tfd"]);
     expect(hoisted.setAppState).toHaveBeenCalledWith(
@@ -301,12 +285,10 @@ describe("TerraformImportModal", () => {
   });
 
   it("passes selected pipeline layout mode for pipeline imports", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     fillFirstBundle();
     fireEvent.change(document.getElementById("terraform-import-links")!, {
@@ -325,10 +307,10 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /exact qp/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
 
-    expect(vi.mocked(terraformPlanParsingFromSources).mock.calls[0][1]).toEqual(
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       {
         semanticLayout: false,
         pipelineLayout: true,
@@ -340,22 +322,17 @@ describe("TerraformImportModal", () => {
   });
 
   it("shows Done and warnings when import succeeds with warnings", async () => {
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          elements: [],
-          meta: {
-            importWarnings: [
-              {
-                code: "duplicate_address",
-                message: 'Address "x" overwritten.',
-              },
-            ],
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      meta: {
+        importWarnings: [
+          {
+            code: "duplicate_address",
+            message: 'Address "x" overwritten.',
           },
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
-    );
+        ],
+      },
+    });
     const onClose = vi.fn();
     render(<TerraformImportModal onCloseRequest={onClose} />);
     fillFirstBundle();
@@ -399,12 +376,10 @@ describe("TerraformImportModal", () => {
       tfdLabels: ["pipeline.tfd"],
       warnings: [],
     });
-    vi.mocked(terraformPlanParsingFromSources).mockResolvedValue(
-      new Response(JSON.stringify({ elements: [], files: {} }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
 
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
@@ -418,9 +393,9 @@ describe("TerraformImportModal", () => {
       expect(loadTerraformImportPresetSources).toHaveBeenCalled(),
     );
     await waitFor(() =>
-      expect(terraformPlanParsingFromSources).toHaveBeenCalled(),
+      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    const sources = vi.mocked(terraformPlanParsingFromSources).mock.calls[0][0];
+    const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.planDotBundles).toHaveLength(1);
     expect(sources.tfdLabels).toEqual(["pipeline.tfd"]);
   });

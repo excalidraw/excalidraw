@@ -15,6 +15,7 @@ import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopolo
 
 import "./terraformTopologySatelliteRegistry";
 import {
+  buildSecurityGroupToVpcMapFromPlan,
   buildSubnetOwnerHintsFromPlan,
   buildSubnetToVpcMapFromPlan,
   isAwsTerraformResourceChange,
@@ -28,8 +29,9 @@ import {
   type TerraformPlanProviderContext,
 } from "./terraformTopologyExtract";
 import {
+  applySubnetInferenceFromSecurityGroups,
   collectPlacementSubnetIds,
-  inferSubnetIdsForLbFromPlanSecurityGroups,
+  resolveTopologyVpcId,
   topologyZoneMapKey,
   flowLogModuleBundlePrefixForAddress,
   type TopologyPlacementZone,
@@ -100,52 +102,97 @@ function modulePlacementKeysForAddress(address: string): string[] {
   return keys;
 }
 
-function zoneEligibleForModuleInheritance(
-  zone: TopologyPlacementZone,
-  plan: TerraformPlanProviderContext & { resource_changes?: ResourceChange[] },
-): boolean {
-  const changes = Array.isArray(plan.resource_changes)
-    ? plan.resource_changes
-    : [];
-  for (const addr of zone.addresses) {
-    const rc = changes.find((r) => r.address === addr);
-    if (rc?.type && rc.type !== "aws_subnet") {
-      return true;
-    }
-  }
-  return false;
-}
+type TopologyModuleInheritanceIndex = {
+  moduleKeyToZoneKey: Map<string, string>;
+};
 
-function findInheritedZoneKey(
-  address: string,
-  zones: TopologyPlacementZone[],
-  plan: TerraformPlanProviderContext & { resource_changes?: ResourceChange[] },
-): string | null {
-  if (flowLogModuleBundlePrefixForAddress(address)) {
-    return null;
-  }
-  const want = new Set(modulePlacementKeysForAddress(address));
-  if (want.size === 0) {
-    return null;
-  }
+function buildTopologyModuleInheritanceIndex(
+  zones: readonly TopologyPlacementZone[],
+  changeByAddress: ReadonlyMap<string, ResourceChange>,
+): TopologyModuleInheritanceIndex {
+  const moduleKeyToZoneKey = new Map<string, string>();
   for (const zone of zones) {
-    if (!zoneEligibleForModuleInheritance(zone, plan)) {
+    let eligible = false;
+    for (const addr of zone.addresses) {
+      const rc = changeByAddress.get(addr);
+      if (rc?.type && rc.type !== "aws_subnet") {
+        eligible = true;
+        break;
+      }
+    }
+    if (!eligible) {
       continue;
     }
+    const zoneKey = zoneMapKey(
+      zone.accountId,
+      zone.region,
+      zone.vpcId,
+      zone.subnetSignature,
+    );
     for (const placedAddr of zone.addresses) {
       for (const moduleKey of modulePlacementKeysForAddress(placedAddr)) {
-        if (want.has(moduleKey)) {
-          return zoneMapKey(
-            zone.accountId,
-            zone.region,
-            zone.vpcId,
-            zone.subnetSignature,
-          );
+        if (!moduleKeyToZoneKey.has(moduleKey)) {
+          moduleKeyToZoneKey.set(moduleKey, zoneKey);
         }
       }
     }
   }
+  return { moduleKeyToZoneKey };
+}
+
+function findInheritedZoneKey(
+  address: string,
+  inheritanceIndex: TopologyModuleInheritanceIndex,
+): string | null {
+  if (flowLogModuleBundlePrefixForAddress(address)) {
+    return null;
+  }
+  for (const moduleKey of modulePlacementKeysForAddress(address)) {
+    const zoneKey = inheritanceIndex.moduleKeyToZoneKey.get(moduleKey);
+    if (zoneKey) {
+      return zoneKey;
+    }
+  }
   return null;
+}
+
+function noteZoneAddressForModuleInheritance(
+  zone: TopologyPlacementZone,
+  address: string,
+  changeByAddress: ReadonlyMap<string, ResourceChange>,
+  eligibleZoneKeys: Set<string>,
+  inheritanceIndex: TopologyModuleInheritanceIndex,
+): void {
+  const zoneKey = zoneMapKey(
+    zone.accountId,
+    zone.region,
+    zone.vpcId,
+    zone.subnetSignature,
+  );
+  const rc = changeByAddress.get(address);
+  if (rc?.type && rc.type !== "aws_subnet") {
+    eligibleZoneKeys.add(zoneKey);
+  }
+  if (!eligibleZoneKeys.has(zoneKey)) {
+    return;
+  }
+  for (const moduleKey of modulePlacementKeysForAddress(address)) {
+    if (!inheritanceIndex.moduleKeyToZoneKey.has(moduleKey)) {
+      inheritanceIndex.moduleKeyToZoneKey.set(moduleKey, zoneKey);
+    }
+  }
+}
+
+function appendPlacementAddress(
+  addresses: string[],
+  seen: Set<string>,
+  address: string,
+): void {
+  if (seen.has(address)) {
+    return;
+  }
+  seen.add(address);
+  addresses.push(address);
 }
 
 /** Addresses rendered as satellites under primaries in zone/regional strips. */
@@ -202,21 +249,21 @@ function resolveVpcZoneKeyForManagedResource(
   },
   rc: ResourceChange,
   subnetToVpc: Map<string, string>,
+  securityGroupToVpc: Map<string, string>,
   subnetOwners: ReturnType<typeof buildSubnetOwnerHintsFromPlan>,
 ): string | null {
   const values = pickResourceValuesForTopologyPlacement(rc);
   if (!values) {
     return null;
   }
-  const t = rc.type;
-  let subnetIds = collectPlacementSubnetIds(values);
-  if (t === "aws_lb" && subnetIds.length === 0) {
-    subnetIds = inferSubnetIdsForLbFromPlanSecurityGroups(
-      plan,
-      values,
-      subnetToVpc,
-    );
-  }
+  const t = rc.type ?? "";
+  let subnetIds = applySubnetInferenceFromSecurityGroups(
+    plan,
+    t,
+    values,
+    collectPlacementSubnetIds(values),
+    subnetToVpc,
+  );
   const merged = mergeWithDefaultAwsProviderAccountRegion(
     plan,
     mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
@@ -232,11 +279,13 @@ function resolveVpcZoneKeyForManagedResource(
   if (!shouldEmitTopologyPlacement(accountId, region)) {
     return null;
   }
-  let vpcId =
-    typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
-  if (!vpcId && subnetIds.length > 0) {
-    vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
-  }
+  const vpcId = resolveTopologyVpcId(
+    t,
+    values,
+    subnetIds,
+    subnetToVpc,
+    securityGroupToVpc,
+  );
   if (!vpcId) {
     return null;
   }
@@ -249,6 +298,7 @@ function resolveRegionalBucketKeyForManagedResource(
   },
   rc: ResourceChange,
   subnetToVpc: Map<string, string>,
+  securityGroupToVpc: Map<string, string>,
   subnetOwners: ReturnType<typeof buildSubnetOwnerHintsFromPlan>,
 ): string | null {
   const values = pickResourceValuesForTopologyPlacement(rc);
@@ -271,23 +321,17 @@ function resolveRegionalBucketKeyForManagedResource(
   if (!shouldEmitTopologyPlacement(accountId, region)) {
     return null;
   }
-  let vpcId =
-    typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
-  if (!vpcId && subnetIds.length > 0) {
-    vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
-  }
+  const vpcId = resolveTopologyVpcId(
+    rc.type ?? "",
+    values,
+    subnetIds,
+    subnetToVpc,
+    securityGroupToVpc,
+  );
   if (vpcId) {
     return null;
   }
   return bucketMapKey(accountId, region);
-}
-
-function addAddressSorted(addresses: string[], address: string): void {
-  if (addresses.includes(address)) {
-    return;
-  }
-  addresses.push(address);
-  addresses.sort((a, b) => a.localeCompare(b));
 }
 
 /**
@@ -306,6 +350,7 @@ export function enrichTopologyPlacementsWithManagedResources(
     ? plan.resource_changes
     : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+  const securityGroupToVpc = buildSecurityGroupToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const arnIndex = buildArnIndexForTopology(nodes);
 
@@ -352,6 +397,41 @@ export function enrichTopologyPlacementsWithManagedResources(
     regionalByKey.set(bucketMapKey(bucket.accountId, bucket.region), bucket);
   }
 
+  const changeByAddress = new Map<string, ResourceChange>();
+  for (const rc of changes) {
+    if (rc.address && typeof rc.address === "string") {
+      changeByAddress.set(rc.address, rc);
+    }
+  }
+  const inheritanceIndex = buildTopologyModuleInheritanceIndex(
+    zones,
+    changeByAddress,
+  );
+  const eligibleZoneKeys = new Set<string>();
+  for (const zone of zones) {
+    const zoneKey = zoneMapKey(
+      zone.accountId,
+      zone.region,
+      zone.vpcId,
+      zone.subnetSignature,
+    );
+    for (const addr of zone.addresses) {
+      const rc = changeByAddress.get(addr);
+      if (rc?.type && rc.type !== "aws_subnet") {
+        eligibleZoneKeys.add(zoneKey);
+        break;
+      }
+    }
+  }
+  const zoneAddressSets = new Map<string, Set<string>>();
+  for (const [zoneKey, zone] of zoneByKey) {
+    zoneAddressSets.set(zoneKey, new Set(zone.addresses));
+  }
+  const regionalAddressSets = new Map<string, Set<string>>();
+  for (const [regionalKey, bucket] of regionalByKey) {
+    regionalAddressSets.set(regionalKey, new Set(bucket.addresses));
+  }
+
   for (const rc of changes) {
     if (!isAwsTerraformResourceChange(rc) || rc.mode !== "managed") {
       continue;
@@ -380,6 +460,7 @@ export function enrichTopologyPlacementsWithManagedResources(
         plan,
         rc,
         subnetToVpc,
+        securityGroupToVpc,
         subnetOwners,
       );
       if (!regionalKey) {
@@ -391,8 +472,13 @@ export function enrichTopologyPlacementsWithManagedResources(
         bucket = { accountId: accountId!, region: region!, addresses: [] };
         regionalBuckets.push(bucket);
         regionalByKey.set(regionalKey, bucket);
+        regionalAddressSets.set(regionalKey, new Set());
       }
-      addAddressSorted(bucket.addresses, address);
+      appendPlacementAddress(
+        bucket.addresses,
+        regionalAddressSets.get(regionalKey)!,
+        address,
+      );
       placed.add(address);
       continue;
     }
@@ -401,6 +487,7 @@ export function enrichTopologyPlacementsWithManagedResources(
       plan,
       rc,
       subnetToVpc,
+      securityGroupToVpc,
       subnetOwners,
     );
     if (zoneKey) {
@@ -410,14 +497,22 @@ export function enrichTopologyPlacementsWithManagedResources(
         if (!values) {
           continue;
         }
-        const subnetIds = collectPlacementSubnetIds(values);
-        let vpcId =
-          typeof values.vpc_id === "string" && values.vpc_id
-            ? values.vpc_id
-            : "";
-        if (!vpcId && subnetIds.length > 0) {
-          vpcId = subnetToVpc.get(subnetIds[0]!) ?? "";
-        }
+        const enrichType = rc.type ?? "";
+        const subnetIds = applySubnetInferenceFromSecurityGroups(
+          plan,
+          enrichType,
+          values,
+          collectPlacementSubnetIds(values),
+          subnetToVpc,
+        );
+        const vpcId =
+          resolveTopologyVpcId(
+            enrichType,
+            values,
+            subnetIds,
+            subnetToVpc,
+            securityGroupToVpc,
+          ) ?? "";
         const merged = mergeWithDefaultAwsProviderAccountRegion(
           plan,
           mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
@@ -439,17 +534,33 @@ export function enrichTopologyPlacementsWithManagedResources(
         };
         zones.push(zone);
         zoneByKey.set(zoneKey, zone);
+        zoneAddressSets.set(zoneKey, new Set());
       }
-      addAddressSorted(zone.addresses, address);
+      appendPlacementAddress(
+        zone.addresses,
+        zoneAddressSets.get(zoneKey)!,
+        address,
+      );
+      noteZoneAddressForModuleInheritance(
+        zone,
+        address,
+        changeByAddress,
+        eligibleZoneKeys,
+        inheritanceIndex,
+      );
       placed.add(address);
       continue;
     }
 
-    const inheritedZoneKey = findInheritedZoneKey(address, zones, plan);
+    const inheritedZoneKey = findInheritedZoneKey(address, inheritanceIndex);
     if (inheritedZoneKey) {
       const zone = zoneByKey.get(inheritedZoneKey);
       if (zone) {
-        addAddressSorted(zone.addresses, address);
+        appendPlacementAddress(
+          zone.addresses,
+          zoneAddressSets.get(inheritedZoneKey)!,
+          address,
+        );
         placed.add(address);
         continue;
       }
@@ -459,6 +570,7 @@ export function enrichTopologyPlacementsWithManagedResources(
       plan,
       rc,
       subnetToVpc,
+      securityGroupToVpc,
       subnetOwners,
     );
     if (!regionalKey) {
@@ -470,8 +582,20 @@ export function enrichTopologyPlacementsWithManagedResources(
       bucket = { accountId: accountId!, region: region!, addresses: [] };
       regionalBuckets.push(bucket);
       regionalByKey.set(regionalKey, bucket);
+      regionalAddressSets.set(regionalKey, new Set());
     }
-    addAddressSorted(bucket.addresses, address);
+    appendPlacementAddress(
+      bucket.addresses,
+      regionalAddressSets.get(regionalKey)!,
+      address,
+    );
     placed.add(address);
+  }
+
+  for (const zone of zones) {
+    zone.addresses.sort((a, b) => a.localeCompare(b));
+  }
+  for (const bucket of regionalBuckets) {
+    bucket.addresses.sort((a, b) => a.localeCompare(b));
   }
 }

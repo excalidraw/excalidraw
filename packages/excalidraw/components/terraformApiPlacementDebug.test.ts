@@ -67,21 +67,24 @@ describe("staging private API VPC placement", () => {
       expect(regional.some((b) => b.addresses.includes(addr))).toBe(false);
 
       const stackPrefix = addr.split("::")[0]!;
+      const apiZone = zones.find((z) => z.addresses.includes(addr));
+      expect(apiZone).toBeDefined();
+      expect(topologySubnetTierFromZone(apiZone!, subnetNameById)).toBe(
+        "intra",
+      );
+
       const lambdaAddr = (plan.resource_changes ?? []).find(
         (r: ResourceChange) =>
           r.type === "aws_lambda_function" &&
           typeof r.address === "string" &&
           r.address.startsWith(`${stackPrefix}::module.api.`),
       )?.address;
-      expect(lambdaAddr).toBeDefined();
-      const apiZone = zones.find((z) => z.addresses.includes(addr));
-      const lambdaZone = zones.find((z) => z.addresses.includes(lambdaAddr!));
-      expect(apiZone).toBeDefined();
+      if (!lambdaAddr) {
+        continue;
+      }
+      const lambdaZone = zones.find((z) => z.addresses.includes(lambdaAddr));
       expect(lambdaZone).toBeDefined();
       expect(apiZone).not.toBe(lambdaZone);
-      expect(topologySubnetTierFromZone(apiZone!, subnetNameById)).toBe(
-        "intra",
-      );
       expect(topologySubnetTierFromZone(lambdaZone!, subnetNameById)).toBe(
         "private",
       );

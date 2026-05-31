@@ -3275,6 +3275,31 @@
       "backgroundColor": "transparent"
     },
     {
+      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "type": "frame",
+      "x": 947,
+      "y": 580,
+      "width": 523,
+      "height": 721,
+      "angle": 0,
+      "isDeleted": false,
+      "name": "aws_lambda_function.this[0]",
+      "customData": {
+        "terraformTopologyRole": "primaryCluster",
+        "terraformTopologyPath": [
+          "992382747916",
+          "us-east-1",
+          "vpc-00519cbd2b1c3e178",
+          "intra",
+          "subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634",
+          "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
+        ]
+      },
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent"
+    },
+    {
       "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.private_workload_network.module.managed_service_endpoints.aws_vpc_endpoint.this[\"logs\"]",
       "type": "frame",
       "x": 981,
@@ -3482,29 +3507,6 @@
       "backgroundColor": "transparent"
     },
     {
-      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
-      "type": "frame",
-      "x": 1996,
-      "y": 580,
-      "width": 523,
-      "height": 729,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_lambda_function.this[0]",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "vpc-00519cbd2b1c3e178",
-          "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
       "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]/module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
       "type": "frame",
       "x": 2006,
@@ -3524,7 +3526,7 @@
           "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -3548,30 +3550,7 @@
           "module.workload_reader_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
-      "type": "frame",
-      "x": 224,
-      "y": 794,
-      "width": 515,
-      "height": 360,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_lb.this",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "vpc-00519cbd2b1c3e178",
-          "module.workload_writer_alb.aws_lb.this"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -3595,30 +3574,7 @@
           "module.workload_writer_alb.aws_security_group.alb"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
-    },
-    {
-      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
-      "type": "frame",
-      "x": 947,
-      "y": 580,
-      "width": 523,
-      "height": 721,
-      "angle": 0,
-      "isDeleted": false,
-      "name": "aws_lambda_function.this[0]",
-      "customData": {
-        "terraformTopologyRole": "primaryCluster",
-        "terraformTopologyPath": [
-          "992382747916",
-          "us-east-1",
-          "vpc-00519cbd2b1c3e178",
-          "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
-        ]
-      },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -3642,7 +3598,7 @@
           "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -3666,7 +3622,57 @@
           "module.workload_writer_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent"
+    },
+    {
+      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "type": "frame",
+      "x": 1996,
+      "y": 580,
+      "width": 523,
+      "height": 729,
+      "angle": 0,
+      "isDeleted": false,
+      "name": "aws_lambda_function.this[0]",
+      "customData": {
+        "terraformTopologyRole": "primaryCluster",
+        "terraformTopologyPath": [
+          "992382747916",
+          "us-east-1",
+          "vpc-00519cbd2b1c3e178",
+          "private",
+          "subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e",
+          "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
+        ]
+      },
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent"
+    },
+    {
+      "key": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
+      "type": "frame",
+      "x": 224,
+      "y": 794,
+      "width": 515,
+      "height": 360,
+      "angle": 0,
+      "isDeleted": false,
+      "name": "aws_lb.this",
+      "customData": {
+        "terraformTopologyRole": "primaryCluster",
+        "terraformTopologyPath": [
+          "992382747916",
+          "us-east-1",
+          "vpc-00519cbd2b1c3e178",
+          "public",
+          "subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130",
+          "module.workload_writer_alb.aws_lb.this"
+        ]
+      },
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -10220,7 +10226,7 @@
         "nodePath": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10238,7 +10244,7 @@
         "nodePath": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10256,7 +10262,7 @@
         "nodePath": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10279,7 +10285,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -10297,7 +10303,7 @@
         "nodePath": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10320,7 +10326,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -10338,7 +10344,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10356,7 +10362,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10374,7 +10380,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10392,7 +10398,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10410,7 +10416,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10428,7 +10434,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10446,7 +10452,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10464,7 +10470,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -10487,7 +10493,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -10505,7 +10511,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10528,7 +10534,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -10546,7 +10552,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10564,7 +10570,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10585,7 +10591,7 @@
         "resourceType": "aws_lambda_function",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -10603,7 +10609,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10624,7 +10630,7 @@
         "resourceType": "aws_lambda_function",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -10683,7 +10689,7 @@
         "nodePath": "module.workload_writer_alb.aws_lambda_permission.alb_invoke",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lambda_permission.alb_invoke"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10701,7 +10707,7 @@
         "nodePath": "module.workload_writer_alb.aws_lambda_permission.alb_invoke",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lambda_permission.alb_invoke"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10724,7 +10730,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -10742,7 +10748,7 @@
         "nodePath": "module.workload_writer_alb.aws_lambda_permission.alb_invoke",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lambda_permission.alb_invoke"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10765,7 +10771,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -10783,7 +10789,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10801,7 +10807,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10819,7 +10825,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10837,7 +10843,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10855,7 +10861,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10873,7 +10879,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10891,7 +10897,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10914,7 +10920,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -10932,7 +10938,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_listener.http_forward[0]",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_listener.http_forward[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -10955,7 +10961,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -10978,7 +10984,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
     },
@@ -11000,7 +11006,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
     },
@@ -11017,7 +11023,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11035,7 +11041,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11053,7 +11059,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11071,7 +11077,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11089,7 +11095,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11107,7 +11113,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11125,7 +11131,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11148,7 +11154,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -11166,7 +11172,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb_target_group.lambda",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb_target_group.lambda"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11189,7 +11195,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -11207,7 +11213,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11225,7 +11231,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11243,7 +11249,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11261,7 +11267,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11279,7 +11285,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11297,7 +11303,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11315,7 +11321,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11336,7 +11342,7 @@
         "resourceType": "aws_lb",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -11354,7 +11360,7 @@
         "nodePath": "module.workload_writer_alb.aws_lb.this",
         "terraformVisibilityKey": "module.workload_writer_alb.aws_lb.this"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11375,7 +11381,7 @@
         "resourceType": "aws_lb",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -11393,7 +11399,7 @@
         "nodePath": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11411,7 +11417,7 @@
         "nodePath": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11429,7 +11435,7 @@
         "nodePath": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11452,7 +11458,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -11470,7 +11476,7 @@
         "nodePath": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11493,7 +11499,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -11511,7 +11517,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11529,7 +11535,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11547,7 +11553,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11565,7 +11571,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11583,7 +11589,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11601,7 +11607,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11619,7 +11625,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11637,7 +11643,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e95d8e",
       "backgroundColor": "transparent"
@@ -11660,7 +11666,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -11678,7 +11684,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_cloudwatch_log_group.lambda[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11701,7 +11707,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -11719,7 +11725,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11737,7 +11743,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11758,7 +11764,7 @@
         "resourceType": "aws_lambda_function",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e67700",
       "backgroundColor": "#fff3bf"
@@ -11776,7 +11782,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
         "terraformVisibilityKey": "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -11797,7 +11803,7 @@
         "resourceType": "aws_lambda_function",
         "terraformExplodeParentKeys": []
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -12558,7 +12564,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -12575,7 +12581,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12593,7 +12599,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12616,7 +12622,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -12634,7 +12640,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12657,7 +12663,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -12675,7 +12681,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -12692,7 +12698,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12710,7 +12716,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12733,7 +12739,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -12751,7 +12757,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12774,7 +12780,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -12792,7 +12798,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -12809,7 +12815,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12827,7 +12833,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12850,7 +12856,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -12868,7 +12874,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12891,7 +12897,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -12909,7 +12915,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[3]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B3%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -12926,7 +12932,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[3]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B3%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12944,7 +12950,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[3]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B3%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -12967,7 +12973,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -12985,7 +12991,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[3]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B3%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13008,7 +13014,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -13026,7 +13032,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -13043,7 +13049,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13061,7 +13067,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13084,7 +13090,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -13102,7 +13108,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13125,7 +13131,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -13143,7 +13149,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -13160,7 +13166,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13178,7 +13184,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13201,7 +13207,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -13219,7 +13225,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13242,7 +13248,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -13260,7 +13266,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -13277,7 +13283,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13295,7 +13301,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13318,7 +13324,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -13336,7 +13342,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[1]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B1%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13359,7 +13365,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -13377,7 +13383,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -13394,7 +13400,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13412,7 +13418,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13435,7 +13441,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -13453,7 +13459,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_cidr_blocks[2]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_cidr_blocks%5B2%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13476,7 +13482,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -13494,7 +13500,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -13511,7 +13517,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13529,7 +13535,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13552,7 +13558,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -13570,7 +13576,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group_rule.egress_with_prefix_list_ids[0]",
         "terraformVisibilityKey": "tf-topo:sat-sgr:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group_rule.egress_with_prefix_list_ids%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -13593,7 +13599,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -14610,7 +14616,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -14627,7 +14633,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14645,7 +14651,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14663,7 +14669,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14681,7 +14687,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14704,7 +14710,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -14722,7 +14728,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -14745,7 +14751,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -14763,7 +14769,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -14780,7 +14786,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14798,7 +14804,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14816,7 +14822,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14834,7 +14840,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14857,7 +14863,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -14875,7 +14881,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -14898,7 +14904,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -14916,7 +14922,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -14933,7 +14939,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14951,7 +14957,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14969,7 +14975,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -14987,7 +14993,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15010,7 +15016,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -15028,7 +15034,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15051,7 +15057,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15069,7 +15075,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15086,7 +15092,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15104,7 +15110,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15122,7 +15128,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15140,7 +15146,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15163,7 +15169,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -15181,7 +15187,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15204,7 +15210,7 @@
           "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15222,7 +15228,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15239,7 +15245,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15257,7 +15263,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15275,7 +15281,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15293,7 +15299,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15311,7 +15317,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15329,7 +15335,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15352,7 +15358,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -15370,7 +15376,7 @@
         "nodePath": "module.workload_reader_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15393,7 +15399,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15411,7 +15417,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15428,7 +15434,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15446,7 +15452,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15469,7 +15475,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#2b8a3e",
       "backgroundColor": "#d3f9d8"
@@ -15487,7 +15493,7 @@
         "nodePath": "module.workload_reader_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_reader_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_reader_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15510,7 +15516,7 @@
           "module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/private/subnet-0558c02b25dbb3877|subnet-08a873a8a7a5b864e/module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15528,7 +15534,7 @@
         "nodePath": "module.workload_writer_alb.aws_security_group.alb",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_alb.aws_lb.this:module.workload_writer_alb.aws_security_group.alb"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15545,7 +15551,7 @@
         "nodePath": "module.workload_writer_alb.aws_security_group.alb",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_alb.aws_lb.this:module.workload_writer_alb.aws_security_group.alb"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15563,7 +15569,7 @@
         "nodePath": "module.workload_writer_alb.aws_security_group.alb",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_alb.aws_lb.this:module.workload_writer_alb.aws_security_group.alb"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15586,7 +15592,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -15604,7 +15610,7 @@
         "nodePath": "module.workload_writer_alb.aws_security_group.alb",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_alb.aws_lb.this:module.workload_writer_alb.aws_security_group.alb"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15627,7 +15633,7 @@
           "module.workload_writer_alb.aws_lb.this"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_alb.aws_lb.this",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/public/subnet-00f60766e3fc26341|subnet-0c22f38fa4eb34130/module.workload_writer_alb.aws_lb.this",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15645,7 +15651,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15662,7 +15668,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15680,7 +15686,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15698,7 +15704,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15716,7 +15722,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15739,7 +15745,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e67700",
       "backgroundColor": "#fff3bf"
@@ -15757,7 +15763,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.additional_inline%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15780,7 +15786,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15798,7 +15804,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15815,7 +15821,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15833,7 +15839,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15851,7 +15857,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15869,7 +15875,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15892,7 +15898,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -15910,7 +15916,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.logs%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -15933,7 +15939,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -15951,7 +15957,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -15968,7 +15974,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -15986,7 +15992,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16004,7 +16010,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16022,7 +16028,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16045,7 +16051,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -16063,7 +16069,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.tracing%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16086,7 +16092,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -16104,7 +16110,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -16121,7 +16127,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16139,7 +16145,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16157,7 +16163,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16175,7 +16181,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16198,7 +16204,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -16216,7 +16222,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role_policy.vpc%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16239,7 +16245,7 @@
           "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -16257,7 +16263,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -16274,7 +16280,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16292,7 +16298,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16310,7 +16316,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16328,7 +16334,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16346,7 +16352,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16364,7 +16370,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#e64980",
       "backgroundColor": "transparent"
@@ -16387,7 +16393,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -16405,7 +16411,7 @@
         "nodePath": "module.workload_writer_lambda.module.lambda.aws_iam_role.lambda[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.lambda.aws_iam_role.lambda%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16428,7 +16434,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"
@@ -16446,7 +16452,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "strokeColor": "transparent",
       "backgroundColor": "transparent"
     },
@@ -16463,7 +16469,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16481,7 +16487,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16504,7 +16510,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1971c2",
       "backgroundColor": "#e7f5ff"
@@ -16522,7 +16528,7 @@
         "nodePath": "module.workload_writer_lambda.module.security_group[0].aws_security_group.this_name_prefix[0]",
         "terraformVisibilityKey": "tf-topo:sat:module.workload_writer_lambda.module.lambda.aws_lambda_function.this%5B0%5D:module.workload_writer_lambda.module.security_group%5B0%5D.aws_security_group.this_name_prefix%5B0%5D"
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#000000",
       "backgroundColor": "transparent"
@@ -16545,7 +16551,7 @@
           "module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]"
         ]
       },
-      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
+      "parentFrame": "frame:992382747916/us-east-1/vpc-00519cbd2b1c3e178/intra/subnet-02d7624ace902d8f3|subnet-06ca3bdd1db054634/module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]",
       "groupIds": [],
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent"

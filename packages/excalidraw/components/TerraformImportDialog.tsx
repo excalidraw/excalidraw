@@ -2,7 +2,7 @@
  * Modal to upload plan JSON + graph DOT bundles (optional raw state, optional .tfd),
  * or raw Terraform state alone, and replace the canvas with the locally generated scene.
  */
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
@@ -228,6 +228,8 @@ export const TerraformImportModal = ({
       DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
     );
   const [loading, setLoading] = useState(false);
+  const [layoutProgress, setLayoutProgress] = useState<string | null>(null);
+  const layoutAbortRef = useRef<AbortController | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [importWarnings, setImportWarnings] = useState<
     TerraformImportWarning[] | null
@@ -272,6 +274,12 @@ export const TerraformImportModal = ({
   useEffect(() => {
     void refreshPresets();
   }, [refreshPresets]);
+
+  useEffect(() => {
+    return () => {
+      layoutAbortRef.current?.abort();
+    };
+  }, []);
 
   const selectedPreset = useMemo(() => {
     const fromApi = availablePresets.find(
@@ -360,6 +368,12 @@ export const TerraformImportModal = ({
           semanticLayout || pipelineLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
+        signal: layoutAbortRef.current?.signal,
+        onLayoutProgress: (p) => {
+          const label =
+            p.total > 0 ? `${p.phase} (${p.done}/${p.total})` : p.phase;
+          setLayoutProgress(label);
+        },
       },
     );
     onImportSuccess?.();
@@ -463,7 +477,10 @@ export const TerraformImportModal = ({
     if (!canImport) {
       return;
     }
+    layoutAbortRef.current?.abort();
+    layoutAbortRef.current = new AbortController();
     setLoading(true);
+    setLayoutProgress(null);
     setError(null);
     setImportWarnings(null);
     setPresetWarnings([]);
@@ -540,6 +557,8 @@ export const TerraformImportModal = ({
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
+      setLayoutProgress(null);
+      layoutAbortRef.current = null;
     }
   };
 
@@ -548,7 +567,10 @@ export const TerraformImportModal = ({
     if (!preset) {
       return;
     }
+    layoutAbortRef.current?.abort();
+    layoutAbortRef.current = new AbortController();
     setLoading(true);
+    setLayoutProgress(null);
     setError(null);
     setImportWarnings(null);
     setPresetWarnings([]);
@@ -577,6 +599,8 @@ export const TerraformImportModal = ({
       setError(err instanceof Error ? err.message : "Preset import failed");
     } finally {
       setLoading(false);
+      setLayoutProgress(null);
+      layoutAbortRef.current = null;
     }
   };
 
@@ -1181,7 +1205,11 @@ writer -> bucket`}</code>
           <FilledButton onClick={onCloseRequest}>Done</FilledButton>
         ) : (
           <FilledButton onClick={handleImport} disabled={!canImport || loading}>
-            {loading ? "Importing..." : "Import & Open"}
+            {loading
+              ? layoutProgress
+                ? `Importing… ${layoutProgress}`
+                : "Importing..."
+              : "Import & Open"}
           </FilledButton>
         )}
       </div>

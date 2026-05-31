@@ -533,17 +533,29 @@ function mergeAccountRegionFromSubnets(
 function buildSubnetToVpcMap(changes: ResourceChange[]): Map<string, string> {
   const map = new Map<string, string>();
   for (const rc of changes) {
-    if (!isAwsResourceChange(rc) || rc.type !== "aws_subnet") {
+    if (!isAwsResourceChange(rc)) {
       continue;
     }
     const values = pickResourceChangeValues(rc);
     if (!values) {
       continue;
     }
-    const sid = stringField(values.id);
-    const vid = stringField(values.vpc_id);
-    if (sid && vid) {
-      map.set(sid, vid);
+    if (rc.type === "aws_subnet") {
+      const sid = stringField(values.id);
+      const vid = stringField(values.vpc_id);
+      if (sid && vid) {
+        map.set(sid, vid);
+      }
+      continue;
+    }
+    if (rc.type === "aws_db_subnet_group") {
+      const vid = stringField(values.vpc_id);
+      if (!vid) {
+        continue;
+      }
+      for (const sid of stringArrayField(values.subnet_ids)) {
+        map.set(sid, vid);
+      }
     }
   }
   return map;
@@ -557,6 +569,35 @@ export function buildSubnetToVpcMapFromPlan(plan: {
     ? plan.resource_changes
     : [];
   return buildSubnetToVpcMap(changes);
+}
+
+function buildSecurityGroupToVpcMap(changes: ResourceChange[]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const rc of changes) {
+    if (!isAwsResourceChange(rc) || rc.type !== "aws_security_group") {
+      continue;
+    }
+    const values = pickResourceChangeValues(rc);
+    if (!values) {
+      continue;
+    }
+    const sgId = stringField(values.id);
+    const vpcId = stringField(values.vpc_id);
+    if (sgId && vpcId) {
+      map.set(sgId, vpcId);
+    }
+  }
+  return map;
+}
+
+/** `aws_security_group.id` → `vpc_id` for VPC resolution when subnet ids are absent from the plan. */
+export function buildSecurityGroupToVpcMapFromPlan(plan: {
+  resource_changes?: ResourceChange[];
+}): Map<string, string> {
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+  return buildSecurityGroupToVpcMap(changes);
 }
 
 export function buildSubnetOwnerHintsFromPlan(plan: {

@@ -456,18 +456,23 @@ export function filterAddressesExcludingRegistrySatellites(
   arnIndex: Map<string, string>,
   addresses: readonly string[],
   plan?: unknown,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): string[] {
-  const primaries = addresses.filter((addr) => {
-    const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const pr = getPrimaryResource(node);
-    const t = typeof pr?.type === "string" ? pr.type : "";
-    return Boolean(t && !t.startsWith("data."));
-  });
-  const consumed = collectTopologySatelliteAddressesFromRegistry(
-    nodes,
-    arnIndex,
-    primaries,
-    plan,
-  );
+  const consumed =
+    precomputedSatelliteAddresses ??
+    (() => {
+      const primaries = addresses.filter((addr) => {
+        const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+        const pr = getPrimaryResource(node);
+        const t = typeof pr?.type === "string" ? pr.type : "";
+        return Boolean(t && !t.startsWith("data."));
+      });
+      return collectTopologySatelliteAddressesFromRegistry(
+        nodes,
+        arnIndex,
+        primaries,
+        plan,
+      );
+    })();
   return addresses.filter((a) => !consumed.has(a));
 }

@@ -11,6 +11,7 @@
  */
 
 import {
+  buildSecurityGroupToVpcMapFromPlan,
   buildSubnetOwnerHintsFromPlan,
   buildSubnetToVpcMapFromPlan,
   isAwsTerraformResourceChange,
@@ -137,6 +138,9 @@ export function topologySubnetTierFromSubnetId(
   if (/\bprivate\b/.test(label) || label.includes("-private-")) {
     return "private";
   }
+  if (/\bdatabase\b/.test(label) || label.includes("-database-")) {
+    return "other";
+  }
   return "other";
 }
 
@@ -146,10 +150,6 @@ export function topologySubnetTierFromZone(
 ): TopologySubnetTier {
   if (z.subnetIds.length === 0) {
     return "vpcOnly";
-  }
-  // Private REST APIs are laid out in the intra strip (execute-api VPCE subnets).
-  if (z.addresses.some((a) => a.includes("aws_api_gateway_rest_api"))) {
-    return "intra";
   }
   const labels = z.subnetIds
     .map((sid) => `${subnetNameById.get(sid) ?? ""} ${sid}`.toLowerCase())
@@ -163,7 +163,70 @@ export function topologySubnetTierFromZone(
   if (/\bprivate\b/.test(labels) || labels.includes("-private-")) {
     return "private";
   }
+  if (/\bdatabase\b/.test(labels) || labels.includes("-database-")) {
+    return "other";
+  }
+  const hasVpcCompute = z.addresses.some(
+    (a) =>
+      a.includes("aws_ecs_service") ||
+      a.includes("aws_lambda_function") ||
+      /\.aws_lb[.\[]/.test(a),
+  );
+  if (hasVpcCompute) {
+    return "private";
+  }
+  if (
+    z.addresses.some(
+      (a) =>
+        a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
+    )
+  ) {
+    return "other";
+  }
+  // Private REST APIs without subnet name hints use the intra strip (execute-api VPCE).
+  if (z.addresses.some((a) => a.includes("aws_api_gateway_rest_api"))) {
+    return "intra";
+  }
   return "other";
+}
+
+/**
+ * Resolve VPC for placement when `subnetToVpc` lacks stale subnet ids (multi-state imports).
+ */
+export function resolveTopologyVpcId(
+  type: string,
+  values: Record<string, unknown>,
+  subnetIds: readonly string[],
+  subnetToVpc: ReadonlyMap<string, string>,
+  securityGroupToVpc: ReadonlyMap<string, string>,
+): string | null {
+  let vpcId: string | null = null;
+  const topLevel = values.vpc_id;
+  if (typeof topLevel === "string" && topLevel.length > 0) {
+    vpcId = topLevel;
+  }
+  if (!vpcId && type === "aws_lambda_function") {
+    for (const block of vpcConfigBlocks(values)) {
+      const blockVpc = block.vpc_id;
+      if (typeof blockVpc === "string" && blockVpc.length > 0) {
+        vpcId = blockVpc;
+        break;
+      }
+    }
+  }
+  if (!vpcId && subnetIds.length > 0) {
+    vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
+  }
+  if (!vpcId) {
+    for (const sg of collectInferenceSecurityGroupIdsFromResource(type, values)) {
+      const fromSg = securityGroupToVpc.get(sg);
+      if (fromSg) {
+        vpcId = fromSg;
+        break;
+      }
+    }
+  }
+  return vpcId;
 }
 
 /** Primary resources with resolved account/region but no VPC (S3, SQS, …). */
@@ -710,7 +773,81 @@ function collectInferenceSecurityGroupIdsFromResource(
   if (type === "aws_ecs_service") {
     out.push(...collectEcsServiceNetworkFieldIds(values, "security_groups"));
   }
+  if (type === "aws_rds_cluster" || type === "aws_db_instance") {
+    out.push(...stringArrayField(values.vpc_security_group_ids));
+  }
   return out.filter((s) => s.startsWith("sg-"));
+}
+
+const SG_SUBNET_INFERENCE_PEER_TYPES = new Set([
+  "aws_instance",
+  "aws_spot_instance_request",
+  "aws_lambda_function",
+  "aws_ecs_service",
+]);
+
+function securityGroupIdsForSubnetInference(
+  type: string,
+  values: Record<string, unknown>,
+): string[] {
+  if (type === "aws_lb") {
+    return parseLbSecurityGroupIds(values);
+  }
+  return collectInferenceSecurityGroupIdsFromResource(type, values);
+}
+
+/**
+ * When a VPC-bound resource has no placement subnets in the plan snapshot, infer subnet ids
+ * from other resources that share its security group ids (same VPC when `vpc_id` is known).
+ */
+export function inferSubnetIdsFromPlanSecurityGroups(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  type: string,
+  values: Record<string, unknown>,
+  subnetToVpc: ReadonlyMap<string, string>,
+): string[] {
+  const resourceSg = new Set(securityGroupIdsForSubnetInference(type, values));
+  if (resourceSg.size === 0) {
+    return [];
+  }
+  const resourceVpcId = stringField(values.vpc_id);
+  const inferred = new Set<string>();
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    const peerType = rc.type;
+    if (!peerType || !SG_SUBNET_INFERENCE_PEER_TYPES.has(peerType)) {
+      continue;
+    }
+    const v = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!v) {
+      continue;
+    }
+    const candSgs = collectInferenceSecurityGroupIdsFromResource(peerType, v);
+    if (!candSgs.some((sg) => resourceSg.has(sg))) {
+      continue;
+    }
+    const candSubnets = collectInferenceSubnetIdsFromResource(peerType, v);
+    for (const sid of candSubnets) {
+      if (resourceVpcId) {
+        const vpc = subnetToVpc.get(sid);
+        if (vpc === resourceVpcId) {
+          inferred.add(sid);
+        }
+      } else {
+        inferred.add(sid);
+      }
+    }
+  }
+
+  return [...inferred].sort((a, b) => a.localeCompare(b));
 }
 
 /**
@@ -725,50 +862,39 @@ export function inferSubnetIdsForLbFromPlanSecurityGroups(
   lbValues: Record<string, unknown>,
   subnetToVpc: ReadonlyMap<string, string>,
 ): string[] {
-  const lbSg = new Set(parseLbSecurityGroupIds(lbValues));
-  if (lbSg.size === 0) {
-    return [];
-  }
-  const lbVpcId = stringField(lbValues.vpc_id);
-  const inferred = new Set<string>();
-  const changes = Array.isArray(plan.resource_changes)
-    ? plan.resource_changes
-    : [];
+  return inferSubnetIdsFromPlanSecurityGroups(
+    plan,
+    "aws_lb",
+    lbValues,
+    subnetToVpc,
+  );
+}
 
-  for (const rc of changes) {
-    if (!isAwsTerraformResourceChange(rc)) {
-      continue;
-    }
-    const t = rc.type;
-    if (
-      t !== "aws_instance" &&
-      t !== "aws_spot_instance_request" &&
-      t !== "aws_lambda_function"
-    ) {
-      continue;
-    }
-    const v = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
-    if (!v) {
-      continue;
-    }
-    const candSgs = collectInferenceSecurityGroupIdsFromResource(t, v);
-    if (!candSgs.some((sg) => lbSg.has(sg))) {
-      continue;
-    }
-    const candSubnets = collectInferenceSubnetIdsFromResource(t, v);
-    for (const sid of candSubnets) {
-      if (lbVpcId) {
-        const vpc = subnetToVpc.get(sid);
-        if (vpc === lbVpcId) {
-          inferred.add(sid);
-        }
-      } else {
-        inferred.add(sid);
-      }
-    }
+export function applySubnetInferenceFromSecurityGroups(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+  type: string,
+  values: Record<string, unknown>,
+  subnetIds: string[],
+  subnetToVpc: ReadonlyMap<string, string>,
+): string[] {
+  if (subnetIds.length > 0) {
+    return subnetIds;
   }
-
-  return [...inferred].sort((a, b) => a.localeCompare(b));
+  if (
+    type !== "aws_lb" &&
+    type !== "aws_ecs_service" &&
+    type !== "aws_lambda_function"
+  ) {
+    return subnetIds;
+  }
+  return inferSubnetIdsFromPlanSecurityGroups(
+    plan,
+    type,
+    values,
+    subnetToVpc,
+  );
 }
 
 export function topologyZoneMapKey(
@@ -802,6 +928,7 @@ export function extractPrimaryTopologyZones(
     ? plan.resource_changes
     : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+  const securityGroupToVpc = buildSecurityGroupToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
   const apiModulePrefixes: Array<{ prefix: string; key: string }> = [];
@@ -840,14 +967,13 @@ export function extractPrimaryTopologyZones(
       continue;
     }
 
-    let subnetIds = collectPlacementSubnetIds(values);
-    if (t === "aws_lb" && subnetIds.length === 0) {
-      subnetIds = inferSubnetIdsForLbFromPlanSecurityGroups(
-        plan,
-        values,
-        subnetToVpc,
-      );
-    }
+    let subnetIds = applySubnetInferenceFromSecurityGroups(
+      plan,
+      t,
+      values,
+      collectPlacementSubnetIds(values),
+      subnetToVpc,
+    );
     if (
       (t === "aws_rds_cluster" || t === "aws_db_instance") &&
       subnetIds.length === 0
@@ -870,8 +996,13 @@ export function extractPrimaryTopologyZones(
       continue;
     }
 
-    let vpcId =
-      typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    let vpcId = resolveTopologyVpcId(
+      t,
+      values,
+      subnetIds,
+      subnetToVpc,
+      securityGroupToVpc,
+    );
     if (!vpcId && t === "aws_api_gateway_rest_api") {
       const vpcePlacement = resolveVpcPlacementFromPrivateRestApi(
         plan,
@@ -884,9 +1015,6 @@ export function extractPrimaryTopologyZones(
           subnetIds = vpcePlacement.subnetIds;
         }
       }
-    }
-    if (!vpcId && subnetIds.length > 0) {
-      vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
     if (!vpcId) {
       continue;
@@ -1497,6 +1625,23 @@ type RouteTableAddressMeta = {
   region: string;
   vpcId: string;
 };
+
+export type RouteTablePlanIndexes = {
+  rtidToSubnets: Map<string, Set<string>>;
+  addrToMeta: Map<string, RouteTableAddressMeta>;
+};
+
+/** Built once per topology layout pass; reused for VPC route-table fan-out. */
+export function buildRouteTablePlanIndexes(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): RouteTablePlanIndexes {
+  return {
+    rtidToSubnets: buildRouteTableIdToSubnetIdsFromPlan(plan),
+    addrToMeta: buildRouteTableAddressToMeta(plan),
+  };
+}
 
 function buildRouteTableIdToSubnetIdsFromPlan(
   plan: TerraformPlanProviderContext & {
@@ -2233,6 +2378,7 @@ export function computeVpcRouteTableFanOutAddressesForVpc(
   accountId: string,
   regionName: string,
   vpcId: string,
+  routeTableIndexes?: RouteTablePlanIndexes,
 ): ReadonlySet<string> {
   const row = placements.vpcBottom.find(
     (x) =>
@@ -2241,8 +2387,11 @@ export function computeVpcRouteTableFanOutAddressesForVpc(
   if (!row || row.addresses.length === 0) {
     return new Set();
   }
-  const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
-  const addrToMeta = buildRouteTableAddressToMeta(plan);
+  const rtidToSubnets =
+    routeTableIndexes?.rtidToSubnets ??
+    buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const addrToMeta =
+    routeTableIndexes?.addrToMeta ?? buildRouteTableAddressToMeta(plan);
   const vpcZones = zones.filter(
     (z) =>
       z.accountId === accountId &&
@@ -2384,6 +2533,7 @@ export function extractRegionalTopologyPrimaries(
     ? plan.resource_changes
     : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+  const securityGroupToVpc = buildSecurityGroupToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   const accum = new Map<
@@ -2428,8 +2578,13 @@ export function extractRegionalTopologyPrimaries(
       continue;
     }
 
-    let vpcId =
-      typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    let vpcId = resolveTopologyVpcId(
+      t,
+      values,
+      subnetIds,
+      subnetToVpc,
+      securityGroupToVpc,
+    );
     if (!vpcId && t === "aws_api_gateway_rest_api") {
       const vpcePlacement = resolveVpcPlacementFromPrivateRestApi(
         plan,
@@ -2439,9 +2594,6 @@ export function extractRegionalTopologyPrimaries(
       if (vpcePlacement) {
         vpcId = vpcePlacement.vpcId;
       }
-    }
-    if (!vpcId && subnetIds.length > 0) {
-      vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
     if (vpcId) {
       continue;
