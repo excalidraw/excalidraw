@@ -2,6 +2,8 @@ import json
 import os
 import urllib.request
 
+import boto3
+
 
 def _invoke(url, payload):
     req = urllib.request.Request(
@@ -22,6 +24,8 @@ def handler(event, context):
         os.environ["API_4_URL"],
         os.environ["API_5_URL"],
     ]
+    egress_queue_url = os.environ.get("EGRESS_QUEUE_URL", "")
+    sqs = boto3.client("sqs") if egress_queue_url else None
 
     processed = 0
     for record in event.get("Records", []):
@@ -29,6 +33,11 @@ def handler(event, context):
         payload = {"message": body, "messageId": record.get("messageId")}
         for url in api_urls:
             _invoke(url, payload)
+        if sqs and egress_queue_url:
+            sqs.send_message(
+                QueueUrl=egress_queue_url,
+                MessageBody=json.dumps({"source": "consumer", "payload": payload}),
+            )
         processed += 1
 
     return {"processed": processed}

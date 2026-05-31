@@ -34,10 +34,11 @@ describe("terraformImportPresets", () => {
       BUILTIN_TERRAFORM_IMPORT_PRESETS,
     );
     const presets = await listTerraformImportPresets();
-    expect(presets).toHaveLength(12);
+    expect(presets).toHaveLength(13);
     expect(presets.map((preset) => preset.id)).toEqual(
       expect.arrayContaining([
         "staging-multi-state",
+        "staging-multi-state-expanded",
         "allplanmodules",
         "cloudflare",
         "aws-cloudflare-modules",

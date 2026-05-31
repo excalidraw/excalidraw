@@ -6,7 +6,18 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.5"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
   }
+}
+
+module "contract" {
+  source = "../shared/contract"
+
+  environment    = var.environment
+  aws_account_id = var.aws_account_id
 }
 
 locals {
@@ -41,17 +52,56 @@ check "assume_role_configured" {
   }
 }
 
-data "terraform_remote_state" "east_network" {
-  backend = "local"
-  config = {
-    path = var.east_network_state_path
+data "aws_vpc" "east" {
+  filter {
+    name   = "tag:Name"
+    values = [module.contract.vpc_names.east]
   }
 }
 
+data "aws_subnets" "east_public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.east.id]
+  }
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.east}-public-*"]
+  }
+}
+
+data "aws_subnets" "east_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.east.id]
+  }
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.east}-private-*"]
+  }
+}
+
+data "aws_sqs_queue" "egress" {
+  name = module.contract.egress_queue_name
+}
+
+data "aws_s3_bucket" "lambda_artifacts" {
+  bucket = module.contract.lambda_artifacts_bucket_names.east
+}
+
+resource "aws_s3_object" "egress_worker_script" {
+  bucket = data.aws_s3_bucket.lambda_artifacts.id
+  key    = "egress/egress_worker.py"
+  source = "${path.module}/src/egress_worker.py"
+  etag   = filemd5("${path.module}/src/egress_worker.py")
+
+  server_side_encryption = "AES256"
+}
+
 resource "aws_security_group" "ecs_service" {
-  name_prefix = "${var.environment}-ecs-service-"
+  name        = "${var.environment}-ecs-service-sg"
   description = "Security group for ECS tasks"
-  vpc_id      = data.terraform_remote_state.east_network.outputs.vpc_id
+  vpc_id      = data.aws_vpc.east.id
 
   egress {
     from_port   = 443
@@ -62,9 +112,9 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_security_group" "alb" {
-  name_prefix = "${var.environment}-ecs-alb-"
+  name        = "${var.environment}-ecs-alb-sg"
   description = "Security group for public ALB"
-  vpc_id      = data.terraform_remote_state.east_network.outputs.vpc_id
+  vpc_id      = data.aws_vpc.east.id
 
   ingress {
     from_port   = 80
@@ -95,6 +145,11 @@ resource "aws_cloudwatch_log_group" "ecs" {
   retention_in_days = 30
 }
 
+resource "aws_cloudwatch_log_group" "egress" {
+  name              = "/aws/ecs/${var.environment}/egress"
+  retention_in_days = 30
+}
+
 resource "aws_iam_role" "ecs_task_execution" {
   name               = "${var.environment}-ecs-task-execution"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -118,6 +173,44 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_managed" {
 resource "aws_iam_role" "ecs_task" {
   name               = "${var.environment}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
+}
+
+data "aws_iam_policy_document" "egress_task" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ChangeMessageVisibility",
+    ]
+    resources = [data.aws_sqs_queue.egress.arn]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["sqs.${var.aws_region}.amazonaws.com"]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${data.aws_s3_bucket.lambda_artifacts.arn}/egress/egress_worker.py"]
+  }
+}
+
+resource "aws_iam_role_policy" "egress_task" {
+  name   = "${var.environment}-ecs-egress-sqs"
+  role   = aws_iam_role.ecs_task.id
+  policy = data.aws_iam_policy_document.egress_task.json
 }
 
 resource "aws_ecs_cluster" "this" {
@@ -144,14 +237,14 @@ resource "aws_lb" "ecs" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = data.terraform_remote_state.east_network.outputs.public_subnet_ids
+  subnets            = data.aws_subnets.east_public.ids
 }
 
 resource "aws_lb_target_group" "ecs" {
-  name_prefix = "ecs"
+  name        = "${var.environment}-ecs-tg"
   port        = 8080
   protocol    = "HTTP"
-  vpc_id      = data.terraform_remote_state.east_network.outputs.vpc_id
+  vpc_id      = data.aws_vpc.east.id
   target_type = "ip"
 
   health_check {
@@ -205,8 +298,39 @@ resource "aws_ecs_task_definition" "producer" {
   ])
 }
 
+resource "aws_ecs_task_definition" "egress" {
+  family                   = "${var.environment}-egress"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "egress"
+      image     = "public.ecr.aws/docker/library/python:3.12-slim"
+      essential = true
+      command = [
+        "sh",
+        "-c",
+        "pip install -q boto3 && python -c \"import boto3; s3=boto3.client('s3'); s3.download_file('${data.aws_s3_bucket.lambda_artifacts.id}', '${aws_s3_object.egress_worker_script.key}', '/tmp/egress_worker.py')\" && EGRESS_QUEUE_URL=${data.aws_sqs_queue.egress.url} python /tmp/egress_worker.py",
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.egress.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "egress"
+        }
+      }
+    }
+  ])
+}
+
 resource "aws_ecs_service" "producer" {
-  name            = "${var.environment}-producer"
+  name            = module.contract.producer_ecs_name
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.producer.arn
   desired_count   = 1
@@ -215,7 +339,7 @@ resource "aws_ecs_service" "producer" {
   network_configuration {
     assign_public_ip = false
     security_groups  = [aws_security_group.ecs_service.id]
-    subnets          = data.terraform_remote_state.east_network.outputs.private_subnet_ids
+    subnets          = data.aws_subnets.east_private.ids
   }
 
   load_balancer {
@@ -225,4 +349,18 @@ resource "aws_ecs_service" "producer" {
   }
 
   depends_on = [aws_lb_listener.http]
+}
+
+resource "aws_ecs_service" "egress" {
+  name            = module.contract.egress_ecs_name
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.egress.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    assign_public_ip = false
+    security_groups  = [aws_security_group.ecs_service.id]
+    subnets          = data.aws_subnets.east_private.ids
+  }
 }

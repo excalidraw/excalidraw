@@ -55,13 +55,6 @@ data "terraform_remote_state" "east_datastores" {
   }
 }
 
-data "terraform_remote_state" "east_api6" {
-  backend = "local"
-  config = {
-    path = var.east_api6_state_path
-  }
-}
-
 data "terraform_remote_state" "east_api7" {
   backend = "local"
   config = {
@@ -84,7 +77,6 @@ module "api" {
   launch_type            = "FARGATE"
   dynamodb_table_arn     = data.terraform_remote_state.east_datastores.outputs.api5_table_arn
   downstream_api_urls = {
-    api6 = data.terraform_remote_state.east_api6.outputs.api_invoke_url
     api7 = data.terraform_remote_state.east_api7.outputs.api_invoke_url
   }
   stage_name = "v1"

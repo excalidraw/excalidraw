@@ -55,13 +55,6 @@ data "terraform_remote_state" "east_datastores" {
   }
 }
 
-data "terraform_remote_state" "west_api8" {
-  backend = "local"
-  config = {
-    path = var.west_api8_state_path
-  }
-}
-
 data "terraform_remote_state" "west_api9" {
   backend = "local"
   config = {
@@ -84,7 +77,6 @@ module "api" {
   launch_type            = "EC2"
   db_secret_arn          = data.terraform_remote_state.east_datastores.outputs.api7_secret_arn
   downstream_api_urls = {
-    api8 = data.terraform_remote_state.west_api8.outputs.api_invoke_url
     api9 = data.terraform_remote_state.west_api9.outputs.api_invoke_url
   }
   stage_name = "v1"

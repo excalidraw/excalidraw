@@ -13,6 +13,13 @@ terraform {
   }
 }
 
+module "contract" {
+  source = "../shared/contract"
+
+  environment    = var.environment
+  aws_account_id = var.aws_account_id
+}
+
 locals {
   terraform_deploy_role_arn = trimspace(var.terraform_deploy_role_arn) != "" ? trimspace(var.terraform_deploy_role_arn) : "arn:aws:iam::${var.aws_account_id}:role/${var.terraform_deploy_role_name}"
 
@@ -22,6 +29,27 @@ locals {
     state       = "45-east-api-6"
     managed_by  = "terraform"
   }
+
+  api8_invoke_url = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+    api_id  = data.aws_api_gateway_rest_api.api8.id
+    vpce_id = data.aws_vpc_endpoint.execute_api_west.id
+    region  = module.contract.regions.west
+    stage   = module.contract.api_stage_name
+  })
+
+  api12_invoke_url = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+    api_id  = data.aws_api_gateway_rest_api.api12.id
+    vpce_id = data.aws_vpc_endpoint.execute_api_west_1.id
+    region  = module.contract.regions.west_1
+    stage   = module.contract.api_stage_name
+  })
+
+  api15_invoke_url = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+    api_id  = data.aws_api_gateway_rest_api.api15.id
+    vpce_id = data.aws_vpc_endpoint.execute_api_east_2.id
+    region  = module.contract.regions.east_2
+    stage   = module.contract.api_stage_name
+  })
 }
 
 provider "aws" {
@@ -31,6 +59,51 @@ provider "aws" {
   assume_role {
     role_arn     = local.terraform_deploy_role_arn
     session_name = "terraform-staging-east-api-6"
+  }
+
+  default_tags {
+    tags = local.tags
+  }
+}
+
+provider "aws" {
+  alias   = "west"
+  region  = module.contract.regions.west
+  profile = var.aws_profile
+
+  assume_role {
+    role_arn     = local.terraform_deploy_role_arn
+    session_name = "terraform-staging-east-api-6-west"
+  }
+
+  default_tags {
+    tags = local.tags
+  }
+}
+
+provider "aws" {
+  alias   = "west_1"
+  region  = module.contract.regions.west_1
+  profile = var.aws_profile
+
+  assume_role {
+    role_arn     = local.terraform_deploy_role_arn
+    session_name = "terraform-staging-east-api-6-west-1"
+  }
+
+  default_tags {
+    tags = local.tags
+  }
+}
+
+provider "aws" {
+  alias   = "east_2"
+  region  = module.contract.regions.east_2
+  profile = var.aws_profile
+
+  assume_role {
+    role_arn     = local.terraform_deploy_role_arn
+    session_name = "terraform-staging-east-api-6-east-2"
   }
 
   default_tags {
@@ -59,18 +132,82 @@ data "terraform_remote_state" "east_datastores" {
   }
 }
 
-data "terraform_remote_state" "west_api8" {
-  backend = "local"
-  config = {
-    path = var.west_api8_state_path
+data "aws_vpc" "west" {
+  provider = aws.west
+
+  filter {
+    name   = "tag:Name"
+    values = [module.contract.vpc_names.west]
   }
 }
 
-data "terraform_remote_state" "west_api9" {
-  backend = "local"
-  config = {
-    path = var.west_api9_state_path
+data "aws_vpc_endpoint" "execute_api_west" {
+  provider = aws.west
+
+  vpc_id       = data.aws_vpc.west.id
+  service_name = "com.amazonaws.${module.contract.regions.west}.execute-api"
+
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.west}-execute-api-vpce"]
   }
+}
+
+data "aws_api_gateway_rest_api" "api8" {
+  provider = aws.west
+  name     = module.contract.api_gateway_names["api-8"]
+}
+
+data "aws_vpc" "west_1" {
+  provider = aws.west_1
+
+  filter {
+    name   = "tag:Name"
+    values = [module.contract.vpc_names.west_1]
+  }
+}
+
+data "aws_vpc_endpoint" "execute_api_west_1" {
+  provider = aws.west_1
+
+  vpc_id       = data.aws_vpc.west_1.id
+  service_name = "com.amazonaws.${module.contract.regions.west_1}.execute-api"
+
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.west_1}-execute-api-vpce"]
+  }
+}
+
+data "aws_api_gateway_rest_api" "api12" {
+  provider = aws.west_1
+  name     = module.contract.api_gateway_names["api-12"]
+}
+
+data "aws_vpc" "east_2" {
+  provider = aws.east_2
+
+  filter {
+    name   = "tag:Name"
+    values = [module.contract.vpc_names.east_2]
+  }
+}
+
+data "aws_vpc_endpoint" "execute_api_east_2" {
+  provider = aws.east_2
+
+  vpc_id       = data.aws_vpc.east_2.id
+  service_name = "com.amazonaws.${module.contract.regions.east_2}.execute-api"
+
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.east_2}-execute-api-vpce"]
+  }
+}
+
+data "aws_api_gateway_rest_api" "api15" {
+  provider = aws.east_2
+  name     = module.contract.api_gateway_names["api-15"]
 }
 
 module "api" {
@@ -88,11 +225,12 @@ module "api" {
   artifact_bucket_id    = data.terraform_remote_state.east_network.outputs.lambda_artifacts_bucket_id
   lambda_source_file    = "${path.module}/../shared/api_handler.py"
   openapi_template_path = "${path.module}/openapi.tftpl"
-  stage_name            = "v1"
+  stage_name            = module.contract.api_stage_name
   db_secret_arn         = data.terraform_remote_state.east_datastores.outputs.api6_secret_arn
   downstream_api_urls = {
-    api8 = data.terraform_remote_state.west_api8.outputs.api_invoke_url
-    api9 = data.terraform_remote_state.west_api9.outputs.api_invoke_url
+    api8  = local.api8_invoke_url
+    api12 = local.api12_invoke_url
+    api15 = local.api15_invoke_url
   }
   tags = local.tags
 }

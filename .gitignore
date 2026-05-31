@@ -62,7 +62,7 @@ packages/backend/terraform/terraform.tfvars
 packages/backend/terraform/terraform.tfvars.backup
 packages/backend/terraform/*.auto.tfvars
 packages/backend/terraform/crash.*
-# Terraform plan / graph / state blobs (hydrate locally: yarn seed:terraform-presets).
+# Terraform plan / graph / state blobs (hydrate locally: yarn hydrate:terraform-preset <preset-id>).
 # Catalog of preset paths stays tracked: import-presets.catalog.json
 packages/backend/terraform/**/plan.json
 packages/backend/terraform/**/graph.dot
@@ -100,7 +100,7 @@ packages/backend/terraform/allplan-s3kms-withstate-stage-snapshots.json
 packages/backend/terraform/modules/private_api_lambda/.build/
 **/terraform/.pluralith/
 
-# Staging multi-state local Terraform artifacts/state.
+# Staging multi-state local Terraform artifacts/state (25 stacks incl. west-1 / east-2).
 packages/backend/terraform/staging-multi-state/**/terraform.tfvars
 packages/backend/terraform/staging-multi-state/**/terraform.tfvars.backup
 packages/backend/terraform/staging-multi-state/**/*.auto.tfvars
@@ -108,7 +108,13 @@ packages/backend/terraform/staging-multi-state/**/crash.*
 packages/backend/terraform/staging-multi-state/**/build/
 packages/backend/terraform/staging-multi-state/**/.build/
 packages/backend/terraform/staging-multi-state/**/.terraform/
+packages/backend/terraform/staging-multi-state/**/.terraform.lock.hcl
 packages/backend/terraform/staging-multi-state/**/tfplan
+packages/backend/terraform/staging-multi-state/**/plan.json
+packages/backend/terraform/staging-multi-state/**/graph.dot
+packages/backend/terraform/staging-multi-state/**/plan.bin
+packages/backend/terraform/staging-multi-state/**/terraform.tfstate
+packages/backend/terraform/staging-multi-state/**/terraform.tfstate.backup
 
 # LocalStack geo fanout generated apply/export artifacts (not source-controlled).
 packages/backend/terraform/localstack-geo-fanout/**/.build/

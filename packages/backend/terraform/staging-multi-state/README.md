@@ -2,22 +2,26 @@
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for full topology, dataflow, and stack dependencies.
 
-Terraform multi-state architecture for staging (11 private APIs, mixed compute + datastores):
+Terraform multi-state architecture for staging (**16 private APIs**, **4 regions**, **25 stacks**):
 
-1. `00-east-network` — VPC, execute-api VPCE, TGW, lambda artifacts
-2. `01-west-network` — west VPC, TGW peering, execute-api VPCE
-3. `02-east-datastores` — dedicated DynamoDB / RDS / Aurora / S3 per east API (+ cross-region stores for api-8/9)
-4. `03-west-datastores` — west-side stores for api-8..11
-5. `40-east-api-1` … `46-east-api-7` — east private APIs (Lambda + ECS Fargate/EC2)
-6. `50-west-api-8` … `53-west-api-11` — west private APIs
-7. `10-east-ecs-edge` — public ALB + ECS producer
-8. `20-east-messaging` — FIFO SQS + consumer Lambda → APIs 1–5
+**Foundation:** `00-east-network`, `01-west-network`, `04-west-1-network`, `05-east-2-network`, plus regional datastores `02`, `03`, `04-west-1-datastores`, `05-east-2-datastores`.
 
-Primary flow: ECS producer → FIFO SQS → consumer Lambda → APIs 1–5 → cascade 6–7 → 8–9 → 10–11.
+**Trunk (us-east-1):** `10-east-ecs-edge` (public ALB + producer ECS + egress ECS), `20-east-messaging` (ingress FIFO + egress SQS + consumer Lambda).
 
-Cross-region SQL (api-9 east RDS): TGW routes + RDS SG peer CIDR rules.
+**API tiers:** `40–46` east hub, `50–53` west-2 lane, `54–55` west-1 mini-cascade (12→14), `56–57` east-2 mini-cascade (15→16).
 
-## Apply order
+**Primary flow:**
+
+1. Internet → IGW → public ALB → producer ECS → **ingress FIFO**
+2. Consumer Lambda → private APIs **1–5** (execute-api VPCE)
+3. Consumer → **egress SQS** → egress ECS (private subnets) → NAT → internet
+4. Cascade: **4→6**, **5→7**; **api-6 → api-8, api-12, api-15** (regional entries); **api-7 → api-9** (west-2 only); **8→10**, **9→11**, **12→14**, **15→16**
+
+Each regional API uses its **own regional datastore** only (no cross-region S3/RDS for api-8/9).
+
+**Naming contract:** `shared/contract/` + `shared/templates/invoke-url.tftpl` enable parallel apply waves without `terraform_remote_state` ordering for downstream API URLs.
+
+## Apply order (parallel waves)
 
 ```bash
 cd packages/backend/terraform/staging-multi-state
@@ -25,12 +29,18 @@ chmod +x scripts/apply-and-export-all.sh
 TF_VAR_aws_account_id=992382747916 AWS_PROFILE=admin ./scripts/apply-and-export-all.sh
 ```
 
-Or apply stacks individually in dependency order (see script).
+Waves: **1a** hub network → **1b** peer networks → **2** datastores → **3–6** APIs → **7** messaging → **8** ECS edge.
 
 Each stack exports `plan.json`, `graph.dot`, and keeps `terraform.tfstate` after apply.
 
-**Teardown (zero cost):** `./scripts/destroy-all-stacks.sh` — parallel destroy in reverse dependency order. See [ARCHITECTURE.md](./ARCHITECTURE.md#teardown-zero-ongoing-cost).
+**Hydrate expanded preset only** (do not run full seed):
 
-Pipeline dataflow: `pipeline.tfd` (imported via terraform import presets).
+```bash
+yarn hydrate:terraform-preset staging-multi-state-expanded
+```
+
+**Teardown:** `./scripts/destroy-all-stacks.sh` — parallel destroy in reverse dependency order (25 stacks). Exported artifacts remain on disk.
+
+Pipeline dataflow: `pipeline.tfd`. Import preset: `staging-multi-state-expanded` (25 stacks) or legacy `staging-multi-state` (17 stacks).
 
 All states default to AWS profile `admin` and support optional assume-role via `terraform_deploy_role_arn`.

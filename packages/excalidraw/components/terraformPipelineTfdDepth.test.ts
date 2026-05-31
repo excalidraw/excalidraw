@@ -1,11 +1,8 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { describe, expect, it } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import { loadStagingMultiStatePlanDotBundlesFromDb, readStagingMultiStatePipelineTfdFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
@@ -21,16 +18,6 @@ import {
   namespacePlanDotBundles,
 } from "./terraformImportMerge";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
-
-function readStagingPipelineTfdFromRepo(): string {
-  return readFileSync(
-    join(
-      process.cwd(),
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    ),
-    "utf8",
-  );
-}
 
 function mockAtomGraph(
   ids: readonly string[],
@@ -154,7 +141,7 @@ describe("staging pipeline TFD depth layout", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;

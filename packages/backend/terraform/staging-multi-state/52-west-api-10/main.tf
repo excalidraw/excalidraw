@@ -38,21 +38,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias   = "east"
-  region  = var.east_region
-  profile = var.aws_profile
-
-  assume_role {
-    role_arn     = local.terraform_deploy_role_arn
-    session_name = "terraform-staging-west-api-10-east"
-  }
-
-  default_tags {
-    tags = local.tags
-  }
-}
-
 check "assume_role_configured" {
   assert {
     condition     = trimspace(var.terraform_deploy_role_arn) != "" || can(regex("^[0-9]{12}$", var.aws_account_id))
@@ -64,13 +49,6 @@ data "terraform_remote_state" "west_network" {
   backend = "local"
   config = {
     path = var.west_network_state_path
-  }
-}
-
-data "terraform_remote_state" "east_network" {
-  backend = "local"
-  config = {
-    path = var.east_network_state_path
   }
 }
 

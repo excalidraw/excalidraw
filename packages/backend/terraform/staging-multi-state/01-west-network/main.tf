@@ -268,15 +268,6 @@ resource "aws_route" "west_db_to_tgw" {
   transit_gateway_id     = aws_ec2_transit_gateway.west.id
 }
 
-resource "aws_route" "east_db_to_tgw" {
-  provider = aws.east
-  for_each = toset(data.terraform_remote_state.east_network.outputs.database_route_table_ids)
-
-  route_table_id         = each.value
-  destination_cidr_block = module.west_network.vpc_cidr_block
-  transit_gateway_id     = data.terraform_remote_state.east_network.outputs.east_tgw_id
-}
-
 resource "aws_route" "east_private_to_tgw" {
   provider = aws.east
   for_each = toset(data.terraform_remote_state.east_network.outputs.private_route_table_ids)

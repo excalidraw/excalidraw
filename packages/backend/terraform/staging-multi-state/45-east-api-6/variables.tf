@@ -37,13 +37,3 @@ variable "east_datastores_state_path" {
   type    = string
   default = "../02-east-datastores/terraform.tfstate"
 }
-
-variable "west_api8_state_path" {
-  type    = string
-  default = "../50-west-api-8/terraform.tfstate"
-}
-
-variable "west_api9_state_path" {
-  type    = string
-  default = "../51-west-api-9/terraform.tfstate"
-}

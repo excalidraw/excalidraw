@@ -38,21 +38,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias   = "east"
-  region  = var.east_region
-  profile = var.aws_profile
-
-  assume_role {
-    role_arn     = local.terraform_deploy_role_arn
-    session_name = "terraform-staging-west-datastores-east"
-  }
-
-  default_tags {
-    tags = local.tags
-  }
-}
-
 check "assume_role_configured" {
   assert {
     condition     = trimspace(var.terraform_deploy_role_arn) != "" || can(regex("^[0-9]{12}$", var.aws_account_id))
@@ -67,17 +52,12 @@ data "terraform_remote_state" "west_network" {
   }
 }
 
-data "terraform_remote_state" "east_network" {
-  backend = "local"
-  config = {
-    path = var.east_network_state_path
-  }
-}
+data "aws_caller_identity" "current" {}
 
 module "api8_west_bucket" {
   source = "../../modules/s3_app_bucket"
 
-  bucket_name = "staging-${data.terraform_remote_state.east_network.outputs.aws_account_id}-api-8-west"
+  bucket_name = "staging-${data.aws_caller_identity.current.account_id}-api-8-west"
   tags        = local.tags
 }
 
@@ -89,12 +69,9 @@ module "api9_west_rds" {
   vpc_id                     = data.terraform_remote_state.west_network.outputs.vpc_id
   database_subnet_ids        = data.terraform_remote_state.west_network.outputs.database_subnet_ids
   allowed_security_group_ids = []
-  peer_vpc_cidr_blocks = [
-    data.terraform_remote_state.west_network.outputs.vpc_cidr,
-    data.terraform_remote_state.east_network.outputs.vpc_cidr,
-  ]
-  db_name = "api9west"
-  tags    = local.tags
+  peer_vpc_cidr_blocks       = [data.terraform_remote_state.west_network.outputs.vpc_cidr]
+  db_name                    = "api9west"
+  tags                       = local.tags
 }
 
 module "api10_table" {

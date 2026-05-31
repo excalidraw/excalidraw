@@ -1,11 +1,8 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { describe, expect, it } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import { loadStagingMultiStatePlanDotBundlesFromDb, readStagingMultiStatePipelineTfdFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
@@ -43,17 +40,6 @@ const PACK_GAP = 24;
 /** Matches pipeline declared-edge horizontal attachment tolerance. */
 const Y_ALIGN_EPS = 2;
 const CHAIN_ALIGN_EPS = 4;
-
-function readStagingPipelineTfdFromRepo(): string {
-  return readFileSync(
-    join(
-      process.cwd(),
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    ),
-    "utf8",
-  );
-}
-
 function boundsOverlap(
   a: { top: number; bottom: number },
   b: { top: number; bottom: number },
@@ -295,7 +281,7 @@ describe("assignPipelineColumnPackedY", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;
@@ -332,7 +318,7 @@ describe("assignPipelineColumnPackedY", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;

@@ -69,23 +69,3 @@ output "api7_aurora_arn" {
 output "api7_secret_arn" {
   value = module.api7_aurora.secret_arn
 }
-
-output "api8_east_bucket_name" {
-  value = module.api8_east_bucket.bucket_id
-}
-
-output "api8_east_bucket_arn" {
-  value = module.api8_east_bucket.bucket_arn
-}
-
-output "api9_east_rds_identifier" {
-  value = "staging-api-9-east"
-}
-
-output "api9_east_rds_arn" {
-  value = module.api9_east_rds.db_instance_arn
-}
-
-output "api9_east_secret_arn" {
-  value = module.api9_east_rds.secret_arn
-}

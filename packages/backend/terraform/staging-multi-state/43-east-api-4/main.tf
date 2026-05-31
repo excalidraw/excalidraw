@@ -66,13 +66,6 @@ data "terraform_remote_state" "east_api6" {
   }
 }
 
-data "terraform_remote_state" "east_api7" {
-  backend = "local"
-  config = {
-    path = var.east_api7_state_path
-  }
-}
-
 module "api" {
   source = "../modules/private_api_lambda"
 
@@ -92,7 +85,6 @@ module "api" {
   s3_bucket_arns        = [data.terraform_remote_state.east_datastores.outputs.api4_bucket_arn]
   downstream_api_urls = {
     api6 = data.terraform_remote_state.east_api6.outputs.api_invoke_url
-    api7 = data.terraform_remote_state.east_api7.outputs.api_invoke_url
   }
   tags = local.tags
 }

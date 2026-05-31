@@ -1,11 +1,8 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { describe, expect, it } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import { readStagingMultiStatePipelineTfdFromDb, loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
@@ -25,17 +22,6 @@ import {
   namespacePlanDotBundles,
 } from "./terraformImportMerge";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
-
-function readStagingPipelineTfdFromRepo(): string {
-  return readFileSync(
-    join(
-      process.cwd(),
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    ),
-    "utf8",
-  );
-}
-
 describe("countTotalAdjacentCrossings", () => {
   it("counts one crossing for inverted bipartite edges", () => {
     const columns = [["a", "b"], ["x", "y"]];
@@ -135,7 +121,7 @@ describe("staging pipeline crossing minimization", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;

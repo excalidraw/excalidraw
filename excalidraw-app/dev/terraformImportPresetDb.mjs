@@ -800,9 +800,31 @@ export function loadStagingMultiStatePlanDotBundlesFromDb() {
   });
 }
 
+/** Upsert a single built-in preset from catalog and hydrate its disk contents. */
+export function upsertAndHydratePresetFromCatalog(db, presetId) {
+  const presets = loadImportPresetsCatalog();
+  const preset = presets.find((entry) => entry.id === presetId);
+  if (!preset) {
+    throw new Error(`Preset not found in catalog: ${presetId}`);
+  }
+  upsertPreset(db, preset);
+  return hydratePresetContentsFromDisk(db, presetId);
+}
+
 export function readStagingMultiStatePipelineTfdFromDb() {
   const db = getTerraformImportPresetTestDb();
-  const row = db
+  const expanded = db
+    .prepare(
+      `SELECT content FROM terraform_import_preset_tfd
+       WHERE preset_id = 'staging-multi-state-expanded' AND path = 'pipeline.tfd'
+       ORDER BY sort_order ASC
+       LIMIT 1`,
+    )
+    .get();
+  if (expanded?.content) {
+    return expanded.content;
+  }
+  const legacy = db
     .prepare(
       `SELECT content FROM terraform_import_preset_tfd
        WHERE preset_id = 'staging-multi-state' AND path = 'pipeline.tfd'
@@ -810,12 +832,12 @@ export function readStagingMultiStatePipelineTfdFromDb() {
        LIMIT 1`,
     )
     .get();
-  if (!row?.content) {
-    return readTerraformImportRepoFileText(
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    );
+  if (legacy?.content) {
+    return legacy.content;
   }
-  return row.content;
+  return readTerraformImportRepoFileText(
+    "packages/backend/terraform/staging-multi-state/pipeline.tfd",
+  );
 }
 
 export function loadLocalstackGeoFanoutPlanDotBundlesFromDb() {

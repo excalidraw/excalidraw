@@ -1,9 +1,6 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { describe, expect, it } from "vitest";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import { loadStagingMultiStatePlanDotBundlesFromDb, readStagingMultiStatePipelineTfdFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
@@ -25,17 +22,6 @@ type SceneEl = {
     nodePath?: string;
   };
 };
-
-function readStagingPipelineTfdFromRepo(): string {
-  return readFileSync(
-    join(
-      process.cwd(),
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    ),
-    "utf8",
-  );
-}
-
 function descendantsOfFrame(
   elements: SceneEl[],
   frameId: string,
@@ -209,7 +195,7 @@ describe("staging pipeline region overlap", () => {
     "keeps west resources out of east region frames (%s)",
     async (pipelineVerticalSolverMode: TerraformPipelineVerticalSolverMode) => {
       const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-      const tfd = readStagingPipelineTfdFromRepo();
+      const tfd = readStagingMultiStatePipelineTfdFromDb();
       const res = await terraformPlanParsingFromSources(
         {
           planDotBundles: bundles,

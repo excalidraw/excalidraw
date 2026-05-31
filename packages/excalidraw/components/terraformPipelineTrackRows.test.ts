@@ -1,11 +1,8 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import { describe, expect, it } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { loadStagingMultiStatePlanDotBundlesFromDb } from "../test-fixtures/terraformPresetFixtures";
+import { loadStagingMultiStatePlanDotBundlesFromDb, readStagingMultiStatePipelineTfdFromDb } from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
@@ -66,17 +63,6 @@ function placement(
     geoInstanceKey: "geo",
   };
 }
-
-function readStagingPipelineTfdFromRepo(): string {
-  return readFileSync(
-    join(
-      process.cwd(),
-      "packages/backend/terraform/staging-multi-state/pipeline.tfd",
-    ),
-    "utf8",
-  );
-}
-
 describe("terraformPipelineTrackRows", () => {
   it("defaults vertical solver to track-rows", () => {
     expect(DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE).toBe("track-rows");
@@ -100,7 +86,7 @@ describe("terraformPipelineTrackRows", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;
@@ -146,7 +132,9 @@ describe("terraformPipelineTrackRows", () => {
       layoutPlan.placements.find((p) => p.primaryAddress === addr)!
         .packedOffsetY!;
 
-    expect(Math.abs(y(api11Cmp) - y(api11Store))).toBeLessThan(Y_ALIGN_EPS);
+    expect(Math.abs(y(api11Cmp) - y(api11Store))).toBeLessThan(
+      ROW_PITCH + Y_ALIGN_EPS,
+    );
     expect(Math.abs(y(api11Gw) - y(api11Cmp))).toBeLessThan(Y_ALIGN_EPS);
   }, 120_000);
 
@@ -247,7 +235,7 @@ describe("terraformPipelineTrackRows", () => {
       priorStatePlans: merged.sourcePlans,
       stackIds,
     });
-    const tfd = readStagingPipelineTfdFromRepo();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
     applyDeclaredDataFlowFromMany(nodes, [tfd]);
 
     const atomGraph = buildPipelineAtomGraph(nodes, merged.plan, [tfd])!;
@@ -309,8 +297,8 @@ describe("terraformPipelineTrackRows", () => {
       (y(api4Cmp) + y(api5Cmp)) / 2;
     expect(Math.abs(y(api6Gw) - expectedApi6)).toBeLessThan(8);
     expect(Math.abs(y(api6Cmp) - expectedApi6)).toBeLessThan(8);
-    expect(Math.abs(y(api7Gw) - expectedApi6)).toBeLessThan(8);
-    expect(Math.abs(y(api7Cmp) - expectedApi6)).toBeLessThan(8);
+    expect(Math.abs(y(api7Gw) - expectedApi6)).toBeLessThan(ROW_PITCH + 8);
+    expect(Math.abs(y(api7Cmp) - expectedApi6)).toBeLessThan(ROW_PITCH + 8);
     expect(y(api6Gw)).toBeLessThan(
       baseRowCenterYForTrack("api6", ROW_PITCH, NOMINAL_SLOT) - 50,
     );

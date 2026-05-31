@@ -124,26 +124,3 @@ module "api7_aurora" {
   db_name                    = "api7"
   tags                       = local.tags
 }
-
-module "api9_east_rds" {
-  source = "../../modules/rds_postgres_micro"
-
-  identifier                 = "staging-api-9-east"
-  environment                = var.environment
-  vpc_id                     = data.terraform_remote_state.east_network.outputs.vpc_id
-  database_subnet_ids        = data.terraform_remote_state.east_network.outputs.database_subnet_ids
-  allowed_security_group_ids = []
-  peer_vpc_cidr_blocks = [
-    data.terraform_remote_state.east_network.outputs.vpc_cidr,
-    var.west_vpc_cidr,
-  ]
-  db_name = "api9east"
-  tags    = local.tags
-}
-
-module "api8_east_bucket" {
-  source = "../../modules/s3_app_bucket"
-
-  bucket_name = "staging-${data.terraform_remote_state.east_network.outputs.aws_account_id}-api-8-east"
-  tags        = local.tags
-}

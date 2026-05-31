@@ -53,7 +53,7 @@ run_wave() {
   fi
 }
 
-# Wave 1: messaging, edge, all API stacks
+# Wave 1: messaging, edge, all API stacks (25-stack expanded layout)
 WAVE1=(
   20-east-messaging
   10-east-ecs-edge
@@ -68,23 +68,35 @@ WAVE1=(
   51-west-api-9
   52-west-api-10
   53-west-api-11
+  54-west-1-api-12
+  55-west-1-api-14
+  56-east-2-api-15
+  57-east-2-api-16
 )
 
 # Wave 2: datastores
 WAVE2=(
   02-east-datastores
   03-west-datastores
+  04-west-1-datastores
+  05-east-2-datastores
+)
+
+# Wave 3: regional networks (not hub)
+WAVE3=(
+  01-west-network
+  04-west-1-network
+  05-east-2-network
 )
 
 run_wave "apps" "${WAVE1[@]}"
 run_wave "datastores" "${WAVE2[@]}"
-run_wave "west-network" "01-west-network"
-run_wave "east-network" "00-east-network"
+run_wave "regional-networks" "${WAVE3[@]}"
+run_wave "hub-network" "00-east-network"
 
 echo ""
 echo "All stacks destroyed. Logs: $LOG_DIR"
 echo ""
-echo "If EC2 API stacks (42, 46, 51) time out on ECS drain, scale ASGs to 0,"
+echo "If EC2 API stacks (42, 46, 51, 56) time out on ECS drain, scale ASGs to 0,"
 echo "terminate instances, force-delete ECS services, then re-run this script."
-echo "If cascade stacks fail on empty remote-state outputs, re-run after stubbing"
-echo "destroyed API stack tfstate outputs (see apply script README)."
+echo "Exported artifacts (plan.json, graph.dot, terraform.tfstate) remain on disk."

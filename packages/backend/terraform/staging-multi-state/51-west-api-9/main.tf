@@ -34,21 +34,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias   = "east"
-  region  = var.east_region
-  profile = var.aws_profile
-
-  assume_role {
-    role_arn     = local.terraform_deploy_role_arn
-    session_name = "terraform-staging-west-api-9-east"
-  }
-
-  default_tags {
-    tags = local.tags
-  }
-}
-
 check "assume_role_configured" {
   assert {
     condition     = trimspace(var.terraform_deploy_role_arn) != "" || can(regex("^[0-9]{12}$", var.aws_account_id))
@@ -63,24 +48,10 @@ data "terraform_remote_state" "west_network" {
   }
 }
 
-data "terraform_remote_state" "east_datastores" {
-  backend = "local"
-  config = {
-    path = var.east_datastores_state_path
-  }
-}
-
 data "terraform_remote_state" "west_datastores" {
   backend = "local"
   config = {
     path = var.west_datastores_state_path
-  }
-}
-
-data "terraform_remote_state" "west_api10" {
-  backend = "local"
-  config = {
-    path = var.west_api10_state_path
   }
 }
 
@@ -104,12 +75,8 @@ module "api" {
   execute_api_vpce_id    = data.terraform_remote_state.west_network.outputs.execute_api_vpce_id
   execute_api_vpce_sg_id = data.terraform_remote_state.west_network.outputs.execute_api_vpce_sg_id
   launch_type            = "EC2"
-  db_secret_arn          = data.terraform_remote_state.west_datastores.outputs.api9_west_secret_arn
-  additional_db_secret_arns = [
-    data.terraform_remote_state.east_datastores.outputs.api9_east_secret_arn,
-  ]
+  db_secret_arn = data.terraform_remote_state.west_datastores.outputs.api9_west_secret_arn
   downstream_api_urls = {
-    api10 = data.terraform_remote_state.west_api10.outputs.api_invoke_url
     api11 = data.terraform_remote_state.west_api11.outputs.api_invoke_url
   }
   stage_name = "v1"

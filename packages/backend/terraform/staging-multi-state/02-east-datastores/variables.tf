@@ -32,8 +32,3 @@ variable "east_network_state_path" {
   type    = string
   default = "../00-east-network/terraform.tfstate"
 }
-
-variable "west_vpc_cidr" {
-  type    = string
-  default = "10.70.0.0/16"
-}

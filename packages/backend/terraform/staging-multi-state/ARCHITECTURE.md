@@ -10,7 +10,7 @@ For apply commands and quick start, see [README.md](./README.md).
 
 ### What it is
 
-**staging-multi-state** is a real AWS staging environment split across **17 independent Terraform states** in one account. It hydrates the built-in **Staging multi-state** import preset (`import-presets.catalog.json` → 17 stacks + `pipeline.tfd` → `terraform-import-presets.db`).
+**staging-multi-state** is a real AWS staging environment split across **25 independent Terraform states** in one account (expanded layout) or **17 states** (legacy preset). The expanded preset **`staging-multi-state-expanded`** hydrates from `import-presets.catalog.json` → 25 stacks + `pipeline.tfd` → `terraform-import-presets.db` via `yarn hydrate:terraform-preset staging-multi-state-expanded`.
 
 Each stack keeps local state (`terraform.tfstate`) and exports `plan.json` + `graph.dot` for layout import.
 

@@ -13,6 +13,13 @@ terraform {
   }
 }
 
+module "contract" {
+  source = "../shared/contract"
+
+  environment    = var.environment
+  aws_account_id = var.aws_account_id
+}
+
 locals {
   terraform_deploy_role_arn = trimspace(var.terraform_deploy_role_arn) != "" ? trimspace(var.terraform_deploy_role_arn) : "arn:aws:iam::${var.aws_account_id}:role/${var.terraform_deploy_role_name}"
 
@@ -21,6 +28,39 @@ locals {
     stack       = "staging-multi-state"
     state       = "20-east-messaging"
     managed_by  = "terraform"
+  }
+
+  api_invoke_urls = {
+    api1 = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+      api_id  = data.aws_api_gateway_rest_api.api1.id
+      vpce_id = data.aws_vpc_endpoint.execute_api.id
+      region  = module.contract.regions.east
+      stage   = module.contract.api_stage_name
+    })
+    api2 = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+      api_id  = data.aws_api_gateway_rest_api.api2.id
+      vpce_id = data.aws_vpc_endpoint.execute_api.id
+      region  = module.contract.regions.east
+      stage   = module.contract.api_stage_name
+    })
+    api3 = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+      api_id  = data.aws_api_gateway_rest_api.api3.id
+      vpce_id = data.aws_vpc_endpoint.execute_api.id
+      region  = module.contract.regions.east
+      stage   = module.contract.api_stage_name
+    })
+    api4 = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+      api_id  = data.aws_api_gateway_rest_api.api4.id
+      vpce_id = data.aws_vpc_endpoint.execute_api.id
+      region  = module.contract.regions.east
+      stage   = module.contract.api_stage_name
+    })
+    api5 = templatefile("${path.module}/../shared/templates/invoke-url.tftpl", {
+      api_id  = data.aws_api_gateway_rest_api.api5.id
+      vpce_id = data.aws_vpc_endpoint.execute_api.id
+      region  = module.contract.regions.east
+      stage   = module.contract.api_stage_name
+    })
   }
 }
 
@@ -45,43 +85,60 @@ check "assume_role_configured" {
   }
 }
 
-data "terraform_remote_state" "east_network" {
-  backend = "local"
-  config = {
-    path = var.east_network_state_path
+data "aws_vpc" "east" {
+  filter {
+    name   = "tag:Name"
+    values = [module.contract.vpc_names.east]
   }
 }
 
-data "terraform_remote_state" "ecs" {
-  backend = "local"
-  config = {
-    path = var.ecs_state_path
+data "aws_subnets" "east_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.east.id]
+  }
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.east}-private-*"]
   }
 }
 
-data "terraform_remote_state" "api1" {
-  backend = "local"
-  config  = { path = var.api_state_paths.api1 }
+data "aws_vpc_endpoint" "execute_api" {
+  vpc_id       = data.aws_vpc.east.id
+  service_name = "com.amazonaws.${module.contract.regions.east}.execute-api"
+
+  filter {
+    name   = "tag:Name"
+    values = ["${module.contract.vpc_names.east}-execute-api-vpce"]
+  }
 }
 
-data "terraform_remote_state" "api2" {
-  backend = "local"
-  config  = { path = var.api_state_paths.api2 }
+data "aws_s3_bucket" "lambda_artifacts" {
+  bucket = module.contract.lambda_artifacts_bucket_names.east
 }
 
-data "terraform_remote_state" "api3" {
-  backend = "local"
-  config  = { path = var.api_state_paths.api3 }
+data "aws_api_gateway_rest_api" "api1" {
+  name = module.contract.api_gateway_names["api-1"]
 }
 
-data "terraform_remote_state" "api4" {
-  backend = "local"
-  config  = { path = var.api_state_paths.api4 }
+data "aws_api_gateway_rest_api" "api2" {
+  name = module.contract.api_gateway_names["api-2"]
 }
 
-data "terraform_remote_state" "api5" {
-  backend = "local"
-  config  = { path = var.api_state_paths.api5 }
+data "aws_api_gateway_rest_api" "api3" {
+  name = module.contract.api_gateway_names["api-3"]
+}
+
+data "aws_api_gateway_rest_api" "api4" {
+  name = module.contract.api_gateway_names["api-4"]
+}
+
+data "aws_api_gateway_rest_api" "api5" {
+  name = module.contract.api_gateway_names["api-5"]
+}
+
+data "aws_iam_role" "ecs_task" {
+  name = "${var.environment}-ecs-task"
 }
 
 data "archive_file" "consumer_zip" {
@@ -91,7 +148,7 @@ data "archive_file" "consumer_zip" {
 }
 
 resource "aws_s3_object" "consumer_package" {
-  bucket = data.terraform_remote_state.east_network.outputs.lambda_artifacts_bucket_id
+  bucket = data.aws_s3_bucket.lambda_artifacts.id
   key    = "consumer/${data.archive_file.consumer_zip.output_md5}.zip"
   source = data.archive_file.consumer_zip.output_path
   etag   = data.archive_file.consumer_zip.output_md5
@@ -99,45 +156,60 @@ resource "aws_s3_object" "consumer_package" {
   server_side_encryption = "AES256"
 }
 
-module "queue" {
+module "ingress_queue" {
   source = "../../modules/encrypted_sqs_queue"
 
-  queue_name = "${var.environment}-events.fifo"
+  queue_name = module.contract.ingress_queue_name
   dlq_name   = "${var.environment}-events-dlq.fifo"
 
   redrive_policy = {
     maxReceiveCount = 5
   }
 
-  tags = merge(local.tags, { component = "messaging" })
+  tags = merge(local.tags, { component = "messaging-ingress" })
+}
+
+module "egress_queue" {
+  source = "../../modules/encrypted_sqs_queue"
+
+  queue_name = module.contract.egress_queue_name
+  dlq_name   = "${var.environment}-egress-dlq"
+  create_dlq = true
+
+  redrive_policy = {
+    maxReceiveCount = 5
+  }
+
+  tags = merge(local.tags, { component = "messaging-egress" })
 }
 
 module "consumer_lambda" {
   source = "../../modules/lambda_service"
 
-  function_name = "${var.environment}-sqs-consumer"
-  lambda_role   = "${var.environment}-sqs-consumer"
+  function_name = module.contract.sqs_consumer_lambda_name
+  lambda_role   = module.contract.sqs_consumer_lambda_name
   handler       = "consumer.handler"
   runtime       = "python3.12"
 
   enable_vpc = true
 
   s3_existing_package = {
-    bucket = data.terraform_remote_state.east_network.outputs.lambda_artifacts_bucket_id
+    bucket = data.aws_s3_bucket.lambda_artifacts.id
     key    = aws_s3_object.consumer_package.key
   }
 
-  vpc_id                         = data.terraform_remote_state.east_network.outputs.vpc_id
-  vpc_subnet_ids                 = data.terraform_remote_state.east_network.outputs.private_subnet_ids
+  vpc_id                         = data.aws_vpc.east.id
+  vpc_subnet_ids                 = data.aws_subnets.east_private.ids
   security_group_name            = "${var.environment}-sqs-consumer-sg"
-  vpc_cidr_for_restricted_egress = data.terraform_remote_state.east_network.outputs.vpc_cidr
+  vpc_cidr_for_restricted_egress = module.contract.vpc_cidrs.east
 
   environment_variables = {
-    API_1_URL = data.terraform_remote_state.api1.outputs.api_invoke_url
-    API_2_URL = data.terraform_remote_state.api2.outputs.api_invoke_url
-    API_3_URL = data.terraform_remote_state.api3.outputs.api_invoke_url
-    API_4_URL = data.terraform_remote_state.api4.outputs.api_invoke_url
-    API_5_URL = data.terraform_remote_state.api5.outputs.api_invoke_url
+    API_1_URL        = local.api_invoke_urls.api1
+    API_2_URL        = local.api_invoke_urls.api2
+    API_3_URL        = local.api_invoke_urls.api3
+    API_4_URL        = local.api_invoke_urls.api4
+    API_5_URL        = local.api_invoke_urls.api5
+    EGRESS_QUEUE_URL = module.egress_queue.queue_url
   }
 
   attach_policy_statements = true
@@ -145,29 +217,34 @@ module "consumer_lambda" {
     sqs_consume = {
       effect    = "Allow"
       actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:ChangeMessageVisibility"]
-      resources = [module.queue.queue_arn]
+      resources = [module.ingress_queue.queue_arn]
+    }
+    sqs_egress_send = {
+      effect    = "Allow"
+      actions   = ["sqs:SendMessage"]
+      resources = [module.egress_queue.queue_arn]
     }
     kms_sqs = {
       effect    = "Allow"
       actions   = ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey"]
-      resources = [module.queue.kms_key_arn]
+      resources = [module.ingress_queue.kms_key_arn, module.egress_queue.kms_key_arn]
     }
     execute_api = {
       effect  = "Allow"
       actions = ["execute-api:Invoke"]
       resources = [
-        "${data.terraform_remote_state.api1.outputs.api_execution_arn}/*",
-        "${data.terraform_remote_state.api2.outputs.api_execution_arn}/*",
-        "${data.terraform_remote_state.api3.outputs.api_execution_arn}/*",
-        "${data.terraform_remote_state.api4.outputs.api_execution_arn}/*",
-        "${data.terraform_remote_state.api5.outputs.api_execution_arn}/*"
+        "${data.aws_api_gateway_rest_api.api1.execution_arn}/*",
+        "${data.aws_api_gateway_rest_api.api2.execution_arn}/*",
+        "${data.aws_api_gateway_rest_api.api3.execution_arn}/*",
+        "${data.aws_api_gateway_rest_api.api4.execution_arn}/*",
+        "${data.aws_api_gateway_rest_api.api5.execution_arn}/*",
       ]
     }
   }
 }
 
 resource "aws_lambda_event_source_mapping" "queue_consumer" {
-  event_source_arn = module.queue.queue_arn
+  event_source_arn = module.ingress_queue.queue_arn
   function_name    = module.consumer_lambda.lambda_function_arn
   batch_size       = 1
   enabled          = true
@@ -177,13 +254,13 @@ data "aws_iam_policy_document" "ecs_send_message" {
   statement {
     effect    = "Allow"
     actions   = ["sqs:SendMessage"]
-    resources = [module.queue.queue_arn]
+    resources = [module.ingress_queue.queue_arn]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey"]
-    resources = [module.queue.kms_key_arn]
+    resources = [module.ingress_queue.kms_key_arn]
   }
 }
 
@@ -193,6 +270,6 @@ resource "aws_iam_policy" "ecs_send_message" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_send_message" {
-  role       = data.terraform_remote_state.ecs.outputs.ecs_task_role_name
+  role       = data.aws_iam_role.ecs_task.name
   policy_arn = aws_iam_policy.ecs_send_message.arn
 }
