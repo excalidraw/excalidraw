@@ -98,7 +98,6 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: true,
-        pipelineLayout: false,
         moduleLayoutOptions: undefined,
       },
       expect.anything(),
@@ -113,7 +112,6 @@ describe("terraformSceneApply", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: true,
-      pipelineLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
@@ -143,7 +141,6 @@ describe("terraformSceneApply", () => {
         tfdTexts: [],
       },
       semanticLayout: false,
-      pipelineLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: [],
@@ -161,7 +158,6 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
-        pipelineLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       },
       expect.anything(),
@@ -180,7 +176,6 @@ describe("terraformSceneApply", () => {
         tfdTexts: [],
       },
       semanticLayout: false,
-      pipelineLayout: false,
       moduleLayoutOptions: rectpackingOptions,
       preset: null,
       importedTfdTexts: [],
@@ -198,24 +193,20 @@ describe("terraformSceneApply", () => {
       expect.anything(),
       {
         semanticLayout: false,
-        pipelineLayout: false,
         moduleLayoutOptions: rectpackingOptions,
       },
       expect.anything(),
     );
   });
 
-  it("refreshTerraformLayout preserves pipeline layout mode from session", async () => {
+  it("refreshTerraformLayout preserves semantic layout and tfd overlay from session", async () => {
     setTerraformImportSession({
       sources: {
         planDotBundles: [{ plan: {}, dotText: "digraph {}", label: "s" }],
         states: [],
         tfdTexts: ["a -> b"],
       },
-      semanticLayout: false,
-      pipelineLayout: true,
-      pipelineLayoutMode: "global-relayer",
-      pipelineVerticalSolverMode: "constrained-ls",
+      semanticLayout: true,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
       preset: null,
       importedTfdTexts: ["a -> b"],
@@ -232,10 +223,7 @@ describe("terraformSceneApply", () => {
     expect(layoutTerraformViaWorkers).toHaveBeenCalledWith(
       expect.anything(),
       {
-        semanticLayout: false,
-        pipelineLayout: true,
-        pipelineLayoutMode: "global-relayer",
-        pipelineVerticalSolverMode: "constrained-ls",
+        semanticLayout: true,
         moduleLayoutOptions: undefined,
       },
       expect.anything(),

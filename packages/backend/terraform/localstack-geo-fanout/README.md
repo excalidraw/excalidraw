@@ -1,6 +1,6 @@
 # LocalStack geo fanout fixture
 
-Minimal Terraform fixture for **tfdraw** pipeline layout testing: one consumer Lambda fans out to six regional API Gateway stacks across **two LocalStack accounts**, **multiple regions**, and **multiple VPCs**.
+Minimal Terraform fixture for **tfdraw** semantic layout + declared dataflow overlay testing: one consumer Lambda fans out to six regional API Gateway stacks across **two LocalStack accounts**, **multiple regions**, and **multiple VPCs**.
 
 ## Topology
 
@@ -39,10 +39,10 @@ yarn seed:terraform-presets
 yarn export:terraform-presets-test-db
 ```
 
-Import preset **LocalStack geo fanout** in the app with **Pipeline** view, or run tests:
+Import preset **LocalStack geo fanout** in the app with **Semantic** view (preset loads `pipeline.tfd` for declared dataflow edges), or run layout tests:
 
 ```bash
-yarn vitest run packages/excalidraw/components/terraformPipelineGeoFanout.test.ts
+yarn vitest run packages/excalidraw/components/terraformDeclaredDataFlow.test.ts
 ```
 
 ## Scripts
@@ -59,7 +59,7 @@ yarn vitest run packages/excalidraw/components/terraformPipelineGeoFanout.test.t
 
 - **Regional** API Gateway only (not private API + VPCE like staging-multi-state).
 - LocalStack may not support every VPC Lambda / IAM edge case; see apply logs if a stack fails.
-- Pipeline view groups fanout **lanes 0–2** under account `111111111111` and **lanes 3–5** under account `222222222222` as horizontal bands.
+- Semantic layout with `.tfd` overlay does not reproduce the old pipeline geographic column bands; fanout lanes are laid out by the semantic topology engine.
 
 ## Modules
 

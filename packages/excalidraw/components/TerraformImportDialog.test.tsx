@@ -113,13 +113,10 @@ describe("TerraformImportModal", () => {
     await waitFor(() =>
       expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
-      {
-        semanticLayout: true,
-        pipelineLayout: false,
-        moduleLayoutOptions: undefined,
-      },
-    );
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: true,
+      moduleLayoutOptions: undefined,
+    });
     expect(hoisted.replaceAllElements).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
   });
@@ -136,13 +133,10 @@ describe("TerraformImportModal", () => {
     await waitFor(() =>
       expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
-      {
-        semanticLayout: false,
-        pipelineLayout: false,
-        moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
-      },
-    );
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: false,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+    });
   });
 
   it("shows module packing settings when module view is selected", () => {
@@ -172,7 +166,6 @@ describe("TerraformImportModal", () => {
     );
     const options = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1];
     expect(options?.semanticLayout).toBe(false);
-    expect(options?.pipelineLayout).toBe(false);
     expect(options?.moduleLayoutOptions?.mode).toBe("rectpacking");
   });
 
@@ -209,13 +202,10 @@ describe("TerraformImportModal", () => {
     await waitFor(() =>
       expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
-      {
-        semanticLayout: false,
-        pipelineLayout: false,
-        moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
-      },
-    );
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: false,
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+    });
   });
 
   it("enables import with state file only", () => {
@@ -284,7 +274,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("passes selected pipeline layout mode for pipeline imports", async () => {
+  it("imports with tfd overlay on semantic view", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -296,29 +286,14 @@ describe("TerraformImportModal", () => {
         files: [textFileLike("a -> b", "pipeline.tfd")],
       },
     });
-    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
-    expect(
-      screen.getByRole("radio", { name: /global relayer/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("radio", { name: /exact qp/i }),
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("radio", { name: /local shims/i }));
-    fireEvent.click(screen.getByRole("radio", { name: /exact qp/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() =>
       expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
     );
-
-    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
-      {
-        semanticLayout: false,
-        pipelineLayout: true,
-        pipelineLayoutMode: "local-shims",
-        pipelineVerticalSolverMode: "exact-qp",
-        moduleLayoutOptions: undefined,
-      },
-    );
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: true,
+      moduleLayoutOptions: undefined,
+    });
   });
 
   it("shows Done and warnings when import succeeds with warnings", async () => {

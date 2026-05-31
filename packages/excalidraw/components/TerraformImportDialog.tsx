@@ -17,12 +17,6 @@ import { runTerraformImportFromSources } from "./terraformSceneApply";
 import { TerraformModulePackingSettings } from "./TerraformModulePackingSettings";
 import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import {
-  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
-  type TerraformPipelineLayoutMode,
-  type TerraformPipelineVerticalSolverMode,
-} from "./terraformPipelineLayoutMode";
-import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
   deleteTerraformImportPreset,
   listTerraformImportPresets,
@@ -42,7 +36,7 @@ import {
 
 import "./TerraformImportDialog.scss";
 
-type TerraformView = "module" | "semantic" | "pipeline";
+type TerraformView = "module" | "semantic";
 
 const MAX_PLAN_BUNDLES = 10;
 
@@ -100,93 +94,6 @@ const VIEW_OPTIONS: ReadonlyArray<{
     label: "Module view",
     description: "Module-framed infrastructure graph.",
   },
-  {
-    value: "pipeline",
-    label: "Pipeline view",
-    description:
-      "TFD dataflow left-to-right with geographic frames (requires .tfd).",
-  },
-];
-
-const PIPELINE_LAYOUT_MODE_OPTIONS: ReadonlyArray<{
-  value: TerraformPipelineLayoutMode;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "legacy",
-    label: "Legacy",
-    description: "Current TFD depth columns.",
-  },
-  {
-    value: "local-shims",
-    label: "Local shims",
-    description: "Splits fragmented hierarchy runs near their TFD column.",
-  },
-  {
-    value: "global-relayer",
-    label: "Global relayer",
-    description: "Re-layers columns with hierarchy grouping constraints.",
-  },
-];
-
-const PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS: ReadonlyArray<{
-  value: TerraformPipelineVerticalSolverMode;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "track-rows",
-    label: "Track rows",
-    description:
-      "One row per API track; trunk inline at consumer hub; multi-parent handoffs use parent median.",
-  },
-  {
-    value: "track-rows-cascade",
-    label: "Track rows + cascade",
-    description:
-      "Per-API rows with tier handoffs merged onto upstream compute rows.",
-  },
-  {
-    value: "track-rows-reorder",
-    label: "Track rows + reorder",
-    description: "Reorder column atoms for crossings, then assign track rows.",
-  },
-  {
-    value: "straight-y",
-    label: "Straight Y (legacy)",
-    description: "Iterative column-forward Y solver (older).",
-  },
-  {
-    value: "straight-reorder",
-    label: "Straight + reorder (legacy)",
-    description: "Legacy straight solver with column reorder.",
-  },
-  {
-    value: "straight-relay",
-    label: "Straight + relays (legacy)",
-    description: "Legacy straight layout with relay arrow bends.",
-  },
-  {
-    value: "none",
-    label: "None",
-    description: "Use column pack Y only (no vertical solver).",
-  },
-  {
-    value: "constrained-ls",
-    label: "Constrained LS",
-    description: "Weighted global edge-length smoothing with column spacing.",
-  },
-  {
-    value: "elk",
-    label: "ELK",
-    description: "Use ELK as a desired-Y generator, then keep fixed columns.",
-  },
-  {
-    value: "exact-qp",
-    label: "Exact QP",
-    description: "Deterministic quadratic solver for global edge length.",
-  },
 ];
 
 let bundleRowCounter = 0;
@@ -219,14 +126,6 @@ export const TerraformImportModal = ({
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
-  const [pipelineLayoutMode, setPipelineLayoutMode] =
-    useState<TerraformPipelineLayoutMode>(
-      DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-    );
-  const [pipelineVerticalSolverMode, setPipelineVerticalSolverMode] =
-    useState<TerraformPipelineVerticalSolverMode>(
-      DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
-    );
   const [loading, setLoading] = useState(false);
   const [layoutProgress, setLayoutProgress] = useState<string | null>(null);
   const layoutAbortRef = useRef<AbortController | null>(null);
@@ -309,13 +208,7 @@ export const TerraformImportModal = ({
   const canImport = hasPlanMode || stateOnly || activePreset != null;
   const canUseSemanticView =
     hasPlanMode || stateFiles.length > 0 || activePreset != null;
-  const canUsePipelineView =
-    canUseSemanticView &&
-    (tfdFiles.length > 0 ||
-      (activePreset?.tfdPaths?.length ?? 0) > 0 ||
-      (activePreset?.tfdFiles?.length ?? 0) > 0);
   const semanticViewDisabled = loading || !canUseSemanticView;
-  const pipelineViewDisabled = loading || !canUsePipelineView;
   const usingPresetManifest = activePreset != null;
 
   const updateBundle = (id: string, patch: Partial<PlanDotBundleRow>) => {
@@ -348,24 +241,14 @@ export const TerraformImportModal = ({
   ) => {
     const canUseSemanticView =
       sources.planDotBundles.length > 0 || sources.states.length > 0;
-    const hasTfd =
-      (opts.importedTfdTexts?.some((t) => t.trim()) ?? false) ||
-      sources.tfdTexts.some((t) => t.trim());
-    const pipelineLayout =
-      importView === "pipeline" && canUseSemanticView && hasTfd;
-    const semanticLayout =
-      importView === "semantic" && canUseSemanticView && !pipelineLayout;
+    const semanticLayout = importView === "semantic" && canUseSemanticView;
     const { importWarnings: warnings } = await runTerraformImportFromSources(
       app,
       setAppState,
       sources,
       {
         semanticLayout,
-        pipelineLayout,
-        pipelineLayoutMode,
-        pipelineVerticalSolverMode,
-        moduleLayoutOptions:
-          semanticLayout || pipelineLayout ? undefined : moduleLayoutOptions,
+        moduleLayoutOptions: semanticLayout ? undefined : moduleLayoutOptions,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
         signal: layoutAbortRef.current?.signal,
@@ -1069,8 +952,7 @@ writer -> bucket`}</code>
           {VIEW_OPTIONS.map((option) => {
             const checked = view === option.value;
             const disabled =
-              (option.value === "semantic" && semanticViewDisabled) ||
-              (option.value === "pipeline" && pipelineViewDisabled);
+              option.value === "semantic" && semanticViewDisabled;
             return (
               <label
                 key={option.value}
@@ -1088,8 +970,6 @@ writer -> bucket`}</code>
                     ? "Semantic view requires at least one plan+graph pair or a state file."
                     : option.value === "semantic" && stateOnly
                     ? "Shows current infrastructure from state (no planned changes)."
-                    : option.value === "pipeline" && !canUsePipelineView
-                    ? "Pipeline view requires plan/state plus a .tfd dataflow file."
                     : undefined
                 }
               >
@@ -1118,86 +998,6 @@ writer -> bucket`}</code>
           options={moduleLayoutOptions}
           onChange={setModuleLayoutOptions}
         />
-      ) : null}
-
-      {view === "pipeline" ? (
-        <div
-          className="TerraformImportModal__section TerraformImportModal__viewSelector"
-          role="radiogroup"
-          aria-label="Pipeline layout"
-        >
-          <h4>Pipeline layout</h4>
-          <div className="TerraformImportModal__viewSelector__options">
-            {PIPELINE_LAYOUT_MODE_OPTIONS.map((option) => {
-              const checked = pipelineLayoutMode === option.value;
-              return (
-                <label
-                  key={option.value}
-                  className={`TerraformImportModal__viewSelector__option${
-                    checked
-                      ? " TerraformImportModal__viewSelector__option--checked"
-                      : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="terraform-pipeline-layout-mode"
-                    value={option.value}
-                    checked={checked}
-                    disabled={loading}
-                    onChange={() => setPipelineLayoutMode(option.value)}
-                  />
-                  <span className="TerraformImportModal__viewSelector__label">
-                    {option.label}
-                  </span>
-                  <span className="TerraformImportModal__viewSelector__description">
-                    {option.description}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-      {view === "pipeline" ? (
-        <div
-          className="TerraformImportModal__section TerraformImportModal__viewSelector"
-          role="radiogroup"
-          aria-label="Pipeline vertical positioning"
-        >
-          <h4>Pipeline vertical positioning</h4>
-          <div className="TerraformImportModal__viewSelector__options">
-            {PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS.map((option) => {
-              const checked = pipelineVerticalSolverMode === option.value;
-              return (
-                <label
-                  key={option.value}
-                  className={`TerraformImportModal__viewSelector__option${
-                    checked
-                      ? " TerraformImportModal__viewSelector__option--checked"
-                      : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="terraform-pipeline-vertical-solver-mode"
-                    value={option.value}
-                    checked={checked}
-                    disabled={loading}
-                    onChange={() => setPipelineVerticalSolverMode(option.value)}
-                  />
-                  <span className="TerraformImportModal__viewSelector__label">
-                    {option.label}
-                  </span>
-                  <span className="TerraformImportModal__viewSelector__description">
-                    {option.description}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
       ) : null}
 
       <div className="TerraformImportModal__settings__buttons">

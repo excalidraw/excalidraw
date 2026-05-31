@@ -460,7 +460,7 @@
       "name": "LocalStack geo fanout",
       "description": "Consumer Lambda fanout to 6 APIs across two accounts, regions, and VPCs (LocalStack fixture).",
       "builtin": true,
-      "view": "pipeline",
+      "view": "semantic",
       "rootPath": "packages/backend/terraform/localstack-geo-fanout",
       "stacks": [
         {
@@ -520,7 +520,7 @@
       "name": "Production geo fanout",
       "description": "Production AWS geo fanout: KMS SQS consumer fans out to 6 private APIs across two accounts and four regional VPCs.",
       "builtin": true,
-      "view": "pipeline",
+      "view": "semantic",
       "rootPath": "packages/backend/terraform/production-geo-fanout",
       "stacks": [
         {

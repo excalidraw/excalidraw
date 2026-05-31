@@ -18,12 +18,6 @@ import {
   type TerraformImportWarning,
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
-import {
-  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
-  type TerraformPipelineLayoutMode,
-  type TerraformPipelineVerticalSolverMode,
-} from "./terraformPipelineLayoutMode";
 import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
 import {
   cloneTerraformElementsForSnapshot,
@@ -130,9 +124,6 @@ export const applyTerraformExcalidrawScene = (
 
 export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
-  pipelineLayout?: boolean;
-  pipelineLayoutMode?: TerraformPipelineLayoutMode;
-  pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
@@ -154,24 +145,13 @@ export const runTerraformImportFromSources = async (
 ): Promise<RunTerraformImportFromSourcesResult> => {
   const moduleLayoutOptions =
     options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
-  const pipelineLayout = options.pipelineLayout === true;
-  const pipelineLayoutMode =
-    options.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
-  const pipelineVerticalSolverMode =
-    options.pipelineVerticalSolverMode ??
-    DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE;
   const scene = await layoutTerraformViaWorkers(
     sources,
     {
       semanticLayout: options.semanticLayout,
-      pipelineLayout,
-      ...(pipelineLayout
-        ? { pipelineLayoutMode, pipelineVerticalSolverMode }
-        : {}),
-      moduleLayoutOptions:
-        options.semanticLayout || pipelineLayout
-          ? undefined
-          : moduleLayoutOptions,
+      moduleLayoutOptions: options.semanticLayout
+        ? undefined
+        : moduleLayoutOptions,
     },
     {
       onProgress: options.onLayoutProgress,
@@ -195,9 +175,6 @@ export const runTerraformImportFromSources = async (
     setTerraformImportSession({
       sources,
       semanticLayout: options.semanticLayout,
-      pipelineLayout,
-      pipelineLayoutMode,
-      pipelineVerticalSolverMode,
       moduleLayoutOptions,
       preset: options.preset ?? null,
       importedTfdTexts,
@@ -267,12 +244,6 @@ export const refreshTerraformLayout = async (
 
   return runTerraformImportFromSources(app, setAppState, sources, {
     semanticLayout: session.semanticLayout,
-    pipelineLayout: session.pipelineLayout,
-    pipelineLayoutMode:
-      session.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-    pipelineVerticalSolverMode:
-      session.pipelineVerticalSolverMode ??
-      DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
     moduleLayoutOptions: session.moduleLayoutOptions,
     importedTfdTexts,
     preset: session.preset,

@@ -32,14 +32,6 @@ import {
 } from "./terraformTopologyPlacement";
 import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
-import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
-import {
-  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
-  type TerraformPipelineLayoutMode,
-  type TerraformPipelineVerticalSolverMode,
-} from "./terraformPipelineLayoutMode";
-import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildDataFlowEdges,
@@ -187,15 +179,9 @@ const stripTerraformAddressIndexes = (address = "") =>
 export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
-  /** When true, emit TFD-driven pipeline layout (requires `.tfd` with resolved edges). */
-  pipelineLayout?: boolean;
-  /** Pipeline column normalization mode. Defaults to legacy for compatibility. */
-  pipelineLayoutMode?: TerraformPipelineLayoutMode;
-  /** Pipeline vertical coordinate solver. Defaults to track-rows. */
-  pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
-  /** Module-view intra-module packing (ignored when semanticLayout or pipelineLayout is true). */
+  /** Module-view intra-module packing (ignored when semanticLayout is true). */
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
 };
 

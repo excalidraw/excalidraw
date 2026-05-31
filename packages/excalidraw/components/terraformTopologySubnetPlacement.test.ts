@@ -8,7 +8,10 @@ import {
   mergePlanJsons,
   namespacePlanDotBundles,
 } from "./terraformImportMerge";
-import { filterPlanByProviderFamily } from "./terraformProviderClassification";
+import {
+  filterPlanByProviderFamily,
+  type TerraformResourceChangeLike,
+} from "./terraformProviderClassification";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 import {
@@ -29,7 +32,10 @@ function expandedAwsPlan() {
     ns.bundles.map((b) => b.plan),
     ns.bundles.map((b) => b.label),
   );
-  const awsPlan = filterPlanByProviderFamily(merged.plan, "aws");
+  const awsPlan = filterPlanByProviderFamily(
+    merged.plan as { resource_changes?: TerraformResourceChangeLike[] },
+    "aws",
+  );
   const graph = graphlibDot.read("digraph G {}\n");
   const nodes = buildTerraformLocalImportNodesMap(merged.plan, graph, [], {
     adjacency: {},

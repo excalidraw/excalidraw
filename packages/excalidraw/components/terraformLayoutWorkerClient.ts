@@ -125,24 +125,16 @@ export async function layoutTerraformViaWorkers(
   workerOptions: LayoutViaWorkersOptions = {},
 ): Promise<TerraformExcalidrawScenePayload> {
   const { onProgress, signal } = workerOptions;
-  const semanticLayout =
-    options.semanticLayout === true && options.pipelineLayout !== true;
-  const pipelineLayout = options.pipelineLayout === true;
+  const semanticLayout = options.semanticLayout === true;
   const multiStackModule =
-    !semanticLayout &&
-    !pipelineLayout &&
-    sources.planDotBundles.length > 1;
+    !semanticLayout && sources.planDotBundles.length > 1;
 
   const runSequential = async () => {
     const result = await layoutTerraformFromSources(sources, options);
     return toScenePayload(result);
   };
 
-  if (
-    !shouldUseTerraformLayoutWorkers ||
-    typeof Worker === "undefined" ||
-    pipelineLayout
-  ) {
+  if (!shouldUseTerraformLayoutWorkers || typeof Worker === "undefined") {
     return runSequential();
   }
 

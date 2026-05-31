@@ -6,10 +6,6 @@ import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { AppState } from "../types";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
-import type {
-  TerraformPipelineLayoutMode,
-  TerraformPipelineVerticalSolverMode,
-} from "./terraformPipelineLayoutMode";
 
 export type TerraformImportSessionSnapshot = {
   elements: readonly ExcalidrawElement[];
@@ -20,9 +16,6 @@ export type TerraformImportSessionSnapshot = {
 export type TerraformImportSession = {
   sources: TerraformPlanParsingSources;
   semanticLayout: boolean;
-  pipelineLayout: boolean;
-  pipelineLayoutMode?: TerraformPipelineLayoutMode;
-  pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   preset: TerraformImportPreset | null;
   importedTfdTexts: string[];

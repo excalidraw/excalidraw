@@ -123,7 +123,7 @@ Shared repo modules: [`private_workload_network`](../modules/private_workload_ne
 
 ## Comparison to localstack-geo-fanout
 
-Same pipeline graph shape (consumer → 6 APIs → 6 Lambdas → 6 SSM) for tfdraw **Pipeline** view testing. Use localstack for offline CI fixtures; use this variant for real AWS deployment templates.
+Same declared dataflow graph shape (consumer → 6 APIs → 6 Lambdas → 6 SSM) for tfdraw **Semantic** view + `.tfd` overlay testing. Use localstack for offline CI fixtures; use this variant for real AWS deployment templates.
 
 ## LocalStack export (plan.json + graph.dot + pipeline.tfd)
 
@@ -142,4 +142,4 @@ yarn seed:terraform-presets
 Exported bundles: `packages/excalidraw/test-fixtures/production-geo-fanout/bundles/`  
 Pipeline dataflow: `localstack/pipeline.tfd` (19 edges: SQS → consumer → 6 APIs → 6 Lambdas → 6 SSM).
 
-Import preset **Production geo fanout** → **Pipeline** view in the app.
+Import preset **Production geo fanout** → **Semantic** view in the app (preset loads `pipeline.tfd` for declared dataflow edges).

@@ -1,5 +1,5 @@
 /**
- * Worker-safe Terraform layout: merge plans, run semantic / module / pipeline layout,
+ * Worker-safe Terraform layout: merge plans, run semantic / module layout,
  * return a plain scene payload (no Response, no DOM).
  */
 import graphlibDot from "@dagrejs/graphlib-dot";
@@ -35,12 +35,6 @@ import {
 } from "./terraformTopologyPlacement";
 import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
-import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
-import {
-  DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE,
-  DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE,
-} from "./terraformPipelineLayoutMode";
-import { buildPipelineAtomGraph } from "./terraformPipelineAtoms";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -190,19 +184,12 @@ function appendImportMeta(
   };
 }
 
-/** Sequential layout (main-thread fallback and pipeline / single-bundle paths). */
+/** Sequential layout (main-thread fallback and single-bundle paths). */
 export async function layoutTerraformFromSources(
   sources: TerraformPlanParsingSources,
   options?: TerraformLayoutOptions,
 ): Promise<LayoutTerraformResult> {
-  const semanticLayout =
-    options?.semanticLayout === true && options?.pipelineLayout !== true;
-  const pipelineLayout = options?.pipelineLayout === true;
-  const pipelineLayoutMode =
-    options?.pipelineLayoutMode ?? DEFAULT_TERRAFORM_PIPELINE_LAYOUT_MODE;
-  const pipelineVerticalSolverMode =
-    options?.pipelineVerticalSolverMode ??
-    DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE;
+  const semanticLayout = options?.semanticLayout === true;
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -261,7 +248,7 @@ export async function layoutTerraformFromSources(
     }
   }
 
-  if (semanticLayout || pipelineLayout) {
+  if (semanticLayout) {
     const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
     if (
       !Array.isArray(rc) ||
@@ -274,7 +261,7 @@ export async function layoutTerraformFromSources(
         ok: false,
         status: 400,
         error:
-          "Semantic and pipeline layout require at least one managed resource in the plan or state file.",
+          "Semantic layout requires at least one managed resource in the plan or state file.",
       };
     }
   }
@@ -325,55 +312,7 @@ export async function layoutTerraformFromSources(
 
   let sceneBody: Record<string, unknown>;
 
-  if (pipelineLayout) {
-    const declared = nodes5[DECLARED_DATAFLOW_ORDERED_KEY];
-    if (!declared || declared.length === 0) {
-      return {
-        ok: false,
-        status: 400,
-        error:
-          "Pipeline layout requires a `.tfd` file with at least one resolved dataflow edge.",
-      };
-    }
-    const atomGraph = buildPipelineAtomGraph(nodes5, plan, tfdTexts);
-    if (!atomGraph || atomGraph.atoms.size === 0) {
-      return {
-        ok: false,
-        status: 400,
-        error:
-          "Pipeline layout could not resolve any layout atoms from the `.tfd` binds.",
-      };
-    }
-
-    const pipelineScene = await buildTerraformPipelineExcalidrawScene(
-      nodes5,
-      plan,
-      tfdTexts,
-      { pipelineLayoutMode, pipelineVerticalSolverMode },
-    );
-    emitLocalParseDebug({
-      phase: "pipelineLayout",
-      meta: pipelineScene.meta,
-      elementCount: pipelineScene.elements.length,
-    });
-    sceneBody = {
-      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-      elements: pipelineScene.elements,
-      ...(pipelineScene.files ? { files: pipelineScene.files } : {}),
-      meta: appendImportMeta(
-        {
-          ...pipelineScene.meta,
-          importSource,
-          plannedChanges: importSource !== "state-only",
-          representedResourceCount: pipelineScene.meta.atomCount,
-          omittedResourceCount: 0,
-        },
-        sources,
-        formatImportWarnings(importWarnings, tfdWarnings),
-        { stackIds, addressToStack },
-      ),
-    };
-  } else if (semanticLayout) {
+  if (semanticLayout) {
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const awsPlan = filterPlanByProviderFamily(semPlan, "aws");

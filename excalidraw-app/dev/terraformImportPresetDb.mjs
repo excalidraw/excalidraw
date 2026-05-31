@@ -28,14 +28,14 @@ function nowIso() {
 const joinRootRelative = (rootPath, relativePath) =>
   `${rootPath.replace(/\/+$/, "")}/${relativePath.replace(/^\/+/, "")}`;
 
-function migratePresetViewConstraint(db) {
+function migrateDropPipelineViewConstraint(db) {
   const row = db
     .prepare(
       `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'terraform_import_presets'`,
     )
     .get();
   const ddl = typeof row?.sql === "string" ? row.sql : "";
-  if (ddl.includes("'pipeline'")) {
+  if (!ddl.includes("'pipeline'")) {
     return;
   }
   db.exec(`
@@ -44,13 +44,23 @@ function migratePresetViewConstraint(db) {
       name TEXT NOT NULL,
       description TEXT,
       builtin INTEGER NOT NULL DEFAULT 0,
-      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
       root_path TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
-    INSERT INTO terraform_import_presets__new
-      SELECT id, name, description, builtin, view, root_path, created_at, updated_at
+    INSERT INTO terraform_import_presets__new (
+      id, name, description, builtin, view, root_path, created_at, updated_at
+    )
+      SELECT
+        id,
+        name,
+        description,
+        builtin,
+        CASE WHEN view = 'pipeline' THEN 'semantic' ELSE view END,
+        root_path,
+        created_at,
+        updated_at
       FROM terraform_import_presets;
     DROP TABLE terraform_import_presets;
     ALTER TABLE terraform_import_presets__new RENAME TO terraform_import_presets;
@@ -64,7 +74,7 @@ function ensureSchema(db) {
       name TEXT NOT NULL,
       description TEXT,
       builtin INTEGER NOT NULL DEFAULT 0,
-      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
       root_path TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -119,7 +129,7 @@ function ensureSchema(db) {
     db.exec(`ALTER TABLE terraform_import_preset_tfd ADD COLUMN content TEXT`);
   }
 
-  migratePresetViewConstraint(db);
+  migrateDropPipelineViewConstraint(db);
 }
 
 function presetHasStoredContent(db, presetId) {
