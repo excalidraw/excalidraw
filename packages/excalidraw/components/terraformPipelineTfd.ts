@@ -30,6 +30,24 @@ export function buildTfdPrimaryParentMap(
   return parentByTarget;
 }
 
+/**
+ * All declared sources per target, in TFD edge order (supports multi-parent handoffs).
+ */
+export function buildTfdIncomingSourcesByTarget(
+  edges: readonly PipelineAtomEdge[],
+): Map<string, string[]> {
+  const sorted = [...edges].sort(
+    (a, b) => a.sequence - b.sequence || a.source.localeCompare(b.source),
+  );
+  const sourcesByTarget = new Map<string, string[]>();
+  for (const e of sorted) {
+    const list = sourcesByTarget.get(e.target) ?? [];
+    list.push(e.source);
+    sourcesByTarget.set(e.target, list);
+  }
+  return sourcesByTarget;
+}
+
 export type TfdEdgeAdvance = {
   source: string;
   target: string;

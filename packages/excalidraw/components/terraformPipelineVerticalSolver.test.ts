@@ -540,6 +540,60 @@ describe("applyPipelineVerticalSolver", () => {
     }
   });
 
+  it("track-rows aligns dual-parent api6 to median of api4 and api5", async () => {
+    const trackGapSpacing = HEIGHT + GAP + 32;
+    const placements = [
+      {
+        ...placement("api4_compute", 2, 0, 48 + trackGapSpacing * 3),
+        trackId: "api4",
+      },
+      {
+        ...placement("api5_compute", 3, 0, 48 + trackGapSpacing * 4),
+        trackId: "api5",
+      },
+      {
+        ...placement("api6_gateway", 5, 0, 48 + trackGapSpacing * 5),
+        trackId: "api6",
+      },
+      {
+        ...placement("api6_compute", 6, 0, 48 + trackGapSpacing * 5),
+        trackId: "api6",
+      },
+    ];
+    const columns: PipelineColumn[] = [
+      { columnIndex: 2, atoms: ["api4_compute"], laneCount: 1 },
+      { columnIndex: 3, atoms: ["api5_compute"], laneCount: 1 },
+      { columnIndex: 5, atoms: ["api6_gateway"], laneCount: 1 },
+      { columnIndex: 6, atoms: ["api6_compute"], laneCount: 1 },
+    ];
+    const edges: PipelineAtomEdge[] = [
+      { source: "api4_compute", target: "api6_gateway", sequence: 0 },
+      { source: "api5_compute", target: "api6_gateway", sequence: 1 },
+      { source: "api6_gateway", target: "api6_compute", sequence: 2 },
+    ];
+    const slotHeight = new Map(placements.map((p) => [p.primaryAddress, HEIGHT]));
+    const colByAtom = new Map(
+      placements.map((p) => [p.primaryAddress, p.columnIndex]),
+    );
+    const primaryParent = buildTfdPrimaryParentMap(edges);
+    await applyPipelineVerticalSolver(
+      placements,
+      columns,
+      edges,
+      slotHeight,
+      colByAtom,
+      { mode: "track-rows", primaryParent },
+    );
+    const y = new Map(
+      placements.map((p) => [p.primaryAddress, p.packedOffsetY ?? 0]),
+    );
+    const expected =
+      ((y.get("api4_compute") ?? 0) + (y.get("api5_compute") ?? 0)) / 2;
+    expect(Math.abs((y.get("api6_gateway") ?? 0) - expected)).toBeLessThan(2);
+    expect(Math.abs((y.get("api6_compute") ?? 0) - expected)).toBeLessThan(2);
+    expect(y.get("api6_gateway")!).toBeLessThan(48 + trackGapSpacing * 5 - 50);
+  });
+
   it("track-rows-cascade aligns cascade compute to downstream gateway", async () => {
     const g = cascadeHandoffGraph();
     const trackGapSpacing = HEIGHT + GAP + 32;

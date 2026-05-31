@@ -139,7 +139,7 @@ const PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS: ReadonlyArray<{
     value: "track-rows",
     label: "Track rows",
     description:
-      "One horizontal row per API track; fan-out only inside a column.",
+      "One row per API track; trunk inline at consumer hub; multi-parent handoffs use parent median.",
   },
   {
     value: "track-rows-cascade",

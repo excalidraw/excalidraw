@@ -206,13 +206,34 @@ function mergeTrackRows(
   return rowByTrack;
 }
 
-function pinTrunkRowToFanoutMedian(
-  placements: readonly PipelineAtomPlacement[],
-  edges: readonly PipelineAtomEdge[],
-  colByAtom: ReadonlyMap<string, number>,
-  yByAtom: Map<string, number>,
+function floodTrackRowsToAtoms(
+  visible: readonly PipelineAtomPlacement[],
   placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
   primaryParent: ReadonlyMap<string, string>,
+  rowByTrack: Map<string, number>,
+  yByAtom: Map<string, number>,
+): void {
+  for (const p of visible) {
+    const track = trackForAtom(
+      p.primaryAddress,
+      placementByAtom,
+      primaryParent,
+    );
+    const rowY = rowByTrack.get(track);
+    if (rowY !== undefined) {
+      yByAtom.set(p.primaryAddress, rowY);
+    }
+  }
+}
+
+/** Gateways with 2+ handoff parents inherit median parent track row. */
+function applyMultiParentHandoffRows(
+  visible: readonly PipelineAtomPlacement[],
+  edges: readonly PipelineAtomEdge[],
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+  rowByTrack: Map<string, number>,
+  yByAtom: Map<string, number>,
 ): void {
   const edgeClass = new Map<PipelineAtomEdge, PipelineEdgeClass>();
   for (const edge of edges) {
@@ -222,37 +243,116 @@ function pinTrunkRowToFanoutMedian(
     );
   }
 
-  for (const placement of placements) {
-    if (placement.trackId !== "trunk") {
+  const handoffSourcesByTarget = new Map<string, string[]>();
+  for (const edge of edges) {
+    if (edgeClass.get(edge) !== "handoff") {
       continue;
     }
-    const source = placement.primaryAddress;
-    const sourceCol = colByAtom.get(source);
-    if (sourceCol === undefined) {
+    const list = handoffSourcesByTarget.get(edge.target) ?? [];
+    list.push(edge.source);
+    handoffSourcesByTarget.set(edge.target, list);
+  }
+
+  for (const [target, sources] of handoffSourcesByTarget) {
+    if (sources.length < 2) {
       continue;
     }
-    const childYs: number[] = [];
-    for (const edge of edges) {
-      if (edge.source !== source) {
-        continue;
-      }
-      const cls = edgeClass.get(edge) ?? "other";
-      if (cls === "ssm") {
-        continue;
-      }
-      const targetCol = colByAtom.get(edge.target);
-      if (targetCol === undefined || targetCol <= sourceCol) {
-        continue;
-      }
-      const ty = yByAtom.get(edge.target);
-      if (ty !== undefined) {
-        childYs.push(ty);
+    const parentYs: number[] = [];
+    for (const source of sources) {
+      const sourceTrack = trackForAtom(
+        source,
+        placementByAtom,
+        primaryParent,
+      );
+      const y = rowByTrack.get(sourceTrack);
+      if (y !== undefined) {
+        parentYs.push(y);
       }
     }
-    const m = median(childYs);
-    if (!Number.isNaN(m)) {
-      yByAtom.set(source, m);
+    const rowY = median(parentYs);
+    if (Number.isNaN(rowY)) {
+      continue;
     }
+    const targetTrack = trackForAtom(target, placementByAtom, primaryParent);
+    rowByTrack.set(targetTrack, rowY);
+  }
+
+  for (const edge of edges) {
+    if (edgeClass.get(edge) !== "backbone") {
+      continue;
+    }
+    const sourceTrack = trackForAtom(
+      edge.source,
+      placementByAtom,
+      primaryParent,
+    );
+    const targetTrack = trackForAtom(
+      edge.target,
+      placementByAtom,
+      primaryParent,
+    );
+    if (sourceTrack !== targetTrack) {
+      continue;
+    }
+    const sy = rowByTrack.get(sourceTrack);
+    if (sy !== undefined) {
+      rowByTrack.set(targetTrack, sy);
+    }
+  }
+
+  floodTrackRowsToAtoms(
+    visible,
+    placementByAtom,
+    primaryParent,
+    rowByTrack,
+    yByAtom,
+  );
+}
+
+/** ECS → SQS → Lambda share one row at the median of entry API (1–5) gateway rows. */
+function alignTrunkBackboneRow(
+  visible: readonly PipelineAtomPlacement[],
+  edges: readonly PipelineAtomEdge[],
+  yByAtom: Map<string, number>,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+): void {
+  const entryGatewayYs: number[] = [];
+  for (const edge of edges) {
+    const sourceTrack = trackForAtom(
+      edge.source,
+      placementByAtom,
+      primaryParent,
+    );
+    const targetTrack = trackForAtom(
+      edge.target,
+      placementByAtom,
+      primaryParent,
+    );
+    if (sourceTrack !== "trunk" || !/^api[1-5]$/i.test(targetTrack)) {
+      continue;
+    }
+    const ty = yByAtom.get(edge.target);
+    if (ty !== undefined) {
+      entryGatewayYs.push(ty);
+    }
+  }
+
+  const hubY = median(entryGatewayYs);
+  if (Number.isNaN(hubY)) {
+    return;
+  }
+
+  for (const p of visible) {
+    const track = trackForAtom(
+      p.primaryAddress,
+      placementByAtom,
+      primaryParent,
+    );
+    if (track !== "trunk") {
+      continue;
+    }
+    yByAtom.set(p.primaryAddress, hubY);
   }
 }
 
@@ -263,6 +363,7 @@ function resolveColumnOverlaps(
   yByAtom: Map<string, number>,
   gap: number,
   primaryParent: ReadonlyMap<string, string>,
+  rowByTrack: ReadonlyMap<string, number>,
 ): void {
   for (const col of columns) {
     const atoms = col.atoms.filter(
@@ -282,11 +383,24 @@ function resolveColumnOverlaps(
     for (let i = 1; i < sorted.length; i++) {
       const prev = sorted[i - 1]!;
       const next = sorted[i]!;
+      const prevTrack = trackForAtom(prev, placementByAtom, primaryParent);
+      const nextTrack = trackForAtom(next, placementByAtom, primaryParent);
       const prevH = slotHeight.get(prev) ?? DEFAULT_SLOT;
       const nextH = slotHeight.get(next) ?? DEFAULT_SLOT;
       const minDelta = prevH / 2 + nextH / 2 + gap;
       const prevY = yByAtom.get(prev)!;
       const nextY = yByAtom.get(next)!;
+      if (prevTrack !== nextTrack) {
+        const prevRow = rowByTrack.get(prevTrack) ?? prevY;
+        const nextRow = rowByTrack.get(nextTrack) ?? nextY;
+        const trackSep = Math.abs(nextRow - prevRow);
+        if (
+          trackSep >= minDelta - 0.001 &&
+          nextY >= prevY + minDelta - 0.001
+        ) {
+          continue;
+        }
+      }
       if (nextY < prevY + minDelta) {
         yByAtom.set(next, prevY + minDelta);
       }
@@ -304,15 +418,6 @@ export function assignTrackRows(options: AssignTrackRowsOptions): Map<string, nu
   const placementByAtom = new Map(
     options.placements.map((p) => [p.primaryAddress, p]),
   );
-  const colByAtom = new Map<string, number>();
-  for (const col of options.columns) {
-    for (const atom of col.atoms) {
-      colByAtom.set(atom, col.columnIndex);
-    }
-  }
-  for (const p of options.placements) {
-    colByAtom.set(p.primaryAddress, p.columnIndex);
-  }
 
   const visible = options.placements.filter(
     (p) =>
@@ -366,6 +471,23 @@ export function assignTrackRows(options: AssignTrackRowsOptions): Map<string, nu
     }
   }
 
+  applyMultiParentHandoffRows(
+    visible,
+    options.edges,
+    placementByAtom,
+    options.primaryParent,
+    rowByTrack,
+    yByAtom,
+  );
+
+  alignTrunkBackboneRow(
+    visible,
+    options.edges,
+    yByAtom,
+    placementByAtom,
+    options.primaryParent,
+  );
+
   resolveColumnOverlaps(
     options.columns,
     placementByAtom,
@@ -373,15 +495,7 @@ export function assignTrackRows(options: AssignTrackRowsOptions): Map<string, nu
     yByAtom,
     gap,
     options.primaryParent,
-  );
-
-  pinTrunkRowToFanoutMedian(
-    visible,
-    options.edges,
-    colByAtom,
-    yByAtom,
-    placementByAtom,
-    options.primaryParent,
+    rowByTrack,
   );
 
   for (const p of options.placements) {

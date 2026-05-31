@@ -13,6 +13,7 @@ import { buildPipelineLayoutPlan } from "./terraformPipelineContainers";
 import { buildPipelineAtomGeoMap } from "./terraformPipelineGeo";
 import {
   buildPipelineColumnIndexMap,
+  buildTfdIncomingSourcesByTarget,
   buildTfdPrimaryParentMap,
 } from "./terraformPipelineTfd";
 import {
@@ -269,4 +270,21 @@ describe("staging pipeline TFD depth layout", () => {
     expect(api7SsmPlacement!.laneIndex).toBe(gwPlacement!.laneIndex);
     expect(api7ComputePlacement!.columnIndex).toBeLessThan(20);
   }, 120_000);
+});
+
+describe("buildTfdIncomingSourcesByTarget", () => {
+  it("records every declared source while primary parent keeps the first", () => {
+    const edges = [
+      { source: "api4_compute", target: "api6_gateway", sequence: 0 },
+      { source: "api5_compute", target: "api6_gateway", sequence: 1 },
+    ];
+    const incoming = buildTfdIncomingSourcesByTarget(edges);
+    expect(incoming.get("api6_gateway")).toEqual([
+      "api4_compute",
+      "api5_compute",
+    ]);
+    expect(buildTfdPrimaryParentMap(edges).get("api6_gateway")).toBe(
+      "api4_compute",
+    );
+  });
 });
