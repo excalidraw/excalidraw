@@ -43,6 +43,7 @@ import {
   type TerraformPipelineLayoutMode,
   type TerraformPipelineVerticalSolverMode,
 } from "./terraformPipelineLayoutMode";
+import { buildTfdPrimaryParentMap } from "./terraformPipelineTfd";
 import { applyPipelineVerticalSolver } from "./terraformPipelineVerticalSolver";
 import {
   buildTopologyPrimaryClusterSkeletonForPipeline,
@@ -1221,13 +1222,14 @@ export async function buildTerraformPipelineExcalidrawScene(
     slotHeight,
     colByAtom,
   );
+  const primaryParent = buildTfdPrimaryParentMap(atomGraph.edges);
   const verticalSolverResult = await applyPipelineVerticalSolver(
     layoutPlan.placements,
     layoutPlan.columns,
     atomGraph.edges,
     slotHeight,
     colByAtom,
-    { mode: pipelineVerticalSolverMode },
+    { mode: pipelineVerticalSolverMode, primaryParent },
   );
 
   const packedSpanCenter = packedSpanCenterY(layoutPlan.placements, contentTop);

@@ -358,7 +358,16 @@ export function assignPipelineColumnPackedY(
     );
   };
 
-  alignTrackAcrossColumns("trunk");
+  const tracksPresent = new Set<string>();
+  for (const p of visible) {
+    tracksPresent.add(p.trackId ?? "other");
+  }
+  const tracksToAlign = [...tracksPresent].sort(
+    (a, b) => trackSortIndex(a) - trackSortIndex(b),
+  );
+  for (const trackId of tracksToAlign) {
+    alignTrackAcrossColumns(trackId);
+  }
 
   const trackSlot = new Map<string, number>();
   for (const track of TRACK_ORDER) {

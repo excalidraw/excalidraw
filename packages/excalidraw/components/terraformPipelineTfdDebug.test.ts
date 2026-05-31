@@ -527,6 +527,9 @@ describe("staging pipeline.tfd resolution", () => {
 
   it.each([
     "none",
+    "track-rows",
+    "track-rows-cascade",
+    "track-rows-reorder",
     "straight-y",
     "straight-reorder",
     "straight-relay",
@@ -572,10 +575,10 @@ describe("staging pipeline.tfd resolution", () => {
     180_000,
   );
 
-  it("pipeline straight-y increases row-aligned declared arrows in global-relayer mode", async () => {
+  it("pipeline track-rows increases row-aligned declared arrows in global-relayer mode", async () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
     const tfd = readStagingMultiStatePipelineTfdFromDb();
-    const build = async (pipelineVerticalSolverMode: "none" | "straight-y") => {
+    const build = async (pipelineVerticalSolverMode: "none" | "track-rows") => {
       const res = await terraformPlanParsingFromSources(
         {
           planDotBundles: bundles,
@@ -614,10 +617,64 @@ describe("staging pipeline.tfd resolution", () => {
       }).length;
 
     const none = await build("none");
-    const straightY = await build("straight-y");
+    const trackRows = await build("track-rows");
 
-    expect(horizontalDeclaredArrowCount(straightY)).toBeGreaterThan(
+    expect(horizontalDeclaredArrowCount(trackRows)).toBeGreaterThan(
       horizontalDeclaredArrowCount(none),
+    );
+  }, 180_000);
+
+  it("pipeline track-rows-reorder stays competitive with track-rows on staging horizontal arrows", async () => {
+    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
+    const build = async (
+      pipelineVerticalSolverMode: "track-rows" | "track-rows-reorder",
+    ) => {
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        {
+          pipelineLayout: true,
+          pipelineLayoutMode: "global-relayer",
+          pipelineVerticalSolverMode,
+        },
+      );
+      expect(res.ok).toBe(true);
+      return res.json();
+    };
+
+    const horizontalDeclaredArrowCount = (body: {
+      elements: readonly {
+        type?: string;
+        points?: readonly (readonly number[])[];
+        customData?: { terraformEdgeLayer?: string };
+      }[];
+    }) =>
+      body.elements.filter((e) => {
+        if (
+          e.type !== "arrow" ||
+          e.customData?.terraformEdgeLayer !== "declaredDataFlow"
+        ) {
+          return false;
+        }
+        const points = e.points;
+        const end = points?.[points.length - 1];
+        return end != null && Math.abs(end[1] ?? Infinity) < 4;
+      }).length;
+
+    const trackRows = await build("track-rows");
+    const reorder = await build("track-rows-reorder");
+
+    expect(horizontalDeclaredArrowCount(reorder)).toBeGreaterThanOrEqual(
+      horizontalDeclaredArrowCount(trackRows) - 3,
+    );
+    expectNoPrimaryClusterOverlapWithinPipelineColumn(
+      reorder.elements as SceneElement[],
     );
   }, 180_000);
 });

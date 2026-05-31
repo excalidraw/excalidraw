@@ -136,24 +136,41 @@ const PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS: ReadonlyArray<{
   description: string;
 }> = [
   {
+    value: "track-rows",
+    label: "Track rows",
+    description:
+      "One horizontal row per API track; fan-out only inside a column.",
+  },
+  {
+    value: "track-rows-cascade",
+    label: "Track rows + cascade",
+    description:
+      "Per-API rows with tier handoffs merged onto upstream compute rows.",
+  },
+  {
+    value: "track-rows-reorder",
+    label: "Track rows + reorder",
+    description: "Reorder column atoms for crossings, then assign track rows.",
+  },
+  {
     value: "straight-y",
-    label: "Straight Y",
-    description: "Keep row order and move Y to align connected resources.",
+    label: "Straight Y (legacy)",
+    description: "Iterative column-forward Y solver (older).",
   },
   {
     value: "straight-reorder",
-    label: "Straight + reorder",
-    description: "Reorder rows inside fixed columns before Y alignment.",
+    label: "Straight + reorder (legacy)",
+    description: "Legacy straight solver with column reorder.",
   },
   {
     value: "straight-relay",
-    label: "Straight + relays",
-    description: "Reorder rows and draw non-horizontal arrows with bends.",
+    label: "Straight + relays (legacy)",
+    description: "Legacy straight layout with relay arrow bends.",
   },
   {
     value: "none",
     label: "None",
-    description: "Use current packed vertical placement.",
+    description: "Use column pack Y only (no vertical solver).",
   },
   {
     value: "constrained-ls",

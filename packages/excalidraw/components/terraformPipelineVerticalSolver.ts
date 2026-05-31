@@ -3,6 +3,11 @@
 import ELK from "elkjs/lib/elk.bundled.js";
 
 import { isTfdHopAddress } from "./terraformDeclaredDataFlow";
+import {
+  derivePipelineTrackId,
+  trackSortIndex,
+} from "./terraformPipelineColumnPack";
+import { assignTrackRows } from "./terraformPipelineTrackRows";
 
 import type { PipelineAtomEdge } from "./terraformPipelineAtoms";
 import type {
@@ -36,7 +41,86 @@ export type PipelineVerticalSolverOptions = {
   gap?: number;
   anchorWeight?: number;
   edgeWeight?: number;
+  primaryParent?: ReadonlyMap<string, string>;
 };
+
+type PipelineEdgeClass = "backbone" | "handoff" | "ssm" | "other";
+
+function median(values: readonly number[]): number {
+  if (values.length === 0) {
+    return Number.NaN;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) {
+    return sorted[mid]!;
+  }
+  return (sorted[mid - 1]! + sorted[mid]!) / 2;
+}
+
+function isSsmAddress(address: string): boolean {
+  return /aws_ssm_parameter/i.test(address);
+}
+
+function isGatewayAddress(address: string): boolean {
+  return /aws_api_gateway_rest_api|_gateway$/i.test(address);
+}
+
+function isComputeLikeAddress(address: string): boolean {
+  return (
+    /aws_ecs_service|aws_lambda_function|_compute$/i.test(address) ||
+    /::module\.api\.(aws_ecs_service|module\.lambda)/i.test(address)
+  );
+}
+
+function isDatastoreAddress(address: string): boolean {
+  return (
+    /aws_db_instance|aws_rds_cluster|aws_dynamodb_table|aws_s3_bucket/i.test(
+      address,
+    ) ||
+    /(?:^|_)store$/i.test(address) ||
+    /datastores/i.test(address)
+  );
+}
+
+function trackForAtom(
+  address: string,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+): string {
+  const p = placementByAtom.get(address);
+  if (p?.trackId) {
+    return p.trackId;
+  }
+  return derivePipelineTrackId(address, primaryParent);
+}
+
+function classifyPipelineEdge(
+  edge: PipelineAtomEdge,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+): PipelineEdgeClass {
+  const { source, target } = edge;
+  if (isSsmAddress(target)) {
+    return "ssm";
+  }
+  const sourceTrack = trackForAtom(source, placementByAtom, primaryParent);
+  const targetTrack = trackForAtom(target, placementByAtom, primaryParent);
+  if (
+    sourceTrack === targetTrack &&
+    primaryParent.get(target) === source
+  ) {
+    return "backbone";
+  }
+  if (
+    sourceTrack !== targetTrack &&
+    isGatewayAddress(target) &&
+    isComputeLikeAddress(source)
+  ) {
+    return "handoff";
+  }
+  return "other";
+}
 
 type VisibleAtom = {
   atom: string;
@@ -77,6 +161,7 @@ function projectColumnOrder(
   atomsById: ReadonlyMap<string, VisibleAtom>,
   yByAtom: Map<string, number>,
   gap: number,
+  preserveOriginalSpacing = false,
 ): void {
   for (const col of columns) {
     const atoms = col.atoms.filter((atom) => atomsById.has(atom));
@@ -88,7 +173,10 @@ function projectColumnOrder(
       const next = atoms[i]!;
       const prevAtom = atomsById.get(prev)!;
       const nextAtom = atomsById.get(next)!;
-      const minDelta = prevAtom.halfHeight + nextAtom.halfHeight + gap;
+      const heightMin = prevAtom.halfHeight + nextAtom.halfHeight + gap;
+      const minDelta = preserveOriginalSpacing
+        ? Math.max(heightMin, nextAtom.initialY - prevAtom.initialY)
+        : heightMin;
       const prevY = yByAtom.get(prev) ?? prevAtom.initialY;
       const nextY = yByAtom.get(next) ?? nextAtom.initialY;
       if (nextY < prevY + minDelta) {
@@ -100,7 +188,10 @@ function projectColumnOrder(
       const next = atoms[i + 1]!;
       const prevAtom = atomsById.get(prev)!;
       const nextAtom = atomsById.get(next)!;
-      const minDelta = prevAtom.halfHeight + nextAtom.halfHeight + gap;
+      const heightMin = prevAtom.halfHeight + nextAtom.halfHeight + gap;
+      const minDelta = preserveOriginalSpacing
+        ? Math.max(heightMin, nextAtom.initialY - prevAtom.initialY)
+        : heightMin;
       const prevY = yByAtom.get(prev) ?? prevAtom.initialY;
       const nextY = yByAtom.get(next) ?? nextAtom.initialY;
       if (prevY > nextY - minDelta) {
@@ -116,6 +207,389 @@ function projectColumnOrder(
   }
 }
 
+function blendWithAnchor(
+  atom: string,
+  candidateY: number,
+  yByAtom: Map<string, number>,
+  atomsById: ReadonlyMap<string, VisibleAtom>,
+  desiredY: ReadonlyMap<string, number> | undefined,
+  anchorWeight: number,
+): number {
+  const atomInfo = atomsById.get(atom);
+  const anchor = desiredY?.get(atom) ?? atomInfo?.initialY ?? candidateY;
+  return (
+    (anchor * anchorWeight + candidateY) /
+    Math.max(anchorWeight + 1, 0.000001)
+  );
+}
+
+function medianFromForwardSources(
+  target: string,
+  targetCol: number,
+  edges: readonly PipelineAtomEdge[],
+  colByAtom: ReadonlyMap<string, number>,
+  yByAtom: ReadonlyMap<string, number>,
+  edgeClass: ReadonlyMap<PipelineAtomEdge, PipelineEdgeClass>,
+): number {
+  const backbone: number[] = [];
+  const handoff: number[] = [];
+  const other: number[] = [];
+  for (const edge of edges) {
+    if (edge.target !== target) {
+      continue;
+    }
+    const sourceCol = colByAtom.get(edge.source);
+    if (sourceCol === undefined || sourceCol >= targetCol) {
+      continue;
+    }
+    const sy = yByAtom.get(edge.source);
+    if (sy === undefined) {
+      continue;
+    }
+    const cls = edgeClass.get(edge) ?? "other";
+    if (cls === "ssm") {
+      continue;
+    }
+    if (cls === "backbone") {
+      backbone.push(sy);
+    } else if (cls === "handoff") {
+      handoff.push(sy);
+    } else {
+      other.push(sy);
+    }
+  }
+  if (backbone.length > 0) {
+    return median(backbone);
+  }
+  if (handoff.length > 0) {
+    return median(handoff);
+  }
+  if (other.length > 0) {
+    return median(other);
+  }
+  return Number.NaN;
+}
+
+function medianFromBackwardChildren(
+  source: string,
+  sourceCol: number,
+  edges: readonly PipelineAtomEdge[],
+  colByAtom: ReadonlyMap<string, number>,
+  yByAtom: ReadonlyMap<string, number>,
+  edgeClass: ReadonlyMap<PipelineAtomEdge, PipelineEdgeClass>,
+  primaryParent: ReadonlyMap<string, string>,
+): number {
+  const ys: number[] = [];
+  for (const edge of edges) {
+    if (edge.source !== source) {
+      continue;
+    }
+    const targetCol = colByAtom.get(edge.target);
+    if (targetCol === undefined || targetCol <= sourceCol) {
+      continue;
+    }
+    const cls = edgeClass.get(edge) ?? "other";
+    if (cls === "ssm") {
+      continue;
+    }
+    if (cls === "backbone" && primaryParent.get(edge.target) !== source) {
+      continue;
+    }
+    const ty = yByAtom.get(edge.target);
+    if (ty !== undefined) {
+      ys.push(ty);
+    }
+  }
+  return median(ys);
+}
+
+function solveColumnForward(params: {
+  atoms: readonly VisibleAtom[];
+  columns: readonly PipelineColumn[];
+  edges: readonly PipelineAtomEdge[];
+  colByAtom: ReadonlyMap<string, number>;
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>;
+  primaryParent: ReadonlyMap<string, string>;
+  desiredY?: ReadonlyMap<string, number>;
+  sweeps: number;
+  gap: number;
+  anchorWeight: number;
+  preserveOriginalSpacing: boolean;
+}): Map<string, number> {
+  const atomsById = new Map(params.atoms.map((atom) => [atom.atom, atom]));
+  const yByAtom = new Map(
+    params.atoms.map((atom) => [atom.atom, atom.initialY]),
+  );
+  const edgeClass = new Map<PipelineAtomEdge, PipelineEdgeClass>();
+  for (const edge of params.edges) {
+    edgeClass.set(
+      edge,
+      classifyPipelineEdge(edge, params.placementByAtom, params.primaryParent),
+    );
+  }
+  const maxCol = Math.max(...params.atoms.map((a) => a.columnIndex), 0);
+  const atomsByCol = new Map<number, VisibleAtom[]>();
+  for (const atom of params.atoms) {
+    const list = atomsByCol.get(atom.columnIndex) ?? [];
+    list.push(atom);
+    atomsByCol.set(atom.columnIndex, list);
+  }
+
+  for (let sweep = 0; sweep < params.sweeps; sweep++) {
+    const next = new Map(yByAtom);
+    for (let c = 1; c <= maxCol; c++) {
+      for (const atom of atomsByCol.get(c) ?? []) {
+        const m = medianFromForwardSources(
+          atom.atom,
+          c,
+          params.edges,
+          params.colByAtom,
+          yByAtom,
+          edgeClass,
+        );
+        if (!Number.isNaN(m)) {
+          next.set(
+            atom.atom,
+            blendWithAnchor(
+              atom.atom,
+              m,
+              yByAtom,
+              atomsById,
+              params.desiredY,
+              params.anchorWeight,
+            ),
+          );
+        }
+      }
+    }
+    for (let c = maxCol - 1; c >= 0; c--) {
+      for (const atom of atomsByCol.get(c) ?? []) {
+        const m = medianFromBackwardChildren(
+          atom.atom,
+          c,
+          params.edges,
+          params.colByAtom,
+          next,
+          edgeClass,
+          params.primaryParent,
+        );
+        if (!Number.isNaN(m)) {
+          const blended = blendWithAnchor(
+            atom.atom,
+            m,
+            next,
+            atomsById,
+            params.desiredY,
+            params.anchorWeight,
+          );
+          next.set(atom.atom, blended);
+        }
+      }
+    }
+    projectColumnOrder(
+      params.columns,
+      atomsById,
+      next,
+      params.gap,
+      params.preserveOriginalSpacing,
+    );
+    yByAtom.clear();
+    for (const [atom, y] of next) {
+      yByAtom.set(atom, y);
+    }
+  }
+  finiteOrThrow(yByAtom);
+  return yByAtom;
+}
+
+function computeTargetYByTrack(
+  atoms: readonly VisibleAtom[],
+  placements: readonly PipelineAtomPlacement[],
+  columns: readonly PipelineColumn[],
+  edges: readonly PipelineAtomEdge[],
+  yByAtom: ReadonlyMap<string, number>,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+  atomsById: ReadonlyMap<string, VisibleAtom>,
+): Map<string, number> {
+  const visible = new Set(atoms.map((atom) => atom.atom));
+  const multiAtomCols = new Set<number>();
+  for (const col of columns) {
+    if (col.atoms.filter((a) => visible.has(a)).length > 1) {
+      multiAtomCols.add(col.columnIndex);
+    }
+  }
+
+  const storeAuthYsByTrack = new Map<string, number[]>();
+  const columnAuthYsByTrack = new Map<string, number[]>();
+  const allYsByTrack = new Map<string, number[]>();
+  for (const placement of placements) {
+    if (!visible.has(placement.primaryAddress)) {
+      continue;
+    }
+    const track = placement.trackId ?? placement.primaryAddress;
+    const addr = placement.primaryAddress;
+    // Use packed initial Y for track targets — not post-solve yByAtom (avoids drift).
+    const y = atomsById.get(addr)?.initialY ?? placement.packedOffsetY ?? 0;
+    const all = allYsByTrack.get(track) ?? [];
+    all.push(y);
+    allYsByTrack.set(track, all);
+    const authY = atomsById.get(addr)?.initialY ?? y;
+    if (isDatastoreAddress(addr)) {
+      const store = storeAuthYsByTrack.get(track) ?? [];
+      store.push(authY);
+      storeAuthYsByTrack.set(track, store);
+    } else if (multiAtomCols.has(placement.columnIndex)) {
+      const col = columnAuthYsByTrack.get(track) ?? [];
+      col.push(authY);
+      columnAuthYsByTrack.set(track, col);
+    }
+  }
+
+  const targetByTrack = new Map<string, number>();
+  for (const [track, allYs] of allYsByTrack) {
+    const ys =
+      storeAuthYsByTrack.get(track) ??
+      columnAuthYsByTrack.get(track) ??
+      allYs;
+    const sorted = [...ys].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    targetByTrack.set(
+      track,
+      sorted.length % 2 === 1
+        ? sorted[mid]!
+        : (sorted[mid - 1]! + sorted[mid]!) / 2,
+    );
+  }
+
+  const edgeClass = new Map<PipelineAtomEdge, PipelineEdgeClass>();
+  for (const edge of edges) {
+    edgeClass.set(
+      edge,
+      classifyPipelineEdge(edge, placementByAtom, primaryParent),
+    );
+  }
+  for (const edge of edges) {
+    if (edgeClass.get(edge) !== "handoff") {
+      continue;
+    }
+    if (!visible.has(edge.source) || !visible.has(edge.target)) {
+      continue;
+    }
+    const sourceTrack = trackForAtom(
+      edge.source,
+      placementByAtom,
+      primaryParent,
+    );
+    const targetTrack = trackForAtom(
+      edge.target,
+      placementByAtom,
+      primaryParent,
+    );
+    const rowY =
+      targetByTrack.get(sourceTrack) ??
+      atomsById.get(edge.source)?.initialY ??
+      yByAtom.get(edge.source);
+    if (rowY !== undefined) {
+      targetByTrack.set(targetTrack, rowY);
+    }
+  }
+
+  return targetByTrack;
+}
+
+function applyTrackBandSnap(params: {
+  atoms: readonly VisibleAtom[];
+  placements: PipelineAtomPlacement[];
+  columns: readonly PipelineColumn[];
+  edges: readonly PipelineAtomEdge[];
+  yByAtom: Map<string, number>;
+  gap: number;
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>;
+  primaryParent: ReadonlyMap<string, string>;
+  preserveOriginalSpacing: boolean;
+}): void {
+  const atomsById = new Map(params.atoms.map((atom) => [atom.atom, atom]));
+  /** Snap per-API rows only; trunk/relay uses column-forward positioning. */
+  const shouldSnapTrack = (track: string) => /^api\d+$/i.test(track);
+
+  const targetByTrack = computeTargetYByTrack(
+    params.atoms,
+    params.placements,
+    params.columns,
+    params.edges,
+    params.yByAtom,
+    params.placementByAtom,
+    params.primaryParent,
+    atomsById,
+  );
+
+  const visible = new Set(params.atoms.map((a) => a.atom));
+  for (const [track, target] of targetByTrack) {
+    if (!shouldSnapTrack(track)) {
+      continue;
+    }
+    for (const placement of params.placements) {
+      if (!visible.has(placement.primaryAddress)) {
+        continue;
+      }
+      if (placement.trackId !== track) {
+        continue;
+      }
+      params.yByAtom.set(placement.primaryAddress, target);
+      placement.packedOffsetY = target;
+    }
+  }
+
+  projectColumnOrder(
+    params.columns,
+    atomsById,
+    params.yByAtom,
+    params.gap,
+    params.preserveOriginalSpacing,
+  );
+}
+
+/** Center trunk/relay on the median Y of downstream fan-out children. */
+function pinTrunkRelayToFanoutMedian(
+  placements: readonly PipelineAtomPlacement[],
+  atoms: readonly VisibleAtom[],
+  edges: readonly PipelineAtomEdge[],
+  colByAtom: ReadonlyMap<string, number>,
+  yByAtom: Map<string, number>,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+): void {
+  const visible = new Set(atoms.map((a) => a.atom));
+  const edgeClass = new Map<PipelineAtomEdge, PipelineEdgeClass>();
+  for (const edge of edges) {
+    edgeClass.set(
+      edge,
+      classifyPipelineEdge(edge, placementByAtom, primaryParent),
+    );
+  }
+  for (const placement of placements) {
+    if (!visible.has(placement.primaryAddress)) {
+      continue;
+    }
+    if (placement.trackId !== "trunk") {
+      continue;
+    }
+    const m = medianFromBackwardChildren(
+      placement.primaryAddress,
+      placement.columnIndex,
+      edges,
+      colByAtom,
+      yByAtom,
+      edgeClass,
+      primaryParent,
+    );
+    if (!Number.isNaN(m)) {
+      yByAtom.set(placement.primaryAddress, m);
+    }
+  }
+}
+
 function solveByAveraging(params: {
   atoms: readonly VisibleAtom[];
   columns: readonly PipelineColumn[];
@@ -126,6 +600,7 @@ function solveByAveraging(params: {
   gap: number;
   anchorWeight: number;
   edgeWeight: number;
+  preserveOriginalSpacing?: boolean;
 }): Map<string, number> {
   const atomsById = new Map(params.atoms.map((atom) => [atom.atom, atom]));
   const yByAtom = new Map(
@@ -161,7 +636,7 @@ function solveByAveraging(params: {
       }
       next.set(atom.atom, weightedY / Math.max(totalWeight, 0.000001));
     }
-    projectColumnOrder(params.columns, atomsById, next, params.gap);
+    projectColumnOrder(params.columns, atomsById, next, params.gap, params.preserveOriginalSpacing);
     yByAtom.clear();
     for (const [atom, y] of next) {
       yByAtom.set(atom, y);
@@ -179,34 +654,35 @@ function isStraightMode(mode: TerraformPipelineVerticalSolverMode): boolean {
   );
 }
 
+function isTrackRowsMode(mode: TerraformPipelineVerticalSolverMode): boolean {
+  return (
+    mode === "track-rows" ||
+    mode === "track-rows-cascade" ||
+    mode === "track-rows-reorder"
+  );
+}
+
 function straightTrackDesiredY(
   atoms: readonly VisibleAtom[],
   placements: readonly PipelineAtomPlacement[],
+  columns: readonly PipelineColumn[],
 ): Map<string, number> {
+  const atomsById = new Map(atoms.map((atom) => [atom.atom, atom]));
+  const placementByAtom = new Map(
+    placements.map((p) => [p.primaryAddress, p]),
+  );
+  const targetByTrack = computeTargetYByTrack(
+    atoms,
+    placements,
+    columns,
+    [],
+    new Map(atoms.map((atom) => [atom.atom, atom.initialY])),
+    placementByAtom,
+    new Map(),
+    atomsById,
+  );
+
   const visible = new Set(atoms.map((atom) => atom.atom));
-  const ysByTrack = new Map<string, number[]>();
-  for (const placement of placements) {
-    if (!visible.has(placement.primaryAddress)) {
-      continue;
-    }
-    const track = placement.trackId ?? placement.primaryAddress;
-    const ys = ysByTrack.get(track) ?? [];
-    ys.push(placement.packedOffsetY ?? 0);
-    ysByTrack.set(track, ys);
-  }
-
-  const targetByTrack = new Map<string, number>();
-  for (const [track, ys] of ysByTrack) {
-    const sorted = [...ys].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    targetByTrack.set(
-      track,
-      sorted.length % 2 === 1
-        ? sorted[mid]!
-        : (sorted[mid - 1]! + sorted[mid]!) / 2,
-    );
-  }
-
   const out = new Map<string, number>();
   for (const placement of placements) {
     if (!visible.has(placement.primaryAddress)) {
@@ -226,6 +702,7 @@ function reorderColumnsForStraightness(
   columns: readonly PipelineColumn[],
   edges: readonly PipelineAtomEdge[],
   atoms: readonly VisibleAtom[],
+  primaryParent: ReadonlyMap<string, string>,
 ): void {
   const visible = new Set(atoms.map((atom) => atom.atom));
   const originalOrder = new Map<string, number>();
@@ -252,9 +729,18 @@ function reorderColumnsForStraightness(
     col.atoms.forEach((atom, index) => rank.set(atom, index));
   }
 
+  const trackIndex = (atom: string) =>
+    trackSortIndex(
+      trackForAtom(atom, placementByAtom, primaryParent),
+    );
+
   for (let sweep = 0; sweep < 8; sweep++) {
     for (const col of columns) {
       const sorted = [...col.atoms].sort((a, b) => {
+        const trackDiff = trackIndex(a) - trackIndex(b);
+        if (trackDiff !== 0) {
+          return trackDiff;
+        }
         const aNeighbors = neighbors.get(a) ?? [];
         const bNeighbors = neighbors.get(b) ?? [];
         const score = (atom: string, ns: readonly string[]) => {
@@ -284,6 +770,49 @@ function reorderColumnsForStraightness(
           placement.laneIndex = index;
         }
       });
+    }
+  }
+}
+
+/**
+ * After reordering column atoms, remap packedOffsetY per track so Y slots stay
+ * with the same trackId (not with column position index).
+ */
+function reassignPackedOffsetYAfterReorder(
+  placements: PipelineAtomPlacement[],
+  columns: readonly PipelineColumn[],
+  atoms: readonly VisibleAtom[],
+  primaryParent: ReadonlyMap<string, string>,
+): void {
+  const initialYByAtom = new Map(atoms.map((a) => [a.atom, a.initialY]));
+  const placementByAtom = new Map(
+    placements.map((p) => [p.primaryAddress, p]),
+  );
+  for (const col of columns) {
+    const colAtoms = col.atoms.filter((a) => initialYByAtom.has(a));
+    if (colAtoms.length <= 1) {
+      continue;
+    }
+    const ysByTrack = new Map<string, number[]>();
+    for (const atom of colAtoms) {
+      const track = trackForAtom(atom, placementByAtom, primaryParent);
+      const list = ysByTrack.get(track) ?? [];
+      list.push(initialYByAtom.get(atom)!);
+      ysByTrack.set(track, list);
+    }
+    for (const [, ys] of ysByTrack) {
+      ys.sort((a, b) => a - b);
+    }
+    const nextSlot = new Map<string, number>();
+    for (const atom of colAtoms) {
+      const track = trackForAtom(atom, placementByAtom, primaryParent);
+      const pool = ysByTrack.get(track) ?? [];
+      const slot = nextSlot.get(track) ?? 0;
+      const p = placementByAtom.get(atom);
+      if (p && pool[slot] !== undefined) {
+        p.packedOffsetY = pool[slot];
+      }
+      nextSlot.set(track, slot + 1);
     }
   }
 }
@@ -362,6 +891,29 @@ export function pipelineVerticalObjective(
   return total;
 }
 
+/** @internal Vitest helper for track target resolution. */
+export function pipelineTrackTargetYByTrackForTest(
+  atoms: readonly VisibleAtom[],
+  placements: readonly PipelineAtomPlacement[],
+  columns: readonly PipelineColumn[],
+  edges: readonly PipelineAtomEdge[],
+  yByAtom: ReadonlyMap<string, number>,
+  placementByAtom: ReadonlyMap<string, PipelineAtomPlacement>,
+  primaryParent: ReadonlyMap<string, string>,
+): Map<string, number> {
+  const atomsById = new Map(atoms.map((atom) => [atom.atom, atom]));
+  return computeTargetYByTrack(
+    atoms,
+    placements,
+    columns,
+    edges,
+    yByAtom,
+    placementByAtom,
+    primaryParent,
+    atomsById,
+  );
+}
+
 export async function applyPipelineVerticalSolver(
   placements: PipelineAtomPlacement[],
   columns: readonly PipelineColumn[],
@@ -387,32 +939,114 @@ export async function applyPipelineVerticalSolver(
     options.edgeWeight ??
     (isStraightMode(options.mode) ? STRAIGHT_EDGE_WEIGHT : DEFAULT_EDGE_WEIGHT);
   try {
+    const primaryParent = options.primaryParent ?? new Map<string, string>();
+    const placementByAtom = new Map(
+      placements.map((p) => [p.primaryAddress, p]),
+    );
+
+    if (isTrackRowsMode(options.mode)) {
+      let currentAtoms = atoms;
+      if (options.mode === "track-rows-reorder") {
+        reorderColumnsForStraightness(
+          placements,
+          columns,
+          edges,
+          currentAtoms,
+          primaryParent,
+        );
+        currentAtoms = visibleAtoms(placements, slotHeight);
+      }
+      assignTrackRows({
+        placements,
+        columns,
+        edges,
+        slotHeight,
+        primaryParent,
+        gap,
+        rowMode:
+          options.mode === "track-rows-cascade" ? "cascade-tier" : "per-api",
+      });
+      return { appliedMode: options.mode, warnings: [] };
+    }
+
+    let currentAtoms = atoms;
     if (
       options.mode === "straight-reorder" ||
       options.mode === "straight-relay"
     ) {
-      reorderColumnsForStraightness(placements, columns, edges, atoms);
+      reorderColumnsForStraightness(
+        placements,
+        columns,
+        edges,
+        currentAtoms,
+        primaryParent,
+      );
+      reassignPackedOffsetYAfterReorder(
+        placements,
+        columns,
+        currentAtoms,
+        primaryParent,
+      );
+      currentAtoms = visibleAtoms(placements, slotHeight);
     }
+    const preserveOriginalSpacing = isStraightMode(options.mode);
     const desiredY = isStraightMode(options.mode)
-      ? straightTrackDesiredY(atoms, placements)
+      ? straightTrackDesiredY(currentAtoms, placements, columns)
       : options.mode === "elk"
-      ? await elkDesiredY(atoms, edges)
+      ? await elkDesiredY(currentAtoms, edges)
       : undefined;
-    const yByAtom = solveByAveraging({
-      atoms,
-      columns,
-      edges,
-      colByAtom,
-      desiredY,
-      sweeps: isStraightMode(options.mode)
-        ? STRAIGHT_SWEEPS
-        : options.mode === "exact-qp"
-        ? EXACT_SWEEPS
-        : CONSTRAINED_SWEEPS,
-      gap,
-      anchorWeight,
-      edgeWeight,
-    });
+
+    const yByAtom = isStraightMode(options.mode)
+      ? solveColumnForward({
+          atoms: currentAtoms,
+          columns,
+          edges,
+          colByAtom,
+          placementByAtom,
+          primaryParent,
+          desiredY,
+          sweeps: STRAIGHT_SWEEPS,
+          gap,
+          anchorWeight,
+          preserveOriginalSpacing,
+        })
+      : solveByAveraging({
+          atoms: currentAtoms,
+          columns,
+          edges,
+          colByAtom,
+          desiredY,
+          sweeps:
+            options.mode === "exact-qp" ? EXACT_SWEEPS : CONSTRAINED_SWEEPS,
+          gap,
+          anchorWeight,
+          edgeWeight,
+          preserveOriginalSpacing,
+        });
+
+    if (isStraightMode(options.mode)) {
+      applyTrackBandSnap({
+        atoms: currentAtoms,
+        placements,
+        columns,
+        edges,
+        yByAtom,
+        gap,
+        placementByAtom,
+        primaryParent,
+        preserveOriginalSpacing,
+      });
+      pinTrunkRelayToFanoutMedian(
+        placements,
+        currentAtoms,
+        edges,
+        colByAtom,
+        yByAtom,
+        placementByAtom,
+        primaryParent,
+      );
+    }
+
     for (const placement of placements) {
       const y = yByAtom.get(placement.primaryAddress);
       if (y !== undefined) {

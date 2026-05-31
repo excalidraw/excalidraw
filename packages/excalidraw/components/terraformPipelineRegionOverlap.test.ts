@@ -197,6 +197,8 @@ function assertStagingRegionContainment(elements: SceneEl[]): void {
 describe("staging pipeline region overlap", () => {
   it.each([
     "none",
+    "track-rows",
+    "track-rows-reorder",
     "straight-y",
     "straight-reorder",
     "straight-relay",
