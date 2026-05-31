@@ -16,6 +16,7 @@ import {
 } from "./terraformElkLayout";
 
 import type { TerraformDataFlowEdgeRecord } from "./terraformExplodeGraph";
+import type { TerraformPipelineVerticalSolverMode } from "./terraformPipelineLayoutMode";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 const Y_ALIGN_EPS = 2;
@@ -48,6 +49,9 @@ export function buildPipelineDeclaredDataFlowLineSkeletons(
   nodes: TerraformPlanNodesMap,
   layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
   declaredEdges: readonly TerraformDataFlowEdgeRecord[],
+  options?: {
+    pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
+  },
 ): ExcalidrawElementSkeleton[] {
   const out: ExcalidrawElementSkeleton[] = [];
   let edgeIndex = 0;
@@ -72,6 +76,21 @@ export function buildPipelineDeclaredDataFlowLineSkeletons(
     const startY = startPoint.y;
     const endX = endPoint.x;
     const endY = endPoint.y;
+    const relayBends =
+      options?.pipelineVerticalSolverMode === "straight-relay" &&
+      Math.abs(startY - endY) >= Y_ALIGN_EPS
+        ? (() => {
+            const dir = endX >= startX ? 1 : -1;
+            const busX =
+              startX + dir * Math.max(48, Math.abs(endX - startX) * 0.28);
+            return [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(busX - startX, 0),
+              pointFrom<LocalPoint>(busX - startX, endY - startY),
+              pointFrom<LocalPoint>(endX - startX, endY - startY),
+            ];
+          })()
+        : null;
     const sequence =
       edge.detail != null && edge.detail !== ""
         ? Number(edge.detail)
@@ -84,7 +103,7 @@ export function buildPipelineDeclaredDataFlowLineSkeletons(
       y: startY,
       width: Math.abs(endX - startX),
       height: Math.abs(endY - startY),
-      points: [
+      points: relayBends ?? [
         pointFrom<LocalPoint>(0, 0),
         pointFrom<LocalPoint>(endX - startX, endY - startY),
       ],

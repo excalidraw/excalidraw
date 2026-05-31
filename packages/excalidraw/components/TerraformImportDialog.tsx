@@ -136,6 +136,21 @@ const PIPELINE_VERTICAL_SOLVER_MODE_OPTIONS: ReadonlyArray<{
   description: string;
 }> = [
   {
+    value: "straight-y",
+    label: "Straight Y",
+    description: "Keep row order and move Y to align connected resources.",
+  },
+  {
+    value: "straight-reorder",
+    label: "Straight + reorder",
+    description: "Reorder rows inside fixed columns before Y alignment.",
+  },
+  {
+    value: "straight-relay",
+    label: "Straight + relays",
+    description: "Reorder rows and draw non-horizontal arrows with bends.",
+  },
+  {
     value: "none",
     label: "None",
     description: "Use current packed vertical placement.",

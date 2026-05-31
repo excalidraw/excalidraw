@@ -212,7 +212,7 @@ describe("staging pipeline.tfd resolution", () => {
         tfdTexts: [tfd],
         tfdLabels: ["pipeline.tfd"],
       },
-      { pipelineLayout: true },
+      { pipelineLayout: true, pipelineVerticalSolverMode: "none" },
     );
     expect(res.ok).toBe(true);
     const body = await res.json();
@@ -525,7 +525,15 @@ describe("staging pipeline.tfd resolution", () => {
     180_000,
   );
 
-  it.each(["none", "constrained-ls", "elk", "exact-qp"] as const)(
+  it.each([
+    "none",
+    "straight-y",
+    "straight-reorder",
+    "straight-relay",
+    "constrained-ls",
+    "elk",
+    "exact-qp",
+  ] as const)(
     "pipeline vertical %s preserves staging arrows, atoms, and column spacing",
     async (pipelineVerticalSolverMode) => {
       const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
@@ -563,4 +571,53 @@ describe("staging pipeline.tfd resolution", () => {
     },
     180_000,
   );
+
+  it("pipeline straight-y increases row-aligned declared arrows in global-relayer mode", async () => {
+    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+    const tfd = readStagingMultiStatePipelineTfdFromDb();
+    const build = async (pipelineVerticalSolverMode: "none" | "straight-y") => {
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        {
+          pipelineLayout: true,
+          pipelineLayoutMode: "global-relayer",
+          pipelineVerticalSolverMode,
+        },
+      );
+      expect(res.ok).toBe(true);
+      return res.json();
+    };
+
+    const horizontalDeclaredArrowCount = (body: {
+      elements: readonly {
+        type?: string;
+        points?: readonly (readonly number[])[];
+        customData?: { terraformEdgeLayer?: string };
+      }[];
+    }) =>
+      body.elements.filter((e) => {
+        if (
+          e.type !== "arrow" ||
+          e.customData?.terraformEdgeLayer !== "declaredDataFlow"
+        ) {
+          return false;
+        }
+        const points = e.points;
+        const end = points?.[points.length - 1];
+        return end != null && Math.abs(end[1] ?? Infinity) < 4;
+      }).length;
+
+    const none = await build("none");
+    const straightY = await build("straight-y");
+
+    expect(horizontalDeclaredArrowCount(straightY)).toBeGreaterThan(
+      horizontalDeclaredArrowCount(none),
+    );
+  }, 180_000);
 });

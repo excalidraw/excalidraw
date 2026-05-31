@@ -1480,6 +1480,7 @@ export async function buildTerraformPipelineExcalidrawScene(
       nodes,
       layoutBoxes,
       declaredEdgeRecords,
+      { pipelineVerticalSolverMode: verticalSolverResult.appliedMode },
     ),
   );
 

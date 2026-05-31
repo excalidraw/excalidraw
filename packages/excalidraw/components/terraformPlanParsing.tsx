@@ -191,7 +191,7 @@ export type TerraformPlanParsingOptions = {
   pipelineLayout?: boolean;
   /** Pipeline column normalization mode. Defaults to legacy for compatibility. */
   pipelineLayoutMode?: TerraformPipelineLayoutMode;
-  /** Pipeline vertical coordinate solver. Defaults to none for compatibility. */
+  /** Pipeline vertical coordinate solver. Defaults to straight-y. */
   pipelineVerticalSolverMode?: TerraformPipelineVerticalSolverMode;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;

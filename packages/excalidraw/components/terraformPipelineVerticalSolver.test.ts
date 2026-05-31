@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { applyPipelineVerticalSolver } from "./terraformPipelineVerticalSolver";
+import { DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE } from "./terraformPipelineLayoutMode";
 
 import type { PipelineAtomEdge } from "./terraformPipelineAtoms";
 import type {
@@ -111,7 +112,19 @@ async function solve(mode: TerraformPipelineVerticalSolverMode) {
 }
 
 describe("applyPipelineVerticalSolver", () => {
-  it.each(["none", "constrained-ls", "elk", "exact-qp"] as const)(
+  it("defaults pipeline vertical positioning to straight Y", () => {
+    expect(DEFAULT_TERRAFORM_PIPELINE_VERTICAL_SOLVER_MODE).toBe("straight-y");
+  });
+
+  it.each([
+    "none",
+    "straight-y",
+    "straight-reorder",
+    "straight-relay",
+    "constrained-ls",
+    "elk",
+    "exact-qp",
+  ] as const)(
     "preserves non-overlap and fixed column membership in %s mode",
     async (mode) => {
       const solved = await solve(mode);
@@ -149,5 +162,22 @@ describe("applyPipelineVerticalSolver", () => {
       ["left", "right"],
       ["sink"],
     ]);
+  });
+
+  it("keeps straight reorder no worse than straight Y for horizontal edge count", async () => {
+    const straightY = await solve("straight-y");
+    const reordered = await solve("straight-reorder");
+    const horizontalCount = (placements: readonly PipelineAtomPlacement[]) => {
+      const y = new Map(
+        placements.map((p) => [p.primaryAddress, p.packedOffsetY ?? 0]),
+      );
+      return straightY.edges.filter(
+        (edge) =>
+          Math.abs((y.get(edge.source) ?? 0) - (y.get(edge.target) ?? 0)) < 2,
+      ).length;
+    };
+    expect(horizontalCount(reordered.placements)).toBeGreaterThanOrEqual(
+      horizontalCount(straightY.placements),
+    );
   });
 });

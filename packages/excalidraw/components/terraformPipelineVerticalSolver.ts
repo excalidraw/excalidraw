@@ -14,8 +14,11 @@ import type { TerraformPipelineVerticalSolverMode } from "./terraformPipelineLay
 const DEFAULT_GAP = 24;
 const DEFAULT_ANCHOR_WEIGHT = 0.2;
 const DEFAULT_EDGE_WEIGHT = 1;
+const STRAIGHT_ANCHOR_WEIGHT = 0.02;
+const STRAIGHT_EDGE_WEIGHT = 8;
 const CONSTRAINED_SWEEPS = 80;
 const EXACT_SWEEPS = 240;
+const STRAIGHT_SWEEPS = 180;
 const ELK_NODE_W = 120;
 
 export type PipelineVerticalSolverWarning = {
@@ -168,6 +171,123 @@ function solveByAveraging(params: {
   return yByAtom;
 }
 
+function isStraightMode(mode: TerraformPipelineVerticalSolverMode): boolean {
+  return (
+    mode === "straight-y" ||
+    mode === "straight-reorder" ||
+    mode === "straight-relay"
+  );
+}
+
+function straightTrackDesiredY(
+  atoms: readonly VisibleAtom[],
+  placements: readonly PipelineAtomPlacement[],
+): Map<string, number> {
+  const visible = new Set(atoms.map((atom) => atom.atom));
+  const ysByTrack = new Map<string, number[]>();
+  for (const placement of placements) {
+    if (!visible.has(placement.primaryAddress)) {
+      continue;
+    }
+    const track = placement.trackId ?? placement.primaryAddress;
+    const ys = ysByTrack.get(track) ?? [];
+    ys.push(placement.packedOffsetY ?? 0);
+    ysByTrack.set(track, ys);
+  }
+
+  const targetByTrack = new Map<string, number>();
+  for (const [track, ys] of ysByTrack) {
+    const sorted = [...ys].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    targetByTrack.set(
+      track,
+      sorted.length % 2 === 1
+        ? sorted[mid]!
+        : (sorted[mid - 1]! + sorted[mid]!) / 2,
+    );
+  }
+
+  const out = new Map<string, number>();
+  for (const placement of placements) {
+    if (!visible.has(placement.primaryAddress)) {
+      continue;
+    }
+    const track = placement.trackId ?? placement.primaryAddress;
+    const target = targetByTrack.get(track);
+    if (target !== undefined) {
+      out.set(placement.primaryAddress, target);
+    }
+  }
+  return out;
+}
+
+function reorderColumnsForStraightness(
+  placements: PipelineAtomPlacement[],
+  columns: readonly PipelineColumn[],
+  edges: readonly PipelineAtomEdge[],
+  atoms: readonly VisibleAtom[],
+): void {
+  const visible = new Set(atoms.map((atom) => atom.atom));
+  const originalOrder = new Map<string, number>();
+  for (const col of columns) {
+    col.atoms.forEach((atom, index) => originalOrder.set(atom, index));
+  }
+  const neighbors = new Map<string, string[]>();
+  for (const edge of edges) {
+    if (!visible.has(edge.source) || !visible.has(edge.target)) {
+      continue;
+    }
+    const out = neighbors.get(edge.source) ?? [];
+    out.push(edge.target);
+    neighbors.set(edge.source, out);
+    const incoming = neighbors.get(edge.target) ?? [];
+    incoming.push(edge.source);
+    neighbors.set(edge.target, incoming);
+  }
+  const placementByAtom = new Map(
+    placements.map((placement) => [placement.primaryAddress, placement]),
+  );
+  const rank = new Map<string, number>();
+  for (const col of columns) {
+    col.atoms.forEach((atom, index) => rank.set(atom, index));
+  }
+
+  for (let sweep = 0; sweep < 8; sweep++) {
+    for (const col of columns) {
+      const sorted = [...col.atoms].sort((a, b) => {
+        const aNeighbors = neighbors.get(a) ?? [];
+        const bNeighbors = neighbors.get(b) ?? [];
+        const score = (atom: string, ns: readonly string[]) => {
+          if (ns.length === 0) {
+            return rank.get(atom) ?? originalOrder.get(atom) ?? 0;
+          }
+          return (
+            ns.reduce(
+              (sum, neighbor) =>
+                sum + (rank.get(neighbor) ?? originalOrder.get(neighbor) ?? 0),
+              0,
+            ) / ns.length
+          );
+        };
+        const diff = score(a, aNeighbors) - score(b, bNeighbors);
+        if (Math.abs(diff) > 0.000001) {
+          return diff;
+        }
+        return (originalOrder.get(a) ?? 0) - (originalOrder.get(b) ?? 0);
+      });
+      col.atoms.splice(0, col.atoms.length, ...sorted);
+      col.laneCount = col.atoms.length;
+      sorted.forEach((atom, index) => {
+        rank.set(atom, index);
+        const placement = placementByAtom.get(atom);
+        if (placement) {
+          placement.laneIndex = index;
+        }
+      });
+    }
+  }
+}
+
 async function elkDesiredY(
   atoms: readonly VisibleAtom[],
   edges: readonly PipelineAtomEdge[],
@@ -258,18 +378,37 @@ export async function applyPipelineVerticalSolver(
     return { appliedMode: "none", warnings: [] };
   }
   const gap = options.gap ?? DEFAULT_GAP;
-  const anchorWeight = options.anchorWeight ?? DEFAULT_ANCHOR_WEIGHT;
-  const edgeWeight = options.edgeWeight ?? DEFAULT_EDGE_WEIGHT;
+  const anchorWeight =
+    options.anchorWeight ??
+    (isStraightMode(options.mode)
+      ? STRAIGHT_ANCHOR_WEIGHT
+      : DEFAULT_ANCHOR_WEIGHT);
+  const edgeWeight =
+    options.edgeWeight ??
+    (isStraightMode(options.mode) ? STRAIGHT_EDGE_WEIGHT : DEFAULT_EDGE_WEIGHT);
   try {
-    const desiredY =
-      options.mode === "elk" ? await elkDesiredY(atoms, edges) : undefined;
+    if (
+      options.mode === "straight-reorder" ||
+      options.mode === "straight-relay"
+    ) {
+      reorderColumnsForStraightness(placements, columns, edges, atoms);
+    }
+    const desiredY = isStraightMode(options.mode)
+      ? straightTrackDesiredY(atoms, placements)
+      : options.mode === "elk"
+      ? await elkDesiredY(atoms, edges)
+      : undefined;
     const yByAtom = solveByAveraging({
       atoms,
       columns,
       edges,
       colByAtom,
       desiredY,
-      sweeps: options.mode === "exact-qp" ? EXACT_SWEEPS : CONSTRAINED_SWEEPS,
+      sweeps: isStraightMode(options.mode)
+        ? STRAIGHT_SWEEPS
+        : options.mode === "exact-qp"
+        ? EXACT_SWEEPS
+        : CONSTRAINED_SWEEPS,
       gap,
       anchorWeight,
       edgeWeight,
