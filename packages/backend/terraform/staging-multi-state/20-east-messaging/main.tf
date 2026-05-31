@@ -160,7 +160,11 @@ module "ingress_queue" {
   source = "../../modules/encrypted_sqs_queue"
 
   queue_name = module.contract.ingress_queue_name
-  dlq_name   = "${var.environment}-events-dlq.fifo"
+  dlq_name   = module.contract.ingress_dlq_name
+  create_dlq = true
+
+  dlq_messages_alarm_name     = module.contract.ingress_dlq_messages_alarm_name
+  visible_messages_alarm_name = "${var.environment}-events-visible-messages"
 
   redrive_policy = {
     maxReceiveCount = 5
@@ -173,8 +177,11 @@ module "egress_queue" {
   source = "../../modules/encrypted_sqs_queue"
 
   queue_name = module.contract.egress_queue_name
-  dlq_name   = "${var.environment}-egress-dlq"
+  dlq_name   = module.contract.egress_dlq_name
   create_dlq = true
+
+  dlq_messages_alarm_name     = module.contract.egress_dlq_messages_alarm_name
+  visible_messages_alarm_name = "${var.environment}-egress-visible-messages"
 
   redrive_policy = {
     maxReceiveCount = 5
@@ -212,6 +219,10 @@ module "consumer_lambda" {
     EGRESS_QUEUE_URL = module.egress_queue.queue_url
   }
 
+  create_errors_alarm   = true
+  errors_alarm_name     = "${var.environment}-sqs-consumer-errors"
+  errors_alarm_threshold = 0
+
   attach_policy_statements = true
   policy_statements = {
     sqs_consume = {
@@ -248,6 +259,8 @@ resource "aws_lambda_event_source_mapping" "queue_consumer" {
   function_name    = module.consumer_lambda.lambda_function_arn
   batch_size       = 1
   enabled          = true
+
+  function_response_types = ["ReportBatchItemFailures"]
 }
 
 data "aws_iam_policy_document" "ecs_send_message" {

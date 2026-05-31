@@ -11,7 +11,11 @@ import {
 import { buildSyntheticPlanFromTfstate } from "./terraformStateToPlan";
 
 export type TerraformImportWarning = {
-  code: "duplicate_address" | "variable_mismatch" | "duplicate_tfd_bind";
+  code:
+    | "duplicate_address"
+    | "variable_mismatch"
+    | "duplicate_tfd_bind"
+    | "pipeline_cycle";
   message: string;
   address?: string;
   source?: string;

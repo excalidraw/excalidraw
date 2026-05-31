@@ -2,7 +2,13 @@
  * Modal to upload plan JSON + graph DOT bundles (optional raw state, optional .tfd),
  * or raw Terraform state alone, and replace the canvas with the locally generated scene.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
@@ -36,7 +42,7 @@ import {
 
 import "./TerraformImportDialog.scss";
 
-type TerraformView = "module" | "semantic";
+type TerraformView = "module" | "semantic" | "pipeline";
 
 const MAX_PLAN_BUNDLES = 10;
 
@@ -88,6 +94,12 @@ const VIEW_OPTIONS: ReadonlyArray<{
     label: "Semantic view",
     description:
       "AWS account, region, VPC, and subnet topology plus provider boxes for other clouds.",
+  },
+  {
+    value: "pipeline",
+    label: "Pipeline view",
+    description:
+      "Left-to-right .tfd dataflow columns with topology context frames.",
   },
   {
     value: "module",
@@ -241,14 +253,22 @@ export const TerraformImportModal = ({
   ) => {
     const canUseSemanticView =
       sources.planDotBundles.length > 0 || sources.states.length > 0;
-    const semanticLayout = importView === "semantic" && canUseSemanticView;
+    const layoutMode =
+      importView === "pipeline" && canUseSemanticView
+        ? "pipeline"
+        : importView === "semantic" && canUseSemanticView
+        ? "semantic"
+        : "module";
+    const semanticLayout = layoutMode === "semantic";
     const { importWarnings: warnings } = await runTerraformImportFromSources(
       app,
       setAppState,
       sources,
       {
         semanticLayout,
-        moduleLayoutOptions: semanticLayout ? undefined : moduleLayoutOptions,
+        layoutMode: layoutMode === "pipeline" ? "pipeline" : undefined,
+        moduleLayoutOptions:
+          layoutMode === "module" ? moduleLayoutOptions : undefined,
         importedTfdTexts: opts.importedTfdTexts,
         preset: opts.preset ?? null,
         signal: layoutAbortRef.current?.signal,
@@ -952,7 +972,8 @@ writer -> bucket`}</code>
           {VIEW_OPTIONS.map((option) => {
             const checked = view === option.value;
             const disabled =
-              option.value === "semantic" && semanticViewDisabled;
+              (option.value === "semantic" || option.value === "pipeline") &&
+              semanticViewDisabled;
             return (
               <label
                 key={option.value}
@@ -968,6 +989,8 @@ writer -> bucket`}</code>
                 title={
                   option.value === "semantic" && !canUseSemanticView
                     ? "Semantic view requires at least one plan+graph pair or a state file."
+                    : option.value === "pipeline" && !canUseSemanticView
+                    ? "Pipeline view requires at least one plan+graph pair or a state file."
                     : option.value === "semantic" && stateOnly
                     ? "Shows current infrastructure from state (no planned changes)."
                     : undefined

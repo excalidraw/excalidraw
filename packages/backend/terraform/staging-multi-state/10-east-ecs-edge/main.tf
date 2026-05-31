@@ -215,6 +215,11 @@ resource "aws_iam_role_policy" "egress_task" {
 
 resource "aws_ecs_cluster" "this" {
   name = "${var.environment}-ecs-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_dynamodb_table" "config" {
@@ -336,6 +341,11 @@ resource "aws_ecs_service" "producer" {
   desired_count   = 1
   launch_type     = "FARGATE"
 
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
   network_configuration {
     assign_public_ip = false
     security_groups  = [aws_security_group.ecs_service.id]
@@ -357,6 +367,11 @@ resource "aws_ecs_service" "egress" {
   task_definition = aws_ecs_task_definition.egress.arn
   desired_count   = 1
   launch_type     = "FARGATE"
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   network_configuration {
     assign_public_ip = false

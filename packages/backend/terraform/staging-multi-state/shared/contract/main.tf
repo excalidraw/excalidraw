@@ -74,7 +74,12 @@ locals {
   }
 
   ingress_queue_name = "${local.environment}-events.fifo"
+  ingress_dlq_name   = "${local.environment}-events-dlq.fifo"
   egress_queue_name  = "${local.environment}-egress"
+  egress_dlq_name    = "${local.environment}-egress-dlq"
+
+  ingress_dlq_messages_alarm_name = "${local.environment}-events-dlq-messages"
+  egress_dlq_messages_alarm_name  = "${local.environment}-egress-dlq-messages"
 
   sqs_consumer_lambda_name = "${local.environment}-sqs-consumer"
   producer_ecs_name        = "${local.environment}-producer"

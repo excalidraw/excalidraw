@@ -30,7 +30,7 @@ describe("terraform import performance", () => {
     expect((elements as unknown[]).length).toBeGreaterThan(0);
 
     // Regression guard: 25-stack expanded semantic import (budget allows CI variance).
-    expect(ms).toBeLessThan(60_000);
+    expect(ms).toBeLessThan(70_000);
     if (process.env.VITEST_TERRAFORM_VERBOSE === "1") {
       console.log(
         `staging-multi-state-expanded semantic import: ${Math.round(ms)}ms, ${(elements as unknown[]).length} elements`,

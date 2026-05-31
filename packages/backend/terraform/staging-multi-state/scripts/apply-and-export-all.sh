@@ -60,11 +60,12 @@ run_wave() {
 # Wave 1a: hub VPC + TGW (apply first to reduce peering races)
 run_wave "1a-hub" "00-east-network"
 
-# Wave 1b: peer regional VPCs + TGW mesh
-run_wave "1b-peers" \
-  "01-west-network" \
-  "04-west-1-network" \
-  "05-east-2-network"
+# Wave 1b: west-2 peer VPC (must finish before east-2 / west-1 read remote state)
+run_wave "1b-west" "01-west-network"
+
+# Wave 1c–1d: satellite regions depend on west-2 outputs; west-1 also needs east-2
+run_wave "1c-east-2" "05-east-2-network"
+run_wave "1d-west-1" "04-west-1-network"
 
 # Wave 2: regional datastores
 run_wave "2-datastores" \
@@ -100,10 +101,10 @@ run_wave "6-east-entry" \
   "43-east-api-4" \
   "44-east-api-5"
 
-# Wave 7: messaging (apis 1-5 + queues)
+# Wave 7: messaging (apis 1-5 + ingress/egress queues + consumer)
+# Wave 8: ECS edge (reads egress queue; completes ecs_task IAM + producer/egress services)
+# Fresh account: create staging-ecs-task + staging-ecs-task-execution IAM roles before wave 7 (see README).
 run_wave "7-messaging" "20-east-messaging"
-
-# Wave 8: ECS edge (egress queue + VPC)
 run_wave "8-ecs-edge" "10-east-ecs-edge"
 
 echo ""

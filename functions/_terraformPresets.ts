@@ -1,6 +1,6 @@
 import { loadPresetBlobText } from "./_terraformPresetBlobStorage";
 
-export type TerraformImportPresetView = "semantic" | "module";
+export type TerraformImportPresetView = "semantic" | "module" | "pipeline";
 
 export type TerraformImportPresetWarning = {
   code: "missing_state_file" | "missing_optional_tfd";

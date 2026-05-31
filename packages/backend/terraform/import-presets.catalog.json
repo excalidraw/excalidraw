@@ -135,7 +135,7 @@
       "name": "Staging multi-state (expanded)",
       "description": "Four-region staging (us-east-1 hub, us-west-2, us-west-1, us-east-2): 25 stacks, paired regional lanes, api-6 triple fanout, api-7 west-2 lane B, trunk ingress+egress, pipeline.tfd.",
       "builtin": true,
-      "view": "semantic",
+      "view": "pipeline",
       "rootPath": "packages/backend/terraform/staging-multi-state",
       "stacks": [
         {

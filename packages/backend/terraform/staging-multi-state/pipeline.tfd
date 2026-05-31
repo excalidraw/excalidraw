@@ -12,9 +12,14 @@ bind ecs_listener        = 10-east-ecs-edge::aws_lb_listener.http
 bind ecs_target_group    = 10-east-ecs-edge::aws_lb_target_group.ecs
 bind ecs_producer        = 10-east-ecs-edge::aws_ecs_service.producer
 bind event_queue         = 20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]
+bind ingress_dlq         = 20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]
 bind egress_queue        = 20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]
+bind egress_dlq          = 20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]
 bind queue_consumer      = 20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]
 bind network_egress_ecs  = 10-east-ecs-edge::aws_ecs_service.egress
+bind ingress_dlq_alarm   = 20-east-messaging::module.ingress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind egress_dlq_alarm    = 20-east-messaging::module.egress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind consumer_errors_alarm = 20-east-messaging::module.consumer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]
 
 # API Gateway front doors (east 1-7, west-2 8-11, west-1 12/14, east-2 15/16)
 bind api1_gateway        = 40-east-api-1::module.api.aws_api_gateway_rest_api.private
@@ -93,11 +98,17 @@ ecs_target_group -> ecs_producer
 # Ingress FIFO path
 ecs_producer -> event_queue
 event_queue -> queue_consumer
+event_queue -> ingress_dlq
+ingress_dlq -> ingress_dlq_alarm
 
 # Egress SQS -> ECS -> NAT
 queue_consumer -> egress_queue
 egress_queue -> network_egress_ecs
+egress_queue -> egress_dlq
+egress_dlq -> egress_dlq_alarm
 network_egress_ecs -> east_nat
+
+queue_consumer -> consumer_errors_alarm
 
 # Entry API fan-out (five gateways)
 queue_consumer -> api1_gateway, api2_gateway, api3_gateway, api4_gateway, api5_gateway

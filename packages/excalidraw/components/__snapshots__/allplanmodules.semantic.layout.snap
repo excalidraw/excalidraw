@@ -3195,7 +3195,7 @@
       "height": 1453,
       "angle": 0,
       "isDeleted": false,
-      "name": "Subnets: ts-test-lambda-intra-us-east-1a, ts-test-lambda-intra-us-east-1b",
+      "name": "Intra · Subnets: ts-test-lambda-intra-us-east-1a, ts-test-lambda-intra-us-east-1b",
       "customData": {
         "terraformTopologyRole": "subnetZone",
         "terraformTopologyPath": [
@@ -3217,7 +3217,7 @@
       "height": 1453,
       "angle": 0,
       "isDeleted": false,
-      "name": "Subnets: ts-test-lambda-private-us-east-1b, ts-test-lambda-private-us-east-1a",
+      "name": "Private · Subnets: ts-test-lambda-private-us-east-1b, ts-test-lambda-private-us-east-1a",
       "customData": {
         "terraformTopologyRole": "subnetZone",
         "terraformTopologyPath": [
@@ -3239,7 +3239,7 @@
       "height": 1453,
       "angle": 0,
       "isDeleted": false,
-      "name": "Subnets: ts-test-lambda-public-us-east-1b, ts-test-lambda-public-us-east-1a",
+      "name": "Public · Subnets: ts-test-lambda-public-us-east-1b, ts-test-lambda-public-us-east-1a",
       "customData": {
         "terraformTopologyRole": "subnetZone",
         "terraformTopologyPath": [

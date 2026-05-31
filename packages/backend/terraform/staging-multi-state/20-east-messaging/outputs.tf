@@ -22,6 +22,14 @@ output "egress_queue_arn" {
   value = module.egress_queue.queue_arn
 }
 
+output "ingress_dlq_arn" {
+  value = module.ingress_queue.dead_letter_queue_arn
+}
+
+output "egress_dlq_arn" {
+  value = module.egress_queue.dead_letter_queue_arn
+}
+
 output "dlq_arn" {
   value = module.ingress_queue.dead_letter_queue_arn
 }

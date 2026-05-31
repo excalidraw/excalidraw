@@ -46,6 +46,10 @@ describe("terraformImportPresets", () => {
         "production-geo-fanout",
       ]),
     );
+    expect(
+      presets.find((preset) => preset.id === "staging-multi-state-expanded")
+        ?.view,
+    ).toBe("pipeline");
   });
 
   it("supports user preset save/update/delete lifecycle via API", async () => {

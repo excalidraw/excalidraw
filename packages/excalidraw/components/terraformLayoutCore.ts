@@ -35,6 +35,7 @@ import {
 } from "./terraformTopologyPlacement";
 import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -189,7 +190,11 @@ export async function layoutTerraformFromSources(
   sources: TerraformPlanParsingSources,
   options?: TerraformLayoutOptions,
 ): Promise<LayoutTerraformResult> {
-  const semanticLayout = options?.semanticLayout === true;
+  const layoutMode =
+    options?.layoutMode ??
+    (options?.semanticLayout === true ? "semantic" : "module");
+  const semanticLayout = layoutMode === "semantic";
+  const pipelineLayout = layoutMode === "pipeline";
   const importWarnings: TerraformImportWarning[] = [];
   let plan: unknown;
   let adjacency: Record<string, string[]>;
@@ -248,7 +253,7 @@ export async function layoutTerraformFromSources(
     }
   }
 
-  if (semanticLayout) {
+  if (semanticLayout || pipelineLayout) {
     const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
     if (
       !Array.isArray(rc) ||
@@ -260,8 +265,9 @@ export async function layoutTerraformFromSources(
       return {
         ok: false,
         status: 400,
-        error:
-          "Semantic layout requires at least one managed resource in the plan or state file.",
+        error: pipelineLayout
+          ? "Pipeline view requires at least one managed resource in the plan or state file."
+          : "Semantic layout requires at least one managed resource in the plan or state file.",
       };
     }
   }
@@ -303,6 +309,13 @@ export async function layoutTerraformFromSources(
         "Dataflow links (.tfd) could not be resolved to any resources in the merged import.",
     };
   }
+  if (pipelineLayout && (!declaredEdges || declaredEdges.length === 0)) {
+    return {
+      ok: false,
+      status: 400,
+      error: "Pipeline view requires at least one resolved .tfd dataflow edge.",
+    };
+  }
 
   emitLocalParseDebug({
     phase: "planParsed_through_moduleTree",
@@ -312,7 +325,34 @@ export async function layoutTerraformFromSources(
 
   let sceneBody: Record<string, unknown>;
 
-  if (semanticLayout) {
+  if (pipelineLayout) {
+    const pipelineScene = await buildTerraformPipelineExcalidrawScene(
+      nodes5,
+      plan,
+    );
+    emitLocalParseDebug({
+      phase: "pipelineLayout",
+      meta: pipelineScene.meta,
+      elementCount: pipelineScene.elements.length,
+    });
+    sceneBody = {
+      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+      elements: pipelineScene.elements,
+      meta: appendImportMeta(
+        {
+          ...pipelineScene.meta,
+          importSource,
+          plannedChanges: importSource !== "state-only",
+        },
+        sources,
+        formatImportWarnings(
+          [...importWarnings, ...pipelineScene.warnings],
+          tfdWarnings,
+        ),
+        { stackIds, addressToStack },
+      ),
+    };
+  } else if (semanticLayout) {
     type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
     const semPlan = plan as SemanticPlan;
     const awsPlan = filterPlanByProviderFamily(semPlan, "aws");

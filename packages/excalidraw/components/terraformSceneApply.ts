@@ -124,6 +124,7 @@ export const applyTerraformExcalidrawScene = (
 
 export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
+  layoutMode?: "module" | "semantic" | "pipeline";
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
@@ -145,13 +146,15 @@ export const runTerraformImportFromSources = async (
 ): Promise<RunTerraformImportFromSourcesResult> => {
   const moduleLayoutOptions =
     options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
+  const layoutMode =
+    options.layoutMode ?? (options.semanticLayout ? "semantic" : "module");
   const scene = await layoutTerraformViaWorkers(
     sources,
     {
       semanticLayout: options.semanticLayout,
-      moduleLayoutOptions: options.semanticLayout
-        ? undefined
-        : moduleLayoutOptions,
+      ...(options.layoutMode ? { layoutMode } : {}),
+      moduleLayoutOptions:
+        layoutMode === "module" ? moduleLayoutOptions : undefined,
     },
     {
       onProgress: options.onLayoutProgress,
@@ -175,6 +178,7 @@ export const runTerraformImportFromSources = async (
     setTerraformImportSession({
       sources,
       semanticLayout: options.semanticLayout,
+      ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions,
       preset: options.preset ?? null,
       importedTfdTexts,
@@ -244,6 +248,7 @@ export const refreshTerraformLayout = async (
 
   return runTerraformImportFromSources(app, setAppState, sources, {
     semanticLayout: session.semanticLayout,
+    layoutMode: session.layoutMode,
     moduleLayoutOptions: session.moduleLayoutOptions,
     importedTfdTexts,
     preset: session.preset,

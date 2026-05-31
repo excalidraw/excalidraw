@@ -28,14 +28,14 @@ function nowIso() {
 const joinRootRelative = (rootPath, relativePath) =>
   `${rootPath.replace(/\/+$/, "")}/${relativePath.replace(/^\/+/, "")}`;
 
-function migrateDropPipelineViewConstraint(db) {
+function migrateAddPipelineViewConstraint(db) {
   const row = db
     .prepare(
       `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'terraform_import_presets'`,
     )
     .get();
   const ddl = typeof row?.sql === "string" ? row.sql : "";
-  if (!ddl.includes("'pipeline'")) {
+  if (!ddl || ddl.includes("'pipeline'")) {
     return;
   }
   db.exec(`
@@ -44,7 +44,7 @@ function migrateDropPipelineViewConstraint(db) {
       name TEXT NOT NULL,
       description TEXT,
       builtin INTEGER NOT NULL DEFAULT 0,
-      view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
       root_path TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -57,7 +57,7 @@ function migrateDropPipelineViewConstraint(db) {
         name,
         description,
         builtin,
-        CASE WHEN view = 'pipeline' THEN 'semantic' ELSE view END,
+        view,
         root_path,
         created_at,
         updated_at
@@ -74,7 +74,7 @@ function ensureSchema(db) {
       name TEXT NOT NULL,
       description TEXT,
       builtin INTEGER NOT NULL DEFAULT 0,
-      view TEXT NOT NULL CHECK (view IN ('semantic', 'module')),
+      view TEXT NOT NULL CHECK (view IN ('semantic', 'module', 'pipeline')),
       root_path TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -129,7 +129,7 @@ function ensureSchema(db) {
     db.exec(`ALTER TABLE terraform_import_preset_tfd ADD COLUMN content TEXT`);
   }
 
-  migrateDropPipelineViewConstraint(db);
+  migrateAddPipelineViewConstraint(db);
 }
 
 function presetHasStoredContent(db, presetId) {

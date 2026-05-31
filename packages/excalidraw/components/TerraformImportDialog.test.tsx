@@ -110,15 +110,30 @@ describe("TerraformImportModal", () => {
     render(<TerraformImportModal onCloseRequest={onClose} />);
     fillFirstBundle();
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: true,
       moduleLayoutOptions: undefined,
     });
     expect(hoisted.replaceAllElements).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("passes layoutMode pipeline when Pipeline view is active", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: false,
+      layoutMode: "pipeline",
+      moduleLayoutOptions: undefined,
+    });
   });
 
   it("passes semanticLayout false for module view", async () => {
@@ -130,9 +145,7 @@ describe("TerraformImportModal", () => {
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
@@ -161,9 +174,7 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("radio", { name: /elk rectpacking/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     const options = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1];
     expect(options?.semanticLayout).toBe(false);
     expect(options?.moduleLayoutOptions?.mode).toBe("rectpacking");
@@ -199,9 +210,7 @@ describe("TerraformImportModal", () => {
     );
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
@@ -235,9 +244,7 @@ describe("TerraformImportModal", () => {
       },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.states).toHaveLength(2);
     expect(sources.stateLabels).toEqual(["a.json", "b.json"]);
@@ -259,9 +266,7 @@ describe("TerraformImportModal", () => {
       },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.tfdTexts).toHaveLength(2);
     expect(sources.tfdLabels).toEqual(["a.tfd", "b.tfd"]);
@@ -287,9 +292,7 @@ describe("TerraformImportModal", () => {
       },
     });
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: true,
       moduleLayoutOptions: undefined,
@@ -367,9 +370,7 @@ describe("TerraformImportModal", () => {
     await waitFor(() =>
       expect(loadTerraformImportPresetSources).toHaveBeenCalled(),
     );
-    await waitFor(() =>
-      expect(layoutTerraformViaWorkers).toHaveBeenCalled(),
-    );
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.planDotBundles).toHaveLength(1);
     expect(sources.tfdLabels).toEqual(["pipeline.tfd"]);

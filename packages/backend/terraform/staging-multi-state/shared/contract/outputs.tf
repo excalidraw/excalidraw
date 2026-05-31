@@ -42,8 +42,24 @@ output "ingress_queue_name" {
   value = local.ingress_queue_name
 }
 
+output "ingress_dlq_name" {
+  value = local.ingress_dlq_name
+}
+
 output "egress_queue_name" {
   value = local.egress_queue_name
+}
+
+output "egress_dlq_name" {
+  value = local.egress_dlq_name
+}
+
+output "ingress_dlq_messages_alarm_name" {
+  value = local.ingress_dlq_messages_alarm_name
+}
+
+output "egress_dlq_messages_alarm_name" {
+  value = local.egress_dlq_messages_alarm_name
 }
 
 output "sqs_consumer_lambda_name" {

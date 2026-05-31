@@ -106,7 +106,9 @@ async function runJobWithFallback(
   }
 }
 
-function toScenePayload(result: LayoutTerraformResult): TerraformExcalidrawScenePayload {
+function toScenePayload(
+  result: LayoutTerraformResult,
+): TerraformExcalidrawScenePayload {
   if (!result.ok) {
     const err = new Error(result.error);
     (err as Error & { status?: number }).status = result.status ?? 400;
@@ -125,9 +127,13 @@ export async function layoutTerraformViaWorkers(
   workerOptions: LayoutViaWorkersOptions = {},
 ): Promise<TerraformExcalidrawScenePayload> {
   const { onProgress, signal } = workerOptions;
-  const semanticLayout = options.semanticLayout === true;
+  const layoutMode =
+    options.layoutMode ??
+    (options.semanticLayout === true ? "semantic" : "module");
+  const semanticLayout = layoutMode === "semantic";
+  const pipelineLayout = layoutMode === "pipeline";
   const multiStackModule =
-    !semanticLayout && sources.planDotBundles.length > 1;
+    !semanticLayout && !pipelineLayout && sources.planDotBundles.length > 1;
 
   const runSequential = async () => {
     const result = await layoutTerraformFromSources(sources, options);
@@ -150,6 +156,10 @@ export async function layoutTerraformViaWorkers(
         onProgress,
       );
       return toScenePayload(result);
+    }
+
+    if (pipelineLayout) {
+      return runSequential();
     }
 
     if (multiStackModule) {

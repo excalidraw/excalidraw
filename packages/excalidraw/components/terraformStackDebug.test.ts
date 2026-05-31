@@ -24,7 +24,7 @@ describe("staging multi-state import", () => {
     );
     expect(res.ok).toBe(true);
     const body = await res.json();
-    expect(body.meta?.stackIds?.length).toBe(9);
+    expect(body.meta?.stackIds?.length).toBe(17);
     expect(body.elements.length).toBeGreaterThan(0);
 
     const stackFrames = body.elements.filter(
@@ -155,7 +155,7 @@ describe("staging multi-state import", () => {
         e.type === "arrow" &&
         e.customData?.terraformEdgeLayer === "declaredDataFlow",
     );
-    expect(declared).toHaveLength(20);
+    expect(declared).toHaveLength(58);
   }, 180_000);
 
   it("imports module layout quickly via ELK fast path for dense multi-stack graph", async () => {
@@ -188,7 +188,7 @@ describe("staging multi-state import", () => {
         typeof e.name === "string" &&
         /^\d{2}-/.test(e.name),
     );
-    expect(stackGroupFrames.length).toBeGreaterThanOrEqual(9);
+    expect(stackGroupFrames.length).toBeGreaterThanOrEqual(17);
 
     const rootFrame = body.elements.find(
       (e: { type?: string; name?: string }) =>
@@ -199,7 +199,7 @@ describe("staging multi-state import", () => {
       (e: { type?: string; frameId?: string | null }) =>
         e.type === "frame" && e.frameId === rootFrame!.id,
     );
-    expect(rootChildFrames.length).toBeGreaterThanOrEqual(9);
+    expect(rootChildFrames.length).toBeGreaterThanOrEqual(17);
 
     const xs = rootChildFrames.map((e: { x?: number }) => e.x ?? 0);
     const ys = rootChildFrames.map((e: { y?: number }) => e.y ?? 0);
