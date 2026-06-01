@@ -7,7 +7,12 @@ import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraf
 import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 
 /** GitHub Actions runners are ~1.5× slower than local for 25-stack semantic layout. */
-const PERF_BUDGET_MS = process.env.CI ? 300_000 : 120_000;
+const PERF_BUDGET_MS =
+  process.env.CI && process.env.VITEST_COVERAGE === "1"
+    ? 540_000
+    : process.env.CI
+    ? 300_000
+    : 120_000;
 
 describe("terraform import performance", () => {
   it(

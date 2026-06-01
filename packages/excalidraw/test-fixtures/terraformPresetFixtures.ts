@@ -31,9 +31,17 @@ export const HAS_CLOUDFLARE_PLAN_FIXTURES = hasTerraformBackendFile(
 export const HAS_AWS_CLOUDFLARE_MULTI_IMPORT_FIXTURES =
   HAS_ALLPLANMODULES_FIXTURES && HAS_CLOUDFLARE_PLAN_FIXTURES;
 
-/** Vitest timeout for 25-stack staging semantic layout (GitHub Actions is ~2× slower). */
-export const STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS = process.env.CI
-  ? 360_000
+const onCi = Boolean(process.env.CI);
+const underCoverage = process.env.VITEST_COVERAGE === "1";
+
+/** Sync tests that load/decompress all 25 stacks from the preset DB. */
+export const STAGING_DB_LOAD_TEST_TIMEOUT_MS = onCi ? 120_000 : 30_000;
+
+/** Full 25-stack semantic layout (GitHub Actions; slower still under coverage). */
+export const STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS = onCi
+  ? underCoverage
+    ? 600_000
+    : 360_000
   : 180_000;
 
 export function loadAwsCloudflareMultiImportFixture() {

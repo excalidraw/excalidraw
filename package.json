@@ -83,7 +83,7 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",
     "test": "yarn test:app",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "VITEST_COVERAGE=1 vitest run --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "fix:code": "yarn test:code --fix",

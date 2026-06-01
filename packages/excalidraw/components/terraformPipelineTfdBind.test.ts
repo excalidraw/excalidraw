@@ -4,7 +4,10 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
-import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+import {
+  STAGING_DB_LOAD_TEST_TIMEOUT_MS,
+  STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 
@@ -46,75 +49,81 @@ function edgePairKey(source: string, target: string) {
 }
 
 describe("staging-multi-state-expanded pipeline.tfd binds", () => {
-  it("resolves all binds and trunk declared-dataflow edges", () => {
-    const { nodes, tfdTexts, tfdLabels } = expandedNodesAndTfd();
-    const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
-      nodes,
-      tfdTexts,
-      tfdLabels,
-    );
+  it(
+    "resolves all binds and trunk declared-dataflow edges",
+    () => {
+      const { nodes, tfdTexts, tfdLabels } = expandedNodesAndTfd();
+      const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
+        nodes,
+        tfdTexts,
+        tfdLabels,
+      );
 
-    expect(errors, errors.join("\n")).toEqual([]);
-    expect(warnings).toEqual([]);
+      expect(errors, errors.join("\n")).toEqual([]);
+      expect(warnings).toEqual([]);
 
-    const edgeKeys = new Set(edges.map((e) => edgePairKey(e.source, e.target)));
+      const edgeKeys = new Set(
+        edges.map((e) => edgePairKey(e.source, e.target)),
+      );
 
-    const trunkHops: [string, string][] = [
-      [
-        "10-east-ecs-edge::aws_ecs_service.producer",
-        "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
-      ],
-      [
-        "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
-        "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
-      ],
-      [
-        "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
-        "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
-      ],
-      [
-        "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
-        "10-east-ecs-edge::aws_ecs_service.egress",
-      ],
-      [
-        "10-east-ecs-edge::aws_ecs_service.egress",
-        "00-east-network::module.east_network.module.vpc.aws_nat_gateway.this[0]",
-      ],
-    ];
+      const trunkHops: [string, string][] = [
+        [
+          "10-east-ecs-edge::aws_ecs_service.producer",
+          "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
+        ],
+        [
+          "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
+          "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
+        ],
+        [
+          "20-east-messaging::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]",
+          "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
+        ],
+        [
+          "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
+          "10-east-ecs-edge::aws_ecs_service.egress",
+        ],
+        [
+          "10-east-ecs-edge::aws_ecs_service.egress",
+          "00-east-network::module.east_network.module.vpc.aws_nat_gateway.this[0]",
+        ],
+      ];
 
-    for (const [source, target] of trunkHops) {
-      expect(
-        edgeKeys.has(edgePairKey(source, target)),
-        `${source} -> ${target}`,
-      ).toBe(true);
-    }
+      for (const [source, target] of trunkHops) {
+        expect(
+          edgeKeys.has(edgePairKey(source, target)),
+          `${source} -> ${target}`,
+        ).toBe(true);
+      }
 
-    const dlqHops: [string, string][] = [
-      [
-        "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
-        "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]",
-      ],
-      [
-        "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
-        "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]",
-      ],
-      [
-        "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]",
-        "20-east-messaging::module.ingress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]",
-      ],
-      [
-        "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]",
-        "20-east-messaging::module.egress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]",
-      ],
-    ];
+      const dlqHops: [string, string][] = [
+        [
+          "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.this[0]",
+          "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]",
+        ],
+        [
+          "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.this[0]",
+          "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]",
+        ],
+        [
+          "20-east-messaging::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]",
+          "20-east-messaging::module.ingress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]",
+        ],
+        [
+          "20-east-messaging::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]",
+          "20-east-messaging::module.egress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]",
+        ],
+      ];
 
-    for (const [source, target] of dlqHops) {
-      expect(
-        edgeKeys.has(edgePairKey(source, target)),
-        `${source} -> ${target}`,
-      ).toBe(true);
-    }
-  });
+      for (const [source, target] of dlqHops) {
+        expect(
+          edgeKeys.has(edgePairKey(source, target)),
+          `${source} -> ${target}`,
+        ).toBe(true);
+      }
+    },
+    STAGING_DB_LOAD_TEST_TIMEOUT_MS,
+  );
 
   it(
     "semantic import exposes ingress and egress SQS primary tiles",
