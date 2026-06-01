@@ -7689,7 +7689,7 @@ class App extends React.Component<AppProps, AppState> {
     // Re-measure position on every interaction so that coordinate transforms
     // stay correct if the container moved since mount (e.g. elements inserted
     // above in a notebook/dashboard without triggering a resize event).
-    this.refresh();
+    flushSync(() => this.refresh());
 
     const selectedElements = this.scene.getSelectedElements(this.state);
 
