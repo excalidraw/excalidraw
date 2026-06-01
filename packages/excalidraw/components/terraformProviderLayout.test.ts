@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
+import {
+  HAS_CLOUDFLARE_PLAN_FIXTURES,
+  readTerraformBackendFile,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import {
@@ -11,44 +14,48 @@ import {
 } from "./terraformProviderLayout";
 
 describe("terraformProviderLayout", () => {
-  it("groups cloudflare fixture into zone/pages/workers bands", async () => {
-    if (process.env.VITEST_TERRAFORM_VERBOSE !== "1") {
-      vi.spyOn(console, "log").mockImplementation(() => {});
-    }
+  it.skipIf(!HAS_CLOUDFLARE_PLAN_FIXTURES)(
+    "groups cloudflare fixture into zone/pages/workers bands",
+    async () => {
+      if (process.env.VITEST_TERRAFORM_VERBOSE !== "1") {
+        vi.spyOn(console, "log").mockImplementation(() => {});
+      }
 
-    const plan = JSON.parse(
-      readTerraformBackendFile("cloudflare/cloudflare-plan.json"),
-    );
-    const dot = readTerraformBackendFile("cloudflare/cloudflare-plan.dot");
-    const graph = graphlibDot.read(dot);
-    const nodes = buildTerraformLocalImportNodesMap(plan, graph, null);
-    const changes = (plan.resource_changes || []).filter(
-      (rc: { mode?: string }) => rc.mode !== "data",
-    );
+      const plan = JSON.parse(
+        readTerraformBackendFile("cloudflare/cloudflare-plan.json"),
+      );
+      const dot = readTerraformBackendFile("cloudflare/cloudflare-plan.dot");
+      const graph = graphlibDot.read(dot);
+      const nodes = buildTerraformLocalImportNodesMap(plan, graph, null);
+      const changes = (plan.resource_changes || []).filter(
+        (rc: { mode?: string }) => rc.mode !== "data",
+      );
 
-    const scene = await buildCloudflareProviderScene(changes, nodes, plan);
-    expect(scene.meta.resourceCount).toBeGreaterThan(0);
-    expect(scene.meta.accountCount).toBe(1);
+      const scene = await buildCloudflareProviderScene(changes, nodes, plan);
+      expect(scene.meta.resourceCount).toBeGreaterThan(0);
+      expect(scene.meta.accountCount).toBe(1);
 
-    const zoneTile = scene.elements.find(
-      (e) => e.customData?.nodePath === "cloudflare_zone.tfdraw_dev",
-    );
-    expect(
-      zoneTile?.customData?.terraformResources?.[0]?.attributes?.length,
-    ).toBeGreaterThan(0);
+      const zoneTile = scene.elements.find(
+        (e) => e.customData?.nodePath === "cloudflare_zone.tfdraw_dev",
+      );
+      expect(
+        zoneTile?.customData?.terraformResources?.[0]?.attributes?.length,
+      ).toBeGreaterThan(0);
 
-    const nodePaths = scene.elements
-      .map((e) => e.customData?.nodePath)
-      .filter(Boolean);
-    expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
-    expect(nodePaths).toContain("cloudflare_pages_project.ainur");
-    expect(nodePaths).toContain("cloudflare_workers_script.ainur");
+      const nodePaths = scene.elements
+        .map((e) => e.customData?.nodePath)
+        .filter(Boolean);
+      expect(nodePaths).toContain("cloudflare_zone.tfdraw_dev");
+      expect(nodePaths).toContain("cloudflare_pages_project.ainur");
+      expect(nodePaths).toContain("cloudflare_workers_script.ainur");
 
-    const bandFrames = scene.elements.filter(
-      (e) => e.customData?.terraformTopologyRole === "providerBand",
-    );
-    expect(bandFrames.length).toBeGreaterThanOrEqual(3);
-  }, 120_000);
+      const bandFrames = scene.elements.filter(
+        (e) => e.customData?.terraformTopologyRole === "providerBand",
+      );
+      expect(bandFrames.length).toBeGreaterThanOrEqual(3);
+    },
+    120_000,
+  );
 
   it("wraps provider blocks in labeled provider frames", () => {
     const blockA = {
