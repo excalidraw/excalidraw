@@ -1,9 +1,57 @@
-// @ts-nocheck — ported from `packages/backend/terraform-data-flow-edges.js`; strict types deferred.
 /**
  * Terraform semantic data-flow edges (`edges_data_flow`).
- * Browser-safe copy of the logic in `packages/backend/terraform-data-flow-edges.js`
- * (Node pipeline). Keep in sync when extending data-flow rules.
+ * Browser-side inference of IAM and config reference edges from plan JSON.
  */
+
+type DataFlowEdgeRecord = {
+  target: string;
+  type: string;
+  label: string;
+  origin: string;
+  detail?: string;
+};
+
+type PlanResource = {
+  address?: string;
+  name?: string;
+  type?: string;
+  values?: Record<string, unknown>;
+  change?: {
+    before?: Record<string, unknown>;
+    after?: Record<string, unknown>;
+  };
+};
+
+export type PlanGraphNode = {
+  resources?: Record<string, PlanResource>;
+  edges_new?: string[];
+  edges_existing?: string[];
+  edges_data_flow?: DataFlowEdgeRecord[];
+  edges_networking?: DataFlowEdgeRecord[];
+};
+
+export type PlanNodesMap = Record<string, PlanGraphNode>;
+
+type MutablePlanNodesWithIndex = PlanNodesMap & {
+  __dataFlowIndex?: DataFlowIndex;
+};
+
+const isPlanGraphNodeKey = (key: string) => !key.startsWith("__");
+
+type DataFlowIndex = {
+  byAddress: Map<string, Set<string>>;
+  byArn: Map<string, string>;
+  byName: Map<string, Set<string>>;
+  byType: Map<string, Set<string>>;
+  bySecurityGroupId: Map<string, Set<string>>;
+  roleToCompute: Map<string, Set<string>>;
+  policyToRoles: Map<string, Set<string>>;
+};
+
+type ResolveNodeRefsOptions = {
+  ignoredKeys?: Iterable<string>;
+};
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -34,7 +82,7 @@ const COMPUTE_RESOURCE_TYPES = new Set([
  * Generic semantic key hints for narrowing reference resolution by field name.
  * Unknown keys fall back to all indexed resource types.
  */
-const REFERENCE_KEY_TYPE_RULES = {
+const REFERENCE_KEY_TYPE_RULES: Record<string, string[]> = {
   functionname: ["aws_lambda_function"],
   function_name: ["aws_lambda_function"],
   queuename: ["aws_sqs_queue"],
@@ -60,7 +108,11 @@ const GENERIC_REFERENCE_IGNORED_KEYS = new Set(["id"]);
 
 const AWS_SECURITY_GROUP_ID_RE = /^sg-[0-9a-f]{8,17}$/i;
 
-function registerAwsSecurityGroupIdIndex(index, sgId, nodePath) {
+function registerAwsSecurityGroupIdIndex(
+  index: DataFlowIndex,
+  sgId: unknown,
+  nodePath: string,
+) {
   if (typeof sgId !== "string") {
     return;
   }
@@ -71,20 +123,21 @@ function registerAwsSecurityGroupIdIndex(index, sgId, nodePath) {
   if (!index.bySecurityGroupId.has(id)) {
     index.bySecurityGroupId.set(id, new Set());
   }
-  index.bySecurityGroupId.get(id).add(nodePath);
+  index.bySecurityGroupId.get(id)!.add(nodePath);
 }
 
-function collectSecurityGroupRulePeerRefs(rule) {
+function collectSecurityGroupRulePeerRefs(rule: unknown) {
   if (!rule || typeof rule !== "object") {
     return [];
   }
+  const ruleObj = rule as Record<string, unknown>;
   const out = [
-    rule.security_groups,
-    rule.source_security_group_id,
-    rule.referenced_security_group_id,
-    rule.destination_security_group_id,
+    ruleObj.security_groups,
+    ruleObj.source_security_group_id,
+    ruleObj.referenced_security_group_id,
+    ruleObj.destination_security_group_id,
   ].filter((x) => x != null);
-  for (const [key, val] of Object.entries(rule)) {
+  for (const [key, val] of Object.entries(ruleObj)) {
     if (
       typeof key === "string" &&
       val != null &&
@@ -98,29 +151,34 @@ function collectSecurityGroupRulePeerRefs(rule) {
 }
 
 /** Registers a Terraform address key (full or index-stripped) → node path in the data-flow index. */
-function addToAddressIndex(index, key, nodePath) {
+function addToAddressIndex(
+  index: DataFlowIndex,
+  key: string,
+  nodePath: string,
+) {
   if (!key || !nodePath) {
     return;
   }
   if (!index.byAddress.has(key)) {
     index.byAddress.set(key, new Set());
   }
-  index.byAddress.get(key).add(nodePath);
+  index.byAddress.get(key)!.add(nodePath);
 }
 
-const getResourceValues = (resource = {}) => ({
+const getResourceValues = (resource: PlanResource = {}) => ({
   ...(resource.values || {}),
   ...(resource.change?.before || {}),
   ...(resource.change?.after || {}),
 });
 
-const getPrimaryResource = (node = {}) =>
-  Object.values(node.resources || {}).find((resource) => resource?.type) || {};
+const getPrimaryResource = (node: PlanGraphNode = {}) =>
+  Object.values(node.resources || {}).find((resource) => resource?.type) ||
+  ({} as PlanResource);
 
-const getResourceType = (nodePath, node) =>
+const getResourceType = (nodePath: string, node: PlanGraphNode) =>
   getPrimaryResource(node)?.type || String(nodePath).split(".").at(-2) || "";
 
-const flattenValues = (value, out = []) => {
+const flattenValues = (value: unknown, out: string[] = []) => {
   if (typeof value === "string") {
     out.push(value);
   } else if (Array.isArray(value)) {
@@ -135,14 +193,14 @@ const flattenValues = (value, out = []) => {
   return out;
 };
 
-const normalizePolicyArray = (value) => {
+const normalizePolicyArray = (value: unknown) => {
   if (!value) {
     return [];
   }
   return Array.isArray(value) ? value : [value];
 };
 
-const parsePolicyDocument = (value) => {
+const parsePolicyDocument = (value: unknown) => {
   if (!value) {
     return null;
   }
@@ -219,7 +277,7 @@ const dataFlowRelationshipForAction = (action = "") => {
   return null;
 };
 
-export function buildDataFlowIndex(nodes) {
+export function buildDataFlowIndex(nodes: PlanNodesMap): DataFlowIndex {
   const index = {
     byAddress: new Map(),
     byArn: new Map(),
@@ -230,7 +288,7 @@ export function buildDataFlowIndex(nodes) {
     policyToRoles: new Map(),
   };
 
-  const addName = (type, name, nodePath) => {
+  const addName = (type: string, name: unknown, nodePath: string) => {
     if (!type || !name) {
       return;
     }
@@ -241,14 +299,14 @@ export function buildDataFlowIndex(nodes) {
     index.byName.get(key).add(nodePath);
   };
 
-  const addArn = (arn, nodePath) => {
+  const addArn = (arn: unknown, nodePath: string) => {
     if (typeof arn === "string" && arn.startsWith("arn:")) {
       index.byArn.set(arn, nodePath);
     }
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     const type = getResourceType(nodePath, node);
@@ -298,7 +356,7 @@ export function buildDataFlowIndex(nodes) {
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     const type = getResourceType(nodePath, node);
@@ -327,7 +385,7 @@ export function buildDataFlowIndex(nodes) {
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     if (getResourceType(nodePath, node) !== "aws_iam_role") {
@@ -349,7 +407,7 @@ export function buildDataFlowIndex(nodes) {
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     const type = getResourceType(nodePath, node);
@@ -387,10 +445,20 @@ export function buildDataFlowIndex(nodes) {
 }
 
 /** Resolves a Terraform reference value (string/ARN/interpolation) to matching node paths using `index`. */
-function resolveNodeRefs(value, index, nodes, allowedTypes) {
-  const matches = new Set();
-  const allowed = allowedTypes ? new Set(allowedTypes) : null;
-  const addMatch = (nodePath) => {
+function resolveNodeRefs(
+  value: unknown,
+  index: DataFlowIndex,
+  nodes: PlanNodesMap,
+  allowedTypes?: string[] | Set<string> | null,
+): string[] {
+  const matches = new Set<string>();
+  const allowed =
+    allowedTypes instanceof Set
+      ? allowedTypes
+      : allowedTypes
+      ? new Set(allowedTypes)
+      : null;
+  const addMatch = (nodePath: string | undefined) => {
     if (!nodePath || !nodes[nodePath]) {
       return;
     }
@@ -410,7 +478,7 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
       allowed.has("aws_security_group") &&
       index.bySecurityGroupId.has(trimmed)
     ) {
-      for (const nodePath of index.bySecurityGroupId.get(trimmed)) {
+      for (const nodePath of index.bySecurityGroupId.get(trimmed)!) {
         addMatch(nodePath);
       }
     }
@@ -451,7 +519,11 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
 }
 
 /** Collects scalar references while preserving the nearest parent object key. */
-function collectReferenceScalars(value, parentKey = "", out = []) {
+function collectReferenceScalars(
+  value: unknown,
+  parentKey = "",
+  out: Array<{ value: string; key: string }> = [],
+) {
   if (typeof value === "string") {
     out.push({ value, key: parentKey });
     return out;
@@ -472,15 +544,17 @@ function collectReferenceScalars(value, parentKey = "", out = []) {
 
 /** Resolves references with key-aware type narrowing and generic fallback. */
 export function resolveNodeRefsAcrossAllResourceTypes(
-  value,
-  index,
-  nodes,
-  options = {},
-) {
-  const matches = new Set();
+  value: unknown,
+  index: DataFlowIndex,
+  nodes: PlanNodesMap,
+  options: ResolveNodeRefsOptions = {},
+): string[] {
+  const matches = new Set<string>();
   const allTypes = [...index.byType.keys()];
   const ignoredKeys = new Set(
-    options.ignoredKeys || GENERIC_REFERENCE_IGNORED_KEYS,
+    options.ignoredKeys
+      ? [...options.ignoredKeys]
+      : GENERIC_REFERENCE_IGNORED_KEYS,
   );
 
   for (const scalar of collectReferenceScalars(value)) {
@@ -503,14 +577,19 @@ export function resolveNodeRefsAcrossAllResourceTypes(
 }
 
 /** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
-function resolvePolicyTargets(resourceValue, index, nodes) {
-  const normalized = normalizeArnPattern(resourceValue);
+function resolvePolicyTargets(
+  resourceValue: unknown,
+  index: DataFlowIndex,
+  nodes: PlanNodesMap,
+): string[] {
+  const normalized = normalizeArnPattern(String(resourceValue ?? ""));
   if (!normalized || normalized === "*") {
     return [];
   }
 
-  const matches = new Set();
-  const direct = index.byArn.get(resourceValue) || index.byArn.get(normalized);
+  const matches = new Set<string>();
+  const direct =
+    index.byArn.get(String(resourceValue)) || index.byArn.get(normalized);
   if (direct) {
     matches.add(direct);
   }
@@ -535,12 +614,20 @@ function resolvePolicyTargets(resourceValue, index, nodes) {
 /**
  * IAM policy semantics only → `edges_data_flow`.
  */
-export function buildDataFlowEdges(nodes) {
+export function buildDataFlowEdges(nodes: PlanNodesMap): PlanNodesMap {
+  const indexed = nodes as MutablePlanNodesWithIndex;
   const index = buildDataFlowIndex(nodes);
-  nodes.__dataFlowIndex = index;
+  indexed.__dataFlowIndex = index;
   const allKeys = new Set();
 
-  const addEdge = (source, target, type, label, origin, detail) => {
+  const addEdge = (
+    source: string,
+    target: string,
+    type: string,
+    label: string,
+    origin: string,
+    detail: string,
+  ) => {
     if (!nodes[source] || !nodes[target] || source === target) {
       return;
     }
@@ -554,7 +641,7 @@ export function buildDataFlowEdges(nodes) {
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     for (const resource of Object.values(node.resources || {})) {
@@ -573,7 +660,7 @@ export function buildDataFlowEdges(nodes) {
         type === "aws_iam_role_policy"
           ? resolveNodeRefs(values.role, index, nodes, ["aws_iam_role"])
           : [...(index.policyToRoles.get(nodePath) || [])];
-      const sourceComputes = new Set();
+      const sourceComputes = new Set<string>();
       for (const role of sourceRoles) {
         for (const compute of index.roleToCompute.get(role) || []) {
           sourceComputes.add(compute);
@@ -617,7 +704,7 @@ export function buildDataFlowEdges(nodes) {
                   relationship.type,
                   relationship.label,
                   "iam_policy",
-                  action,
+                  String(action),
                 );
               }
             }
@@ -627,18 +714,26 @@ export function buildDataFlowEdges(nodes) {
     }
   }
 
-  delete nodes.__dataFlowIndex;
+  delete indexed.__dataFlowIndex;
 
   return nodes;
 }
 
 /** SG peer edges into `edges_networking`. */
-export function buildNetworkingEdges(nodes) {
+export function buildNetworkingEdges(nodes: PlanNodesMap): PlanNodesMap {
+  const indexed = nodes as MutablePlanNodesWithIndex;
   const index = buildDataFlowIndex(nodes);
-  nodes.__dataFlowIndex = index;
+  indexed.__dataFlowIndex = index;
   const allKeys = new Set();
 
-  const addNetEdge = (source, target, type, label, origin, detail) => {
+  const addNetEdge = (
+    source: string,
+    target: string,
+    type: string,
+    label: string,
+    origin: string,
+    detail: string,
+  ) => {
     if (!nodes[source] || !nodes[target] || source === target) {
       return;
     }
@@ -658,7 +753,7 @@ export function buildNetworkingEdges(nodes) {
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
+    if (!isPlanGraphNodeKey(nodePath)) {
       continue;
     }
     for (const resource of Object.values(node.resources || {})) {
@@ -707,7 +802,7 @@ export function buildNetworkingEdges(nodes) {
           values.source_security_group_id,
           values.destination_security_group_id,
         ];
-        const peers = new Set();
+        const peers = new Set<string>();
         for (const pr of peerPool) {
           for (const p of resolveNodeRefs(pr, index, nodes, [
             "aws_security_group",
@@ -756,7 +851,7 @@ export function buildNetworkingEdges(nodes) {
     }
   }
 
-  delete nodes.__dataFlowIndex;
+  delete indexed.__dataFlowIndex;
 
   return nodes;
 }

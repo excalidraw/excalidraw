@@ -1,0 +1,30 @@
+{
+  "ignores": [
+    "@types/*",
+    "eslint-*",
+    "@excalidraw/*",
+    "@babel/*",
+    "@vitejs/*",
+    "@vitest/*",
+    "vite-plugin-*",
+    "vitest-canvas-mock",
+    "husky",
+    "lint-staged",
+    "prettier",
+    "typescript",
+    "rimraf",
+    "knip",
+    "depcheck",
+    "madge",
+    "react",
+    "react-dom",
+    "chai",
+    "dotenv",
+    "http-server",
+    "nodemon",
+    "pepjs",
+    "vite"
+  ],
+  "ignoreMatches": ["eslint", "@testing-library/jest-dom", "fake-indexeddb", "esbuild", "esbuild-sass-plugin", "fonteditor-core", "wawoff2", "which"],
+  "skipMissing": false
+}

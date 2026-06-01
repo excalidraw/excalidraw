@@ -2,6 +2,7 @@ import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildDataFlowEdges,
   buildNetworkingEdges,
+  type PlanNodesMap,
 } from "./terraformDataFlowEdges";
 import {
   applyDeclaredDataFlow,
@@ -331,8 +332,8 @@ export function buildTerraformLocalImportNodesMap(
   }
   const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
   const withTree = attachModuleTree(sanitizedNodes);
-  buildDataFlowEdges(withTree as Record<string, unknown>);
-  buildNetworkingEdges(withTree as Record<string, unknown>);
+  buildDataFlowEdges(withTree as PlanNodesMap);
+  buildNetworkingEdges(withTree as PlanNodesMap);
   return withTree;
 }
 

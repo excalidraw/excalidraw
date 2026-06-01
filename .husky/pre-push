@@ -1,5 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Lint, typecheck, tests, coverage, ESM build, and size-limit (formerly split across pre-commit + pre-push).
+# Typecheck, ESLint, Prettier, Knip, depcheck, tests, coverage, ESM build, and size-limit.
+export TERRAFORM_IMPORT_PRESETS_DB="${TERRAFORM_IMPORT_PRESETS_DB:-packages/excalidraw/test-fixtures/terraform-import-presets.db}"
 yarn test:prepush

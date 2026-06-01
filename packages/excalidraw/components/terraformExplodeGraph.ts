@@ -1,6 +1,5 @@
 /**
- * Undirected neighbor map for Terraform “explode” UI (parity with
- * `packages/backend/excalidraw-arrows.js` collectDataFlowEdges + buildTerraformExplodeParentMap).
+ * Undirected neighbor map for Terraform “explode” UI (see `collectDataFlowEdges` + `buildTerraformExplodeParentMap` in this module).
  */
 
 import {

@@ -32,7 +32,7 @@ import type { PointerDownState } from "../types";
 /**
  * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
  * expand/collapse for dependency neighborhoods, and edge rebind after layout changes.
- * Element `customData` is written by `packages/backend/excalidraw.js`.
+ * Element `customData` is written during browser-side layout (`terraformElkLayout`, `terraformTopologyLayout`).
  */
 
 export type TerraformEdgeLayerPins = {

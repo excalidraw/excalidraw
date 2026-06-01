@@ -69,11 +69,11 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc" {
 }
 
 resource "aws_lambda_function" "consumer" {
-  function_name = "${var.environment}-consumer"
-  role          = aws_iam_role.lambda.arn
-  handler       = "handler.handler"
-  runtime       = "python3.12"
-  filename      = data.archive_file.lambda_zip.output_path
+  function_name    = "${var.environment}-consumer"
+  role             = aws_iam_role.lambda.arn
+  handler          = "handler.handler"
+  runtime          = "python3.12"
+  filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   vpc_config {

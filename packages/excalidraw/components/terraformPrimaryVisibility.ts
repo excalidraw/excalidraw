@@ -1,8 +1,6 @@
 /**
  * Default “primary” resource visibility for Terraform diagrams (explode / overview).
- *
- * Keep in sync with `packages/backend/excalidraw-elements.js` (PRIMARY_* + getResourceType +
- * isPrimaryVisibleResourceType).
+ * Primary types and `getResourceType` / `isPrimaryVisibleResourceType` live in this module.
  */
 
 const PRIMARY_COMPUTE_TYPES = new Set([

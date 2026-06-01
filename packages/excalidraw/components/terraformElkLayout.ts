@@ -13,8 +13,7 @@
  *    into one directed edge set per `source|||target`. Endpoints resolve like `resolveCanonicalNodePath`
  *    (exact address, then index-stripped key). Stroke color: new-only green, prior-only blue, both yellow.
  *
- * 3. **ELK options** — Align with `packages/backend/excalidraw-layout.js`: layered, RIGHT,
- *    `INCLUDE_CHILDREN`, generous spacing, separate components.
+ * 3. **ELK options** — Layered, RIGHT, `INCLUDE_CHILDREN`, generous spacing, separate components.
  *
  * 4. **Geometry** — Read ELK’s hierarchical coordinates (child `x`/`y` are **relative to
  *    parent**). Then **per module (deepest first)**: lay direct **submodules** in a horizontal
@@ -97,7 +96,7 @@ import {
 
 const px = tfComfortPx;
 
-/** Align with backend `packages/backend/excalidraw-layout.js` defaults (pixel values scaled). */
+/** ELK layout defaults (pixel values scaled via {@link tfComfortPx}). */
 const ELK_ROOT_LAYOUT_OPTIONS: Record<string, string> = {
   "elk.algorithm": "layered",
   "elk.direction": "RIGHT",
@@ -336,8 +335,7 @@ export type TerraformDirectedLayoutEdge = {
 };
 
 /**
- * De-duplicates `edges_new` and `edges_existing` into directed pairs with origin flags
- * (same semantics as `packages/backend/excalidraw-arrows.js` `collectDirectedEdges`).
+ * De-duplicates `edges_new` and `edges_existing` into directed pairs with origin flags.
  */
 export function collectDirectedEdges(
   nodes: TerraformPlanNodesMap,
@@ -472,7 +470,7 @@ function getDominantTerraformAction(actions: Iterable<unknown>) {
   return "existing";
 }
 
-/** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
+/** Primary Terraform change action for a plan node (create/update/delete/existing). */
 export function getTerraformPlanNodeAction(
   node: TerraformPlanGraphNode | undefined,
 ) {

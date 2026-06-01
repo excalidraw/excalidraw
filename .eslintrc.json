@@ -59,6 +59,58 @@
           }
         ]
       }
+    },
+    {
+      "files": ["packages/excalidraw/components/terraform*.{ts,tsx}", "packages/excalidraw/components/Terraform*.{ts,tsx}"],
+      "excludedFiles": [
+        "packages/excalidraw/components/terraformTopologyLayout.ts",
+        "packages/excalidraw/components/terraformTopologyPlacement.ts",
+        "packages/excalidraw/components/terraformElkLayout.ts",
+        "packages/excalidraw/components/terraformVisibility.ts",
+        "packages/excalidraw/components/terraformTopologySatelliteRenderers.ts",
+        "packages/excalidraw/components/terraformTopologyEcsLinks.ts",
+        "packages/excalidraw/components/terraformTopologySgLinks.ts",
+        "packages/excalidraw/components/terraformPlanParsing.tsx",
+        "packages/excalidraw/components/terraformDataFlowEdges.ts",
+        "packages/excalidraw/components/terraformTopologyApiGatewayLinks.ts",
+        "packages/excalidraw/components/terraformTopologyLayout.test.ts",
+        "packages/excalidraw/components/terraformTopologyPlacement.test.ts",
+        "packages/excalidraw/components/terraformElkLayout.test.ts",
+        "packages/excalidraw/components/terraformPlanParsing.test.ts",
+        "packages/excalidraw/components/terraformTopologySgLinks.test.ts"
+      ],
+      "rules": {
+        "max-lines": [
+          "error",
+          {
+            "max": 800,
+            "skipComments": true,
+            "skipBlankLines": true
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "packages/excalidraw/components/terraformTopologyLayout.ts",
+        "packages/excalidraw/components/terraformTopologyPlacement.ts",
+        "packages/excalidraw/components/terraformElkLayout.ts",
+        "packages/excalidraw/components/terraformVisibility.ts",
+        "packages/excalidraw/components/terraformTopologySatelliteRenderers.ts",
+        "packages/excalidraw/components/terraformTopologyEcsLinks.ts",
+        "packages/excalidraw/components/terraformTopologySgLinks.ts",
+        "packages/excalidraw/components/terraformPlanParsing.tsx",
+        "packages/excalidraw/components/terraformDataFlowEdges.ts",
+        "packages/excalidraw/components/terraformTopologyApiGatewayLinks.ts",
+        "packages/excalidraw/components/terraformTopologyLayout.test.ts",
+        "packages/excalidraw/components/terraformTopologyPlacement.test.ts",
+        "packages/excalidraw/components/terraformElkLayout.test.ts",
+        "packages/excalidraw/components/terraformPlanParsing.test.ts",
+        "packages/excalidraw/components/terraformTopologySgLinks.test.ts"
+      ],
+      "rules": {
+        "max-lines": "off"
+      }
     }
   ]
 }
