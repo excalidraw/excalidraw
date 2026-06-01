@@ -1,8 +1,0 @@
-.terraform/
-.terraform.lock.hcl
-build/
-*.tfstate
-*.tfstate.*
-tfplan
-plan.json
-graph.dot

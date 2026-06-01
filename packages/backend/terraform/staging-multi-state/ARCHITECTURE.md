@@ -25,14 +25,7 @@ Each stack keeps local state (`terraform.tfstate`) and exports `plan.json` + `gr
 
 ### What it is not
 
-This is **production-shaped staging**, not full production parity with [`production-geo-fanout/`](../production-geo-fanout/):
-
-| Aspect | staging-multi-state | production-geo-fanout |
-| --- | --- | --- |
-| Accounts | Single account | Multi-account |
-| Compute | Lambda + ECS Fargate + ECS EC2 | Lambda-only |
-| Target | AWS staging + Excalidraw presets | LocalStack / prod fanout patterns |
-| APIs | 11 private REST APIs + cascade | 6 APIs, consumer SigV4 fanout |
+This is **production-shaped staging** in a single AWS account: multi-region networks, mixed Lambda/ECS compute, and cascade APIs—not a separate multi-account production fanout layout.
 
 ---
 
@@ -494,6 +487,5 @@ Rough **24/7 idle** staging cost (single account, May 2026 pricing assumptions):
 ## Related references
 
 - [README.md](./README.md) — quick start and apply order summary
-- [production-geo-fanout/README.md](../production-geo-fanout/README.md) — multi-account production fanout contrast
 - [import-presets.catalog.json](../import-presets.catalog.json) — preset stack manifest
 - [CLAUDE.md](../../../../CLAUDE.md) — monorepo structure and Terraform import context
