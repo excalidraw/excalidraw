@@ -10,24 +10,21 @@ import {
 } from "./terraformTopologyExtract";
 import {
   computeInterfaceVpcEndpointZonePlacements,
-  computeNatGatewayZonePlacements,
   collectRouteAddressesFromBottomPlacements,
   computeRouteTableBottomEdgePlacements,
   extractInterfaceEndpointSecurityGroupBuckets,
-  extractPrimaryTopologyZones,
   extractRegionalTopologyPrimaries,
   extractRouteTablesByVpc,
-  extractSupplementarySubnetZones,
-  extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
   filterVpcEndpointBucketsRemovingZonePlacedAddresses,
-  mergePrimaryTopologyZonesByTier,
-  reconcileTopologyPlacementZonesAfterEnrich,
-  mergeSupplementarySubnetZonesByTier,
-  mergeSupplementarySubnetZonesSharedRouteTable,
 } from "./terraformTopologyPlacement";
-import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
+import {
+  buildMergedTopologyZones,
+  buildVpcDefaultPlumbingWithNat,
+  collectTopologyPreplacedAddresses,
+  enrichAndReconcileTopologyPlacements,
+} from "./terraformTopologyPlacementBuild";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import {
   filterPlanByProviderFamily,
@@ -196,38 +193,7 @@ export function prepareSemanticAwsLayoutPrep(
   }
 
   const topoModel = extractTerraformTopologyFromPlan(awsPlan);
-  const primaryZones = mergePrimaryTopologyZonesByTier(
-    extractPrimaryTopologyZones(awsPlan).map((z) => ({
-      ...z,
-      topologyZoneSource: "primary" as const,
-    })),
-    awsPlan,
-  );
-  const supplementaryZones = extractSupplementarySubnetZones(
-    awsPlan,
-    primaryZones,
-  ).map((z) => ({
-    ...z,
-    topologyZoneSource: "supplementary" as const,
-  }));
-  const zones = mergeSupplementarySubnetZonesByTier(
-    mergeSupplementarySubnetZonesSharedRouteTable(
-      [...primaryZones, ...supplementaryZones].sort((a, b) => {
-        if (a.accountId !== b.accountId) {
-          return a.accountId.localeCompare(b.accountId);
-        }
-        if (a.region !== b.region) {
-          return a.region.localeCompare(b.region);
-        }
-        if (a.vpcId !== b.vpcId) {
-          return a.vpcId.localeCompare(b.vpcId);
-        }
-        return a.subnetSignature.localeCompare(b.subnetSignature);
-      }),
-      awsPlan,
-    ),
-    awsPlan,
-  );
+  const zones = buildMergedTopologyZones(awsPlan);
   const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
   const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
   const {
@@ -239,19 +205,8 @@ export function prepareSemanticAwsLayoutPrep(
     zonePlacedAddresses,
   );
   const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
-  const rawVpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(awsPlan);
-  const natZonePlacements = computeNatGatewayZonePlacements(awsPlan, zones);
-  const vpcDefaultPlumbingBuckets =
-    natZonePlacements.consumedAddresses.size === 0
-      ? rawVpcDefaultPlumbingBuckets
-      : rawVpcDefaultPlumbingBuckets
-          .map((b) => ({
-            ...b,
-            addresses: b.addresses.filter(
-              (a) => !natZonePlacements.consumedAddresses.has(a),
-            ),
-          }))
-          .filter((b) => b.addresses.length > 0);
+  const { vpcDefaultPlumbingBuckets, natZonePlacements } =
+    buildVpcDefaultPlumbingWithNat(awsPlan, zones);
   const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
   const endpointSecurityGroupBuckets =
     extractInterfaceEndpointSecurityGroupBuckets(awsPlan, vpcEndpointBucketsRaw);
@@ -267,41 +222,37 @@ export function prepareSemanticAwsLayoutPrep(
   mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
   mergeTopologyModelWithRouteTables(topoModel, endpointSecurityGroupBuckets);
 
-  const enrichPreplaced = new Set<string>();
-  for (const z of zones) {
-    for (const a of z.addresses) {
-      enrichPreplaced.add(a);
-    }
-  }
-  for (const b of [
+  const enrichPreplaced = collectTopologyPreplacedAddresses([
+    ...zones,
     ...regionalBuckets,
     ...vpcEndpointBuckets,
     ...routeTableBuckets,
     ...vpcDefaultPlumbingBuckets,
     ...vpcFlowLogBuckets,
     ...endpointSecurityGroupBuckets,
-  ]) {
-    for (const a of b.addresses) {
-      enrichPreplaced.add(a);
-    }
+  ]);
+  for (const address of natZonePlacements.consumedAddresses) {
+    enrichPreplaced.add(address);
   }
-  for (const a of natZonePlacements.consumedAddresses) {
-    enrichPreplaced.add(a);
+  for (const address of zonePlacedAddresses) {
+    enrichPreplaced.add(address);
   }
-  for (const p of zonePlacedAddresses) {
-    enrichPreplaced.add(p);
-  }
-  for (const a of collectRouteAddressesFromBottomPlacements(
+  for (const address of collectRouteAddressesFromBottomPlacements(
     routeTableBottomPlacements,
   )) {
-    enrichPreplaced.add(a);
+    enrichPreplaced.add(address);
   }
-  enrichTopologyPlacementsWithManagedResources(awsPlan, zones, regionalBuckets, {
+  enrichAndReconcileTopologyPlacements(
+    {
+      zones,
+      regionalBuckets,
+      vpcDefaultPlumbingBuckets,
+      natZonePlacements,
+    },
+    awsPlan,
     nodes,
-    plan: awsPlan,
-    preplacedAddresses: enrichPreplaced,
-  });
-  reconcileTopologyPlacementZonesAfterEnrich(zones, awsPlan);
+    enrichPreplaced,
+  );
 
   if (topoModel.accounts.size === 0) {
     return {

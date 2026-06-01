@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
+import {
+  buildEnrichedTopologyPlacements,
+  topologyAddressPlacementMap,
+} from "./terraformTopologyPlacementBuild";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
@@ -14,6 +18,7 @@ const rc = (
   mode: "managed",
   type,
   name: address.split(".").pop() ?? address,
+  provider_name: "registry.terraform.io/hashicorp/aws",
   change: {
     actions: ["no-op"],
     after,
@@ -131,6 +136,99 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
     expect(resourceX(scene.elements, "aws_sqs_queue.b")).toBe(
       resourceX(scene.elements, "aws_dynamodb_table.c"),
     );
+  });
+
+  it("resolves IGW, NAT, and SSM account/region/VPC in placement map", () => {
+    const igw = rc("aws_internet_gateway.this", "aws_internet_gateway", {
+      vpc_id: "vpc-aaa",
+      region: "us-east-1",
+    });
+    const nat = rc("aws_nat_gateway.this", "aws_nat_gateway", {
+      subnet_id: "subnet-public-a",
+      region: "us-east-1",
+    });
+    const subnetPublic = rc("aws_subnet.public_a", "aws_subnet", {
+      id: "subnet-public-a",
+      vpc_id: "vpc-aaa",
+      region: "us-east-1",
+    });
+    const ssm = rc("module.api.aws_ssm_parameter.api_name", "aws_ssm_parameter", {
+      region: "us-east-1",
+    });
+    const lambda = rc(
+      "module.api.module.lambda.aws_lambda_function.this[0]",
+      "aws_lambda_function",
+      {
+        vpc_id: "vpc-aaa",
+        subnet_ids: ["subnet-private-a"],
+        region: "us-east-1",
+      },
+    );
+    const subnetPrivate = rc("aws_subnet.private_a", "aws_subnet", {
+      id: "subnet-private-a",
+      vpc_id: "vpc-aaa",
+      region: "us-east-1",
+    });
+    const vpc = rc("aws_vpc.main", "aws_vpc", {
+      id: "vpc-aaa",
+      region: "us-east-1",
+    });
+    const plan = {
+      configuration: {
+        provider_config: {
+          aws: {
+            name: "aws",
+            expressions: {
+              region: { constant_value: "us-east-1" },
+              assume_role: [
+                {
+                  role_arn: {
+                    constant_value: "arn:aws:iam::111111111111:role/Deploy",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      resource_changes: [
+        vpc,
+        subnetPublic,
+        subnetPrivate,
+        igw,
+        nat,
+        ssm,
+        lambda,
+      ],
+    };
+    const nodes = {
+      "aws_internet_gateway.this": nodeFromRc(igw),
+      "aws_nat_gateway.this": nodeFromRc(nat),
+      "module.api.aws_ssm_parameter.api_name": nodeFromRc(ssm),
+      "module.api.module.lambda.aws_lambda_function.this[0]": nodeFromRc(lambda),
+    } as unknown as TerraformPlanNodesMap;
+
+    const enriched = buildEnrichedTopologyPlacements(plan, nodes);
+    const map = topologyAddressPlacementMap(enriched, plan);
+
+    expect(map.get("aws_internet_gateway.this")).toMatchObject({
+      providerFamily: "aws",
+      accountId: "111111111111",
+      region: "us-east-1",
+      vpcId: "vpc-aaa",
+    });
+    expect(map.get("aws_nat_gateway.this")).toMatchObject({
+      providerFamily: "aws",
+      accountId: "111111111111",
+      region: "us-east-1",
+      vpcId: "vpc-aaa",
+    });
+    expect(map.get("module.api.aws_ssm_parameter.api_name")).toMatchObject({
+      providerFamily: "aws",
+      accountId: "111111111111",
+      region: "us-east-1",
+      vpcId: null,
+    });
   });
 
   it("collapses ALB listener and target group endpoints into one aws_lb cluster", async () => {

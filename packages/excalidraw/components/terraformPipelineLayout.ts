@@ -17,19 +17,18 @@ import {
   type DeclaredDataFlowEdge,
 } from "./terraformDeclaredDataFlow";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
+import { filterPlanByProviderFamily } from "./terraformProviderClassification";
 import {
-  extractPrimaryTopologyZones,
-  extractRegionalTopologyPrimaries,
-  mergePrimaryTopologyZonesByTier,
-  topologySubnetTierFromZone,
-} from "./terraformTopologyPlacement";
+  buildEnrichedTopologyPlacements,
+  topologyAddressPlacementMap,
+  type TopologyAddressPlacement,
+} from "./terraformTopologyPlacementBuild";
 import {
   buildTopologyPrimaryClusterSkeletonForPipeline,
   type PipelinePrimaryClusterBuildResult,
 } from "./terraformTopologyLayout";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
 import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
-import { buildTopologySubnetNameMap } from "./terraformTopologyPlacement";
 import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
@@ -48,15 +47,7 @@ type ResourceChange = {
   type?: string;
 };
 
-type PipelinePlacement = {
-  providerFamily: string;
-  accountId: string;
-  region: string;
-  vpcId: string | null;
-  subnetSignature?: string;
-  subnetIds?: string[];
-  subnetTier?: string;
-};
+type PipelinePlacement = TopologyAddressPlacement;
 
 type PipelineCluster = {
   id: string;
@@ -164,41 +155,9 @@ function buildPlacementMap(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
 ): Map<string, PipelinePlacement> {
-  const out = new Map<string, PipelinePlacement>();
-  const subnetNames = buildTopologySubnetNameMap(plan);
-  const primaryZones = mergePrimaryTopologyZonesByTier(
-    extractPrimaryTopologyZones(plan as any).map((z) => ({
-      ...z,
-      topologyZoneSource: "primary" as const,
-    })),
-    plan as any,
-  );
-
-  for (const z of primaryZones) {
-    const tier = topologySubnetTierFromZone(z, subnetNames);
-    for (const address of z.addresses) {
-      out.set(address, {
-        providerFamily: "aws",
-        accountId: z.accountId,
-        region: z.region,
-        vpcId: z.vpcId,
-        subnetSignature: z.subnetSignature,
-        subnetIds: z.subnetIds,
-        subnetTier: tier,
-      });
-    }
-  }
-
-  for (const bucket of extractRegionalTopologyPrimaries(plan as any)) {
-    for (const address of bucket.addresses) {
-      out.set(address, {
-        providerFamily: "aws",
-        accountId: bucket.accountId,
-        region: bucket.region,
-        vpcId: null,
-      });
-    }
-  }
+  const awsPlan = filterPlanByProviderFamily(plan as any, "aws");
+  const enriched = buildEnrichedTopologyPlacements(awsPlan, nodes);
+  const out = topologyAddressPlacementMap(enriched, awsPlan);
 
   for (const address of Object.keys(nodes)) {
     if (address.startsWith("__") || out.has(address)) {

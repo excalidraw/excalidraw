@@ -72,7 +72,7 @@ describe("terraform layout golden snapshots", () => {
 
   it("staging-multi-state pipeline layout matches golden snapshot", async () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readStagingMultiStatePipelineTfdFromDb();
+    const tfd = readTerraformBackendFile("staging-multi-state/pipeline.tfd");
     const snapshot = await importLayoutSnapshot(
       {
         planDotBundles: bundles,
