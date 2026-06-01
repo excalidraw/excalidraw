@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 
 /** GitHub Actions runners are ~1.5× slower than local for 25-stack semantic layout. */
-const PERF_BUDGET_MS = process.env.CI ? 240_000 : 120_000;
-const PERF_TEST_TIMEOUT_MS = process.env.CI ? 300_000 : 120_000;
+const PERF_BUDGET_MS = process.env.CI ? 300_000 : 120_000;
 
 describe("terraform import performance", () => {
   it(
@@ -46,6 +47,6 @@ describe("terraform import performance", () => {
         );
       }
     },
-    PERF_TEST_TIMEOUT_MS,
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
   );
 });

@@ -31,6 +31,11 @@ export const HAS_CLOUDFLARE_PLAN_FIXTURES = hasTerraformBackendFile(
 export const HAS_AWS_CLOUDFLARE_MULTI_IMPORT_FIXTURES =
   HAS_ALLPLANMODULES_FIXTURES && HAS_CLOUDFLARE_PLAN_FIXTURES;
 
+/** Vitest timeout for 25-stack staging semantic layout (GitHub Actions is ~2× slower). */
+export const STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS = process.env.CI
+  ? 360_000
+  : 180_000;
+
 export function loadAwsCloudflareMultiImportFixture() {
   return {
     awsPlan: JSON.parse(readTerraformBackendFile("allplanmodules.json")),

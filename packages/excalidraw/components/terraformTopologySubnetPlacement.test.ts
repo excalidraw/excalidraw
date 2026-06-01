@@ -4,6 +4,8 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import {
   mergePlanJsons,
   namespacePlanDotBundles,
@@ -106,68 +108,72 @@ describe("staging-multi-state-expanded topology subnet placement", () => {
     expect(auroraZone!.subnetIds.length).toBeGreaterThan(0);
   }, 120_000);
 
-  it("semantic layout: ECS producer is under a private subnetZone frame", async () => {
-    const { zones } = expandedAwsPlan();
-    const producerZone = zoneForAddress(zones, "aws_ecs_service.producer");
-    expect(producerZone?.subnetIds.length).toBeGreaterThan(0);
+  it(
+    "semantic layout: ECS producer is under a private subnetZone frame",
+    async () => {
+      const { zones } = expandedAwsPlan();
+      const producerZone = zoneForAddress(zones, "aws_ecs_service.producer");
+      expect(producerZone?.subnetIds.length).toBeGreaterThan(0);
 
-    const sources = getTerraformImportPresetSourcesFromDb(
-      "staging-multi-state-expanded",
-    );
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: sources!.planDotBundles,
-        states: [],
-        stateLabels: [],
-        tfdTexts: sources!.tfdTexts,
-        tfdLabels: sources!.tfdLabels,
-      },
-      { semanticLayout: true },
-    );
-    expect(res.ok).toBe(true);
-    const elements = (await res.json()).elements as Array<{
-      id: string;
-      type?: string;
-      frameId?: string | null;
-      name?: string | null;
-      customData?: {
-        terraformTopologyRole?: string;
-        terraformSubnetIds?: string[];
-        nodePath?: string;
-        terraformVisibilityRole?: string;
-      };
-    }>;
-    const byId = new Map(elements.map((e) => [e.id, e]));
+      const sources = getTerraformImportPresetSourcesFromDb(
+        "staging-multi-state-expanded",
+      );
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: sources!.planDotBundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: sources!.tfdTexts,
+          tfdLabels: sources!.tfdLabels,
+        },
+        { semanticLayout: true },
+      );
+      expect(res.ok).toBe(true);
+      const elements = (await res.json()).elements as Array<{
+        id: string;
+        type?: string;
+        frameId?: string | null;
+        name?: string | null;
+        customData?: {
+          terraformTopologyRole?: string;
+          terraformSubnetIds?: string[];
+          nodePath?: string;
+          terraformVisibilityRole?: string;
+        };
+      }>;
+      const byId = new Map(elements.map((e) => [e.id, e]));
 
-    const producer = elements.find(
-      (e) =>
-        e.type === "rectangle" &&
-        e.customData?.terraformVisibilityRole === "resource" &&
-        e.customData?.nodePath?.includes("aws_ecs_service.producer"),
-    );
-    expect(producer).toBeDefined();
+      const producer = elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          e.customData?.terraformVisibilityRole === "resource" &&
+          e.customData?.nodePath?.includes("aws_ecs_service.producer"),
+      );
+      expect(producer).toBeDefined();
 
-    let current: string | null | undefined = producer!.frameId;
-    const seen = new Set<string>();
-    let subnetZone: typeof elements[number] | undefined;
-    while (current && !seen.has(current)) {
-      seen.add(current);
-      const el = byId.get(current);
-      if (
-        el?.type === "frame" &&
-        el.customData?.terraformTopologyRole === "subnetZone"
-      ) {
-        subnetZone = el;
-        break;
+      let current: string | null | undefined = producer!.frameId;
+      const seen = new Set<string>();
+      let subnetZone: typeof elements[number] | undefined;
+      while (current && !seen.has(current)) {
+        seen.add(current);
+        const el = byId.get(current);
+        if (
+          el?.type === "frame" &&
+          el.customData?.terraformTopologyRole === "subnetZone"
+        ) {
+          subnetZone = el;
+          break;
+        }
+        current = el?.frameId;
       }
-      current = el?.frameId;
-    }
-    expect(subnetZone).toBeDefined();
-    expect(subnetZone!.name).toMatch(/private/i);
-    expect(
-      subnetZone!.customData?.terraformSubnetIds?.some((id) =>
-        producerZone!.subnetIds.includes(id),
-      ),
-    ).toBe(true);
-  }, 180_000);
+      expect(subnetZone).toBeDefined();
+      expect(subnetZone!.name).toMatch(/private/i);
+      expect(
+        subnetZone!.customData?.terraformSubnetIds?.some((id) =>
+          producerZone!.subnetIds.includes(id),
+        ),
+      ).toBe(true);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
 });

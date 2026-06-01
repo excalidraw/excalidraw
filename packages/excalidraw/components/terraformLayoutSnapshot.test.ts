@@ -6,6 +6,7 @@ import {
   loadStagingMultiStatePlanDotBundlesFromDb,
   readStagingMultiStatePipelineTfdFromDb,
   readTerraformBackendFile,
+  STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
 } from "../test-fixtures/terraformPresetFixtures";
 
 import {
@@ -35,60 +36,72 @@ describe("terraform layout golden snapshots", () => {
     return serializeTerraformLayoutSnapshot(buildTerraformLayoutSnapshot(body));
   }
 
-  it("staging-multi-state semantic layout matches golden snapshot", async () => {
-    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readStagingMultiStatePipelineTfdFromDb();
-    const snapshot = await importLayoutSnapshot(
-      {
-        planDotBundles: bundles,
-        states: [],
-        stateLabels: [],
-        tfdTexts: [tfd],
-        tfdLabels: ["pipeline.tfd"],
-      },
-      true,
-    );
-    await expect(snapshot).toMatchFileSnapshot(
-      "./__snapshots__/staging-multi-state.semantic.layout.snap",
-    );
-  }, 180_000);
+  it(
+    "staging-multi-state semantic layout matches golden snapshot",
+    async () => {
+      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+      const tfd = readStagingMultiStatePipelineTfdFromDb();
+      const snapshot = await importLayoutSnapshot(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        true,
+      );
+      await expect(snapshot).toMatchFileSnapshot(
+        "./__snapshots__/staging-multi-state.semantic.layout.snap",
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
 
-  it("staging-multi-state module layout matches golden snapshot", async () => {
-    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readStagingMultiStatePipelineTfdFromDb();
-    const snapshot = await importLayoutSnapshot(
-      {
-        planDotBundles: bundles,
-        states: [],
-        stateLabels: [],
-        tfdTexts: [tfd],
-        tfdLabels: ["pipeline.tfd"],
-      },
-      false,
-    );
-    await expect(snapshot).toMatchFileSnapshot(
-      "./__snapshots__/staging-multi-state.module.layout.snap",
-    );
-  }, 180_000);
+  it(
+    "staging-multi-state module layout matches golden snapshot",
+    async () => {
+      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+      const tfd = readStagingMultiStatePipelineTfdFromDb();
+      const snapshot = await importLayoutSnapshot(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        false,
+      );
+      await expect(snapshot).toMatchFileSnapshot(
+        "./__snapshots__/staging-multi-state.module.layout.snap",
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
 
-  it("staging-multi-state pipeline layout matches golden snapshot", async () => {
-    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readTerraformBackendFile("staging-multi-state/pipeline.tfd");
-    const snapshot = await importLayoutSnapshot(
-      {
-        planDotBundles: bundles,
-        states: [],
-        stateLabels: [],
-        tfdTexts: [tfd],
-        tfdLabels: ["pipeline.tfd"],
-      },
-      false,
-      "pipeline",
-    );
-    await expect(snapshot).toMatchFileSnapshot(
-      "./__snapshots__/staging-multi-state.pipeline.layout.snap",
-    );
-  }, 180_000);
+  it(
+    "staging-multi-state pipeline layout matches golden snapshot",
+    async () => {
+      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
+      const tfd = readTerraformBackendFile("staging-multi-state/pipeline.tfd");
+      const snapshot = await importLayoutSnapshot(
+        {
+          planDotBundles: bundles,
+          states: [],
+          stateLabels: [],
+          tfdTexts: [tfd],
+          tfdLabels: ["pipeline.tfd"],
+        },
+        false,
+        "pipeline",
+      );
+      await expect(snapshot).toMatchFileSnapshot(
+        "./__snapshots__/staging-multi-state.pipeline.layout.snap",
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
 
   it.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
     "allplanmodules semantic layout matches golden snapshot",

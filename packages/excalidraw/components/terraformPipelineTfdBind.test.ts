@@ -4,6 +4,8 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
@@ -114,57 +116,67 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
     }
   });
 
-  it("semantic import exposes ingress and egress SQS primary tiles", async () => {
-    const rawSources = getTerraformImportPresetSourcesFromDb(
-      "staging-multi-state-expanded",
-    );
-    expect(rawSources).not.toBeNull();
-    const sources = resolveSourcesWithTfdComposition(
-      rawSources! as TerraformImportPresetSources,
-    );
+  it(
+    "semantic import exposes ingress and egress SQS primary tiles",
+    async () => {
+      const rawSources = getTerraformImportPresetSourcesFromDb(
+        "staging-multi-state-expanded",
+      );
+      expect(rawSources).not.toBeNull();
+      const sources = resolveSourcesWithTfdComposition(
+        rawSources! as TerraformImportPresetSources,
+      );
 
-    const res = await terraformPlanParsingFromSources(sources, {
-      semanticLayout: true,
-    });
-    expect(res.ok).toBe(true);
-    const body = await res.json();
+      const res = await terraformPlanParsingFromSources(sources, {
+        semanticLayout: true,
+      });
+      expect(res.ok).toBe(true);
+      const body = await res.json();
 
-    const sqsPaths = [
-      ...new Set<string>(
-        body.elements
-          .filter(
-            (e: {
-              isDeleted?: boolean;
-              type?: string;
-              customData?: { resourceType?: string; nodePath?: string };
-            }) =>
-              !e.isDeleted &&
-              e.type === "rectangle" &&
-              e.customData?.resourceType === "aws_sqs_queue",
-          )
-          .map(
-            (e: { customData?: { nodePath?: string } }) =>
-              e.customData?.nodePath ?? "",
-          ),
-      ),
-    ];
+      const sqsPaths = [
+        ...new Set<string>(
+          body.elements
+            .filter(
+              (e: {
+                isDeleted?: boolean;
+                type?: string;
+                customData?: { resourceType?: string; nodePath?: string };
+              }) =>
+                !e.isDeleted &&
+                e.type === "rectangle" &&
+                e.customData?.resourceType === "aws_sqs_queue",
+            )
+            .map(
+              (e: { customData?: { nodePath?: string } }) =>
+                e.customData?.nodePath ?? "",
+            ),
+        ),
+      ];
 
-    expect(sqsPaths.some((p) => p.includes("module.ingress_queue"))).toBe(true);
-    expect(sqsPaths.some((p) => p.includes("module.egress_queue"))).toBe(true);
-    expect(
-      sqsPaths.some(
-        (p) =>
-          p.includes("module.ingress_queue") && p.includes("aws_sqs_queue.dlq"),
-      ),
-    ).toBe(true);
-    expect(
-      sqsPaths.some(
-        (p) =>
-          p.includes("module.egress_queue") && p.includes("aws_sqs_queue.dlq"),
-      ),
-    ).toBe(true);
-    expect(sqsPaths.some((p) => p.includes("module.queue.module.queue"))).toBe(
-      false,
-    );
-  }, 180_000);
+      expect(sqsPaths.some((p) => p.includes("module.ingress_queue"))).toBe(
+        true,
+      );
+      expect(sqsPaths.some((p) => p.includes("module.egress_queue"))).toBe(
+        true,
+      );
+      expect(
+        sqsPaths.some(
+          (p) =>
+            p.includes("module.ingress_queue") &&
+            p.includes("aws_sqs_queue.dlq"),
+        ),
+      ).toBe(true);
+      expect(
+        sqsPaths.some(
+          (p) =>
+            p.includes("module.egress_queue") &&
+            p.includes("aws_sqs_queue.dlq"),
+        ),
+      ).toBe(true);
+      expect(
+        sqsPaths.some((p) => p.includes("module.queue.module.queue")),
+      ).toBe(false);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
 });
