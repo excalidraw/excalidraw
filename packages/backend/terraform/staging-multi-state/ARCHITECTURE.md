@@ -28,7 +28,7 @@ Each stack keeps local state (`terraform.tfstate`) and exports `plan.json` + `gr
 This is **production-shaped staging**, not full production parity with [`production-geo-fanout/`](../production-geo-fanout/):
 
 | Aspect | staging-multi-state | production-geo-fanout |
-|--------|---------------------|------------------------|
+| --- | --- | --- |
 | Accounts | Single account | Multi-account |
 | Compute | Lambda + ECS Fargate + ECS EC2 | Lambda-only |
 | Target | AWS staging + Excalidraw presets | LocalStack / prod fanout patterns |
@@ -45,7 +45,7 @@ Every stack lives under `packages/backend/terraform/staging-multi-state/<stack-i
 - `graph.dot` (from `terraform graph -plan`)
 
 | Stack ID | Region | Role | Key outputs consumed downstream |
-|----------|--------|------|--------------------------------|
+| --- | --- | --- | --- |
 | `00-east-network` | us-east-1 | East VPC (4 subnet tiers), execute-api VPCE, east TGW, east lambda artifacts bucket, APIGW CloudWatch account | `vpc_id`, subnet IDs, `execute_api_vpce_id`, `lambda_artifacts_bucket_id`, TGW IDs |
 | `01-west-network` | us-west-2 | West VPC, west TGW, TGW peering to east, execute-api VPCE, west lambda artifacts, APIGW logging | Same pattern as east; peers east via TGW |
 | `02-east-datastores` | us-east-1 | Dedicated stores for east APIs 1–7 plus cross-region stores for api-8 (S3) and api-9 (RDS) | Table/bucket ARNs, RDS/Aurora `secret_arn` |
@@ -75,7 +75,7 @@ Numbering convention: `00–03` foundation, `10–20` trunk/messaging, `40–46`
 Both regions use [`private_workload_network`](../modules/private_workload_network/) with **four subnet tiers** (two AZs each):
 
 | Tier | Purpose | East CIDRs | West CIDRs |
-|------|---------|------------|------------|
+| --- | --- | --- | --- |
 | Public | NAT, public ALB (ecs-edge only) | `10.60.0.0/24`, `10.60.1.0/24` | `10.70.0.0/24`, `10.70.1.0/24` |
 | Private | Lambda, ECS tasks, internal NLBs | `10.60.10.0/24`, `10.60.11.0/24` | `10.70.10.0/24`, `10.70.11.0/24` |
 | Intra | VPC endpoints (execute-api, Secrets Manager, etc.) | `10.60.20.0/24`, `10.60.21.0/24` | `10.70.20.0/24`, `10.70.21.0/24` |
@@ -182,7 +182,7 @@ Declared edges for drawing: [`pipeline.tfd`](./pipeline.tfd) (cascade section at
 Each API owns **one dedicated primary store**. apis 8 and 9 also have a **second store in the other region** (not shared with any other API).
 
 | API | Stack | Region | Compute | Primary store | Store stack / module | Cross-region store |
-|-----|-------|--------|---------|---------------|----------------------|-------------------|
+| --- | --- | --- | --- | --- | --- | --- |
 | 1 | `40-east-api-1` | east | Lambda | DynamoDB | `02` / `api1_table` | — |
 | 2 | `41-east-api-2` | east | ECS Fargate MAZ | RDS Multi-AZ | `02` / `api2_rds` | — |
 | 3 | `42-east-api-3` | east | ECS EC2 MAZ | Aurora Serverless v2 MAZ | `02` / `api3_aurora` | — |
@@ -260,7 +260,7 @@ Callers inside the VPC resolve this via the execute-api VPCE private DNS name.
 ### Shared modules (`packages/backend/terraform/modules/`)
 
 | Module | Used for | Notes |
-|--------|----------|-------|
+| --- | --- | --- |
 | `dynamodb_app_table` | api-1, api-5, api-10 | PAY_PER_REQUEST, hash key `id` |
 | `rds_postgres_micro` | api-2, api-6, api-9 (×2) | Postgres 16, `db.t4g.micro`, Multi-AZ, Secrets Manager |
 | `aurora_serverless_v2_micro` | api-3, api-7, api-11 | Serverless v2 0.5–1 ACU, writer + reader in separate AZs |
@@ -367,7 +367,7 @@ bind api2_store   = 02-east-datastores::module.api2_rds.aws_db_instance.this
 The file starts with `tfd 2` so pipeline column depth uses **adjacency-list semantics** (each edge advances one column; sibling targets from the same source share depth). Files without that header keep legacy v1 run-ordinal grouping.
 
 | Form | Meaning |
-|------|---------|
+| --- | --- |
 | `src -> dst` | One column hop |
 | `src -> a, b` | Parallel fanout (same depth for `a` and `b`) |
 | `src --> dst` | Extra depth via auto dummy hop (`src -> __tfd_hop_N -> dst`) |
@@ -383,7 +383,7 @@ api6_compute -> api6_ssm_name, api6_store
 ### Edge categories
 
 | Category | Example |
-|----------|---------|
+| --- | --- |
 | Trunk | `ecs_producer → event_queue → queue_consumer → api1_gateway … api5_gateway` |
 | Gateway → compute → SSM | `api2_gateway → api2_compute → api2_ssm_name` |
 | Compute → store | `api2_compute → api2_store` |
@@ -405,14 +405,14 @@ Import **Staging multi-state** in the app (semantic view) to render the full top
 ### Staging-local (`staging-multi-state/modules/`)
 
 | Module | Role |
-|--------|------|
+| --- | --- |
 | `private_api_lambda` | Private REST API + Lambda aws_proxy + SSM params + optional datastore/downstream IAM |
 | `private_api_ecs` | Private REST API + VPC link + internal NLB + Multi-AZ ECS (Fargate or EC2) |
 
 ### Shared repo modules (`packages/backend/terraform/modules/`)
 
 | Module | Used by |
-|--------|---------|
+| --- | --- |
 | `private_workload_network` | `00`, `01` |
 | `lambda_service` | Lambda APIs, messaging consumer |
 | `encrypted_sqs_queue` | `20-east-messaging` |
@@ -421,10 +421,10 @@ Import **Staging multi-state** in the app (semantic view) to render the full top
 
 ### Shared runtime (`staging-multi-state/shared/`)
 
-| File | Used by |
-|------|---------|
-| `api_handler.py` | Lambda API stacks |
-| `api_server.py` | ECS container HTTP server |
+| File             | Used by                   |
+| ---------------- | ------------------------- |
+| `api_handler.py` | Lambda API stacks         |
+| `api_server.py`  | ECS container HTTP server |
 
 ---
 
@@ -474,13 +474,13 @@ yarn test:app --run packages/excalidraw/components/terraformLayoutSnapshot.test.
 
 Rough **24/7 idle** staging cost (single account, May 2026 pricing assumptions):
 
-| Layer | Approx. monthly |
-|-------|-----------------|
-| SQL (4× RDS Multi-AZ + 3× Aurora Multi-AZ) | ~$375–395 |
-| 7× internal NLBs (ECS APIs) | ~$110 |
-| ECS Fargate + EC2 Multi-AZ tasks | ~$130 |
-| NAT, TGW, VPCEs, misc. | ~$50+ |
-| **All-in estimate** | **~$650–730+/mo** |
+| Layer                                      | Approx. monthly   |
+| ------------------------------------------ | ----------------- |
+| SQL (4× RDS Multi-AZ + 3× Aurora Multi-AZ) | ~$375–395         |
+| 7× internal NLBs (ECS APIs)                | ~$110             |
+| ECS Fargate + EC2 Multi-AZ tasks           | ~$130             |
+| NAT, TGW, VPCEs, misc.                     | ~$50+             |
+| **All-in estimate**                        | **~$650–730+/mo** |
 
 **Cost levers** (not implemented; documented for future dev tuning):
 

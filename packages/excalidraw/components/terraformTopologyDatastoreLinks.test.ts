@@ -180,8 +180,12 @@ describe("terraformTopologyDatastoreLinks", () => {
       nodes,
       "module.api2_rds.aws_db_instance.this",
     );
-    expect(cluster!.subnetGroup).toBe("module.api2_rds.aws_db_subnet_group.this");
-    expect(cluster!.secret).toBe("module.api2_rds.aws_secretsmanager_secret.db");
+    expect(cluster!.subnetGroup).toBe(
+      "module.api2_rds.aws_db_subnet_group.this",
+    );
+    expect(cluster!.secret).toBe(
+      "module.api2_rds.aws_secretsmanager_secret.db",
+    );
   });
 
   it("isDatastoreCompanionConsumedAsSatellite marks cluster instances as consumed", () => {

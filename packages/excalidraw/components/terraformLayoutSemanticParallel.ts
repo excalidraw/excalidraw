@@ -60,7 +60,6 @@ import type {
 } from "./terraformLayoutWorkerTypes";
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { TerraformLayoutOptions } from "./terraformLayoutCore";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { TerraformProviderFamily } from "./terraformProviderClassification";
 
 export function prepareSemanticAwsLayoutPrep(
@@ -196,20 +195,22 @@ export function prepareSemanticAwsLayoutPrep(
   const zones = buildMergedTopologyZones(awsPlan);
   const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
   const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
-  const {
-    byZone: interfaceVpcEndpointZonePlacements,
-    zonePlacedAddresses,
-  } = computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
-  const vpcEndpointBuckets = filterVpcEndpointBucketsRemovingZonePlacedAddresses(
-    vpcEndpointBucketsRaw,
-    zonePlacedAddresses,
-  );
+  const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
+    computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
+  const vpcEndpointBuckets =
+    filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+      vpcEndpointBucketsRaw,
+      zonePlacedAddresses,
+    );
   const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
   const { vpcDefaultPlumbingBuckets, natZonePlacements } =
     buildVpcDefaultPlumbingWithNat(awsPlan, zones);
   const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
   const endpointSecurityGroupBuckets =
-    extractInterfaceEndpointSecurityGroupBuckets(awsPlan, vpcEndpointBucketsRaw);
+    extractInterfaceEndpointSecurityGroupBuckets(
+      awsPlan,
+      vpcEndpointBucketsRaw,
+    );
   const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
     zones,
     awsPlan,
@@ -300,21 +301,29 @@ export async function runSemanticAwsLayoutJob(
   const p = prep as {
     topoModel: Parameters<typeof buildTerraformTopologyExcalidrawScene>[0];
     zones: Parameters<typeof buildTerraformTopologyExcalidrawScene>[1];
-    regionalBuckets: Parameters<typeof buildTerraformTopologyExcalidrawScene>[2];
+    regionalBuckets: Parameters<
+      typeof buildTerraformTopologyExcalidrawScene
+    >[2];
     nodes: Parameters<typeof buildTerraformTopologyExcalidrawScene>[3];
     awsPlan: Parameters<typeof buildTerraformTopologyExcalidrawScene>[4];
-    vpcEndpointBuckets: Parameters<typeof buildTerraformTopologyExcalidrawScene>[5];
+    vpcEndpointBuckets: Parameters<
+      typeof buildTerraformTopologyExcalidrawScene
+    >[5];
     routeTableBottomPlacements: Parameters<
       typeof buildTerraformTopologyExcalidrawScene
     >[6];
     vpcDefaultPlumbingBuckets: Parameters<
       typeof buildTerraformTopologyExcalidrawScene
     >[7];
-    vpcFlowLogBuckets: Parameters<typeof buildTerraformTopologyExcalidrawScene>[8];
+    vpcFlowLogBuckets: Parameters<
+      typeof buildTerraformTopologyExcalidrawScene
+    >[8];
     endpointSecurityGroupBuckets: Parameters<
       typeof buildTerraformTopologyExcalidrawScene
     >[9];
-    natZonePlacements: Parameters<typeof buildTerraformTopologyExcalidrawScene>[10];
+    natZonePlacements: Parameters<
+      typeof buildTerraformTopologyExcalidrawScene
+    >[10];
     interfaceVpcEndpointZonePlacements: Parameters<
       typeof buildTerraformTopologyExcalidrawScene
     >[11];
@@ -347,7 +356,9 @@ export async function runSemanticProviderLayoutJob(
   changes: unknown[],
   nodes: Parameters<typeof buildProviderFamilyScene>[3],
   plan: unknown,
-): Promise<Extract<TerraformLayoutWorkerJobResult, { type: "semanticProvider" }>> {
+): Promise<
+  Extract<TerraformLayoutWorkerJobResult, { type: "semanticProvider" }>
+> {
   const providerScene = await buildProviderFamilyScene(
     family,
     label,
@@ -410,27 +421,28 @@ export async function layoutSemanticViewParallel(
   };
   let layoutFiles: Record<string, unknown> | undefined;
 
+  const reportProgress = (phase: string) => {
+    done += 1;
+    onProgress?.({ phase, done, total: jobCount });
+  };
+
   const jobs: Promise<TerraformLayoutWorkerJobResult>[] = [];
   if (prepared.prep) {
     jobs.push(
       runJob({ type: "semanticAws", prep: prepared.prep }).then((r) => {
-        onProgress?.({
-          phase: "AWS topology",
-          done: ++done,
-          total: jobCount,
-        });
+        reportProgress("AWS topology");
         return r;
       }),
     );
   }
-  for (const family of nonAws) {
-    const changes = (
-      prepared.providerBuckets as ReturnType<
-        typeof partitionResourceChangesByProviderFamily
-      >
-    ).get(family)!;
-    jobs.push(
-      runJob({
+  jobs.push(
+    ...nonAws.map((family) => {
+      const changes = (
+        prepared.providerBuckets as ReturnType<
+          typeof partitionResourceChangesByProviderFamily
+        >
+      ).get(family)!;
+      return runJob({
         type: "semanticProvider",
         family,
         label: getProviderFamilyLabel(family),
@@ -438,15 +450,11 @@ export async function layoutSemanticViewParallel(
         nodes: prepared.nodes,
         plan: prepared.semPlan,
       }).then((r) => {
-        onProgress?.({
-          phase: `provider ${family}`,
-          done: ++done,
-          total: jobCount,
-        });
+        reportProgress(`provider ${family}`);
         return r;
-      }),
-    );
-  }
+      });
+    }),
+  );
 
   const results = await Promise.all(jobs);
   for (const result of results) {

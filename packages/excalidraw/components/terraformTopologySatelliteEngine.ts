@@ -353,7 +353,7 @@ export function collectSatelliteAddressesForKind(
           out.add(a);
         }
       }
-    } else     if (Array.isArray(c.stack)) {
+    } else if (Array.isArray(c.stack)) {
       for (const a of c.stack) {
         if (typeof a === "string") {
           out.add(a);

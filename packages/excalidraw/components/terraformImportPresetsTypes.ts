@@ -5,10 +5,7 @@ import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 export type TerraformImportPresetView = "semantic" | "module" | "pipeline";
 
 export type TerraformImportPresetWarning = {
-  code:
-    | "missing_state_file"
-    | "missing_optional_tfd"
-    | "composition_error";
+  code: "missing_state_file" | "missing_optional_tfd" | "composition_error";
   message: string;
 };
 

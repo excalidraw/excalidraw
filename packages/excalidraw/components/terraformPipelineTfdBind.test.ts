@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
-
 import graphlibDot from "@dagrejs/graphlib-dot";
 
+import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
-import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
+
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import {
   mergePlanJsons,
@@ -13,6 +13,8 @@ import {
 } from "./terraformImportMerge";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+
+import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 
 function expandedNodesAndTfd() {
   const rawSources = getTerraformImportPresetSourcesFromDb(
@@ -53,9 +55,7 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
     expect(errors, errors.join("\n")).toEqual([]);
     expect(warnings).toEqual([]);
 
-    const edgeKeys = new Set(
-      edges.map((e) => edgePairKey(e.source, e.target)),
-    );
+    const edgeKeys = new Set(edges.map((e) => edgePairKey(e.source, e.target)));
 
     const trunkHops: [string, string][] = [
       [
@@ -81,9 +81,10 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
     ];
 
     for (const [source, target] of trunkHops) {
-      expect(edgeKeys.has(edgePairKey(source, target)), `${source} -> ${target}`).toBe(
-        true,
-      );
+      expect(
+        edgeKeys.has(edgePairKey(source, target)),
+        `${source} -> ${target}`,
+      ).toBe(true);
     }
 
     const dlqHops: [string, string][] = [
@@ -106,9 +107,10 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
     ];
 
     for (const [source, target] of dlqHops) {
-      expect(edgeKeys.has(edgePairKey(source, target)), `${source} -> ${target}`).toBe(
-        true,
-      );
+      expect(
+        edgeKeys.has(edgePairKey(source, target)),
+        `${source} -> ${target}`,
+      ).toBe(true);
     }
   });
 
@@ -147,22 +149,18 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
       ),
     ];
 
-    expect(
-      sqsPaths.some((p) => p.includes("module.ingress_queue")),
-    ).toBe(true);
+    expect(sqsPaths.some((p) => p.includes("module.ingress_queue"))).toBe(true);
     expect(sqsPaths.some((p) => p.includes("module.egress_queue"))).toBe(true);
     expect(
       sqsPaths.some(
         (p) =>
-          p.includes("module.ingress_queue") &&
-          p.includes("aws_sqs_queue.dlq"),
+          p.includes("module.ingress_queue") && p.includes("aws_sqs_queue.dlq"),
       ),
     ).toBe(true);
     expect(
       sqsPaths.some(
         (p) =>
-          p.includes("module.egress_queue") &&
-          p.includes("aws_sqs_queue.dlq"),
+          p.includes("module.egress_queue") && p.includes("aws_sqs_queue.dlq"),
       ),
     ).toBe(true);
     expect(sqsPaths.some((p) => p.includes("module.queue.module.queue"))).toBe(

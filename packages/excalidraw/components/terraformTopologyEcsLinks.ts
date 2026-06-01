@@ -31,11 +31,7 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
-import {
-  parseStackAddress,
-  prefixStackAddress,
-  stripStackPrefixForModuleParsing,
-} from "./terraformStackAddress";
+import { parseStackAddress, prefixStackAddress } from "./terraformStackAddress";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -46,7 +42,9 @@ type PlanRc = {
   change?: { after?: unknown; before?: unknown };
 };
 
-export const ECS_TOPOLOGY_SATELLITE_TYPES = new Set(["aws_ecs_task_definition"]);
+export const ECS_TOPOLOGY_SATELLITE_TYPES = new Set([
+  "aws_ecs_task_definition",
+]);
 
 export const ECS_EC2_TOPOLOGY_SATELLITE_TYPES = new Set([
   "aws_ecs_capacity_provider",
@@ -101,7 +99,10 @@ function getResourceType(
   return typeof parts[i] === "string" ? String(parts[i]) : "";
 }
 
-function moduleScopesMatch(a: TopologyModuleScope, b: TopologyModuleScope): boolean {
+function moduleScopesMatch(
+  a: TopologyModuleScope,
+  b: TopologyModuleScope,
+): boolean {
   return a.stackId === b.stackId && a.modulePrefix === b.modulePrefix;
 }
 
@@ -189,8 +190,8 @@ function resolveNodePathForRef(
     bareRef.startsWith("module.") || bareRef.startsWith("aws_")
       ? bareRef
       : modulePrefix
-        ? `${modulePrefix}.${bareRef}`
-        : bareRef;
+      ? `${modulePrefix}.${bareRef}`
+      : bareRef;
   const resolved = resolveTerraformPlanNodeKey(graph, stripIndexes(qualified));
   if (resolved && getResourceType(resolved, nodes[resolved]) === acceptType) {
     return resolved;
@@ -365,7 +366,11 @@ function resolveCapacityProviderByName(
       return rc.address;
     }
   }
-  return findResourceAddressForPlanRef(name, changes, "aws_ecs_capacity_provider");
+  return findResourceAddressForPlanRef(
+    name,
+    changes,
+    "aws_ecs_capacity_provider",
+  );
 }
 
 export type EcsEc2CapacityChain = {
@@ -386,8 +391,7 @@ export function isEc2BackedEcsService(
   if (!primary || primary.type !== "aws_ecs_service") {
     return false;
   }
-  const values =
-    serviceValues ?? mergeTerraformPlanResourceValues(primary);
+  const values = serviceValues ?? mergeTerraformPlanResourceValues(primary);
   if (values.launch_type === "FARGATE") {
     return false;
   }
@@ -598,8 +602,7 @@ export function buildEcsEc2CapacityChainsForService(
           scope.modulePrefix,
           ref,
           "aws_ecs_capacity_provider",
-        ) ??
-        resolveCapacityProviderByName(nodes, scope, ref, changes);
+        ) ?? resolveCapacityProviderByName(nodes, scope, ref, changes);
       if (cpPath) {
         break;
       }
@@ -664,7 +667,9 @@ export function resolveEcsClusterPathFromService(
       if (!moduleScopesMatch(topologyModuleScopeForAddress(path), scope)) {
         continue;
       }
-      const cv = mergeTerraformPlanResourceValues(getPrimaryResource(nodes[path])!);
+      const cv = mergeTerraformPlanResourceValues(
+        getPrimaryResource(nodes[path])!,
+      );
       if (
         (typeof cv.name === "string" && cv.name === bare) ||
         (typeof cv.id === "string" && cv.id === bare) ||
@@ -703,7 +708,9 @@ function resolveClusterCapacityProvidersPath(
     if (!moduleScopesMatch(topologyModuleScopeForAddress(path), scope)) {
       continue;
     }
-    const pv = mergeTerraformPlanResourceValues(getPrimaryResource(nodes[path])!);
+    const pv = mergeTerraformPlanResourceValues(
+      getPrimaryResource(nodes[path])!,
+    );
     const cn = typeof pv.cluster_name === "string" ? pv.cluster_name : "";
     if (clusterName && cn === clusterName) {
       return path;
@@ -711,10 +718,7 @@ function resolveClusterCapacityProvidersPath(
   }
 
   for (const rc of changes) {
-    if (
-      rc.type !== "aws_ecs_cluster_capacity_providers" ||
-      !rc.address
-    ) {
+    if (rc.type !== "aws_ecs_cluster_capacity_providers" || !rc.address) {
       continue;
     }
     if (!moduleScopesMatch(topologyModuleScopeForAddress(rc.address), scope)) {
@@ -793,7 +797,10 @@ export function buildEcsEc2CapacityCompanionCluster(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
-): { cluster: EcsEc2CapacityCompanionCluster | null; edges: TopologyIamEdge[] } {
+): {
+  cluster: EcsEc2CapacityCompanionCluster | null;
+  edges: TopologyIamEdge[];
+} {
   const chains = buildEcsEc2CapacityChainsForService(
     nodes,
     serviceAddress,
@@ -892,8 +899,8 @@ function resolveLogGroupPathFromText(
     bareRef.startsWith("module.") || bareRef.startsWith("aws_")
       ? bareRef
       : modulePrefix
-        ? `${modulePrefix}.${bareRef}`
-        : bareRef;
+      ? `${modulePrefix}.${bareRef}`
+      : bareRef;
   const resolved = resolveTerraformPlanNodeKey(graph, stripIndexes(qualified));
   if (
     resolved &&

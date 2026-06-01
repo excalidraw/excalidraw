@@ -6,6 +6,7 @@ import {
   resolveRouteTableIdForRoute,
 } from "./terraformTopologyRouteLinks";
 import { computeRouteTableBottomEdgePlacements } from "./terraformTopologyPlacement";
+
 import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
 
 describe("terraformTopologyRouteLinks", () => {
@@ -55,7 +56,8 @@ describe("terraformTopologyRouteLinks", () => {
           },
         },
         {
-          address: "module.east_network.module.vpc.aws_route_table_association.database[0]",
+          address:
+            "module.east_network.module.vpc.aws_route_table_association.database[0]",
           mode: "managed",
           type: "aws_route_table_association",
           provider_name: "registry.terraform.io/hashicorp/aws",

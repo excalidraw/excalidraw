@@ -126,8 +126,9 @@ export function buildLayoutBoxesFromElements(
     if (el.isDeleted) {
       continue;
     }
-    const role = (el.customData as { terraformVisibilityRole?: string } | undefined)
-      ?.terraformVisibilityRole;
+    const role = (
+      el.customData as { terraformVisibilityRole?: string } | undefined
+    )?.terraformVisibilityRole;
     if (role && role !== "resource") {
       continue;
     }

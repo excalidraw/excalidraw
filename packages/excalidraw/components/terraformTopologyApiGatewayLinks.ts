@@ -111,7 +111,10 @@ export function topologyModuleScopeForAddress(
   };
 }
 
-function moduleScopesMatch(a: TopologyModuleScope, b: TopologyModuleScope): boolean {
+function moduleScopesMatch(
+  a: TopologyModuleScope,
+  b: TopologyModuleScope,
+): boolean {
   return a.stackId === b.stackId && a.modulePrefix === b.modulePrefix;
 }
 
@@ -402,7 +405,9 @@ export function resolveVpcLinkParentRestApiAddressFromPlan(
     if (rc.type !== "aws_api_gateway_rest_api" || !rc.address) {
       continue;
     }
-    if (moduleScopesMatch(topologyModuleScopeForAddress(rc.address), linkScope)) {
+    if (
+      moduleScopesMatch(topologyModuleScopeForAddress(rc.address), linkScope)
+    ) {
       candidates.push(rc.address);
     }
   }
@@ -680,7 +685,10 @@ export function apiGatewayBottomCompanionSatellitePaths(
 export function apiGatewayCompanionSatellitePaths(
   cluster: ApiGatewayCompanionCluster,
 ): string[] {
-  return [...cluster.vpcLinks, ...apiGatewayBottomCompanionSatellitePaths(cluster)];
+  return [
+    ...cluster.vpcLinks,
+    ...apiGatewayBottomCompanionSatellitePaths(cluster),
+  ];
 }
 
 export function buildApiGatewayCompanionCluster(
@@ -697,7 +705,7 @@ export function buildApiGatewayCompanionCluster(
   const changes = Array.isArray(
     (plan as { resource_changes?: PlanRc[] } | undefined)?.resource_changes,
   )
-    ? ((plan as { resource_changes: PlanRc[] }).resource_changes ?? [])
+    ? (plan as { resource_changes: PlanRc[] }).resource_changes ?? []
     : undefined;
 
   const vpcLinks = resolveVpcLinksForRestApi(nodes, restApiAddress, changes);
@@ -746,7 +754,11 @@ export function buildApiGatewayCompanionCluster(
   stages.sort((a, b) => a.stage.localeCompare(b.stage));
   methodSettings.sort((a, b) => a.localeCompare(b));
 
-  if (stages.length === 0 && methodSettings.length === 0 && vpcLinks.length === 0) {
+  if (
+    stages.length === 0 &&
+    methodSettings.length === 0 &&
+    vpcLinks.length === 0
+  ) {
     return { cluster: null, edges: [] };
   }
 

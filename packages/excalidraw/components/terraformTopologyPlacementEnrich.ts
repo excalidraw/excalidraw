@@ -257,7 +257,7 @@ function resolveVpcZoneKeyForManagedResource(
     return null;
   }
   const t = rc.type ?? "";
-  let subnetIds = applySubnetInferenceFromSecurityGroups(
+  const subnetIds = applySubnetInferenceFromSecurityGroups(
     plan,
     t,
     values,

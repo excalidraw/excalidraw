@@ -571,7 +571,9 @@ export function buildSubnetToVpcMapFromPlan(plan: {
   return buildSubnetToVpcMap(changes);
 }
 
-function buildSecurityGroupToVpcMap(changes: ResourceChange[]): Map<string, string> {
+function buildSecurityGroupToVpcMap(
+  changes: ResourceChange[],
+): Map<string, string> {
   const map = new Map<string, string>();
   for (const rc of changes) {
     if (!isAwsResourceChange(rc) || rc.type !== "aws_security_group") {

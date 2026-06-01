@@ -88,7 +88,9 @@ function makeFallbackSources(): TerraformImportPresetSources {
 
 describe("terraformTfdComposition", () => {
   it("parses repoName/relativePath artifact refs", () => {
-    expect(parseArtifactRef("staging-multi-state/20-east-messaging/plan.json")).toEqual({
+    expect(
+      parseArtifactRef("staging-multi-state/20-east-messaging/plan.json"),
+    ).toEqual({
       repoName: "staging-multi-state",
       relativePath: "20-east-messaging/plan.json",
     });
@@ -127,7 +129,10 @@ describe("terraformTfdComposition", () => {
 
   it("infers stack ids from bind addresses", () => {
     const parsed = parseTfdComposition(sampleTfdV2);
-    expect(inferStackIdsFromBinds(parsed.binds)).toEqual(["stack-a", "stack-b"]);
+    expect(inferStackIdsFromBinds(parsed.binds)).toEqual([
+      "stack-a",
+      "stack-b",
+    ]);
   });
 
   it("resolves use blocks into selected stacks only", () => {
@@ -138,10 +143,9 @@ describe("terraformTfdComposition", () => {
     });
 
     expect(result.errors).toEqual([]);
-    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual([
-      "stack-a",
-      "stack-b",
-    ]);
+    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual(
+      ["stack-a", "stack-b"],
+    );
     expect(result.sources.states).toHaveLength(1);
     expect(result.sources.stateLabels).toEqual(["stack-b"]);
   });
@@ -153,10 +157,9 @@ describe("terraformTfdComposition", () => {
     });
 
     expect(result.errors).toEqual([]);
-    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual([
-      "stack-a",
-      "stack-b",
-    ]);
+    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual(
+      ["stack-a", "stack-b"],
+    );
   });
 
   it("reports missing artifacts when neither catalog nor fallback bundles match", () => {
@@ -177,7 +180,8 @@ use missing {
     expect(
       result.errors.some(
         (error) =>
-          error.includes("missing plan") || error.includes("Artifact not found"),
+          error.includes("missing plan") ||
+          error.includes("Artifact not found"),
       ),
     ).toBe(true);
   });

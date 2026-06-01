@@ -1,68 +1,14 @@
-import graphlibDot from "@dagrejs/graphlib-dot";
-
-import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
-
-import {
-  extractTerraformTopologyFromPlan,
-  mergeTopologyModelWithPlacementZones,
-  mergeTopologyModelWithRegionalBuckets,
-  mergeTopologyModelWithVpcEndpoints,
-  mergeTopologyModelWithRouteTables,
-  mergeTopologyModelWithVpcDefaults,
-  pickResourceValuesForTopologyPlacement,
-} from "./terraformTopologyExtract";
-import {
-  computeInterfaceVpcEndpointZonePlacements,
-  computeNatGatewayZonePlacements,
-  collectRouteAddressesFromBottomPlacements,
-  computeRouteTableBottomEdgePlacements,
-  extractInterfaceEndpointSecurityGroupBuckets,
-  extractPrimaryTopologyZones,
-  extractRegionalTopologyPrimaries,
-  extractRouteTablesByVpc,
-  extractSupplementarySubnetZones,
-  extractVpcDefaultPlumbingBuckets,
-  extractVpcEndpointsByVpc,
-  extractVpcFlowLogBundles,
-  filterVpcEndpointBucketsRemovingZonePlacedAddresses,
-  mergePrimaryTopologyZonesByTier,
-  reconcileTopologyPlacementZonesAfterEnrich,
-  mergeSupplementarySubnetZonesByTier,
-  mergeSupplementarySubnetZonesSharedRouteTable,
-} from "./terraformTopologyPlacement";
-import { enrichTopologyPlacementsWithManagedResources } from "./terraformTopologyPlacementEnrich";
-import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildDataFlowEdges,
   buildNetworkingEdges,
 } from "./terraformDataFlowEdges";
 import {
-  filterPlanByProviderFamily,
-  getProviderFamilyLabel,
-  hasManagedResourcesForSemantic,
-  partitionResourceChangesByProviderFamily,
-  sortedNonAwsProviderFamilies,
-} from "./terraformProviderClassification";
-import {
-  buildProviderFamilyScene,
-  composeMultiProviderTopologyScene,
-  type ProviderTopologyBlock,
-} from "./terraformProviderLayout";
-import {
   applyDeclaredDataFlow,
   applyDeclaredDataFlowFromMany,
-  DECLARED_DATAFLOW_ORDERED_KEY,
   type DeclaredDataFlowEdge,
 } from "./terraformDeclaredDataFlow";
-import {
-  mergeDotAdjacency,
-  mergePlanJsons,
-  mergePlanWithStates,
-  mergeSyntheticPlans,
-  namespacePlanDotBundles,
-  parseRawStateJson,
-} from "./terraformImportMerge";
+import { parseRawStateJson } from "./terraformImportMerge";
 import {
   collectKnownStackIdsFromNodes,
   isStackQualifiedAddress,
@@ -75,6 +21,8 @@ import {
 } from "./terraformStackAddress";
 import { dedupeTerraformPlanNodesByBareAddress } from "./terraformTopologyAddress";
 
+import type { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
+
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 
 import type { Graph } from "@dagrejs/graphlib";
@@ -83,12 +31,12 @@ import type {
   TerraformPlanDotBundle,
 } from "./terraformImportMerge";
 
-export type { TerraformImportWarning, TerraformPlanDotBundle };
-
 import type {
   TerraformImportPresetWarning,
   TerraformImportStackCatalogEntry,
 } from "./terraformImportPresetsTypes";
+
+export type { TerraformImportWarning, TerraformPlanDotBundle };
 
 export type TerraformPlanParsingSources = {
   planDotBundles: TerraformPlanDotBundle[];
@@ -102,23 +50,6 @@ export type TerraformPlanParsingSources = {
 };
 
 export { TERRAFORM_MODULE_TREE_KEY };
-
-/**
- * Empty Excalidraw v2 scene — same shape as backend `GET …/upload/:id/excalidraw`
- * (`renderUploadAs` → `result.body` from `packages/backend/connectors/excalidraw.js`).
- */
-const EMPTY_TERRAFORM_EXCALIDRAW_SCENE = {
-  type: "excalidraw" as const,
-  version: 2,
-  source: "terraform-local-parse",
-  elements: [],
-  appState: {
-    viewBackgroundColor: "#ffffff",
-    gridSize: null as number | null,
-  },
-};
-
-const DEBUG_PREFIX = "[terraform:local-parse]";
 
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
 
@@ -166,20 +97,6 @@ type TerraformPriorStateResource = {
   depends_on?: string[];
 };
 
-/**
- * Browser-only: logs in dev when local parse runs (`import.meta.env.DEV`).
- * Look in the **browser** DevTools → **Console** (not the terminal where `yarn start` runs).
- * Use `console.log` so lines show at default log levels (`console.debug` is often hidden until
- * you enable “Verbose” in Chrome’s console level filter).
- */
-function emitLocalParseDebug(payload: Record<string, unknown>) {
-  if (!import.meta.env.DEV) {
-    return;
-  }
-  // eslint-disable-next-line no-console -- intentional dev-only parse tracing
-  console.log(DEBUG_PREFIX, payload);
-}
-
 /** Strip `count` / `for_each` instance keys so graph ids match `terraform graph` / `depends_on` variants. */
 const stripTerraformAddressIndexes = (address = "") =>
   address.replace(/\[[^\]]+\]/g, "");
@@ -208,63 +125,6 @@ type BuildNodesMapOptions = {
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
-const SEMANTIC_LAYOUT_OMITTED_TYPES = new Set(["terraform_data"]);
-
-function collectSemanticRepresentedResourceAddresses(
-  elements: Array<{ customData?: Record<string, any> }>,
-  plan: { resource_changes?: Array<{ address?: string; type?: string }> },
-): Set<string> {
-  const represented = new Set<string>();
-  const representedSubnetIds = new Set<string>();
-  for (const element of elements) {
-    const cd = element.customData || {};
-    if (typeof cd.nodePath === "string") {
-      represented.add(cd.nodePath);
-    }
-    if (Array.isArray(cd.terraformMergedSubnetAddresses)) {
-      for (const addr of cd.terraformMergedSubnetAddresses) {
-        if (typeof addr === "string") {
-          represented.add(addr);
-        }
-      }
-    }
-    if (Array.isArray(cd.terraformSubnetIds)) {
-      for (const subnetId of cd.terraformSubnetIds) {
-        if (typeof subnetId === "string") {
-          representedSubnetIds.add(subnetId);
-        }
-      }
-    }
-    if (Array.isArray(cd.terraformResources)) {
-      for (const resource of cd.terraformResources) {
-        const address = resource?.address;
-        if (typeof address === "string") {
-          represented.add(address);
-        }
-      }
-    }
-  }
-  for (const rc of plan.resource_changes || []) {
-    if (rc.type === "aws_vpc" && typeof rc.address === "string") {
-      represented.add(rc.address);
-    }
-    if (rc.type === "aws_subnet" && typeof rc.address === "string") {
-      const values = pickResourceValuesForTopologyPlacement(rc as any);
-      const subnetId =
-        values && typeof values.id === "string" ? values.id : null;
-      if (subnetId && representedSubnetIds.has(subnetId)) {
-        represented.add(rc.address);
-      }
-    }
-    if (
-      rc.type === "aws_iam_policy_document" &&
-      typeof rc.address === "string"
-    ) {
-      represented.add(rc.address);
-    }
-  }
-  return represented;
-}
 
 function isExcludedDataSourceAddressForGraph(address: string): boolean {
   const parts = stripTerraformAddressIndexes(address).split(".");
@@ -503,38 +363,6 @@ export function applyTfdOverlayToNodes(
     tfdLabels,
   );
   return warnings;
-}
-
-function formatImportWarnings(
-  warnings: TerraformImportWarning[],
-  tfdWarnings: string[],
-): TerraformImportWarning[] {
-  const out = [...warnings];
-  for (const message of tfdWarnings) {
-    out.push({ code: "duplicate_tfd_bind", message });
-  }
-  return out;
-}
-
-function appendImportMeta(
-  meta: Record<string, unknown>,
-  sources: TerraformPlanParsingSources,
-  importWarnings: TerraformImportWarning[],
-  stackMeta?: { stackIds: string[]; addressToStack: Record<string, string> },
-) {
-  return {
-    ...meta,
-    importBundleCount: sources.planDotBundles.length,
-    importStateCount: sources.states.length,
-    importTfdCount: sources.tfdTexts.filter((t) => t.trim()).length,
-    ...(stackMeta?.stackIds.length
-      ? {
-          stackIds: stackMeta.stackIds,
-          addressToStack: stackMeta.addressToStack,
-        }
-      : {}),
-    ...(importWarnings.length > 0 ? { importWarnings } : {}),
-  };
 }
 
 /** Multi-file local import (plans, states, `.tfd` overlays). */

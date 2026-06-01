@@ -197,7 +197,13 @@ export async function getTerraformImportPresetSourcesFromD1(
     .bind(presetId)
     .all<StackRow>();
 
-  const repoName = preset.rootPath.replace(/\\/g, "/").replace(/\/+$/, "").split("/").filter(Boolean).pop() ?? "terraform";
+  const repoName =
+    preset.rootPath
+      .replace(/\\/g, "/")
+      .replace(/\/+$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "terraform";
   const stackCatalog = (stackRows.results ?? []).map((stack) => ({
     stackId: stack.stack_id,
     label: stack.label,

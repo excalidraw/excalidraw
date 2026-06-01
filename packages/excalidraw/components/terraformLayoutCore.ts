@@ -232,7 +232,10 @@ export async function layoutTerraformFromSources(
   sources: TerraformPlanParsingSources,
   options?: TerraformLayoutOptions,
 ): Promise<LayoutTerraformResult> {
-  const compositionResult = applyTfdCompositionToLayoutSources(sources, options);
+  const compositionResult = applyTfdCompositionToLayoutSources(
+    sources,
+    options,
+  );
   if ("ok" in compositionResult) {
     return compositionResult;
   }

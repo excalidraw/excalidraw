@@ -170,15 +170,14 @@ export function topologySubnetTierFromZone(
     (a) =>
       a.includes("aws_ecs_service") ||
       a.includes("aws_lambda_function") ||
-      /\.aws_lb[.\[]/.test(a),
+      /\.aws_lb[.[]/.test(a),
   );
   if (hasVpcCompute) {
     return "private";
   }
   if (
     z.addresses.some(
-      (a) =>
-        a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
+      (a) => a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
     )
   ) {
     return "other";
@@ -218,7 +217,10 @@ export function resolveTopologyVpcId(
     vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
   }
   if (!vpcId) {
-    for (const sg of collectInferenceSecurityGroupIdsFromResource(type, values)) {
+    for (const sg of collectInferenceSecurityGroupIdsFromResource(
+      type,
+      values,
+    )) {
       const fromSg = securityGroupToVpc.get(sg);
       if (fromSg) {
         vpcId = fromSg;
@@ -889,12 +891,7 @@ export function applySubnetInferenceFromSecurityGroups(
   ) {
     return subnetIds;
   }
-  return inferSubnetIdsFromPlanSecurityGroups(
-    plan,
-    type,
-    values,
-    subnetToVpc,
-  );
+  return inferSubnetIdsFromPlanSecurityGroups(plan, type, values, subnetToVpc);
 }
 
 export function topologyZoneMapKey(

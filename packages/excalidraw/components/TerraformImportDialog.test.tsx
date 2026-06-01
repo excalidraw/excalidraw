@@ -327,7 +327,7 @@ describe("TerraformImportModal", () => {
   it("shows preset manifest table when Use preset manifest is clicked", async () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
-      expect(screen.getByRole("combobox")).toBeInTheDocument(),
+      expect(screen.getAllByRole("combobox").length).toBeGreaterThan(0),
     );
     fireEvent.click(
       screen.getByRole("button", { name: /use preset manifest/i }),

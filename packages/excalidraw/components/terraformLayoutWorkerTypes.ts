@@ -1,12 +1,12 @@
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
-import type { TerraformPlanDotBundle } from "./terraformImportMerge";
 import type {
   TerraformLayoutOptions,
   TerraformPlanParsingSources,
 } from "./terraformLayoutCore";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import type { TerraformProviderFamily } from "./terraformProviderClassification";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 export type TerraformLayoutProgress = {
   phase: string;

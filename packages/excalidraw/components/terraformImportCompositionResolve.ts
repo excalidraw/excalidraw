@@ -14,7 +14,11 @@ import type {
 export type ArtifactLoader = (
   ref: TerraformArtifactRef,
   kind: TerraformArtifactKind,
-) => Pick<TerraformArtifactRecord, "content"> | TerraformArtifactRecord | null | undefined;
+) =>
+  | Pick<TerraformArtifactRecord, "content">
+  | TerraformArtifactRecord
+  | null
+  | undefined;
 
 export function resolveSourcesWithTfdComposition(
   sources: TerraformImportPresetSources,

@@ -162,9 +162,11 @@ describe("terraformTopologySatelliteLayout", () => {
       "aws_security_group.shared",
     );
     expect(idA).not.toBe(idB);
-    expect(buildLoadBalancerSgCluster(nodes, "aws_lb.a", arnIndex).cluster?.groups)
-      .toHaveLength(1);
-    expect(buildLoadBalancerSgCluster(nodes, "aws_lb.b", arnIndex).cluster?.groups)
-      .toHaveLength(1);
+    expect(
+      buildLoadBalancerSgCluster(nodes, "aws_lb.a", arnIndex).cluster?.groups,
+    ).toHaveLength(1);
+    expect(
+      buildLoadBalancerSgCluster(nodes, "aws_lb.b", arnIndex).cluster?.groups,
+    ).toHaveLength(1);
   });
 });

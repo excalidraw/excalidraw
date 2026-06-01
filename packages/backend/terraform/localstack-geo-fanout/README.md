@@ -26,7 +26,7 @@ Declared dataflow: [`pipeline.tfd`](pipeline.tfd) (20 edges: consumer→6 APIs, 
 
 From repo root:
 
-```bash
+````bash
 # Offline / CI: committed synthetic plan bundles (no Docker)
 yarn localstack:geo-fanout:generate-bundles
 
@@ -40,7 +40,7 @@ Layout tests use bundles under `packages/excalidraw/test-fixtures/localstack-geo
 ```bash
 yarn hydrate:terraform-preset staging-multi-state-expanded
 yarn export:terraform-presets-test-db
-```
+````
 
 Or run layout tests directly:
 

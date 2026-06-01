@@ -55,7 +55,11 @@ export type ApplyTfdCompositionOptions = {
   artifactLoader?: (
     ref: TerraformArtifactRef,
     kind: TerraformArtifactKind,
-  ) => Pick<TerraformArtifactRecord, "content"> | TerraformArtifactRecord | null | undefined;
+  ) =>
+    | Pick<TerraformArtifactRecord, "content">
+    | TerraformArtifactRecord
+    | null
+    | undefined;
 };
 
 export type ApplyTfdCompositionResult = {
@@ -304,7 +308,9 @@ function buildBundleFromUseBlock(
     parsedPlan = JSON.parse(plan.content);
   } catch {
     errors.push(
-      `use ${block.stackId}: invalid plan JSON at ${formatArtifactRef(block.plan)}`,
+      `use ${block.stackId}: invalid plan JSON at ${formatArtifactRef(
+        block.plan,
+      )}`,
     );
     return null;
   }
@@ -343,8 +349,9 @@ function filterBundlesByStackIds(
   const stateLabels: string[] = [];
   for (let index = 0; index < sources.stateLabels.length; index++) {
     const label = sources.stateLabels[index] ?? "";
-    const stackId = catalog.find((entry) => entry.label.trim() === label.trim())
-      ?.stackId;
+    const stackId = catalog.find(
+      (entry) => entry.label.trim() === label.trim(),
+    )?.stackId;
     if (!wanted.has(label.trim()) && !(stackId && wanted.has(stackId))) {
       continue;
     }
@@ -411,7 +418,9 @@ export function applyTfdCompositionToSources(
             stateLabels.push(bundle.label ?? block.stackId);
           } catch {
             errors.push(
-              `use ${block.stackId}: invalid state JSON at ${formatArtifactRef(block.state)}`,
+              `use ${block.stackId}: invalid state JSON at ${formatArtifactRef(
+                block.state,
+              )}`,
             );
           }
         } else {
@@ -419,7 +428,9 @@ export function applyTfdCompositionToSources(
             code: "missing_state_file",
             message:
               state.error ??
-              `Optional state missing for use ${block.stackId}: ${formatArtifactRef(block.state)}`,
+              `Optional state missing for use ${
+                block.stackId
+              }: ${formatArtifactRef(block.state)}`,
           });
         }
       } else {
@@ -463,7 +474,9 @@ export function applyTfdCompositionToSources(
   const filtered = filterBundlesByStackIds(fallbackSources, inferred, catalog);
   if (filtered.planDotBundles.length === 0) {
     errors.push(
-      `TFD bind inference found stacks [${inferred.join(", ")}] but no matching import bundles were loaded.`,
+      `TFD bind inference found stacks [${inferred.join(
+        ", ",
+      )}] but no matching import bundles were loaded.`,
     );
   }
 

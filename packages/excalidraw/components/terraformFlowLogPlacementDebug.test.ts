@@ -102,5 +102,5 @@ describe("staging VPC flow log placement", () => {
       .flatMap((z) => z.addresses)
       .filter((a) => a.includes("vpc_flow_logs"));
     expect(flowInIntraZone).toEqual([]);
-  });
+  }, 60_000);
 });

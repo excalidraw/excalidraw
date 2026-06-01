@@ -45,21 +45,27 @@ export function terraformSatelliteLayoutElementId(
   parentPrimary: string,
   nodePath: string,
 ): string {
-  return `tf-topo:sat:${encodeURIComponent(parentPrimary)}:${encodeURIComponent(nodePath)}`;
+  return `tf-topo:sat:${encodeURIComponent(parentPrimary)}:${encodeURIComponent(
+    nodePath,
+  )}`;
 }
 
 export function terraformSatelliteSgRuleLayoutElementId(
   parentPrimary: string,
   rulePath: string,
 ): string {
-  return `tf-topo:sat-sgr:${encodeURIComponent(parentPrimary)}:${encodeURIComponent(rulePath)}`;
+  return `tf-topo:sat-sgr:${encodeURIComponent(
+    parentPrimary,
+  )}:${encodeURIComponent(rulePath)}`;
 }
 
 export function satelliteClusterSkeletonId(
   parentPrimary: string,
   rootNodePath: string,
 ): string {
-  return `tf-topo:sat-cluster:${encodeURIComponent(parentPrimary)}:${encodeURIComponent(rootNodePath)}`;
+  return `tf-topo:sat-cluster:${encodeURIComponent(
+    parentPrimary,
+  )}:${encodeURIComponent(rootNodePath)}`;
 }
 
 function getResourceTypeFromPath(
@@ -67,7 +73,10 @@ function getResourceTypeFromPath(
   node?: TerraformPlanGraphNode,
 ): string {
   const first = Object.values(node?.resources || {})[0];
-  const t = first && typeof first === "object" ? (first as { type?: string }).type : undefined;
+  const t =
+    first && typeof first === "object"
+      ? (first as { type?: string }).type
+      : undefined;
   if (typeof t === "string") {
     return t;
   }

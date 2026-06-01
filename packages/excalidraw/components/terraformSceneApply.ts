@@ -13,7 +13,7 @@ import {
   type TerraformModuleLayoutOptions,
 } from "./terraformModuleLayoutOptions";
 import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
-import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
+
 import {
   type TerraformImportWarning,
   type TerraformPlanParsingSources,
@@ -24,6 +24,8 @@ import {
   getTerraformImportSession,
   setTerraformImportSession,
 } from "./terraformImportSession";
+
+import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 
 import type React from "react";
 

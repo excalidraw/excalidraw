@@ -42,12 +42,12 @@ import {
   saveTerraformImportCompositionViaApi,
   syncTerraformImportPresetFromDiskViaApi,
 } from "./terraformImportPresetsApi";
+import "./TerraformImportDialog.scss";
+
 import type {
   TerraformImportArtifact,
   TerraformImportArtifactKind,
 } from "./terraformImportPresetsTypes";
-
-import "./TerraformImportDialog.scss";
 
 type TerraformView = "module" | "semantic" | "pipeline";
 
@@ -171,7 +171,9 @@ export const TerraformImportModal = ({
   const [artifactRelativePath, setArtifactRelativePath] = useState("");
   const [artifactKind, setArtifactKind] =
     useState<TerraformImportArtifactKind>("plan");
-  const [artifactUploadFile, setArtifactUploadFile] = useState<File | null>(null);
+  const [artifactUploadFile, setArtifactUploadFile] = useState<File | null>(
+    null,
+  );
 
   const refreshPresets = useCallback(async () => {
     setPresetsLoading(true);
@@ -659,7 +661,9 @@ export const TerraformImportModal = ({
 
   const handleRegisterArtifact = async () => {
     if (!artifactUploadFile || !artifactRelativePath.trim()) {
-      setError("Choose a file and enter repoName/relativePath for the artifact.");
+      setError(
+        "Choose a file and enter repoName/relativePath for the artifact.",
+      );
       return;
     }
     setLoading(true);
@@ -675,7 +679,9 @@ export const TerraformImportModal = ({
       setArtifactRelativePath("");
       await refreshArtifacts();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to register artifact.");
+      setError(
+        err instanceof Error ? err.message : "Failed to register artifact.",
+      );
     } finally {
       setLoading(false);
     }
@@ -701,7 +707,9 @@ export const TerraformImportModal = ({
         tfdContent,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save composition.");
+      setError(
+        err instanceof Error ? err.message : "Failed to save composition.",
+      );
     } finally {
       setLoading(false);
     }
@@ -943,7 +951,9 @@ writer -> bucket`}</code>
               ))}
             </ul>
           ) : (
-            <p className="TerraformImportModal__muted">No artifacts registered yet.</p>
+            <p className="TerraformImportModal__muted">
+              No artifacts registered yet.
+            </p>
           )}
         </div>
       )}

@@ -789,9 +789,9 @@ describe("terraformTopologySgLinks", () => {
     expect(cluster!.groups[0]!.rules.sort()).toEqual(
       [egressPath, ingressPath].sort(),
     );
-    expect(edges.some((e) => e.source === clusterPath && e.target === sgPath)).toBe(
-      true,
-    );
+    expect(
+      edges.some((e) => e.source === clusterPath && e.target === sgPath),
+    ).toBe(true);
     const { cluster: viaPrimary } = buildPrimarySgCluster(
       nodes,
       clusterPath,

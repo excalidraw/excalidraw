@@ -74,11 +74,7 @@ export function installSatellitePlugins(): void {
       ),
 
     ecs_cluster_companions: (_kind, ctx) =>
-      buildEcsClusterCompanionCluster(
-        ctx.nodes,
-        ctx.primaryAddress,
-        ctx.plan,
-      ),
+      buildEcsClusterCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
 
     ecs_ec2_capacity_companions: (_kind, ctx) =>
       buildEcsEc2CapacityCompanionCluster(
@@ -89,11 +85,7 @@ export function installSatellitePlugins(): void {
       ),
 
     api_gateway_companions: (_kind, ctx) =>
-      buildApiGatewayCompanionCluster(
-        ctx.nodes,
-        ctx.primaryAddress,
-        ctx.plan,
-      ),
+      buildApiGatewayCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
 
     api_gateway_vpc_links: (_kind, ctx) =>
       buildApiGatewayVpcLinkCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),

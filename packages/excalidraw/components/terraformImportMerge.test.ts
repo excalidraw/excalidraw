@@ -177,7 +177,7 @@ describe("terraformImportMerge", () => {
   it("namespaced staging multi-state merge has no duplicate_address warnings", () => {
     const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
     const { bundles: namespaced, stackIds } = namespacePlanDotBundles(bundles);
-    expect(stackIds).toHaveLength(9);
+    expect(stackIds).toHaveLength(25);
     const merged = mergePlanJsons(
       namespaced.map((b) => b.plan),
       namespaced.map((b) => b.label),
@@ -192,13 +192,13 @@ describe("terraformImportMerge", () => {
         "module.api.module.lambda_service.module.lambda.aws_lambda_function",
       ),
     );
-    expect(apiLambdas.length).toBe(5);
+    expect(apiLambdas.length).toBe(6);
     const stacksSeen = new Set(
       apiLambdas.map(
         (rc) => (rc as { address: string }).address.split("::")[0],
       ),
     );
-    expect(stacksSeen.size).toBe(5);
+    expect(stacksSeen.size).toBe(6);
   });
 
   it("mergeDotAdjacency prefixes node ids per stack", () => {

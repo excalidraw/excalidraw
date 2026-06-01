@@ -3,10 +3,7 @@
  */
 
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
-import type {
-  TerraformPlanGraphNode,
-  TerraformPlanNodesMap,
-} from "./terraformPlanParsing";
+
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
 import {
   mergeTerraformPlanResourceValues,
@@ -18,6 +15,11 @@ import {
   type TopologyModuleScope,
 } from "./terraformTopologyApiGatewayLinks";
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
+
+import type {
+  TerraformPlanGraphNode,
+  TerraformPlanNodesMap,
+} from "./terraformPlanParsing";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -67,7 +69,10 @@ function getResourceType(
   return typeof parts[i] === "string" ? String(parts[i]) : "";
 }
 
-function moduleScopesMatch(a: TopologyModuleScope, b: TopologyModuleScope): boolean {
+function moduleScopesMatch(
+  a: TopologyModuleScope,
+  b: TopologyModuleScope,
+): boolean {
   return a.stackId === b.stackId && a.modulePrefix === b.modulePrefix;
 }
 
@@ -268,10 +273,7 @@ export function buildAuroraCompanionCluster(
     }
 
     if (t === "aws_db_subnet_group" && !subnetGroup) {
-      if (
-        groupNameRef &&
-        refMatchesDbSubnetGroup(groupNameRef, path, values)
-      ) {
+      if (groupNameRef && refMatchesDbSubnetGroup(groupNameRef, path, values)) {
         subnetGroup = path;
       } else if (!groupNameRef) {
         subnetGroup = path;
@@ -303,12 +305,7 @@ export function buildAuroraCompanionCluster(
 
   instances.sort((a, b) => a.localeCompare(b));
 
-  if (
-    instances.length === 0 &&
-    !subnetGroup &&
-    !secret &&
-    !secretVersion
-  ) {
+  if (instances.length === 0 && !subnetGroup && !secret && !secretVersion) {
     return { cluster: null, edges: [] };
   }
 
@@ -391,10 +388,7 @@ export function buildRdsCompanionCluster(
     const values = mergeTerraformPlanResourceValues(p);
 
     if (t === "aws_db_subnet_group" && !subnetGroup) {
-      if (
-        groupNameRef &&
-        refMatchesDbSubnetGroup(groupNameRef, path, values)
-      ) {
+      if (groupNameRef && refMatchesDbSubnetGroup(groupNameRef, path, values)) {
         subnetGroup = path;
       } else if (!groupNameRef) {
         subnetGroup = path;
@@ -680,7 +674,10 @@ export function resolveDbSubnetGroupSubnetIds(
     return collectPlacementSubnetIdsFromValues(gv);
   }
 
-  return inferSubnetIdsForModuleColocatedPrimariesFromPlan(plan, primaryAddress);
+  return inferSubnetIdsForModuleColocatedPrimariesFromPlan(
+    plan,
+    primaryAddress,
+  );
 }
 
 function collectPlacementSubnetIdsFromValues(

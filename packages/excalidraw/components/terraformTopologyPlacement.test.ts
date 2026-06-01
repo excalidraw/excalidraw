@@ -2080,7 +2080,11 @@ describe("resolveTopologyVpcId", () => {
           provider_name: "registry.terraform.io/hashicorp/aws",
           change: {
             actions: ["no-op"],
-            after: { id: "sg-lambda", vpc_id: "vpc-from-sg", region: "us-east-1" },
+            after: {
+              id: "sg-lambda",
+              vpc_id: "vpc-from-sg",
+              region: "us-east-1",
+            },
           },
         },
         {

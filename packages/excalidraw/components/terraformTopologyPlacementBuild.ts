@@ -55,7 +55,9 @@ function sortTopologyPlacementZones(
   return a.subnetSignature.localeCompare(b.subnetSignature);
 }
 
-export function buildMergedTopologyZones(plan: AwsPlan): TopologyPlacementZone[] {
+export function buildMergedTopologyZones(
+  plan: AwsPlan,
+): TopologyPlacementZone[] {
   const primaryZones = mergePrimaryTopologyZonesByTier(
     extractPrimaryTopologyZones(plan).map((z) => ({
       ...z,
@@ -114,9 +116,7 @@ export function collectTopologyPreplacedAddresses(
   return out;
 }
 
-function baseEnrichPreplaced(
-  state: EnrichedTopologyPlacements,
-): Set<string> {
+function baseEnrichPreplaced(state: EnrichedTopologyPlacements): Set<string> {
   const preplaced = collectTopologyPreplacedAddresses([
     ...state.zones,
     ...state.regionalBuckets,

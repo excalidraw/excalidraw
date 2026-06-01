@@ -409,13 +409,7 @@ export function satelliteStackHeightPxForKind(
         : 0;
     case "rds_companions":
       return primaryType === "aws_db_instance"
-        ? rdsSatelliteStackHeightPx(
-            nodes,
-            primaryAddress,
-            tier1H,
-            tier2H,
-            gap,
-          )
+        ? rdsSatelliteStackHeightPx(nodes, primaryAddress, tier1H, tier2H, gap)
         : 0;
     default:
       return 0;

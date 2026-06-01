@@ -396,7 +396,6 @@ export function renderPrimarySatellitesFromConfig(
 
   const vpcCluster = bundles.apiVpc.cluster;
   if (vpcCluster?.vpcLinks.length) {
-    let yVpc = ry;
     for (const linkPath of vpcCluster.vpcLinks) {
       const satY = ry + Math.floor((tier0H - tier1H) / 2);
       if (!globalPlaced.apiGateway.has(linkPath)) {
@@ -407,7 +406,6 @@ export function renderPrimarySatellitesFromConfig(
           satelliteTier: 1,
         });
       }
-      yVpc = satY + tier1H + satelliteGap;
     }
   }
 
@@ -706,14 +704,10 @@ function renderBottomKind(p: RenderBottomKindParams): number {
       if (clusterBand.clusterCapacityProvidersPath) {
         const cpReg = clusterBand.clusterCapacityProvidersPath;
         if (!globalPlaced.ecs.has(cpReg)) {
-          drawEcsSat(
-            cpReg,
-            ruleTileXEcsCluster,
-            tier2W,
-            tier2H,
-            2,
-            [addr, clusterBand.clusterPath],
-          );
+          drawEcsSat(cpReg, ruleTileXEcsCluster, tier2W, tier2H, 2, [
+            addr,
+            clusterBand.clusterPath,
+          ]);
           y += tier2H + satelliteGap;
         } else {
           y += tier2H + satelliteGap;
@@ -758,31 +752,37 @@ function renderBottomKind(p: RenderBottomKindParams): number {
         return y;
       }
       const ruleTileXEc2 = columnX + Math.floor((iamW - tier2W) / 2);
-      for (const chain of ec2Cluster.chains) {
-        const drawChainSat = (
-          satAddr: string,
-          x: number,
-          w: number,
-          h: number,
-          tier: 1 | 2,
-          explodeKeys: string[],
-        ): number => {
-          if (globalPlaced.ecs.has(satAddr)) {
-            return h;
-          }
-          globalPlaced.ecs.add(satAddr);
-          addClusterMember(satAddr, x, y, w, h);
-          pushRect(skeleton, satAddr, x, y, w, h, nodes, {
-            explodeParentKeys: explodeKeys,
-            satelliteTier: tier,
-          });
+      const drawChainSat = (
+        satAddr: string,
+        x: number,
+        w: number,
+        h: number,
+        tier: 1 | 2,
+        explodeKeys: string[],
+        yPos: number,
+      ): number => {
+        if (globalPlaced.ecs.has(satAddr)) {
           return h;
-        };
-
+        }
+        globalPlaced.ecs.add(satAddr);
+        addClusterMember(satAddr, x, yPos, w, h);
+        pushRect(skeleton, satAddr, x, yPos, w, h, nodes, {
+          explodeParentKeys: explodeKeys,
+          satelliteTier: tier,
+        });
+        return h;
+      };
+      for (const chain of ec2Cluster.chains) {
         y +=
-          drawChainSat(chain.capacityProvider, columnX, iamW, tier1H, 1, [
-            addr,
-          ]) + satelliteGap;
+          drawChainSat(
+            chain.capacityProvider,
+            columnX,
+            iamW,
+            tier1H,
+            1,
+            [addr],
+            y,
+          ) + satelliteGap;
 
         if (chain.autoscalingGroup) {
           y +=
@@ -793,6 +793,7 @@ function renderBottomKind(p: RenderBottomKindParams): number {
               tier2H,
               2,
               [addr, chain.capacityProvider],
+              y,
             ) + satelliteGap;
         }
         if (chain.launchTemplate) {
@@ -808,6 +809,7 @@ function renderBottomKind(p: RenderBottomKindParams): number {
                 chain.capacityProvider,
                 ...(chain.autoscalingGroup ? [chain.autoscalingGroup] : []),
               ],
+              y,
             ) + satelliteGap;
         }
         if (chain.instanceProfile) {
@@ -824,6 +826,7 @@ function renderBottomKind(p: RenderBottomKindParams): number {
                 ...(chain.autoscalingGroup ? [chain.autoscalingGroup] : []),
                 ...(chain.launchTemplate ? [chain.launchTemplate] : []),
               ],
+              y,
             ) + satelliteGap;
         }
       }

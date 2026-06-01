@@ -30,7 +30,8 @@ function stagingEc2ModuleNodes(): TerraformPlanNodesMap {
             actions: ["create"],
             after: {
               cluster: "module.private_api.aws_ecs_cluster.api.id",
-              task_definition: "module.private_api.aws_ecs_task_definition.api.arn",
+              task_definition:
+                "module.private_api.aws_ecs_task_definition.api.arn",
               launch_type: null,
               capacity_provider_strategy: [
                 {
@@ -52,7 +53,10 @@ function stagingEc2ModuleNodes(): TerraformPlanNodesMap {
           type: "aws_ecs_cluster",
           change: {
             actions: ["create"],
-            after: { name: "staging-api-2", id: "arn:aws:ecs:us-east-1:1:cluster/staging-api-2" },
+            after: {
+              name: "staging-api-2",
+              id: "arn:aws:ecs:us-east-1:1:cluster/staging-api-2",
+            },
           },
         },
       },
@@ -133,7 +137,8 @@ function stagingEc2ModuleNodes(): TerraformPlanNodesMap {
     "module.private_api.aws_iam_instance_profile.ecs_instance": {
       resources: {
         "module.private_api.aws_iam_instance_profile.ecs_instance[0]": {
-          address: "module.private_api.aws_iam_instance_profile.ecs_instance[0]",
+          address:
+            "module.private_api.aws_iam_instance_profile.ecs_instance[0]",
           mode: "managed",
           type: "aws_iam_instance_profile",
           change: {
@@ -270,7 +275,11 @@ describe("terraformTopologyEcsLinks", () => {
     const arnIndex = buildArnIndexForTopology(nodes);
     expect(isEc2BackedEcsService(nodes, service, arnIndex)).toBe(true);
 
-    const chains = buildEcsEc2CapacityChainsForService(nodes, service, arnIndex);
+    const chains = buildEcsEc2CapacityChainsForService(
+      nodes,
+      service,
+      arnIndex,
+    );
     expect(chains).toHaveLength(1);
     expect(chains[0]?.capacityProvider).toBe(
       "module.private_api.aws_ecs_capacity_provider.ec2",
@@ -296,7 +305,9 @@ describe("terraformTopologyEcsLinks", () => {
       nodes,
       service,
     );
-    expect(clusterBand?.clusterPath).toBe("module.private_api.aws_ecs_cluster.api");
+    expect(clusterBand?.clusterPath).toBe(
+      "module.private_api.aws_ecs_cluster.api",
+    );
     expect(clusterBand?.clusterCapacityProvidersPath).toBe(
       "module.private_api.aws_ecs_cluster_capacity_providers.api",
     );

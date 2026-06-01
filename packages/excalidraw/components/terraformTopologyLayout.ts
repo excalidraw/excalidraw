@@ -199,7 +199,9 @@ function buildTopologyLayoutCaches(
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const first = Object.values(node?.resources || {})[0];
     const type =
-      first && typeof first === "object" && typeof (first as { type?: string }).type === "string"
+      first &&
+      typeof first === "object" &&
+      typeof (first as { type?: string }).type === "string"
         ? (first as { type: string }).type
         : "";
     if (!type || !isPrimaryVisibleResourceType(type)) {
@@ -700,18 +702,6 @@ function outerWidthForPlacementZone(
   };
 }
 
-function zonesForVpc(
-  zones: readonly TopologyPlacementZone[],
-  accountId: string,
-  region: string,
-  vpcId: string,
-): TopologyPlacementZone[] {
-  return zones.filter(
-    (z) =>
-      z.accountId === accountId && z.region === region && z.vpcId === vpcId,
-  );
-}
-
 function compareTopologyZonesByTier(
   subnetNameById: ReadonlyMap<string, string>,
 ): (a: TopologyPlacementZone, b: TopologyPlacementZone) => number {
@@ -985,15 +975,14 @@ function zoneDisplayName(
     /\bdatabase\b/.test(labelBlob) ||
     labelBlob.includes("-database-") ||
     z.addresses.some(
-      (a) =>
-        a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
+      (a) => a.includes("aws_rds_cluster") || a.includes("aws_db_instance"),
     );
   const tierPrefix =
     tier === "public" || tier === "intra" || tier === "private"
       ? `${tier.charAt(0).toUpperCase()}${tier.slice(1)} · `
       : isDatabaseZone
-        ? "Database · "
-        : "";
+      ? "Database · "
+      : "";
   if (z.subnetIds.length <= 2) {
     return `${tierPrefix}Subnets: ${labels.join(", ")}`;
   }
@@ -1881,13 +1870,13 @@ function appendVpcEndpointPrimaryClusters(
             TOPOLOGY_TIER2_H,
             nodes,
             {
-            explodeParentKeys: [sgLayoutId],
-            satelliteTier: 2,
-            elementId: ruleLayoutId,
-            terraformSemanticLayoutDuplicate: ruleIsDup,
-          },
-        );
-        yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
+              explodeParentKeys: [sgLayoutId],
+              satelliteTier: 2,
+              elementId: ruleLayoutId,
+              terraformSemanticLayoutDuplicate: ruleIsDup,
+            },
+          );
+          yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
         }
 
         if (gi < sgBuild.cluster.groups.length - 1) {

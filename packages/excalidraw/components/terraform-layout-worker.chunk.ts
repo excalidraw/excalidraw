@@ -18,7 +18,9 @@ export const WorkerUrl: URL | undefined = import.meta.url
   : undefined;
 
 if (typeof window === "undefined" && typeof self !== "undefined") {
-  self.onmessage = async (event: MessageEvent<TerraformLayoutWorkerRequest>) => {
+  self.onmessage = async (
+    event: MessageEvent<TerraformLayoutWorkerRequest>,
+  ) => {
     const { id, job } = event.data;
     try {
       let result;

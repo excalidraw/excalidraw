@@ -1,13 +1,19 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   buildTerraformDependencyLineSkeletons,
   collectDirectedEdges,
   resolveTerraformPlanVertexId,
 } from "./terraformElkLayout";
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
-import { mergeDotAdjacency, mergePlanJsons, namespacePlanDotBundles } from "./terraformImportMerge";
+import {
+  mergeDotAdjacency,
+  mergePlanJsons,
+  namespacePlanDotBundles,
+} from "./terraformImportMerge";
 import {
   buildLayoutBoxesFromElements,
   composeStackModuleScenes,
@@ -21,7 +27,6 @@ import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 import type { TerraformLayoutWorkerJobResult } from "./terraformLayoutWorkerTypes";
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 export async function runModuleStackLayoutJob(

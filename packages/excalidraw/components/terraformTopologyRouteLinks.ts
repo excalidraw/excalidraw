@@ -13,6 +13,7 @@ import {
   resolveTerraformTopologyAccountRegion,
   shouldEmitTopologyPlacement,
 } from "./terraformTopologyExtract";
+
 import type { ResourceChange } from "./terraformTopologyExtract";
 
 function stringField(v: unknown): string | null {

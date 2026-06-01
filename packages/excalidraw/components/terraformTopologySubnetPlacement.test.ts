@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
-
 import graphlibDot from "@dagrejs/graphlib-dot";
+
+import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
 import {
   mergePlanJsons,
@@ -75,9 +75,9 @@ describe("staging-multi-state-expanded topology subnet placement", () => {
 
     const producerZone = zoneForAddress(zones, "aws_ecs_service.producer");
     expect(producerZone).toBeDefined();
-    expect(regional.some((b) => b.addresses.some((a) => a.includes("producer")))).toBe(
-      false,
-    );
+    expect(
+      regional.some((b) => b.addresses.some((a) => a.includes("producer"))),
+    ).toBe(false);
     expect(topologySubnetTierFromZone(producerZone!, subnetNameById)).toBe(
       "private",
     );
@@ -98,7 +98,10 @@ describe("staging-multi-state-expanded topology subnet placement", () => {
     expect(rdsZone).toBeDefined();
     expect(rdsZone!.subnetIds.length).toBeGreaterThan(0);
 
-    const auroraZone = zoneForAddress(zones, "module.api3_aurora.aws_rds_cluster");
+    const auroraZone = zoneForAddress(
+      zones,
+      "module.api3_aurora.aws_rds_cluster",
+    );
     expect(auroraZone).toBeDefined();
     expect(auroraZone!.subnetIds.length).toBeGreaterThan(0);
   }, 120_000);
@@ -146,11 +149,14 @@ describe("staging-multi-state-expanded topology subnet placement", () => {
 
     let current: string | null | undefined = producer!.frameId;
     const seen = new Set<string>();
-    let subnetZone: (typeof elements)[number] | undefined;
+    let subnetZone: typeof elements[number] | undefined;
     while (current && !seen.has(current)) {
       seen.add(current);
       const el = byId.get(current);
-      if (el?.type === "frame" && el.customData?.terraformTopologyRole === "subnetZone") {
+      if (
+        el?.type === "frame" &&
+        el.customData?.terraformTopologyRole === "subnetZone"
+      ) {
         subnetZone = el;
         break;
       }

@@ -152,9 +152,13 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
       vpc_id: "vpc-aaa",
       region: "us-east-1",
     });
-    const ssm = rc("module.api.aws_ssm_parameter.api_name", "aws_ssm_parameter", {
-      region: "us-east-1",
-    });
+    const ssm = rc(
+      "module.api.aws_ssm_parameter.api_name",
+      "aws_ssm_parameter",
+      {
+        region: "us-east-1",
+      },
+    );
     const lambda = rc(
       "module.api.module.lambda.aws_lambda_function.this[0]",
       "aws_lambda_function",
@@ -205,7 +209,8 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
       "aws_internet_gateway.this": nodeFromRc(igw),
       "aws_nat_gateway.this": nodeFromRc(nat),
       "module.api.aws_ssm_parameter.api_name": nodeFromRc(ssm),
-      "module.api.module.lambda.aws_lambda_function.this[0]": nodeFromRc(lambda),
+      "module.api.module.lambda.aws_lambda_function.this[0]":
+        nodeFromRc(lambda),
     } as unknown as TerraformPlanNodesMap;
 
     const enriched = buildEnrichedTopologyPlacements(plan, nodes);

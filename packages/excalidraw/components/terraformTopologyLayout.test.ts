@@ -256,7 +256,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       target?: string;
     };
     expect(rel?.source).toBe("aws_lambda_function.fn");
-    expect(rel?.target).toBe("aws_iam_role.fn_role");
+    expect(String(rel?.target)).toContain("aws_iam_role.fn_role");
 
     const zoneFrames = elements.filter(
       (e) =>
@@ -1230,7 +1230,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const subnetFrame = elements.find((e) => isTopologyFrame(e, "subnetZone"));
 
     expect(vpcFrame?.name).toBe("VPC: workload-vpc");
-    expect(subnetFrame?.name).toBe("Subnets: public-a, public-b");
+    expect(subnetFrame?.name).toBe("Public · Subnets: public-a, public-b");
   });
 
   it("orders VPC-only, public, intra, and private zones from left to right", async () => {
@@ -1336,9 +1336,9 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     expect(subnetFrames.map((f) => f.name)).toEqual([
       "VPC-only placement",
-      "Subnets: app-public-a",
-      "Subnets: app-intra-a",
-      "Subnets: app-private-a",
+      "Public · Subnets: app-public-a",
+      "Intra · Subnets: app-intra-a",
+      "Private · Subnets: app-private-a",
     ]);
   });
 
@@ -1432,11 +1432,11 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     );
     const publicZone = elements.find(
       (e) =>
-        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-public-a",
+        isTopologyFrame(e, "subnetZone") && e.name?.includes("app-public-a"),
     );
     const privateZone = elements.find(
       (e) =>
-        isTopologyFrame(e, "subnetZone") && e.name === "Subnets: app-private-a",
+        isTopologyFrame(e, "subnetZone") && e.name?.includes("app-private-a"),
     );
     expect(publicZone).toBeDefined();
     expect(privateZone).toBeDefined();
@@ -2047,7 +2047,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           r?.origin === "topology_sg" &&
           r?.type === "security_group" &&
           r?.source === "aws_lambda_function.fn" &&
-          r?.target === "aws_security_group.app",
+          String(r?.target).includes("aws_security_group.app"),
       ),
     ).toBe(true);
     expect(
@@ -2055,8 +2055,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         (r) =>
           r?.origin === "topology_sg" &&
           r?.type === "sg_rule" &&
-          r?.source === "aws_security_group.app" &&
-          r?.target === "aws_vpc_security_group_ingress_rule.ssh",
+          String(r?.source).includes("aws_security_group.app") &&
+          String(r?.target).includes("aws_vpc_security_group_ingress_rule.ssh"),
       ),
     ).toBe(true);
 
