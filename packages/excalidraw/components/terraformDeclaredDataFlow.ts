@@ -7,7 +7,7 @@ export const DECLARED_DATAFLOW_ORDERED_KEY = "__declaredDataFlowOrdered";
 export const TFD_HOP_ADDRESS = "@hop";
 export const TFD_DUMMY_ADDRESS = "@dummy";
 
-export type TfdVersion = 1 | 2;
+export type TfdVersion = 1 | 2 | 3;
 
 export type DeclaredDataFlowEdge = {
   source: string;
@@ -83,6 +83,9 @@ function parseTfdVersionHeader(line: string): TfdVersion | null {
     return null;
   }
   const n = Number(match[1]);
+  if (n === 3) {
+    return 3;
+  }
   if (n === 2) {
     return 2;
   }

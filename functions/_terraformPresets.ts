@@ -41,6 +41,17 @@ export type TerraformImportPresetSources = {
   tfdTexts: string[];
   tfdLabels: string[];
   warnings: TerraformImportPresetWarning[];
+  repoName?: string;
+  stackCatalog?: Array<{
+    stackId: string;
+    label: string;
+    planPath: string;
+    dotPath: string;
+    statePath?: string;
+    planText?: string;
+    dotText?: string;
+    stateText?: string;
+  }>;
 };
 
 type PresetRow = {
@@ -177,19 +188,26 @@ export async function getTerraformImportPresetSourcesFromD1(
 
   const stackRows = await db
     .prepare(
-      `SELECT stack_id, label, plan_text, dot_text, state_text
+      `SELECT stack_id, label, plan_path, dot_path, state_path,
+              plan_text, dot_text, state_text
        FROM terraform_import_preset_stacks
        WHERE preset_id = ?
        ORDER BY sort_order ASC`,
     )
     .bind(presetId)
-    .all<{
-      stack_id: string;
-      label: string;
-      plan_text: string | null;
-      dot_text: string | null;
-      state_text: string | null;
-    }>();
+    .all<StackRow>();
+
+  const repoName = preset.rootPath.replace(/\\/g, "/").replace(/\/+$/, "").split("/").filter(Boolean).pop() ?? "terraform";
+  const stackCatalog = (stackRows.results ?? []).map((stack) => ({
+    stackId: stack.stack_id,
+    label: stack.label,
+    planPath: stack.plan_path,
+    dotPath: stack.dot_path,
+    ...(stack.state_path ? { statePath: stack.state_path } : {}),
+    ...(stack.plan_text ? { planText: stack.plan_text } : {}),
+    ...(stack.dot_text ? { dotText: stack.dot_text } : {}),
+    ...(stack.state_text ? { stateText: stack.state_text } : {}),
+  }));
 
   const warnings: TerraformImportPresetWarning[] = [];
   const planDotBundles: TerraformImportPresetSources["planDotBundles"] = [];
@@ -295,6 +313,8 @@ export async function getTerraformImportPresetSourcesFromD1(
     tfdTexts,
     tfdLabels,
     warnings,
+    repoName,
+    stackCatalog,
   };
 }
 

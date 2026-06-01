@@ -114,3 +114,73 @@ export async function syncTerraformImportPresetFromDiskViaApi(
   const body = (await response.json()) as { preset: TerraformImportPreset };
   return body.preset;
 }
+
+const ARTIFACT_API_BASE = "/api/terraform-import-artifacts";
+const COMPOSITION_API_BASE = "/api/terraform-import-compositions";
+
+export async function fetchTerraformImportArtifactsFromApi(): Promise<
+  import("./terraformImportPresetsTypes").TerraformImportArtifact[]
+> {
+  const response = await fetch(ARTIFACT_API_BASE);
+  if (!response.ok) {
+    throw new Error(await readApiError(response));
+  }
+  const body = (await response.json()) as {
+    artifacts?: import("./terraformImportPresetsTypes").TerraformImportArtifact[];
+  };
+  return Array.isArray(body.artifacts) ? body.artifacts : [];
+}
+
+export async function saveTerraformImportArtifactViaApi(
+  artifact: import("./terraformImportPresetsTypes").TerraformImportArtifact & {
+    content: string;
+  },
+): Promise<import("./terraformImportPresetsTypes").TerraformImportArtifact> {
+  const response = await fetch(ARTIFACT_API_BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artifact }),
+  });
+  if (!response.ok) {
+    throw new Error(await readApiError(response));
+  }
+  const body = (await response.json()) as {
+    artifact: import("./terraformImportPresetsTypes").TerraformImportArtifact;
+  };
+  return body.artifact;
+}
+
+export async function saveTerraformImportCompositionViaApi(
+  composition: import("./terraformImportPresetsTypes").TerraformImportComposition,
+): Promise<import("./terraformImportPresetsTypes").TerraformImportComposition> {
+  const response = await fetch(COMPOSITION_API_BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ composition }),
+  });
+  if (!response.ok) {
+    throw new Error(await readApiError(response));
+  }
+  const body = (await response.json()) as {
+    composition: import("./terraformImportPresetsTypes").TerraformImportComposition;
+  };
+  return body.composition;
+}
+
+export async function fetchTerraformImportCompositionSourcesFromApi(
+  compositionId: string,
+): Promise<TerraformImportPresetSources> {
+  const response = await fetch(
+    `${COMPOSITION_API_BASE}/${encodeURIComponent(compositionId)}/sources`,
+  );
+  if (!response.ok) {
+    throw new Error(await readApiError(response));
+  }
+  const body = (await response.json()) as {
+    sources?: TerraformImportPresetSources;
+  };
+  if (!body.sources) {
+    throw new Error("Composition sources response was empty.");
+  }
+  return body.sources;
+}

@@ -5,6 +5,10 @@ import {
 import { fetchTerraformImportPresetSourcesFromApi } from "./terraformImportPresetsApi";
 
 import { parseRawStateJson } from "./terraformImportMerge";
+import {
+  buildStackCatalogFromPresetStacks,
+  repoNameFromRootPath,
+} from "./terraformImportCompositionResolve";
 
 import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 import type {
@@ -304,6 +308,21 @@ export async function loadTerraformImportPresetSources(
     tfdLabels.push(tfdPath);
   }
 
+  const repoName = repoNameFromRootPath(preset.rootPath);
+  const stackCatalog = buildStackCatalogFromPresetStacks(
+    repoName,
+    preset.stacks.map((stack) => ({
+      id: stack.id,
+      label: stack.label,
+      planPath: stack.planPath,
+      dotPath: stack.dotPath,
+      statePath: stack.statePath,
+      planText: stack.planText,
+      dotText: stack.dotText,
+      stateText: stack.stateText,
+    })),
+  );
+
   return {
     planDotBundles,
     states,
@@ -311,5 +330,7 @@ export async function loadTerraformImportPresetSources(
     tfdTexts,
     tfdLabels,
     warnings,
+    repoName,
+    stackCatalog,
   };
 }

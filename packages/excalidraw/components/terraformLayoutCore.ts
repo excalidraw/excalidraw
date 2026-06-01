@@ -64,6 +64,7 @@ import {
   type TerraformPlanParsingOptions,
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
+import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 
@@ -185,11 +186,61 @@ function appendImportMeta(
   };
 }
 
+function applyTfdCompositionToLayoutSources(
+  sources: TerraformPlanParsingSources,
+  options?: TerraformLayoutOptions,
+):
+  | { ok: false; error: string; status?: number }
+  | { sources: TerraformPlanParsingSources } {
+  const hasTfd = sources.tfdTexts.some((text) => text?.trim());
+  if (!hasTfd) {
+    return { sources };
+  }
+
+  const resolved = resolveSourcesWithTfdComposition(
+    {
+      planDotBundles: sources.planDotBundles,
+      states: sources.states ?? [],
+      stateLabels: (sources.stateLabels ?? []).map((label) => String(label)),
+      tfdTexts: sources.tfdTexts,
+      tfdLabels: (sources.tfdLabels ?? []).map((label) => String(label)),
+      warnings: sources.warnings ?? [],
+      repoName: sources.repoName,
+      stackCatalog: sources.stackCatalog,
+    },
+    options?.artifactLoader,
+  );
+
+  if (resolved.compositionErrors?.length) {
+    return {
+      ok: false,
+      status: 400,
+      error: resolved.compositionErrors.join("\n"),
+    };
+  }
+
+  return {
+    sources: {
+      ...sources,
+      planDotBundles: resolved.planDotBundles,
+      states: resolved.states,
+      stateLabels: resolved.stateLabels,
+      warnings: resolved.warnings,
+    },
+  };
+}
+
 /** Sequential layout (main-thread fallback and single-bundle paths). */
 export async function layoutTerraformFromSources(
   sources: TerraformPlanParsingSources,
   options?: TerraformLayoutOptions,
 ): Promise<LayoutTerraformResult> {
+  const compositionResult = applyTfdCompositionToLayoutSources(sources, options);
+  if ("ok" in compositionResult) {
+    return compositionResult;
+  }
+  sources = compositionResult.sources;
+
   const layoutMode =
     options?.layoutMode ??
     (options?.semanticLayout === true ? "semantic" : "module");

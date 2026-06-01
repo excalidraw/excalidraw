@@ -43,3 +43,26 @@ CREATE TABLE IF NOT EXISTS terraform_import_preset_blob_chunks (
   PRIMARY KEY (preset_id, blob_kind, blob_key, chunk_index),
   FOREIGN KEY (preset_id) REFERENCES terraform_import_presets(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS terraform_import_artifacts (
+  repo_name TEXT NOT NULL,
+  relative_path TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('plan', 'dot', 'state')),
+  stack_id TEXT,
+  label TEXT,
+  content TEXT,
+  content_hash TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (repo_name, relative_path)
+);
+
+CREATE TABLE IF NOT EXISTS terraform_import_compositions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  default_view TEXT NOT NULL CHECK (default_view IN ('semantic', 'module', 'pipeline')),
+  tfd_content TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);

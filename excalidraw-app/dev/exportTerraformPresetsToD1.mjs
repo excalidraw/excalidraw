@@ -78,6 +78,23 @@ const tfdRows = db
   )
   .all();
 
+const artifacts = db
+  .prepare(
+    `SELECT repo_name, relative_path, kind, stack_id, label, content, content_hash,
+            created_at, updated_at
+     FROM terraform_import_artifacts
+     ORDER BY repo_name ASC, relative_path ASC`,
+  )
+  .all();
+
+const compositions = db
+  .prepare(
+    `SELECT id, name, description, default_view, tfd_content, created_at, updated_at
+     FROM terraform_import_compositions
+     ORDER BY id ASC`,
+  )
+  .all();
+
 db.close();
 
 const blobChunkRows = [];
@@ -123,6 +140,8 @@ const lines = [
   "DELETE FROM terraform_import_preset_blob_chunks;",
   "DELETE FROM terraform_import_preset_tfd;",
   "DELETE FROM terraform_import_preset_stacks;",
+  "DELETE FROM terraform_import_compositions;",
+  "DELETE FROM terraform_import_artifacts;",
   "DELETE FROM terraform_import_presets;",
   "",
 ];
@@ -147,6 +166,56 @@ writeInsert(
     row.builtin,
     row.view,
     row.root_path,
+    row.created_at,
+    row.updated_at,
+  ]),
+);
+
+writeInsert(
+  lines,
+  "terraform_import_artifacts",
+  [
+    "repo_name",
+    "relative_path",
+    "kind",
+    "stack_id",
+    "label",
+    "content",
+    "content_hash",
+    "created_at",
+    "updated_at",
+  ],
+  artifacts.map((row) => [
+    row.repo_name,
+    row.relative_path,
+    row.kind,
+    row.stack_id,
+    row.label,
+    row.content,
+    row.content_hash,
+    row.created_at,
+    row.updated_at,
+  ]),
+);
+
+writeInsert(
+  lines,
+  "terraform_import_compositions",
+  [
+    "id",
+    "name",
+    "description",
+    "default_view",
+    "tfd_content",
+    "created_at",
+    "updated_at",
+  ],
+  compositions.map((row) => [
+    row.id,
+    row.name,
+    row.description,
+    row.default_view,
+    row.tfd_content,
     row.created_at,
     row.updated_at,
   ]),

@@ -5,8 +5,47 @@ import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 export type TerraformImportPresetView = "semantic" | "module" | "pipeline";
 
 export type TerraformImportPresetWarning = {
-  code: "missing_state_file" | "missing_optional_tfd";
+  code:
+    | "missing_state_file"
+    | "missing_optional_tfd"
+    | "composition_error";
   message: string;
+};
+
+export type TerraformImportArtifactKind = "plan" | "dot" | "state";
+
+export type TerraformImportArtifactRef = {
+  repoName: string;
+  relativePath: string;
+};
+
+export type TerraformImportArtifact = {
+  repoName: string;
+  relativePath: string;
+  kind: TerraformImportArtifactKind;
+  stackId?: string;
+  label?: string;
+  contentHash?: string;
+  hasContent?: boolean;
+};
+
+export type TerraformImportStackCatalogEntry = {
+  stackId: string;
+  label: string;
+  planPath: string;
+  dotPath: string;
+  statePath?: string;
+  planText?: string;
+  dotText?: string;
+  stateText?: string;
+};
+
+export type TerraformImportComposition = {
+  id: string;
+  name: string;
+  description?: string;
+  defaultView: TerraformImportPresetView;
+  tfdContent: string;
 };
 
 export type TerraformImportPresetSources = {
@@ -16,6 +55,9 @@ export type TerraformImportPresetSources = {
   tfdTexts: string[];
   tfdLabels: string[];
   warnings: TerraformImportPresetWarning[];
+  repoName?: string;
+  stackCatalog?: TerraformImportStackCatalogEntry[];
+  compositionErrors?: string[];
 };
 
 export type TerraformImportPresetStack = {

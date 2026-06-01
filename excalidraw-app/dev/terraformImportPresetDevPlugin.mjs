@@ -2,11 +2,15 @@ import fs from "node:fs";
 
 import {
   deleteTerraformImportPresetFromDb,
+  getTerraformImportCompositionFromDb,
   getTerraformImportPresetDb,
   getTerraformImportPresetFromDb,
   getTerraformImportPresetSourcesFromDb,
+  listTerraformImportArtifactsFromDb,
   listTerraformImportPresetsFromDb,
   resolveTerraformImportFilePath,
+  saveTerraformImportArtifactToDb,
+  saveTerraformImportCompositionToDb,
   saveTerraformImportPresetToDb,
   seedAllBuiltinsFromCatalog,
   syncTerraformImportPresetFromDisk,
@@ -15,6 +19,8 @@ import {
 
 const TERRAFORM_PRESET_FILE_ROUTE = "/__dev/terraform-import/";
 const TERRAFORM_PRESET_API_ROUTE = "/api/terraform-import-presets";
+const TERRAFORM_ARTIFACT_API_ROUTE = "/api/terraform-import-artifacts";
+const TERRAFORM_COMPOSITION_API_ROUTE = "/api/terraform-import-compositions";
 
 const readJsonBody = (req) =>
   new Promise((resolve, reject) => {
@@ -50,6 +56,19 @@ const parsePresetRoute = (url) => {
   };
 };
 
+const parseCompositionRoute = (url) => {
+  const match = url.match(
+    /^\/api\/terraform-import-compositions\/([^/?]+)(\/[^?]*)?(?:\?.*)?$/,
+  );
+  if (!match) {
+    return null;
+  }
+  return {
+    compositionId: decodeURIComponent(match[1]),
+    suffix: match[2] ?? "",
+  };
+};
+
 export const terraformImportPresetDevPlugin = () => ({
   name: "terraform-import-preset-dev",
   configureServer(server) {
@@ -81,6 +100,84 @@ export const terraformImportPresetDevPlugin = () => ({
           res.statusCode = 404;
           res.end("File not found");
         }
+        return;
+      }
+
+      if (url.startsWith(TERRAFORM_ARTIFACT_API_ROUTE)) {
+        if (req.method === "GET" && url === TERRAFORM_ARTIFACT_API_ROUTE) {
+          sendJson(res, 200, { artifacts: listTerraformImportArtifactsFromDb() });
+          return;
+        }
+        if (req.method === "POST" && url === TERRAFORM_ARTIFACT_API_ROUTE) {
+          try {
+            const body = await readJsonBody(req);
+            const artifact = saveTerraformImportArtifactToDb(body.artifact ?? body);
+            sendJson(res, 201, { artifact });
+          } catch (error) {
+            sendJson(res, 400, {
+              error: error instanceof Error ? error.message : "Invalid artifact.",
+            });
+          }
+          return;
+        }
+        sendJson(res, 405, { error: "Method not allowed." });
+        return;
+      }
+
+      const compositionRoute = parseCompositionRoute(url);
+      if (compositionRoute && url.startsWith(TERRAFORM_COMPOSITION_API_ROUTE)) {
+        const { compositionId, suffix } = compositionRoute;
+        if (req.method === "GET" && suffix === "/sources") {
+          try {
+            const composition = getTerraformImportCompositionFromDb(compositionId);
+            if (!composition) {
+              sendJson(res, 404, { error: "Composition not found." });
+              return;
+            }
+            const presetId = compositionId.replace(/-composition$/, "");
+            const sources = getTerraformImportPresetSourcesFromDb(presetId);
+            if (!sources) {
+              sendJson(res, 404, { error: "Composition sources unavailable." });
+              return;
+            }
+            sources.tfdTexts = [composition.tfdContent];
+            sources.tfdLabels = ["composition.tfd"];
+            sendJson(res, 200, { sources, composition });
+          } catch (error) {
+            sendJson(res, 400, {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "Composition sources unavailable.",
+            });
+          }
+          return;
+        }
+        if (req.method === "POST" && url === TERRAFORM_COMPOSITION_API_ROUTE) {
+          try {
+            const body = await readJsonBody(req);
+            const composition = saveTerraformImportCompositionToDb(
+              body.composition ?? body,
+            );
+            sendJson(res, 201, { composition });
+          } catch (error) {
+            sendJson(res, 400, {
+              error:
+                error instanceof Error ? error.message : "Invalid composition.",
+            });
+          }
+          return;
+        }
+        if (req.method === "GET" && compositionId && !suffix) {
+          const composition = getTerraformImportCompositionFromDb(compositionId);
+          if (!composition) {
+            sendJson(res, 404, { error: "Composition not found." });
+            return;
+          }
+          sendJson(res, 200, { composition });
+          return;
+        }
+        sendJson(res, 405, { error: "Method not allowed." });
         return;
       }
 

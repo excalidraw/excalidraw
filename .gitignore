@@ -6,9 +6,13 @@
 graph.db
 graph.db-shm
 graph.db-wal
+# Local dev SQLite for Terraform import presets, artifacts, and compositions.
 terraform-import-presets.db
 terraform-import-presets.db-shm
 terraform-import-presets.db-wal
+terraform-import-presets-test-*.db
+terraform-import-presets-test-*.db-shm
+terraform-import-presets-test-*.db-wal
 !packages/excalidraw/test-fixtures/terraform-import-presets.db
 packages/excalidraw/test-fixtures/terraform-import-presets.db-shm
 packages/excalidraw/test-fixtures/terraform-import-presets.db-wal

@@ -5,6 +5,8 @@ import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/d
 import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
+import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
+import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import {
   mergePlanJsons,
   namespacePlanDotBundles,
@@ -13,11 +15,15 @@ import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
 import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
 function expandedNodesAndTfd() {
-  const sources = getTerraformImportPresetSourcesFromDb(
+  const rawSources = getTerraformImportPresetSourcesFromDb(
     "staging-multi-state-expanded",
   );
-  expect(sources).not.toBeNull();
-  const ns = namespacePlanDotBundles(sources!.planDotBundles);
+  expect(rawSources).not.toBeNull();
+  const sources = resolveSourcesWithTfdComposition(
+    rawSources! as TerraformImportPresetSources,
+  );
+  expect(sources.compositionErrors ?? []).toEqual([]);
+  const ns = namespacePlanDotBundles(sources.planDotBundles);
   const merged = mergePlanJsons(
     ns.bundles.map((b) => b.plan),
     ns.bundles.map((b) => b.label),
@@ -28,7 +34,7 @@ function expandedNodesAndTfd() {
     priorStatePlans: merged.sourcePlans,
     stackIds: ns.stackIds,
   });
-  return { nodes, tfdTexts: sources!.tfdTexts, tfdLabels: sources!.tfdLabels };
+  return { nodes, tfdTexts: sources.tfdTexts, tfdLabels: sources.tfdLabels };
 }
 
 function edgePairKey(source: string, target: string) {
@@ -107,12 +113,15 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
   });
 
   it("semantic import exposes ingress and egress SQS primary tiles", async () => {
-    const sources = getTerraformImportPresetSourcesFromDb(
+    const rawSources = getTerraformImportPresetSourcesFromDb(
       "staging-multi-state-expanded",
     );
-    expect(sources).not.toBeNull();
+    expect(rawSources).not.toBeNull();
+    const sources = resolveSourcesWithTfdComposition(
+      rawSources! as TerraformImportPresetSources,
+    );
 
-    const res = await terraformPlanParsingFromSources(sources!, {
+    const res = await terraformPlanParsingFromSources(sources, {
       semanticLayout: true,
     });
     expect(res.ok).toBe(true);

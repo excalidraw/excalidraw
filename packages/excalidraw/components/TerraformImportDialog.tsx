@@ -36,9 +36,16 @@ import {
   type TerraformImportPresetWarning,
 } from "./terraformImportPresetLoader";
 import {
+  fetchTerraformImportArtifactsFromApi,
   fetchTerraformImportPresetFromApi,
+  saveTerraformImportArtifactViaApi,
+  saveTerraformImportCompositionViaApi,
   syncTerraformImportPresetFromDiskViaApi,
 } from "./terraformImportPresetsApi";
+import type {
+  TerraformImportArtifact,
+  TerraformImportArtifactKind,
+} from "./terraformImportPresetsTypes";
 
 import "./TerraformImportDialog.scss";
 
@@ -158,6 +165,13 @@ export const TerraformImportModal = ({
   const [presetsLoading, setPresetsLoading] = useState(true);
   const [activePreset, setActivePreset] =
     useState<TerraformImportPreset | null>(null);
+  const [artifacts, setArtifacts] = useState<TerraformImportArtifact[]>([]);
+  const [artifactsLoading, setArtifactsLoading] = useState(false);
+  const [artifactRepoName, setArtifactRepoName] = useState("my-infra");
+  const [artifactRelativePath, setArtifactRelativePath] = useState("");
+  const [artifactKind, setArtifactKind] =
+    useState<TerraformImportArtifactKind>("plan");
+  const [artifactUploadFile, setArtifactUploadFile] = useState<File | null>(null);
 
   const refreshPresets = useCallback(async () => {
     setPresetsLoading(true);
@@ -185,6 +199,24 @@ export const TerraformImportModal = ({
   useEffect(() => {
     void refreshPresets();
   }, [refreshPresets]);
+
+  const refreshArtifacts = useCallback(async () => {
+    if (!import.meta.env.DEV) {
+      return;
+    }
+    setArtifactsLoading(true);
+    try {
+      setArtifacts(await fetchTerraformImportArtifactsFromApi());
+    } catch {
+      // Artifact library is optional outside dev API.
+    } finally {
+      setArtifactsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshArtifacts();
+  }, [refreshArtifacts]);
 
   useEffect(() => {
     return () => {
@@ -401,6 +433,9 @@ export const TerraformImportModal = ({
             stateLabels: presetSources.stateLabels,
             tfdTexts: presetSources.tfdTexts,
             tfdLabels: presetSources.tfdLabels,
+            repoName: presetSources.repoName,
+            stackCatalog: presetSources.stackCatalog,
+            warnings: presetSources.warnings,
           },
           {
             importedTfdTexts: presetSources.tfdTexts,
@@ -489,6 +524,9 @@ export const TerraformImportModal = ({
           stateLabels: presetSources.stateLabels,
           tfdTexts: presetSources.tfdTexts,
           tfdLabels: presetSources.tfdLabels,
+          repoName: presetSources.repoName,
+          stackCatalog: presetSources.stackCatalog,
+          warnings: presetSources.warnings,
         },
         {
           importedTfdTexts: presetSources.tfdTexts,
@@ -616,6 +654,56 @@ export const TerraformImportModal = ({
       setError(
         err instanceof Error ? err.message : "Failed to choose preset folder.",
       );
+    }
+  };
+
+  const handleRegisterArtifact = async () => {
+    if (!artifactUploadFile || !artifactRelativePath.trim()) {
+      setError("Choose a file and enter repoName/relativePath for the artifact.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await saveTerraformImportArtifactViaApi({
+        repoName: artifactRepoName.trim() || "my-infra",
+        relativePath: artifactRelativePath.trim(),
+        kind: artifactKind,
+        content: await readFileText(artifactUploadFile),
+      });
+      setArtifactUploadFile(null);
+      setArtifactRelativePath("");
+      await refreshArtifacts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to register artifact.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveComposition = async () => {
+    const nameInput = window.prompt("Composition name");
+    if (!nameInput?.trim()) {
+      return;
+    }
+    if (tfdFiles.length === 0) {
+      setError("Upload at least one .tfd file to save as a composition.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const tfdContent = await readFileText(tfdFiles[0]!);
+      await saveTerraformImportCompositionViaApi({
+        id: toPresetId(nameInput),
+        name: nameInput.trim(),
+        defaultView: view,
+        tfdContent,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save composition.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -772,6 +860,93 @@ writer -> bucket`}</code>
           </button>
         </div>
       </div>
+
+      {import.meta.env.DEV && (
+        <div className="TerraformImportModal__section">
+          <h4>Artifact library</h4>
+          <p className="TerraformImportModal__muted">
+            Register plan/dot/state blobs under{" "}
+            <code>repoName/relativePath</code> for TFD <code>use</code> blocks.
+          </p>
+          <div className="TerraformImportModal__artifactForm">
+            <label>
+              Repo name
+              <input
+                value={artifactRepoName}
+                disabled={loading}
+                onChange={(event) => setArtifactRepoName(event.target.value)}
+              />
+            </label>
+            <label>
+              Relative path
+              <input
+                value={artifactRelativePath}
+                placeholder="my-stack/plan.json"
+                disabled={loading}
+                onChange={(event) =>
+                  setArtifactRelativePath(event.target.value)
+                }
+              />
+            </label>
+            <label>
+              Kind
+              <select
+                value={artifactKind}
+                disabled={loading}
+                onChange={(event) =>
+                  setArtifactKind(
+                    event.target.value as TerraformImportArtifactKind,
+                  )
+                }
+              >
+                <option value="plan">plan</option>
+                <option value="dot">dot</option>
+                <option value="state">state</option>
+              </select>
+            </label>
+            <label>
+              File
+              <input
+                type="file"
+                disabled={loading}
+                onChange={(event) =>
+                  setArtifactUploadFile(event.target.files?.[0] ?? null)
+                }
+              />
+            </label>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => void handleRegisterArtifact()}
+            >
+              Register artifact
+            </button>
+            <button
+              type="button"
+              disabled={loading || tfdFiles.length === 0}
+              onClick={() => void handleSaveComposition()}
+            >
+              Save composition
+            </button>
+          </div>
+          {artifactsLoading ? (
+            <p className="TerraformImportModal__muted">Loading artifacts…</p>
+          ) : artifacts.length > 0 ? (
+            <ul className="TerraformImportModal__artifactList">
+              {artifacts.slice(0, 12).map((artifact) => (
+                <li key={`${artifact.repoName}/${artifact.relativePath}`}>
+                  <code>
+                    {artifact.repoName}/{artifact.relativePath}
+                  </code>{" "}
+                  ({artifact.kind})
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="TerraformImportModal__muted">No artifacts registered yet.</p>
+          )}
+        </div>
+      )}
 
       {usingPresetManifest && activePreset ? (
         <div className="TerraformImportModal__section">

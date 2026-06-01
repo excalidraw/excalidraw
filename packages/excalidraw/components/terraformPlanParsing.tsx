@@ -85,12 +85,20 @@ import type {
 
 export type { TerraformImportWarning, TerraformPlanDotBundle };
 
+import type {
+  TerraformImportPresetWarning,
+  TerraformImportStackCatalogEntry,
+} from "./terraformImportPresetsTypes";
+
 export type TerraformPlanParsingSources = {
   planDotBundles: TerraformPlanDotBundle[];
   states: unknown[];
   stateLabels?: (string | undefined)[];
   tfdTexts: string[];
   tfdLabels?: (string | undefined)[];
+  repoName?: string;
+  stackCatalog?: TerraformImportStackCatalogEntry[];
+  warnings?: TerraformImportPresetWarning[];
 };
 
 export { TERRAFORM_MODULE_TREE_KEY };
@@ -185,6 +193,11 @@ export type TerraformPlanParsingOptions = {
   dataflowLinks?: string;
   /** Module-view intra-module packing (ignored when semanticLayout is true). */
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  /** Resolve TFD `use` artifact refs from the global artifact library. */
+  artifactLoader?: (
+    ref: { repoName: string; relativePath: string },
+    kind: "plan" | "dot" | "state",
+  ) => { content: string } | null | undefined;
 };
 
 type BuildNodesMapOptions = {
