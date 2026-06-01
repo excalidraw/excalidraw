@@ -67,8 +67,8 @@ export const applyTerraformExcalidrawScene = (
       Boolean(
         entry &&
           typeof entry === "object" &&
-          typeof (entry as BinaryFileData).id === "string" &&
-          typeof (entry as BinaryFileData).dataURL === "string",
+          typeof entry.id === "string" &&
+          typeof entry.dataURL === "string",
       ),
     );
     if (list.length > 0) {
@@ -169,7 +169,7 @@ export const runTerraformImportFromSources = async (
   const { elements, terraformEdgeLayerPins } = applyTerraformExcalidrawScene(
     app,
     setAppState,
-    scene as TerraformExcalidrawScenePayload,
+    scene,
     {
       enableDeclaredDataFlow,
       scrollToContent: options.scrollToContent,

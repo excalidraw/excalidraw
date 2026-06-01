@@ -292,7 +292,7 @@ export function buildDataFlowIndex(nodes: PlanNodesMap): DataFlowIndex {
     if (!type || !name) {
       return;
     }
-    const key = `${type}:${name}`;
+    const key = `${type}:${String(name)}`;
     if (!index.byName.has(key)) {
       index.byName.set(key, new Set());
     }
@@ -335,8 +335,9 @@ export function buildDataFlowIndex(nodes: PlanNodesMap): DataFlowIndex {
       if ((resource.type || type) === "aws_s3_bucket") {
         const bucketName = values.bucket || values.id || resource.name;
         if (bucketName) {
-          addArn(`arn:aws:s3:::${bucketName}`, nodePath);
-          addArn(`arn:aws:s3:::${bucketName}/*`, nodePath);
+          const bucket = String(bucketName);
+          addArn(`arn:aws:s3:::${bucket}`, nodePath);
+          addArn(`arn:aws:s3:::${bucket}/*`, nodePath);
         }
       }
 
@@ -596,15 +597,12 @@ function resolvePolicyTargets(
 
   for (const [arn, nodePath] of index.byArn.entries()) {
     if (
-      normalized === arn ||
-      arn.startsWith(normalized) ||
-      normalized.startsWith(arn)
+      (normalized === arn ||
+        arn.startsWith(normalized) ||
+        normalized.startsWith(arn)) &&
+      DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))
     ) {
-      if (
-        DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))
-      ) {
-        matches.add(nodePath);
-      }
+      matches.add(nodePath);
     }
   }
 

@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-console": "warn",
+    "typescript/no-explicit-any": "warn",
+    "eslint/no-debugger": "error"
+  },
+  "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/__snapshots__/**"]
+}

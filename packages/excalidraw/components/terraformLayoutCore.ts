@@ -95,40 +95,44 @@ function emitLocalParseDebug(payload: Record<string, unknown>) {
   console.log(DEBUG_PREFIX, payload);
 }
 
-function collectSemanticRepresentedResourceAddresses(
-  elements: Array<{ customData?: Record<string, any> }>,
-  plan: { resource_changes?: Array<{ address?: string; type?: string }> },
-): Set<string> {
-  const represented = new Set<string>();
-  const representedSubnetIds = new Set<string>();
-  for (const element of elements) {
-    const cd = element.customData || {};
-    if (typeof cd.nodePath === "string") {
-      represented.add(cd.nodePath);
-    }
-    if (Array.isArray(cd.terraformMergedSubnetAddresses)) {
-      for (const addr of cd.terraformMergedSubnetAddresses) {
-        if (typeof addr === "string") {
-          represented.add(addr);
-        }
-      }
-    }
-    if (Array.isArray(cd.terraformSubnetIds)) {
-      for (const subnetId of cd.terraformSubnetIds) {
-        if (typeof subnetId === "string") {
-          representedSubnetIds.add(subnetId);
-        }
-      }
-    }
-    if (Array.isArray(cd.terraformResources)) {
-      for (const resource of cd.terraformResources) {
-        const address = resource?.address;
-        if (typeof address === "string") {
-          represented.add(address);
-        }
+function addRepresentedAddressesFromElement(
+  represented: Set<string>,
+  representedSubnetIds: Set<string>,
+  element: { customData?: Record<string, unknown> },
+) {
+  const cd = element.customData || {};
+  if (typeof cd.nodePath === "string") {
+    represented.add(cd.nodePath);
+  }
+  if (Array.isArray(cd.terraformMergedSubnetAddresses)) {
+    for (const addr of cd.terraformMergedSubnetAddresses) {
+      if (typeof addr === "string") {
+        represented.add(addr);
       }
     }
   }
+  if (Array.isArray(cd.terraformSubnetIds)) {
+    for (const subnetId of cd.terraformSubnetIds) {
+      if (typeof subnetId === "string") {
+        representedSubnetIds.add(subnetId);
+      }
+    }
+  }
+  if (Array.isArray(cd.terraformResources)) {
+    for (const resource of cd.terraformResources) {
+      const address = (resource as { address?: unknown })?.address;
+      if (typeof address === "string") {
+        represented.add(address);
+      }
+    }
+  }
+}
+
+function addRepresentedAddressesFromPlan(
+  represented: Set<string>,
+  representedSubnetIds: Set<string>,
+  plan: { resource_changes?: Array<{ address?: string; type?: string }> },
+) {
   for (const rc of plan.resource_changes || []) {
     if (rc.type === "aws_vpc" && typeof rc.address === "string") {
       represented.add(rc.address);
@@ -148,6 +152,22 @@ function collectSemanticRepresentedResourceAddresses(
       represented.add(rc.address);
     }
   }
+}
+
+function collectSemanticRepresentedResourceAddresses(
+  elements: Array<{ customData?: Record<string, any> }>,
+  plan: { resource_changes?: Array<{ address?: string; type?: string }> },
+): Set<string> {
+  const represented = new Set<string>();
+  const representedSubnetIds = new Set<string>();
+  for (const element of elements) {
+    addRepresentedAddressesFromElement(
+      represented,
+      representedSubnetIds,
+      element,
+    );
+  }
+  addRepresentedAddressesFromPlan(represented, representedSubnetIds, plan);
   return represented;
 }
 
@@ -227,33 +247,30 @@ function applyTfdCompositionToLayoutSources(
   };
 }
 
-/** Sequential layout (main-thread fallback and single-bundle paths). */
-export async function layoutTerraformFromSources(
-  sources: TerraformPlanParsingSources,
-  options?: TerraformLayoutOptions,
-): Promise<LayoutTerraformResult> {
-  const compositionResult = applyTfdCompositionToLayoutSources(
-    sources,
-    options,
-  );
-  if ("ok" in compositionResult) {
-    return compositionResult;
-  }
-  sources = compositionResult.sources;
+type LayoutPlanResolution =
+  | { ok: false; status: number; error: string }
+  | {
+      ok: true;
+      plan: unknown;
+      adjacency: Record<string, string[]>;
+      importSource: "plan" | "state-only";
+      sourcePlans: unknown[];
+      stackIds: string[];
+      addressToStack: Record<string, string>;
+      importWarnings: TerraformImportWarning[];
+    };
 
-  const layoutMode =
-    options?.layoutMode ??
-    (options?.semanticLayout === true ? "semantic" : "module");
-  const semanticLayout = layoutMode === "semantic";
-  const pipelineLayout = layoutMode === "pipeline";
+function resolveLayoutPlanFromSources(
+  sources: TerraformPlanParsingSources,
+): LayoutPlanResolution {
   const importWarnings: TerraformImportWarning[] = [];
+  const states = sources.states ?? [];
   let plan: unknown;
-  let adjacency: Record<string, string[]>;
+  let adjacency: Record<string, string[]> = {};
   let importSource: "plan" | "state-only" = "plan";
   let sourcePlans: unknown[] = [];
   let stackIds: string[] = [];
   let addressToStack: Record<string, string> = {};
-  const states = sources.states ?? [];
 
   if (sources.planDotBundles.length === 0) {
     if (states.length === 0) {
@@ -304,23 +321,332 @@ export async function layoutTerraformFromSources(
     }
   }
 
-  if (semanticLayout || pipelineLayout) {
-    const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
-    if (
-      !Array.isArray(rc) ||
-      rc.length === 0 ||
-      !hasManagedResourcesForSemantic(
-        plan as { resource_changes?: Array<{ mode?: string; type?: string }> },
-      )
-    ) {
-      return {
-        ok: false,
-        status: 400,
-        error: pipelineLayout
-          ? "Pipeline view requires at least one managed resource in the plan or state file."
-          : "Semantic layout requires at least one managed resource in the plan or state file.",
-      };
+  return {
+    ok: true,
+    plan,
+    adjacency,
+    importSource,
+    sourcePlans,
+    stackIds,
+    addressToStack,
+    importWarnings,
+  };
+}
+
+function validateLayoutPlanForMode(
+  plan: unknown,
+  semanticLayout: boolean,
+  pipelineLayout: boolean,
+): { ok: false; status: number; error: string } | { ok: true } {
+  if (!semanticLayout && !pipelineLayout) {
+    return { ok: true };
+  }
+  const rc = (plan as { resource_changes?: unknown[] }).resource_changes;
+  if (
+    !Array.isArray(rc) ||
+    rc.length === 0 ||
+    !hasManagedResourcesForSemantic(
+      plan as { resource_changes?: Array<{ mode?: string; type?: string }> },
+    )
+  ) {
+    return {
+      ok: false,
+      status: 400,
+      error: pipelineLayout
+        ? "Pipeline view requires at least one managed resource in the plan or state file."
+        : "Semantic layout requires at least one managed resource in the plan or state file.",
+    };
+  }
+  return { ok: true };
+}
+
+type LayoutSceneContext = {
+  sources: TerraformPlanParsingSources;
+  plan: unknown;
+  nodes5: ReturnType<typeof buildTerraformLocalImportNodesMap>;
+  importSource: "plan" | "state-only";
+  importWarnings: TerraformImportWarning[];
+  tfdWarnings: string[];
+  stackIds: string[];
+  addressToStack: Record<string, string>;
+};
+
+async function buildPipelineLayoutSceneBody(
+  ctx: LayoutSceneContext,
+): Promise<Record<string, unknown>> {
+  const pipelineScene = await buildTerraformPipelineExcalidrawScene(
+    ctx.nodes5,
+    ctx.plan,
+  );
+  emitLocalParseDebug({
+    phase: "pipelineLayout",
+    meta: pipelineScene.meta,
+    elementCount: pipelineScene.elements.length,
+  });
+  return {
+    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+    elements: pipelineScene.elements,
+    meta: appendImportMeta(
+      {
+        ...pipelineScene.meta,
+        importSource: ctx.importSource,
+        plannedChanges: ctx.importSource !== "state-only",
+      },
+      ctx.sources,
+      formatImportWarnings(
+        [...ctx.importWarnings, ...pipelineScene.warnings],
+        ctx.tfdWarnings,
+      ),
+      { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
+    ),
+  };
+}
+
+async function buildSemanticLayoutSceneBody(
+  ctx: LayoutSceneContext,
+): Promise<Record<string, unknown>> {
+  type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
+  const semPlan = ctx.plan as SemanticPlan;
+  const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
+  const providerBuckets = partitionResourceChangesByProviderFamily(semPlan);
+
+  const providerBlocks: ProviderTopologyBlock[] = [];
+  let topoMeta: Record<string, unknown> = {
+    layoutEngine: "topology",
+    accountCount: 0,
+    regionCount: 0,
+    vpcCount: 0,
+    subnetCount: 0,
+    primaryResourceCount: 0,
+    regionalPrimaryCount: 0,
+    vpcEndpointCount: 0,
+    routeTableCount: 0,
+    dependencyEdgeCount: 0,
+  };
+  let layoutFiles: Record<string, unknown> | undefined;
+
+  const awsChanges = providerBuckets.get("aws") ?? [];
+  if (awsChanges.length > 0) {
+    const topoModel = extractTerraformTopologyFromPlan(awsPlan);
+    const zones = buildMergedTopologyZones(awsPlan);
+    const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
+    const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
+    const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
+      computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
+    const vpcEndpointBuckets =
+      filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+        vpcEndpointBucketsRaw,
+        zonePlacedAddresses,
+      );
+    const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
+    const { vpcDefaultPlumbingBuckets, natZonePlacements } =
+      buildVpcDefaultPlumbingWithNat(awsPlan, zones);
+    const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
+    const endpointSecurityGroupBuckets =
+      extractInterfaceEndpointSecurityGroupBuckets(
+        awsPlan,
+        vpcEndpointBucketsRaw,
+      );
+    const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
+      zones,
+      awsPlan,
+    );
+    mergeTopologyModelWithPlacementZones(topoModel, zones);
+    mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
+    mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
+    mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
+    mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
+    mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
+    mergeTopologyModelWithRouteTables(topoModel, endpointSecurityGroupBuckets);
+
+    const enrichPreplaced = collectTopologyPreplacedAddresses([
+      ...zones,
+      ...regionalBuckets,
+      ...vpcEndpointBuckets,
+      ...routeTableBuckets,
+      ...vpcDefaultPlumbingBuckets,
+      ...vpcFlowLogBuckets,
+      ...endpointSecurityGroupBuckets,
+    ]);
+    for (const address of natZonePlacements.consumedAddresses) {
+      enrichPreplaced.add(address);
     }
+    for (const address of zonePlacedAddresses) {
+      enrichPreplaced.add(address);
+    }
+    for (const address of collectRouteAddressesFromBottomPlacements(
+      routeTableBottomPlacements,
+    )) {
+      enrichPreplaced.add(address);
+    }
+    enrichAndReconcileTopologyPlacements(
+      {
+        zones,
+        regionalBuckets,
+        vpcDefaultPlumbingBuckets,
+        natZonePlacements,
+      },
+      awsPlan,
+      ctx.nodes5,
+      enrichPreplaced,
+    );
+
+    if (topoModel.accounts.size > 0) {
+      const topoScene = await buildTerraformTopologyExcalidrawScene(
+        topoModel,
+        zones,
+        regionalBuckets,
+        ctx.nodes5,
+        awsPlan,
+        vpcEndpointBuckets,
+        routeTableBottomPlacements,
+        vpcDefaultPlumbingBuckets,
+        vpcFlowLogBuckets,
+        endpointSecurityGroupBuckets,
+        natZonePlacements,
+        interfaceVpcEndpointZonePlacements,
+      );
+      if (topoScene.elements.length > 0) {
+        providerBlocks.push({
+          family: "aws",
+          label: "AWS",
+          elements: topoScene.elements,
+        });
+      }
+      topoMeta = { ...topoScene.meta };
+      if (topoScene.files && Object.keys(topoScene.files).length > 0) {
+        layoutFiles = topoScene.files;
+      }
+    }
+  }
+
+  for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
+    const changes = providerBuckets.get(family)!;
+    const providerScene = await buildProviderFamilyScene(
+      family,
+      getProviderFamilyLabel(family),
+      changes,
+      ctx.nodes5,
+      semPlan,
+    );
+    if (providerScene.elements.length > 0) {
+      providerBlocks.push({
+        family,
+        label: getProviderFamilyLabel(family),
+        elements: providerScene.elements,
+      });
+    }
+  }
+
+  const composedElements = composeMultiProviderTopologyScene(providerBlocks);
+  const represented = collectSemanticRepresentedResourceAddresses(
+    composedElements as Array<{ customData?: Record<string, any> }>,
+    semPlan as {
+      resource_changes?: Array<{ address?: string; type?: string }>;
+    },
+  );
+  const omittedSemanticResources = (semPlan.resource_changes || []).filter(
+    (rc: { address?: string; type?: string }) =>
+      typeof rc.address === "string" &&
+      !represented.has(rc.address) &&
+      SEMANTIC_LAYOUT_OMITTED_TYPES.has(rc.type || ""),
+  );
+  emitLocalParseDebug({
+    phase: "topologyLayout",
+    meta: topoMeta,
+    elementCount: composedElements.length,
+    providerBlockCount: providerBlocks.length,
+  });
+  return {
+    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+    elements: composedElements,
+    ...(layoutFiles ? { files: layoutFiles } : {}),
+    meta: appendImportMeta(
+      {
+        ...topoMeta,
+        importSource: ctx.importSource,
+        plannedChanges: ctx.importSource !== "state-only",
+        representedResourceCount: represented.size,
+        omittedResourceCount: omittedSemanticResources.length,
+        providerBlockCount: providerBlocks.length,
+      },
+      ctx.sources,
+      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings),
+      { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
+    ),
+  };
+}
+
+async function buildModuleLayoutSceneBody(
+  ctx: LayoutSceneContext,
+  moduleLayoutOptions?: TerraformLayoutOptions["moduleLayoutOptions"],
+): Promise<Record<string, unknown>> {
+  const elkScene = await buildTerraformElkExcalidrawScene(
+    ctx.nodes5,
+    ctx.plan,
+    moduleLayoutOptions,
+  );
+  emitLocalParseDebug({
+    phase: "elkLayout",
+    meta: elkScene.meta,
+    elementCount: elkScene.elements.length,
+  });
+  return {
+    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+    elements: elkScene.elements,
+    meta: appendImportMeta(
+      {
+        ...elkScene.meta,
+        importSource: ctx.importSource,
+        plannedChanges: ctx.importSource !== "state-only",
+      },
+      ctx.sources,
+      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings),
+    ),
+  };
+}
+
+/** Sequential layout (main-thread fallback and single-bundle paths). */
+export async function layoutTerraformFromSources(
+  sources: TerraformPlanParsingSources,
+  options?: TerraformLayoutOptions,
+): Promise<LayoutTerraformResult> {
+  const compositionResult = applyTfdCompositionToLayoutSources(
+    sources,
+    options,
+  );
+  if ("ok" in compositionResult) {
+    return compositionResult;
+  }
+  sources = compositionResult.sources;
+
+  const layoutMode =
+    options?.layoutMode ??
+    (options?.semanticLayout === true ? "semantic" : "module");
+  const semanticLayout = layoutMode === "semantic";
+  const pipelineLayout = layoutMode === "pipeline";
+  const planResolution = resolveLayoutPlanFromSources(sources);
+  if (!planResolution.ok) {
+    return planResolution;
+  }
+  const {
+    plan,
+    adjacency,
+    importSource,
+    sourcePlans,
+    stackIds,
+    addressToStack,
+    importWarnings,
+  } = planResolution;
+  const states = sources.states ?? [];
+
+  const layoutValidation = validateLayoutPlanForMode(
+    plan,
+    semanticLayout,
+    pipelineLayout,
+  );
+  if (!layoutValidation.ok) {
+    return layoutValidation;
   }
 
   const graph = graphlibDot.read("digraph G {}\n");
@@ -374,236 +700,25 @@ export async function layoutTerraformFromSources(
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
-  let sceneBody: Record<string, unknown>;
+  const sceneContext: LayoutSceneContext = {
+    sources,
+    plan,
+    nodes5,
+    importSource,
+    importWarnings,
+    tfdWarnings,
+    stackIds,
+    addressToStack,
+  };
 
-  if (pipelineLayout) {
-    const pipelineScene = await buildTerraformPipelineExcalidrawScene(
-      nodes5,
-      plan,
-    );
-    emitLocalParseDebug({
-      phase: "pipelineLayout",
-      meta: pipelineScene.meta,
-      elementCount: pipelineScene.elements.length,
-    });
-    sceneBody = {
-      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-      elements: pipelineScene.elements,
-      meta: appendImportMeta(
-        {
-          ...pipelineScene.meta,
-          importSource,
-          plannedChanges: importSource !== "state-only",
-        },
-        sources,
-        formatImportWarnings(
-          [...importWarnings, ...pipelineScene.warnings],
-          tfdWarnings,
-        ),
-        { stackIds, addressToStack },
-      ),
-    };
-  } else if (semanticLayout) {
-    type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
-    const semPlan = plan as SemanticPlan;
-    const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
-    const providerBuckets = partitionResourceChangesByProviderFamily(semPlan);
-
-    const providerBlocks: ProviderTopologyBlock[] = [];
-    let topoMeta: Record<string, unknown> = {
-      layoutEngine: "topology",
-      accountCount: 0,
-      regionCount: 0,
-      vpcCount: 0,
-      subnetCount: 0,
-      primaryResourceCount: 0,
-      regionalPrimaryCount: 0,
-      vpcEndpointCount: 0,
-      routeTableCount: 0,
-      dependencyEdgeCount: 0,
-    };
-    let layoutFiles: Record<string, unknown> | undefined;
-
-    const awsChanges = providerBuckets.get("aws") ?? [];
-    if (awsChanges.length > 0) {
-      const topoModel = extractTerraformTopologyFromPlan(awsPlan);
-      const zones = buildMergedTopologyZones(awsPlan);
-      const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
-      const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
-      const {
-        byZone: interfaceVpcEndpointZonePlacements,
-        zonePlacedAddresses,
-      } = computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
-      const vpcEndpointBuckets =
-        filterVpcEndpointBucketsRemovingZonePlacedAddresses(
-          vpcEndpointBucketsRaw,
-          zonePlacedAddresses,
-        );
-      const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
-      const { vpcDefaultPlumbingBuckets, natZonePlacements } =
-        buildVpcDefaultPlumbingWithNat(awsPlan, zones);
-      const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
-      const endpointSecurityGroupBuckets =
-        extractInterfaceEndpointSecurityGroupBuckets(
-          awsPlan,
-          vpcEndpointBucketsRaw,
-        );
-      const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
-        zones,
-        awsPlan,
+  const sceneBody = pipelineLayout
+    ? await buildPipelineLayoutSceneBody(sceneContext)
+    : semanticLayout
+    ? await buildSemanticLayoutSceneBody(sceneContext)
+    : await buildModuleLayoutSceneBody(
+        sceneContext,
+        options?.moduleLayoutOptions,
       );
-      mergeTopologyModelWithPlacementZones(topoModel, zones);
-      mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
-      mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
-      mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
-      mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
-      mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
-      mergeTopologyModelWithRouteTables(
-        topoModel,
-        endpointSecurityGroupBuckets,
-      );
-
-      const enrichPreplaced = collectTopologyPreplacedAddresses([
-        ...zones,
-        ...regionalBuckets,
-        ...vpcEndpointBuckets,
-        ...routeTableBuckets,
-        ...vpcDefaultPlumbingBuckets,
-        ...vpcFlowLogBuckets,
-        ...endpointSecurityGroupBuckets,
-      ]);
-      for (const address of natZonePlacements.consumedAddresses) {
-        enrichPreplaced.add(address);
-      }
-      for (const address of zonePlacedAddresses) {
-        enrichPreplaced.add(address);
-      }
-      for (const address of collectRouteAddressesFromBottomPlacements(
-        routeTableBottomPlacements,
-      )) {
-        enrichPreplaced.add(address);
-      }
-      enrichAndReconcileTopologyPlacements(
-        {
-          zones,
-          regionalBuckets,
-          vpcDefaultPlumbingBuckets,
-          natZonePlacements,
-        },
-        awsPlan,
-        nodes5,
-        enrichPreplaced,
-      );
-
-      if (topoModel.accounts.size > 0) {
-        const topoScene = await buildTerraformTopologyExcalidrawScene(
-          topoModel,
-          zones,
-          regionalBuckets,
-          nodes5,
-          awsPlan,
-          vpcEndpointBuckets,
-          routeTableBottomPlacements,
-          vpcDefaultPlumbingBuckets,
-          vpcFlowLogBuckets,
-          endpointSecurityGroupBuckets,
-          natZonePlacements,
-          interfaceVpcEndpointZonePlacements,
-        );
-        if (topoScene.elements.length > 0) {
-          providerBlocks.push({
-            family: "aws",
-            label: "AWS",
-            elements: topoScene.elements,
-          });
-        }
-        topoMeta = { ...topoScene.meta };
-        if (topoScene.files && Object.keys(topoScene.files).length > 0) {
-          layoutFiles = topoScene.files;
-        }
-      }
-    }
-
-    for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
-      const changes = providerBuckets.get(family)!;
-      const providerScene = await buildProviderFamilyScene(
-        family,
-        getProviderFamilyLabel(family),
-        changes,
-        nodes5,
-        semPlan,
-      );
-      if (providerScene.elements.length > 0) {
-        providerBlocks.push({
-          family,
-          label: getProviderFamilyLabel(family),
-          elements: providerScene.elements,
-        });
-      }
-    }
-
-    const composedElements = composeMultiProviderTopologyScene(providerBlocks);
-    const represented = collectSemanticRepresentedResourceAddresses(
-      composedElements as Array<{ customData?: Record<string, any> }>,
-      semPlan as {
-        resource_changes?: Array<{ address?: string; type?: string }>;
-      },
-    );
-    const omittedSemanticResources = (semPlan.resource_changes || []).filter(
-      (rc: { address?: string; type?: string }) =>
-        typeof rc.address === "string" &&
-        !represented.has(rc.address) &&
-        SEMANTIC_LAYOUT_OMITTED_TYPES.has(rc.type || ""),
-    );
-    emitLocalParseDebug({
-      phase: "topologyLayout",
-      meta: topoMeta,
-      elementCount: composedElements.length,
-      providerBlockCount: providerBlocks.length,
-    });
-    sceneBody = {
-      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-      elements: composedElements,
-      ...(layoutFiles ? { files: layoutFiles } : {}),
-      meta: appendImportMeta(
-        {
-          ...topoMeta,
-          importSource,
-          plannedChanges: importSource !== "state-only",
-          representedResourceCount: represented.size,
-          omittedResourceCount: omittedSemanticResources.length,
-          providerBlockCount: providerBlocks.length,
-        },
-        sources,
-        formatImportWarnings(importWarnings, tfdWarnings),
-        { stackIds, addressToStack },
-      ),
-    };
-  } else {
-    const elkScene = await buildTerraformElkExcalidrawScene(
-      nodes5,
-      plan,
-      options?.moduleLayoutOptions,
-    );
-    emitLocalParseDebug({
-      phase: "elkLayout",
-      meta: elkScene.meta,
-      elementCount: elkScene.elements.length,
-    });
-    sceneBody = {
-      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-      elements: elkScene.elements,
-      meta: appendImportMeta(
-        {
-          ...elkScene.meta,
-          importSource,
-          plannedChanges: importSource !== "state-only",
-        },
-        sources,
-        formatImportWarnings(importWarnings, tfdWarnings),
-      ),
-    };
-  }
 
   return { ok: true, scene: sceneBody };
 }

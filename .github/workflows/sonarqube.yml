@@ -1,0 +1,39 @@
+name: SonarQube
+
+on:
+  pull_request:
+  push:
+    branches:
+      - terraform-feature
+      - master
+  workflow_dispatch:
+
+jobs:
+  sonarqube:
+    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test coverage
+        env:
+          TERRAFORM_IMPORT_PRESETS_DB: packages/excalidraw/test-fixtures/terraform-import-presets.db
+        run: yarn test:coverage
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

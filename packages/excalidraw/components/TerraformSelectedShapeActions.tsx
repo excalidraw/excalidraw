@@ -169,6 +169,224 @@ const TerraformUnknownAfterIntentRows = ({
   );
 };
 
+const TerraformUnknownAfterPlaceholder = () => (
+  <div className="terraform-element-actions__value terraform-element-actions__value--config">
+    <em>{formatTerraformPanelValue(UNKNOWN_VALUE_PLACEHOLDER)}</em>
+  </div>
+);
+
+const TerraformAttributeUnknownAfterBody = ({
+  attribute,
+  onFocusTerraformNodePath,
+}: {
+  attribute: TerraformAttribute;
+  onFocusTerraformNodePath?: (nodePath: string) => void;
+}) => {
+  const showBeforeAfterDiff =
+    attribute.changed && attribute.before != null && attribute.before !== "";
+
+  if (showBeforeAfterDiff) {
+    return (
+      <div className="terraform-element-actions__unknown-after">
+        <div className="terraform-element-actions__diff">
+          <div>
+            <span>Before</span>
+            <TerraformConfigValue value={attribute.before} />
+          </div>
+          <div>
+            <span>After apply</span>
+            {hasUnknownAfterIntentRows(attribute.unknownAfterPreview) ? (
+              <TerraformUnknownAfterIntentRows
+                rows={attribute.unknownAfterPreview!}
+                onFocusTerraformNodePath={onFocusTerraformNodePath}
+              />
+            ) : (
+              <TerraformUnknownAfterPlaceholder />
+            )}
+          </div>
+        </div>
+        <TerraformAttributeDependsOn
+          attribute={attribute}
+          onFocusTerraformNodePath={onFocusTerraformNodePath}
+        />
+      </div>
+    );
+  }
+
+  if (hasUnknownAfterIntentRows(attribute.unknownAfterPreview)) {
+    return (
+      <div className="terraform-element-actions__unknown-after">
+        <TerraformUnknownAfterIntentRows
+          rows={attribute.unknownAfterPreview!}
+          onFocusTerraformNodePath={onFocusTerraformNodePath}
+        />
+        <TerraformAttributeDependsOn
+          attribute={attribute}
+          onFocusTerraformNodePath={onFocusTerraformNodePath}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="terraform-element-actions__unknown-after">
+      <TerraformUnknownAfterPlaceholder />
+      <TerraformAttributeDependsOn
+        attribute={attribute}
+        onFocusTerraformNodePath={onFocusTerraformNodePath}
+      />
+    </div>
+  );
+};
+
+const TerraformAttributeDependsOn = ({
+  attribute,
+  onFocusTerraformNodePath,
+}: {
+  attribute: TerraformAttribute;
+  onFocusTerraformNodePath?: (nodePath: string) => void;
+}) => {
+  if (
+    (attribute.unknownAfterPreview?.length ?? 0) > 0 ||
+    (attribute.unknownAfterDependencies?.length ?? 0) === 0
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="terraform-element-actions__depends-on">
+      <div className="terraform-element-actions__label">Depends on</div>
+      <ul className="terraform-element-actions__depends-on-list">
+        {attribute.unknownAfterDependencies!.map((dep) => (
+          <li key={dep.reference}>
+            {dep.nodePath && onFocusTerraformNodePath ? (
+              <button
+                type="button"
+                className="terraform-element-actions__depends-on-link"
+                onClick={() => onFocusTerraformNodePath(dep.nodePath!)}
+              >
+                {formatTerraformPanelValue(dep.reference)}
+              </button>
+            ) : (
+              formatTerraformPanelValue(dep.reference)
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const TerraformAttributeConfigBody = ({
+  attribute,
+  onFocusTerraformNodePath,
+}: {
+  attribute: TerraformAttribute;
+  onFocusTerraformNodePath?: (nodePath: string) => void;
+}) => {
+  if (attribute.unknownAfter) {
+    return (
+      <TerraformAttributeUnknownAfterBody
+        attribute={attribute}
+        onFocusTerraformNodePath={onFocusTerraformNodePath}
+      />
+    );
+  }
+
+  if (attribute.changed) {
+    return (
+      <div className="terraform-element-actions__diff">
+        <div>
+          <span>Before</span>
+          <TerraformConfigValue value={attribute.before} />
+        </div>
+        <div>
+          <span>After</span>
+          <TerraformConfigValue
+            value={
+              typeof attribute.after === "undefined"
+                ? attribute.value
+                : attribute.after
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="terraform-element-actions__value terraform-element-actions__value--config">
+      <TerraformConfigValue value={attribute.value} />
+    </div>
+  );
+};
+
+const TerraformResourceConfigPanel = ({
+  resources,
+  onFocusTerraformNodePath,
+}: {
+  resources: TerraformResourceDetails[];
+  onFocusTerraformNodePath?: (nodePath: string) => void;
+}) => {
+  if (resources.length === 0) {
+    return (
+      <div className="terraform-element-actions__empty">
+        Re-import this Terraform graph to include config and diff data.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {resources.map((resource, resourceIndex) => {
+        const attributes = resource.attributes || [];
+        return (
+          <div
+            className="terraform-element-actions__resource"
+            key={resource.address || resourceIndex}
+          >
+            {resources.length > 1 && (
+              <div className="terraform-element-actions__resource-title">
+                {formatTerraformPanelValue(
+                  resource.address || `Resource ${resourceIndex + 1}`,
+                )}
+              </div>
+            )}
+            {attributes.length > 0 ? (
+              attributes.map((attribute) => (
+                <div
+                  className={clsx("terraform-element-actions__attribute", {
+                    "terraform-element-actions__attribute--changed":
+                      attribute.changed,
+                  })}
+                  key={attribute.key}
+                >
+                  <div className="terraform-element-actions__attribute-head">
+                    <span>{attribute.key}</span>
+                    {attribute.unknownAfter ? (
+                      <strong>after apply</strong>
+                    ) : (
+                      attribute.changed && <strong>changed</strong>
+                    )}
+                  </div>
+                  <TerraformAttributeConfigBody
+                    attribute={attribute}
+                    onFocusTerraformNodePath={onFocusTerraformNodePath}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="terraform-element-actions__empty">
+                No config attributes in this Terraform plan entry.
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const toFacetRows = (facet: TerraformContainerFacet) => {
   const data = facet?.data;
   if (!data || typeof data !== "object") {
@@ -527,163 +745,10 @@ export const TerraformElementActions = ({
       </div>
 
       <div className="terraform-element-actions__config">
-        {resources.length > 0 ? (
-          resources.map((resource, resourceIndex) => {
-            const attributes = resource.attributes || [];
-            return (
-              <div
-                className="terraform-element-actions__resource"
-                key={resource.address || resourceIndex}
-              >
-                {resources.length > 1 && (
-                  <div className="terraform-element-actions__resource-title">
-                    {formatTerraformPanelValue(
-                      resource.address || `Resource ${resourceIndex + 1}`,
-                    )}
-                  </div>
-                )}
-                {attributes.length > 0 ? (
-                  attributes.map((attribute) => (
-                    <div
-                      className={clsx("terraform-element-actions__attribute", {
-                        "terraform-element-actions__attribute--changed":
-                          attribute.changed,
-                      })}
-                      key={attribute.key}
-                    >
-                      <div className="terraform-element-actions__attribute-head">
-                        <span>{attribute.key}</span>
-                        {attribute.unknownAfter ? (
-                          <strong>after apply</strong>
-                        ) : (
-                          attribute.changed && <strong>changed</strong>
-                        )}
-                      </div>
-                      {attribute.unknownAfter ? (
-                        <div className="terraform-element-actions__unknown-after">
-                          {attribute.changed &&
-                          attribute.before != null &&
-                          attribute.before !== "" ? (
-                            <div className="terraform-element-actions__diff">
-                              <div>
-                                <span>Before</span>
-                                <TerraformConfigValue
-                                  value={attribute.before}
-                                />
-                              </div>
-                              <div>
-                                <span>After apply</span>
-                                {hasUnknownAfterIntentRows(
-                                  attribute.unknownAfterPreview,
-                                ) ? (
-                                  <TerraformUnknownAfterIntentRows
-                                    rows={attribute.unknownAfterPreview!}
-                                    onFocusTerraformNodePath={
-                                      onFocusTerraformNodePath
-                                    }
-                                  />
-                                ) : (
-                                  <div className="terraform-element-actions__value terraform-element-actions__value--config">
-                                    <em>
-                                      {formatTerraformPanelValue(
-                                        UNKNOWN_VALUE_PLACEHOLDER,
-                                      )}
-                                    </em>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ) : hasUnknownAfterIntentRows(
-                              attribute.unknownAfterPreview,
-                            ) ? (
-                            <TerraformUnknownAfterIntentRows
-                              rows={attribute.unknownAfterPreview!}
-                              onFocusTerraformNodePath={
-                                onFocusTerraformNodePath
-                              }
-                            />
-                          ) : (
-                            <div className="terraform-element-actions__value terraform-element-actions__value--config">
-                              <em>
-                                {formatTerraformPanelValue(
-                                  UNKNOWN_VALUE_PLACEHOLDER,
-                                )}
-                              </em>
-                            </div>
-                          )}
-                          {(attribute.unknownAfterPreview?.length ?? 0) === 0 &&
-                          (attribute.unknownAfterDependencies?.length ?? 0) >
-                            0 ? (
-                            <div className="terraform-element-actions__depends-on">
-                              <div className="terraform-element-actions__label">
-                                Depends on
-                              </div>
-                              <ul className="terraform-element-actions__depends-on-list">
-                                {attribute.unknownAfterDependencies!.map(
-                                  (dep) => (
-                                    <li key={dep.reference}>
-                                      {dep.nodePath &&
-                                      onFocusTerraformNodePath ? (
-                                        <button
-                                          type="button"
-                                          className="terraform-element-actions__depends-on-link"
-                                          onClick={() =>
-                                            onFocusTerraformNodePath(
-                                              dep.nodePath!,
-                                            )
-                                          }
-                                        >
-                                          {formatTerraformPanelValue(
-                                            dep.reference,
-                                          )}
-                                        </button>
-                                      ) : (
-                                        formatTerraformPanelValue(dep.reference)
-                                      )}
-                                    </li>
-                                  ),
-                                )}
-                              </ul>
-                            </div>
-                          ) : null}
-                        </div>
-                      ) : attribute.changed ? (
-                        <div className="terraform-element-actions__diff">
-                          <div>
-                            <span>Before</span>
-                            <TerraformConfigValue value={attribute.before} />
-                          </div>
-                          <div>
-                            <span>After</span>
-                            <TerraformConfigValue
-                              value={
-                                typeof attribute.after === "undefined"
-                                  ? attribute.value
-                                  : attribute.after
-                              }
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
-                          <TerraformConfigValue value={attribute.value} />
-                        </div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="terraform-element-actions__empty">
-                    No config attributes in this Terraform plan entry.
-                  </div>
-                )}
-              </div>
-            );
-          })
-        ) : (
-          <div className="terraform-element-actions__empty">
-            Re-import this Terraform graph to include config and diff data.
-          </div>
-        )}
+        <TerraformResourceConfigPanel
+          resources={resources}
+          onFocusTerraformNodePath={onFocusTerraformNodePath}
+        />
       </div>
 
       {resources[0]?.address && (

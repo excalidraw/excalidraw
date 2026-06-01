@@ -111,6 +111,52 @@
       "rules": {
         "max-lines": "off"
       }
+    },
+    {
+      "files": [
+        "packages/excalidraw/components/terraformLayoutCore.ts",
+        "packages/excalidraw/components/terraformSceneApply.ts",
+        "packages/excalidraw/components/terraformImportMerge.ts",
+        "packages/excalidraw/components/terraformImportDialogUtils.ts",
+        "packages/excalidraw/components/terraformElementActionsSelection.ts",
+        "packages/excalidraw/components/useTerraformImportDialog.ts",
+        "packages/excalidraw/components/useTerraformRelationshipFocusEffect.ts",
+        "packages/excalidraw/components/TerraformSelectedShapeActions.tsx"
+      ],
+      "plugins": ["sonarjs", "@typescript-eslint"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfigRootDir": "."
+      },
+      "rules": {
+        "sonarjs/cognitive-complexity": ["error", 25],
+        "sonarjs/no-duplicate-string": ["warn", { "threshold": 5 }],
+        "sonarjs/no-identical-functions": "warn",
+        "sonarjs/no-all-duplicated-branches": "warn",
+        "sonarjs/no-collapsible-if": "warn",
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-misused-promises": "error",
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+        "@typescript-eslint/restrict-template-expressions": "warn"
+      }
+    },
+    {
+      "files": ["packages/excalidraw/components/terraformDataFlowEdges.ts"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfigRootDir": "."
+      },
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-misused-promises": "error",
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+        "@typescript-eslint/restrict-template-expressions": "warn"
+      }
     }
   ]
 }

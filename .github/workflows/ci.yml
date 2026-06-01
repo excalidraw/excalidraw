@@ -44,6 +44,13 @@ jobs:
       - name: Typecheck
         run: yarn test:typecheck
 
+      - name: Architecture lint (dependency-cruiser)
+        run: yarn lint:arch
+
+      - name: Oxlint (report-only)
+        run: yarn lint:oxlint
+        continue-on-error: true
+
       - name: Knip
         run: yarn knip
 

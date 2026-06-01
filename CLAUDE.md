@@ -45,7 +45,12 @@ yarn test:update      # Run all tests (with snapshot updates)
 yarn fix              # Auto-fix formatting and linting issues
 yarn build:packages   # Build all packages with esbuild
 yarn build:app        # Build excalidraw-app with Vite
+yarn lint:arch        # Terraform import boundaries (dependency-cruiser)
+yarn lint:oxlint      # Fast oxlint pass on terraform UI (report-only)
+yarn health           # fix + typecheck + eslint + arch + knip + depcheck
 ```
+
+See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLint scopes, Oxlint rollout, and SonarQube Community Build setup.
 
 ## Architecture Notes
 
