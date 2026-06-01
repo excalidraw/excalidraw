@@ -68,7 +68,8 @@ const PROTRACTOR_SQUARE_SIZE = 250;
 
 // Minimum score (0–1) required to commit to a shape; below that we assume
 // freedraw.
-const PROTRACTOR_SCORE_THRESHOLD = 0.75;
+const PROTRACTOR_SCORE_THRESHOLD = 0.95;
+const PROTRACTOR_LINEAR_SCORE_THRESHOLD = 0.98;
 
 type Vec = Float64Array; // interleaved [x0, y0, x1, y1, …] of length 2*N
 
@@ -576,7 +577,9 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
 ): ShapeRecognitionResult<P> => {
   const boundingBox = getElementBoundsFromPoints(points);
 
-  if (!points || points.length < 3) {
+  const [minX, minY, maxX, maxY] = boundingBox;
+  const area = (maxX - minX) * (maxY - minY);
+  if (!points || points.length < 3 || area < 50 * 50) {
     return { type: "freedraw", points, boundingBox };
   }
 
@@ -609,7 +612,12 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   }
 
   let type: Shape;
-  if (bestScore >= PROTRACTOR_SCORE_THRESHOLD) {
+  if (
+    bestScore >= PROTRACTOR_LINEAR_SCORE_THRESHOLD ||
+    (bestType !== "arrow" &&
+      bestType !== "line" &&
+      bestScore >= PROTRACTOR_SCORE_THRESHOLD)
+  ) {
     type = bestType;
   } else {
     type = "freedraw";
