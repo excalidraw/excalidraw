@@ -20,6 +20,15 @@ export function hasTerraformBackendFile(fileName: string): boolean {
   );
 }
 
+/** Legacy monolithic fixtures (gitignored); present locally after hydrate, absent in CI. */
+export const HAS_ALLPLANMODULES_FIXTURES = hasTerraformBackendFile(
+  "allplanmodules.json",
+);
+export const HAS_DELPLAN_FIXTURES = hasTerraformBackendFile("delplan.json");
+export const HAS_AWS_CLOUDFLARE_MULTI_IMPORT_FIXTURES =
+  HAS_ALLPLANMODULES_FIXTURES &&
+  hasTerraformBackendFile("cloudflare/cloudflare-plan.json");
+
 export function loadAwsCloudflareMultiImportFixture() {
   return {
     awsPlan: JSON.parse(readTerraformBackendFile("allplanmodules.json")),

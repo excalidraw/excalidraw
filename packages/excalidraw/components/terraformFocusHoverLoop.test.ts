@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { readTerraformBackendFile } from "../test-fixtures/terraformPresetFixtures";
+import {
+  HAS_ALLPLANMODULES_FIXTURES,
+  readTerraformBackendFile,
+} from "../test-fixtures/terraformPresetFixtures";
 
 import { restoreElements } from "../data/restore";
 
@@ -121,200 +124,76 @@ const runLayerUiTerraformPass = (
   return { next, replaced: true, didChange: result.didChange };
 };
 
-describe("terraform focus hover loop (LayerUI effect simulation)", () => {
-  it("stabilizes when hovering one semantic resource with default pins", async () => {
-    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-    const dot = readTerraformBackendFile("allplanmodules.dot");
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: [{ plan, dotText: dot }],
-        states: [],
-        tfdTexts: [],
-      },
-      { semanticLayout: true },
-    );
-    const body = await res.json();
-    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-      repairBindings: true,
-    });
-    const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
-    const resource = elements.find(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        !e.isDeleted &&
-        typeof e.customData?.nodePath === "string",
-    );
-    expect(resource).toBeTruthy();
-    const hoveredElementIds = { [resource!.id]: true as const };
-
-    for (let i = 0; i < 12; i++) {
-      const { next, replaced } = runLayerUiTerraformPass(
-        elements,
-        hoveredElementIds,
-        pins,
-        "#ffffff",
+describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
+  "terraform focus hover loop (LayerUI effect simulation)",
+  () => {
+    it("stabilizes when hovering one semantic resource with default pins", async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [],
+          tfdTexts: [],
+        },
+        { semanticLayout: true },
       );
-      if (!replaced) {
-        expect(i).toBeLessThan(6);
-        return;
-      }
-      elements = next;
-    }
-    throw new Error("did not stabilize while hovering one resource");
-  });
-
-  it("is idempotent on consecutive passes with the same hover target", async () => {
-    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-    const dot = readTerraformBackendFile("allplanmodules.dot");
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: [{ plan, dotText: dot }],
-        states: [],
-        tfdTexts: [],
-      },
-      { semanticLayout: true },
-    );
-    const body = await res.json();
-    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-      repairBindings: true,
-    });
-    const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
-    const resource = elements.find(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        !e.isDeleted &&
-        typeof e.customData?.nodePath === "string",
-    )!;
-    const hoveredElementIds = { [resource.id]: true as const };
-
-    // settle
-    for (let i = 0; i < 8; i++) {
-      const pass = runLayerUiTerraformPass(
-        elements,
-        hoveredElementIds,
-        pins,
-        "#ffffff",
+      const body = await res.json();
+      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+        repairBindings: true,
+      });
+      const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
+      const resource = elements.find(
+        (e) =>
+          e.customData?.terraformVisibilityRole === "resource" &&
+          !e.isDeleted &&
+          typeof e.customData?.nodePath === "string",
       );
-      if (!pass.replaced) {
-        break;
-      }
-      elements = pass.next;
-    }
+      expect(resource).toBeTruthy();
+      const hoveredElementIds = { [resource!.id]: true as const };
 
-    const pass1 = runLayerUiTerraformPass(
-      elements,
-      hoveredElementIds,
-      pins,
-      "#ffffff",
-    );
-    const pass2 = runLayerUiTerraformPass(
-      pass1.next,
-      hoveredElementIds,
-      pins,
-      "#ffffff",
-    );
-    expect(pass2.replaced).toBe(false);
-    expect(pass2.didChange).toBe(false);
-  });
-
-  it("each hover switch updates scene but same target is idempotent", async () => {
-    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-    const dot = readTerraformBackendFile("allplanmodules.dot");
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: [{ plan, dotText: dot }],
-        states: [],
-        tfdTexts: [],
-      },
-      { semanticLayout: true },
-    );
-    const body = await res.json();
-    const elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-      repairBindings: true,
-    });
-    const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
-    const resources = elements.filter(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        !e.isDeleted &&
-        typeof e.customData?.nodePath === "string",
-    );
-    expect(resources.length).toBeGreaterThan(1);
-    const a = resources[0];
-    const b = resources[1];
-
-    const settle = (
-      els: ExcalidrawElement[],
-      hoveredElementIds: Readonly<{ [id: string]: true }>,
-    ) => {
-      let current = els;
-      for (let i = 0; i < 8; i++) {
-        const pass = runLayerUiTerraformPass(
-          current,
+      for (let i = 0; i < 12; i++) {
+        const { next, replaced } = runLayerUiTerraformPass(
+          elements,
           hoveredElementIds,
           pins,
           "#ffffff",
         );
-        if (!pass.replaced) {
-          return pass.next;
+        if (!replaced) {
+          expect(i).toBeLessThan(6);
+          return;
         }
-        current = pass.next;
+        elements = next;
       }
-      return current;
-    };
-
-    const onA = settle(elements, { [a.id]: true as const });
-    const onAAgain = runLayerUiTerraformPass(
-      onA,
-      { [a.id]: true as const },
-      pins,
-      "#ffffff",
-    );
-    expect(onAAgain.replaced).toBe(false);
-
-    const onB = settle(onA, { [b.id]: true as const });
-    const onBAgain = runLayerUiTerraformPass(
-      onB,
-      { [b.id]: true as const },
-      pins,
-      "#ffffff",
-    );
-    expect(onBAgain.replaced).toBe(false);
-  });
-
-  it("does not loop when focus toggles null between hovers (gap flicker)", async () => {
-    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-    const dot = readTerraformBackendFile("allplanmodules.dot");
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: [{ plan, dotText: dot }],
-        states: [],
-        tfdTexts: [],
-      },
-      { semanticLayout: true },
-    );
-    const body = await res.json();
-    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-      repairBindings: true,
+      throw new Error("did not stabilize while hovering one resource");
     });
-    const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
-    const resource = elements.find(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        !e.isDeleted &&
-        typeof e.customData?.nodePath === "string",
-    )!;
-    const hovered = { [resource.id]: true as const };
-    const sequence: Array<Readonly<{ [id: string]: true }>> = [
-      hovered,
-      {},
-      hovered,
-      {},
-      hovered,
-    ];
-    let replaceTotal = 0;
-    for (const hoveredElementIds of sequence) {
-      for (let i = 0; i < 6; i++) {
+
+    it("is idempotent on consecutive passes with the same hover target", async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [],
+          tfdTexts: [],
+        },
+        { semanticLayout: true },
+      );
+      const body = await res.json();
+      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+        repairBindings: true,
+      });
+      const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
+      const resource = elements.find(
+        (e) =>
+          e.customData?.terraformVisibilityRole === "resource" &&
+          !e.isDeleted &&
+          typeof e.customData?.nodePath === "string",
+      )!;
+      const hoveredElementIds = { [resource.id]: true as const };
+
+      // settle
+      for (let i = 0; i < 8; i++) {
         const pass = runLayerUiTerraformPass(
           elements,
           hoveredElementIds,
@@ -324,56 +203,187 @@ describe("terraform focus hover loop (LayerUI effect simulation)", () => {
         if (!pass.replaced) {
           break;
         }
-        replaceTotal += 1;
         elements = pass.next;
       }
-    }
-    expect(replaceTotal).toBeLessThan(20);
-  });
 
-  it("does not replace across 50 consecutive passes after settle (appState churn)", async () => {
-    const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-    const dot = readTerraformBackendFile("allplanmodules.dot");
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: [{ plan, dotText: dot }],
-        states: [],
-        tfdTexts: [],
-      },
-      { semanticLayout: true },
-    );
-    const body = await res.json();
-    let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-      repairBindings: true,
+      const pass1 = runLayerUiTerraformPass(
+        elements,
+        hoveredElementIds,
+        pins,
+        "#ffffff",
+      );
+      const pass2 = runLayerUiTerraformPass(
+        pass1.next,
+        hoveredElementIds,
+        pins,
+        "#ffffff",
+      );
+      expect(pass2.replaced).toBe(false);
+      expect(pass2.didChange).toBe(false);
     });
-    const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
-    const resource = elements.find(
-      (e) =>
-        e.customData?.terraformVisibilityRole === "resource" &&
-        !e.isDeleted &&
-        typeof e.customData?.nodePath === "string",
-    )!;
-    const hoveredElementIds = { [resource.id]: true as const };
-    for (let i = 0; i < 8; i++) {
-      const pass = runLayerUiTerraformPass(
-        elements,
-        hoveredElementIds,
+
+    it("each hover switch updates scene but same target is idempotent", async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [],
+          tfdTexts: [],
+        },
+        { semanticLayout: true },
+      );
+      const body = await res.json();
+      const elements: ExcalidrawElement[] = restoreElements(
+        body.elements,
+        null,
+        {
+          repairBindings: true,
+        },
+      );
+      const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
+      const resources = elements.filter(
+        (e) =>
+          e.customData?.terraformVisibilityRole === "resource" &&
+          !e.isDeleted &&
+          typeof e.customData?.nodePath === "string",
+      );
+      expect(resources.length).toBeGreaterThan(1);
+      const a = resources[0];
+      const b = resources[1];
+
+      const settle = (
+        els: ExcalidrawElement[],
+        hoveredElementIds: Readonly<{ [id: string]: true }>,
+      ) => {
+        let current = els;
+        for (let i = 0; i < 8; i++) {
+          const pass = runLayerUiTerraformPass(
+            current,
+            hoveredElementIds,
+            pins,
+            "#ffffff",
+          );
+          if (!pass.replaced) {
+            return pass.next;
+          }
+          current = pass.next;
+        }
+        return current;
+      };
+
+      const onA = settle(elements, { [a.id]: true as const });
+      const onAAgain = runLayerUiTerraformPass(
+        onA,
+        { [a.id]: true as const },
         pins,
         "#ffffff",
       );
-      if (!pass.replaced) {
-        break;
+      expect(onAAgain.replaced).toBe(false);
+
+      const onB = settle(onA, { [b.id]: true as const });
+      const onBAgain = runLayerUiTerraformPass(
+        onB,
+        { [b.id]: true as const },
+        pins,
+        "#ffffff",
+      );
+      expect(onBAgain.replaced).toBe(false);
+    });
+
+    it("does not loop when focus toggles null between hovers (gap flicker)", async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [],
+          tfdTexts: [],
+        },
+        { semanticLayout: true },
+      );
+      const body = await res.json();
+      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+        repairBindings: true,
+      });
+      const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
+      const resource = elements.find(
+        (e) =>
+          e.customData?.terraformVisibilityRole === "resource" &&
+          !e.isDeleted &&
+          typeof e.customData?.nodePath === "string",
+      )!;
+      const hovered = { [resource.id]: true as const };
+      const sequence: Array<Readonly<{ [id: string]: true }>> = [
+        hovered,
+        {},
+        hovered,
+        {},
+        hovered,
+      ];
+      let replaceTotal = 0;
+      for (const hoveredElementIds of sequence) {
+        for (let i = 0; i < 6; i++) {
+          const pass = runLayerUiTerraformPass(
+            elements,
+            hoveredElementIds,
+            pins,
+            "#ffffff",
+          );
+          if (!pass.replaced) {
+            break;
+          }
+          replaceTotal += 1;
+          elements = pass.next;
+        }
       }
-      elements = pass.next;
-    }
-    for (let i = 0; i < 50; i++) {
-      const pass = runLayerUiTerraformPass(
-        elements,
-        hoveredElementIds,
-        pins,
-        "#ffffff",
+      expect(replaceTotal).toBeLessThan(20);
+    });
+
+    it("does not replace across 50 consecutive passes after settle (appState churn)", async () => {
+      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
+      const dot = readTerraformBackendFile("allplanmodules.dot");
+      const res = await terraformPlanParsingFromSources(
+        {
+          planDotBundles: [{ plan, dotText: dot }],
+          states: [],
+          tfdTexts: [],
+        },
+        { semanticLayout: true },
       );
-      expect(pass.replaced).toBe(false);
-    }
-  });
-});
+      const body = await res.json();
+      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
+        repairBindings: true,
+      });
+      const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
+      const resource = elements.find(
+        (e) =>
+          e.customData?.terraformVisibilityRole === "resource" &&
+          !e.isDeleted &&
+          typeof e.customData?.nodePath === "string",
+      )!;
+      const hoveredElementIds = { [resource.id]: true as const };
+      for (let i = 0; i < 8; i++) {
+        const pass = runLayerUiTerraformPass(
+          elements,
+          hoveredElementIds,
+          pins,
+          "#ffffff",
+        );
+        if (!pass.replaced) {
+          break;
+        }
+        elements = pass.next;
+      }
+      for (let i = 0; i < 50; i++) {
+        const pass = runLayerUiTerraformPass(
+          elements,
+          hoveredElementIds,
+          pins,
+          "#ffffff",
+        );
+        expect(pass.replaced).toBe(false);
+      }
+    });
+  },
+);

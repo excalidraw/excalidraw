@@ -954,11 +954,18 @@ export function getTerraformImportPresetFromDb(presetId, options = {}) {
 }
 
 export function getTerraformImportPresetSourcesFromDb(presetId) {
-  const db = getTerraformImportPresetDb();
-  const preset = getTerraformImportPresetFromDb(presetId);
-  if (!preset) {
+  const db = getTerraformImportPresetTestDb();
+  const row = db
+    .prepare(
+      `SELECT id, name, description, builtin, view, root_path
+       FROM terraform_import_presets
+       WHERE id = ?`,
+    )
+    .get(presetId);
+  if (!row) {
     return null;
   }
+  const preset = rowToPreset(db, row, { includeContent: true });
 
   if (!preset.hasContent) {
     throw new Error(
@@ -1178,7 +1185,8 @@ export function readTerraformImportRepoFileText(repoRelativePath) {
 
   const stackRows = db
     .prepare(
-      `SELECT p.root_path AS rootPath, s.plan_path AS planPath, s.dot_path AS dotPath,
+      `SELECT p.id AS presetId, p.root_path AS rootPath, s.stack_id AS stackId,
+              s.plan_path AS planPath, s.dot_path AS dotPath,
               s.state_path AS statePath, s.plan_text AS planText, s.dot_text AS dotText,
               s.state_text AS stateText
        FROM terraform_import_preset_stacks s
@@ -1193,13 +1201,29 @@ export function readTerraformImportRepoFileText(repoRelativePath) {
       if (!row.planText) {
         break;
       }
-      return row.planText;
+      return (
+        loadPresetBlobTextSqlite(
+          db,
+          row.presetId,
+          "plan",
+          row.stackId,
+          row.planText,
+        ) ?? row.planText
+      );
     }
     if (dotRepoPath === normalized) {
       if (!row.dotText) {
         break;
       }
-      return row.dotText;
+      return (
+        loadPresetBlobTextSqlite(
+          db,
+          row.presetId,
+          "dot",
+          row.stackId,
+          row.dotText,
+        ) ?? row.dotText
+      );
     }
     if (row.statePath) {
       const stateRepoPath = repoPathFromPresetParts(
@@ -1210,14 +1234,22 @@ export function readTerraformImportRepoFileText(repoRelativePath) {
         if (!row.stateText) {
           break;
         }
-        return row.stateText;
+        return (
+          loadPresetBlobTextSqlite(
+            db,
+            row.presetId,
+            "state",
+            row.stackId,
+            row.stateText,
+          ) ?? row.stateText
+        );
       }
     }
   }
 
   const tfdRows = db
     .prepare(
-      `SELECT p.root_path AS rootPath, t.path AS path, t.content AS content
+      `SELECT p.id AS presetId, p.root_path AS rootPath, t.path AS path, t.content AS content
        FROM terraform_import_preset_tfd t
        JOIN terraform_import_presets p ON p.id = t.preset_id`,
     )
@@ -1229,7 +1261,15 @@ export function readTerraformImportRepoFileText(repoRelativePath) {
       if (!row.content) {
         break;
       }
-      return row.content;
+      return (
+        loadPresetBlobTextSqlite(
+          db,
+          row.presetId,
+          "tfd",
+          row.path,
+          row.content,
+        ) ?? row.content
+      );
     }
   }
 
@@ -1254,15 +1294,30 @@ export function loadStagingMultiStatePlanDotBundlesFromDb() {
     )
     .all();
 
+  const presetId = "staging-multi-state-expanded";
   return rows.map((row) => {
-    if (!row.planText || !row.dotText) {
+    const planText = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "plan",
+      row.id,
+      row.planText,
+    );
+    const dotText = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "dot",
+      row.id,
+      row.dotText,
+    );
+    if (!planText || !dotText) {
       throw new Error(
         `staging-multi-state-expanded stack "${row.id}" is missing plan or dot content in the preset DB.`,
       );
     }
     return {
-      plan: JSON.parse(row.planText),
-      dotText: row.dotText,
+      plan: JSON.parse(planText),
+      dotText,
       label: row.label || row.id,
     };
   });
