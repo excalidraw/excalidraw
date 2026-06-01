@@ -106,6 +106,16 @@ describe("_terraformPresets", () => {
     const sources = await getTerraformImportPresetSourcesFromD1(db, "demo");
     expect(sources?.planDotBundles).toHaveLength(1);
     expect(sources?.tfdTexts).toEqual(["a -> b"]);
+    expect(sources?.stackCatalog).toEqual([
+      {
+        stackId: "main",
+        label: "Main",
+        planPath: "plan.json",
+        dotPath: "graph.dot",
+      },
+    ]);
+    expect(sources?.stackCatalog?.[0]).not.toHaveProperty("planText");
+    expect(sources?.repoName).toBe("terraform");
   });
 
   it("returns null for missing preset", async () => {

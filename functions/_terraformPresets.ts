@@ -204,19 +204,19 @@ export async function getTerraformImportPresetSourcesFromD1(
       .split("/")
       .filter(Boolean)
       .pop() ?? "terraform";
-  const stackCatalog = (stackRows.results ?? []).map((stack) => ({
+
+  const warnings: TerraformImportPresetWarning[] = [];
+  const planDotBundles: TerraformImportPresetSources["planDotBundles"] = [];
+  /** Paths only — blob text stays in D1 chunks; clients use `planDotBundles`. */
+  const stackCatalog: NonNullable<
+    TerraformImportPresetSources["stackCatalog"]
+  > = (stackRows.results ?? []).map((stack) => ({
     stackId: stack.stack_id,
     label: stack.label,
     planPath: stack.plan_path,
     dotPath: stack.dot_path,
     ...(stack.state_path ? { statePath: stack.state_path } : {}),
-    ...(stack.plan_text ? { planText: stack.plan_text } : {}),
-    ...(stack.dot_text ? { dotText: stack.dot_text } : {}),
-    ...(stack.state_text ? { stateText: stack.state_text } : {}),
   }));
-
-  const warnings: TerraformImportPresetWarning[] = [];
-  const planDotBundles: TerraformImportPresetSources["planDotBundles"] = [];
 
   for (const stack of stackRows.results ?? []) {
     const planText = await loadPresetBlobText(
@@ -233,6 +233,7 @@ export async function getTerraformImportPresetSourcesFromD1(
       stack.stack_id,
       stack.dot_text,
     );
+
     if (!planText || !dotText) {
       throw new Error(
         `Preset "${presetId}" is missing stored plan or graph for stack "${stack.stack_id}".`,
@@ -256,6 +257,9 @@ export async function getTerraformImportPresetSourcesFromD1(
   const states: unknown[] = [];
   const stateLabels: string[] = [];
   for (const stack of stackRows.results ?? []) {
+    if (!stack.state_path) {
+      continue;
+    }
     const stateText = await loadPresetBlobText(
       db,
       presetId,

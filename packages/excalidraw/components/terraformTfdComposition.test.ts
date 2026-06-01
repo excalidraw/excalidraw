@@ -150,6 +150,51 @@ describe("terraformTfdComposition", () => {
     expect(result.sources.stateLabels).toEqual(["stack-b"]);
   });
 
+  it("falls back to API planDotBundles when stackCatalog is paths-only (D1 API)", () => {
+    const fallback = makeFallbackSources();
+    const pathsOnlyCatalog = fallback.stackCatalog!.map(
+      ({ stackId, label, planPath, dotPath, statePath }) => ({
+        stackId,
+        label,
+        planPath,
+        dotPath,
+        ...(statePath ? { statePath } : {}),
+      }),
+    );
+    const result = applyTfdCompositionToSources(fallback, [sampleTfdWithUse], {
+      repoName: "demo",
+      stackCatalog: pathsOnlyCatalog,
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual(
+      ["stack-a", "stack-b"],
+    );
+    expect(result.sources.states).toHaveLength(1);
+    expect(result.sources.stateLabels).toEqual(["stack-b"]);
+  });
+
+  it("falls back to API planDotBundles when stackCatalog has D1 compressed blobs", () => {
+    const fallback = makeFallbackSources();
+    const compressedCatalog = fallback.stackCatalog!.map((entry) => ({
+      ...entry,
+      planText: entry.planText ? `gz:b64:chunks:3` : undefined,
+      dotText: entry.dotText ? `gz:b64:chunks:1` : undefined,
+      stateText: entry.stateText ? `gz:b64:chunks:2` : undefined,
+    }));
+    const result = applyTfdCompositionToSources(fallback, [sampleTfdWithUse], {
+      repoName: "demo",
+      stackCatalog: compressedCatalog,
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.sources.planDotBundles.map((bundle) => bundle.label)).toEqual(
+      ["stack-a", "stack-b"],
+    );
+    expect(result.sources.states).toHaveLength(1);
+    expect(result.sources.stateLabels).toEqual(["stack-b"]);
+  });
+
   it("falls back to bind inference when use blocks are absent", () => {
     const fallback = makeFallbackSources();
     const result = applyTfdCompositionToSources(fallback, [sampleTfdV2], {

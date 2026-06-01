@@ -51,6 +51,13 @@ if (presetCount < 1 || withContent < 1) {
   process.exit(1);
 }
 
+// verifyTerraformImportPresetTestDb opens the DB writable and re-syncs stack text
+// into terraform_import_artifacts (duplicate of preset_stacks + blob_chunks).
+// D1 cannot ingest those multi-MB INSERTs; preset import uses stacks/chunks only.
+const dbPrep = new Database(sourcePath);
+dbPrep.prepare(`DELETE FROM terraform_import_artifacts`).run();
+dbPrep.close();
+
 const db = new Database(sourcePath, { readonly: true });
 
 const presets = db
@@ -75,15 +82,6 @@ const tfdRows = db
     `SELECT preset_id, sort_order, path, content
      FROM terraform_import_preset_tfd
      ORDER BY preset_id ASC, sort_order ASC`,
-  )
-  .all();
-
-const artifacts = db
-  .prepare(
-    `SELECT repo_name, relative_path, kind, stack_id, label, content, content_hash,
-            created_at, updated_at
-     FROM terraform_import_artifacts
-     ORDER BY repo_name ASC, relative_path ASC`,
   )
   .all();
 
@@ -171,32 +169,7 @@ writeInsert(
   ]),
 );
 
-writeInsert(
-  lines,
-  "terraform_import_artifacts",
-  [
-    "repo_name",
-    "relative_path",
-    "kind",
-    "stack_id",
-    "label",
-    "content",
-    "content_hash",
-    "created_at",
-    "updated_at",
-  ],
-  artifacts.map((row) => [
-    row.repo_name,
-    row.relative_path,
-    row.kind,
-    row.stack_id,
-    row.label,
-    row.content,
-    row.content_hash,
-    row.created_at,
-    row.updated_at,
-  ]),
-);
+// Artifacts omitted from D1 export (see DELETE above).
 
 writeInsert(
   lines,

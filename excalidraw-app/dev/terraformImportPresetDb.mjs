@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 
+import { loadPresetBlobTextSqlite } from "./loadPresetBlobTextSqlite.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
 const DEFAULT_DB_PATH = path.join(REPO_ROOT, "terraform-import-presets.db");
@@ -126,6 +128,16 @@ function ensureSchema(db) {
       tfd_content TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS terraform_import_preset_blob_chunks (
+      preset_id TEXT NOT NULL,
+      blob_kind TEXT NOT NULL,
+      blob_key TEXT NOT NULL,
+      chunk_index INTEGER NOT NULL,
+      data TEXT NOT NULL,
+      PRIMARY KEY (preset_id, blob_kind, blob_key, chunk_index),
+      FOREIGN KEY (preset_id) REFERENCES terraform_import_presets(id) ON DELETE CASCADE
     );
   `);
 
@@ -966,35 +978,47 @@ export function getTerraformImportPresetSourcesFromDb(presetId) {
     .all(presetId);
 
   const repoName = repoNameFromRootPath(preset.rootPath);
+  /** Paths only — blob bodies live in stacks/chunks; clients use `planDotBundles`. */
   const stackCatalog = stackRows.map((stack) => ({
     stackId: stack.id,
     label: stack.label,
     planPath: stack.planPath,
     dotPath: stack.dotPath,
     ...(stack.statePath ? { statePath: stack.statePath } : {}),
-    planText: stack.planText,
-    dotText: stack.dotText,
-    ...(stack.stateText ? { stateText: stack.stateText } : {}),
   }));
 
   const warnings = [];
   const planDotBundles = [];
 
   for (const stack of stackRows) {
-    if (!stack.planText || !stack.dotText) {
+    const planText = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "plan",
+      stack.id,
+      stack.planText,
+    );
+    const dotText = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "dot",
+      stack.id,
+      stack.dotText,
+    );
+    if (!planText || !dotText) {
       throw new Error(
         `Preset "${presetId}" is missing stored plan or graph for stack "${stack.id}".`,
       );
     }
     let parsedPlan;
     try {
-      parsedPlan = JSON.parse(stack.planText);
+      parsedPlan = JSON.parse(planText);
     } catch {
       throw new Error(`Stored plan JSON is invalid for stack "${stack.id}".`);
     }
     planDotBundles.push({
       plan: parsedPlan,
-      dotText: stack.dotText,
+      dotText,
       label: stack.label,
     });
   }
@@ -1002,7 +1026,17 @@ export function getTerraformImportPresetSourcesFromDb(presetId) {
   const states = [];
   const stateLabels = [];
   for (const stack of stackRows) {
-    if (!stack.stateText) {
+    if (!stack.statePath) {
+      continue;
+    }
+    const stateText = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "state",
+      stack.id,
+      stack.stateText,
+    );
+    if (!stateText) {
       warnings.push({
         code: "missing_state_file",
         message: `Optional state file missing for stack "${stack.id}".`,
@@ -1011,7 +1045,7 @@ export function getTerraformImportPresetSourcesFromDb(presetId) {
     }
     let parsedState;
     try {
-      parsedState = JSON.parse(stack.stateText);
+      parsedState = JSON.parse(stateText);
     } catch {
       throw new Error(`Stored state JSON is invalid for stack "${stack.id}".`);
     }
@@ -1030,14 +1064,21 @@ export function getTerraformImportPresetSourcesFromDb(presetId) {
   const tfdTexts = [];
   const tfdLabels = [];
   for (const tfdRow of tfdRows) {
-    if (!tfdRow.content) {
+    const tfdContent = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "tfd",
+      tfdRow.path,
+      tfdRow.content,
+    );
+    if (!tfdContent) {
       warnings.push({
         code: "missing_optional_tfd",
         message: `Optional dataflow file missing: ${tfdRow.path}`,
       });
       continue;
     }
-    tfdTexts.push(tfdRow.content);
+    tfdTexts.push(tfdContent);
     tfdLabels.push(tfdRow.path);
   }
 

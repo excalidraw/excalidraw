@@ -4,9 +4,9 @@ import {
 } from "./terraformPresetCompression.mjs";
 
 /** D1 rejects very long SQL statements; keep chunk payloads under this size. */
-export const D1_BLOB_CHUNK_SIZE = 48_000;
+export const D1_BLOB_CHUNK_SIZE = 32_000;
 
-export const INLINE_BLOB_MAX_CHARS = 48_000;
+export const INLINE_BLOB_MAX_CHARS = 32_000;
 
 export function chunkPresetBlob(text) {
   if (text === null || text === undefined) {

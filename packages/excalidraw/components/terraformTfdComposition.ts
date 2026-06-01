@@ -49,6 +49,30 @@ export type TerraformStackCatalogEntry = {
   stateText?: string;
 };
 
+/** Matches D1 preset blob encoding (`functions/_terraformPresetCompression.ts`). */
+const PRESET_COMPRESSED_BLOB_PREFIX = "gz:b64:";
+
+function isStoredPresetCompressedBlob(content: string): boolean {
+  return content.startsWith(PRESET_COMPRESSED_BLOB_PREFIX);
+}
+
+function stateFromFallbackSources(
+  fallbackSources: TerraformImportPresetSources,
+  stackId: string,
+  catalog: readonly TerraformStackCatalogEntry[],
+  bundleLabel?: string,
+): unknown | undefined {
+  const label =
+    bundleLabel?.trim() ||
+    catalog.find((entry) => entry.stackId === stackId)?.label.trim() ||
+    stackId;
+  const idx = fallbackSources.stateLabels.findIndex(
+    (candidate) =>
+      candidate.trim() === label || candidate.trim() === stackId.trim(),
+  );
+  return idx >= 0 ? fallbackSources.states[idx] : undefined;
+}
+
 export type ApplyTfdCompositionOptions = {
   repoName?: string;
   stackCatalog?: readonly TerraformStackCatalogEntry[];
@@ -270,43 +294,69 @@ function buildBundleFromUseBlock(
     return null;
   }
 
+  const fallbackBundle = bundleFromFallbackSources(
+    fallbackSources,
+    block.stackId,
+    catalog,
+  );
+
+  const loaderPlan = options.artifactLoader?.(block.plan, "plan");
+  const loaderDot = options.artifactLoader?.(block.dot, "dot");
+  if (loaderPlan?.content && loaderDot?.content) {
+    try {
+      return {
+        plan: JSON.parse(loaderPlan.content),
+        dotText: loaderDot.content,
+        label: block.stackId,
+      };
+    } catch {
+      // fall through to catalog / preset bundles
+    }
+  }
+
   const plan = loadArtifactContent(block.plan, "plan", options, catalog);
   const dot = loadArtifactContent(block.dot, "dot", options, catalog);
-  if (!plan.content) {
-    const fallback = bundleFromFallbackSources(
-      fallbackSources,
-      block.stackId,
-      catalog,
-    );
-    if (fallback) {
-      return fallback;
+  const catalogPlanText = plan.content ?? "";
+  const catalogDotText = dot.content ?? "";
+  const canUseCatalogText =
+    catalogPlanText.length > 0 &&
+    catalogDotText.length > 0 &&
+    !isStoredPresetCompressedBlob(catalogPlanText) &&
+    !isStoredPresetCompressedBlob(catalogDotText);
+
+  if (!canUseCatalogText) {
+    if (fallbackBundle) {
+      return fallbackBundle;
+    }
+    if (!catalogPlanText) {
+      errors.push(
+        plan.error ??
+          `use ${block.stackId}: missing plan ${formatArtifactRef(block.plan)}`,
+      );
+      return null;
+    }
+    if (!catalogDotText) {
+      errors.push(
+        dot.error ??
+          `use ${block.stackId}: missing dot ${formatArtifactRef(block.dot)}`,
+      );
+      return null;
     }
     errors.push(
-      plan.error ??
-        `use ${block.stackId}: missing plan ${formatArtifactRef(block.plan)}`,
-    );
-    return null;
-  }
-  if (!dot.content) {
-    const fallback = bundleFromFallbackSources(
-      fallbackSources,
-      block.stackId,
-      catalog,
-    );
-    if (fallback) {
-      return fallback;
-    }
-    errors.push(
-      dot.error ??
-        `use ${block.stackId}: missing dot ${formatArtifactRef(block.dot)}`,
+      `use ${block.stackId}: invalid plan JSON at ${formatArtifactRef(
+        block.plan,
+      )}`,
     );
     return null;
   }
 
   let parsedPlan: unknown;
   try {
-    parsedPlan = JSON.parse(plan.content);
+    parsedPlan = JSON.parse(catalogPlanText);
   } catch {
+    if (fallbackBundle) {
+      return fallbackBundle;
+    }
     errors.push(
       `use ${block.stackId}: invalid plan JSON at ${formatArtifactRef(
         block.plan,
@@ -317,7 +367,7 @@ function buildBundleFromUseBlock(
 
   return {
     plan: parsedPlan,
-    dotText: dot.content,
+    dotText: catalogDotText,
     label: block.stackId,
   };
 }
@@ -413,25 +463,66 @@ export function applyTfdCompositionToSources(
           catalog,
         );
         if (state.content) {
-          try {
-            states.push(JSON.parse(state.content));
-            stateLabels.push(bundle.label ?? block.stackId);
-          } catch {
-            errors.push(
-              `use ${block.stackId}: invalid state JSON at ${formatArtifactRef(
-                block.state,
-              )}`,
+          if (isStoredPresetCompressedBlob(state.content)) {
+            const fallbackState = stateFromFallbackSources(
+              fallbackSources,
+              block.stackId,
+              catalog,
+              bundle.label,
             );
+            if (fallbackState !== undefined) {
+              states.push(fallbackState);
+              stateLabels.push(bundle.label ?? block.stackId);
+            } else {
+              errors.push(
+                `use ${
+                  block.stackId
+                }: invalid state JSON at ${formatArtifactRef(block.state)}`,
+              );
+            }
+          } else {
+            try {
+              states.push(JSON.parse(state.content));
+              stateLabels.push(bundle.label ?? block.stackId);
+            } catch {
+              const fallbackState = stateFromFallbackSources(
+                fallbackSources,
+                block.stackId,
+                catalog,
+                bundle.label,
+              );
+              if (fallbackState !== undefined) {
+                states.push(fallbackState);
+                stateLabels.push(bundle.label ?? block.stackId);
+              } else {
+                errors.push(
+                  `use ${
+                    block.stackId
+                  }: invalid state JSON at ${formatArtifactRef(block.state)}`,
+                );
+              }
+            }
           }
         } else {
-          warnings.push({
-            code: "missing_state_file",
-            message:
-              state.error ??
-              `Optional state missing for use ${
-                block.stackId
-              }: ${formatArtifactRef(block.state)}`,
-          });
+          const fallbackState = stateFromFallbackSources(
+            fallbackSources,
+            block.stackId,
+            catalog,
+            bundle.label,
+          );
+          if (fallbackState !== undefined) {
+            states.push(fallbackState);
+            stateLabels.push(bundle.label ?? block.stackId);
+          } else {
+            warnings.push({
+              code: "missing_state_file",
+              message:
+                state.error ??
+                `Optional state missing for use ${
+                  block.stackId
+                }: ${formatArtifactRef(block.state)}`,
+            });
+          }
         }
       } else {
         const catalogEntry = catalog.find(

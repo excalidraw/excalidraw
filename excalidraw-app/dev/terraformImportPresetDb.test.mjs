@@ -5,6 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  getTerraformImportPresetSourcesFromDb,
   openTerraformImportPresetDb,
   resetTerraformImportPresetDbSingleton,
   seedAllBuiltinsFromCatalog,
@@ -64,5 +65,23 @@ describe("terraformImportPresetDb seed", () => {
         fs.unlinkSync(filePath);
       }
     }
+  });
+
+  it("sources use paths-only stackCatalog and resolve TFD use blocks", () => {
+    if (!fs.existsSync(TEST_FIXTURE_DB_PATH)) {
+      return;
+    }
+    resetTerraformImportPresetDbSingleton();
+    const sources = getTerraformImportPresetSourcesFromDb(
+      "staging-multi-state-expanded",
+    );
+    expect(sources).not.toBeNull();
+    expect(sources.planDotBundles).toHaveLength(25);
+    expect(sources.stackCatalog).toHaveLength(25);
+    expect(sources.stackCatalog[0]).not.toHaveProperty("planText");
+    expect(sources.repoName).toBe("staging-multi-state");
+    expect(sources.tfdTexts[0]).toMatch(/^tfd 3/);
+    expect(sources.tfdTexts[0]).toMatch(/^use 00-east-network/m);
+    resetTerraformImportPresetDbSingleton();
   });
 });
