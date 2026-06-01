@@ -9808,7 +9808,9 @@ class App extends React.Component<AppProps, AppState> {
               drawShapeTrailPoints,
               this.state,
               this.scene.getNonDeletedElementsMap(),
+              this.state.newElement,
             ) as ExcalidrawNonSelectionElement | undefined;
+
             if (shapePreview) {
               this.pendingDrawShapeElement = shapePreview;
 
@@ -11644,6 +11646,7 @@ class App extends React.Component<AppProps, AppState> {
                 points,
                 this.state,
                 this.scene.getNonDeletedElementsMap(),
+                this.state.newElement,
               );
 
             if (detectedElement) {

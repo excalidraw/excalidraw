@@ -510,56 +510,12 @@ function makeTriangleArrowTemplate(headLenRatio: number = 0.4): LocalPoint[] {
 
 // Pre-computed template library. We need mutiple templates per shape to cover
 // different drawing start positions and configurations.
-const TEMPLATES: readonly Template[] = (() => {
+const ARROW_TEMPLATES: readonly Template[] = (() => {
   const defs: Array<{
     type: Shape;
     pts: LocalPoint[];
     rotationInvariant?: boolean;
   }> = [
-    // Square (1:1) templates
-    { type: "rectangle", pts: makeRectangleTemplate(0) },
-    { type: "rectangle", pts: makeRectangleTemplate(1) },
-    { type: "rectangle", pts: makeRectangleTemplate(2) },
-    { type: "rectangle", pts: makeRectangleTemplate(3) },
-    // Wide (3:1) rectangle templates — thin horizontal shape
-    { type: "rectangle", pts: makeRectangleTemplate(0, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(1, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(2, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(3, 3) },
-    // Tall (1:3) rectangle templates — thin vertical shape
-    { type: "rectangle", pts: makeRectangleTemplate(0, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(1, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(2, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(3, 1 / 3) },
-    // Square (1:1) diamond templates
-    { type: "diamond", pts: makeDiamondTemplate(0) },
-    { type: "diamond", pts: makeDiamondTemplate(1) },
-    { type: "diamond", pts: makeDiamondTemplate(2) },
-    { type: "diamond", pts: makeDiamondTemplate(3) },
-    // Wide (3:1) diamond templates: thin horizontal diamond
-    { type: "diamond", pts: makeDiamondTemplate(0, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(1, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(2, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(3, 3) },
-    // Tall (1:3) diamond templates: thin vertical diamond
-    { type: "diamond", pts: makeDiamondTemplate(0, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(1, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(2, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(3, 1 / 3) },
-    // Ellipse: 8 templates at 45° increments
-    { type: "ellipse", pts: makeEllipseTemplate(0) },
-    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
-    { type: "ellipse", pts: makeEllipseTemplate(Math.PI) },
-    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
-    // Line: 8 templates at 45° increments
-    { type: "line", pts: makeLineTemplate(0) },
-    { type: "line", pts: makeLineTemplate(Math.PI / 4) },
-    { type: "line", pts: makeLineTemplate(Math.PI / 2) },
-    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 4) },
-    { type: "line", pts: makeLineTemplate(Math.PI) },
-    { type: "line", pts: makeLineTemplate((5 * Math.PI) / 4) },
-    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 2) },
-    { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
     // V-shaped arrow templates with increasing arrowhead size (0.1 to 0.5)
     {
       type: "arrow",
@@ -659,6 +615,64 @@ const TEMPLATES: readonly Template[] = (() => {
     rotationInvariant,
   }));
 })();
+const OTHER_TEMPLATES: readonly Template[] = (() => {
+  const defs: Array<{
+    type: Shape;
+    pts: LocalPoint[];
+    rotationInvariant?: boolean;
+  }> = [
+    // Square (1:1) templates
+    { type: "rectangle", pts: makeRectangleTemplate(0) },
+    { type: "rectangle", pts: makeRectangleTemplate(1) },
+    { type: "rectangle", pts: makeRectangleTemplate(2) },
+    { type: "rectangle", pts: makeRectangleTemplate(3) },
+    // Wide (3:1) rectangle templates — thin horizontal shape
+    { type: "rectangle", pts: makeRectangleTemplate(0, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(1, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(2, 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(3, 3) },
+    // Tall (1:3) rectangle templates — thin vertical shape
+    { type: "rectangle", pts: makeRectangleTemplate(0, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(1, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(2, 1 / 3) },
+    { type: "rectangle", pts: makeRectangleTemplate(3, 1 / 3) },
+    // Square (1:1) diamond templates
+    { type: "diamond", pts: makeDiamondTemplate(0) },
+    { type: "diamond", pts: makeDiamondTemplate(1) },
+    { type: "diamond", pts: makeDiamondTemplate(2) },
+    { type: "diamond", pts: makeDiamondTemplate(3) },
+    // Wide (3:1) diamond templates: thin horizontal diamond
+    { type: "diamond", pts: makeDiamondTemplate(0, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(1, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(2, 3) },
+    { type: "diamond", pts: makeDiamondTemplate(3, 3) },
+    // Tall (1:3) diamond templates: thin vertical diamond
+    { type: "diamond", pts: makeDiamondTemplate(0, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(1, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(2, 1 / 3) },
+    { type: "diamond", pts: makeDiamondTemplate(3, 1 / 3) },
+    // Ellipse: 8 templates at 45° increments
+    { type: "ellipse", pts: makeEllipseTemplate(0) },
+    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
+    { type: "ellipse", pts: makeEllipseTemplate(Math.PI) },
+    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
+    // Line: 8 templates at 45° increments
+    { type: "line", pts: makeLineTemplate(0) },
+    { type: "line", pts: makeLineTemplate(Math.PI / 4) },
+    { type: "line", pts: makeLineTemplate(Math.PI / 2) },
+    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 4) },
+    { type: "line", pts: makeLineTemplate(Math.PI) },
+    { type: "line", pts: makeLineTemplate((5 * Math.PI) / 4) },
+    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 2) },
+    { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
+  ];
+  return defs.map(({ type, pts, rotationInvariant = false }) => ({
+    type,
+    vec: vectorise(pts, rotationInvariant),
+    rotationInvariant,
+  }));
+})();
+const TEMPLATES = [...ARROW_TEMPLATES, ...OTHER_TEMPLATES];
 
 // Arrow endpoint selection
 
@@ -724,6 +738,7 @@ function getArrowEndpoint<P extends LocalPoint | GlobalPoint>(
 // Recognizes common shapes from free-draw input points
 export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   points: P[],
+  previousElement: ExcalidrawElement | null,
 ): ShapeRecognitionResult<P> => {
   const boundingBox = getElementBoundsFromPoints(points);
 
@@ -746,18 +761,39 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   let bestScore = -1;
   let bestType: Shape = "freedraw";
 
-  for (const tmpl of TEMPLATES) {
-    const cv = tmpl.rotationInvariant ? candidateVecRotInv : candidateVecFixed;
-    const cvRev = tmpl.rotationInvariant
-      ? candidateVecRotInvRev
-      : candidateVecFixedRev;
-    const score = Math.max(
-      frechetScore(frechetDistance(cv, tmpl.vec)),
-      frechetScore(frechetDistance(cvRev, tmpl.vec)),
-    );
-    if (score > bestScore) {
-      bestScore = score;
-      bestType = tmpl.type;
+  if (previousElement?.type === "arrow") {
+    for (const tmpl of ARROW_TEMPLATES) {
+      const cv = tmpl.rotationInvariant
+        ? candidateVecRotInv
+        : candidateVecFixed;
+      const cvRev = tmpl.rotationInvariant
+        ? candidateVecRotInvRev
+        : candidateVecFixedRev;
+      const score = Math.max(
+        frechetScore(frechetDistance(cv, tmpl.vec)),
+        frechetScore(frechetDistance(cvRev, tmpl.vec)),
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        bestType = tmpl.type;
+      }
+    }
+  } else {
+    for (const tmpl of TEMPLATES) {
+      const cv = tmpl.rotationInvariant
+        ? candidateVecRotInv
+        : candidateVecFixed;
+      const cvRev = tmpl.rotationInvariant
+        ? candidateVecRotInvRev
+        : candidateVecFixedRev;
+      const score = Math.max(
+        frechetScore(frechetDistance(cv, tmpl.vec)),
+        frechetScore(frechetDistance(cvRev, tmpl.vec)),
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        bestType = tmpl.type;
+      }
     }
   }
 
@@ -781,8 +817,9 @@ export const convertToShape = (
   points: LocalPoint[],
   appState: AppState,
   elementsMap: ElementsMap,
+  previousElement: ExcalidrawElement | null,
 ): ExcalidrawElement | undefined => {
-  const recognizedShape = recognizeShape(points);
+  const recognizedShape = recognizeShape(points, previousElement);
 
   const boundingBox = recognizedShape.boundingBox;
   const [minX, minY, maxX, maxY] = boundingBox;
