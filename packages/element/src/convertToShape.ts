@@ -448,6 +448,60 @@ function makeArrowTemplate(): LocalPoint[] {
   return pts.slice(0, PROTRACTOR_N);
 }
 
+// Build a template for an arrow with a solid triangular arrowhead pointing right.
+// Drawn as a single continuous stroke: left -> right (shaft), then trace the
+// triangle: tip -> upper-left -> lower-left -> back to tip.
+function makeArrowWithTriangleTemplate(): LocalPoint[] {
+  const s = PROTRACTOR_SQUARE_SIZE / 2;
+  const tipX = s;
+  const headLen = s * 0.4;
+  const headAngle = Math.PI / 6; // 30°
+
+  // Shaft: from (-s, 0) to (s, 0)
+  const shaftPts = Math.floor(PROTRACTOR_N * 0.5);
+  // Arrowhead triangle: three sides of the triangle
+  const headPts = PROTRACTOR_N - shaftPts;
+  const perSide = Math.floor(headPts / 3);
+
+  const pts: LocalPoint[] = [];
+
+  // Draw shaft
+  for (let i = 0; i < shaftPts; i++) {
+    const t = i / (shaftPts - 1);
+    pts.push([-s + t * (tipX - -s), 0] as LocalPoint);
+  }
+
+  // Triangle vertices
+  const ux = tipX - headLen * Math.cos(headAngle);
+  const uy = -headLen * Math.sin(headAngle);
+  const lx = tipX - headLen * Math.cos(headAngle);
+  const ly = headLen * Math.sin(headAngle);
+
+  // First side: tip to upper-left
+  for (let i = 0; i < perSide; i++) {
+    const t = i / (perSide - 1);
+    pts.push([tipX + t * (ux - tipX), t * uy] as LocalPoint);
+  }
+
+  // Second side: upper-left to lower-left
+  for (let i = 0; i < perSide; i++) {
+    const t = i / (perSide - 1);
+    pts.push([ux + t * (lx - ux), uy + t * (ly - uy)] as LocalPoint);
+  }
+
+  // Third side: lower-left back to tip
+  const remaining = PROTRACTOR_N - pts.length;
+  for (let i = 0; i < remaining; i++) {
+    const t = i / Math.max(remaining - 1, 1);
+    pts.push([lx + t * (tipX - lx), ly + t * (0 - ly)] as LocalPoint);
+  }
+
+  while (pts.length < PROTRACTOR_N) {
+    pts.push(pts[pts.length - 1]);
+  }
+  return pts.slice(0, PROTRACTOR_N);
+}
+
 // Pre-computed template library. We need mutiple templates per shape to cover
 // different drawing start positions and configurations.
 const TEMPLATES: readonly Template[] = (() => {
@@ -502,6 +556,11 @@ const TEMPLATES: readonly Template[] = (() => {
     { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
     // Arrow templates
     { type: "arrow", pts: makeArrowTemplate(), rotationInvariant: true },
+    {
+      type: "arrow",
+      pts: makeArrowWithTriangleTemplate(),
+      rotationInvariant: true,
+    },
   ];
   return defs.map(({ type, pts, rotationInvariant = false }) => ({
     type,
