@@ -69,7 +69,7 @@ const PROTRACTOR_SQUARE_SIZE = 250;
 // Minimum score (0–1) required to commit to a shape; below that we assume
 // freedraw.
 const PROTRACTOR_SCORE_THRESHOLD = 0.95;
-const PROTRACTOR_LINEAR_SCORE_THRESHOLD = 0.98;
+const PROTRACTOR_LINEAR_SCORE_THRESHOLD = 0.95;
 
 type Vec = Float64Array; // interleaved [x0, y0, x1, y1, …] of length 2*N
 
