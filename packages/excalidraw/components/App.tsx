@@ -7686,6 +7686,11 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    // Re-measure position on every interaction so that coordinate transforms
+    // stay correct if the container moved since mount (e.g. elements inserted
+    // above in a notebook/dashboard without triggering a resize event).
+    this.refresh();
+
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
