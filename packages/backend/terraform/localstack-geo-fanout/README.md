@@ -35,11 +35,14 @@ yarn localstack:geo-fanout:up
 yarn localstack:geo-fanout:apply
 yarn localstack:geo-fanout:export
 
-yarn seed:terraform-presets
+Layout tests use bundles under `packages/excalidraw/test-fixtures/localstack-geo-fanout/` (not the import preset catalog). To refresh the committed preset DB for CI, run:
+
+```bash
+yarn hydrate:terraform-preset staging-multi-state-expanded
 yarn export:terraform-presets-test-db
 ```
 
-Import preset **LocalStack geo fanout** in the app with **Semantic** view (preset loads `pipeline.tfd` for declared dataflow edges), or run layout tests:
+Or run layout tests directly:
 
 ```bash
 yarn vitest run packages/excalidraw/components/terraformDeclaredDataFlow.test.ts

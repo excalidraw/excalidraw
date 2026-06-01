@@ -799,6 +799,21 @@ export function loadImportPresetsCatalog() {
 /** Upsert and hydrate every built-in preset from import-presets.catalog.json. */
 export function seedAllBuiltinsFromCatalog(db) {
   const presets = loadImportPresetsCatalog();
+  const catalogIds = new Set(presets.map((preset) => preset.id));
+  const staleBuiltins = db
+    .prepare(`SELECT id FROM terraform_import_presets WHERE builtin = 1`)
+    .all()
+    .filter((row) => !catalogIds.has(row.id));
+  for (const row of staleBuiltins) {
+    db.prepare(`DELETE FROM terraform_import_preset_stacks WHERE preset_id = ?`).run(
+      row.id,
+    );
+    db.prepare(`DELETE FROM terraform_import_preset_tfd WHERE preset_id = ?`).run(
+      row.id,
+    );
+    db.prepare(`DELETE FROM terraform_import_presets WHERE id = ?`).run(row.id);
+  }
+
   const results = [];
 
   for (const preset of presets) {
@@ -1177,8 +1192,13 @@ export function readTerraformImportRepoFileText(repoRelativePath) {
     }
   }
 
+  const fromDisk = readTextFileAtRepoPath(normalized);
+  if (fromDisk !== null) {
+    return fromDisk;
+  }
+
   throw new Error(
-    `Terraform fixture not found in import preset DB: ${normalized}. Run yarn export:terraform-presets-test-db after yarn seed:terraform-presets.`,
+    `Terraform fixture not found in import preset DB or on disk: ${normalized}. Run yarn hydrate:terraform-preset staging-multi-state-expanded && yarn export:terraform-presets-test-db.`,
   );
 }
 
@@ -1188,7 +1208,7 @@ export function loadStagingMultiStatePlanDotBundlesFromDb() {
     .prepare(
       `SELECT stack_id AS id, label, plan_text AS planText, dot_text AS dotText
        FROM terraform_import_preset_stacks
-       WHERE preset_id = 'staging-multi-state'
+       WHERE preset_id = 'staging-multi-state-expanded'
        ORDER BY sort_order ASC`,
     )
     .all();
@@ -1196,7 +1216,7 @@ export function loadStagingMultiStatePlanDotBundlesFromDb() {
   return rows.map((row) => {
     if (!row.planText || !row.dotText) {
       throw new Error(
-        `staging-multi-state stack "${row.id}" is missing plan or dot content in the preset DB.`,
+        `staging-multi-state-expanded stack "${row.id}" is missing plan or dot content in the preset DB.`,
       );
     }
     return {
@@ -1220,7 +1240,7 @@ export function upsertAndHydratePresetFromCatalog(db, presetId) {
 
 export function readStagingMultiStatePipelineTfdFromDb() {
   const db = getTerraformImportPresetTestDb();
-  const expanded = db
+  const row = db
     .prepare(
       `SELECT content FROM terraform_import_preset_tfd
        WHERE preset_id = 'staging-multi-state-expanded' AND path = 'pipeline.tfd'
@@ -1228,19 +1248,8 @@ export function readStagingMultiStatePipelineTfdFromDb() {
        LIMIT 1`,
     )
     .get();
-  if (expanded?.content) {
-    return expanded.content;
-  }
-  const legacy = db
-    .prepare(
-      `SELECT content FROM terraform_import_preset_tfd
-       WHERE preset_id = 'staging-multi-state' AND path = 'pipeline.tfd'
-       ORDER BY sort_order ASC
-       LIMIT 1`,
-    )
-    .get();
-  if (legacy?.content) {
-    return legacy.content;
+  if (row?.content) {
+    return row.content;
   }
   return readTerraformImportRepoFileText(
     "packages/backend/terraform/staging-multi-state/pipeline.tfd",
@@ -1317,9 +1326,9 @@ export function verifyTerraformImportPresetTestDb(
     )
     .get().count;
   db.close();
-  if (presetCount < 10 || withContent < 10) {
+  if (presetCount < 1 || withContent < 1) {
     throw new Error(
-      `Test preset DB is incomplete (${withContent}/${presetCount} presets with plan+dot). Run yarn export:terraform-presets-test-db.`,
+      `Test preset DB is incomplete (${withContent}/${presetCount} presets with plan+dot). Run yarn hydrate:terraform-preset staging-multi-state-expanded && yarn export:terraform-presets-test-db.`,
     );
   }
   return { presetCount, withContent };

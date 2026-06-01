@@ -110,18 +110,19 @@ If the same resource address appears in more than one file, the **last file wins
 
 ### Sample fixtures
 
-Example import bundles live under [`packages/backend/terraform/`](./packages/backend/terraform/) (`allplanmodules.json` / `.dot` / `.tfd`, staging `plan.json` + `graph.dot` per stack, etc.). Those files are **gitignored**; hydrate them locally with `yarn seed:terraform-presets` (see dev presets below) or generate plans from your own Terraform roots.
+Example import bundles live under [`packages/backend/terraform/staging-multi-state/`](./packages/backend/terraform/staging-multi-state/) (`plan.json` + `graph.dot` per stack, `pipeline.tfd`, etc.). Those files are **gitignored**; hydrate them locally with the dev preset commands below or generate plans from your own Terraform roots.
 
-For state-only tests locally, generate `terraform_allplanmodules.tfstate` in that directory (also gitignored).
+Unit tests may still read other gitignored fixtures under [`packages/backend/terraform/`](./packages/backend/terraform/) (for example `allplanmodules.json`) directly from disk; those are not import presets.
 
 ### Dev import presets (SQLite)
 
-Local dev (`yarn start`) loads Terraform import **presets** from `terraform-import-presets.db` at the repo root (gitignored). The catalog is [`packages/backend/terraform/import-presets.catalog.json`](./packages/backend/terraform/import-presets.catalog.json) (staging multi-state, allplanmodules, cloudflare, add/del/new plans, AWS+Cloudflare combo, etc.).
+Local dev (`yarn start`) loads Terraform import **presets** from `terraform-import-presets.db` at the repo root (gitignored). The catalog is [`packages/backend/terraform/import-presets.catalog.json`](./packages/backend/terraform/import-presets.catalog.json) — built-in preset **`staging-multi-state-expanded`** only (25 stacks + `pipeline.tfd`).
 
-After adding or updating plan/dot/state files under `packages/backend/terraform/`, re-seed the database:
+After adding or updating plan/dot/state files under `packages/backend/terraform/staging-multi-state/`, re-hydrate:
 
 ```bash
-yarn seed:terraform-presets
+yarn hydrate:terraform-preset staging-multi-state-expanded
+# or: yarn seed:terraform-presets
 ```
 
 Copy `terraform-import-presets.db` to share presets with another machine. In the import dialog, use **Use preset manifest** or **Sync from disk** on a single preset; `POST /api/terraform-import-presets/seed-all` re-hydrates every built-in preset without restarting the dev server.
@@ -158,7 +159,7 @@ Deploy the app when code or Functions change ([`pages-deploy.yml`](./.github/wor
 **Tests and CI** read plan/dot/tfd content from the committed SQLite file [`packages/excalidraw/test-fixtures/terraform-import-presets.db`](./packages/excalidraw/test-fixtures/terraform-import-presets.db) (not from gitignored paths on disk). After changing catalog fixtures locally, run:
 
 ```bash
-yarn seed:terraform-presets
+yarn hydrate:terraform-preset staging-multi-state-expanded
 yarn export:terraform-presets-test-db
 ```
 

@@ -41,6 +41,6 @@ yarn hydrate:terraform-preset staging-multi-state-expanded
 
 **Teardown:** `./scripts/destroy-all-stacks.sh` — parallel destroy in reverse dependency order (25 stacks). Exported artifacts remain on disk.
 
-Pipeline dataflow: `pipeline.tfd`. Import preset: `staging-multi-state-expanded` (25 stacks) or legacy `staging-multi-state` (17 stacks).
+Pipeline dataflow: `pipeline.tfd`. Import preset: **`staging-multi-state-expanded`** (25 stacks).
 
 All states default to AWS profile `admin` and support optional assume-role via `terraform_deploy_role_arn`.

@@ -34,22 +34,9 @@ describe("terraformImportPresets", () => {
       BUILTIN_TERRAFORM_IMPORT_PRESETS,
     );
     const presets = await listTerraformImportPresets();
-    expect(presets).toHaveLength(13);
-    expect(presets.map((preset) => preset.id)).toEqual(
-      expect.arrayContaining([
-        "staging-multi-state",
-        "staging-multi-state-expanded",
-        "allplanmodules",
-        "cloudflare",
-        "aws-cloudflare-modules",
-        "localstack-geo-fanout",
-        "production-geo-fanout",
-      ]),
-    );
-    expect(
-      presets.find((preset) => preset.id === "staging-multi-state-expanded")
-        ?.view,
-    ).toBe("pipeline");
+    expect(presets).toHaveLength(1);
+    expect(presets[0]?.id).toBe("staging-multi-state-expanded");
+    expect(presets[0]?.view).toBe("pipeline");
   });
 
   it("supports user preset save/update/delete lifecycle via API", async () => {

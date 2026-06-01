@@ -10,7 +10,7 @@ For apply commands and quick start, see [README.md](./README.md).
 
 ### What it is
 
-**staging-multi-state** is a real AWS staging environment split across **25 independent Terraform states** in one account (expanded layout) or **17 states** (legacy preset). The expanded preset **`staging-multi-state-expanded`** hydrates from `import-presets.catalog.json` → 25 stacks + `pipeline.tfd` → `terraform-import-presets.db` via `yarn hydrate:terraform-preset staging-multi-state-expanded`.
+**staging-multi-state** is a real AWS staging environment split across **25 independent Terraform states** in one account. The import preset **`staging-multi-state-expanded`** hydrates from `import-presets.catalog.json` → 25 stacks + `pipeline.tfd` → `terraform-import-presets.db` via `yarn hydrate:terraform-preset staging-multi-state-expanded`.
 
 Each stack keeps local state (`terraform.tfstate`) and exports `plan.json` + `graph.dot` for layout import.
 
@@ -391,7 +391,7 @@ api6_compute -> api6_ssm_name, api6_store
 
 ### Preset hydration
 
-1. Catalog entry in [`import-presets.catalog.json`](../import-presets.catalog.json) lists all 17 stacks + `pipeline.tfd`.
+1. Catalog entry in [`import-presets.catalog.json`](../import-presets.catalog.json) lists all 25 stacks + `pipeline.tfd` (`staging-multi-state-expanded`).
 2. `yarn seed:terraform-presets` → repo-root `terraform-import-presets.db`
 3. `yarn export:terraform-presets-test-db` → test fixture for Vitest
 4. Golden layout snapshots: `packages/excalidraw/components/terraformLayoutSnapshot.test.ts`

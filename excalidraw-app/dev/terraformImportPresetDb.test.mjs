@@ -21,8 +21,8 @@ describe("terraformImportPresetDb seed", () => {
     }
     const { presetCount, withContent } =
       verifyTerraformImportPresetTestDb(TEST_FIXTURE_DB_PATH);
-    expect(presetCount).toBe(14);
-    expect(withContent).toBe(13);
+    expect(presetCount).toBe(1);
+    expect(withContent).toBe(1);
   });
 
   it("seeds all catalog presets with plan+dot content when disk files exist", () => {
@@ -36,7 +36,7 @@ describe("terraformImportPresetDb seed", () => {
     const { presetCount, results } = seedAllBuiltinsFromCatalog(db);
     const missing = results.flatMap((entry) => entry.missing ?? []);
 
-    expect(presetCount).toBe(13);
+    expect(presetCount).toBe(1);
     if (missing.length > 0) {
       return;
     }
@@ -44,13 +44,13 @@ describe("terraformImportPresetDb seed", () => {
     const presetCountRow = db
       .prepare(`SELECT COUNT(*) AS count FROM terraform_import_presets`)
       .get();
-    expect(presetCountRow.count).toBe(13);
+    expect(presetCountRow.count).toBe(1);
 
     const stack = db
       .prepare(
         `SELECT plan_text AS planText, dot_text AS dotText
          FROM terraform_import_preset_stacks
-         WHERE preset_id = 'allplanmodules'
+         WHERE preset_id = 'staging-multi-state-expanded'
          LIMIT 1`,
       )
       .get();
