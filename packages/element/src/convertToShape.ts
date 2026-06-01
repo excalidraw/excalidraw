@@ -404,13 +404,16 @@ function makeLineTemplate(angle: number = 0): LocalPoint[] {
   });
 }
 
-// Build a template for an arrow: a shaft from left to right, then a V-shaped
-// arrowhead pointing right. Drawn as a single continuous stroke: left -> right,
+// Build a template for an arrow with a V-shaped arrowhead pointing right.
+// Drawn as a single continuous stroke: left -> right (shaft), then
 // back-left-up, right-tip, back-left-down.
-function makeArrowTemplate(): LocalPoint[] {
+//
+// headLenRatio: ratio of arrowhead length to half-square (0.1 to 0.5 for
+// small to large heads).
+function makeVShapedArrowTemplate(headLenRatio: number = 0.35): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
   const tipX = s;
-  const headLen = s * 0.35;
+  const headLen = s * headLenRatio;
   const headAngle = Math.PI / 6; // 30°
 
   // Shaft: from (-s, 0) to (s, 0)
@@ -451,10 +454,13 @@ function makeArrowTemplate(): LocalPoint[] {
 // Build a template for an arrow with a solid triangular arrowhead pointing right.
 // Drawn as a single continuous stroke: left -> right (shaft), then trace the
 // triangle: tip -> upper-left -> lower-left -> back to tip.
-function makeArrowWithTriangleTemplate(): LocalPoint[] {
+//
+// headLenRatio: ratio of arrowhead length to half-square (0.1 to 0.5 for
+// small to large heads).
+function makeTriangleArrowTemplate(headLenRatio: number = 0.4): LocalPoint[] {
   const s = PROTRACTOR_SQUARE_SIZE / 2;
   const tipX = s;
-  const headLen = s * 0.4;
+  const headLen = s * headLenRatio;
   const headAngle = Math.PI / 6; // 30°
 
   // Shaft: from (-s, 0) to (s, 0)
@@ -554,11 +560,96 @@ const TEMPLATES: readonly Template[] = (() => {
     { type: "line", pts: makeLineTemplate((5 * Math.PI) / 4) },
     { type: "line", pts: makeLineTemplate((3 * Math.PI) / 2) },
     { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
-    // Arrow templates
-    { type: "arrow", pts: makeArrowTemplate(), rotationInvariant: true },
+    // V-shaped arrow templates with increasing arrowhead size (0.1 to 0.5)
     {
       type: "arrow",
-      pts: makeArrowWithTriangleTemplate(),
+      pts: makeVShapedArrowTemplate(0.1),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.15),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.2),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.25),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.3),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.35),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.4),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.45),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeVShapedArrowTemplate(0.5),
+      rotationInvariant: true,
+    },
+    // Triangle arrow templates with increasing arrowhead size (0.1 to 0.5)
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.1),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.15),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.2),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.25),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.3),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.35),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.4),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.45),
+      rotationInvariant: true,
+    },
+    {
+      type: "arrow",
+      pts: makeTriangleArrowTemplate(0.5),
       rotationInvariant: true,
     },
   ];
