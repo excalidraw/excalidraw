@@ -1,4 +1,4 @@
-# Builds excalidraw-app, then uploads to Cloudflare Pages with `wrangler pages deploy`.
+# Builds excalidraw-app, deploys to Cloudflare Pages, runs smoke tests, and posts a sticky PR comment.
 # Do NOT use `wrangler deploy` here — that is Workers mode and needs `main` when `assets` is absent.
 #
 # GitHub: Settings → Secrets and variables → Actions
@@ -6,12 +6,16 @@
 #   Variables: CF_PAGES_PROJECT_NAME (e.g. ainur)
 #   Variables (optional): VITE_TURNSTILE_SITE_KEY
 #
-# wrangler.jsonc must NOT contain "assets" (Pages rejects it). Workers Git builds
-# should use wrangler.workers.jsonc or be disabled — see docs/cloudflare-deploy.md.
+# wrangler.jsonc must NOT contain "assets" (Pages rejects it). See docs/cloudflare-deploy.md.
 
 name: Deploy to Cloudflare Pages
 
 on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
   push:
     branches:
       - master
@@ -19,18 +23,64 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: pages-deploy-${{ github.workflow }}-${{ github.ref }}
+  group: pages-deploy-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
 jobs:
-  build-and-deploy:
+  fork-notice:
+    name: Fork PR notice
+    if: >-
+      github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+
+
     runs-on: ubuntu-latest
+    steps:
+      - name: Find existing preview comment
+        id: find_comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- cloudflare-pages-preview -->"
+
+      - name: Explain skipped preview deploy
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- cloudflare-pages-preview -->
+            ## Cloudflare Pages preview
+
+            Preview deploy was **skipped** because this pull request comes from a fork (Cloudflare secrets are not available to fork workflows).
+
+            Open a branch on the upstream repository to get an automatic preview URL and smoke tests.
+
+  build-and-deploy:
+    name: Build and deploy
+    if: >-
+      github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+      alias-url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+      environment: ${{ steps.deploy_cmd.outputs.environment }}
+      deployed: ${{ steps.deploy.outputs.deployment-url != '' }}
     env:
       NODE_OPTIONS: --max-old-space-size=6144
       GITHUB_SHA: ${{ github.sha }}
       VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: actions/setup-node@v4
         with:
@@ -47,24 +97,154 @@ jobs:
       - name: Verify build output
         run: test -f excalidraw-app/build/index.html
 
-      - name: Deploy to Cloudflare Pages
-        if: ${{ vars.CF_PAGES_PROJECT_NAME != '' }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Set deploy command
+        id: deploy_cmd
+        if: vars.CF_PAGES_PROJECT_NAME != ''
         run: |
           set -euo pipefail
           PROJECT="${{ vars.CF_PAGES_PROJECT_NAME }}"
-          echo "Running: wrangler pages deploy (not wrangler deploy)"
-          if [ "${{ github.ref_name }}" = "master" ]; then
-            npx wrangler@4 pages deploy ./excalidraw-app/build --project-name="$PROJECT"
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "master" ]; then
+            echo "command=pages deploy ./excalidraw-app/build --project-name=${PROJECT}" >> "$GITHUB_OUTPUT"
+            echo "environment=production" >> "$GITHUB_OUTPUT"
           else
-            npx wrangler@4 pages deploy ./excalidraw-app/build \
-              --project-name="$PROJECT" \
-              --branch="${{ github.ref_name }}"
+            BRANCH="${{ github.head_ref || github.ref_name }}"
+            echo "command=pages deploy ./excalidraw-app/build --project-name=${PROJECT} --branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+            echo "environment=preview" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        if: vars.CF_PAGES_PROJECT_NAME != ''
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: ${{ steps.deploy_cmd.outputs.command }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Pages deploy skipped
-        if: ${{ vars.CF_PAGES_PROJECT_NAME == '' }}
+        if: vars.CF_PAGES_PROJECT_NAME == ''
         run: |
           echo "::notice::Set Actions variable CF_PAGES_PROJECT_NAME (and secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)."
+
+      - name: Deployment summary
+        if: steps.deploy.outputs.deployment-url != ''
+        run: |
+          {
+            echo "## Cloudflare Pages deploy"
+            echo ""
+            echo "| | URL |"
+            echo "|---|---|"
+            echo "| **Branch alias** | ${{ steps.deploy.outputs.pages-deployment-alias-url }} |"
+            echo "| **Deployment** | ${{ steps.deploy.outputs.deployment-url }} |"
+            echo "| **Environment** | ${{ steps.deploy_cmd.outputs.environment }} |"
+            echo ""
+            echo "### Demo deep links"
+            BASE="${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}"
+            echo "- [App](${BASE})"
+            echo "- [Demo (pipeline)](${BASE}/demo?preset=staging-multi-state-expanded)"
+            echo "- [Demo (semantic)](${BASE}/demo?preset=staging-multi-state-expanded&view=semantic)"
+            echo "- [Presets API](${BASE}/api/terraform-import-presets)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    name: Smoke test
+    needs: build-and-deploy
+    if: needs.build-and-deploy.outputs.deployed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Smoke — index
+        env:
+          BASE: ${{ needs.build-and-deploy.outputs.alias-url || needs.build-and-deploy.outputs.deployment-url }}
+        run: curl -fsS "$BASE/" | grep -q '<html'
+
+      - name: Smoke — presets API
+        env:
+          BASE: ${{ needs.build-and-deploy.outputs.alias-url || needs.build-and-deploy.outputs.deployment-url }}
+        run: curl -fsS "$BASE/api/terraform-import-presets" | jq -e '.presets | length > 0'
+
+      - name: Smoke — demo route
+        env:
+          BASE: ${{ needs.build-and-deploy.outputs.alias-url || needs.build-and-deploy.outputs.deployment-url }}
+        run: |
+          code="$(curl -fsS -o /dev/null -w '%{http_code}' "$BASE/demo?preset=staging-multi-state-expanded")"
+          test "$code" = "200"
+
+      - name: Tail Functions logs on failure
+        if: failure() && vars.CF_PAGES_PROJECT_NAME != ''
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deployment tail --project-name=${{ vars.CF_PAGES_PROJECT_NAME }}
+
+  pr-comment:
+    name: PR preview comment
+    needs:
+      - build-and-deploy
+      - smoke
+    if: >-
+      always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && needs.build-and-deploy.result != 'cancelled'
+
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find existing preview comment
+        id: find_comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- cloudflare-pages-preview -->"
+
+      - name: Set comment body
+        id: comment_body
+        env:
+          ALIAS_URL: ${{ needs.build-and-deploy.outputs.alias-url }}
+          DEPLOY_URL: ${{ needs.build-and-deploy.outputs.deployment-url }}
+          DEPLOYED: ${{ needs.build-and-deploy.outputs.deployed }}
+          SMOKE_RESULT: ${{ needs.smoke.result }}
+          ENVIRONMENT: ${{ needs.build-and-deploy.outputs.environment }}
+        run: |
+          set -euo pipefail
+          if [ "$DEPLOYED" != "true" ]; then
+            BODY="<!-- cloudflare-pages-preview -->
+          ## Cloudflare Pages preview
+
+          Deploy did not run (check \`CF_PAGES_PROJECT_NAME\` and Cloudflare secrets).
+
+          **Commit:** \`${{ github.sha }}\`"
+          else
+            if [ "$SMOKE_RESULT" = "success" ]; then
+              SMOKE_BADGE="passed"
+            elif [ "$SMOKE_RESULT" = "failure" ]; then
+              SMOKE_BADGE="failed"
+            else
+              SMOKE_BADGE="skipped"
+            fi
+            BASE="${ALIAS_URL:-$DEPLOY_URL}"
+            BODY="<!-- cloudflare-pages-preview -->
+          ## Cloudflare Pages preview
+
+          | | Link |
+          |---|---|
+          | **Preview** | ${BASE} |
+          | **Demo (pipeline)** | ${BASE}/demo?preset=staging-multi-state-expanded |
+          | **Demo (semantic)** | ${BASE}/demo?preset=staging-multi-state-expanded&view=semantic |
+          | **Presets API** | ${BASE}/api/terraform-import-presets |
+          | **Hash URL** | \`${DEPLOY_URL}\` |
+
+          **Environment:** \`${ENVIRONMENT}\` · **Smoke tests:** \`${SMOKE_BADGE}\` · **Commit:** \`${{ github.sha }}\`"
+          fi
+          {
+            echo "body<<EOF"
+            echo "$BODY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update preview comment
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: ${{ steps.comment_body.outputs.body }}

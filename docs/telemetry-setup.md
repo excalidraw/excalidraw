@@ -60,15 +60,8 @@ you ran **`npx wrangler deploy`** (Workers) instead of **`npx wrangler pages dep
 | Command | Use for tfdraw? |
 | --- | --- |
 | `wrangler pages deploy ./excalidraw-app/build` | Yes — static app + `/functions` API |
-| `wrangler deploy` | No — needs `main` or `assets` in config |
-| `wrangler deploy -c wrangler.workers.jsonc` | Optional — static only, **no** Pages Functions |
+| `wrangler deploy` | **No** — Workers mode; does not run Pages Functions |
 
-[`wrangler.jsonc`](../wrangler.jsonc) is **Pages-only** (no `assets`). Workers static deploys use [`wrangler.workers.jsonc`](../wrangler.workers.jsonc).
+[`wrangler.jsonc`](../wrangler.jsonc) is **Pages-only** (no `assets`).
 
-**Full setup checklist:** [cloudflare-deploy.md](./cloudflare-deploy.md) (Workers vs Pages, GitHub secrets, why `workers.dev` previews skip email).
-
-### Cloudflare dashboard
-
-- Prefer **GitHub Actions** ([`pages-deploy.yml`](../.github/workflows/pages-deploy.yml)) for deploys.
-- Disable conflicting **Workers Builds** Git deploy, or use `wrangler.workers.jsonc` for Workers-only previews (no `/api/*`).
-- Do not run `wrangler deploy` against `wrangler.jsonc`.
+**Full setup checklist:** [cloudflare-deploy.md](./cloudflare-deploy.md) (Pages-only deploy via GitHub Actions).

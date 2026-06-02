@@ -8,7 +8,7 @@
  * env.production = Production (master / production branch in Pages dashboard).
  *
  * Do NOT add an `assets` block here — Pages validation rejects it.
- * Workers static deploys: use wrangler.workers.jsonc with `wrangler deploy -c …`.
+ * Do NOT use `wrangler deploy` — use `wrangler pages deploy` (see docs/cloudflare-deploy.md).
  *
  * Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
  */

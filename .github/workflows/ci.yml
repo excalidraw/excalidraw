@@ -1,6 +1,7 @@
 # Mirrors local git hooks:
-#   pre-push    → lint job (ESLint, Prettier, tsc, Knip, depcheck) + prepush job (coverage, ESM build, size-limit)
+#   pre-push    → lint job (ESLint, Prettier, tsc, Knip, depcheck) + prepush job (coverage, ESM build, build:pages)
 #   test:commit → test job (vitest) — manual / workflow_dispatch only
+#   size-limit  → size-limit.yml (PR bundle size comments)
 name: CI
 
 on:
@@ -101,10 +102,12 @@ jobs:
     name: Pre-push checks
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     needs:
       - lint
       - test
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
     steps:
       - uses: actions/checkout@v4
 
@@ -136,7 +139,5 @@ jobs:
       - name: Build @excalidraw/excalidraw ESM
         run: yarn workspace @excalidraw/excalidraw run build:esm
 
-      - name: Bundle size limit
-        run: yarn workspace @excalidraw/excalidraw run check:size
-        env:
-          CI: true
+      - name: Build static app
+        run: yarn build:pages

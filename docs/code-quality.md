@@ -85,10 +85,12 @@ Configuration: [`.oxlintrc.json`](../.oxlintrc.json). Scoped via [`scripts/lint-
 
 ### CI (optional)
 
-[`.github/workflows/sonarqube.yml`](../.github/workflows/sonarqube.yml) runs when repo secrets are set:
+[`.github/workflows/sonarqube.yml`](../.github/workflows/sonarqube.yml) runs when the repo variable `SONAR_ENABLED` is set to `true` and these secrets are configured:
 
 - `SONAR_HOST_URL` — e.g. `https://sonar.example.com`
 - `SONAR_TOKEN` — analysis token (never commit)
+
+In GitHub **Settings → Secrets and variables → Actions**, add variable `SONAR_ENABLED=true` when both secrets are present. Leave it unset (or not `true`) to skip the workflow.
 
 Not part of pre-push (slow; needs server).
 
@@ -121,6 +123,4 @@ rules:
 
 ## Pre-push and CI order
 
-Pre-push (`yarn test:prepush`): typecheck → ESLint → Prettier → **lint:arch** → **lint:oxlint** → Knip → depcheck → coverage → ESM build → size limit.
-
-CI lint job mirrors the fast checks; SonarQube is a separate workflow.
+Pre-push (`yarn test:prepush`): typecheck → ESLint → Prettier → **lint:arch** → **lint:oxlint** → Knip → depcheck → coverage → ESM build → size limit. CI prepush on pull requests also runs `yarn build:pages`; bundle size comments come from [`size-limit.yml`](../.github/workflows/size-limit.yml).

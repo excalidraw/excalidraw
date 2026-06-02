@@ -10,7 +10,7 @@ on:
 
 jobs:
   sonarqube:
-    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
+    if: vars.SONAR_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

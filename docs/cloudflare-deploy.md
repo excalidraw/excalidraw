@@ -1,6 +1,6 @@
-# Cloudflare deploy — fix your setup
+# Cloudflare deploy — Pages only
 
-This repo uses **two** deploy paths. Mixing them is why PR checks can look “half green” and email signup fails.
+This repo deploys with **GitHub Actions + `wrangler pages deploy`**. Do not use **`wrangler deploy`** (Workers) — Pages Functions (`/api/*`) only run on Pages.
 
 ## What you want (site + email API)
 
@@ -8,33 +8,32 @@ This repo uses **two** deploy paths. Mixing them is why PR checks can look “ha
 | -------------- | ----------------------------------------------------------- |
 | Deploy command | `wrangler pages deploy` (GitHub Actions or manual)          |
 | Config file    | [`wrangler.jsonc`](../wrangler.jsonc) — **no `assets` key** |
-| Host           | `*.pages.dev` or custom domain on **Pages**                 |
-| API            | `/functions` → `/api/subscribe`, `/api/event`               |
+| Host           | `*.pages.dev` or custom domain (`tfdraw.dev`) on **Pages**  |
+| API            | `/functions` → `/api/subscribe`, `/api/event`, presets API  |
 
-## What you have if only Workers Builds is green
+## Workers Builds removed
 
-| Piece          | What happens                                             |
-| -------------- | -------------------------------------------------------- |
-| Deploy command | `wrangler deploy` (Cloudflare Workers Builds)            |
-| URL            | `https://<branch>-ainur.<account>.workers.dev`           |
-| Email signup   | **Broken** — no Pages Functions on Workers static deploy |
+The **Worker script `ainur`** (Workers Builds / `*.workers.dev`) was deleted. It could only serve static assets — **no Pages Functions** — so email signup and `/api/terraform-import-presets` never worked there.
 
-Example preview: `terraform-feature-ainur.tushar-sariya77.workers.dev` — fine for UI, **not** for email.
+If GitHub still shows a **Cloudflare Workers** check on pull requests:
+
+1. [Cloudflare dashboard → Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages)
+2. If a Worker named `ainur` reappears, open it → **Settings → Builds → Disconnect**
+3. Or remove the stale check under GitHub **Settings → Branches → required status checks**
+
+The **Pages** project `ainur` (`tfdraw.dev`, `ainur-chb.pages.dev`) is separate and is deployed by [`.github/workflows/pages-deploy.yml`](../.github/workflows/pages-deploy.yml).
 
 ---
 
-## Step 1 — Config (done in repo)
+## Step 1 — Config (repo)
 
 - [`wrangler.jsonc`](../wrangler.jsonc) — Pages only (`pages_build_output_dir`, KV, D1). **No `assets`.**
-- [`wrangler.workers.jsonc`](../wrangler.workers.jsonc) — optional Workers static preview (`assets` only).
 
-Merge/push this branch so GitHub Actions stops failing with:
-
-`Configuration file for Pages projects does not support "assets"`
+Do **not** add `assets` to `wrangler.jsonc` — Pages validation rejects it.
 
 ---
 
-## Step 2 — GitHub Actions (production + branch previews)
+## Step 2 — GitHub Actions (production + PR previews)
 
 Repo → **Settings → Secrets and variables → Actions**
 
@@ -47,30 +46,61 @@ Repo → **Settings → Secrets and variables → Actions**
 
 Workflow: [`.github/workflows/pages-deploy.yml`](../.github/workflows/pages-deploy.yml)
 
+- **Pull request** (same-repo only) → preview deploy (`--branch=<head>`), sticky PR comment with live URLs, smoke tests
 - Push to **`master`** → production Pages deploy
 - Push to **`terraform-feature`** → preview deploy (`--branch=terraform-feature`)
 
-After a green run, open the URL Wrangler prints (or Cloudflare **Pages → ainur → Deployments**). It will be **`*.pages.dev`**, not `workers.dev`.
+After a green run, open the branch alias URL from the Actions job summary or the sticky PR comment (`*.pages.dev` or `tfdraw.dev`).
 
 ---
 
-## Step 3 — Cloudflare dashboard (stop fighting GitHub)
+## PR preview workflow
 
-You likely have **Workers Builds** on script **ainur** connected to GitHub. That bypasses Pages Functions.
+Every **same-repo** pull request triggers [`.github/workflows/pages-deploy.yml`](../.github/workflows/pages-deploy.yml):
 
-**Recommended:** use **one** deploy path.
+1. **Build** — `yarn build:pages` on the GitHub runner (not on Cloudflare)
+2. **Upload** — `wrangler pages deploy ./excalidraw-app/build` (direct upload of static files)
+3. **Smoke tests** — `GET /`, `GET /api/terraform-import-presets`, `GET /demo?preset=staging-multi-state-expanded`
+4. **Sticky PR comment** — one updating comment with preview URL, demo deep links, and smoke status
 
-### Option A — GitHub Actions only (recommended)
+### Preview URL pattern
 
-1. **Workers & Pages** → your **Worker** `ainur` (if it’s only Workers) — either delete/disable **Workers Builds** Git integration, **or** leave it for static-only previews knowing email won’t work there.
-2. Create or use a **Pages** project named `ainur` (same name is OK; different product).
-3. On the **Pages** project: **Builds** → disable automatic Git builds (Actions deploys for you).
+Branch aliases follow Cloudflare’s rules (lowercase, non-alphanumeric → hyphen):
 
-### Option B — Keep Workers Builds for static previews
+```text
+<branch>.<CF_PAGES_PROJECT_NAME>.pages.dev
+```
 
-1. In Workers build settings, point Wrangler config to **`wrangler.workers.jsonc`** if the UI allows a config path.
-2. Do **not** use `wrangler.jsonc` for `wrangler deploy` (no `assets` in that file anymore).
-3. Still run GitHub Actions for **Pages** when you need email/API.
+Example: PR from branch `fix/api` → `fix-api.ainur.pages.dev` (subdomain may include a suffix, e.g. `ainur-chb.pages.dev`).
+
+Production custom domain: **https://tfdraw.dev**
+
+### Fork pull requests
+
+Preview deploy is **skipped** for fork PRs (Cloudflare secrets are not available). The workflow posts a notice comment. CI (`ci.yml`) still runs.
+
+### Smoke test expectations
+
+| Check | Pass criteria |
+| --- | --- |
+| Index | `GET /` returns HTML |
+| Presets API | `GET /api/terraform-import-presets` returns JSON with `presets.length > 0` |
+| Demo route | `GET /demo?preset=staging-multi-state-expanded` returns HTTP 200 |
+
+If the presets API smoke test fails on preview, push preset data to **preview D1** (see below).
+
+---
+
+## Step 3 — Cloudflare dashboard
+
+Use **one** deploy path: **GitHub Actions → Pages**.
+
+On the **Pages** project `ainur`:
+
+- **Builds** → disable automatic Git builds (Actions deploys for you)
+- **Settings → Production branch** → should match your prod branch (`master` in this repo; dashboard may show `main` — align them)
+
+Do **not** reconnect **Workers Builds** to this repository.
 
 ---
 
@@ -83,7 +113,7 @@ You likely have **Workers Builds** on script **ainur** connected to GitHub. That
 | `DB`         | `tfdraw-analytics`    | `tfdraw-analytics-preview` |
 | `PRESETS_DB` | `tfdraw-presets`      | `tfdraw-presets-preview`   |
 
-Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs when Pages deploys the **production branch** (set in dashboard, usually `master`).
+Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs when Pages deploys the **production branch**.
 
 **One-time prod schemas:**
 
@@ -92,7 +122,7 @@ npx wrangler d1 execute tfdraw-analytics --remote --file=./functions/schema.sql
 npx wrangler d1 execute tfdraw-presets --remote --file=./functions/presets-schema.sql
 ```
 
-**One-time preview schemas** (after `wrangler d1 create …-preview`):
+**One-time preview schemas:**
 
 ```bash
 npx wrangler d1 execute tfdraw-analytics-preview --remote --file=./functions/schema.sql
@@ -103,53 +133,41 @@ npx wrangler d1 execute tfdraw-presets-preview --remote --file=./functions/prese
 npx wrangler pages secret put TURNSTILE_SECRET_KEY --project-name=ainur
 ```
 
-See [telemetry-setup.md](./telemetry-setup.md) for Turnstile and stats. Preview analytics starts empty (test signups do not hit prod emails).
+See [telemetry-setup.md](./telemetry-setup.md) for Turnstile and stats.
 
 ### Terraform import presets (read-only, D1)
-
-The Pages app calls `GET /api/terraform-import-presets` and `GET /api/terraform-import-presets/:id/sources`. Which database is used depends on the deployment environment (prod vs preview).
 
 **Push local SQLite** (after `yarn seed:terraform-presets`):
 
 ```bash
-yarn push:terraform-presets-d1:prod      # production only (tfdraw.dev)
-yarn push:terraform-presets-d1:preview   # branch previews only
+yarn push:terraform-presets-d1:prod      # production (tfdraw.dev)
+yarn push:terraform-presets-d1:preview   # branch previews
 yarn push:terraform-presets-d1           # both
 ```
 
-Or use GitHub Actions → **Push Terraform presets to D1** (`workflow_dispatch`, target `prod` / `preview` / `both`).
+Or GitHub Actions → **Push Terraform presets to D1** (`workflow_dispatch`).
 
-Large plan/dot payloads are gzip-compressed and split into `terraform_import_preset_blob_chunks` so each SQL statement stays under D1 limits.
-
-**Verify presets API** (use the host that matches the environment):
+**Verify presets API:**
 
 ```bash
-# Production
 curl -sS "https://tfdraw.dev/api/terraform-import-presets" | head -c 200
-
-# Preview (example)
-curl -sS "https://terraform-feature.YOUR.pages.dev/api/terraform-import-presets" | head -c 200
+curl -sS "https://<branch>.ainur-chb.pages.dev/api/terraform-import-presets" | head -c 200
 ```
-
-In the app: **Import Terraform** → preset dropdown → **Load & import**.
-
-**Dashboard:** Pages → Settings → ensure **Production branch** = `master` (or your prod branch).
 
 ---
 
 ## Step 5 — Verify
 
-1. **Actions** → “Deploy to Cloudflare Pages” → green on your branch (required after `wrangler.jsonc` env changes so prod/preview bindings apply).
-2. Open the **Pages** deployment URL (not `workers.dev`).
-3. DevTools → Network → submit email → `POST /api/subscribe` should be **200** JSON `{ "ok": true }` (preview signups go to `tfdraw-analytics-preview`, prod to `tfdraw-analytics`).
-4. DevTools → `GET /api/terraform-import-presets` → **200** with a `presets` array (after D1 data import to the matching environment).
+1. **Actions** → “Deploy to Cloudflare Pages” → green on your branch
+2. Open the **Pages** URL from the PR comment or job summary
+3. `POST /api/subscribe` → **200** JSON `{ "ok": true }`
+4. `GET /api/terraform-import-presets` → **200** with a `presets` array
 
 ---
 
 ## Quick reference
 
-| Command | Config | Email API |
-| --- | --- | --- |
-| `wrangler pages deploy ./excalidraw-app/build` | `wrangler.jsonc` | Yes |
-| `wrangler deploy -c wrangler.workers.jsonc` | `wrangler.workers.jsonc` | No |
-| `wrangler deploy` (default config) | Fails or wrong | No |
+| Command | Use for tfdraw? |
+| --- | --- |
+| `wrangler pages deploy ./excalidraw-app/build` | **Yes** — static app + Pages Functions |
+| `wrangler deploy` | **No** — Workers mode; no Pages Functions |

@@ -12,13 +12,13 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
     <img alt="CI" src="https://github.com/TusharSariya/excalidraw-tf/actions/workflows/ci.yml/badge.svg" />
   </a>
   <img alt="Node 22+" src="https://img.shields.io/badge/node-22%2B-339933" />
-  <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">
+  <a href="https://tfdraw.dev/demo">
     <img alt="Live demo" src="https://img.shields.io/badge/live-demo-0f766e" />
   </a>
 </p>
 
 <p align="center">
-  <a href="https://master-ainur.tushar-sariya77.workers.dev/demo">Open live demo</a>
+  <a href="https://tfdraw.dev/demo">Open live demo</a>
   |
   <a href="https://github.com/TusharSariya/excalidraw-tf">GitHub repository</a>
 </p>
@@ -28,14 +28,14 @@ Import Terraform/OpenTofu plan JSON and graph DOT files, review the generated in
 ## How it works
 
 1. You run Terraform or OpenTofu locally and export **plan JSON** (`terraform show -json`) and **graph DOT** (`terraform graph -type=plan`) from the same working directory.
-2. You open the [hosted demo](https://master-ainur.tushar-sariya77.workers.dev/demo) or a local dev build and choose **Import Terraform** (`Ctrl/Cmd+Shift+K`).
+2. You open the [hosted demo](https://tfdraw.dev/demo) or a local dev build and choose **Import Terraform** (`Ctrl/Cmd+Shift+K`).
 3. The browser parses those files into Excalidraw elements: resource cards, dependency edges, module frames, and cloud hierarchy (account, region, VPC, subnets).
 4. Optionally you attach a **`.tfd`** file to add **declared dataflow** arrows (blue) in a fixed order; IAM-inferred **data flow** (grey) still comes from the plan.
 5. You edit, save locally, or export the scene like any other Excalidraw drawing.
 
 ## Quick start
 
-**Hosted app:** [https://master-ainur.tushar-sariya77.workers.dev/demo](https://master-ainur.tushar-sariya77.workers.dev/demo)
+**Hosted app:** [https://tfdraw.dev/demo](https://tfdraw.dev/demo)
 
 **Local dev** (Node.js 22+, see [`.nvmrc`](./.nvmrc)):
 
@@ -340,11 +340,11 @@ yarn deploy:pages -- --project-name=YOUR_PAGES_PROJECT_NAME
 npx wrangler@4 pages deploy ./excalidraw-app/build --project-name=YOUR_PAGES_PROJECT_NAME
 ```
 
-Use **`wrangler pages deploy`**, not `wrangler deploy`. [`wrangler.jsonc`](./wrangler.jsonc) is Pages-only (no `assets`); Workers static previews use [`wrangler.workers.jsonc`](./wrangler.workers.jsonc).
+Use **`wrangler pages deploy`**, not `wrangler deploy`. [`wrangler.jsonc`](./wrangler.jsonc) is **Pages-only** (no `assets` key).
 
-Ensure **Pages → Settings → Production branch** is `master` (or your prod branch) so production uses `env.production` D1 bindings.
+Hosted deploys use **Cloudflare Pages** (GitHub Actions). The old **Workers Builds** Worker (`ainur`) was removed — it could not serve Pages Functions (`/api/*`).
 
-**Workers `*.workers.dev` previews do not run Pages Functions** (`/api/subscribe`, `/api/terraform-import-presets`, etc.) — use a **Pages** URL from GitHub Actions. Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
+Setup: [docs/cloudflare-deploy.md](./docs/cloudflare-deploy.md).
 
 ## Upstream Excalidraw
 
