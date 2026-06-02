@@ -46,7 +46,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, chevronLeftIcon, chevronRight } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -237,6 +237,38 @@ const LayerUI = ({
   const renderSelectedShapeActions = () => {
     const isCompactMode = isCompactStylesPanel;
 
+    if (appState.isPropertiesPanelCollapsed) {
+      return (
+        <Section
+          heading="selectedShapeActions"
+          className={clsx("selected-shape-actions zen-mode-transition", {
+            "transition-left": appState.zenModeEnabled,
+          })}
+        >
+          <Island
+            padding={1}
+            className="properties-panel-collapsed"
+            style={{
+              width: "fit-content",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <button
+              type="button"
+              className="properties-panel-expand-button"
+              onClick={() => setAppState({ isPropertiesPanelCollapsed: false })}
+              title={`${t("buttons.expand")} (Ctrl+H)`}
+              aria-label={t("buttons.expand")}
+            >
+              {chevronRight}
+            </button>
+          </Island>
+        </Section>
+      );
+    }
+
     return (
       <Section
         heading="selectedShapeActions"
@@ -244,6 +276,15 @@ const LayerUI = ({
           "transition-left": appState.zenModeEnabled,
         })}
       >
+        <button
+          type="button"
+          className="properties-panel-toggle"
+          onClick={() => setAppState({ isPropertiesPanelCollapsed: true })}
+          title={`${t("buttons.collapse")} (Ctrl+H)`}
+          aria-label={t("buttons.collapse")}
+        >
+          {chevronLeftIcon}
+        </button>
         {isCompactMode ? (
           <Island
             className={clsx("compact-shape-actions-island")}

@@ -154,6 +154,61 @@ body.excalidraw-cursor-resize * {
     display: flex;
     flex-direction: column;
     row-gap: 0.75rem;
+    position: relative;
+
+    .properties-panel-toggle {
+      position: absolute;
+      right: -10px;
+      top: 16px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: var(--island-bg-color);
+      border: 1px solid var(--default-border-color);
+      color: var(--icon-fill-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s, color 0.2s;
+      padding: 0;
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+        color: var(--color-brand-hover);
+      }
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .properties-panel-expand-button {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      background-color: transparent;
+      border: none;
+      color: var(--icon-fill-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: var(--space-factor);
+      padding: 0;
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+        color: var(--color-brand-hover);
+      }
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+    }
 
     h3,
     legend,

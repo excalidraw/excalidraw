@@ -325,6 +325,7 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionTogglePropertiesPanel,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -12705,6 +12706,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
+          actionTogglePropertiesPanel,
         ];
       }
 
@@ -12725,6 +12727,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,
+        actionTogglePropertiesPanel,
       ];
     }
 

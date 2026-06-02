@@ -255,7 +255,10 @@
     "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
-    "embeddableInteractionButton": "Click to interact"
+    "embeddableInteractionButton": "Click to interact",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "togglePropertiesPanel": "Toggle properties panel"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
