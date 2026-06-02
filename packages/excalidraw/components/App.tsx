@@ -207,10 +207,11 @@ import {
   getLineHeightInPx,
   getApproxMinLineWidth,
   getApproxMinLineHeight,
-  getMinTextElementWidth,
-  ShapeCache,
-  getRenderOpacity,
-  editGroupForSelectedElement,
+   getMinTextElementWidth,
+   ShapeCache,
+   getRenderOpacity,
+   resolveRenderOpacity,
+   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
@@ -450,6 +451,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
+import { AnimationController } from "../renderer/animation";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -740,6 +742,90 @@ class App extends React.Component<AppProps, AppState> {
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   api: ExcalidrawImperativeAPI;
+  private renderOpacityVersion = 0;
+  private elementOpacityOverrides = new Map<string, number>();
+  private elementFadeStates = new Map<
+    string,
+    {
+      from: number;
+      to: number;
+      duration: number;
+      delay: number;
+      elapsed: number;
+    }
+  >();
+
+  private getElementFadeAnimationKey = () => `${this.id}:fade-element`;
+
+  private bumpRenderOpacityVersion = () => {
+    this.renderOpacityVersion++;
+    this.setState({});
+  };
+
+  private getRenderOpacityConfig = () => ({
+    elementOpacityOverrides: this.elementOpacityOverrides,
+    resolveRenderOpacity: this.props.resolveRenderOpacity,
+  });
+
+  private getResolvedElementOpacity = (element: NonDeletedExcalidrawElement) => {
+    return resolveRenderOpacity(element, this.getRenderOpacityConfig());
+  };
+
+  private syncFadeElementAnimations = () => {
+    const animationKey = this.getElementFadeAnimationKey();
+
+    if (this.elementFadeStates.size === 0) {
+      AnimationController.cancel(animationKey);
+      return;
+    }
+
+    if (AnimationController.running(animationKey)) {
+      return;
+    }
+
+    AnimationController.start(animationKey, ({ deltaTime }) => {
+      let shouldRerender = false;
+
+      for (const [id, fade] of this.elementFadeStates) {
+        const element = this.scene.getNonDeletedElement(id);
+
+        if (!element) {
+          this.elementFadeStates.delete(id);
+          shouldRerender =
+            this.elementOpacityOverrides.delete(id) || shouldRerender;
+          continue;
+        }
+
+        fade.elapsed += deltaTime;
+
+        const nextOpacity =
+          fade.elapsed <= fade.delay
+            ? fade.from
+            : fade.duration === 0
+              ? fade.to
+              : fade.from +
+                (fade.to - fade.from) *
+                  Math.min((fade.elapsed - fade.delay) / fade.duration, 1);
+
+        const clampedOpacity = clamp(nextOpacity, 0, 100);
+
+        if (this.elementOpacityOverrides.get(id) !== clampedOpacity) {
+          this.elementOpacityOverrides.set(id, clampedOpacity);
+          shouldRerender = true;
+        }
+
+        if (fade.elapsed >= fade.delay + fade.duration) {
+          this.elementFadeStates.delete(id);
+        }
+      }
+
+      if (shouldRerender) {
+        this.bumpRenderOpacityVersion();
+      }
+
+      return this.elementFadeStates.size > 0 ? {} : undefined;
+    });
+  };
 
   private createExcalidrawAPI(): ExcalidrawImperativeAPI {
     const api: ExcalidrawImperativeAPI = {
@@ -757,6 +843,9 @@ class App extends React.Component<AppProps, AppState> {
         clear: this.resetHistory,
       },
       scrollToContent: this.scrollToContent,
+      fadeElement: this.fadeElement,
+      cancelFadeElement: this.cancelFadeElement,
+      clearElementOpacityOverrides: this.clearElementOpacityOverrides,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -1762,6 +1851,7 @@ class App extends React.Component<AppProps, AppState> {
                 display: isVisible ? "block" : "none",
                 opacity: getRenderOpacity(
                   el,
+                  this.getRenderOpacityConfig(),
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                   null,
@@ -2351,6 +2441,8 @@ class App extends React.Component<AppProps, AppState> {
                               pendingFlowchartNodes:
                                 this.flowChartCreator.pendingNodes,
                               theme: this.state.theme,
+                              ...this.getRenderOpacityConfig(),
+                              renderOpacityVersion: this.renderOpacityVersion,
                             }}
                           />
                           {newElementCanvasElement && (
@@ -2373,6 +2465,9 @@ class App extends React.Component<AppProps, AppState> {
                                   this.elementsPendingErasure,
                                 pendingFlowchartNodes: null,
                                 theme: this.state.theme,
+                                ...this.getRenderOpacityConfig(),
+                                renderOpacityVersion:
+                                  this.renderOpacityVersion,
                               }}
                             />
                           )}
@@ -3206,6 +3301,7 @@ class App extends React.Component<AppProps, AppState> {
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
+    AnimationController.cancel(this.getElementFadeAnimationKey());
 
     (window as any).launchQueue?.setConsumer(() => {});
 
@@ -4617,6 +4713,77 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  public fadeElement = ({
+    id,
+    from,
+    to = 100,
+    duration = 250,
+    delay = 0,
+  }: {
+    id: string;
+    from?: number;
+    to?: number;
+    duration?: number;
+    delay?: number;
+  }) => {
+    const element = this.scene.getNonDeletedElement(id);
+
+    if (!element) {
+      return;
+    }
+
+    const startOpacity = clamp(
+      from ?? this.getResolvedElementOpacity(element),
+      0,
+      100,
+    );
+    const targetOpacity = clamp(to, 0, 100);
+    const normalizedDuration = Math.max(duration, 0);
+    const normalizedDelay = Math.max(delay, 0);
+
+    this.elementOpacityOverrides.set(id, startOpacity);
+
+    if (normalizedDuration === 0 && normalizedDelay === 0) {
+      this.elementFadeStates.delete(id);
+      this.elementOpacityOverrides.set(id, targetOpacity);
+      this.bumpRenderOpacityVersion();
+      return;
+    }
+
+    this.elementFadeStates.set(id, {
+      from: startOpacity,
+      to: targetOpacity,
+      duration: normalizedDuration,
+      delay: normalizedDelay,
+      elapsed: 0,
+    });
+
+    this.bumpRenderOpacityVersion();
+    this.syncFadeElementAnimations();
+  };
+
+  public cancelFadeElement = (id: string) => {
+    if (!this.elementFadeStates.delete(id)) {
+      return;
+    }
+
+    this.syncFadeElementAnimations();
+  };
+
+  public clearElementOpacityOverrides = () => {
+    if (
+      this.elementOpacityOverrides.size === 0 &&
+      this.elementFadeStates.size === 0
+    ) {
+      return;
+    }
+
+    this.elementFadeStates.clear();
+    this.elementOpacityOverrides.clear();
+    this.syncFadeElementAnimations();
+    this.bumpRenderOpacityVersion();
+  };
 
   public applyDeltas = (
     deltas: StoreDelta[],

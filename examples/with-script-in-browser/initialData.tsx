@@ -2,6 +2,28 @@ import type { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/element/t
 import type { FileId } from "@excalidraw/excalidraw/element/types";
 
 const elements: ExcalidrawElementSkeleton[] = [
+  // {
+  //   type: "arrow",
+  //   x: 100,
+  //   y: 500,
+  // },
+  // {
+  //   type: "arrow",
+  //   x: 250,
+  //   y: 250,
+  //   label: {
+  //     text: "HELLO WORLD!!",
+  //   },
+  //   start: {
+  //     type: "rectangle",
+  //     // x: -100,
+  //   },
+  //   end: {
+  //     type: "ellipse",
+  //     // x: 300,
+  //   },
+  // },
+
   {
     type: "rectangle",
     x: 10,
@@ -22,14 +44,14 @@ const elements: ExcalidrawElementSkeleton[] = [
     },
     id: "2",
   },
-  {
-    type: "arrow",
-    x: 100,
-    y: 200,
-    label: { text: "HELLO WORLD!!" },
-    start: { type: "rectangle" },
-    end: { type: "ellipse" },
-  },
+  // {
+  //   type: "arrow",
+  //   x: 100,
+  //   y: 200,
+  //   label: { text: "HELLO WORLD!!" },
+  //   start: { type: "rectangle" },
+  //   end: { type: "ellipse" },
+  // },
   {
     type: "image",
     x: 606.1042326312408,
@@ -38,11 +60,11 @@ const elements: ExcalidrawElementSkeleton[] = [
     height: 230,
     fileId: "rocket" as FileId,
   },
-  {
-    type: "frame",
-    children: ["1", "2"],
-    name: "My frame",
-  },
+  // {
+  //   type: "frame",
+  //   children: ["1", "2"],
+  //   name: "My frame",
+  // },
 ];
 export default {
   elements,

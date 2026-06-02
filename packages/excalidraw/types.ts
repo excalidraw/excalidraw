@@ -567,6 +567,10 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+export type RenderOpacityResolver = (
+  element: NonDeletedExcalidrawElement,
+) => ExcalidrawElement["opacity"] | undefined;
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -682,6 +686,7 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  resolveRenderOpacity?: RenderOpacityResolver;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
@@ -962,6 +967,11 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  fadeElement: InstanceType<typeof App>["fadeElement"];
+  cancelFadeElement: InstanceType<typeof App>["cancelFadeElement"];
+  clearElementOpacityOverrides: InstanceType<
+    typeof App
+  >["clearElementOpacityOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

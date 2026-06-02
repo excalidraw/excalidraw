@@ -1,6 +1,7 @@
 import rough from "roughjs/bin/rough";
 
 import {
+  clamp,
   type GlobalPoint,
   isRightAngleRads,
   lineSegment,
@@ -105,8 +106,36 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
   }
 };
 
+export const resolveRenderOpacity = (
+  element: ExcalidrawElement,
+  renderConfig: Pick<
+    StaticCanvasRenderConfig,
+    "elementOpacityOverrides" | "resolveRenderOpacity"
+  >,
+) => {
+  const override = renderConfig.elementOpacityOverrides?.get(element.id);
+
+  if (override !== undefined) {
+    return clamp(override, 0, 100);
+  }
+
+  const resolvedOpacity = renderConfig.resolveRenderOpacity?.(
+    element as NonDeletedExcalidrawElement,
+  );
+
+  if (resolvedOpacity !== undefined) {
+    return clamp(resolvedOpacity, 0, 100);
+  }
+
+  return element.opacity;
+};
+
 export const getRenderOpacity = (
   element: ExcalidrawElement,
+  renderConfig: Pick<
+    StaticCanvasRenderConfig,
+    "elementOpacityOverrides" | "resolveRenderOpacity"
+  >,
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
   pendingNodes: Readonly<PendingExcalidrawElements> | null,
@@ -115,7 +144,8 @@ export const getRenderOpacity = (
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
   let opacity =
-    (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
+    (((containingFrame?.opacity ?? 100) * resolveRenderOpacity(element, renderConfig)) /
+      10000) *
     globalAlpha;
 
   // if pending erasure, multiply again to combine further
@@ -793,6 +823,7 @@ export const renderElement = (
 
   context.globalAlpha = getRenderOpacity(
     element,
+    renderConfig,
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
     renderConfig.pendingFlowchartNodes,

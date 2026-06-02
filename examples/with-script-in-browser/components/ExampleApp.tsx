@@ -70,6 +70,7 @@ export interface AppProps {
   customArgs?: any[];
   children: React.ReactNode;
   excalidrawLib: typeof TExcalidraw;
+  showFadeDemo?: boolean;
 }
 
 export default function ExampleApp({
@@ -78,6 +79,7 @@ export default function ExampleApp({
   customArgs,
   children,
   excalidrawLib,
+  showFadeDemo = false,
 }: AppProps) {
   const {
     exportToCanvas,
@@ -116,6 +118,8 @@ export default function ExampleApp({
     {},
   );
   const [comment, setComment] = useState<Comment | null>(null);
+  const [hideAllForFadeDemo, setHideAllForFadeDemo] = useState(showFadeDemo);
+  const [fadeDemoNextIndex, setFadeDemoNextIndex] = useState(0);
 
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
@@ -178,7 +182,8 @@ export default function ExampleApp({
     const newElement = cloneElement(
       Excalidraw,
       {
-        excalidrawAPI: (api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api),
+        onExcalidrawAPI: (api: ExcalidrawImperativeAPI | null) =>
+          setExcalidrawAPI(api),
         initialData: initialStatePromiseRef.current.promise,
         onChange: (
           elements: NonDeletedExcalidrawElement[],
@@ -208,6 +213,7 @@ export default function ExampleApp({
         onPointerDown,
         onScrollChange: rerenderCommentIcons,
         validateEmbeddable: true,
+        resolveRenderOpacity: hideAllForFadeDemo ? () => 0 : undefined,
       },
       <>
         {excalidrawAPI && (
@@ -664,6 +670,58 @@ export default function ExampleApp({
           >
             Reset Scene
           </button>
+          {showFadeDemo && (
+            <>
+              <button
+                onClick={() => {
+                  if (!excalidrawAPI) {
+                    return;
+                  }
+
+                  const elements = excalidrawAPI.getSceneElements();
+
+                  if (!elements.length) {
+                    return;
+                  }
+
+                  setHideAllForFadeDemo(true);
+
+                  const nextIndex =
+                    fadeDemoNextIndex >= elements.length
+                      ? 0
+                      : fadeDemoNextIndex;
+
+                  if (nextIndex === 0) {
+                    excalidrawAPI.clearElementOpacityOverrides();
+                  }
+
+                  console.info("Fading in element", {
+                    element: elements[nextIndex],
+                  });
+
+                  excalidrawAPI.fadeElement({
+                    id: elements[nextIndex].id,
+                    from: 0,
+                    to: 100,
+                    duration: 500,
+                  });
+
+                  setFadeDemoNextIndex(nextIndex + 1);
+                }}
+              >
+                Fade in next element
+              </button>
+              <button
+                onClick={() => {
+                  excalidrawAPI?.clearElementOpacityOverrides();
+                  setHideAllForFadeDemo(true);
+                  setFadeDemoNextIndex(0);
+                }}
+              >
+                Reset fade demo
+              </button>
+            </>
+          )}
           <button
             onClick={() => {
               const libraryItems: LibraryItems = [
