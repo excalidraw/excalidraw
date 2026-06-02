@@ -67,9 +67,7 @@ const _renderNewElementScene = ({
         }
       }
 
-      const renderTargetElement = renderConfig.pendingDrawShapeElement
-        ? { ...renderConfig.pendingDrawShapeElement, seed: 1 }
-        : newElement;
+      const renderTargetElement = newElement;
 
       renderElement(
         renderTargetElement,

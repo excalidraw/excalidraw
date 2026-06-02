@@ -272,7 +272,6 @@ export const exportToCanvas = async (
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
-      pendingDrawShapeElement: null,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
   });

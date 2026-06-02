@@ -24,7 +24,6 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
-  ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
 } from "@excalidraw/common";
 
 import type {
@@ -111,7 +110,6 @@ export const getRenderOpacity = (
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
   pendingNodes: Readonly<PendingExcalidrawElements> | null,
-  pendingDrawShapeElement: ExcalidrawElement | null,
   globalAlpha: number = 1,
 ) => {
   // multiplying frame opacity with element opacity to combine them
@@ -119,10 +117,6 @@ export const getRenderOpacity = (
   let opacity =
     (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
     globalAlpha;
-
-  if (pendingDrawShapeElement && pendingDrawShapeElement.id === element.id) {
-    opacity *= ELEMENT_PENDING_DRAW_SHAPE_OPACITY / 100;
-  }
 
   // if pending erasure, multiply again to combine further
   // (so that erasing always results in lower opacity than original)
@@ -802,7 +796,6 @@ export const renderElement = (
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
     renderConfig.pendingFlowchartNodes,
-    renderConfig.pendingDrawShapeElement,
     reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1,
   );
 

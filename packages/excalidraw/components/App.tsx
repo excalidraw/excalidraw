@@ -110,6 +110,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getElementBoundsFromPoints,
+  ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
 } from "@excalidraw/common";
 
 import {
@@ -665,8 +666,6 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
-
-  private pendingDrawShapeElement: ExcalidrawElement | null = null;
 
   private _initialized = false;
 
@@ -1772,7 +1771,6 @@ class App extends React.Component<AppProps, AppState> {
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                   null,
-                  null,
                   this.state.openDialog?.name === "elementLinkSelector"
                     ? DEFAULT_REDUCED_GLOBAL_ALPHA
                     : 1,
@@ -2359,8 +2357,6 @@ class App extends React.Component<AppProps, AppState> {
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes:
                                 this.flowChartCreator.pendingNodes,
-                              pendingDrawShapeElement:
-                                this.pendingDrawShapeElement,
                               theme: this.state.theme,
                             }}
                           />
@@ -2383,8 +2379,6 @@ class App extends React.Component<AppProps, AppState> {
                                 elementsPendingErasure:
                                   this.elementsPendingErasure,
                                 pendingFlowchartNodes: null,
-                                pendingDrawShapeElement:
-                                  this.pendingDrawShapeElement,
                                 theme: this.state.theme,
                               }}
                             />
@@ -9812,19 +9806,19 @@ class App extends React.Component<AppProps, AppState> {
             ) as ExcalidrawNonSelectionElement | undefined;
 
             if (shapePreview) {
-              this.pendingDrawShapeElement = shapePreview;
-
               this.setState({
-                newElement: shapePreview,
+                newElement: {
+                  ...shapePreview,
+                  seed: 1,
+                  opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
+                },
               });
             } else {
-              this.pendingDrawShapeElement = null;
               this.setState({
                 newElement: null,
               });
             }
           } else {
-            this.pendingDrawShapeElement = null;
             this.setState({
               newElement: null,
             });
@@ -11630,7 +11624,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "drawShape") {
-        this.pendingDrawShapeElement = null;
         const points = this.drawShapeTrail.getCurrentPoints();
         this.drawShapeTrail.endPath();
 
@@ -11650,28 +11643,33 @@ class App extends React.Component<AppProps, AppState> {
               );
 
             if (detectedElement) {
-              this.insertNewElement(detectedElement);
+              const _detectedElement = {
+                ...detectedElement,
+                seed: randomInteger(),
+                opacity: this.state.currentItemOpacity,
+              };
+              this.insertNewElement(_detectedElement);
 
-              if (isBindingElement(detectedElement)) {
+              if (isBindingElement(_detectedElement)) {
                 const [x, y] =
                   LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                    detectedElement,
+                    _detectedElement,
                     1,
                     this.scene.getNonDeletedElementsMap(),
                   );
 
-                this.scene.mutateElement(detectedElement, {
+                this.scene.mutateElement(_detectedElement, {
                   startArrowhead: this.state.currentItemStartArrowhead,
                   endArrowhead: this.state.currentItemEndArrowhead,
                 });
 
                 flushSync(() => {
                   const linearElement = new LinearElementEditor(
-                    detectedElement,
+                    _detectedElement,
                     this.scene.getNonDeletedElementsMap(),
                   );
                   this.setState({
-                    newElement: detectedElement,
+                    newElement: _detectedElement,
                     selectedLinearElement: {
                       ...linearElement,
                       pointerOffset: {
