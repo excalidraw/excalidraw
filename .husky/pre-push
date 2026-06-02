@@ -1,6 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Typecheck, ESLint, Prettier, Knip, depcheck, tests, coverage, ESM build, and size-limit.
+# Typecheck, ESLint, Prettier, Knip, depcheck, fast tests, ESM build, and size-limit.
+# Full vitest+coverage runs in CI prepush on pull requests (yarn test:prepush).
 export TERRAFORM_IMPORT_PRESETS_DB="${TERRAFORM_IMPORT_PRESETS_DB:-packages/excalidraw/test-fixtures/terraform-import-presets.db}"
-yarn test:prepush
+yarn test:prepush:fast

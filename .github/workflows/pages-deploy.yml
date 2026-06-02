@@ -119,6 +119,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: ${{ steps.deploy_cmd.outputs.command }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -176,6 +177,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: pages deployment tail --project-name=${{ vars.CF_PAGES_PROJECT_NAME }}
 
   pr-comment:

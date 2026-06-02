@@ -51,7 +51,8 @@
     "vite-plugin-pwa": "0.21.1",
     "vite-plugin-svgr": "4.2.0",
     "vitest": "3.0.6",
-    "vitest-canvas-mock": "0.3.3"
+    "vitest-canvas-mock": "0.3.3",
+    "wrangler": "4"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -84,8 +85,11 @@
     "start:production": "yarn --cwd ./excalidraw-app start:production",
     "start:example": "yarn build:packages && yarn --cwd ./examples/with-script-in-browser start",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
-    "test:commit": "yarn test:typecheck && yarn vitest run --watch=false",
+    "test:commit": "yarn test:typecheck && yarn test:fast",
+    "test:fast": "VITEST_FAST=1 vitest run --watch=false",
+    "test:slow": "VITEST_SLOW_ONLY=1 vitest run --watch=false",
     "test:prepush": "yarn test:typecheck && yarn test:code && yarn test:other && yarn lint:arch && yarn lint:oxlint && yarn knip && yarn depcheck && yarn test:coverage && yarn workspace @excalidraw/excalidraw run build:esm && yarn workspace @excalidraw/excalidraw run check:size",
+    "test:prepush:fast": "yarn test:typecheck && yarn test:code && yarn test:other && yarn lint:arch && yarn lint:oxlint && yarn knip && yarn depcheck && yarn test:fast && yarn workspace @excalidraw/excalidraw run build:esm && yarn workspace @excalidraw/excalidraw run check:size",
     "test:app": "vitest",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
     "test:other": "yarn prettier --list-different",

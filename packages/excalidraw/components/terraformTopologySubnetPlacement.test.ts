@@ -4,6 +4,7 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 
+import { getStagingSemanticLayoutElements } from "../test-fixtures/stagingSemanticLayoutFixture";
 import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
 
 import {
@@ -15,7 +16,6 @@ import {
   type TerraformResourceChangeLike,
 } from "./terraformProviderClassification";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
-import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 import {
   buildTopologySubnetNameMap,
   extractPrimaryTopologyZones,
@@ -115,21 +115,7 @@ describe("staging-multi-state-expanded topology subnet placement", () => {
       const producerZone = zoneForAddress(zones, "aws_ecs_service.producer");
       expect(producerZone?.subnetIds.length).toBeGreaterThan(0);
 
-      const sources = getTerraformImportPresetSourcesFromDb(
-        "staging-multi-state-expanded",
-      );
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: sources!.planDotBundles,
-          states: [],
-          stateLabels: [],
-          tfdTexts: sources!.tfdTexts,
-          tfdLabels: sources!.tfdLabels,
-        },
-        { semanticLayout: true },
-      );
-      expect(res.ok).toBe(true);
-      const elements = (await res.json()).elements as Array<{
+      const elements = (await getStagingSemanticLayoutElements()) as Array<{
         id: string;
         type?: string;
         frameId?: string | null;

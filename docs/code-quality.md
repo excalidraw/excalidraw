@@ -10,7 +10,10 @@ This fork extends upstream Excalidraw cleanup checks (Knip, depcheck, Prettier, 
 | `yarn lint:arch` | [dependency-cruiser](https://github.com/sverweij/dependency-cruiser) import boundaries under `packages/excalidraw/components` |
 | `yarn lint:oxlint` | [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) on terraform components (report-only; exits 0) |
 | `yarn lint:quality` | `lint:arch` + `lint:oxlint` |
-| `yarn test:prepush` | Full pre-push chain (includes `lint:arch` + `lint:oxlint`) |
+| `yarn test:fast` | Vitest without slow terraform layout/import files (`VITEST_FAST=1`) |
+| `yarn test:slow` | Only the slow terraform test files (`VITEST_SLOW_ONLY=1`) |
+| `yarn test:prepush:fast` | Default **local** pre-push hook: same as prepush but `test:fast` instead of coverage |
+| `yarn test:prepush` | Full pre-push chain with coverage (use before release; CI prepush on PRs) |
 | `yarn sonar:up` / `yarn sonar:down` | Start/stop local SonarQube Community Build (port 9000) |
 | `yarn sonar:scan` | Vitest coverage + `@sonar/scan` (requires running server + token) |
 
@@ -123,4 +126,6 @@ rules:
 
 ## Pre-push and CI order
 
-Pre-push (`yarn test:prepush`): typecheck → ESLint → Prettier → **lint:arch** → **lint:oxlint** → Knip → depcheck → coverage → ESM build → size limit. CI prepush on pull requests also runs `yarn build:pages`; bundle size comments come from [`size-limit.yml`](../.github/workflows/size-limit.yml).
+Local pre-push (`.husky/pre-push` → `yarn test:prepush:fast`): typecheck → ESLint → Prettier → **lint:arch** → **lint:oxlint** → Knip → depcheck → **fast vitest** → ESM build → size limit.
+
+CI on pull requests: **lint** + **test** (`yarn test:fast`) in parallel, then **prepush** (`yarn test:coverage` full suite + ESM + size limit). Static app build and PR previews are in [`pages-deploy.yml`](../.github/workflows/pages-deploy.yml). Bundle size comments come from [`size-limit.yml`](../.github/workflows/size-limit.yml).

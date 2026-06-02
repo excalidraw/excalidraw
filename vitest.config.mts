@@ -1,6 +1,15 @@
 import path from "path";
 
-import { coverageConfigDefaults, defineConfig } from "vitest/config";
+import {
+  configDefaults,
+  coverageConfigDefaults,
+  defineConfig,
+} from "vitest/config";
+
+import { SLOW_TEST_PATTERNS } from "./packages/excalidraw/test-fixtures/slowTestPatterns";
+
+const isFastRun = process.env.VITEST_FAST === "1";
+const isSlowOnlyRun = process.env.VITEST_SLOW_ONLY === "1";
 
 export default defineConfig({
   resolve: {
@@ -50,6 +59,10 @@ export default defineConfig({
   },
   //@ts-ignore
   test: {
+    ...(isSlowOnlyRun ? { include: [...SLOW_TEST_PATTERNS] } : {}),
+    ...(isFastRun
+      ? { exclude: [...configDefaults.exclude, ...SLOW_TEST_PATTERNS] }
+      : {}),
     // Since hooks are running in stack in v2, which means all hooks run serially whereas
     // we need to run them in parallel
     sequence: {
@@ -73,7 +86,9 @@ export default defineConfig({
     coverage: {
       /** Ensures CI / vitest-coverage-report-action still get json-summary when tests or thresholds fail */
       reportOnFailure: true,
-      reporter: ["text", "json-summary", "json", "html", "lcovonly"],
+      reporter: process.env.CI
+        ? ["text", "json-summary", "lcovonly"]
+        : ["text", "json-summary", "json", "html", "lcovonly"],
       exclude: [
         ...coverageConfigDefaults.exclude,
         "dev-docs/**",

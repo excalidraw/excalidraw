@@ -1,12 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
-import {
-  loadStagingMultiStatePlanDotBundlesFromDb,
-  readStagingMultiStatePipelineTfdFromDb,
-  STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
-} from "../test-fixtures/terraformPresetFixtures";
-
-import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
+import { getStagingSemanticLayoutElements } from "../test-fixtures/stagingSemanticLayoutFixture";
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
 
 type SceneEl = {
   id: string;
@@ -88,79 +83,58 @@ function resourceTile(
 }
 
 describe("semantic topology subnet containment", () => {
-  async function importSemantic() {
-    const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-    const tfd = readStagingMultiStatePipelineTfdFromDb();
-    const res = await terraformPlanParsingFromSources(
-      {
-        planDotBundles: bundles,
-        states: [],
-        stateLabels: [],
-        tfdTexts: [tfd],
-        tfdLabels: ["pipeline.tfd"],
-      },
-      { semanticLayout: true },
+  let elements: SceneEl[];
+
+  beforeAll(async () => {
+    elements = (await getStagingSemanticLayoutElements()) as SceneEl[];
+  }, STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS);
+
+  it("ecs-edge producer primaryCluster is contained in a subnetZone frame", () => {
+    const producer = resourceTile(elements, "aws_ecs_service.producer");
+    expect(producer).toBeDefined();
+
+    const cluster = ancestorFrameWithRole(
+      elements,
+      producer!.frameId ?? producer!.id,
+      "primaryCluster",
     );
-    expect(res.ok).toBe(true);
-    return (await res.json()).elements as SceneEl[];
-  }
+    expect(cluster).toBeDefined();
 
-  it(
-    "ecs-edge producer primaryCluster is contained in a subnetZone frame",
-    async () => {
-      const elements = await importSemantic();
-      const producer = resourceTile(elements, "aws_ecs_service.producer");
-      expect(producer).toBeDefined();
+    const subnetZone = ancestorFrameWithRole(
+      elements,
+      cluster!.frameId ?? cluster!.id,
+      "subnetZone",
+    );
+    expect(subnetZone).toBeDefined();
+    expect(boundsContain(subnetZone!, cluster!)).toBe(true);
+    expect(subnetZone!.name).toMatch(/private/i);
+    expect(
+      Array.isArray(subnetZone!.customData?.terraformSubnetIds) &&
+        subnetZone!.customData!.terraformSubnetIds!.length > 0,
+    ).toBe(true);
+  });
 
-      const cluster = ancestorFrameWithRole(
-        elements,
-        producer!.frameId ?? producer!.id,
-        "primaryCluster",
-      );
-      expect(cluster).toBeDefined();
+  it("consumer lambda primaryCluster is contained in a subnetZone frame", () => {
+    const lambda = resourceTile(
+      elements,
+      "module.consumer_lambda.module.lambda.aws_lambda_function",
+    );
+    expect(lambda).toBeDefined();
 
-      const subnetZone = ancestorFrameWithRole(
-        elements,
-        cluster!.frameId ?? cluster!.id,
-        "subnetZone",
-      );
-      expect(subnetZone).toBeDefined();
-      expect(boundsContain(subnetZone!, cluster!)).toBe(true);
-      expect(subnetZone!.name).toMatch(/private/i);
-      expect(
-        Array.isArray(subnetZone!.customData?.terraformSubnetIds) &&
-          subnetZone!.customData!.terraformSubnetIds!.length > 0,
-      ).toBe(true);
-    },
-    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
-  );
+    const cluster = ancestorFrameWithRole(
+      elements,
+      lambda!.frameId ?? lambda!.id,
+      "primaryCluster",
+    );
+    expect(cluster).toBeDefined();
 
-  it(
-    "consumer lambda primaryCluster is contained in a subnetZone frame",
-    async () => {
-      const elements = await importSemantic();
-      const lambda = resourceTile(
-        elements,
-        "module.consumer_lambda.module.lambda.aws_lambda_function",
-      );
-      expect(lambda).toBeDefined();
-
-      const cluster = ancestorFrameWithRole(
-        elements,
-        lambda!.frameId ?? lambda!.id,
-        "primaryCluster",
-      );
-      expect(cluster).toBeDefined();
-
-      const subnetZone = ancestorFrameWithRole(
-        elements,
-        cluster!.frameId ?? cluster!.id,
-        "subnetZone",
-      );
-      expect(subnetZone).toBeDefined();
-      expect(boundsContain(subnetZone!, cluster!)).toBe(true);
-      expect(subnetZone!.name).toMatch(/private/i);
-    },
-    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
-  );
+    const subnetZone = ancestorFrameWithRole(
+      elements,
+      cluster!.frameId ?? cluster!.id,
+      "subnetZone",
+    );
+    expect(subnetZone).toBeDefined();
+    expect(boundsContain(subnetZone!, cluster!)).toBe(true);
+    expect(subnetZone!.name).toMatch(/private/i);
+  });
 });

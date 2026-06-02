@@ -1,6 +1,6 @@
 # Mirrors local git hooks:
-#   pre-push    → lint job (ESLint, Prettier, tsc, Knip, depcheck) + prepush job (coverage, ESM build, build:pages)
-#   test:commit → test job (vitest) — manual / workflow_dispatch only
+#   pre-push    → lint job + prepush job on PRs (full vitest+coverage, ESM build; Pages build is pages-deploy.yml)
+#   test:commit → test job (yarn test:fast) — manual / workflow_dispatch only
 #   size-limit  → size-limit.yml (PR bundle size comments)
 name: CI
 
@@ -74,10 +74,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Vitest
+      - name: Vitest (fast suite)
         env:
           TERRAFORM_IMPORT_PRESETS_DB: packages/excalidraw/test-fixtures/terraform-import-presets.db
-        run: yarn vitest run --watch=false
+        run: yarn test:fast
 
   terraform-presets:
     name: Terraform preset seed
@@ -139,5 +139,5 @@ jobs:
       - name: Build @excalidraw/excalidraw ESM
         run: yarn workspace @excalidraw/excalidraw run build:esm
 
-      - name: Build static app
-        run: yarn build:pages
+      - name: Size limit
+        run: yarn workspace @excalidraw/excalidraw run check:size
