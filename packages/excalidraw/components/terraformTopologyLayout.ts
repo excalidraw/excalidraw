@@ -164,6 +164,52 @@ type TopologyLayoutCaches = {
   routeTableIndexes: RouteTablePlanIndexes | null;
 };
 
+type TopologyLayoutMemoCtx = {
+  primaryFootprintByAddr: Map<string, number>;
+  primaryMarginsByAddr: Map<string, { top: number; bottom: number }>;
+  satHeightCtxByAddr: Map<
+    string,
+    ReturnType<typeof buildSatelliteKindHeightContext>
+  >;
+  satelliteBundlesByAddr: Map<
+    string,
+    ReturnType<typeof buildTopologyPrimarySatelliteBundles>
+  >;
+  layoutConfigByResourceType: Map<string, ReturnType<typeof getPrimaryLayoutConfig>>;
+};
+
+let activeTopologyMemoCtx: TopologyLayoutMemoCtx | null = null;
+
+function withPrimaryFootprintMemo(
+  nodes: TerraformPlanNodesMap,
+  addr: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): number {
+  const cached = activeTopologyMemoCtx?.primaryFootprintByAddr.get(addr);
+  if (cached != null) {
+    return cached;
+  }
+  const computed = primaryCellFootprintForAddress(nodes, addr, arnIndex, plan);
+  activeTopologyMemoCtx?.primaryFootprintByAddr.set(addr, computed);
+  return computed;
+}
+
+function withPrimaryMarginsMemo(
+  nodes: TerraformPlanNodesMap,
+  addr: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): { top: number; bottom: number } {
+  const cached = activeTopologyMemoCtx?.primaryMarginsByAddr.get(addr);
+  if (cached) {
+    return cached;
+  }
+  const computed = primaryVerticalMarginsForAddress(nodes, addr, arnIndex, plan);
+  activeTopologyMemoCtx?.primaryMarginsByAddr.set(addr, computed);
+  return computed;
+}
+
 function vpcZonesCacheKey(
   accountId: string,
   region: string,
@@ -483,10 +529,7 @@ function maxTopologyCellFootprintPx(
 ): number {
   let maxW = TOPOLOGY_TIER0_W;
   for (const addr of sortedAddresses) {
-    maxW = Math.max(
-      maxW,
-      primaryCellFootprintForAddress(nodes, addr, arnIndex, plan),
-    );
+    maxW = Math.max(maxW, withPrimaryFootprintMemo(nodes, addr, arnIndex, plan));
   }
   return maxW;
 }
@@ -553,12 +596,7 @@ function zoneFrameSizeForTopologyAddresses(
   for (let i = 0; i < sortedAddresses.length; i++) {
     const addr = sortedAddresses[i]!;
     const r = Math.floor(i / cols);
-    const margins = primaryVerticalMarginsForAddress(
-      nodes,
-      addr,
-      arnIndex,
-      plan,
-    );
+    const margins = withPrimaryMarginsMemo(nodes, addr, arnIndex, plan);
     rowTopBase[r] = Math.max(rowTopBase[r]!, margins.top);
     rowBottomBase[r] = Math.max(rowBottomBase[r]!, margins.bottom);
   }
@@ -2729,13 +2767,26 @@ function appendTopologyResourceRectangles(
       action,
     );
 
-    const layoutConfig = getPrimaryLayoutConfig(resourceType);
-    const satHeightCtx = buildSatelliteKindHeightContext(
-      nodes,
-      addr,
-      arnIndex,
-      plan,
+    let layoutConfig = activeTopologyMemoCtx?.layoutConfigByResourceType.get(
+      resourceType,
     );
+    if (!layoutConfig) {
+      layoutConfig = getPrimaryLayoutConfig(resourceType);
+      activeTopologyMemoCtx?.layoutConfigByResourceType.set(
+        resourceType,
+        layoutConfig,
+      );
+    }
+    let satHeightCtx = activeTopologyMemoCtx?.satHeightCtxByAddr.get(addr);
+    if (!satHeightCtx) {
+      satHeightCtx = buildSatelliteKindHeightContext(
+        nodes,
+        addr,
+        arnIndex,
+        plan,
+      );
+      activeTopologyMemoCtx?.satHeightCtxByAddr.set(addr, satHeightCtx);
+    }
     const leftPad = primaryLeftMarginPx(layoutConfig, satHeightCtx);
     const primaryX = rx + leftPad;
 
@@ -2751,12 +2802,11 @@ function appendTopologyResourceRectangles(
       { initiallyVisible, explodeParentKeys: [] },
     );
 
-    const bundles = buildTopologyPrimarySatelliteBundles(
-      nodes,
-      addr,
-      arnIndex,
-      plan,
-    );
+    let bundles = activeTopologyMemoCtx?.satelliteBundlesByAddr.get(addr);
+    if (!bundles) {
+      bundles = buildTopologyPrimarySatelliteBundles(nodes, addr, arnIndex, plan);
+      activeTopologyMemoCtx?.satelliteBundlesByAddr.set(addr, bundles);
+    }
 
     renderPrimarySatellitesFromConfig({
       skeleton,
@@ -2949,11 +2999,21 @@ export async function buildTerraformTopologyExcalidrawScene(
     consumedAddresses: new Set(),
   },
   interfaceVpcEndpointZonePlacements: InterfaceVpcEndpointZonePlacementMap = new Map(),
+  deferDecorations = false,
+  skipZoneRouteAnchorDebug = false,
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
   files?: BinaryFiles;
 }> {
+  activeTopologyMemoCtx = {
+    primaryFootprintByAddr: new Map(),
+    primaryMarginsByAddr: new Map(),
+    satHeightCtxByAddr: new Map(),
+    satelliteBundlesByAddr: new Map(),
+    layoutConfigByResourceType: new Map(),
+  };
+  try {
   const counts = countTopology(model);
   const regionalPrimaryCount = regionalBuckets.reduce(
     (n, b) => n + b.addresses.length,
@@ -3736,7 +3796,10 @@ export async function buildTerraformTopologyExcalidrawScene(
             const zoneRtRectIds =
               zoneRtRow && zoneRtRow.addresses.length > 0
                 ? (() => {
-                    if (zoneRouteAnchorDebug.length < 64) {
+                    if (
+                      !skipZoneRouteAnchorDebug &&
+                      zoneRouteAnchorDebug.length < 64
+                    ) {
                       zoneRouteAnchorDebug.push({
                         accountId,
                         region: regionName,
@@ -3772,15 +3835,35 @@ export async function buildTerraformTopologyExcalidrawScene(
               fanOutRtAddrs.size > 0 &&
               z.subnetIds.length > 0
             ) {
-              for (const addr of fanOutRtAddrs) {
-                const snSet = subnetSetForRouteTableAddress(
-                  plan as never,
-                  addr,
-                  routeTableIndexes,
-                );
-                if (!snSet || !z.subnetIds.some((sid) => snSet.has(sid))) {
-                  continue;
+              const candidateRtAddrs = new Set<string>();
+              if (routeTableIndexes?.subnetToRouteTableAddrs) {
+                for (const subnetId of z.subnetIds) {
+                  const rtAddrs =
+                    routeTableIndexes.subnetToRouteTableAddrs.get(subnetId);
+                  if (!rtAddrs) {
+                    continue;
+                  }
+                  for (const addr of rtAddrs) {
+                    if (fanOutRtAddrs.has(addr)) {
+                      candidateRtAddrs.add(addr);
+                    }
+                  }
                 }
+              } else {
+                for (const addr of fanOutRtAddrs) {
+                  const snSet = subnetSetForRouteTableAddress(
+                    plan as never,
+                    addr,
+                    routeTableIndexes,
+                  );
+                  if (!snSet || !z.subnetIds.some((sid) => snSet.has(sid))) {
+                    continue;
+                  }
+                  candidateRtAddrs.add(addr);
+                }
+              }
+
+              for (const addr of candidateRtAddrs) {
                 const routes = vpcBottomRtChildrenByTable[addr] ?? [];
                 fanOutRtRectIds.push(
                   ...appendRouteTableBottomEdgeRectangles(
@@ -4166,7 +4249,9 @@ export async function buildTerraformTopologyExcalidrawScene(
     semanticAllVisible: true,
   });
   elements = mirrorAndDetachTerraformResourceLabels(elements);
-  elements = await injectTerraformAwsIconsIntoElements(elements);
+  if (!deferDecorations) {
+    elements = await injectTerraformAwsIconsIntoElements(elements);
+  }
   elements = reconcileTerraformVisibility(
     repairTerraformEdgeBindings(elements),
     {
@@ -4178,14 +4263,17 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   normalizeTopologyOrigin(elements);
 
-  const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
-    elements,
-  );
-  elements = glyphInjected.elements;
-  const layoutGlyphFiles =
-    Object.keys(glyphInjected.files).length > 0
-      ? glyphInjected.files
-      : undefined;
+  let layoutGlyphFiles: BinaryFiles | undefined;
+  if (!deferDecorations) {
+    const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
+      elements,
+    );
+    elements = glyphInjected.elements;
+    layoutGlyphFiles =
+      Object.keys(glyphInjected.files).length > 0
+        ? glyphInjected.files
+        : undefined;
+  }
 
   const result: {
     elements: ExcalidrawElement[];
@@ -4205,11 +4293,15 @@ export async function buildTerraformTopologyExcalidrawScene(
       vpcEndpointCount,
       routeTableCount,
       dependencyEdgeCount: topologyDirectedEdges.length,
+      ...(deferDecorations ? { deferredDecorations: true } : {}),
       ...(zoneRouteAnchorDebug.length > 0 ? { zoneRouteAnchorDebug } : {}),
     },
   };
   topologyResourcePanelPlan = undefined;
   return result;
+  } finally {
+    activeTopologyMemoCtx = null;
+  }
 }
 
 export type PipelinePrimaryClusterBuildResult = {

@@ -27,6 +27,11 @@ export type TerraformLayoutWorkerJob =
       prep: SemanticAwsLayoutPrep;
     }
   | {
+      type: "semanticAwsShard";
+      shardId: string;
+      prep: SemanticAwsLayoutPrep;
+    }
+  | {
       type: "semanticProvider";
       family: TerraformProviderFamily;
       label: string;
@@ -48,6 +53,9 @@ export type SemanticAwsLayoutPrep = {
   endpointSecurityGroupBuckets: unknown[];
   natZonePlacements: unknown;
   interfaceVpcEndpointZonePlacements: unknown;
+  deferDecorations?: boolean;
+  /** Staging fast path: skip per-zone route anchor debug rows in topology meta. */
+  skipZoneRouteAnchorDebug?: boolean;
 };
 
 export type TerraformLayoutWorkerJobResult =
@@ -59,6 +67,13 @@ export type TerraformLayoutWorkerJobResult =
     }
   | {
       type: "semanticAws";
+      elements: ExcalidrawElement[];
+      meta: Record<string, unknown>;
+      files?: Record<string, unknown>;
+    }
+  | {
+      type: "semanticAwsShard";
+      shardId: string;
       elements: ExcalidrawElement[];
       meta: Record<string, unknown>;
       files?: Record<string, unknown>;

@@ -17,12 +17,16 @@ export type TerraformImportSessionSnapshot = {
 
 export type TerraformImportSession = {
   sources: TerraformPlanParsingSources;
+  sourceFingerprint?: string;
   semanticLayout: boolean;
   layoutMode?: "module" | "semantic" | "pipeline";
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   preset: TerraformImportPreset | null;
   importedTfdTexts: string[];
   snapshot: TerraformImportSessionSnapshot;
+  snapshotsByLayoutMode?: Partial<
+    Record<"module" | "semantic" | "pipeline", TerraformImportSessionSnapshot>
+  >;
 };
 
 let activeSession: TerraformImportSession | null = null;
@@ -32,12 +36,28 @@ export const cloneTerraformElementsForSnapshot = (
 ): ExcalidrawElement[] => structuredClone(elements) as ExcalidrawElement[];
 
 export const setTerraformImportSession = (session: TerraformImportSession) => {
+  const clonedByLayout = session.snapshotsByLayoutMode
+    ? Object.fromEntries(
+        Object.entries(session.snapshotsByLayoutMode).map(([mode, snap]) => [
+          mode,
+          {
+            ...snap,
+            elements: cloneTerraformElementsForSnapshot(snap.elements),
+          },
+        ]),
+      )
+    : undefined;
   activeSession = {
     ...session,
     snapshot: {
       ...session.snapshot,
       elements: cloneTerraformElementsForSnapshot(session.snapshot.elements),
     },
+    ...(clonedByLayout
+      ? {
+          snapshotsByLayoutMode: clonedByLayout as TerraformImportSession["snapshotsByLayoutMode"],
+        }
+      : {}),
   };
 };
 

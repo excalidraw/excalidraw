@@ -36,6 +36,12 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
         case "semanticAws":
           result = await runSemanticAwsLayoutJob(job.prep);
           break;
+        case "semanticAwsShard":
+          result = await runSemanticAwsLayoutJob(job.prep, {
+            type: "semanticAwsShard",
+            shardId: job.shardId,
+          });
+          break;
         case "semanticProvider":
           result = await runSemanticProviderLayoutJob(
             job.family,

@@ -398,6 +398,7 @@ type LayoutSceneContext = {
   tfdWarnings: string[];
   stackIds: string[];
   addressToStack: Record<string, string>;
+  deferDecorations?: boolean;
 };
 
 async function buildPipelineLayoutSceneBody(
@@ -534,6 +535,7 @@ async function buildSemanticLayoutSceneBody(
         endpointSecurityGroupBuckets,
         natZonePlacements,
         interfaceVpcEndpointZonePlacements,
+        ctx.deferDecorations,
       );
       if (topoScene.elements.length > 0) {
         providerBlocks.push({
@@ -781,6 +783,7 @@ export async function layoutTerraformFromSources(
     tfdWarnings,
     stackIds,
     addressToStack,
+    deferDecorations: options?.deferDecorations === true,
   };
 
   const sceneBody = pipelineLayout

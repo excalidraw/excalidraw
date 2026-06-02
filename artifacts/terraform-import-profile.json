@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-02T13:47:24.317Z",
+  "topSelfSpans": [
+    {
+      "name": "layout.semantic",
+      "ms": 36041.94,
+      "selfMs": 36041.94,
+      "callCount": 1
+    },
+    {
+      "name": "prep.cache",
+      "ms": 4942.64,
+      "selfMs": 4942.64,
+      "callCount": 1
+    },
+    {
+      "name": "merge.plans",
+      "ms": 0.17,
+      "selfMs": 0.17,
+      "callCount": 1
+    }
+  ],
+  "topRegressions": []
+}

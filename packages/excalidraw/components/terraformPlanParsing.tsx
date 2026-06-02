@@ -116,6 +116,8 @@ export type TerraformPlanParsingOptions = {
     ref: { repoName: string; relativePath: string },
     kind: "plan" | "dot" | "state",
   ) => { content: string } | null | undefined;
+  /** Experimental: skip icon/glyph decoration during first semantic pass. */
+  deferDecorations?: boolean;
 };
 
 type BuildNodesMapOptions = {

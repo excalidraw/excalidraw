@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -40,6 +40,50 @@ type PerfBaseline = {
   >;
   spans: Record<string, number>;
 };
+
+function maybeWriteProfilerArtifact(payload: {
+  spans: ReturnType<typeof terraformImportProfilerSummary>;
+  baselineSpans: PerfBaseline["spans"];
+}): void {
+  const outPath = process.env.VITEST_TERRAFORM_PROFILE_OUT;
+  if (!outPath) {
+    return;
+  }
+  const regressions = payload.spans
+    .map((row) => {
+      const base = payload.baselineSpans[row.name];
+      if (base == null || base <= 0) {
+        return null;
+      }
+      return {
+        name: row.name,
+        selfMs: row.selfMs,
+        baselineSelfMs: base,
+        deltaMs: Math.round((row.selfMs - base) * 100) / 100,
+        ratio: Math.round((row.selfMs / base) * 1000) / 1000,
+      };
+    })
+    .filter((v): v is NonNullable<typeof v> => v != null)
+    .sort((a, b) => b.ratio - a.ratio);
+  const topSelfSpans = payload.spans
+    .slice()
+    .sort((a, b) => b.selfMs - a.selfMs)
+    .slice(0, 20);
+  mkdirSync(dirname(outPath), { recursive: true });
+  writeFileSync(
+    outPath,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        topSelfSpans,
+        topRegressions: regressions.slice(0, 20),
+      },
+      null,
+      2,
+    ),
+    "utf8",
+  );
+}
 
 function loadBaseline(): PerfBaseline {
   return JSON.parse(readFileSync(PERF_BASELINE_PATH, "utf8")) as PerfBaseline;
@@ -117,10 +161,14 @@ describe("terraform import performance (all views)", () => {
 
   it("span timings do not regress beyond baseline ratio", () => {
     const baseline = loadBaseline();
+    const current = terraformImportProfilerSummary();
+    maybeWriteProfilerArtifact({
+      spans: current,
+      baselineSpans: baseline.spans,
+    });
     if (Object.keys(baseline.spans).length === 0) {
       return;
     }
-    const current = terraformImportProfilerSummary();
     const byName = new Map(current.map((r) => [r.name, r.selfMs]));
     for (const [name, baseMs] of Object.entries(baseline.spans)) {
       const cur = byName.get(name);

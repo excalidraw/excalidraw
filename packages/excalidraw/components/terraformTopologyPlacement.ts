@@ -1626,6 +1626,7 @@ type RouteTableAddressMeta = {
 export type RouteTablePlanIndexes = {
   rtidToSubnets: Map<string, Set<string>>;
   addrToMeta: Map<string, RouteTableAddressMeta>;
+  subnetToRouteTableAddrs: Map<string, Set<string>>;
 };
 
 /** Built once per topology layout pass; reused for VPC route-table fan-out. */
@@ -1634,9 +1635,27 @@ export function buildRouteTablePlanIndexes(
     resource_changes?: ResourceChange[];
   },
 ): RouteTablePlanIndexes {
+  const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const addrToMeta = buildRouteTableAddressToMeta(plan);
+  const subnetToRouteTableAddrs = new Map<string, Set<string>>();
+  for (const [addr, meta] of addrToMeta.entries()) {
+    const subnetIds = rtidToSubnets.get(meta.rtbId);
+    if (!subnetIds) {
+      continue;
+    }
+    for (const subnetId of subnetIds) {
+      const addrs = subnetToRouteTableAddrs.get(subnetId);
+      if (addrs) {
+        addrs.add(addr);
+      } else {
+        subnetToRouteTableAddrs.set(subnetId, new Set([addr]));
+      }
+    }
+  }
   return {
-    rtidToSubnets: buildRouteTableIdToSubnetIdsFromPlan(plan),
-    addrToMeta: buildRouteTableAddressToMeta(plan),
+    rtidToSubnets,
+    addrToMeta,
+    subnetToRouteTableAddrs,
   };
 }
 

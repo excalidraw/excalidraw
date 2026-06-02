@@ -141,3 +141,21 @@ jobs:
 
       - name: Size limit
         run: yarn workspace @excalidraw/excalidraw run check:size
+
+      - name: Terraform semantic hotspot ranker
+        env:
+          TERRAFORM_IMPORT_PRESETS_DB: packages/excalidraw/test-fixtures/terraform-import-presets.db
+          VITEST_TERRAFORM_PROFILE: "1"
+          VITEST_TERRAFORM_PROFILE_OUT: artifacts/terraform-import-profile.json
+        run: |
+          yarn vitest run packages/excalidraw/components/terraformImportPerf.views.test.ts \
+            -t "semantic import within budget|span timings do not regress beyond baseline ratio"
+          node scripts/terraform/perf-hotspot-ranker.mjs "$VITEST_TERRAFORM_PROFILE_OUT" >> "$GITHUB_STEP_SUMMARY"
+        continue-on-error: true
+
+      - name: Upload terraform hotspot artifact
+        if: always() && hashFiles('artifacts/terraform-import-profile.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-import-hotspot-profile
+          path: artifacts/terraform-import-profile.json

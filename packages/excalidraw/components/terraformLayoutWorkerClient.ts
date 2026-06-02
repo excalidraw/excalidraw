@@ -89,6 +89,11 @@ async function runJobOnMainThread(
       );
     case "semanticAws":
       return runSemanticAwsLayoutJob(job.prep);
+    case "semanticAwsShard":
+      return runSemanticAwsLayoutJob(job.prep, {
+        type: "semanticAwsShard",
+        shardId: job.shardId,
+      });
     case "semanticProvider":
       return runSemanticProviderLayoutJob(
         job.family,
