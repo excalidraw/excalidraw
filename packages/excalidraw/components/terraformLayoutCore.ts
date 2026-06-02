@@ -62,6 +62,16 @@ import {
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
+import {
+  buildTerraformImportPrepCache,
+  clearTerraformImportPrepCache,
+  getTerraformImportPrepCache,
+  terraformImportPrepFingerprint,
+} from "./terraformImportPrepCache";
+import {
+  terraformImportProfilerMeasure,
+  terraformImportProfilerMeasureAsync,
+} from "./terraformImportProfiler";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 
@@ -263,6 +273,25 @@ type LayoutPlanResolution =
 function resolveLayoutPlanFromSources(
   sources: TerraformPlanParsingSources,
 ): LayoutPlanResolution {
+  if (sources.planDotBundles.length > 0) {
+    const cache = getTerraformImportPrepCache();
+    if (
+      cache &&
+      cache.fingerprint === terraformImportPrepFingerprint(sources)
+    ) {
+      return {
+        ok: true,
+        plan: cache.mergedPlan,
+        adjacency: cache.adjacency,
+        importSource: "plan",
+        sourcePlans: cache.sourcePlans,
+        stackIds: cache.stackIds,
+        addressToStack: cache.addressToStack,
+        importWarnings: cache.importWarnings,
+      };
+    }
+  }
+
   const importWarnings: TerraformImportWarning[] = [];
   const states = sources.states ?? [];
   let plan: unknown;
@@ -625,7 +654,35 @@ export async function layoutTerraformFromSources(
     (options?.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
   const pipelineLayout = layoutMode === "pipeline";
-  const planResolution = resolveLayoutPlanFromSources(sources);
+  const multiStackModule =
+    !semanticLayout &&
+    !pipelineLayout &&
+    sources.planDotBundles.length > 1;
+
+  if (sources.planDotBundles.length > 0) {
+    terraformImportProfilerMeasure("prep.cache", () => {
+      buildTerraformImportPrepCache(sources, options);
+    });
+  } else {
+    clearTerraformImportPrepCache();
+  }
+
+  if (multiStackModule) {
+    const { layoutModuleViewParallel, runModuleStackLayoutJob } =
+      await import("./terraformLayoutModuleParallel");
+    return terraformImportProfilerMeasureAsync("layout.module.parallel", () =>
+      layoutModuleViewParallel(
+        sources,
+        options?.moduleLayoutOptions,
+        runModuleStackLayoutJob,
+      ),
+    );
+  }
+
+  const planResolution = terraformImportProfilerMeasure(
+    "merge.plans",
+    () => resolveLayoutPlanFromSources(sources),
+  );
   if (!planResolution.ok) {
     return planResolution;
   }
@@ -663,18 +720,33 @@ export async function layoutTerraformFromSources(
     ...(options?.dataflowLinks?.trim() ? [options.dataflowLinks] : []),
   ];
 
-  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, states, {
-    adjacency,
-    priorStatePlans: sourcePlans,
-    stackIds,
-  });
+  const prepCache = getTerraformImportPrepCache();
+  const useCachedNodes =
+    prepCache &&
+    prepCache.fingerprint === terraformImportPrepFingerprint(sources) &&
+    states.length === 0;
 
-  const tfdWarnings = applyTfdOverlayToNodes(
-    nodes5,
-    sources.tfdTexts,
-    sources.tfdLabels,
-    options?.dataflowLinks,
-  );
+  let nodes5: ReturnType<typeof buildTerraformLocalImportNodesMap>;
+  let tfdWarnings: string[] = [];
+  if (useCachedNodes) {
+    nodes5 = prepCache.nodes;
+  } else {
+    nodes5 = terraformImportProfilerMeasure("parse.nodes", () =>
+      buildTerraformLocalImportNodesMap(plan, graph, states, {
+        adjacency,
+        priorStatePlans: sourcePlans,
+        stackIds,
+      }),
+    );
+    tfdWarnings = terraformImportProfilerMeasure("parse.tfd", () =>
+      applyTfdOverlayToNodes(
+        nodes5,
+        sources.tfdTexts,
+        sources.tfdLabels,
+        options?.dataflowLinks,
+      ),
+    );
+  }
 
   const hasTfdEdgeSyntax = tfdTexts.some((t) => /\S+\s*->\s*\S+/.test(t));
   const declaredEdges = nodes5[DECLARED_DATAFLOW_ORDERED_KEY];
@@ -712,12 +784,15 @@ export async function layoutTerraformFromSources(
   };
 
   const sceneBody = pipelineLayout
-    ? await buildPipelineLayoutSceneBody(sceneContext)
+    ? await terraformImportProfilerMeasureAsync("layout.pipeline", () =>
+        buildPipelineLayoutSceneBody(sceneContext),
+      )
     : semanticLayout
-    ? await buildSemanticLayoutSceneBody(sceneContext)
-    : await buildModuleLayoutSceneBody(
-        sceneContext,
-        options?.moduleLayoutOptions,
+    ? await terraformImportProfilerMeasureAsync("layout.semantic", () =>
+        buildSemanticLayoutSceneBody(sceneContext),
+      )
+    : await terraformImportProfilerMeasureAsync("layout.elk", () =>
+        buildModuleLayoutSceneBody(sceneContext, options?.moduleLayoutOptions),
       );
 
   return { ok: true, scene: sceneBody };

@@ -140,6 +140,7 @@ export function enrichAndReconcileTopologyPlacements(
       preplaced.add(address);
     }
   }
+  const zoneCountBefore = state.zones.length;
   enrichTopologyPlacementsWithManagedResources(
     plan,
     state.zones,
@@ -150,7 +151,9 @@ export function enrichAndReconcileTopologyPlacements(
       preplacedAddresses: preplaced,
     },
   );
-  reconcileTopologyPlacementZonesAfterEnrich(state.zones, plan);
+  if (state.zones.length !== zoneCountBefore) {
+    reconcileTopologyPlacementZonesAfterEnrich(state.zones, plan);
+  }
 }
 
 export function buildTopologyPlacementFoundation(

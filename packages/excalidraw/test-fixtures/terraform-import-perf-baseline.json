@@ -1,0 +1,21 @@
+{
+  "fixture": "staging-multi-state-expanded",
+  "recordedAt": "2026-06-02",
+  "environment": "local-dev-baseline",
+  "views": {
+    "semantic": {
+      "wallClockMs": 65000,
+      "elementCount": 9160
+    },
+    "pipeline": {
+      "wallClockMs": 17000,
+      "elementCount": 1121
+    },
+    "module": {
+      "wallClockMs": 6000,
+      "elementCount": 0,
+      "skippedLayout": false
+    }
+  },
+  "spans": {}
+}

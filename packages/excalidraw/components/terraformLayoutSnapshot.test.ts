@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import {
-  loadStagingMultiStatePlanDotBundlesFromDb,
-  readStagingMultiStatePipelineTfdFromDb,
-  readTerraformBackendFile,
-  STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
-} from "../test-fixtures/terraformPresetFixtures";
+  stagingMultiStateLayoutSources,
+  stagingMultiStatePipelineLayoutSources,
+} from "./terraformLayoutSnapshotFixtures";
 
 import {
   buildTerraformLayoutSnapshot,
@@ -37,16 +37,8 @@ describe("terraform layout golden snapshots", () => {
   it(
     "staging-multi-state semantic layout matches golden snapshot",
     async () => {
-      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-      const tfd = readStagingMultiStatePipelineTfdFromDb();
       const snapshot = await importLayoutSnapshot(
-        {
-          planDotBundles: bundles,
-          states: [],
-          stateLabels: [],
-          tfdTexts: [tfd],
-          tfdLabels: ["pipeline.tfd"],
-        },
+        stagingMultiStateLayoutSources(),
         true,
       );
       await expect(snapshot).toMatchFileSnapshot(
@@ -59,16 +51,8 @@ describe("terraform layout golden snapshots", () => {
   it(
     "staging-multi-state module layout matches golden snapshot",
     async () => {
-      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-      const tfd = readStagingMultiStatePipelineTfdFromDb();
       const snapshot = await importLayoutSnapshot(
-        {
-          planDotBundles: bundles,
-          states: [],
-          stateLabels: [],
-          tfdTexts: [tfd],
-          tfdLabels: ["pipeline.tfd"],
-        },
+        stagingMultiStateLayoutSources(),
         false,
       );
       await expect(snapshot).toMatchFileSnapshot(
@@ -81,16 +65,8 @@ describe("terraform layout golden snapshots", () => {
   it(
     "staging-multi-state pipeline layout matches golden snapshot",
     async () => {
-      const bundles = loadStagingMultiStatePlanDotBundlesFromDb();
-      const tfd = readTerraformBackendFile("staging-multi-state/pipeline.tfd");
       const snapshot = await importLayoutSnapshot(
-        {
-          planDotBundles: bundles,
-          states: [],
-          stateLabels: [],
-          tfdTexts: [tfd],
-          tfdLabels: ["pipeline.tfd"],
-        },
+        stagingMultiStatePipelineLayoutSources(),
         false,
         "pipeline",
       );

@@ -18,9 +18,11 @@ import {
 } from "./terraformDeclaredDataFlow";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import { filterPlanByProviderFamily } from "./terraformProviderClassification";
+import { getTerraformImportPrepCache } from "./terraformImportPrepCache";
 import {
   buildEnrichedTopologyPlacements,
   topologyAddressPlacementMap,
+  type EnrichedTopologyPlacements,
   type TopologyAddressPlacement,
 } from "./terraformTopologyPlacementBuild";
 import {
@@ -154,9 +156,14 @@ function collapseEndpoint(
 function buildPlacementMap(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
+  enrichedOverride?: EnrichedTopologyPlacements,
 ): Map<string, PipelinePlacement> {
   const awsPlan = filterPlanByProviderFamily(plan as any, "aws");
-  const enriched = buildEnrichedTopologyPlacements(awsPlan, nodes);
+  const cache = getTerraformImportPrepCache();
+  const enriched =
+    enrichedOverride ??
+    cache?.enrichedPlacements ??
+    buildEnrichedTopologyPlacements(awsPlan, nodes);
   const out = topologyAddressPlacementMap(enriched, awsPlan);
 
   for (const address of Object.keys(nodes)) {

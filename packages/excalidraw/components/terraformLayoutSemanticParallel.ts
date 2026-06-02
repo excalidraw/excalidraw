@@ -61,6 +61,10 @@ import type {
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { TerraformLayoutOptions } from "./terraformLayoutCore";
 import type { TerraformProviderFamily } from "./terraformProviderClassification";
+import {
+  terraformImportProfilerMeasure,
+  terraformImportProfilerMeasureAsync,
+} from "./terraformImportProfiler";
 
 export function prepareSemanticAwsLayoutPrep(
   sources: TerraformPlanParsingSources,
@@ -384,7 +388,9 @@ export async function layoutSemanticViewParallel(
   onProgress?: (p: TerraformLayoutProgress) => void,
 ): Promise<LayoutTerraformResult> {
   onProgress?.({ phase: "prepare semantic", done: 0, total: 1 });
-  const prepared = prepareSemanticAwsLayoutPrep(sources, options);
+  const prepared = terraformImportProfilerMeasure("prep.semantic", () =>
+    prepareSemanticAwsLayoutPrep(sources, options),
+  );
   if (!prepared.semPlan) {
     return {
       ok: false,
@@ -456,7 +462,10 @@ export async function layoutSemanticViewParallel(
     }),
   );
 
-  const results = await Promise.all(jobs);
+  const results = await terraformImportProfilerMeasureAsync(
+    "layout.semantic.workers",
+    () => Promise.all(jobs),
+  );
   for (const result of results) {
     if (result.type === "semanticAws" && result.elements.length > 0) {
       providerBlocks.push({

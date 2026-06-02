@@ -1,5 +1,7 @@
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import { clearTerraformImportPrepCache } from "./terraformImportPrepCache";
+
 import type { TerraformImportPreset } from "./terraformImportPresetsTypes";
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 
@@ -44,6 +46,7 @@ export const getTerraformImportSession = (): TerraformImportSession | null =>
 
 export const clearTerraformImportSession = () => {
   activeSession = null;
+  clearTerraformImportPrepCache();
 };
 
 export const hasTerraformImportSession = (): boolean => activeSession != null;

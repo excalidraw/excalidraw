@@ -80,7 +80,7 @@ export function mergeDotAdjacency(
   dotTexts: string[],
   stackIds?: (string | undefined)[],
 ): Record<string, string[]> {
-  const adjacency: Record<string, string[]> = {};
+  const targetSets = new Map<string, Set<string>>();
 
   for (let i = 0; i < dotTexts.length; i++) {
     const dotText = dotTexts[i]!;
@@ -95,15 +95,19 @@ export function mergeDotAdjacency(
       const target = stackId
         ? prefixStackAddress(stackId, rawTarget)
         : rawTarget;
-      if (!adjacency[source]) {
-        adjacency[source] = [];
+      let set = targetSets.get(source);
+      if (!set) {
+        set = new Set();
+        targetSets.set(source, set);
       }
-      if (!adjacency[source].includes(target)) {
-        adjacency[source].push(target);
-      }
+      set.add(target);
     }
   }
 
+  const adjacency: Record<string, string[]> = {};
+  for (const [source, set] of targetSets) {
+    adjacency[source] = [...set];
+  }
   return adjacency;
 }
 

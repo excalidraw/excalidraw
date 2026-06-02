@@ -3138,7 +3138,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             defaultPlumbingAddrs,
             nodes,
           );
-          const vd = vpcFrameDimensionsForZones(
+          const vdWidth = vpcFrameDimensionsForZones(
             vpcZs,
             nodes,
             arnIndex,
@@ -3183,68 +3183,15 @@ export async function buildTerraformTopologyExcalidrawScene(
                 FRAME_CONTENT_SLACK_X +
                 vpcRtSizing.minInnerWidthPx
               : 0;
-          vpcCellW = Math.max(vpcCellW, vd.w, epMinOuter, rtMinOuter);
-        }
-        for (const [vpcId] of vpcEntries) {
-          const vpcZs = zonesForVpcCached(accountId, regionName, vpcId);
-          const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const epAddrsPre = endpointsForVpc(
-            vpcEndpointBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const { clusterAddrs: clusterAddrs2, compactAddrs: compactAddrs2 } =
-            partitionVpcEndpointsForClusterLayout(
-              epAddrsPre,
-              nodes,
-              arnIndex,
-              plan,
-            );
-          const hostedSg2 = sgCanonicalPathsHostedOnVpcEndpointClusters(
-            clusterAddrs2,
-            nodes,
-            arnIndex,
-            plan,
-          );
-          const endpointSgStripAddrs2 = bucketAddressesForVpc(
-            endpointSecurityGroupBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          ).filter((a) => !hostedSg2.has(a));
-          const infraTop = vpcInfrastructureTopPadPx(
-            accountId,
-            regionName,
-            vpcId,
-            vpcDefaultPlumbingBuckets,
-            vpcFlowLogBuckets,
-            endpointSecurityGroupBuckets,
-            nodes,
-            endpointSgStripAddrs2,
-          );
-          const defaultPlumbingAddrs = bucketAddressesForVpc(
-            vpcDefaultPlumbingBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const internetEdges = splitVpcInternetEdgeAddresses(
-            defaultPlumbingAddrs,
-            nodes,
-          );
+          vpcCellW = Math.max(vpcCellW, vdWidth.w, epMinOuter, rtMinOuter);
+
           const vpceClusterBodyPad = vpcEndpointClusterBodyPadPx(
-            clusterAddrs2,
+            clusterAddrs,
             nodes,
             arnIndex,
             plan,
           );
-          const vd = vpcFrameDimensionsForZones(
+          const vdHeight = vpcFrameDimensionsForZones(
             vpcZs,
             nodes,
             arnIndex,
@@ -3259,22 +3206,16 @@ export async function buildTerraformTopologyExcalidrawScene(
             satelliteAddresses,
           );
           const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
-            clusterAddrs2,
+            clusterAddrs,
             nodes,
             arnIndex,
             plan,
           );
-          const vpcRtSizing = vpcBottomRouteTablesRowSizing(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          vpcCellBodyH = Math.max(vpcCellBodyH, vd.h);
+          vpcCellBodyH = Math.max(vpcCellBodyH, vdHeight.h);
           maxVpcBottomStripInset = Math.max(
             maxVpcBottomStripInset,
             vpcBottomStripInsetPx(
-              compactAddrs2.length,
+              compactAddrs.length,
               clusterBandOuterH,
               vpcRtSizing?.maxExtentBelowAnchorPx ?? 0,
             ),
@@ -3835,6 +3776,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                 const snSet = subnetSetForRouteTableAddress(
                   plan as never,
                   addr,
+                  routeTableIndexes,
                 );
                 if (!snSet || !z.subnetIds.some((sid) => snSet.has(sid))) {
                   continue;

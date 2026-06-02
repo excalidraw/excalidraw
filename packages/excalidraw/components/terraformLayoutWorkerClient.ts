@@ -21,9 +21,19 @@ import type {
   TerraformLayoutWorkerResponse,
 } from "./terraformLayoutWorkerTypes";
 
-let shouldUseTerraformLayoutWorkers =
+const defaultUseTerraformLayoutWorkers =
   typeof Worker !== "undefined" &&
   import.meta.env.VITE_TERRAFORM_LAYOUT_WORKERS !== "false";
+
+let shouldUseTerraformLayoutWorkers = defaultUseTerraformLayoutWorkers;
+
+/** Vitest / tooling: override worker usage (null restores env default). */
+export function setTerraformLayoutWorkersEnabledForTests(
+  value: boolean | null,
+): void {
+  shouldUseTerraformLayoutWorkers =
+    value === null ? defaultUseTerraformLayoutWorkers : value;
+}
 
 let layoutWorkerPool: Promise<
   WorkerPool<TerraformLayoutWorkerRequest, TerraformLayoutWorkerResponse>

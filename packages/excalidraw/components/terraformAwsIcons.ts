@@ -196,6 +196,29 @@ export async function injectTerraformAwsIconsIntoElements(
     rectId: string;
     resourceType: string;
   };
+  const textByVisibilityKey = new Map<string, number>();
+  for (let j = 0; j < elements.length; j++) {
+    const t = elements[j];
+    if (t.type !== "text") {
+      continue;
+    }
+    if ("containerId" in t && t.containerId) {
+      continue;
+    }
+    const tcd = t.customData ?? {};
+    if (
+      tcd.terraformVisibilityRole === "resource" &&
+      typeof tcd.terraformVisibilityKey === "string"
+    ) {
+      textByVisibilityKey.set(tcd.terraformVisibilityKey, j);
+    }
+  }
+
+  const rectIdToIndex = new Map<string, number>();
+  for (let i = 0; i < elements.length; i++) {
+    rectIdToIndex.set(elements[i]!.id, i);
+  }
+
   const work: Work[] = [];
 
   for (let i = 0; i < elements.length; i++) {
@@ -217,24 +240,7 @@ export async function injectTerraformAwsIconsIntoElements(
       continue;
     }
 
-    let textIdx = -1;
-    for (let j = 0; j < elements.length; j++) {
-      const t = elements[j];
-      if (t.type !== "text") {
-        continue;
-      }
-      if ("containerId" in t && t.containerId) {
-        continue;
-      }
-      const tcd = t.customData ?? {};
-      if (
-        tcd.terraformVisibilityRole === "resource" &&
-        tcd.terraformVisibilityKey === nodePath
-      ) {
-        textIdx = j;
-        break;
-      }
-    }
+    const textIdx = textByVisibilityKey.get(nodePath) ?? -1;
     if (textIdx < 0) {
       continue;
     }
@@ -246,7 +252,7 @@ export async function injectTerraformAwsIconsIntoElements(
 
   const out = elements.slice() as ExcalidrawElement[];
   for (const { textIdx, rectId, resourceType } of work) {
-    const rectIdx = out.findIndex((e) => e.id === rectId);
+    const rectIdx = rectIdToIndex.get(rectId) ?? -1;
     if (rectIdx < 0) {
       continue;
     }
