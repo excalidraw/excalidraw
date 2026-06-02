@@ -1,7 +1,8 @@
 import { THEME } from "@excalidraw/common";
+import { pointFrom } from "@excalidraw/math";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import { AnimatedTrail } from "./animatedTrail";
 
@@ -45,14 +46,15 @@ export class DrawShapeTrail implements Trail {
     this.trail.clearTrails();
   }
 
-  getCurrentPoints(): LocalPoint[] {
+  getCurrentPoints(): GlobalPoint[] {
     const currentTrail = this.trail.getCurrentTrail();
     if (!currentTrail) {
       return [];
     }
 
-    const points = currentTrail.originalPoints;
-    return points.map(([x, y]) => [x, y] as LocalPoint);
+    return currentTrail.originalPoints.map(([x, y]) =>
+      pointFrom<GlobalPoint>(x, y),
+    );
   }
 
   start(container: SVGSVGElement) {

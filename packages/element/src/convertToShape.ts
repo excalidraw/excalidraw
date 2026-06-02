@@ -814,7 +814,7 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
 
 // Converts a freedraw element to the detected shape
 export const convertToShape = (
-  points: LocalPoint[],
+  points: GlobalPoint[],
   appState: AppState,
   elementsMap: ElementsMap,
   previousElement: ExcalidrawElement | null,
@@ -863,23 +863,26 @@ export const convertToShape = (
       });
     }
     case "arrow": {
-      const [arrowMinX, arrowMinY] = recognizedShape.boundingBox;
-      let endPoint: LocalPoint;
+      const [arrowX, arrowY] = recognizedShape.points[0];
+
+      let globalEndX: number;
+      let globalEndY: number;
       if (previousElement && previousElement.type === "line") {
         const prevEndLocal = previousElement.points[1];
-        const globalEndX = prevEndLocal[0] + previousElement.x;
-        const globalEndY = prevEndLocal[1] + previousElement.y;
-        endPoint = [
-          globalEndX - arrowMinX,
-          globalEndY - arrowMinY,
-        ] as LocalPoint;
+        // No need for rotation handling
+        globalEndX = prevEndLocal[0] + previousElement.x;
+        globalEndY = prevEndLocal[1] + previousElement.y;
       } else {
-        endPoint = getArrowEndpoint(
+        [globalEndX, globalEndY] = getArrowEndpoint(
           recognizedShape.points,
           recognizedShape.boundingBox,
           recognizedShape.points[0],
         );
       }
+      const endPoint: LocalPoint = pointFrom<LocalPoint>(
+        globalEndX - arrowX,
+        globalEndY - arrowY,
+      );
       const arrowLen = Math.hypot(
         endPoint[0] - recognizedShape.points[0][0],
         endPoint[1] - recognizedShape.points[0][1],
@@ -887,14 +890,14 @@ export const convertToShape = (
       if (arrowLen < 60) {
         const tempElement = newLinearElement({
           type: "line",
-          x: arrowMinX,
-          y: arrowMinY,
+          x: arrowX,
+          y: arrowY,
           points: [
-            [
-              recognizedShape.points[0][0] - arrowMinX,
-              recognizedShape.points[0][1] - arrowMinY,
-            ] as LocalPoint,
-            [endPoint[0] - arrowMinX, endPoint[1] - arrowMinY] as LocalPoint,
+            pointFrom<LocalPoint>(
+              recognizedShape.points[0][0] - arrowX,
+              recognizedShape.points[0][1] - arrowY,
+            ),
+            endPoint,
           ],
           groupIds: [],
           frameId,
@@ -920,16 +923,16 @@ export const convertToShape = (
       }
       const tempElement = newArrowElement({
         type: "arrow",
-        x: arrowMinX,
-        y: arrowMinY,
+        x: arrowX,
+        y: arrowY,
         startArrowhead: appState.currentItemStartArrowhead,
         endArrowhead: appState.currentItemEndArrowhead,
         points: [
-          [
-            recognizedShape.points[0][0] - arrowMinX,
-            recognizedShape.points[0][1] - arrowMinY,
-          ] as LocalPoint,
-          [endPoint[0] - arrowMinX, endPoint[1] - arrowMinY] as LocalPoint,
+          pointFrom<LocalPoint>(
+            recognizedShape.points[0][0] - arrowX,
+            recognizedShape.points[0][1] - arrowY,
+          ),
+          endPoint,
         ],
         groupIds: [],
         frameId,
@@ -954,22 +957,19 @@ export const convertToShape = (
       });
     }
     case "line": {
-      const [lineMinX, lineMinY] = recognizedShape.boundingBox;
+      const [lineX, lineY] = recognizedShape.points[0];
+      const endPoint =
+        recognizedShape.points[recognizedShape.points.length - 1];
       const tempElement = newLinearElement({
         type: recognizedShape.type,
-        x: lineMinX,
-        y: lineMinY,
+        x: lineX,
+        y: lineY,
         points: [
-          [
-            recognizedShape.points[0][0] - lineMinX,
-            recognizedShape.points[0][1] - lineMinY,
-          ] as LocalPoint,
-          [
-            recognizedShape.points[recognizedShape.points.length - 1][0] -
-              lineMinX,
-            recognizedShape.points[recognizedShape.points.length - 1][1] -
-              lineMinY,
-          ] as LocalPoint,
+          pointFrom<LocalPoint>(
+            recognizedShape.points[0][0] - lineX,
+            recognizedShape.points[0][1] - lineY,
+          ),
+          pointFrom<LocalPoint>(endPoint[0] - lineX, endPoint[1] - lineY),
         ],
         groupIds: [],
         frameId,
