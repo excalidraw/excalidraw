@@ -46,6 +46,24 @@ yarn start
 
 Open the Vite URL (usually `http://localhost:3000/`), then **Import Terraform** from the menu or `Ctrl/Cmd+Shift+K`.
 
+### Demo deep links (`/demo`)
+
+The full editor at `/demo` can load a hosted import preset automatically via query params (no import dialog):
+
+| Param | Required | Values |
+| --- | --- | --- |
+| `preset` | yes | Preset id from the catalog, e.g. `staging-multi-state-expanded` |
+| `view` | no | `module`, `semantic`, or `pipeline` (overrides the preset default) |
+| `pack` | no | `default`, `box`, or `rectpacking` (module view only) |
+
+Examples:
+
+- `/demo?preset=staging-multi-state-expanded` — preset default view (`pipeline`)
+- `/demo?preset=staging-multi-state-expanded&view=semantic`
+- `/demo?preset=staging-multi-state-expanded&view=module&pack=box`
+
+Preset data is served from D1 on Cloudflare Pages (see [Hosted Pages](#hosted-pages-cloudflare-d1) below). Local dev uses the same API via the Vite preset plugin after `yarn seed:terraform-presets`.
+
 ## Import Terraform plans
 
 Generate exports from one Terraform or OpenTofu working directory, then import them together.

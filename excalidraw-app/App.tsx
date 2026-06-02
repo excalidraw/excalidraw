@@ -56,6 +56,7 @@ import {
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
 import { isTerraformImportedScene } from "@excalidraw/excalidraw/components/terraformVisibility";
+import { hasTerraformDemoAutoImportQuery } from "@excalidraw/excalidraw/components/terraformDemoUrlParams";
 import { stabilizeTerraformSceneAfterPersistence } from "@excalidraw/excalidraw/components/terraformRelationshipFocus";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
@@ -434,6 +435,9 @@ const ExcalidrawWrapper = ({
   const handleTerraformImportSuccess = useCallback(() => {
     void postImportEvent("terraform_import_success");
     clearPostImportEmailTimeout();
+    if (hasTerraformDemoAutoImportQuery(window.location.search)) {
+      return;
+    }
     try {
       if (sessionStorage.getItem(POST_IMPORT_EMAIL_DISMISSED_KEY) === "1") {
         return;

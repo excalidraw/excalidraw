@@ -7,7 +7,10 @@ import {
   type TerraformPlanDotBundle,
 } from "./terraformPlanParsing";
 import { parseRawStateJson } from "./terraformImportMerge";
-import { runTerraformImportFromSources } from "./terraformSceneApply";
+import {
+  runTerraformImportWithView,
+  runTerraformPresetImport,
+} from "./terraformPresetImport";
 import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayoutOptions";
 import {
   BUILTIN_TERRAFORM_IMPORT_PRESETS,
@@ -19,7 +22,6 @@ import {
 } from "./terraformImportPresets";
 import {
   chooseTerraformImportPresetRootDirectory,
-  loadTerraformImportPresetSources,
   type TerraformImportPresetWarning,
 } from "./terraformImportPresetLoader";
 import {
@@ -197,6 +199,20 @@ export const useTerraformImportDialog = ({
     });
   };
 
+  const completeImport = (
+    warnings: TerraformImportWarning[] | undefined,
+    extraWarnings: TerraformImportPresetWarning[] = [],
+  ) => {
+    onImportSuccess?.();
+    setImportDone(true);
+    setPresetWarnings(extraWarnings);
+    if (warnings?.length) {
+      setImportWarnings(warnings);
+    } else if (extraWarnings.length === 0) {
+      onCloseRequest();
+    }
+  };
+
   const runImportFromSources = async (
     sources: TerraformPlanParsingSources,
     opts: {
@@ -205,42 +221,22 @@ export const useTerraformImportDialog = ({
       preset?: TerraformImportPreset | null;
     } = {},
   ) => {
-    const canUseSemanticView =
-      sources.planDotBundles.length > 0 || sources.states.length > 0;
-    const layoutMode =
-      view === "pipeline" && canUseSemanticView
-        ? "pipeline"
-        : view === "semantic" && canUseSemanticView
-        ? "semantic"
-        : "module";
-    const semanticLayout = layoutMode === "semantic";
-    const { importWarnings: warnings } = await runTerraformImportFromSources(
+    const { importWarnings: warnings } = await runTerraformImportWithView({
       app,
       setAppState,
       sources,
-      {
-        semanticLayout,
-        layoutMode: layoutMode === "pipeline" ? "pipeline" : undefined,
-        moduleLayoutOptions:
-          layoutMode === "module" ? moduleLayoutOptions : undefined,
-        importedTfdTexts: opts.importedTfdTexts,
-        preset: opts.preset ?? null,
-        signal: layoutAbortRef.current?.signal,
-        onLayoutProgress: (p) => {
-          const label =
-            p.total > 0 ? `${p.phase} (${p.done}/${p.total})` : p.phase;
-          setLayoutProgress(label);
-        },
+      view,
+      moduleLayoutOptions,
+      importedTfdTexts: opts.importedTfdTexts,
+      preset: opts.preset ?? null,
+      signal: layoutAbortRef.current?.signal,
+      onLayoutProgress: (p) => {
+        const label =
+          p.total > 0 ? `${p.phase} (${p.done}/${p.total})` : p.phase;
+        setLayoutProgress(label);
       },
-    );
-    onImportSuccess?.();
-    setImportDone(true);
-    setPresetWarnings(opts.extraWarnings ?? []);
-    if (warnings?.length) {
-      setImportWarnings(warnings);
-    } else if ((opts.extraWarnings ?? []).length === 0) {
-      onCloseRequest();
-    }
+    });
+    completeImport(warnings, opts.extraWarnings ?? []);
   };
 
   const buildPresetPayload = async (
@@ -344,27 +340,18 @@ export const useTerraformImportDialog = ({
     setImportDone(false);
     try {
       if (activePreset) {
-        const presetSources = await loadTerraformImportPresetSources(
-          activePreset,
-          { allowDirectoryHandleFallback: true },
-        );
-        await runImportFromSources(
-          {
-            planDotBundles: presetSources.planDotBundles,
-            states: presetSources.states,
-            stateLabels: presetSources.stateLabels,
-            tfdTexts: presetSources.tfdTexts,
-            tfdLabels: presetSources.tfdLabels,
-            repoName: presetSources.repoName,
-            stackCatalog: presetSources.stackCatalog,
-            warnings: presetSources.warnings,
-          },
-          {
-            importedTfdTexts: presetSources.tfdTexts,
-            extraWarnings: presetSources.warnings,
-            preset: activePreset,
-          },
-        );
+        const { importWarnings: warnings, presetSources } =
+          await runTerraformPresetImport(app, setAppState, activePreset, {
+            view,
+            moduleLayoutOptions,
+            signal: layoutAbortRef.current?.signal,
+            onLayoutProgress: (p) => {
+              const label =
+                p.total > 0 ? `${p.phase} (${p.done}/${p.total})` : p.phase;
+              setLayoutProgress(label);
+            },
+          });
+        completeImport(warnings, presetSources.warnings);
         return;
       }
 
@@ -436,26 +423,18 @@ export const useTerraformImportDialog = ({
     setPresetWarnings([]);
     setImportDone(false);
     try {
-      const presetSources = await loadTerraformImportPresetSources(preset, {
-        allowDirectoryHandleFallback: true,
-      });
-      await runImportFromSources(
-        {
-          planDotBundles: presetSources.planDotBundles,
-          states: presetSources.states,
-          stateLabels: presetSources.stateLabels,
-          tfdTexts: presetSources.tfdTexts,
-          tfdLabels: presetSources.tfdLabels,
-          repoName: presetSources.repoName,
-          stackCatalog: presetSources.stackCatalog,
-          warnings: presetSources.warnings,
-        },
-        {
-          importedTfdTexts: presetSources.tfdTexts,
-          extraWarnings: presetSources.warnings,
-          preset,
-        },
-      );
+      const { importWarnings: warnings, presetSources } =
+        await runTerraformPresetImport(app, setAppState, preset, {
+          view,
+          moduleLayoutOptions,
+          signal: layoutAbortRef.current?.signal,
+          onLayoutProgress: (p) => {
+            const label =
+              p.total > 0 ? `${p.phase} (${p.done}/${p.total})` : p.phase;
+            setLayoutProgress(label);
+          },
+        });
+      completeImport(warnings, presetSources.warnings);
     } catch (err) {
       console.error("Preset import error:", err);
       onImportFail?.();

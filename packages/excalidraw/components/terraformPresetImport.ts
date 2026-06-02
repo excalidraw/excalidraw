@@ -1,0 +1,133 @@
+import {
+  DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  resolveTerraformModuleLayoutOptions,
+  type TerraformModuleLayoutOptions,
+} from "./terraformModuleLayoutOptions";
+import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
+import {
+  runTerraformImportFromSources,
+  type RunTerraformImportFromSourcesResult,
+} from "./terraformSceneApply";
+
+import type { TerraformView } from "./terraformImportDialogUtils";
+import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
+import type { TerraformImportPreset } from "./terraformImportPresetsTypes";
+import type { TerraformImportPresetWarning } from "./terraformImportPresetsTypes";
+import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
+import type { AppClassProperties, AppState } from "../types";
+import type React from "react";
+
+type SetAppState = React.Component<any, AppState>["setState"];
+
+export type TerraformLayoutMode = "module" | "semantic" | "pipeline";
+
+export const deriveLayoutModeFromView = (
+  view: TerraformView,
+  sources: Pick<TerraformPlanParsingSources, "planDotBundles" | "states">,
+): TerraformLayoutMode => {
+  const canUseSemanticView =
+    sources.planDotBundles.length > 0 || sources.states.length > 0;
+  if (view === "pipeline" && canUseSemanticView) {
+    return "pipeline";
+  }
+  if (view === "semantic" && canUseSemanticView) {
+    return "semantic";
+  }
+  return "module";
+};
+
+export type RunTerraformImportFromSourcesArgs = {
+  app: AppClassProperties;
+  setAppState: SetAppState;
+  sources: TerraformPlanParsingSources;
+  view: TerraformView;
+  moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  importedTfdTexts?: string[];
+  preset?: TerraformImportPreset | null;
+  signal?: AbortSignal;
+  onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
+};
+
+export const runTerraformImportWithView = async ({
+  app,
+  setAppState,
+  sources,
+  view,
+  moduleLayoutOptions = DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  importedTfdTexts,
+  preset = null,
+  signal,
+  onLayoutProgress,
+}: RunTerraformImportFromSourcesArgs): Promise<RunTerraformImportFromSourcesResult> => {
+  const layoutMode = deriveLayoutModeFromView(view, sources);
+  const semanticLayout = layoutMode === "semantic";
+  return runTerraformImportFromSources(app, setAppState, sources, {
+    semanticLayout,
+    layoutMode: layoutMode === "pipeline" ? "pipeline" : undefined,
+    moduleLayoutOptions:
+      layoutMode === "module" ? moduleLayoutOptions : undefined,
+    importedTfdTexts,
+    preset,
+    signal,
+    onLayoutProgress,
+  });
+};
+
+export type RunTerraformPresetImportOptions = {
+  view?: TerraformView;
+  moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  signal?: AbortSignal;
+  onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
+};
+
+export type RunTerraformPresetImportResult =
+  RunTerraformImportFromSourcesResult & {
+    presetSources: Awaited<ReturnType<typeof loadTerraformImportPresetSources>>;
+  };
+
+export const runTerraformPresetImport = async (
+  app: AppClassProperties,
+  setAppState: SetAppState,
+  preset: TerraformImportPreset,
+  options: RunTerraformPresetImportOptions = {},
+): Promise<RunTerraformPresetImportResult> => {
+  const presetSources = await loadTerraformImportPresetSources(preset, {
+    allowDirectoryHandleFallback: true,
+  });
+  const view = options.view ?? preset.view;
+  const moduleLayoutOptions =
+    options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
+  const sources: TerraformPlanParsingSources = {
+    planDotBundles: presetSources.planDotBundles,
+    states: presetSources.states,
+    stateLabels: presetSources.stateLabels,
+    tfdTexts: presetSources.tfdTexts,
+    tfdLabels: presetSources.tfdLabels,
+    repoName: presetSources.repoName,
+    stackCatalog: presetSources.stackCatalog,
+    warnings: presetSources.warnings,
+  };
+  const result = await runTerraformImportWithView({
+    app,
+    setAppState,
+    sources,
+    view,
+    moduleLayoutOptions,
+    importedTfdTexts: presetSources.tfdTexts,
+    preset,
+    signal: options.signal,
+    onLayoutProgress: options.onLayoutProgress,
+  });
+  return { ...result, presetSources };
+};
+
+export type TerraformPresetImportSideEffects = {
+  extraWarnings?: TerraformImportPresetWarning[];
+};
+
+export const resolveModuleLayoutOptionsForDemo = (
+  pack?: TerraformModuleLayoutOptions["mode"],
+): TerraformModuleLayoutOptions =>
+  pack
+    ? resolveTerraformModuleLayoutOptions({ mode: pack })
+    : DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;

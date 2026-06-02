@@ -58,6 +58,7 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import { TerraformDemoAutoImport } from "./TerraformDemoAutoImport";
 import { TerraformDebugToolbar } from "./TerraformDebugToolbar";
 import { TerraformElementActions } from "./TerraformSelectedShapeActions";
 import {
@@ -632,6 +633,10 @@ const LayerUI = ({
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderTerraformImportDialog()}
+      <TerraformDemoAutoImport
+        onImportSuccess={onTerraformImportSuccess}
+        onImportFail={onTerraformImportFail}
+      />
       {renderJSONExportDialog()}
       {appState.openDialog?.name === "charts" && (
         <PasteChartDialog

@@ -1,0 +1,28 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .TerraformDemoAutoImport {
+    position: fixed;
+    top: 4.5rem;
+    left: 50%;
+    z-index: var(--zIndex-layerUI, 4);
+    transform: translateX(-50%);
+    max-width: min(36rem, calc(100vw - 2rem));
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-gray-30);
+    background: var(--color-surface-lowest);
+    color: var(--color-on-surface);
+    box-shadow: 0 4px 24px rgb(0 0 0 / 12%);
+    font-family: "Assistant", system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    pointer-events: none;
+
+    &--error {
+      border-color: var(--color-danger, #e03131);
+      background: var(--color-danger-background, #fff5f5);
+      color: var(--color-danger, #c92a2a);
+    }
+  }
+}
