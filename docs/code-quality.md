@@ -132,7 +132,7 @@ CI on pull requests: **lint** + **test** (`yarn test:fast`) in parallel, then **
 
 ## Terraform import performance
 
-**Full agent handoff** (fixture, call graph, kept/reverted optimizations, measure commands, change log): [`docs/terraform-import-performance-log.md`](terraform-import-performance-log.md).
+**Full agent handoff** (fixture, call graph, kept/reverted optimizations, measure commands, change log, **KV layout cache**): [`docs/terraform-import-performance-log.md`](terraform-import-performance-log.md).
 
 Machine baseline: [`packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json`](../packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json).
 

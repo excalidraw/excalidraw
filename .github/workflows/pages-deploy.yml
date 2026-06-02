@@ -128,6 +128,40 @@ jobs:
         run: |
           echo "::notice::Set Actions variable CF_PAGES_PROJECT_NAME (and secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)."
 
+      - name: Purge production layout cache KV
+        if: >-
+          steps.deploy.outputs.deployment-url != '' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/terraform/purge-terraform-layout-cache.mjs
+
+      - name: Precompute Terraform layout cache
+        if: >-
+          steps.deploy.outputs.deployment-url != '' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
+        env:
+          TERRAFORM_IMPORT_PRESETS_DB: packages/excalidraw/test-fixtures/terraform-import-presets.db
+          LAYOUT_CACHE_VERSION: ${{ github.sha }}
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: yarn precompute:terraform-layout-cache
+
+      - name: Upload layout cache to production KV
+        if: >-
+          steps.deploy.outputs.deployment-url != '' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler@4 kv bulk put functions/generated/terraform-layout-cache-bulk.json \
+            --namespace-id=f47a2e1592bd4edc8e9a132683dbb534 \
+            --remote
+
       - name: Deployment summary
         if: steps.deploy.outputs.deployment-url != ''
         run: |
@@ -169,6 +203,17 @@ jobs:
           BASE: ${{ needs.build-and-deploy.outputs.alias-url || needs.build-and-deploy.outputs.deployment-url }}
         run: |
           code="$(curl -fsS -o /dev/null -w '%{http_code}' "$BASE/demo?preset=staging-multi-state-expanded")"
+          test "$code" = "200"
+
+      - name: Smoke — layout cache API (production)
+        if: needs.build-and-deploy.outputs.environment == 'production'
+        env:
+          BASE: ${{ needs.build-and-deploy.outputs.alias-url || needs.build-and-deploy.outputs.deployment-url }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          V="${GITHUB_SHA:0:12}"
+          code="$(curl -fsS -o /dev/null -w '%{http_code}' \
+            "$BASE/api/terraform-import-layout-cache?v=${V}&preset=staging-multi-state-expanded&view=pipeline")"
           test "$code" = "200"
 
       - name: Tail Functions logs on failure

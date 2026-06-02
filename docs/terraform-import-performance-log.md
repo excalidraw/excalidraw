@@ -14,6 +14,22 @@
 | Profiler | [`packages/excalidraw/components/terraformImportProfiler.ts`](../packages/excalidraw/components/terraformImportProfiler.ts) |
 | Perf tests (all views) | [`packages/excalidraw/components/terraformImportPerf.views.test.ts`](../packages/excalidraw/components/terraformImportPerf.views.test.ts) |
 | Hotspot ranker | [`scripts/terraform/perf-hotspot-ranker.mjs`](../scripts/terraform/perf-hotspot-ranker.mjs) |
+| Layout cache (KV) | [`functions/_terraformLayoutCache.ts`](../functions/_terraformLayoutCache.ts), [`terraformLayoutCacheClient.ts`](../packages/excalidraw/components/terraformLayoutCacheClient.ts) |
+
+---
+
+## Layout cache (Cloudflare KV)
+
+Built-in **preset** imports can skip client-side layout when a precomputed scene exists in KV.
+
+| Item | Detail |
+| --- | --- |
+| API | `GET /api/terraform-import-layout-cache?v={sha}&preset={id}&view={semantic\|pipeline\|module}&pack={default\|box\|rectpacking}` (pack only for module) |
+| Key | `v{version}/{presetId}/{view}[/pack]` — `version` = first 12 chars of deploy git SHA (`VITE_TERRAFORM_LAYOUT_CACHE_VERSION`) |
+| Populate | `yarn precompute:terraform-layout-cache` (CI on **master** deploy after purge) |
+| Purge | `yarn purge:terraform-layout-cache` (production KV); runs automatically on master in [`pages-deploy.yml`](../.github/workflows/pages-deploy.yml) |
+| Local dev | Version env empty → cache skipped; layout always runs |
+| File uploads | Not cached server-side in v1 |
 
 ---
 

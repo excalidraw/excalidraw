@@ -20,6 +20,10 @@
     {
       "binding": "STATS",
       "id": "67b24881a9a746e2bcfe4505b02ba00a"
+    },
+    {
+      "binding": "LAYOUT_CACHE",
+      "id": "ffdd6e30dd904f1e899e1e3da72f27f4"
     }
   ],
   "d1_databases": [
@@ -36,6 +40,12 @@
   ],
   "env": {
     "production": {
+      "kv_namespaces": [
+        {
+          "binding": "LAYOUT_CACHE",
+          "id": "f47a2e1592bd4edc8e9a132683dbb534"
+        }
+      ],
       "d1_databases": [
         {
           "binding": "DB",

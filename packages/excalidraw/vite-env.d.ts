@@ -55,6 +55,8 @@ interface ImportMetaEnv {
   VITE_TERRAFORM_BACKEND_URL?: string;
   /** When `"true"`, load built-in presets from `/api/terraform-import-presets` (Cloudflare Pages). */
   VITE_TERRAFORM_PRESETS_API?: string;
+  /** Short git SHA for KV layout cache keys (Pages production builds). Empty in local dev → cache skipped. */
+  VITE_TERRAFORM_LAYOUT_CACHE_VERSION?: string;
 
   MODE: string;
   DEV: string;

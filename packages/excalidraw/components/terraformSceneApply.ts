@@ -12,6 +12,7 @@ import {
   DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   type TerraformModuleLayoutOptions,
 } from "./terraformModuleLayoutOptions";
+import { fetchPresetLayoutCache } from "./terraformLayoutCacheClient";
 import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 
 import {
@@ -31,6 +32,7 @@ import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 import type React from "react";
 
 import type { TerraformImportPreset } from "./terraformImportPresetsTypes";
+import type { TerraformView } from "./terraformImportDialogUtils";
 import type { AppClassProperties, AppState, BinaryFileData } from "../types";
 
 type SetAppState = React.Component<any, AppState>["setState"];
@@ -154,19 +156,32 @@ export const runTerraformImportFromSources = async (
   const sourceFingerprint = terraformImportPrepFingerprint(sources);
   const importedTfdTexts = options.importedTfdTexts ?? [];
   const enableDeclaredDataFlow = importedTfdTexts.some((t) => t.trim());
-  const scene = await layoutTerraformViaWorkers(
-    sources,
-    {
-      semanticLayout: options.semanticLayout,
-      ...(options.layoutMode ? { layoutMode } : {}),
-      moduleLayoutOptions:
-        layoutMode === "module" ? moduleLayoutOptions : undefined,
-    },
-    {
-      onProgress: options.onLayoutProgress,
-      signal: options.signal,
-    },
-  );
+
+  const presetId = options.preset?.id?.trim();
+  let scene: TerraformExcalidrawScenePayload | null = null;
+  if (presetId) {
+    scene = await fetchPresetLayoutCache(
+      presetId,
+      layoutMode as TerraformView,
+      layoutMode === "module" ? moduleLayoutOptions : undefined,
+      { signal: options.signal },
+    );
+  }
+  if (!scene) {
+    scene = await layoutTerraformViaWorkers(
+      sources,
+      {
+        semanticLayout: options.semanticLayout,
+        ...(options.layoutMode ? { layoutMode } : {}),
+        moduleLayoutOptions:
+          layoutMode === "module" ? moduleLayoutOptions : undefined,
+      },
+      {
+        onProgress: options.onLayoutProgress,
+        signal: options.signal,
+      },
+    );
+  }
 
   const { elements, terraformEdgeLayerPins } = applyTerraformExcalidrawScene(
     app,

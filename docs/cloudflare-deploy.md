@@ -112,8 +112,16 @@ Do **not** reconnect **Workers Builds** to this repository.
 | ------------ | --------------------- | -------------------------- |
 | `DB`         | `tfdraw-analytics`    | `tfdraw-analytics-preview` |
 | `PRESETS_DB` | `tfdraw-presets`      | `tfdraw-presets-preview`   |
+| `LAYOUT_CACHE` (KV) | `tfdraw-layout-cache` | `tfdraw-layout-cache-preview` |
 
-Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs when Pages deploys the **production branch**.
+Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs and production layout KV when Pages deploys the **production branch**.
+
+**Layout cache KV** (precomputed Terraform scenes for builtin presets):
+
+- Namespaces were created with `wrangler kv namespace create` (ids in [`wrangler.jsonc`](../wrangler.jsonc)).
+- On every **push to `master`**, [pages-deploy.yml](../.github/workflows/pages-deploy.yml) purges production KV, runs `yarn precompute:terraform-layout-cache`, and `wrangler kv bulk put`.
+- Manual: `yarn purge:terraform-layout-cache` then `LAYOUT_CACHE_VERSION=$(git rev-parse --short HEAD) yarn precompute:terraform-layout-cache` then bulk put (see workflow for namespace id).
+- Preview branch deploys: cache miss → client layout fallback (no precompute on PRs).
 
 **One-time prod schemas:**
 
@@ -162,6 +170,7 @@ curl -sS "https://<branch>.ainur-chb.pages.dev/api/terraform-import-presets" | h
 2. Open the **Pages** URL from the PR comment or job summary
 3. `POST /api/subscribe` → **200** JSON `{ "ok": true }`
 4. `GET /api/terraform-import-presets` → **200** with a `presets` array
+5. `GET /api/terraform-import-layout-cache?v=<deploy-sha-prefix>&preset=staging-multi-state-expanded&view=pipeline` → **200** with `{ scene }` (production, after master cache seed)
 
 ---
 

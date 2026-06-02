@@ -38,6 +38,8 @@ interface ImportMetaEnv {
 
   VITE_APP_GIT_SHA: string;
 
+  VITE_TERRAFORM_LAYOUT_CACHE_VERSION?: string;
+
   VITE_TFDRAW_TELEMETRY_ENABLED: string;
   VITE_TURNSTILE_SITE_KEY: string;
 
