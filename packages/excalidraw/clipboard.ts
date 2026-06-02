@@ -25,6 +25,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import { isHtmlInCanvasSupported } from "./htmlcanvas";
+
 import { ExcalidrawError } from "./errors";
 import {
   createFile,
@@ -41,7 +43,10 @@ type ElementsClipboard = {
   files: BinaryFiles | undefined;
 };
 
-export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
+export type PastedMixedContent = {
+  type: "text" | "imageUrl" | "htmlContent";
+  value: string;
+}[];
 
 export interface ClipboardData {
   elements?: readonly ExcalidrawElement[];
@@ -235,6 +240,16 @@ const maybeParseHTMLDataItem = (
   const html = dataItem.value;
 
   try {
+    // When HTML-in-Canvas is available, preserve the raw HTML so it can
+    // be rendered natively on the canvas surface instead of being
+    // decomposed into text + image fragments.
+    if (isHtmlInCanvasSupported()) {
+      return {
+        type: "mixedContent",
+        value: [{ type: "htmlContent", value: html }],
+      };
+    }
+
     const doc = new DOMParser().parseFromString(html, MIME_TYPES.html);
 
     const content = parseHTMLTree(doc.body);
