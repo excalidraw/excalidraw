@@ -130,7 +130,7 @@ If the same resource address appears in more than one file, the **last file wins
 
 Example import bundles live under [`packages/backend/terraform/staging-multi-state/`](./packages/backend/terraform/staging-multi-state/) (`plan.json` + `graph.dot` per stack, `pipeline.tfd`, etc.). Those files are **gitignored**; hydrate them locally with the dev preset commands below or generate plans from your own Terraform roots.
 
-Unit tests may still read other gitignored fixtures under [`packages/backend/terraform/`](./packages/backend/terraform/) (for example `allplanmodules.json`) directly from disk; those are not import presets.
+Unit tests read plan/dot content from the committed preset test database and optional gitignored exports under [`packages/backend/terraform/cloudflare/`](./packages/backend/terraform/cloudflare/) and [`packages/backend/terraform/staging-multi-state/`](./packages/backend/terraform/staging-multi-state/).
 
 ### Dev import presets (SQLite)
 
@@ -205,18 +205,15 @@ jq -r '.resource_changes[] | select(.mode == "managed") | .address' plan.json | 
 
 **Order matters:** edges are drawn in file order.
 
-### Example ([`allplanmodules.tfd`](./packages/backend/terraform/allplanmodules.tfd))
+### Example ([`staging-multi-state/pipeline.tfd`](./packages/backend/terraform/staging-multi-state/pipeline.tfd))
+
+See the committed preset catalog for a full multi-stack pipeline; a minimal pattern is:
 
 ```tfd
-bind writer = module.workload_writer_lambda.module.lambda.aws_lambda_function.this[0]
-bind reader = module.workload_reader_lambda.module.lambda.aws_lambda_function.this[0]
-bind bucket = module.application_data_bucket.module.bucket.aws_s3_bucket.this[0]
-bind queue  = module.application_job_queue.module.queue.aws_sqs_queue.this[0]
+bind api = module.example.aws_api_gateway_rest_api.this
+bind fn  = module.example.aws_lambda_function.this
 
-writer -> bucket
-writer -> queue
-queue -> reader
-bucket -> reader
+api -> fn
 ```
 
 ### Import
@@ -309,19 +306,11 @@ yarn build:packages
 yarn build:app
 ```
 
-Parser tests: [`terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts) using [`packages/backend/terraform/allplanmodules.*`](./packages/backend/terraform/).
-
-### Fixture corpus (maintainers)
-
-For regression testing, the repo can generate **100 real plan exports** from the sample stack in [`packages/backend/terraform/`](./packages/backend/terraform/). See [`packages/backend/README.md`](./packages/backend/README.md) for bootstrap, `yarn fixtures:*` commands, AWS prerequisites, and corpus debugging.
+Parser tests: [`terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts) using the committed preset test DB plus [`packages/backend/terraform/cloudflare/`](./packages/backend/terraform/cloudflare/) and [`packages/backend/terraform/staging-multi-state/`](./packages/backend/terraform/staging-multi-state/) exports.
 
 ### Hosted telemetry (maintainers)
 
 Pages Functions under [`functions/`](./functions/) provide `/api/subscribe` and `/api/event`. Setup: [docs/telemetry-setup.md](./docs/telemetry-setup.md).
-
-## Local fixtures
-
-For pipeline geo fanout testing without AWS, use the LocalStack fixture under [`packages/backend/terraform/localstack-geo-fanout/`](packages/backend/terraform/localstack-geo-fanout/README.md): `yarn localstack:geo-fanout:generate-bundles` (offline CI) or `yarn localstack:geo-fanout:up`, `yarn localstack:geo-fanout:apply`, `yarn localstack:geo-fanout:export` (real LocalStack).
 
 ## Deployment
 

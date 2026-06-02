@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import {
-  HAS_ALLPLANMODULES_FIXTURES,
-  readTerraformBackendFile,
-} from "../test-fixtures/terraformPresetFixtures";
+import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
+import { HAS_STAGING_MULTI_STATE_PRESET } from "../test-fixtures/terraformPresetFixtures";
 
 import { restoreElements } from "../data/restore";
 
@@ -124,24 +123,33 @@ const runLayerUiTerraformPass = (
   return { next, replaced: true, didChange: result.didChange };
 };
 
-describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
+async function loadSemanticElementsFromStagingStack() {
+  const sources = getTerraformImportPresetSourcesFromDb(
+    "staging-multi-state-expanded",
+  );
+  const bundle = sources?.planDotBundles[0];
+  if (!bundle) {
+    throw new Error("staging-multi-state-expanded preset sources missing");
+  }
+  const res = await terraformPlanParsingFromSources(
+    {
+      planDotBundles: [{ plan: bundle.plan, dotText: bundle.dotText }],
+      states: [],
+      tfdTexts: [],
+    },
+    { semanticLayout: true },
+  );
+  const body = await res.json();
+  return restoreElements(body.elements, null, {
+    repairBindings: true,
+  }) as ExcalidrawElement[];
+}
+
+describe.skipIf(!HAS_STAGING_MULTI_STATE_PRESET)(
   "terraform focus hover loop (LayerUI effect simulation)",
   () => {
     it("stabilizes when hovering one semantic resource with default pins", async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: [{ plan, dotText: dot }],
-          states: [],
-          tfdTexts: [],
-        },
-        { semanticLayout: true },
-      );
-      const body = await res.json();
-      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-        repairBindings: true,
-      });
+      let elements = await loadSemanticElementsFromStagingStack();
       const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
       const resource = elements.find(
         (e) =>
@@ -169,20 +177,7 @@ describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
     });
 
     it("is idempotent on consecutive passes with the same hover target", async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: [{ plan, dotText: dot }],
-          states: [],
-          tfdTexts: [],
-        },
-        { semanticLayout: true },
-      );
-      const body = await res.json();
-      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-        repairBindings: true,
-      });
+      let elements = await loadSemanticElementsFromStagingStack();
       const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
       const resource = elements.find(
         (e) =>
@@ -223,24 +218,7 @@ describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
     });
 
     it("each hover switch updates scene but same target is idempotent", async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: [{ plan, dotText: dot }],
-          states: [],
-          tfdTexts: [],
-        },
-        { semanticLayout: true },
-      );
-      const body = await res.json();
-      const elements: ExcalidrawElement[] = restoreElements(
-        body.elements,
-        null,
-        {
-          repairBindings: true,
-        },
-      );
+      const elements = await loadSemanticElementsFromStagingStack();
       const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
       const resources = elements.filter(
         (e) =>
@@ -292,20 +270,7 @@ describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
     });
 
     it("does not loop when focus toggles null between hovers (gap flicker)", async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: [{ plan, dotText: dot }],
-          states: [],
-          tfdTexts: [],
-        },
-        { semanticLayout: true },
-      );
-      const body = await res.json();
-      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-        repairBindings: true,
-      });
+      let elements = await loadSemanticElementsFromStagingStack();
       const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
       const resource = elements.find(
         (e) =>
@@ -341,20 +306,7 @@ describe.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
     });
 
     it("does not replace across 50 consecutive passes after settle (appState churn)", async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const res = await terraformPlanParsingFromSources(
-        {
-          planDotBundles: [{ plan, dotText: dot }],
-          states: [],
-          tfdTexts: [],
-        },
-        { semanticLayout: true },
-      );
-      const body = await res.json();
-      let elements: ExcalidrawElement[] = restoreElements(body.elements, null, {
-        repairBindings: true,
-      });
+      let elements = await loadSemanticElementsFromStagingStack();
       const pins = { ...TERRAFORM_IMPORT_EDGE_LAYER_PINS };
       const resource = elements.find(
         (e) =>

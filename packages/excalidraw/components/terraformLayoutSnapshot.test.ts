@@ -1,8 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
-  HAS_ALLPLANMODULES_FIXTURES,
-  hasTerraformBackendFile,
   loadStagingMultiStatePlanDotBundlesFromDb,
   readStagingMultiStatePipelineTfdFromDb,
   readTerraformBackendFile,
@@ -101,59 +99,5 @@ describe("terraform layout golden snapshots", () => {
       );
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
-  );
-
-  it.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
-    "allplanmodules semantic layout matches golden snapshot",
-    async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const tfd = readTerraformBackendFile("allplanmodules.tfd");
-      const state = hasTerraformBackendFile("terraform_allplanmodules.tfstate")
-        ? readTerraformBackendFile("terraform_allplanmodules.tfstate")
-        : null;
-
-      const snapshot = await importLayoutSnapshot(
-        {
-          planDotBundles: [{ plan, dotText: dot, label: "main" }],
-          states: state ? [state] : [],
-          stateLabels: state ? ["terraform_allplanmodules.tfstate"] : [],
-          tfdTexts: [tfd],
-          tfdLabels: ["allplanmodules.tfd"],
-        },
-        true,
-      );
-      await expect(snapshot).toMatchFileSnapshot(
-        "./__snapshots__/allplanmodules.semantic.layout.snap",
-      );
-    },
-    180_000,
-  );
-
-  it.skipIf(!HAS_ALLPLANMODULES_FIXTURES)(
-    "allplanmodules module layout matches golden snapshot",
-    async () => {
-      const plan = JSON.parse(readTerraformBackendFile("allplanmodules.json"));
-      const dot = readTerraformBackendFile("allplanmodules.dot");
-      const tfd = readTerraformBackendFile("allplanmodules.tfd");
-      const state = hasTerraformBackendFile("terraform_allplanmodules.tfstate")
-        ? readTerraformBackendFile("terraform_allplanmodules.tfstate")
-        : null;
-
-      const snapshot = await importLayoutSnapshot(
-        {
-          planDotBundles: [{ plan, dotText: dot, label: "main" }],
-          states: state ? [state] : [],
-          stateLabels: state ? ["terraform_allplanmodules.tfstate"] : [],
-          tfdTexts: [tfd],
-          tfdLabels: ["allplanmodules.tfd"],
-        },
-        false,
-      );
-      await expect(snapshot).toMatchFileSnapshot(
-        "./__snapshots__/allplanmodules.module.layout.snap",
-      );
-    },
-    180_000,
   );
 });

@@ -1,7 +1,0 @@
-module "application_data_bucket" {
-  source = "./modules/encrypted_s3_bucket"
-
-  bucket_name = "ts-test-lambda-data"
-
-  tags = local.workload_tags
-}

@@ -77,31 +77,12 @@ packages/backend/terraform/*plan.json
 packages/backend/terraform/*plan.dot
 packages/backend/terraform/*plan2.json
 packages/backend/terraform/*plan2.dot
-packages/backend/terraform/allplan.json
-packages/backend/terraform/allplan.dot
-packages/backend/terraform/allplanmodules.json
-packages/backend/terraform/allplanmodules.dot
 packages/backend/terraform/cloudflare/*plan.json
 packages/backend/terraform/cloudflare/*plan.dot
 packages/backend/terraform/**/*.tfd
 !packages/backend/terraform/staging-multi-state/pipeline.tfd
 packages/backend/terraform/cloudflare/cloudflare-state-summary.json
 packages/backend/terraform/cloudflare/cloudflare.dot
-# Generated fixture corpus outputs (plans, graphs, per-case terraform dirs — created by fixtures:corpus).
-packages/backend/terraform/.corpus/
-packages/backend/terraform/fixtures/states/**
-!packages/backend/terraform/fixtures/states/.gitkeep
-# Binary `terraform plan -out=…` / OpenTofu plan zips.
-packages/backend/terraform/tfplan
-packages/backend/terraform/testplan
-packages/backend/terraform/allplanmodules
-packages/backend/terraform/allplan-kms-interesting-edges.json
-packages/backend/terraform/allplan-kms-nodes-stage-snapshots.json
-packages/backend/terraform/allplan-s3kms-debug.json
-packages/backend/terraform/allplan-policydoc-debug.json
-packages/backend/terraform/allplan-s3kms-policy-trace.json
-packages/backend/terraform/allplan-s3kms-stage-snapshots.json
-packages/backend/terraform/allplan-s3kms-withstate-stage-snapshots.json
 packages/backend/terraform/modules/private_api_lambda/.build/
 **/terraform/.pluralith/
 
@@ -122,12 +103,6 @@ packages/backend/terraform/staging-multi-state/**/terraform.tfstate
 packages/backend/terraform/staging-multi-state/**/terraform.tfstate.backup
 packages/backend/terraform/staging-multi-state/**/.terraform.tfstate.lock.info
 **/.terraform.tfstate.lock.info
-
-# LocalStack geo fanout generated apply/export artifacts (not source-controlled).
-packages/backend/terraform/localstack-geo-fanout/**/.build/
-packages/backend/terraform/localstack-geo-fanout/**/tfplan
-packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.plan.json
-packages/excalidraw/test-fixtures/localstack-geo-fanout/bundles/*.graph.dot
 
 # Cloudflare Wrangler (local dev state, caches; not source-controlled)
 .wrangler/

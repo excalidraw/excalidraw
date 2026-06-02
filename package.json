@@ -122,21 +122,7 @@
     "bundle:whiteboard:archive": "node scripts/bundle-whiteboard.js --skip-build",
     "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
     "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
-    "clean-install": "yarn rm:node_modules && yarn install",
-    "fixtures:manifest": "node packages/backend/terraform/scripts/fixture-corpus/build-manifest.mjs",
-    "fixtures:compose": "node packages/backend/terraform/scripts/fixture-corpus/compose-main.mjs",
-    "fixtures:bootstrap": "node packages/backend/terraform/scripts/fixture-corpus/bootstrap.mjs",
-    "fixtures:bootstrap:destroy": "node packages/backend/terraform/scripts/fixture-corpus/bootstrap.mjs --destroy-after",
-    "fixtures:all": "node packages/backend/terraform/scripts/fixture-corpus/bootstrap.mjs --destroy-after && node packages/backend/terraform/scripts/fixture-corpus/run-recipes.mjs --jobs 8 && node packages/backend/terraform/scripts/fixture-corpus/validate-corpus.mjs",
-    "fixtures:corpus": "node packages/backend/terraform/scripts/fixture-corpus/run-recipes.mjs",
-    "fixtures:corpus:serial": "node packages/backend/terraform/scripts/fixture-corpus/run-recipes.mjs --serial --skip-missing-state",
-    "fixtures:corpus:validate": "node packages/backend/terraform/scripts/fixture-corpus/validate-corpus.mjs",
-    "fixtures:seed-state-070": "node packages/backend/terraform/scripts/fixture-corpus/seed-state-070.mjs",
-    "localstack:geo-fanout:up": "docker compose -f packages/backend/terraform/localstack-geo-fanout/docker-compose.yml up -d",
-    "localstack:geo-fanout:down": "docker compose -f packages/backend/terraform/localstack-geo-fanout/docker-compose.yml down",
-    "localstack:geo-fanout:apply": "packages/backend/terraform/localstack-geo-fanout/scripts/apply-all.sh",
-    "localstack:geo-fanout:export": "packages/backend/terraform/localstack-geo-fanout/scripts/export-all.sh",
-    "localstack:geo-fanout:generate-bundles": "node packages/backend/terraform/localstack-geo-fanout/scripts/generate-synthetic-bundles.mjs"
+    "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
     "strip-ansi": "6.0.1"

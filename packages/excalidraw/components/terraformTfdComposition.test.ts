@@ -107,9 +107,9 @@ describe("terraformTfdComposition", () => {
     expect(
       formatArtifactRef({
         repoName: "terraform",
-        relativePath: "allplanmodules.json",
+        relativePath: "staging-multi-state/pipeline.tfd",
       }),
-    ).toBe("terraform/allplanmodules.json");
+    ).toBe("terraform/staging-multi-state/pipeline.tfd");
   });
 
   it("parses TFD v3 use blocks with binds and edges", () => {

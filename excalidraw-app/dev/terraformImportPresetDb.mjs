@@ -1352,55 +1352,6 @@ export function readStagingMultiStatePipelineTfdFromDb() {
   );
 }
 
-export function loadLocalstackGeoFanoutPlanDotBundlesFromDb() {
-  const db = getTerraformImportPresetTestDb();
-  const rows = db
-    .prepare(
-      `SELECT stack_id AS id, label, plan_text AS planText, dot_text AS dotText
-       FROM terraform_import_preset_stacks
-       WHERE preset_id = 'localstack-geo-fanout'
-       ORDER BY sort_order ASC`,
-    )
-    .all();
-
-  return rows.map((row) => {
-    if (!row.planText || !row.dotText) {
-      throw new Error(
-        `localstack-geo-fanout stack "${row.id}" is missing plan or dot content in the preset DB.`,
-      );
-    }
-    return {
-      plan: JSON.parse(row.planText),
-      dotText: row.dotText,
-      label: row.label || row.id,
-    };
-  });
-}
-
-export function readLocalstackGeoFanoutPipelineTfdFromDb() {
-  return readTerraformImportRepoFileText(
-    "packages/backend/terraform/localstack-geo-fanout/pipeline.tfd",
-  );
-}
-
-export function hasLocalstackGeoFanoutPresetInDb() {
-  try {
-    const db = getTerraformImportPresetTestDb();
-    const row = db
-      .prepare(
-        `SELECT COUNT(*) AS count
-         FROM terraform_import_preset_stacks
-         WHERE preset_id = 'localstack-geo-fanout'
-           AND plan_text IS NOT NULL
-           AND dot_text IS NOT NULL`,
-      )
-      .get();
-    return (row?.count ?? 0) >= 7;
-  } catch {
-    return false;
-  }
-}
-
 export function verifyTerraformImportPresetTestDb(
   dbPath = TEST_FIXTURE_DB_PATH,
 ) {
