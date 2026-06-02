@@ -10,16 +10,8 @@ import {
   buildTerraformLocalImportNodesMap,
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
-import {
-  buildAwsLayoutContext,
-  type AwsLayoutContext,
-} from "./terraformAwsLayoutContext";
-import {
-  buildEnrichedTopologyPlacements,
-  type EnrichedTopologyPlacements,
-} from "./terraformTopologyPlacementBuild";
-import { filterPlanByProviderFamily } from "./terraformProviderClassification";
 
+import type { EnrichedTopologyPlacements } from "./terraformTopologyPlacementBuild";
 import type { TerraformLayoutOptions } from "./terraformLayoutCore";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
@@ -32,8 +24,13 @@ export type TerraformImportPrepCache = {
   importWarnings: import("./terraformImportMerge").TerraformImportWarning[];
   sourcePlans: unknown[];
   nodes: TerraformPlanNodesMap;
-  awsContext: AwsLayoutContext;
-  enrichedPlacements: EnrichedTopologyPlacements;
+  /**
+   * Pipeline-only enriched placements, built lazily on first pipeline access and
+   * memoized here so a later semantic→pipeline switch reuses it. The semantic path
+   * never reads this (it runs its own placement reconcile), so it is not built
+   * eagerly — keeping it off the semantic critical path.
+   */
+  enrichedPlacements?: EnrichedTopologyPlacements;
 };
 
 let sessionCache: TerraformImportPrepCache | null = null;
@@ -112,13 +109,10 @@ export function buildTerraformImportPrepCache(
     options?.dataflowLinks,
   );
 
-  const awsPlan = filterPlanByProviderFamily(
-    merged.plan as Parameters<typeof filterPlanByProviderFamily>[0],
-    "aws",
-  );
-  const awsContext = buildAwsLayoutContext(awsPlan);
-  const enrichedPlacements = buildEnrichedTopologyPlacements(awsPlan, nodes);
-
+  // Prep only computes what is shared across views (merged plan, dependency
+  // nodes, adjacency). The AWS layout context was dead (never read), and enriched
+  // placements are pipeline-only — the semantic path recomputes its own placement
+  // reconcile — so both are left to the pipeline path to build on demand.
   sessionCache = {
     fingerprint,
     mergedPlan: merged.plan,
@@ -128,8 +122,6 @@ export function buildTerraformImportPrepCache(
     importWarnings: merged.warnings,
     sourcePlans: merged.sourcePlans,
     nodes,
-    awsContext,
-    enrichedPlacements,
   };
   return sessionCache;
 }

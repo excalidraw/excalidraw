@@ -817,6 +817,14 @@ function natClustersForZone(
 
 /** VPC frame size that fits all subnet-zone cells for this VPC. */
 function vpcFrameDimensionsForZones(
+  ...args: Parameters<typeof vpcFrameDimensionsForZonesImpl>
+): VpcZoneGridDimensions {
+  return terraformImportProfilerMeasure("skeleton.vpcSizing", () =>
+    vpcFrameDimensionsForZonesImpl(...args),
+  );
+}
+
+function vpcFrameDimensionsForZonesImpl(
   vpcZs: readonly TopologyPlacementZone[],
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
@@ -2677,6 +2685,14 @@ type TopologyPrimaryClusterPlacement = {
 
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
+  ...args: Parameters<typeof appendTopologyResourceRectanglesImpl>
+): string[] {
+  return terraformImportProfilerMeasure("skeleton.resourceRects", () =>
+    appendTopologyResourceRectanglesImpl(...args),
+  );
+}
+
+function appendTopologyResourceRectanglesImpl(
   skeleton: ExcalidrawElementSkeleton[],
   placement: TopologyPrimaryClusterPlacement,
   addrs: readonly string[],
@@ -2825,11 +2841,9 @@ function appendTopologyResourceRectangles(
 
     let bundles = activeTopologyMemoCtx?.satelliteBundlesByAddr.get(addr);
     if (!bundles) {
-      bundles = buildTopologyPrimarySatelliteBundles(
-        nodes,
-        addr,
-        arnIndex,
-        plan,
+      bundles = terraformImportProfilerMeasure(
+        "skeleton.satelliteBundles",
+        () => buildTopologyPrimarySatelliteBundles(nodes, addr, arnIndex, plan),
       );
       activeTopologyMemoCtx?.satelliteBundlesByAddr.set(addr, bundles);
     }

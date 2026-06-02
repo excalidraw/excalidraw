@@ -53,15 +53,24 @@ export function isTerraformImportProfilerEnabled(): boolean {
   return isProfilerEnabled();
 }
 
-function recordSpan(name: string, durationMs: number, selfMs: number): void {
-  const prev = totals.get(name);
-  if (prev) {
-    prev.ms += durationMs;
-    prev.selfMs += selfMs;
-    prev.callCount += 1;
-  } else {
-    totals.set(name, { ms: durationMs, selfMs, callCount: 1 });
+function ensureEntry(name: string): {
+  ms: number;
+  selfMs: number;
+  callCount: number;
+} {
+  let entry = totals.get(name);
+  if (!entry) {
+    entry = { ms: 0, selfMs: 0, callCount: 0 };
+    totals.set(name, entry);
   }
+  return entry;
+}
+
+function recordSpan(name: string, durationMs: number, selfMs: number): void {
+  const entry = ensureEntry(name);
+  entry.ms += durationMs;
+  entry.selfMs += selfMs;
+  entry.callCount += 1;
 }
 
 export function terraformImportProfilerMark(_name: string): void {
@@ -78,6 +87,9 @@ export function terraformImportProfilerMeasure<T>(
   const parentSelf = stack.length > 0 ? stack[stack.length - 1]!.name : null;
   const start = performance.now();
   stack.push({ name, start });
+  // Pre-create this span's entry so any child completing before us (post-order
+  // `finally`) can decrement our selfMs — otherwise the subtraction silently no-ops.
+  ensureEntry(name);
   try {
     return fn();
   } finally {
@@ -103,6 +115,9 @@ export async function terraformImportProfilerMeasureAsync<T>(
   const parentSelf = stack.length > 0 ? stack[stack.length - 1]!.name : null;
   const start = performance.now();
   stack.push({ name, start });
+  // Pre-create this span's entry so any child completing before us (post-order
+  // `finally`) can decrement our selfMs — otherwise the subtraction silently no-ops.
+  ensureEntry(name);
   try {
     return await fn();
   } finally {

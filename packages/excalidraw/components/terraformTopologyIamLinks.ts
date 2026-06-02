@@ -784,8 +784,24 @@ export function iamSatelliteStackHeightPx(
   return h + nestedIamRoleStacksExtraHeightPx(roleStacks.length);
 }
 
+/**
+ * arn→nodePath index, memoized by the `nodes` map reference. The index is a pure
+ * function of `nodes` and is used read-only by callers, so it is safe to share.
+ * This collapses the redundant full-node scans across one import — notably the
+ * pipeline path, which rebuilds it once per cluster (~70×) via
+ * `buildTopologyPrimaryClusterSkeletonForPipeline`.
+ */
+const arnIndexByNodes = new WeakMap<object, Map<string, string>>();
+
 export function buildArnIndexForTopology(
   nodes: TerraformPlanNodesMap,
 ): Map<string, string> {
-  return buildArnToNodePath(nodes);
+  const key = nodes as unknown as object;
+  const cached = arnIndexByNodes.get(key);
+  if (cached) {
+    return cached;
+  }
+  const index = buildArnToNodePath(nodes);
+  arnIndexByNodes.set(key, index);
+  return index;
 }

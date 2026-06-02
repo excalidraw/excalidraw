@@ -160,10 +160,14 @@ function buildPlacementMap(
 ): Map<string, PipelinePlacement> {
   const awsPlan = filterPlanByProviderFamily(plan as any, "aws");
   const cache = getTerraformImportPrepCache();
-  const enriched =
-    enrichedOverride ??
-    cache?.enrichedPlacements ??
-    buildEnrichedTopologyPlacements(awsPlan, nodes);
+  let enriched = enrichedOverride ?? cache?.enrichedPlacements;
+  if (!enriched) {
+    enriched = buildEnrichedTopologyPlacements(awsPlan, nodes);
+    // Memoize back so a semantic→pipeline switch (same prep fingerprint) reuses it.
+    if (cache) {
+      cache.enrichedPlacements = enriched;
+    }
+  }
   const out = topologyAddressPlacementMap(enriched, awsPlan);
 
   for (const address of Object.keys(nodes)) {

@@ -41,15 +41,27 @@ type PerfBaseline = {
   spans: Record<string, number>;
 };
 
+type ViewSpans = ReturnType<typeof terraformImportProfilerSummary>;
+
+/**
+ * Per-view span snapshots captured at the end of each view's test. The profiler
+ * totals are module-global and reset per test, so the only correct moment to read
+ * a view's spans is right after its own layout call — not in the final test (which
+ * would otherwise serialize whatever the previous test left behind).
+ */
+const capturedSpansByView: Record<string, ViewSpans> = {};
+
 function maybeWriteProfilerArtifact(payload: {
-  spans: ReturnType<typeof terraformImportProfilerSummary>;
+  spansByView: Record<string, ViewSpans>;
+  primaryView: string;
   baselineSpans: PerfBaseline["spans"];
 }): void {
   const outPath = process.env.VITEST_TERRAFORM_PROFILE_OUT;
   if (!outPath) {
     return;
   }
-  const regressions = payload.spans
+  const primarySpans = payload.spansByView[payload.primaryView] ?? [];
+  const regressions = primarySpans
     .map((row) => {
       const base = payload.baselineSpans[row.name];
       if (base == null || base <= 0) {
@@ -65,9 +77,11 @@ function maybeWriteProfilerArtifact(payload: {
     })
     .filter((v): v is NonNullable<typeof v> => v != null)
     .sort((a, b) => b.ratio - a.ratio);
-  const topSelfSpans = payload.spans
+  // Rank by inclusive `ms` (selfMs is only meaningful for leaf spans; a parent's
+  // self time is its `ms` minus its children — read the per-view tree for that).
+  const topSpans = primarySpans
     .slice()
-    .sort((a, b) => b.selfMs - a.selfMs)
+    .sort((a, b) => b.ms - a.ms)
     .slice(0, 20);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(
@@ -75,8 +89,10 @@ function maybeWriteProfilerArtifact(payload: {
     JSON.stringify(
       {
         generatedAt: new Date().toISOString(),
-        topSelfSpans,
+        primaryView: payload.primaryView,
+        topSpans,
         topRegressions: regressions.slice(0, 20),
+        spansByView: payload.spansByView,
       },
       null,
       2,
@@ -115,6 +131,7 @@ describe("terraform import performance (all views)", () => {
         semanticLayout: true,
       });
       const ms = performance.now() - t0;
+      capturedSpansByView.semantic = terraformImportProfilerSummary();
       expect((body.elements as unknown[]).length).toBeGreaterThan(0);
       expect(ms).toBeLessThan(PERF_BUDGET_SEMANTIC_MS);
       if (process.env.VITEST_TERRAFORM_PROFILE === "1") {
@@ -134,6 +151,7 @@ describe("terraform import performance (all views)", () => {
         layoutMode: "pipeline",
       });
       const ms = performance.now() - t0;
+      capturedSpansByView.pipeline = terraformImportProfilerSummary();
       expect((body.elements as unknown[]).length).toBeGreaterThan(0);
       expect(ms).toBeLessThan(PERF_BUDGET_PIPELINE_MS);
     },
@@ -149,6 +167,7 @@ describe("terraform import performance (all views)", () => {
         semanticLayout: false,
       });
       const ms = performance.now() - t0;
+      capturedSpansByView.module = terraformImportProfilerSummary();
       const elements = body.elements as unknown[];
       const meta = body.meta as { skippedLayout?: boolean } | undefined;
       if (!meta?.skippedLayout) {
@@ -161,15 +180,18 @@ describe("terraform import performance (all views)", () => {
 
   it("span timings do not regress beyond baseline ratio", () => {
     const baseline = loadBaseline();
-    const current = terraformImportProfilerSummary();
+    // Semantic is the meaningful view for hotspot ranking; read its captured
+    // snapshot, not the module-global totals (which now hold the module run).
+    const semanticSpans = capturedSpansByView.semantic ?? [];
     maybeWriteProfilerArtifact({
-      spans: current,
+      spansByView: capturedSpansByView,
+      primaryView: "semantic",
       baselineSpans: baseline.spans,
     });
     if (Object.keys(baseline.spans).length === 0) {
       return;
     }
-    const byName = new Map(current.map((r) => [r.name, r.selfMs]));
+    const byName = new Map(semanticSpans.map((r) => [r.name, r.ms]));
     for (const [name, baseMs] of Object.entries(baseline.spans)) {
       const cur = byName.get(name);
       if (cur == null) {

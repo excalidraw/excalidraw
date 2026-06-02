@@ -1,24 +1,171 @@
 {
-  "generatedAt": "2026-06-02T13:47:24.317Z",
-  "topSelfSpans": [
+  "generatedAt": "2026-06-02T22:44:37.777Z",
+  "primaryView": "semantic",
+  "topSpans": [
     {
       "name": "layout.semantic",
-      "ms": 36041.94,
-      "selfMs": 36041.94,
+      "ms": 32028.99,
+      "selfMs": 8777.22,
       "callCount": 1
     },
     {
+      "name": "layout.topology.skeleton",
+      "ms": 23153.16,
+      "selfMs": 4878.9,
+      "callCount": 1
+    },
+    {
+      "name": "skeleton.resourceRects",
+      "ms": 10386.25,
+      "selfMs": 6866.74,
+      "callCount": 20
+    },
+    {
+      "name": "skeleton.vpcSizing",
+      "ms": 7888.01,
+      "selfMs": 7888.01,
+      "callCount": 12
+    },
+    {
+      "name": "skeleton.satelliteBundles",
+      "ms": 3519.51,
+      "selfMs": 3519.51,
+      "callCount": 121
+    },
+    {
       "name": "prep.cache",
-      "ms": 4942.64,
-      "selfMs": 4942.64,
+      "ms": 1352.78,
+      "selfMs": 1352.78,
+      "callCount": 1
+    },
+    {
+      "name": "layout.topology.materialize",
+      "ms": 98.53,
+      "selfMs": 98.53,
       "callCount": 1
     },
     {
       "name": "merge.plans",
-      "ms": 0.17,
-      "selfMs": 0.17,
+      "ms": 0.13,
+      "selfMs": 0.13,
+      "callCount": 1
+    },
+    {
+      "name": "layout.topology.collect",
+      "ms": 0.08,
+      "selfMs": 0.08,
       "callCount": 1
     }
   ],
-  "topRegressions": []
+  "topRegressions": [],
+  "spansByView": {
+    "semantic": [
+      {
+        "name": "layout.semantic",
+        "ms": 32028.99,
+        "selfMs": 8777.22,
+        "callCount": 1
+      },
+      {
+        "name": "skeleton.vpcSizing",
+        "ms": 7888.01,
+        "selfMs": 7888.01,
+        "callCount": 12
+      },
+      {
+        "name": "skeleton.resourceRects",
+        "ms": 10386.25,
+        "selfMs": 6866.74,
+        "callCount": 20
+      },
+      {
+        "name": "layout.topology.skeleton",
+        "ms": 23153.16,
+        "selfMs": 4878.9,
+        "callCount": 1
+      },
+      {
+        "name": "skeleton.satelliteBundles",
+        "ms": 3519.51,
+        "selfMs": 3519.51,
+        "callCount": 121
+      },
+      {
+        "name": "prep.cache",
+        "ms": 1352.78,
+        "selfMs": 1352.78,
+        "callCount": 1
+      },
+      {
+        "name": "layout.topology.materialize",
+        "ms": 98.53,
+        "selfMs": 98.53,
+        "callCount": 1
+      },
+      {
+        "name": "merge.plans",
+        "ms": 0.13,
+        "selfMs": 0.13,
+        "callCount": 1
+      },
+      {
+        "name": "layout.topology.collect",
+        "ms": 0.08,
+        "selfMs": 0.08,
+        "callCount": 1
+      }
+    ],
+    "pipeline": [
+      {
+        "name": "skeleton.resourceRects",
+        "ms": 12692.71,
+        "selfMs": 9372.36,
+        "callCount": 70
+      },
+      {
+        "name": "layout.pipeline",
+        "ms": 19677.8,
+        "selfMs": 6985.09,
+        "callCount": 1
+      },
+      {
+        "name": "skeleton.satelliteBundles",
+        "ms": 3320.35,
+        "selfMs": 3320.35,
+        "callCount": 70
+      },
+      {
+        "name": "prep.cache",
+        "ms": 0.02,
+        "selfMs": 0.02,
+        "callCount": 1
+      },
+      {
+        "name": "merge.plans",
+        "ms": 0.01,
+        "selfMs": 0.01,
+        "callCount": 1
+      }
+    ],
+    "module": [
+      {
+        "name": "layout.elk",
+        "ms": 2.44,
+        "selfMs": 2.44,
+        "callCount": 1
+      },
+      {
+        "name": "prep.cache",
+        "ms": 0.02,
+        "selfMs": 0.02,
+        "callCount": 1
+      },
+      {
+        "name": "merge.plans",
+        "ms": 0.01,
+        "selfMs": 0.01,
+        "callCount": 1
+      }
+    ]
+  }
 }

@@ -17,7 +17,13 @@ if (!inputPath) {
 }
 
 const raw = JSON.parse(readFileSync(inputPath, "utf8"));
-const topSelfSpans = Array.isArray(raw.topSelfSpans) ? raw.topSelfSpans : [];
+// `topSpans` (ranked by inclusive ms) is the current shape; fall back to the
+// legacy `topSelfSpans` for older artifacts.
+const topSpans = Array.isArray(raw.topSpans)
+  ? raw.topSpans
+  : Array.isArray(raw.topSelfSpans)
+  ? raw.topSelfSpans
+  : [];
 const topRegressions = Array.isArray(raw.topRegressions)
   ? raw.topRegressions
   : [];
@@ -28,13 +34,18 @@ lines.push("## Terraform Import Hotspot Ranker");
 lines.push("");
 lines.push(`Profile source: \`${inputPath}\``);
 lines.push("");
-lines.push("### Top self-time spans");
+if (raw.primaryView) {
+  lines.push(`Primary view: \`${raw.primaryView}\``);
+  lines.push("");
+}
+lines.push("### Top spans (inclusive ms)");
 lines.push("");
-if (topSelfSpans.length === 0) {
+if (topSpans.length === 0) {
   lines.push("- (none)");
 } else {
-  for (const s of topSelfSpans.slice(0, 10)) {
-    lines.push(`- \`${s.name}\`: ${fmtMs(s.selfMs)} (calls: ${s.callCount})`);
+  for (const s of topSpans.slice(0, 10)) {
+    const v = typeof s.ms === "number" ? s.ms : s.selfMs;
+    lines.push(`- \`${s.name}\`: ${fmtMs(v)} (calls: ${s.callCount})`);
   }
 }
 lines.push("");
