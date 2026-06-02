@@ -2,9 +2,13 @@ import { pointFrom } from "@excalidraw/math";
 
 import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
 import {
+  getHoveredElementForBinding,
   isValidPolygon,
   LinearElementEditor,
+  maxBindingDistance_simple,
+  newArrowElement,
   newElementWith,
+  syncInvalidIndices,
 } from "@excalidraw/element";
 
 import {
@@ -27,7 +31,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -42,7 +46,7 @@ import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
 
-import type { AppState } from "../types";
+import type { App, AppState } from "../types";
 
 type FormData = {
   event: PointerEvent;
@@ -208,6 +212,22 @@ export const actionFinalize = register<FormData>({
       }
     }
 
+    if (
+      appState.isBindingEnabled &&
+      appState.newElement?.type === "line" &&
+      appState.activeTool.type === "drawShape"
+    ) {
+      const line = appState.newElement;
+      const arrow = handleDrawShapeArrowConversion(appState, app.scene, line);
+      if (arrow) {
+        newElements = syncInvalidIndices([
+          ...newElements.filter((el) => el.id !== line.id),
+          arrow,
+        ]);
+      }
+      element = arrow || element;
+    }
+
     if (element) {
       // pen and mouse have hover
       if (
@@ -366,3 +386,104 @@ export const actionFinalize = register<FormData>({
     />
   ),
 });
+
+function handleDrawShapeArrowConversion(
+  appState: AppState,
+  scene: App["scene"],
+  line: ExcalidrawLinearElement,
+): ExcalidrawLinearElement | undefined {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const startGlobal = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    line,
+    0,
+    elementsMap,
+  );
+  const endGlobal = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    line,
+    -1,
+    elementsMap,
+  );
+
+  const startBindTarget = getHoveredElementForBinding(
+    startGlobal,
+    scene.getNonDeletedElements(),
+    elementsMap,
+    maxBindingDistance_simple(appState.zoom),
+  );
+  const endBindTarget = getHoveredElementForBinding(
+    endGlobal,
+    scene.getNonDeletedElements(),
+    elementsMap,
+    maxBindingDistance_simple(appState.zoom),
+  );
+
+  if (startBindTarget && endBindTarget) {
+    const arrow = newArrowElement({
+      type: "arrow",
+      x: line.x,
+      y: line.y,
+      width: line.width,
+      height: line.height,
+      startArrowhead: null,
+      endArrowhead: appState.currentItemEndArrowhead,
+      points: line.points,
+      groupIds: line.groupIds,
+      frameId: line.frameId,
+      locked: false,
+      angle: 0 as Radians,
+      strokeColor: line.strokeColor,
+      backgroundColor: line.backgroundColor,
+      fillStyle: line.fillStyle,
+      roughness: line.roughness,
+      opacity: line.opacity,
+      strokeStyle: line.strokeStyle,
+      strokeWidth: line.strokeWidth,
+    });
+
+    const startDraggingPoints = new Map([
+      [
+        0,
+        {
+          point: LinearElementEditor.pointFromAbsoluteCoords(
+            arrow,
+            startGlobal,
+            elementsMap,
+          ),
+        },
+      ],
+    ]);
+    bindOrUnbindBindingElement(
+      arrow,
+      startDraggingPoints,
+      startGlobal[0],
+      startGlobal[1],
+      scene,
+      appState,
+      { newArrow: true },
+    );
+
+    const endDraggingPoints = new Map([
+      [
+        arrow.points.length - 1,
+        {
+          point: LinearElementEditor.pointFromAbsoluteCoords(
+            arrow,
+            endGlobal,
+            elementsMap,
+          ),
+        },
+      ],
+    ]);
+    bindOrUnbindBindingElement(
+      arrow,
+      endDraggingPoints,
+      endGlobal[0],
+      endGlobal[1],
+      scene,
+      appState,
+      { newArrow: true },
+    );
+
+    return arrow;
+  }
+}
