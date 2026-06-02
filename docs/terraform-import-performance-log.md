@@ -235,12 +235,71 @@ Measured locally (25 stacks, 792 merged `resource_changes`, workers on/off ~same
 
 ### Recommended levers, in priority order
 
-1. **Account-level worker parallelism (highest ceiling).** The 25 stacks map to independent accounts laid out in isolation then offset (`accountCursorX` advance in the skeleton loop). Build each account's skeleton in a worker (`runJobOnMainThread` fallback + `terraformLayoutWorkerClient.ts` exist) and concatenate with deterministic X offsets. This is the structural fix for the genuine per-resource cost — workers "don't help" today only because the whole skeleton is one synchronous main-thread call. Keep it layout-neutral (deterministic merge) so goldens hold; otherwise gate behind the toggle. _Note: the doc previously removed a "semantic sharding" attempt — that was finer-grained / shared-state; account grain is the embarrassingly-parallel boundary._
-2. **Toggle-gated reduction of the per-resource builders** (`appendTopologyResourceRectangles` / `buildTopologyPrimarySatelliteBundles`). These produce ~31 elements/primary. Any change that reduces element count or simplifies geometry will move the wall but **will** change the diagram → must be opt-in (rule 2) with its own golden.
-3. **`skeleton.vpcSizing` cold cost** — profile _inside_ `outerWidthForPlacementZone` first (add a temporary sub-span). If the VPCE/NAT/RT zone-sizing sub-calls dominate (footprint/margins are already memo-shared with `resourceRects`), there may be a snapshot-safe memo there; if it's the genuine geometry, it needs the toggle.
-4. **Materialize / workers for materialize** — only ~0.1s; ignore unless it grows.
+All line numbers below are in `terraformTopologyLayout.ts` unless stated; they drift, so grep the named symbol. The hot loop is `buildTerraformTopologyExcalidrawScene` (the `layout.topology.skeleton` `terraformImportProfilerMeasure` block, ~L3294+).
 
-**Semantic is the priority** (34s, the felt cost). Pipeline (~16–20s) is a separate, smaller code path — note its test number now reflects honest standalone cost (it builds its own enriched placements; see the prep-trim Change log row).
+---
+
+#### Lever 1 — Account-level parallelism (highest ceiling, the real structural fix)
+
+**Why this and not "workers" generically:** the existing worker path (`layoutSemanticViewParallel` / `runSemanticAwsLayoutJob`) runs the **entire** AWS topology as **one** synchronous job, so a worker just moves the same 22s to another thread — no speedup. The 25 stacks, however, map to independent **accounts** that are laid out in isolation and then packed left-to-right. That's the embarrassingly-parallel boundary. (The previously-removed "semantic sharding" was finer-grained and shared mutable state — see Do-not-retry. Account grain is coarser and has exactly one shared- state problem, addressed below.)
+
+**Current structure to refactor:**
+
+- The account loop starts at `let accountCursorX = MARGIN` (~L3291) and iterates `collectTopologyAccountBuildUnits(model)`. Each account appends its region/VPC/zone skeletons into the single shared `skeleton[]`, tracks `maxRegionRight`, pushes an account `frame` at `x: accountCursorX` (~L4270), then advances `accountCursorX += accountWidth + ACCOUNT_GAP` (~L4287). So account _N_'s X is a **prefix sum** of accounts `0..N-1` widths — a pack step, not a per-account input.
+- After the loop, a **global, inherently-sequential** pass runs once over the assembled boxes (~L4336–4410): `filteredSatelliteLineSpecs` → `buildTopologySatelliteLineSkeletons`, `collectDirectedEdges`, `partitionDirectedEdgesByNetworking`, `buildTerraformDeclaredDataFlowLineSkeletons`. These build cross-account edges/dataflow and **must stay on the main thread after** the parallel phase.
+
+**Target shape (parallel-then-pack, same pattern `terraformPipelineLayout.ts` already uses via `translateSkeleton`):**
+
+1. **Phase A (parallelizable):** build each account's skeleton at **local origin (x=0)**, returning `{ accountId, skeleton, width, height, satelliteLineSpecs, zoneRouteAnchorDebug, … }`. No `accountCursorX` inside; no shared `skeleton[]`.
+2. **Phase B (sequential, cheap, main thread):** sort accounts deterministically (the current iteration order — keep `collectTopologyAccountBuildUnits`’s order), compute prefix-sum X offsets, `translateSkeleton(acc.skeleton, offsetX, 0)`, concat, push account frames, then run the **existing** global edge/dataflow pass unchanged over the assembled boxes.
+
+**The one correctness blocker — global satellite dedup (`globalPlaced*` sets, declared ~L3278–3288, mutated inside `appendTopologyResourceRectangles`, ~L3516+):** these 11 `Set<string>` (IAM, KMS, SG, CloudWatch, S3, SQS, ALB, ECS, ApiGateway, TGW, LambdaPermission) dedup satellites **across the whole scene by mutation order** — the first primary to reach a shared satellite places it; later ones skip. Plus `vpceLayoutDuplicateRegistry` (~L3259) is a second cross-account registry. Parallel accounts would race these → non-deterministic → golden break.
+
+**De-risk it in one cheap, sequential step before writing any worker code:** make these sets **per-account** (allocate fresh inside the account loop body instead of before it) and run the snapshot test. Two outcomes:
+
+- **Snapshot stays green** → no satellite is shared across accounts on this fixture (very likely: addresses are stack/account-namespaced, e.g. `43-east-api-4::module.api…`, and IAM/KMS/SG are per-stack). Per-account sets are then equivalent → Phase A is genuinely independent and **layout-neutral**. Proceed to parallelize.
+- **Snapshot changes** → real cross-account sharing exists. Add a deterministic pre-assignment pass (walk primaries in the current global order, assign each shared satellite to its first owner into a `Map<satelliteAddr, ownerPrimaryAddr>`), pass that map into each account build so accounts honor assignments without runtime coordination. Then per-account sets are safe.
+
+**Worker/serialization notes:** start with **main-thread parallel-then-pack** (Phase A/B split, still synchronous) — that alone restructures the code and is independently testable. Only then move Phase A into workers via the existing `runJobWithFallback` machinery (`terraformLayoutWorkerClient.ts`). Each account job must receive serializable inputs; filter `nodes`/`plan`/zones to the account's namespaced addresses to shrink the structured-clone payload (the full `nodes` map + plan are large — don't clone them 25×). Keep `runJobOnMainThread` as the fallback (jsdom/tests have no `Worker`, so the parity test exercises the sequential Phase-A/B path — it must match the old golden).
+
+**Payoff & gating:** if Phase A (`vpcSizing` + `resourceRects` + `satelliteBundles` ≈ 17s of the 22s skeleton) parallelizes across ~4 busy cores, semantic could approach ~12–15s wall. The main-thread parallel-then-pack restructure should be **layout-neutral** (deterministic pack) → no toggle needed. If you cannot make the pack/merge byte-identical, gate behind the import toggle (Ground rule 2) with a toggle-on golden.
+
+**First commit suggestion:** the per-account-`globalPlaced` snapshot experiment above (no perf change, just proves independence). Record the result in the Change log — it unblocks everything else here.
+
+---
+
+#### Lever 2 — The per-resource builders (`resourceRects` ~6.5s + `satelliteBundles` ~3.3s)
+
+This is the shared per-resource core (both views funnel through `appendTopologyResourceRectangles`, ~L2700). `buildTopologyPrimarySatelliteBundles` (`terraformTopologySatelliteRegistry.ts:171`) runs up to ~17 `build*Cluster` calls per primary, each a graph walk keyed off `arnIndex`. It already gates by `enabledKindsForPrimaryType`, so only relevant kinds run — the cost is the genuine walks for the kinds that ARE present, not wasted work.
+
+**Snapshot-safe sub-targets (try first, no toggle):**
+
+- **Profile inside the bundle build.** Add temporary sub-spans around the individual `build*Cluster` families (iam / sg / kms / ecs / alb / apiGateway) to find which 2–3 dominate the 3.3s, then optimize only those (e.g. a shared per-primary `SatelliteBuildContext` index instead of re-walking `arnIndex`/plan inside each family). `buildSatelliteContext` (`…SatelliteRegistry.ts:123`) is built once per primary already — check whether the individual builders re-derive things it could hold.
+- **`resourceRects` self (6.5s)** is the placement/loop logic in `appendTopologyResourceRectangles` _minus_ the bundle build. Profile its own body (grid math, `pushResourceRectangleSkeleton`, `renderPrimarySatellitesFromConfig`). Watch for per-address recomputation that isn't in `activeTopologyMemoCtx` yet.
+
+**Toggle-gated reductions (change the diagram → Ground rule 2 + own golden):** collapse satellites by default and expand on demand; coarser satellite geometry; cap satellites per primary. Note: element **count** is not the cost (`materialize` is ~0.1s) — the cost is the **building logic**, so "fewer elements" only helps if it also skips the build walks.
+
+---
+
+#### Lever 3 — `skeleton.vpcSizing` cold cost (~7.5s, genuine)
+
+`vpcFrameDimensionsForZones` (~L820) → `outerWidthForPlacementZone` (~L664, result memoized by `zoneOuterWidthByKey`) → `zoneFrameSizeForTopologyAddresses` (~L590). The 3×/VPC redundancy is **already gone** (memo); the 7.5s is the **cold first compute per unique zone**. Per zone it runs: `partitionVpcEndpointsForClusterLayout`, `vpcEndpointClusterBodyPadPx` / `vpcEndpointClusterRowMinInnerWidth`, `natClustersForZone`
+
+- NAT band sizing, route-table sizing, and `maxTopologyCellFootprintPx` + per-address margins (these last two **are** memo-shared with `resourceRects` via `primaryFootprintByAddr` / `primaryMarginsByAddr`).
+
+**Most promising snapshot-safe angle:** the **VPCE/NAT/route-table** per-zone sub-computations are _also_ recomputed in the placement pass (the second loop, the `vd` call ~L3788 and the zone-placement body below it) — i.e. the sizing pass and the placement pass both derive the same per-zone cluster/NAT/RT data. Build a **per-zone derived context once** (keyed by `topologyZoneMapKey(account,region,vpc,subnetSignature)` in `activeTopologyMemoCtx`) holding `{ clusterAddrs, compactAddrs, natClusters, rtSizing, vpceBodyPad, … }` and consume it in **both** passes. This is the correctly-scoped version of the reverted Lever-1.4 attempt (that one memoized the final dims, which the existing memo already covered; this memoizes the _expensive intermediate per-zone data_ that is currently derived twice). Snapshot-safe if it's pure memoization. Add the temporary sub-spans inside `outerWidthForPlacementZone` first to confirm these sub-calls dominate before investing.
+
+If profiling shows the cost is irreducible geometry (not duplicated derivation), it falls to Lever 1 (parallelize it) since `vpcSizing` runs inside the per-account work.
+
+---
+
+#### Lever 4 — Materialize / collect
+
+`materialize` ~0.1s, `collect` ~0.0001s. **Ignore** unless a future change makes them grow.
+
+---
+
+**Priority recap:** Lever 1 (parallelism) has by far the highest ceiling and, done as deterministic parallel-then-pack, can be layout-neutral. Levers 2–3 are incremental and partly snapshot-safe. **Semantic is the priority** (34s, the felt cost). Pipeline (~16–20s) is a separate, smaller path — its test number now reflects honest standalone cost (it builds its own enriched placements; see the prep-trim Change log row).
 
 ### How to measure
 
