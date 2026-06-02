@@ -180,6 +180,10 @@ type TopologyLayoutMemoCtx = {
     string,
     ReturnType<typeof getPrimaryLayoutConfig>
   >;
+  zoneOuterWidthByKey: Map<
+    string,
+    { outerW: number; bodyH: number; routeInset: number }
+  >;
 };
 
 let activeTopologyMemoCtx: TopologyLayoutMemoCtx | null = null;
@@ -677,6 +681,10 @@ function outerWidthForPlacementZone(
     z.vpcId,
     z.subnetSignature,
   );
+  const cachedZoneOuter = activeTopologyMemoCtx?.zoneOuterWidthByKey.get(zk);
+  if (cachedZoneOuter) {
+    return cachedZoneOuter;
+  }
   let zoneVpceBodyPad = 0;
   let zoneVpceMinOuterW = 0;
   const zonePl = interfaceVpcEndpointZonePlacements?.get(zk);
@@ -745,11 +753,13 @@ function outerWidthForPlacementZone(
   const outerW = Math.max(d.w, rtMinW, natBandMinOuterW, zoneVpceMinOuterW);
   const routeInset =
     sizing && sizing.tableCount > 0 ? sizing.maxExtentBelowAnchorPx : 0;
-  return {
+  const result = {
     outerW,
     bodyH: d.h + natBandH + zoneVpceBodyPad,
     routeInset,
   };
+  activeTopologyMemoCtx?.zoneOuterWidthByKey.set(zk, result);
+  return result;
 }
 
 function compareTopologyZonesByTier(
@@ -3201,6 +3211,7 @@ export async function buildTerraformTopologyExcalidrawScene(
     satHeightCtxByAddr: new Map(),
     satelliteBundlesByAddr: new Map(),
     layoutConfigByResourceType: new Map(),
+    zoneOuterWidthByKey: new Map(),
   };
   try {
     const {

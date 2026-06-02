@@ -132,31 +132,17 @@ CI on pull requests: **lint** + **test** (`yarn test:fast`) in parallel, then **
 
 ## Terraform import performance
 
-Fixture: `staging-multi-state-expanded` (25 stacks). Human changelog: [`docs/terraform-import-performance-log.md`](terraform-import-performance-log.md). Machine baseline: [`packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json`](../packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json).
+**Full agent handoff** (fixture, call graph, kept/reverted optimizations, measure commands, change log): [`docs/terraform-import-performance-log.md`](terraform-import-performance-log.md).
 
-### Layout stability (required before perf changes)
+Machine baseline: [`packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json`](../packages/excalidraw/test-fixtures/terraform-import-perf-baseline.json).
+
+Quick gate before a perf PR:
 
 ```bash
 yarn vitest run packages/excalidraw/components/terraformLayoutSnapshot.test.ts
 yarn vitest run packages/excalidraw/components/terraformLayoutWorkerParity.test.ts
 yarn vitest run packages/excalidraw/components/terraformImportPrepCache.test.ts
-```
-
-Golden snapshots under `packages/excalidraw/components/__snapshots__/` must not change unless the PR intentionally changes layout. Do not run `yarn test:update` to “fix” a perf regression.
-
-### Profiling
-
-```bash
 VITEST_TERRAFORM_PROFILE=1 yarn vitest run packages/excalidraw/components/terraformImportPerf.views.test.ts
 ```
 
-Browser: `localStorage.terraformImportProfile = "1"` or demo `?profile=1` when wired.
-
-### Optimization iteration checklist
-
-1. Layout + worker parity + prep-cache parity tests green (no `.snap` diff).
-2. Profile all three views; append a row to `docs/terraform-import-performance-log.md`.
-3. One focused optimization; re-run tests.
-4. Update `terraform-import-perf-baseline.json` only after sustained improvement (>10%, 3 local runs).
-
-Slow tests: `yarn test:slow` or full `yarn test:update` before commit.
+Do not run `yarn test:update` to mask a perf regression. Slow suite before commit: `yarn test:slow` or `yarn test:update`.
