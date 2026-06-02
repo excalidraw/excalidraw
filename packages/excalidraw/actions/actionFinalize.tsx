@@ -12,6 +12,7 @@ import {
 } from "@excalidraw/element";
 
 import {
+  isArrowElement,
   isBindingElement,
   isFreeDrawElement,
   isLinearElement,
@@ -209,6 +210,51 @@ export const actionFinalize = register<FormData>({
       ) as NonDeleted<ExcalidrawLinearElement> | undefined;
       if (candidate) {
         element = candidate;
+      }
+    }
+
+    if (
+      appState.isBindingEnabled &&
+      appState.newElement?.type === "arrow" &&
+      appState.activeTool.type === "drawShape"
+    ) {
+      const arrow = appState.newElement;
+      const elementsMap = scene.getNonDeletedElementsMap();
+      const startGlobal = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        0,
+        elementsMap,
+      );
+
+      const startBindTarget = getHoveredElementForBinding(
+        startGlobal,
+        scene.getNonDeletedElements(),
+        elementsMap,
+        maxBindingDistance_simple(appState.zoom),
+      );
+
+      if (startBindTarget && isArrowElement(arrow)) {
+        const startDraggingPoints = new Map([
+          [
+            0,
+            {
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                arrow,
+                startGlobal,
+                elementsMap,
+              ),
+            },
+          ],
+        ]);
+        bindOrUnbindBindingElement(
+          arrow,
+          startDraggingPoints,
+          startGlobal[0],
+          startGlobal[1],
+          scene,
+          appState,
+          { newArrow: true },
+        );
       }
     }
 
