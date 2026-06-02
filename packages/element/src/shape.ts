@@ -52,7 +52,12 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
-import { getCornerRadius, isPathALoop } from "./utils";
+import {
+  doesPathIntersect,
+  getCornerRadius,
+  getIntersectionPoint,
+  isPathALoop,
+} from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -194,6 +199,7 @@ export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
   isDarkMode: boolean = false,
+  isElementALoop: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -240,7 +246,7 @@ export const generateRoughOptions = (
     }
     case "line":
     case "freedraw": {
-      if (isPathALoop(element.points)) {
+      if (isElementALoop) {
         options.fillStyle = element.fillStyle;
         options.fill =
           element.backgroundColor === "transparent"
@@ -741,6 +747,47 @@ export const generateLinearCollisionShape = (
   }
 };
 
+// NOTE: This is a simplified loop extraction and does not handle
+// multiple intersections per segment or nested loops yet.
+const generateFillableLoops = (
+  points: LocalPoint[],
+  isLoopFromProximity: boolean,
+): [number, number][][] => {
+  const simplified = simplify(points, 0.75);
+
+  if (isLoopFromProximity) {
+    return [simplified];
+  }
+  const n = simplified.length;
+  if (n < 4) return [] as LocalPoint[][];
+
+  const loops: [number, number][][] = [];
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 2; j < n - 1; j++) {
+      if (i === 0 && j === n - 2) continue;
+
+      const inter = getIntersectionPoint(
+        simplified[i],
+        simplified[i + 1],
+        simplified[j],
+        simplified[j + 1],
+      );
+
+      if (inter) {
+        const segment = simplified.slice(i + 1, j);
+        if (segment.length >= 2) {
+          loops.push([inter, ...segment, inter]);
+        }
+      }
+    }
+  }
+
+  if (loops.length === 0) {
+    return [simplified];
+  }
+  return loops;
+};
+
 /**
  * Generates the roughjs shape for given element.
  *
@@ -959,17 +1006,19 @@ const _generateElementShape = (
       const shapes: ElementShapes[typeof element.type] = [];
 
       // (1) background fill (rc shape), optional
-      if (isPathALoop(element.points)) {
+      const isLoopFromProximity = isPathALoop(element.points);
+      if (isLoopFromProximity || doesPathIntersect(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
-        shapes.push(
-          generator.curve(simplifiedPoints as [number, number][], {
-            ...generateRoughOptions(element, false, isDarkMode),
-            stroke: "none",
-          }),
+        generateFillableLoops(
+          element.points as LocalPoint[],
+          isLoopFromProximity,
+        ).map((loop) =>
+          shapes.push(
+            generator.curve(loop as [number, number][], {
+              ...generateRoughOptions(element, false, isDarkMode, true),
+              stroke: "none",
+            }),
+          ),
         );
       }
 

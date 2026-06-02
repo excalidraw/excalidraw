@@ -480,6 +480,58 @@ export const isPathALoop = (
   return false;
 };
 
+export function getIntersectionPoint<P extends [number, number]>(
+  p1: P,
+  p2: P,
+  p3: P,
+  p4: P,
+): [number, number] | null {
+  const x1 = p1[0],
+    y1 = p1[1];
+  const x2 = p2[0],
+    y2 = p2[1];
+  const x3 = p3[0],
+    y3 = p3[1];
+  const x4 = p4[0],
+    y4 = p4[1];
+
+  const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  if (Math.abs(denom) < 1e-6) return null;
+
+  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+  const u = ((x1 - x3) * (y1 - y2) - (y1 - y3) * (x1 - x2)) / denom;
+  if (t > 0 && t < 1 && u > 0 && u < 1) {
+    return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)];
+  }
+  return null;
+}
+
+// Checks if the path crosses itself to be considered closed
+export const doesPathIntersect = (
+  points: ExcalidrawLinearElement["points"],
+): boolean => {
+  // Detect intersection exist in the loop
+  if (points.length >= 4) {
+    for (let i = 0; i < points.length - 1; i++) {
+      for (let j = i + 2; j < points.length - 1; j++) {
+        // Skip adjacent segments
+        if (i === 0 && j === points.length - 2) continue;
+
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const q1 = points[j];
+        const q2 = points[j + 1];
+
+        if (getIntersectionPoint(p1, p2, q1, q2)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   if (
     element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||

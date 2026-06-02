@@ -71,3 +71,4 @@ export function doLineSegmentsIntersect<P extends GlobalPoint | LocalPoint>(
     isLineSegmentTouchingOrCrossingLine(b, a)
   );
 }
+
