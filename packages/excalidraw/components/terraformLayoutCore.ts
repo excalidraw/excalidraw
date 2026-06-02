@@ -656,11 +656,6 @@ export async function layoutTerraformFromSources(
     (options?.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
   const pipelineLayout = layoutMode === "pipeline";
-  const multiStackModule =
-    !semanticLayout &&
-    !pipelineLayout &&
-    sources.planDotBundles.length > 1;
-
   if (sources.planDotBundles.length > 0) {
     terraformImportProfilerMeasure("prep.cache", () => {
       buildTerraformImportPrepCache(sources, options);
@@ -669,21 +664,8 @@ export async function layoutTerraformFromSources(
     clearTerraformImportPrepCache();
   }
 
-  if (multiStackModule) {
-    const { layoutModuleViewParallel, runModuleStackLayoutJob } =
-      await import("./terraformLayoutModuleParallel");
-    return terraformImportProfilerMeasureAsync("layout.module.parallel", () =>
-      layoutModuleViewParallel(
-        sources,
-        options?.moduleLayoutOptions,
-        runModuleStackLayoutJob,
-      ),
-    );
-  }
-
-  const planResolution = terraformImportProfilerMeasure(
-    "merge.plans",
-    () => resolveLayoutPlanFromSources(sources),
+  const planResolution = terraformImportProfilerMeasure("merge.plans", () =>
+    resolveLayoutPlanFromSources(sources),
   );
   if (!planResolution.ok) {
     return planResolution;

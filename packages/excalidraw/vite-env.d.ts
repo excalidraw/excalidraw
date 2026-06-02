@@ -55,8 +55,6 @@ interface ImportMetaEnv {
   VITE_TERRAFORM_BACKEND_URL?: string;
   /** When `"true"`, load built-in presets from `/api/terraform-import-presets` (Cloudflare Pages). */
   VITE_TERRAFORM_PRESETS_API?: string;
-  /** When `"1"`, use single-job AWS semantic layout for `staging-multi-state-expanded` (25 stacks). */
-  VITE_TERRAFORM_STAGING_FASTPATH?: string;
 
   MODE: string;
   DEV: string;

@@ -1,12 +1,19 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
 
-import { mergeDotAdjacency, mergePlanJsons, namespacePlanDotBundles } from "./terraformImportMerge";
+import {
+  mergeDotAdjacency,
+  mergePlanJsons,
+  namespacePlanDotBundles,
+} from "./terraformImportMerge";
 import {
   applyTfdOverlayToNodes,
   buildTerraformLocalImportNodesMap,
   type TerraformPlanParsingSources,
 } from "./terraformPlanParsing";
-import { buildAwsLayoutContext, type AwsLayoutContext } from "./terraformAwsLayoutContext";
+import {
+  buildAwsLayoutContext,
+  type AwsLayoutContext,
+} from "./terraformAwsLayoutContext";
 import {
   buildEnrichedTopologyPlacements,
   type EnrichedTopologyPlacements,
@@ -55,9 +62,7 @@ export function terraformImportPrepFingerprint(
   return parts.join("|");
 }
 
-export function getTerraformImportPrepCache():
-  | TerraformImportPrepCache
-  | null {
+export function getTerraformImportPrepCache(): TerraformImportPrepCache | null {
   return sessionCache;
 }
 

@@ -1,6 +1,5 @@
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 import type {
   TerraformLayoutOptions,
   TerraformPlanParsingSources,
@@ -16,19 +15,7 @@ export type TerraformLayoutProgress = {
 
 export type TerraformLayoutWorkerJob =
   | {
-      type: "moduleStack";
-      stackId: string;
-      plan: unknown;
-      dotText: string;
-      moduleLayoutOptions?: Partial<TerraformModuleLayoutOptions>;
-    }
-  | {
       type: "semanticAws";
-      prep: SemanticAwsLayoutPrep;
-    }
-  | {
-      type: "semanticAwsShard";
-      shardId: string;
       prep: SemanticAwsLayoutPrep;
     }
   | {
@@ -54,26 +41,11 @@ export type SemanticAwsLayoutPrep = {
   natZonePlacements: unknown;
   interfaceVpcEndpointZonePlacements: unknown;
   deferDecorations?: boolean;
-  /** Staging fast path: skip per-zone route anchor debug rows in topology meta. */
-  skipZoneRouteAnchorDebug?: boolean;
 };
 
 export type TerraformLayoutWorkerJobResult =
   | {
-      type: "moduleStack";
-      stackId: string;
-      elements: ExcalidrawElement[];
-      meta: Record<string, unknown>;
-    }
-  | {
       type: "semanticAws";
-      elements: ExcalidrawElement[];
-      meta: Record<string, unknown>;
-      files?: Record<string, unknown>;
-    }
-  | {
-      type: "semanticAwsShard";
-      shardId: string;
       elements: ExcalidrawElement[];
       meta: Record<string, unknown>;
       files?: Record<string, unknown>;

@@ -24,11 +24,12 @@ export type AwsLayoutPlan = {
 
 export type AwsLayoutContext = {
   plan: AwsLayoutPlan;
-  changeByAddress: Map<string, AwsLayoutPlan["resource_changes"] extends
-    | (infer R)[]
-    | undefined
-    ? R
-    : never>;
+  changeByAddress: Map<
+    string,
+    AwsLayoutPlan["resource_changes"] extends (infer R)[] | undefined
+      ? R
+      : never
+  >;
   subnetToVpc: Map<string, string>;
   securityGroupToVpc: Map<string, string>;
   subnetOwners: Map<string, TerraformSubnetOwnerHint>;

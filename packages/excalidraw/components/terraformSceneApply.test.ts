@@ -230,7 +230,7 @@ describe("terraformSceneApply", () => {
     );
   });
 
-  it("reuses cached snapshot when switching layout mode for identical sources", async () => {
+  it("relayouts when switching layout mode for identical sources", async () => {
     const semanticEl = newTextElement({
       text: "semantic",
       x: 0,
@@ -244,14 +244,17 @@ describe("terraformSceneApply", () => {
       customData: { terraformVisibilityRole: "resource" },
     });
     const sources = {
-      planDotBundles: [{ plan: { resource_changes: [] }, dotText: "digraph {}", label: "s" }],
+      planDotBundles: [
+        { plan: { resource_changes: [] }, dotText: "digraph {}", label: "s" },
+      ],
       states: [],
       tfdTexts: ["a -> b"],
       tfdLabels: ["pipeline.tfd"],
     };
     vi.mocked(layoutTerraformViaWorkers)
       .mockResolvedValueOnce({ elements: [semanticEl] })
-      .mockResolvedValueOnce({ elements: [pipelineEl] });
+      .mockResolvedValueOnce({ elements: [pipelineEl] })
+      .mockResolvedValueOnce({ elements: [semanticEl] });
     hoisted.replaceAllElements.mockImplementation((els) => {
       hoisted.getElementsIncludingDeleted.mockReturnValue(els);
     });
@@ -268,7 +271,6 @@ describe("terraformSceneApply", () => {
       sources,
       { semanticLayout: false, layoutMode: "pipeline" },
     );
-    // second semantic should come from cached snapshot map, not relayout
     await runTerraformImportFromSources(
       mockApp(),
       hoisted.setAppState,
@@ -276,6 +278,6 @@ describe("terraformSceneApply", () => {
       { semanticLayout: true, layoutMode: "semantic" },
     );
 
-    expect(layoutTerraformViaWorkers).toHaveBeenCalledTimes(2);
+    expect(layoutTerraformViaWorkers).toHaveBeenCalledTimes(3);
   });
 });

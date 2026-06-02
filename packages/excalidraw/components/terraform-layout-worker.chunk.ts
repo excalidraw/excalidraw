@@ -1,8 +1,7 @@
 /**
- * Web Worker entry for Terraform layout jobs (module stack / semantic AWS / semantic provider).
+ * Web Worker entry for Terraform layout jobs (semantic AWS / semantic provider).
  * Loaded as a separate chunk via `import.meta.url` (see subset-worker.chunk.ts).
  */
-import { runModuleStackLayoutJob } from "./terraformLayoutModuleParallel";
 import {
   runSemanticAwsLayoutJob,
   runSemanticProviderLayoutJob,
@@ -25,22 +24,8 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
     try {
       let result;
       switch (job.type) {
-        case "moduleStack":
-          result = await runModuleStackLayoutJob(
-            job.stackId,
-            job.plan,
-            job.dotText,
-            job.moduleLayoutOptions,
-          );
-          break;
         case "semanticAws":
           result = await runSemanticAwsLayoutJob(job.prep);
-          break;
-        case "semanticAwsShard":
-          result = await runSemanticAwsLayoutJob(job.prep, {
-            type: "semanticAwsShard",
-            shardId: job.shardId,
-          });
           break;
         case "semanticProvider":
           result = await runSemanticProviderLayoutJob(

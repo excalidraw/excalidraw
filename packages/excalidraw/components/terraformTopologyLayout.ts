@@ -115,6 +115,7 @@ import {
   TERRAFORM_IMPORT_EDGE_LAYER_PINS,
 } from "./terraformVisibility";
 import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
+import { terraformImportProfilerMeasure } from "./terraformImportProfiler";
 import {
   getPrimaryLayoutConfig,
   buildSatelliteKindHeightContext,
@@ -175,7 +176,10 @@ type TopologyLayoutMemoCtx = {
     string,
     ReturnType<typeof buildTopologyPrimarySatelliteBundles>
   >;
-  layoutConfigByResourceType: Map<string, ReturnType<typeof getPrimaryLayoutConfig>>;
+  layoutConfigByResourceType: Map<
+    string,
+    ReturnType<typeof getPrimaryLayoutConfig>
+  >;
 };
 
 let activeTopologyMemoCtx: TopologyLayoutMemoCtx | null = null;
@@ -205,7 +209,12 @@ function withPrimaryMarginsMemo(
   if (cached) {
     return cached;
   }
-  const computed = primaryVerticalMarginsForAddress(nodes, addr, arnIndex, plan);
+  const computed = primaryVerticalMarginsForAddress(
+    nodes,
+    addr,
+    arnIndex,
+    plan,
+  );
   activeTopologyMemoCtx?.primaryMarginsByAddr.set(addr, computed);
   return computed;
 }
@@ -529,7 +538,10 @@ function maxTopologyCellFootprintPx(
 ): number {
   let maxW = TOPOLOGY_TIER0_W;
   for (const addr of sortedAddresses) {
-    maxW = Math.max(maxW, withPrimaryFootprintMemo(nodes, addr, arnIndex, plan));
+    maxW = Math.max(
+      maxW,
+      withPrimaryFootprintMemo(nodes, addr, arnIndex, plan),
+    );
   }
   return maxW;
 }
@@ -2767,9 +2779,8 @@ function appendTopologyResourceRectangles(
       action,
     );
 
-    let layoutConfig = activeTopologyMemoCtx?.layoutConfigByResourceType.get(
-      resourceType,
-    );
+    let layoutConfig =
+      activeTopologyMemoCtx?.layoutConfigByResourceType.get(resourceType);
     if (!layoutConfig) {
       layoutConfig = getPrimaryLayoutConfig(resourceType);
       activeTopologyMemoCtx?.layoutConfigByResourceType.set(
@@ -2804,7 +2815,12 @@ function appendTopologyResourceRectangles(
 
     let bundles = activeTopologyMemoCtx?.satelliteBundlesByAddr.get(addr);
     if (!bundles) {
-      bundles = buildTopologyPrimarySatelliteBundles(nodes, addr, arnIndex, plan);
+      bundles = buildTopologyPrimarySatelliteBundles(
+        nodes,
+        addr,
+        arnIndex,
+        plan,
+      );
       activeTopologyMemoCtx?.satelliteBundlesByAddr.set(addr, bundles);
     }
 
@@ -2977,6 +2993,180 @@ function normalizeTopologyOrigin(elements: readonly ExcalidrawElement[]) {
   }
 }
 
+type TopologySceneCountMetrics = {
+  counts: ReturnType<typeof countTopology>;
+  primaryResourceCount: number;
+  regionalPrimaryCount: number;
+  vpcEndpointCount: number;
+  routeTableCount: number;
+};
+
+type TopologyMaterializeInput = {
+  skeleton: ExcalidrawElementSkeleton[];
+  counts: ReturnType<typeof countTopology>;
+  primaryResourceCount: number;
+  regionalPrimaryCount: number;
+  vpcEndpointCount: number;
+  routeTableCount: number;
+  topologyDirectedEdges: TerraformDirectedLayoutEdge[];
+  zoneRouteAnchorDebug: TerraformTopologyZoneRouteAnchorDebugRow[];
+  deferDecorations: boolean;
+};
+
+type TopologyAccountBuildUnit = {
+  accountId: string;
+  account: TerraformTopologyModel["accounts"] extends Map<string, infer T>
+    ? T
+    : never;
+  regionEntries: Array<
+    [
+      string,
+      TerraformTopologyModel["accounts"] extends Map<string, infer TAccount>
+        ? TAccount extends { regions: Map<string, infer TRegion> }
+          ? TRegion
+          : never
+        : never,
+    ]
+  >;
+};
+
+function collectTopologySceneCountMetrics(
+  model: TerraformTopologyModel,
+  zones: readonly TopologyPlacementZone[],
+  regionalBuckets: readonly TopologyRegionalPrimaryBucket[],
+  vpcEndpointBuckets: readonly TopologyVpcEndpointBucket[],
+  routeTableBottomPlacements: TopologyRouteTableBottomPlacements,
+): TopologySceneCountMetrics {
+  const counts = countTopology(model);
+  const regionalPrimaryCount = regionalBuckets.reduce(
+    (n, b) => n + b.addresses.length,
+    0,
+  );
+  const vpcEndpointCount = vpcEndpointBuckets.reduce(
+    (n, b) => n + b.addresses.length,
+    0,
+  );
+  const routeTableCount =
+    routeTableBottomPlacements.zoneBottom.reduce(
+      (n, z) => n + z.addresses.length,
+      0,
+    ) +
+    routeTableBottomPlacements.vpcBottom.reduce(
+      (n, v) => n + v.addresses.length,
+      0,
+    );
+  const primaryResourceCount =
+    zones.reduce((n, z) => n + z.addresses.length, 0) + regionalPrimaryCount;
+  return {
+    counts,
+    primaryResourceCount,
+    regionalPrimaryCount,
+    vpcEndpointCount,
+    routeTableCount,
+  };
+}
+
+function buildEmptyTopologyResult(): {
+  elements: ExcalidrawElement[];
+  meta: TerraformTopologySceneMeta;
+} {
+  return {
+    elements: [],
+    meta: {
+      layoutEngine: "topology",
+      accountCount: 0,
+      regionCount: 0,
+      vpcCount: 0,
+      subnetCount: 0,
+      primaryResourceCount: 0,
+      regionalPrimaryCount: 0,
+      vpcEndpointCount: 0,
+      routeTableCount: 0,
+      dependencyEdgeCount: 0,
+      skippedLayout: true,
+      skipReason: "empty_topology",
+    },
+  };
+}
+
+function sortedMapEntries<K extends string, V>(
+  map: ReadonlyMap<K, V>,
+): Array<[K, V]> {
+  return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+}
+
+function collectTopologyAccountBuildUnits(
+  model: TerraformTopologyModel,
+): TopologyAccountBuildUnit[] {
+  return sortedMapEntries(model.accounts).map(([accountId, account]) => ({
+    accountId,
+    account,
+    regionEntries: sortedMapEntries(account.regions),
+  }));
+}
+
+async function materializeTopologyScene(
+  input: TopologyMaterializeInput,
+): Promise<{
+  elements: ExcalidrawElement[];
+  meta: TerraformTopologySceneMeta;
+  files?: BinaryFiles;
+}> {
+  let elements = convertToExcalidrawElements(input.skeleton, {
+    regenerateIds: true,
+  }) as ExcalidrawElement[];
+
+  elements = applyTerraformResourceRectangleSoftDelete(elements, {
+    semanticAllVisible: true,
+  });
+  elements = mirrorAndDetachTerraformResourceLabels(elements);
+  if (!input.deferDecorations) {
+    elements = await injectTerraformAwsIconsIntoElements(elements);
+  }
+  elements = reconcileTerraformVisibility(
+    repairTerraformEdgeBindings(elements),
+    {
+      pins: TERRAFORM_IMPORT_EDGE_LAYER_PINS,
+      hoverPeekKey: null,
+    },
+  );
+  elements = reorderTopologyElementsZStack(elements);
+  normalizeTopologyOrigin(elements);
+
+  let layoutGlyphFiles: BinaryFiles | undefined;
+  if (!input.deferDecorations) {
+    const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
+      elements,
+    );
+    elements = glyphInjected.elements;
+    layoutGlyphFiles =
+      Object.keys(glyphInjected.files).length > 0
+        ? glyphInjected.files
+        : undefined;
+  }
+
+  return {
+    elements,
+    ...(layoutGlyphFiles ? { files: layoutGlyphFiles } : {}),
+    meta: {
+      layoutEngine: "topology",
+      accountCount: input.counts.accounts,
+      regionCount: input.counts.regions,
+      vpcCount: input.counts.vpcs,
+      subnetCount: input.counts.subnets,
+      primaryResourceCount: input.primaryResourceCount,
+      regionalPrimaryCount: input.regionalPrimaryCount,
+      vpcEndpointCount: input.vpcEndpointCount,
+      routeTableCount: input.routeTableCount,
+      dependencyEdgeCount: input.topologyDirectedEdges.length,
+      ...(input.deferDecorations ? { deferredDecorations: true } : {}),
+      ...(input.zoneRouteAnchorDebug.length > 0
+        ? { zoneRouteAnchorDebug: input.zoneRouteAnchorDebug }
+        : {}),
+    },
+  };
+}
+
 /**
  * Nested AWS topology: account → region → VPC → subnet **zones** (multi-subnet capable) → primary rectangles.
  */
@@ -3000,7 +3190,6 @@ export async function buildTerraformTopologyExcalidrawScene(
   },
   interfaceVpcEndpointZonePlacements: InterfaceVpcEndpointZonePlacementMap = new Map(),
   deferDecorations = false,
-  skipZoneRouteAnchorDebug = false,
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
@@ -3014,672 +3203,289 @@ export async function buildTerraformTopologyExcalidrawScene(
     layoutConfigByResourceType: new Map(),
   };
   try {
-  const counts = countTopology(model);
-  const regionalPrimaryCount = regionalBuckets.reduce(
-    (n, b) => n + b.addresses.length,
-    0,
-  );
-  const vpcEndpointCount = vpcEndpointBuckets.reduce(
-    (n, b) => n + b.addresses.length,
-    0,
-  );
-  const routeTableCount =
-    routeTableBottomPlacements.zoneBottom.reduce(
-      (n, z) => n + z.addresses.length,
-      0,
-    ) +
-    routeTableBottomPlacements.vpcBottom.reduce(
-      (n, v) => n + v.addresses.length,
-      0,
-    );
-  const primaryResourceCount =
-    zones.reduce((n, z) => n + z.addresses.length, 0) + regionalPrimaryCount;
-
-  if (model.accounts.size === 0) {
-    return {
-      elements: [],
-      meta: {
-        layoutEngine: "topology",
-        accountCount: 0,
-        regionCount: 0,
-        vpcCount: 0,
-        subnetCount: 0,
-        primaryResourceCount: 0,
-        regionalPrimaryCount: 0,
-        vpcEndpointCount: 0,
-        routeTableCount: 0,
-        dependencyEdgeCount: 0,
-        skippedLayout: true,
-        skipReason: "empty_topology",
-      },
-    };
-  }
-
-  topologyResourcePanelPlan = plan;
-
-  const skeleton: ExcalidrawElementSkeleton[] = [];
-  const arnIndex = buildArnIndexForTopology(nodes);
-  const layoutCaches = buildTopologyLayoutCaches(
-    zones,
-    regionalBuckets,
-    nodes,
-    arnIndex,
-    plan,
-  );
-  const zonesForVpcCached = (
-    accountId: string,
-    region: string,
-    vpcId: string,
-  ): TopologyPlacementZone[] =>
-    layoutCaches.zonesByVpc.get(vpcZonesCacheKey(accountId, region, vpcId)) ??
-    [];
-  const { satelliteAddresses, routeTableIndexes } = layoutCaches;
-  const vpcNameById = buildTopologyVpcNameMap(plan);
-  const subnetNameById = buildTopologySubnetNameMap(plan);
-  const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
-  const vpceLayoutDuplicateRegistry: TerraformVpceLayoutRegistry = {
-    sgCanonicalToLayoutKeys: new Map(),
-    ruleCanonicalToLayoutKeys: new Map(),
-    layoutKeyToVpceAddress: new Map(),
-  };
-  const globalPlacedIamSatellites = new Set<string>();
-  const globalPlacedKmsPolicySatellites = new Set<string>();
-  const globalPlacedSgSatellites = new Set<string>();
-  const globalPlacedCloudWatchSatellites = new Set<string>();
-  const globalPlacedS3Satellites = new Set<string>();
-  const globalPlacedSqsSatellites = new Set<string>();
-  const globalPlacedAlbSatellites = new Set<string>();
-  const globalPlacedEcsSatellites = new Set<string>();
-  const globalPlacedApiGatewaySatellites = new Set<string>();
-  const globalPlacedTgwSatellites = new Set<string>();
-  const globalPlacedLambdaPermissionSatellites = new Set<string>();
-  const zoneRouteAnchorDebug: TerraformTopologyZoneRouteAnchorDebugRow[] = [];
-
-  let accountCursorX = MARGIN;
-  const accountCursorY = MARGIN;
-
-  const sortedAccounts = [...model.accounts.entries()].sort(([a], [b]) =>
-    a.localeCompare(b),
-  );
-
-  for (const [accountId, account] of sortedAccounts) {
-    const accountSkId = skeletonId("account", accountId, "", null);
-    const regionEntries = [...account.regions.entries()].sort(([a], [b]) =>
-      a.localeCompare(b),
-    );
-
-    let regionRowX = accountCursorX + INNER_PAD;
-    const regionRowY = accountCursorY + VPC_TOP_PAD;
-    let maxRegionBottom = regionRowY;
-    let maxRegionRight = accountCursorX;
-
-    const regionFrameIds: string[] = [];
-
-    for (const [regionName, region] of regionEntries) {
-      const vpcEntries = [...region.vpcs.entries()].sort(([a], [b]) =>
-        a.localeCompare(b),
-      );
-
-      const regionalAddrsRaw = regionalAddressesFor(
+    const {
+      counts,
+      primaryResourceCount,
+      regionalPrimaryCount,
+      vpcEndpointCount,
+      routeTableCount,
+    } = terraformImportProfilerMeasure("layout.topology.collect", () =>
+      collectTopologySceneCountMetrics(
+        model,
+        zones,
         regionalBuckets,
-        accountId,
-        regionName,
-      );
-      const regionalAddrs = filterTopologyAddressesExcludingPrimarySatellites(
-        nodes,
-        arnIndex,
-        regionalAddrsRaw,
-        plan,
-        satelliteAddresses,
-      ).sort((a, b) => a.localeCompare(b));
-      const hasVpc = vpcEntries.length > 0;
-      const hasReg = regionalAddrs.length > 0;
-      if (!hasVpc && !hasReg) {
-        continue;
-      }
+        vpcEndpointBuckets,
+        routeTableBottomPlacements,
+      ),
+    );
 
-      const regionSkId = skeletonId("region", accountId, regionName, null);
-      regionFrameIds.push(regionSkId);
+    if (model.accounts.size === 0) {
+      return buildEmptyTopologyResult();
+    }
 
-      let vpcCellW = MIN_VPC_W + FRAME_CONTENT_SLACK_X;
-      let vpcCellBodyH = MIN_VPC_H + FRAME_CONTENT_SLACK_Y;
-      let maxVpcBottomStripInset = 0;
-      if (hasVpc) {
-        for (const [vpcId] of vpcEntries) {
-          const vpcZs = zonesForVpcCached(accountId, regionName, vpcId);
-          const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
-            routeTableBottomPlacements,
+    topologyResourcePanelPlan = plan;
+
+    const skeleton: ExcalidrawElementSkeleton[] = [];
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const layoutCaches = buildTopologyLayoutCaches(
+      zones,
+      regionalBuckets,
+      nodes,
+      arnIndex,
+      plan,
+    );
+    const zonesForVpcCached = (
+      accountId: string,
+      region: string,
+      vpcId: string,
+    ): TopologyPlacementZone[] =>
+      layoutCaches.zonesByVpc.get(vpcZonesCacheKey(accountId, region, vpcId)) ??
+      [];
+    const { satelliteAddresses, routeTableIndexes } = layoutCaches;
+    const vpcNameById = buildTopologyVpcNameMap(plan);
+    const subnetNameById = buildTopologySubnetNameMap(plan);
+    const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
+    const vpceLayoutDuplicateRegistry: TerraformVpceLayoutRegistry = {
+      sgCanonicalToLayoutKeys: new Map(),
+      ruleCanonicalToLayoutKeys: new Map(),
+      layoutKeyToVpceAddress: new Map(),
+    };
+    const globalPlacedIamSatellites = new Set<string>();
+    const globalPlacedKmsPolicySatellites = new Set<string>();
+    const globalPlacedSgSatellites = new Set<string>();
+    const globalPlacedCloudWatchSatellites = new Set<string>();
+    const globalPlacedS3Satellites = new Set<string>();
+    const globalPlacedSqsSatellites = new Set<string>();
+    const globalPlacedAlbSatellites = new Set<string>();
+    const globalPlacedEcsSatellites = new Set<string>();
+    const globalPlacedApiGatewaySatellites = new Set<string>();
+    const globalPlacedTgwSatellites = new Set<string>();
+    const globalPlacedLambdaPermissionSatellites = new Set<string>();
+    const zoneRouteAnchorDebug: TerraformTopologyZoneRouteAnchorDebugRow[] = [];
+
+    let accountCursorX = MARGIN;
+    const accountCursorY = MARGIN;
+
+    const accountBuildUnits = collectTopologyAccountBuildUnits(model);
+
+    terraformImportProfilerMeasure("layout.topology.skeleton", () => {
+      for (const { accountId, regionEntries } of accountBuildUnits) {
+        const accountSkId = skeletonId("account", accountId, "", null);
+
+        let regionRowX = accountCursorX + INNER_PAD;
+        const regionRowY = accountCursorY + VPC_TOP_PAD;
+        let maxRegionBottom = regionRowY;
+        let maxRegionRight = accountCursorX;
+
+        const regionFrameIds: string[] = [];
+
+        for (const [regionName, region] of regionEntries) {
+          const vpcEntries = sortedMapEntries(region.vpcs);
+
+          const regionalAddrsRaw = regionalAddressesFor(
+            regionalBuckets,
             accountId,
             regionName,
-            vpcId,
           );
-          const epAddrs = endpointsForVpc(
-            vpcEndpointBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const { clusterAddrs, compactAddrs } =
-            partitionVpcEndpointsForClusterLayout(
-              epAddrs,
+          const regionalAddrs =
+            filterTopologyAddressesExcludingPrimarySatellites(
               nodes,
               arnIndex,
-              plan,
-            );
-          const hostedSg = sgCanonicalPathsHostedOnVpcEndpointClusters(
-            clusterAddrs,
-            nodes,
-            arnIndex,
-            plan,
-          );
-          const endpointSgStripAddrs = bucketAddressesForVpc(
-            endpointSecurityGroupBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          ).filter((a) => !hostedSg.has(a));
-          const infraTop = vpcInfrastructureTopPadPx(
-            accountId,
-            regionName,
-            vpcId,
-            vpcDefaultPlumbingBuckets,
-            vpcFlowLogBuckets,
-            endpointSecurityGroupBuckets,
-            nodes,
-            endpointSgStripAddrs,
-          );
-          const defaultPlumbingAddrs = bucketAddressesForVpc(
-            vpcDefaultPlumbingBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const internetEdges = splitVpcInternetEdgeAddresses(
-            defaultPlumbingAddrs,
-            nodes,
-          );
-          const vdWidth = vpcFrameDimensionsForZones(
-            vpcZs,
-            nodes,
-            arnIndex,
-            plan,
-            rtZoneSizing,
-            infraTop,
-            subnetNameById,
-            vpcInternetSideGutterPx(internetEdges),
-            natZonePlacements,
-            0,
-            interfaceVpcEndpointZonePlacements,
-            satelliteAddresses,
-          );
-          const wCluster =
-            clusterAddrs.length > 0
-              ? vpcEndpointClusterRowMinInnerWidth(
-                  clusterAddrs,
-                  nodes,
-                  arnIndex,
-                  plan,
-                )
-              : 0;
-          const wCompact =
-            compactAddrs.length > 0
-              ? vpcEndpointSingleRowMinInnerWidth(compactAddrs.length)
-              : 0;
-          const epMinOuter =
-            epAddrs.length > 0
-              ? 2 * INNER_PAD +
-                FRAME_CONTENT_SLACK_X +
-                Math.max(wCluster, wCompact)
-              : 0;
-          const vpcRtSizing = vpcBottomRouteTablesRowSizing(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const rtMinOuter =
-            vpcRtSizing != null
-              ? 2 * INNER_PAD +
-                FRAME_CONTENT_SLACK_X +
-                vpcRtSizing.minInnerWidthPx
-              : 0;
-          vpcCellW = Math.max(vpcCellW, vdWidth.w, epMinOuter, rtMinOuter);
-
-          const vpceClusterBodyPad = vpcEndpointClusterBodyPadPx(
-            clusterAddrs,
-            nodes,
-            arnIndex,
-            plan,
-          );
-          const vdHeight = vpcFrameDimensionsForZones(
-            vpcZs,
-            nodes,
-            arnIndex,
-            plan,
-            rtZoneSizing,
-            infraTop,
-            subnetNameById,
-            vpcInternetSideGutterPx(internetEdges),
-            natZonePlacements,
-            vpceClusterBodyPad,
-            interfaceVpcEndpointZonePlacements,
-            satelliteAddresses,
-          );
-          const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
-            clusterAddrs,
-            nodes,
-            arnIndex,
-            plan,
-          );
-          vpcCellBodyH = Math.max(vpcCellBodyH, vdHeight.h);
-          maxVpcBottomStripInset = Math.max(
-            maxVpcBottomStripInset,
-            vpcBottomStripInsetPx(
-              compactAddrs.length,
-              clusterBandOuterH,
-              vpcRtSizing?.maxExtentBelowAnchorPx ?? 0,
-            ),
-          );
-        }
-      }
-      const vpcCellFrameH = vpcCellBodyH + maxVpcBottomStripInset;
-
-      const { cols: vpcCols, rows: vpcRows } = hasVpc
-        ? gridColsRows(vpcEntries.length)
-        : { cols: 0, rows: 0 };
-
-      const regDims = hasReg
-        ? zoneFrameSizeForTopologyAddresses(
-            regionalAddrs,
-            nodes,
-            arnIndex,
-            plan,
-          )
-        : { w: 0, h: 0 };
-
-      let vpcGridW = 0;
-      let vpcGridH = 0;
-      if (hasVpc && vpcCols > 0 && vpcRows > 0) {
-        vpcGridW = vpcCols * (vpcCellW + VPC_GAP) - VPC_GAP;
-        vpcGridH = vpcRows * (vpcCellFrameH + VPC_GAP) - VPC_GAP;
-      }
-
-      const innerTop = regionRowY + VPC_TOP_PAD;
-      const contentInnerX = regionRowX + INNER_PAD;
-
-      const vpcGridOriginX = contentInnerX;
-      const vpcGridOriginY = innerTop;
-
-      const regionChildIds: string[] = [];
-
-      if (hasReg) {
-        const regX = contentInnerX;
-        const regY = innerTop + (hasVpc ? vpcGridH + REGIONAL_TO_VPC_GAP : 0);
-
-        const regionalRectIds = appendTopologyResourceRectangles(
-          skeleton,
-          { accountId, region: regionName, vpcId: null },
-          regionalAddrs,
-          regX + INNER_PAD,
-          regY + VPC_TOP_PAD,
-          nodes,
-          arnIndex,
-          globalPlacedIamSatellites,
-          globalPlacedKmsPolicySatellites,
-          globalPlacedSgSatellites,
-          globalPlacedCloudWatchSatellites,
-          globalPlacedS3Satellites,
-          globalPlacedSqsSatellites,
-          globalPlacedAlbSatellites,
-          globalPlacedEcsSatellites,
-          globalPlacedApiGatewaySatellites,
-          globalPlacedTgwSatellites,
-          globalPlacedLambdaPermissionSatellites,
-          satelliteLineSpecs,
-          plan,
-        );
-        regionChildIds.push(...regionalRectIds);
-      }
-
-      const vpcFrameIds: string[] = [];
-
-      for (let vi = 0; hasVpc && vi < vpcEntries.length; vi++) {
-        const [vpcId] = vpcEntries[vi]!;
-        const col = vi % vpcCols;
-        const row = Math.floor(vi / vpcCols);
-        const vpcX = vpcGridOriginX + col * (vpcCellW + VPC_GAP);
-        const vpcY = vpcGridOriginY + row * (vpcCellFrameH + VPC_GAP);
-        const vpcSkId = skeletonId("vpc", accountId, regionName, vpcId);
-        vpcFrameIds.push(vpcSkId);
-
-        const vpcZs = zonesForVpcCached(accountId, regionName, vpcId).sort(
-          compareTopologyZonesByTier(subnetNameById),
-        );
-
-        const epAddrs = endpointsForVpc(
-          vpcEndpointBuckets,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const { clusterAddrs, compactAddrs } =
-          partitionVpcEndpointsForClusterLayout(epAddrs, nodes, arnIndex, plan);
-        const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
-          clusterAddrs,
-          nodes,
-          arnIndex,
-          plan,
-        );
-        const vpcBottomRtRowRaw = routeTablesVpcBottomRow(
-          routeTableBottomPlacements,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const fanOutRtAddrs =
-          plan != null
-            ? computeVpcRouteTableFanOutAddressesForVpc(
-                zones,
-                routeTableBottomPlacements,
-                plan as never,
-                accountId,
-                regionName,
-                vpcId,
-                routeTableIndexes ?? undefined,
-              )
-            : new Set<string>();
-        const vpcBottomRtRow =
-          vpcBottomRtRowRaw && fanOutRtAddrs.size > 0
-            ? {
-                ...vpcBottomRtRowRaw,
-                addresses: vpcBottomRtRowRaw.addresses.filter(
-                  (a) => !fanOutRtAddrs.has(a),
-                ),
-                routeChildrenByTable: Object.fromEntries(
-                  vpcBottomRtRowRaw.addresses
-                    .filter((a) => !fanOutRtAddrs.has(a))
-                    .map((a) => [
-                      a,
-                      vpcBottomRtRowRaw.routeChildrenByTable[a] ?? [],
-                    ]),
-                ),
-              }
-            : vpcBottomRtRowRaw;
-        const vpcBottomRtChildrenByTable =
-          vpcBottomRtRowRaw?.routeChildrenByTable ?? {};
-        const vpcBottomRtMaxExtentBelow =
-          vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
-            ? routeTableMaxExtentBelowAnchorForRowPx(
-                vpcBottomRtRow.addresses,
-                vpcBottomRtRow.routeChildrenByTable,
-              )
-            : 0;
-        const hasBottomEpVisual =
-          compactAddrs.length > 0 || clusterAddrs.length > 0;
-        const rtStackAboveVpcBottomPx =
-          hasBottomEpVisual || vpcBottomRtMaxExtentBelow > 0
-            ? Math.max(
-                compactAddrs.length > 0 ? VPC_ENDPOINT_TILE_H : 0,
-                clusterBandOuterH,
-                vpcBottomRtMaxExtentBelow,
-              ) + 8
-            : 0;
-
-        const defaultPlumbingAddrs = bucketAddressesForVpc(
-          vpcDefaultPlumbingBuckets,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const internetEdgeAddrs = splitVpcInternetEdgeAddresses(
-          defaultPlumbingAddrs,
-          nodes,
-        );
-        const flowLogAddrs = bucketAddressesForVpc(
-          vpcFlowLogBuckets,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const endpointSgAddrs = bucketAddressesForVpc(
-          endpointSecurityGroupBuckets,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const hostedSg = sgCanonicalPathsHostedOnVpcEndpointClusters(
-          clusterAddrs,
-          nodes,
-          arnIndex,
-          plan,
-        );
-        const endpointSgStripAddrs = endpointSgAddrs.filter(
-          (a) => !hostedSg.has(a),
-        );
-        const infraTop = vpcInfrastructureTopPadPx(
-          accountId,
-          regionName,
-          vpcId,
-          vpcDefaultPlumbingBuckets,
-          vpcFlowLogBuckets,
-          endpointSecurityGroupBuckets,
-          nodes,
-          endpointSgStripAddrs,
-        );
-        const vpcInfraIds = appendVpcInfrastructureStrips(
-          skeleton,
-          accountId,
-          regionName,
-          vpcId,
-          vpcX,
-          vpcY,
-          vpcCellW,
-          nodes,
-          internetEdgeAddrs.defaultTop,
-          flowLogAddrs,
-          endpointSgStripAddrs,
-        );
-        const vpcInternetEdgeIds = appendVpcInternetEdgeRectangles(
-          skeleton,
-          accountId,
-          regionName,
-          vpcId,
-          vpcX,
-          vpcY,
-          vpcCellW,
-          vpcCellBodyH,
-          nodes,
-          internetEdgeAddrs,
-        );
-        appendVpcFlowLogBundleSatelliteEdges(
-          satelliteLineSpecs,
-          flowLogAddrs,
-          nodes,
-        );
-
-        if (vpcZs.length === 0) {
-          const vpcBottomRtRectIdsEmpty =
-            vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
-              ? appendRouteTableBottomEdgeRectangles(
-                  skeleton,
-                  accountId,
-                  regionName,
-                  vpcId,
-                  vpcBottomRtRow.addresses,
-                  vpcBottomRtRow.routeChildrenByTable,
-                  vpcX,
-                  vpcY,
-                  vpcCellW,
-                  vpcCellBodyH,
-                  nodes,
-                  undefined,
-                  rtStackAboveVpcBottomPx,
-                )
-              : [];
-          const vpcEpClusterIdsEmpty =
-            clusterAddrs.length > 0
-              ? appendVpcEndpointPrimaryClusters(
-                  skeleton,
-                  satelliteLineSpecs,
-                  accountId,
-                  regionName,
-                  vpcId,
-                  clusterAddrs,
-                  vpcX,
-                  vpcY,
-                  vpcCellW,
-                  vpcCellBodyH,
-                  nodes,
-                  arnIndex,
-                  plan,
-                  vpceLayoutDuplicateRegistry,
-                )
-              : [];
-          const vpcEpCompactIdsEmpty =
-            compactAddrs.length > 0
-              ? appendVpcEndpointEgressRectangles(
-                  skeleton,
-                  accountId,
-                  regionName,
-                  vpcId,
-                  compactAddrs,
-                  vpcX,
-                  vpcY,
-                  vpcCellW,
-                  vpcCellBodyH,
-                  nodes,
-                )
-              : [];
-          const vpcEpRectIdsEmpty = [
-            ...vpcEpClusterIdsEmpty,
-            ...vpcEpCompactIdsEmpty,
-          ];
-
-          skeleton.push({
-            type: "frame",
-            id: vpcSkId,
-            name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
-            x: vpcX,
-            y: vpcY,
-            width: vpcCellW,
-            height: vpcCellFrameH,
-            children: [
-              ...vpcInfraIds,
-              ...vpcInternetEdgeIds,
-              ...vpcBottomRtRectIdsEmpty,
-              ...vpcEpRectIdsEmpty,
-            ] as readonly string[],
-            customData: frameCustomData(
-              "vpc",
-              accountId,
-              regionName,
-              vpcId,
-              vpcSkId,
-            ),
-          });
-          continue;
-        }
-
-        const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
-          routeTableBottomPlacements,
-          accountId,
-          regionName,
-          vpcId,
-        );
-        const vpceClusterBodyPadForZoneGrid = vpcEndpointClusterBodyPadPx(
-          clusterAddrs,
-          nodes,
-          arnIndex,
-          plan,
-        );
-        const vd = vpcFrameDimensionsForZones(
-          vpcZs,
-          nodes,
-          arnIndex,
-          plan,
-          rtZoneSizing,
-          infraTop,
-          subnetNameById,
-          vpcInternetSideGutterPx(internetEdgeAddrs),
-          natZonePlacements,
-          vpceClusterBodyPadForZoneGrid,
-          interfaceVpcEndpointZonePlacements,
-          satelliteAddresses,
-        );
-        const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
-        const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
-        const zoneGridOriginY = vpcY + VPC_TOP_PAD + infraTop;
-        const zoneFrameIds: string[] = [];
-        const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
-
-        for (let zcol = 0; zcol < zoneColumns.length; zcol++) {
-          const column = zoneColumns[zcol]!;
-          for (let zrow = 0; zrow < column.length; zrow++) {
-            const z = column[zrow]!;
-            const zoneWidthKey = placementZoneWidthKey(
-              accountId,
-              regionName,
-              vpcId,
-              z.subnetSignature,
-            );
-            const zoneW = vd.zoneWBySignature.get(zoneWidthKey) ?? vd.perZoneW;
-            const zoneX = zoneGridOriginX + (vd.columnOriginX[zcol] ?? 0);
-            const zoneY =
-              zoneGridOriginY + zrow * (vd.perZoneH + ZONE_CELL_GAP);
-
-            const zoneSkId = zoneSkeletonId(
-              accountId,
-              regionName,
-              vpcId,
-              z.subnetSignature,
-            );
-            zoneFrameIds.push(zoneSkId);
-
-            const natClusters = natClustersForZone(
-              natZonePlacements,
-              accountId,
-              regionName,
-              vpcId,
-              z.subnetSignature,
-            );
-            const natBandHeight = natZoneBandTotalHeightPx(natClusters);
-            /** NAT primaryClusters band at the top; primary grid below pushed down by band height. */
-            const natRectIds =
-              natClusters.length > 0
-                ? appendNatGatewayZoneClusters(
-                    skeleton,
-                    accountId,
-                    regionName,
-                    vpcId,
-                    natClusters,
-                    zoneX,
-                    zoneY,
-                    Math.max(0, zoneW - 2 * INNER_PAD),
-                    zoneY + VPC_TOP_PAD,
-                    nodes,
-                  )
-                : [];
-
-            const zoneAddrsRaw = [...z.addresses];
-            const addrs = filterTopologyAddressesExcludingPrimarySatellites(
-              nodes,
-              arnIndex,
-              zoneAddrsRaw,
+              regionalAddrsRaw,
               plan,
               satelliteAddresses,
             ).sort((a, b) => a.localeCompare(b));
-            const rectIds = appendTopologyResourceRectangles(
-              skeleton,
-              {
+          const hasVpc = vpcEntries.length > 0;
+          const hasReg = regionalAddrs.length > 0;
+          if (!hasVpc && !hasReg) {
+            continue;
+          }
+
+          const regionSkId = skeletonId("region", accountId, regionName, null);
+          regionFrameIds.push(regionSkId);
+
+          let vpcCellW = MIN_VPC_W + FRAME_CONTENT_SLACK_X;
+          let vpcCellBodyH = MIN_VPC_H + FRAME_CONTENT_SLACK_Y;
+          let maxVpcBottomStripInset = 0;
+          if (hasVpc) {
+            for (const [vpcId] of vpcEntries) {
+              const vpcZs = zonesForVpcCached(accountId, regionName, vpcId);
+              const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
+                routeTableBottomPlacements,
                 accountId,
-                region: regionName,
+                regionName,
                 vpcId,
-                subnetTier: topologySubnetTierFromZone(z, subnetNameById),
-                subnetSignature: z.subnetSignature,
-              },
-              addrs,
-              zoneX + INNER_PAD,
-              zoneY + VPC_TOP_PAD + natBandHeight,
+              );
+              const epAddrs = endpointsForVpc(
+                vpcEndpointBuckets,
+                accountId,
+                regionName,
+                vpcId,
+              );
+              const { clusterAddrs, compactAddrs } =
+                partitionVpcEndpointsForClusterLayout(
+                  epAddrs,
+                  nodes,
+                  arnIndex,
+                  plan,
+                );
+              const hostedSg = sgCanonicalPathsHostedOnVpcEndpointClusters(
+                clusterAddrs,
+                nodes,
+                arnIndex,
+                plan,
+              );
+              const endpointSgStripAddrs = bucketAddressesForVpc(
+                endpointSecurityGroupBuckets,
+                accountId,
+                regionName,
+                vpcId,
+              ).filter((a) => !hostedSg.has(a));
+              const infraTop = vpcInfrastructureTopPadPx(
+                accountId,
+                regionName,
+                vpcId,
+                vpcDefaultPlumbingBuckets,
+                vpcFlowLogBuckets,
+                endpointSecurityGroupBuckets,
+                nodes,
+                endpointSgStripAddrs,
+              );
+              const defaultPlumbingAddrs = bucketAddressesForVpc(
+                vpcDefaultPlumbingBuckets,
+                accountId,
+                regionName,
+                vpcId,
+              );
+              const internetEdges = splitVpcInternetEdgeAddresses(
+                defaultPlumbingAddrs,
+                nodes,
+              );
+              const vdWidth = vpcFrameDimensionsForZones(
+                vpcZs,
+                nodes,
+                arnIndex,
+                plan,
+                rtZoneSizing,
+                infraTop,
+                subnetNameById,
+                vpcInternetSideGutterPx(internetEdges),
+                natZonePlacements,
+                0,
+                interfaceVpcEndpointZonePlacements,
+                satelliteAddresses,
+              );
+              const wCluster =
+                clusterAddrs.length > 0
+                  ? vpcEndpointClusterRowMinInnerWidth(
+                      clusterAddrs,
+                      nodes,
+                      arnIndex,
+                      plan,
+                    )
+                  : 0;
+              const wCompact =
+                compactAddrs.length > 0
+                  ? vpcEndpointSingleRowMinInnerWidth(compactAddrs.length)
+                  : 0;
+              const epMinOuter =
+                epAddrs.length > 0
+                  ? 2 * INNER_PAD +
+                    FRAME_CONTENT_SLACK_X +
+                    Math.max(wCluster, wCompact)
+                  : 0;
+              const vpcRtSizing = vpcBottomRouteTablesRowSizing(
+                routeTableBottomPlacements,
+                accountId,
+                regionName,
+                vpcId,
+              );
+              const rtMinOuter =
+                vpcRtSizing != null
+                  ? 2 * INNER_PAD +
+                    FRAME_CONTENT_SLACK_X +
+                    vpcRtSizing.minInnerWidthPx
+                  : 0;
+              vpcCellW = Math.max(vpcCellW, vdWidth.w, epMinOuter, rtMinOuter);
+
+              const vpceClusterBodyPad = vpcEndpointClusterBodyPadPx(
+                clusterAddrs,
+                nodes,
+                arnIndex,
+                plan,
+              );
+              const vdHeight = vpcFrameDimensionsForZones(
+                vpcZs,
+                nodes,
+                arnIndex,
+                plan,
+                rtZoneSizing,
+                infraTop,
+                subnetNameById,
+                vpcInternetSideGutterPx(internetEdges),
+                natZonePlacements,
+                vpceClusterBodyPad,
+                interfaceVpcEndpointZonePlacements,
+                satelliteAddresses,
+              );
+              const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
+                clusterAddrs,
+                nodes,
+                arnIndex,
+                plan,
+              );
+              vpcCellBodyH = Math.max(vpcCellBodyH, vdHeight.h);
+              maxVpcBottomStripInset = Math.max(
+                maxVpcBottomStripInset,
+                vpcBottomStripInsetPx(
+                  compactAddrs.length,
+                  clusterBandOuterH,
+                  vpcRtSizing?.maxExtentBelowAnchorPx ?? 0,
+                ),
+              );
+            }
+          }
+          const vpcCellFrameH = vpcCellBodyH + maxVpcBottomStripInset;
+
+          const { cols: vpcCols, rows: vpcRows } = hasVpc
+            ? gridColsRows(vpcEntries.length)
+            : { cols: 0, rows: 0 };
+
+          const regDims = hasReg
+            ? zoneFrameSizeForTopologyAddresses(
+                regionalAddrs,
+                nodes,
+                arnIndex,
+                plan,
+              )
+            : { w: 0, h: 0 };
+
+          let vpcGridW = 0;
+          let vpcGridH = 0;
+          if (hasVpc && vpcCols > 0 && vpcRows > 0) {
+            vpcGridW = vpcCols * (vpcCellW + VPC_GAP) - VPC_GAP;
+            vpcGridH = vpcRows * (vpcCellFrameH + VPC_GAP) - VPC_GAP;
+          }
+
+          const innerTop = regionRowY + VPC_TOP_PAD;
+          const contentInnerX = regionRowX + INNER_PAD;
+
+          const vpcGridOriginX = contentInnerX;
+          const vpcGridOriginY = innerTop;
+
+          const regionChildIds: string[] = [];
+
+          if (hasReg) {
+            const regX = contentInnerX;
+            const regY =
+              innerTop + (hasVpc ? vpcGridH + REGIONAL_TO_VPC_GAP : 0);
+
+            const regionalRectIds = appendTopologyResourceRectangles(
+              skeleton,
+              { accountId, region: regionName, vpcId: null },
+              regionalAddrs,
+              regX + INNER_PAD,
+              regY + VPC_TOP_PAD,
               nodes,
               arnIndex,
               globalPlacedIamSatellites,
@@ -3696,609 +3502,921 @@ export async function buildTerraformTopologyExcalidrawScene(
               satelliteLineSpecs,
               plan,
             );
+            regionChildIds.push(...regionalRectIds);
+          }
 
-            const zoneVpceKey = topologyZoneMapKey(
+          const vpcFrameIds: string[] = [];
+
+          for (let vi = 0; hasVpc && vi < vpcEntries.length; vi++) {
+            const [vpcId] = vpcEntries[vi]!;
+            const col = vi % vpcCols;
+            const row = Math.floor(vi / vpcCols);
+            const vpcX = vpcGridOriginX + col * (vpcCellW + VPC_GAP);
+            const vpcY = vpcGridOriginY + row * (vpcCellFrameH + VPC_GAP);
+            const vpcSkId = skeletonId("vpc", accountId, regionName, vpcId);
+            vpcFrameIds.push(vpcSkId);
+
+            const vpcZs = zonesForVpcCached(accountId, regionName, vpcId).sort(
+              compareTopologyZonesByTier(subnetNameById),
+            );
+
+            const epAddrs = endpointsForVpc(
+              vpcEndpointBuckets,
               accountId,
               regionName,
               vpcId,
-              z.subnetSignature,
             );
-            const zoneVpcePlacementsForZ =
-              interfaceVpcEndpointZonePlacements.get(zoneVpceKey) ?? [];
-            const zoneVpceAddrsForZ = zoneVpcePlacementsForZ.map(
-              (p) => p.address,
-            );
-            const zoneVpceDupForZ = new Map(
-              zoneVpcePlacementsForZ.map(
-                (p) => [p.address, p.subnetMirrorDuplicate] as const,
-              ),
-            );
-            const zoneVpcePartForZ =
-              zoneVpceAddrsForZ.length > 0
-                ? partitionVpcEndpointsForClusterLayout(
-                    zoneVpceAddrsForZ,
-                    nodes,
-                    arnIndex,
-                    plan,
-                  )
-                : {
-                    clusterAddrs: [] as string[],
-                    compactAddrs: [] as string[],
-                  };
-            let zoneVpceRowMinInnerWForRouteCenter = 0;
-            if (
-              zoneVpcePartForZ.clusterAddrs.length > 0 ||
-              zoneVpcePartForZ.compactAddrs.length > 0
-            ) {
-              const wCz =
-                zoneVpcePartForZ.clusterAddrs.length > 0
-                  ? vpcEndpointClusterRowMinInnerWidth(
-                      zoneVpcePartForZ.clusterAddrs,
-                      nodes,
-                      arnIndex,
-                      plan,
-                    )
-                  : 0;
-              const wCompz =
-                zoneVpcePartForZ.compactAddrs.length > 0
-                  ? vpcEndpointSingleRowMinInnerWidth(
-                      zoneVpcePartForZ.compactAddrs.length,
-                    )
-                  : 0;
-              zoneVpceRowMinInnerWForRouteCenter = Math.max(wCz, wCompz);
-            }
-            const zoneVpceOptsForZ: TopologyVpcePerZoneLayoutOpts | undefined =
-              zoneVpceAddrsForZ.length > 0
-                ? {
-                    layoutInstanceIdForAddress: (address) =>
-                      `${address}__zone__${encodeURIComponent(
-                        z.subnetSignature,
-                      )}`,
-                    subnetMirrorDuplicateForAddress: (address) =>
-                      zoneVpceDupForZ.get(address) ?? false,
-                  }
-                : undefined;
-
-            /** Primary footprint height; route anchor uses uniform `vd.perZoneBodyH` (cell bottom). */
-            const zoneContentBodyHPx = zoneFrameSizeForTopologyAddresses(
-              addrs,
-              nodes,
-              arnIndex,
-              plan,
-            ).h;
-            let routeTableRowCenterBandW: number | undefined;
-            if (addrs.length > 0) {
-              const { cols: rcCols } = gridColsRowsForPrimaryTiles(
-                addrs.length,
-              );
-              const cellW = maxTopologyCellFootprintPx(
-                addrs,
+            const { clusterAddrs, compactAddrs } =
+              partitionVpcEndpointsForClusterLayout(
+                epAddrs,
                 nodes,
                 arnIndex,
                 plan,
               );
-              routeTableRowCenterBandW =
-                rcCols * cellW + Math.max(0, rcCols - 1) * RESOURCE_GAP;
-            }
-            if (zoneVpceRowMinInnerWForRouteCenter > 0) {
-              routeTableRowCenterBandW = Math.max(
-                routeTableRowCenterBandW ?? 0,
-                zoneVpceRowMinInnerWForRouteCenter,
-              );
-            }
-            const zoneRtRow = routeTablesZoneBottomRow(
+            const clusterBandOuterH = vpcEndpointClusterBandOuterHeightPx(
+              clusterAddrs,
+              nodes,
+              arnIndex,
+              plan,
+            );
+            const vpcBottomRtRowRaw = routeTablesVpcBottomRow(
               routeTableBottomPlacements,
               accountId,
               regionName,
               vpcId,
-              z.subnetSignature,
             );
-            const zoneRtRectIds =
-              zoneRtRow && zoneRtRow.addresses.length > 0
-                ? (() => {
-                    if (
-                      !skipZoneRouteAnchorDebug &&
-                      zoneRouteAnchorDebug.length < 64
-                    ) {
-                      zoneRouteAnchorDebug.push({
-                        accountId,
-                        region: regionName,
-                        vpcId,
-                        subnetSignature: z.subnetSignature,
-                        tier: topologySubnetTierFromZone(z, subnetNameById),
-                        zoneContentBodyHPx,
-                        routeAnchorBodyHPx: vd.perZoneBodyH,
-                      });
-                    }
-                    return appendRouteTableBottomEdgeRectangles(
+            const fanOutRtAddrs =
+              plan != null
+                ? computeVpcRouteTableFanOutAddressesForVpc(
+                    zones,
+                    routeTableBottomPlacements,
+                    plan as never,
+                    accountId,
+                    regionName,
+                    vpcId,
+                    routeTableIndexes ?? undefined,
+                  )
+                : new Set<string>();
+            const vpcBottomRtRow =
+              vpcBottomRtRowRaw && fanOutRtAddrs.size > 0
+                ? {
+                    ...vpcBottomRtRowRaw,
+                    addresses: vpcBottomRtRowRaw.addresses.filter(
+                      (a) => !fanOutRtAddrs.has(a),
+                    ),
+                    routeChildrenByTable: Object.fromEntries(
+                      vpcBottomRtRowRaw.addresses
+                        .filter((a) => !fanOutRtAddrs.has(a))
+                        .map((a) => [
+                          a,
+                          vpcBottomRtRowRaw.routeChildrenByTable[a] ?? [],
+                        ]),
+                    ),
+                  }
+                : vpcBottomRtRowRaw;
+            const vpcBottomRtChildrenByTable =
+              vpcBottomRtRowRaw?.routeChildrenByTable ?? {};
+            const vpcBottomRtMaxExtentBelow =
+              vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
+                ? routeTableMaxExtentBelowAnchorForRowPx(
+                    vpcBottomRtRow.addresses,
+                    vpcBottomRtRow.routeChildrenByTable,
+                  )
+                : 0;
+            const hasBottomEpVisual =
+              compactAddrs.length > 0 || clusterAddrs.length > 0;
+            const rtStackAboveVpcBottomPx =
+              hasBottomEpVisual || vpcBottomRtMaxExtentBelow > 0
+                ? Math.max(
+                    compactAddrs.length > 0 ? VPC_ENDPOINT_TILE_H : 0,
+                    clusterBandOuterH,
+                    vpcBottomRtMaxExtentBelow,
+                  ) + 8
+                : 0;
+
+            const defaultPlumbingAddrs = bucketAddressesForVpc(
+              vpcDefaultPlumbingBuckets,
+              accountId,
+              regionName,
+              vpcId,
+            );
+            const internetEdgeAddrs = splitVpcInternetEdgeAddresses(
+              defaultPlumbingAddrs,
+              nodes,
+            );
+            const flowLogAddrs = bucketAddressesForVpc(
+              vpcFlowLogBuckets,
+              accountId,
+              regionName,
+              vpcId,
+            );
+            const endpointSgAddrs = bucketAddressesForVpc(
+              endpointSecurityGroupBuckets,
+              accountId,
+              regionName,
+              vpcId,
+            );
+            const hostedSg = sgCanonicalPathsHostedOnVpcEndpointClusters(
+              clusterAddrs,
+              nodes,
+              arnIndex,
+              plan,
+            );
+            const endpointSgStripAddrs = endpointSgAddrs.filter(
+              (a) => !hostedSg.has(a),
+            );
+            const infraTop = vpcInfrastructureTopPadPx(
+              accountId,
+              regionName,
+              vpcId,
+              vpcDefaultPlumbingBuckets,
+              vpcFlowLogBuckets,
+              endpointSecurityGroupBuckets,
+              nodes,
+              endpointSgStripAddrs,
+            );
+            const vpcInfraIds = appendVpcInfrastructureStrips(
+              skeleton,
+              accountId,
+              regionName,
+              vpcId,
+              vpcX,
+              vpcY,
+              vpcCellW,
+              nodes,
+              internetEdgeAddrs.defaultTop,
+              flowLogAddrs,
+              endpointSgStripAddrs,
+            );
+            const vpcInternetEdgeIds = appendVpcInternetEdgeRectangles(
+              skeleton,
+              accountId,
+              regionName,
+              vpcId,
+              vpcX,
+              vpcY,
+              vpcCellW,
+              vpcCellBodyH,
+              nodes,
+              internetEdgeAddrs,
+            );
+            appendVpcFlowLogBundleSatelliteEdges(
+              satelliteLineSpecs,
+              flowLogAddrs,
+              nodes,
+            );
+
+            if (vpcZs.length === 0) {
+              const vpcBottomRtRectIdsEmpty =
+                vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
+                  ? appendRouteTableBottomEdgeRectangles(
                       skeleton,
                       accountId,
                       regionName,
                       vpcId,
-                      zoneRtRow.addresses,
-                      zoneRtRow.routeChildrenByTable,
-                      zoneX,
-                      zoneY,
-                      zoneW,
-                      vd.perZoneBodyH,
+                      vpcBottomRtRow.addresses,
+                      vpcBottomRtRow.routeChildrenByTable,
+                      vpcX,
+                      vpcY,
+                      vpcCellW,
+                      vpcCellBodyH,
                       nodes,
-                      z.subnetSignature,
-                      0,
-                      routeTableRowCenterBandW,
-                    );
-                  })()
-                : [];
+                      undefined,
+                      rtStackAboveVpcBottomPx,
+                    )
+                  : [];
+              const vpcEpClusterIdsEmpty =
+                clusterAddrs.length > 0
+                  ? appendVpcEndpointPrimaryClusters(
+                      skeleton,
+                      satelliteLineSpecs,
+                      accountId,
+                      regionName,
+                      vpcId,
+                      clusterAddrs,
+                      vpcX,
+                      vpcY,
+                      vpcCellW,
+                      vpcCellBodyH,
+                      nodes,
+                      arnIndex,
+                      plan,
+                      vpceLayoutDuplicateRegistry,
+                    )
+                  : [];
+              const vpcEpCompactIdsEmpty =
+                compactAddrs.length > 0
+                  ? appendVpcEndpointEgressRectangles(
+                      skeleton,
+                      accountId,
+                      regionName,
+                      vpcId,
+                      compactAddrs,
+                      vpcX,
+                      vpcY,
+                      vpcCellW,
+                      vpcCellBodyH,
+                      nodes,
+                    )
+                  : [];
+              const vpcEpRectIdsEmpty = [
+                ...vpcEpClusterIdsEmpty,
+                ...vpcEpCompactIdsEmpty,
+              ];
 
-            const fanOutRtRectIds: string[] = [];
-            if (
-              plan != null &&
-              fanOutRtAddrs.size > 0 &&
-              z.subnetIds.length > 0
-            ) {
-              const candidateRtAddrs = new Set<string>();
-              if (routeTableIndexes?.subnetToRouteTableAddrs) {
-                for (const subnetId of z.subnetIds) {
-                  const rtAddrs =
-                    routeTableIndexes.subnetToRouteTableAddrs.get(subnetId);
-                  if (!rtAddrs) {
-                    continue;
-                  }
-                  for (const addr of rtAddrs) {
-                    if (fanOutRtAddrs.has(addr)) {
-                      candidateRtAddrs.add(addr);
-                    }
-                  }
+              skeleton.push({
+                type: "frame",
+                id: vpcSkId,
+                name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
+                x: vpcX,
+                y: vpcY,
+                width: vpcCellW,
+                height: vpcCellFrameH,
+                children: [
+                  ...vpcInfraIds,
+                  ...vpcInternetEdgeIds,
+                  ...vpcBottomRtRectIdsEmpty,
+                  ...vpcEpRectIdsEmpty,
+                ] as readonly string[],
+                customData: frameCustomData(
+                  "vpc",
+                  accountId,
+                  regionName,
+                  vpcId,
+                  vpcSkId,
+                ),
+              });
+              continue;
+            }
+
+            const rtZoneSizing = buildRouteTableZoneSizingMapForVpc(
+              routeTableBottomPlacements,
+              accountId,
+              regionName,
+              vpcId,
+            );
+            const vpceClusterBodyPadForZoneGrid = vpcEndpointClusterBodyPadPx(
+              clusterAddrs,
+              nodes,
+              arnIndex,
+              plan,
+            );
+            const vd = vpcFrameDimensionsForZones(
+              vpcZs,
+              nodes,
+              arnIndex,
+              plan,
+              rtZoneSizing,
+              infraTop,
+              subnetNameById,
+              vpcInternetSideGutterPx(internetEdgeAddrs),
+              natZonePlacements,
+              vpceClusterBodyPadForZoneGrid,
+              interfaceVpcEndpointZonePlacements,
+              satelliteAddresses,
+            );
+            const sideGutterPx = vpcInternetSideGutterPx(internetEdgeAddrs);
+            const zoneGridOriginX = vpcX + INNER_PAD + sideGutterPx;
+            const zoneGridOriginY = vpcY + VPC_TOP_PAD + infraTop;
+            const zoneFrameIds: string[] = [];
+            const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
+
+            for (let zcol = 0; zcol < zoneColumns.length; zcol++) {
+              const column = zoneColumns[zcol]!;
+              for (let zrow = 0; zrow < column.length; zrow++) {
+                const z = column[zrow]!;
+                const zoneWidthKey = placementZoneWidthKey(
+                  accountId,
+                  regionName,
+                  vpcId,
+                  z.subnetSignature,
+                );
+                const zoneW =
+                  vd.zoneWBySignature.get(zoneWidthKey) ?? vd.perZoneW;
+                const zoneX = zoneGridOriginX + (vd.columnOriginX[zcol] ?? 0);
+                const zoneY =
+                  zoneGridOriginY + zrow * (vd.perZoneH + ZONE_CELL_GAP);
+
+                const zoneSkId = zoneSkeletonId(
+                  accountId,
+                  regionName,
+                  vpcId,
+                  z.subnetSignature,
+                );
+                zoneFrameIds.push(zoneSkId);
+
+                const natClusters = natClustersForZone(
+                  natZonePlacements,
+                  accountId,
+                  regionName,
+                  vpcId,
+                  z.subnetSignature,
+                );
+                const natBandHeight = natZoneBandTotalHeightPx(natClusters);
+                /** NAT primaryClusters band at the top; primary grid below pushed down by band height. */
+                const natRectIds =
+                  natClusters.length > 0
+                    ? appendNatGatewayZoneClusters(
+                        skeleton,
+                        accountId,
+                        regionName,
+                        vpcId,
+                        natClusters,
+                        zoneX,
+                        zoneY,
+                        Math.max(0, zoneW - 2 * INNER_PAD),
+                        zoneY + VPC_TOP_PAD,
+                        nodes,
+                      )
+                    : [];
+
+                const zoneAddrsRaw = [...z.addresses];
+                const addrs = filterTopologyAddressesExcludingPrimarySatellites(
+                  nodes,
+                  arnIndex,
+                  zoneAddrsRaw,
+                  plan,
+                  satelliteAddresses,
+                ).sort((a, b) => a.localeCompare(b));
+                const rectIds = appendTopologyResourceRectangles(
+                  skeleton,
+                  {
+                    accountId,
+                    region: regionName,
+                    vpcId,
+                    subnetTier: topologySubnetTierFromZone(z, subnetNameById),
+                    subnetSignature: z.subnetSignature,
+                  },
+                  addrs,
+                  zoneX + INNER_PAD,
+                  zoneY + VPC_TOP_PAD + natBandHeight,
+                  nodes,
+                  arnIndex,
+                  globalPlacedIamSatellites,
+                  globalPlacedKmsPolicySatellites,
+                  globalPlacedSgSatellites,
+                  globalPlacedCloudWatchSatellites,
+                  globalPlacedS3Satellites,
+                  globalPlacedSqsSatellites,
+                  globalPlacedAlbSatellites,
+                  globalPlacedEcsSatellites,
+                  globalPlacedApiGatewaySatellites,
+                  globalPlacedTgwSatellites,
+                  globalPlacedLambdaPermissionSatellites,
+                  satelliteLineSpecs,
+                  plan,
+                );
+
+                const zoneVpceKey = topologyZoneMapKey(
+                  accountId,
+                  regionName,
+                  vpcId,
+                  z.subnetSignature,
+                );
+                const zoneVpcePlacementsForZ =
+                  interfaceVpcEndpointZonePlacements.get(zoneVpceKey) ?? [];
+                const zoneVpceAddrsForZ = zoneVpcePlacementsForZ.map(
+                  (p) => p.address,
+                );
+                const zoneVpceDupForZ = new Map(
+                  zoneVpcePlacementsForZ.map(
+                    (p) => [p.address, p.subnetMirrorDuplicate] as const,
+                  ),
+                );
+                const zoneVpcePartForZ =
+                  zoneVpceAddrsForZ.length > 0
+                    ? partitionVpcEndpointsForClusterLayout(
+                        zoneVpceAddrsForZ,
+                        nodes,
+                        arnIndex,
+                        plan,
+                      )
+                    : {
+                        clusterAddrs: [] as string[],
+                        compactAddrs: [] as string[],
+                      };
+                let zoneVpceRowMinInnerWForRouteCenter = 0;
+                if (
+                  zoneVpcePartForZ.clusterAddrs.length > 0 ||
+                  zoneVpcePartForZ.compactAddrs.length > 0
+                ) {
+                  const wCz =
+                    zoneVpcePartForZ.clusterAddrs.length > 0
+                      ? vpcEndpointClusterRowMinInnerWidth(
+                          zoneVpcePartForZ.clusterAddrs,
+                          nodes,
+                          arnIndex,
+                          plan,
+                        )
+                      : 0;
+                  const wCompz =
+                    zoneVpcePartForZ.compactAddrs.length > 0
+                      ? vpcEndpointSingleRowMinInnerWidth(
+                          zoneVpcePartForZ.compactAddrs.length,
+                        )
+                      : 0;
+                  zoneVpceRowMinInnerWForRouteCenter = Math.max(wCz, wCompz);
                 }
-              } else {
-                for (const addr of fanOutRtAddrs) {
-                  const snSet = subnetSetForRouteTableAddress(
-                    plan as never,
-                    addr,
-                    routeTableIndexes,
+                const zoneVpceOptsForZ:
+                  | TopologyVpcePerZoneLayoutOpts
+                  | undefined =
+                  zoneVpceAddrsForZ.length > 0
+                    ? {
+                        layoutInstanceIdForAddress: (address) =>
+                          `${address}__zone__${encodeURIComponent(
+                            z.subnetSignature,
+                          )}`,
+                        subnetMirrorDuplicateForAddress: (address) =>
+                          zoneVpceDupForZ.get(address) ?? false,
+                      }
+                    : undefined;
+
+                /** Primary footprint height; route anchor uses uniform `vd.perZoneBodyH` (cell bottom). */
+                const zoneContentBodyHPx = zoneFrameSizeForTopologyAddresses(
+                  addrs,
+                  nodes,
+                  arnIndex,
+                  plan,
+                ).h;
+                let routeTableRowCenterBandW: number | undefined;
+                if (addrs.length > 0) {
+                  const { cols: rcCols } = gridColsRowsForPrimaryTiles(
+                    addrs.length,
                   );
-                  if (!snSet || !z.subnetIds.some((sid) => snSet.has(sid))) {
-                    continue;
-                  }
-                  candidateRtAddrs.add(addr);
+                  const cellW = maxTopologyCellFootprintPx(
+                    addrs,
+                    nodes,
+                    arnIndex,
+                    plan,
+                  );
+                  routeTableRowCenterBandW =
+                    rcCols * cellW + Math.max(0, rcCols - 1) * RESOURCE_GAP;
                 }
-              }
+                if (zoneVpceRowMinInnerWForRouteCenter > 0) {
+                  routeTableRowCenterBandW = Math.max(
+                    routeTableRowCenterBandW ?? 0,
+                    zoneVpceRowMinInnerWForRouteCenter,
+                  );
+                }
+                const zoneRtRow = routeTablesZoneBottomRow(
+                  routeTableBottomPlacements,
+                  accountId,
+                  regionName,
+                  vpcId,
+                  z.subnetSignature,
+                );
+                const zoneRtRectIds =
+                  zoneRtRow && zoneRtRow.addresses.length > 0
+                    ? (() => {
+                        if (zoneRouteAnchorDebug.length < 64) {
+                          zoneRouteAnchorDebug.push({
+                            accountId,
+                            region: regionName,
+                            vpcId,
+                            subnetSignature: z.subnetSignature,
+                            tier: topologySubnetTierFromZone(z, subnetNameById),
+                            zoneContentBodyHPx,
+                            routeAnchorBodyHPx: vd.perZoneBodyH,
+                          });
+                        }
+                        return appendRouteTableBottomEdgeRectangles(
+                          skeleton,
+                          accountId,
+                          regionName,
+                          vpcId,
+                          zoneRtRow.addresses,
+                          zoneRtRow.routeChildrenByTable,
+                          zoneX,
+                          zoneY,
+                          zoneW,
+                          vd.perZoneBodyH,
+                          nodes,
+                          z.subnetSignature,
+                          0,
+                          routeTableRowCenterBandW,
+                        );
+                      })()
+                    : [];
 
-              for (const addr of candidateRtAddrs) {
-                const routes = vpcBottomRtChildrenByTable[addr] ?? [];
-                fanOutRtRectIds.push(
-                  ...appendRouteTableBottomEdgeRectangles(
+                const fanOutRtRectIds: string[] = [];
+                if (
+                  plan != null &&
+                  fanOutRtAddrs.size > 0 &&
+                  z.subnetIds.length > 0
+                ) {
+                  for (const addr of fanOutRtAddrs) {
+                    const snSet = subnetSetForRouteTableAddress(
+                      plan as never,
+                      addr,
+                      routeTableIndexes,
+                    );
+                    if (!snSet || !z.subnetIds.some((sid) => snSet.has(sid))) {
+                      continue;
+                    }
+                    const routes = vpcBottomRtChildrenByTable[addr] ?? [];
+                    fanOutRtRectIds.push(
+                      ...appendRouteTableBottomEdgeRectangles(
+                        skeleton,
+                        accountId,
+                        regionName,
+                        vpcId,
+                        [addr],
+                        { [addr]: [...routes] },
+                        zoneX,
+                        zoneY,
+                        zoneW,
+                        vd.perZoneBodyH,
+                        nodes,
+                        z.subnetSignature,
+                        0,
+                        routeTableRowCenterBandW,
+                        {
+                          placementIdSuffix: `__dup__${encodeURIComponent(
+                            z.subnetSignature,
+                          )}`,
+                          semanticRouteTableDuplicate: true,
+                        },
+                      ),
+                    );
+                  }
+                }
+
+                const zoneEpClusterIds =
+                  zoneVpcePartForZ.clusterAddrs.length > 0 && zoneVpceOptsForZ
+                    ? appendVpcEndpointPrimaryClusters(
+                        skeleton,
+                        satelliteLineSpecs,
+                        accountId,
+                        regionName,
+                        vpcId,
+                        zoneVpcePartForZ.clusterAddrs,
+                        zoneX,
+                        zoneY,
+                        zoneW,
+                        vd.perZoneBodyH,
+                        nodes,
+                        arnIndex,
+                        plan,
+                        vpceLayoutDuplicateRegistry,
+                        zoneVpceOptsForZ,
+                      )
+                    : [];
+                const zoneEpCompactIds =
+                  zoneVpcePartForZ.compactAddrs.length > 0 && zoneVpceOptsForZ
+                    ? appendVpcEndpointEgressRectangles(
+                        skeleton,
+                        accountId,
+                        regionName,
+                        vpcId,
+                        zoneVpcePartForZ.compactAddrs,
+                        zoneX,
+                        zoneY,
+                        zoneW,
+                        vd.perZoneBodyH,
+                        nodes,
+                        zoneVpceOptsForZ,
+                      )
+                    : [];
+
+                skeleton.push({
+                  type: "frame",
+                  id: zoneSkId,
+                  name: zoneDisplayName(z, subnetNameById),
+                  x: zoneX,
+                  y: zoneY,
+                  width: zoneW,
+                  height: vd.perZoneH,
+                  children: [
+                    ...natRectIds,
+                    ...rectIds,
+                    ...zoneRtRectIds,
+                    ...fanOutRtRectIds,
+                    ...zoneEpClusterIds,
+                    ...zoneEpCompactIds,
+                  ] as readonly string[],
+                  customData: frameCustomData(
+                    "subnetZone",
+                    accountId,
+                    regionName,
+                    vpcId,
+                    zoneSkId,
+                    { terraformSubnetIds: z.subnetIds },
+                  ),
+                });
+              }
+            }
+
+            const vpcBottomRtRectIds =
+              vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
+                ? appendRouteTableBottomEdgeRectangles(
                     skeleton,
                     accountId,
                     regionName,
                     vpcId,
-                    [addr],
-                    { [addr]: [...routes] },
-                    zoneX,
-                    zoneY,
-                    zoneW,
-                    vd.perZoneBodyH,
+                    vpcBottomRtRow.addresses,
+                    vpcBottomRtRow.routeChildrenByTable,
+                    vpcX,
+                    vpcY,
+                    vpcCellW,
+                    vpcCellBodyH,
                     nodes,
-                    z.subnetSignature,
-                    0,
-                    routeTableRowCenterBandW,
-                    {
-                      placementIdSuffix: `__dup__${encodeURIComponent(
-                        z.subnetSignature,
-                      )}`,
-                      semanticRouteTableDuplicate: true,
-                    },
-                  ),
-                );
-              }
-            }
+                    undefined,
+                    rtStackAboveVpcBottomPx,
+                  )
+                : [];
 
-            const zoneEpClusterIds =
-              zoneVpcePartForZ.clusterAddrs.length > 0 && zoneVpceOptsForZ
+            const vpcEpClusterIds =
+              clusterAddrs.length > 0
                 ? appendVpcEndpointPrimaryClusters(
                     skeleton,
                     satelliteLineSpecs,
                     accountId,
                     regionName,
                     vpcId,
-                    zoneVpcePartForZ.clusterAddrs,
-                    zoneX,
-                    zoneY,
-                    zoneW,
-                    vd.perZoneBodyH,
+                    clusterAddrs,
+                    vpcX,
+                    vpcY,
+                    vpcCellW,
+                    vpcCellBodyH,
                     nodes,
                     arnIndex,
                     plan,
                     vpceLayoutDuplicateRegistry,
-                    zoneVpceOptsForZ,
                   )
                 : [];
-            const zoneEpCompactIds =
-              zoneVpcePartForZ.compactAddrs.length > 0 && zoneVpceOptsForZ
+            const vpcEpCompactIds =
+              compactAddrs.length > 0
                 ? appendVpcEndpointEgressRectangles(
                     skeleton,
                     accountId,
                     regionName,
                     vpcId,
-                    zoneVpcePartForZ.compactAddrs,
-                    zoneX,
-                    zoneY,
-                    zoneW,
-                    vd.perZoneBodyH,
+                    compactAddrs,
+                    vpcX,
+                    vpcY,
+                    vpcCellW,
+                    vpcCellBodyH,
                     nodes,
-                    zoneVpceOptsForZ,
                   )
                 : [];
+            const vpcEpRectIds = [...vpcEpClusterIds, ...vpcEpCompactIds];
 
             skeleton.push({
               type: "frame",
-              id: zoneSkId,
-              name: zoneDisplayName(z, subnetNameById),
-              x: zoneX,
-              y: zoneY,
-              width: zoneW,
-              height: vd.perZoneH,
+              id: vpcSkId,
+              name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
+              x: vpcX,
+              y: vpcY,
+              width: vpcCellW,
+              height: vpcCellFrameH,
               children: [
-                ...natRectIds,
-                ...rectIds,
-                ...zoneRtRectIds,
-                ...fanOutRtRectIds,
-                ...zoneEpClusterIds,
-                ...zoneEpCompactIds,
+                ...vpcInfraIds,
+                ...vpcInternetEdgeIds,
+                ...zoneFrameIds,
+                ...vpcBottomRtRectIds,
+                ...vpcEpRectIds,
               ] as readonly string[],
               customData: frameCustomData(
-                "subnetZone",
+                "vpc",
                 accountId,
                 regionName,
                 vpcId,
-                zoneSkId,
-                { terraformSubnetIds: z.subnetIds },
+                vpcSkId,
               ),
             });
           }
+
+          regionChildIds.push(...vpcFrameIds);
+
+          const innerContentW = Math.max(hasReg ? regDims.w : 0, vpcGridW);
+          const innerContentH =
+            vpcGridH +
+            (hasReg && hasVpc ? REGIONAL_TO_VPC_GAP : 0) +
+            (hasReg ? regDims.h : 0);
+
+          const regionWidth =
+            innerContentW + 2 * INNER_PAD + FRAME_CONTENT_SLACK_X;
+          const regionHeight =
+            VPC_TOP_PAD + innerContentH + 2 * INNER_PAD + FRAME_CONTENT_SLACK_Y;
+
+          skeleton.push({
+            type: "frame",
+            id: regionSkId,
+            name: shortLabel("Region", regionName),
+            x: regionRowX,
+            y: regionRowY,
+            width: regionWidth,
+            height: regionHeight,
+            children: regionChildIds as readonly string[],
+            customData: frameCustomData(
+              "region",
+              accountId,
+              regionName,
+              null,
+              regionSkId,
+            ),
+          });
+
+          maxRegionRight = Math.max(
+            maxRegionRight,
+            regionRowX + regionWidth + INNER_PAD,
+          );
+          maxRegionBottom = Math.max(
+            maxRegionBottom,
+            regionRowY + regionHeight + INNER_PAD,
+          );
+          regionRowX += regionWidth + REGION_GAP;
         }
 
-        const vpcBottomRtRectIds =
-          vpcBottomRtRow && vpcBottomRtRow.addresses.length > 0
-            ? appendRouteTableBottomEdgeRectangles(
-                skeleton,
-                accountId,
-                regionName,
-                vpcId,
-                vpcBottomRtRow.addresses,
-                vpcBottomRtRow.routeChildrenByTable,
-                vpcX,
-                vpcY,
-                vpcCellW,
-                vpcCellBodyH,
-                nodes,
-                undefined,
-                rtStackAboveVpcBottomPx,
-              )
-            : [];
+        if (regionFrameIds.length === 0) {
+          continue;
+        }
 
-        const vpcEpClusterIds =
-          clusterAddrs.length > 0
-            ? appendVpcEndpointPrimaryClusters(
-                skeleton,
-                satelliteLineSpecs,
-                accountId,
-                regionName,
-                vpcId,
-                clusterAddrs,
-                vpcX,
-                vpcY,
-                vpcCellW,
-                vpcCellBodyH,
-                nodes,
-                arnIndex,
-                plan,
-                vpceLayoutDuplicateRegistry,
-              )
-            : [];
-        const vpcEpCompactIds =
-          compactAddrs.length > 0
-            ? appendVpcEndpointEgressRectangles(
-                skeleton,
-                accountId,
-                regionName,
-                vpcId,
-                compactAddrs,
-                vpcX,
-                vpcY,
-                vpcCellW,
-                vpcCellBodyH,
-                nodes,
-              )
-            : [];
-        const vpcEpRectIds = [...vpcEpClusterIds, ...vpcEpCompactIds];
+        const accountWidth = Math.max(
+          maxRegionRight - accountCursorX + INNER_PAD + FRAME_CONTENT_SLACK_X,
+          MIN_VPC_W + 2 * INNER_PAD,
+        );
+        const accountHeight = Math.max(
+          maxRegionBottom - accountCursorY + INNER_PAD + FRAME_CONTENT_SLACK_Y,
+          MIN_VPC_H + 2 * INNER_PAD,
+        );
 
         skeleton.push({
           type: "frame",
-          id: vpcSkId,
-          name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
-          x: vpcX,
-          y: vpcY,
-          width: vpcCellW,
-          height: vpcCellFrameH,
-          children: [
-            ...vpcInfraIds,
-            ...vpcInternetEdgeIds,
-            ...zoneFrameIds,
-            ...vpcBottomRtRectIds,
-            ...vpcEpRectIds,
-          ] as readonly string[],
+          id: accountSkId,
+          name: shortLabel("Account", accountId),
+          x: accountCursorX,
+          y: accountCursorY,
+          width: accountWidth,
+          height: accountHeight,
+          children: regionFrameIds as readonly string[],
           customData: frameCustomData(
-            "vpc",
+            "account",
             accountId,
-            regionName,
-            vpcId,
-            vpcSkId,
+            "",
+            null,
+            accountSkId,
           ),
         });
+
+        accountCursorX += accountWidth + ACCOUNT_GAP;
       }
-
-      regionChildIds.push(...vpcFrameIds);
-
-      const innerContentW = Math.max(hasReg ? regDims.w : 0, vpcGridW);
-      const innerContentH =
-        vpcGridH +
-        (hasReg && hasVpc ? REGIONAL_TO_VPC_GAP : 0) +
-        (hasReg ? regDims.h : 0);
-
-      const regionWidth = innerContentW + 2 * INNER_PAD + FRAME_CONTENT_SLACK_X;
-      const regionHeight =
-        VPC_TOP_PAD + innerContentH + 2 * INNER_PAD + FRAME_CONTENT_SLACK_Y;
-
-      skeleton.push({
-        type: "frame",
-        id: regionSkId,
-        name: shortLabel("Region", regionName),
-        x: regionRowX,
-        y: regionRowY,
-        width: regionWidth,
-        height: regionHeight,
-        children: regionChildIds as readonly string[],
-        customData: frameCustomData(
-          "region",
-          accountId,
-          regionName,
-          null,
-          regionSkId,
-        ),
-      });
-
-      maxRegionRight = Math.max(
-        maxRegionRight,
-        regionRowX + regionWidth + INNER_PAD,
-      );
-      maxRegionBottom = Math.max(
-        maxRegionBottom,
-        regionRowY + regionHeight + INNER_PAD,
-      );
-      regionRowX += regionWidth + REGION_GAP;
-    }
-
-    if (regionFrameIds.length === 0) {
-      continue;
-    }
-
-    const accountWidth = Math.max(
-      maxRegionRight - accountCursorX + INNER_PAD + FRAME_CONTENT_SLACK_X,
-      MIN_VPC_W + 2 * INNER_PAD,
-    );
-    const accountHeight = Math.max(
-      maxRegionBottom - accountCursorY + INNER_PAD + FRAME_CONTENT_SLACK_Y,
-      MIN_VPC_H + 2 * INNER_PAD,
-    );
-
-    skeleton.push({
-      type: "frame",
-      id: accountSkId,
-      name: shortLabel("Account", accountId),
-      x: accountCursorX,
-      y: accountCursorY,
-      width: accountWidth,
-      height: accountHeight,
-      children: regionFrameIds as readonly string[],
-      customData: frameCustomData("account", accountId, "", null, accountSkId),
     });
 
-    accountCursorX += accountWidth + ACCOUNT_GAP;
-  }
-
-  const wideVertexSet = new Set(
-    Object.keys(nodes).filter(
-      (k) => k !== TERRAFORM_MODULE_TREE_KEY && !k.startsWith("__"),
-    ),
-  );
-  const wideDirectedEdges = collectDirectedEdges(nodes, wideVertexSet);
-  const { networkingDependencyEdges: wideNetworkingDependencyEdges } =
-    partitionDirectedEdgesByNetworking(nodes, wideDirectedEdges);
-  const wideNetDepPairKeys = new Set(
-    wideNetworkingDependencyEdges.map((e) =>
-      [e.source, e.target].sort().join("|||"),
-    ),
-  );
-  const allNetworkingRecordEdges = collectNetworkingEdges(
-    nodes as Record<
-      string,
-      { edges_data_flow?: unknown; edges_networking?: unknown }
-    >,
-  );
-  const wideNetworkingRecordEdges = allNetworkingRecordEdges.filter((r) => {
-    const s = resolveTerraformPlanVertexId(nodes, r.source);
-    const t = resolveTerraformPlanVertexId(nodes, r.target);
-    if (!s || !t) {
-      return false;
-    }
-    return !wideNetDepPairKeys.has([s, t].sort().join("|||"));
-  });
-  const networkingStructuralPairKeys = new Set<string>([
-    ...wideNetworkingDependencyEdges.map((e) =>
-      [e.source, e.target].sort().join("|||"),
-    ),
-    ...wideNetworkingRecordEdges.map((r) => {
-      const s = resolveTerraformPlanVertexId(nodes, r.source)!;
-      const t = resolveTerraformPlanVertexId(nodes, r.target)!;
-      return [s, t].sort().join("|||");
-    }),
-  ]);
-
-  const dataFlowEdgeRecords = collectDataFlowEdges(
-    nodes as Record<string, { edges_data_flow?: unknown }>,
-  );
-  const declaredDataFlowEdgeRecords = collectDeclaredDataFlowEdges(nodes);
-  const dataFlowUndirectedPairKeys = new Set(
-    dataFlowEdgeRecords.map((e) => [e.source, e.target].sort().join("|||")),
-  );
-  const filteredSatelliteLineSpecs = satelliteLineSpecs.filter((s) => {
-    const satKey = [
-      resolveTerraformPlanVertexId(nodes, s.edge.source) ?? s.edge.source,
-      resolveTerraformPlanVertexId(nodes, s.edge.target) ?? s.edge.target,
-    ]
-      .sort()
-      .join("|||");
-    return (
-      !dataFlowUndirectedPairKeys.has(satKey) &&
-      !networkingStructuralPairKeys.has(satKey)
+    const wideVertexSet = new Set(
+      Object.keys(nodes).filter(
+        (k) => k !== TERRAFORM_MODULE_TREE_KEY && !k.startsWith("__"),
+      ),
     );
-  });
-
-  skeleton.unshift(
-    ...buildTopologySatelliteLineSkeletons(filteredSatelliteLineSpecs),
-  );
-
-  const { placedVertexSet, layoutBoxes: topologyLayoutBoxes } =
-    collectTopologyRectangleLayoutFromSkeleton(skeleton);
-  let topologyDirectedEdges = collectDirectedEdges(nodes, placedVertexSet);
-  topologyDirectedEdges = remapDirectedEdgesForVpceLayoutInstances(
-    topologyDirectedEdges,
-    vpceLayoutDuplicateRegistry,
-    nodes,
-    placedVertexSet,
-  );
-  const { dependencyEdges, networkingDependencyEdges } =
-    partitionDirectedEdgesByNetworking(nodes, topologyDirectedEdges);
-  const structuralUndirectedPairs = new Set(
-    [...dependencyEdges, ...networkingDependencyEdges].map((e) =>
-      [e.source, e.target].sort().join("|||"),
-    ),
-  );
-  const netDepPairKeys = new Set(
-    networkingDependencyEdges.map((e) =>
-      [e.source, e.target].sort().join("|||"),
-    ),
-  );
-  const networkingRecordEdgesFiltered = allNetworkingRecordEdges.filter((r) => {
-    const s = resolveTerraformPlanVertexId(nodes, r.source);
-    const t = resolveTerraformPlanVertexId(nodes, r.target);
-    if (!s || !t || !placedVertexSet.has(s) || !placedVertexSet.has(t)) {
-      return false;
-    }
-    return !netDepPairKeys.has([s, t].sort().join("|||"));
-  });
-  skeleton.push(
-    ...buildTerraformDependencyLineSkeletons(
-      nodes,
-      topologyLayoutBoxes,
-      dependencyEdges,
-      { terraformSemanticOverview: true },
-    ),
-  );
-  skeleton.push(
-    ...buildTerraformNetworkingDependencyLineSkeletons(
-      nodes,
-      topologyLayoutBoxes,
-      networkingDependencyEdges,
-      { terraformSemanticOverview: true },
-    ),
-  );
-  skeleton.push(
-    ...buildTerraformNetworkingRecordLineSkeletons(
-      nodes,
-      topologyLayoutBoxes,
-      networkingRecordEdgesFiltered,
-      structuralUndirectedPairs,
-      { terraformSemanticOverview: true },
-    ),
-  );
-  skeleton.push(
-    ...buildTerraformDataFlowLineSkeletons(
-      nodes,
-      topologyLayoutBoxes,
-      dataFlowEdgeRecords,
-      structuralUndirectedPairs,
-      { terraformSemanticOverview: true },
-    ),
-  );
-  skeleton.push(
-    ...buildTerraformDeclaredDataFlowLineSkeletons(
-      nodes,
-      topologyLayoutBoxes,
-      declaredDataFlowEdgeRecords,
-      structuralUndirectedPairs,
-      { terraformSemanticOverview: true },
-    ),
-  );
-
-  let elements = convertToExcalidrawElements(skeleton, {
-    regenerateIds: true,
-  }) as ExcalidrawElement[];
-
-  elements = applyTerraformResourceRectangleSoftDelete(elements, {
-    semanticAllVisible: true,
-  });
-  elements = mirrorAndDetachTerraformResourceLabels(elements);
-  if (!deferDecorations) {
-    elements = await injectTerraformAwsIconsIntoElements(elements);
-  }
-  elements = reconcileTerraformVisibility(
-    repairTerraformEdgeBindings(elements),
-    {
-      pins: TERRAFORM_IMPORT_EDGE_LAYER_PINS,
-      hoverPeekKey: null,
-    },
-  );
-  elements = reorderTopologyElementsZStack(elements);
-
-  normalizeTopologyOrigin(elements);
-
-  let layoutGlyphFiles: BinaryFiles | undefined;
-  if (!deferDecorations) {
-    const glyphInjected = await injectTerraformLayoutDuplicateInfoGlyphs(
-      elements,
+    const wideDirectedEdges = collectDirectedEdges(nodes, wideVertexSet);
+    const { networkingDependencyEdges: wideNetworkingDependencyEdges } =
+      partitionDirectedEdgesByNetworking(nodes, wideDirectedEdges);
+    const wideNetDepPairKeys = new Set(
+      wideNetworkingDependencyEdges.map((e) =>
+        [e.source, e.target].sort().join("|||"),
+      ),
     );
-    elements = glyphInjected.elements;
-    layoutGlyphFiles =
-      Object.keys(glyphInjected.files).length > 0
-        ? glyphInjected.files
-        : undefined;
-  }
+    const allNetworkingRecordEdges = collectNetworkingEdges(
+      nodes as Record<
+        string,
+        { edges_data_flow?: unknown; edges_networking?: unknown }
+      >,
+    );
+    const wideNetworkingRecordEdges = allNetworkingRecordEdges.filter((r) => {
+      const s = resolveTerraformPlanVertexId(nodes, r.source);
+      const t = resolveTerraformPlanVertexId(nodes, r.target);
+      if (!s || !t) {
+        return false;
+      }
+      return !wideNetDepPairKeys.has([s, t].sort().join("|||"));
+    });
+    const networkingStructuralPairKeys = new Set<string>([
+      ...wideNetworkingDependencyEdges.map((e) =>
+        [e.source, e.target].sort().join("|||"),
+      ),
+      ...wideNetworkingRecordEdges.map((r) => {
+        const s = resolveTerraformPlanVertexId(nodes, r.source)!;
+        const t = resolveTerraformPlanVertexId(nodes, r.target)!;
+        return [s, t].sort().join("|||");
+      }),
+    ]);
 
-  const result: {
-    elements: ExcalidrawElement[];
-    meta: TerraformTopologySceneMeta;
-    files?: BinaryFiles;
-  } = {
-    elements,
-    ...(layoutGlyphFiles ? { files: layoutGlyphFiles } : {}),
-    meta: {
-      layoutEngine: "topology",
-      accountCount: counts.accounts,
-      regionCount: counts.regions,
-      vpcCount: counts.vpcs,
-      subnetCount: counts.subnets,
-      primaryResourceCount,
-      regionalPrimaryCount,
-      vpcEndpointCount,
-      routeTableCount,
-      dependencyEdgeCount: topologyDirectedEdges.length,
-      ...(deferDecorations ? { deferredDecorations: true } : {}),
-      ...(zoneRouteAnchorDebug.length > 0 ? { zoneRouteAnchorDebug } : {}),
-    },
-  };
-  topologyResourcePanelPlan = undefined;
-  return result;
+    const dataFlowEdgeRecords = collectDataFlowEdges(
+      nodes as Record<string, { edges_data_flow?: unknown }>,
+    );
+    const declaredDataFlowEdgeRecords = collectDeclaredDataFlowEdges(nodes);
+    const dataFlowUndirectedPairKeys = new Set(
+      dataFlowEdgeRecords.map((e) => [e.source, e.target].sort().join("|||")),
+    );
+    const filteredSatelliteLineSpecs = satelliteLineSpecs.filter((s) => {
+      const satKey = [
+        resolveTerraformPlanVertexId(nodes, s.edge.source) ?? s.edge.source,
+        resolveTerraformPlanVertexId(nodes, s.edge.target) ?? s.edge.target,
+      ]
+        .sort()
+        .join("|||");
+      return (
+        !dataFlowUndirectedPairKeys.has(satKey) &&
+        !networkingStructuralPairKeys.has(satKey)
+      );
+    });
+
+    skeleton.unshift(
+      ...buildTopologySatelliteLineSkeletons(filteredSatelliteLineSpecs),
+    );
+
+    const { placedVertexSet, layoutBoxes: topologyLayoutBoxes } =
+      collectTopologyRectangleLayoutFromSkeleton(skeleton);
+    let topologyDirectedEdges = collectDirectedEdges(nodes, placedVertexSet);
+    topologyDirectedEdges = remapDirectedEdgesForVpceLayoutInstances(
+      topologyDirectedEdges,
+      vpceLayoutDuplicateRegistry,
+      nodes,
+      placedVertexSet,
+    );
+    const { dependencyEdges, networkingDependencyEdges } =
+      partitionDirectedEdgesByNetworking(nodes, topologyDirectedEdges);
+    const structuralUndirectedPairs = new Set(
+      [...dependencyEdges, ...networkingDependencyEdges].map((e) =>
+        [e.source, e.target].sort().join("|||"),
+      ),
+    );
+    const netDepPairKeys = new Set(
+      networkingDependencyEdges.map((e) =>
+        [e.source, e.target].sort().join("|||"),
+      ),
+    );
+    const networkingRecordEdgesFiltered = allNetworkingRecordEdges.filter(
+      (r) => {
+        const s = resolveTerraformPlanVertexId(nodes, r.source);
+        const t = resolveTerraformPlanVertexId(nodes, r.target);
+        if (!s || !t || !placedVertexSet.has(s) || !placedVertexSet.has(t)) {
+          return false;
+        }
+        return !netDepPairKeys.has([s, t].sort().join("|||"));
+      },
+    );
+    skeleton.push(
+      ...buildTerraformDependencyLineSkeletons(
+        nodes,
+        topologyLayoutBoxes,
+        dependencyEdges,
+        { terraformSemanticOverview: true },
+      ),
+    );
+    skeleton.push(
+      ...buildTerraformNetworkingDependencyLineSkeletons(
+        nodes,
+        topologyLayoutBoxes,
+        networkingDependencyEdges,
+        { terraformSemanticOverview: true },
+      ),
+    );
+    skeleton.push(
+      ...buildTerraformNetworkingRecordLineSkeletons(
+        nodes,
+        topologyLayoutBoxes,
+        networkingRecordEdgesFiltered,
+        structuralUndirectedPairs,
+        { terraformSemanticOverview: true },
+      ),
+    );
+    skeleton.push(
+      ...buildTerraformDataFlowLineSkeletons(
+        nodes,
+        topologyLayoutBoxes,
+        dataFlowEdgeRecords,
+        structuralUndirectedPairs,
+        { terraformSemanticOverview: true },
+      ),
+    );
+    skeleton.push(
+      ...buildTerraformDeclaredDataFlowLineSkeletons(
+        nodes,
+        topologyLayoutBoxes,
+        declaredDataFlowEdgeRecords,
+        structuralUndirectedPairs,
+        { terraformSemanticOverview: true },
+      ),
+    );
+
+    const result = await terraformImportProfilerMeasure(
+      "layout.topology.materialize",
+      () =>
+        materializeTopologyScene({
+          skeleton,
+          counts,
+          primaryResourceCount,
+          regionalPrimaryCount,
+          vpcEndpointCount,
+          routeTableCount,
+          topologyDirectedEdges,
+          zoneRouteAnchorDebug,
+          deferDecorations,
+        }),
+    );
+    topologyResourcePanelPlan = undefined;
+    return result;
   } finally {
     activeTopologyMemoCtx = null;
   }

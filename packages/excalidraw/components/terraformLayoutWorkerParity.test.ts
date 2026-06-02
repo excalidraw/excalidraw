@@ -61,7 +61,10 @@ describe("terraform layout worker parity", () => {
     {
       name: "pipeline",
       sources: () => stagingMultiStatePipelineLayoutSources(),
-      coreOptions: { semanticLayout: false as const, layoutMode: "pipeline" as const },
+      coreOptions: {
+        semanticLayout: false as const,
+        layoutMode: "pipeline" as const,
+      },
       workerOptions: {
         semanticLayout: false as const,
         layoutMode: "pipeline" as const,
@@ -84,7 +87,10 @@ describe("terraform layout worker parity", () => {
         const coreSnap = snapshotFromLayoutResult(
           await layoutTerraformFromSources(sources, view.coreOptions),
         );
-        const workerSnap = await snapshotViaWorkers(sources, view.workerOptions);
+        const workerSnap = await snapshotViaWorkers(
+          sources,
+          view.workerOptions,
+        );
         expect(workerSnap).toEqual(coreSnap);
       },
       STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,

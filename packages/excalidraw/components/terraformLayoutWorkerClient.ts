@@ -9,7 +9,6 @@ import {
   type TerraformLayoutOptions,
   type TerraformPlanParsingSources,
 } from "./terraformLayoutCore";
-import { layoutModuleViewParallel } from "./terraformLayoutModuleParallel";
 import { layoutSemanticViewParallel } from "./terraformLayoutSemanticParallel";
 
 import type { TerraformExcalidrawScenePayload } from "./terraformSceneApply";
@@ -73,27 +72,12 @@ async function runPoolJob(
 async function runJobOnMainThread(
   job: TerraformLayoutWorkerJob,
 ): Promise<TerraformLayoutWorkerJobResult> {
-  const { runModuleStackLayoutJob } = await import(
-    "./terraformLayoutModuleParallel"
-  );
   const { runSemanticAwsLayoutJob, runSemanticProviderLayoutJob } =
     await import("./terraformLayoutSemanticParallel");
 
   switch (job.type) {
-    case "moduleStack":
-      return runModuleStackLayoutJob(
-        job.stackId,
-        job.plan,
-        job.dotText,
-        job.moduleLayoutOptions,
-      );
     case "semanticAws":
       return runSemanticAwsLayoutJob(job.prep);
-    case "semanticAwsShard":
-      return runSemanticAwsLayoutJob(job.prep, {
-        type: "semanticAwsShard",
-        shardId: job.shardId,
-      });
     case "semanticProvider":
       return runSemanticProviderLayoutJob(
         job.family,
@@ -147,8 +131,6 @@ export async function layoutTerraformViaWorkers(
     (options.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
   const pipelineLayout = layoutMode === "pipeline";
-  const multiStackModule =
-    !semanticLayout && !pipelineLayout && sources.planDotBundles.length > 1;
 
   const runSequential = async () => {
     const result = await layoutTerraformFromSources(sources, options);
@@ -175,27 +157,6 @@ export async function layoutTerraformViaWorkers(
 
     if (pipelineLayout) {
       return runSequential();
-    }
-
-    if (multiStackModule) {
-      const result = await layoutModuleViewParallel(
-        sources,
-        options.moduleLayoutOptions,
-        async (stackId, plan, dotText) => {
-          const job: TerraformLayoutWorkerJob = {
-            type: "moduleStack",
-            stackId,
-            plan,
-            dotText,
-            moduleLayoutOptions: options.moduleLayoutOptions,
-          };
-          return runJob(job) as Promise<
-            Extract<TerraformLayoutWorkerJobResult, { type: "moduleStack" }>
-          >;
-        },
-        onProgress,
-      );
-      return toScenePayload(result);
     }
 
     return runSequential();

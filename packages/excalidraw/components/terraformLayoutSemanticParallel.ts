@@ -52,6 +52,11 @@ import {
 } from "./terraformPlanParsing";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 
+import {
+  terraformImportProfilerMeasure,
+  terraformImportProfilerMeasureAsync,
+} from "./terraformImportProfiler";
+
 import type { LayoutTerraformResult } from "./terraformLayoutCore";
 import type {
   SemanticAwsLayoutPrep,
@@ -61,13 +66,6 @@ import type {
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { TerraformLayoutOptions } from "./terraformLayoutCore";
 import type { TerraformProviderFamily } from "./terraformProviderClassification";
-import {
-  shouldUseStagingExpandedFastPath,
-} from "./terraformImportFastPath";
-import {
-  terraformImportProfilerMeasure,
-  terraformImportProfilerMeasureAsync,
-} from "./terraformImportProfiler";
 
 export function prepareSemanticAwsLayoutPrep(
   sources: TerraformPlanParsingSources,
@@ -289,10 +287,6 @@ export function prepareSemanticAwsLayoutPrep(
     natZonePlacements,
     interfaceVpcEndpointZonePlacements,
     deferDecorations: options?.deferDecorations === true,
-    skipZoneRouteAnchorDebug: shouldUseStagingExpandedFastPath(
-      options,
-      sources,
-    ),
   };
 
   return {
@@ -307,121 +301,9 @@ export function prepareSemanticAwsLayoutPrep(
   };
 }
 
-type SemanticAwsShard = {
-  shardId: string;
-  prep: SemanticAwsLayoutPrep;
-};
-
-const semanticShardingEnabled =
-  import.meta.env.VITE_TERRAFORM_SEMANTIC_SHARDING === "1";
-
-function buildSemanticAwsRegionShards(
-  prep: SemanticAwsLayoutPrep,
-): SemanticAwsShard[] {
-  if (!semanticShardingEnabled) {
-    return [{ shardId: "all", prep }];
-  }
-  const p = prep as {
-    topoModel: { accounts?: Map<string, { regions?: Map<string, unknown> }> };
-    zones: Array<{ accountId?: string; region?: string }>;
-    regionalBuckets: Array<{ accountId?: string; region?: string }>;
-    vpcEndpointBuckets: Array<{ accountId?: string; region?: string }>;
-    vpcDefaultPlumbingBuckets: Array<{ accountId?: string; region?: string }>;
-    vpcFlowLogBuckets: Array<{ accountId?: string; region?: string }>;
-    endpointSecurityGroupBuckets: Array<{ accountId?: string; region?: string }>;
-    routeTableBottomPlacements: {
-      zoneBottom?: Array<{ accountId?: string; region?: string }>;
-      vpcBottom?: Array<{ accountId?: string; region?: string }>;
-    };
-    natZonePlacements: {
-      byZone?: Map<{ accountId?: string; region?: string }, unknown>;
-      consumedAddresses?: Set<string>;
-    };
-    interfaceVpcEndpointZonePlacements: Map<
-      { accountId?: string; region?: string },
-      unknown
-    >;
-  };
-
-  const allShards: SemanticAwsShard[] = [];
-  const accounts = p.topoModel.accounts;
-  if (!(accounts instanceof Map) || accounts.size === 0) {
-    return [{ shardId: "all", prep }];
-  }
-  for (const [accountId, account] of accounts.entries()) {
-    const regions = (account as { regions?: Map<string, unknown> }).regions;
-    if (!(regions instanceof Map)) {
-      continue;
-    }
-    for (const [regionName, regionData] of regions.entries()) {
-      const shardId = `${accountId}/${regionName}`;
-      const shardTopoModel = { accounts: new Map() as Map<string, unknown> };
-      shardTopoModel.accounts.set(accountId, {
-        ...account,
-        regions: new Map([[regionName, regionData]]),
-      });
-
-      const shardPrep = {
-        ...prep,
-        topoModel: shardTopoModel,
-        zones: p.zones.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        regionalBuckets: p.regionalBuckets.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        vpcEndpointBuckets: p.vpcEndpointBuckets.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        vpcDefaultPlumbingBuckets: p.vpcDefaultPlumbingBuckets.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        vpcFlowLogBuckets: p.vpcFlowLogBuckets.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        endpointSecurityGroupBuckets: p.endpointSecurityGroupBuckets.filter(
-          (z) => z.accountId === accountId && z.region === regionName,
-        ),
-        routeTableBottomPlacements: {
-          zoneBottom: (p.routeTableBottomPlacements.zoneBottom ?? []).filter(
-            (z) => z.accountId === accountId && z.region === regionName,
-          ),
-          vpcBottom: (p.routeTableBottomPlacements.vpcBottom ?? []).filter(
-            (z) => z.accountId === accountId && z.region === regionName,
-          ),
-        },
-        natZonePlacements: {
-          byZone: new Map(
-            [...(p.natZonePlacements.byZone ?? new Map()).entries()].filter(
-              ([zone]) =>
-                zone.accountId === accountId && zone.region === regionName,
-            ),
-          ),
-          consumedAddresses: p.natZonePlacements.consumedAddresses ?? new Set(),
-        },
-        interfaceVpcEndpointZonePlacements: new Map(
-          [...(p.interfaceVpcEndpointZonePlacements ?? new Map()).entries()].filter(
-            ([zone]) =>
-              zone.accountId === accountId && zone.region === regionName,
-          ),
-        ),
-      } as SemanticAwsLayoutPrep;
-      allShards.push({ shardId, prep: shardPrep });
-    }
-  }
-  if (allShards.length <= 1) {
-    return [{ shardId: "all", prep }];
-  }
-  return allShards.sort((a, b) => a.shardId.localeCompare(b.shardId));
-}
-
 export async function runSemanticAwsLayoutJob(
   prep: SemanticAwsLayoutPrep,
-  output?: { type: "semanticAws" | "semanticAwsShard"; shardId?: string },
-): Promise<
-  | Extract<TerraformLayoutWorkerJobResult, { type: "semanticAws" }>
-  | Extract<TerraformLayoutWorkerJobResult, { type: "semanticAwsShard" }>
-> {
+): Promise<Extract<TerraformLayoutWorkerJobResult, { type: "semanticAws" }>> {
   const p = prep as {
     topoModel: Parameters<typeof buildTerraformTopologyExcalidrawScene>[0];
     zones: Parameters<typeof buildTerraformTopologyExcalidrawScene>[1];
@@ -454,9 +336,6 @@ export async function runSemanticAwsLayoutJob(
     deferDecorations?: Parameters<
       typeof buildTerraformTopologyExcalidrawScene
     >[12];
-    skipZoneRouteAnchorDebug?: Parameters<
-      typeof buildTerraformTopologyExcalidrawScene
-    >[13];
   };
   const topoScene = await buildTerraformTopologyExcalidrawScene(
     p.topoModel,
@@ -472,17 +351,13 @@ export async function runSemanticAwsLayoutJob(
     p.natZonePlacements,
     p.interfaceVpcEndpointZonePlacements,
     p.deferDecorations,
-    p.skipZoneRouteAnchorDebug,
   );
   return {
-    type: output?.type ?? "semanticAws",
-    ...(output?.shardId ? { shardId: output.shardId } : {}),
+    type: "semanticAws",
     elements: topoScene.elements,
     meta: topoScene.meta as Record<string, unknown>,
     files: topoScene.files as Record<string, unknown> | undefined,
-  } as
-    | Extract<TerraformLayoutWorkerJobResult, { type: "semanticAws" }>
-    | Extract<TerraformLayoutWorkerJobResult, { type: "semanticAwsShard" }>;
+  };
 }
 
 export async function runSemanticProviderLayoutJob(
@@ -548,21 +423,13 @@ export async function layoutSemanticViewParallel(
       typeof partitionResourceChangesByProviderFamily
     >,
   );
-  const useStagingFastPath = shouldUseStagingExpandedFastPath(options, sources);
-  const awsShards = prepared.prep
-    ? buildSemanticAwsRegionShards(prepared.prep)
-    : [];
-  const jobCount =
-    awsShards.length + (useStagingFastPath ? 0 : nonAws.length);
+  const jobCount = (prepared.prep ? 1 : 0) + nonAws.length;
   let done = 0;
 
   const providerBlocks: ProviderTopologyBlock[] = [];
   let topoMeta: Record<string, unknown> = {
     layoutEngine: "topology",
-    layoutParallel: useStagingFastPath
-      ? "semantic-staging-fastpath"
-      : "semantic-providers",
-    ...(useStagingFastPath ? { stagingFastPath: true } : {}),
+    layoutParallel: "semantic-providers",
   };
   let layoutFiles: Record<string, unknown> | undefined;
 
@@ -572,19 +439,16 @@ export async function layoutSemanticViewParallel(
   };
 
   const jobs: Promise<TerraformLayoutWorkerJobResult>[] = [];
-  if (awsShards.length > 0) {
+  if (prepared.prep) {
     jobs.push(
-      ...awsShards.map(({ shardId, prep }) =>
-        runJob({ type: "semanticAwsShard", shardId, prep }).then((r) => {
-          reportProgress(`AWS ${shardId}`);
-          return r;
-        }),
-      ),
+      runJob({ type: "semanticAws", prep: prepared.prep }).then((r) => {
+        reportProgress("AWS");
+        return r;
+      }),
     );
   }
-  if (!useStagingFastPath) {
-    jobs.push(
-      ...nonAws.map((family) => {
+  jobs.push(
+    ...nonAws.map((family) => {
       const changes = (
         prepared.providerBuckets as ReturnType<
           typeof partitionResourceChangesByProviderFamily
@@ -602,18 +466,14 @@ export async function layoutSemanticViewParallel(
         return r;
       });
     }),
-    );
-  }
+  );
 
   const results = await terraformImportProfilerMeasureAsync(
     "layout.semantic.workers",
     () => Promise.all(jobs),
   );
   for (const result of results) {
-    if (
-      (result.type === "semanticAws" || result.type === "semanticAwsShard") &&
-      result.elements.length > 0
-    ) {
+    if (result.type === "semanticAws" && result.elements.length > 0) {
       providerBlocks.push({
         family: "aws",
         label: "AWS",

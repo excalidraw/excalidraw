@@ -154,52 +154,11 @@ export const runTerraformImportFromSources = async (
   const sourceFingerprint = terraformImportPrepFingerprint(sources);
   const importedTfdTexts = options.importedTfdTexts ?? [];
   const enableDeclaredDataFlow = importedTfdTexts.some((t) => t.trim());
-  const activeSession = getTerraformImportSession();
-  const cachedSnapshot =
-    activeSession?.sourceFingerprint === sourceFingerprint
-      ? activeSession.snapshotsByLayoutMode?.[layoutMode]
-      : undefined;
-
-  if (cachedSnapshot) {
-    applyTerraformExcalidrawScene(
-      app,
-      setAppState,
-      { elements: cloneTerraformElementsForSnapshot(cachedSnapshot.elements) },
-      {
-        enableDeclaredDataFlow: cachedSnapshot.enableDeclaredDataFlow,
-        terraformEdgeLayerPins: cachedSnapshot.terraformEdgeLayerPins,
-        scrollToContent: options.scrollToContent,
-      },
-    );
-
-    if (options.updateSession !== false && activeSession) {
-      const snapshotsByLayoutMode = {
-        ...(activeSession.snapshotsByLayoutMode ?? {}),
-        [layoutMode]: cachedSnapshot,
-      };
-      setTerraformImportSession({
-        ...activeSession,
-        sourceFingerprint,
-        semanticLayout: options.semanticLayout,
-        ...(options.layoutMode ? { layoutMode } : {}),
-        moduleLayoutOptions,
-        preset: options.preset ?? activeSession.preset,
-        importedTfdTexts,
-        snapshot: cachedSnapshot,
-        snapshotsByLayoutMode,
-      });
-    }
-    return { importWarnings: undefined };
-  }
-
   const scene = await layoutTerraformViaWorkers(
     sources,
     {
       semanticLayout: options.semanticLayout,
       ...(options.layoutMode ? { layoutMode } : {}),
-      ...(import.meta.env.VITE_TERRAFORM_PROGRESSIVE_DECORATION === "1"
-        ? { deferDecorations: true as const }
-        : {}),
       moduleLayoutOptions:
         layoutMode === "module" ? moduleLayoutOptions : undefined,
     },
@@ -225,12 +184,6 @@ export const runTerraformImportFromSources = async (
       terraformEdgeLayerPins,
       enableDeclaredDataFlow,
     };
-    const snapshotsByLayoutMode = {
-      ...(activeSession?.sourceFingerprint === sourceFingerprint
-        ? activeSession.snapshotsByLayoutMode
-        : {}),
-      [layoutMode]: nextSnapshot,
-    };
     setTerraformImportSession({
       sources,
       sourceFingerprint,
@@ -240,7 +193,6 @@ export const runTerraformImportFromSources = async (
       preset: options.preset ?? null,
       importedTfdTexts,
       snapshot: nextSnapshot,
-      snapshotsByLayoutMode,
     });
   }
 

@@ -4,5 +4,5 @@
     "outDir": "./dist/types"
   },
   "include": ["**/*"],
-  "exclude": ["**/*.test.*", "tests", "test-fixtures", "types", "examples", "dist"]
+  "exclude": ["**/*.test.*", "tests", "test-fixtures", "components/terraformLayoutSnapshotFixtures.ts", "types", "examples", "dist"]
 }

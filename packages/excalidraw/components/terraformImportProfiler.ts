@@ -14,16 +14,25 @@ type StackEntry = { name: string; start: number };
 
 let enabled: boolean | null = null;
 const stack: StackEntry[] = [];
-const totals = new Map<string, { ms: number; selfMs: number; callCount: number }>();
+const totals = new Map<
+  string,
+  { ms: number; selfMs: number; callCount: number }
+>();
 
 function isProfilerEnabled(): boolean {
   if (enabled !== null) {
     return enabled;
   }
-  if (typeof process !== "undefined" && process.env.VITEST_TERRAFORM_PROFILE === "1") {
+  if (
+    typeof process !== "undefined" &&
+    process.env.VITEST_TERRAFORM_PROFILE === "1"
+  ) {
     return true;
   }
-  if (import.meta.env.DEV && import.meta.env.VITE_TERRAFORM_IMPORT_PROFILE === "1") {
+  if (
+    import.meta.env.DEV &&
+    import.meta.env.VITE_TERRAFORM_IMPORT_PROFILE === "1"
+  ) {
     return true;
   }
   if (
@@ -59,7 +68,10 @@ export function terraformImportProfilerMark(_name: string): void {
   // Reserved for future instant events; spans use measure/measureAsync.
 }
 
-export function terraformImportProfilerMeasure<T>(name: string, fn: () => T): T {
+export function terraformImportProfilerMeasure<T>(
+  name: string,
+  fn: () => T,
+): T {
   if (!isProfilerEnabled()) {
     return fn();
   }
@@ -122,7 +134,9 @@ export function terraformImportProfilerReset(): void {
   totals.clear();
 }
 
-export function terraformImportProfilerLogSummary(prefix = "[terraform:profile]"): void {
+export function terraformImportProfilerLogSummary(
+  prefix = "[terraform:profile]",
+): void {
   if (!isProfilerEnabled()) {
     return;
   }
