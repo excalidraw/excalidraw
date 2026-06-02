@@ -864,11 +864,22 @@ export const convertToShape = (
     }
     case "arrow": {
       const [arrowMinX, arrowMinY] = recognizedShape.boundingBox;
-      const endPoint = getArrowEndpoint(
-        recognizedShape.points,
-        recognizedShape.boundingBox,
-        recognizedShape.points[0],
-      );
+      let endPoint: LocalPoint;
+      if (previousElement && previousElement.type === "line") {
+        const prevEndLocal = previousElement.points[1];
+        const globalEndX = prevEndLocal[0] + previousElement.x;
+        const globalEndY = prevEndLocal[1] + previousElement.y;
+        endPoint = [
+          globalEndX - arrowMinX,
+          globalEndY - arrowMinY,
+        ] as LocalPoint;
+      } else {
+        endPoint = getArrowEndpoint(
+          recognizedShape.points,
+          recognizedShape.boundingBox,
+          recognizedShape.points[0],
+        );
+      }
       const arrowLen = Math.hypot(
         endPoint[0] - recognizedShape.points[0][0],
         endPoint[1] - recognizedShape.points[0][1],
