@@ -843,7 +843,7 @@ class App extends React.Component<AppProps, AppState> {
         clear: this.resetHistory,
       },
       scrollToContent: this.scrollToContent,
-      fadeElement: this.fadeElement,
+      fadeElements: this.fadeElements,
       cancelFadeElement: this.cancelFadeElement,
       clearElementOpacityOverrides: this.clearElementOpacityOverrides,
       getSceneElements: this.getSceneElements,
@@ -4714,7 +4714,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  public fadeElement = ({
+  private fadeElement = ({
     id,
     from,
     to = 100,
@@ -4761,6 +4761,35 @@ class App extends React.Component<AppProps, AppState> {
 
     this.bumpRenderOpacityVersion();
     this.syncFadeElementAnimations();
+  };
+
+  public fadeElements = ({
+    elements,
+    from,
+    to = 100,
+    duration = 250,
+    delay = 0,
+    stagger = 0,
+  }: {
+    elements: readonly (ExcalidrawElement | ExcalidrawElement["id"])[];
+    from?: number;
+    to?: number;
+    duration?: number;
+    delay?: number;
+    stagger?: number;
+  }) => {
+    const normalizedDelay = Math.max(delay, 0);
+    const normalizedStagger = Math.max(stagger, 0);
+
+    elements.forEach((element, index) => {
+      this.fadeElement({
+        id: typeof element === "string" ? element : element.id,
+        from,
+        to,
+        duration,
+        delay: normalizedDelay + index * normalizedStagger,
+      });
+    });
   };
 
   public cancelFadeElement = (id: string) => {

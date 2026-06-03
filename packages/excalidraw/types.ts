@@ -967,7 +967,7 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
-  fadeElement: InstanceType<typeof App>["fadeElement"];
+  fadeElements: InstanceType<typeof App>["fadeElements"];
   cancelFadeElement: InstanceType<typeof App>["cancelFadeElement"];
   clearElementOpacityOverrides: InstanceType<
     typeof App

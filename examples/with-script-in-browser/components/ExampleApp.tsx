@@ -683,7 +683,9 @@ export default function ExampleApp({
                   }
 
                   setFadeDemoElementIds(
-                    excalidrawAPI.getSceneElements().map((element) => element.id),
+                    excalidrawAPI
+                      .getSceneElements()
+                      .map((element) => element.id),
                   );
                   excalidrawAPI.clearElementOpacityOverrides();
                   setHideAllForFadeDemo(true);
@@ -700,7 +702,9 @@ export default function ExampleApp({
 
                   const elements = excalidrawAPI
                     .getSceneElements()
-                    .filter((element) => fadeDemoElementIds.includes(element.id));
+                    .filter((element) =>
+                      fadeDemoElementIds.includes(element.id),
+                    );
 
                   if (!elements.length) {
                     return;
@@ -715,8 +719,8 @@ export default function ExampleApp({
                     excalidrawAPI.clearElementOpacityOverrides();
                   }
 
-                  excalidrawAPI.fadeElement({
-                    id: elements[nextIndex].id,
+                  excalidrawAPI.fadeElements({
+                    elements: [elements[nextIndex].id],
                     from: 0,
                     to: 100,
                     duration: 500,
@@ -735,19 +739,20 @@ export default function ExampleApp({
 
                   const elements = excalidrawAPI
                     .getSceneElements()
-                    .filter((element) => fadeDemoElementIds.includes(element.id));
+                    .filter((element) =>
+                      fadeDemoElementIds.includes(element.id),
+                    );
 
                   if (!elements.length) {
                     return;
                   }
 
-                  elements.forEach((element) => {
-                    excalidrawAPI.fadeElement({
-                      id: element.id,
-                      from: 0,
-                      to: 100,
-                      duration: 500,
-                    });
+                  excalidrawAPI.fadeElements({
+                    elements,
+                    from: 0,
+                    to: 100,
+                    duration: 500,
+                    stagger: 1000,
                   });
 
                   setFadeDemoNextIndex(elements.length);
@@ -763,7 +768,9 @@ export default function ExampleApp({
 
                   const elements = excalidrawAPI
                     .getSceneElements()
-                    .filter((element) => fadeDemoElementIds.includes(element.id));
+                    .filter((element) =>
+                      fadeDemoElementIds.includes(element.id),
+                    );
 
                   if (!elements.length) {
                     return;
@@ -778,8 +785,8 @@ export default function ExampleApp({
                     return;
                   }
 
-                  excalidrawAPI.fadeElement({
-                    id: elements[prevIndex].id,
+                  excalidrawAPI.fadeElements({
+                    elements: [elements[prevIndex].id],
                     from: 100,
                     to: 0,
                     duration: 500,
