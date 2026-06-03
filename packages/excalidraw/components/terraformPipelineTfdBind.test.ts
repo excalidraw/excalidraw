@@ -293,3 +293,45 @@ describe("staging-localstack pipeline preset", () => {
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
   );
 });
+
+describe("staging-extended-localstack pipeline preset", () => {
+  it(
+    "resolves extended lake Kubernetes and security paths",
+    async () => {
+      const { nodes, sources, tfdTexts, tfdLabels } =
+        nodesAndTfdFromPreset("staging-extended-localstack");
+      const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
+        nodes,
+        tfdTexts,
+        tfdLabels,
+      );
+
+      expect(errors, errors.join("\n")).toEqual([]);
+      expect(warnings).toEqual([]);
+      expect(edges.length).toBeGreaterThan(30);
+
+      expect(Object.keys(nodes)).toEqual(
+        expect.arrayContaining([
+          'aws_s3_bucket.lake["raw"]',
+          "aws_eks_cluster.stream_processors",
+          "aws_cloudtrail.organization",
+          "aws_cloudwatch_log_group.guardduty_findings",
+        ]),
+      );
+
+      const body = await layoutTerraformViaWorkers(sources, {
+        semanticLayout: false,
+        layoutMode: "pipeline",
+      });
+      const elements = body.elements as LooseLayoutElement[];
+      expect(elements.length).toBeGreaterThan(0);
+
+      expect(
+        resourceFrameRoles(elements, "aws_eks_cluster.stream_processors"),
+      ).toEqual(
+        expect.arrayContaining(["primaryCluster", "vpc", "region", "account"]),
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
+});

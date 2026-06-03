@@ -202,6 +202,23 @@
         }
       ],
       "tfdPaths": ["pipeline.tfd"]
+    },
+    {
+      "id": "staging-extended-localstack",
+      "name": "Staging Extended LocalStack",
+      "description": "LocalStack single-root extended staging: large render-first platform with multi-region API ingestion, EKS processing, Kinesis/SQS variants, data lake replication, regional persistence, security, audit, and observability.",
+      "builtin": true,
+      "view": "pipeline",
+      "rootPath": "packages/backend/terraform/staging-extended-localstack",
+      "stacks": [
+        {
+          "id": "staging-extended-localstack",
+          "label": "staging-extended-localstack",
+          "planPath": "plan.json",
+          "dotPath": "graph.dot"
+        }
+      ],
+      "tfdPaths": ["pipeline.tfd"]
     }
   ]
 }
