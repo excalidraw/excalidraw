@@ -98,7 +98,9 @@ describe("terraformImportPresetLoader", () => {
           status: 400,
         });
       }
-      fetchedPaths.push(decodeURIComponent(input.replace(/.*terraform-import\//, "")));
+      fetchedPaths.push(
+        decodeURIComponent(input.replace(/.*terraform-import\//, "")),
+      );
       return okResponse("{}");
     });
 

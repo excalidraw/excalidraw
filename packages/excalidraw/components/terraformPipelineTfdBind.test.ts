@@ -40,9 +40,7 @@ function expandedNodesAndTfd() {
 }
 
 function nodesAndTfdFromPreset(presetId: string) {
-  const rawSources = getTerraformImportPresetSourcesFromDb(
-    presetId,
-  );
+  const rawSources = getTerraformImportPresetSourcesFromDb(presetId);
   expect(rawSources).not.toBeNull();
   const sources = resolveSourcesWithTfdComposition(
     rawSources! as TerraformImportPresetSources,

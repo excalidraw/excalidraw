@@ -210,9 +210,7 @@ function fullPathForPresetFile(
   const rootLeaf = repoLeafFromRootPath(preset.rootPath);
   // Single-root presets (e.g. staging-localstack): plan.json lives at root, not under stack.id/.
   const isRootLevelArtifact =
-    Boolean(stackBase) &&
-    stackBase === rootLeaf &&
-    !relativePath.includes("/");
+    Boolean(stackBase) && stackBase === rootLeaf && !relativePath.includes("/");
   if (isRootLevelArtifact) {
     return joinRootRelative(preset.rootPath, relativePath);
   }
