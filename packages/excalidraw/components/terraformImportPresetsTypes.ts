@@ -1,4 +1,4 @@
-import importPresetsCatalog from "../../backend/terraform/import-presets.catalog.json";
+import importPresetsCatalog from "../assets/import-presets.catalog.json";
 
 import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 

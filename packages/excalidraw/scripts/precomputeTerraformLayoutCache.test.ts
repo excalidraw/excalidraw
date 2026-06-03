@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import catalog from "../../../packages/backend/terraform/import-presets.catalog.json";
+import catalog from "../assets/import-presets.catalog.json";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
 

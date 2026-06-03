@@ -18,7 +18,7 @@ export const TEST_FIXTURE_DB_PATH = path.join(
 );
 const IMPORT_PRESETS_CATALOG_PATH = path.join(
   REPO_ROOT,
-  "packages/backend/terraform/import-presets.catalog.json",
+  "packages/excalidraw/assets/import-presets.catalog.json",
 );
 
 let dbSingleton = null;
