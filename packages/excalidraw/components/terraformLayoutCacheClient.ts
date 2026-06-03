@@ -49,7 +49,9 @@ export async function fetchPresetLayoutCache(
   if (!res.ok) {
     return null;
   }
-  const body = (await res.json()) as { scene?: TerraformExcalidrawScenePayload };
+  const body = (await res.json()) as {
+    scene?: TerraformExcalidrawScenePayload;
+  };
   if (!body.scene || typeof body.scene !== "object") {
     return null;
   }

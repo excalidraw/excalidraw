@@ -9,11 +9,16 @@ import {
 
 describe("_terraformLayoutCache", () => {
   it("buildLayoutCacheKey encodes version preset view and module pack", () => {
-    expect(buildLayoutCacheKey("abc123", "staging-multi-state-expanded", "semantic")).toBe(
-      "vabc123/staging-multi-state-expanded/semantic",
-    );
     expect(
-      buildLayoutCacheKey("abc123", "staging-multi-state-expanded", "module", "box"),
+      buildLayoutCacheKey("abc123", "staging-multi-state-expanded", "semantic"),
+    ).toBe("vabc123/staging-multi-state-expanded/semantic");
+    expect(
+      buildLayoutCacheKey(
+        "abc123",
+        "staging-multi-state-expanded",
+        "module",
+        "box",
+      ),
     ).toBe("vabc123/staging-multi-state-expanded/module/box");
     expect(MODULE_LAYOUT_PACKS).toContain("rectpacking");
   });

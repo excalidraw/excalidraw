@@ -5,10 +5,7 @@ export type LayoutCacheKv = {
   get(key: string): Promise<string | null>;
   put(key: string, value: string): Promise<void>;
   delete(key: string): Promise<void>;
-  list(options?: {
-    cursor?: string;
-    limit?: number;
-  }): Promise<{
+  list(options?: { cursor?: string; limit?: number }): Promise<{
     keys: { name: string }[];
     list_complete: boolean;
     cursor?: string;

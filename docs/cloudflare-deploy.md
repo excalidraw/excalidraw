@@ -108,10 +108,10 @@ Do **not** reconnect **Workers Builds** to this repository.
 
 [`wrangler.jsonc`](../wrangler.jsonc) uses **separate D1 databases** for production vs preview:
 
-| Binding      | Production (`master`) | Preview (branch deploys)   |
-| ------------ | --------------------- | -------------------------- |
-| `DB`         | `tfdraw-analytics`    | `tfdraw-analytics-preview` |
-| `PRESETS_DB` | `tfdraw-presets`      | `tfdraw-presets-preview`   |
+| Binding             | Production (`master`) | Preview (branch deploys)      |
+| ------------------- | --------------------- | ----------------------------- |
+| `DB`                | `tfdraw-analytics`    | `tfdraw-analytics-preview`    |
+| `PRESETS_DB`        | `tfdraw-presets`      | `tfdraw-presets-preview`      |
 | `LAYOUT_CACHE` (KV) | `tfdraw-layout-cache` | `tfdraw-layout-cache-preview` |
 
 Top-level bindings in `wrangler.jsonc` = preview. `env.production` overrides to prod DBs and production layout KV when Pages deploys the **production branch**.

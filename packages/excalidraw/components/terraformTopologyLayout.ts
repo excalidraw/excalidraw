@@ -878,9 +878,7 @@ function outerWidthForPlacementZone(
   const result = {
     outerW,
     bodyH:
-      derived.zoneFrameSize.h +
-      derived.natBandHeight +
-      derived.zoneVpceBodyPad,
+      derived.zoneFrameSize.h + derived.natBandHeight + derived.zoneVpceBodyPad,
     routeInset: derived.routeInset,
   };
   activeTopologyMemoCtx?.zoneOuterWidthByKey.set(zk, result);
