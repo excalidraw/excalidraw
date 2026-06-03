@@ -1,0 +1,3 @@
+[submodule "packages/backend/terraform"]
+	path = packages/backend/terraform
+	url = https://github.com/TusharSariya/excalidraw-tf-terraform.git
