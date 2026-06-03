@@ -187,6 +187,8 @@ Enable in browser: `localStorage.terraformImportProfile = "1"` or dev `VITE_TERR
 3. **One** focused optimization; re-run tests.
 4. Update `terraform-import-perf-baseline.json` only after **>10%** wall-clock improvement over **3** local runs — prefer seeding `spans` from a **CI-representative** run, not a single laptop, to avoid hardware flakiness.
 
+CI perf budgets in `terraformImportPerf.views.test.ts` use higher limits under `VITEST_COVERAGE=1` (prepush) than plain CI, matching the semantic tier pattern — pipeline standalone on GitHub runners is ~5× local wall time.
+
 Slow suite before commit: `yarn test:slow` or `yarn test:update`.
 
 ---
@@ -252,6 +254,8 @@ Measured locally (25 stacks, 792 merged `resource_changes`, workers on/off ~same
 ### Recommended levers, in priority order
 
 All line numbers below are in `terraformTopologyLayout.ts` unless stated; they drift, so grep the named symbol. The hot loop is `buildTerraformTopologyExcalidrawScene` (the `layout.topology.skeleton` `terraformImportProfilerMeasure` block, ~L3294+).
+
+**2026-06-02 correction:** the current `staging-multi-state-expanded` golden has `accountCount: 1`, `regionCount: 4`, `vpcCount: 4`. Account-level sharding is therefore not a useful parallel boundary for this fixture; it would create one AWS topology job. Use region/VPC-level sharding for this fixture, with the same deterministic parallel-then-pack shape and the same global edge/dataflow pass after packing.
 
 ---
 
@@ -335,6 +339,8 @@ Newest first.
 
 | Date | Change | View | Before (ms) | After (ms) | Δ% | Layout snap OK? | Top span | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-06-02 | **Correction + region-independence proof:** verified golden metadata is `accountCount: 1`, so account sharding is not useful for this fixture. Moved satellite dedup to region scope and collected VPCE duplicate registries per region with deterministic merge. | semantic | — | — | 0% expected | yes | layout.topology.skeleton | **Kept.** Snapshot, worker parity, prep-cache, and perf tests green. This proves region-local satellite dedup is layout-neutral on the current fixture and unblocks a future region/VPC parallel-then-pack refactor. |
+| 2026-06-02 | **Zone-derived context memo:** cache per-zone filtered primary addresses, frame sizing, NAT, route-table sizing, and zone VPCE partition data for reuse between VPC sizing and placement. | semantic | 31,452 local research run | 31,728 local run | noise / ~neutral | yes | layout.topology.skeleton | **Kept for now as pure memoization, but not a baseline bump.** Single-run spans stayed within machine noise (`layout.topology.skeleton` ~21.7s, `vpcSizing` ~7.8s, `resourceRects` ~10.2s inclusive). Do not claim a wall-clock win without 3-run evidence. |
 | 2026-06-02 | **Prep trim:** delete dead `buildAwsLayoutContext`/`awsContext` (built every prep, read nowhere) and make `enrichedPlacements` lazy — semantic never builds it (runs its own `enrichAndReconcile`), pipeline builds once on demand and memoizes back to the session cache for semantic→pipeline switches. Deleted orphaned `terraformAwsLayoutContext.ts`. | semantic | `prep.cache` 4881 | `prep.cache` **1353** | −3.5s prep (−72% of the span); wall noisy (~34s±2s) | yes | layout.topology.skeleton | **Kept.** Golden snapshots + worker parity (sem+pipe, workers on/off) + prep-cache tests green. Pipeline _test_ rises ~16→~20s but that is honest cost: it previously free-rode on semantic's eager enriched build in the shared-cache test order; standalone pipeline total work is unchanged. |
 | 2026-06-02 | **arnIndex memo:** `buildArnIndexForTopology` memoized by `nodes` ref (`WeakMap`). Pipeline sets `activeTopologyMemoCtx = null` and rebuilds the index per cluster (~70×); index is a pure, read-only function of `nodes`. | pipeline | — | — | ~neutral on fixture (scan ~3ms; ~220ms total) | yes | layout.pipeline | **Kept** as redundancy removal; too small to show on this fixture but O(clusters) scans eliminated. |
 | 2026-06-02 | **Investigated + reverted — vpcSizing 3×/VPC collapse.** `callCount` counts memo hits; the prior `zoneOuterWidthByKey` memo already absorbed the redundancy, so collapsing the 3 calls saved only ~270ms (noise). `skeleton.vpcSizing` (~7.5s) is genuine cold per-VPC zone sizing, not redundant re-calls. Reverted to keep the tree lean. | semantic | — | — | ~0 | yes | skeleton.vpcSizing | **Reverted.** Finding: micro-redundancies here are cheap; cost is real per-resource/zone building. |

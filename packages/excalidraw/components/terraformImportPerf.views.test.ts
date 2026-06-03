@@ -28,8 +28,19 @@ const PERF_BUDGET_SEMANTIC_MS =
     ? 300_000
     : 120_000;
 
-const PERF_BUDGET_PIPELINE_MS = process.env.CI ? 90_000 : 45_000;
-const PERF_BUDGET_MODULE_MS = process.env.CI ? 120_000 : 60_000;
+const PERF_BUDGET_PIPELINE_MS =
+  process.env.CI && process.env.VITEST_COVERAGE === "1"
+    ? 180_000
+    : process.env.CI
+    ? 150_000
+    : 45_000;
+
+const PERF_BUDGET_MODULE_MS =
+  process.env.CI && process.env.VITEST_COVERAGE === "1"
+    ? 180_000
+    : process.env.CI
+    ? 120_000
+    : 60_000;
 
 const SPAN_REGRESSION_RATIO = 1.15;
 
