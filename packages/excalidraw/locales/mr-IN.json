@@ -296,6 +296,7 @@
     "image": "प्रतिमा आत घाला",
     "rectangle": "आयत",
     "diamond": "चौकोन आकाराचा",
+    "triangle": "त्रिकोण",
     "ellipse": "अंडाकार",
     "arrow": "बाण",
     "line": "रेखा",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "आयत",
     "diamond": "चौकट",
+    "triangle": "त्रिकोण",
     "ellipse": "लंबवर्तुळाकार",
     "arrow": "बाण",
     "line": "रेषा",

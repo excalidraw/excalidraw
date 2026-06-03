@@ -296,6 +296,7 @@
     "image": "แทรกรูปภาพ",
     "rectangle": "สี่เหลี่ยมผืนผ้า",
     "diamond": "รูปเพชร",
+    "triangle": "สามเหลี่ยม",
     "ellipse": "วงรี",
     "arrow": "ลูกศร",
     "line": "เส้น",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "สี่เหลี่ยม",
     "diamond": "รูปเพชร",
+    "triangle": "สามเหลี่ยม",
     "ellipse": "วงรี",
     "arrow": "ลูกศร",
     "line": "เส้น",

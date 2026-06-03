@@ -296,6 +296,7 @@
     "image": "",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
+    "triangle": "",
     "ellipse": "အဝိုင်း",
     "arrow": "မြှား",
     "line": "မျဉ်း",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "",
     "ellipse": "",
     "arrow": "",
     "line": "",

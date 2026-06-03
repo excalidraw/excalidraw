@@ -296,6 +296,7 @@
     "image": "Ger tugna",
     "rectangle": "Asrem",
     "diamond": "Ameɣṛun",
+    "triangle": "Akerdis",
     "ellipse": "Taglayt",
     "arrow": "Taneccabt",
     "line": "Izirig",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Asrem",
     "diamond": "",
+    "triangle": "Akerdis",
     "ellipse": "",
     "arrow": "",
     "line": "Izirig",

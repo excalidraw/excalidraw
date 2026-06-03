@@ -67,6 +67,7 @@ import type {
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
+  ExcalidrawTriangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
@@ -86,6 +87,7 @@ import {
   EllipseIcon,
   LineIcon,
   RectangleIcon,
+  TriangleIcon,
   roundArrowIcon,
   sharpArrowIcon,
 } from "./icons";
@@ -100,11 +102,12 @@ const GAP_VERTICAL = 10;
 type ExcalidrawConvertibleElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
+  | ExcalidrawTriangleElement
   | ExcalidrawEllipseElement
   | ExcalidrawLinearElement;
 
 // indicates order of switching
-const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
+const GENERIC_TYPES = ["rectangle", "diamond", "triangle", "ellipse"] as const;
 // indicates order of switching
 const LINEAR_TYPES = [
   "line",
@@ -302,6 +305,7 @@ const Panel = ({
       ? [
           ["rectangle", RectangleIcon],
           ["diamond", DiamondIcon],
+          ["triangle", TriangleIcon],
           ["ellipse", EllipseIcon],
         ]
       : [];
@@ -671,6 +675,7 @@ const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
     | ExcalidrawRectangleElement
     | ExcalidrawDiamondElement
+    | ExcalidrawTriangleElement
     | ExcalidrawEllipseElement
   >;
 

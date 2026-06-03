@@ -296,6 +296,7 @@
     "image": "Chèn ảnh",
     "rectangle": "Hình chữ nhật",
     "diamond": "Kim cương",
+    "triangle": "Tam giác",
     "ellipse": "Hình elíp",
     "arrow": "Mũi tên",
     "line": "Đường kẻ",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Hình chữ nhật",
     "diamond": "Kim cương",
+    "triangle": "Tam giác",
     "ellipse": "Hình bầu dục",
     "arrow": "Mũi tên",
     "line": "Đường kẻ",

@@ -296,6 +296,7 @@
     "image": "وارد کردن تصویر",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
+    "triangle": "مثلث",
     "ellipse": "بیضی",
     "arrow": "پیکان",
     "line": "خط",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "مستطیل",
     "diamond": "لوزی",
+    "triangle": "مثلث",
     "ellipse": "بیضی",
     "arrow": "پیکان",
     "line": "خط",

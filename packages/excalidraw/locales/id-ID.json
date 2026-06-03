@@ -296,6 +296,7 @@
     "image": "Sisipkan gambar",
     "rectangle": "Persegi",
     "diamond": "Berlian",
+    "triangle": "Segitiga",
     "ellipse": "Elips",
     "arrow": "Panah",
     "line": "Garis",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Persegi Panjang",
     "diamond": "Wajik",
+    "triangle": "Segitiga",
     "ellipse": "Elips",
     "arrow": "Panah",
     "line": "Garis",

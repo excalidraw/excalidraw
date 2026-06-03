@@ -47,6 +47,14 @@ const getNonLinearElementRelativePoints = (
       pointFrom(0, element.height / 2),
     ];
   }
+  if (element.type === "triangle") {
+    return [
+      pointFrom(element.width / 2, 0),
+      pointFrom(element.width, element.height),
+      pointFrom(0, element.height),
+      pointFrom(element.width / 2, 0),
+    ];
+  }
   return [
     pointFrom(0, 0),
     pointFrom(0 + element.width, 0),

@@ -314,6 +314,7 @@
     "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
+    "triangle": "Triangle",
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
@@ -336,6 +337,7 @@
   "element": {
     "rectangle": "Rectangle",
     "diamond": "Diamond",
+    "triangle": "Triangle",
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",

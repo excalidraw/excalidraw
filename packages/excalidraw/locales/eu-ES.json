@@ -296,6 +296,7 @@
     "image": "Txertatu irudia",
     "rectangle": "Laukizuzena",
     "diamond": "Diamantea",
+    "triangle": "Hirukia",
     "ellipse": "Elipsea",
     "arrow": "Gezia",
     "line": "Lerroa",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "Hirukia",
     "ellipse": "",
     "arrow": "",
     "line": "",

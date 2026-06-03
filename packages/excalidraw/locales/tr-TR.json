@@ -296,6 +296,7 @@
     "image": "Görsel ekle",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
+    "triangle": "Üçgen",
     "ellipse": "Elips",
     "arrow": "Ok",
     "line": "Çizgi",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
+    "triangle": "Üçgen",
     "ellipse": "Elips",
     "arrow": "Ok",
     "line": "Çizgi",

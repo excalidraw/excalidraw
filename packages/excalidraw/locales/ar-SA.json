@@ -296,6 +296,7 @@
     "image": "إدراج صورة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
+    "triangle": "مثلث",
     "ellipse": "دائرة",
     "arrow": "سهم",
     "line": "خط",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "مستطيل",
     "diamond": "مضلع",
+    "triangle": "مثلث",
     "ellipse": "دائرة",
     "arrow": "سهم",
     "line": "خط",

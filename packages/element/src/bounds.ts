@@ -203,6 +203,30 @@ export class ElementBounds {
       const maxX = Math.max(x11, x12, x22, x21);
       const maxY = Math.max(y11, y12, y22, y21);
       bounds = [minX, minY, maxX, maxY];
+    } else if (element.type === "triangle") {
+      const [topX, topY, rightX, rightY, leftX, leftY] =
+        getTrianglePoints(element);
+      const [xTop, yTop] = pointRotateRads(
+        pointFrom(x1 + topX, y1 + topY),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [xRight, yRight] = pointRotateRads(
+        pointFrom(x1 + rightX, y1 + rightY),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [xLeft, yLeft] = pointRotateRads(
+        pointFrom(x1 + leftX, y1 + leftY),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      bounds = [
+        Math.min(xTop, xRight, xLeft),
+        Math.min(yTop, yRight, yLeft),
+        Math.max(xTop, xRight, xLeft),
+        Math.max(yTop, yRight, yLeft),
+      ];
     } else if (element.type === "ellipse") {
       const w = (x2 - x1) / 2;
       const h = (y2 - y1) / 2;
@@ -535,6 +559,17 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
+};
+
+export const getTrianglePoints = (element: ExcalidrawElement) => {
+  const topX = element.width / 2;
+  const topY = 0;
+  const rightX = element.width;
+  const rightY = element.height;
+  const leftX = 0;
+  const leftY = element.height;
+
+  return [topX, topY, rightX, rightY, leftX, leftY];
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes

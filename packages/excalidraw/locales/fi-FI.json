@@ -296,6 +296,7 @@
     "image": "Lisää kuva",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
+    "triangle": "Kolmio",
     "ellipse": "Soikio",
     "arrow": "Nuoli",
     "line": "Viiva",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "Kolmio",
     "ellipse": "",
     "arrow": "",
     "line": "",

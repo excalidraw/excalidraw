@@ -296,6 +296,7 @@
     "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
+    "triangle": "Trekant",
     "ellipse": "Ellipse",
     "arrow": "Pil",
     "line": "Linje",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Rektangel",
     "diamond": "Diamant",
+    "triangle": "Trekant",
     "ellipse": "Ellipse",
     "arrow": "Pil",
     "line": "Linje",

@@ -296,6 +296,7 @@
     "image": "Ievietot attēlu",
     "rectangle": "Taisnstūris",
     "diamond": "Rombs",
+    "triangle": "Trijstūris",
     "ellipse": "Elipse",
     "arrow": "Bulta",
     "line": "Līnija",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "Trijstūris",
     "ellipse": "",
     "arrow": "",
     "line": "",

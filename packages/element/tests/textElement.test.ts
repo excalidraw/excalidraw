@@ -50,6 +50,17 @@ describe("Test measureText", () => {
         y: 50,
       });
     });
+
+    it("should compute coords correctly when triangle", () => {
+      const element = API.createElement({
+        type: "triangle",
+        ...params,
+      });
+      expect(getContainerCoords(element)).toEqual({
+        x: 65,
+        y: 75,
+      });
+    });
   });
 
   describe("Test computeContainerDimensionForBoundText", () => {
@@ -87,6 +98,16 @@ describe("Test measureText", () => {
         320,
       );
     });
+
+    it("should compute container height correctly for triangle", () => {
+      const element = API.createElement({
+        type: "triangle",
+        ...params,
+      });
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+        320,
+      );
+    });
   });
 
   describe("Test getBoundTextMaxWidth", () => {
@@ -107,6 +128,11 @@ describe("Test measureText", () => {
 
     it("should return max width when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
+      expect(getBoundTextMaxWidth(container, null)).toBe(79);
+    });
+
+    it("should return max width when container is triangle", () => {
+      const container = API.createElement({ type: "triangle", ...params });
       expect(getBoundTextMaxWidth(container, null)).toBe(79);
     });
   });
@@ -145,6 +171,11 @@ describe("Test measureText", () => {
 
     it("should return max height when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(87);
+    });
+
+    it("should return max height when container is triangle", () => {
+      const container = API.createElement({ type: "triangle", ...params });
       expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(87);
     });
 

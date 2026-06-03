@@ -157,29 +157,33 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[KEYS.D, KEYS["3"]]}
             />
             <Shortcut
+              label={t("toolBar.triangle")}
+              shortcuts={[KEYS["4"]]}
+            />
+            <Shortcut
               label={t("toolBar.ellipse")}
-              shortcuts={[KEYS.O, KEYS["4"]]}
+              shortcuts={[KEYS.O, KEYS["5"]]}
             />
             <Shortcut
               label={t("toolBar.arrow")}
-              shortcuts={[KEYS.A, KEYS["5"]]}
+              shortcuts={[KEYS.A, KEYS["6"]]}
             />
             <Shortcut
               label={t("toolBar.line")}
-              shortcuts={[KEYS.L, KEYS["6"]]}
+              shortcuts={[KEYS.L, KEYS["7"]]}
             />
             <Shortcut
               label={t("toolBar.freedraw")}
-              shortcuts={[KEYS.P, KEYS["7"]]}
+              shortcuts={[KEYS.P, KEYS["8"]]}
             />
             <Shortcut
               label={t("toolBar.text")}
-              shortcuts={[KEYS.T, KEYS["8"]]}
+              shortcuts={[KEYS.T, KEYS["9"]]}
             />
-            <Shortcut label={t("toolBar.image")} shortcuts={[KEYS["9"]]} />
+            <Shortcut label={t("toolBar.image")} shortcuts={[KEYS["0"]]} />
             <Shortcut
               label={t("toolBar.eraser")}
-              shortcuts={[KEYS.E, KEYS["0"]]}
+              shortcuts={[KEYS.E]}
             />
             <Shortcut label={t("toolBar.frame")} shortcuts={[KEYS.F]} />
             <Shortcut label={t("toolBar.laser")} shortcuts={[KEYS.K]} />

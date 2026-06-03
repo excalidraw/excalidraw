@@ -296,6 +296,7 @@
     "image": "පින්තූරය",
     "rectangle": "සෘජුකෝණාස්‍රය",
     "diamond": "දියමන්ති",
+    "triangle": "ත්‍රිකෝණය",
     "ellipse": "ඉලිප්සය",
     "arrow": "ඊතලය",
     "line": "රේඛාව",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "ත්‍රිකෝණය",
     "ellipse": "",
     "arrow": "",
     "line": "",

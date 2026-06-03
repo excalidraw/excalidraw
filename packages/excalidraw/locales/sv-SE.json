@@ -296,6 +296,7 @@
     "image": "Infoga bild",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
+    "triangle": "Triangel",
     "ellipse": "Ellips",
     "arrow": "Pil",
     "line": "Linje",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Rektangel",
     "diamond": "Romb",
+    "triangle": "Triangel",
     "ellipse": "Ellips",
     "arrow": "Pil",
     "line": "Linje",

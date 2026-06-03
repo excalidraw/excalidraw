@@ -1097,9 +1097,10 @@ export const ShapesSwitcher = ({
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
+          const shortcut =
+            letter && numericKey
+              ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+              : letter || numericKey || "";
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
 

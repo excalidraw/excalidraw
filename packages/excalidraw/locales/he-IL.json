@@ -296,6 +296,7 @@
     "image": "הוספת תמונה",
     "rectangle": "מלבן",
     "diamond": "יהלום",
+    "triangle": "משולש",
     "ellipse": "אליפסה",
     "arrow": "חץ",
     "line": "קו",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "מלבן",
     "diamond": "יהלום",
+    "triangle": "משולש",
     "ellipse": "אליפסה",
     "arrow": "חץ",
     "line": "קו",

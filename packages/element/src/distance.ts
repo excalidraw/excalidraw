@@ -1,6 +1,8 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
+  lineSegment,
+  pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
 
@@ -24,7 +26,9 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  ExcalidrawTriangleElement,
 } from "./types";
+import { getTrianglePoints } from "./bounds";
 
 export const distanceToElement = (
   element: ExcalidrawElement,
@@ -43,6 +47,8 @@ export const distanceToElement = (
       return distanceToRectanguloidElement(element, elementsMap, p);
     case "diamond":
       return distanceToDiamondElement(element, elementsMap, p);
+    case "triangle":
+      return distanceToTriangleElement(element, elementsMap, p);
     case "ellipse":
       return distanceToEllipseElement(element, elementsMap, p);
     case "line":
@@ -107,6 +113,33 @@ const distanceToDiamondElement = (
     ...curves
       .map((a) => curvePointDistance(a, rotatedPoint))
       .filter((d): d is number => d !== null),
+  );
+};
+
+const distanceToTriangleElement = (
+  element: ExcalidrawTriangleElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+): number => {
+  const center = elementCenterPoint(element, elementsMap);
+  const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
+  const [topX, topY, rightX, rightY, leftX, leftY] = getTrianglePoints(
+    element,
+  );
+
+  return Math.min(
+    distanceToLineSegment(rotatedPoint, lineSegment(
+      pointFrom(element.x + topX, element.y + topY),
+      pointFrom(element.x + rightX, element.y + rightY),
+    )),
+    distanceToLineSegment(rotatedPoint, lineSegment(
+      pointFrom(element.x + rightX, element.y + rightY),
+      pointFrom(element.x + leftX, element.y + leftY),
+    )),
+    distanceToLineSegment(rotatedPoint, lineSegment(
+      pointFrom(element.x + leftX, element.y + leftY),
+      pointFrom(element.x + topX, element.y + topY),
+    )),
   );
 };
 

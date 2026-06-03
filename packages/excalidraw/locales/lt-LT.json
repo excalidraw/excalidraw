@@ -296,6 +296,7 @@
     "image": "Įkelti paveiksliuką",
     "rectangle": "Stačiakampis",
     "diamond": "Deimantas",
+    "triangle": "Trikampis",
     "ellipse": "Elipsė",
     "arrow": "Rodyklė",
     "line": "Linija",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "Trikampis",
     "ellipse": "",
     "arrow": "",
     "line": "",

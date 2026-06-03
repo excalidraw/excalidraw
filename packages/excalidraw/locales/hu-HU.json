@@ -296,6 +296,7 @@
     "image": "Kép beszúrása",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
+    "triangle": "Háromszög",
     "ellipse": "Ellipszis",
     "arrow": "Nyíl",
     "line": "Vonal",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
+    "triangle": "Háromszög",
     "ellipse": "Ellipszis",
     "arrow": "Nyíl",
     "line": "Vonal",

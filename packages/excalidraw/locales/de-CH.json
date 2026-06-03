@@ -296,6 +296,7 @@
     "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
+    "triangle": "Dreieck",
     "ellipse": "Ellipse",
     "arrow": "Pfeil",
     "line": "Linie",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Rechteck",
     "diamond": "Raute",
+    "triangle": "Dreieck",
     "ellipse": "Ellipse",
     "arrow": "Pfeil",
     "line": "Linie",

@@ -296,6 +296,7 @@
     "image": "Wstaw obraz",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
+    "triangle": "Trójkąt",
     "ellipse": "Elipsa",
     "arrow": "Strzałka",
     "line": "Linia",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Prostokąt",
     "diamond": "Romb",
+    "triangle": "Trójkąt",
     "ellipse": "Elipsa",
     "arrow": "Strzałka",
     "line": "Linia",
