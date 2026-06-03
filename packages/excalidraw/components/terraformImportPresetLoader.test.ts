@@ -72,6 +72,50 @@ describe("terraformImportPresetLoader", () => {
     );
   });
 
+  it("resolves root-level plan paths for single-root staging-localstack preset", async () => {
+    const preset: TerraformImportPreset = {
+      id: "staging-localstack",
+      name: "Staging LocalStack",
+      view: "pipeline",
+      rootPath: "packages/backend/terraform/staging-localstack",
+      hasContent: false,
+      stacks: [
+        {
+          id: "staging-localstack",
+          label: "staging-localstack",
+          planPath: "plan.json",
+          dotPath: "graph.dot",
+        },
+      ],
+      tfdPaths: ["pipeline.tfd"],
+    };
+
+    const fetchedPaths: string[] = [];
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
+      const input = String(url);
+      if (input.includes("/sources")) {
+        return new Response(JSON.stringify({ error: "no content" }), {
+          status: 400,
+        });
+      }
+      fetchedPaths.push(decodeURIComponent(input.replace(/.*terraform-import\//, "")));
+      return okResponse("{}");
+    });
+
+    await loadTerraformImportPresetSources(preset, {
+      allowApiFetch: true,
+      allowDevFetch: true,
+      allowDirectoryHandleFallback: false,
+    });
+
+    expect(fetchedPaths).toContain(
+      "packages/backend/terraform/staging-localstack/plan.json",
+    );
+    expect(fetchedPaths).not.toContain(
+      "packages/backend/terraform/staging-localstack/staging-localstack/plan.json",
+    );
+  });
+
   it("falls back to dev fetch when DB has no content", async () => {
     const preset: TerraformImportPreset = {
       id: "x",

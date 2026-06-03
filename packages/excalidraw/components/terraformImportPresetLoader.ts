@@ -195,12 +195,27 @@ async function loadOptionalText(
   }
 }
 
+function repoLeafFromRootPath(rootPath: string): string {
+  const normalized = rootPath.replace(/\\/g, "/").replace(/\/+$/, "");
+  const segments = normalized.split("/").filter(Boolean);
+  return segments[segments.length - 1] ?? "";
+}
+
 function fullPathForPresetFile(
   preset: TerraformImportPreset,
   stack: TerraformImportPresetStack,
   relativePath: string,
 ) {
   const stackBase = stack.id ? stack.id : "";
+  const rootLeaf = repoLeafFromRootPath(preset.rootPath);
+  // Single-root presets (e.g. staging-localstack): plan.json lives at root, not under stack.id/.
+  const isRootLevelArtifact =
+    Boolean(stackBase) &&
+    stackBase === rootLeaf &&
+    !relativePath.includes("/");
+  if (isRootLevelArtifact) {
+    return joinRootRelative(preset.rootPath, relativePath);
+  }
   return joinRootRelative(
     preset.rootPath,
     stackBase && !relativePath.startsWith(`${stackBase}/`)

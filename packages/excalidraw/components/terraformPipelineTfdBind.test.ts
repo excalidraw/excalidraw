@@ -8,6 +8,7 @@ import {
   STAGING_DB_LOAD_TEST_TIMEOUT_MS,
   STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
 } from "../test-fixtures/terraformPresetFixtures";
+import { importStagingSemanticLayoutBody } from "../test-fixtures/stagingSemanticLayoutFixture";
 
 import { applyDeclaredDataFlowFromMany } from "./terraformDeclaredDataFlow";
 
@@ -16,14 +17,31 @@ import {
   mergePlanJsons,
   namespacePlanDotBundles,
 } from "./terraformImportMerge";
+import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 import { buildTerraformLocalImportNodesMap } from "./terraformPlanParsing";
-import { terraformPlanParsingFromSources } from "./terraformPlanParsing";
 
 import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 
+type LooseLayoutElement = {
+  id: string;
+  type: string;
+  isDeleted?: boolean;
+  frameId?: string | null;
+  customData?: {
+    nodePath?: string;
+    resourceType?: string;
+    terraformTopologyRole?: string;
+    terraformTopologyPath?: unknown;
+  };
+};
+
 function expandedNodesAndTfd() {
+  return nodesAndTfdFromPreset("staging-multi-state-expanded");
+}
+
+function nodesAndTfdFromPreset(presetId: string) {
   const rawSources = getTerraformImportPresetSourcesFromDb(
-    "staging-multi-state-expanded",
+    presetId,
   );
   expect(rawSources).not.toBeNull();
   const sources = resolveSourcesWithTfdComposition(
@@ -41,11 +59,43 @@ function expandedNodesAndTfd() {
     priorStatePlans: merged.sourcePlans,
     stackIds: ns.stackIds,
   });
-  return { nodes, tfdTexts: sources.tfdTexts, tfdLabels: sources.tfdLabels };
+  return {
+    nodes,
+    sources,
+    tfdTexts: sources.tfdTexts,
+    tfdLabels: sources.tfdLabels,
+  };
 }
 
 function edgePairKey(source: string, target: string) {
   return `${source} -> ${target}`;
+}
+
+function resourceFrameRoles(
+  elements: readonly LooseLayoutElement[],
+  nodePath: string,
+) {
+  const byId = new Map(elements.map((element) => [element.id, element]));
+  const resource = elements.find(
+    (element) =>
+      element.type === "rectangle" && element.customData?.nodePath === nodePath,
+  );
+  expect(resource, nodePath).toBeTruthy();
+
+  const roles: string[] = [];
+  let frameId = resource!.frameId ?? null;
+  while (frameId) {
+    const frame = byId.get(frameId);
+    if (!frame) {
+      break;
+    }
+    const role = frame.customData?.terraformTopologyRole;
+    if (role) {
+      roles.push(role);
+    }
+    frameId = frame.frameId ?? null;
+  }
+  return roles;
 }
 
 describe("staging-multi-state-expanded pipeline.tfd binds", () => {
@@ -128,37 +178,19 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
   it(
     "semantic import exposes ingress and egress SQS primary tiles",
     async () => {
-      const rawSources = getTerraformImportPresetSourcesFromDb(
-        "staging-multi-state-expanded",
-      );
-      expect(rawSources).not.toBeNull();
-      const sources = resolveSourcesWithTfdComposition(
-        rawSources! as TerraformImportPresetSources,
-      );
-
-      const res = await terraformPlanParsingFromSources(sources, {
-        semanticLayout: true,
-      });
-      expect(res.ok).toBe(true);
-      const body = await res.json();
+      const body = await importStagingSemanticLayoutBody();
+      const elements = body.elements as LooseLayoutElement[];
 
       const sqsPaths = [
         ...new Set<string>(
-          body.elements
+          elements
             .filter(
-              (e: {
-                isDeleted?: boolean;
-                type?: string;
-                customData?: { resourceType?: string; nodePath?: string };
-              }) =>
+              (e) =>
                 !e.isDeleted &&
                 e.type === "rectangle" &&
                 e.customData?.resourceType === "aws_sqs_queue",
             )
-            .map(
-              (e: { customData?: { nodePath?: string } }) =>
-                e.customData?.nodePath ?? "",
-            ),
+            .map((e) => e.customData?.nodePath ?? ""),
         ),
       ];
 
@@ -185,6 +217,80 @@ describe("staging-multi-state-expanded pipeline.tfd binds", () => {
       expect(
         sqsPaths.some((p) => p.includes("module.queue.module.queue")),
       ).toBe(false);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
+});
+
+describe("staging-localstack pipeline preset", () => {
+  it(
+    "resolves binds and produces a non-empty pipeline layout",
+    async () => {
+      const { nodes, sources, tfdTexts, tfdLabels } =
+        nodesAndTfdFromPreset("staging-localstack");
+      const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
+        nodes,
+        tfdTexts,
+        tfdLabels,
+      );
+
+      expect(errors, errors.join("\n")).toEqual([]);
+      expect(warnings).toEqual([]);
+      expect(edges.length).toBeGreaterThan(0);
+
+      const body = await layoutTerraformViaWorkers(sources, {
+        semanticLayout: false,
+        layoutMode: "pipeline",
+      });
+      expect((body.elements as unknown[]).length).toBeGreaterThan(0);
+      const meta = body.meta as
+        | { layoutEngine?: string; pipelineEdgeCount?: number }
+        | undefined;
+      expect(meta?.layoutEngine).toBe("pipeline");
+      expect(meta?.pipelineEdgeCount).toBeGreaterThan(0);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "wraps VPC-level pipeline resources in their topology frames",
+    async () => {
+      const { sources } = nodesAndTfdFromPreset("staging-localstack");
+      const body = await layoutTerraformViaWorkers(sources, {
+        semanticLayout: false,
+        layoutMode: "pipeline",
+      });
+      const elements = body.elements as LooseLayoutElement[];
+
+      expect(
+        resourceFrameRoles(
+          elements,
+          "module.east_network.module.vpc.aws_internet_gateway.this[0]",
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          "primaryCluster",
+          "vpc",
+          "region",
+          "account",
+          "provider",
+        ]),
+      );
+      expect(
+        resourceFrameRoles(
+          elements,
+          "module.east_network.module.vpc.aws_nat_gateway.this[0]",
+        ),
+      ).toEqual(
+        expect.arrayContaining([
+          "primaryCluster",
+          "subnetZone",
+          "vpc",
+          "region",
+          "account",
+          "provider",
+        ]),
+      );
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
   );

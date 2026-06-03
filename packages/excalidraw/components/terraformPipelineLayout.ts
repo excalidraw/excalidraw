@@ -480,7 +480,7 @@ function pushContextFrames(
                 c.placement.region,
               ].join("\0")
             : [c.placement.providerFamily, c.placement.accountId].join("\0");
-        return childIdsByKey.get(lower)?.[0] ?? group[0]!.build.clusterFrameId;
+        return childIdsByKey.get(lower)?.[0] ?? c.build.clusterFrameId;
       });
       const uniqueChildIds = [...new Set(childIds)];
       const b = boundsOf(uniqueChildIds, boxes);
