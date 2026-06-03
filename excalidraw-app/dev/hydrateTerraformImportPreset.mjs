@@ -8,6 +8,7 @@ import {
   resetTerraformImportPresetDbSingleton,
   upsertAndHydratePresetFromCatalog,
 } from "./terraformImportPresetDb.mjs";
+import { formatCompactStats } from "./compactTerraformImportPresetDb.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
@@ -31,10 +32,14 @@ if (!catalog.some((entry) => entry.id === presetId)) {
 
 resetTerraformImportPresetDbSingleton();
 const db = getTerraformImportPresetDb(dbPath);
-const { hydrated, missing } = upsertAndHydratePresetFromCatalog(db, presetId);
+const { hydrated, missing, compactStats } =
+  upsertAndHydratePresetFromCatalog(db, presetId);
 
 console.log(`Hydrated preset "${presetId}" into ${dbPath}`);
 console.log(`  ${hydrated} file(s) loaded from disk`);
+if (compactStats) {
+  console.log(`  Compact: ${formatCompactStats(compactStats)}`);
+}
 
 if (missing.length > 0) {
   console.warn("Missing files (not hydrated):");

@@ -8,6 +8,7 @@ import {
   resetTerraformImportPresetDbSingleton,
   seedAllBuiltinsFromCatalog,
 } from "./terraformImportPresetDb.mjs";
+import { formatCompactStats } from "./compactTerraformImportPresetDb.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "../..");
@@ -17,7 +18,7 @@ const dbPath = process.argv[2] ?? DEFAULT_DB_PATH;
 
 resetTerraformImportPresetDbSingleton();
 const db = getTerraformImportPresetDb(dbPath);
-const { presetCount, results } = seedAllBuiltinsFromCatalog(db);
+const { presetCount, results, compactStats } = seedAllBuiltinsFromCatalog(db);
 
 const missing = results.flatMap((entry) =>
   (entry.missing ?? []).map((filePath) => ({ presetId: entry.id, filePath })),
@@ -28,6 +29,9 @@ const withContent = presets.filter((preset) => preset.hasContent);
 
 console.log(`Seeded ${presetCount} built-in preset(s) into ${dbPath}`);
 console.log(`  ${withContent.length} preset(s) have stored plan+dot content`);
+if (compactStats) {
+  console.log(`  Compact: ${formatCompactStats(compactStats)}`);
+}
 
 if (missing.length > 0) {
   console.warn("Missing files (not hydrated):");

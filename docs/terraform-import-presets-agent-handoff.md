@@ -46,6 +46,27 @@ node excalidraw-app/dev/verifyTerraformPresetsTestDb.mjs
 
 **CI / tests** do not read gitignored `plan.json` on disk; they use the committed SQLite fixture. After catalog or fixture changes, re-export the test DB.
 
+### Compact fixture format (~3 MB)
+
+The committed test fixture and local dev DB are **gzip-compacted** after every seed/hydrate/export:
+
+| Storage | Format | Notes |
+| --- | --- | --- |
+| `terraform_import_preset_stacks.plan_text` / `dot_text` / `state_text` | `gz:b64:…` inline or `gz:b64:chunks:N` pointer | Decompressed via [`loadPresetBlobTextSqlite`](../../excalidraw-app/dev/loadPresetBlobTextSqlite.mjs) |
+| `terraform_import_preset_blob_chunks` | gzip base64 shards | Large plans (e.g. staging-localstack ~8 MB raw) overflow inline 32 KB limit |
+| `terraform_import_preset_tfd.content` | same as stacks | Small files usually inline |
+| `terraform_import_artifacts` | — | **Stripped on compact** (dev-only duplicate; not in committed fixture) |
+| `terraform_import_compositions` | — | **Stripped on compact** (regenerated on seed/hydrate, then removed) |
+
+Implementation: [`compactTerraformImportPresetDb.mjs`](../../excalidraw-app/dev/compactTerraformImportPresetDb.mjs) — called from `seedAllBuiltinsFromCatalog`, `upsertAndHydratePresetFromCatalog`, and `exportTerraformPresetsTestDb`.
+
+Expected sizes after `yarn seed:terraform-presets` + `yarn export:terraform-presets-test-db`:
+
+- **~3 MB** fixture file (was ~73 MB before compact: duplicate artifacts + raw UTF-8 + SQLite freelist)
+- **~80 blob chunks** for current two-preset catalog
+
+To check fixture size: `ls -lh packages/excalidraw/test-fixtures/terraform-import-presets.db` (expect ~3 MB).
+
 ---
 
 ## Reproduction steps (human or agent)
@@ -274,6 +295,7 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 | Area | Path |
 | --- | --- |
 | Catalog | `packages/excalidraw/assets/import-presets.catalog.json` |
+| Compact export | `excalidraw-app/dev/compactTerraformImportPresetDb.mjs` |
 | Types / builtins | `packages/excalidraw/components/terraformImportPresetsTypes.ts` |
 | Preset DB (Node) | `excalidraw-app/dev/terraformImportPresetDb.mjs` |
 | Dev API plugin | `excalidraw-app/dev/terraformImportPresetDevPlugin.mjs` |
@@ -297,3 +319,5 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 ## Changelog note (2026-06-03)
 
 **staging-localstack** preset added to catalog + test fixture DB. **Bug fix:** single-root presets must not prefix `stack.id/` onto root-level `plan.json` / `graph.dot` when loading from disk; regression test in `terraformImportPresetLoader.test.ts` (_"resolves root-level plan paths for single-root staging-localstack preset"_).
+
+**Preset DB slim-down:** committed fixture gzip-compacts stack/TFD blobs, strips duplicate `artifacts`/`compositions` rows, and VACUUMs (~73 MB → ~3 MB). Seed/hydrate/export call `compactTerraformImportPresetDb`; tests read blobs via `loadPresetBlobTextSqlite`.

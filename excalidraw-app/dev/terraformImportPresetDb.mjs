@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 
+import {
+  compactTerraformImportPresetDb,
+} from "./compactTerraformImportPresetDb.mjs";
 import { loadPresetBlobTextSqlite } from "./loadPresetBlobTextSqlite.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -176,7 +179,6 @@ function ensureSchema(db) {
   }
 
   migrateAddPipelineViewConstraint(db);
-  migratePresetStacksToArtifacts(db);
 }
 
 function repoNameFromRootPath(rootPath) {
@@ -839,7 +841,9 @@ export function seedAllBuiltinsFromCatalog(db) {
     });
   }
 
-  return { presetCount: presets.length, results };
+  const compactStats = compactTerraformImportPresetDb(db);
+
+  return { presetCount: presets.length, results, compactStats };
 }
 
 function seedBuiltins(db) {
@@ -1112,7 +1116,8 @@ export function syncTerraformImportPresetFromDisk(presetId) {
   const result = hydratePresetContentsFromDisk(db, presetId);
   syncArtifactsFromPreset(db, presetId);
   upsertCompositionForPreset(db, presetId);
-  return result;
+  const compactStats = compactTerraformImportPresetDb(db);
+  return { ...result, compactStats };
 }
 
 export function saveTerraformImportPresetToDb(preset) {
@@ -1331,7 +1336,11 @@ export function upsertAndHydratePresetFromCatalog(db, presetId) {
     throw new Error(`Preset not found in catalog: ${presetId}`);
   }
   upsertPreset(db, preset);
-  return hydratePresetContentsFromDisk(db, presetId);
+  const hydrateResult = hydratePresetContentsFromDisk(db, presetId);
+  syncArtifactsFromPreset(db, presetId);
+  upsertCompositionForPreset(db, presetId);
+  const compactStats = compactTerraformImportPresetDb(db);
+  return { ...hydrateResult, compactStats };
 }
 
 export function readStagingMultiStatePipelineTfdFromDb() {
@@ -1380,6 +1389,8 @@ export function verifyTerraformImportPresetTestDb(
   }
   return { presetCount, withContent };
 }
+
+export { formatCompactStats } from "./compactTerraformImportPresetDb.mjs";
 
 export function resolveTerraformImportFilePath(relativePath) {
   const normalized = String(relativePath)

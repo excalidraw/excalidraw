@@ -12,6 +12,8 @@ import {
   TEST_FIXTURE_DB_PATH,
   verifyTerraformImportPresetTestDb,
 } from "./terraformImportPresetDb.mjs";
+import { loadPresetBlobTextSqlite } from "./loadPresetBlobTextSqlite.mjs";
+import { GZIP_PREFIX } from "./terraformPresetCompression.mjs";
 
 describe("terraformImportPresetDb seed", () => {
   it("committed test DB has all catalog presets with plan+dot content", () => {
@@ -49,14 +51,29 @@ describe("terraformImportPresetDb seed", () => {
 
     const stack = db
       .prepare(
-        `SELECT plan_text AS planText, dot_text AS dotText
+        `SELECT stack_id AS stackId, plan_text AS planText, dot_text AS dotText
          FROM terraform_import_preset_stacks
          WHERE preset_id = 'staging-multi-state-expanded'
          LIMIT 1`,
       )
       .get();
-    expect(stack.planText).toMatch(/"resource_changes"/);
-    expect(stack.dotText).toMatch(/digraph/i);
+    expect(stack.planText.startsWith(GZIP_PREFIX)).toBe(true);
+    const planText = loadPresetBlobTextSqlite(
+      db,
+      "staging-multi-state-expanded",
+      "plan",
+      stack.stackId,
+      stack.planText,
+    );
+    const dotText = loadPresetBlobTextSqlite(
+      db,
+      "staging-multi-state-expanded",
+      "dot",
+      stack.stackId,
+      stack.dotText,
+    );
+    expect(planText).toMatch(/"resource_changes"/);
+    expect(dotText).toMatch(/digraph/i);
 
     resetTerraformImportPresetDbSingleton();
     for (const suffix of ["", "-wal", "-shm"]) {
