@@ -1,2 +1,23 @@
 /*
   Access-Control-Allow-Origin: *
+
+/brand/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/og-image.png
+  Cache-Control: public, max-age=86400
+
+/tfdraw-logo.png
+  Cache-Control: public, max-age=604800
+
+/favicon*
+  Cache-Control: public, max-age=604800
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+
+/android-chrome*
+  Cache-Control: public, max-age=604800
+
+/maskable_icon*
+  Cache-Control: public, max-age=604800

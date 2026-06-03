@@ -14,7 +14,9 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
         alt=""
         aria-hidden="true"
         class="ExcalidrawLogo-icon"
+        height="512"
         src="/tfdraw-logo.png"
+        width="512"
       />
       <span
         class="ExcalidrawLogo-text"

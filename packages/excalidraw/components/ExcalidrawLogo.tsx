@@ -26,6 +26,8 @@ export const ExcalidrawLogo = ({
         src="/tfdraw-logo.png"
         alt=""
         aria-hidden="true"
+        width={512}
+        height={512}
       />
       {withText && <span className="ExcalidrawLogo-text">tfdraw.dev</span>}
     </div>

@@ -62,8 +62,8 @@ export const LandingNav = ({ onScrollToCanvas }: LandingNavProps) => {
             alt=""
             aria-hidden="true"
             fetchPriority="high"
-            width={40}
-            height={40}
+            width={512}
+            height={512}
           />
           <span>tfdraw.dev</span>
         </a>

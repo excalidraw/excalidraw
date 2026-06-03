@@ -237,7 +237,7 @@ export default defineConfig(({ mode }) => {
           icons: [
             {
               src: "tfdraw-logo.png",
-              sizes: "1024x1024",
+              sizes: "512x512",
               type: "image/png",
               purpose: "any maskable",
             },
@@ -266,7 +266,7 @@ export default defineConfig(({ mode }) => {
           start_url: "/",
           id: "tfdraw.dev",
           display: "standalone",
-          theme_color: "#121212",
+          theme_color: "#0b1210",
           background_color: "#ffffff",
           file_handlers: [
             {

@@ -144,7 +144,7 @@ body.terraform-canvas-landing #root {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--lp-radius-sm);
-  object-fit: cover;
+  object-fit: contain;
   box-shadow: var(--lp-shadow-sm);
 }
 
