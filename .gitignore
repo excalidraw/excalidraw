@@ -81,6 +81,7 @@ packages/backend/terraform/cloudflare/*plan.json
 packages/backend/terraform/cloudflare/*plan.dot
 packages/backend/terraform/**/*.tfd
 !packages/backend/terraform/staging-multi-state/pipeline.tfd
+!packages/backend/terraform/staging-localstack/pipeline.tfd
 packages/backend/terraform/cloudflare/cloudflare-state-summary.json
 packages/backend/terraform/cloudflare/cloudflare.dot
 packages/backend/terraform/modules/private_api_lambda/.build/
@@ -102,6 +103,23 @@ packages/backend/terraform/staging-multi-state/**/plan.bin
 packages/backend/terraform/staging-multi-state/**/terraform.tfstate
 packages/backend/terraform/staging-multi-state/**/terraform.tfstate.backup
 packages/backend/terraform/staging-multi-state/**/.terraform.tfstate.lock.info
+
+# Staging LocalStack single-root artifacts (plan/dot/state local only).
+packages/backend/terraform/staging-localstack/**/terraform.tfvars
+packages/backend/terraform/staging-localstack/**/terraform.tfvars.backup
+packages/backend/terraform/staging-localstack/**/*.auto.tfvars
+packages/backend/terraform/staging-localstack/**/crash.*
+packages/backend/terraform/staging-localstack/**/build/
+packages/backend/terraform/staging-localstack/**/.build/
+packages/backend/terraform/staging-localstack/**/.terraform/
+packages/backend/terraform/staging-localstack/**/.terraform.lock.hcl
+packages/backend/terraform/staging-localstack/**/tfplan
+packages/backend/terraform/staging-localstack/**/plan.json
+packages/backend/terraform/staging-localstack/**/graph.dot
+packages/backend/terraform/staging-localstack/**/plan.bin
+packages/backend/terraform/staging-localstack/**/terraform.tfstate
+packages/backend/terraform/staging-localstack/**/terraform.tfstate.backup
+packages/backend/terraform/staging-localstack/**/.terraform.tfstate.lock.info
 **/.terraform.tfstate.lock.info
 
 # Cloudflare Wrangler (local dev state, caches; not source-controlled)

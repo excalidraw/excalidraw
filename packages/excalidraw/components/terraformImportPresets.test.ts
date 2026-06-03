@@ -34,8 +34,9 @@ describe("terraformImportPresets", () => {
       BUILTIN_TERRAFORM_IMPORT_PRESETS,
     );
     const presets = await listTerraformImportPresets();
-    expect(presets).toHaveLength(1);
+    expect(presets).toHaveLength(2);
     expect(presets[0]?.id).toBe("staging-multi-state-expanded");
+    expect(presets[1]?.id).toBe("staging-localstack");
     expect(presets[0]?.view).toBe("pipeline");
   });
 

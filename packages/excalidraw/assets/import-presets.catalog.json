@@ -185,6 +185,23 @@
         }
       ],
       "tfdPaths": ["pipeline.tfd"]
+    },
+    {
+      "id": "staging-localstack",
+      "name": "Staging LocalStack",
+      "description": "LocalStack single-root staging: four-region replica of staging-multi-state in one Terraform apply (plan.json + graph.dot + pipeline.tfd).",
+      "builtin": true,
+      "view": "pipeline",
+      "rootPath": "packages/backend/terraform/staging-localstack",
+      "stacks": [
+        {
+          "id": "staging-localstack",
+          "label": "staging-localstack",
+          "planPath": "plan.json",
+          "dotPath": "graph.dot"
+        }
+      ],
+      "tfdPaths": ["pipeline.tfd"]
     }
   ]
 }
