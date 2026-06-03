@@ -5,7 +5,6 @@
     "packages/excalidraw/index.tsx",
     "packages/excalidraw/index-node.ts",
     "packages/excalidraw/**/*.test.{ts,tsx}",
-    "packages/excalidraw/scripts/precomputeTerraformLayoutCache.vitest.ts",
     "packages/excalidraw/tests/**/*.{ts,tsx}",
     "packages/{common,element,math,utils}/src/index.ts",
     "packages/{common,element,math,utils}/**/*.test.{ts,tsx}",

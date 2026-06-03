@@ -37,7 +37,7 @@ const result = spawnSync(
   [
     "vitest",
     "run",
-    "packages/excalidraw/scripts/precomputeTerraformLayoutCache.vitest.ts",
+    "packages/excalidraw/scripts/precomputeTerraformLayoutCache.test.ts",
     "--watch=false",
   ],
   {
