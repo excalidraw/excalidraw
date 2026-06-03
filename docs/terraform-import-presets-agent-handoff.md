@@ -9,7 +9,7 @@ Handoff doc for another agent working on **built-in Terraform import presets**, 
 Source of truth: [`packages/excalidraw/assets/import-presets.catalog.json`](../packages/excalidraw/assets/import-presets.catalog.json)
 
 | Preset ID | Terraform root | Stacks | Default view | `pipeline.tfd` |
-|-----------|----------------|--------|--------------|----------------|
+| --- | --- | --- | --- | --- |
 | `staging-multi-state-expanded` | `packages/backend/terraform/staging-multi-state/` | 25 (one root per stack dir) | `pipeline` | `pipeline.tfd` (committed) |
 | `staging-localstack` | `packages/backend/terraform/staging-localstack/` | 1 (single root) | `pipeline` | `pipeline.tfd` (committed) |
 
@@ -24,7 +24,7 @@ Plan/dot exports are **gitignored** except `pipeline.tfd`. Generate locally (Loc
 ## Preset databases and commands
 
 | Artifact | Path | Purpose |
-|----------|------|---------|
+| --- | --- | --- |
 | Dev DB (gitignored) | `terraform-import-presets.db` (repo root) | Used by `yarn start` + Vite dev API |
 | Test fixture DB (committed) | `packages/excalidraw/test-fixtures/terraform-import-presets.db` | Vitest / CI read plan+dot+tfd from SQLite |
 | D1 (production) | `tfdraw-presets` / preview | Pages deploy; push via `yarn push:terraform-presets-d1:*` |
@@ -69,7 +69,7 @@ node excalidraw-app/dev/verifyTerraformPresetsTestDb.mjs
 ### Demo URLs
 
 | URL | Expected |
-|-----|----------|
+| --- | --- |
 | `/demo?preset=staging-multi-state-expanded` | Pipeline (default) |
 | `/demo?preset=staging-multi-state-expanded&view=semantic` | Semantic topology |
 | `/demo?preset=staging-localstack` | Pipeline, ~722 elements |
@@ -145,7 +145,7 @@ flowchart TD
 ### Entry points (code)
 
 | Step | Module |
-|------|--------|
+| --- | --- |
 | Preset import | [`terraformPresetImport.ts`](../packages/excalidraw/components/terraformPresetImport.ts) — `runTerraformPresetImport` |
 | Load plan/dot/tfd | [`terraformImportPresetLoader.ts`](../packages/excalidraw/components/terraformImportPresetLoader.ts) |
 | View → layout mode | `deriveLayoutModeFromView` in `terraformPresetImport.ts` |
@@ -170,7 +170,7 @@ Hydration on disk uses `joinRootRelative(rootPath, stack.planPath)` directly in 
 - At layout time: `resolveSourcesWithTfdComposition` → `applyTfdCompositionToSources` (optional `use` blocks pulling artifacts from catalog).
 - Overlay: `applyTfdOverlayToNodes` → `applyDeclaredDataFlowFromMany` — binds `staging-localstack::...` resolve to bare plan keys via `resolveTerraformPlanNodeKey` (stack prefix matching).
 
-**Pipeline hard requirement:** at least one resolved declared dataflow edge; otherwise HTTP 400: *"Pipeline view requires at least one resolved .tfd dataflow edge."*
+**Pipeline hard requirement:** at least one resolved declared dataflow edge; otherwise HTTP 400: _"Pipeline view requires at least one resolved .tfd dataflow edge."_
 
 ---
 
@@ -179,7 +179,7 @@ Hydration on disk uses `joinRootRelative(rootPath, stack.planPath)` directly in 
 Both **semantic** and **pipeline** run through the same preparation unless semantic parallel path short-circuits prep:
 
 | Phase | Profiler span (typical) | What happens |
-|-------|-------------------------|--------------|
+| --- | --- | --- |
 | TFD composition | — | `resolveSourcesWithTfdComposition` |
 | Prep cache | `prep.cache` | `buildTerraformImportPrepCache` — merge plans, adjacency, fingerprint |
 | Merge plans | `merge.plans` | `namespacePlanDotBundles` **only if** `planDotBundles.length > 1`; else single bundle, `stackIds: []` |
@@ -187,7 +187,7 @@ Both **semantic** and **pipeline** run through the same preparation unless seman
 | Parse graph | `parse.nodes` | `buildTerraformLocalImportNodesMap(plan, graph, states, { adjacency, stackIds })` |
 | TFD overlay | `parse.tfd` | `applyTfdOverlayToNodes` |
 | TFD edge check | — | Fail if `.tfd` has `->` but zero resolved edges |
-| **Layout branch** | see below | |
+| **Layout branch** | see below |  |
 
 **Multi-bundle naming:** `namespacePlanDotBundles` prefixes addresses with `stackId::` and sets `stackIds` / `addressToStack`. **Single bundle (localstack):** no namespace; TFD still uses `staging-localstack::` in binds; resolution maps qualified binds to unqualified node keys.
 
@@ -214,7 +214,7 @@ Both **semantic** and **pipeline** run through the same preparation unless seman
 ### Expected scale (current fixtures)
 
 | Preset | Bundles | Pipeline elements (approx.) | Notes |
-|--------|---------|-------------------------------|--------|
+| --- | --- | --- | --- |
 | `staging-multi-state-expanded` | 25 | Similar topology to localstack | Sharded plans |
 | `staging-localstack` | 1 | ~722 | One large plan (~4.5MB JSON) |
 
@@ -259,7 +259,7 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 ## Common failures (troubleshooting)
 
 | Symptom | Likely cause | Fix |
-|---------|--------------|-----|
+| --- | --- | --- |
 | Missing preset file `.../staging-localstack/staging-localstack/plan.json` | Old `fullPathForPresetFile` double-prefix | Ensure fix in `terraformImportPresetLoader.ts` (`isRootLevelArtifact`) |
 | Pipeline: no resolved `.tfd` edges | Bad binds vs plan addresses | Check `pipeline.tfd` stack qualifiers match plan keys; run `terraformPipelineTfdBind.test.ts` pattern for localstack |
 | Empty canvas, no error | Wrong layout option in tests: `pipelineLayout: true` | Use `layoutMode: "pipeline"` |
@@ -272,7 +272,7 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 ## Key files checklist for agents
 
 | Area | Path |
-|------|------|
+| --- | --- |
 | Catalog | `packages/excalidraw/assets/import-presets.catalog.json` |
 | Types / builtins | `packages/excalidraw/components/terraformImportPresetsTypes.ts` |
 | Preset DB (Node) | `excalidraw-app/dev/terraformImportPresetDb.mjs` |
@@ -296,4 +296,4 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 
 ## Changelog note (2026-06-03)
 
-**staging-localstack** preset added to catalog + test fixture DB. **Bug fix:** single-root presets must not prefix `stack.id/` onto root-level `plan.json` / `graph.dot` when loading from disk; regression test in `terraformImportPresetLoader.test.ts` (*"resolves root-level plan paths for single-root staging-localstack preset"*).
+**staging-localstack** preset added to catalog + test fixture DB. **Bug fix:** single-root presets must not prefix `stack.id/` onto root-level `plan.json` / `graph.dot` when loading from disk; regression test in `terraformImportPresetLoader.test.ts` (_"resolves root-level plan paths for single-root staging-localstack preset"_).
