@@ -6,6 +6,7 @@ import {
   MIME_TYPES,
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -49,6 +50,7 @@ export const prepareElementsForExport = (
   exportSelectionOnly: boolean,
 ) => {
   elements = getNonDeletedElements(elements);
+  const elementsMap = arrayToMap(elements);
 
   const isExportingSelection =
     exportSelectionOnly &&
@@ -71,7 +73,11 @@ export const prepareElementsForExport = (
       isFrameLikeElement(exportedElements[0])
     ) {
       exportingFrame = exportedElements[0];
-      exportedElements = getElementsOverlappingFrame(elements, exportingFrame);
+      exportedElements = getElementsOverlappingFrame(
+        elements,
+        exportingFrame,
+        elementsMap,
+      );
     } else if (exportedElements.length > 1) {
       exportedElements = getSelectedElements(
         elements,

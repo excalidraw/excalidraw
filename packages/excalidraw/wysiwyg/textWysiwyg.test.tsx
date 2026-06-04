@@ -45,6 +45,28 @@ unmountComponent();
 const tab = "    ";
 const mouse = new Pointer("mouse");
 
+const exitTextEditorAndAssertSelection = async ({
+  editor,
+  selectedIds,
+  nextText,
+}: {
+  editor: HTMLTextAreaElement;
+  selectedIds: string[];
+  nextText?: string;
+}) => {
+  if (nextText !== undefined) {
+    updateTextEditor(editor, nextText);
+  }
+
+  Keyboard.exitTextEditor(editor);
+
+  expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+  expect(window.h.state.editingTextElement).toBeNull();
+  expect(API.getSelectedElements().map((element) => element.id)).toEqual(
+    selectedIds,
+  );
+};
+
 describe("textWysiwyg", () => {
   describe("start text editing", () => {
     const { h } = window;
@@ -269,6 +291,33 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+
+    it("should reselect text after exiting wysiwyg with escape", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      await exitTextEditorAndAssertSelection({
+        editor,
+        selectedIds: [text.id],
+      });
     });
 
     it("should edit selected bound text on single click", async () => {
@@ -718,6 +767,63 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should not add bound text to a frame when its container is not a frame child", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+      });
+      API.setElements([frame, rectangle]);
+
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+
+      const text = h.elements[2] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(null);
+    });
+
+    it("should bind text to a frame child container when single clicking its center", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+        frameId: frame.id,
+      });
+      API.setElements([rectangle, frame]);
+
+      UI.clickTool("text");
+      mouse.clickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(frame.id);
     });
 
     it("should set the text element angle to same as container angle when binding to rotated container", async () => {
@@ -1304,6 +1410,40 @@ describe("textWysiwyg", () => {
         }),
       );
     });
+
+    it.each([
+      {
+        label: "container",
+        createElements: () => API.createTextContainer(),
+      },
+      {
+        label: "arrow",
+        createElements: () => API.createLabeledArrow(),
+      },
+    ])(
+      "should reselect $label after deleting bound text with escape",
+      async ({ createElements }) => {
+        const [selectedElement, text] = createElements();
+        API.setElements([selectedElement, text]);
+        API.setSelectedElements([selectedElement]);
+
+        Keyboard.keyPress(KEYS.ENTER);
+        const editor = await getTextEditor();
+
+        await exitTextEditorAndAssertSelection({
+          editor,
+          nextText: "",
+          selectedIds: [selectedElement.id],
+        });
+
+        expect(selectedElement.boundElements).toStrictEqual([]);
+        expect(h.elements[1]).toEqual(
+          expect.objectContaining({
+            isDeleted: true,
+          }),
+        );
+      },
+    );
 
     it("should restore original container height and clear cache once text is unbind", async () => {
       const container = API.createElement({

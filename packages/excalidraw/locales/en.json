@@ -185,6 +185,9 @@
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
     "preferences_toolLock": "Tool lock",
+    "boxSelectionMode": "Select on",
+    "boxSelectionContain": "Wrap",
+    "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints"
   },
