@@ -261,7 +261,6 @@ const handleDimensionChange: DragInputCallbackType<
               scene.getElementsIncludingDeleted(),
               nextElementsInFrame,
               latestElement,
-              app,
             );
 
             scene.replaceAllElements(updatedElements);
@@ -416,7 +415,6 @@ const handleDragFinished: DragFinishedCallbackType = ({
       app.scene.getElementsIncludingDeleted(),
       nextElementsInFrame,
       latestElement,
-      app,
     );
 
     app.scene.replaceAllElements(updatedElements);

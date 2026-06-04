@@ -119,15 +119,12 @@ export const SHAPES = [
 export const getToolbarTools = (app: AppClassProperties) => {
   return app.state.preferredSelectionTool.type === "lasso"
     ? ([
+        SHAPES[0],
         {
+          ...SHAPES[1],
           value: "lasso",
-          icon: SelectionIcon,
-          key: KEYS.V,
-          numericKey: KEYS["1"],
-          fillable: true,
-          toolbar: true,
         },
-        ...SHAPES.slice(1),
+        ...SHAPES.slice(2),
       ] as const)
     : SHAPES;
 };
