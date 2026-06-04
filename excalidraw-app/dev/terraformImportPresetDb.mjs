@@ -1344,17 +1344,28 @@ export function upsertAndHydratePresetFromCatalog(db, presetId) {
 }
 
 export function readStagingMultiStatePipelineTfdFromDb() {
+  const presetId = "staging-multi-state-expanded";
+  const tfdPath = "pipeline.tfd";
   const db = getTerraformImportPresetTestDb();
   const row = db
     .prepare(
       `SELECT content FROM terraform_import_preset_tfd
-       WHERE preset_id = 'staging-multi-state-expanded' AND path = 'pipeline.tfd'
+       WHERE preset_id = ? AND path = ?
        ORDER BY sort_order ASC
        LIMIT 1`,
     )
-    .get();
-  if (row?.content) {
-    return row.content;
+    .get(presetId, tfdPath);
+  if (row?.content != null) {
+    const text = loadPresetBlobTextSqlite(
+      db,
+      presetId,
+      "tfd",
+      tfdPath,
+      row.content,
+    );
+    if (text) {
+      return text;
+    }
   }
   return readTerraformImportRepoFileText(
     "packages/backend/terraform/staging-multi-state/pipeline.tfd",
