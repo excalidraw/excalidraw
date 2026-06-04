@@ -1,4 +1,4 @@
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap, reseed } from "@excalidraw/common";
 import { type GlobalPoint, type LocalPoint, pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
@@ -12,6 +12,7 @@ import { hitElementItself } from "../src/collision";
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {
     localStorage.clear();
+    reseed(7);
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
@@ -56,6 +57,7 @@ describe("hitElementItself cache", () => {
     });
 
     localStorage.clear();
+    reseed(7);
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 

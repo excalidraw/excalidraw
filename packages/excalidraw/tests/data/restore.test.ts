@@ -160,6 +160,39 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should restore only valid freedraw points and keep pressures aligned", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      id: "id-freedraw-invalid-points",
+      points: [pointFrom(0, 0), pointFrom(10, 10)],
+    });
+
+    const restoredFreedraw = restore.restoreElements(
+      [
+        {
+          ...freedrawElement,
+          simulatePressure: false,
+          points: [
+            pointFrom(0, 0),
+            [Infinity, 10],
+            null,
+            pointFrom(20, 20),
+            [NaN, 30],
+            [40, null],
+          ],
+          pressures: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+        } as any,
+      ],
+      null,
+    )[0] as ExcalidrawFreeDrawElement;
+
+    expect(restoredFreedraw.points).toEqual([
+      pointFrom(0, 0),
+      pointFrom(20, 20),
+    ]);
+    expect(restoredFreedraw.pressures).toEqual([0.1, 0.4]);
+  });
+
   it("should restore line and draw elements correctly", () => {
     const lineElement = API.createElement({ type: "line", id: "id-line01" });
 
@@ -398,6 +431,52 @@ describe("restoreElements", () => {
     )[0] as ExcalidrawLinearElement;
 
     expect(restoredLine.points).toMatchObject(expectedLinePoints);
+  });
+
+  it("should restore only valid linear points", () => {
+    const lineElement: any = API.createElement({
+      type: "line",
+      x: 10,
+      y: 20,
+      width: 100,
+      height: 200,
+    });
+    const arrowElement: any = API.createElement({
+      type: "arrow",
+      width: 100,
+      height: 200,
+    });
+
+    lineElement.points = [
+      [2, 3],
+      null,
+      [Infinity, 4],
+      [5, 7],
+      [NaN, 8],
+      [9, null],
+    ];
+    arrowElement.points = [
+      [null, 0],
+      [Infinity, 4],
+    ];
+
+    const restoredElements = restore.restoreElements(
+      [lineElement, arrowElement],
+      null,
+    );
+    const restoredLine = restoredElements[0] as ExcalidrawLinearElement;
+    const restoredArrow = restoredElements[1] as ExcalidrawArrowElement;
+
+    expect(restoredLine.points).toEqual([pointFrom(0, 0), pointFrom(3, 4)]);
+    expect(restoredLine.x).toBe(12);
+    expect(restoredLine.y).toBe(23);
+    expect(restoredLine.width).toBe(3);
+    expect(restoredLine.height).toBe(4);
+
+    expect(restoredArrow.points).toEqual([
+      pointFrom(0, 0),
+      pointFrom(100, 200),
+    ]);
   });
 
   it("when the number of points of a line is greater or equal 2", () => {
