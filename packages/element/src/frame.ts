@@ -1,6 +1,9 @@
 import { arrayToMap } from "@excalidraw/common";
-import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
-import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
+import {
+  isPointWithinBounds,
+  pointFrom,
+  segmentsIntersectAt,
+} from "@excalidraw/math";
 
 import type {
   AppClassProperties,
@@ -78,7 +81,7 @@ export function isElementIntersectingFrame(
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
-      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+      segmentsIntersectAt(frameLineSegment, elementLineSegment),
     ),
   );
 
