@@ -392,6 +392,13 @@ const renderElementToSvg = (
         if (typeof shape === "string") {
           // stroke (SVGPathString) — fill inherited from wrapper <g>
           const path = svgRoot.ownerDocument.createElementNS(SVG_NS, "path");
+          path.setAttribute(
+            "fill",
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
+          );
           path.setAttribute("d", shape);
           wrapper.appendChild(path);
         } else {
@@ -623,9 +630,10 @@ const renderElementToSvg = (
         rect.setAttribute("fill", "none");
         rect.setAttribute(
           "stroke",
-          renderConfig.theme === THEME.DARK
-            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
-            : FRAME_STYLE.strokeColor,
+          applyDarkModeFilter(
+            FRAME_STYLE.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
         );
         rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
 
@@ -679,9 +687,10 @@ const renderElementToSvg = (
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute(
             "fill",
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor,
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
           );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");

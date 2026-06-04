@@ -163,7 +163,10 @@ export const drawFreeDrawSegments = (
       ? applyDarkModeFilter(element.strokeColor)
       : element.strokeColor;
 
-  context.fillStyle = strokeColor;
+  context.fillStyle = applyDarkModeFilter(
+    strokeColor,
+    renderConfig.theme === THEME.DARK,
+  );
 
   const baseRadius = (element.strokeWidth * 1.25) / 2;
 

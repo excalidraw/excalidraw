@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import {
+  applyDarkModeFilter,
   DEFAULT_IMAGE_OPTIONS,
   DEFAULT_UI_OPTIONS,
   isShallowEqual,
@@ -450,3 +451,5 @@ export function useExcalidrawStateValue(
 // -----------------------------------------------------------------------------
 
 export { _useOnAppStateChange as useOnExcalidrawStateChange };
+
+export { applyDarkModeFilter };
