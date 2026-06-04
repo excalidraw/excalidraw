@@ -41,6 +41,8 @@ import type {
   ExcalidrawProps,
 } from "./types";
 
+export { elementsOverlappingBBox } from "@excalidraw/element";
+
 polyfill();
 
 /**
