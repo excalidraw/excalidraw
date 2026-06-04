@@ -298,8 +298,9 @@ describe("staging-extended-localstack pipeline preset", () => {
   it(
     "resolves extended lake Kubernetes and security paths",
     async () => {
-      const { nodes, sources, tfdTexts, tfdLabels } =
-        nodesAndTfdFromPreset("staging-extended-localstack");
+      const { nodes, sources, tfdTexts, tfdLabels } = nodesAndTfdFromPreset(
+        "staging-extended-localstack",
+      );
       const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
         nodes,
         tfdTexts,

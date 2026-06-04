@@ -32,9 +32,15 @@ const EKS_COMPANION_TYPES = new Set([
 ]);
 
 function typeOrder(t: string): number {
-  if (t === "aws_eks_node_group") return 0;
-  if (t === "aws_eks_fargate_profile") return 1;
-  if (t === "aws_eks_addon") return 2;
+  if (t === "aws_eks_node_group") {
+    return 0;
+  }
+  if (t === "aws_eks_fargate_profile") {
+    return 1;
+  }
+  if (t === "aws_eks_addon") {
+    return 2;
+  }
   return 3;
 }
 

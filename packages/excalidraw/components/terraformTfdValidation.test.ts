@@ -118,9 +118,7 @@ describe("detectOrphanedBinds", () => {
   });
 
   it("emits no warning when there are no binds", () => {
-    expect(
-      detectOrphanedBinds(new Map(), new Set(), new Set()),
-    ).toEqual([]);
+    expect(detectOrphanedBinds(new Map(), new Set(), new Set())).toEqual([]);
   });
 });
 

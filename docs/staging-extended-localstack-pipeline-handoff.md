@@ -39,12 +39,14 @@ Source: [`packages/excalidraw/assets/import-presets.catalog.json`](../packages/e
   "name": "Staging Extended LocalStack",
   "view": "pipeline",
   "rootPath": "packages/backend/terraform/staging-extended-localstack",
-  "stacks": [{
-    "id": "staging-extended-localstack",
-    "label": "staging-extended-localstack",
-    "planPath": "plan.json",
-    "dotPath": "graph.dot"
-  }],
+  "stacks": [
+    {
+      "id": "staging-extended-localstack",
+      "label": "staging-extended-localstack",
+      "planPath": "plan.json",
+      "dotPath": "graph.dot"
+    }
+  ],
   "tfdPaths": ["pipeline.tfd"]
 }
 ```
@@ -225,7 +227,7 @@ Asserts:
 
 ## Comparison with sibling presets
 
-| | `staging-multi-state-expanded` | `staging-localstack` | `staging-extended-localstack` |
+|  | `staging-multi-state-expanded` | `staging-localstack` | `staging-extended-localstack` |
 | --- | --- | --- | --- |
 | Stacks | 25 | 1 | 1 |
 | Plan shape | 25 sharded JSON files | 1 large JSON | 1 larger JSON (+ lake/EKS/security) |

@@ -44,7 +44,9 @@ export function detectTfdGraphCycles(edges: DeclaredDataFlowEdge[]): string[] {
         if (!reportedCycleRoots.has(cycleRoot)) {
           reportedCycleRoots.add(cycleRoot);
           errors.push(
-            `Cycle in declared dataflow: ${[...cycleNodes, cycleRoot].join(" → ")}`,
+            `Cycle in declared dataflow: ${[...cycleNodes, cycleRoot].join(
+              " → ",
+            )}`,
           );
         }
       } else if (c === WHITE) {
