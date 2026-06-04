@@ -132,6 +132,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: false,
       layoutMode: "pipeline",
+      pipelineCompact: true,
       moduleLayoutOptions: undefined,
     });
   });
