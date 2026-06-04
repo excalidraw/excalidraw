@@ -62,10 +62,10 @@ export const bootstrapCanvas = ({
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
     context.save();
-    context.fillStyle =
-      theme === THEME.DARK
-        ? applyDarkModeFilter(viewBackgroundColor)
-        : viewBackgroundColor;
+    context.fillStyle = applyDarkModeFilter(
+      viewBackgroundColor,
+      theme === THEME.DARK,
+    );
     context.fillRect(0, 0, normalizedWidth, normalizedHeight);
     context.restore();
   } else {

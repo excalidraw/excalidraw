@@ -2001,9 +2001,10 @@ class App extends React.Component<AppProps, AppState> {
               }
             }}
             style={{
-              background: isDarkTheme
-                ? applyDarkModeFilter(this.state.viewBackgroundColor)
-                : this.state.viewBackgroundColor,
+              background: applyDarkModeFilter(
+                this.state.viewBackgroundColor,
+                isDarkTheme,
+              ),
               zIndex: 2,
               border: "none",
               display: "block",
