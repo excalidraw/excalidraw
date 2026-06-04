@@ -834,6 +834,14 @@ export const CompactShapeActions = ({
         container={container}
       />
 
+      {/* Stroke Shape Toggle (freedraw only) */}
+      {(appState.activeTool.type === "freedraw" ||
+        targetElements.some((element) => element.type === "freedraw")) && (
+        <div className="compact-action-item">
+          {renderAction("changeStrokeShape")}
+        </div>
+      )}
+
       <CombinedArrowProperties
         appState={appState}
         renderAction={renderAction}
@@ -969,6 +977,13 @@ export const MobileShapeActions = ({
           targetElements={targetElements}
           container={container}
         />
+        {/* Stroke Shape Toggle (freedraw only) */}
+        {(appState.activeTool.type === "freedraw" ||
+          targetElements.some((element) => element.type === "freedraw")) && (
+          <div className="compact-action-item">
+            {renderAction("changeStrokeShape")}
+          </div>
+        )}
         {/* Combined Arrow Properties */}
         <CombinedArrowProperties
           appState={appState}

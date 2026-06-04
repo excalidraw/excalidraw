@@ -9,7 +9,7 @@ import {
 } from "@excalidraw/excalidraw/renderer/helpers";
 import { type AppState } from "@excalidraw/excalidraw/types";
 import { arrayToMap, throttleRAF } from "@excalidraw/common";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   getGlobalFixedPointForBindableElement,
@@ -435,6 +435,34 @@ export const loadSavedDebugState = () => {
 export const isVisualDebuggerEnabled = () =>
   Array.isArray(window.visualDebug?.data);
 
+export const loadConsoleLoggerState = (): boolean => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_DEBUG_CONSOLE);
+    if (raw !== null) {
+      return JSON.parse(raw) === true;
+    }
+  } catch {}
+  return false;
+};
+
+export const saveConsoleLoggerState = (enabled: boolean) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_DEBUG_CONSOLE,
+      JSON.stringify(enabled),
+    );
+  } catch {}
+};
+
+const CONSOLE_LOGGER_TOGGLE_EVENT = "excalidraw-debug-console-toggle";
+
+export const setConsoleLoggerEnabled = (enabled: boolean) => {
+  saveConsoleLoggerState(enabled);
+  window.dispatchEvent(
+    new CustomEvent<boolean>(CONSOLE_LOGGER_TOGGLE_EVENT, { detail: enabled }),
+  );
+};
+
 export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
   const moveForward = useCallback(() => {
     if (
@@ -459,6 +487,7 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
   }, [onChange]);
   const reset = useCallback(() => {
     window.visualDebug!.currentFrame = undefined;
+    _clearLogsCallback?.();
     onChange();
   }, [onChange]);
   const trashFrames = useCallback(() => {
@@ -466,6 +495,7 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
       window.visualDebug.currentFrame = undefined;
       window.visualDebug.data = [];
     }
+    _clearLogsCallback?.();
     onChange();
   }, [onChange]);
 
@@ -562,5 +592,182 @@ const DebugCanvas = React.forwardRef<HTMLCanvasElement, DebugCanvasProps>(
     );
   },
 );
+
+type LogLevel = "log" | "info" | "warn" | "error";
+
+interface LogEntry {
+  id: number;
+  level: LogLevel;
+  message: string;
+  timestamp: number;
+}
+
+const LOG_COLORS: Record<LogLevel, string> = {
+  log: "rgba(220,220,220,0.9)",
+  info: "rgba(100,180,255,0.9)",
+  warn: "rgba(255,200,60,0.9)",
+  error: "rgba(255,90,90,0.9)",
+};
+
+const MAX_LOGS = 500;
+let logIdCounter = 0;
+let _clearLogsCallback: (() => void) | null = null;
+
+export const ConsoleLogger = () => {
+  const [enabled, setEnabled] = useState(() => loadConsoleLoggerState());
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const logsRef = useRef<LogEntry[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{ startY: number; startScrollTop: number } | null>(
+    null,
+  );
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setEnabled((e as CustomEvent<boolean>).detail);
+    };
+    window.addEventListener(CONSOLE_LOGGER_TOGGLE_EVENT, handler);
+    return () => {
+      window.removeEventListener(CONSOLE_LOGGER_TOGGLE_EVENT, handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    _clearLogsCallback = () => {
+      logsRef.current = [];
+      setLogs([]);
+    };
+    return () => {
+      _clearLogsCallback = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const originals: Record<LogLevel, (...args: unknown[]) => void> = {
+      // eslint-disable-next-line no-console
+      log: console.log.bind(console),
+      info: console.info.bind(console),
+      warn: console.warn.bind(console),
+      error: console.error.bind(console),
+    };
+
+    const patch = (level: LogLevel) => {
+      // eslint-disable-next-line no-console
+      console[level] = (...args: unknown[]) => {
+        originals[level](...args);
+        const message = args
+          .map((a) =>
+            typeof a === "object" ? JSON.stringify(a, null, 0) : String(a),
+          )
+          .join(" ");
+        const entry: LogEntry = {
+          id: ++logIdCounter,
+          level,
+          message,
+          timestamp: Date.now(),
+        };
+        logsRef.current = [...logsRef.current, entry].slice(-MAX_LOGS);
+        setLogs([...logsRef.current]);
+        if (!isDragging.current && scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      };
+    };
+
+    (["log", "info", "warn", "error"] as LogLevel[]).forEach(patch);
+
+    return () => {
+      (["log", "info", "warn", "error"] as LogLevel[]).forEach((level) => {
+        // eslint-disable-next-line no-console
+        console[level] = originals[level];
+      });
+    };
+  }, []);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrollRef.current) {
+      return;
+    }
+    dragState.current = {
+      startY: e.clientY,
+      startScrollTop: scrollRef.current.scrollTop,
+    };
+    scrollRef.current.setPointerCapture(e.pointerId);
+    isDragging.current = true;
+    e.preventDefault();
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragState.current || !scrollRef.current) {
+      return;
+    }
+    const delta = dragState.current.startY - e.clientY;
+    scrollRef.current.scrollTop = dragState.current.startScrollTop + delta;
+    e.preventDefault();
+  }, []);
+
+  const onPointerUp = useCallback(() => {
+    dragState.current = null;
+    isDragging.current = false;
+  }, []);
+
+  if (!enabled || logs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      ref={scrollRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={{
+        position: "fixed",
+        top: 8,
+        right: 8,
+        zIndex: 9999,
+        maxWidth: 420,
+        maxHeight: "60vh",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        pointerEvents: "all",
+        cursor: "grab",
+        userSelect: "none",
+        scrollbarWidth: "none",
+      }}
+    >
+      {logs.map((entry) => (
+        <div
+          key={entry.id}
+          style={{
+            background: "rgba(18,18,20,0.55)",
+            backdropFilter: "blur(8px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(8px) saturate(1.4)",
+            borderLeft: `3px solid ${LOG_COLORS[entry.level]}`,
+            borderRadius: 4,
+            padding: "2px 8px",
+            fontFamily: "monospace",
+            fontSize: 11,
+            lineHeight: 1.5,
+            color: LOG_COLORS[entry.level],
+            wordBreak: "break-all",
+            whiteSpace: "pre-wrap",
+            opacity: 0.95,
+            boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
+          }}
+        >
+          <span style={{ opacity: 0.5, marginRight: 6 }}>
+            {entry.level.toUpperCase()}
+          </span>
+          {entry.message}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default DebugCanvas;

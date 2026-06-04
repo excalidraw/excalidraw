@@ -4,7 +4,8 @@ import {
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
-import React from "react";
+import DropdownMenuItemCheckbox from "@excalidraw/excalidraw/components/dropdownMenu/DropdownMenuItemCheckbox";
+import React, { useState } from "react";
 
 import { isDevEnv } from "@excalidraw/common";
 
@@ -13,7 +14,29 @@ import type { Theme } from "@excalidraw/element/types";
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
-import { saveDebugState } from "./DebugCanvas";
+import {
+  isVisualDebuggerEnabled,
+  loadConsoleLoggerState,
+  saveDebugState,
+  setConsoleLoggerEnabled,
+} from "./DebugCanvas";
+
+const ConsoleLoggerToggle = () => {
+  const [checked, setChecked] = useState(() => loadConsoleLoggerState());
+  return (
+    <DropdownMenuItemCheckbox
+      checked={checked}
+      onSelect={(event) => {
+        const next = !checked;
+        setChecked(next);
+        setConsoleLoggerEnabled(next);
+        event.preventDefault();
+      }}
+    >
+      Show console log overlay
+    </DropdownMenuItemCheckbox>
+  );
+};
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -77,7 +100,13 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.Preferences />
+      <MainMenu.DefaultItems.Preferences
+        additionalItems={
+          isDevEnv() && isVisualDebuggerEnabled() ? (
+            <ConsoleLoggerToggle />
+          ) : null
+        }
+      />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme
         theme={props.theme}

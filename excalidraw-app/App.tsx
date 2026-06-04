@@ -136,6 +136,7 @@ import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
 import DebugCanvas, {
+  ConsoleLogger,
   debugRenderer,
   isVisualDebuggerEnabled,
   loadSavedDebugState,
@@ -1261,6 +1262,7 @@ const ExcalidrawWrapper = () => {
             ref={debugCanvasRef}
           />
         )}
+        {isVisualDebuggerEnabled() && <ConsoleLogger />}
       </Excalidraw>
     </div>
   );

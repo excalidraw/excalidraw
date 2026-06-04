@@ -355,6 +355,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   stopCollaboration = (keepRemoteState = true) => {
+    this.broadcastElements.flush();
+    this.broadcastElements.cancel();
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
@@ -941,7 +943,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.portal.broadcastIdleChange(userState);
   };
 
-  broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
+  private _broadcastElements = (
+    elements: readonly OrderedExcalidrawElement[],
+  ) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -951,6 +955,13 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.queueBroadcastAllElements();
     }
   };
+
+  broadcastElements = throttle(
+    (elements: readonly OrderedExcalidrawElement[]) =>
+      this._broadcastElements(elements),
+    10,
+    { leading: true, trailing: true },
+  );
 
   syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
     this.broadcastElements(elements);

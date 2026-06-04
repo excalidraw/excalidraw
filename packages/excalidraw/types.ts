@@ -363,6 +363,7 @@ export interface AppState {
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidth: number;
+  currentItemFreedrawConstantPressure: boolean;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
@@ -909,7 +910,10 @@ export type PointerDownState = Readonly<{
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
     // It's defined on the initial pointer down event
-    onMove: null | ReturnType<typeof throttleRAF>;
+    onMove:
+      | null
+      | ReturnType<typeof throttleRAF>
+      | (((event: PointerEvent) => void) & { flush(): void; cancel(): void });
     // It's defined on the initial pointer down event
     onUp: null | ((event: PointerEvent) => void);
     // It's defined on the initial pointer down event

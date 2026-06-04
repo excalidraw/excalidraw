@@ -377,12 +377,20 @@ const renderElementToSvg = (
     case "freedraw": {
       const wrapper = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
 
+      // Set fill once on the group so all capsule paths inherit it
+      // instead of repeating the attribute on every child element.
+      wrapper.setAttribute(
+        "fill",
+        renderConfig.theme === THEME.DARK
+          ? applyDarkModeFilter(element.strokeColor)
+          : element.strokeColor,
+      );
+
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
       // always ordered as [background, stroke]
       for (const shape of shapes) {
         if (typeof shape === "string") {
-          // stroke (SVGPathString)
-
+          // stroke (SVGPathString) — fill inherited from wrapper <g>
           const path = svgRoot.ownerDocument.createElementNS(SVG_NS, "path");
           path.setAttribute(
             "fill",
