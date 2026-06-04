@@ -80,7 +80,11 @@ const cssInvert = (
   return { r: invertedR, g: invertedG, b: invertedB };
 };
 
-export const applyDarkModeFilter = (color: string): string => {
+export const applyDarkModeFilter = (color: string, enable = true): string => {
+  if (!enable) {
+    return color;
+  }
+
   const cached = DARK_MODE_COLORS_CACHE?.get(color);
   if (cached) {
     return cached;

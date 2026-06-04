@@ -645,6 +645,10 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
+  /**
+   * dimensions and size constraints for inserted images
+   */
+  imageOptions?: ImageOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -731,6 +735,11 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+export type ImageOptions = Partial<{
+  maxWidthOrHeight: number;
+  maxFileSizeBytes: number;
+}>;
+
 // NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
@@ -772,6 +781,7 @@ export type AppProps = Merge<
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
     >;
+    imageOptions: Required<ImageOptions>;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;

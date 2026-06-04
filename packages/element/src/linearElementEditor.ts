@@ -486,7 +486,7 @@ export class LinearElementEditor {
           selectedPointsIndices,
         )}) points(0..${
           element.points.length - 1
-        }) lastClickedPoint(${lastClickedPoint})`,
+        }) lastClickedPoint(${lastClickedPoint}) isElbowArrow: ${elbowed}`,
       );
 
       // Fall back to the actual last point as a last resort.
@@ -2139,13 +2139,13 @@ const pointDraggingUpdates = (
 } => {
   const naiveDraggingPoints = new Map(
     selectedPointsIndices.map((pointIndex) => {
+      // NOTE: Avoid stale point index issue potentially caused by elbow
+      // arrows unpredictably changing the number of points during dragging
+      const point = element.points[pointIndex] ?? element.points.at(-1);
       return [
         pointIndex,
         {
-          point: pointFrom<LocalPoint>(
-            element.points[pointIndex][0] + deltaX,
-            element.points[pointIndex][1] + deltaY,
-          ),
+          point: pointFrom<LocalPoint>(point[0] + deltaX, point[1] + deltaY),
           isDragging: true,
         },
       ];

@@ -6,7 +6,12 @@ import React, {
   useState,
 } from "react";
 
-import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  DEFAULT_IMAGE_OPTIONS,
+  DEFAULT_UI_OPTIONS,
+  isShallowEqual,
+} from "@excalidraw/common";
 
 import App, {
   ExcalidrawAPIContext,
@@ -98,6 +103,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
+    imageOptions,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -127,6 +133,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   ) {
     UIOptions.canvasActions.toggleTheme = true;
   }
+
+  const normalizedImageOptions: AppProps["imageOptions"] = {
+    maxFileSizeBytes:
+      imageOptions?.maxFileSizeBytes ?? DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes,
+    maxWidthOrHeight:
+      imageOptions?.maxWidthOrHeight ?? DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight,
+  };
 
   const setExcalidrawAPI = useContext(ExcalidrawAPISetContext);
 
@@ -208,6 +221,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
+          imageOptions={normalizedImageOptions}
         >
           {children}
         </App>
@@ -225,11 +239,13 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   const {
     initialData: prevInitialData,
     UIOptions: prevUIOptions = {},
+    imageOptions: prevImageOptions,
     ...prev
   } = prevProps;
   const {
     initialData: nextInitialData,
     UIOptions: nextUIOptions = {},
+    imageOptions: nextImageOptions,
     ...next
   } = nextProps;
 
@@ -273,7 +289,17 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     return prevUIOptions[key] === nextUIOptions[key];
   });
 
-  return isUIOptionsSame && isShallowEqual(prev, next);
+  const isImageOptionsSame =
+    (prevImageOptions?.maxWidthOrHeight ??
+      DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) ===
+      (nextImageOptions?.maxWidthOrHeight ??
+        DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) &&
+    (prevImageOptions?.maxFileSizeBytes ??
+      DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes) ===
+      (nextImageOptions?.maxFileSizeBytes ??
+        DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes);
+
+  return isUIOptionsSame && isImageOptionsSame && isShallowEqual(prev, next);
 };
 
 export const Excalidraw = React.memo(ExcalidrawBase, areEqual);
@@ -419,3 +445,5 @@ export function useExcalidrawStateValue(
 // -----------------------------------------------------------------------------
 
 export { _useOnAppStateChange as useOnExcalidrawStateChange };
+
+export { applyDarkModeFilter };

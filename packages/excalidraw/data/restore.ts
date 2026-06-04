@@ -1,4 +1,4 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
   type CombineBrandsIfNeeded,
@@ -97,6 +97,67 @@ type RestoredAppState = Omit<
 >;
 
 const MAX_ARROW_PX = 75_000;
+
+const restoreLinearElementPoints = (
+  points: unknown,
+  width: unknown,
+  height: unknown,
+): LocalPoint[] => {
+  const restoredPoints = Array.isArray(points)
+    ? points.reduce<LocalPoint[]>((acc, point) => {
+        if (isValidPoint(point)) {
+          acc.push(pointFrom<LocalPoint>(point[0], point[1]));
+        }
+        return acc;
+      }, [])
+    : [];
+
+  return restoredPoints.length < 2
+    ? [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(
+          isFiniteNumber(width) ? width : 0,
+          isFiniteNumber(height) ? height : 0,
+        ),
+      ]
+    : restoredPoints;
+};
+
+const restoreFreedrawPoints = (
+  points: unknown,
+  pressures: unknown,
+): {
+  points: LocalPoint[];
+  pressures: number[];
+} => {
+  if (!Array.isArray(points)) {
+    return {
+      points: [],
+      pressures: [],
+    };
+  }
+
+  const pressureValues: readonly unknown[] = Array.isArray(pressures)
+    ? pressures
+    : [];
+  const restoredPoints: LocalPoint[] = [];
+  const restoredPressures: number[] = [];
+
+  points.forEach((point, index) => {
+    if (isValidPoint(point)) {
+      restoredPoints.push(pointFrom<LocalPoint>(point[0], point[1]));
+      if (index in pressureValues) {
+        const pressure = pressureValues[index];
+        restoredPressures.push(isFiniteNumber(pressure) ? pressure : 0.5);
+      }
+    }
+  });
+
+  return {
+    points: restoredPoints,
+    pressures: restoredPressures,
+  };
+};
 
 export const AllowedExcalidrawActiveTools: Record<
   AppState["activeTool"]["type"],
@@ -414,10 +475,15 @@ export const restoreElement = (
 
       return element;
     case "freedraw": {
+      const { points, pressures } = restoreFreedrawPoints(
+        element.points,
+        element.pressures,
+      );
+
       return restoreElementWithProperties(element, {
-        points: element.points,
+        points,
         simulatePressure: element.simulatePressure,
-        pressures: element.pressures,
+        pressures,
       });
     }
     case "image":
@@ -435,14 +501,20 @@ export const restoreElement = (
       const endArrowhead = normalizeArrowhead(element.endArrowhead);
       let x = element.x;
       let y = element.y;
-      let points = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
+      let points = restoreLinearElementPoints(
+        element.points,
+        element.width,
+        element.height,
+      );
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
         ({ points, x, y } =
-          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
+          LinearElementEditor.getNormalizeElementPointsAndCoords({
+            ...element,
+            points,
+            x: x ?? 0,
+            y: y ?? 0,
+          } as ExcalidrawLinearElement));
       }
 
       return restoreElementWithProperties(element, {
@@ -456,7 +528,7 @@ export const restoreElement = (
         y,
         ...(isLineElement(element)
           ? {
-              polygon: isValidPolygon(element.points)
+              polygon: isValidPolygon(points)
                 ? element.polygon ?? false
                 : false,
             }
@@ -471,22 +543,29 @@ export const restoreElement = (
           : normalizeArrowhead(element.endArrowhead);
       const x = element.x as number | undefined;
       const y = element.y as number | undefined;
-      const points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
+      const points = restoreLinearElementPoints(
+        element.points,
+        element.width,
+        element.height,
+      );
+      const elementWithRestoredPoints = {
+        ...element,
+        points,
+        x: x ?? 0,
+        y: y ?? 0,
+      } as ExcalidrawArrowElement;
 
       const base = {
         type: element.type,
         startBinding: repairBinding(
-          element as ExcalidrawArrowElement,
+          elementWithRestoredPoints,
           element.startBinding,
           targetElementsMap,
           existingElementsMap,
           "start",
         ),
         endBinding: repairBinding(
-          element as ExcalidrawArrowElement,
+          elementWithRestoredPoints,
           element.endBinding,
           targetElementsMap,
           existingElementsMap,
