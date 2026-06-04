@@ -184,9 +184,7 @@
           "statePath": "57-east-2-api-16/terraform.tfstate"
         }
       ],
-      "tfdPaths": [
-        "pipeline.tfd"
-      ]
+      "tfdPaths": ["pipeline.tfd"]
     },
     {
       "id": "staging-localstack",
@@ -203,9 +201,7 @@
           "dotPath": "graph.dot"
         }
       ],
-      "tfdPaths": [
-        "pipeline.tfd"
-      ]
+      "tfdPaths": ["pipeline.tfd"]
     },
     {
       "id": "staging-extended-localstack",
@@ -222,9 +218,7 @@
           "dotPath": "graph.dot"
         }
       ],
-      "tfdPaths": [
-        "pipeline.tfd"
-      ]
+      "tfdPaths": ["pipeline.tfd"]
     },
     {
       "id": "staging-extended-localstack-v2",
@@ -241,9 +235,7 @@
           "dotPath": "graph.dot"
         }
       ],
-      "tfdPaths": [
-        "pipeline.tfd"
-      ]
+      "tfdPaths": ["pipeline.tfd"]
     }
   ]
 }
