@@ -12,6 +12,7 @@ import {
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
+  newHighlighterElement,
   newIframeElement,
   newImageElement,
   newLinearElement,
@@ -31,6 +32,7 @@ import type {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawImageElement,
   FileId,
   ExcalidrawFrameElement,
@@ -316,6 +318,14 @@ export class API {
       case "freedraw":
         element = newFreeDrawElement({
           type: type as "freedraw",
+          simulatePressure: true,
+          points: rest.points,
+          ...base,
+        });
+        break;
+      case "highlighter":
+        element = newHighlighterElement({
+          type: type as "highlighter",
           simulatePressure: true,
           points: rest.points,
           ...base,

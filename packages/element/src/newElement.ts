@@ -38,6 +38,7 @@ import type {
   VerticalAlign,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
@@ -449,6 +450,22 @@ export const newFreeDrawElement = (
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
+    points: opts.points || [],
+    pressures: opts.pressures || [],
+    simulatePressure: opts.simulatePressure,
+  };
+};
+
+export const newHighlighterElement = (
+  opts: {
+    type: "highlighter";
+    points?: ExcalidrawHighlighterElement["points"];
+    simulatePressure: boolean;
+    pressures?: ExcalidrawHighlighterElement["pressures"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawHighlighterElement> => {
+  return {
+    ..._newElementBase<ExcalidrawHighlighterElement>(opts.type, opts),
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,

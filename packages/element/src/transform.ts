@@ -49,6 +49,7 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawIframeLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
@@ -175,7 +176,9 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
+      | ExcalidrawIframeLikeElement
+      | ExcalidrawFreeDrawElement
+      | ExcalidrawHighlighterElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -531,56 +534,59 @@ export const convertToExcalidrawElements = (
       case "ellipse":
       case "diamond": {
         const width =
-          element?.label?.text && element.width === undefined
+          (element as any)?.label?.text && (element as any).width === undefined
             ? 0
-            : element?.width || DEFAULT_DIMENSION;
+            : (element as any)?.width || DEFAULT_DIMENSION;
         const height =
-          element?.label?.text && element.height === undefined
+          (element as any)?.label?.text && (element as any).height === undefined
             ? 0
-            : element?.height || DEFAULT_DIMENSION;
+            : (element as any)?.height || DEFAULT_DIMENSION;
         excalidrawElement = newElement({
           ...element,
           width,
           height,
-        });
+        } as any);
 
         break;
       }
       case "line": {
-        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        const width = (element as any).width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = (element as any).height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
         excalidrawElement = newLinearElement({
           width,
           height,
           points: [pointFrom(0, 0), pointFrom(width, height)],
-          ...element,
+          ...(element as any),
         });
 
         break;
       }
       case "arrow": {
-        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        const width = (element as any).width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = (element as any).height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
         excalidrawElement = newArrowElement({
           width,
           height,
           endArrowhead: "arrow",
           points: [pointFrom(0, 0), pointFrom(width, height)],
-          ...element,
+          ...(element as any),
           type: "arrow",
         });
 
         Object.assign(
           excalidrawElement,
-          getSizeFromPoints(excalidrawElement.points),
+          LinearElementEditor.getNormalizeElementPointsAndCoords(
+            excalidrawElement as ExcalidrawLinearElement,
+          ),
         );
+
         break;
       }
       case "text": {
-        const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
-        const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight = element?.lineHeight || getLineHeight(fontFamily);
-        const text = element.text ?? "";
+        const fontFamily = (element as any)?.fontFamily || DEFAULT_FONT_FAMILY;
+        const fontSize = (element as any)?.fontSize || DEFAULT_FONT_SIZE;
+        const lineHeight = (element as any)?.lineHeight || getLineHeight(fontFamily);
+        const text = (element as any).text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
           normalizedText,
@@ -593,7 +599,7 @@ export const convertToExcalidrawElements = (
           height: metrics.height,
           fontFamily,
           fontSize,
-          ...element,
+          ...(element as any),
         });
         break;
       }
@@ -601,7 +607,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newImageElement({
           width: element?.width || DEFAULT_DIMENSION,
           height: element?.height || DEFAULT_DIMENSION,
-          ...element,
+          ...(element as any),
         });
 
         break;
@@ -610,7 +616,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newFrameElement({
           x: 0,
           y: 0,
-          ...element,
+          ...(element as any),
         });
         break;
       }
@@ -618,21 +624,22 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newMagicFrameElement({
           x: 0,
           y: 0,
-          ...element,
+          ...(element as any),
         });
         break;
       }
       case "freedraw":
+      case "highlighter":
       case "iframe":
       case "embeddable": {
-        excalidrawElement = element;
+        excalidrawElement = element as any;
         break;
       }
 
       default: {
-        excalidrawElement = element;
+        excalidrawElement = element as any;
         assertNever(
-          element,
+          element as any as never,
           `Unhandled element type "${(element as any).type}"`,
           true,
         );
@@ -663,10 +670,10 @@ export const convertToExcalidrawElements = (
       case "ellipse":
       case "diamond":
       case "arrow": {
-        if (element.label?.text) {
+        if ((element as any).label?.text) {
           let [container, text] = bindTextToContainer(
             excalidrawElement,
-            element?.label,
+            (element as any)?.label,
             scene,
           );
           elementStore.add(container);
@@ -674,9 +681,9 @@ export const convertToExcalidrawElements = (
 
           if (isArrowElement(container)) {
             const originalStart =
-              element.type === "arrow" ? element?.start : undefined;
+              element.type === "arrow" ? (element as any)?.start : undefined;
             const originalEnd =
-              element.type === "arrow" ? element?.end : undefined;
+              element.type === "arrow" ? (element as any)?.end : undefined;
             if (originalStart && originalStart.id) {
               const newStartId = oldToNewElementIdMap.get(originalStart.id);
               if (newStartId) {
@@ -705,7 +712,7 @@ export const convertToExcalidrawElements = (
         } else {
           switch (element.type) {
             case "arrow": {
-              const { start, end } = element;
+              const { start, end } = element as any;
               if (start && start.id) {
                 const newStartId = oldToNewElementIdMap.get(start.id);
                 Object.assign(start, { id: newStartId });
@@ -749,7 +756,7 @@ export const convertToExcalidrawElements = (
     }
     const childrenElements: ExcalidrawElement[] = [];
 
-    element.children.forEach((id) => {
+    (element as any).children.forEach((id: string) => {
       const newElementId = oldToNewElementIdMap.get(id);
       if (!newElementId) {
         throw new Error(`Element with ${id} wasn't mapped correctly`);
@@ -796,7 +803,7 @@ export const convertToExcalidrawElements = (
     });
     if (
       isDevEnv() &&
-      element.children.length &&
+      (element as any).children.length &&
       (frame?.x || frame?.y || frame?.width || frame?.height)
     ) {
       console.info(

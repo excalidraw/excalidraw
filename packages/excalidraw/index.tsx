@@ -118,6 +118,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     },
     tools: {
       image: props.UIOptions?.tools?.image ?? true,
+      highlighter: props.UIOptions?.tools?.highlighter ?? true,
     },
   };
 

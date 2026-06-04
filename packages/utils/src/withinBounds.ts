@@ -17,6 +17,7 @@ import {
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -31,7 +32,9 @@ type Points = readonly LocalPoint[];
 const getNonLinearElementRelativePoints = (
   element: Exclude<
     Element,
-    ExcalidrawLinearElement | ExcalidrawFreeDrawElement
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawHighlighterElement
   >,
 ): [
   TopLeft: LocalPoint,
@@ -58,7 +61,7 @@ const getNonLinearElementRelativePoints = (
 /** @returns vertices relative to element's top-left [0,0] position  */
 const getElementRelativePoints = (element: ExcalidrawElement): Points => {
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    return element.points;
+    return (element as ExcalidrawLinearElement | ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement).points;
   }
   return getNonLinearElementRelativePoints(element);
 };

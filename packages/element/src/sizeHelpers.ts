@@ -20,7 +20,13 @@ import {
   isLinearElement,
 } from "./typeChecks";
 
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
+  ExcalidrawLinearElement,
+} from "./types";
 
 export const INVISIBLY_SMALL_ELEMENT_SIZE = 0.1;
 
@@ -31,13 +37,14 @@ export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
   if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const el = element as ExcalidrawLinearElement | ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement;
     return (
-      element.points.length < 2 ||
-      (element.points.length === 2 &&
-        isArrowElement(element) &&
+      el.points.length < 2 ||
+      (el.points.length === 2 &&
+        isArrowElement(el) &&
         pointsEqual(
-          element.points[0],
-          element.points[element.points.length - 1],
+          el.points[0],
+          el.points[el.points.length - 1],
           INVISIBLY_SMALL_ELEMENT_SIZE,
         ))
     );
@@ -135,7 +142,8 @@ export const getPerfectElementSize = (
   if (
     elementType === "line" ||
     elementType === "arrow" ||
-    elementType === "freedraw"
+    elementType === "freedraw" ||
+    elementType === "highlighter"
   ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *

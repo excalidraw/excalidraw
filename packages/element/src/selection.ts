@@ -4,6 +4,7 @@ import {
   pointFrom,
   pointRotateRads,
   type GlobalPoint,
+  type LocalPoint,
 } from "@excalidraw/math";
 
 import type {
@@ -44,6 +45,9 @@ import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
+  ExcalidrawLinearElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -245,7 +249,7 @@ export const getElementsWithinSelection = (
       // Preliminary check potential intersection imprecision
       if (isLinearElement(element) || isFreeDrawElement(element)) {
         const center = elementCenterPoint(element, elementsMap);
-        hasIntersection = element.points.some((point) => {
+        hasIntersection = (element as ExcalidrawLinearElement | ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement).points.some((point: LocalPoint) => {
           const rotatedPoint = pointRotateRads(
             pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
             center,

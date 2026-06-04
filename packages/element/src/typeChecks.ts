@@ -13,6 +13,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
@@ -92,14 +93,14 @@ export const isFrameLikeElement = (
 
 export const isFreeDrawElement = (
   element?: ExcalidrawElement | null,
-): element is ExcalidrawFreeDrawElement => {
+): element is ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement => {
   return element != null && isFreeDrawElementType(element.type);
 };
 
 export const isFreeDrawElementType = (
   elementType: ExcalidrawElementType,
 ): boolean => {
-  return elementType === "freedraw";
+  return elementType === "freedraw" || elementType === "highlighter";
 };
 
 export const isLinearElement = (
@@ -257,6 +258,7 @@ export const isExcalidrawElement = (
     case "ellipse":
     case "arrow":
     case "freedraw":
+    case "highlighter":
     case "line":
     case "frame":
     case "magicframe":
@@ -401,6 +403,7 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
     case "arrow":
     case "line":
     case "freedraw":
+    case "highlighter":
     case "text":
     case "image":
     case "frame":

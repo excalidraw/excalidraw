@@ -19,6 +19,7 @@ import { ToolPopover } from "./ToolPopover";
 import {
   SelectionIcon,
   FreedrawIcon,
+  HighlighterIcon,
   EraserIcon,
   RectangleIcon,
   ArrowIcon,
@@ -231,7 +232,7 @@ export const MobileToolBar = ({
         }
       />
 
-      {/* Free Draw */}
+      {/* Freedraw */}
       <ToolButton
         className={clsx({
           active: activeTool.type === "freedraw",
@@ -244,6 +245,21 @@ export const MobileToolBar = ({
         aria-label={capitalizeString(t("toolBar.freedraw"))}
         data-testid="toolbar-freedraw"
         onChange={() => handleToolChange("freedraw")}
+      />
+
+      {/* Highlighter */}
+      <ToolButton
+        className={clsx({
+          active: activeTool.type === "highlighter",
+        })}
+        type="radio"
+        icon={HighlighterIcon}
+        checked={activeTool.type === "highlighter"}
+        name="editor-current-shape"
+        title={`${capitalizeString(t("toolBar.highlighter"))}`}
+        aria-label={capitalizeString(t("toolBar.highlighter"))}
+        data-testid="toolbar-highlighter"
+        onChange={() => handleToolChange("highlighter")}
       />
 
       {/* Eraser */}

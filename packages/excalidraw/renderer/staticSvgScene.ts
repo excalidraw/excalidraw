@@ -42,7 +42,11 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
+import type {
+  RenderableElementsMap,
+  SVGRenderConfig,
+  SVGPathString,
+} from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
@@ -374,10 +378,20 @@ const renderElementToSvg = (
       }
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       const wrapper = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      if (element.type === "highlighter") {
+        wrapper.setAttribute(
+          "style",
+          `mix-blend-mode: ${
+            renderConfig.theme === THEME.DARK ? "screen" : "multiply"
+          }`,
+        );
+      }
 
-      const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      const shapes = (ShapeCache.generateElementShape(element, renderConfig) ||
+        []) as (Drawable | SVGPathString)[];
       // always ordered as [background, stroke]
       for (const shape of shapes) {
         if (typeof shape === "string") {

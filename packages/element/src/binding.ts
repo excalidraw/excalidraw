@@ -73,6 +73,8 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawRectanguloidElement,
   ExcalidrawTextElement,
   FixedPoint,

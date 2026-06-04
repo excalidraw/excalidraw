@@ -73,6 +73,7 @@ import type {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
@@ -80,7 +81,9 @@ import type {
   ElementsMap,
 } from "./types";
 
+import type { Drawable } from "roughjs/bin/core";
 import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { SVGPathString } from "@excalidraw/excalidraw/scene/types";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -92,6 +95,7 @@ const isPendingImageElement = (
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
+    case "highlighter":
       return element.strokeWidth * 12;
     case "text":
       return element.fontSize / 2;
@@ -171,11 +175,11 @@ const cappedElementCanvasSize = (
   const elementWidth =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(x1, x2)
-      : element.width;
+      : (element as any).width;
   const elementHeight =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(y1, y2)
-      : element.height;
+      : (element as any).height;
 
   let width = elementWidth * window.devicePixelRatio + padding * 2;
   let height = elementHeight * window.devicePixelRatio + padding * 2;
@@ -414,11 +418,18 @@ const drawElementOnCanvas = (
       );
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       // Draw directly to canvas
       context.save();
 
-      const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      if (element.type === "highlighter") {
+        context.globalCompositeOperation =
+          renderConfig.theme === THEME.DARK ? "screen" : "multiply";
+      }
+
+      const shapes = (ShapeCache.generateElementShape(element, renderConfig) ||
+        []) as (Drawable | SVGPathString)[];
 
       for (const shape of shapes) {
         if (typeof shape === "string") {
@@ -843,7 +854,8 @@ export const renderElement = (
       }
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -1072,7 +1084,7 @@ export const renderElement = (
 };
 
 export function getFreedrawOutlineAsSegments(
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement,
   points: [number, number][],
   elementsMap: ElementsMap,
 ) {

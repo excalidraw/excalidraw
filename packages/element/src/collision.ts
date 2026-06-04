@@ -71,6 +71,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
   NonDeleted,
@@ -94,7 +95,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
-  if (element.type === "freedraw") {
+  if (element.type === "freedraw" || element.type === "highlighter") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
@@ -480,6 +481,7 @@ export const intersectElementWithLineSegment = (
       );
     case "line":
     case "freedraw":
+    case "highlighter":
     case "arrow":
       return intersectLinearOrFreeDrawWithLineSegment(
         element,
@@ -551,7 +553,10 @@ const lineIntersections = (
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawHighlighterElement,
   segment: LineSegment<GlobalPoint>,
   elementsMap: ElementsMap,
   onlyFirst = false,
@@ -760,7 +765,7 @@ export const isPointInElement = (
 ) => {
   if (
     (isLinearElement(element) || isFreeDrawElement(element)) &&
-    !isPathALoop(element.points)
+    !isPathALoop((element as ExcalidrawLinearElement | ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement).points)
   ) {
     // There isn't any "inside" for a non-looping path
     return false;
