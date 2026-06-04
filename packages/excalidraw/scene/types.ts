@@ -40,7 +40,11 @@ export type StaticCanvasRenderConfig = {
   theme: AppState["theme"];
   resolveRenderOpacity?: RenderOpacityResolver;
   elementOpacityOverrides?: ReadonlyMap<ExcalidrawElement["id"], number>;
-  renderOpacityVersion?: number;
+  elementPositionOverrides?: ReadonlyMap<
+    ExcalidrawElement["id"],
+    { x: number; y: number }
+  >;
+  renderAnimationVersion?: number;
 };
 
 export type SVGRenderConfig = {

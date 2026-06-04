@@ -19,7 +19,11 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { getRenderOpacity, renderElement } from "@excalidraw/element";
+import {
+  getRenderElementWithPositionOverride,
+  getRenderOpacity,
+  renderElement,
+} from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -173,6 +177,8 @@ const renderLinkIcon = (
   elementsMap: ElementsMap,
   renderConfig: StaticCanvasRenderConfig,
 ) => {
+  element = getRenderElementWithPositionOverride(element, renderConfig);
+
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(

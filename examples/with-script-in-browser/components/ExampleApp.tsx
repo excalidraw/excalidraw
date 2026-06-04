@@ -121,6 +121,16 @@ export default function ExampleApp({
   const [hideAllForFadeDemo, setHideAllForFadeDemo] = useState(false);
   const [fadeDemoNextIndex, setFadeDemoNextIndex] = useState(0);
   const [fadeDemoElementIds, setFadeDemoElementIds] = useState<string[]>([]);
+  const [demoAnimationType, setDemoAnimationType] = useState<"fade" | "fly">(
+    "fade",
+  );
+  const [demoAnimationDuration, setDemoAnimationDuration] = useState(500);
+  const [demoFlyFrom, setDemoFlyFrom] = useState<
+    "left" | "right" | "top" | "bottom"
+  >("left");
+  const [demoAnimationEasing, setDemoAnimationEasing] = useState<
+    "linear" | "easeOut" | "easeInOut"
+  >("easeOut");
 
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
@@ -676,6 +686,67 @@ export default function ExampleApp({
           </button>
           {showFadeDemo && (
             <>
+              <label>
+                Animation type
+                <select
+                  value={demoAnimationType}
+                  onChange={(event) =>
+                    setDemoAnimationType(
+                      event.target.value as "fade" | "fly",
+                    )
+                  }
+                >
+                  <option value="fade">fade</option>
+                  <option value="fly">fly</option>
+                </select>
+              </label>
+              <label>
+                Duration
+                <input
+                  type="number"
+                  value={demoAnimationDuration}
+                  onChange={(event) =>
+                    setDemoAnimationDuration(Number(event.target.value) || 0)
+                  }
+                />
+              </label>
+              <label>
+                Easing
+                <select
+                  value={demoAnimationEasing}
+                  onChange={(event) =>
+                    setDemoAnimationEasing(
+                      event.target.value as "linear" | "easeOut" | "easeInOut",
+                    )
+                  }
+                >
+                  <option value="linear">linear</option>
+                  <option value="easeOut">easeOut</option>
+                  <option value="easeInOut">easeInOut</option>
+                </select>
+              </label>
+              {demoAnimationType === "fly" && (
+                <label>
+                  Fly from
+                  <select
+                    value={demoFlyFrom}
+                    onChange={(event) =>
+                      setDemoFlyFrom(
+                        event.target.value as
+                          | "left"
+                          | "right"
+                          | "top"
+                          | "bottom",
+                      )
+                    }
+                  >
+                    <option value="left">left</option>
+                    <option value="right">right</option>
+                    <option value="top">top</option>
+                    <option value="bottom">bottom</option>
+                  </select>
+                </label>
+              )}
               <button
                 onClick={() => {
                   if (!excalidrawAPI) {
@@ -687,7 +758,7 @@ export default function ExampleApp({
                       .getSceneElements()
                       .map((element) => element.id),
                   );
-                  excalidrawAPI.clearElementOpacityOverrides();
+                  excalidrawAPI.clearElementAnimationOverrides();
                   setHideAllForFadeDemo(true);
                   setFadeDemoNextIndex(0);
                 }}
@@ -716,20 +787,32 @@ export default function ExampleApp({
                       : fadeDemoNextIndex;
 
                   if (nextIndex === 0) {
-                    excalidrawAPI.clearElementOpacityOverrides();
+                    excalidrawAPI.clearElementAnimationOverrides();
                   }
 
-                  excalidrawAPI.fadeElements({
-                    elements: [elements[nextIndex].id],
-                    from: 0,
-                    to: 100,
-                    duration: 500,
-                  });
+                  if (demoAnimationType === "fly") {
+                    excalidrawAPI.animateElements({
+                      elements: [elements[nextIndex].id],
+                      type: "fly",
+                      from: demoFlyFrom,
+                      duration: demoAnimationDuration,
+                      phase: "in",
+                      easing: demoAnimationEasing,
+                    });
+                  } else {
+                    excalidrawAPI.animateElements({
+                      elements: [elements[nextIndex].id],
+                      type: "fade",
+                      duration: demoAnimationDuration,
+                      phase: "in",
+                      easing: demoAnimationEasing,
+                    });
+                  }
 
                   setFadeDemoNextIndex(nextIndex + 1);
                 }}
               >
-                Fade in next element
+                Animate in next element
               </button>
               <button
                 onClick={() => {
@@ -747,18 +830,31 @@ export default function ExampleApp({
                     return;
                   }
 
-                  excalidrawAPI.fadeElements({
-                    elements,
-                    from: 0,
-                    to: 100,
-                    duration: 500,
-                    stagger: 1000,
-                  });
+                  if (demoAnimationType === "fly") {
+                    excalidrawAPI.animateElements({
+                      elements,
+                      type: "fly",
+                      from: demoFlyFrom,
+                      duration: demoAnimationDuration,
+                      stagger: 120,
+                      phase: "in",
+                      easing: demoAnimationEasing,
+                    });
+                  } else {
+                    excalidrawAPI.animateElements({
+                      elements,
+                      type: "fade",
+                      duration: demoAnimationDuration,
+                      stagger: 120,
+                      phase: "in",
+                      easing: demoAnimationEasing,
+                    });
+                  }
 
                   setFadeDemoNextIndex(elements.length);
                 }}
               >
-                Fade in all
+                Animate in all
               </button>
               <button
                 onClick={() => {
@@ -785,17 +881,29 @@ export default function ExampleApp({
                     return;
                   }
 
-                  excalidrawAPI.fadeElements({
-                    elements: [elements[prevIndex].id],
-                    from: 100,
-                    to: 0,
-                    duration: 500,
-                  });
+                  if (demoAnimationType === "fly") {
+                    excalidrawAPI.animateElements({
+                      elements: [elements[prevIndex].id],
+                      type: "fly",
+                      from: demoFlyFrom,
+                      duration: demoAnimationDuration,
+                      phase: "out",
+                      easing: demoAnimationEasing,
+                    });
+                  } else {
+                    excalidrawAPI.animateElements({
+                      elements: [elements[prevIndex].id],
+                      type: "fade",
+                      duration: demoAnimationDuration,
+                      phase: "out",
+                      easing: demoAnimationEasing,
+                    });
+                  }
 
                   setFadeDemoNextIndex(prevIndex);
                 }}
               >
-                Fade out prev element
+                Animate out prev element
               </button>
             </>
           )}

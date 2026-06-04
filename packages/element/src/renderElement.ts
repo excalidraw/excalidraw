@@ -130,6 +130,32 @@ export const resolveRenderOpacity = (
   return element.opacity;
 };
 
+export const resolveRenderPositionOffset = (
+  element: ExcalidrawElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementPositionOverrides">,
+) => {
+  return renderConfig.elementPositionOverrides?.get(element.id) ?? { x: 0, y: 0 };
+};
+
+export const getRenderElementWithPositionOverride = <
+  TElement extends NonDeletedExcalidrawElement,
+>(
+  element: TElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementPositionOverrides">,
+): TElement => {
+  const positionOffset = resolveRenderPositionOffset(element, renderConfig);
+
+  if (positionOffset.x === 0 && positionOffset.y === 0) {
+    return element;
+  }
+
+  return {
+    ...element,
+    x: element.x + positionOffset.x,
+    y: element.y + positionOffset.y,
+  } as TElement;
+};
+
 export const getRenderOpacity = (
   element: ExcalidrawElement,
   renderConfig: Pick<
@@ -820,6 +846,8 @@ export const renderElement = (
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&
     !appState.hoveredElementIds[element.id];
+
+  element = getRenderElementWithPositionOverride(element, renderConfig);
 
   context.globalAlpha = getRenderOpacity(
     element,

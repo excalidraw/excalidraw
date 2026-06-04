@@ -967,11 +967,11 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
-  fadeElements: InstanceType<typeof App>["fadeElements"];
-  cancelFadeElement: InstanceType<typeof App>["cancelFadeElement"];
-  clearElementOpacityOverrides: InstanceType<
+  animateElements: InstanceType<typeof App>["animateElements"];
+  cancelElementAnimation: InstanceType<typeof App>["cancelElementAnimation"];
+  clearElementAnimationOverrides: InstanceType<
     typeof App
-  >["clearElementOpacityOverrides"];
+  >["clearElementAnimationOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
