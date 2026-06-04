@@ -46,7 +46,6 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
-import { debugDrawLine, debugDrawPolygon } from "./visualdebug";
 
 import {
   canBecomePolygon,
