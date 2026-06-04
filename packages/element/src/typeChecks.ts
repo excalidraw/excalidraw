@@ -392,3 +392,23 @@ export const canBecomePolygon = (
     (points.length === 3 && !pointsEqual(points[0], points[points.length - 1]))
   );
 };
+
+export const isEligibleFrameChildType = (type: ElementOrToolType) => {
+  switch (type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse":
+    case "arrow":
+    case "line":
+    case "freedraw":
+    case "text":
+    case "image":
+    case "frame":
+    case "embeddable": {
+      return true;
+    }
+    default: {
+      return false;
+    }
+  }
+};

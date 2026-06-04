@@ -1,5 +1,5 @@
 import { degreesToRadians } from "./angle";
-import { PRECISION } from "./utils";
+import { isFiniteNumber, PRECISION } from "./utils";
 import { vectorFromPoint, vectorScale } from "./vector";
 
 import type {
@@ -251,5 +251,14 @@ export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
     q[0] >= Math.min(p[0], r[0]) &&
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
+  );
+};
+
+export const isValidPoint = (point: unknown): point is LocalPoint => {
+  return (
+    Array.isArray(point) &&
+    point.length === 2 &&
+    isFiniteNumber(point[0]) &&
+    isFiniteNumber(point[1])
   );
 };

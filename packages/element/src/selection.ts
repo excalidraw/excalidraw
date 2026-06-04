@@ -34,7 +34,6 @@ import {
   elementOverlapsWithFrame,
   getContainingFrame,
   getFrameChildren,
-  isElementIntersectingFrame,
 } from "./frame";
 
 import { LinearElementEditor } from "./linearElementEditor";
@@ -130,11 +129,22 @@ export const getElementsWithinSelection = (
   const framesInSelection = excludeElementsInFrames
     ? new Set<NonDeletedExcalidrawElement["id"]>()
     : null;
-  let elementsInSelection: NonDeletedExcalidrawElement[] = [];
+  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
+  const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
 
   for (const element of elements) {
     if (shouldIgnoreElementFromSelection(element)) {
       continue;
+    }
+
+    // Track only selectable top-level group members, so ignored elements such
+    // as bound text and locked elements don't affect group selection.
+    const groupId = element.groupIds.at(-1);
+    if (groupId) {
+      if (!groups[groupId]) {
+        groups[groupId] = [];
+      }
+      groups[groupId].push(element);
     }
 
     const strokeWidth = element.strokeWidth;
@@ -170,7 +180,7 @@ export const getElementsWithinSelection = (
     const associatedFrame = getContainingFrame(element, elementsMap);
     if (
       associatedFrame &&
-      isElementIntersectingFrame(element, associatedFrame, elementsMap)
+      elementOverlapsWithFrame(element, associatedFrame, elementsMap)
     ) {
       const frameAABB = getElementBounds(associatedFrame, elementsMap);
       elementAABB = [
@@ -209,10 +219,9 @@ export const getElementsWithinSelection = (
     if (boundsContainBounds(selectionBounds, commonAABB)) {
       if (framesInSelection && isFrameLikeElement(element)) {
         framesInSelection.add(element.id);
-      } else {
-        elementsInSelection.push(element);
-        continue;
       }
+      elementsInSelection.add(element);
+      continue;
     }
 
     // 2. Handle the case where the label is overlapped by the selection box
@@ -221,7 +230,7 @@ export const getElementsWithinSelection = (
       labelAABB &&
       doBoundsIntersect(selectionBounds, labelAABB)
     ) {
-      elementsInSelection.push(element);
+      elementsInSelection.add(element);
       continue;
     }
 
@@ -311,7 +320,7 @@ export const getElementsWithinSelection = (
           framesInSelection.add(element.id);
         }
 
-        elementsInSelection.push(element);
+        elementsInSelection.add(element);
         continue;
       }
     }
@@ -320,21 +329,41 @@ export const getElementsWithinSelection = (
     //    as it is separately handled in App.
   }
 
-  elementsInSelection = framesInSelection
-    ? excludeElementsFromFrames(elementsInSelection, framesInSelection)
-    : elementsInSelection;
+  if (framesInSelection) {
+    elementsInSelection.forEach((element) => {
+      if (element.frameId && framesInSelection.has(element.frameId)) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
 
-  elementsInSelection = elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element, elementsMap);
+  if (boxSelectionMode === "overlap") {
+    Array.from(elementsInSelection).forEach((element) => {
+      const groupId = element.groupIds.at(-1);
+      const group = groupId ? groups[groupId] : null;
 
-    if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
-    }
+      group?.forEach((groupElement) => elementsInSelection.add(groupElement));
+    });
+  } else if (boxSelectionMode === "contain") {
+    elementsInSelection.forEach((element) => {
+      // note: currently we only support top-level group handling since
+      // we don't support box selecting while editing the group/subgroup
+      // see https://github.com/excalidraw/excalidraw/pull/11234#issuecomment-4387654451
+      const groupId = element.groupIds.at(-1);
 
-    return true;
-  });
+      const group = groupId ? groups[groupId] : null;
 
-  return elementsInSelection;
+      if (
+        group &&
+        !group.every((groupElement) => elementsInSelection.has(groupElement))
+      ) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
+
+  // to maintain original order elements (namely for group selection)
+  return elements.filter((element) => elementsInSelection.has(element));
 };
 
 export const getVisibleAndNonSelectedElements = (

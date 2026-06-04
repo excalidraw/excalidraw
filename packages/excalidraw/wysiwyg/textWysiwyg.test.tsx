@@ -769,6 +769,63 @@ describe("textWysiwyg", () => {
       ]);
     });
 
+    it("should not add bound text to a frame when its container is not a frame child", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+      });
+      API.setElements([frame, rectangle]);
+
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+
+      const text = h.elements[2] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(null);
+    });
+
+    it("should bind text to a frame child container when single clicking its center", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+        frameId: frame.id,
+      });
+      API.setElements([rectangle, frame]);
+
+      UI.clickTool("text");
+      mouse.clickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(frame.id);
+    });
+
     it("should set the text element angle to same as container angle when binding to rotated container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",

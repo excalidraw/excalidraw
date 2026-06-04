@@ -277,7 +277,6 @@ export const actionUngroup = register({
             elementsMap,
           ),
           frame,
-          app,
         );
       }
     });
