@@ -23,7 +23,7 @@ type StaticCanvasProps = {
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
-  sceneNonce: number | undefined;
+  canvasNonce: string;
   selectionNonce: number | undefined;
   scale: number;
   appState: StaticCanvasAppState;
@@ -110,10 +110,10 @@ const areEqual = (
   nextProps: StaticCanvasProps,
 ) => {
   if (
-    prevProps.sceneNonce !== nextProps.sceneNonce ||
+    prevProps.canvasNonce !== nextProps.canvasNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if sceneNonce didn't change (e.g. we filter elements out based
+    // even if canvasNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements

@@ -329,8 +329,8 @@ export const actionFinalize = register<FormData>({
         selectionElement: null,
         multiElement: null,
         editingTextElement: null,
-        startBoundElement: null,
         suggestedBinding: null,
+        frameToHighlight: null,
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
@@ -348,9 +348,7 @@ export const actionFinalize = register<FormData>({
     };
   },
   keyTest: (event, appState) =>
-    (event.key === KEYS.ESCAPE &&
-      (appState.selectedLinearElement?.isEditing ||
-        (!appState.newElement && appState.multiElement === null))) ||
+    (event.key === KEYS.ESCAPE && appState.selectedLinearElement?.isEditing) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (

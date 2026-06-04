@@ -30,7 +30,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
-import { useStylesPanelMode } from "..";
+import { useStylesPanelMode } from "../components/App";
 
 import { register } from "./register";
 

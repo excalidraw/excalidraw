@@ -7,6 +7,7 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
+  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -37,14 +38,10 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
+  maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
-  headingForPoint,
-  compareHeading,
-  HEADING_RIGHT,
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_UP,
+  getActiveTextElement,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -61,6 +58,8 @@ import {
   getGlobalFixedPointForBindableElement,
   isFocusPointVisible,
 } from "@excalidraw/element";
+
+import type { EditorInterface } from "@excalidraw/common";
 
 import type {
   TransformHandles,
@@ -90,6 +89,10 @@ import {
 } from "../scene/scrollbars";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
+import {
+  getTextAutoResizeHandle,
+  getTextBoxPadding,
+} from "../textAutoResizeHandle";
 
 import {
   bootstrapCanvas,
@@ -411,17 +414,17 @@ const renderBindingHighlightForBindableElement_simple = (
   }
 
   if (
-    isFrameLikeElement(suggestedBinding.element) ||
-    isBindableElement(suggestedBinding.element)
+    appState.isMidpointSnappingEnabled &&
+    (isFrameLikeElement(suggestedBinding.element) ||
+      isBindableElement(suggestedBinding.element))
   ) {
     // Draw midpoint indicators
     const linearElement = appState.selectedLinearElement;
     const arrow =
       linearElement?.elementId &&
       LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-    const insideBindable =
+    const cursorIsInsideBindable =
       pointerCoords &&
-      arrow &&
       hitElementItself({
         point: pointerCoords,
         element: suggestedBinding.element,
@@ -430,14 +433,17 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    if (!insideBindable || isElbowArrow(arrow)) {
-      context.save();
-      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
+    const isElbow =
+      (arrow && isElbowArrow(arrow)) ||
+      (appState.activeTool.type === "arrow" &&
+        appState.currentItemArrowType === "elbow");
 
-      const midpointRadius = 5 / appState.zoom.value;
+    if (!cursorIsInsideBindable || isElbow) {
+      context.save();
+
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
-      let midpoints: LocalPoint[];
+      let midpoints: GlobalPoint[];
       if (suggestedBinding.element.type === "diamond") {
         const center = elementCenterPoint(
           suggestedBinding.element,
@@ -452,10 +458,7 @@ const renderBindingHighlightForBindableElement_simple = (
               suggestedBinding.element.angle,
             );
 
-            return pointFrom<LocalPoint>(
-              rotatedPoint[0] - suggestedBinding.element.x,
-              rotatedPoint[1] - suggestedBinding.element.y,
-            );
+            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
           },
         );
       } else {
@@ -481,52 +484,66 @@ const renderBindingHighlightForBindableElement_simple = (
             center,
             suggestedBinding.element.angle,
           );
-          return pointFrom<LocalPoint>(
-            rotatedPoint[0] - suggestedBinding.element.x,
-            rotatedPoint[1] - suggestedBinding.element.y,
-          );
+          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
         });
       }
-      const highlightedPoint =
-        suggestedBinding.midPoint &&
-        pointFrom<LocalPoint>(
-          suggestedBinding.midPoint[0] - suggestedBinding.element.x,
-          suggestedBinding.midPoint[1] - suggestedBinding.element.y,
+
+      const hoveredMidpoint =
+        pointerCoords &&
+        midpoints.reduce(
+          (
+            closestIdx: {
+              idx: number;
+              distance: number;
+            },
+            point,
+            idx,
+          ) => {
+            const distance = pointDistance(point, pointerCoords);
+            if (idx === -1 || distance < closestIdx.distance) {
+              return { idx, distance };
+            }
+            return closestIdx;
+          },
+          {
+            idx: -1,
+            distance: Infinity,
+          },
         );
 
-      const target = [HEADING_RIGHT, HEADING_DOWN, HEADING_LEFT, HEADING_UP];
+      const midpointRadius = 4 / appState.zoom.value;
+      const highlightThreshold =
+        maxBindingDistance_simple(appState.zoom) +
+        suggestedBinding.element.strokeWidth / 2;
+
       midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
-          highlightedPoint &&
-          compareHeading(
-            headingForPoint(
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  highlightedPoint[0] + suggestedBinding.element.x,
-                  highlightedPoint[1] + suggestedBinding.element.y,
-                ),
-                center,
-                suggestedBinding.element.angle as Radians,
-              ),
-              center,
-            ),
-            target[idx],
-          );
+          (!cursorIsInsideBindable || isElbow) &&
+          hoveredMidpoint?.idx === idx &&
+          hoveredMidpoint.distance <= highlightThreshold;
 
-        if (!isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.5)`
-              : `rgba(65, 65, 65, 0.4)`;
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else {
+        // also render midpoint if cursor close but not highlighted
+        // (for elbows, always show all points)
+        const isShown =
+          !isHighlighted &&
+          (isElbow ||
+            (idx === hoveredMidpoint?.idx &&
+              hoveredMidpoint.distance <= highlightThreshold * 2));
+
+        if (isHighlighted) {
           context.fillStyle =
             appState.theme === THEME.DARK
               ? `rgba(3, 93, 161, 1)`
               : `rgba(106, 189, 252, 1)`;
 
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        } else if (isShown) {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(0, 0, 0, 0.8)`
+              : `rgba(65, 65, 65, 0.5)`;
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
@@ -790,77 +807,79 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.restore();
 
-    // Draw midpoint indicators
-    context.save();
-    context.translate(
-      element.x + appState.scrollX,
-      element.y + appState.scrollY,
-    );
-
-    const midpointRadius = 5 / appState.zoom.value;
-    const cutoutPadding = 5 / appState.zoom.value;
-    const cutoutRadius = midpointRadius + cutoutPadding;
-
-    let midpoints;
-    if (element.type === "diamond") {
-      const [, curves] = deconstructDiamondElement(element);
-      const center = elementCenterPoint(element, allElementsMap);
-
-      midpoints = curves.map((curve) => {
-        const point = bezierEquation(curve, 0.5);
-        const rotatedPoint = pointRotateRads(point, center, element.angle);
-        return {
-          x: rotatedPoint[0] - element.x,
-          y: rotatedPoint[1] - element.y,
-        };
-      });
-    } else {
-      const center = elementCenterPoint(element, allElementsMap);
-      const basePoints = [
-        { x: element.width / 2, y: 0 }, // TOP
-        { x: element.width, y: element.height / 2 }, // RIGHT
-        { x: element.width / 2, y: element.height }, // BOTTOM
-        { x: 0, y: element.height / 2 }, // LEFT
-      ];
-      midpoints = basePoints.map((point) => {
-        const globalPoint = pointFrom<GlobalPoint>(
-          point.x + element.x,
-          point.y + element.y,
-        );
-        const rotatedPoint = pointRotateRads(
-          globalPoint,
-          center,
-          element.angle,
-        );
-        return {
-          x: rotatedPoint[0] - element.x,
-          y: rotatedPoint[1] - element.y,
-        };
-      });
-    }
-
-    // Clear cutouts around midpoints
-    midpoints.forEach((midpoint) => {
-      context.clearRect(
-        midpoint.x - cutoutRadius,
-        midpoint.y - cutoutRadius,
-        cutoutRadius * 2,
-        cutoutRadius * 2,
+    if (appState.isMidpointSnappingEnabled) {
+      // Draw midpoint indicators
+      context.save();
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
       );
-    });
 
-    context.fillStyle =
-      appState.theme === THEME.DARK
-        ? `rgba(3, 93, 161, ${opacity})`
-        : `rgba(106, 189, 252, ${opacity})`;
+      const midpointRadius = 5 / appState.zoom.value;
+      const cutoutPadding = 5 / appState.zoom.value;
+      const cutoutRadius = midpointRadius + cutoutPadding;
 
-    midpoints.forEach((midpoint) => {
-      context.beginPath();
-      context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
-      context.fill();
-    });
+      let midpoints;
+      if (element.type === "diamond") {
+        const [, curves] = deconstructDiamondElement(element);
+        const center = elementCenterPoint(element, allElementsMap);
 
-    context.restore();
+        midpoints = curves.map((curve) => {
+          const point = bezierEquation(curve, 0.5);
+          const rotatedPoint = pointRotateRads(point, center, element.angle);
+          return {
+            x: rotatedPoint[0] - element.x,
+            y: rotatedPoint[1] - element.y,
+          };
+        });
+      } else {
+        const center = elementCenterPoint(element, allElementsMap);
+        const basePoints = [
+          { x: element.width / 2, y: 0 }, // TOP
+          { x: element.width, y: element.height / 2 }, // RIGHT
+          { x: element.width / 2, y: element.height }, // BOTTOM
+          { x: 0, y: element.height / 2 }, // LEFT
+        ];
+        midpoints = basePoints.map((point) => {
+          const globalPoint = pointFrom<GlobalPoint>(
+            point.x + element.x,
+            point.y + element.y,
+          );
+          const rotatedPoint = pointRotateRads(
+            globalPoint,
+            center,
+            element.angle,
+          );
+          return {
+            x: rotatedPoint[0] - element.x,
+            y: rotatedPoint[1] - element.y,
+          };
+        });
+      }
+
+      // Clear cutouts around midpoints
+      midpoints.forEach((midpoint) => {
+        context.clearRect(
+          midpoint.x - cutoutRadius,
+          midpoint.y - cutoutRadius,
+          cutoutRadius * 2,
+          cutoutRadius * 2,
+        );
+      });
+
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${opacity})`
+          : `rgba(106, 189, 252, ${opacity})`;
+
+      midpoints.forEach((midpoint) => {
+        context.beginPath();
+        context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
+        context.fill();
+      });
+
+      context.restore();
+    }
   }
 
   return {
@@ -1137,6 +1156,7 @@ const renderLinearPointHandles = (
           points[idx],
           idx,
           appState.zoom,
+          elementsMap,
         )
       ) {
         renderSingleLinearPoint(
@@ -1269,6 +1289,7 @@ const renderFocusPointIndicator = ({
       bindableElement,
       elementsMap,
       appState,
+      type,
     )
   ) {
     return;
@@ -1476,18 +1497,55 @@ const renderTextBox = (
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const padding = getTextBoxPadding(appState.zoom.value);
   const width = text.width + padding * 2;
   const height = text.height + padding * 2;
-  const cx = text.x + width / 2;
-  const cy = text.y + height / 2;
-  const shiftX = -(width / 2 + padding);
-  const shiftY = -(height / 2 + padding);
+  const cx = text.x + text.width / 2;
+  const cy = text.y + text.height / 2;
+  const shiftX = -(text.width / 2 + padding);
+  const shiftY = -(text.height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
   context.lineWidth = 1 / appState.zoom.value;
   context.strokeStyle = selectionColor;
+  context.globalAlpha = 0.5;
+  context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
   context.strokeRect(shiftX, shiftY, width, height);
+  context.restore();
+};
+
+const renderResetAutoResizeHandle = (
+  text: NonDeleted<ExcalidrawTextElement>,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  formFactor: EditorInterface["formFactor"],
+) => {
+  const autoResizeHandle = getTextAutoResizeHandle(
+    text,
+    appState.zoom.value,
+    formFactor,
+  );
+
+  if (!autoResizeHandle) {
+    return;
+  }
+
+  context.save();
+  context.globalAlpha = 0.5;
+  context.lineWidth = 1.5 / appState.zoom.value;
+  context.lineCap = "round";
+  context.strokeStyle = selectionColor;
+  context.beginPath();
+  context.moveTo(
+    autoResizeHandle.start[0] + appState.scrollX,
+    autoResizeHandle.start[1] + appState.scrollY,
+  );
+  context.lineTo(
+    autoResizeHandle.end[0] + appState.scrollX,
+    autoResizeHandle.end[1] + appState.scrollY,
+  );
+  context.stroke();
   context.restore();
 };
 
@@ -1571,10 +1629,19 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (
-    appState.editingTextElement &&
-    isTextElement(appState.editingTextElement)
-  ) {
+  const activeTextElement = getActiveTextElement(selectedElements, appState);
+
+  if (activeTextElement && !activeTextElement.autoResize) {
+    renderResetAutoResizeHandle(
+      activeTextElement,
+      context,
+      appState,
+      renderConfig.selectionColor,
+      editorInterface.formFactor,
+    );
+  }
+
+  if (appState.editingTextElement) {
     const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;

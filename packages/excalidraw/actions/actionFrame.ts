@@ -205,7 +205,6 @@ export const actionWrapSelectionInFrame = register({
       [...app.scene.getElementsIncludingDeleted(), frame],
       selectedElements,
       frame,
-      appState,
     );
 
     return {

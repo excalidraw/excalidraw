@@ -40,10 +40,12 @@ export class FileManager {
 
   private _getFiles;
   private _saveFiles;
+  private _onFileStatusChange;
 
   constructor({
     getFiles,
     saveFiles,
+    onFileStatusChange,
   }: {
     getFiles: (fileIds: FileId[]) => Promise<{
       loadedFiles: BinaryFileData[];
@@ -53,9 +55,13 @@ export class FileManager {
       savedFiles: Map<FileId, BinaryFileData>;
       erroredFiles: Map<FileId, BinaryFileData>;
     }>;
+    onFileStatusChange?: (
+      updates: Array<[FileId, "loading" | "loaded" | "error"]>,
+    ) => void;
   }) {
     this._getFiles = getFiles;
     this._saveFiles = saveFiles;
+    this._onFileStatusChange = onFileStatusChange;
   }
 
   /**
@@ -146,6 +152,8 @@ export class FileManager {
       this.fetchingFiles.set(id, true);
     }
 
+    this._onFileStatusChange?.(ids.map((id) => [id, "loading"]));
+
     try {
       const { loadedFiles, erroredFiles } = await this._getFiles(ids);
 
@@ -155,6 +163,13 @@ export class FileManager {
       for (const [fileId] of erroredFiles) {
         this.erroredFiles_fetch.set(fileId, true);
       }
+
+      this._onFileStatusChange?.([
+        ...loadedFiles.map((f) => [f.id, "loaded"] as [FileId, "loaded"]),
+        ...[...erroredFiles.keys()].map(
+          (id) => [id, "error"] as [FileId, "error"],
+        ),
+      ]);
 
       return { loadedFiles, erroredFiles };
     } finally {
@@ -195,6 +210,13 @@ export class FileManager {
   };
 
   reset() {
+    if (this._onFileStatusChange && this.fetchingFiles.size) {
+      this._onFileStatusChange(
+        [...this.fetchingFiles.keys()].map(
+          (id) => [id, "error"] as [FileId, "error"],
+        ),
+      );
+    }
     this.fetchingFiles.clear();
     this.savingFiles.clear();
     this.savedFiles.clear();
