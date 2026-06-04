@@ -10,6 +10,7 @@ export const TOPOLOGY_SATELLITE_KINDS = [
   "ecs_companions",
   "ecs_cluster_companions",
   "ecs_ec2_capacity_companions",
+  "eks_companions",
   "api_gateway_companions",
   "api_gateway_vpc_links",
   "tgw_companions",

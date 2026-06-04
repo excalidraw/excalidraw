@@ -1,4 +1,9 @@
 import { resolveTerraformPlanNodeKey } from "./terraformPlanParsing";
+import {
+  detectDuplicateEdges,
+  detectOrphanedBinds,
+  detectTfdGraphCycles,
+} from "./terraformTfdValidation";
 
 import type { TerraformPlanGraphNode } from "./terraformPlanParsing";
 
@@ -209,6 +214,7 @@ export function applyDeclaredDataFlowFromMany(
   const errors: string[] = [];
   const warnings: string[] = [];
   const edges: DeclaredDataFlowEdge[] = [];
+  const edgeAliases = new Set<string>();
   let sequence = 0;
   let tfdVersion: TfdVersion = 1;
   const seenVersions = new Set<TfdVersion>();
@@ -251,6 +257,8 @@ export function applyDeclaredDataFlowFromMany(
     }
 
     for (const spec of parsed.edgeSpecs) {
+      edgeAliases.add(spec.source);
+      edgeAliases.add(spec.target);
       if (
         isTfdHopAlias(spec.source, hopAliases, binds) ||
         isTfdHopAlias(spec.target, hopAliases, binds)
@@ -274,6 +282,16 @@ export function applyDeclaredDataFlowFromMany(
       edges.push({ source, target, sequence, origin: "tfd" });
       sequence += 1;
     }
+  }
+
+  for (const msg of detectTfdGraphCycles(edges)) {
+    errors.push(msg);
+  }
+  for (const msg of detectDuplicateEdges(edges)) {
+    warnings.push(msg);
+  }
+  for (const msg of detectOrphanedBinds(binds, hopAliases, edgeAliases)) {
+    warnings.push(msg);
   }
 
   if (seenVersions.size > 1) {

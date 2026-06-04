@@ -40,6 +40,10 @@
       "attachment": { "mode": "plugin", "plugin": "ecs_companions" }
     },
     {
+      "kind": "eks_companions",
+      "attachment": { "mode": "plugin", "plugin": "eks_companions" }
+    },
+    {
       "kind": "ecs_cluster_companions",
       "attachment": { "mode": "plugin", "plugin": "ecs_cluster_companions" }
     },

@@ -345,27 +345,27 @@ export function applyTfdOverlayToNodes(
   tfdTexts: string[],
   tfdLabels?: (string | undefined)[],
   legacySingleText?: string,
-): string[] {
+): { errors: string[]; warnings: string[] } {
   const texts = [
     ...tfdTexts.filter((t) => t.trim()),
     ...(legacySingleText?.trim() ? [legacySingleText] : []),
   ];
   if (texts.length === 0) {
-    return [];
+    return { errors: [], warnings: [] };
   }
   if (texts.length === 1 && tfdTexts.length === 0 && legacySingleText) {
-    applyDeclaredDataFlow(
+    const { errors, warnings } = applyDeclaredDataFlow(
       nodes as Record<string, TerraformPlanGraphNode>,
       texts[0],
     );
-    return [];
+    return { errors, warnings };
   }
-  const { warnings } = applyDeclaredDataFlowFromMany(
+  const { errors, warnings } = applyDeclaredDataFlowFromMany(
     nodes as Record<string, TerraformPlanGraphNode>,
     texts,
     tfdLabels,
   );
-  return warnings;
+  return { errors, warnings };
 }
 
 /** Multi-file local import (plans, states, `.tfd` overlays). */
@@ -508,6 +508,7 @@ export function resolveTerraformPlanNodeKey(
 
   if (parsed) {
     const stackAliases: string[] = [];
+    const exactMatches: string[] = [];
     for (const k of Object.keys(nodes)) {
       if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
         continue;
@@ -518,9 +519,18 @@ export function resolveTerraformPlanNodeKey(
         topologyBareAddressKey(k) === bareKey
       ) {
         stackAliases.push(k);
+        if (kParsed.address === parsed.address) {
+          exactMatches.push(k);
+        }
       } else if (!kParsed && topologyBareAddressKey(k) === bareKey) {
         stackAliases.push(k);
+        if (k === parsed.address) {
+          exactMatches.push(k);
+        }
       }
+    }
+    if (exactMatches.length === 1) {
+      return exactMatches[0]!;
     }
     if (stackAliases.length > 0) {
       return preferTopologyNodeKeyAmongAliases(stackAliases);

@@ -22,6 +22,7 @@ import {
   buildAuroraCompanionCluster,
   buildRdsCompanionCluster,
 } from "./terraformTopologyDatastoreLinks";
+import { buildEksCompanionCluster } from "./terraformTopologyEksLinks";
 import {
   registerSatellitePlugins,
   type SatelliteClusterBuildResult,
@@ -65,6 +66,9 @@ export function installSatellitePlugins(): void {
         ctx.primaryAddress,
         ctx.arnIndex,
       ),
+
+    eks_companions: (_kind, ctx) =>
+      buildEksCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
 
     ecs_companions: (_kind, ctx) =>
       buildEcsServiceCompanionCluster(

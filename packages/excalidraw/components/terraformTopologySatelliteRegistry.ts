@@ -17,6 +17,10 @@ import {
   ecsSatelliteStackHeightPx,
 } from "./terraformTopologyEcsLinks";
 import {
+  buildEksCompanionCluster,
+  eksCompanionSatelliteStackHeightPx,
+} from "./terraformTopologyEksLinks";
+import {
   buildPrimaryIamCluster,
   iamSatelliteStackHeightPx,
   type TopologyIamEdge,
@@ -157,6 +161,7 @@ export type TopologyPrimarySatelliteBundles = {
   alb: ReturnType<typeof buildAlbListenerTargetCluster>;
   ecs: ReturnType<typeof buildEcsServiceCompanionCluster>;
   ecsCluster: ReturnType<typeof buildEcsClusterCompanionCluster>;
+  eks: ReturnType<typeof buildEksCompanionCluster>;
   ecsEc2: ReturnType<typeof buildEcsEc2CapacityCompanionCluster>;
   api: ReturnType<typeof buildApiGatewayCompanionCluster>;
   apiVpc: ReturnType<typeof buildApiGatewayVpcLinkCluster>;
@@ -201,6 +206,9 @@ export function buildTopologyPrimarySatelliteBundles(
       : empty,
     ecs: enabled.has("ecs_companions")
       ? buildEcsServiceCompanionCluster(nodes, address, arnIndex)
+      : empty,
+    eks: enabled.has("eks_companions")
+      ? buildEksCompanionCluster(nodes, address, arnIndex)
       : empty,
     ecsCluster: enabled.has("ecs_cluster_companions")
       ? buildEcsClusterCompanionCluster(nodes, address, plan)
@@ -314,6 +322,17 @@ export function satelliteStackHeightPxForKind(
     case "ecs_companions":
       return primaryType === "aws_ecs_service"
         ? ecsSatelliteStackHeightPx(
+            nodes,
+            primaryAddress,
+            arnIndex,
+            tier1H,
+            tier2H,
+            gap,
+          )
+        : 0;
+    case "eks_companions":
+      return primaryType === "aws_eks_cluster"
+        ? eksCompanionSatelliteStackHeightPx(
             nodes,
             primaryAddress,
             arnIndex,

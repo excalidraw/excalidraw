@@ -68,6 +68,7 @@ export type TopologyGlobalPlacedSatellites = {
   sqs: Set<string>;
   alb: Set<string>;
   ecs: Set<string>;
+  eks: Set<string>;
   apiGateway: Set<string>;
   tgw: Set<string>;
   lambdaPermission: Set<string>;
@@ -171,6 +172,8 @@ function kindHasCluster(
       return Boolean(bundles.alb.cluster);
     case "ecs_companions":
       return Boolean(bundles.ecs.cluster);
+    case "eks_companions":
+      return Boolean(bundles.eks.cluster);
     case "ecs_cluster_companions":
       return Boolean(bundles.ecsCluster.cluster?.clusterPath);
     case "ecs_ec2_capacity_companions":
@@ -712,6 +715,37 @@ function renderBottomKind(p: RenderBottomKindParams): number {
         } else {
           y += tier2H + satelliteGap;
         }
+      }
+      return y;
+    }
+    case "eks_companions": {
+      const eksCluster = bundles.eks.cluster;
+      if (!eksCluster) {
+        return y;
+      }
+      const ruleTileXEks = columnX + Math.floor((iamW - tier2W) / 2);
+      for (const satAddr of eksCluster.stack) {
+        const satType = getTerraformCardResourceType(
+          satAddr,
+          getPrimaryResource(
+            nodes[satAddr] as TerraformPlanGraphNode,
+          ) as Record<string, unknown> | null,
+        );
+        const isAddon = satType === "aws_eks_addon";
+        const tileH = isAddon ? tier2H : tier1H;
+        const tileW = isAddon ? tier2W : iamW;
+        const tileX = isAddon ? ruleTileXEks : columnX;
+        if (globalPlaced.eks.has(satAddr)) {
+          y += tileH + satelliteGap;
+          continue;
+        }
+        globalPlaced.eks.add(satAddr);
+        addClusterMember(satAddr, tileX, y, tileW, tileH);
+        pushRect(skeleton, satAddr, tileX, y, tileW, tileH, nodes, {
+          explodeParentKeys: [addr],
+          satelliteTier: isAddon ? 2 : 1,
+        });
+        y += tileH + satelliteGap;
       }
       return y;
     }

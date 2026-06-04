@@ -23,6 +23,7 @@ export function collectTopologySatelliteEdges(
     ...bundles.s3.edges,
     ...bundles.alb.edges,
     ...bundles.ecs.edges,
+    ...bundles.eks.edges,
     ...bundles.ecsCluster.edges,
     ...bundles.ecsEc2.edges,
     ...bundles.api.edges,

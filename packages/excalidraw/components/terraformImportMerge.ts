@@ -15,6 +15,7 @@ export type TerraformImportWarning = {
     | "duplicate_address"
     | "variable_mismatch"
     | "duplicate_tfd_bind"
+    | "tfd_error"
     | "pipeline_cycle";
   message: string;
   address?: string;

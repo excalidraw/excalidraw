@@ -1,6 +1,6 @@
 # Terraform import presets — agent handoff
 
-Handoff doc for another agent working on **built-in Terraform import presets**, **layout (semantic / pipeline)**, or **staging-localstack** vs **staging-multi-state-expanded**.
+Handoff doc for another agent working on **built-in Terraform import presets**, **layout (semantic / pipeline)**, or **staging-localstack** / **staging-extended-localstack** vs **staging-multi-state-expanded**.
 
 ---
 
@@ -12,6 +12,7 @@ Source of truth: [`packages/excalidraw/assets/import-presets.catalog.json`](../p
 | --- | --- | --- | --- | --- |
 | `staging-multi-state-expanded` | `packages/backend/terraform/staging-multi-state/` | 25 (one root per stack dir) | `pipeline` | `pipeline.tfd` (committed) |
 | `staging-localstack` | `packages/backend/terraform/staging-localstack/` | 1 (single root) | `pipeline` | `pipeline.tfd` (committed) |
+| `staging-extended-localstack` | `packages/backend/terraform/staging-extended-localstack/` | 1 (single root, extended lake/EKS/security) | `pipeline` | `pipeline.tfd` (committed) |
 
 **Multi-state** — each stack has `plan.json` + `graph.dot` under `{stack-id}/` (e.g. `00-east-network/plan.json`). TFD binds use stack-qualified addresses: `40-east-api-1::module.api.aws_...`.
 
@@ -62,8 +63,7 @@ Implementation: [`compactTerraformImportPresetDb.mjs`](../../excalidraw-app/dev/
 
 Expected sizes after `yarn seed:terraform-presets` + `yarn export:terraform-presets-test-db`:
 
-- **~3 MB** fixture file (was ~73 MB before compact: duplicate artifacts + raw UTF-8 + SQLite freelist)
-- **~80 blob chunks** for current two-preset catalog
+- **~4–5 MB** fixture file with three presets (gzip-compacted; was ~73 MB before compact)
 
 To check fixture size: `ls -lh packages/excalidraw/test-fixtures/terraform-import-presets.db` (expect ~3 MB).
 
@@ -311,6 +311,7 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 
 - [README.md — Terraform import & presets](../README.md#declared-dataflow-tfd)
 - [docs/cloudflare-deploy.md](./cloudflare-deploy.md) — D1 preset push, demo smoke URLs
+- [docs/staging-extended-localstack-pipeline-handoff.md](./staging-extended-localstack-pipeline-handoff.md) — extended LocalStack preset + pipeline.tfd lanes
 - [docs/terraform-import-performance-log.md](./terraform-import-performance-log.md) — semantic perf work on `staging-multi-state-expanded`
 - [packages/backend/README.md](../packages/backend/README.md) — terraform submodule layout
 

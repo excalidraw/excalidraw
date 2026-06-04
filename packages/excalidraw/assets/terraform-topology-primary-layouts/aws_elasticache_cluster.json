@@ -1,0 +1,38 @@
+{
+  "primaryType": "aws_elasticache_cluster",
+  "attachments": ["cloudwatch_alarms", "security_groups"],
+  "tierBase": {
+    "tier0": { "w": 200, "h": 88 },
+    "tier1": { "w": 176, "h": 52 },
+    "tier2": { "w": 154, "h": 44 }
+  },
+  "padding": {
+    "sgRight": 6,
+    "cloudwatchLeft": 6,
+    "cloudwatchRight": 6,
+    "primaryClusterFrame": 10
+  },
+  "gaps": {
+    "satellite": 8,
+    "iamSgColumn": 8,
+    "cloudwatchColumn": 8,
+    "sgBetweenGroups": 4
+  },
+  "slots": [
+    {
+      "id": "top_observability",
+      "anchor": "top",
+      "align": "start",
+      "kinds": ["cloudwatch_alarms"],
+      "layout": "stack"
+    },
+    {
+      "id": "bottom_network",
+      "anchor": "bottom",
+      "align": "end",
+      "kinds": ["security_groups"],
+      "layout": "stack",
+      "groupLayout": "sg_groups_with_rules"
+    }
+  ]
+}

@@ -184,8 +184,12 @@ function collectSemanticRepresentedResourceAddresses(
 function formatImportWarnings(
   warnings: TerraformImportWarning[],
   tfdWarnings: string[],
+  tfdErrors: string[] = [],
 ): TerraformImportWarning[] {
   const out = [...warnings];
+  for (const message of tfdErrors) {
+    out.push({ code: "tfd_error", message });
+  }
   for (const message of tfdWarnings) {
     out.push({ code: "duplicate_tfd_bind", message });
   }
@@ -395,6 +399,7 @@ type LayoutSceneContext = {
   nodes5: ReturnType<typeof buildTerraformLocalImportNodesMap>;
   importSource: "plan" | "state-only";
   importWarnings: TerraformImportWarning[];
+  tfdErrors: string[];
   tfdWarnings: string[];
   stackIds: string[];
   addressToStack: Record<string, string>;
@@ -426,6 +431,7 @@ async function buildPipelineLayoutSceneBody(
       formatImportWarnings(
         [...ctx.importWarnings, ...pipelineScene.warnings],
         ctx.tfdWarnings,
+        ctx.tfdErrors,
       ),
       { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
     ),
@@ -602,7 +608,7 @@ async function buildSemanticLayoutSceneBody(
         providerBlockCount: providerBlocks.length,
       },
       ctx.sources,
-      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings),
+      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings, ctx.tfdErrors),
       { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
     ),
   };
@@ -632,7 +638,7 @@ async function buildModuleLayoutSceneBody(
         plannedChanges: ctx.importSource !== "state-only",
       },
       ctx.sources,
-      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings),
+      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings, ctx.tfdErrors),
     ),
   };
 }
@@ -711,6 +717,7 @@ export async function layoutTerraformFromSources(
     states.length === 0;
 
   let nodes5: ReturnType<typeof buildTerraformLocalImportNodesMap>;
+  let tfdErrors: string[] = [];
   let tfdWarnings: string[] = [];
   if (useCachedNodes) {
     nodes5 = prepCache.nodes;
@@ -722,14 +729,15 @@ export async function layoutTerraformFromSources(
         stackIds,
       }),
     );
-    tfdWarnings = terraformImportProfilerMeasure("parse.tfd", () =>
-      applyTfdOverlayToNodes(
-        nodes5,
-        sources.tfdTexts,
-        sources.tfdLabels,
-        options?.dataflowLinks,
-      ),
-    );
+    ({ errors: tfdErrors, warnings: tfdWarnings } =
+      terraformImportProfilerMeasure("parse.tfd", () =>
+        applyTfdOverlayToNodes(
+          nodes5,
+          sources.tfdTexts,
+          sources.tfdLabels,
+          options?.dataflowLinks,
+        ),
+      ));
   }
 
   const hasTfdEdgeSyntax = tfdTexts.some((t) => /\S+\s*->\s*\S+/.test(t));
@@ -762,6 +770,7 @@ export async function layoutTerraformFromSources(
     nodes5,
     importSource,
     importWarnings,
+    tfdErrors,
     tfdWarnings,
     stackIds,
     addressToStack,

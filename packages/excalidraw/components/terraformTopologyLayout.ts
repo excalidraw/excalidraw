@@ -3034,6 +3034,7 @@ function appendTopologyResourceRectanglesImpl(
         sqs: globalPlacedSqsSatellites,
         alb: globalPlacedAlbSatellites,
         ecs: globalPlacedEcsSatellites,
+        eks: new Set<string>(),
         apiGateway: globalPlacedApiGatewaySatellites,
         tgw: globalPlacedTgwSatellites,
         lambdaPermission: globalPlacedLambdaPermissionSatellites,
