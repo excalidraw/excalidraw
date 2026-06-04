@@ -8169,6 +8169,32 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
       });
     }
+
+    // Pipeline compact-mode: single-click on a primary card expands/collapses its satellites.
+    if (event.isPrimary) {
+      const hitEl = this.getElementAtPosition(scenePointerX, scenePointerY, {
+        includeLockedElements: false,
+      });
+      if (
+        hitEl?.customData?.terraformPipelineExpandable === true &&
+        hitEl.customData?.terraformPipelineView === true
+      ) {
+        const allEls = this.scene.getElementsIncludingDeleted();
+        const reconcileOpts = buildTerraformReconcileOptionsForAppState(
+          this.state.terraformEdgeLayerPins,
+          this.state.terraformEdgeHoverPeekKey,
+        );
+        const isExpanded = hitEl.customData?.terraformPipelineExpanded === true;
+        void (async () => {
+          const { expandPipelineCluster, collapsePipelineCluster } =
+            await import("./terraformPipelineLayout");
+          const nextEls = isExpanded
+            ? collapsePipelineCluster(allEls, hitEl, reconcileOpts)
+            : await expandPipelineCluster(allEls, hitEl, reconcileOpts);
+          this.scene.replaceAllElements(nextEls);
+        })();
+      }
+    }
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (

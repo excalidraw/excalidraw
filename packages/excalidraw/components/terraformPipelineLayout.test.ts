@@ -268,9 +268,11 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
       ],
     } as unknown as TerraformPlanNodesMap;
 
-    const scene = await buildTerraformPipelineExcalidrawScene(nodes, {
-      resource_changes: [lb, listener, tg],
-    });
+    const scene = await buildTerraformPipelineExcalidrawScene(
+      nodes,
+      { resource_changes: [lb, listener, tg] },
+      { compact: false },
+    );
 
     expect(scene.meta.pipelineClusterCount).toBe(1);
     expect(

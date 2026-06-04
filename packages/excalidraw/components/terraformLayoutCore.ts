@@ -404,6 +404,7 @@ type LayoutSceneContext = {
   stackIds: string[];
   addressToStack: Record<string, string>;
   deferDecorations?: boolean;
+  pipelineCompact?: boolean;
 };
 
 async function buildPipelineLayoutSceneBody(
@@ -412,6 +413,7 @@ async function buildPipelineLayoutSceneBody(
   const pipelineScene = await buildTerraformPipelineExcalidrawScene(
     ctx.nodes5,
     ctx.plan,
+    { compact: ctx.pipelineCompact !== false },
   );
   emitLocalParseDebug({
     phase: "pipelineLayout",
@@ -775,6 +777,7 @@ export async function layoutTerraformFromSources(
     stackIds,
     addressToStack,
     deferDecorations: options?.deferDecorations === true,
+    pipelineCompact: options?.pipelineCompact,
   };
 
   const sceneBody = pipelineLayout

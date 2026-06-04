@@ -4,6 +4,8 @@ Handoff for another agent working on the **third built-in Terraform import prese
 
 For shared preset DB mechanics, compact fixture format, and the generic import pipeline, see [`terraform-import-presets-agent-handoff.md`](./terraform-import-presets-agent-handoff.md).
 
+For **how to view and debug pipeline import** (profiler, console traces, Vitest playbook), see [`terraform-pipeline-import-debug-handoff.md`](./terraform-pipeline-import-debug-handoff.md).
+
 ---
 
 ## What this preset is

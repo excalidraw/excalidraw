@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -9,11 +9,13 @@ import { Tooltip } from "./Tooltip";
 import { useExcalidrawElements, useExcalidrawSetAppState } from "./App";
 import {
   clearTerraformImportSession,
+  getTerraformImportSession,
   hasTerraformImportSession,
 } from "./terraformImportSession";
 import {
   refreshTerraformLayout,
   resetTerraformLayout,
+  runTerraformImportFromSources,
 } from "./terraformSceneApply";
 
 import "./TerraformDebugToolbar.scss";
@@ -25,6 +27,10 @@ const hasTerraformResourceNodes = (
   elements: ReadonlyArray<{ customData?: Record<string, unknown> }>,
 ) =>
   elements.some((el) => el.customData?.terraformVisibilityRole === "resource");
+
+const isTerraformPipelineScene = (
+  elements: ReadonlyArray<{ customData?: Record<string, unknown> }>,
+) => elements.some((el) => el.customData?.terraformPipelineView === true);
 
 export const TerraformDebugToolbar = ({
   app,
@@ -39,8 +45,16 @@ export const TerraformDebugToolbar = ({
   useExcalidrawElements();
   const [refreshing, setRefreshing] = useState(false);
   const [hasSession, setHasSession] = useState(hasTerraformImportSession);
+  const [pipelineCompact, setPipelineCompact] = useState(
+    () => getTerraformImportSession()?.pipelineCompact !== false,
+  );
+  const [togglingCompact, setTogglingCompact] = useState(false);
 
   const isTerraformScene = hasTerraformResourceNodes(elements);
+  const isPipelineScene = useMemo(
+    () => isTerraformPipelineScene(elements),
+    [elements],
+  );
 
   useEffect(() => {
     if (!isTerraformScene) {
@@ -53,6 +67,7 @@ export const TerraformDebugToolbar = ({
 
   const syncSessionFlag = useCallback(() => {
     setHasSession(hasTerraformImportSession());
+    setPipelineCompact(getTerraformImportSession()?.pipelineCompact !== false);
   }, []);
 
   const handleReset = useCallback(() => {
@@ -82,6 +97,85 @@ export const TerraformDebugToolbar = ({
       setRefreshing(false);
     }
   }, [app, setAppState, syncSessionFlag]);
+
+  const handleToggleCompact = useCallback(async () => {
+    const session = getTerraformImportSession();
+    if (!session) {
+      return;
+    }
+    setTogglingCompact(true);
+    try {
+      await runTerraformImportFromSources(app, setAppState, session.sources, {
+        semanticLayout: session.semanticLayout,
+        layoutMode: session.layoutMode,
+        moduleLayoutOptions: session.moduleLayoutOptions,
+        pipelineCompact: !pipelineCompact,
+        importedTfdTexts: session.importedTfdTexts,
+        preset: session.preset,
+      });
+      syncSessionFlag();
+    } catch (err) {
+      setAppState({
+        toast: {
+          message: err instanceof Error ? err.message : "Layout toggle failed",
+          duration: 4000,
+          closable: true,
+        },
+      });
+    } finally {
+      setTogglingCompact(false);
+    }
+  }, [app, setAppState, syncSessionFlag, pipelineCompact]);
+
+  const handleExpandAll = useCallback(async () => {
+    const allEls = app.scene.getElementsIncludingDeleted();
+    const { buildTerraformReconcileOptionsForAppState } = await import(
+      "./terraformVisibility"
+    );
+    const { expandPipelineCluster } = await import("./terraformPipelineLayout");
+    const reconcileOpts = buildTerraformReconcileOptionsForAppState(
+      app.state.terraformEdgeLayerPins,
+      app.state.terraformEdgeHoverPeekKey,
+    );
+    const expandables = allEls.filter(
+      (el) =>
+        el.customData?.terraformPipelineExpandable === true &&
+        el.customData?.terraformPipelineExpanded !== true &&
+        !el.isDeleted,
+    );
+    let current =
+      allEls as import("@excalidraw/element/types").ExcalidrawElement[];
+    for (const card of expandables) {
+      current = await expandPipelineCluster(current, card, reconcileOpts);
+    }
+    app.scene.replaceAllElements(current);
+  }, [app]);
+
+  const handleCollapseAll = useCallback(async () => {
+    const allEls = app.scene.getElementsIncludingDeleted();
+    const { buildTerraformReconcileOptionsForAppState } = await import(
+      "./terraformVisibility"
+    );
+    const { collapsePipelineCluster } = await import(
+      "./terraformPipelineLayout"
+    );
+    const reconcileOpts = buildTerraformReconcileOptionsForAppState(
+      app.state.terraformEdgeLayerPins,
+      app.state.terraformEdgeHoverPeekKey,
+    );
+    const expanded = allEls.filter(
+      (el) =>
+        el.customData?.terraformPipelineExpandable === true &&
+        el.customData?.terraformPipelineExpanded === true &&
+        !el.isDeleted,
+    );
+    let current =
+      allEls as import("@excalidraw/element/types").ExcalidrawElement[];
+    for (const card of expanded) {
+      current = collapsePipelineCluster(current, card, reconcileOpts);
+    }
+    app.scene.replaceAllElements(current);
+  }, [app]);
 
   if (!isTerraformScene) {
     return null;
@@ -138,6 +232,64 @@ export const TerraformDebugToolbar = ({
               Refresh
             </ToolButton>
           </Tooltip>
+          {isPipelineScene && (
+            <>
+              <Tooltip
+                label={
+                  sessionDisabled
+                    ? "Import Terraform to toggle pipeline mode"
+                    : pipelineCompact
+                    ? "Switch to full pipeline view (show all satellites)"
+                    : "Switch to compact pipeline view (satellites on click)"
+                }
+              >
+                <ToolButton
+                  type="button"
+                  size="small"
+                  aria-label={
+                    pipelineCompact
+                      ? "Pipeline: Full view"
+                      : "Pipeline: Compact view"
+                  }
+                  title={
+                    pipelineCompact
+                      ? "Pipeline: Full view"
+                      : "Pipeline: Compact view"
+                  }
+                  data-testid="terraform-debug-toggle-compact"
+                  disabled={sessionDisabled || togglingCompact}
+                  isLoading={togglingCompact}
+                  onClick={() => void handleToggleCompact()}
+                >
+                  {pipelineCompact ? "Full" : "Compact"}
+                </ToolButton>
+              </Tooltip>
+              <Tooltip label="Expand all pipeline clusters">
+                <ToolButton
+                  type="button"
+                  size="small"
+                  aria-label="Expand all pipeline clusters"
+                  title="Expand all pipeline clusters"
+                  data-testid="terraform-debug-expand-all"
+                  onClick={() => void handleExpandAll()}
+                >
+                  Expand all
+                </ToolButton>
+              </Tooltip>
+              <Tooltip label="Collapse all pipeline clusters">
+                <ToolButton
+                  type="button"
+                  size="small"
+                  aria-label="Collapse all pipeline clusters"
+                  title="Collapse all pipeline clusters"
+                  data-testid="terraform-debug-collapse-all"
+                  onClick={() => void handleCollapseAll()}
+                >
+                  Collapse all
+                </ToolButton>
+              </Tooltip>
+            </>
+          )}
         </Stack.Col>
       </Island>
     </div>

@@ -21,6 +21,8 @@ export type TerraformImportSession = {
   semanticLayout: boolean;
   layoutMode?: "module" | "semantic" | "pipeline";
   moduleLayoutOptions: TerraformModuleLayoutOptions;
+  /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
+  pipelineCompact?: boolean;
   preset: TerraformImportPreset | null;
   importedTfdTexts: string[];
   snapshot: TerraformImportSessionSnapshot;

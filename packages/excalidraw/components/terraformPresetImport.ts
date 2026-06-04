@@ -42,6 +42,8 @@ export type RunTerraformImportFromSourcesArgs = {
   sources: TerraformPlanParsingSources;
   view: TerraformView;
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  /** Pipeline view: start with satellites hidden (true, default) or all visible (false). */
+  pipelineCompact?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   signal?: AbortSignal;
@@ -54,6 +56,7 @@ export const runTerraformImportWithView = async ({
   sources,
   view,
   moduleLayoutOptions = DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  pipelineCompact,
   importedTfdTexts,
   preset = null,
   signal,
@@ -66,6 +69,7 @@ export const runTerraformImportWithView = async ({
     layoutMode: layoutMode === "pipeline" ? "pipeline" : undefined,
     moduleLayoutOptions:
       layoutMode === "module" ? moduleLayoutOptions : undefined,
+    ...(layoutMode === "pipeline" ? { pipelineCompact } : {}),
     importedTfdTexts,
     preset,
     signal,
@@ -76,6 +80,7 @@ export const runTerraformImportWithView = async ({
 export type RunTerraformPresetImportOptions = {
   view?: TerraformView;
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  pipelineCompact?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
 };
@@ -113,6 +118,7 @@ export const runTerraformPresetImport = async (
     sources,
     view,
     moduleLayoutOptions,
+    pipelineCompact: options.pipelineCompact,
     importedTfdTexts: presetSources.tfdTexts,
     preset,
     signal: options.signal,

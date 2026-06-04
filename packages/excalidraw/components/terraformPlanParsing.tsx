@@ -118,6 +118,11 @@ export type TerraformPlanParsingOptions = {
   ) => { content: string } | null | undefined;
   /** Experimental: skip icon/glyph decoration during first semantic pass. */
   deferDecorations?: boolean;
+  /**
+   * Pipeline view: when true (default) each cluster renders only the primary card.
+   * Satellites are added on demand when the user clicks the card.
+   */
+  pipelineCompact?: boolean;
 };
 
 type BuildNodesMapOptions = {

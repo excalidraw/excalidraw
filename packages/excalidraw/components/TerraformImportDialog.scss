@@ -338,6 +338,45 @@
       }
     }
 
+    &__viewSubOption {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+      margin-top: 6px;
+
+      &__btn {
+        font-family: "Assistant";
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.55rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--tf-control-border);
+        background: var(--color-surface-lowest);
+        color: var(--tf-control-text-muted);
+        cursor: pointer;
+        transition: border-color var(--tf-transition),
+          background-color var(--tf-transition), color var(--tf-transition);
+
+        &:hover {
+          border-color: var(--tf-control-border-hover);
+          background-color: var(--tf-control-bg-hover);
+          color: var(--tf-control-text);
+        }
+
+        &--active {
+          border-color: var(--color-primary);
+          background-color: var(--color-primary-light);
+          color: var(--color-primary);
+          box-shadow: 0 0 0 1px var(--color-primary) inset;
+
+          &:hover {
+            background-color: var(--color-primary-light);
+            border-color: var(--color-primary);
+          }
+        }
+      }
+    }
+
     &__modulePacking {
       display: flex;
       flex-direction: column;

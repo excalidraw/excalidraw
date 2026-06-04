@@ -312,6 +312,7 @@ Same overlay as pipeline; declared dataflow layer can be enabled when importing 
 - [README.md — Terraform import & presets](../README.md#declared-dataflow-tfd)
 - [docs/cloudflare-deploy.md](./cloudflare-deploy.md) — D1 preset push, demo smoke URLs
 - [docs/staging-extended-localstack-pipeline-handoff.md](./staging-extended-localstack-pipeline-handoff.md) — extended LocalStack preset + pipeline.tfd lanes
+- [docs/terraform-pipeline-import-debug-handoff.md](./terraform-pipeline-import-debug-handoff.md) — pipeline view import flow, viewing, and debugging
 - [docs/terraform-import-performance-log.md](./terraform-import-performance-log.md) — semantic perf work on `staging-multi-state-expanded`
 - [packages/backend/README.md](../packages/backend/README.md) — terraform submodule layout
 

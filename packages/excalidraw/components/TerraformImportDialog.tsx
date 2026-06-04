@@ -33,6 +33,7 @@ export const TerraformImportModal = ({
     stateFiles,
     tfdFiles,
     view,
+    pipelineCompact,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -58,6 +59,7 @@ export const TerraformImportModal = ({
     setStateFiles,
     setTfdFiles,
     setView,
+    setPipelineCompact,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,
@@ -564,6 +566,35 @@ writer -> bucket`}</code>
                 <span className="TerraformImportModal__viewSelector__description">
                   {option.description}
                 </span>
+                {option.value === "pipeline" && checked && !disabled && (
+                  <div
+                    className="TerraformImportModal__viewSubOption"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      className={`TerraformImportModal__viewSubOption__btn${
+                        pipelineCompact
+                          ? " TerraformImportModal__viewSubOption__btn--active"
+                          : ""
+                      }`}
+                      onClick={() => setPipelineCompact(true)}
+                    >
+                      Compact
+                    </button>
+                    <button
+                      type="button"
+                      className={`TerraformImportModal__viewSubOption__btn${
+                        !pipelineCompact
+                          ? " TerraformImportModal__viewSubOption__btn--active"
+                          : ""
+                      }`}
+                      onClick={() => setPipelineCompact(false)}
+                    >
+                      Full
+                    </button>
+                  </div>
+                )}
               </label>
             );
           })}

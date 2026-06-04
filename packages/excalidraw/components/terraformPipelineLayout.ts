@@ -27,6 +27,7 @@ import {
   type TopologyAddressPlacement,
 } from "./terraformTopologyPlacementBuild";
 import {
+  buildCompactPipelinePrimaryCluster,
   buildTopologyPrimaryClusterSkeletonForPipeline,
   type PipelinePrimaryClusterBuildResult,
 } from "./terraformTopologyLayout";
@@ -530,11 +531,13 @@ function pushContextFrames(
 export async function buildTerraformPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
+  options?: { compact?: boolean },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: Record<string, unknown>;
   warnings: TerraformImportWarning[];
 }> {
+  const compact = options?.compact !== false;
   const declared = nodes[DECLARED_DATAFLOW_ORDERED_KEY];
   if (!Array.isArray(declared) || declared.length === 0) {
     throw new Error(
@@ -586,18 +589,26 @@ export async function buildTerraformPipelineExcalidrawScene(
       region: "unknown-region",
       vpcId: null,
     };
-    let build = buildTopologyPrimaryClusterSkeletonForPipeline(
-      address,
-      nodes,
-      plan,
-      {
-        accountId: placement.accountId,
-        region: placement.region,
-        vpcId: placement.vpcId,
-        subnetTier: placement.subnetTier,
-        subnetSignature: placement.subnetSignature,
-      },
-    );
+    const clusterPlacement = {
+      accountId: placement.accountId,
+      region: placement.region,
+      vpcId: placement.vpcId,
+      subnetTier: placement.subnetTier,
+      subnetSignature: placement.subnetSignature,
+    };
+    let build = compact
+      ? buildCompactPipelinePrimaryCluster(
+          address,
+          nodes,
+          plan,
+          clusterPlacement,
+        )
+      : buildTopologyPrimaryClusterSkeletonForPipeline(
+          address,
+          nodes,
+          plan,
+          clusterPlacement,
+        );
     if (build.skeleton.length === 0 || build.width <= 0 || build.height <= 0) {
       build = buildFallbackCluster(address, nodes, plan, placement);
     }
@@ -747,6 +758,7 @@ export async function buildTerraformPipelineExcalidrawScene(
     elements,
     meta: {
       layoutEngine: "pipeline",
+      pipelineCompact: compact,
       pipelineClusterCount: clusters.length,
       pipelineEdgeCount: collapsedEdges.length,
       pipelineColumnCount: maxDepth + 1,
@@ -762,3 +774,8 @@ export async function buildTerraformPipelineExcalidrawScene(
       : [],
   };
 }
+
+export {
+  collapsePipelineCluster,
+  expandPipelineCluster,
+} from "./terraformPipelineLayoutExpand";

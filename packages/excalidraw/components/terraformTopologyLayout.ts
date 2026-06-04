@@ -2841,7 +2841,7 @@ function growClusterBounds(
   };
 }
 
-type TopologyPrimaryClusterPlacement = {
+export type TopologyPrimaryClusterPlacement = {
   accountId: string;
   region: string;
   vpcId: string | null;
@@ -4570,6 +4570,78 @@ export type PipelinePrimaryClusterBuildResult = {
   height: number;
   clusterFrameId: string;
 };
+
+/**
+ * Build a compact single-card cluster skeleton at origin for pipeline compact mode.
+ * Contains only the primary resource card + a wrapping frame (no satellites).
+ * The primary card carries `terraformPipelineExpandable: true` so a click handler
+ * can later inject full satellite content on demand.
+ */
+export function buildCompactPipelinePrimaryCluster(
+  primaryAddr: string,
+  nodes: TerraformPlanNodesMap,
+  plan: unknown,
+  placement: TopologyPrimaryClusterPlacement,
+): PipelinePrimaryClusterBuildResult {
+  const skeleton: ExcalidrawElementSkeleton[] = [];
+  pushResourceRectangleSkeleton(
+    skeleton,
+    primaryAddr,
+    INNER_PAD,
+    INNER_PAD,
+    RESOURCE_RECT_W,
+    RESOURCE_RECT_H,
+    nodes,
+    {
+      explodeParentKeys: [],
+      plan,
+      initiallyVisible: true,
+    },
+  );
+
+  // Stamp pipeline-specific fields onto the primary card's customData.
+  const card = skeleton[0];
+  if (card && card.customData) {
+    (card.customData as Record<string, unknown>).terraformPipelineExpandable =
+      true;
+    (card.customData as Record<string, unknown>).terraformPipelineExpanded =
+      false;
+    (card.customData as Record<string, unknown>).terraformPipelineView = true;
+    // Serialize placement so the expand handler can re-derive the full cluster.
+    (card.customData as Record<string, unknown>).terraformPipelinePlacement = {
+      accountId: placement.accountId,
+      region: placement.region,
+      vpcId: placement.vpcId ?? null,
+      subnetTier: placement.subnetTier ?? null,
+      subnetSignature: placement.subnetSignature ?? null,
+    };
+  }
+
+  const clusterFrameId = primaryClusterSkeletonId(primaryAddr);
+  const frameW = RESOURCE_RECT_W + 2 * INNER_PAD;
+  const frameH = RESOURCE_RECT_H + 2 * INNER_PAD;
+
+  skeleton.push({
+    type: "frame",
+    id: clusterFrameId,
+    name: "",
+    x: 0,
+    y: 0,
+    width: frameW,
+    height: frameH,
+    children: [primaryAddr],
+    customData: {
+      terraform: true,
+      terraformSemanticOverview: true,
+      terraformPipelineView: true,
+      terraformTopologyRole: "primaryCluster",
+      terraformTopologyKey: clusterFrameId,
+      terraformPrimaryAddress: primaryAddr,
+    },
+  });
+
+  return { skeleton, width: frameW, height: frameH, clusterFrameId };
+}
 
 /** Build one primaryCluster skeleton at origin for pipeline layout sizing/placement. */
 export function buildTopologyPrimaryClusterSkeletonForPipeline(

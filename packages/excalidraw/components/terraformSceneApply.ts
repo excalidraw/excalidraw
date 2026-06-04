@@ -131,6 +131,8 @@ export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
   layoutMode?: "module" | "semantic" | "pipeline";
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
+  /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
+  pipelineCompact?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   updateSession?: boolean;
@@ -175,6 +177,9 @@ export const runTerraformImportFromSources = async (
         ...(options.layoutMode ? { layoutMode } : {}),
         moduleLayoutOptions:
           layoutMode === "module" ? moduleLayoutOptions : undefined,
+        ...(layoutMode === "pipeline"
+          ? { pipelineCompact: options.pipelineCompact !== false }
+          : {}),
       },
       {
         onProgress: options.onLayoutProgress,
@@ -205,6 +210,9 @@ export const runTerraformImportFromSources = async (
       semanticLayout: options.semanticLayout,
       ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions,
+      ...(layoutMode === "pipeline"
+        ? { pipelineCompact: options.pipelineCompact !== false }
+        : {}),
       preset: options.preset ?? null,
       importedTfdTexts,
       snapshot: nextSnapshot,
@@ -271,6 +279,7 @@ export const refreshTerraformLayout = async (
     semanticLayout: session.semanticLayout,
     layoutMode: session.layoutMode,
     moduleLayoutOptions: session.moduleLayoutOptions,
+    pipelineCompact: session.pipelineCompact,
     importedTfdTexts,
     preset: session.preset,
   });

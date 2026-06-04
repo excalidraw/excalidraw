@@ -66,6 +66,7 @@ export const useTerraformImportDialog = ({
   const [stateFiles, setStateFiles] = useState<File[]>([]);
   const [tfdFiles, setTfdFiles] = useState<File[]>([]);
   const [view, setView] = useState<TerraformView>("semantic");
+  const [pipelineCompact, setPipelineCompact] = useState(true);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
@@ -227,6 +228,7 @@ export const useTerraformImportDialog = ({
       sources,
       view,
       moduleLayoutOptions,
+      pipelineCompact,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -344,6 +346,7 @@ export const useTerraformImportDialog = ({
           await runTerraformPresetImport(app, setAppState, activePreset, {
             view,
             moduleLayoutOptions,
+            pipelineCompact,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -427,6 +430,7 @@ export const useTerraformImportDialog = ({
         await runTerraformPresetImport(app, setAppState, preset, {
           view,
           moduleLayoutOptions,
+          pipelineCompact,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -619,6 +623,7 @@ export const useTerraformImportDialog = ({
     stateFiles,
     tfdFiles,
     view,
+    pipelineCompact,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -645,6 +650,7 @@ export const useTerraformImportDialog = ({
     setStateFiles,
     setTfdFiles,
     setView,
+    setPipelineCompact,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,
