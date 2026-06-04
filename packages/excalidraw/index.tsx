@@ -41,8 +41,6 @@ import type {
   ExcalidrawProps,
 } from "./types";
 
-export { elementsOverlappingBBox } from "@excalidraw/element";
-
 polyfill();
 
 /**
@@ -399,6 +397,8 @@ export {
   getVisibleSceneBounds,
   convertToExcalidrawElements,
 } from "@excalidraw/element";
+
+export { elementsOverlappingBBox } from "@excalidraw/element";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
