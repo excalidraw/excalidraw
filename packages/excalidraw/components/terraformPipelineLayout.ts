@@ -6,6 +6,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import {
   buildTerraformDeclaredDataFlowLineSkeletons,
   buildTerraformResourceCardCustomData,
+  mirrorAndDetachTerraformResourceLabels,
   shortTerraformResourceLabel,
   type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
@@ -732,6 +733,7 @@ export async function buildTerraformPipelineExcalidrawScene(
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,
   }) as ExcalidrawElement[];
+  elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = await injectTerraformAwsIconsIntoElements(elements);
   elements = reconcileTerraformVisibility(
     repairTerraformEdgeBindings(elements),
