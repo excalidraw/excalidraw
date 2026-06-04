@@ -78,6 +78,7 @@ export function assertAllCatalogPluginsRegistered(): void {
     "iam_execution_role",
     "security_groups",
     "alb_companions",
+    "eks_companions",
     "ecs_companions",
     "ecs_cluster_companions",
     "ecs_ec2_capacity_companions",

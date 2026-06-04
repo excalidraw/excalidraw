@@ -27,9 +27,17 @@ describe("terraformTopologyPrimaryLayoutConfig", () => {
   });
 
   it("falls back to default for unknown primary types", () => {
-    const unknown = getPrimaryLayoutConfig("aws_instance");
+    const unknown = getPrimaryLayoutConfig("aws_fictional_unknown_type");
     const def = getPrimaryLayoutConfig("default");
     expect(unknown.slots).toEqual(def.slots);
+  });
+
+  it("loads aws_instance-specific slot kinds", () => {
+    const ec2 = getTopologyPrimaryLayoutJson("aws_instance");
+    expect(ec2.attachments).toContain("security_groups");
+    expect(ec2.slots.some((s) => s.kinds.includes("cloudwatch_alarms"))).toBe(
+      true,
+    );
   });
 
   it("loads lambda-specific slot kinds", () => {
