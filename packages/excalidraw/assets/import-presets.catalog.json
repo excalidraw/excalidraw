@@ -184,7 +184,9 @@
           "statePath": "57-east-2-api-16/terraform.tfstate"
         }
       ],
-      "tfdPaths": ["pipeline.tfd"]
+      "tfdPaths": [
+        "pipeline.tfd"
+      ]
     },
     {
       "id": "staging-localstack",
@@ -201,7 +203,9 @@
           "dotPath": "graph.dot"
         }
       ],
-      "tfdPaths": ["pipeline.tfd"]
+      "tfdPaths": [
+        "pipeline.tfd"
+      ]
     },
     {
       "id": "staging-extended-localstack",
@@ -218,7 +222,28 @@
           "dotPath": "graph.dot"
         }
       ],
-      "tfdPaths": ["pipeline.tfd"]
+      "tfdPaths": [
+        "pipeline.tfd"
+      ]
+    },
+    {
+      "id": "staging-extended-localstack-v2",
+      "name": "Staging Extended LocalStack v2",
+      "description": "LocalStack multi-account extended staging: workload, ingestion, security, and management account namespaces with Organizations/OUs, lake and EKS processing, regional persistence, audit, security, and observability.",
+      "builtin": true,
+      "view": "pipeline",
+      "rootPath": "packages/backend/terraform/staging-extended-localstack-v2",
+      "stacks": [
+        {
+          "id": "staging-extended-localstack-v2",
+          "label": "staging-extended-localstack-v2",
+          "planPath": "plan.json",
+          "dotPath": "graph.dot"
+        }
+      ],
+      "tfdPaths": [
+        "pipeline.tfd"
+      ]
     }
   ]
 }

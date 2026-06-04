@@ -336,3 +336,84 @@ describe("staging-extended-localstack pipeline preset", () => {
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
   );
 });
+
+describe("staging-extended-localstack-v2 pipeline preset", () => {
+  it(
+    "resolves multi-account Organizations ingestion and security paths",
+    async () => {
+      const { nodes, sources, tfdTexts, tfdLabels } = nodesAndTfdFromPreset(
+        "staging-extended-localstack-v2",
+      );
+      const { edges, errors, warnings } = applyDeclaredDataFlowFromMany(
+        nodes,
+        tfdTexts,
+        tfdLabels,
+      );
+
+      expect(errors, errors.join("\n")).toEqual([]);
+      expect(warnings).toEqual([]);
+      expect(edges.length).toBeGreaterThan(40);
+
+      expect(Object.keys(nodes)).toEqual(
+        expect.arrayContaining([
+          "aws_organizations_organization.this",
+          "aws_organizations_organizational_unit.workloads",
+          "aws_organizations_organizational_unit.data_platform",
+          "aws_organizations_organizational_unit.security",
+          'aws_s3_bucket.lake["raw"]',
+          "aws_eks_cluster.stream_processors",
+          "aws_dynamodb_table.regional_events_east",
+          'aws_s3_bucket.audit["audit"]',
+          "aws_cloudtrail.organization",
+          "aws_config_configuration_recorder.this",
+          "aws_sns_topic.ops",
+        ]),
+      );
+
+      const edgeKeys = new Set(
+        edges.map((e) => edgePairKey(e.source, e.target)),
+      );
+      expect(
+        edgeKeys.has(
+          edgePairKey(
+            "aws_organizations_organization.this",
+            "aws_organizations_organizational_unit.workloads",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        edgeKeys.has(
+          edgePairKey(
+            "aws_organizations_account.ingestion",
+            "aws_sqs_queue.ingest_fifo",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        edgeKeys.has(
+          edgePairKey(
+            "aws_organizations_account.security",
+            "aws_cloudtrail.organization",
+          ),
+        ),
+      ).toBe(true);
+
+      const body = await layoutTerraformViaWorkers(sources, {
+        semanticLayout: false,
+        layoutMode: "pipeline",
+      });
+      const elements = body.elements as LooseLayoutElement[];
+      expect(elements.length).toBeGreaterThan(0);
+
+      expect(
+        resourceFrameRoles(elements, "aws_eks_cluster.stream_processors"),
+      ).toEqual(
+        expect.arrayContaining(["primaryCluster", "vpc", "region", "account"]),
+      );
+      expect(
+        resourceFrameRoles(elements, "aws_cloudtrail.organization"),
+      ).toEqual(expect.arrayContaining(["primaryCluster", "account"]));
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS,
+  );
+});
