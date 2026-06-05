@@ -4771,6 +4771,18 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      if (
+        isInputLike(event.target) &&
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.S &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        if (this.actionManager.handleKeyDown(event)) {
+          return;
+        }
+      }
+
       if (!isInputLike(event.target)) {
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
