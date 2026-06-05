@@ -10864,10 +10864,22 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isLinearElement(newElement)) {
+        const { x: scenePointerX, y: scenePointerY } =
+          viewportCoordsToSceneCoords(childEvent, this.state);
+        const hoveredElement =
+          isArrowElement(this.state.newElement) &&
+          isBindingEnabled(this.state) &&
+          getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            maxBindingDistance_simple(this.state.zoom),
+          );
         if (
           newElement!.points.length > 1 &&
           newElement.points[1][0] !== 0 &&
-          newElement.points[1][1] !== 0
+          newElement.points[1][1] !== 0 &&
+          !hoveredElement
         ) {
           this.store.scheduleCapture();
         }
