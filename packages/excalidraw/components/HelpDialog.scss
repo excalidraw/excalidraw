@@ -18,6 +18,17 @@
       gap: 0.75rem;
     }
 
+    &__search {
+      margin-top: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__search-icon {
+      display: flex;
+      align-items: center;
+      color: var(--color-primary);
+    }
+
     &__btn {
       --background: var(--color-surface-mid);
 
@@ -126,6 +137,13 @@
       align-items: center;
       font-family: inherit;
       line-height: 1;
+    }
+
+    &__empty {
+      margin: 2rem 0 0;
+      text-align: center;
+      color: var(--text-secondary-color);
+      font-size: 0.875rem;
     }
   }
 }
