@@ -575,9 +575,7 @@ export const convertToExcalidrawElements = (
 
         Object.assign(
           excalidrawElement,
-          LinearElementEditor.getNormalizeElementPointsAndCoords(
-            excalidrawElement as ExcalidrawLinearElement,
-          ),
+          getSizeFromPoints(excalidrawElement.points),
         );
 
         break;

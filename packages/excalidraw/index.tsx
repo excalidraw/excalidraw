@@ -399,11 +399,7 @@ export {
   convertToExcalidrawElements,
 } from "@excalidraw/element";
 
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "@excalidraw/utils/withinBounds";
+export { elementsOverlappingBBox } from "@excalidraw/element";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";

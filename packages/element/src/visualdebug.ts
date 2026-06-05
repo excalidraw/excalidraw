@@ -5,6 +5,7 @@ import {
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
+  type LineSegment,
 } from "@excalidraw/math";
 import { type Bounds, isBounds } from "@excalidraw/common";
 import {
@@ -23,7 +24,6 @@ import type {
   ExcalidrawLinearElement,
 } from "@excalidraw/element/types";
 import type { Curve } from "@excalidraw/math";
-import type { LineSegment } from "@excalidraw/utils";
 
 // The global data holder to collect the debug operations
 declare global {
