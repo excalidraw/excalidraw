@@ -17,7 +17,7 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { updateTextEditor } from "./queries/dom";
-import { act, render, waitFor } from "./test-utils";
+import { act, render, screen, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -27,6 +27,18 @@ const querySearchInput = async () => {
       `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
     )!;
   await waitFor(() => expect(input).not.toBeNull());
+  return input;
+};
+
+const queryHelpSearchInput = async () => {
+  await waitFor(() => {
+    expect(document.querySelector(".HelpDialog")).not.toBeNull();
+  });
+
+  const input = document.querySelector<HTMLInputElement>(
+    ".HelpDialog__search input",
+  )!;
+  expect(input).not.toBeNull();
   return input;
 };
 
@@ -73,6 +85,50 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(searchInput?.matches(":focus")).toBe(true);
+  });
+
+  it("should focus help dialog search on cmd+f without opening canvas search", async () => {
+    API.setAppState({
+      openDialog: { name: "help" },
+      openSidebar: null,
+    });
+
+    const helpSearchInput = await queryHelpSearchInput();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    expect(h.app.state.openDialog?.name).toBe("help");
+    expect(h.app.state.openSidebar).toBeNull();
+    expect(helpSearchInput.matches(":focus")).toBe(true);
+  });
+
+  it("should filter help dialog shortcuts", async () => {
+    API.setAppState({
+      openDialog: { name: "help" },
+      openSidebar: null,
+    });
+
+    const helpSearchInput = await queryHelpSearchInput();
+
+    updateTextEditor(helpSearchInput, "font");
+
+    await waitFor(() => {
+      expect(screen.getByText("Show font picker")).toBeInTheDocument();
+      expect(screen.getByText("Decrease font size")).toBeInTheDocument();
+      expect(screen.queryByText("Find on canvas")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Finish editing (text editor)"),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Zoom in")).not.toBeInTheDocument();
+    });
+
+    updateTextEditor(helpSearchInput, "zzzzzz");
+
+    await waitFor(() => {
+      expect(screen.getByText("No matches found...")).toBeInTheDocument();
+    });
   });
 
   it("should match text and cycle through matches on Enter", async () => {

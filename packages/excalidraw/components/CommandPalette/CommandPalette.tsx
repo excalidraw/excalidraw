@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import fuzzy from "fuzzy";
 import { useEffect, useRef, useMemo, useState } from "react";
 
 import {
@@ -27,7 +26,6 @@ import {
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
-import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
 import { t } from "../../i18n";
 import {
@@ -72,6 +70,7 @@ import {
 } from "../../hooks/useLibraryItemSvg";
 
 import * as defaultItems from "./defaultCommandPaletteItems";
+import { buildSearchHaystack, filterItemsBySearch } from "./search";
 import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
@@ -235,7 +234,7 @@ function CommandPaletteInner({
           ),
           category: "Library",
           order: getCategoryOrder("Library"),
-          haystack: deburr(libraryItem.name),
+          haystack: buildSearchHaystack(libraryItem.name),
           perform: () => {
             app.onInsertElements(
               distributeLibraryItemsOnSquareGrid([libraryItem]),
@@ -616,9 +615,7 @@ function CommandPaletteInner({
           ...command,
           icon: command.icon || boltIcon,
           order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
-            command.keywords?.join(" ") || ""
-          }`,
+          haystack: buildSearchHaystack(command.label, command.keywords),
         };
       });
 
@@ -863,15 +860,7 @@ function CommandPaletteInner({
       return;
     }
 
-    const _query = deburr(
-      commandSearch.toLocaleLowerCase().replace(/[<>_| -]/g, ""),
-    );
-    matchingCommands = fuzzy
-      .filter(_query, matchingCommands, {
-        extract: (command) => command.haystack ?? "",
-      })
-      .sort((a, b) => b.score - a.score)
-      .map((item) => item.original);
+    matchingCommands = filterItemsBySearch(commandSearch, matchingCommands);
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0] ?? null);
