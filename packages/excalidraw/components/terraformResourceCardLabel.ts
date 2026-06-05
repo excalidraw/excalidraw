@@ -1,3 +1,5 @@
+import terraformAwsIconTypeNames from "../assets/terraform-aws-icon-type-names.json";
+
 import { getTerraformResourceTypeFromNodePath } from "./terraformPrimaryVisibility";
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 
@@ -88,6 +90,27 @@ export function terraformInstanceNameFromAddress(
   }
 
   return rest[0] || stripped;
+}
+
+/**
+ * Short human-readable service name for a resource type (e.g. `"aws_lambda_function"` → `"Lambda"`).
+ * Uses the AWS icon type name mapping as the authoritative display name, falling back to the
+ * type suffix after the provider prefix.
+ */
+export function getTerraformResourceShortDisplayName(
+  resourceType: string,
+): string {
+  const names = terraformAwsIconTypeNames as Record<string, string>;
+  const iconName = names[resourceType];
+  if (iconName) {
+    return iconName;
+  }
+  // Strip provider prefix: "aws_lambda_function" → "lambda_function", "data.aws_ami" → "ami"
+  const bare = resourceType
+    .replace(/^data\./, "")
+    .replace(/^aws_/, "")
+    .replace(/^[a-z0-9]+_/, "");
+  return bare || resourceType;
 }
 
 /**

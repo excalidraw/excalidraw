@@ -36,6 +36,7 @@ import {
 import {
   terraformResourceCardLabel,
   getTerraformCardResourceType,
+  getTerraformResourceShortDisplayName,
 } from "./terraformResourceCardLabel";
 import {
   collectDataFlowEdges,
@@ -47,6 +48,8 @@ import {
   isInitiallyVisibleTerraformTopologyTile,
   isPrimaryVisibleResourceType,
   isTopologyPlacementResourceType,
+  getClusterFrameColorForResourceType,
+  getTerraformResourceTypeFromNodePath,
 } from "./terraformPrimaryVisibility";
 import {
   TERRAFORM_MODULE_TREE_KEY,
@@ -3051,6 +3054,7 @@ function appendTopologyResourceRectanglesImpl(
     const pad = layoutConfig.padding.primaryClusterFrame;
     const b = clusterBounds!;
     const clusterSkId = primaryClusterSkeletonId(addr);
+    const clusterResourceType = getTerraformResourceTypeFromNodePath(addr);
     skeleton.push({
       type: "frame",
       id: clusterSkId,
@@ -3059,6 +3063,7 @@ function appendTopologyResourceRectanglesImpl(
       y: b.minY - pad,
       width: b.maxX - b.minX + 2 * pad,
       height: b.maxY - b.minY + 2 * pad,
+      ...getClusterFrameColorForResourceType(clusterResourceType),
       children: clusterChildIds as readonly string[],
       customData: frameCustomData(
         "primaryCluster",
@@ -4617,9 +4622,26 @@ export function buildCompactPipelinePrimaryCluster(
     };
   }
 
+  // Append service type subtitle to the primary card label.
+  if (card && (card as Record<string, unknown>).label) {
+    const compactResourceType =
+      getTerraformResourceTypeFromNodePath(primaryAddr);
+    const subtitle = getTerraformResourceShortDisplayName(compactResourceType);
+    const existingLabel = (card as Record<string, unknown>).label as Record<
+      string,
+      unknown
+    >;
+    (card as Record<string, unknown>).label = {
+      ...existingLabel,
+      text: `${existingLabel.text}\n${subtitle}`,
+    };
+  }
+
   const clusterFrameId = primaryClusterSkeletonId(primaryAddr);
   const frameW = RESOURCE_RECT_W + 2 * INNER_PAD;
   const frameH = RESOURCE_RECT_H + 2 * INNER_PAD;
+  const compactClusterResourceType =
+    getTerraformResourceTypeFromNodePath(primaryAddr);
 
   skeleton.push({
     type: "frame",
@@ -4629,6 +4651,7 @@ export function buildCompactPipelinePrimaryCluster(
     y: 0,
     width: frameW,
     height: frameH,
+    ...getClusterFrameColorForResourceType(compactClusterResourceType),
     children: [primaryAddr],
     customData: {
       terraform: true,
@@ -4696,6 +4719,24 @@ export function buildTopologyPrimaryClusterSkeletonForPipeline(
     typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
   const height =
     typeof frame?.height === "number" ? frame.height : RESOURCE_RECT_H;
+
+  // Append service type subtitle to the primary card label.
+  const primaryCard = skeleton.find(
+    (el) => el.type === "rectangle" && el.id === primaryAddr,
+  );
+  if (primaryCard && (primaryCard as Record<string, unknown>).label) {
+    const fullClusterResourceType =
+      getTerraformResourceTypeFromNodePath(primaryAddr);
+    const subtitle = getTerraformResourceShortDisplayName(
+      fullClusterResourceType,
+    );
+    const existingLabel = (primaryCard as Record<string, unknown>)
+      .label as Record<string, unknown>;
+    (primaryCard as Record<string, unknown>).label = {
+      ...existingLabel,
+      text: `${existingLabel.text}\n${subtitle}`,
+    };
+  }
 
   return { skeleton, width, height, clusterFrameId };
 }

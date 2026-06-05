@@ -9,7 +9,7 @@ import { tfComfortPx } from "./terraformLayoutComfort";
 const px = tfComfortPx;
 
 const TERRAFORM_AWS_ICON_PAD = px(12);
-const TERRAFORM_AWS_ICON_SIZE = px(36);
+const TERRAFORM_AWS_ICON_SIZE = px(44);
 /** Matches `TERRAFORM_RESOURCE_LABEL_STROKE` in `terraformElkLayout.ts`. */
 const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 

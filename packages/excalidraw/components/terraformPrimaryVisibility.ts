@@ -256,6 +256,63 @@ export function isInitiallyVisibleTerraformTopologyTile(
   return isInitiallyVisibleTerraformResource(resourceType, action);
 }
 
+const CLUSTER_FRAME_COLORS = {
+  compute: { strokeColor: "#ea580c", backgroundColor: "#fff7ed" },
+  data: { strokeColor: "#059669", backgroundColor: "#ecfdf5" },
+  messaging: { strokeColor: "#e11d48", backgroundColor: "#fff1f2" },
+  networking: { strokeColor: "#0284c7", backgroundColor: "#f0f9ff" },
+  security: { strokeColor: "#d97706", backgroundColor: "#fffbeb" },
+  management: { strokeColor: "#7c3aed", backgroundColor: "#f5f3ff" },
+  default: { strokeColor: "#64748b", backgroundColor: "#f8fafc" },
+} as const;
+
+/** Frame border + background color keyed by primary resource type for pipeline/topology cluster frames. */
+export function getClusterFrameColorForResourceType(resourceType: string): {
+  strokeColor: string;
+  backgroundColor: string;
+} {
+  if (PRIMARY_COMPUTE_TYPES.has(resourceType)) {
+    return CLUSTER_FRAME_COLORS.compute;
+  }
+  if (PRIMARY_STORAGE_TYPES.has(resourceType)) {
+    return CLUSTER_FRAME_COLORS.data;
+  }
+  if (PRIMARY_MESSAGING_TYPES.has(resourceType)) {
+    return CLUSTER_FRAME_COLORS.messaging;
+  }
+  if (
+    PRIMARY_NETWORKING_TYPES.has(resourceType) ||
+    PRIMARY_API_TYPES.has(resourceType) ||
+    resourceType.startsWith("aws_vpc") ||
+    resourceType.startsWith("aws_route53_") ||
+    resourceType.startsWith("aws_cloudfront_") ||
+    resourceType === "aws_lb"
+  ) {
+    return CLUSTER_FRAME_COLORS.networking;
+  }
+  if (
+    PRIMARY_CRYPTO_TYPES.has(resourceType) ||
+    resourceType.startsWith("aws_iam_") ||
+    resourceType.startsWith("aws_secretsmanager_") ||
+    resourceType.startsWith("aws_acm_") ||
+    resourceType.startsWith("aws_wafv2_") ||
+    resourceType.startsWith("aws_waf_") ||
+    resourceType.startsWith("aws_shield_")
+  ) {
+    return CLUSTER_FRAME_COLORS.security;
+  }
+  if (
+    resourceType.startsWith("aws_organizations_") ||
+    resourceType.startsWith("aws_cloudwatch_") ||
+    resourceType.startsWith("aws_ssm_") ||
+    resourceType.startsWith("aws_cloudtrail_") ||
+    resourceType.startsWith("aws_config_")
+  ) {
+    return CLUSTER_FRAME_COLORS.management;
+  }
+  return CLUSTER_FRAME_COLORS.default;
+}
+
 /**
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */
