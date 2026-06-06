@@ -24,6 +24,7 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawIframeLikeElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawTableElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
@@ -88,6 +89,12 @@ export const isFrameLikeElement = (
     element != null &&
     (element.type === "frame" || element.type === "magicframe")
   );
+};
+
+export const isTableElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTableElement => {
+  return element != null && element.type === "table";
 };
 
 export const isFreeDrawElement = (
@@ -189,6 +196,7 @@ export const isBindableElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "table" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -205,6 +213,7 @@ export const isRectanguloidElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "table" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -223,6 +232,7 @@ export const isRectangularElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "table" ||
       element.type === "freedraw")
   );
 };
@@ -260,6 +270,7 @@ export const isExcalidrawElement = (
     case "line":
     case "frame":
     case "magicframe":
+    case "table":
     case "image":
     case "selection": {
       return true;
@@ -309,7 +320,8 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "iframe" ||
-  type === "image";
+  type === "image" ||
+  type === "table";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";
@@ -404,6 +416,7 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
     case "text":
     case "image":
     case "frame":
+    case "table":
     case "embeddable": {
       return true;
     }

@@ -64,6 +64,8 @@ import {
   debounce,
   distance,
   getFontString,
+  getFontFamilyString,
+  BOUND_TEXT_PADDING,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -131,7 +133,10 @@ import {
   newElement,
   newImageElement,
   newLinearElement,
+  newTableElement,
   newTextElement,
+  DEFAULT_TABLE_ROWS,
+  DEFAULT_TABLE_COLS,
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
@@ -142,6 +147,7 @@ import {
   isBoundToContainer,
   isFrameLikeElement,
   isImageElement,
+  isTableElement,
   isEmbeddableElement,
   isInitializedImageElement,
   isLinearElement,
@@ -278,6 +284,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawTableElement,
   ExcalidrawIframeLikeElement,
   IframeData,
   ExcalidrawIframeElement,
@@ -630,6 +637,9 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
+
+  /** teardown for the active table cell inline editor, if any */
+  private editingTableCellCleanup: (() => void) | null = null;
 
   public scene: Scene;
   public fonts: Fonts;
@@ -6569,6 +6579,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // double-click inside a table cell → edit that cell's text
+      if (isTableElement(hitElement)) {
+        this.startTableCellEditing(hitElement, sceneX, sceneY);
+        return;
+      }
+
       // shouldn't edit/create text when inside line editor (often false positive)
 
       if (!this.state.selectedLinearElement?.isEditing) {
@@ -8089,6 +8105,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
         this.state.activeTool.type,
       );
+    } else if (this.state.activeTool.type === TOOL_TYPE.table) {
+      this.createTableElementOnPointerDown(pointerDownState);
     } else if (this.state.activeTool.type === "laser") {
       this.laserTrails.startPath(
         pointerDownState.lastCoords.x,
@@ -9597,6 +9615,209 @@ class App extends React.Component<AppProps, AppState> {
       multiElement: null,
       newElement: frame,
     });
+  };
+
+  private createTableElementOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const table = newTableElement({
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      // grid lines stay straight; default to sharp outer corners (roundness can
+      // still be toggled afterwards via the shape actions panel)
+      roundness: null,
+      locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+      rows: DEFAULT_TABLE_ROWS,
+      cols: DEFAULT_TABLE_COLS,
+      fontSize: this.state.currentItemFontSize,
+      fontFamily: this.state.currentItemFontFamily,
+    });
+
+    this.insertNewElement(table);
+
+    this.setState({
+      multiElement: null,
+      newElement: table,
+    });
+  };
+
+  /**
+   * Maps a scene coordinate to the table cell (row/col) it falls in, accounting
+   * for the table's rotation. Returns null if the point is outside the table.
+   */
+  private getTableCellAtPosition = (
+    table: ExcalidrawTableElement,
+    sceneX: number,
+    sceneY: number,
+  ): { row: number; col: number } | null => {
+    // rotate the point back into the table's local (unrotated) frame
+    const cx = table.x + table.width / 2;
+    const cy = table.y + table.height / 2;
+    const [localX, localY] = pointRotateRads(
+      pointFrom(sceneX, sceneY),
+      pointFrom(cx, cy),
+      -table.angle as Radians,
+    );
+    const relX = localX - table.x;
+    const relY = localY - table.y;
+    if (relX < 0 || relY < 0 || relX > table.width || relY > table.height) {
+      return null;
+    }
+
+    let accY = 0;
+    for (let row = 0; row < table.rows; row++) {
+      const rowHeight = table.rowHeights[row] ?? 0;
+      if (relY >= accY && relY < accY + rowHeight) {
+        let accX = 0;
+        for (let col = 0; col < table.cols; col++) {
+          const colWidth = table.columnWidths[col] ?? 0;
+          if (relX >= accX && relX < accX + colWidth) {
+            return { row, col };
+          }
+          accX += colWidth;
+        }
+        return null;
+      }
+      accY += rowHeight;
+    }
+    return null;
+  };
+
+  /**
+   * Minimal-but-complete table cell editor: overlays a positioned <textarea>
+   * over the hit cell and writes the value back to `cells[row][col].text` via
+   * `scene.mutateElement` on commit (Enter / blur). Escape cancels.
+   *
+   * NOTE: This intentionally does not reuse the single-container text-element
+   * editing path (textWysiwyg), which assumes a real bound ExcalidrawTextElement
+   * and would fight the grid model. Rich cell editing (autosize, per-cell
+   * styling) is a documented extension point.
+   */
+  private startTableCellEditing = (
+    table: ExcalidrawTableElement,
+    sceneX: number,
+    sceneY: number,
+  ): void => {
+    const hit = this.getTableCellAtPosition(table, sceneX, sceneY);
+    const container = this.excalidrawContainerRef.current;
+    if (!hit || !container) {
+      return;
+    }
+    const { row, col } = hit;
+
+    // tear down any previous cell editor first
+    this.editingTableCellCleanup?.();
+
+    let cellLocalX = 0;
+    for (let c = 0; c < col; c++) {
+      cellLocalX += table.columnWidths[c] ?? 0;
+    }
+    let cellLocalY = 0;
+    for (let r = 0; r < row; r++) {
+      cellLocalY += table.rowHeights[r] ?? 0;
+    }
+    const cellWidth = table.columnWidths[col] ?? 0;
+    const cellHeight = table.rowHeights[row] ?? 0;
+    const cell = table.cells[row]?.[col];
+
+    const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+      { sceneX: table.x + cellLocalX, sceneY: table.y + cellLocalY },
+      this.state,
+    );
+
+    const zoom = this.state.zoom.value;
+    const editable = document.createElement("textarea");
+    editable.dir = "auto";
+    editable.value = cell?.text ?? "";
+    editable.setAttribute("data-testid", "table-cell-editor");
+    Object.assign(editable.style, {
+      position: "absolute",
+      left: `${viewportX - this.state.offsetLeft}px`,
+      top: `${viewportY - this.state.offsetTop}px`,
+      width: `${cellWidth * zoom}px`,
+      height: `${cellHeight * zoom}px`,
+      padding: `${BOUND_TEXT_PADDING * zoom}px`,
+      boxSizing: "border-box",
+      margin: "0",
+      border: "1px solid var(--color-primary, #6965db)",
+      outline: "none",
+      resize: "none",
+      overflow: "hidden",
+      background: "var(--island-bg-color, #ffffff)",
+      color: table.strokeColor,
+      fontFamily: getFontFamilyString({ fontFamily: table.fontFamily }),
+      fontSize: `${table.fontSize * zoom}px`,
+      lineHeight: `${table.lineHeight}`,
+      textAlign: cell?.textAlign ?? "left",
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      zIndex: "1",
+    } as Partial<CSSStyleDeclaration>);
+
+    const cleanup = () => {
+      editable.onblur = null;
+      editable.onkeydown = null;
+      editable.remove();
+      if (this.editingTableCellCleanup === cleanup) {
+        this.editingTableCellCleanup = null;
+      }
+    };
+
+    const commit = () => {
+      const value = editable.value;
+      const current = this.scene.getElement(table.id);
+      if (current && isTableElement(current) && value !== cell?.text) {
+        const nextCells = current.cells.map((cellRow, r) =>
+          cellRow.map((existing, c) =>
+            r === row && c === col ? { ...existing, text: value } : existing,
+          ),
+        );
+        this.scene.mutateElement(current, { cells: nextCells });
+      }
+      cleanup();
+    };
+
+    editable.onkeydown = (event) => {
+      if (event.key === KEYS.ESCAPE) {
+        event.preventDefault();
+        event.stopPropagation();
+        cleanup();
+      } else if (event.key === KEYS.ENTER && !event.shiftKey) {
+        event.preventDefault();
+        event.stopPropagation();
+        commit();
+      } else {
+        // keep canvas shortcuts (delete, tool switches, etc.) from firing
+        event.stopPropagation();
+      }
+    };
+    editable.onblur = commit;
+
+    this.editingTableCellCleanup = cleanup;
+    container.appendChild(editable);
+    editable.focus();
+    editable.select();
   };
 
   private maybeCacheReferenceSnapPoints(

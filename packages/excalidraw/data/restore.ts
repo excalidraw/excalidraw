@@ -3,6 +3,7 @@ import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 import {
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
@@ -54,6 +55,12 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import {
+  DEFAULT_TABLE_COLS,
+  DEFAULT_TABLE_ROWS,
+  computeTableGrid,
+} from "@excalidraw/element";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -65,6 +72,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
+  ExcalidrawTableCell,
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
@@ -159,6 +167,27 @@ const restoreFreedrawPoints = (
   };
 };
 
+/**
+ * Rebuilds a valid `rows x cols` cell grid from possibly-missing/partial data,
+ * preserving any existing cell text. This is the table migration path for
+ * older/hand-authored files.
+ */
+const restoreTableCells = (
+  cells: readonly (readonly Partial<ExcalidrawTableCell>[])[] | undefined,
+  rows: number,
+  cols: number,
+): ExcalidrawTableCell[][] =>
+  Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => {
+      const cell = cells?.[r]?.[c];
+      return {
+        text: typeof cell?.text === "string" ? cell.text : "",
+        textAlign: cell?.textAlign ?? "left",
+        verticalAlign: cell?.verticalAlign ?? "top",
+      };
+    }),
+  );
+
 export const AllowedExcalidrawActiveTools: Record<
   AppState["activeTool"]["type"],
   boolean
@@ -176,6 +205,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  table: true,
   embeddable: true,
   hand: true,
   laser: false,
@@ -646,6 +676,35 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
       });
+    case "table": {
+      const rows = element.rows ?? DEFAULT_TABLE_ROWS;
+      const cols = element.cols ?? DEFAULT_TABLE_COLS;
+      const fontFamily = element.fontFamily || DEFAULT_FONT_FAMILY;
+      const fontSize = element.fontSize || DEFAULT_FONT_SIZE;
+      const lineHeight = element.lineHeight || getLineHeight(fontFamily);
+      const grid = computeTableGrid(
+        rows,
+        cols,
+        element.width || 0,
+        element.height || 0,
+      );
+      return restoreElementWithProperties(element, {
+        rows,
+        cols,
+        columnWidths:
+          element.columnWidths?.length === cols
+            ? element.columnWidths
+            : grid.columnWidths,
+        rowHeights:
+          element.rowHeights?.length === rows
+            ? element.rowHeights
+            : grid.rowHeights,
+        cells: restoreTableCells(element.cells, rows, cols),
+        fontSize,
+        fontFamily,
+        lineHeight,
+      });
+    }
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

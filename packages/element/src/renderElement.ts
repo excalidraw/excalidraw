@@ -52,7 +52,8 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
 } from "./textElement";
-import { getLineHeightInPx } from "./textMeasurements";
+import { getLineHeightInPx, normalizeText } from "./textMeasurements";
+import { wrapText } from "./textWrapping";
 import {
   isTextElement,
   isLinearElement,
@@ -543,6 +544,83 @@ const drawElementOnCanvas = (
       context.restore();
       break;
     }
+    case "table": {
+      context.save();
+      context.lineJoin = "round";
+      context.lineCap = "round";
+
+      // (1) draw the rough outer box + grid lines
+      ShapeCache.generateElementShape(element, renderConfig).forEach(
+        (shape) => {
+          rc.draw(shape);
+        },
+      );
+
+      // (2) draw each cell's wrapped text
+      const fontString = getFontString(element);
+      const isDark = renderConfig.theme === THEME.DARK;
+      context.font = fontString;
+      context.fillStyle = applyDarkModeFilter(element.strokeColor, isDark);
+      context.textBaseline = "alphabetic";
+
+      const lineHeightPx = getLineHeightInPx(
+        element.fontSize,
+        element.lineHeight,
+      );
+      const verticalOffset = getVerticalOffset(
+        element.fontFamily,
+        element.fontSize,
+        lineHeightPx,
+      );
+      const padding = BOUND_TEXT_PADDING;
+
+      let cellY = 0;
+      for (let row = 0; row < element.rows; row++) {
+        const rowHeight = element.rowHeights[row] ?? 0;
+        let cellX = 0;
+        for (let col = 0; col < element.cols; col++) {
+          const colWidth = element.columnWidths[col] ?? 0;
+          const cell = element.cells[row]?.[col];
+          if (cell?.text) {
+            const maxWidth = Math.max(0, colWidth - padding * 2);
+            const lines = wrapText(
+              normalizeText(cell.text),
+              fontString,
+              maxWidth,
+            ).split("\n");
+
+            context.textAlign = cell.textAlign as CanvasTextAlign;
+            const horizontalOffset =
+              cell.textAlign === "center"
+                ? colWidth / 2
+                : cell.textAlign === "right"
+                ? colWidth - padding
+                : padding;
+
+            const textBlockHeight = lines.length * lineHeightPx;
+            const verticalStart =
+              cell.verticalAlign === "middle"
+                ? (rowHeight - textBlockHeight) / 2
+                : cell.verticalAlign === "bottom"
+                ? rowHeight - textBlockHeight - padding
+                : padding;
+
+            for (let i = 0; i < lines.length; i++) {
+              context.fillText(
+                lines[i],
+                cellX + horizontalOffset,
+                cellY + verticalStart + i * lineHeightPx + verticalOffset,
+              );
+            }
+          }
+          cellX += colWidth;
+        }
+        cellY += rowHeight;
+      }
+
+      context.restore();
+      break;
+    }
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
@@ -886,7 +964,8 @@ export const renderElement = (
     case "image":
     case "text":
     case "iframe":
-    case "embeddable": {
+    case "embeddable":
+    case "table": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;

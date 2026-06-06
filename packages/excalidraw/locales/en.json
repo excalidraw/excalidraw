@@ -326,6 +326,7 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
+    "table": "Table",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
@@ -345,6 +346,7 @@
     "group": "Group",
     "frame": "Frame",
     "magicframe": "Wireframe to code",
+    "table": "Table",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"

@@ -228,7 +228,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "table": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -978,6 +979,58 @@ const _generateElementShape = (
 
       return shapes;
     }
+    case "table": {
+      // ordered in terms of z-index: [outer box, ...grid lines]. The outer box
+      // carries the fill/background; interior grid lines are stroke-only. Both
+      // are roughjs drawables so the table renders in the hand-drawn style and
+      // honors strokeColor/strokeWidth/strokeStyle/roughness/roundness.
+      const shapes: ElementShapes["table"] = [];
+      const w = element.width;
+      const h = element.height;
+
+      if (element.roundness) {
+        const r = getCornerRadius(Math.min(w, h), element);
+        shapes.push(
+          generator.path(
+            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+              h - r
+            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+              h - r
+            } L 0 ${r} Q 0 0, ${r} 0`,
+            generateRoughOptions(element, true, isDarkMode),
+          ),
+        );
+      } else {
+        shapes.push(
+          generator.rectangle(
+            0,
+            0,
+            w,
+            h,
+            generateRoughOptions(element, false, isDarkMode),
+          ),
+        );
+      }
+
+      const gridOptions: Options = {
+        ...generateRoughOptions(element, false, isDarkMode),
+        fill: undefined,
+      };
+
+      let x = 0;
+      for (let col = 0; col < element.columnWidths.length - 1; col++) {
+        x += element.columnWidths[col];
+        shapes.push(generator.line(x, 0, x, h, gridOptions));
+      }
+
+      let y = 0;
+      for (let row = 0; row < element.rowHeights.length - 1; row++) {
+        y += element.rowHeights[row];
+        shapes.push(generator.line(0, y, w, y, gridOptions));
+      }
+
+      return shapes;
+    }
     case "frame":
     case "magicframe":
     case "text":
@@ -1075,6 +1128,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "diamond":
     case "frame":
     case "magicframe":
+    case "table":
     case "embeddable":
     case "image":
     case "iframe":

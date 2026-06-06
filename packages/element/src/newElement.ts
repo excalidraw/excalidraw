@@ -43,6 +43,8 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawTableElement,
+  ExcalidrawTableCell,
   ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
@@ -212,6 +214,75 @@ export const newMagicFrameElement = (
   );
 
   return frameElement;
+};
+
+export const DEFAULT_TABLE_ROWS = 3;
+export const DEFAULT_TABLE_COLS = 3;
+
+/** Builds an empty `rows x cols` grid of table cells. */
+export const createTableCells = (
+  rows: number,
+  cols: number,
+): ExcalidrawTableCell[][] =>
+  Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({
+      text: "",
+      textAlign: "left" as const,
+      verticalAlign: "top" as const,
+    })),
+  );
+
+/**
+ * (Re)computes equal-width columns / equal-height rows summing to the given
+ * width/height. Shared by table creation and drag-create so the grid always
+ * stays in sync with the element bounds.
+ */
+export const computeTableGrid = (
+  rows: number,
+  cols: number,
+  width: number,
+  height: number,
+): { columnWidths: number[]; rowHeights: number[] } => ({
+  columnWidths: Array.from({ length: cols }, () => width / cols),
+  rowHeights: Array.from({ length: rows }, () => height / rows),
+});
+
+export const newTableElement = (
+  opts: {
+    rows?: number;
+    cols?: number;
+    columnWidths?: readonly number[];
+    rowHeights?: readonly number[];
+    cells?: readonly (readonly ExcalidrawTableCell[])[];
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    lineHeight?: ExcalidrawTableElement["lineHeight"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTableElement> => {
+  const rows = opts.rows ?? DEFAULT_TABLE_ROWS;
+  const cols = opts.cols ?? DEFAULT_TABLE_COLS;
+  const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
+  const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
+  const grid = computeTableGrid(rows, cols, opts.width ?? 0, opts.height ?? 0);
+
+  const tableElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawTableElement>("table", opts),
+      type: "table",
+      rows,
+      cols,
+      columnWidths: opts.columnWidths ?? grid.columnWidths,
+      rowHeights: opts.rowHeights ?? grid.rowHeights,
+      cells: opts.cells ?? createTableCells(rows, cols),
+      fontSize,
+      fontFamily,
+      lineHeight,
+    },
+    {},
+  );
+
+  return tableElement;
 };
 
 /** computes element x/y offset based on textAlign/verticalAlign */

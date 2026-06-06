@@ -460,6 +460,7 @@ export const TOOL_TYPE = {
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
+  table: "table",
   embeddable: "embeddable",
   laser: "laser",
 } as const;
