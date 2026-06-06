@@ -16,6 +16,7 @@ import {
   isElbowArrow,
   isImageElement,
   isLinearElement,
+  isTableElement,
   isTextElement,
   isArrowElement,
   hasStrokeColor,
@@ -233,6 +234,16 @@ export const SelectedShapeActions = ({
             renderAction("changeTextAlign")}
         </>
       )}
+
+      {/* tables carry their own font size + per-cell alignment (no font-family
+          control yet) */}
+      {!targetElements.some(isTextElement) &&
+        targetElements.some(isTableElement) && (
+          <>
+            {renderAction("changeFontSize")}
+            {renderAction("changeTextAlign")}
+          </>
+        )}
 
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}

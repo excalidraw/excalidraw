@@ -713,6 +713,31 @@ const renderElementToSvg = (
                 ? rowHeight - textBlockHeight - padding
                 : padding;
 
+            // clip the cell's text to the cell so overflow doesn't bleed into
+            // neighboring cells
+            const clipId = `table-cell-clip-${element.id}-${row}-${col}`;
+            const clipPath = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "clipPath",
+            );
+            clipPath.setAttribute("id", clipId);
+            const clipRect = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "rect",
+            );
+            clipRect.setAttribute("x", `${cellX}`);
+            clipRect.setAttribute("y", `${cellY}`);
+            clipRect.setAttribute("width", `${colWidth}`);
+            clipRect.setAttribute("height", `${rowHeight}`);
+            clipPath.appendChild(clipRect);
+            group.appendChild(clipPath);
+
+            const cellGroup = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "g",
+            );
+            cellGroup.setAttribute("clip-path", `url(#${clipId})`);
+
             for (let i = 0; i < lines.length; i++) {
               const text = svgRoot.ownerDocument.createElementNS(
                 SVG_NS,
@@ -731,8 +756,9 @@ const renderElementToSvg = (
               text.setAttribute("style", "white-space: pre;");
               text.setAttribute("direction", direction);
               text.setAttribute("dominant-baseline", "alphabetic");
-              group.appendChild(text);
+              cellGroup.appendChild(text);
             }
+            group.appendChild(cellGroup);
           }
           cellX += colWidth;
         }

@@ -27,6 +27,7 @@ import { wrapText } from "./textWrapping";
 import {
   isBoundToContainer,
   isArrowElement,
+  isTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -405,6 +406,9 @@ export const shouldAllowVerticalAlign = (
   elementsMap: ElementsMap,
 ) => {
   return selectedElements.some((element) => {
+    if (isTableElement(element)) {
+      return true;
+    }
     if (isBoundToContainer(element)) {
       const container = getContainerElement(element, elementsMap);
       if (isArrowElement(container)) {
@@ -429,7 +433,7 @@ export const suppportsHorizontalAlign = (
       return true;
     }
 
-    return isTextElement(element);
+    return isTextElement(element) || isTableElement(element);
   });
 };
 

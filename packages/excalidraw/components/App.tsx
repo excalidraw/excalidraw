@@ -135,6 +135,7 @@ import {
   newLinearElement,
   newTableElement,
   newTextElement,
+  getTableFittedToContent,
   DEFAULT_TABLE_ROWS,
   DEFAULT_TABLE_COLS,
   refreshTextDimensions,
@@ -315,6 +316,11 @@ import {
   actionFlipHorizontal,
   actionFlipVertical,
   actionGroup,
+  actionAddTableRow,
+  actionAddTableColumn,
+  actionDeleteTableRow,
+  actionDeleteTableColumn,
+  actionToggleTableRowAutoResize,
   actionPasteStyles,
   actionSelectAll,
   actionSendBackward,
@@ -9726,7 +9732,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     const { row, col } = hit;
 
-    // tear down any previous cell editor first
+    // commit & tear down any previous cell editor first (so switching directly
+    // from one cell to another doesn't drop the in-progress edit)
     this.editingTableCellCleanup?.();
 
     let cellLocalX = 0;
@@ -9779,7 +9786,7 @@ class App extends React.Component<AppProps, AppState> {
       editable.onblur = null;
       editable.onkeydown = null;
       editable.remove();
-      if (this.editingTableCellCleanup === cleanup) {
+      if (this.editingTableCellCleanup === commit) {
         this.editingTableCellCleanup = null;
       }
     };
@@ -9793,7 +9800,21 @@ class App extends React.Component<AppProps, AppState> {
             r === row && c === col ? { ...existing, text: value } : existing,
           ),
         );
-        this.scene.mutateElement(current, { cells: nextCells });
+        if (current.autoResizeRows) {
+          // auto-grow rows so the edited text isn't clipped
+          const fitted = getTableFittedToContent({
+            ...current,
+            cells: nextCells,
+          });
+          this.scene.mutateElement(current, {
+            cells: nextCells,
+            rowHeights: fitted.rowHeights,
+            height: fitted.height,
+          });
+        } else {
+          // fixed row height: keep dimensions, overflow is clipped on render
+          this.scene.mutateElement(current, { cells: nextCells });
+        }
       }
       cleanup();
     };
@@ -9814,7 +9835,8 @@ class App extends React.Component<AppProps, AppState> {
     };
     editable.onblur = commit;
 
-    this.editingTableCellCleanup = cleanup;
+    // the interrupt hook commits (Escape uses its own discard path)
+    this.editingTableCellCleanup = commit;
     container.appendChild(editable);
     editable.focus();
     editable.select();
@@ -12987,6 +13009,11 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionAddTableRow,
+      actionAddTableColumn,
+      actionDeleteTableRow,
+      actionDeleteTableColumn,
+      actionToggleTableRowAutoResize,
       actionTextAutoResize,
       actionUnbindText,
       actionBindText,

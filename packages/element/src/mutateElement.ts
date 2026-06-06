@@ -48,7 +48,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, fileId } = updates as any;
+  const { points, fixedSegments, fileId, cells, columnWidths, rowHeights } =
+    updates as any;
 
   if (
     isElbowArrow(element) &&
@@ -131,7 +132,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
     typeof fileId != "undefined" ||
-    typeof points !== "undefined"
+    typeof points !== "undefined" ||
+    // table content/layout affects the cached rough grid and/or the cached
+    // element canvas (where cell text is drawn), so force regeneration
+    typeof cells !== "undefined" ||
+    typeof columnWidths !== "undefined" ||
+    typeof rowHeights !== "undefined"
   ) {
     ShapeCache.delete(element);
   }

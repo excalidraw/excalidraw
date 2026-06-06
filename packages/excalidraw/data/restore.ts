@@ -703,6 +703,7 @@ export const restoreElement = (
         fontSize,
         fontFamily,
         lineHeight,
+        autoResizeRows: element.autoResizeRows ?? true,
       });
     }
 

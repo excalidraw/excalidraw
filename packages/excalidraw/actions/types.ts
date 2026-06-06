@@ -145,7 +145,12 @@ export type ActionName =
   | "wrapSelectionInFrame"
   | "toggleLassoTool"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "addTableRow"
+  | "addTableColumn"
+  | "deleteTableRow"
+  | "deleteTableColumn"
+  | "toggleTableRowAutoResize";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

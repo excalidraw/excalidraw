@@ -3,6 +3,7 @@
 exports[`table element > drag-creates a default 3x3 table sized to the drag rectangle 1`] = `
 {
   "angle": 0,
+  "autoResizeRows": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "cells": [

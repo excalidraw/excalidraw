@@ -20,7 +20,7 @@ import {
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { isTextElement } from "@excalidraw/element";
+import { isTableElement, isTextElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -137,6 +137,17 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
+      } else if (isTableElement(element)) {
+        // tables draw their cell text into the cached element canvas too, so the
+        // cache must be dropped once the real font finishes loading
+        didUpdate = true;
+        ShapeCache.delete(element);
+        charWidth.clearCache(
+          getFontString({
+            fontSize: element.fontSize,
+            fontFamily: element.fontFamily,
+          }),
+        );
       }
     }
 
@@ -410,7 +421,7 @@ export class Fonts {
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
       elements.reduce((families, element) => {
-        if (isTextElement(element)) {
+        if (isTextElement(element) || isTableElement(element)) {
           families.add(element.fontFamily);
         }
         return families;
@@ -427,17 +438,26 @@ export class Fonts {
     const charsPerFamily: Record<number, Set<string>> = {};
 
     for (const element of elements) {
-      if (!isTextElement(element)) {
-        continue;
-      }
+      if (isTextElement(element)) {
+        // gather unique codepoints only when inlining fonts
+        for (const char of element.originalText) {
+          if (!charsPerFamily[element.fontFamily]) {
+            charsPerFamily[element.fontFamily] = new Set();
+          }
 
-      // gather unique codepoints only when inlining fonts
-      for (const char of element.originalText) {
-        if (!charsPerFamily[element.fontFamily]) {
-          charsPerFamily[element.fontFamily] = new Set();
+          charsPerFamily[element.fontFamily].add(char);
         }
-
-        charsPerFamily[element.fontFamily].add(char);
+      } else if (isTableElement(element)) {
+        for (const row of element.cells) {
+          for (const cell of row) {
+            for (const char of cell.text) {
+              if (!charsPerFamily[element.fontFamily]) {
+                charsPerFamily[element.fontFamily] = new Set();
+              }
+              charsPerFamily[element.fontFamily].add(char);
+            }
+          }
+        }
       }
     }
 

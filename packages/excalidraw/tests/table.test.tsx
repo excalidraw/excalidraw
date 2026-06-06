@@ -3,12 +3,23 @@ import { vi } from "vitest";
 
 import { reseed } from "@excalidraw/common";
 
+import { ShapeCache, mutateElement } from "@excalidraw/element";
+
 import type { ExcalidrawTableElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 import * as InteractiveScene from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 import * as restore from "../data/restore";
+import {
+  actionAddTableRow,
+  actionAddTableColumn,
+  actionDeleteTableRow,
+  actionDeleteTableColumn,
+  actionChangeTextAlign,
+  actionChangeVerticalAlign,
+  actionToggleTableRowAutoResize,
+} from "../actions";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
@@ -208,5 +219,227 @@ describe("table element", () => {
     const updated = table.get();
     const hasText = updated.cells.flat().some((cell) => cell.text === "hello");
     expect(hasText).toBe(true);
+  });
+
+  it("invalidates the cached shape/canvas when cell text changes", async () => {
+    await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    const element = table.get();
+    const elementsMap = h.app.scene.getNonDeletedElementsMap();
+    ShapeCache.generateElementShape(element, null);
+    expect(ShapeCache.get(element, null)).not.toBeUndefined();
+
+    const nextCells = element.cells.map((row, r) =>
+      row.map((cell, c) =>
+        r === 0 && c === 0 ? { ...cell, text: "x" } : cell,
+      ),
+    );
+    // low-level mutate (no re-render) so we can observe the cache drop directly
+    mutateElement(element, elementsMap, { cells: nextCells });
+
+    // mutating cells must drop the cached shape so the new text re-renders
+    expect(ShapeCache.get(element, null)).toBeUndefined();
+  });
+
+  it("adds and removes rows via actions, growing/shrinking height", async () => {
+    await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    API.setSelectedElements([table.get()]);
+    const before = table.get();
+
+    API.executeAction(actionAddTableRow);
+    let after = table.get();
+    expect(after.rows).toEqual(before.rows + 1);
+    expect(after.rowHeights.length).toEqual(before.rows + 1);
+    expect(after.cells.length).toEqual(before.rows + 1);
+    expect(after.cells[after.rows - 1].length).toEqual(after.cols);
+    expect(after.height).toBeGreaterThan(before.height);
+
+    API.setSelectedElements([table.get()]);
+    API.executeAction(actionDeleteTableRow);
+    after = table.get();
+    expect(after.rows).toEqual(before.rows);
+    expect(after.height).toBeCloseTo(before.height);
+  });
+
+  it("adds and removes columns via actions, growing/shrinking width", async () => {
+    await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    API.setSelectedElements([table.get()]);
+    const before = table.get();
+
+    API.executeAction(actionAddTableColumn);
+    let after = table.get();
+    expect(after.cols).toEqual(before.cols + 1);
+    expect(after.columnWidths.length).toEqual(before.cols + 1);
+    after.cells.forEach((row) => expect(row.length).toEqual(before.cols + 1));
+    expect(after.width).toBeGreaterThan(before.width);
+
+    API.setSelectedElements([table.get()]);
+    API.executeAction(actionDeleteTableColumn);
+    after = table.get();
+    expect(after.cols).toEqual(before.cols);
+    expect(after.width).toBeCloseTo(before.width);
+  });
+
+  it("does not delete the last remaining row/column", async () => {
+    await render(<Excalidraw />);
+
+    const table = API.createElement({
+      type: "table",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      rows: 1,
+      cols: 1,
+    });
+    API.setElements([table]);
+    API.setSelectedElements([table]);
+
+    API.executeAction(actionDeleteTableRow);
+    API.executeAction(actionDeleteTableColumn);
+
+    const after = h.elements[0] as ExcalidrawTableElement;
+    expect(after.rows).toEqual(1);
+    expect(after.cols).toEqual(1);
+  });
+
+  it("auto-grows a row to fit multi-line cell text on commit", async () => {
+    const { container } = await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    // capture primitives up front (the proxy reflects live mutations)
+    const beforeHeight = table.get().height;
+    const beforeRow0 = table.get().rowHeights[0];
+    const beforeRow1 = table.get().rowHeights[1];
+    const beforeColumnWidths = [...table.get().columnWidths];
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    // edit the top-left cell (col 0, row 0)
+    fireEvent.dblClick(canvas, { clientX: 50, clientY: 25 });
+    const editor = document.querySelector<HTMLTextAreaElement>(
+      "[data-testid='table-cell-editor']",
+    );
+    expect(editor).not.toBeNull();
+
+    act(() => {
+      const value = "a\nb\nc\nd";
+      editor!.value = value;
+      fireEvent.input(editor!, { target: { value } });
+      editor!.blur();
+    });
+
+    const after = table.get();
+    // the edited row grew to fit four lines...
+    expect(after.rowHeights[0]).toBeGreaterThan(beforeRow0);
+    // ...other rows are untouched, columns unchanged...
+    expect(after.rowHeights[1]).toBeCloseTo(beforeRow1);
+    expect(after.columnWidths).toEqual(beforeColumnWidths);
+    // ...and the element height still equals the sum of row heights
+    expect(sum(after.rowHeights)).toBeCloseTo(after.height);
+    expect(after.height).toBeGreaterThan(beforeHeight);
+  });
+
+  it("toggles between fit-rows and fixed-row-height (clip) modes", async () => {
+    const { container } = await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    // tables default to auto-resize (fit) mode
+    expect(table.get().autoResizeRows).toBe(true);
+
+    // switch to fixed-row-height (clip) mode
+    API.setSelectedElements([table.get()]);
+    API.executeAction(actionToggleTableRowAutoResize);
+    expect(table.get().autoResizeRows).toBe(false);
+
+    const fixedHeight = table.get().height;
+    const fixedRow0 = table.get().rowHeights[0];
+
+    // editing a tall cell must NOT grow the row in fixed mode (text is clipped)
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.dblClick(canvas, { clientX: 50, clientY: 25 });
+    const editor = document.querySelector<HTMLTextAreaElement>(
+      "[data-testid='table-cell-editor']",
+    );
+    act(() => {
+      const value = "a\nb\nc\nd\ne";
+      editor!.value = value;
+      fireEvent.input(editor!, { target: { value } });
+      editor!.blur();
+    });
+    expect(table.get().rowHeights[0]).toBeCloseTo(fixedRow0);
+    expect(table.get().height).toBeCloseTo(fixedHeight);
+
+    // switching back to fit mode re-grows rows to fit the existing text
+    API.setSelectedElements([table.get()]);
+    API.executeAction(actionToggleTableRowAutoResize);
+    expect(table.get().autoResizeRows).toBe(true);
+    expect(table.get().rowHeights[0]).toBeGreaterThan(fixedRow0);
+  });
+
+  it("centers cell text horizontally and vertically via actions", async () => {
+    await render(<Excalidraw />);
+
+    const table = UI.createElement("table", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 150,
+    }) as unknown as ExcalidrawTableElement & { get(): ExcalidrawTableElement };
+
+    API.setSelectedElements([table.get()]);
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeTextAlign, "api", "center");
+    });
+
+    API.setSelectedElements([table.get()]);
+    act(() => {
+      h.app.actionManager.executeAction(
+        actionChangeVerticalAlign,
+        "api",
+        "middle",
+      );
+    });
+
+    const after = table.get();
+    const allCells = after.cells.flat();
+    expect(allCells.every((cell) => cell.textAlign === "center")).toBe(true);
+    expect(allCells.every((cell) => cell.verticalAlign === "middle")).toBe(
+      true,
+    );
   });
 });

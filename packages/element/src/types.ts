@@ -206,6 +206,11 @@ export type ExcalidrawTableElement = _ExcalidrawElementBase &
      * with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * When `true`, rows auto-grow on edit to fit their wrapped cell text. When
+     * `false`, rows keep a fixed height and overflowing text is clipped.
+     */
+    autoResizeRows: boolean;
   }>;
 
 /**

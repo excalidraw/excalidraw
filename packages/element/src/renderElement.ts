@@ -605,6 +605,11 @@ const drawElementOnCanvas = (
                 ? rowHeight - textBlockHeight - padding
                 : padding;
 
+            // clip to the cell so overflowing text never bleeds into neighbors
+            context.save();
+            context.beginPath();
+            context.rect(cellX, cellY, colWidth, rowHeight);
+            context.clip();
             for (let i = 0; i < lines.length; i++) {
               context.fillText(
                 lines[i],
@@ -612,6 +617,7 @@ const drawElementOnCanvas = (
                 cellY + verticalStart + i * lineHeightPx + verticalOffset,
               );
             }
+            context.restore();
           }
           cellX += colWidth;
         }
