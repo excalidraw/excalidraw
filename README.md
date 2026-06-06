@@ -102,7 +102,7 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 
 ## Integrations
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
+- [VS Code extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
 - [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
 
 ## Who's integrating Excalidraw
