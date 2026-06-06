@@ -17,6 +17,13 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
+- Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
+
+  - `MainMenu.DefaultItems.ToggleTheme` no longer accepts the item-level `onSelect` callback. Host apps that need to control light/dark/system theme should pass `onThemeChange` to `<Excalidraw />` instead.
+  - `MainMenu.DefaultItems.ToggleTheme` with system theme support now uses `allowSystemTheme` together with `theme={Theme | "system"}` only to render the selected value. For the regular light/dark item, pass `allowSystemTheme={false}`.
+  - `CommandPalette.defaultItems.toggleTheme` was removed. The default theme command is now rendered by the command palette itself when `UIOptions.canvasActions.toggleTheme` enables the action (see below).
+  - `UIOptions.canvasActions.toggleTheme` still controls default theme UI availability. When it is `null`, it defaults to `true` if `props.theme` is omitted or `props.onThemeChange` is supplied, and otherwise defaults to disabled.
+
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
   - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 

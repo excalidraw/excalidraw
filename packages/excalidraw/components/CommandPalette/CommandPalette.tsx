@@ -19,6 +19,7 @@ import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
+  actionToggleTheme,
 } from "../../actions";
 import {
   actionCopyElementLink,
@@ -424,6 +425,7 @@ function CommandPaletteInner({
       ];
 
       const additionalCommands: CommandPaletteItem[] = [
+        actionToCommand(actionToggleTheme, DEFAULT_CATEGORIES.app),
         {
           label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,

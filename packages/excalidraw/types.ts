@@ -573,6 +573,7 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onThemeChange?: (theme: Theme | "system") => void;
   /**
    * note: only subscribes if the props.onIncrement is defined on initial render
    */
@@ -750,6 +751,11 @@ export type CanvasActions = Partial<{
   export: false | ExportOpts;
   loadScene: boolean;
   saveToActiveFile: boolean;
+  /**
+   * defaults to true if `props.theme` is omitted or `props.onThemeChange`
+   * is supplied (at which point the theme is considered as host-app controlled),
+   * else default to false
+   * */
   toggleTheme: boolean | null;
   saveAsImage: boolean;
 }>;

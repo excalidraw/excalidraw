@@ -67,6 +67,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onExport,
     onChange,
+    onThemeChange,
     onIncrement,
     initialData,
     onExcalidrawAPI,
@@ -129,7 +130,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   if (
     UIOptions.canvasActions.toggleTheme === null &&
-    typeof theme === "undefined"
+    (theme == null || onThemeChange)
   ) {
     UIOptions.canvasActions.toggleTheme = true;
   }
@@ -185,6 +186,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
         <App
           onExport={onExport}
           onChange={onChange}
+          onThemeChange={onThemeChange}
           onIncrement={onIncrement}
           initialData={initialData}
           onExcalidrawAPI={handleExcalidrawAPI}
