@@ -54,10 +54,10 @@ const LibraryHint = ({ children }: { children?: React.ReactNode }) => {
   return (
     <DefaultSidebarTriggerTunnel.In>
       <div className="excalifont welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--library">
+        {WelcomeScreenMenuArrow}
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.libraryHint")}
         </div>
-        {WelcomeScreenMenuArrow}
       </div>
     </DefaultSidebarTriggerTunnel.In>
   );
