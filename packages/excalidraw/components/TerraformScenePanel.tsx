@@ -70,8 +70,8 @@ const LegendSwatch = ({
   <span
     className="terraform-scene-panel__swatch"
     style={{
-      borderColor: strokeColor,
-      backgroundColor,
+      "--tf-swatch-stroke": strokeColor,
+      "--tf-swatch-fill": backgroundColor,
     }}
     aria-hidden="true"
   />

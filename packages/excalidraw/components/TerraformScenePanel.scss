@@ -54,8 +54,8 @@
     }
 
     &__popover-island {
-      min-width: 14rem;
-      max-width: 18rem;
+      min-width: 16rem;
+      max-width: 20rem;
     }
 
     &__legend-popover {
@@ -162,7 +162,7 @@
       list-style: none;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.25rem 0.75rem;
+      gap: 0.375rem 0.875rem;
     }
 
     &__legend-item {
@@ -174,11 +174,16 @@
 
     &__swatch {
       flex: 0 0 auto;
-      width: 0.75rem;
-      height: 0.5rem;
-      border: 2px solid;
-      border-radius: 0.125rem;
+      width: 1rem;
+      height: 1rem;
+      border: 0;
+      border-radius: 0.25rem;
       box-sizing: border-box;
+      background-color: var(--tf-swatch-fill);
+      box-shadow:
+        inset 0 0 0 1px
+          color-mix(in srgb, var(--tf-swatch-stroke) 55%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--tf-swatch-stroke) 20%, transparent);
     }
 
     &__legend-label {

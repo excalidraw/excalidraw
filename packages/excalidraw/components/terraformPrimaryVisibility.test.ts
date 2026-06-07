@@ -219,29 +219,29 @@ describe("terraformPrimaryVisibility", () => {
     it("maps compute, data, and messaging types to distinct palette colors", () => {
       expect(
         getClusterFrameColorForResourceType("aws_lambda_function").strokeColor,
-      ).toBe("#ea580c");
+      ).toBe("#e67700");
       expect(
         getClusterFrameColorForResourceType("aws_s3_bucket").strokeColor,
-      ).toBe("#059669");
+      ).toBe("#2b8a3e");
       expect(
         getClusterFrameColorForResourceType("aws_sqs_queue").strokeColor,
-      ).toBe("#e11d48");
+      ).toBe("#c92a2a");
     });
   });
 
   describe("getContextFrameColorForTopologyRole", () => {
     it("maps hierarchy roles to distinct structural palette colors", () => {
       expect(getContextFrameColorForTopologyRole("provider").strokeColor).toBe(
-        "#475569",
+        "#495057",
       );
       expect(getContextFrameColorForTopologyRole("account").strokeColor).toBe(
-        "#4f46e5",
+        "#5c7cfa",
       );
       expect(getContextFrameColorForTopologyRole("region").strokeColor).toBe(
-        "#0891b2",
+        "#15aabf",
       );
       expect(getContextFrameColorForTopologyRole("vpc").strokeColor).toBe(
-        "#0369a1",
+        "#339af0",
       );
     });
 
@@ -250,22 +250,22 @@ describe("terraformPrimaryVisibility", () => {
         getContextFrameColorForTopologyRole("subnetZone", {
           subnetTier: "public",
         }).strokeColor,
-      ).toBe("#d97706");
+      ).toBe("#82c91e");
       expect(
         getContextFrameColorForTopologyRole("subnetZone", {
           subnetTier: "private",
         }).strokeColor,
-      ).toBe("#7c3aed");
+      ).toBe("#845ef7");
       expect(
         getContextFrameColorForTopologyRole("subnetZone", {
           subnetTier: "intra",
         }).strokeColor,
-      ).toBe("#db2777");
+      ).toBe("#e64980");
       expect(
         getContextFrameColorForTopologyRole("subnetZone", {
           subnetTier: "other",
         }).strokeColor,
-      ).toBe("#64748b");
+      ).toBe("#adb5bd");
     });
   });
 
@@ -283,9 +283,9 @@ describe("terraformPrimaryVisibility", () => {
       expect(
         resolveClusterFrameColors("aws_lambda_function", "category")
           .strokeColor,
-      ).toBe("#ea580c");
+      ).toBe("#e67700");
       expect(resolveContextFrameColors("vpc", "category").strokeColor).toBe(
-        "#0369a1",
+        "#339af0",
       );
     });
 
@@ -297,8 +297,8 @@ describe("terraformPrimaryVisibility", () => {
         y: 0,
         width: 100,
         height: 100,
-        strokeColor: "#ea580c",
-        backgroundColor: "#fff7ed",
+        strokeColor: "#e67700",
+        backgroundColor: "#fff3bf",
         customData: {
           terraformTopologyRole: "primaryCluster",
           terraformPrimaryAddress: "aws_lambda_function.main",
@@ -314,7 +314,7 @@ describe("terraformPrimaryVisibility", () => {
         [actionFrame!],
         "category",
       );
-      expect(categoryFrame!.strokeColor).toBe("#ea580c");
+      expect(categoryFrame!.strokeColor).toBe("#e67700");
     });
   });
 });
