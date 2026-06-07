@@ -1,3 +1,5 @@
+import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
+
 /**
  * Default “primary” resource visibility for Terraform diagrams (explode / overview).
  * Primary types and `getResourceType` / `isPrimaryVisibleResourceType` live in this module.
@@ -317,7 +319,7 @@ export function getClusterFrameColorForResourceType(resourceType: string): {
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */
 export function getTerraformResourceTypeFromNodePath(nodePath: string): string {
-  const parts = nodePath.split(".");
+  const parts = stripStackPrefixForModuleParsing(nodePath).split(".");
   let i = 0;
   while (i < parts.length - 1 && parts[i] === "module") {
     i += 2;

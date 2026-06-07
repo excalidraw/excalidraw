@@ -14075,8 +14075,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#e11d48",
+      "backgroundColor": "#fff1f2"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:715",
@@ -14091,8 +14091,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#e11d48",
+      "backgroundColor": "#fff1f2"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:716",
@@ -14107,8 +14107,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#e11d48",
+      "backgroundColor": "#fff1f2"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:717",
@@ -14123,8 +14123,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#e11d48",
+      "backgroundColor": "#fff1f2"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:718",
@@ -14139,8 +14139,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:719",
@@ -14155,8 +14155,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:720",
@@ -14171,8 +14171,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:721",
@@ -14187,8 +14187,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:722",
@@ -14203,8 +14203,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:723",
@@ -14219,8 +14219,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:724",
@@ -14235,8 +14235,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:725",
@@ -14251,8 +14251,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:726",
@@ -14267,8 +14267,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:727",
@@ -14283,8 +14283,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3",
@@ -14362,8 +14362,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:730",
@@ -14378,8 +14378,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:731",
@@ -14394,8 +14394,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:732",
@@ -14410,8 +14410,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:733",
@@ -14426,8 +14426,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:734",
@@ -14442,8 +14442,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:735",
@@ -14458,8 +14458,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:736",
@@ -14474,8 +14474,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:737",
@@ -14490,8 +14490,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:738",
@@ -14506,8 +14506,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-00b3d8865d12ef5d5|subnet-0df336f36ddc4b684",
@@ -14546,8 +14546,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-00b3d8865d12ef5d5|subnet-0df336f36ddc4b684",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-00b3d8865d12ef5d5|subnet-0df336f36ddc4b684::frame:740",
@@ -14602,8 +14602,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16::frame:742",
@@ -14618,8 +14618,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16::frame:743",
@@ -14634,8 +14634,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16::frame:744",
@@ -14650,8 +14650,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
@@ -14690,8 +14690,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:746",
@@ -14706,8 +14706,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:747",
@@ -14722,8 +14722,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:748",
@@ -14738,8 +14738,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:749",
@@ -14754,8 +14754,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:750",
@@ -14770,8 +14770,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:751",
@@ -14786,8 +14786,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2",
@@ -14824,8 +14824,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2::frame:753",
@@ -14840,8 +14840,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e",
@@ -14903,8 +14903,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-00235d4b2f1a6a408|subnet-0401203eab1aa6c85",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-00235d4b2f1a6a408|subnet-0401203eab1aa6c85::frame:755",
@@ -14919,8 +14919,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-00235d4b2f1a6a408|subnet-0401203eab1aa6c85",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-034b47d3dd3c88f9c|subnet-0a194069781cfa5a3",
@@ -14959,8 +14959,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-034b47d3dd3c88f9c|subnet-0a194069781cfa5a3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-034b47d3dd3c88f9c|subnet-0a194069781cfa5a3::frame:757",
@@ -14975,8 +14975,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-034b47d3dd3c88f9c|subnet-0a194069781cfa5a3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-0439be88129c0395f|subnet-0b582d95161603c4f",
@@ -15015,8 +15015,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-0439be88129c0395f|subnet-0b582d95161603c4f",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-0439be88129c0395f|subnet-0b582d95161603c4f::frame:759",
@@ -15031,8 +15031,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-0439be88129c0395f|subnet-0b582d95161603c4f",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-1",
@@ -15069,8 +15069,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1::frame:761",
@@ -15085,8 +15085,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-1::frame:762",
@@ -15101,8 +15101,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1::frame:763",
@@ -15117,8 +15117,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8",
@@ -15180,8 +15180,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-04d64ef52d8522fab|subnet-0d4586fd670543a5b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-04d64ef52d8522fab|subnet-0d4586fd670543a5b::frame:765",
@@ -15196,8 +15196,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-04d64ef52d8522fab|subnet-0d4586fd670543a5b",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-0b1ccdd9d3fd613db|subnet-0b56ca1c0e38d749f",
@@ -15236,8 +15236,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-0b1ccdd9d3fd613db|subnet-0b56ca1c0e38d749f",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-0b1ccdd9d3fd613db|subnet-0b56ca1c0e38d749f::frame:767",
@@ -15252,8 +15252,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-0b1ccdd9d3fd613db|subnet-0b56ca1c0e38d749f",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-2",
@@ -15290,8 +15290,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:769",
@@ -15306,8 +15306,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:770",
@@ -15322,8 +15322,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:771",
@@ -15338,8 +15338,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:772",
@@ -15354,8 +15354,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:773",
@@ -15370,8 +15370,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7",
@@ -15433,8 +15433,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-01759e5dc04d665a1|subnet-052468b8c55b2da07",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-01759e5dc04d665a1|subnet-052468b8c55b2da07::frame:775",
@@ -15449,8 +15449,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-01759e5dc04d665a1|subnet-052468b8c55b2da07",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#059669",
+      "backgroundColor": "#ecfdf5"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3",
@@ -15489,8 +15489,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3::frame:777",
@@ -15505,8 +15505,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3::frame:778",
@@ -15521,8 +15521,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3::frame:779",
@@ -15537,8 +15537,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#ea580c",
+      "backgroundColor": "#fff7ed"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d",
@@ -15577,8 +15577,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d::frame:781",
@@ -15593,8 +15593,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d::frame:782",
@@ -15609,8 +15609,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d::frame:783",
@@ -15625,8 +15625,8 @@
         "terraformTopologyRole": "primaryCluster"
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d",
-      "strokeColor": "#64748b",
-      "backgroundColor": "#f8fafc"
+      "strokeColor": "#0284c7",
+      "backgroundColor": "#f0f9ff"
     }
   ]
 }

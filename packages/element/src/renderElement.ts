@@ -808,13 +808,21 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle =
-          appState.theme === THEME.DARK
-            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
-            : FRAME_STYLE.strokeColor;
+        const useElementFrameColors =
+          element.backgroundColor &&
+          element.backgroundColor !== "transparent";
+
+        context.lineWidth =
+          (element.strokeWidth ?? FRAME_STYLE.strokeWidth) /
+          appState.zoom.value;
+        context.strokeStyle = useElementFrameColors
+          ? appState.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor
+          : appState.theme === THEME.DARK
+          ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
+          : FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
@@ -822,6 +830,13 @@ export const renderElement = (
             appState.theme === THEME.LIGHT
               ? "#7affd7"
               : applyDarkModeFilter("#1d8264");
+        }
+
+        if (useElementFrameColors) {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? applyDarkModeFilter(element.backgroundColor)
+              : element.backgroundColor;
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -833,9 +848,15 @@ export const renderElement = (
             element.height,
             FRAME_STYLE.radius / appState.zoom.value,
           );
+          if (useElementFrameColors) {
+            context.fill();
+          }
           context.stroke();
           context.closePath();
         } else {
+          if (useElementFrameColors) {
+            context.fillRect(0, 0, element.width, element.height);
+          }
           context.strokeRect(0, 0, element.width, element.height);
         }
 

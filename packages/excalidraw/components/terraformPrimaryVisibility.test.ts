@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getClusterFrameColorForResourceType,
   getTerraformResourceTypeFromNodePath,
   isChangedTerraformAction,
   isGenericManagedProviderResourceType,
@@ -197,6 +198,27 @@ describe("terraformPrimaryVisibility", () => {
       expect(getTerraformResourceTypeFromNodePath("module.a")).toBe(
         "terraform_module",
       );
+    });
+    it("strips stack-qualified prefixes before parsing", () => {
+      expect(
+        getTerraformResourceTypeFromNodePath(
+          "00-east-network::module.lambda.aws_lambda_function.handler",
+        ),
+      ).toBe("aws_lambda_function");
+    });
+  });
+
+  describe("getClusterFrameColorForResourceType", () => {
+    it("maps compute, data, and messaging types to distinct palette colors", () => {
+      expect(
+        getClusterFrameColorForResourceType("aws_lambda_function").strokeColor,
+      ).toBe("#ea580c");
+      expect(
+        getClusterFrameColorForResourceType("aws_s3_bucket").strokeColor,
+      ).toBe("#059669");
+      expect(
+        getClusterFrameColorForResourceType("aws_sqs_queue").strokeColor,
+      ).toBe("#e11d48");
     });
   });
 });

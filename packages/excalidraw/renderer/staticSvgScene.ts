@@ -618,14 +618,31 @@ const renderElementToSvg = (
         rect.setAttribute("rx", FRAME_STYLE.radius.toString());
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
-        rect.setAttribute("fill", "none");
+        const useElementFrameColors =
+          element.backgroundColor &&
+          element.backgroundColor !== "transparent";
+        rect.setAttribute(
+          "fill",
+          useElementFrameColors
+            ? renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.backgroundColor)
+              : element.backgroundColor
+            : "none",
+        );
         rect.setAttribute(
           "stroke",
-          renderConfig.theme === THEME.DARK
+          useElementFrameColors
+            ? renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor
+            : renderConfig.theme === THEME.DARK
             ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
             : FRAME_STYLE.strokeColor,
         );
-        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
+        rect.setAttribute(
+          "stroke-width",
+          (element.strokeWidth ?? FRAME_STYLE.strokeWidth).toString(),
+        );
 
         addToRoot(rect, element);
       }
