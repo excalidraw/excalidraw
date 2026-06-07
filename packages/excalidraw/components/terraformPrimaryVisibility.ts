@@ -315,6 +315,44 @@ export function getClusterFrameColorForResourceType(resourceType: string): {
   return CLUSTER_FRAME_COLORS.default;
 }
 
+export type TerraformContextFrameRole =
+  | "provider"
+  | "account"
+  | "region"
+  | "vpc"
+  | "subnetZone";
+
+const CONTEXT_FRAME_COLORS = {
+  provider: { strokeColor: "#475569", backgroundColor: "#f8fafc" },
+  account: { strokeColor: "#4f46e5", backgroundColor: "#eef2ff" },
+  region: { strokeColor: "#0891b2", backgroundColor: "#ecfeff" },
+  vpc: { strokeColor: "#0369a1", backgroundColor: "#e0f2fe" },
+  subnetPublic: { strokeColor: "#d97706", backgroundColor: "#fffbeb" },
+  subnetPrivate: { strokeColor: "#7c3aed", backgroundColor: "#f5f3ff" },
+  subnetIntra: { strokeColor: "#db2777", backgroundColor: "#fdf2f8" },
+  subnetDefault: { strokeColor: "#64748b", backgroundColor: "#f1f5f9" },
+} as const;
+
+/** Frame border + background for topology context hierarchy (provider → account → region → VPC → subnet). */
+export function getContextFrameColorForTopologyRole(
+  role: TerraformContextFrameRole,
+  options?: { subnetTier?: string | null },
+): { strokeColor: string; backgroundColor: string } {
+  if (role === "subnetZone") {
+    switch (options?.subnetTier) {
+      case "public":
+        return CONTEXT_FRAME_COLORS.subnetPublic;
+      case "private":
+        return CONTEXT_FRAME_COLORS.subnetPrivate;
+      case "intra":
+        return CONTEXT_FRAME_COLORS.subnetIntra;
+      default:
+        return CONTEXT_FRAME_COLORS.subnetDefault;
+    }
+  }
+  return CONTEXT_FRAME_COLORS[role];
+}
+
 /**
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */

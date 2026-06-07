@@ -14016,8 +14016,8 @@
           "aws"
         ]
       },
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#475569",
+      "backgroundColor": "#f8fafc"
     },
     {
       "key": "frame:aws/992382747916",
@@ -14037,8 +14037,8 @@
         ]
       },
       "parentFrame": "frame:aws",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#4f46e5",
+      "backgroundColor": "#eef2ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1",
@@ -14059,8 +14059,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0891b2",
+      "backgroundColor": "#ecfeff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1::frame:714",
@@ -14306,8 +14306,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-1",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0369a1",
+      "backgroundColor": "#e0f2fe"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3::frame:728",
@@ -14346,8 +14346,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-003fcfcb843e1fb7e|subnet-09ac46da407c508b3::frame:729",
@@ -14530,8 +14530,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#d97706",
+      "backgroundColor": "#fffbeb"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-00b3d8865d12ef5d5|subnet-0df336f36ddc4b684::frame:739",
@@ -14586,8 +14586,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#64748b",
+      "backgroundColor": "#f1f5f9"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-018f5073787f3e418|subnet-0b9f8ead9e0f24a16::frame:741",
@@ -14674,8 +14674,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#db2777",
+      "backgroundColor": "#fdf2f8"
     },
     {
       "key": "frame:aws/992382747916/us-east-1/vpc-07ac1824dc3f8b4e3/subnet-033d6797358459515|subnet-08eccd14a38f99d1b::frame:745",
@@ -14808,8 +14808,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0891b2",
+      "backgroundColor": "#ecfeff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2::frame:752",
@@ -14863,8 +14863,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-2",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0369a1",
+      "backgroundColor": "#e0f2fe"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-00235d4b2f1a6a408|subnet-0401203eab1aa6c85",
@@ -14887,8 +14887,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#db2777",
+      "backgroundColor": "#fdf2f8"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-00235d4b2f1a6a408|subnet-0401203eab1aa6c85::frame:754",
@@ -14943,8 +14943,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-034b47d3dd3c88f9c|subnet-0a194069781cfa5a3::frame:756",
@@ -14999,8 +14999,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#64748b",
+      "backgroundColor": "#f1f5f9"
     },
     {
       "key": "frame:aws/992382747916/us-east-2/vpc-0ff01f65820f5040e/subnet-0439be88129c0395f|subnet-0b582d95161603c4f::frame:758",
@@ -15053,8 +15053,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0891b2",
+      "backgroundColor": "#ecfeff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1::frame:760",
@@ -15140,8 +15140,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-1",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0369a1",
+      "backgroundColor": "#e0f2fe"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-04d64ef52d8522fab|subnet-0d4586fd670543a5b",
@@ -15164,8 +15164,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#db2777",
+      "backgroundColor": "#fdf2f8"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-04d64ef52d8522fab|subnet-0d4586fd670543a5b::frame:764",
@@ -15220,8 +15220,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-1/vpc-02732d6b71d93f4d8/subnet-0b1ccdd9d3fd613db|subnet-0b56ca1c0e38d749f::frame:766",
@@ -15274,8 +15274,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0891b2",
+      "backgroundColor": "#ecfeff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2::frame:768",
@@ -15393,8 +15393,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-2",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#0369a1",
+      "backgroundColor": "#e0f2fe"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-01759e5dc04d665a1|subnet-052468b8c55b2da07",
@@ -15417,8 +15417,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#64748b",
+      "backgroundColor": "#f1f5f9"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-01759e5dc04d665a1|subnet-052468b8c55b2da07::frame:774",
@@ -15473,8 +15473,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "#f5f3ff"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-08dde197d15c5d813|subnet-0a9825842f7f54ba3::frame:776",
@@ -15561,8 +15561,8 @@
         ]
       },
       "parentFrame": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7",
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent"
+      "strokeColor": "#db2777",
+      "backgroundColor": "#fdf2f8"
     },
     {
       "key": "frame:aws/992382747916/us-west-2/vpc-0a0d65ef48ac1b6e7/subnet-0aa99796d580e34ad|subnet-0c6d9f4fbc06dd57d::frame:780",

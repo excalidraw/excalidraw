@@ -14,6 +14,7 @@ import { collectDeclaredDataFlowEdges } from "./terraformExplodeGraph";
 import {
   isPrimaryVisibleResourceType,
   getClusterFrameColorForResourceType,
+  getContextFrameColorForTopologyRole,
 } from "./terraformPrimaryVisibility";
 import {
   getTerraformCardResourceType,
@@ -35,6 +36,7 @@ import {
 import {
   buildCompactPipelinePrimaryCluster,
   buildTopologyPrimaryClusterSkeletonForPipeline,
+  reorderTopologyElementsZStack,
   type PipelinePrimaryClusterBuildResult,
 } from "./terraformTopologyLayout";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
@@ -522,6 +524,10 @@ function pushContextFrames(
         width: b.width + 2 * pad,
         height: b.height + 2 * pad,
         children: uniqueChildIds,
+        ...getContextFrameColorForTopologyRole(level.role, {
+          subnetTier:
+            level.role === "subnetZone" ? placement.subnetTier : undefined,
+        }),
         customData: pipelineFrameCustomData(level.role, placement, id, {
           terraformSubnetSignature: placement.subnetSignature,
           terraformSubnetTier: placement.subnetTier,
@@ -763,6 +769,7 @@ export async function buildTerraformPipelineExcalidrawScene(
       hoverPeekKey: null,
     },
   );
+  elements = reorderTopologyElementsZStack(elements);
 
   return {
     elements,

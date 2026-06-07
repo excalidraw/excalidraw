@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getClusterFrameColorForResourceType,
+  getContextFrameColorForTopologyRole,
   getTerraformResourceTypeFromNodePath,
   isChangedTerraformAction,
   isGenericManagedProviderResourceType,
@@ -219,6 +220,46 @@ describe("terraformPrimaryVisibility", () => {
       expect(
         getClusterFrameColorForResourceType("aws_sqs_queue").strokeColor,
       ).toBe("#e11d48");
+    });
+  });
+
+  describe("getContextFrameColorForTopologyRole", () => {
+    it("maps hierarchy roles to distinct structural palette colors", () => {
+      expect(getContextFrameColorForTopologyRole("provider").strokeColor).toBe(
+        "#475569",
+      );
+      expect(getContextFrameColorForTopologyRole("account").strokeColor).toBe(
+        "#4f46e5",
+      );
+      expect(getContextFrameColorForTopologyRole("region").strokeColor).toBe(
+        "#0891b2",
+      );
+      expect(getContextFrameColorForTopologyRole("vpc").strokeColor).toBe(
+        "#0369a1",
+      );
+    });
+
+    it("maps subnet tiers to distinct subnet palette colors", () => {
+      expect(
+        getContextFrameColorForTopologyRole("subnetZone", {
+          subnetTier: "public",
+        }).strokeColor,
+      ).toBe("#d97706");
+      expect(
+        getContextFrameColorForTopologyRole("subnetZone", {
+          subnetTier: "private",
+        }).strokeColor,
+      ).toBe("#7c3aed");
+      expect(
+        getContextFrameColorForTopologyRole("subnetZone", {
+          subnetTier: "intra",
+        }).strokeColor,
+      ).toBe("#db2777");
+      expect(
+        getContextFrameColorForTopologyRole("subnetZone", {
+          subnetTier: "other",
+        }).strokeColor,
+      ).toBe("#64748b");
     });
   });
 });

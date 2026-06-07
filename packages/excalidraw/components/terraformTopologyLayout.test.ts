@@ -6,7 +6,7 @@ import type {
   ExcalidrawFrameElement,
 } from "@excalidraw/element/types";
 
-import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import { buildTerraformTopologyExcalidrawScene, reorderTopologyElementsZStack } from "./terraformTopologyLayout";
 import { terraformVpceSgLayoutElementId } from "./terraformTopologySgLinks";
 
 import { tfComfortPx } from "./terraformLayoutComfort";
@@ -3030,5 +3030,48 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           "aws_lambda_function.workload",
     );
     expect(lambdaRect).toBeDefined();
+  });
+});
+
+describe("reorderTopologyElementsZStack", () => {
+  const frame = (
+    id: string,
+    role: string,
+  ): ExcalidrawElement =>
+    ({
+      id,
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      customData: { terraformTopologyRole: role },
+    }) as ExcalidrawElement;
+
+  it("paints context frames back-to-front: provider → account → region → vpc → subnet → primaryCluster", () => {
+    const input = [
+      frame("primary", "primaryCluster"),
+      frame("subnet", "subnetZone"),
+      frame("vpc", "vpc"),
+      frame("region", "region"),
+      frame("account", "account"),
+      frame("provider", "provider"),
+      { id: "card", type: "rectangle", x: 0, y: 0, width: 10, height: 10 },
+    ] as ExcalidrawElement[];
+
+    const ordered = reorderTopologyElementsZStack(input);
+    const frameIds = ordered
+      .filter((el) => el.type === "frame")
+      .map((el) => el.id);
+
+    expect(frameIds).toEqual([
+      "provider",
+      "account",
+      "region",
+      "vpc",
+      "subnet",
+      "primary",
+    ]);
+    expect(ordered[ordered.length - 1]?.id).toBe("card");
   });
 });

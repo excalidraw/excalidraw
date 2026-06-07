@@ -49,6 +49,7 @@ import {
   isPrimaryVisibleResourceType,
   isTopologyPlacementResourceType,
   getClusterFrameColorForResourceType,
+  getContextFrameColorForTopologyRole,
   getTerraformResourceTypeFromNodePath,
 } from "./terraformPrimaryVisibility";
 import {
@@ -3126,9 +3127,18 @@ const topologyFrameZPriority = (el: ExcalidrawElement): number => {
     case "providerBand":
       return 1;
     case "providerAccount":
+    case "account":
       return 2;
+    case "region":
+      return 3;
+    case "vpc":
+      return 4;
+    case "subnetZone":
+      return 5;
+    case "primaryCluster":
+      return 6;
     default:
-      return role ? 3 : 4;
+      return role ? 7 : 8;
   }
 };
 
@@ -3934,6 +3944,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                   ...vpcBottomRtRectIdsEmpty,
                   ...vpcEpRectIdsEmpty,
                 ] as readonly string[],
+                ...getContextFrameColorForTopologyRole("vpc"),
                 customData: frameCustomData(
                   "vpc",
                   accountId,
@@ -4001,6 +4012,11 @@ export async function buildTerraformTopologyExcalidrawScene(
                 );
                 zoneFrameIds.push(zoneSkId);
 
+                const zoneSubnetTier = topologySubnetTierFromZone(
+                  z,
+                  subnetNameById,
+                );
+
                 const zoneDerived = topologyZoneDerivedContext(
                   z,
                   nodes,
@@ -4035,7 +4051,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                     accountId,
                     region: regionName,
                     vpcId,
-                    subnetTier: topologySubnetTierFromZone(z, subnetNameById),
+                    subnetTier: zoneSubnetTier,
                     subnetSignature: z.subnetSignature,
                   },
                   addrs,
@@ -4237,6 +4253,9 @@ export async function buildTerraformTopologyExcalidrawScene(
                     ...zoneEpClusterIds,
                     ...zoneEpCompactIds,
                   ] as readonly string[],
+                  ...getContextFrameColorForTopologyRole("subnetZone", {
+                    subnetTier: zoneSubnetTier,
+                  }),
                   customData: frameCustomData(
                     "subnetZone",
                     accountId,
@@ -4319,6 +4338,7 @@ export async function buildTerraformTopologyExcalidrawScene(
                 ...vpcBottomRtRectIds,
                 ...vpcEpRectIds,
               ] as readonly string[],
+              ...getContextFrameColorForTopologyRole("vpc"),
               customData: frameCustomData(
                 "vpc",
                 accountId,
@@ -4351,6 +4371,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             width: regionWidth,
             height: regionHeight,
             children: regionChildIds as readonly string[],
+            ...getContextFrameColorForTopologyRole("region"),
             customData: frameCustomData(
               "region",
               accountId,
@@ -4397,6 +4418,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           width: accountWidth,
           height: accountHeight,
           children: regionFrameIds as readonly string[],
+          ...getContextFrameColorForTopologyRole("account"),
           customData: frameCustomData(
             "account",
             accountId,
