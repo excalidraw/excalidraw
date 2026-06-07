@@ -353,6 +353,61 @@ export function getContextFrameColorForTopologyRole(
   return CONTEXT_FRAME_COLORS[role];
 }
 
+export type TerraformColorLegendEntry = {
+  id: string;
+  label: string;
+  strokeColor: string;
+  backgroundColor: string;
+};
+
+/** Primary cluster frame colors keyed by AWS resource category. */
+export const TERRAFORM_RESOURCE_CATEGORY_LEGEND: readonly TerraformColorLegendEntry[] =
+  [
+    { id: "compute", label: "Compute", ...CLUSTER_FRAME_COLORS.compute },
+    { id: "data", label: "Data", ...CLUSTER_FRAME_COLORS.data },
+    { id: "messaging", label: "Messaging", ...CLUSTER_FRAME_COLORS.messaging },
+    {
+      id: "networking",
+      label: "Networking",
+      ...CLUSTER_FRAME_COLORS.networking,
+    },
+    { id: "security", label: "Security", ...CLUSTER_FRAME_COLORS.security },
+    {
+      id: "management",
+      label: "Management",
+      ...CLUSTER_FRAME_COLORS.management,
+    },
+    { id: "default", label: "Other", ...CLUSTER_FRAME_COLORS.default },
+  ];
+
+/** Context hierarchy frame colors (provider → account → region → VPC → subnet). */
+export const TERRAFORM_HIERARCHY_LEGEND: readonly TerraformColorLegendEntry[] = [
+  { id: "provider", label: "Provider", ...CONTEXT_FRAME_COLORS.provider },
+  { id: "account", label: "Account", ...CONTEXT_FRAME_COLORS.account },
+  { id: "region", label: "Region", ...CONTEXT_FRAME_COLORS.region },
+  { id: "vpc", label: "VPC", ...CONTEXT_FRAME_COLORS.vpc },
+  {
+    id: "subnet-public",
+    label: "Subnet · public",
+    ...CONTEXT_FRAME_COLORS.subnetPublic,
+  },
+  {
+    id: "subnet-private",
+    label: "Subnet · private",
+    ...CONTEXT_FRAME_COLORS.subnetPrivate,
+  },
+  {
+    id: "subnet-intra",
+    label: "Subnet · intra",
+    ...CONTEXT_FRAME_COLORS.subnetIntra,
+  },
+  {
+    id: "subnet-other",
+    label: "Subnet · other",
+    ...CONTEXT_FRAME_COLORS.subnetDefault,
+  },
+];
+
 /**
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */

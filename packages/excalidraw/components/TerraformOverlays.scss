@@ -1,0 +1,13 @@
+.excalidraw {
+  .terraform-overlays {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+}

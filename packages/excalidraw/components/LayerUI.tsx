@@ -60,6 +60,8 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
 import { TerraformDemoAutoImport } from "./TerraformDemoAutoImport";
 import { TerraformDebugToolbar } from "./TerraformDebugToolbar";
+import { TerraformColorLegend } from "./TerraformColorLegend";
+import "./TerraformOverlays.scss";
 import { TerraformElementActions } from "./TerraformSelectedShapeActions";
 import {
   findTerraformElementByNodePath,
@@ -689,11 +691,14 @@ const LayerUI = ({
               renderWelcomeScreen={renderWelcomeScreen}
             />
             {!appState.viewModeEnabled && (
-              <TerraformDebugToolbar
-                app={app}
-                actionManager={actionManager}
-                elements={elements}
-              />
+              <div className="terraform-overlays">
+                <TerraformDebugToolbar
+                  app={app}
+                  actionManager={actionManager}
+                  elements={elements}
+                />
+                <TerraformColorLegend elements={elements} />
+              </div>
             )}
             {(appState.toast || appState.scrolledOutside) && (
               <div className="floating-status-stack">
