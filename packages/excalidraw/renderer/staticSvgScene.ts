@@ -619,8 +619,7 @@ const renderElementToSvg = (
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
         const useElementFrameColors =
-          element.backgroundColor &&
-          element.backgroundColor !== "transparent";
+          element.backgroundColor && element.backgroundColor !== "transparent";
         rect.setAttribute(
           "fill",
           useElementFrameColors

@@ -59,8 +59,10 @@ import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
 import { TerraformDemoAutoImport } from "./TerraformDemoAutoImport";
-import { TerraformDebugToolbar } from "./TerraformDebugToolbar";
-import { TerraformColorLegend } from "./TerraformColorLegend";
+import {
+  TerraformScenePanel,
+  isTerraformSceneElements,
+} from "./TerraformScenePanel";
 import "./TerraformOverlays.scss";
 import { TerraformElementActions } from "./TerraformSelectedShapeActions";
 import {
@@ -689,15 +691,18 @@ const LayerUI = ({
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
+              hideHelpButton={
+                !appState.viewModeEnabled && isTerraformSceneElements(elements)
+              }
             />
             {!appState.viewModeEnabled && (
               <div className="terraform-overlays">
-                <TerraformDebugToolbar
+                <TerraformScenePanel
                   app={app}
                   actionManager={actionManager}
                   elements={elements}
+                  renderWelcomeScreen={renderWelcomeScreen}
                 />
-                <TerraformColorLegend app={app} elements={elements} />
               </div>
             )}
             {(appState.toast || appState.scrolledOutside) && (

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   applyTerraformColorModeToElements,
   getClusterFrameColorForResourceType,
@@ -269,9 +271,9 @@ describe("terraformPrimaryVisibility", () => {
 
   describe("terraform color mode", () => {
     it("uses default frame colors in action mode", () => {
-      expect(resolveClusterFrameColors("aws_lambda_function", "action")).toEqual(
-        TERRAFORM_DEFAULT_FRAME_COLORS,
-      );
+      expect(
+        resolveClusterFrameColors("aws_lambda_function", "action"),
+      ).toEqual(TERRAFORM_DEFAULT_FRAME_COLORS);
       expect(
         resolveContextFrameColors("vpc", "action", { subnetTier: "public" }),
       ).toEqual(TERRAFORM_DEFAULT_FRAME_COLORS);
@@ -301,8 +303,11 @@ describe("terraformPrimaryVisibility", () => {
           terraformTopologyRole: "primaryCluster",
           terraformPrimaryAddress: "aws_lambda_function.main",
         },
-      } as const;
-      const [actionFrame] = applyTerraformColorModeToElements([frame], "action");
+      } as unknown as ExcalidrawElement;
+      const [actionFrame] = applyTerraformColorModeToElements(
+        [frame],
+        "action",
+      );
       expect(actionFrame!.strokeColor).toBe("#bbb");
       expect(actionFrame!.backgroundColor).toBe("transparent");
       const [categoryFrame] = applyTerraformColorModeToElements(

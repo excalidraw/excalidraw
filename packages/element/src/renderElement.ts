@@ -810,8 +810,7 @@ export const renderElement = (
         );
 
         const useElementFrameColors =
-          element.backgroundColor &&
-          element.backgroundColor !== "transparent";
+          element.backgroundColor && element.backgroundColor !== "transparent";
 
         context.lineWidth =
           (element.strokeWidth ?? FRAME_STYLE.strokeWidth) /

@@ -114,6 +114,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: true,
       moduleLayoutOptions: undefined,
+      colorMode: "category",
     });
     expect(hoisted.replaceAllElements).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
@@ -134,6 +135,7 @@ describe("TerraformImportModal", () => {
       layoutMode: "pipeline",
       pipelineCompact: true,
       moduleLayoutOptions: undefined,
+      colorMode: "category",
     });
   });
 
@@ -150,6 +152,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+      colorMode: "category",
     });
   });
 
@@ -215,6 +218,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: false,
       moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+      colorMode: "category",
     });
   });
 
@@ -297,6 +301,7 @@ describe("TerraformImportModal", () => {
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
       semanticLayout: true,
       moduleLayoutOptions: undefined,
+      colorMode: "category",
     });
   });
 

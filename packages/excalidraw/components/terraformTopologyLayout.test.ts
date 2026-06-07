@@ -6,7 +6,10 @@ import type {
   ExcalidrawFrameElement,
 } from "@excalidraw/element/types";
 
-import { buildTerraformTopologyExcalidrawScene, reorderTopologyElementsZStack } from "./terraformTopologyLayout";
+import {
+  buildTerraformTopologyExcalidrawScene,
+  reorderTopologyElementsZStack,
+} from "./terraformTopologyLayout";
 import { terraformVpceSgLayoutElementId } from "./terraformTopologySgLinks";
 
 import { tfComfortPx } from "./terraformLayoutComfort";
@@ -3034,10 +3037,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 });
 
 describe("reorderTopologyElementsZStack", () => {
-  const frame = (
-    id: string,
-    role: string,
-  ): ExcalidrawElement =>
+  const frame = (id: string, role: string): ExcalidrawElement =>
     ({
       id,
       type: "frame",
@@ -3046,7 +3046,7 @@ describe("reorderTopologyElementsZStack", () => {
       width: 100,
       height: 100,
       customData: { terraformTopologyRole: role },
-    }) as ExcalidrawElement;
+    } as unknown as ExcalidrawElement);
 
   it("paints context frames back-to-front: provider → account → region → vpc → subnet → primaryCluster", () => {
     const input = [

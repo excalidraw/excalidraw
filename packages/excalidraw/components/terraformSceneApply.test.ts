@@ -99,6 +99,7 @@ describe("terraformSceneApply", () => {
       {
         semanticLayout: true,
         moduleLayoutOptions: undefined,
+        colorMode: "category",
       },
       expect.anything(),
     );
@@ -159,6 +160,7 @@ describe("terraformSceneApply", () => {
       {
         semanticLayout: false,
         moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+        colorMode: "category",
       },
       expect.anything(),
     );
@@ -194,6 +196,7 @@ describe("terraformSceneApply", () => {
       {
         semanticLayout: false,
         moduleLayoutOptions: rectpackingOptions,
+        colorMode: "category",
       },
       expect.anything(),
     );
@@ -225,6 +228,7 @@ describe("terraformSceneApply", () => {
       {
         semanticLayout: true,
         moduleLayoutOptions: undefined,
+        colorMode: "category",
       },
       expect.anything(),
     );

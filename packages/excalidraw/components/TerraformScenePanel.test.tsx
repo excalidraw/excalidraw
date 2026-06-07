@@ -1,10 +1,10 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { newTextElement } from "@excalidraw/element";
 
-import { TerraformDebugToolbar } from "./TerraformDebugToolbar";
+import { TerraformScenePanel } from "./TerraformScenePanel";
 import {
   clearTerraformImportSession,
   setTerraformImportSession,
@@ -23,11 +23,13 @@ const hoisted = vi.hoisted(() => ({
       {name}
     </button>
   )),
+  replaceAllElements: vi.fn(),
 }));
 
 vi.mock("./terraformSceneApply", () => ({
   resetTerraformLayout: vi.fn(() => true),
   refreshTerraformLayout: vi.fn(async () => ({})),
+  runTerraformImportFromSources: vi.fn(async () => ({})),
 }));
 
 vi.mock("./App", async (importOriginal) => {
@@ -36,17 +38,15 @@ vi.mock("./App", async (importOriginal) => {
     ...mod,
     useExcalidrawElements: () => undefined,
     useExcalidrawSetAppState: () => hoisted.setAppState,
+    useExcalidrawContainer: () => ({ container: document.body, id: "test" }),
   };
 });
 
-const mockApp = {
-  scene: { getElementsIncludingDeleted: () => [] },
-  state: { viewBackgroundColor: "#ffffff" },
-} as unknown as Parameters<typeof TerraformDebugToolbar>[0]["app"];
-
-const mockActionManager = {
-  renderAction: hoisted.renderAction,
-} as unknown as Parameters<typeof TerraformDebugToolbar>[0]["actionManager"];
+vi.mock("../context/tunnels", () => ({
+  useTunnels: () => ({
+    WelcomeScreenHelpHintTunnel: { Out: () => null },
+  }),
+}));
 
 const terraformResource = newTextElement({
   x: 0,
@@ -55,26 +55,51 @@ const terraformResource = newTextElement({
   customData: { terraformVisibilityRole: "resource" },
 });
 
-describe("TerraformDebugToolbar", () => {
+const mockApp = {
+  scene: {
+    getElementsIncludingDeleted: () => [terraformResource],
+    replaceAllElements: hoisted.replaceAllElements,
+  },
+  state: {
+    viewBackgroundColor: "#ffffff",
+    terraformEdgeLayerPins: null,
+    terraformEdgeHoverPeekKey: null,
+  },
+} as unknown as Parameters<typeof TerraformScenePanel>[0]["app"];
+
+const mockActionManager = {
+  renderAction: hoisted.renderAction,
+  executeAction: vi.fn(),
+} as unknown as Parameters<typeof TerraformScenePanel>[0]["actionManager"];
+
+const openLegend = async () => {
+  fireEvent.click(screen.getByTestId("terraform-scene-panel-legend-trigger"));
+  await waitFor(() => {
+    expect(screen.getByTestId("terraform-color-legend")).toBeTruthy();
+  });
+};
+
+describe("TerraformScenePanel", () => {
   beforeEach(() => {
     clearTerraformImportSession();
     hoisted.setAppState.mockReset();
+    hoisted.replaceAllElements.mockReset();
     vi.mocked(resetTerraformLayout).mockClear();
     vi.mocked(refreshTerraformLayout).mockClear();
   });
 
   it("is hidden when scene has no terraform resources", () => {
     render(
-      <TerraformDebugToolbar
+      <TerraformScenePanel
         app={mockApp}
         actionManager={mockActionManager}
         elements={[]}
       />,
     );
-    expect(screen.queryByTestId("terraform-debug-toolbar")).toBeNull();
+    expect(screen.queryByTestId("terraform-scene-panel")).toBeNull();
   });
 
-  it("shows toolbar and enables reset/refresh when session exists", () => {
+  it("shows action strip and enables reset/refresh when session exists", () => {
     setTerraformImportSession({
       sources: { planDotBundles: [], states: [], tfdTexts: [] },
       semanticLayout: true,
@@ -89,22 +114,26 @@ describe("TerraformDebugToolbar", () => {
     });
 
     render(
-      <TerraformDebugToolbar
+      <TerraformScenePanel
         app={mockApp}
         actionManager={mockActionManager}
         elements={[terraformResource]}
       />,
     );
 
-    expect(screen.getByTestId("terraform-debug-toolbar")).toBeTruthy();
+    expect(screen.getByTestId("terraform-scene-panel")).toBeTruthy();
     expect(screen.getByTestId("terraform-debug-reset")).not.toBeDisabled();
     expect(screen.getByTestId("terraform-debug-refresh")).not.toBeDisabled();
     expect(screen.getByTestId("action-undo")).toBeTruthy();
+    expect(
+      screen.getByTestId("terraform-scene-panel-legend-trigger"),
+    ).toBeTruthy();
+    expect(screen.getByTestId("terraform-scene-panel-help")).toBeTruthy();
   });
 
   it("disables reset and refresh without import session", () => {
     render(
-      <TerraformDebugToolbar
+      <TerraformScenePanel
         app={mockApp}
         actionManager={mockActionManager}
         elements={[terraformResource]}
@@ -130,7 +159,7 @@ describe("TerraformDebugToolbar", () => {
     });
 
     render(
-      <TerraformDebugToolbar
+      <TerraformScenePanel
         app={mockApp}
         actionManager={mockActionManager}
         elements={[terraformResource]}
@@ -142,5 +171,55 @@ describe("TerraformDebugToolbar", () => {
 
     fireEvent.click(screen.getByTestId("terraform-debug-refresh"));
     expect(refreshTerraformLayout).toHaveBeenCalled();
+  });
+
+  it("opens legend popover with category sections by default", async () => {
+    render(
+      <TerraformScenePanel
+        app={mockApp}
+        actionManager={mockActionManager}
+        elements={[terraformResource]}
+      />,
+    );
+
+    await openLegend();
+
+    expect(screen.getByText("Color key")).toBeTruthy();
+    expect(screen.getByText("Resources")).toBeTruthy();
+    expect(screen.getByText("Hierarchy")).toBeTruthy();
+    expect(screen.getByText("Compute")).toBeTruthy();
+    expect(screen.getByText("Provider")).toBeTruthy();
+  });
+
+  it("switches to plan action legend when toggled", async () => {
+    render(
+      <TerraformScenePanel
+        app={mockApp}
+        actionManager={mockActionManager}
+        elements={[terraformResource]}
+      />,
+    );
+
+    await openLegend();
+    fireEvent.click(screen.getByTestId("terraform-color-mode-action"));
+
+    expect(screen.getByText("Plan actions")).toBeTruthy();
+    expect(screen.getByText("Created")).toBeTruthy();
+    expect(screen.getByText("Changed")).toBeTruthy();
+    expect(screen.queryByText("Hierarchy")).toBeNull();
+    expect(hoisted.replaceAllElements).toHaveBeenCalled();
+  });
+
+  it("opens keyboard shortcuts via merged help button", () => {
+    render(
+      <TerraformScenePanel
+        app={mockApp}
+        actionManager={mockActionManager}
+        elements={[terraformResource]}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("terraform-scene-panel-help"));
+    expect(mockActionManager.executeAction).toHaveBeenCalled();
   });
 });

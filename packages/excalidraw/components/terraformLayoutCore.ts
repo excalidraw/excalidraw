@@ -73,12 +73,13 @@ import {
   terraformImportProfilerMeasureAsync,
 } from "./terraformImportProfiler";
 
-import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 import {
   TERRAFORM_COLOR_MODE_DEFAULT,
   withTerraformLayoutColorModeAsync,
   type TerraformColorMode,
 } from "./terraformPrimaryVisibility";
+
+import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
 
 export type TerraformLayoutOptions = TerraformPlanParsingOptions;
 
@@ -419,34 +420,34 @@ async function buildPipelineLayoutSceneBody(
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
     async () => {
-  const pipelineScene = await buildTerraformPipelineExcalidrawScene(
-    ctx.nodes5,
-    ctx.plan,
-    { compact: ctx.pipelineCompact !== false },
-  );
-  emitLocalParseDebug({
-    phase: "pipelineLayout",
-    meta: pipelineScene.meta,
-    elementCount: pipelineScene.elements.length,
-  });
-  return {
-    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-    elements: pipelineScene.elements,
-    meta: appendImportMeta(
-      {
-        ...pipelineScene.meta,
-        importSource: ctx.importSource,
-        plannedChanges: ctx.importSource !== "state-only",
-      },
-      ctx.sources,
-      formatImportWarnings(
-        [...ctx.importWarnings, ...pipelineScene.warnings],
-        ctx.tfdWarnings,
-        ctx.tfdErrors,
-      ),
-      { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
-    ),
-  };
+      const pipelineScene = await buildTerraformPipelineExcalidrawScene(
+        ctx.nodes5,
+        ctx.plan,
+        { compact: ctx.pipelineCompact !== false },
+      );
+      emitLocalParseDebug({
+        phase: "pipelineLayout",
+        meta: pipelineScene.meta,
+        elementCount: pipelineScene.elements.length,
+      });
+      return {
+        ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+        elements: pipelineScene.elements,
+        meta: appendImportMeta(
+          {
+            ...pipelineScene.meta,
+            importSource: ctx.importSource,
+            plannedChanges: ctx.importSource !== "state-only",
+          },
+          ctx.sources,
+          formatImportWarnings(
+            [...ctx.importWarnings, ...pipelineScene.warnings],
+            ctx.tfdWarnings,
+            ctx.tfdErrors,
+          ),
+          { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
+        ),
+      };
     },
   );
 }
@@ -457,177 +458,187 @@ async function buildSemanticLayoutSceneBody(
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
     async () => {
-  type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
-  const semPlan = ctx.plan as SemanticPlan;
-  const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
-  const providerBuckets = partitionResourceChangesByProviderFamily(semPlan);
+      type SemanticPlan = Parameters<
+        typeof extractTerraformTopologyFromPlan
+      >[0];
+      const semPlan = ctx.plan as SemanticPlan;
+      const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
+      const providerBuckets = partitionResourceChangesByProviderFamily(semPlan);
 
-  const providerBlocks: ProviderTopologyBlock[] = [];
-  let topoMeta: Record<string, unknown> = {
-    layoutEngine: "topology",
-    accountCount: 0,
-    regionCount: 0,
-    vpcCount: 0,
-    subnetCount: 0,
-    primaryResourceCount: 0,
-    regionalPrimaryCount: 0,
-    vpcEndpointCount: 0,
-    routeTableCount: 0,
-    dependencyEdgeCount: 0,
-  };
-  let layoutFiles: Record<string, unknown> | undefined;
+      const providerBlocks: ProviderTopologyBlock[] = [];
+      let topoMeta: Record<string, unknown> = {
+        layoutEngine: "topology",
+        accountCount: 0,
+        regionCount: 0,
+        vpcCount: 0,
+        subnetCount: 0,
+        primaryResourceCount: 0,
+        regionalPrimaryCount: 0,
+        vpcEndpointCount: 0,
+        routeTableCount: 0,
+        dependencyEdgeCount: 0,
+      };
+      let layoutFiles: Record<string, unknown> | undefined;
 
-  const awsChanges = providerBuckets.get("aws") ?? [];
-  if (awsChanges.length > 0) {
-    const topoModel = extractTerraformTopologyFromPlan(awsPlan);
-    const zones = buildMergedTopologyZones(awsPlan);
-    const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
-    const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
-    const { byZone: interfaceVpcEndpointZonePlacements, zonePlacedAddresses } =
-      computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
-    const vpcEndpointBuckets =
-      filterVpcEndpointBucketsRemovingZonePlacedAddresses(
-        vpcEndpointBucketsRaw,
-        zonePlacedAddresses,
-      );
-    const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
-    const { vpcDefaultPlumbingBuckets, natZonePlacements } =
-      buildVpcDefaultPlumbingWithNat(awsPlan, zones);
-    const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
-    const endpointSecurityGroupBuckets =
-      extractInterfaceEndpointSecurityGroupBuckets(
-        awsPlan,
-        vpcEndpointBucketsRaw,
-      );
-    const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
-      zones,
-      awsPlan,
-    );
-    mergeTopologyModelWithPlacementZones(topoModel, zones);
-    mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
-    mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
-    mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
-    mergeTopologyModelWithRouteTables(topoModel, endpointSecurityGroupBuckets);
+      const awsChanges = providerBuckets.get("aws") ?? [];
+      if (awsChanges.length > 0) {
+        const topoModel = extractTerraformTopologyFromPlan(awsPlan);
+        const zones = buildMergedTopologyZones(awsPlan);
+        const regionalBuckets = extractRegionalTopologyPrimaries(awsPlan);
+        const vpcEndpointBucketsRaw = extractVpcEndpointsByVpc(awsPlan);
+        const {
+          byZone: interfaceVpcEndpointZonePlacements,
+          zonePlacedAddresses,
+        } = computeInterfaceVpcEndpointZonePlacements(awsPlan, zones);
+        const vpcEndpointBuckets =
+          filterVpcEndpointBucketsRemovingZonePlacedAddresses(
+            vpcEndpointBucketsRaw,
+            zonePlacedAddresses,
+          );
+        const routeTableBuckets = extractRouteTablesByVpc(awsPlan);
+        const { vpcDefaultPlumbingBuckets, natZonePlacements } =
+          buildVpcDefaultPlumbingWithNat(awsPlan, zones);
+        const vpcFlowLogBuckets = extractVpcFlowLogBundles(awsPlan);
+        const endpointSecurityGroupBuckets =
+          extractInterfaceEndpointSecurityGroupBuckets(
+            awsPlan,
+            vpcEndpointBucketsRaw,
+          );
+        const routeTableBottomPlacements =
+          computeRouteTableBottomEdgePlacements(zones, awsPlan);
+        mergeTopologyModelWithPlacementZones(topoModel, zones);
+        mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
+        mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
+        mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
+        mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
+        mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
+        mergeTopologyModelWithRouteTables(
+          topoModel,
+          endpointSecurityGroupBuckets,
+        );
 
-    const enrichPreplaced = collectTopologyPreplacedAddresses([
-      ...zones,
-      ...regionalBuckets,
-      ...vpcEndpointBuckets,
-      ...routeTableBuckets,
-      ...vpcDefaultPlumbingBuckets,
-      ...vpcFlowLogBuckets,
-      ...endpointSecurityGroupBuckets,
-    ]);
-    for (const address of natZonePlacements.consumedAddresses) {
-      enrichPreplaced.add(address);
-    }
-    for (const address of zonePlacedAddresses) {
-      enrichPreplaced.add(address);
-    }
-    for (const address of collectRouteAddressesFromBottomPlacements(
-      routeTableBottomPlacements,
-    )) {
-      enrichPreplaced.add(address);
-    }
-    enrichAndReconcileTopologyPlacements(
-      {
-        zones,
-        regionalBuckets,
-        vpcDefaultPlumbingBuckets,
-        natZonePlacements,
-      },
-      awsPlan,
-      ctx.nodes5,
-      enrichPreplaced,
-    );
+        const enrichPreplaced = collectTopologyPreplacedAddresses([
+          ...zones,
+          ...regionalBuckets,
+          ...vpcEndpointBuckets,
+          ...routeTableBuckets,
+          ...vpcDefaultPlumbingBuckets,
+          ...vpcFlowLogBuckets,
+          ...endpointSecurityGroupBuckets,
+        ]);
+        for (const address of natZonePlacements.consumedAddresses) {
+          enrichPreplaced.add(address);
+        }
+        for (const address of zonePlacedAddresses) {
+          enrichPreplaced.add(address);
+        }
+        for (const address of collectRouteAddressesFromBottomPlacements(
+          routeTableBottomPlacements,
+        )) {
+          enrichPreplaced.add(address);
+        }
+        enrichAndReconcileTopologyPlacements(
+          {
+            zones,
+            regionalBuckets,
+            vpcDefaultPlumbingBuckets,
+            natZonePlacements,
+          },
+          awsPlan,
+          ctx.nodes5,
+          enrichPreplaced,
+        );
 
-    if (topoModel.accounts.size > 0) {
-      const topoScene = await buildTerraformTopologyExcalidrawScene(
-        topoModel,
-        zones,
-        regionalBuckets,
-        ctx.nodes5,
-        awsPlan,
-        vpcEndpointBuckets,
-        routeTableBottomPlacements,
-        vpcDefaultPlumbingBuckets,
-        vpcFlowLogBuckets,
-        endpointSecurityGroupBuckets,
-        natZonePlacements,
-        interfaceVpcEndpointZonePlacements,
-        ctx.deferDecorations,
-      );
-      if (topoScene.elements.length > 0) {
-        providerBlocks.push({
-          family: "aws",
-          label: "AWS",
-          elements: topoScene.elements,
-        });
+        if (topoModel.accounts.size > 0) {
+          const topoScene = await buildTerraformTopologyExcalidrawScene(
+            topoModel,
+            zones,
+            regionalBuckets,
+            ctx.nodes5,
+            awsPlan,
+            vpcEndpointBuckets,
+            routeTableBottomPlacements,
+            vpcDefaultPlumbingBuckets,
+            vpcFlowLogBuckets,
+            endpointSecurityGroupBuckets,
+            natZonePlacements,
+            interfaceVpcEndpointZonePlacements,
+            ctx.deferDecorations,
+          );
+          if (topoScene.elements.length > 0) {
+            providerBlocks.push({
+              family: "aws",
+              label: "AWS",
+              elements: topoScene.elements,
+            });
+          }
+          topoMeta = { ...topoScene.meta };
+          if (topoScene.files && Object.keys(topoScene.files).length > 0) {
+            layoutFiles = topoScene.files;
+          }
+        }
       }
-      topoMeta = { ...topoScene.meta };
-      if (topoScene.files && Object.keys(topoScene.files).length > 0) {
-        layoutFiles = topoScene.files;
+
+      for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
+        const changes = providerBuckets.get(family)!;
+        const providerScene = await buildProviderFamilyScene(
+          family,
+          getProviderFamilyLabel(family),
+          changes,
+          ctx.nodes5,
+          semPlan,
+        );
+        if (providerScene.elements.length > 0) {
+          providerBlocks.push({
+            family,
+            label: getProviderFamilyLabel(family),
+            elements: providerScene.elements,
+          });
+        }
       }
-    }
-  }
 
-  for (const family of sortedNonAwsProviderFamilies(providerBuckets)) {
-    const changes = providerBuckets.get(family)!;
-    const providerScene = await buildProviderFamilyScene(
-      family,
-      getProviderFamilyLabel(family),
-      changes,
-      ctx.nodes5,
-      semPlan,
-    );
-    if (providerScene.elements.length > 0) {
-      providerBlocks.push({
-        family,
-        label: getProviderFamilyLabel(family),
-        elements: providerScene.elements,
-      });
-    }
-  }
-
-  const composedElements = composeMultiProviderTopologyScene(providerBlocks);
-  const represented = collectSemanticRepresentedResourceAddresses(
-    composedElements as Array<{ customData?: Record<string, any> }>,
-    semPlan as {
-      resource_changes?: Array<{ address?: string; type?: string }>;
-    },
-  );
-  const omittedSemanticResources = (semPlan.resource_changes || []).filter(
-    (rc: { address?: string; type?: string }) =>
-      typeof rc.address === "string" &&
-      !represented.has(rc.address) &&
-      SEMANTIC_LAYOUT_OMITTED_TYPES.has(rc.type || ""),
-  );
-  emitLocalParseDebug({
-    phase: "topologyLayout",
-    meta: topoMeta,
-    elementCount: composedElements.length,
-    providerBlockCount: providerBlocks.length,
-  });
-  return {
-    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-    elements: composedElements,
-    ...(layoutFiles ? { files: layoutFiles } : {}),
-    meta: appendImportMeta(
-      {
-        ...topoMeta,
-        importSource: ctx.importSource,
-        plannedChanges: ctx.importSource !== "state-only",
-        representedResourceCount: represented.size,
-        omittedResourceCount: omittedSemanticResources.length,
+      const composedElements =
+        composeMultiProviderTopologyScene(providerBlocks);
+      const represented = collectSemanticRepresentedResourceAddresses(
+        composedElements as Array<{ customData?: Record<string, any> }>,
+        semPlan as {
+          resource_changes?: Array<{ address?: string; type?: string }>;
+        },
+      );
+      const omittedSemanticResources = (semPlan.resource_changes || []).filter(
+        (rc: { address?: string; type?: string }) =>
+          typeof rc.address === "string" &&
+          !represented.has(rc.address) &&
+          SEMANTIC_LAYOUT_OMITTED_TYPES.has(rc.type || ""),
+      );
+      emitLocalParseDebug({
+        phase: "topologyLayout",
+        meta: topoMeta,
+        elementCount: composedElements.length,
         providerBlockCount: providerBlocks.length,
-      },
-      ctx.sources,
-      formatImportWarnings(ctx.importWarnings, ctx.tfdWarnings, ctx.tfdErrors),
-      { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
-    ),
-  };
+      });
+      return {
+        ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+        elements: composedElements,
+        ...(layoutFiles ? { files: layoutFiles } : {}),
+        meta: appendImportMeta(
+          {
+            ...topoMeta,
+            importSource: ctx.importSource,
+            plannedChanges: ctx.importSource !== "state-only",
+            representedResourceCount: represented.size,
+            omittedResourceCount: omittedSemanticResources.length,
+            providerBlockCount: providerBlocks.length,
+          },
+          ctx.sources,
+          formatImportWarnings(
+            ctx.importWarnings,
+            ctx.tfdWarnings,
+            ctx.tfdErrors,
+          ),
+          { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
+        ),
+      };
     },
   );
 }
