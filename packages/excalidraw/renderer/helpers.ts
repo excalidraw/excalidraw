@@ -53,21 +53,36 @@ export const bootstrapCanvas = ({
 
   // Paint background
   if (typeof viewBackgroundColor === "string") {
-    const hasTransparence =
+    // 1. Verify if the color is a valid CSS string.
+    // Corrupted values like "0000" (missing #) cause the ghosting bug.
+    const isValidColor =
+      /^(#|rgba\(|hsla\(|rgb\(|hsl\()/.test(viewBackgroundColor) ||
       viewBackgroundColor === "transparent" ||
-      viewBackgroundColor.length === 5 || // #RGBA
-      viewBackgroundColor.length === 9 || // #RRGGBBA
+      (!viewBackgroundColor.startsWith("#") && !/\d/.test(viewBackgroundColor));
+
+    // 2. Determine if we need to clear the canvas.
+    // If the color is invalid, we force a clear to prevent trails.
+    const hasTransparence =
+      !isValidColor ||
+      viewBackgroundColor === "transparent" ||
+      viewBackgroundColor.length === 5 ||
+      viewBackgroundColor.length === 9 ||
       /(hsla|rgba)\(/.test(viewBackgroundColor);
+
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
-    context.save();
-    context.fillStyle = applyDarkModeFilter(
-      viewBackgroundColor,
-      theme === THEME.DARK,
-    );
-    context.fillRect(0, 0, normalizedWidth, normalizedHeight);
-    context.restore();
+
+    // 3. Only attempt to fill if the color is valid and not transparent
+    if (isValidColor && viewBackgroundColor !== "transparent") {
+      context.save();
+      context.fillStyle = applyDarkModeFilter(
+        viewBackgroundColor,
+        theme === THEME.DARK,
+      );
+      context.fillRect(0, 0, normalizedWidth, normalizedHeight);
+      context.restore();
+    }
   } else {
     context.clearRect(0, 0, normalizedWidth, normalizedHeight);
   }
