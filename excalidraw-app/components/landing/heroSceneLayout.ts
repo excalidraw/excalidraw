@@ -47,7 +47,8 @@ export type HeroChangeStyle = {
 };
 
 const heroStyle = (action: keyof typeof TERRAFORM_ACTION_PASTEL_STYLES) => {
-  const { backgroundColor, strokeColor } = TERRAFORM_ACTION_PASTEL_STYLES[action];
+  const { backgroundColor, strokeColor } =
+    TERRAFORM_ACTION_PASTEL_STYLES[action];
   return { fill: backgroundColor, stroke: strokeColor };
 };
 
