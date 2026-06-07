@@ -113,6 +113,12 @@ const LINEAR_TYPES = [
   "elbowArrow",
 ] as const;
 
+const BOUND_ARROW_LINEAR_TYPES = [
+  "sharpArrow",
+  "curvedArrow",
+  "elbowArrow",
+] as const;
+
 const CONVERTIBLE_GENERIC_TYPES: ReadonlySet<ConvertibleGenericTypes> = new Set(
   GENERIC_TYPES,
 );
@@ -292,12 +298,18 @@ const Panel = ({
 
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? shouldExcludeLineConversion(elements)
+        ? [
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ]
+        : [
+            ["line", LineIcon],
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ]
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -515,10 +527,14 @@ export const convertElementTypes = (
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      const availableLinearTypes = getAvailableLinearTypes(selectedElements);
+      const index = commonSubType
+        ? availableLinearTypes.findIndex((type) => type === commonSubType)
+        : -1;
       nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        availableLinearTypes[
+          (index + availableLinearTypes.length + advancement) %
+            availableLinearTypes.length
         ];
     }
 
@@ -653,12 +669,28 @@ export const getConversionTypeFromElements = (
 };
 
 const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
-  );
+  return isLinearElement(element);
 };
+
+/** Lines cannot preserve shape bindings or arrow labels — hide line option. */
+const shouldExcludeLineConversion = (elements: ExcalidrawElement[]) => {
+  for (const element of elements) {
+    if (
+      isArrowElement(element) &&
+      (isArrowBoundToElement(element) || hasBoundTextElement(element))
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const getAvailableLinearTypes = (
+  elements: ExcalidrawElement[],
+): readonly (typeof LINEAR_TYPES)[number][] =>
+  shouldExcludeLineConversion(elements)
+    ? BOUND_ARROW_LINEAR_TYPES
+    : LINEAR_TYPES;
 
 const toCacheKey = (
   elementId: ExcalidrawElement["id"],
@@ -866,6 +898,8 @@ const convertElementType = <
             roundness: null,
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
@@ -880,6 +914,8 @@ const convertElementType = <
             },
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
@@ -889,8 +925,10 @@ const convertElementType = <
             ...element,
             type: "arrow",
             elbowed: true,
-            fixedSegments: null,
+            fixedSegments: [],
             roundness: null,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
