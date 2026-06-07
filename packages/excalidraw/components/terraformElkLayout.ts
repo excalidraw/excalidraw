@@ -507,6 +507,23 @@ export function getTerraformActionStyle(action: string) {
   return TERRAFORM_ACTION_STYLES[action] || TERRAFORM_ACTION_STYLES.existing;
 }
 
+export type TerraformActionLegendEntry = {
+  id: string;
+  label: string;
+  strokeColor: string;
+  backgroundColor: string;
+};
+
+/** Plan change action colors shown on resource cards (and in action-mode legend). */
+export const TERRAFORM_ACTION_LEGEND: readonly TerraformActionLegendEntry[] = [
+  { id: "create", label: "Created", ...TERRAFORM_ACTION_STYLES.create },
+  { id: "update", label: "Changed", ...TERRAFORM_ACTION_STYLES.update },
+  { id: "delete", label: "Deleted", ...TERRAFORM_ACTION_STYLES.delete },
+  { id: "replace", label: "Replaced", ...TERRAFORM_ACTION_STYLES.replace },
+  { id: "no-op", label: "No-op", ...TERRAFORM_ACTION_STYLES["no-op"] },
+  { id: "existing", label: "Existing", ...TERRAFORM_ACTION_STYLES.existing },
+];
+
 export const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
 
 export type { TerraformUnknownAfterDependency, TerraformUnknownAfterIntentRow };

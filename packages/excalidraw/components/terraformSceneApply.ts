@@ -26,6 +26,11 @@ import {
   getTerraformImportSession,
   setTerraformImportSession,
 } from "./terraformImportSession";
+import {
+  TERRAFORM_COLOR_MODE_DEFAULT,
+  applyTerraformColorModeToElements,
+  type TerraformColorMode,
+} from "./terraformPrimaryVisibility";
 
 import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 
@@ -133,6 +138,8 @@ export type RunTerraformImportFromSourcesOptions = {
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
   pipelineCompact?: boolean;
+  /** Frame tint mode for pipeline/semantic topology views. */
+  colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   updateSession?: boolean;
@@ -180,6 +187,7 @@ export const runTerraformImportFromSources = async (
         ...(layoutMode === "pipeline"
           ? { pipelineCompact: options.pipelineCompact !== false }
           : {}),
+        colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
       },
       {
         onProgress: options.onLayoutProgress,
@@ -213,6 +221,7 @@ export const runTerraformImportFromSources = async (
       ...(layoutMode === "pipeline"
         ? { pipelineCompact: options.pipelineCompact !== false }
         : {}),
+      colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
       preset: options.preset ?? null,
       importedTfdTexts,
       snapshot: nextSnapshot,
@@ -236,10 +245,15 @@ export const resetTerraformLayout = (
   }
 
   const { snapshot } = session;
+  const colorMode = session.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT;
+  const elements = applyTerraformColorModeToElements(
+    cloneTerraformElementsForSnapshot(snapshot.elements),
+    colorMode,
+  );
   applyTerraformExcalidrawScene(
     app,
     setAppState,
-    { elements: cloneTerraformElementsForSnapshot(snapshot.elements) },
+    { elements },
     {
       enableDeclaredDataFlow: snapshot.enableDeclaredDataFlow,
       terraformEdgeLayerPins: snapshot.terraformEdgeLayerPins,
@@ -280,6 +294,7 @@ export const refreshTerraformLayout = async (
     layoutMode: session.layoutMode,
     moduleLayoutOptions: session.moduleLayoutOptions,
     pipelineCompact: session.pipelineCompact,
+    colorMode: session.colorMode,
     importedTfdTexts,
     preset: session.preset,
   });

@@ -123,6 +123,8 @@ export type TerraformPlanParsingOptions = {
    * Satellites are added on demand when the user clicks the card.
    */
   pipelineCompact?: boolean;
+  /** Frame tint mode for pipeline/semantic topology views. */
+  colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };
 
 type BuildNodesMapOptions = {

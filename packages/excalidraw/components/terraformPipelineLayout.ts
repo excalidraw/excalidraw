@@ -13,8 +13,8 @@ import {
 import { collectDeclaredDataFlowEdges } from "./terraformExplodeGraph";
 import {
   isPrimaryVisibleResourceType,
-  getClusterFrameColorForResourceType,
-  getContextFrameColorForTopologyRole,
+  spreadClusterFrameColors,
+  spreadContextFrameColors,
 } from "./terraformPrimaryVisibility";
 import {
   getTerraformCardResourceType,
@@ -245,7 +245,7 @@ function buildFallbackCluster(
       y: 0,
       width: FALLBACK_W + 20,
       height: FALLBACK_H + 20,
-      ...getClusterFrameColorForResourceType(fallbackResourceType),
+      ...spreadClusterFrameColors(fallbackResourceType),
       children: [address],
       customData: pipelineFrameCustomData(
         "primaryCluster",
@@ -524,7 +524,7 @@ function pushContextFrames(
         width: b.width + 2 * pad,
         height: b.height + 2 * pad,
         children: uniqueChildIds,
-        ...getContextFrameColorForTopologyRole(level.role, {
+        ...spreadContextFrameColors(level.role, {
           subnetTier:
             level.role === "subnetZone" ? placement.subnetTier : undefined,
         }),

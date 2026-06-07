@@ -11,6 +11,17 @@
       color: var(--text-primary-color);
     }
 
+    &__mode {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    &__mode .ToolIcon_type_button {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
     &__section + &__section {
       margin-top: 0.5rem;
       padding-top: 0.5rem;

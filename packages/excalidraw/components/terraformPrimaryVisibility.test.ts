@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  applyTerraformColorModeToElements,
   getClusterFrameColorForResourceType,
   getContextFrameColorForTopologyRole,
   getTerraformResourceTypeFromNodePath,
@@ -11,6 +12,9 @@ import {
   isManagedTopologyResourceType,
   isPrimaryVisibleResourceType,
   isTopologyPlacementResourceType,
+  resolveClusterFrameColors,
+  resolveContextFrameColors,
+  TERRAFORM_DEFAULT_FRAME_COLORS,
 } from "./terraformPrimaryVisibility";
 
 describe("terraformPrimaryVisibility", () => {
@@ -260,6 +264,52 @@ describe("terraformPrimaryVisibility", () => {
           subnetTier: "other",
         }).strokeColor,
       ).toBe("#64748b");
+    });
+  });
+
+  describe("terraform color mode", () => {
+    it("uses default frame colors in action mode", () => {
+      expect(resolveClusterFrameColors("aws_lambda_function", "action")).toEqual(
+        TERRAFORM_DEFAULT_FRAME_COLORS,
+      );
+      expect(
+        resolveContextFrameColors("vpc", "action", { subnetTier: "public" }),
+      ).toEqual(TERRAFORM_DEFAULT_FRAME_COLORS);
+    });
+
+    it("preserves category colors in category mode", () => {
+      expect(
+        resolveClusterFrameColors("aws_lambda_function", "category")
+          .strokeColor,
+      ).toBe("#ea580c");
+      expect(resolveContextFrameColors("vpc", "category").strokeColor).toBe(
+        "#0369a1",
+      );
+    });
+
+    it("re-tints topology frames in place", () => {
+      const frame = {
+        id: "frame-1",
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        strokeColor: "#ea580c",
+        backgroundColor: "#fff7ed",
+        customData: {
+          terraformTopologyRole: "primaryCluster",
+          terraformPrimaryAddress: "aws_lambda_function.main",
+        },
+      } as const;
+      const [actionFrame] = applyTerraformColorModeToElements([frame], "action");
+      expect(actionFrame!.strokeColor).toBe("#bbb");
+      expect(actionFrame!.backgroundColor).toBe("transparent");
+      const [categoryFrame] = applyTerraformColorModeToElements(
+        [actionFrame!],
+        "category",
+      );
+      expect(categoryFrame!.strokeColor).toBe("#ea580c");
     });
   });
 });

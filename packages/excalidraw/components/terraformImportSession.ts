@@ -8,6 +8,7 @@ import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { AppState } from "../types";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
+import type { TerraformColorMode } from "./terraformPrimaryVisibility";
 
 export type TerraformImportSessionSnapshot = {
   elements: readonly ExcalidrawElement[];
@@ -23,6 +24,8 @@ export type TerraformImportSession = {
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
   pipelineCompact?: boolean;
+  /** Frame tint mode: category/hierarchy vs plan-action default frames. */
+  colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;
   importedTfdTexts: string[];
   snapshot: TerraformImportSessionSnapshot;
@@ -53,3 +56,11 @@ export const clearTerraformImportSession = () => {
 };
 
 export const hasTerraformImportSession = (): boolean => activeSession != null;
+
+export const updateTerraformImportSessionColorMode = (
+  colorMode: TerraformColorMode,
+) => {
+  if (activeSession) {
+    activeSession = { ...activeSession, colorMode };
+  }
+};

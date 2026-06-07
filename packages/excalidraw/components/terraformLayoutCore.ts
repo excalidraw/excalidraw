@@ -74,6 +74,11 @@ import {
 } from "./terraformImportProfiler";
 
 import type { TerraformModuleLayoutOptions } from "./terraformModuleLayoutOptions";
+import {
+  TERRAFORM_COLOR_MODE_DEFAULT,
+  withTerraformLayoutColorModeAsync,
+  type TerraformColorMode,
+} from "./terraformPrimaryVisibility";
 
 export type TerraformLayoutOptions = TerraformPlanParsingOptions;
 
@@ -405,11 +410,15 @@ type LayoutSceneContext = {
   addressToStack: Record<string, string>;
   deferDecorations?: boolean;
   pipelineCompact?: boolean;
+  colorMode?: TerraformColorMode;
 };
 
 async function buildPipelineLayoutSceneBody(
   ctx: LayoutSceneContext,
 ): Promise<Record<string, unknown>> {
+  return withTerraformLayoutColorModeAsync(
+    ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
+    async () => {
   const pipelineScene = await buildTerraformPipelineExcalidrawScene(
     ctx.nodes5,
     ctx.plan,
@@ -438,11 +447,16 @@ async function buildPipelineLayoutSceneBody(
       { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
     ),
   };
+    },
+  );
 }
 
 async function buildSemanticLayoutSceneBody(
   ctx: LayoutSceneContext,
 ): Promise<Record<string, unknown>> {
+  return withTerraformLayoutColorModeAsync(
+    ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
+    async () => {
   type SemanticPlan = Parameters<typeof extractTerraformTopologyFromPlan>[0];
   const semPlan = ctx.plan as SemanticPlan;
   const awsPlan = filterPlanByProviderFamily(semPlan, "aws");
@@ -614,6 +628,8 @@ async function buildSemanticLayoutSceneBody(
       { stackIds: ctx.stackIds, addressToStack: ctx.addressToStack },
     ),
   };
+    },
+  );
 }
 
 async function buildModuleLayoutSceneBody(
@@ -778,6 +794,7 @@ export async function layoutTerraformFromSources(
     addressToStack,
     deferDecorations: options?.deferDecorations === true,
     pipelineCompact: options?.pipelineCompact,
+    colorMode: options?.colorMode,
   };
 
   const sceneBody = pipelineLayout

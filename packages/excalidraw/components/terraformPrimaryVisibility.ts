@@ -1,4 +1,50 @@
+import { newElementWith } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
+
+/** Frame tint mode: resource/hierarchy categories vs default frames (plan action colors on cards). */
+export type TerraformColorMode = "category" | "action";
+
+export const TERRAFORM_COLOR_MODE_DEFAULT: TerraformColorMode = "category";
+
+/** Default Excalidraw frame styling used in plan-action mode (resource cards keep action tints). */
+export const TERRAFORM_DEFAULT_FRAME_COLORS = {
+  strokeColor: "#bbb",
+  backgroundColor: "transparent",
+} as const;
+
+let layoutColorMode: TerraformColorMode = TERRAFORM_COLOR_MODE_DEFAULT;
+
+export const getActiveTerraformLayoutColorMode = (): TerraformColorMode =>
+  layoutColorMode;
+
+export const withTerraformLayoutColorMode = <T>(
+  colorMode: TerraformColorMode,
+  fn: () => T,
+): T => {
+  const prev = layoutColorMode;
+  layoutColorMode = colorMode;
+  try {
+    return fn();
+  } finally {
+    layoutColorMode = prev;
+  }
+};
+
+export const withTerraformLayoutColorModeAsync = async <T>(
+  colorMode: TerraformColorMode,
+  fn: () => Promise<T>,
+): Promise<T> => {
+  const prev = layoutColorMode;
+  layoutColorMode = colorMode;
+  try {
+    return await fn();
+  } finally {
+    layoutColorMode = prev;
+  }
+};
 
 /**
  * Default “primary” resource visibility for Terraform diagrams (explode / overview).
@@ -315,6 +361,24 @@ export function getClusterFrameColorForResourceType(resourceType: string): {
   return CLUSTER_FRAME_COLORS.default;
 }
 
+export function resolveClusterFrameColors(
+  resourceType: string,
+  colorMode: TerraformColorMode = layoutColorMode,
+): { strokeColor: string; backgroundColor: string } {
+  if (colorMode === "action") {
+    return TERRAFORM_DEFAULT_FRAME_COLORS;
+  }
+  return getClusterFrameColorForResourceType(resourceType);
+}
+
+/** Spread helper for layout skeletons — uses active layout color mode. */
+export function spreadClusterFrameColors(resourceType: string): {
+  strokeColor: string;
+  backgroundColor: string;
+} {
+  return resolveClusterFrameColors(resourceType, layoutColorMode);
+}
+
 export type TerraformContextFrameRole =
   | "provider"
   | "account"
@@ -351,6 +415,81 @@ export function getContextFrameColorForTopologyRole(
     }
   }
   return CONTEXT_FRAME_COLORS[role];
+}
+
+export function resolveContextFrameColors(
+  role: TerraformContextFrameRole,
+  colorMode: TerraformColorMode = layoutColorMode,
+  options?: { subnetTier?: string | null },
+): { strokeColor: string; backgroundColor: string } {
+  if (colorMode === "action") {
+    return TERRAFORM_DEFAULT_FRAME_COLORS;
+  }
+  return getContextFrameColorForTopologyRole(role, options);
+}
+
+/** Spread helper for layout skeletons — uses active layout color mode. */
+export function spreadContextFrameColors(
+  role: TerraformContextFrameRole,
+  options?: { subnetTier?: string | null },
+): { strokeColor: string; backgroundColor: string } {
+  return resolveContextFrameColors(role, layoutColorMode, options);
+}
+
+const TOPOLOGY_CONTEXT_FRAME_ROLES = new Set<TerraformContextFrameRole>([
+  "provider",
+  "account",
+  "region",
+  "vpc",
+  "subnetZone",
+]);
+
+const isTopologyContextFrameRole = (
+  role: string,
+): role is TerraformContextFrameRole =>
+  TOPOLOGY_CONTEXT_FRAME_ROLES.has(role as TerraformContextFrameRole);
+
+/** Re-tint topology frame elements without re-running layout. */
+export function applyTerraformColorModeToElements(
+  elements: readonly ExcalidrawElement[],
+  colorMode: TerraformColorMode,
+): ExcalidrawElement[] {
+  return elements.map((el) => {
+    if (el.type !== "frame" || el.isDeleted) {
+      return el;
+    }
+    const role = el.customData?.terraformTopologyRole;
+    if (typeof role !== "string") {
+      return el;
+    }
+
+    let colors: { strokeColor: string; backgroundColor: string } | null = null;
+    if (role === "primaryCluster") {
+      const primaryAddress = el.customData?.terraformPrimaryAddress;
+      const resourceType =
+        typeof primaryAddress === "string"
+          ? getTerraformResourceTypeFromNodePath(primaryAddress)
+          : "terraform_module";
+      colors = resolveClusterFrameColors(resourceType, colorMode);
+    } else if (isTopologyContextFrameRole(role)) {
+      colors = resolveContextFrameColors(role, colorMode, {
+        subnetTier:
+          typeof el.customData?.terraformSubnetTier === "string"
+            ? el.customData.terraformSubnetTier
+            : undefined,
+      });
+    }
+
+    if (
+      !colors ||
+      (el.strokeColor === colors.strokeColor &&
+        el.backgroundColor === colors.backgroundColor)
+    ) {
+      return el;
+    }
+
+    return newElementWith(el, colors);
+  });
 }
 
 export type TerraformColorLegendEntry = {

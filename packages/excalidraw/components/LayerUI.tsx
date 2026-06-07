@@ -697,7 +697,7 @@ const LayerUI = ({
                   actionManager={actionManager}
                   elements={elements}
                 />
-                <TerraformColorLegend elements={elements} />
+                <TerraformColorLegend app={app} elements={elements} />
               </div>
             )}
             {(appState.toast || appState.scrolledOutside) && (
