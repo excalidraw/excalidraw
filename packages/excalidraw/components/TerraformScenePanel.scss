@@ -180,8 +180,7 @@
       border-radius: 0.25rem;
       box-sizing: border-box;
       background-color: var(--tf-swatch-fill);
-      box-shadow:
-        inset 0 0 0 1px
+      box-shadow: inset 0 0 0 1px
           color-mix(in srgb, var(--tf-swatch-stroke) 55%, transparent),
         0 0 0 1px color-mix(in srgb, var(--tf-swatch-stroke) 20%, transparent);
     }
