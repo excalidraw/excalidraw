@@ -130,3 +130,6 @@ packages/backend/terraform/staging-localstack/**/.terraform.tfstate.lock.info
 
 # Local Reddit notes / scratch (not part of the product docs)
 docs/reddit/
+
+# Generated landing perf benchmark output (see scripts/benchmark-landing.mjs)
+scripts/benchmark-landing-results.json

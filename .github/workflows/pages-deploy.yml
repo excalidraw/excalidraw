@@ -97,6 +97,11 @@ jobs:
       - name: Verify build output
         run: test -f excalidraw-app/build/index.html
 
+      - name: Verify brand asset sizes
+        run: |
+          test "$(wc -c < public/tfdraw-logo.png)" -lt 81920
+          test "$(wc -c < public/og-image.png)" -lt 307200
+
       - name: Set deploy command
         id: deploy_cmd
         if: vars.CF_PAGES_PROJECT_NAME != ''

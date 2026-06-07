@@ -85,6 +85,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: "build",
+      modulePreload: {
+        resolveDependencies: (_filename, deps) =>
+          deps.filter((dep) => !dep.includes("EditorApp")),
+      },
       rollupOptions: {
         output: {
           assetFileNames(chunkInfo) {
@@ -101,16 +105,26 @@ export default defineConfig(({ mode }) => {
           // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
           manualChunks(id) {
             if (
+              /[/\\]node_modules[/\\](react|react-dom|scheduler)[/\\]/.test(id)
+            ) {
+              return "react-vendor";
+            }
+
+            if (/[/\\]excalidraw-app[/\\]sentry\.ts$/.test(id)) {
+              return "sentry";
+            }
+
+            if (/[/\\]EmailSignupForm\.tsx$/.test(id)) {
+              return "email-signup";
+            }
+
+            if (
               id.includes("packages/excalidraw/locales") &&
               id.match(/en.json|percentages.json/) === null
             ) {
               const index = id.indexOf("locales/");
               // Taking the substring after "locales/"
               return `locales/${id.substring(index + 8)}`;
-            }
-
-            if (id.includes("@excalidraw/mermaid-to-excalidraw")) {
-              return "mermaid-to-excalidraw";
             }
 
             if (id.includes("@codemirror/") || id.includes("@lezer/")) {
@@ -227,7 +241,7 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          maximumFileSizeToCacheInBytes: 4.5 * 1024 ** 2, // 4.5MB
+          maximumFileSizeToCacheInBytes: 6 * 1024 ** 2, // 6MB (editor-app + excalidraw-vendor chunks)
         },
         manifest: {
           short_name: "tfdraw.dev",
@@ -293,38 +307,6 @@ export default defineConfig(({ mode }) => {
               ],
             },
           },
-          screenshots: [
-            {
-              src: "/screenshots/virtual-whiteboard.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-            {
-              src: "/screenshots/wireframe.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-            {
-              src: "/screenshots/illustration.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-            {
-              src: "/screenshots/shapes.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-            {
-              src: "/screenshots/collaboration.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-            {
-              src: "/screenshots/export.png",
-              type: "image/png",
-              sizes: "462x945",
-            },
-          ],
         },
       }),
       createHtmlPlugin({
