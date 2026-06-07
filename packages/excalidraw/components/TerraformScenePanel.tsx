@@ -69,10 +69,12 @@ const LegendSwatch = ({
 }: Pick<TerraformColorLegendEntry, "strokeColor" | "backgroundColor">) => (
   <span
     className="terraform-scene-panel__swatch"
-    style={{
-      "--tf-swatch-stroke": strokeColor,
-      "--tf-swatch-fill": backgroundColor,
-    }}
+    style={
+      {
+        "--tf-swatch-stroke": strokeColor,
+        "--tf-swatch-fill": backgroundColor,
+      } as React.CSSProperties
+    }
     aria-hidden="true"
   />
 );
