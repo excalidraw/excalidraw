@@ -1,3 +1,5 @@
+import { TERRAFORM_ACTION_PASTEL_STYLES } from "@excalidraw/excalidraw/components/terraformPastelColors";
+
 export type HeroChangeState = "existing" | "create" | "delete" | "update";
 
 export type HeroSceneNode = {
@@ -44,19 +46,24 @@ export type HeroChangeStyle = {
   stroke: string;
 };
 
+const heroStyle = (action: keyof typeof TERRAFORM_ACTION_PASTEL_STYLES) => {
+  const { backgroundColor, strokeColor } = TERRAFORM_ACTION_PASTEL_STYLES[action];
+  return { fill: backgroundColor, stroke: strokeColor };
+};
+
 /** Matches product TERRAFORM_ACTION_STYLES in terraformElkLayout.ts */
 export const HERO_CHANGE_STYLES: Record<HeroChangeState, HeroChangeStyle> = {
-  existing: { fill: "#e7f5ff", stroke: "#1971c2" },
-  create: { fill: "#d3f9d8", stroke: "#2b8a3e" },
-  delete: { fill: "#ffe3e3", stroke: "#c92a2a" },
-  update: { fill: "#fff3bf", stroke: "#e67700" },
+  existing: heroStyle("existing"),
+  create: heroStyle("create"),
+  delete: heroStyle("delete"),
+  update: heroStyle("update"),
 };
 
 export const HERO_EDGE_STROKE: Record<HeroChangeState, string> = {
-  existing: "#1971c2",
-  create: "#2b8a3e",
-  delete: "#c92a2a",
-  update: "#e67700",
+  existing: HERO_CHANGE_STYLES.existing.stroke,
+  create: HERO_CHANGE_STYLES.create.stroke,
+  delete: HERO_CHANGE_STYLES.delete.stroke,
+  update: HERO_CHANGE_STYLES.update.stroke,
 };
 
 export const HERO_SCENE_VIEWBOX = { width: 520, height: 380 } as const;

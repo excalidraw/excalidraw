@@ -181,8 +181,8 @@
       box-sizing: border-box;
       background-color: var(--tf-swatch-fill);
       box-shadow: inset 0 0 0 1px
-          color-mix(in srgb, var(--tf-swatch-stroke) 55%, transparent),
-        0 0 0 1px color-mix(in srgb, var(--tf-swatch-stroke) 20%, transparent);
+          color-mix(in srgb, var(--tf-swatch-stroke) 40%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--tf-swatch-stroke) 15%, transparent);
     }
 
     &__legend-label {

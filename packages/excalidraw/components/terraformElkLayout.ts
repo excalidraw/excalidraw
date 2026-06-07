@@ -48,6 +48,10 @@ import {
 } from "./terraformExplodeGraph";
 import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
 import {
+  TERRAFORM_ACTION_PASTEL_STYLES,
+  TERRAFORM_DEPENDENCY_EDGE_COLORS,
+} from "./terraformPastelColors";
+import {
   getTerraformResourceTypeFromNodePath,
   isInitiallyVisibleTerraformResource,
 } from "./terraformPrimaryVisibility";
@@ -293,12 +297,16 @@ function collectGraphVertexIds(nodes: TerraformPlanNodesMap): Set<string> {
 }
 
 /** DOT / plan-only dependency (`edges_new`). Matches backend resource “create” stroke. */
-const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
+const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY =
+  TERRAFORM_DEPENDENCY_EDGE_COLORS.newOnly;
 /** Prior-state / `depends_on` (`edges_existing`); wins over DOT when also in `edges_new`. */
-const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
+const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY =
+  TERRAFORM_DEPENDENCY_EDGE_COLORS.existingOnly;
 /** Matches backend `strokeColorForTerraformDependencyKinds` delete / replace precedence. */
-const TERRAFORM_DEPENDENCY_EDGE_DELETE = "#c92a2a";
-const TERRAFORM_DEPENDENCY_EDGE_REPLACE = "#f08c00";
+const TERRAFORM_DEPENDENCY_EDGE_DELETE =
+  TERRAFORM_DEPENDENCY_EDGE_COLORS.delete;
+const TERRAFORM_DEPENDENCY_EDGE_REPLACE =
+  TERRAFORM_DEPENDENCY_EDGE_COLORS.replace;
 
 /**
  * Stroke for Terraform dependency lines (browser ELK and backend use the same hexes).
@@ -489,19 +497,7 @@ export function getTerraformPlanNodeAction(
   return "existing";
 }
 
-const TERRAFORM_ACTION_STYLES: Record<
-  string,
-  { backgroundColor: string; strokeColor: string }
-> = {
-  create: { backgroundColor: "#d3f9d8", strokeColor: "#2b8a3e" },
-  delete: { backgroundColor: "#ffe3e3", strokeColor: "#c92a2a" },
-  update: { backgroundColor: "#fff3bf", strokeColor: "#e67700" },
-  replace: { backgroundColor: "#ffe8cc", strokeColor: "#f08c00" },
-  "no-op": { backgroundColor: "#e7f5ff", strokeColor: "#1971c2" },
-  existing: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
-  read: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
-  external: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
-};
+const TERRAFORM_ACTION_STYLES = TERRAFORM_ACTION_PASTEL_STYLES;
 
 export function getTerraformActionStyle(action: string) {
   return TERRAFORM_ACTION_STYLES[action] || TERRAFORM_ACTION_STYLES.existing;

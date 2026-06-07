@@ -29,7 +29,7 @@ describe("strokeColorForTerraformDependencyEdge", () => {
         hasExisting: false,
         sourceAction: "delete",
       }),
-    ).toBe("#c92a2a");
+    ).toBe("#ff8787");
   });
 
   it("uses replace orange when no delete on endpoints (even if existing+new)", () => {
@@ -40,7 +40,7 @@ describe("strokeColorForTerraformDependencyEdge", () => {
         sourceAction: "replace",
         targetAction: "create",
       }),
-    ).toBe("#f08c00");
+    ).toBe("#ffa94d");
   });
 
   it("treats existing+new as blue when no delete/replace", () => {
@@ -49,7 +49,7 @@ describe("strokeColorForTerraformDependencyEdge", () => {
         hasNew: true,
         hasExisting: true,
       }),
-    ).toBe("#1971c2");
+    ).toBe("#4dabf7");
   });
 });
 
@@ -366,12 +366,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
   });
 
   it.each([
-    ["new-only", { edges_new: ["aws_s3_bucket.b"] }, "#2b8a3e"],
-    ["prior-only", { edges_existing: ["aws_s3_bucket.b"] }, "#1971c2"],
+    ["new-only", { edges_new: ["aws_s3_bucket.b"] }, "#69db7c"],
+    ["prior-only", { edges_existing: ["aws_s3_bucket.b"] }, "#4dabf7"],
     [
       "existing-over-new",
       { edges_new: ["aws_s3_bucket.b"], edges_existing: ["aws_s3_bucket.b"] },
-      "#1971c2",
+      "#4dabf7",
     ],
   ] as const)(
     "colors dependency edge by origin (%s)",
@@ -636,12 +636,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
   });
 
   it.each([
-    ["create", ["create"], "#d3f9d8", "#2b8a3e"],
-    ["update", ["update"], "#fff3bf", "#e67700"],
-    ["delete", ["delete"], "#ffe3e3", "#c92a2a"],
-    ["no-op", ["no-op"], "#e7f5ff", "#1971c2"],
+    ["create", ["create"], "#ebfbee", "#69db7c"],
+    ["update", ["update"], "#fff9db", "#ffd43b"],
+    ["delete", ["delete"], "#fff5f5", "#ff8787"],
+    ["no-op", ["no-op"], "#e7f5ff", "#4dabf7"],
     ["existing", ["existing"], "#f8f9fa", "#868e96"],
-    ["replace", ["delete", "create"], "#ffe8cc", "#f08c00"],
+    ["replace", ["delete", "create"], "#fff4e6", "#ffa94d"],
   ])(
     "styles %s resources by Terraform action",
     async (expectedAction, actions, backgroundColor, strokeColor) => {
