@@ -1,5 +1,5 @@
 import { Center } from "./WelcomeScreen.Center";
-import { MenuHint, ToolbarHint, HelpHint } from "./WelcomeScreen.Hints";
+import { MenuHint, ToolbarHint, HelpHint, LibraryHint } from "./WelcomeScreen.Hints";
 
 import "./WelcomeScreen.scss";
 
@@ -10,6 +10,7 @@ const WelcomeScreen = (props: { children?: React.ReactNode }) => {
         <>
           <Center />
           <MenuHint />
+          <LibraryHint />
           <ToolbarHint />
           <HelpHint />
         </>
@@ -21,6 +22,6 @@ const WelcomeScreen = (props: { children?: React.ReactNode }) => {
 WelcomeScreen.displayName = "WelcomeScreen";
 
 WelcomeScreen.Center = Center;
-WelcomeScreen.Hints = { MenuHint, ToolbarHint, HelpHint };
+WelcomeScreen.Hints = { MenuHint, ToolbarHint, HelpHint, LibraryHint };
 
 export default WelcomeScreen;
