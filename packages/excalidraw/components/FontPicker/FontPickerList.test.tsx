@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 import { beforeAll } from "vitest";
 
 import { Excalidraw } from "../..";
@@ -36,10 +36,23 @@ describe("FontPickerList - Italic Feature", () => {
     fireEvent.click(screen.getByTestId("font-family-show-fonts"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("font-picker-popover-content")).toBeVisible();
-      expect(screen.getByTestId("font-family-italic-fallback")).toHaveTextContent(
-        "Itálico",
+      const popover = screen.getByTestId("font-picker-popover-content");
+      expect(popover).toBeVisible();
+
+      const italicFallback = screen.getByTestId("font-family-italic-fallback");
+      expect(italicFallback).toHaveTextContent("Itálico");
+
+      const italicButtons = screen.getAllByRole("button", { name: /Italic/i });
+      const italicOptionButton = italicButtons.find(
+        (button) => button.dataset.testid !== "font-family-italic-fallback",
       );
+
+      expect(italicOptionButton).toBeInTheDocument();
+
+      const italicIcon = italicOptionButton?.querySelector(
+        'svg line[x1="14"][y1="5"][x2="10"][y2="19"]',
+      );
+      expect(italicIcon).toBeInTheDocument();
     });
   });
 });
