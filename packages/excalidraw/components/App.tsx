@@ -7112,45 +7112,7 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        const hoveredElement =
-          isArrowElement(this.state.newElement) &&
-          isBindingEnabled(this.state) &&
-          getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
-          );
-        if (hoveredElement) {
-          this.actionManager.executeAction(actionFinalize, "ui", {
-            event: event.nativeEvent,
-            sceneCoords: {
-              x: scenePointerX,
-              y: scenePointerY,
-            },
-          });
-          this.setState({ suggestedBinding: null });
-          if (!this.state.activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
-            this.setState((prevState) => ({
-              newElement: null,
-              activeTool: updateActiveTool(this.state, {
-                type: this.state.preferredSelectionTool.type,
-              }),
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [multiElement.id]: true,
-                },
-                prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                multiElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            }));
-          }
-        } else if (
+        if (
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
@@ -7158,6 +7120,24 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
+          this.store.scheduleCapture();
+          flushSync(() => {
+            invariant(
+              this.state.selectedLinearElement?.initialState,
+              "initialState must be set",
+            );
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                lastCommittedPoint: points[points.length - 1],
+                selectedPointsIndices: [multiElement.points.length],
+                initialState: {
+                  ...this.state.selectedLinearElement.initialState,
+                  lastClickedPoint: multiElement.points.length,
+                },
+              },
+            });
+          });
           this.scene.mutateElement(
             multiElement,
             {
@@ -7168,21 +7148,6 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
-          invariant(
-            this.state.selectedLinearElement?.initialState,
-            "initialState must be set",
-          );
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              lastCommittedPoint: points[points.length - 1],
-              selectedPointsIndices: [multiElement.points.length - 1],
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                lastClickedPoint: multiElement.points.length - 1,
-              },
-            },
-          });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
@@ -9280,7 +9245,9 @@ class App extends React.Component<AppProps, AppState> {
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) && hoveredElementForBinding) ||
+        (hoveredElementForBinding &&
+          multiElement.startBinding?.elementId !==
+            hoveredElementForBinding.id) || // Outside->in: Bind immediately
         (multiElement.points.length > 1 &&
           lastCommittedPoint &&
           pointDistance(
@@ -10864,25 +10831,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isLinearElement(newElement)) {
-        const { x: scenePointerX, y: scenePointerY } =
-          viewportCoordsToSceneCoords(childEvent, this.state);
-        const hoveredElement =
-          isArrowElement(this.state.newElement) &&
-          isBindingEnabled(this.state) &&
-          getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
-          );
-        if (
-          newElement!.points.length > 1 &&
-          newElement.points[1][0] !== 0 &&
-          newElement.points[1][1] !== 0 &&
-          !hoveredElement
-        ) {
-          this.store.scheduleCapture();
-        }
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -10920,23 +10868,15 @@ class App extends React.Component<AppProps, AppState> {
 
             this.actionManager.executeAction(actionFinalize);
           } else {
-            const dx = pointerCoords.x - newElement.x;
-            const dy = pointerCoords.y - newElement.y;
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [newElement.points[0], pointFrom<LocalPoint>(dx, dy)],
-              },
-              { informMutation: false, isDragging: false },
-            );
-
+            // Movement out of commit area will create the point
             this.setState({
               multiElement: newElement,
               newElement,
             });
           }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          this.store.scheduleCapture();
+
           if (isLinearElement(newElement)) {
             this.actionManager.executeAction(actionFinalize, "ui", {
               event: childEvent,
