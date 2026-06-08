@@ -24,6 +24,8 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  isIOS,
+  isAndroid,
 } from "@excalidraw/common";
 
 import type {
@@ -160,9 +162,23 @@ const cappedElementCanvasSize = (
   // based on browser/device type, if we get reports of low quality rendering
   // on zoom.
   //
-  // ~ safari mobile canvas area limit
-  const AREA_LIMIT = 16777216;
-  // ~ safari width/height limit based on developer.mozilla.org.
+  // We keep a conservative area limit on iOS/Android (mobile Safari and some
+  // Android browsers cap the backing store around 4096² px) and on Safari in
+  // general, which has historically had stricter canvas limits. On other
+  // desktop browsers (Chrome/Firefox) we can afford a larger area, which keeps
+  // large elements crisp at high zoom levels instead of being downscaled (and
+  // then upscaled when drawn back), which manifests as visible artifacting.
+  // See #11433.
+  const usesConservativeCanvasLimit = isIOS || isAndroid || isSafari;
+  // ~ safari mobile canvas area limit (4096²)
+  const CONSERVATIVE_AREA_LIMIT = 16777216;
+  // ~ desktop canvas area limit (16384²); well within Chrome/Firefox limits.
+  const DESKTOP_AREA_LIMIT = 268435456;
+  const AREA_LIMIT = usesConservativeCanvasLimit
+    ? CONSERVATIVE_AREA_LIMIT
+    : DESKTOP_AREA_LIMIT;
+  // ~ safari width/height limit based on developer.mozilla.org. This is a hard
+  // per-dimension cap across browsers, so it stays the same on every device.
   const WIDTH_HEIGHT_LIMIT = 32767;
 
   const padding = getCanvasPadding(element);
