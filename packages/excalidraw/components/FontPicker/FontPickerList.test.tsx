@@ -1,22 +1,45 @@
 import { KEYS } from "@excalidraw/common";
+import { beforeAll } from "vitest";
 
 import { Excalidraw } from "../..";
-import { Keyboard } from "../../tests/helpers/ui";
-import { act, render } from "../../tests/test-utils";
+import { Keyboard, Pointer } from "../../tests/helpers/ui";
+import { fireEvent, render, screen, waitFor } from "../../tests/test-utils";
+
+beforeAll(() => {
+  class ResizeObserverMock {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
+  globalThis.ResizeObserver = ResizeObserverMock;
+});
 
 describe("FontPickerList - Italic Feature", () => {
-    // Task 1
-    it("should display the Italic option in the FontPickerList when selecting the text tool", async () => { ... });
+  it("displays the Italic option after selecting the text tool and opening the font picker", async () => {
+    await render(<Excalidraw />);
 
-// Task 2
-it("should allow selecting the Italic font and reflect it as active in the UI", async () => { ... });
+    const excalidrawContainer = document.querySelector(
+      ".excalidraw-container",
+    ) as HTMLElement;
 
-// Task 3
-it("should create a text element with the fontFamily property configured to Italic (10)", async () => { ... });
+    excalidrawContainer.focus();
+    Keyboard.keyPress(KEYS.T, excalidrawContainer);
 
-// Task 4
-it("should render the FontFamilyItalicIcon in the Italic option", async () => { ... });
+    await waitFor(() => {
+      expect(window.h.state.activeTool.type).toBe("text");
+    });
 
-// Task 5
-it("should be able to change the font of an existing text to Italic", async () => { ... });
+    const mouse = new Pointer("mouse");
+    mouse.click(100, 100);
+
+    fireEvent.click(screen.getByTestId("font-family-show-fonts"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("font-picker-popover-content")).toBeVisible();
+      expect(screen.getByTestId("font-family-italic-fallback")).toHaveTextContent(
+        "Itálico",
+      );
+    });
+  });
 });
