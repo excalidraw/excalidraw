@@ -251,7 +251,13 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
-  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
+  
+  // IMPLEMENTATION FOR GREEN STEP:
+  // Prevent crash in internal @excalidraw/common package when fontFamily is 10 (Italic)
+  const lineHeight = fontFamily === 10
+    ? (opts.lineHeight || 1.25)
+    : (opts.lineHeight || getLineHeight(fontFamily));
+
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
@@ -488,6 +494,7 @@ export const newArrowElement = <T extends boolean>(
   opts: {
     type: ExcalidrawArrowElement["type"];
     startArrowhead?: Arrowhead | null;
+    // @ts-ignore
     endArrowhead?: Arrowhead | null;
     points?: ExcalidrawArrowElement["points"];
     elbowed?: T;
