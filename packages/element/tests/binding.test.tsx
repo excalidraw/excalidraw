@@ -403,6 +403,7 @@ describe("binding for simple arrows", () => {
       mouse.moveTo(340, 251);
       mouse.moveTo(410, 251);
       mouse.clickAt(410, 251);
+      mouse.clickAt(410, 251);
       const arrow = h.elements[h.elements.length - 1] as any;
 
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
@@ -446,6 +447,7 @@ describe("binding for simple arrows", () => {
       mouse.clickAt(300, 200);
       mouse.moveTo(350, 251);
       mouse.moveTo(410, 251);
+      mouse.clickAt(410, 251);
       mouse.clickAt(410, 251);
 
       const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
