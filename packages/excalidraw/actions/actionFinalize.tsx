@@ -54,6 +54,7 @@ export const actionFinalize = register<FormData>({
   label: "",
   trackEvent: false,
   perform: (elements, appState, data, app) => {
+    let shouldCommit = true;
     let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
@@ -222,6 +223,7 @@ export const actionFinalize = register<FormData>({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
+          shouldCommit = false;
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
           });
@@ -373,7 +375,9 @@ export const actionFinalize = register<FormData>({
         selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      captureUpdate: shouldCommit
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.NEVER,
     };
   },
   keyTest: (event, appState) =>
