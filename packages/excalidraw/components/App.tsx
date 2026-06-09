@@ -9232,9 +9232,7 @@ class App extends React.Component<AppProps, AppState> {
       const { lastCommittedPoint } = selectedLinearElement;
       const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
       const { end } =
-        isBindingElement(multiElement) &&
-        isBindingEnabled(this.state) &&
-        lastCommittedPoint
+        isBindingElement(multiElement) && isBindingEnabled(this.state)
           ? getBindingStrategyForDraggingBindingElementEndpoints(
               multiElement,
               new Map([
