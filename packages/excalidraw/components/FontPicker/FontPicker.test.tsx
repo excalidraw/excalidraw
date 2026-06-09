@@ -46,11 +46,15 @@ describe("FontPicker", () => {
     });
 
     // Injeta o elemento no cenário de teste e faz a seleção dele
-    window.h.elements = [textoExistente];
-    API.setSelectedElements([textoExistente]);
+    act(() => {
+      window.h.elements = [textoExistente];
+      API.setSelectedElements([textoExistente]);
+    });
 
     // 3. Ativa a ferramenta de texto para expor a barra de propriedades
-    Keyboard.keyPress(KEYS.T);
+    act(() => {
+      Keyboard.keyPress(KEYS.T);
+    });
 
     // 4. Localiza e abre o dropdown de fontes (FontPickerList)
     const fontPickerTrigger = queryByTestId("font-family-show-fonts");
