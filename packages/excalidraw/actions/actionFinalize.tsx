@@ -225,6 +225,35 @@ export const actionFinalize = register<FormData>({
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
           });
+          if (isBindingElement(element) && element.endBinding) {
+            const newArrow = !!appState.newElement;
+            const draggedPoints: PointsPositionUpdates = new Map([
+              [
+                element.points.length - 1,
+                {
+                  point: element.points[element.points.length - 1],
+                  isDragging: false,
+                },
+              ],
+            ]);
+            const globalPoint =
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                elementsMap,
+              );
+            bindOrUnbindBindingElement(
+              element,
+              draggedPoints,
+              globalPoint[0],
+              globalPoint[1],
+              scene,
+              appState,
+              {
+                newArrow,
+              },
+            );
+          }
         }
       }
 
