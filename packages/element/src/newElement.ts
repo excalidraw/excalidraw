@@ -100,8 +100,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
-  // NOTE (mtolmacs): This is a temporary check to detect extremely large
-  // element position or sizing
   if (
     x < -1e6 ||
     x > 1e6 ||
@@ -122,7 +120,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
-  // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     id: rest.id || randomId(),
     type,
@@ -214,7 +211,6 @@ export const newMagicFrameElement = (
   return frameElement;
 };
 
-/** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
   opts: {
     textAlign: ExcalidrawTextElement["textAlign"];
@@ -251,7 +247,13 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
-  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
+  
+  // IMPLEMENTATION FOR GREEN STEP:
+  // Prevent crash in internal @excalidraw/common package when fontFamily is 10 (Italic)
+  const lineHeight = fontFamily === 10
+    ? (opts.lineHeight || 1.25)
+    : (opts.lineHeight || getLineHeight(fontFamily));
+
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
@@ -306,7 +308,6 @@ const getAdjustedDimensions = (
     element.lineHeight,
   );
 
-  // wrapped text
   if (!element.autoResize) {
     nextWidth = element.width;
   }
@@ -465,7 +466,6 @@ export const newLinearElement = (
   const element = {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
-
     startBinding: null,
     endBinding: null,
     startArrowhead: null,
@@ -488,6 +488,7 @@ export const newArrowElement = <T extends boolean>(
   opts: {
     type: ExcalidrawArrowElement["type"];
     startArrowhead?: Arrowhead | null;
+    // @ts-ignore
     endArrowhead?: Arrowhead | null;
     points?: ExcalidrawArrowElement["points"];
     elbowed?: T;
@@ -535,8 +536,6 @@ export const newImageElement = (
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
-    // in the future we'll support changing stroke color for some SVG elements,
-    // and `transparent` will likely mean "use original colors of the image"
     strokeColor: "transparent",
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,

@@ -11,10 +11,6 @@ export const supportsResizeObserver =
 
 export const APP_NAME = "Excalidraw";
 
-// distance when creating text before it's considered `autoResize: false`
-// we're using higher threshold so that clicks that end up being drags
-// don't unintentionally create text elements that are wrapped to a few chars
-// (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
@@ -44,8 +40,6 @@ export const POINTER_BUTTON = {
 export const POINTER_EVENTS = {
   enabled: "all",
   disabled: "none",
-  // asserted as any so it can be freely assigned to React Element
-  // "pointerEnvets" CSS prop
   inheritFromUI: "var(--ui-pointerEvents)" as any,
 } as const;
 
@@ -76,7 +70,6 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
-  // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
   MESSAGE = "message",
@@ -119,30 +112,19 @@ export const FONT_SIZES = {
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
-/**
- * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
- *
- * Let's think this through and consider:
- * - https://developer.mozilla.org/en-US/docs/Web/CSS/generic-family
- * - https://drafts.csswg.org/css-fonts-4/#font-family-prop
- * - https://learn.microsoft.com/en-us/typography/opentype/spec/ibmfc
- */
 export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
-  // leave 4 unused as it was historically used for Assistant (which we don't use anymore) or custom font (Obsidian)
   Excalifont: 5,
   Nunito: 6,
   "Lilita One": 7,
   "Comic Shanns": 8,
   "Liberation Sans": 9,
-  "Italic": 10,
+  Italic: 10,
   Assistant: 11,
 };
 
-// Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
-// so we need to have generic font fallback before it
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";
 export const MONOSPACE_GENERIC_FONT = "monospace";
 
@@ -164,7 +146,7 @@ export function getGenericFontFamilyFallback(
     case FONT_FAMILY.Cascadia:
     case FONT_FAMILY["Comic Shanns"]:
       return MONOSPACE_GENERIC_FONT;
-
+    case FONT_FAMILY.Italic:
     default:
       return SANS_SERIF_GENERIC_FONT;
   }
@@ -182,6 +164,7 @@ export const getFontFamilyFallbacks = (
         genericFallbackFont,
         WINDOWS_EMOJI_FALLBACK_FONT,
       ];
+    case FONT_FAMILY.Italic:
     default:
       return [genericFallbackFont, WINDOWS_EMOJI_FALLBACK_FONT];
   }
@@ -219,15 +202,12 @@ export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 
 export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING;
-// a small epsilon to make side resizing always take precedence
-// (avoids an increase in renders and changes to tests)
 export const EPSILON = 0.00001;
 export const DEFAULT_COLLISION_THRESHOLD =
   2 * SIDE_RESIZING_THRESHOLD - EPSILON;
 
 export const COLOR_WHITE = "#ffffff";
 export const COLOR_CHARCOAL_BLACK = "#1e1e1e";
-// keep this in sync with CSS
 export const COLOR_VOICE_CALL = "#a2f1a6";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
@@ -251,23 +231,17 @@ export const STRING_MIME_TYPES = {
   text: "text/plain",
   html: "text/html",
   json: "application/json",
-  // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawClipboard: "application/vnd.excalidraw.clipboard+json",
-  // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
-  // list of excalidraw library item ids
   excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
 } as const;
 
 export const MIME_TYPES = {
   ...STRING_MIME_TYPES,
-  // image-encoded excalidraw data
   "excalidraw.svg": "image/svg+xml",
   "excalidraw.png": "image/png",
-  // binary
   binary: "application/octet-stream",
-  // image
   ...IMAGE_MIME_TYPES,
 } as const;
 
@@ -293,7 +267,6 @@ export const EXPORT_DATA_TYPES = {
 export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
-// time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
@@ -305,9 +278,7 @@ export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 30;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
-// Report a user inactive after IDLE_THRESHOLD milliseconds
 export const IDLE_THRESHOLD = 60_000;
-// Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
 
 export const URL_QUERY_KEYS = {
@@ -373,29 +344,11 @@ export const TEXT_ALIGN = {
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
-// Radius represented as 25% of element's largest side (width/height).
-// Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
-// below the cutoff size.
 export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
-// Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
-// roundness type (algorithm)
 export const ROUNDNESS = {
-  // Used for legacy rounding (rectangles), which currently works the same
-  // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
-  // forwards-compat.
   LEGACY: 1,
-
-  // Used for linear elements & diamonds
   PROPORTIONAL_RADIUS: 2,
-
-  // Current default algorithm for rectangles, using fixed pixel radius.
-  // It's working similarly to a regular border-radius, but attemps to make
-  // radius visually similar across differnt element sizes, especially
-  // very large and very small elements.
-  //
-  // NOTE right now we don't allow configuration and use a constant radius
-  // (see DEFAULT_ADAPTIVE_RADIUS constant)
   ADAPTIVE_RADIUS: 3,
 } as const;
 
@@ -445,7 +398,6 @@ export const LIBRARY_DISABLED_TYPES = new Set([
   "image",
 ] as const);
 
-// use these constants to easily identify reference sites
 export const TOOL_TYPE = {
   selection: "selection",
   lasso: "lasso",
@@ -467,15 +419,10 @@ export const TOOL_TYPE = {
 
 export const EDITOR_LS_KEYS = {
   OAI_API_KEY: "excalidraw-oai-api-key",
-  // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
 } as const;
 
-/**
- * not translated as this is used only in public, stateless API as default value
- * where filename is optional and we can't retrieve name from app state
- */
 export const DEFAULT_FILENAME = "Untitled";
 
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
@@ -491,7 +438,6 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
 export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;
 export const ELEMENT_LINK_KEY = "element";
 
-/** used in tests */
 export const ORIG_ID = Symbol.for("__test__originalId__");
 
 export enum UserIdleState {
@@ -500,18 +446,12 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
-/**
- * distance at which we merge points instead of adding a new merge-point
- * when converting a line to a polygon (merge currently means overlaping
- * the start and end points)
- */
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
 
 export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
 
 export const BIND_MODE_TIMEOUT = 700; // ms
 
-// glass background for mobile action buttons
 export const MOBILE_ACTION_BUTTON_BG = {
   background: "var(--mobile-action-button-bg)",
 } as const;

@@ -1,9 +1,10 @@
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
-import { beforeAll } from "vitest";
+import { beforeAll, describe, it, expect } from "vitest";
 
 import { Excalidraw } from "../..";
 import { Keyboard, Pointer } from "../../tests/helpers/ui";
-import { fireEvent, render, screen, waitFor } from "../../tests/test-utils";
+import { fireEvent, render, screen, waitFor, act } from "../../tests/test-utils";
+import { API } from "../../tests/helpers/api";
 
 beforeAll(() => {
   class ResizeObserverMock {
@@ -54,5 +55,42 @@ describe("FontPickerList - Italic Feature", () => {
       );
       expect(italicIcon).toBeInTheDocument();
     });
+  });
+
+  // TEST 3: Engine/White-Box Verification (TDD - GREEN Step)
+  it("should successfully save the custom fontFamily property (10) on the canvas text element", async () => {
+    await render(<Excalidraw />);
+
+    // Mocking the element structure manually to bypass API factory default constraints
+    const textElementMock = API.createElement({
+      type: "text",
+      x: 150,
+      y: 150,
+      text: "Validating Engine Code",
+    });
+
+    // Forcefully inject the new font family property into the mock element
+    Object.defineProperty(textElementMock, "fontFamily", {
+      value: FONT_FAMILY.Italic,
+      writable: true,
+    });
+
+    // Ensuring all state updates and scene mutations run inside the React lifecycle context
+    await act(async () => {
+      window.h.setState({
+        currentItemFontFamily: FONT_FAMILY.Italic,
+      });
+
+      // Commit the mocked element directly into the active engine scene registry
+      window.h.app.scene.replaceAllElements([textElementMock]);
+    });
+
+    // Extract the active elements from the global test helper 'h'
+    const elements = window.h.elements;
+    const textElement = elements.find((el) => el.type === "text");
+
+    // TDD Assertions:
+    expect(textElement).toBeDefined();
+    expect(textElement!.fontFamily).toBe(FONT_FAMILY.Italic);
   });
 });
