@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
+import {
+  buildTerraformCompoundPipelineExcalidrawScene,
+  buildTerraformPipelineExcalidrawScene,
+} from "./terraformPipelineLayout";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
   buildEnrichedTopologyPlacements,
@@ -236,6 +239,110 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
     });
   });
 
+  it("sets pipelineVariant classic in meta", async () => {
+    const nodes = {
+      "aws_s3_bucket.a": node("aws_s3_bucket.a", "aws_s3_bucket"),
+      "aws_sqs_queue.b": node("aws_sqs_queue.b", "aws_sqs_queue"),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_sqs_queue.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const scene = await buildTerraformPipelineExcalidrawScene(nodes, {
+      resource_changes: [
+        rc("aws_s3_bucket.a", "aws_s3_bucket"),
+        rc("aws_sqs_queue.b", "aws_sqs_queue"),
+      ],
+    });
+
+    expect(scene.meta.pipelineVariant).toBe("classic");
+  });
+});
+
+describe("buildTerraformCompoundPipelineExcalidrawScene", () => {
+  it("assigns left-to-right depth columns from .tfd edges", async () => {
+    const nodes = {
+      "aws_s3_bucket.a": node("aws_s3_bucket.a", "aws_s3_bucket"),
+      "aws_sqs_queue.b": node("aws_sqs_queue.b", "aws_sqs_queue"),
+      "aws_dynamodb_table.c": node(
+        "aws_dynamodb_table.c",
+        "aws_dynamodb_table",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_sqs_queue.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+        {
+          source: "aws_sqs_queue.b",
+          target: "aws_dynamodb_table.c",
+          sequence: 1,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(nodes, {
+      resource_changes: [
+        rc("aws_s3_bucket.a", "aws_s3_bucket"),
+        rc("aws_sqs_queue.b", "aws_sqs_queue"),
+        rc("aws_dynamodb_table.c", "aws_dynamodb_table"),
+      ],
+    });
+
+    expect(scene.meta.pipelineVariant).toBe("compound");
+    expect(resourceX(scene.elements, "aws_s3_bucket.a")).toBeLessThan(
+      resourceX(scene.elements, "aws_sqs_queue.b"),
+    );
+    expect(resourceX(scene.elements, "aws_sqs_queue.b")).toBeLessThan(
+      resourceX(scene.elements, "aws_dynamodb_table.c"),
+    );
+  });
+
+  it("keeps fanout targets in the same next column", async () => {
+    const nodes = {
+      "aws_s3_bucket.a": node("aws_s3_bucket.a", "aws_s3_bucket"),
+      "aws_sqs_queue.b": node("aws_sqs_queue.b", "aws_sqs_queue"),
+      "aws_dynamodb_table.c": node(
+        "aws_dynamodb_table.c",
+        "aws_dynamodb_table",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_sqs_queue.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_dynamodb_table.c",
+          sequence: 1,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(nodes, {
+      resource_changes: [
+        rc("aws_s3_bucket.a", "aws_s3_bucket"),
+        rc("aws_sqs_queue.b", "aws_sqs_queue"),
+        rc("aws_dynamodb_table.c", "aws_dynamodb_table"),
+      ],
+    });
+
+    expect(resourceX(scene.elements, "aws_sqs_queue.b")).toBe(
+      resourceX(scene.elements, "aws_dynamodb_table.c"),
+    );
+  });
+
   it("collapses ALB listener and target group endpoints into one aws_lb cluster", async () => {
     const lb = rc("aws_lb.app", "aws_lb", {
       arn: "arn:aws:elasticloadbalancing:us-east-1:123:loadbalancer/app/app/1",
@@ -268,7 +375,7 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
       ],
     } as unknown as TerraformPlanNodesMap;
 
-    const scene = await buildTerraformPipelineExcalidrawScene(
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
       nodes,
       { resource_changes: [lb, listener, tg] },
       { compact: false },
@@ -288,5 +395,145 @@ describe("buildTerraformPipelineExcalidrawScene", () => {
         (e: any) => e.customData?.nodePath === "aws_lb_target_group.app",
       ),
     ).toBe(true);
+  });
+});
+
+describe("classic vs compound pipeline parity", () => {
+  const frameRoleChain = (elements: any[], startFrameId: string | null) => {
+    const byId = new Map(elements.map((el) => [el.id, el]));
+    const roles: string[] = [];
+    let frameId = startFrameId;
+    while (frameId) {
+      const frame = byId.get(frameId);
+      if (!frame || frame.type !== "frame") {
+        break;
+      }
+      const role = frame.customData?.terraformTopologyRole;
+      if (role) {
+        roles.push(role);
+      }
+      frameId = frame.frameId ?? null;
+    }
+    return roles;
+  };
+
+  const assertParity = async (
+    nodes: TerraformPlanNodesMap,
+    plan: unknown,
+    clusterIds: string[],
+    options?: { compact?: boolean },
+  ) => {
+    const classic = await buildTerraformPipelineExcalidrawScene(
+      nodes,
+      plan,
+      options,
+    );
+    const compound = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+      options,
+    );
+
+    for (const clusterId of clusterIds) {
+      const classicEl = classic.elements.find(
+        (e: any) => e.customData?.nodePath === clusterId,
+      );
+      const compoundEl = compound.elements.find(
+        (e: any) => e.customData?.nodePath === clusterId,
+      );
+      expect(classicEl).toBeTruthy();
+      expect(compoundEl).toBeTruthy();
+      if (!classicEl || !compoundEl) {
+        return;
+      }
+      expect(frameRoleChain(compound.elements, compoundEl.frameId)).toEqual(
+        frameRoleChain(classic.elements, classicEl.frameId),
+      );
+    }
+
+    for (let i = 1; i < clusterIds.length; i++) {
+      const prev = compound.elements.find(
+        (e: any) => e.customData?.nodePath === clusterIds[i - 1],
+      );
+      const cur = compound.elements.find(
+        (e: any) => e.customData?.nodePath === clusterIds[i],
+      );
+      if (prev && cur) {
+        expect(prev.x).toBeLessThanOrEqual(cur.x);
+      }
+    }
+  };
+
+  it("matches coordinates and roleChain on fan-out fixture", async () => {
+    const nodes = {
+      "aws_s3_bucket.a": node("aws_s3_bucket.a", "aws_s3_bucket"),
+      "aws_sqs_queue.b": node("aws_sqs_queue.b", "aws_sqs_queue"),
+      "aws_dynamodb_table.c": node(
+        "aws_dynamodb_table.c",
+        "aws_dynamodb_table",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_sqs_queue.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+        {
+          source: "aws_s3_bucket.a",
+          target: "aws_dynamodb_table.c",
+          sequence: 1,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      resource_changes: [
+        rc("aws_s3_bucket.a", "aws_s3_bucket"),
+        rc("aws_sqs_queue.b", "aws_sqs_queue"),
+        rc("aws_dynamodb_table.c", "aws_dynamodb_table"),
+      ],
+    };
+
+    await assertParity(nodes, plan, [
+      "aws_s3_bucket.a",
+      "aws_sqs_queue.b",
+      "aws_dynamodb_table.c",
+    ]);
+  });
+
+  it("matches coordinates and roleChain on VPC subnet fixture", async () => {
+    const nodes = {
+      "aws_lambda_function.a": node(
+        "aws_lambda_function.a",
+        "aws_lambda_function",
+      ),
+      "aws_s3_bucket.b": node("aws_s3_bucket.b", "aws_s3_bucket"),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_s3_bucket.b",
+          target: "aws_lambda_function.a",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      resource_changes: [
+        rc("aws_s3_bucket.b", "aws_s3_bucket", { region: "us-east-1" }),
+        rc("aws_lambda_function.a", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-aaa",
+          subnet_ids: ["subnet-private-a"],
+        }),
+      ],
+    };
+
+    await assertParity(nodes, plan, [
+      "aws_s3_bucket.b",
+      "aws_lambda_function.a",
+    ]);
   });
 });

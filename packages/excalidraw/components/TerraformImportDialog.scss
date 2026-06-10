@@ -338,11 +338,26 @@
       }
     }
 
+    &__viewSubOptionRow {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    &__viewSubOptionLabel {
+      font-family: "Assistant";
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--tf-control-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
     &__viewSubOption {
       display: flex;
       flex-direction: row;
       gap: 4px;
-      margin-top: 6px;
 
       &__btn {
         font-family: "Assistant";
@@ -361,6 +376,11 @@
           border-color: var(--tf-control-border-hover);
           background-color: var(--tf-control-bg-hover);
           color: var(--tf-control-text);
+        }
+
+        &:focus-visible {
+          outline: none;
+          box-shadow: var(--tf-control-focus-ring);
         }
 
         &--active {

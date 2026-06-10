@@ -34,6 +34,7 @@ export const TerraformImportModal = ({
     tfdFiles,
     view,
     pipelineCompact,
+    pipelineLayoutVariant,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -60,6 +61,7 @@ export const TerraformImportModal = ({
     setTfdFiles,
     setView,
     setPipelineCompact,
+    setPipelineLayoutVariant,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,
@@ -567,32 +569,77 @@ writer -> bucket`}</code>
                   {option.description}
                 </span>
                 {option.value === "pipeline" && checked && !disabled && (
-                  <div
-                    className="TerraformImportModal__viewSubOption"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      type="button"
-                      className={`TerraformImportModal__viewSubOption__btn${
-                        pipelineCompact
-                          ? " TerraformImportModal__viewSubOption__btn--active"
-                          : ""
-                      }`}
-                      onClick={() => setPipelineCompact(true)}
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="TerraformImportModal__viewSubOptionRow"
+                      role="group"
+                      aria-label="Pipeline detail level"
                     >
-                      Compact
-                    </button>
-                    <button
-                      type="button"
-                      className={`TerraformImportModal__viewSubOption__btn${
-                        !pipelineCompact
-                          ? " TerraformImportModal__viewSubOption__btn--active"
-                          : ""
-                      }`}
-                      onClick={() => setPipelineCompact(false)}
+                      <span className="TerraformImportModal__viewSubOptionLabel">
+                        Detail
+                      </span>
+                      <div className="TerraformImportModal__viewSubOption">
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            pipelineCompact
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={pipelineCompact}
+                          onClick={() => setPipelineCompact(true)}
+                        >
+                          Compact
+                        </button>
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            !pipelineCompact
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={!pipelineCompact}
+                          onClick={() => setPipelineCompact(false)}
+                        >
+                          Full
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      className="TerraformImportModal__viewSubOptionRow"
+                      role="group"
+                      aria-label="Pipeline layout variant"
                     >
-                      Full
-                    </button>
+                      <span className="TerraformImportModal__viewSubOptionLabel">
+                        Layout
+                      </span>
+                      <div className="TerraformImportModal__viewSubOption">
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            pipelineLayoutVariant === "classic"
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={pipelineLayoutVariant === "classic"}
+                          onClick={() => setPipelineLayoutVariant("classic")}
+                        >
+                          Classic
+                        </button>
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            pipelineLayoutVariant === "compound"
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={pipelineLayoutVariant === "compound"}
+                          onClick={() => setPipelineLayoutVariant("compound")}
+                        >
+                          Compound
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </label>

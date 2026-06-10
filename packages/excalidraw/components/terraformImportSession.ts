@@ -24,6 +24,8 @@ export type TerraformImportSession = {
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
   pipelineCompact?: boolean;
+  /** Pipeline layout variant — classic global grid or compound hierarchy. */
+  pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

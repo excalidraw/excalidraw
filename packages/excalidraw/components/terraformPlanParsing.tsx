@@ -123,6 +123,10 @@ export type TerraformPlanParsingOptions = {
    * Satellites are added on demand when the user clicks the card.
    */
   pipelineCompact?: boolean;
+  /** Pipeline layout: classic global grid or compound hierarchy containers. */
+  pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
+  /** Pipeline layout: enable cross-lane column slack packing (experimental). */
+  pipelinePacked?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

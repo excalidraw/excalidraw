@@ -1,15 +1,23 @@
-import type { TerraformView } from "./terraformImportDialogUtils";
+import type {
+  PipelineLayoutVariant,
+  TerraformView,
+} from "./terraformImportDialogUtils";
 import type { ModulePackingMode } from "./terraformModuleLayoutOptions";
 
 export type TerraformDemoUrlParams = {
   presetId: string;
   view?: TerraformView;
   pack?: ModulePackingMode;
+  pipelineVariant?: PipelineLayoutVariant;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const VALID_VIEWS = new Set<TerraformView>(["module", "semantic", "pipeline"]);
+const VALID_PIPELINE_VARIANTS = new Set<PipelineLayoutVariant>([
+  "classic",
+  "compound",
+]);
 const VALID_PACK_MODES = new Set<ModulePackingMode>([
   "default",
   "box",
@@ -63,7 +71,24 @@ export const parseTerraformDemoUrlParams = (
     pack = normalizedPack;
   }
 
-  return { presetId, ...(view ? { view } : {}), ...(pack ? { pack } : {}) };
+  const pipelineVariantRaw = params.get("pipelineVariant");
+  let pipelineVariant: PipelineLayoutVariant | undefined;
+  if (pipelineVariantRaw != null && pipelineVariantRaw.trim() !== "") {
+    const normalized = pipelineVariantRaw
+      .trim()
+      .toLowerCase() as PipelineLayoutVariant;
+    if (!VALID_PIPELINE_VARIANTS.has(normalized)) {
+      return null;
+    }
+    pipelineVariant = normalized;
+  }
+
+  return {
+    presetId,
+    ...(view ? { view } : {}),
+    ...(pack ? { pack } : {}),
+    ...(pipelineVariant ? { pipelineVariant } : {}),
+  };
 };
 
 export const hasTerraformDemoAutoImportQuery = (search: string): boolean =>

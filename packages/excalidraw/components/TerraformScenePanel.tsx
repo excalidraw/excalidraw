@@ -296,6 +296,7 @@ export const TerraformScenePanel = ({
         layoutMode: session.layoutMode,
         moduleLayoutOptions: session.moduleLayoutOptions,
         pipelineCompact: !pipelineCompact,
+        pipelineLayoutVariant: session.pipelineLayoutVariant ?? "classic",
         importedTfdTexts: session.importedTfdTexts,
         preset: session.preset,
       });

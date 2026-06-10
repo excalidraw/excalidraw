@@ -138,6 +138,7 @@ export type RunTerraformImportFromSourcesOptions = {
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
   pipelineCompact?: boolean;
+  pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -185,7 +186,10 @@ export const runTerraformImportFromSources = async (
         moduleLayoutOptions:
           layoutMode === "module" ? moduleLayoutOptions : undefined,
         ...(layoutMode === "pipeline"
-          ? { pipelineCompact: options.pipelineCompact !== false }
+          ? {
+              pipelineCompact: options.pipelineCompact !== false,
+              pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+            }
           : {}),
         colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
       },
@@ -219,7 +223,10 @@ export const runTerraformImportFromSources = async (
       ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions,
       ...(layoutMode === "pipeline"
-        ? { pipelineCompact: options.pipelineCompact !== false }
+        ? {
+            pipelineCompact: options.pipelineCompact !== false,
+            pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+          }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
       preset: options.preset ?? null,
@@ -294,6 +301,7 @@ export const refreshTerraformLayout = async (
     layoutMode: session.layoutMode,
     moduleLayoutOptions: session.moduleLayoutOptions,
     pipelineCompact: session.pipelineCompact,
+    pipelineLayoutVariant: session.pipelineLayoutVariant ?? "classic",
     colorMode: session.colorMode,
     importedTfdTexts,
     preset: session.preset,

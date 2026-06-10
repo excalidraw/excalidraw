@@ -1,5 +1,7 @@
 export type TerraformView = "module" | "semantic" | "pipeline";
 
+export type PipelineLayoutVariant = "classic" | "compound";
+
 export const MAX_PLAN_BUNDLES = 10;
 
 export type PlanDotBundleRow = {

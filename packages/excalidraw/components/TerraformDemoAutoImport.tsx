@@ -83,6 +83,7 @@ export const TerraformDemoAutoImport = ({
         await runTerraformPresetImport(app, setAppState, preset, {
           view,
           moduleLayoutOptions,
+          pipelineLayoutVariant: params.pipelineVariant,
           signal,
           onLayoutProgress: (progress) => {
             const label =

@@ -134,6 +134,28 @@ describe("TerraformImportModal", () => {
       semanticLayout: false,
       layoutMode: "pipeline",
       pipelineCompact: true,
+      pipelineLayoutVariant: "classic",
+      moduleLayoutOptions: undefined,
+      colorMode: "category",
+    });
+  });
+
+  it("passes pipelineLayoutVariant compound when Compound layout is selected", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^compound$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual({
+      semanticLayout: false,
+      layoutMode: "pipeline",
+      pipelineCompact: true,
+      pipelineLayoutVariant: "compound",
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });

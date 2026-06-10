@@ -32,7 +32,10 @@ import {
   enrichAndReconcileTopologyPlacements,
 } from "./terraformTopologyPlacementBuild";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
-import { buildTerraformPipelineExcalidrawScene } from "./terraformPipelineLayout";
+import {
+  buildTerraformCompoundPipelineExcalidrawScene,
+  buildTerraformPipelineExcalidrawScene,
+} from "./terraformPipelineLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -411,6 +414,8 @@ type LayoutSceneContext = {
   addressToStack: Record<string, string>;
   deferDecorations?: boolean;
   pipelineCompact?: boolean;
+  pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
+  pipelinePacked?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -420,11 +425,13 @@ async function buildPipelineLayoutSceneBody(
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
     async () => {
-      const pipelineScene = await buildTerraformPipelineExcalidrawScene(
-        ctx.nodes5,
-        ctx.plan,
-        { compact: ctx.pipelineCompact !== false },
-      );
+      const buildPipeline =
+        ctx.pipelineLayoutVariant === "compound"
+          ? buildTerraformCompoundPipelineExcalidrawScene
+          : buildTerraformPipelineExcalidrawScene;
+      const pipelineScene = await buildPipeline(ctx.nodes5, ctx.plan, {
+        compact: ctx.pipelineCompact !== false,
+      });
       emitLocalParseDebug({
         phase: "pipelineLayout",
         meta: pipelineScene.meta,
@@ -436,6 +443,7 @@ async function buildPipelineLayoutSceneBody(
         meta: appendImportMeta(
           {
             ...pipelineScene.meta,
+            ...(ctx.pipelinePacked ? { pipelinePacked: true } : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
           },
@@ -805,6 +813,8 @@ export async function layoutTerraformFromSources(
     addressToStack,
     deferDecorations: options?.deferDecorations === true,
     pipelineCompact: options?.pipelineCompact,
+    pipelineLayoutVariant: options?.pipelineLayoutVariant,
+    pipelinePacked: options?.pipelinePacked === true,
     colorMode: options?.colorMode,
   };
 
