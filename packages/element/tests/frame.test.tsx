@@ -19,6 +19,7 @@ import { elementOverlapsWithFrame } from "../src/frame";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
 } from "../src/types";
 
 const { h } = window;
@@ -779,7 +780,7 @@ describe("adding elements to frames", () => {
             newElement: h.state.newElement,
             selectedElements: getSelectedElements(h.elements, h.state),
             selectedElementsAreBeingDragged,
-            frameToHighlight: frame as ExcalidrawFrameLikeElement,
+            frameToHighlight: frame as NonDeleted<ExcalidrawFrameLikeElement>,
           })
           .visibleElements.map((element) => element.id);
       };
@@ -843,7 +844,7 @@ describe("adding elements to frames", () => {
           newElement: h.state.newElement,
           selectedElements: getSelectedElements(h.elements, h.state),
           selectedElementsAreBeingDragged: true,
-          frameToHighlight: frame as ExcalidrawFrameLikeElement,
+          frameToHighlight: frame as NonDeleted<ExcalidrawFrameLikeElement>,
         })
         .visibleElements.map((element) => element.id);
 

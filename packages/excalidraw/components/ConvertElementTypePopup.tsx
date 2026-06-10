@@ -71,6 +71,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
@@ -505,9 +506,8 @@ export const convertElementTypes = (
   }
 
   if (conversionType === "linear") {
-    const convertibleLinearElements = filterLinearConvertibleElements(
-      selectedElements,
-    ) as ExcalidrawLinearElement[];
+    const convertibleLinearElements =
+      filterLinearConvertibleElements(selectedElements);
 
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
@@ -667,17 +667,23 @@ const toCacheKey = (
   return `${elementId}:${convertitleType}` as CacheKey;
 };
 
-const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
+const filterGenericConvetibleElements = <T extends ExcalidrawElement>(
+  elements: T[],
+) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
-    | ExcalidrawRectangleElement
-    | ExcalidrawDiamondElement
-    | ExcalidrawEllipseElement
+    T &
+      (
+        | ExcalidrawRectangleElement
+        | ExcalidrawDiamondElement
+        | ExcalidrawEllipseElement
+      )
   >;
 
-const filterLinearConvertibleElements = (elements: ExcalidrawElement[]) =>
-  elements.filter((element) =>
-    isEligibleLinearElement(element),
-  ) as ExcalidrawLinearElement[];
+const filterLinearConvertibleElements = <T extends ExcalidrawElement>(
+  elements: T[],
+) =>
+  elements.filter((element) => isEligibleLinearElement(element)) as (T &
+    ExcalidrawLinearElement)[];
 
 const THRESHOLD = 20;
 const isVert = (a: LocalPoint, b: LocalPoint) => a[0] === b[0];
@@ -807,7 +813,10 @@ const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
  *   e.g. elbow arrow -> line
  */
 const convertElementType = <
-  TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  TElement extends Exclude<
+    NonDeletedExcalidrawElement,
+    ExcalidrawSelectionElement
+  >,
 >(
   element: TElement,
   targetType: ConvertibleTypes,

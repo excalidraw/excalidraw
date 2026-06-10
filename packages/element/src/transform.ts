@@ -57,7 +57,10 @@ import type {
   ExcalidrawTextElement,
   FileId,
   FontFamilyValues,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  Ordered,
   TextAlign,
   VerticalAlign,
 } from "./types";
@@ -243,7 +246,7 @@ const bindTextToContainer = (
 };
 
 const bindLinearElementToElement = (
-  linearElement: ExcalidrawArrowElement,
+  linearElement: NonDeleted<ExcalidrawArrowElement>,
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
@@ -492,7 +495,10 @@ class ElementStore {
   };
 
   getElements = () => {
-    return syncInvalidIndices(Array.from(this.excalidrawElements.values()));
+    // programmatically created elements are always non-deleted
+    return syncInvalidIndices(
+      Array.from(this.excalidrawElements.values()),
+    ) as Ordered<NonDeletedExcalidrawElement>[];
   };
 
   getElementsMap = () => {
@@ -691,7 +697,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container,
+                container as NonDeleted<ExcalidrawArrowElement>,
                 originalStart,
                 originalEnd,
                 elementStore,
@@ -716,7 +722,7 @@ export const convertToExcalidrawElements = (
               }
               const { linearElement, startBoundElement, endBoundElement } =
                 bindLinearElementToElement(
-                  excalidrawElement as ExcalidrawArrowElement,
+                  excalidrawElement as NonDeleted<ExcalidrawArrowElement>,
                   start,
                   end,
                   elementStore,

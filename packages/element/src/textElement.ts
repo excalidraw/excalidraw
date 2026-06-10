@@ -40,7 +40,6 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 export const redrawTextBoundingBox = (
@@ -140,7 +139,7 @@ export const redrawTextBoundingBox = (
 };
 
 export const handleBindTextResize = (
-  container: NonDeletedExcalidrawElement,
+  container: ExcalidrawElement,
   scene: Scene,
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
@@ -353,7 +352,7 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
-export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+export const getContainerCoords = (container: ExcalidrawElement) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
@@ -401,7 +400,7 @@ export const getBoundTextElementPosition = (
 };
 
 export const shouldAllowVerticalAlign = (
-  selectedElements: NonDeletedExcalidrawElement[],
+  selectedElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ) => {
   return selectedElements.some((element) => {
@@ -417,7 +416,7 @@ export const shouldAllowVerticalAlign = (
 };
 
 export const suppportsHorizontalAlign = (
-  selectedElements: NonDeletedExcalidrawElement[],
+  selectedElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ) => {
   return selectedElements.some((element) => {
