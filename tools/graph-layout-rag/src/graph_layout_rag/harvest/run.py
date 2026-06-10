@@ -1,0 +1,620 @@
+from __future__ import annotations
+
+import time
+
+import click
+
+from graph_layout_rag.harvest.arxiv import harvest_arxiv
+from graph_layout_rag.harvest.bibliography import (
+    collect_bibliography_dois,
+    download_bibliography_pdfs,
+    resolve_dois_to_items,
+)
+from graph_layout_rag.harvest.books import book_metadata_stubs
+from graph_layout_rag.harvest.curated import harvest_curated
+from graph_layout_rag.harvest.dblp import harvest_dblp
+from graph_layout_rag.harvest.elk_references import harvest_elk_references
+from graph_layout_rag.harvest.graphviz_theory import harvest_graphviz_theory
+from graph_layout_rag.harvest.handbook import harvest_handbook
+from graph_layout_rag.harvest.log import setup_harvest_logging
+from graph_layout_rag.harvest.openalex import harvest_openalex
+from graph_layout_rag.harvest.parallel import DEFAULT_WORKERS, MAX_WORKERS, set_workers
+from graph_layout_rag.harvest.retry import retry_unresolved_multi_pass
+from graph_layout_rag.harvest.semantic_scholar import harvest_semantic_scholar
+from graph_layout_rag.harvest.topic_seeds import harvest_topic_seeds
+from graph_layout_rag.harvest.verify import verify_manifest
+from graph_layout_rag.manifest import load_manifest, save_manifest, upsert_item
+
+
+def _merge_items(manifest, items) -> int:
+    added = 0
+    existing_ids = {i.id for i in manifest.items}
+    for item in items:
+        if item.id not in existing_ids:
+            added += 1
+        upsert_item(manifest, item)
+    return added
+
+
+def _counts(manifest) -> tuple[int, int, int, int]:
+    ok = sum(1 for i in manifest.items if i.status == "ok")
+    meta = sum(1 for i in manifest.items if i.status == "metadata_only")
+    failed = sum(1 for i in manifest.items if i.status == "failed")
+    return len(manifest.items), ok, meta, failed
+
+
+def _save_progress(manifest, label: str, log) -> None:
+    save_manifest(manifest)
+    total, ok, meta, failed = _counts(manifest)
+    msg = f"[{label}] saved — {total} items (ok={ok}, meta={meta}, failed={failed})"
+    log.info(msg)
+    click.echo(f"  {msg}")
+
+
+def _run_stage(label: str, log, fn, *, required: bool = True) -> bool:
+    log.info("=== stage: %s ===", label)
+    click.echo(f"Harvesting {label}...")
+    t0 = time.monotonic()
+    try:
+        fn()
+    except Exception as exc:
+        log.exception("stage failed: %s — %s", label, exc)
+        click.echo(f"  Warning: {label} failed ({exc}) — continuing")
+        return False
+    elapsed = time.monotonic() - t0
+    log.info("=== stage done: %s (%.1fs) ===", label, elapsed)
+    return True
+
+
+def _existing_ids(manifest) -> set[str]:
+    return {i.id for i in manifest.items}
+
+
+def _run_early_stages(manifest, log, *, kw, skip_topic_seeds: bool, skip_elk_bibliography: bool, dry_run: bool) -> None:
+    _run_stage("Graphviz theory PDFs", log, lambda: _merge_items(manifest, harvest_graphviz_theory(**kw)))
+    if not dry_run:
+        _save_progress(manifest, "graphviz", log)
+
+    _run_stage("Handbook chapter PDFs", log, lambda: _merge_items(manifest, harvest_handbook(**kw)))
+    if not dry_run:
+        _save_progress(manifest, "handbook", log)
+
+    _merge_items(manifest, book_metadata_stubs())
+
+    if not skip_topic_seeds:
+        _run_stage(
+            "topic seeds (ELK, Sugiyama, compound, constraints)",
+            log,
+            lambda: _merge_items(manifest, harvest_topic_seeds(**kw)),
+        )
+        if not dry_run:
+            _save_progress(manifest, "topic-seeds", log)
+
+    _run_stage(
+        "curated HN / Terrastruct crossing-minimization refs",
+        log,
+        lambda: _merge_items(manifest, harvest_curated(**kw)),
+    )
+    if not dry_run:
+        _save_progress(manifest, "curated", log)
+
+    if not skip_elk_bibliography:
+        _run_stage(
+            "ELK paper bibliography (arXiv:2311.00533)",
+            log,
+            lambda: _merge_items(manifest, harvest_elk_references(**kw)),
+        )
+        if not dry_run:
+            _save_progress(manifest, "elk-bibliography", log)
+
+
+def _run_discovery_pass(
+    manifest,
+    log,
+    *,
+    kw,
+    max_openalex: int,
+    max_openalex_per_topic: int,
+    max_dblp: int,
+    max_semantic_scholar: int,
+    max_arxiv: int,
+    skip_openalex: bool,
+    skip_dblp: bool,
+    skip_semantic_scholar: bool,
+    skip_arxiv: bool,
+    target: int | None,
+    dry_run: bool,
+) -> None:
+    if not skip_openalex:
+        cap = max_openalex
+        _run_stage(
+            f"OpenAlex (max {cap}, {max_openalex_per_topic}/topic)",
+            log,
+            lambda: _merge_items(
+                manifest,
+                harvest_openalex(
+                    max_works=cap,
+                    max_per_topic=max_openalex_per_topic,
+                    use_topic_queries=True,
+                    oa_only=True,
+                    existing_ids=_existing_ids(manifest),
+                    **kw,
+                ),
+            ),
+        )
+        if not dry_run:
+            _save_progress(manifest, "openalex", log)
+
+    if not skip_arxiv:
+        arxiv_cap = max_arxiv
+        if target:
+            arxiv_cap = min(arxiv_cap, max(50, target - len(manifest.items)))
+        _run_stage(
+            f"arXiv (max {arxiv_cap})",
+            log,
+            lambda: _merge_items(
+                manifest,
+                harvest_arxiv(max_works=arxiv_cap, existing_ids=_existing_ids(manifest), **kw),
+            ),
+        )
+        if not dry_run:
+            _save_progress(manifest, "arxiv", log)
+
+    if not skip_dblp:
+        _run_stage(
+            f"DBLP (max {max_dblp})",
+            log,
+            lambda: _merge_items(
+                manifest,
+                harvest_dblp(max_works=max_dblp, existing_ids=_existing_ids(manifest), **kw),
+            ),
+        )
+        if not dry_run:
+            _save_progress(manifest, "dblp", log)
+
+    if not skip_semantic_scholar and (target is None or len(manifest.items) < target):
+        s2_cap = max_semantic_scholar
+        if target:
+            s2_cap = min(s2_cap, max(50, target - len(manifest.items)))
+        _run_stage(
+            f"Semantic Scholar (max {s2_cap})",
+            log,
+            lambda: _merge_items(
+                manifest,
+                harvest_semantic_scholar(
+                    max_works=s2_cap,
+                    existing_ids=_existing_ids(manifest),
+                    **kw,
+                ),
+            ),
+        )
+        if not dry_run:
+            _save_progress(manifest, "semantic-scholar", log)
+
+    if not skip_openalex and target and len(manifest.items) < target:
+        extra = min(800, target - len(manifest.items) + 100)
+        broad_cap = len(manifest.items) + extra
+        _run_stage(
+            f"OpenAlex broad pass (max {broad_cap}, include paywalled metadata)",
+            log,
+            lambda: _merge_items(
+                manifest,
+                harvest_openalex(
+                    max_works=broad_cap,
+                    max_per_topic=60,
+                    use_topic_queries=True,
+                    oa_only=False,
+                    existing_ids=_existing_ids(manifest),
+                    **kw,
+                ),
+            ),
+        )
+        if not dry_run:
+            _save_progress(manifest, "openalex-broad", log)
+
+
+def _run_bibliography_pass(manifest, log, *, workers: int, max_bib_dois: int, dry_run: bool) -> None:
+    _run_stage("bibliography DOI chain from seed PDFs", log, lambda: None)
+    dois = collect_bibliography_dois(max_dois=max_bib_dois)
+    log.info("bibliography: found %d new relevant DOIs from seed PDFs", len(dois))
+    click.echo(f"  Found {len(dois)} new relevant DOIs from seed PDFs")
+    _merge_items(manifest, resolve_dois_to_items(dois, workers=workers))
+    download_bibliography_pdfs(manifest, dry_run=dry_run, workers=workers)
+    save_manifest(manifest)
+    _save_progress(manifest, "bibliography", log)
+
+
+def _apply_deep_harvest_defaults(
+    deep_harvest: bool,
+    max_openalex: int | None,
+    max_openalex_per_topic: int | None,
+    max_dblp: int | None,
+    max_semantic_scholar: int | None,
+    max_arxiv: int | None,
+    max_bib_dois: int | None,
+    target: int | None,
+    target_pdfs: int | None,
+    retry_passes: int,
+    bib_passes: int,
+) -> tuple[int, int, int, int, int, int, int | None, int | None, int, int]:
+    if deep_harvest:
+        return (
+            max_openalex or 4000,
+            max_openalex_per_topic or 80,
+            max_dblp or 400,
+            max_semantic_scholar or 800,
+            max_arxiv or 500,
+            max_bib_dois or 1200,
+            target or 2800,
+            target_pdfs or 2000,
+            retry_passes if retry_passes > 1 else 3,
+            bib_passes if bib_passes > 1 else 3,
+        )
+    return (
+        max_openalex or 200,
+        max_openalex_per_topic or 30,
+        max_dblp or 120,
+        max_semantic_scholar or 250,
+        max_arxiv or 100,
+        max_bib_dois or 300,
+        target,
+        target_pdfs,
+        retry_passes,
+        bib_passes,
+    )
+
+
+def _execute_harvest(
+    *,
+    dry_run: bool,
+    workers: int,
+    target: int | None,
+    target_pdfs: int | None,
+    max_openalex: int,
+    max_openalex_per_topic: int,
+    max_dblp: int,
+    max_semantic_scholar: int,
+    max_arxiv: int,
+    max_bib_dois: int,
+    bib_passes: int,
+    retry_passes: int,
+    max_passes: int,
+    skip_openalex: bool,
+    skip_dblp: bool,
+    skip_arxiv: bool,
+    skip_bibliography: bool,
+    skip_topic_seeds: bool,
+    skip_elk_bibliography: bool,
+    skip_semantic_scholar: bool,
+    skip_retry: bool,
+    resume: bool,
+    verbose: bool,
+    log_file: str | None,
+) -> None:
+    from pathlib import Path
+
+    log = setup_harvest_logging(
+        log_file=Path(log_file) if log_file else None,
+        verbose=verbose,
+    )
+    set_workers(workers)
+
+    manifest = load_manifest()
+    total, ok, meta, failed = _counts(manifest)
+    log.info(
+        "harvest start workers=%d target=%s target_pdfs=%s dry_run=%s resume=%s manifest=%d (ok=%d meta=%d failed=%d)",
+        workers,
+        target,
+        target_pdfs,
+        dry_run,
+        resume,
+        total,
+        ok,
+        meta,
+        failed,
+    )
+    click.echo(
+        f"Harvesting with {workers} workers (target={target or 'none'}, target_pdfs={target_pdfs or 'none'})..."
+    )
+
+    kw = {"dry_run": dry_run, "workers": workers}
+
+    has_early_seeds = any(
+        i.source in ("graphviz.org", "handbook", "topic-seed", "curated", "elk-bibliography")
+        for i in manifest.items
+    )
+    skip_early = resume and has_early_seeds
+
+    if skip_early:
+        log.info("resume: skipping early seed stages (already harvested)")
+        click.echo("  resume: skipping early seed stages")
+    else:
+        _run_early_stages(
+            manifest,
+            log,
+            kw=kw,
+            skip_topic_seeds=skip_topic_seeds,
+            skip_elk_bibliography=skip_elk_bibliography,
+            dry_run=dry_run,
+        )
+
+    stagnant_passes = 0
+    for pass_num in range(1, max_passes + 1):
+        _, ok_before, _, _ = _counts(manifest)
+        if target_pdfs and ok_before >= target_pdfs:
+            log.info("target_pdfs reached: %d >= %d", ok_before, target_pdfs)
+            break
+
+        log.info("=== discovery pass %d/%d (ok=%d) ===", pass_num, max_passes, ok_before)
+        click.echo(f"Discovery pass {pass_num}/{max_passes} (ok PDFs={ok_before})...")
+
+        _run_discovery_pass(
+            manifest,
+            log,
+            kw=kw,
+            max_openalex=max_openalex,
+            max_openalex_per_topic=max_openalex_per_topic,
+            max_dblp=max_dblp,
+            max_semantic_scholar=max_semantic_scholar,
+            max_arxiv=max_arxiv,
+            skip_openalex=skip_openalex,
+            skip_dblp=skip_dblp,
+            skip_semantic_scholar=skip_semantic_scholar,
+            skip_arxiv=skip_arxiv,
+            target=target,
+            dry_run=dry_run,
+        )
+        save_manifest(manifest)
+
+        if not skip_bibliography and not dry_run:
+            for bib_num in range(1, bib_passes + 1):
+                log.info("bibliography pass %d/%d", bib_num, bib_passes)
+                _run_bibliography_pass(
+                    manifest, log, workers=workers, max_bib_dois=max_bib_dois, dry_run=dry_run
+                )
+
+        if not skip_retry and not dry_run:
+            pending = sum(
+                1
+                for i in manifest.items
+                if i.status in ("failed", "metadata_only")
+                and (i.doi or (i.url and ".pdf" in (i.url or "").lower()))
+            )
+            log.info("retry: %d items eligible", pending)
+            click.echo(f"Retrying {pending} failed/metadata items ({retry_passes} passes)...")
+            upgraded = retry_unresolved_multi_pass(
+                manifest, passes=retry_passes, dry_run=dry_run, workers=workers
+            )
+            save_manifest(manifest)
+            click.echo(f"  Retry upgraded {upgraded} items to ok PDFs")
+
+        _, ok_after, _, _ = _counts(manifest)
+        if target_pdfs and ok_after >= target_pdfs:
+            log.info("target_pdfs reached after pass %d: %d", pass_num, ok_after)
+            break
+        if ok_after == ok_before:
+            stagnant_passes += 1
+            if stagnant_passes >= 2:
+                log.info("no PDF progress for 2 passes — stopping")
+                click.echo("  No PDF progress for 2 passes — stopping discovery loop")
+                break
+        else:
+            stagnant_passes = 0
+
+    if not dry_run:
+        stats = verify_manifest(manifest, downgrade=True)
+        log.info("verify: %s", stats)
+        save_manifest(manifest)
+
+    total, ok, meta, failed = _counts(manifest)
+    summary = f"Done: {total} items (ok={ok}, metadata_only={meta}, failed={failed})"
+    log.info(summary)
+    click.echo(summary)
+    if target_pdfs and ok < target_pdfs:
+        log.warning("below target_pdfs: have %d, wanted %d", ok, target_pdfs)
+        click.echo(f"  Warning: below target_pdfs ({ok} < {target_pdfs}) — run again or add sources.")
+    if target and total < target:
+        log.warning("below target: have %d, wanted %d", total, target)
+        click.echo(f"  Warning: below target ({total} < {target}) — run again or add sources.")
+
+
+def harvest_options(f):
+    """Shared Click options for harvest commands."""
+    f = click.option("--dry-run", is_flag=True, help="Discover URLs only; do not download.")(f)
+    f = click.option(
+        "--workers",
+        default=DEFAULT_WORKERS,
+        show_default=True,
+        help=f"Parallel download threads (default {DEFAULT_WORKERS}; max {MAX_WORKERS}).",
+    )(f)
+    f = click.option("--target", default=None, type=int, help="Grow manifest to at least this many items.")(f)
+    f = click.option("--target-pdfs", default=None, type=int, help="Stop when this many ok PDFs are downloaded.")(f)
+    f = click.option("--max-openalex", default=None, type=int, help="Max OpenAlex works per pass.")(f)
+    f = click.option("--max-openalex-per-topic", default=None, type=int)(f)
+    f = click.option("--max-dblp", default=None, type=int)(f)
+    f = click.option("--max-semantic-scholar", default=None, type=int)(f)
+    f = click.option("--max-arxiv", default=None, type=int)(f)
+    f = click.option("--max-bib-dois", default=None, type=int, help="Max bibliography DOIs per pass.")(f)
+    f = click.option("--bib-passes", default=1, show_default=True)(f)
+    f = click.option("--retry-passes", default=1, show_default=True)(f)
+    f = click.option("--max-passes", default=5, show_default=True, help="Max discovery loop iterations.")(f)
+    f = click.option("--skip-openalex", is_flag=True)(f)
+    f = click.option("--skip-dblp", is_flag=True)(f)
+    f = click.option("--skip-arxiv", is_flag=True)(f)
+    f = click.option("--skip-bibliography", is_flag=True)(f)
+    f = click.option("--skip-topic-seeds", is_flag=True)(f)
+    f = click.option("--skip-elk-bibliography", is_flag=True)(f)
+    f = click.option("--skip-semantic-scholar", is_flag=True)(f)
+    f = click.option("--skip-retry", is_flag=True, help="Skip DOI retry pass.")(f)
+    f = click.option("--resume", is_flag=True, help="Skip one-time early stages if already harvested.")(f)
+    f = click.option("--deep-harvest", is_flag=True, help="Higher caps for 2k PDF harvest.")(f)
+    f = click.option("-v", "--verbose", is_flag=True, help="DEBUG logs on console.")(f)
+    f = click.option("--log-file", default=None, type=click.Path(), help="Harvest log path.")(f)
+    return f
+
+
+def _run_harvest_from_kwargs(**kwargs) -> None:
+    deep = kwargs.pop("deep_harvest")
+    (
+        kwargs["max_openalex"],
+        kwargs["max_openalex_per_topic"],
+        kwargs["max_dblp"],
+        kwargs["max_semantic_scholar"],
+        kwargs["max_arxiv"],
+        kwargs["max_bib_dois"],
+        kwargs["target"],
+        kwargs["target_pdfs"],
+        kwargs["retry_passes"],
+        kwargs["bib_passes"],
+    ) = _apply_deep_harvest_defaults(
+        deep,
+        kwargs.get("max_openalex"),
+        kwargs.get("max_openalex_per_topic"),
+        kwargs.get("max_dblp"),
+        kwargs.get("max_semantic_scholar"),
+        kwargs.get("max_arxiv"),
+        kwargs.get("max_bib_dois"),
+        kwargs.get("target"),
+        kwargs.get("target_pdfs"),
+        kwargs.get("retry_passes", 1),
+        kwargs.get("bib_passes", 1),
+    )
+    _execute_harvest(**kwargs)
+
+
+@click.group(invoke_without_command=True)
+@harvest_options
+@click.pass_context
+def harvest_group(
+    ctx: click.Context,
+    dry_run: bool,
+    workers: int,
+    target: int | None,
+    target_pdfs: int | None,
+    max_openalex: int | None,
+    max_openalex_per_topic: int | None,
+    max_dblp: int | None,
+    max_semantic_scholar: int | None,
+    max_arxiv: int | None,
+    max_bib_dois: int | None,
+    bib_passes: int,
+    retry_passes: int,
+    max_passes: int,
+    skip_openalex: bool,
+    skip_dblp: bool,
+    skip_arxiv: bool,
+    skip_bibliography: bool,
+    skip_topic_seeds: bool,
+    skip_elk_bibliography: bool,
+    skip_semantic_scholar: bool,
+    skip_retry: bool,
+    resume: bool,
+    deep_harvest: bool,
+    verbose: bool,
+    log_file: str | None,
+) -> None:
+    """Download graph drawing research corpus into data/manifest.json."""
+    if ctx.invoked_subcommand is None:
+        _run_harvest_from_kwargs(
+            dry_run=dry_run,
+            workers=workers,
+            target=target,
+            target_pdfs=target_pdfs,
+            max_openalex=max_openalex,
+            max_openalex_per_topic=max_openalex_per_topic,
+            max_dblp=max_dblp,
+            max_semantic_scholar=max_semantic_scholar,
+            max_arxiv=max_arxiv,
+            max_bib_dois=max_bib_dois,
+            bib_passes=bib_passes,
+            retry_passes=retry_passes,
+            max_passes=max_passes,
+            skip_openalex=skip_openalex,
+            skip_dblp=skip_dblp,
+            skip_arxiv=skip_arxiv,
+            skip_bibliography=skip_bibliography,
+            skip_topic_seeds=skip_topic_seeds,
+            skip_elk_bibliography=skip_elk_bibliography,
+            skip_semantic_scholar=skip_semantic_scholar,
+            skip_retry=skip_retry,
+            resume=resume,
+            deep_harvest=deep_harvest,
+            verbose=verbose,
+            log_file=log_file,
+        )
+
+
+@harvest_group.command("run")
+@harvest_options
+def harvest_run_cmd(
+    dry_run: bool,
+    workers: int,
+    target: int | None,
+    target_pdfs: int | None,
+    max_openalex: int | None,
+    max_openalex_per_topic: int | None,
+    max_dblp: int | None,
+    max_semantic_scholar: int | None,
+    max_arxiv: int | None,
+    max_bib_dois: int | None,
+    bib_passes: int,
+    retry_passes: int,
+    max_passes: int,
+    skip_openalex: bool,
+    skip_dblp: bool,
+    skip_arxiv: bool,
+    skip_bibliography: bool,
+    skip_topic_seeds: bool,
+    skip_elk_bibliography: bool,
+    skip_semantic_scholar: bool,
+    skip_retry: bool,
+    resume: bool,
+    deep_harvest: bool,
+    verbose: bool,
+    log_file: str | None,
+) -> None:
+    """Run full harvest pipeline."""
+    _run_harvest_from_kwargs(
+        dry_run=dry_run,
+        workers=workers,
+        target=target,
+        target_pdfs=target_pdfs,
+        max_openalex=max_openalex,
+        max_openalex_per_topic=max_openalex_per_topic,
+        max_dblp=max_dblp,
+        max_semantic_scholar=max_semantic_scholar,
+        max_arxiv=max_arxiv,
+        max_bib_dois=max_bib_dois,
+        bib_passes=bib_passes,
+        retry_passes=retry_passes,
+        max_passes=max_passes,
+        skip_openalex=skip_openalex,
+        skip_dblp=skip_dblp,
+        skip_arxiv=skip_arxiv,
+        skip_bibliography=skip_bibliography,
+        skip_topic_seeds=skip_topic_seeds,
+        skip_elk_bibliography=skip_elk_bibliography,
+        skip_semantic_scholar=skip_semantic_scholar,
+        skip_retry=skip_retry,
+        resume=resume,
+        deep_harvest=deep_harvest,
+        verbose=verbose,
+        log_file=log_file,
+    )
+
+
+@harvest_group.command("verify")
+@click.option("--no-downgrade", is_flag=True, help="Report only; do not downgrade invalid ok items.")
+def harvest_verify_cmd(no_downgrade: bool) -> None:
+    """Verify ok manifest items have valid PDFs on disk."""
+    manifest = load_manifest()
+    stats = verify_manifest(manifest, downgrade=not no_downgrade)
+    save_manifest(manifest)
+    click.echo(
+        f"Verify: checked={stats['checked']} valid={stats['valid']} "
+        f"downgraded={stats['downgraded']} off_topic={stats['off_topic']}"
+    )
+
+
+# Backward-compatible alias for cli.py
+harvest_cmd = harvest_group

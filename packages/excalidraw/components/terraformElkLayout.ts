@@ -1701,6 +1701,12 @@ export function appendDeclaredDataFlowMissingEndpointRectangles(
             resourceType,
             action,
           ),
+          terraformSatelliteTier: isInitiallyVisibleTerraformResource(
+            resourceType,
+            action,
+          )
+            ? 0
+            : 1,
           terraformExplodeParentKeys: [],
           terraformExplodeParent: null,
           terraformDeclaredDataFlowOrphan: true,
@@ -2165,6 +2171,7 @@ export async function buildTerraformElkExcalidrawScene(
       resourceType,
       action,
     );
+    const satelliteTier: 0 | 1 | 2 = initiallyVisible ? 0 : 1;
     const actionStyle = getTerraformActionStyle(action);
     resourceSkeletons.push({
       type: "rectangle",
@@ -2188,6 +2195,7 @@ export async function buildTerraformElkExcalidrawScene(
         terraformVisibilityKey: id,
         terraformNodeKind: "resource",
         terraformInitiallyVisible: initiallyVisible,
+        terraformSatelliteTier: satelliteTier,
         terraformExplodeParentKeys: explodeKeys,
         terraformExplodeParent: explodeParent,
         ...buildTerraformResourceCardCustomData(id, resource, nodes[id], plan),

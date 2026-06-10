@@ -2410,6 +2410,14 @@ function pushResourceRectangleSkeleton(
   const initiallyVisible =
     options.initiallyVisible ??
     isInitiallyVisibleTerraformTopologyTile(resourceType, action);
+  const satelliteTier: 0 | 1 | 2 =
+    options.satelliteTier === 2
+      ? 2
+      : options.satelliteTier === 1
+      ? 1
+      : initiallyVisible
+      ? 0
+      : 1;
 
   skeleton.push({
     type: "rectangle",
@@ -2440,6 +2448,7 @@ function pushResourceRectangleSkeleton(
       terraformVisibilityKey: visibilityKey,
       terraformNodeKind: "resource",
       terraformInitiallyVisible: initiallyVisible,
+      terraformSatelliteTier: satelliteTier,
       terraformExplodeParentKeys: explodeKeys,
       terraformExplodeParent: explodeParent,
       terraformExpandAllView: false,

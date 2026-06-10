@@ -130,6 +130,8 @@ export const getDefaultAppState = (): Omit<
     boxSelectionMode: "contain",
     terraformEdgeLayerPins: null,
     terraformEdgeHoverPeekKey: null,
+    terraformLodEnabled: true,
+    terraformLodPreset: "balanced",
   };
 };
 
@@ -258,6 +260,8 @@ const APP_STATE_STORAGE_CONF = (<
   bindMode: { browser: true, export: false, server: false },
   terraformEdgeLayerPins: { browser: true, export: true, server: true },
   terraformEdgeHoverPeekKey: { browser: false, export: false, server: false },
+  terraformLodEnabled: { browser: true, export: false, server: false },
+  terraformLodPreset: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

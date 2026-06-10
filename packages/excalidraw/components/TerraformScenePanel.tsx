@@ -25,6 +25,8 @@ import {
   resetZoom,
   RetryIcon,
   stackPushIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
 } from "./icons";
 import { TERRAFORM_ACTION_LEGEND } from "./terraformElkLayout";
 import {
@@ -32,7 +34,13 @@ import {
   getTerraformImportSession,
   hasTerraformImportSession,
   updateTerraformImportSessionColorMode,
+  updateTerraformImportSessionLodEnabled,
+  updateTerraformImportSessionLodPreset,
 } from "./terraformImportSession";
+import {
+  TERRAFORM_LOD_DEFAULT_PRESET,
+  type TerraformLodPreset,
+} from "./terraformLod";
 import {
   refreshTerraformLayout,
   resetTerraformLayout,
@@ -102,6 +110,55 @@ const LegendSection = ({
       ))}
     </ul>
   </section>
+);
+
+const LOD_PRESET_OPTIONS: ReadonlyArray<{
+  id: TerraformLodPreset;
+  label: string;
+}> = [
+  { id: "performance", label: "Performance" },
+  { id: "balanced", label: "Balanced" },
+  { id: "detailed", label: "Detailed" },
+];
+
+const LodPresetSegment = ({
+  preset,
+  disabled,
+  onChange,
+}: {
+  preset: TerraformLodPreset;
+  disabled?: boolean;
+  onChange: (preset: TerraformLodPreset) => void;
+}) => (
+  <div
+    className="terraform-scene-panel__segment terraform-scene-panel__lod-preset"
+    role="radiogroup"
+    aria-label="Zoom LOD detail"
+  >
+    {LOD_PRESET_OPTIONS.map(({ id, label }) => {
+      const checked = preset === id;
+      return (
+        <label
+          key={id}
+          className={clsx("terraform-scene-panel__segment-btn", {
+            "terraform-scene-panel__segment-btn--active": checked,
+            "terraform-scene-panel__segment-btn--disabled": disabled,
+          })}
+        >
+          <input
+            type="radio"
+            name="terraform-lod-preset"
+            value={id}
+            checked={checked}
+            disabled={disabled}
+            data-testid={`terraform-lod-preset-${id}`}
+            onChange={() => onChange(id)}
+          />
+          {label}
+        </label>
+      );
+    })}
+  </div>
 );
 
 const ColorModeSegment = ({
@@ -208,6 +265,15 @@ export const TerraformScenePanel = ({
   const [pipelineCompact, setPipelineCompact] = useState(
     () => getTerraformImportSession()?.pipelineCompact !== false,
   );
+  const [terraformLodEnabled, setTerraformLodEnabled] = useState(
+    () => getTerraformImportSession()?.terraformLodEnabled !== false,
+  );
+  const [terraformLodPreset, setTerraformLodPreset] =
+    useState<TerraformLodPreset>(
+      () =>
+        getTerraformImportSession()?.terraformLodPreset ??
+        TERRAFORM_LOD_DEFAULT_PRESET,
+    );
   const [togglingCompact, setTogglingCompact] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
   const [colorMode, setColorMode] = useState<TerraformColorMode>(
@@ -239,6 +305,13 @@ export const TerraformScenePanel = ({
   const syncSessionFlag = useCallback(() => {
     setHasSession(hasTerraformImportSession());
     setPipelineCompact(getTerraformImportSession()?.pipelineCompact !== false);
+    setTerraformLodEnabled(
+      getTerraformImportSession()?.terraformLodEnabled !== false,
+    );
+    setTerraformLodPreset(
+      getTerraformImportSession()?.terraformLodPreset ??
+        TERRAFORM_LOD_DEFAULT_PRESET,
+    );
   }, []);
 
   const handleColorModeChange = useCallback(
@@ -313,6 +386,25 @@ export const TerraformScenePanel = ({
       setTogglingCompact(false);
     }
   }, [app, setAppState, syncSessionFlag, pipelineCompact]);
+
+  const handleToggleLod = useCallback(() => {
+    const next = !terraformLodEnabled;
+    setTerraformLodEnabled(next);
+    updateTerraformImportSessionLodEnabled(next);
+    setAppState({ terraformLodEnabled: next });
+  }, [setAppState, terraformLodEnabled]);
+
+  const handleLodPresetChange = useCallback(
+    (next: TerraformLodPreset) => {
+      if (next === terraformLodPreset) {
+        return;
+      }
+      setTerraformLodPreset(next);
+      updateTerraformImportSessionLodPreset(next);
+      setAppState({ terraformLodPreset: next });
+    },
+    [setAppState, terraformLodPreset],
+  );
 
   const handleExpandAll = useCallback(async () => {
     const allEls = app.scene.getElementsIncludingDeleted();
@@ -418,6 +510,39 @@ export const TerraformScenePanel = ({
               onClick={() => void handleRefresh()}
             />
           </Tooltip>
+          <Tooltip
+            label={
+              sessionDisabled
+                ? "Import Terraform to toggle zoom LOD"
+                : terraformLodEnabled
+                ? `Zoom LOD on (${terraformLodPreset}) — hide labels and satellites when zoomed out`
+                : "Zoom LOD off — always show full detail"
+            }
+          >
+            <ToolButton
+              className="terraform-scene-panel__action"
+              type="button"
+              size="small"
+              icon={terraformLodEnabled ? ZoomOutIcon : ZoomInIcon}
+              aria-label={
+                terraformLodEnabled ? "Zoom LOD: on" : "Zoom LOD: off"
+              }
+              aria-pressed={terraformLodEnabled}
+              title={
+                terraformLodEnabled
+                  ? `Zoom LOD: on (${terraformLodPreset})`
+                  : "Zoom LOD: off"
+              }
+              data-testid="terraform-debug-toggle-lod"
+              disabled={sessionDisabled}
+              onClick={handleToggleLod}
+            />
+          </Tooltip>
+          <LodPresetSegment
+            preset={terraformLodPreset}
+            disabled={sessionDisabled || !terraformLodEnabled}
+            onChange={handleLodPresetChange}
+          />
           {isPipelineScene && (
             <>
               <Tooltip

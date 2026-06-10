@@ -447,6 +447,7 @@ import {
   isTerraformInspectableElement,
   isTerraformResourceElement,
 } from "./terraformElementMetadata";
+import { shouldShowTerraformPipelineFrameName } from "./terraformLod";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -2031,6 +2032,16 @@ class App extends React.Component<AppProps, AppState> {
 
     return nonDeletedFramesLikes.map((f) => {
       if (
+        this.state.terraformLodEnabled &&
+        !shouldShowTerraformPipelineFrameName(
+          f.customData as Record<string, unknown> | undefined,
+          this.state.zoom.value,
+          this.state.terraformLodPreset,
+        )
+      ) {
+        return null;
+      }
+      if (
         !isElementInViewport(
           f,
           this.canvas.width / window.devicePixelRatio,
@@ -2194,6 +2205,10 @@ class App extends React.Component<AppProps, AppState> {
         width: this.state.width,
         editingTextElement: this.state.editingTextElement,
         newElementId: this.state.newElement?.id,
+        terraformLodEnabled: this.state.terraformLodEnabled,
+        terraformLodPreset: this.state.terraformLodPreset,
+        selectedElementIds: this.state.selectedElementIds,
+        terraformEdgeHoverPeekKey: this.state.terraformEdgeHoverPeekKey,
       });
     this.visibleElements = visibleElements;
 

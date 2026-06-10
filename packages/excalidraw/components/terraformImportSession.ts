@@ -24,6 +24,10 @@ export type TerraformImportSession = {
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
   pipelineCompact?: boolean;
+  /** Zoom LOD — hide labels/satellites when zoomed out. Default true. */
+  terraformLodEnabled?: boolean;
+  /** LOD preset — performance / balanced / detailed. Default balanced. */
+  terraformLodPreset?: import("./terraformLod").TerraformLodPreset;
   /** Pipeline layout variant — classic global grid or compound hierarchy. */
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
@@ -64,5 +68,21 @@ export const updateTerraformImportSessionColorMode = (
 ) => {
   if (activeSession) {
     activeSession = { ...activeSession, colorMode };
+  }
+};
+
+export const updateTerraformImportSessionLodEnabled = (
+  terraformLodEnabled: boolean,
+) => {
+  if (activeSession) {
+    activeSession = { ...activeSession, terraformLodEnabled };
+  }
+};
+
+export const updateTerraformImportSessionLodPreset = (
+  terraformLodPreset: import("./terraformLod").TerraformLodPreset,
+) => {
+  if (activeSession) {
+    activeSession = { ...activeSession, terraformLodPreset };
   }
 };

@@ -1,6 +1,7 @@
 {
   "meta": {
     "layoutEngine": "pipeline",
+    "pipelineVariant": "classic",
     "pipelineCompact": true,
     "pipelineClusterCount": 70,
     "pipelineEdgeCount": 69,

@@ -497,6 +497,10 @@ export interface AppState {
   } | null;
   /** Transient graph key for revealing incident edges when `terraformEdgeLayerPins` is set. */
   terraformEdgeHoverPeekKey: string | null;
+  /** Zoom-based LOD for Terraform imports (hide labels/satellites when zoomed out). */
+  terraformLodEnabled: boolean;
+  /** LOD preset — scales zoom thresholds (detailed = visible farther out). */
+  terraformLodPreset: import("./components/terraformLod").TerraformLodPreset;
 }
 
 export type SearchMatch = {

@@ -263,6 +263,7 @@ function buildFallbackCluster(
         terraformVisibilityKey: address,
         terraformNodeKind: "resource",
         terraformInitiallyVisible: true,
+        terraformSatelliteTier: 0,
         terraformExplodeParentKeys: [],
         terraformExplodeParent: null,
         terraformExpandAllView: false,

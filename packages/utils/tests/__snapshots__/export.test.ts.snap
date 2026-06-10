@@ -105,6 +105,8 @@ exports[`exportToSvg > with default arguments 1`] = `
   "suggestedBinding": null,
   "terraformEdgeHoverPeekKey": null,
   "terraformEdgeLayerPins": null,
+  "terraformLodEnabled": true,
+  "terraformLodPreset": "balanced",
   "theme": "light",
   "toast": null,
   "userToFollow": null,

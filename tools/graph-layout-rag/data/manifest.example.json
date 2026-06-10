@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-09T00:00:00.000Z",
+  "items": [
+    {
+      "id": "gansner-tse93",
+      "title": "A Technique for Drawing Directed Graphs",
+      "authors": ["Gansner", "Koutsofios", "North", "Vo"],
+      "year": 1993,
+      "source": "graphviz.org",
+      "url": "https://www.graphviz.org/documentation/TSE93.pdf",
+      "localPath": "data/raw/pdf/gansner-tse93.pdf",
+      "contentType": "application/pdf",
+      "status": "ok",
+      "tags": ["dot", "hierarchical", "layered"],
+      "sha256": null
+    },
+    {
+      "id": "gansner-gkn04-stress",
+      "title": "Graph Drawing by Stress Majorization",
+      "authors": ["Gansner", "Koren", "North"],
+      "year": 2004,
+      "source": "graphviz.org",
+      "url": "https://graphviz.org/documentation/GKN04.pdf",
+      "localPath": "data/raw/pdf/gansner-gkn04-stress.pdf",
+      "contentType": "application/pdf",
+      "status": "ok",
+      "tags": ["neato", "stress", "force-directed"],
+      "sha256": null
+    },
+    {
+      "id": "handbook-force-directed",
+      "title": "Force-Directed Drawing Algorithms",
+      "authors": ["Hu", "Koren", "North"],
+      "year": 2013,
+      "source": "handbook",
+      "url": "https://cs.brown.edu/people/rtamassi/gdhandbook/chapters/force-directed.pdf",
+      "localPath": "data/raw/pdf/handbook-force-directed.pdf",
+      "contentType": "application/pdf",
+      "status": "ok",
+      "tags": ["handbook", "force-directed"],
+      "sha256": null
+    }
+  ]
+}

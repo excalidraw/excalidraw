@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/raw/
+data/lancedb/
+data/manifest.json
+data/ingest_state.json
+data/harvest.log
+# Keep data/manifest.example.json tracked; ignore live harvest output above.

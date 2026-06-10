@@ -21,6 +21,7 @@ import {
 } from "./terraformPlanParsing";
 import { loadTerraformImportPresetSources } from "./terraformImportPresetLoader";
 import { terraformImportPrepFingerprint } from "./terraformImportPrepCache";
+import { TERRAFORM_LOD_DEFAULT_PRESET } from "./terraformLod";
 import {
   cloneTerraformElementsForSnapshot,
   getTerraformImportSession,
@@ -51,6 +52,8 @@ export type TerraformExcalidrawScenePayload = {
 export type ApplyTerraformExcalidrawSceneOptions = {
   enableDeclaredDataFlow?: boolean;
   terraformEdgeLayerPins?: AppState["terraformEdgeLayerPins"];
+  terraformLodEnabled?: boolean;
+  terraformLodPreset?: AppState["terraformLodPreset"];
   scrollToContent?: boolean;
 };
 
@@ -120,6 +123,9 @@ export const applyTerraformExcalidrawScene = (
   setAppState({
     terraformEdgeLayerPins,
     terraformEdgeHoverPeekKey: null,
+    terraformLodEnabled: options.terraformLodEnabled ?? true,
+    terraformLodPreset:
+      options.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
   });
   if (options.scrollToContent !== false) {
     app.scrollToContent();
@@ -138,6 +144,9 @@ export type RunTerraformImportFromSourcesOptions = {
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
   pipelineCompact?: boolean;
+  /** Zoom LOD — hide labels/satellites when zoomed out. Default true. */
+  terraformLodEnabled?: boolean;
+  terraformLodPreset?: AppState["terraformLodPreset"];
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
@@ -153,6 +162,47 @@ export type RunTerraformImportFromSourcesResult = {
   importWarnings?: TerraformImportWarning[];
 };
 
+async function layoutTerraformSceneFromSources(
+  sources: TerraformPlanParsingSources,
+  options: RunTerraformImportFromSourcesOptions,
+  layoutMode: "module" | "semantic" | "pipeline",
+  moduleLayoutOptions: TerraformModuleLayoutOptions,
+): Promise<TerraformExcalidrawScenePayload> {
+  const presetId = options.preset?.id?.trim();
+  if (presetId) {
+    const cached = await fetchPresetLayoutCache(
+      presetId,
+      layoutMode as TerraformView,
+      layoutMode === "module" ? moduleLayoutOptions : undefined,
+      { signal: options.signal },
+    );
+    if (cached) {
+      return cached;
+    }
+  }
+
+  return layoutTerraformViaWorkers(
+    sources,
+    {
+      semanticLayout: options.semanticLayout,
+      ...(options.layoutMode ? { layoutMode } : {}),
+      moduleLayoutOptions:
+        layoutMode === "module" ? moduleLayoutOptions : undefined,
+      ...(layoutMode === "pipeline"
+        ? {
+            pipelineCompact: options.pipelineCompact !== false,
+            pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+          }
+        : {}),
+      colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
+    },
+    {
+      onProgress: options.onLayoutProgress,
+      signal: options.signal,
+    },
+  );
+}
+
 export const runTerraformImportFromSources = async (
   app: AppClassProperties,
   setAppState: SetAppState,
@@ -161,44 +211,18 @@ export const runTerraformImportFromSources = async (
 ): Promise<RunTerraformImportFromSourcesResult> => {
   const moduleLayoutOptions =
     options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
-  const layoutMode =
+  const layoutMode: "module" | "semantic" | "pipeline" =
     options.layoutMode ?? (options.semanticLayout ? "semantic" : "module");
   const sourceFingerprint = terraformImportPrepFingerprint(sources);
   const importedTfdTexts = options.importedTfdTexts ?? [];
   const enableDeclaredDataFlow = importedTfdTexts.some((t) => t.trim());
 
-  const presetId = options.preset?.id?.trim();
-  let scene: TerraformExcalidrawScenePayload | null = null;
-  if (presetId) {
-    scene = await fetchPresetLayoutCache(
-      presetId,
-      layoutMode as TerraformView,
-      layoutMode === "module" ? moduleLayoutOptions : undefined,
-      { signal: options.signal },
-    );
-  }
-  if (!scene) {
-    scene = await layoutTerraformViaWorkers(
-      sources,
-      {
-        semanticLayout: options.semanticLayout,
-        ...(options.layoutMode ? { layoutMode } : {}),
-        moduleLayoutOptions:
-          layoutMode === "module" ? moduleLayoutOptions : undefined,
-        ...(layoutMode === "pipeline"
-          ? {
-              pipelineCompact: options.pipelineCompact !== false,
-              pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
-            }
-          : {}),
-        colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
-      },
-      {
-        onProgress: options.onLayoutProgress,
-        signal: options.signal,
-      },
-    );
-  }
+  const scene = await layoutTerraformSceneFromSources(
+    sources,
+    options,
+    layoutMode,
+    moduleLayoutOptions,
+  );
 
   const { elements, terraformEdgeLayerPins } = applyTerraformExcalidrawScene(
     app,
@@ -207,6 +231,9 @@ export const runTerraformImportFromSources = async (
     {
       enableDeclaredDataFlow,
       scrollToContent: options.scrollToContent,
+      terraformLodEnabled: options.terraformLodEnabled !== false,
+      terraformLodPreset:
+        options.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
     },
   );
 
@@ -222,6 +249,9 @@ export const runTerraformImportFromSources = async (
       semanticLayout: options.semanticLayout,
       ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions,
+      terraformLodEnabled: options.terraformLodEnabled !== false,
+      terraformLodPreset:
+        options.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
       ...(layoutMode === "pipeline"
         ? {
             pipelineCompact: options.pipelineCompact !== false,
@@ -264,6 +294,9 @@ export const resetTerraformLayout = (
     {
       enableDeclaredDataFlow: snapshot.enableDeclaredDataFlow,
       terraformEdgeLayerPins: snapshot.terraformEdgeLayerPins,
+      terraformLodEnabled: session.terraformLodEnabled !== false,
+      terraformLodPreset:
+        session.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
     },
   );
   return true;
@@ -303,6 +336,9 @@ export const refreshTerraformLayout = async (
     pipelineCompact: session.pipelineCompact,
     pipelineLayoutVariant: session.pipelineLayoutVariant ?? "classic",
     colorMode: session.colorMode,
+    terraformLodEnabled: session.terraformLodEnabled,
+    terraformLodPreset:
+      session.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
     importedTfdTexts,
     preset: session.preset,
   });

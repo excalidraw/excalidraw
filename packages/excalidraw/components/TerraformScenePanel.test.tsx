@@ -64,6 +64,8 @@ const mockApp = {
     viewBackgroundColor: "#ffffff",
     terraformEdgeLayerPins: null,
     terraformEdgeHoverPeekKey: null,
+    terraformLodEnabled: true,
+    terraformLodPreset: "balanced",
   },
 } as unknown as Parameters<typeof TerraformScenePanel>[0]["app"];
 
