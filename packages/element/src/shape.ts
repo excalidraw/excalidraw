@@ -66,7 +66,6 @@ import { shouldTestInside } from "./collision";
 
 import type {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
@@ -258,7 +257,7 @@ export const generateRoughOptions = (
 };
 
 const modifyIframeLikeForRoughOptions = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   isExporting: boolean,
   embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
@@ -749,7 +748,7 @@ export const generateLinearCollisionShape = (
  * @private
  */
 const _generateElementShape = (
-  element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
+  element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
     isExporting,

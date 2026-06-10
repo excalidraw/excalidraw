@@ -22,7 +22,7 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { IMAGE_MIME_TYPES, STRING_MIME_TYPES } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
+  ExcalidrawFrameLikeElement,
 } from "@excalidraw/element/types";
 
 import { ExcalidrawError } from "./errors";
@@ -37,7 +37,7 @@ import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
 
@@ -143,11 +143,11 @@ export const serializeAsClipboardJSON = ({
   elements,
   files,
 }: {
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   files: BinaryFiles | null;
 }) => {
   const elementsMap = arrayToMap(elements);
-  const framesToCopy = new Set(
+  const framesToCopy = new Set<ExcalidrawFrameLikeElement>(
     elements.filter((element) => isFrameLikeElement(element)),
   );
   let foundFile = false;
@@ -192,7 +192,7 @@ export const serializeAsClipboardJSON = ({
 };
 
 export const copyToClipboard = async (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   files: BinaryFiles | null,
   /** supply if available to make the operation more certain to succeed */
   clipboardEvent?: ClipboardEvent | null,

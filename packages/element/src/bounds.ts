@@ -63,7 +63,6 @@ import type {
   ExcalidrawRectanguloidElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 export type RectangleBox = {
@@ -1297,7 +1296,7 @@ export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
  * It can be used to get elements overlapping a selection box, for example.
  *
  */
-export const elementsOverlappingBBox = ({
+export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
   elements,
   elementsMap,
   bounds,
@@ -1305,7 +1304,7 @@ export const elementsOverlappingBBox = ({
   excludeElementsInFrames,
   shouldIgnoreElementFromSelection,
 }: {
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly T[];
   elementsMap?: ElementsMap;
   bounds: Bounds | ExcalidrawElement;
   /**
@@ -1314,9 +1313,7 @@ export const elementsOverlappingBBox = ({
    **/
   type: "contain" | "overlap";
   excludeElementsInFrames?: boolean;
-  shouldIgnoreElementFromSelection?: (
-    element: NonDeletedExcalidrawElement,
-  ) => boolean;
+  shouldIgnoreElementFromSelection?: (element: T) => boolean;
 }) => {
   if (!elementsMap) {
     elementsMap = arrayToMap(elements) as ElementsMap;
@@ -1345,10 +1342,10 @@ export const elementsOverlappingBBox = ({
   ];
 
   const framesInSelection = excludeElementsInFrames
-    ? new Set<NonDeletedExcalidrawElement["id"]>()
+    ? new Set<ExcalidrawElement["id"]>()
     : null;
-  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
-  const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
+  const groups: Record<string, T[]> = {};
+  const elementsInSelection: Set<T> = new Set();
 
   for (const element of elements) {
     if (shouldIgnoreElementFromSelection?.(element)) {

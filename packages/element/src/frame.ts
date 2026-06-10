@@ -40,7 +40,6 @@ import type {
   ElementsMapOrArray,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
-  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 
@@ -160,7 +159,7 @@ export const isCursorInFrame = (
     x: number;
     y: number;
   },
-  frame: NonDeleted<ExcalidrawFrameLikeElement>,
+  frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
@@ -266,8 +265,8 @@ export const getFrameLikeElements = (
  *
  * Considers non-frame bound elements (container or arrow labels) as root.
  */
-export const getRootElements = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const getRootElements = <T extends ExcalidrawElement>(
+  allElements: readonly T[],
 ) => {
   const frameElements = arrayToMap(getFrameLikeElements(allElements));
   return allElements.filter(
@@ -538,7 +537,7 @@ export const getFrameChildrenInsertionIndex = (
  */
 export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
-  elementsToAdd: NonDeletedExcalidrawElement[],
+  elementsToAdd: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ): T => {
   const elementsMap = arrayToMap(allElements);
@@ -634,7 +633,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 };
 
 export const removeElementsFromFrame = (
-  elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsToRemove: ReadonlySetLike<ExcalidrawElement>,
   elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
@@ -979,8 +978,8 @@ export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
   return element.name === null ? getDefaultFrameName(element) : element.name;
 };
 
-export const getElementsOverlappingFrame = (
-  elements: readonly ExcalidrawElement[],
+export const getElementsOverlappingFrame = <T extends ExcalidrawElement>(
+  elements: readonly T[],
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {

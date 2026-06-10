@@ -45,6 +45,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -62,7 +63,10 @@ import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
 
-const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
+const truncateText = (
+  element: NonDeleted<ExcalidrawTextElement>,
+  maxWidth: number,
+) => {
   if (element.width <= maxWidth) {
     return element;
   }
@@ -106,18 +110,19 @@ const addFrameLabelsAsTextElements = (
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
-        x: element.x,
-        y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Helvetica,
-        fontSize: FRAME_STYLE.nameFontSize,
-        lineHeight:
-          FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-        strokeColor: opts.exportWithDarkMode
-          ? FRAME_STYLE.nameColorDarkTheme
-          : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(element),
-      });
+      let textElement: Mutable<NonDeleted<ExcalidrawTextElement>> =
+        newTextElement({
+          x: element.x,
+          y: element.y - FRAME_STYLE.nameOffsetY,
+          fontFamily: FONT_FAMILY.Helvetica,
+          fontSize: FRAME_STYLE.nameFontSize,
+          lineHeight:
+            FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
+          strokeColor: opts.exportWithDarkMode
+            ? FRAME_STYLE.nameColorDarkTheme
+            : FRAME_STYLE.nameColorLightTheme,
+          text: getFrameLikeTitle(element),
+        });
       textElement.y -= textElement.height;
 
       textElement = truncateText(textElement, element.width);
@@ -149,12 +154,12 @@ const prepareElementsForRender = ({
   frameRendering,
   exportWithDarkMode,
 }: {
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
 }) => {
-  let nextElements: readonly ExcalidrawElement[];
+  let nextElements: readonly NonDeletedExcalidrawElement[];
 
   if (exportingFrame) {
     nextElements = getElementsOverlappingFrame(
@@ -560,7 +565,7 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   exportPadding: number,
 ): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);

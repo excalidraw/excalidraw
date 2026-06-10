@@ -1097,11 +1097,11 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
+const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
   const elements = restoreElements(
     getNonDeletedElements(libraryItem.elements),
     null,
-  );
+  ) as unknown as LibraryItem["elements"];
   return elements.length ? { ...libraryItem, elements } : null;
 };
 

@@ -123,7 +123,10 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }
 
   // assign type to guard against excess properties
-  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
+  const element: Merge<
+    ExcalidrawGenericElement,
+    { type: T["type"]; isDeleted: false }
+  > = {
     id: rest.id || randomId(),
     type,
     x,
@@ -265,7 +268,7 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElementProps: ExcalidrawTextElement = {
+  const textElementProps: NonDeleted<ExcalidrawTextElement> = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
@@ -282,7 +285,7 @@ export const newTextElement = (
     lineHeight,
   };
 
-  const textElement: ExcalidrawTextElement = newElementWith(
+  const textElement: NonDeleted<ExcalidrawTextElement> = newElementWith(
     textElementProps,
     {},
   );

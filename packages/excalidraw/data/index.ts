@@ -18,6 +18,7 @@ import { getElementsOverlappingFrame } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -45,18 +46,18 @@ export type ExportedElements = readonly NonDeletedExcalidrawElement[] & {
 };
 
 export const prepareElementsForExport = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   { selectedElementIds }: Pick<AppState, "selectedElementIds">,
   exportSelectionOnly: boolean,
 ) => {
-  elements = getNonDeletedElements(elements);
+  const elements = getNonDeletedElements(allElements);
   const elementsMap = arrayToMap(elements);
 
   const isExportingSelection =
     exportSelectionOnly &&
     isSomeElementSelected(elements, { selectedElementIds });
 
-  let exportingFrame: ExcalidrawFrameLikeElement | null = null;
+  let exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
         elements,
@@ -68,14 +69,12 @@ export const prepareElementsForExport = (
     : elements;
 
   if (isExportingSelection) {
-    if (
-      exportedElements.length === 1 &&
-      isFrameLikeElement(exportedElements[0])
-    ) {
-      exportingFrame = exportedElements[0];
+    const firstElement = exportedElements[0];
+    if (exportedElements.length === 1 && isFrameLikeElement(firstElement)) {
+      exportingFrame = firstElement;
       exportedElements = getElementsOverlappingFrame(
         elements,
-        exportingFrame,
+        firstElement,
         elementsMap,
       );
     } else if (exportedElements.length > 1) {

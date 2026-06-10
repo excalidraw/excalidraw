@@ -153,14 +153,19 @@ const getContiguousFrameRangeElements = (
 export const moveArrowAboveBindable = (
   point: GlobalPoint,
   arrow: ExcalidrawArrowElement,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly OrderedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   hit?: NonDeletedExcalidrawElement,
 ): readonly OrderedExcalidrawElement[] => {
   const hoveredElement = hit
     ? hit
-    : getHoveredElementForBinding(point, elements, elementsMap);
+    : getHoveredElementForBinding(
+        point,
+        // callers that omit `hit` pass non-deleted elements
+        elements as readonly Ordered<NonDeletedExcalidrawElement>[],
+        elementsMap,
+      );
 
   if (!hoveredElement) {
     return elements;

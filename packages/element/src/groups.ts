@@ -15,7 +15,6 @@ import type {
   GroupId,
   ExcalidrawElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
   ElementsMapOrArray,
   ElementsMap,
 } from "./types";
@@ -23,7 +22,7 @@ import type {
 export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly ExcalidrawElement[],
 ): Pick<
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
@@ -68,14 +67,13 @@ export const selectGroupsForSelectedElements = (function () {
     "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
   >;
 
-  let lastSelectedElements: readonly NonDeleted<ExcalidrawElement>[] | null =
-    null;
-  let lastElements: readonly NonDeleted<ExcalidrawElement>[] | null = null;
+  let lastSelectedElements: readonly ExcalidrawElement[] | null = null;
+  let lastElements: readonly ExcalidrawElement[] | null = null;
   let lastReturnValue: SelectGroupsReturnType | null = null;
 
   const _selectGroups = (
-    selectedElements: readonly NonDeleted<ExcalidrawElement>[],
-    elements: readonly NonDeleted<ExcalidrawElement>[],
+    selectedElements: readonly ExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
     prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
@@ -163,7 +161,7 @@ export const selectGroupsForSelectedElements = (function () {
    */
   const selectGroupsForSelectedElements = (
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     prevAppState: InteractiveCanvasAppState,
     /**
      * supply null in cases where you don't have access to App instance and
@@ -237,7 +235,7 @@ export const getSelectedGroupIds = (
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly ExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
   let nextAppState: InteractiveCanvasAppState = {
@@ -383,7 +381,7 @@ export const elementsAreInSameGroup = (
   return maxGroup === elements.length;
 };
 
-export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+export const isInGroup = (element: ExcalidrawElement) => {
   return element.groupIds.length > 0;
 };
 

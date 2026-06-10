@@ -579,7 +579,9 @@ describe("restoreElements", () => {
   it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true }); // version=2
+    const rectangle_modified = newElementWith(rectangle as ExcalidrawElement, {
+      isDeleted: true,
+    }); // version=2
 
     const restoredElements = restore.bumpElementVersions(
       restore.restoreElements([rectangle, ellipse], null),

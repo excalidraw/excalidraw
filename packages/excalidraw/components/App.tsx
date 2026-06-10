@@ -3965,7 +3965,10 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    let nextElements = [...prevElements, ...duplicatedElements];
+    let nextElements: ExcalidrawElement[] = [
+      ...prevElements,
+      ...duplicatedElements,
+    ];
 
     const mappedNewSceneElements = this.props.onDuplicate?.(
       nextElements,
@@ -5862,7 +5865,7 @@ class App extends React.Component<AppProps, AppState> {
     return getBoundTextElement(
       selectedElement,
       this.scene.getNonDeletedElementsMap(),
-    );
+    ) as NonDeleted<ExcalidrawTextElement> | null;
   }
 
   private getSelectedTextEditingContainerAtPosition(
@@ -6036,7 +6039,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement>[] {
-    const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
+    const iframeLikes: Ordered<NonDeleted<ExcalidrawIframeElement>>[] = [];
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -6627,7 +6630,7 @@ class App extends React.Component<AppProps, AppState> {
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
-  ): ExcalidrawElement | undefined => {
+  ): NonDeletedExcalidrawElement | undefined => {
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       return undefined;
     }
@@ -6750,7 +6753,7 @@ class App extends React.Component<AppProps, AppState> {
     const framesUnderCursor = this.scene
       .getNonDeletedFramesLikes()
       .filter(
-        (frame): frame is ExcalidrawFrameLikeElement =>
+        (frame) =>
           !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
@@ -7399,7 +7402,7 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
 
-    let hitElement: ExcalidrawElement | null = null;
+    let hitElement: NonDeleted<ExcalidrawElement> | null = null;
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       hitElement = null;
     } else {
@@ -8984,7 +8987,7 @@ class App extends React.Component<AppProps, AppState> {
     let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
     if (hasBoundTextElement(element)) {
-      container = element as ExcalidrawTextContainer;
+      container = element as NonDeleted<ExcalidrawTextContainer>;
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
@@ -11190,9 +11193,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const selectedFrames = this.scene
           .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
-          );
+          .filter(isFrameLikeElement);
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -11815,7 +11816,7 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getElement(imagePlaceholder.id) ?? imagePlaceholder;
 
     return newElementWith(
-      latestImageElement as InitializedExcalidrawImageElement,
+      latestImageElement as NonDeleted<InitializedExcalidrawImageElement>,
       {
         fileId,
       },
@@ -12035,7 +12036,9 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
           });
-          return newElementWith(placeholder, { isDeleted: true });
+          return newElementWith(placeholder as ExcalidrawImageElement, {
+            isDeleted: true,
+          });
         }
       }),
     );
@@ -12561,10 +12564,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const selectedFrames = selectedElements.filter(
-      (element): element is ExcalidrawFrameLikeElement =>
-        isFrameLikeElement(element),
-    );
+    const selectedFrames = selectedElements.filter(isFrameLikeElement);
 
     const transformHandleType = pointerDownState.resize.handleType;
 

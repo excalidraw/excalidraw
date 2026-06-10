@@ -34,6 +34,7 @@ import {
   type ExcalidrawBindableElement,
   type ExcalidrawElement,
   type ExcalidrawFlowchartNodeElement,
+  type NonDeletedExcalidrawElement,
   type NonDeletedSceneElementsMap,
   type Ordered,
   type OrderedExcalidrawElement,
@@ -490,7 +491,7 @@ const createBindingArrow = (
         [startBindingElement.id, startBindingElement],
         [endBindingElement.id, endBindingElement],
         [bindingArrow.id, bindingArrow],
-      ] as [string, Ordered<ExcalidrawElement>][]),
+      ] as [string, Ordered<NonDeletedExcalidrawElement>][]),
     ),
     { points: bindingArrow.points },
   );

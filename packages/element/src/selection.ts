@@ -28,9 +28,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
-const shouldIgnoreElementFromSelection = (
-  element: NonDeletedExcalidrawElement,
-) => element.locked || isBoundToContainer(element);
+const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
+  element.locked || isBoundToContainer(element);
 
 const excludeElementsFromFrames = <T extends ExcalidrawElement>(
   selectedElements: readonly T[],
@@ -66,14 +65,14 @@ export const excludeElementsInFramesFromSelection = <
   return excludeElementsFromFrames(selectedElements, framesInSelection);
 };
 
-export const getElementsWithinSelection = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  selection: NonDeletedExcalidrawElement,
+export const getElementsWithinSelection = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+  selection: ExcalidrawElement,
   elementsMap: ElementsMap,
   // TODO remove (this flag is effectively unused AFAIK)
   excludeElementsInFrames: boolean = true,
   boxSelectionMode: BoxSelectionMode = "contain",
-): NonDeletedExcalidrawElement[] => {
+): T[] => {
   const [selectionStartX, selectionStartY, selectionEndX, selectionEndY] =
     getElementAbsoluteCoords(selection, elementsMap);
   const selectionX1 = Math.min(selectionStartX, selectionEndX);
@@ -97,9 +96,9 @@ export const getElementsWithinSelection = (
   });
 };
 
-export const getVisibleAndNonSelectedElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: readonly NonDeletedExcalidrawElement[],
+export const getVisibleAndNonSelectedElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+  selectedElements: readonly ExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
@@ -164,10 +163,11 @@ export const getSelectedElements = (
   },
 ) => {
   const addedElements = new Set<ExcalidrawElement["id"]>();
-  const selectedElements: ExcalidrawElement[] = [];
+  // selection can only contain non-deleted elements
+  const selectedElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements.values()) {
     if (appState.selectedElementIds[element.id]) {
-      selectedElements.push(element);
+      selectedElements.push(element as NonDeletedExcalidrawElement);
       addedElements.add(element.id);
       continue;
     }
@@ -176,18 +176,20 @@ export const getSelectedElements = (
       isBoundToContainer(element) &&
       appState.selectedElementIds[element?.containerId]
     ) {
-      selectedElements.push(element);
+      selectedElements.push(element as NonDeletedExcalidrawElement);
       addedElements.add(element.id);
       continue;
     }
   }
 
   if (opts?.includeElementsInFrames) {
-    const elementsToInclude: ExcalidrawElement[] = [];
+    const elementsToInclude: NonDeletedExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         getFrameChildren(elements, element.id).forEach(
-          (e) => !addedElements.has(e.id) && elementsToInclude.push(e),
+          (e) =>
+            !addedElements.has(e.id) &&
+            elementsToInclude.push(e as NonDeletedExcalidrawElement),
         );
       }
       elementsToInclude.push(element);
@@ -230,7 +232,7 @@ export const makeNextSelectedElementIds = (
 };
 
 const _getLinearElementEditor = (
-  targetElements: readonly ExcalidrawElement[],
+  targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const linears = targetElements.filter(isLinearElement);
@@ -250,7 +252,7 @@ const _getLinearElementEditor = (
 };
 
 export const getSelectionStateForElements = (
-  targetElements: readonly ExcalidrawElement[],
+  targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
