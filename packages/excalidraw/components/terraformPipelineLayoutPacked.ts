@@ -27,11 +27,13 @@ export const EMPTY_PACKED_DEPTH_SHIFTS: PackedDepthShiftResult = {
 };
 
 /**
- * Pushing a unit past a wide sibling predecessor may need columns beyond the
- * unshifted maxDepth; allow bounded growth so width stays sane while height
- * (the packing objective) can shrink.
+ * Pushing a unit past a wide sibling predecessor may need columns well beyond
+ * the unshifted maxDepth, and fine-level shifts consume room before coarse
+ * region/account shifts run. The allowance can be generous because used
+ * depths are compacted to contiguous columns afterwards, so intermediate
+ * spread does not translate into empty-column width.
  */
-const PACKED_EXTRA_COLUMN_ALLOWANCE = 6;
+const packedMaxAllowedDepth = (maxDepth: number): number => maxDepth * 2 + 4;
 
 /**
  * Two sibling boxes may share a Y band only when their inflated rects are
@@ -105,6 +107,12 @@ function unitInterval(
   return { min, max };
 }
 
+/** Max relaxation sweeps per level; intervals stabilize fast in practice. */
+const PACKED_LEVEL_SWEEPS = 3;
+
+/** Closure size guard for joint shifts across zero-slack chains. */
+const PACKED_MAX_CLOSURE_UNITS = 8;
+
 /**
  * Pass 1 — group-uniform rightward depth shifts (ALAP bounded by outgoing
  * edges). A unit with sibling predecessors (TFD edges arriving from a sibling
@@ -113,6 +121,13 @@ function unitInterval(
  * Incoming edges only gain margin; intra-unit edges shift uniformly; external
  * outgoing edges bound the shift, so `A -> B ⇒ depth(A) < depth(B)` is
  * preserved by construction.
+ *
+ * Levels run bottom-up (lanes → VPCs → regions → accounts) so a unit's
+ * interval is final before its siblings react to it; a coarser shift moves
+ * subtrees uniformly and never reshuffles finer levels. When a unit cannot
+ * move because an outgoing edge has no slack (e.g. API hops ping-ponging
+ * between two accounts in the same region), the target's unit is pulled into
+ * a closure and the whole closure shifts together.
  */
 export function computePackedDepthShifts(
   prep: PipelineLayoutPrep,
@@ -125,105 +140,152 @@ export function computePackedDepthShifts(
     prep.clusters.map((c) => [c.id, c.depth]),
   );
   const clusterById = new Map(prep.clusters.map((c) => [c.id, c]));
-  const maxAllowedDepth = prep.maxDepth + PACKED_EXTRA_COLUMN_ALLOWANCE;
+  const maxAllowedDepth = packedMaxAllowedDepth(prep.maxDepth);
   let groupShiftCount = 0;
 
-  for (const level of PACKED_SHIFT_LEVELS) {
-    const byParent = new Map<string, Map<string, PackedShiftUnit>>();
+  for (const level of [...PACKED_SHIFT_LEVELS].reverse()) {
+    const unitByKey = new Map<string, PackedShiftUnit>();
+    const unitKeyById = new Map<string, string>();
+    const unitKeysByParent = new Map<string, string[]>();
     for (const cluster of prep.clusters) {
       const parentKey = level.parentOf(cluster);
       if (parentKey == null) {
         continue;
       }
       const unitKey = level.unitOf(cluster);
-      const units = byParent.get(parentKey) ?? new Map();
-      byParent.set(parentKey, units);
-      const unit = units.get(unitKey) ?? {
-        key: unitKey,
-        members: [],
-        minFirstSequence: Infinity,
-      };
+      let unit = unitByKey.get(unitKey);
+      if (!unit) {
+        unit = { key: unitKey, members: [], minFirstSequence: Infinity };
+        unitByKey.set(unitKey, unit);
+        unitKeysByParent.set(parentKey, [
+          ...(unitKeysByParent.get(parentKey) ?? []),
+          unitKey,
+        ]);
+      }
       unit.members.push(cluster);
       unit.minFirstSequence = Math.min(
         unit.minFirstSequence,
         cluster.firstSequence,
       );
-      units.set(unitKey, unit);
+      unitKeyById.set(cluster.id, unitKey);
     }
 
-    for (const [, unitMap] of [...byParent.entries()].sort(([a], [b]) =>
-      a.localeCompare(b),
-    )) {
-      const units = [...unitMap.values()];
-      if (units.length < 2) {
-        continue;
-      }
-      const unitKeyById = new Map<string, string>();
-      for (const unit of units) {
-        for (const member of unit.members) {
-          unitKeyById.set(member.id, unit.key);
-        }
-      }
-      units.sort(
-        (a, b) =>
-          unitInterval(a, depths).min - unitInterval(b, depths).min ||
-          a.minFirstSequence - b.minFirstSequence ||
-          a.key.localeCompare(b.key),
-      );
-
-      for (const unit of units) {
-        const memberIds = new Set(unit.members.map((m) => m.id));
-        const predecessorSiblings = new Set<string>();
-        let outgoingSlack = Infinity;
-        for (const edge of prep.collapsedEdges) {
-          const sourceInUnit = memberIds.has(edge.source);
-          const targetInUnit = memberIds.has(edge.target);
-          if (sourceInUnit && !targetInUnit) {
-            const sourceDepth = depths.get(edge.source);
-            const targetDepth = depths.get(edge.target);
-            if (sourceDepth != null && targetDepth != null) {
-              outgoingSlack = Math.min(
-                outgoingSlack,
-                targetDepth - sourceDepth - 1,
-              );
-            }
-          } else if (targetInUnit && !sourceInUnit) {
-            const siblingKey = unitKeyById.get(edge.source);
-            if (siblingKey != null && siblingKey !== unit.key) {
-              predecessorSiblings.add(siblingKey);
-            }
-          }
-        }
-        if (predecessorSiblings.size === 0) {
+    for (let sweep = 0; sweep < PACKED_LEVEL_SWEEPS; sweep++) {
+      let changed = false;
+      for (const [, unitKeys] of [...unitKeysByParent.entries()].sort(
+        ([a], [b]) => a.localeCompare(b),
+      )) {
+        if (unitKeys.length < 2) {
           continue;
         }
-        const interval = unitInterval(unit, depths);
-        let pastAllPredecessors = -Infinity;
-        for (const siblingKey of predecessorSiblings) {
-          const sibling = unitMap.get(siblingKey);
-          if (sibling) {
+        const siblings = new Set(unitKeys);
+        const ordered = [...unitKeys]
+          .map((key) => unitByKey.get(key)!)
+          .sort(
+            (a, b) =>
+              unitInterval(a, depths).min - unitInterval(b, depths).min ||
+              a.minFirstSequence - b.minFirstSequence ||
+              a.key.localeCompare(b.key),
+          );
+
+        for (const unit of ordered) {
+          const memberIds = new Set(unit.members.map((m) => m.id));
+          const predecessorSiblings = new Set<string>();
+          for (const edge of prep.collapsedEdges) {
+            if (memberIds.has(edge.target) && !memberIds.has(edge.source)) {
+              const sourceUnitKey = unitKeyById.get(edge.source);
+              if (
+                sourceUnitKey != null &&
+                sourceUnitKey !== unit.key &&
+                siblings.has(sourceUnitKey)
+              ) {
+                predecessorSiblings.add(sourceUnitKey);
+              }
+            }
+          }
+          if (predecessorSiblings.size === 0) {
+            continue;
+          }
+          const interval = unitInterval(unit, depths);
+          let pastAllPredecessors = -Infinity;
+          for (const siblingKey of predecessorSiblings) {
             pastAllPredecessors = Math.max(
               pastAllPredecessors,
-              unitInterval(sibling, depths).max + 1,
+              unitInterval(unitByKey.get(siblingKey)!, depths).max + 1,
             );
           }
+          const desired = pastAllPredecessors - interval.min;
+          if (desired <= 0) {
+            continue;
+          }
+
+          // Grow a closure over outgoing edges that lack slack for the shift;
+          // the closure moves as one block so those edges keep their length.
+          const closure = new Set<string>([unit.key]);
+          const closureMemberIds = new Set<string>(memberIds);
+          let feasible = true;
+          let expanded = true;
+          while (feasible && expanded) {
+            expanded = false;
+            for (const edge of prep.collapsedEdges) {
+              if (
+                !closureMemberIds.has(edge.source) ||
+                closureMemberIds.has(edge.target)
+              ) {
+                continue;
+              }
+              const slack =
+                (depths.get(edge.target) ?? 0) -
+                (depths.get(edge.source) ?? 0) -
+                1;
+              if (slack >= desired) {
+                continue;
+              }
+              const targetUnitKey = unitKeyById.get(edge.target);
+              if (
+                targetUnitKey == null ||
+                predecessorSiblings.has(targetUnitKey) ||
+                closure.size >= PACKED_MAX_CLOSURE_UNITS
+              ) {
+                feasible = false;
+                break;
+              }
+              closure.add(targetUnitKey);
+              for (const member of unitByKey.get(targetUnitKey)!.members) {
+                closureMemberIds.add(member.id);
+              }
+              expanded = true;
+            }
+          }
+          if (!feasible) {
+            continue;
+          }
+          let maxClosureDepth = -Infinity;
+          for (const id of closureMemberIds) {
+            maxClosureDepth = Math.max(maxClosureDepth, depths.get(id) ?? 0);
+          }
+          if (maxClosureDepth + desired > maxAllowedDepth) {
+            continue;
+          }
+          for (const id of closureMemberIds) {
+            depths.set(id, (depths.get(id) ?? 0) + desired);
+          }
+          groupShiftCount += 1;
+          changed = true;
         }
-        const desired = pastAllPredecessors - interval.min;
-        if (desired <= 0 || desired > outgoingSlack) {
-          continue;
-        }
-        if (interval.max + desired > maxAllowedDepth) {
-          continue;
-        }
-        for (const member of unit.members) {
-          depths.set(
-            member.id,
-            (depths.get(member.id) ?? member.depth) + desired,
-          );
-        }
-        groupShiftCount += 1;
+      }
+      if (!changed) {
+        break;
       }
     }
+  }
+
+  // Compact used depths to contiguous column indices; shifts leave hollow
+  // columns behind and every empty column would otherwise cost full width.
+  const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
+  const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
+  for (const [id, depth] of depths) {
+    depths.set(id, depthRemap.get(depth)!);
   }
 
   const shiftedDepths = new Map<string, number>();
@@ -251,24 +313,32 @@ export function computePackedDepthShifts(
   };
 }
 
+/**
+ * Packed scenes use a wider column gap so two region-deep hull stacks
+ * (subnet + vpc + region pad on each side, plus share clearance) fit between
+ * adjacent columns — otherwise sibling regions can never share a Y band.
+ */
+export const PACKED_COLUMN_GAP =
+  2 * 3 * PIPELINE_FRAME_PAD + PACKED_HORIZONTAL_SHARE_CLEARANCE;
+
 export function applyPackedDepthShifts(
   prep: PipelineLayoutPrep,
   shifts: PackedDepthShiftResult,
 ): PipelineLayoutPrep {
-  if (shifts.shiftCount === 0) {
-    return prep;
-  }
-  const clusters = prep.clusters.map((cluster) => {
-    const depth = shifts.shiftedDepths.get(cluster.id);
-    return depth == null ? cluster : { ...cluster, depth };
-  });
+  const clusters =
+    shifts.shiftCount === 0
+      ? prep.clusters
+      : prep.clusters.map((cluster) => {
+          const depth = shifts.shiftedDepths.get(cluster.id);
+          return depth == null ? cluster : { ...cluster, depth };
+        });
   const maxDepth = Math.max(0, ...clusters.map((c) => c.depth));
   const depths = new Map(clusters.map((c) => [c.id, c.depth]));
   return {
     ...prep,
     clusters,
     maxDepth,
-    columnX: computeGlobalColumnX(clusters, maxDepth),
+    columnX: computeGlobalColumnX(clusters, maxDepth, PACKED_COLUMN_GAP),
     depthResult: { depths, hasCycle: prep.depthResult.hasCycle },
   };
 }

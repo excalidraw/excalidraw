@@ -412,6 +412,7 @@ export function boundsOf(
 export function computeGlobalColumnX(
   clusters: readonly PipelineCluster[],
   maxDepth: number,
+  columnGap: number = PIPELINE_COLUMN_GAP,
 ): number[] {
   const columnWidths = Array.from({ length: maxDepth + 1 }, (_, depth) =>
     Math.max(
@@ -423,7 +424,7 @@ export function computeGlobalColumnX(
   let x = PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
   for (let i = 0; i < columnWidths.length; i++) {
     columnX[i] = x;
-    x += columnWidths[i]! + PIPELINE_COLUMN_GAP;
+    x += columnWidths[i]! + columnGap;
   }
   return columnX;
 }
