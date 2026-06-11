@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Excalidraw — Think it. Sketch it. Ship it.</title>
+<meta name="description" content="The free, open-source virtual whiteboard that feels like the back of a napkin — rough, fast, and zero pressure to be perfect." />
+<meta name="theme-color" content="#6965db" />
+<meta property="og:title" content="Excalidraw — Think it. Sketch it. Ship it." />
+<meta property="og:description" content="A virtual whiteboard with a hand-drawn feel. Free, collaborative, open source." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://excalidraw.com" />
+<link rel="icon" href="favicon.ico" />
+<style>
+  /* Real Excalidraw hand-drawn font, shipped in /public */
+  @font-face {
+    font-family: "Virgil";
+    src: url("Virgil.woff2") format("woff2");
+    font-display: swap;
+  }
+
+  /* Brand tokens, pulled from packages/excalidraw/css/variables.module.scss */
+  :root {
+    --brand: #6965db;
+    --brand-darker: #5b57d1;
+    --brand-darkest: #4a47b1;
+    --brand-light: #e3e2fe;
+    --ink: #1b1b1f;
+    --paper-warm: #fdfcf8;
+    --paper: #ffffff;
+    --muted: #57565f;
+    --hand: "Virgil", "Segoe Print", "Comic Sans MS", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--hand);
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 18% 28%, rgba(105,101,219,0.05), transparent 42%),
+      radial-gradient(circle at 85% 75%, rgba(105,101,219,0.04), transparent 40%),
+      var(--paper-warm);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+  }
+  a { color: inherit; }
+
+  /* ---------- top nav ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1120px; margin: 0 auto; padding: 22px 28px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 23px; }
+  .logo svg { color: var(--brand); }
+  .nav-links { display: flex; gap: 24px; align-items: center;
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: 14px; }
+  .nav-links a { color: var(--muted); text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links .star {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 6px 11px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    max-width: 1120px; margin: 0 auto; padding: 36px 28px 90px;
+    display: grid; grid-template-columns: 1.08fr 1fr; gap: 48px; align-items: center;
+  }
+  h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1.02; margin: 0 0 22px; font-weight: 400; }
+  h1 .hl { color: var(--brand); position: relative; white-space: nowrap; }
+  /* self-drawing underline (the nicest touch from the "Living Canvas" variant) */
+  h1 .hl svg { position: absolute; left: -6px; bottom: -12px; width: calc(100% + 12px); height: 16px; overflow: visible; }
+  h1 .hl path {
+    stroke-dasharray: 260; stroke-dashoffset: 260;
+    animation: draw-underline 1s ease .35s forwards;
+  }
+  @keyframes draw-underline { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    h1 .hl path { animation: none; stroke-dashoffset: 0; }
+  }
+
+  .sub { font-size: clamp(18px, 2.2vw, 23px); color: var(--muted);
+    line-height: 1.5; margin: 0 0 32px; max-width: 470px; }
+
+  .cta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+  .btn-sketch {
+    font-family: var(--hand); font-size: 21px; color: #fff;
+    background: var(--brand); border: 2px solid var(--brand-darkest);
+    padding: 13px 30px; cursor: pointer; text-decoration: none; display: inline-block;
+    border-radius: 15px 10px 14px 9px / 9px 14px 10px 15px;
+    box-shadow: 3px 3px 0 var(--brand-darkest);
+    transition: transform .1s, box-shadow .1s;
+  }
+  .btn-sketch:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--brand-darkest); }
+  .btn-sketch:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--brand-darkest); }
+  .btn-ghost {
+    font-family: var(--hand); font-size: 20px; color: var(--ink);
+    background: transparent; border: 2px solid var(--ink);
+    padding: 12px 26px; cursor: pointer; text-decoration: none; display: inline-block;
+    border-radius: 13px 9px 14px 10px / 10px 14px 9px 13px;
+    transition: transform .12s;
+  }
+  .btn-ghost:hover { transform: rotate(-1.5deg) scale(1.02); }
+
+  .pills { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap;
+    font-family: ui-sans-serif, system-ui, sans-serif; }
+  .pill { font-size: 13px; background: var(--brand-light); color: var(--brand-darkest);
+    padding: 6px 14px; border-radius: 20px; }
+
+  /* ---------- hero doodle card ---------- */
+  .doodle-card {
+    background: var(--paper); border: 2px solid var(--ink);
+    border-radius: 20px 12px 22px 10px / 10px 22px 12px 20px;
+    padding: 24px; box-shadow: 7px 8px 0 rgba(27,27,31,0.07);
+    transform: rotate(1.5deg);
+  }
+  .doodle-card svg { width: 100%; height: auto; display: block; }
+
+  /* ---------- feature strip ---------- */
+  .features {
+    max-width: 1120px; margin: 0 auto; padding: 10px 28px 100px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+  }
+  .feature {
+    background: var(--paper); border: 2px solid rgba(27,27,31,0.85);
+    border-radius: 16px 11px 17px 10px / 10px 17px 11px 16px;
+    padding: 22px 22px 24px;
+    transition: transform .14s;
+  }
+  .feature:hover { transform: translateY(-3px) rotate(-0.6deg); }
+  .feature .ico { font-size: 28px; display: block; margin-bottom: 12px; }
+  .feature h3 { font-size: 23px; font-weight: 400; margin: 0 0 6px; }
+  .feature p { font-size: 16px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  footer {
+    text-align: center; padding: 30px 20px 50px; color: var(--muted);
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: 13px;
+  }
+  footer a { color: var(--brand); text-decoration: none; }
+
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; gap: 30px; padding-bottom: 50px; }
+    .features { grid-template-columns: 1fr; }
+    .nav-links a:not(.star) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 18 L9 5 L14 18 M6 13 L12 13" />
+        <path d="M15 9 q4 -2 5 3 q1 5 -4 6" />
+      </svg>
+      <span>Excalidraw</span>
+    </div>
+    <div class="nav-links">
+      <a href="https://plus.excalidraw.com">Plus</a>
+      <a href="https://blog.excalidraw.com">Blog</a>
+      <a href="https://docs.excalidraw.com">Docs</a>
+      <a class="star" href="https://github.com/excalidraw/excalidraw">★ Star on GitHub</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <h1>Think it.
+        <span class="hl">Sketch it.<svg viewBox="0 0 240 16" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9 Q65 16 120 8 T237 7" stroke="#6965db" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span><br>
+        Ship it.</h1>
+      <p class="sub">The virtual whiteboard that feels like the back of a napkin — rough, fast, and zero pressure to be perfect.</p>
+      <div class="cta-row">
+        <a class="btn-sketch" href="https://excalidraw.com">Start drawing →</a>
+        <a class="btn-ghost" href="https://github.com/excalidraw/excalidraw">It's free &amp; open source</a>
+      </div>
+      <div class="pills">
+        <span class="pill">No sign-up</span>
+        <span class="pill">End-to-end encrypted</span>
+        <span class="pill">Works offline</span>
+      </div>
+    </div>
+
+    <div class="doodle-card">
+      <svg viewBox="0 0 340 230" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="A hand-drawn flow diagram: Idea leads to Plan leads to Ship it.">
+        <rect x="24" y="30" width="116" height="64" rx="9" stroke="#1971c2" stroke-width="2.5" fill="#e7f5ff" transform="rotate(-1.5 82 62)"/>
+        <text x="50" y="70" font-family="Virgil" font-size="22" fill="#1971c2">Idea</text>
+        <rect x="200" y="32" width="116" height="62" rx="9" stroke="#2f9e44" stroke-width="2.5" fill="#ebfbee" transform="rotate(2 258 63)"/>
+        <text x="226" y="71" font-family="Virgil" font-size="22" fill="#2f9e44">Plan</text>
+        <rect x="110" y="146" width="126" height="64" rx="9" stroke="#e64980" stroke-width="2.5" fill="#fff0f6" transform="rotate(-1 173 178)"/>
+        <text x="134" y="186" font-family="Virgil" font-size="22" fill="#e64980">Ship it</text>
+        <path d="M140 66 Q176 52 206 64" stroke="#868e96" stroke-width="2" marker-end="url(#ah)"/>
+        <path d="M258 94 Q224 124 204 148" stroke="#868e96" stroke-width="2" marker-end="url(#ah)"/>
+        <path d="M110 178 Q72 156 80 100" stroke="#868e96" stroke-width="2" marker-end="url(#ah)"/>
+        <defs>
+          <marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6" stroke="#868e96" stroke-width="1.5" fill="none"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <span class="ico">✏️</span>
+      <h3>Hand-drawn feel</h3>
+      <p>Every line has a little wobble — on purpose. Rough sketches keep ideas feeling open, not finished.</p>
+    </div>
+    <div class="feature">
+      <span class="ico">👯</span>
+      <h3>Sketch together</h3>
+      <p>Share a link and draw with your whole team in real time. No accounts to wrangle.</p>
+    </div>
+    <div class="feature">
+      <span class="ico">🔒</span>
+      <h3>Yours to keep</h3>
+      <p>End-to-end encrypted, works offline, and fully open source. Your napkins stay your napkins.</p>
+    </div>
+  </section>
+
+  <footer>
+    Made with rough lines by the Excalidraw community ·
+    <a href="https://github.com/excalidraw/excalidraw">github.com/excalidraw/excalidraw</a>
+  </footer>
+
+</body>
+</html>
