@@ -64,6 +64,7 @@ const defaultTerraformEdgeLayerPins = (
   dataFlow: false,
   declaredDataFlow: enableDeclaredDataFlow,
   networking: false,
+  topologyFrameFlow: false,
 });
 
 export const applyTerraformExcalidrawScene = (

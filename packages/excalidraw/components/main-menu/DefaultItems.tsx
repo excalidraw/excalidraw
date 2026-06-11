@@ -87,7 +87,8 @@ type TerraformEdgeLayer =
   | "dependency"
   | "dataFlow"
   | "declaredDataFlow"
-  | "networking";
+  | "networking"
+  | "topologyFrameFlow";
 
 const isTerraformDependencyPreviewEdge = (element: {
   customData?: Record<string, any>;
@@ -318,6 +319,9 @@ export const TerraformLayers = () => {
         </TerraformLayerItem>
         <TerraformLayerItem layer="declaredDataFlow">
           Declared data flow edges
+        </TerraformLayerItem>
+        <TerraformLayerItem layer="topologyFrameFlow">
+          Topology box edges
         </TerraformLayerItem>
       </DropdownMenuSub.Content>
     </DropdownMenuSub>

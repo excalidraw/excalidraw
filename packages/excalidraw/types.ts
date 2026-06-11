@@ -494,6 +494,7 @@ export interface AppState {
     dataFlow: boolean;
     declaredDataFlow: boolean;
     networking: boolean;
+    topologyFrameFlow: boolean;
   } | null;
   /** Transient graph key for revealing incident edges when `terraformEdgeLayerPins` is set. */
   terraformEdgeHoverPeekKey: string | null;

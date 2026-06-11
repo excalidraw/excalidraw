@@ -59,12 +59,13 @@ describe("terraformElementMetadata", () => {
     expect(isTerraformGroupElement(el({ customData: {} }))).toBe(false);
   });
 
-  it("isTerraformLayerEdge matches dependency, dataFlow, declaredDataFlow, networking", () => {
+  it("isTerraformLayerEdge matches dependency, dataFlow, declaredDataFlow, networking, topologyFrameFlow", () => {
     for (const layer of [
       "dependency",
       "dataFlow",
       "declaredDataFlow",
       "networking",
+      "topologyFrameFlow",
     ] as const) {
       expect(
         isTerraformLayerEdge(

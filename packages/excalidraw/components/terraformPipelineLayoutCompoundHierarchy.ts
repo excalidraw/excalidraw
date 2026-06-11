@@ -27,7 +27,11 @@ type SkeletonCustomData = {
   terraformCompoundLayout?: boolean;
   terraformCompoundParentKey?: string;
   terraformCompoundLocal?: { x: number; y: number };
-  relationship?: { source?: string; target?: string };
+  relationship?: {
+    source?: string;
+    target?: string;
+    parentFrameId?: string;
+  };
   terraformEdgeLayer?: string;
 };
 
@@ -282,21 +286,32 @@ export function assignCompoundEdgeFrameParents(
       continue;
     }
     const cd = skeletonCustomData(arrow);
-    if (cd?.terraformEdgeLayer !== "declaredDataFlow") {
+    if (!cd) {
       continue;
     }
-    const source = cd.relationship?.source;
-    const target = cd.relationship?.target;
-    if (!source || !target) {
+    const layer = cd.terraformEdgeLayer;
+    let parentFrameId: string | null = null;
+
+    if (layer === "topologyFrameFlow") {
+      const explicitParent = cd.relationship?.parentFrameId;
+      parentFrameId =
+        typeof explicitParent === "string" ? explicitParent : null;
+    } else if (layer === "declaredDataFlow") {
+      const source = cd.relationship?.source;
+      const target = cd.relationship?.target;
+      if (!source || !target) {
+        continue;
+      }
+      const sourcePath = pathsByCluster.get(source);
+      const targetPath = pathsByCluster.get(target);
+      if (!sourcePath || !targetPath) {
+        continue;
+      }
+      const lca = lcaTopologyPath(sourcePath, targetPath);
+      parentFrameId = frameSkeletonForTopologyPath(lca);
+    } else {
       continue;
     }
-    const sourcePath = pathsByCluster.get(source);
-    const targetPath = pathsByCluster.get(target);
-    if (!sourcePath || !targetPath) {
-      continue;
-    }
-    const lca = lcaTopologyPath(sourcePath, targetPath);
-    const parentFrameId = frameSkeletonForTopologyPath(lca);
     if (!parentFrameId) {
       continue;
     }

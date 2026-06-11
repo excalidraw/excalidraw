@@ -40,6 +40,7 @@ export type TerraformEdgeLayerPins = {
   dataFlow: boolean;
   declaredDataFlow: boolean;
   networking: boolean;
+  topologyFrameFlow: boolean;
 };
 
 /** Default after ELK / topology layout: all edge layers off until pins or hover reveal. */
@@ -48,6 +49,7 @@ export const TERRAFORM_IMPORT_EDGE_LAYER_PINS: TerraformEdgeLayerPins = {
   dataFlow: false,
   declaredDataFlow: false,
   networking: false,
+  topologyFrameFlow: false,
 };
 
 export type TerraformVisibilityReconcileOverrides = {
@@ -55,6 +57,7 @@ export type TerraformVisibilityReconcileOverrides = {
   dataFlowLayerEnabled?: boolean;
   declaredDataFlowLayerEnabled?: boolean;
   networkingLayerEnabled?: boolean;
+  topologyFrameFlowLayerEnabled?: boolean;
   pins?: TerraformEdgeLayerPins;
   hoverPeekKey?: string | null;
 };
@@ -140,6 +143,9 @@ export const inferLegacyTerraformEdgePinsFromElements = (
   ),
   networking: elements.some(
     (e) => getTerraformEdgeLayer(e) === "networking" && !e.isDeleted,
+  ),
+  topologyFrameFlow: elements.some(
+    (e) => getTerraformEdgeLayer(e) === "topologyFrameFlow" && !e.isDeleted,
   ),
 });
 
@@ -231,13 +237,14 @@ export const isTerraformImportedScene = (
 ): boolean =>
   elements.some((element) => element.customData?.terraform === true);
 
-/** `"dependency"` | `"dataFlow"` | `"declaredDataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
+/** Terraform edge layer id for edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
   return layer === "dependency" ||
     layer === "dataFlow" ||
     layer === "declaredDataFlow" ||
-    layer === "networking"
+    layer === "networking" ||
+    layer === "topologyFrameFlow"
     ? layer
     : null;
 };
@@ -655,13 +662,38 @@ const getDescendantKeys = (
 const edgeEndpointsAreVisible = (
   element: ExcalidrawElement,
   visibleKeys: Set<string>,
+  elementsById: Map<string, ExcalidrawElement>,
 ) => {
   const relationship = getCustomData(element).relationship;
+  if (
+    typeof relationship?.source !== "string" ||
+    typeof relationship?.target !== "string"
+  ) {
+    return false;
+  }
+
+  if (getTerraformEdgeLayer(element) === "topologyFrameFlow") {
+    const frameForTopologyKey = (key: string) => {
+      for (const candidate of elementsById.values()) {
+        if (
+          candidate.isDeleted ||
+          candidate.type !== "frame" ||
+          getCustomData(candidate).terraformTopologyKey !== key
+        ) {
+          continue;
+        }
+        return candidate;
+      }
+      return undefined;
+    };
+    return Boolean(
+      frameForTopologyKey(relationship.source) &&
+        frameForTopologyKey(relationship.target),
+    );
+  }
+
   return (
-    typeof relationship?.source === "string" &&
-    typeof relationship?.target === "string" &&
-    visibleKeys.has(relationship.source) &&
-    visibleKeys.has(relationship.target)
+    visibleKeys.has(relationship.source) && visibleKeys.has(relationship.target)
   );
 };
 
@@ -686,6 +718,7 @@ const deriveLayerState = (
       dataFlowLayerEnabled: overrides.pins.dataFlow,
       declaredDataFlowLayerEnabled: overrides.pins.declaredDataFlow,
       networkingLayerEnabled: overrides.pins.networking,
+      topologyFrameFlowLayerEnabled: overrides.pins.topologyFrameFlow,
     };
   }
   return {
@@ -706,6 +739,11 @@ const deriveLayerState = (
       overrides.networkingLayerEnabled ??
       elements.some(
         (element) => getTerraformEdgeLayer(element) === "networking",
+      ),
+    topologyFrameFlowLayerEnabled:
+      overrides.topologyFrameFlowLayerEnabled ??
+      elements.some(
+        (element) => getTerraformEdgeLayer(element) === "topologyFrameFlow",
       ),
   };
 };
@@ -1089,6 +1127,7 @@ export const reconcileTerraformVisibility = (
   overrides: TerraformVisibilityReconcileOverrides = {},
 ) => {
   const visibleKeys = getVisibleTerraformKeys(elements);
+  const elementsById = new Map(elements.map((element) => [element.id, element]));
   const layerState = deriveLayerState(elements, overrides);
   const semanticScene = isTerraformSemanticOverviewScene(elements);
   const pinMode = overrides.pins != null;
@@ -1123,6 +1162,8 @@ export const reconcileTerraformVisibility = (
         ? layerState.dataFlowLayerEnabled
         : layer === "declaredDataFlow"
         ? layerState.declaredDataFlowLayerEnabled
+        : layer === "topologyFrameFlow"
+        ? layerState.topologyFrameFlowLayerEnabled
         : layerState.networkingLayerEnabled;
 
     const relationship = getCustomData(element).relationship as
@@ -1137,7 +1178,7 @@ export const reconcileTerraformVisibility = (
 
     const shouldShow =
       (layerEnabled || Boolean(hoverTouches)) &&
-      edgeEndpointsAreVisible(element, visibleKeys);
+      edgeEndpointsAreVisible(element, visibleKeys, elementsById);
 
     if (
       element.isDeleted === !shouldShow &&

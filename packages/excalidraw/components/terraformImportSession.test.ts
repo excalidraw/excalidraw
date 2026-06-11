@@ -36,6 +36,7 @@ describe("terraformImportSession", () => {
           dataFlow: false,
           declaredDataFlow: false,
           networking: false,
+          topologyFrameFlow: false,
         },
         enableDeclaredDataFlow: false,
       },

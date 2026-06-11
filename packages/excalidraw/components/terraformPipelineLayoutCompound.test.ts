@@ -9,6 +9,12 @@ import {
   buildTerraformPipelineExcalidrawScene,
 } from "./terraformPipelineLayout";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
+import {
+  collectCompoundTopologyFrameEdges,
+  resolveSiblingTopologyFramePair,
+} from "./terraformPipelineLayoutCompoundSiblingEdges";
+import { topologyFrameSkeletonId } from "./terraformPipelineTopologyFrames";
+import { reconcileTerraformVisibility } from "./terraformVisibility";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
@@ -63,6 +69,32 @@ function frameRoleChain(
   }
   return roles;
 }
+
+const edgesByLayer = (elements: readonly ExcalidrawElement[], layer: string) =>
+  elements.filter(
+    (el) =>
+      (el.type === "arrow" || el.type === "line") &&
+      (el as { customData?: { terraformEdgeLayer?: string } }).customData
+        ?.terraformEdgeLayer === layer,
+  );
+
+const awsAccountPlanConfig = {
+  configuration: {
+    provider_config: {
+      aws: {
+        expressions: {
+          assume_role: [
+            {
+              role_arn: {
+                constant_value: "arn:aws:iam::111111111111:role/Deploy",
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+};
 
 const resourceX = (elements: ExcalidrawElement[], address: string) => {
   const el = elements.find(
@@ -400,5 +432,353 @@ describe("terraformPipelineLayoutCompound hierarchical post-pass", () => {
         frameRoleChain(compound.elements, compoundEl?.frameId ?? null),
       ).toEqual(frameRoleChain(classic.elements, classicEl?.frameId ?? null));
     }
+  });
+});
+
+describe("terraformPipelineLayoutCompound sibling topology box edges", () => {
+  it("resolveSiblingTopologyFramePair returns subnet siblings under the same VPC", () => {
+    const pair = resolveSiblingTopologyFramePair(
+      ["aws", "111", "us-east-1", "vpc-a", "subnet-a"],
+      ["aws", "111", "us-east-1", "vpc-a", "subnet-b"],
+    );
+    expect(pair?.role).toBe("subnetZone");
+    expect(pair?.parentFrameId).toBe(
+      topologyFrameSkeletonId(
+        "vpc",
+        ["aws", "111", "us-east-1", "vpc-a"].join("\0"),
+      ),
+    );
+    expect(pair?.sourceFrameId).toContain("subnetZone");
+    expect(pair?.targetFrameId).toContain("subnetZone");
+    expect(pair?.sourceFrameId).not.toBe(pair?.targetFrameId);
+  });
+
+  it("resolveSiblingTopologyFramePair skips ancestor/descendant placements", () => {
+    expect(
+      resolveSiblingTopologyFramePair(
+        ["aws", "111", "us-east-1", "vpc-a"],
+        ["aws", "111", "us-east-1", "vpc-a", "subnet-a"],
+      ),
+    ).toBeNull();
+  });
+
+  it("emits subnet-to-subnet topologyFrameFlow edge when resources cross subnets", async () => {
+    const nodes = {
+      "aws_lambda_function.a": node(
+        "aws_lambda_function.a",
+        "aws_lambda_function",
+      ),
+      "aws_lambda_function.b": node(
+        "aws_lambda_function.b",
+        "aws_lambda_function",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      ...awsAccountPlanConfig,
+      resource_changes: [
+        rc("aws_lambda_function.a", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+        rc("aws_lambda_function.b", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-b"],
+        }),
+      ],
+    };
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+    );
+    expect(scene.meta.pipelineTopologyFrameEdgeCount).toBe(1);
+    expect(edgesByLayer(scene.elements, "declaredDataFlow")).toHaveLength(1);
+    expect(edgesByLayer(scene.elements, "topologyFrameFlow")).toHaveLength(1);
+
+    const boxEdge = edgesByLayer(scene.elements, "topologyFrameFlow")[0]!;
+    const vpcFrame = scene.elements.find(
+      (el) =>
+        el.type === "frame" &&
+        (el as { customData?: { terraformTopologyRole?: string } }).customData
+          ?.terraformTopologyRole === "vpc",
+    );
+    expect(vpcFrame).toBeTruthy();
+    expect(boxEdge.frameId).toBe(vpcFrame?.id);
+
+    const descendants = getFrameDescendants(scene.elements, vpcFrame!.id);
+    expect(descendants.some((el) => el.id === boxEdge.id)).toBe(true);
+  });
+
+  it("does not emit topologyFrameFlow edge for intra-subnet resource edges", async () => {
+    const nodes = {
+      "aws_lambda_function.a": node(
+        "aws_lambda_function.a",
+        "aws_lambda_function",
+      ),
+      "aws_lambda_function.b": node(
+        "aws_lambda_function.b",
+        "aws_lambda_function",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      ...awsAccountPlanConfig,
+      resource_changes: [
+        rc("aws_lambda_function.a", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+        rc("aws_lambda_function.b", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+      ],
+    };
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+    );
+    expect(edgesByLayer(scene.elements, "topologyFrameFlow")).toHaveLength(0);
+    expect(edgesByLayer(scene.elements, "declaredDataFlow")).toHaveLength(1);
+  });
+
+  it("does not emit topologyFrameFlow edge for vpc-direct to subnet placements", async () => {
+    const nodes = {
+      "aws_nat_gateway.a": node("aws_nat_gateway.a", "aws_nat_gateway"),
+      "aws_lambda_function.b": node(
+        "aws_lambda_function.b",
+        "aws_lambda_function",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_nat_gateway.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      ...awsAccountPlanConfig,
+      resource_changes: [
+        rc("aws_nat_gateway.a", "aws_nat_gateway", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+        }),
+        rc("aws_lambda_function.b", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+      ],
+    };
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+    );
+    expect(edgesByLayer(scene.elements, "topologyFrameFlow")).toHaveLength(0);
+  });
+
+  it("dedupes multiple resource edges into one sibling box edge", async () => {
+    const nodes = {
+      "aws_lambda_function.a": node(
+        "aws_lambda_function.a",
+        "aws_lambda_function",
+      ),
+      "aws_lambda_function.b": node(
+        "aws_lambda_function.b",
+        "aws_lambda_function",
+      ),
+      "aws_sqs_queue.c": node("aws_sqs_queue.c", "aws_sqs_queue"),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+        {
+          source: "aws_sqs_queue.c",
+          target: "aws_lambda_function.b",
+          sequence: 1,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      ...awsAccountPlanConfig,
+      resource_changes: [
+        rc("aws_lambda_function.a", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+        rc("aws_lambda_function.b", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-b"],
+        }),
+        rc("aws_sqs_queue.c", "aws_sqs_queue", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+      ],
+    };
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+    );
+    expect(edgesByLayer(scene.elements, "topologyFrameFlow")).toHaveLength(1);
+    expect(scene.meta.pipelineTopologyFrameEdgeCount).toBe(1);
+  });
+
+  it("soft-hides topologyFrameFlow edges when the layer pin is off", async () => {
+    const nodes = {
+      "aws_lambda_function.a": node(
+        "aws_lambda_function.a",
+        "aws_lambda_function",
+      ),
+      "aws_lambda_function.b": node(
+        "aws_lambda_function.b",
+        "aws_lambda_function",
+      ),
+      [DECLARED_DATAFLOW_ORDERED_KEY]: [
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          origin: "tfd",
+        },
+      ],
+    } as unknown as TerraformPlanNodesMap;
+
+    const plan = {
+      ...awsAccountPlanConfig,
+      resource_changes: [
+        rc("aws_lambda_function.a", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-a"],
+        }),
+        rc("aws_lambda_function.b", "aws_lambda_function", {
+          region: "us-east-1",
+          vpc_id: "vpc-a",
+          subnet_ids: ["subnet-b"],
+        }),
+      ],
+    };
+
+    const scene = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+    );
+    const reconciled = reconcileTerraformVisibility(scene.elements, {
+      pins: {
+        dependency: false,
+        dataFlow: false,
+        declaredDataFlow: true,
+        networking: false,
+        topologyFrameFlow: false,
+      },
+      hoverPeekKey: null,
+    });
+
+    const boxEdge = reconciled.find(
+      (el) =>
+        (el.type === "arrow" || el.type === "line") &&
+        (el as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer === "topologyFrameFlow",
+    );
+    const resourceEdge = reconciled.find(
+      (el) =>
+        (el.type === "arrow" || el.type === "line") &&
+        (el as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer === "declaredDataFlow",
+    );
+    expect(boxEdge?.isDeleted).toBe(true);
+    expect(resourceEdge?.isDeleted).toBe(false);
+  });
+
+  it("collectCompoundTopologyFrameEdges returns stable deduped pairs", () => {
+    const clusters = [
+      {
+        id: "aws_lambda_function.a",
+        placement: {
+          providerFamily: "aws",
+          accountId: "111",
+          region: "us-east-1",
+          vpcId: "vpc-a",
+          subnetSignature: "subnet-a",
+        },
+      },
+      {
+        id: "aws_lambda_function.b",
+        placement: {
+          providerFamily: "aws",
+          accountId: "111",
+          region: "us-east-1",
+          vpcId: "vpc-a",
+          subnetSignature: "subnet-b",
+        },
+      },
+    ] as unknown as Parameters<typeof collectCompoundTopologyFrameEdges>[1];
+
+    const edges = collectCompoundTopologyFrameEdges(
+      [
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 2,
+          original: {
+            source: "aws_lambda_function.a",
+            target: "aws_lambda_function.b",
+            sequence: 2,
+            origin: "tfd",
+          },
+        },
+        {
+          source: "aws_lambda_function.a",
+          target: "aws_lambda_function.b",
+          sequence: 0,
+          original: {
+            source: "aws_lambda_function.a",
+            target: "aws_lambda_function.b",
+            sequence: 0,
+            origin: "tfd",
+          },
+        },
+      ],
+      clusters,
+    );
+
+    expect(edges).toHaveLength(1);
+    expect(edges[0]?.sequence).toBe(0);
   });
 });

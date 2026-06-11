@@ -65,6 +65,7 @@ describe.skipIf(!HAS_STAGING_CLOUDFLARE_MULTI_IMPORT_FIXTURES)(
           dataFlow: false,
           declaredDataFlow: true,
           networking: false,
+          topologyFrameFlow: false,
         };
         const focus = applyTerraformRelationshipFocus(
           elements,

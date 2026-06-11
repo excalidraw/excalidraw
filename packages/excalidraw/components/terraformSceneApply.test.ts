@@ -123,6 +123,7 @@ describe("terraformSceneApply", () => {
           dataFlow: false,
           declaredDataFlow: true,
           networking: false,
+          topologyFrameFlow: false,
         },
         enableDeclaredDataFlow: true,
       },

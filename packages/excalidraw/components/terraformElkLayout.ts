@@ -1489,6 +1489,9 @@ export function buildTerraformNetworkingDependencyLineSkeletons(
 export const TERRAFORM_DATAFLOW_EDGE_STROKE = "#868e96";
 /** Declared `.tfd` dataflow layer (blue). */
 export const TERRAFORM_DECLARED_DATAFLOW_EDGE_STROKE = "#339af0";
+
+/** Compound pipeline aggregated edges between sibling topology frames. */
+export const TERRAFORM_TOPOLOGY_FRAME_FLOW_STROKE = "#5c7cfa";
 const TERRAFORM_DATAFLOW_OFFSET_PX = 18;
 const TERRAFORM_DECLARED_DATAFLOW_OFFSET_PX = 10;
 

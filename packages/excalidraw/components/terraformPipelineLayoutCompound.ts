@@ -9,6 +9,7 @@ import {
   applyCompoundHierarchicalLayout,
   assignCompoundEdgeFrameParents,
 } from "./terraformPipelineLayoutCompoundHierarchy";
+import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
 import {
   placeClustersClassicGrid,
   preparePipelineLayout,
@@ -43,6 +44,13 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
     skeleton,
     layoutBoxes,
   );
+  const pipelineTopologyFrameEdgeCount =
+    appendCompoundTopologyFrameEdgeSkeletons(
+      prep.collapsedEdges,
+      prep.clusters,
+      skeleton,
+      layoutBoxes,
+    );
   assignCompoundEdgeFrameParents(skeleton, prep.clusters);
 
   const elements = await convertPipelineSkeletonToElements(skeleton);
@@ -56,6 +64,7 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
       pipelineCompact: compact,
       pipelineClusterCount: prep.clusters.length,
       pipelineEdgeCount: prep.collapsedEdges.length,
+      pipelineTopologyFrameEdgeCount,
       pipelineColumnCount: prep.maxDepth + 1,
     },
     warnings: pipelineCycleWarnings(prep.depthResult),
