@@ -4559,7 +4559,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // TODO: Cover with tests
-  // TODO: anim obj support
   private async insertClipboardContent(
     data: ClipboardData,
     dataTransferFiles: ParsedDataTransferFile[],
@@ -4945,7 +4944,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // TODO rewrite this to paste both text & images at the same time if
-  // TODO anim support
   // pasted data contains both
   private async addElementsFromMixedContentPaste(
     mixedContent: PastedMixedContent,
