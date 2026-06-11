@@ -1547,6 +1547,151 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private renderAnimationElements() {
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
+
+    const animationElements = this.scene
+      .getNonDeletedElements()
+      .filter(
+        (el): el is Ordered<NonDeleted<ExcalidrawImageElement>> =>
+          isImageElement(el) && el.is_anim === true,
+      );
+
+    return animationElements.map((el) => {
+      const { x, y } = sceneCoordsToViewportCoords(
+        { sceneX: el.x, sceneY: el.y },
+        this.state,
+      );
+
+      const isVisible = isElementInViewport(
+        el,
+        normalizedWidth,
+        normalizedHeight,
+        this.state,
+        this.scene.getNonDeletedElementsMap(),
+      );
+
+      if (!isVisible) {
+        return null;
+      }
+
+      const dataURL = this.files[el.fileId!]?.dataURL;
+
+      const hasCrop = el.crop != null;
+      const isCroppingActive = this.state.croppingElementId === el.id;
+
+      let innerStyle: React.CSSProperties = {
+        width: el.width,
+        height: el.height,
+        transform: `rotate(${el.angle}rad) scale(${el.scale[0]}, ${el.scale[1]})`,
+        transformOrigin: "center",
+        pointerEvents: "none",
+        overflow: "hidden",
+        borderRadius: getCornerRadius(Math.min(el.width, el.height), el),
+      };
+
+      let imgStyle: React.CSSProperties;
+      let uncropOverlay: React.ReactNode = null;
+
+      if (hasCrop && el.crop) {
+        // using css to impl crop
+        const scaleX = el.width / el.crop.width;
+        const scaleY = el.height / el.crop.height;
+        innerStyle = {
+          ...innerStyle,
+          position: "relative",
+        };
+        imgStyle = {
+          display: "block",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: el.crop.naturalWidth * scaleX,
+          height: el.crop.naturalHeight * scaleY,
+          transform: `translate(${-el.crop.x * scaleX}px, ${
+            -el.crop.y * scaleY
+          }px)`,
+          transformOrigin: "top left",
+        };
+
+        if (isCroppingActive) {
+          // use css to impl crop overlay
+          const { width: uncropW, height: uncropH } =
+            getUncroppedWidthAndHeight(el);
+          uncropOverlay = (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: uncropW,
+                height: uncropH,
+                transform: `rotate(${el.angle}rad) scale(${el.scale[0]}, ${el.scale[1]})`,
+                transformOrigin: `${el.width / 2}px ${el.height / 2}px`,
+                opacity: 0.1,
+                pointerEvents: "none",
+              }}
+            >
+              <img
+                src={dataURL}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "block",
+                  transform: `translate(${-el.crop.x * scaleX}px, ${
+                    -el.crop.y * scaleY
+                  }px)`,
+                  transformOrigin: "top left",
+                }}
+                alt=""
+              />
+            </div>
+          );
+        }
+      } else {
+        imgStyle = {
+          display: "block",
+          width: "100%",
+          height: "100%",
+        };
+      }
+
+      return (
+        <div
+          key={el.id}
+          className="excalidraw__embeddable-container"
+          style={{
+            transform: `translate(${x - this.state.offsetLeft}px, ${
+              y - this.state.offsetTop
+            }px) scale(${scale})`,
+            opacity: getRenderOpacity(
+              el,
+              getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
+              this.elementsPendingErasure,
+              null,
+              this.state.openDialog?.name === "elementLinkSelector" ? 0.4 : 1,
+            ),
+            position: uncropOverlay ? "relative" : undefined,
+            ["--embeddable-radius" as string]: `${getCornerRadius(
+              Math.min(el.width, el.height),
+              el,
+            )}px`,
+          }}
+        >
+          {uncropOverlay}
+          <div
+            className="excalidraw__embeddable-container__inner"
+            style={innerStyle}
+          >
+            <img src={dataURL} style={imgStyle} alt="" />
+          </div>
+        </div>
+      );
+    });
+  }
+
   private renderEmbeddables() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
@@ -2426,6 +2571,7 @@ class App extends React.Component<AppProps, AppState> {
                             <ConvertElementTypePopup app={this} />
                           )}
                         </ExcalidrawActionManagerContext.Provider>
+                        {this.renderAnimationElements()}
                         {this.renderEmbeddables()}
                       </ExcalidrawElementsContext.Provider>
                     </ExcalidrawAppStateContext.Provider>
@@ -3692,6 +3838,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // TODO: Cover with tests
+  // TODO: anim obj support
   private async insertClipboardContent(
     data: ClipboardData,
     dataTransferFiles: ParsedDataTransferFile[],
@@ -4065,6 +4212,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // TODO rewrite this to paste both text & images at the same time if
+  // TODO anim support
   // pasted data contains both
   private async addElementsFromMixedContentPaste(
     mixedContent: PastedMixedContent,
@@ -11719,15 +11867,19 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingFileData?.dataURL) {
       const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
 
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
+      if (!(mimeType === MIME_TYPES.gif)) {
+        //TODO other format support
+        //TODO resize Image File output is jpg, breaks anim
+        try {
+          imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight,
+          });
+        } catch (error: any) {
+          console.error(
+            "Error trying to resizing image file on insertion",
+            error,
+          );
+        }
       }
 
       if (imageFile.size > maxFileSizeBytes) {
@@ -12026,10 +12178,13 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(
+          const element = await this.initializeImage(
             placeholder,
             await normalizeFile(imageFiles[i]),
           );
+          const imageFile = imageFiles[i];
+          const isAnim = imageFile.type === MIME_TYPES.gif; //TODO other format support
+          return isAnim ? newElementWith(element, { is_anim: true }) : element;
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
