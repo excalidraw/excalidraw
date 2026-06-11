@@ -292,6 +292,7 @@ import type {
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
+import { isAnim } from "@excalidraw/utils";
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -11865,8 +11866,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingFileData?.dataURL) {
       const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
 
-      if (!(mimeType === MIME_TYPES.gif)) {
-        //TODO other format support
+      if (!(await isAnim(imageFile))) {
         //TODO resize Image File output is jpg, breaks anim
         try {
           imageFile = await resizeImageFile(imageFile, {
@@ -12181,8 +12181,8 @@ class App extends React.Component<AppProps, AppState> {
             await normalizeFile(imageFiles[i]),
           );
           const imageFile = imageFiles[i];
-          const isAnim = imageFile.type === MIME_TYPES.gif; //TODO other format support
-          return isAnim ? newElementWith(element, { is_anim: true }) : element;
+          const isAnimated = await isAnim(imageFile);
+          return isAnimated ? newElementWith(element, { is_anim: true }) : element;
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
