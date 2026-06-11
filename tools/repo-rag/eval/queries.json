@@ -1,0 +1,44 @@
+{
+  "queries": [
+    {
+      "query": "terraform import pipeline flow",
+      "expect_path_contains": ["terraform", "pipeline"]
+    },
+    {
+      "query": "terraformPipelineLayoutCompound sibling columns",
+      "expect_path_contains": ["terraformPipelineLayoutCompound"]
+    },
+    {
+      "query": "preset SQLite hydrate command",
+      "expect_source_type": "handoff"
+    },
+    {
+      "query": "dependency-cruiser import rules terraformLayoutCore",
+      "expect_path_contains": ["code-quality", "terraformLayoutCore"]
+    },
+    {
+      "query": "compound pipeline layout hierarchical frames",
+      "expect_path_contains": ["pipeline-compound", "terraformPipelineLayoutCompound"]
+    },
+    {
+      "query": "KV layout cache preset import",
+      "expect_path_contains": ["cache", "preset"]
+    },
+    {
+      "query": "semantic topology layout placement",
+      "expect_path_contains": ["terraformTopology"]
+    },
+    {
+      "query": "TFD declared dataflow edges pipeline view",
+      "expect_path_contains": ["terraformDeclaredDataFlow", "pipeline"]
+    },
+    {
+      "query": "Cloudflare D1 preset deployment",
+      "expect_source_type": "handoff"
+    },
+    {
+      "query": "layout worker client parity",
+      "expect_path_contains": ["terraformLayoutWorker"]
+    }
+  ]
+}

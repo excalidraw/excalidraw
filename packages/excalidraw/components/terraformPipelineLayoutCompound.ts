@@ -14,6 +14,12 @@ import {
   placeClustersClassicGrid,
   preparePipelineLayout,
 } from "./terraformPipelineLayoutShared";
+import {
+  applyPackedDepthShifts,
+  computePackedDepthShifts,
+  placeClustersPackedGrid,
+  EMPTY_PACKED_DEPTH_SHIFTS,
+} from "./terraformPipelineLayoutPacked";
 import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
@@ -26,15 +32,23 @@ import type { TerraformImportWarning } from "./terraformImportMerge";
 export async function buildTerraformCompoundPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
-  options?: { compact?: boolean },
+  options?: { compact?: boolean; packed?: boolean },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: Record<string, unknown>;
   warnings: TerraformImportWarning[];
 }> {
   const compact = options?.compact !== false;
-  const prep = preparePipelineLayout(nodes, plan, compact);
-  const { skeleton, layoutBoxes } = placeClustersClassicGrid(prep);
+  const packed = options?.packed === true;
+  let prep = preparePipelineLayout(nodes, plan, compact);
+  let packedShifts = EMPTY_PACKED_DEPTH_SHIFTS;
+  if (packed) {
+    packedShifts = computePackedDepthShifts(prep);
+    prep = applyPackedDepthShifts(prep, packedShifts);
+  }
+  const { skeleton, layoutBoxes } = packed
+    ? placeClustersPackedGrid(prep)
+    : placeClustersClassicGrid(prep);
 
   buildCompoundFramesFromLayoutBoxes(skeleton, prep.clusters, layoutBoxes);
   applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
@@ -66,6 +80,13 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
       pipelineEdgeCount: prep.collapsedEdges.length,
       pipelineTopologyFrameEdgeCount,
       pipelineColumnCount: prep.maxDepth + 1,
+      ...(packed
+        ? {
+            pipelinePackedApplied: true,
+            pipelinePackedDepthShiftCount: packedShifts.shiftCount,
+            pipelinePackedGroupShiftCount: packedShifts.groupShiftCount,
+          }
+        : {}),
     },
     warnings: pipelineCycleWarnings(prep.depthResult),
   };

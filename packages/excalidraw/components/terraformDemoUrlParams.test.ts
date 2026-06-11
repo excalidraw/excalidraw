@@ -62,6 +62,26 @@ describe("terraformDemoUrlParams", () => {
       });
     });
 
+    it("parses pipeline variant and packed", () => {
+      expect(
+        parseTerraformDemoUrlParams(
+          "?preset=staging-extended-localstack-v2&view=pipeline&pipelineVariant=compound&packed=1",
+        ),
+      ).toEqual({
+        presetId: "staging-extended-localstack-v2",
+        view: "pipeline",
+        pipelineVariant: "compound",
+        packed: true,
+      });
+      expect(parseTerraformDemoUrlParams("?preset=demo&packed=false")).toEqual({
+        presetId: "demo",
+        packed: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&packed=nope"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

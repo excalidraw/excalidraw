@@ -1127,7 +1127,9 @@ export const reconcileTerraformVisibility = (
   overrides: TerraformVisibilityReconcileOverrides = {},
 ) => {
   const visibleKeys = getVisibleTerraformKeys(elements);
-  const elementsById = new Map(elements.map((element) => [element.id, element]));
+  const elementsById = new Map(
+    elements.map((element) => [element.id, element]),
+  );
   const layerState = deriveLayerState(elements, overrides);
   const semanticScene = isTerraformSemanticOverviewScene(elements);
   const pinMode = overrides.pins != null;

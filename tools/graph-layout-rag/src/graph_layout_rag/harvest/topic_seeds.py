@@ -329,6 +329,87 @@ TOPIC_DOI_SEEDS: list[dict] = [
     },
 ]
 
+# Pipeline layout research threads: compaction, packing, overlap, VPSC/containment
+PIPELINE_LAYOUT_DOI_SEEDS: list[dict] = [
+    {
+        "doi": "10.1007/11582767_38",
+        "tags": ["constraints", "overlap", "vpsc"],
+        "title_hint": "Fast Node Overlap Removal (VPSC)",
+        "pdf_urls": ["http://marvl.infotech.monash.edu/~dwyer/papers/fnr.pdf"],
+    },
+    {
+        "doi": "10.1109/TVCG.2006.197",
+        "tags": ["constraints", "compound", "overlap"],
+        "title_hint": "IPSep-CoLa separation constraint layout",
+        "pdf_urls": ["http://marvl.infotech.monash.edu/~dwyer/papers/ipsepcola.pdf"],
+    },
+    {
+        "doi": "10.1007/978-3-642-00219-9_22",
+        "tags": ["constraints", "compound", "overlap"],
+        "title_hint": "Topology Preserving Constrained Graph Layout",
+        "pdf_urls": ["http://www.csse.monash.edu.au/~tdwyer/topology.pdf"],
+    },
+    {
+        "doi": "10.1007/BFb0021827",
+        "tags": ["overlap", "mental-map", "force-directed"],
+        "title_hint": "Layout Adjustment and the Mental Map",
+    },
+    {
+        "doi": "10.1109/TCAD.1983.1270025",
+        "tags": ["compaction", "vlsi"],
+        "title_hint": "An Algorithm to Compact a VLSI Symbolic Layout with Mixed Constraints",
+    },
+    {
+        "doi": "10.1145/285730.285792",
+        "tags": ["compaction", "vlsi"],
+        "title_hint": "Symbolic layout compaction review",
+    },
+    {
+        "doi": "10.1016/j.ins.2007.02.016",
+        "tags": ["overlap", "cluster-busting"],
+        "title_hint": "A new algorithm for removing node overlapping in graph visualization",
+    },
+    {
+        "doi": "10.7155/jgaa.00004",
+        "tags": ["overlap", "cluster-busting", "compound"],
+        "title_hint": "Algorithms for Cluster Busting in Anchored Graph Drawing",
+        "pdf_urls": ["https://jgaa.info/index.php/jgaa/article/view/paper4/4.pdf"],
+    },
+    {
+        "doi": "10.1016/j.ejor.2011.06.022",
+        "tags": ["packing", "strip-packing"],
+        "title_hint": "A skyline heuristic for the 2D rectangular packing and strip packing problems",
+    },
+    {
+        "doi": "10.1016/j.cor.2016.11.024",
+        "tags": ["packing", "strip-packing"],
+        "title_hint": "An improved skyline based heuristic for the 2D strip packing problem",
+    },
+    {
+        "doi": "10.1145/800158.805069",
+        "tags": ["packing", "channel-routing", "left-edge"],
+        "title_hint": "Wire routing by optimizing channel assignment (left-edge algorithm)",
+    },
+    {
+        "doi": "10.1587/e76-a_4_507",
+        "tags": ["compaction", "vlsi", "scanline"],
+        "title_hint": "Optimal constraint graph generation via enhanced plane-sweep (shadow propagation)",
+    },
+    {
+        "doi": "10.1109/43.543596",
+        "tags": ["packing", "floorplanning", "sequence-pair"],
+        "title_hint": "VLSI module placement based on rectangle-packing by the sequence-pair",
+    },
+    {
+        "doi": "10.1145/337292.337541",
+        "tags": ["packing", "floorplanning", "b-star-tree"],
+        "title_hint": "B*-Trees: a new representation for non-slicing floorplans",
+        "pdf_urls": [
+            "https://cecs.uci.edu/~papers/compendium94-03/papers/2000/dac00/pdffiles/27_1.pdf"
+        ],
+    },
+]
+
 TOPIC_METADATA_SEEDS = [
     {
         "id": "mermaid-layouts-docs",
@@ -342,6 +423,92 @@ TOPIC_METADATA_SEEDS = [
             "Mermaid supports multiple layout engines: dagre (layered/Sugiyama-style), "
             "elk (Eclipse Layout Kernel for compound graphs and ports), tidy-tree, and "
             "cose-bilkent force-directed. Configure via flowchart defaultRenderer."
+        ),
+    },
+    {
+        "id": "research-thread-layer-assignment",
+        "title": "Layer reassignment with slack / ALAP scheduling",
+        "authors": ["Gansner", "Nikolov", "Tarassov"],
+        "year": 2005,
+        "url": "https://graphviz.org/documentation/TSE93.pdf",
+        "source": "research-thread",
+        "tags": ["layer-assignment", "research-thread"],
+        "abstract": (
+            "Network simplex balance, node promotion layering, minimum-width layering with "
+            "dummy nodes, Coffman-Graham scheduling. Queries: minimum width layering dummy "
+            "nodes; node promotion layering; ALAP as-late-as-possible scheduling DAG."
+        ),
+    },
+    {
+        "id": "research-thread-compaction",
+        "title": "VLSI layout compaction — constraint graphs and scanlines",
+        "authors": ["Liao", "Wong"],
+        "year": 1983,
+        "url": "https://doi.org/10.1109/TCAD.1983.1270025",
+        "source": "research-thread",
+        "tags": ["compaction", "research-thread"],
+        "abstract": (
+            "Reposition boxes in XY without overlap via 1D compaction (constraint graphs + "
+            "longest path), scanline constraint generation, mixed-constraint compaction. "
+            "Queries: constraint graph one-dimensional compaction longest path; scanline "
+            "shadow constraint generation VLSI; two-dimensional compaction NP-hard."
+        ),
+    },
+    {
+        "id": "research-thread-constraints",
+        "title": "Constraint-based layout with cluster containment",
+        "authors": ["Dwyer", "Marriott", "Stuckey"],
+        "year": 2005,
+        "url": "http://marvl.infotech.monash.edu/~dwyer/papers/fnr.pdf",
+        "source": "research-thread",
+        "tags": ["constraints", "research-thread"],
+        "abstract": (
+            "VPSC separation constraints, IPSep-CoLa cluster containment, topology-preserving "
+            "constrained layout. Queries: separation constraints quadratic program VPSC; "
+            "cluster containment constraint layout."
+        ),
+    },
+    {
+        "id": "research-thread-compound",
+        "title": "Compound/clustered Sugiyama layout",
+        "authors": ["Sugiyama", "Sander", "Forster"],
+        "year": 1996,
+        "url": "https://arxiv.org/abs/2311.00533",
+        "source": "research-thread",
+        "tags": ["compound", "research-thread"],
+        "abstract": (
+            "Global ranking with cluster borders, ELK layered hierarchical handling, crossing "
+            "reduction in compound graphs. Queries: compound directed graph layout global "
+            "ranking cluster borders."
+        ),
+    },
+    {
+        "id": "research-thread-packing",
+        "title": "Rectangle/strip packing with fixed coordinate",
+        "authors": ["Hashimoto", "Burke", "Wei"],
+        "year": 2011,
+        "url": "https://doi.org/10.1016/j.ejor.2011.06.022",
+        "source": "research-thread",
+        "tags": ["packing", "research-thread"],
+        "abstract": (
+            "Skyline/bottom-left strip packing heuristics; interval scheduling and track "
+            "assignment (channel routing left-edge algorithm — siblings with disjoint "
+            "X-intervals sharing Y tracks). Queries: strip packing bottom-left skyline "
+            "heuristic; left edge algorithm channel routing track assignment."
+        ),
+    },
+    {
+        "id": "research-thread-overlap",
+        "title": "Mental-map-preserving layout adjustment",
+        "authors": ["Misue", "Gansner", "Huang"],
+        "year": 1995,
+        "url": "https://doi.org/10.1007/BFb0021827",
+        "source": "research-thread",
+        "tags": ["overlap", "research-thread"],
+        "abstract": (
+            "Force-scan layout adjustment, PRISM overlap removal, cluster busting. "
+            "Queries: layout adjustment mental map graph drawing; cluster busting clutter "
+            "reduction graph layout."
         ),
     },
 ]
@@ -402,7 +569,8 @@ def harvest_topic_seeds(*, dry_run: bool = False, workers: int | None = None) ->
             dry_run=dry_run,
         )
 
-    results.extend(parallel_map(_resolve_doi_seed, TOPIC_DOI_SEEDS, workers=workers))
+    all_doi_seeds = [*TOPIC_DOI_SEEDS, *PIPELINE_LAYOUT_DOI_SEEDS]
+    results.extend(parallel_map(_resolve_doi_seed, all_doi_seeds, workers=workers))
 
     for spec in TOPIC_METADATA_SEEDS:
         results.append(

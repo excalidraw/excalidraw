@@ -2,6 +2,8 @@
 
 Guide for another agent working on **Terraform import → pipeline layout → Excalidraw canvas**, or debugging why pipeline import fails / looks wrong.
 
+**Compound pipeline overview:** [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md)
+
 Related docs:
 
 - [terraform-import-presets-agent-handoff.md](./terraform-import-presets-agent-handoff.md) — preset DB, catalog, shared layout phases

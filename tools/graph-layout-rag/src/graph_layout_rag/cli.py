@@ -5,9 +5,12 @@ import sys
 
 import click
 
+from graph_layout_rag.env import load_env_file
 from graph_layout_rag.harvest.run import harvest_group
 from graph_layout_rag.ingest.run import ingest_cmd
 from graph_layout_rag.query.search import search
+
+load_env_file()
 
 
 @click.group()

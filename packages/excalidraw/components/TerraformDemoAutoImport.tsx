@@ -84,6 +84,7 @@ export const TerraformDemoAutoImport = ({
           view,
           moduleLayoutOptions,
           pipelineLayoutVariant: params.pipelineVariant,
+          pipelinePacked: params.packed,
           signal,
           onLayoutProgress: (progress) => {
             const label =

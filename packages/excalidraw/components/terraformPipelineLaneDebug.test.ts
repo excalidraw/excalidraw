@@ -346,9 +346,12 @@ describe("pipeline lane height diagnostic", () => {
         JSON.stringify(comparison, null, 2),
       );
       expect(packed.layoutMeta.pipelinePacked).toBe(true);
-      // Cross-lane column slack packing is not implemented yet; heights match
-      // until pipelinePacked layout logic lands (see pipeline-layout-improvement-agent-prompt.md).
-      expect(packed.sceneBounds.height).toBe(stacked.sceneBounds.height);
+      expect(packed.layoutMeta.pipelinePackedApplied).toBe(true);
+      // Packed layout pushes sink-only groups into later columns and re-packs
+      // sibling boxes in Y, so the scene must get shorter than lane stacking.
+      expect(packed.sceneBounds.height).toBeLessThan(
+        stacked.sceneBounds.height,
+      );
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
   );

@@ -26,9 +26,11 @@ TOPIC_QUERIES: dict[str, list[str]] = {
     "layer-assignment": [
         "network simplex rank assignment graph",
         "minimum width graph layering",
+        "minimum width layering dummy nodes",
         "node promotion graph layering",
         "Coffman Graham graph layering",
         "layer reassignment graph",
+        "ALAP as-late-as-possible scheduling DAG",
     ],
     "crossing": [
         "layered crossing minimization",
@@ -38,15 +40,34 @@ TOPIC_QUERIES: dict[str, list[str]] = {
     ],
     "compound": [
         "compound directed graph layout",
+        "compound directed graph layout global ranking cluster borders",
         "layered compound graphs crossing",
         "grouped network grid layout",
         "nested graph layout",
     ],
     "constraints": [
         "separation constraint graph layout",
+        "separation constraints quadratic program VPSC",
+        "cluster containment constraint layout",
         "Dig-CoLa constrained energy graph",
         "IPSep-CoLa separation layout",
         "port constraints hierarchical graph",
+    ],
+    "compaction": [
+        "constraint graph one-dimensional compaction longest path",
+        "scanline shadow constraint generation VLSI",
+        "two-dimensional compaction NP-hard",
+        "VLSI symbolic layout compaction",
+    ],
+    "packing": [
+        "strip packing bottom-left skyline heuristic",
+        "left edge algorithm channel routing track assignment",
+        "2D rectangular strip packing heuristic",
+    ],
+    "overlap": [
+        "layout adjustment mental map graph drawing",
+        "cluster busting clutter reduction graph layout",
+        "node overlap removal graph visualization",
     ],
     "elk-kieler": [
         "ELK layered layout eclipse",

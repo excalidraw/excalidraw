@@ -52,6 +52,32 @@ yarn health           # fix + typecheck + eslint + arch + knip + depcheck
 
 See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLint scopes, Oxlint rollout, and SonarQube Community Build setup.
 
+### Repo RAG (code + docs search)
+
+Local hybrid search over this monorepo (AST chunking, OpenAI `text-embedding-3-large`, BM25). Requires `OPENAI_API_KEY`.
+
+```bash
+cd tools/repo-rag && uv sync && cp .env.example .env  # set OPENAI_API_KEY in .env
+yarn repo-rag:index
+yarn repo-rag:query "terraform pipeline compound layout" --top 8 --json
+yarn repo-rag:status
+```
+
+See [tools/repo-rag/README.md](tools/repo-rag/README.md). Agent skill: [.agents/skills/repo-rag/SKILL.md](.agents/skills/repo-rag/SKILL.md).
+
+### Graph layout RAG (literature search)
+
+Local vector search over harvested graph-drawing papers (OpenAI `text-embedding-3-large`, LanceDB). Reuses `OPENAI_API_KEY` from `tools/repo-rag/.env` or `tools/graph-layout-rag/.env`.
+
+```bash
+cd tools/graph-layout-rag && uv sync
+yarn graph-rag:harvest
+yarn graph-rag:ingest -- --force --rebuild   # required after embed model change
+yarn graph-rag:query "VPSC separation constraints" --tag constraints --json
+```
+
+See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md).
+
 ## Architecture Notes
 
 ### Build System

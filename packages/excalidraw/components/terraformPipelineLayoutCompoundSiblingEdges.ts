@@ -9,7 +9,7 @@ import {
   TERRAFORM_TOPOLOGY_FRAME_FLOW_STROKE,
   type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
-import type { PipelineCluster } from "./terraformPipelineLayoutShared";
+
 import {
   lcaTopologyPath,
   topologyFrameSkeletonId,
@@ -17,6 +17,8 @@ import {
   topologyRoleAndKeyFromPath,
   type TopologyFrameRole,
 } from "./terraformPipelineTopologyFrames";
+
+import type { PipelineCluster } from "./terraformPipelineLayoutShared";
 
 import type { CollapsedPipelineEdge } from "./terraformPipelineLayoutShared";
 
@@ -117,7 +119,8 @@ export function collectCompoundTopologyFrameEdges(
   }
 
   return [...deduped.values()].sort(
-    (a, b) => a.sequence - b.sequence || a.sourceFrameId.localeCompare(b.targetFrameId),
+    (a, b) =>
+      a.sequence - b.sequence || a.sourceFrameId.localeCompare(b.targetFrameId),
   );
 }
 
@@ -129,7 +132,10 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
   skeleton: ExcalidrawElementSkeleton[],
   layoutBoxes: Map<string, LayoutBox>,
 ): number {
-  const frameEdges = collectCompoundTopologyFrameEdges(collapsedEdges, clusters);
+  const frameEdges = collectCompoundTopologyFrameEdges(
+    collapsedEdges,
+    clusters,
+  );
   let edgeIndex = 0;
 
   for (const edge of frameEdges) {

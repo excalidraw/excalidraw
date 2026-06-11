@@ -35,6 +35,7 @@ export const TerraformImportModal = ({
     view,
     pipelineCompact,
     pipelineLayoutVariant,
+    pipelinePacked,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -62,6 +63,7 @@ export const TerraformImportModal = ({
     setView,
     setPipelineCompact,
     setPipelineLayoutVariant,
+    setPipelinePacked,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,
@@ -637,6 +639,42 @@ writer -> bucket`}</code>
                           onClick={() => setPipelineLayoutVariant("compound")}
                         >
                           Compound
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      className="TerraformImportModal__viewSubOptionRow"
+                      role="group"
+                      aria-label="Pipeline height packing"
+                    >
+                      <span className="TerraformImportModal__viewSubOptionLabel">
+                        Height
+                      </span>
+                      <div className="TerraformImportModal__viewSubOption">
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            !pipelinePacked
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={!pipelinePacked}
+                          onClick={() => setPipelinePacked(false)}
+                        >
+                          Stacked
+                        </button>
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            pipelinePacked
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={pipelinePacked}
+                          title="Push receive-only groups into later columns and pack boxes side by side to reduce diagram height"
+                          onClick={() => setPipelinePacked(true)}
+                        >
+                          Packed
                         </button>
                       </div>
                     </div>

@@ -52,7 +52,9 @@ dev-dist
 html
 meta*.json
 .claude
-.agents/
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 *.iml
 **/terraform/.terraform.lock.hcl
 **/terraform/.terraform/
@@ -135,6 +137,7 @@ docs/reddit/
 scripts/benchmark-landing-results.json
 
 # Graph layout RAG — local harvest corpus and Python venv (see tools/graph-layout-rag/.gitignore)
+tools/graph-layout-rag/.env
 tools/graph-layout-rag/.venv/
 tools/graph-layout-rag/data/raw/
 tools/graph-layout-rag/data/lancedb/
@@ -143,3 +146,14 @@ tools/graph-layout-rag/data/ingest_state.json
 tools/graph-layout-rag/data/harvest.log
 tools/graph-layout-rag/**/__pycache__/
 tools/graph-layout-rag/.pytest_cache/
+
+# Repo RAG — local indexes and Python venv (see tools/repo-rag/.gitignore)
+tools/repo-rag/.env
+tools/repo-rag/.venv/
+tools/repo-rag/data/lancedb/
+tools/repo-rag/data/bm25/
+tools/repo-rag/data/manifest.json
+tools/repo-rag/data/ingest_state.json
+tools/repo-rag/data/repo-rag.log
+tools/repo-rag/**/__pycache__/
+tools/repo-rag/.pytest_cache/

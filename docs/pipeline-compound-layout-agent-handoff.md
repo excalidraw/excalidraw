@@ -2,6 +2,8 @@
 
 Deep reference for another agent working on **Terraform pipeline import → Compound layout variant**. Covers algorithm design, code map, invariants, Classic vs Compound differences, and what is intentionally not implemented yet.
 
+**Start here for a unified import + compound overview:** [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md)
+
 Related docs:
 
 - [terraform-pipeline-import-debug-handoff.md](./terraform-pipeline-import-debug-handoff.md) — end-to-end import flow, debugging pipeline failures

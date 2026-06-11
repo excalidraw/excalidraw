@@ -1,0 +1,32 @@
+[project]
+name = "repo-rag"
+version = "0.1.0"
+description = "Full-repo RAG for excalidraw-tf — AST chunking, OpenAI embeddings, hybrid search"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "click>=8.1.0",
+  "lancedb>=0.15.0",
+  "openai>=1.40.0",
+  "pydantic>=2.7.0",
+  "tantivy>=0.22.0",
+  "tiktoken>=0.7.0",
+  "tree-sitter>=0.23.0",
+  "tree-sitter-typescript>=0.23.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+repo-rag = "repo_rag.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/repo_rag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

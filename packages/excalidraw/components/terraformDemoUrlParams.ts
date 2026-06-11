@@ -9,6 +9,7 @@ export type TerraformDemoUrlParams = {
   view?: TerraformView;
   pack?: ModulePackingMode;
   pipelineVariant?: PipelineLayoutVariant;
+  packed?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -83,11 +84,25 @@ export const parseTerraformDemoUrlParams = (
     pipelineVariant = normalized;
   }
 
+  const packedRaw = params.get("packed");
+  let packed: boolean | undefined;
+  if (packedRaw != null && packedRaw.trim() !== "") {
+    const normalized = packedRaw.trim().toLowerCase();
+    if (normalized === "1" || normalized === "true") {
+      packed = true;
+    } else if (normalized === "0" || normalized === "false") {
+      packed = false;
+    } else {
+      return null;
+    }
+  }
+
   return {
     presetId,
     ...(view ? { view } : {}),
     ...(pack ? { pack } : {}),
     ...(pipelineVariant ? { pipelineVariant } : {}),
+    ...(packed != null ? { packed } : {}),
   };
 };
 

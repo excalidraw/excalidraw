@@ -5,6 +5,12 @@ import {
   placeClustersClassicGrid,
   preparePipelineLayout,
 } from "./terraformPipelineLayoutShared";
+import {
+  applyPackedDepthShifts,
+  computePackedDepthShifts,
+  placeClustersPackedGrid,
+  EMPTY_PACKED_DEPTH_SHIFTS,
+} from "./terraformPipelineLayoutPacked";
 import { emitTopologyContextFrames } from "./terraformPipelineTopologyFrames";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
@@ -13,15 +19,23 @@ import type { TerraformImportWarning } from "./terraformImportMerge";
 export async function buildTerraformPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
-  options?: { compact?: boolean },
+  options?: { compact?: boolean; packed?: boolean },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: Record<string, unknown>;
   warnings: TerraformImportWarning[];
 }> {
   const compact = options?.compact !== false;
-  const prep = preparePipelineLayout(nodes, plan, compact);
-  const { skeleton, layoutBoxes } = placeClustersClassicGrid(prep);
+  const packed = options?.packed === true;
+  let prep = preparePipelineLayout(nodes, plan, compact);
+  let packedShifts = EMPTY_PACKED_DEPTH_SHIFTS;
+  if (packed) {
+    packedShifts = computePackedDepthShifts(prep);
+    prep = applyPackedDepthShifts(prep, packedShifts);
+  }
+  const { skeleton, layoutBoxes } = packed
+    ? placeClustersPackedGrid(prep)
+    : placeClustersClassicGrid(prep);
 
   emitTopologyContextFrames(skeleton, prep.clusters, layoutBoxes);
 
@@ -37,6 +51,13 @@ export async function buildTerraformPipelineExcalidrawScene(
       pipelineClusterCount: prep.clusters.length,
       pipelineEdgeCount: prep.collapsedEdges.length,
       pipelineColumnCount: prep.maxDepth + 1,
+      ...(packed
+        ? {
+            pipelinePackedApplied: true,
+            pipelinePackedDepthShiftCount: packedShifts.shiftCount,
+            pipelinePackedGroupShiftCount: packedShifts.groupShiftCount,
+          }
+        : {}),
     },
     prep.depthResult,
   );

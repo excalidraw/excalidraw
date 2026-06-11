@@ -4,8 +4,8 @@ from typing import Any
 
 import lancedb
 
-from graph_layout_rag.ingest.embed import embed_texts
-from graph_layout_rag.ingest.index import _table_names
+from graph_layout_rag.ingest.embed import EmbedConfig, embed_texts
+from graph_layout_rag.ingest.index import _table_names, ensure_embed_config_matches, load_ingest_state
 from graph_layout_rag.paths import CHUNKS_TABLE, LANCE_DIR
 
 
@@ -25,7 +25,9 @@ def search(
         return []
 
     table = db.open_table(CHUNKS_TABLE)
-    vector = embed_texts([query])[0]
+    cfg = EmbedConfig.from_env()
+    ensure_embed_config_matches(load_ingest_state(), cfg)
+    vector = embed_texts([query], config=cfg, workers=1)[0]
 
     results = (
         table.search(vector)

@@ -431,6 +431,7 @@ async function buildPipelineLayoutSceneBody(
           : buildTerraformPipelineExcalidrawScene;
       const pipelineScene = await buildPipeline(ctx.nodes5, ctx.plan, {
         compact: ctx.pipelineCompact !== false,
+        packed: ctx.pipelinePacked === true,
       });
       emitLocalParseDebug({
         phase: "pipelineLayout",

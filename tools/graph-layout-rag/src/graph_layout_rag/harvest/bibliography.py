@@ -29,6 +29,10 @@ SEED_TAGS = {
     "curated",
     "bibliography",
     "arxiv",
+    "compaction",
+    "packing",
+    "overlap",
+    "research-thread",
 }
 DEFAULT_MAX_BIB_DOIS = 300
 

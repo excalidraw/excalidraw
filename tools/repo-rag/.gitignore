@@ -1,0 +1,10 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+data/lancedb/
+data/bm25/
+data/manifest.json
+data/ingest_state.json
+data/repo-rag.log

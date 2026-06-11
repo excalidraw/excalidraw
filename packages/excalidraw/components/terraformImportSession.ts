@@ -30,6 +30,8 @@ export type TerraformImportSession = {
   terraformLodPreset?: import("./terraformLod").TerraformLodPreset;
   /** Pipeline layout variant — classic global grid or compound hierarchy. */
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
+  /** Pipeline packed mode — push sink-only groups right, re-pack lanes in Y. */
+  pipelinePacked?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

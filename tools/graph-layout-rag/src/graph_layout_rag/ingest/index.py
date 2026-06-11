@@ -1,24 +1,45 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Any
 
 import lancedb
 
 from graph_layout_rag.ingest.chunk import TextChunk
-from graph_layout_rag.ingest.embed import embed_texts
-from graph_layout_rag.paths import CHUNKS_TABLE, INGEST_STATE_PATH, LANCE_DIR
+from graph_layout_rag.ingest.embed import EmbedConfig, EmbedStats, embed_texts
+from graph_layout_rag.paths import (
+    CHUNKS_TABLE,
+    EMBED_COST_PER_MILLION_TOKENS,
+    INGEST_STATE_PATH,
+    LANCE_DIR,
+)
+
+METADATA_KEYS = frozenset(
+    {
+        "embed_model",
+        "embed_dims",
+        "total_tokens_embedded",
+        "estimated_cost_usd",
+        "last_indexed_at",
+    }
+)
 
 
-def load_ingest_state() -> dict[str, str]:
+def load_ingest_state() -> dict[str, Any]:
     if not INGEST_STATE_PATH.exists():
         return {}
     return json.loads(INGEST_STATE_PATH.read_text(encoding="utf-8"))
 
 
-def save_ingest_state(state: dict[str, str]) -> None:
+def save_ingest_state(state: dict[str, Any]) -> None:
     INGEST_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     INGEST_STATE_PATH.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def doc_sha256(state: dict[str, Any], doc_id: str) -> str | None:
+    value = state.get(doc_id)
+    return value if isinstance(value, str) else None
 
 
 def _table_names(db: lancedb.DBConnection) -> list[str]:
@@ -44,16 +65,65 @@ def _chunk_row(chunk: TextChunk, vector: list[float]) -> dict[str, Any]:
     }
 
 
-def upsert_chunks(chunks: list[TextChunk], *, rebuild: bool = False) -> int:
+def embed_config_mismatch(state: dict[str, Any], config: EmbedConfig) -> bool:
+    model = state.get("embed_model")
+    dims = state.get("embed_dims")
+    if model and model != config.model:
+        return True
+    if dims is not None and int(dims) != config.dimensions:
+        return True
+    return False
+
+
+def ensure_embed_config_matches(state: dict[str, Any], config: EmbedConfig) -> None:
+    model = state.get("embed_model")
+    dims = state.get("embed_dims")
+    if model and model != config.model:
+        raise RuntimeError(
+            f"Index was built with embed model '{model}' but query uses '{config.model}'. "
+            "Re-run: graph-layout-rag ingest --force --rebuild"
+        )
+    if dims is not None and int(dims) != config.dimensions:
+        raise RuntimeError(
+            f"Index was built with embed dims {dims} but query uses {config.dimensions}. "
+            "Re-run: graph-layout-rag ingest --force --rebuild"
+        )
+
+
+def update_ingest_metadata(
+    state: dict[str, Any],
+    *,
+    config: EmbedConfig,
+    run_tokens: int,
+) -> None:
+    prev_tokens = int(state.get("total_tokens_embedded", 0))
+    prev_cost = float(state.get("estimated_cost_usd", 0.0))
+    run_cost = (run_tokens / 1_000_000) * EMBED_COST_PER_MILLION_TOKENS
+    state["embed_model"] = config.model
+    state["embed_dims"] = config.dimensions
+    state["total_tokens_embedded"] = prev_tokens + run_tokens
+    state["estimated_cost_usd"] = round(prev_cost + run_cost, 6)
+    state["last_indexed_at"] = datetime.now(timezone.utc).isoformat()
+
+
+def upsert_chunks(
+    chunks: list[TextChunk],
+    *,
+    rebuild: bool = False,
+    config: EmbedConfig | None = None,
+    stats: EmbedStats | None = None,
+    workers: int | None = None,
+) -> int:
     if not chunks:
         return 0
 
+    cfg = config or EmbedConfig.from_env()
+    texts = [c.text for c in chunks]
+    vectors = embed_texts(texts, config=cfg, stats=stats, workers=workers)
+    rows = [_chunk_row(c, v) for c, v in zip(chunks, vectors)]
+
     LANCE_DIR.mkdir(parents=True, exist_ok=True)
     db = lancedb.connect(str(LANCE_DIR))
-
-    texts = [c.text for c in chunks]
-    vectors = embed_texts(texts)
-    rows = [_chunk_row(c, v) for c, v in zip(chunks, vectors)]
 
     tables = _table_names(db)
     if rebuild or CHUNKS_TABLE not in tables:

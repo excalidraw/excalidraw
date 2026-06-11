@@ -149,6 +149,8 @@ export type RunTerraformImportFromSourcesOptions = {
   terraformLodEnabled?: boolean;
   terraformLodPreset?: AppState["terraformLodPreset"];
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
+  /** Pipeline packed mode — push sink-only groups right and re-pack lanes in Y. Default false. */
+  pipelinePacked?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -170,7 +172,11 @@ async function layoutTerraformSceneFromSources(
   moduleLayoutOptions: TerraformModuleLayoutOptions,
 ): Promise<TerraformExcalidrawScenePayload> {
   const presetId = options.preset?.id?.trim();
-  if (presetId) {
+  // Packed pipeline scenes are not part of the KV layout cache key yet; skip
+  // the cache so a packed import never returns the cached stacked layout.
+  const skipLayoutCache =
+    layoutMode === "pipeline" && options.pipelinePacked === true;
+  if (presetId && !skipLayoutCache) {
     const cached = await fetchPresetLayoutCache(
       presetId,
       layoutMode as TerraformView,
@@ -193,6 +199,7 @@ async function layoutTerraformSceneFromSources(
         ? {
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+            pipelinePacked: options.pipelinePacked === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -257,6 +264,7 @@ export const runTerraformImportFromSources = async (
         ? {
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+            pipelinePacked: options.pipelinePacked === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

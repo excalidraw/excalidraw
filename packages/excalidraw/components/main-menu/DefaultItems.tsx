@@ -384,8 +384,7 @@ export const TerraformZoomLod = () => {
               {
                 value: "performance",
                 label: "Performance",
-                ariaLabel:
-                  "Performance — hide detail soonest when zoomed out",
+                ariaLabel: "Performance — hide detail soonest when zoomed out",
                 testId: "terraform-lod-preset-performance",
               },
               {
