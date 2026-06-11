@@ -19,8 +19,7 @@ import {
   newTextElement,
 } from "@excalidraw/element";
 
-import { isLinearElementType } from "@excalidraw/element";
-import { getSelectedElements } from "@excalidraw/element";
+import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import { FONT_SIZES } from "@excalidraw/common";
@@ -267,9 +266,9 @@ export class API {
           : rest.roundness
       )
         ? {
-            type: isLinearElementType(type)
-              ? ROUNDNESS.PROPORTIONAL_RADIUS
-              : ROUNDNESS.ADAPTIVE_RADIUS,
+            type: isUsingAdaptiveRadius(type)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
           }
         : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
