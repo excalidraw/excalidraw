@@ -11,11 +11,12 @@ from repo_rag.chunk.types import TextChunk
 from repo_rag.harvest.manifest import FileEntry, save_manifest
 from repo_rag.harvest.walk import harvest_repo
 from repo_rag.ingest import bm25 as bm25_index
-from repo_rag.ingest.embed import EmbedConfig, EmbedStats, resolve_workers
+from repo_rag.ingest.embed import ENV_PREFIX, EmbedConfig, EmbedStats, embed_config_from_env, prepare_embed_config, resolve_workers
 from repo_rag.logging_config import get_logger
 from repo_rag.ingest.index import (
     chunk_count as lance_chunk_count,
     delete_chunks_for_file,
+    embed_config_mismatch,
     load_ingest_state,
     save_ingest_state,
     update_ingest_metadata,
@@ -152,14 +153,24 @@ def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
 
     state = load_ingest_state()
     file_hashes: dict[str, str] = dict(state.get("files", {}))
-    config = EmbedConfig.from_env()
+    config = prepare_embed_config()
     stats = EmbedStats()
+
+    if embed_config_mismatch(state, config) and not rebuild:
+        log.warning(
+            "embed backend/model changed (%s -> %s); auto-enabling rebuild",
+            state.get("embed_backend"),
+            config.backend,
+        )
+        rebuild = True
+        force = True
 
     mode = "rebuild" if rebuild else ("force" if force else "incremental")
     log.info(
-        "index start mode=%s workers=%d embed_model=%s dims=%d previously_indexed=%d",
+        "index start mode=%s workers=%d embed_backend=%s embed_model=%s dims=%d previously_indexed=%d",
         mode,
         n_workers,
+        config.backend,
         config.model,
         config.dimensions,
         len(file_hashes),
@@ -204,12 +215,13 @@ def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
 
     file_hashes.update(new_hashes)
     state["files"] = file_hashes
-    update_ingest_metadata(state, config=config, run_tokens=stats.tokens)
+    effective = stats.effective_config or config
+    update_ingest_metadata(state, config=effective, run_tokens=stats.tokens)
     save_ingest_state(state)
 
     total = lance_chunk_count()
     elapsed = time.monotonic() - started
-    run_cost = (stats.tokens / 1_000_000) * EMBED_COST_PER_MILLION_TOKENS
+    run_cost = (stats.tokens / 1_000_000) * EMBED_COST_PER_MILLION_TOKENS if effective.backend == "openai" else 0.0
     indexed = len(new_hashes)
     log.info(
         "index done files=%d skipped=%d chunks_written=%d total_chunks=%d "
@@ -226,6 +238,7 @@ def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
     )
     click.echo(
         f"Indexed {indexed} files ({written} chunks written, {skipped} skipped). "
+        f"Backend: {effective.backend}. "
         f"Tokens this run: {stats.tokens:,} (~${run_cost:.4f}). "
         f"Index total: {total} chunks. "
         f"Elapsed: {elapsed:.1f}s ({n_workers} workers)."

@@ -6,8 +6,12 @@ from typing import Any
 import lancedb
 
 from repo_rag.ingest.bm25 import search_bm25
-from repo_rag.ingest.embed import EmbedConfig, embed_query
-from repo_rag.ingest.index import _table_names, ensure_embed_config_matches, load_ingest_state
+from repo_rag.ingest.embed import ENV_PREFIX, EmbedConfig, embed_config_from_env, embed_query
+from repo_rag.ingest.index import (
+    _table_names,
+    embed_config_from_state,
+    load_ingest_state,
+)
 from repo_rag.logging_config import get_logger
 from repo_rag.paths import CHUNKS_TABLE, LANCE_DIR
 from repo_rag.query.hybrid import reciprocal_rank_fusion
@@ -31,7 +35,7 @@ def _dense_search(
     if CHUNKS_TABLE not in _table_names(db):
         return []
 
-    vector = embed_query(query, config=config)
+    vector = embed_query(query, config=config, prefix=ENV_PREFIX, allow_fallback=False)
     table = db.open_table(CHUNKS_TABLE)
     t0 = time.monotonic()
     results = table.search(vector).metric("cosine").limit(limit * 2).to_list()
@@ -74,10 +78,11 @@ def search(
     package: str | None = None,
     path_contains: str | None = None,
 ) -> list[dict[str, Any]]:
-    config = EmbedConfig.from_env()
+    config = embed_config_from_env()
     state = load_ingest_state()
-    if state:
-        ensure_embed_config_matches(state, config)
+    indexed = embed_config_from_state(state)
+    if indexed is not None:
+        config = indexed
 
     dense = _dense_search(
         query,

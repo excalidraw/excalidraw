@@ -8,7 +8,7 @@ import lancedb
 
 from repo_rag.chunk.prefix import build_prefixed_text
 from repo_rag.chunk.types import TextChunk
-from repo_rag.ingest.embed import EmbedConfig, EmbedStats, embed_texts
+from repo_rag.ingest.embed import ENV_PREFIX, EmbedConfig, EmbedStats, embed_config_from_env, embed_texts, prepare_embed_config
 from repo_rag.paths import CHUNKS_TABLE, EMBED_COST_PER_MILLION_TOKENS, INGEST_STATE_PATH, LANCE_DIR
 
 
@@ -73,9 +73,17 @@ def upsert_chunks(
     if not chunks:
         return 0
 
-    cfg = config or EmbedConfig.from_env()
+    cfg = config or embed_config_from_env()
     prefixed = [build_prefixed_text(c) for c in chunks]
-    vectors = embed_texts(prefixed, config=cfg, stats=stats, workers=workers)
+    vectors = embed_texts(
+        prefixed,
+        config=cfg,
+        stats=stats,
+        workers=workers,
+        prefix=ENV_PREFIX,
+        allow_fallback=False,
+        probe=False,
+    )
     rows = [_chunk_row(c, v, p) for c, v, p in zip(chunks, vectors, prefixed)]
 
     LANCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -118,6 +126,7 @@ def update_ingest_metadata(
     prev_tokens = int(state.get("total_tokens_embedded", 0))
     prev_cost = float(state.get("estimated_cost_usd", 0.0))
     run_cost = (run_tokens / 1_000_000) * EMBED_COST_PER_MILLION_TOKENS
+    state["embed_backend"] = config.backend
     state["embed_model"] = config.model
     state["embed_dims"] = config.dimensions
     state["total_tokens_embedded"] = prev_tokens + run_tokens
@@ -125,16 +134,44 @@ def update_ingest_metadata(
     state["last_indexed_at"] = datetime.now(timezone.utc).isoformat()
 
 
+def embed_config_from_state(state: dict[str, Any]) -> EmbedConfig | None:
+    backend = state.get("embed_backend")
+    if not backend:
+        return None
+    return EmbedConfig(
+        backend=backend,
+        model=state.get("embed_model", ""),
+        dimensions=int(state.get("embed_dims", 0)),
+    )
+
+
+def embed_config_mismatch(state: dict[str, Any], config: EmbedConfig) -> bool:
+    indexed = embed_config_from_state(state)
+    if indexed is None:
+        return False
+    return (
+        indexed.backend != config.backend
+        or indexed.model != config.model
+        or indexed.dimensions != config.dimensions
+    )
+
+
 def ensure_embed_config_matches(state: dict[str, Any], config: EmbedConfig) -> None:
-    model = state.get("embed_model")
-    dims = state.get("embed_dims")
-    if model and model != config.model:
+    indexed = embed_config_from_state(state)
+    if indexed is None:
+        return
+    if indexed.backend != config.backend:
         raise RuntimeError(
-            f"Index was built with embed model '{model}' but query uses '{config.model}'. "
-            "Re-run: repo-rag index --force"
+            f"Index was built with embed backend '{indexed.backend}' "
+            f"but query uses '{config.backend}'. Re-run: repo-rag index --force --rebuild"
         )
-    if dims and int(dims) != config.dimensions:
+    if indexed.model != config.model:
         raise RuntimeError(
-            f"Index was built with embed dims {dims} but query uses {config.dimensions}. "
-            "Re-run: repo-rag index --force"
+            f"Index was built with embed model '{indexed.model}' but query uses '{config.model}'. "
+            "Re-run: repo-rag index --force --rebuild"
+        )
+    if indexed.dimensions != config.dimensions:
+        raise RuntimeError(
+            f"Index was built with embed dims {indexed.dimensions} but query uses {config.dimensions}. "
+            "Re-run: repo-rag index --force --rebuild"
         )

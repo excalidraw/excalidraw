@@ -1,0 +1,23 @@
+[project]
+name = "rag-common"
+version = "0.1.0"
+description = "Shared embedding providers for repo-rag and graph-layout-rag"
+requires-python = ">=3.11"
+dependencies = [
+  "openai>=1.40.0",
+  "sentence-transformers>=3.0.0",
+  "tiktoken>=0.7.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_common"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

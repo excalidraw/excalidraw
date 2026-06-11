@@ -1,11 +1,11 @@
 ---
 name: repo-rag
-description: Query local full-repo RAG over excalidraw-tf code and handoff docs. Use when onboarding to this repo, finding where Terraform import/layout code lives, tracing pipeline compound layout, preset loaders, dependency-cruiser boundaries, or any "where is X implemented?" question. Hybrid BM25 + OpenAI embeddings. After search, read full source files from file_path + start_line.
+description: Query local full-repo RAG over excalidraw-tf code and handoff docs. Use when onboarding to this repo, finding where Terraform import/layout code lives, tracing pipeline compound layout, preset loaders, dependency-cruiser boundaries, or any "where is X implemented?" question. Hybrid BM25 + embeddings (OpenAI text-embedding-3-large, local MiniLM fallback). After search, read full source files from file_path + start_line.
 ---
 
 # Repo RAG
 
-Local hybrid search (BM25 + `text-embedding-3-large`) over **this repo's** TypeScript, tests, and markdown handoffs. AST-chunked at function/class boundaries.
+Local hybrid search (BM25 + vector) over **this repo's** TypeScript, tests, and markdown handoffs. AST-chunked at function/class boundaries. Embeddings: OpenAI `text-embedding-3-large` by default; `RAG_EMBED_BACKEND=auto` falls back to local `all-MiniLM-L6-v2` without a valid API key.
 
 **Not** graph-drawing literature — use skill `graph-layout-rag` / `yarn graph-rag:query` for Sugiyama, ELK, compound-graph papers.
 
@@ -39,8 +39,8 @@ Local hybrid search (BM25 + `text-embedding-3-large`) over **this repo's** TypeS
 
 ```bash
 cd tools/repo-rag && uv sync
-cp .env.example .env   # set OPENAI_API_KEY=sk-...
-yarn repo-rag:index    # first run ~$0.30, incremental after
+cp .env.example .env   # OPENAI_API_KEY optional with RAG_EMBED_BACKEND=auto
+yarn repo-rag:index    # OpenAI ~$0.30 first run; local fallback is free
 yarn repo-rag:status   # confirm chunks_lance > 0
 ```
 

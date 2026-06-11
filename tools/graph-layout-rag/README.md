@@ -12,7 +12,7 @@ uv sync
 cp .env.example .env   # or reuse tools/repo-rag/.env — set OPENAI_API_KEY
 ```
 
-Embeddings use OpenAI **`text-embedding-3-large`** (3072 dims). The API key is loaded from `tools/graph-layout-rag/.env`, `.env.example`, or sibling `tools/repo-rag/.env`.
+Embeddings default to OpenAI **`text-embedding-3-large`** (3072 dims) with **`RAG_EMBED_BACKEND=auto`** fallback to local **`all-MiniLM-L6-v2`** (384 dims) when OpenAI is unavailable. API key is loaded from `tools/graph-layout-rag/.env`, sibling `tools/repo-rag/.env`, or `.env.example`.
 
 ## Pipeline
 

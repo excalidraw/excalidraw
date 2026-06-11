@@ -4,8 +4,12 @@ from typing import Any
 
 import lancedb
 
-from graph_layout_rag.ingest.embed import EmbedConfig, embed_texts
-from graph_layout_rag.ingest.index import _table_names, ensure_embed_config_matches, load_ingest_state
+from graph_layout_rag.ingest.embed import ENV_PREFIX, embed_config_from_env, embed_texts
+from graph_layout_rag.ingest.index import (
+    _table_names,
+    embed_config_from_state,
+    load_ingest_state,
+)
 from graph_layout_rag.paths import CHUNKS_TABLE, LANCE_DIR
 
 
@@ -24,10 +28,19 @@ def search(
     if CHUNKS_TABLE not in _table_names(db):
         return []
 
+    state = load_ingest_state()
+    indexed = embed_config_from_state(state)
+    config = indexed if indexed is not None else embed_config_from_env()
+
     table = db.open_table(CHUNKS_TABLE)
-    cfg = EmbedConfig.from_env()
-    ensure_embed_config_matches(load_ingest_state(), cfg)
-    vector = embed_texts([query], config=cfg, workers=1)[0]
+    vector = embed_texts(
+        [query],
+        config=config,
+        workers=1,
+        prefix=ENV_PREFIX,
+        allow_fallback=False,
+        probe=False,
+    )[0]
 
     results = (
         table.search(vector)

@@ -1,6 +1,6 @@
 # Repo RAG
 
-Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, OpenAI `text-embedding-3-large` embeddings, and hybrid BM25 + vector search. Use this before diving into hundreds of terraform layout files.
+Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, hybrid BM25 + vector search. Embeddings default to OpenAI `text-embedding-3-large` and **automatically fall back** to local `all-MiniLM-L6-v2` when no valid API key or OpenAI is unavailable (`RAG_EMBED_BACKEND=auto`).
 
 Separate from [`tools/graph-layout-rag`](../graph-layout-rag) (external graph-drawing papers).
 
@@ -14,7 +14,7 @@ Requires Python 3.11+ and [uv](https://github.com/astral-sh/uv).
 cd tools/repo-rag
 uv sync
 cp .env.example .env
-# Edit .env and set OPENAI_API_KEY=sk-...
+# Edit .env and set OPENAI_API_KEY=sk-... (optional with RAG_EMBED_BACKEND=auto — uses local MiniLM if missing)
 ```
 
 The key is read from `tools/repo-rag/.env` on every CLI run (gitignored). If `.env` is missing, **`.env.example` is used as fallback**. Shell `export OPENAI_API_KEY=...` overrides both.
@@ -45,8 +45,10 @@ uv run repo-rag harvest            # manifest only, no API calls
 
 | Env var | Default | Purpose |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | — | Required for index and query |
-| `REPO_RAG_EMBED_MODEL` | `text-embedding-3-large` | Embedding model |
+| `OPENAI_API_KEY` | — | Required for OpenAI backend; optional when `RAG_EMBED_BACKEND=auto` (falls back to local) |
+| `RAG_EMBED_BACKEND` | `auto` | `auto` \| `openai` \| `local` |
+| `REPO_RAG_EMBED_BACKEND` | — | Override backend for repo-rag only |
+| `REPO_RAG_EMBED_MODEL` | `text-embedding-3-large` | OpenAI embedding model |
 | `REPO_RAG_EMBED_DIMS` | `3072` | Vector dimensions (1024 optional) |
 | `REPO_RAG_LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, … |
 | `REPO_RAG_LOG` | off | Set `1` to append logs to `data/repo-rag.log` |

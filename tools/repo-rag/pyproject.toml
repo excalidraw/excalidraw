@@ -9,11 +9,15 @@ dependencies = [
   "lancedb>=0.15.0",
   "openai>=1.40.0",
   "pydantic>=2.7.0",
+  "rag-common",
   "tantivy>=0.22.0",
   "tiktoken>=0.7.0",
   "tree-sitter>=0.23.0",
   "tree-sitter-typescript>=0.23.0",
 ]
+
+[tool.uv.sources]
+rag-common = { path = "../rag-common", editable = true }
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]

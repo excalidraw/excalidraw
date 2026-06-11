@@ -15,8 +15,8 @@ setup_logging()
 from repo_rag.harvest.manifest import save_manifest
 from repo_rag.harvest.walk import harvest_repo
 from repo_rag.ingest import bm25 as bm25_index
-from repo_rag.ingest.embed import EmbedConfig
-from repo_rag.ingest.index import chunk_count, load_ingest_state
+from repo_rag.ingest.embed import embed_config_from_env
+from repo_rag.ingest.index import chunk_count, embed_config_from_state, load_ingest_state
 from repo_rag.ingest.run import index_cmd
 from repo_rag.paths import DEFAULT_LOG_FILE
 from repo_rag.query.search import search
@@ -106,7 +106,8 @@ def query_cmd(
 def status_cmd() -> None:
     """Show index stats, embed model, and estimated cost."""
     state = load_ingest_state()
-    config = EmbedConfig.from_env()
+    resolved = embed_config_from_env()
+    indexed = embed_config_from_state(state)
     manifest = harvest_repo()
 
     payload = {
@@ -114,8 +115,11 @@ def status_cmd() -> None:
         "chunks_bm25": bm25_index.chunk_count(),
         "files_in_repo": len(manifest.files),
         "files_indexed": len(state.get("files", {})),
-        "embed_model": state.get("embed_model", config.model),
-        "embed_dims": state.get("embed_dims", config.dimensions),
+        "embed_backend": state.get("embed_backend", indexed.backend if indexed else resolved.backend),
+        "embed_model": state.get("embed_model", indexed.model if indexed else resolved.model),
+        "embed_dims": state.get("embed_dims", indexed.dimensions if indexed else resolved.dimensions),
+        "resolved_backend": resolved.backend,
+        "resolved_model": resolved.model,
         "total_tokens_embedded": state.get("total_tokens_embedded", 0),
         "estimated_cost_usd": state.get("estimated_cost_usd", 0.0),
         "last_indexed_at": state.get("last_indexed_at"),

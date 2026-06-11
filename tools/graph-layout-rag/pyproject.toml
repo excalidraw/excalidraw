@@ -12,8 +12,12 @@ dependencies = [
   "openai>=1.40.0",
   "pydantic>=2.7.0",
   "pymupdf>=1.24.0",
+  "rag-common",
   "tiktoken>=0.7.0",
 ]
+
+[tool.uv.sources]
+rag-common = { path = "../rag-common", editable = true }
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]

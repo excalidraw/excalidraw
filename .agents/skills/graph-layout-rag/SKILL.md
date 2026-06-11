@@ -32,9 +32,9 @@ Local vector search over a harvested graph-drawing corpus (target ~2.8k catalog 
 ```bash
 # One-time setup
 cd tools/graph-layout-rag && uv sync
-# OPENAI_API_KEY: tools/graph-layout-rag/.env or tools/repo-rag/.env
+# OPENAI_API_KEY optional — RAG_EMBED_BACKEND=auto uses local MiniLM if unavailable
 
-# Pipeline
+# Pipeline (rebuild required when switching openai ↔ local backends)
 yarn graph-rag:harvest
 yarn graph-rag:ingest -- --force --rebuild   # after embed model change
 yarn graph-rag:query "network simplex rank assignment dot" --top 8 --json
@@ -193,8 +193,8 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 
 - Python 3.11+, `uv` installed
 - `cd tools/graph-layout-rag && uv sync` once
-- `OPENAI_API_KEY` in `.env` (or sibling `tools/repo-rag/.env`)
-- Embeddings: OpenAI **`text-embedding-3-large`** (3072 dims). Re-run `ingest --force --rebuild` after model changes.
+- `OPENAI_API_KEY` optional with `RAG_EMBED_BACKEND=auto` (shared via `tools/rag-common`)
+- Embeddings: OpenAI `text-embedding-3-large` (3072 dims) or local `all-MiniLM-L6-v2` (384 dims). Re-run `ingest --force --rebuild` after switching backends.
 
 ## Paths (all gitignored except example manifest)
 

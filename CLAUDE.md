@@ -54,7 +54,7 @@ See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLin
 
 ### Repo RAG (code + docs search)
 
-Local hybrid search over this monorepo (AST chunking, OpenAI `text-embedding-3-large`, BM25). Requires `OPENAI_API_KEY`.
+Local hybrid search over this monorepo (AST chunking, BM25 + vector). Embeddings use shared [`tools/rag-common`](../tools/rag-common): OpenAI `text-embedding-3-large` by default, local `all-MiniLM-L6-v2` when `RAG_EMBED_BACKEND=auto` and OpenAI is unavailable.
 
 ```bash
 cd tools/repo-rag && uv sync && cp .env.example .env  # set OPENAI_API_KEY in .env
@@ -67,7 +67,7 @@ See [tools/repo-rag/README.md](tools/repo-rag/README.md). Agent skill: [.agents/
 
 ### Graph layout RAG (literature search)
 
-Local vector search over harvested graph-drawing papers (OpenAI `text-embedding-3-large`, LanceDB). Reuses `OPENAI_API_KEY` from `tools/repo-rag/.env` or `tools/graph-layout-rag/.env`.
+Local vector search over harvested graph-drawing papers (LanceDB). Same embed stack as repo-rag via `tools/rag-common` — OpenAI first, local fallback with `RAG_EMBED_BACKEND=auto`.
 
 ```bash
 cd tools/graph-layout-rag && uv sync

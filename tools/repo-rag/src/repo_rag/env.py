@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from rag_common.env import valid_openai_key
 from repo_rag.paths import ENV_EXAMPLE_PATH, ENV_PATH
 
 
@@ -38,7 +39,8 @@ def load_env_file(path: Path | None = None) -> bool:
 
     if ENV_PATH.is_file():
         _load_env_path(ENV_PATH)
-        return True
+        if valid_openai_key():
+            return True
 
     if ENV_EXAMPLE_PATH.is_file():
         _load_env_path(ENV_EXAMPLE_PATH)

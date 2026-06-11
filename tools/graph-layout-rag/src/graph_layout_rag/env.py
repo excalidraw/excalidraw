@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from rag_common.env import valid_openai_key
 from graph_layout_rag.paths import ENV_EXAMPLE_PATH, ENV_PATH, REPO_RAG_ENV_PATH
 
 
@@ -28,13 +29,6 @@ def _load_env_path(env_path: Path) -> None:
             os.environ[key] = value
 
 
-def _is_placeholder_api_key(key: str | None) -> bool:
-    if not key:
-        return True
-    lowered = key.strip().lower()
-    return lowered in {"", "sk-your-key-here", "sk-your-key", "your-api-key-here"}
-
-
 def load_env_file(path: Path | None = None) -> bool:
     """Load KEY=VALUE pairs from .env, sibling repo-rag/.env, then .env.example."""
     if path is not None:
@@ -45,11 +39,12 @@ def load_env_file(path: Path | None = None) -> bool:
 
     if ENV_PATH.is_file():
         _load_env_path(ENV_PATH)
-        return True
+        if valid_openai_key():
+            return True
 
     if REPO_RAG_ENV_PATH.is_file():
         _load_env_path(REPO_RAG_ENV_PATH)
-        if not _is_placeholder_api_key(os.environ.get("OPENAI_API_KEY")):
+        if valid_openai_key():
             return True
 
     if ENV_EXAMPLE_PATH.is_file():
