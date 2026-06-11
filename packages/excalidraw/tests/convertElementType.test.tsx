@@ -17,7 +17,7 @@ describe("convert element type", () => {
   it("recalculates roundness type when switching between generic shapes", () => {
     const rectangle = API.createElement({
       type: "rectangle",
-      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS }, // Dooesn't matter as long as it is set
     });
 
     API.setElements([rectangle]);
