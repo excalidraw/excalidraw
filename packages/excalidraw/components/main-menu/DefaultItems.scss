@@ -1,4 +1,20 @@
 .excalidraw {
+  .dropdown-menu-item-hint {
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: var(--color-gray-60);
+    cursor: default;
+    user-select: none;
+  }
+
+  .terraform-zoom-lod-preset-row {
+    &--inactive {
+      opacity: 0.55;
+      color: var(--color-gray-60);
+    }
+  }
+
   .ActiveFile {
     .ActiveFile__fileName {
       display: flex;

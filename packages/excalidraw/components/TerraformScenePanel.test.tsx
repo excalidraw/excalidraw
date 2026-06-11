@@ -126,6 +126,8 @@ describe("TerraformScenePanel", () => {
     expect(screen.getByTestId("terraform-scene-panel")).toBeTruthy();
     expect(screen.getByTestId("terraform-debug-reset")).not.toBeDisabled();
     expect(screen.getByTestId("terraform-debug-refresh")).not.toBeDisabled();
+    expect(screen.queryByTestId("terraform-debug-toggle-lod")).toBeNull();
+    expect(screen.queryByTestId("terraform-lod-preset-balanced")).toBeNull();
     expect(screen.getByTestId("action-undo")).toBeTruthy();
     expect(
       screen.getByTestId("terraform-scene-panel-legend-trigger"),

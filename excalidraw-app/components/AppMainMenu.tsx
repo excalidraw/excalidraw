@@ -33,6 +33,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.ImportTerraform />
       <MainMenu.DefaultItems.TerraformExpandAllToggle />
       <MainMenu.DefaultItems.TerraformLayers />
+      <MainMenu.DefaultItems.TerraformZoomLod />
       {props.isCollabEnabled && !props.frontendOnly && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}

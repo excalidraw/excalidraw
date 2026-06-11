@@ -6,6 +6,7 @@ export type RadioGroupChoice<T> = {
   value: T;
   label: React.ReactNode;
   ariaLabel?: string;
+  testId?: string;
 };
 
 export type RadioGroupProps<T> = {
@@ -37,6 +38,7 @@ export const RadioGroup = function <T>({
             checked={choice.value === value}
             onChange={() => onChange(choice.value)}
             aria-label={choice.ariaLabel}
+            data-testid={choice.testId}
           />
           {choice.label}
         </div>

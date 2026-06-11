@@ -86,23 +86,6 @@
       gap: 4px;
     }
 
-    &__lod-preset {
-      flex-shrink: 0;
-
-      .terraform-scene-panel__segment-btn {
-        flex: 0 1 auto;
-        padding: 0.2rem 0.4rem;
-        font-size: 0.65rem;
-        white-space: nowrap;
-
-        &--disabled {
-          opacity: 0.45;
-          cursor: not-allowed;
-          pointer-events: none;
-        }
-      }
-    }
-
     &__segment-btn {
       flex: 1 1 0;
       position: relative;

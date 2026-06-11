@@ -1,15 +1,11 @@
 import { useEditorInterface } from "../App";
 import { Ellipsify } from "../Ellipsify";
-import { RadioGroup } from "../RadioGroup";
+import { RadioGroup, type RadioGroupChoice } from "../RadioGroup";
 
 type Props<T> = {
   value: T;
   shortcut?: string;
-  choices: {
-    value: T;
-    label: React.ReactNode;
-    ariaLabel?: string;
-  }[];
+  choices: RadioGroupChoice<T>[];
   onChange: (value: T) => void;
   children: React.ReactNode;
   name: string;
