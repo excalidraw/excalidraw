@@ -153,6 +153,8 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     scale: [number, number];
     /** whether an element is cropped */
     crop: ImageCrop | null;
+    /** whether the image is animated (gif, apng) */
+    is_anim?: true;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
