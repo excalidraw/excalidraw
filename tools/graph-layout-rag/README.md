@@ -180,10 +180,10 @@ Requires `rag-common[gemini]` (included in `uv sync` for this package).
 
 Then `uv run graph-layout-rag ingest --force --rebuild`. Typical full corpus (~1,679 PDFs + 1,119 metadata-only, ~60k chunks, ~770 tokens/chunk):
 
-| Model | Est. cost (one-time) | Est. time |
-| --- | --- | --- |
-| `text-embedding-3-large` | **~$5–7** | ~30–90 min |
-| `text-embedding-3-small` | **~$1** | similar |
+| Model                    | Est. cost (one-time) | Est. time  |
+| ------------------------ | -------------------- | ---------- |
+| `text-embedding-3-large` | **~$5–7**            | ~30–90 min |
+| `text-embedding-3-small` | **~$1**              | similar    |
 
 `ingest_state.json` records `total_tokens_embedded` and `estimated_cost_usd` after OpenAI runs.
 

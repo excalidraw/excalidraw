@@ -16,7 +16,7 @@ yarn graph-rag:catalog --category <slug> --limit 20
 ## Code module → queries
 
 | Code | Category | Example query |
-|------|----------|---------------|
+| --- | --- | --- |
 | `computeDepths()` / longest-path columns | `layer-assignment` | `network simplex rank assignment slack layered digraph` |
 | `terraformPipelineLayoutPacked.ts` | `packing`, `layer-assignment` | `column reassignment vertical slack cross-lane packing` |
 | Compound frames / hierarchy | `compound` | `compound directed graph global ranking cluster borders` |

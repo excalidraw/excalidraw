@@ -177,7 +177,7 @@ Parsed by `terraformDemoUrlParams.ts` → `TerraformDemoAutoImport.tsx`:
 | `pipelineVariant=classic\|compound` | `pipelineLayoutVariant` | Optional; default classic |
 | `packed=1\|true` | `pipelinePacked: true` | Optional; default stacked |
 | `packedPullLeft=1\|true` | `pipelinePackedPullLeft: true` | Optional; implies `packed=1` unless `packed=0` given |
-| *(no param)* | `pipelineCompact: true` | Compact/Full **not** exposed in demo URL; always compact unless user toggles in dialog |
+| _(no param)_ | `pipelineCompact: true` | Compact/Full **not** exposed in demo URL; always compact unless user toggles in dialog |
 
 ---
 
