@@ -129,6 +129,8 @@ export type TerraformPlanParsingOptions = {
   pipelinePacked?: boolean;
   /** Packed only: pull slack clusters to their leftmost TFD-feasible column. */
   pipelinePackedPullLeft?: boolean;
+  /** Pipeline: also draw non-TFD resources in per-hull "Unconnected" strips. */
+  pipelineIncludeAncillary?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

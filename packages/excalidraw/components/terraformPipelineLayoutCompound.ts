@@ -11,6 +11,10 @@ import {
 } from "./terraformPipelineLayoutCompoundHierarchy";
 import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
 import {
+  buildAncillaryStrips,
+  countAncillaryCards,
+} from "./terraformPipelineLayoutAncillary";
+import {
   placeClustersClassicGrid,
   preparePipelineLayout,
 } from "./terraformPipelineLayoutShared";
@@ -35,7 +39,12 @@ import type { TerraformImportWarning } from "./terraformImportMerge";
 export async function buildTerraformCompoundPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
-  options?: { compact?: boolean; packed?: boolean; packedPullLeft?: boolean },
+  options?: {
+    compact?: boolean;
+    packed?: boolean;
+    packedPullLeft?: boolean;
+    includeAncillary?: boolean;
+  },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: Record<string, unknown>;
@@ -44,25 +53,33 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
   const compact = options?.compact !== false;
   const packed = options?.packed === true;
   const packedPullLeft = packed && options?.packedPullLeft === true;
+  const includeAncillary = options?.includeAncillary === true;
   let prep = preparePipelineLayout(nodes, plan, compact);
+  const ancillaryStrips = includeAncillary
+    ? buildAncillaryStrips(nodes, plan, prep, { compact })
+    : [];
   let packedShifts = EMPTY_PACKED_DEPTH_SHIFTS;
   let pullLeftShifts = EMPTY_PACKED_PULL_LEFT_SHIFTS;
   if (packed) {
     packedShifts = computePackedDepthShifts(prep);
     prep = applyPackedDepthShifts(prep, packedShifts);
     if (packedPullLeft) {
-      pullLeftShifts = computePackedPullLeftShifts(prep);
+      pullLeftShifts = computePackedPullLeftShifts(prep, ancillaryStrips);
       prep = applyPackedDepthShifts(
         prep,
         pullLeftShiftsAsDepthShifts(pullLeftShifts),
       );
     }
   }
-  const { skeleton, layoutBoxes } = packed
-    ? placeClustersPackedGrid(prep)
-    : placeClustersClassicGrid(prep);
+  const { skeleton, layoutBoxes, ancillaryClusters } = packed
+    ? placeClustersPackedGrid(prep, ancillaryStrips)
+    : placeClustersClassicGrid(prep, ancillaryStrips);
 
-  buildCompoundFramesFromLayoutBoxes(skeleton, prep.clusters, layoutBoxes);
+  buildCompoundFramesFromLayoutBoxes(
+    skeleton,
+    [...prep.clusters, ...ancillaryClusters],
+    layoutBoxes,
+  );
   applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
   appendPipelineEdgeSkeletons(
     nodes,
@@ -106,6 +123,14 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
             ...(pullLeftShifts.evalCapReached
               ? { pipelinePackedPullLeftCapped: true }
               : {}),
+          }
+        : {}),
+      ...(includeAncillary
+        ? {
+            pipelineIncludeAncillary: true,
+            pipelineAncillaryApplied: ancillaryStrips.length > 0,
+            pipelineAncillaryCount: countAncillaryCards(ancillaryStrips),
+            pipelineAncillaryStripCount: ancillaryStrips.length,
           }
         : {}),
     },

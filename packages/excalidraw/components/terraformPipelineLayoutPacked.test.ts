@@ -26,9 +26,12 @@ import {
   pullLeftShiftsAsDepthShifts,
 } from "./terraformPipelineLayoutPacked";
 import {
+  ancillaryStripFrameId,
   computeDepths,
   computeGlobalColumnX,
   placeClustersClassicGrid,
+  vpcScopeKey,
+  type AncillaryStrip,
   type CollapsedPipelineEdge,
   type PipelineCluster,
   type PipelineLayoutPrep,
@@ -106,6 +109,8 @@ function makePrep(
     maxDepth,
     columnX: computeGlobalColumnX(clusters, maxDepth),
     depthResult,
+    satelliteOwners: new Map(),
+    placementByAddress: new Map(clusters.map((c) => [c.id, c.placement])),
   };
 }
 
@@ -492,6 +497,77 @@ describe("placeClustersPackedGrid", () => {
     expect(heightOf(packed.layoutBoxes)).toBeLessThan(
       heightOf(classic.layoutBoxes),
     );
+  });
+
+  it("packs ancillary strips below their scope's lanes without moving clusters", () => {
+    const vpcPlacement = placementOf("111", "us-east-1", "vpc-aaa");
+    const prep = makePrep(
+      [
+        {
+          id: "a",
+          placement: placementOf("111", "us-east-1", "vpc-aaa", "private"),
+        },
+        {
+          id: "b",
+          placement: placementOf("111", "us-east-1", "vpc-aaa", "public"),
+        },
+      ],
+      [["a", "b"]],
+    );
+    const scopeKey = vpcScopeKey(vpcPlacement)!;
+    const strip: AncillaryStrip = {
+      scopeRole: "vpc",
+      scopeKey,
+      placement: vpcPlacement,
+      stripFrameId: ancillaryStripFrameId(scopeKey),
+      cards: ["anc1", "anc2"].map((id) => ({
+        address: id,
+        placement: vpcPlacement,
+        build: {
+          skeleton: [],
+          width: 200,
+          height: 100,
+          clusterFrameId: `tf-pipeline:cluster:${id}`,
+        },
+      })),
+    };
+
+    const bare = placeClustersPackedGrid(prep);
+    const packed = placeClustersPackedGrid(prep, [strip]);
+
+    expect(bare.ancillaryClusters).toEqual([]);
+    expect(packed.ancillaryClusters).toHaveLength(1);
+    expect(packed.ancillaryClusters[0]!.build.clusterFrameId).toBe(
+      strip.stripFrameId,
+    );
+
+    // TFD cluster placement is unchanged by the strip.
+    for (const cluster of prep.clusters) {
+      expect(packed.layoutBoxes.get(cluster.build.clusterFrameId)).toEqual(
+        bare.layoutBoxes.get(cluster.build.clusterFrameId),
+      );
+    }
+
+    const stripBox = packed.layoutBoxes.get(strip.stripFrameId)!;
+    expect(stripBox).toBeTruthy();
+    for (const cluster of prep.clusters) {
+      const box = packed.layoutBoxes.get(cluster.build.clusterFrameId)!;
+      expect(boxesOverlap(stripBox, box)).toBe(false);
+      // Strip lands below the scope's lanes (its X span overlaps theirs).
+      expect(stripBox.y).toBeGreaterThanOrEqual(box.y + box.height);
+    }
+
+    // Pull-left measure threading accepts strips and keeps the invariant.
+    const pull = computePackedPullLeftShifts(prep, [strip]);
+    for (const edge of prep.collapsedEdges) {
+      const sourceDepth =
+        pull.shiftedDepths.get(edge.source) ??
+        prep.clusters.find((c) => c.id === edge.source)!.depth;
+      const targetDepth =
+        pull.shiftedDepths.get(edge.target) ??
+        prep.clusters.find((c) => c.id === edge.target)!.depth;
+      expect(sourceDepth).toBeLessThan(targetDepth);
+    }
   });
 });
 

@@ -55,6 +55,7 @@ export const TerraformImportModal = ({
     pipelineLayoutVariant,
     pipelinePacked,
     pipelinePackedPullLeft,
+    pipelineIncludeAncillary,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -544,10 +545,12 @@ terraform show -json tfplan > plan.json`}</code>
               pipelineLayoutVariant={pipelineLayoutVariant}
               pipelinePacked={pipelinePacked}
               pipelinePackedPullLeft={pipelinePackedPullLeft}
+              pipelineIncludeAncillary={pipelineIncludeAncillary}
               setPipelineCompact={dialog.setPipelineCompact}
               setPipelineLayoutVariant={dialog.setPipelineLayoutVariant}
               setPipelinePacked={dialog.setPipelinePacked}
               setPipelinePackedPullLeft={dialog.setPipelinePackedPullLeft}
+              setPipelineIncludeAncillary={dialog.setPipelineIncludeAncillary}
             />
           )}
           {view === "module" && (

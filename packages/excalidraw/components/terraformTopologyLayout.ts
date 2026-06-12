@@ -3144,10 +3144,12 @@ const topologyFrameZPriority = (el: ExcalidrawElement): number => {
       return 4;
     case "subnetZone":
       return 5;
-    case "primaryCluster":
+    case "ancillaryStrip":
       return 6;
+    case "primaryCluster":
+      return 7;
     default:
-      return role ? 7 : 8;
+      return role ? 8 : 9;
   }
 };
 

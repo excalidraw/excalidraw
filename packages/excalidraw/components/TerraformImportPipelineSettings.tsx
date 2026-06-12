@@ -7,19 +7,23 @@ export const TerraformImportPipelineSettings = ({
   pipelineLayoutVariant,
   pipelinePacked,
   pipelinePackedPullLeft,
+  pipelineIncludeAncillary,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
   setPipelinePackedPullLeft,
+  setPipelineIncludeAncillary,
 }: {
   pipelineCompact: boolean;
   pipelineLayoutVariant: PipelineLayoutVariant;
   pipelinePacked: boolean;
   pipelinePackedPullLeft: boolean;
+  pipelineIncludeAncillary: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
   setPipelinePackedPullLeft: (pullLeft: boolean) => void;
+  setPipelineIncludeAncillary: (includeAncillary: boolean) => void;
 }) => {
   const option = (
     label: string,
@@ -89,6 +93,20 @@ export const TerraformImportPipelineSettings = ({
                 setPipelinePackedPullLeft(true);
               },
               "Pack boxes and pull clusters to their leftmost valid column",
+            )}
+          </div>
+        </div>
+        <div role="group" aria-label="Pipeline resource scope">
+          <span className="TerraformImportModal__controlLabel">Resources</span>
+          <div className="TerraformImportModal__segmentedControl">
+            {option("Dataflow only", !pipelineIncludeAncillary, () =>
+              setPipelineIncludeAncillary(false),
+            )}
+            {option(
+              "All resources",
+              pipelineIncludeAncillary,
+              () => setPipelineIncludeAncillary(true),
+              "Also draw resources not connected by .tfd dataflow in an Unconnected strip per VPC/region",
             )}
           </div>
         </div>

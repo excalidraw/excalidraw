@@ -82,6 +82,23 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses ancillary", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=pipeline&ancillary=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "pipeline",
+        ancillary: true,
+      });
+      expect(parseTerraformDemoUrlParams("?preset=demo&ancillary=0")).toEqual({
+        presetId: "demo",
+        ancillary: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&ancillary=nope"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

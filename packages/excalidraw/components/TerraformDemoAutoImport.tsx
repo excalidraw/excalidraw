@@ -86,6 +86,7 @@ export const TerraformDemoAutoImport = ({
           pipelineLayoutVariant: params.pipelineVariant,
           pipelinePacked: params.packed,
           pipelinePackedPullLeft: params.packedPullLeft,
+          pipelineIncludeAncillary: params.ancillary,
           signal,
           onLayoutProgress: (progress) => {
             const label =

@@ -1,15 +1,26 @@
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
 import {
+  accountScopeKey,
+  ancillaryStripAsPseudoCluster,
   computeGlobalColumnX,
   laneKey,
+  layoutAncillaryStrip,
   layoutLaneClusters,
+  measureAncillaryStrip,
+  providerScopeKey,
+  regionScopeKey,
+  translateSkeleton,
+  vpcScopeKey,
+  ANCILLARY_DEFAULT_WRAP_WIDTH,
   PIPELINE_CLUSTER_GAP_Y,
   PIPELINE_FRAME_PAD,
   PIPELINE_LANE_GAP_Y,
   PIPELINE_MARGIN,
+  type AncillaryStrip,
   type PipelineCluster,
   type PipelineLayoutPrep,
+  type PipelinePlacement,
 } from "./terraformPipelineLayoutShared";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
@@ -44,30 +55,19 @@ const packedMaxAllowedDepth = (maxDepth: number): number => maxDepth * 2 + 4;
 const PACKED_HORIZONTAL_SHARE_CLEARANCE = PIPELINE_FRAME_PAD;
 
 function providerKeyOf(c: PipelineCluster): string {
-  return c.placement.providerFamily;
+  return providerScopeKey(c.placement);
 }
 
 function accountKeyOf(c: PipelineCluster): string {
-  return [c.placement.providerFamily, c.placement.accountId].join("\0");
+  return accountScopeKey(c.placement);
 }
 
 function regionKeyOf(c: PipelineCluster): string {
-  return [
-    c.placement.providerFamily,
-    c.placement.accountId,
-    c.placement.region,
-  ].join("\0");
+  return regionScopeKey(c.placement);
 }
 
 function vpcKeyOf(c: PipelineCluster): string | null {
-  return c.placement.vpcId
-    ? [
-        c.placement.providerFamily,
-        c.placement.accountId,
-        c.placement.region,
-        c.placement.vpcId,
-      ].join("\0")
-    : null;
+  return vpcScopeKey(c.placement);
 }
 
 /**
@@ -344,7 +344,14 @@ export function applyPackedDepthShifts(
   };
 }
 
-type PackRole = "root" | "provider" | "account" | "region" | "vpc" | "lane";
+type PackRole =
+  | "root"
+  | "provider"
+  | "account"
+  | "region"
+  | "vpc"
+  | "lane"
+  | "ancillaryStrip";
 
 type PackNode = {
   key: string;
@@ -438,6 +445,56 @@ function groupClustersIntoLanes(
   return [...lanes.entries()].sort(([a], [b]) => a.localeCompare(b));
 }
 
+function ensurePackChild(
+  nodesByKey: Map<string, PackNode>,
+  parent: PackNode,
+  childKey: string,
+  role: PackRole,
+  pad: number,
+): PackNode {
+  let node = nodesByKey.get(childKey);
+  if (!node) {
+    node = newPackNode(childKey, role, pad);
+    nodesByKey.set(childKey, node);
+    parent.children.push(node);
+  }
+  return node;
+}
+
+/** Ensure the provider→account→region(→vpc) chain for a placement. */
+function ensureScopeChain(
+  root: PackNode,
+  nodesByKey: Map<string, PackNode>,
+  placement: PipelinePlacement,
+): { region: PackNode; vpc: PackNode | null } {
+  const provider = ensurePackChild(
+    nodesByKey,
+    root,
+    providerScopeKey(placement),
+    "provider",
+    PIPELINE_FRAME_PAD,
+  );
+  const account = ensurePackChild(
+    nodesByKey,
+    provider,
+    accountScopeKey(placement),
+    "account",
+    PIPELINE_FRAME_PAD,
+  );
+  const region = ensurePackChild(
+    nodesByKey,
+    account,
+    regionScopeKey(placement),
+    "region",
+    PIPELINE_FRAME_PAD,
+  );
+  const vKey = vpcScopeKey(placement);
+  const vpc = vKey
+    ? ensurePackChild(nodesByKey, region, vKey, "vpc", PIPELINE_FRAME_PAD)
+    : null;
+  return { region, vpc };
+}
+
 /** Insert the provider→account→region→vpc→lane chain for one lane key. */
 function insertLanePackNode(
   root: PackNode,
@@ -445,52 +502,79 @@ function insertLanePackNode(
   key: string,
   sample: PipelineCluster,
 ): PackNode {
-  const ensureChild = (
-    parent: PackNode,
-    childKey: string,
-    role: PackRole,
-    pad: number,
-  ): PackNode => {
-    let node = nodesByKey.get(childKey);
-    if (!node) {
-      node = newPackNode(childKey, role, pad);
-      nodesByKey.set(childKey, node);
-      parent.children.push(node);
-    }
-    return node;
-  };
-  const provider = ensureChild(
-    root,
-    providerKeyOf(sample),
-    "provider",
-    PIPELINE_FRAME_PAD,
-  );
-  const account = ensureChild(
-    provider,
-    accountKeyOf(sample),
-    "account",
-    PIPELINE_FRAME_PAD,
-  );
-  const region = ensureChild(
-    account,
-    regionKeyOf(sample),
-    "region",
-    PIPELINE_FRAME_PAD,
-  );
-  const vpcKey = vpcKeyOf(sample);
-  const laneParent = vpcKey
-    ? ensureChild(region, vpcKey, "vpc", PIPELINE_FRAME_PAD)
-    : region;
+  const { region, vpc } = ensureScopeChain(root, nodesByKey, sample.placement);
+  const laneParent = vpc ?? region;
   const hasSubnetFrame =
     sample.placement.vpcId != null &&
     sample.placement.vpcId !== "" &&
     sample.placement.subnetSignature != null;
-  return ensureChild(
+  return ensurePackChild(
+    nodesByKey,
     laneParent,
     `lane:${key}`,
     "lane",
     hasSubnetFrame ? PIPELINE_FRAME_PAD : 0,
   );
+}
+
+/** Min/max X over a pack subtree's already-sized leaves (lanes, strips). */
+function packSubtreeLeafSpan(
+  node: PackNode,
+): { x0: number; x1: number } | null {
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  const visit = (n: PackNode): void => {
+    if (n.children.length === 0) {
+      if (Number.isFinite(n.x0)) {
+        x0 = Math.min(x0, n.x0);
+        x1 = Math.max(x1, n.x1);
+      }
+      return;
+    }
+    for (const child of n.children) {
+      visit(child);
+    }
+  };
+  visit(node);
+  return Number.isFinite(x0) ? { x0, x1 } : null;
+}
+
+/**
+ * Attach ancillary strips as extra pack-node children of their vpc/region
+ * scope node, sized to the scope's current lane span. `minDepth: Infinity`
+ * makes `packSiblings` place a strip last, and the overlapping X span forces
+ * it below the scope's lanes — bottom of the hull, overlap-free. VPC strips
+ * attach before region strips so a region strip spans its vpc strips too.
+ * The node key set depends only on scope membership (never depths), keeping
+ * pull-left's per-node baseline comparison sound.
+ */
+function attachAncillaryStripNodes(
+  root: PackNode,
+  nodesByKey: Map<string, PackNode>,
+  ancillaryStrips: readonly AncillaryStrip[],
+  sizeStrip: (
+    node: PackNode,
+    strip: AncillaryStrip,
+    stripX: number,
+    wrapWidth: number,
+  ) => void,
+): void {
+  const ordered = [...ancillaryStrips].sort(
+    (a, b) =>
+      (a.scopeRole === "vpc" ? 0 : 1) - (b.scopeRole === "vpc" ? 0 : 1) ||
+      a.scopeKey.localeCompare(b.scopeKey),
+  );
+  for (const strip of ordered) {
+    const { region, vpc } = ensureScopeChain(root, nodesByKey, strip.placement);
+    const parent = strip.scopeRole === "vpc" ? vpc ?? region : region;
+    const span = packSubtreeLeafSpan(parent);
+    const stripX = span ? span.x0 : PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
+    const wrapWidth = span ? span.x1 - span.x0 : ANCILLARY_DEFAULT_WRAP_WIDTH;
+    const node = newPackNode(strip.stripFrameId, "ancillaryStrip", 0);
+    sizeStrip(node, strip, stripX, wrapWidth);
+    nodesByKey.set(strip.stripFrameId, node);
+    parent.children.push(node);
+  }
 }
 
 function packNode(node: PackNode): void {
@@ -523,10 +607,14 @@ function packNode(node: PackNode): void {
  * inflated by the hull-frame pad at each level that emits a frame, so the
  * frames drawn afterwards by `emitTopologyContextFrames` cannot overlap.
  */
-export function placeClustersPackedGrid(prep: PipelineLayoutPrep): {
+export function placeClustersPackedGrid(
+  prep: PipelineLayoutPrep,
+  ancillaryStrips?: readonly AncillaryStrip[],
+): {
   skeleton: ExcalidrawElementSkeleton[];
   layoutBoxes: Map<string, TerraformDependencyLayoutBox>;
   laneEntries: [string, PipelineCluster[]][];
+  ancillaryClusters: PipelineCluster[];
 } {
   const laneEntries = groupClustersIntoLanes(prep.clusters);
 
@@ -565,6 +653,27 @@ export function placeClustersPackedGrid(prep: PipelineLayoutPrep): {
     }
   }
 
+  if (ancillaryStrips && ancillaryStrips.length > 0) {
+    attachAncillaryStripNodes(
+      root,
+      nodesByKey,
+      ancillaryStrips,
+      (node, strip, stripX, wrapWidth) => {
+        const laid = layoutAncillaryStrip(strip, wrapWidth);
+        node.laneSkeleton = translateSkeleton(laid.skeleton, stripX, 0);
+        node.laneBoxes = new Map(
+          [...laid.boxes].map(([id, box]) => [
+            id,
+            { ...box, x: box.x + stripX },
+          ]),
+        );
+        node.x0 = stripX;
+        node.x1 = stripX + laid.width;
+        node.height = laid.height;
+      },
+    );
+  }
+
   packNode(root);
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
@@ -589,7 +698,11 @@ export function placeClustersPackedGrid(prep: PipelineLayoutPrep): {
   };
   materialize(root, PIPELINE_MARGIN);
 
-  return { skeleton, layoutBoxes, laneEntries };
+  const ancillaryClusters = (ancillaryStrips ?? []).map((strip) =>
+    ancillaryStripAsPseudoCluster(strip, layoutBoxes.get(strip.stripFrameId)!),
+  );
+
+  return { skeleton, layoutBoxes, laneEntries, ancillaryClusters };
 }
 
 export type PackedPullLeftResult = {
@@ -634,6 +747,7 @@ type PackedSceneMeasure = {
 function measurePackedSceneForDepths(
   prep: PipelineLayoutPrep,
   depths: ReadonlyMap<string, number>,
+  ancillaryStrips?: readonly AncillaryStrip[],
 ): PackedSceneMeasure {
   const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
   const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
@@ -684,6 +798,19 @@ function measurePackedSceneForDepths(
     lane.x0 = minX - lane.pad;
     lane.x1 = maxX + lane.pad;
     lane.height = maxY + 2 * lane.pad;
+  }
+  if (ancillaryStrips && ancillaryStrips.length > 0) {
+    attachAncillaryStripNodes(
+      root,
+      nodesByKey,
+      ancillaryStrips,
+      (node, strip, stripX, wrapWidth) => {
+        const measured = measureAncillaryStrip(strip, wrapWidth);
+        node.x0 = stripX;
+        node.x1 = stripX + measured.width;
+        node.height = measured.height;
+      },
+    );
   }
   packNode(root);
   const nodeHeights = new Map<string, number>([[root.key, root.height]]);
@@ -737,6 +864,7 @@ function fitsWithinBaseline(
  */
 export function computePackedPullLeftShifts(
   prep: PipelineLayoutPrep,
+  ancillaryStrips?: readonly AncillaryStrip[],
 ): PackedPullLeftResult {
   if (prep.depthResult.hasCycle || prep.clusters.length === 0) {
     return EMPTY_PACKED_PULL_LEFT_SHIFTS;
@@ -764,7 +892,7 @@ export function computePackedPullLeftShifts(
   );
   let evals = 0;
   let evalCapReached = false;
-  let baseline = measurePackedSceneForDepths(prep, depths);
+  let baseline = measurePackedSceneForDepths(prep, depths, ancillaryStrips);
   let pullCount = 0;
 
   for (let sweep = 0; sweep < PACKED_PULL_LEFT_SWEEPS; sweep++) {
@@ -787,7 +915,11 @@ export function computePackedPullLeftShifts(
         const trial = new Map(depths);
         trial.set(cluster.id, candidate);
         evals += 1;
-        const measured = measurePackedSceneForDepths(prep, trial);
+        const measured = measurePackedSceneForDepths(
+          prep,
+          trial,
+          ancillaryStrips,
+        );
         if (fitsWithinBaseline(measured, baseline)) {
           depths.set(cluster.id, candidate);
           baseline = measured;

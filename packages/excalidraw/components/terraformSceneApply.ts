@@ -153,6 +153,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelinePacked?: boolean;
   /** Packed only — pull slack clusters to their leftmost TFD-feasible column. Default false. */
   pipelinePackedPullLeft?: boolean;
+  /** Pipeline — draw non-TFD resources in per-hull "Unconnected" strips. Default false. */
+  pipelineIncludeAncillary?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -174,12 +176,13 @@ async function layoutTerraformSceneFromSources(
   moduleLayoutOptions: TerraformModuleLayoutOptions,
 ): Promise<TerraformExcalidrawScenePayload> {
   const presetId = options.preset?.id?.trim();
-  // Packed pipeline scenes are not part of the KV layout cache key yet; skip
-  // the cache so a packed import never returns the cached stacked layout.
+  // Packed and ancillary pipeline scenes are not part of the KV layout cache
+  // key yet; skip the cache so such imports never return the default layout.
   const skipLayoutCache =
     layoutMode === "pipeline" &&
     (options.pipelinePacked === true ||
-      options.pipelinePackedPullLeft === true);
+      options.pipelinePackedPullLeft === true ||
+      options.pipelineIncludeAncillary === true);
   if (presetId && !skipLayoutCache) {
     const cached = await fetchPresetLayoutCache(
       presetId,
@@ -205,6 +208,8 @@ async function layoutTerraformSceneFromSources(
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
+            pipelineIncludeAncillary:
+              options.pipelineIncludeAncillary === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -271,6 +276,8 @@ export const runTerraformImportFromSources = async (
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
+            pipelineIncludeAncillary:
+              options.pipelineIncludeAncillary === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

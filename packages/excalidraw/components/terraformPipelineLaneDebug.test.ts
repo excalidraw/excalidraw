@@ -262,7 +262,7 @@ function round(n: number) {
 
 async function diagnosePreset(
   presetId: string,
-  options?: { pipelinePacked?: boolean },
+  options?: { pipelinePacked?: boolean; pipelineIncludeAncillary?: boolean },
 ) {
   const raw = getTerraformImportPresetSourcesFromDb(presetId);
   expect(raw).not.toBeNull();
@@ -303,15 +303,17 @@ async function diagnosePreset(
       semanticLayout: false,
       layoutMode: "pipeline",
       pipelinePacked: options?.pipelinePacked === true,
+      pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
     },
   );
 
-  return reportPipelineLaneHeight(
+  const report = reportPipelineLaneHeight(
     presetId,
     body.elements as LooseElement[],
     (body.meta ?? {}) as Record<string, unknown>,
     zoneStats,
   );
+  return { ...report, elements: body.elements as LooseElement[] };
 }
 
 describe("pipeline lane height diagnostic", () => {
@@ -351,6 +353,82 @@ describe("pipeline lane height diagnostic", () => {
       // sibling boxes in Y, so the scene must get shorter than lane stacking.
       expect(packed.sceneBounds.height).toBeLessThan(
         stacked.sceneBounds.height,
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
+  );
+
+  it(
+    "staging-extended-localstack-v2 — ancillary strips hold non-TFD resources without overlaps",
+    async () => {
+      const plain = await diagnosePreset("staging-extended-localstack-v2");
+      const withAncillary = await diagnosePreset(
+        "staging-extended-localstack-v2",
+        { pipelineIncludeAncillary: true },
+      );
+
+      expect(plain.layoutMeta.pipelineIncludeAncillary).toBeUndefined();
+      expect(withAncillary.layoutMeta.pipelineIncludeAncillary).toBe(true);
+      expect(withAncillary.layoutMeta.pipelineAncillaryApplied).toBe(true);
+      const ancillaryCount = withAncillary.layoutMeta
+        .pipelineAncillaryCount as number;
+      const stripCount = withAncillary.layoutMeta
+        .pipelineAncillaryStripCount as number;
+      expect(ancillaryCount).toBeGreaterThan(0);
+      expect(stripCount).toBeGreaterThan(0);
+      // TFD topology untouched by hydration.
+      expect(withAncillary.layoutMeta.pipelineClusterCount).toBe(
+        plain.layoutMeta.pipelineClusterCount,
+      );
+      expect(withAncillary.layoutMeta.pipelineColumnCount).toBe(
+        plain.layoutMeta.pipelineColumnCount,
+      );
+
+      const strips = withAncillary.elements.filter(
+        (el) =>
+          el.type === "frame" &&
+          !el.isDeleted &&
+          el.customData?.terraformTopologyRole === "ancillaryStrip",
+      );
+      expect(strips.length).toBe(stripCount);
+      const clusterFrames = withAncillary.elements.filter(
+        (el) =>
+          el.type === "frame" &&
+          !el.isDeleted &&
+          el.customData?.terraformTopologyRole === "primaryCluster",
+      );
+      for (const strip of strips) {
+        for (const frame of clusterFrames) {
+          if (frame.frameId === strip.id) {
+            continue;
+          }
+          const disjoint =
+            frame.x + frame.width <= strip.x ||
+            strip.x + strip.width <= frame.x ||
+            frame.y + frame.height <= strip.y ||
+            strip.y + strip.height <= frame.y;
+          expect(disjoint).toBe(true);
+        }
+      }
+
+      const comparison = {
+        plain: {
+          height: plain.sceneBounds.height,
+          width: plain.sceneBounds.width,
+          elementCount: plain.elementCount,
+        },
+        ancillary: {
+          height: withAncillary.sceneBounds.height,
+          width: withAncillary.sceneBounds.width,
+          elementCount: withAncillary.elementCount,
+          ancillaryCount,
+          stripCount,
+        },
+      };
+      // eslint-disable-next-line no-console -- intentional diagnostic output
+      console.log(
+        "\n[pipeline:ancillary-comparison]\n",
+        JSON.stringify(comparison, null, 2),
       );
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,

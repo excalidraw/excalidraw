@@ -11,6 +11,7 @@ export type TerraformDemoUrlParams = {
   pipelineVariant?: PipelineLayoutVariant;
   packed?: boolean;
   packedPullLeft?: boolean;
+  ancillary?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -112,6 +113,10 @@ export const parseTerraformDemoUrlParams = (
   if (packedPullLeft === true && packed !== false) {
     packed = true;
   }
+  const ancillary = parseBooleanParam("ancillary");
+  if (ancillary === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -120,6 +125,7 @@ export const parseTerraformDemoUrlParams = (
     ...(pipelineVariant ? { pipelineVariant } : {}),
     ...(packed != null ? { packed } : {}),
     ...(packedPullLeft != null ? { packedPullLeft } : {}),
+    ...(ancillary != null ? { ancillary } : {}),
   };
 };
 

@@ -42,17 +42,18 @@ Pipeline view requires at least one resolved .tfd dataflow edge.
 
 ---
 
-## Three independent pipeline toggles
+## Four independent pipeline toggles
 
-When the user selects **Pipeline** in the import dialog (or `view=pipeline` on `/demo`), three sub-options appear. They are **orthogonal** — any combination is valid.
+When the user selects **Pipeline** in the import dialog (or `view=pipeline` on `/demo`), four sub-options appear. They are **orthogonal** — any combination is valid.
 
 | UI label | Session / code field | Values | Default |
 | --- | --- | --- | --- |
 | **Detail** | `pipelineCompact` | `true` = Compact, `false` = Full | **Compact** (`true`) |
 | **Layout** | `pipelineLayoutVariant` | `classic` \| `compound` | **Classic** |
 | **Height** | `pipelinePacked` (+ `pipelinePackedPullLeft`) | Stacked \| Packed \| Packed + pull-left | **Stacked** (`false`) |
+| **Resources** | `pipelineIncludeAncillary` | `false` = Dataflow only, `true` = All resources | **Dataflow only** (`false`) |
 
-**Default import:** Compact + Classic + Stacked.
+**Default import:** Compact + Classic + Stacked + Dataflow only.
 
 ### Detail: Compact vs Full
 
@@ -65,7 +66,17 @@ Controls **what each pipeline cluster renders at import time**.
 
 Both modes share the same TFD column assignment, lane stacking, and frame hull logic. Compact is the performance/default path for large presets.
 
-**Expand:** `terraformPipelineLayoutExpand.ts` — click a compact primary card to inject satellites in-place without re-running full layout.
+**How the two builders differ** (`terraformTopologyLayout.ts`):
+
+- `buildCompactPipelinePrimaryCluster` emits exactly two skeletons at origin — the primary resource card plus a wrapping `primaryCluster` frame (fixed size: card + inner pad). It stamps the card with `terraformPipelineExpandable: true`, `terraformPipelineExpanded: false`, and a serialized `terraformPipelinePlacement` (account/region/vpc/subnet) so the click-to-expand handler can rebuild the full cluster later **without re-running prep**.
+- `buildTopologyPrimaryClusterSkeletonForPipeline` runs the full `appendTopologyResourceRectangles` machinery per cluster: ARN index + per-satellite-family dedupe registries (IAM, KMS, SG, CloudWatch, S3, SQS, ALB, ECS, API Gateway, TGW, Lambda permission). Cluster width/height are read back from the emitted cluster frame. This per-cluster satellite walk is the dominant cost of Full mode on large presets — Full does at import time what Compact defers to per-cluster clicks.
+
+Either way, a build that comes back empty (or with non-positive size) is replaced by `buildFallbackCluster` (plain labeled rectangle + frame) in `terraformPipelineLayoutShared.ts`.
+
+**Expand / collapse** (`terraformPipelineLayoutExpand.ts`):
+
+- `expandPipelineCluster` requires the import prep cache (`getTerraformImportPrepCache()` — no-op if missing, e.g. after reload). It rebuilds the **full** skeleton via `buildTopologyPrimaryClusterSkeletonForPipeline` from `cache.nodes` + `cache.mergedPlan`, translates it to the existing cluster frame's x/y, converts with regenerated ids, then keeps only the satellites: they are re-parented onto the **existing** frame id, the existing frame is resized in place to the full build's width/height, and the existing primary card is flagged `terraformPipelineExpanded: true`. No relayout runs — neighbors do not move, so an expanded cluster can overlap siblings (see "Not implemented yet").
+- `collapsePipelineCluster` soft-deletes elements whose `terraformExplodeParent` is the primary address and snaps the frame back to the fixed compact size (`220×96` card + `2×28` pad = `276×152`). Both paths finish with edge-binding repair + visibility reconciliation.
 
 ### Layout: Classic vs Compound
 
@@ -76,7 +87,7 @@ Controls **Excalidraw frame hierarchy and arrow parenting** after placement. **D
 | **Classic** | `classic` (default) | `buildTerraformPipelineExcalidrawScene` | TFD grid + topology hull frames; arrows stay at scene root |
 | **Compound** | `compound` | `buildTerraformCompoundPipelineExcalidrawScene` | Same placement, plus hierarchical re-anchor, arrow parenting to LCA topology frame, sibling frame connector edges — dragging a region/VPC frame moves resources **and in-group arrows** |
 
-Compound = Classic placement + post-pass for Excalidraw compound semantics. See [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md) for phase-by-phase detail.
+Compound = Classic placement + post-pass for Excalidraw compound semantics. See **Compound mode** section below and [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md) for phase-by-phase detail.
 
 ### Height: Stacked vs Packed
 
@@ -262,15 +273,30 @@ laneKey(p) = [
 
 ---
 
+## Compound mode (detail)
+
+**File:** `terraformPipelineLayoutCompound.ts` · **Default:** off · **UI:** Layout → Compound · **URL:** `&pipelineVariant=compound`
+
+Compound shares prep, packed passes, grid placement, and hull-frame emission with Classic (`buildCompoundFramesFromLayoutBoxes` is a direct alias of `emitTopologyContextFrames`). The difference is four post-passes that run **in this exact order** — each consumes positions/boxes the previous one wrote:
+
+1. **`applyCompoundHierarchicalLayout`** (`terraformPipelineLayoutCompoundHierarchy.ts`) — re-anchors each provider frame subtree at `PIPELINE_MARGIN` and stacks providers vertically (`providerY += height + PIPELINE_LANE_GAP_Y`), translating every descendant skeleton **and** its `layoutBoxes` entry. Then `stampCompoundLocalOnSubtree` recursively writes `terraformCompoundLayout: true`, `terraformCompoundParentKey`, and `terraformCompoundLocal: {x, y}` (coordinates relative to the parent frame's content origin = `frame.x/y + PIPELINE_FRAME_PAD`) onto every frame and child. This metadata is written for re-import but not read back yet (see "Not implemented yet").
+2. **`appendPipelineEdgeSkeletons`** (`terraformPipelineLayoutFinalize.ts`, shared with Classic) — blue declared-dataflow arrows, routed against the **already re-anchored** `layoutBoxes`. Each arrow's `relationship` carries the collapsed endpoints plus `terraformPipelineOriginalSource/Target/Sequence` for the pre-collapse edge.
+3. **`appendCompoundTopologyFrameEdgeSkeletons`** (`terraformPipelineLayoutCompoundSiblingEdges.ts`) — sibling topology frame connectors. For each collapsed edge whose source/target topology paths diverge as **siblings of the same role** under their LCA (`resolveSiblingTopologyFramePair`), it emits one dashed aggregated arrow (`strokeWidth: 4`, layer `topologyFrameFlow`, `relationship.aggregated: true`) between the two sibling frames, with `fixedPoint`/orbit bindings on both frames and center-clipped endpoints. Edges are deduped per `(parentFrame, sourceFrame, targetFrame)` keeping the smallest TFD sequence; the count is reported as `pipelineTopologyFrameEdgeCount`. Pairs whose frames have no layout box are skipped silently.
+4. **`assignCompoundEdgeFrameParents`** — pushes each arrow into a frame's `children` so group-drag moves it: `declaredDataFlow` arrows go to the frame at the **LCA of the two clusters' topology paths** (`lcaTopologyPath` → `topologyRoleAndKeyFromPath`); `topologyFrameFlow` arrows go to their explicit `relationship.parentFrameId`. Arrows whose LCA path is empty (cross-provider) stay at scene root.
+
+Topology paths come from `topologyPathForCluster`: `[provider, account, region]`, extended with `vpcId` and `subnetSignature` when present — so the LCA frame can be any of the five hull levels.
+
+**Meta when compound:** `pipelineVariant: "compound"`, `pipelineCompoundHierarchical: true`, `pipelineTopologyFrameEdgeCount`.
+
 ## Packed mode (detail)
 
 **File:** `terraformPipelineLayoutPacked.ts` · **Default:** off · **UI:** Height → Packed · **URL:** `&packed=1`
 
 Two extra passes between prep and frame emission, replacing `placeClustersClassicGrid` (plus an opt-in third — see **Pull-left** below):
 
-1. **`computePackedDepthShifts` + `applyPackedDepthShifts`** — group-uniform rightward depth shifts, processed bottom-up (lanes under VPC → VPCs under region → regions under account → accounts under provider). Targets with TFD edges from siblings shift past those siblings' columns. Outgoing edges with no slack join a **closure** that shifts as one block. Edge direction `A -> B ⇒ depth(A) < depth(B)` always holds; used depths are compacted to contiguous columns; wider column gap (`PACKED_COLUMN_GAP`) so sibling region hulls can share a Y band.
+1. **`computePackedDepthShifts` + `applyPackedDepthShifts`** — group-uniform rightward depth shifts, processed bottom-up (lanes under VPC → VPCs under region → regions under account → accounts under provider), up to `PACKED_LEVEL_SWEEPS = 3` relaxation sweeps per level. Targets with TFD edges from siblings shift past those siblings' columns. Outgoing edges with no slack join a **closure** that shifts as one block (capped at `PACKED_MAX_CLOSURE_UNITS = 8`; an infeasible closure skips the shift). Shifts may use columns up to `maxDepth * 2 + 4`; used depths are compacted to contiguous columns afterwards, so intermediate spread costs no width. Wider column gap (`PACKED_COLUMN_GAP = 7 × PIPELINE_FRAME_PAD`) so two region-deep hull stacks fit between adjacent columns. **Verify-or-abort:** after compaction the pass re-checks `depth(A) < depth(B)` for every collapsed edge and returns **zero shifts** on any violation — packed silently degrades to stacked-equivalent depths rather than rendering a wrong-order diagram. (Skipped entirely when prep detected a TFD cycle.)
 
-2. **`placeClustersPackedGrid`** — hierarchical Y re-packing. Sibling boxes at every topology level are skyline-packed in Y; boxes with horizontally disjoint inflated rects share a Y band.
+2. **`placeClustersPackedGrid`** — hierarchical Y re-packing. Lanes keep their classic intra-lane placement and global column X; a pack tree mirroring the topology hierarchy (root → provider → account → region → vpc → lane) is packed bottom-up. `packSiblings` tries candidate Y positions (0, or just below each placed sibling) and takes the first conflict-free one — two boxes share a Y band only when their pad-inflated X spans are horizontally disjoint with `PACKED_HORIZONTAL_SHARE_CLEARANCE` daylight. Rects are inflated by the hull-frame pad at each level that emits a frame, so the hull frames drawn afterwards cannot overlap.
 
 **Consequences:**
 
@@ -288,10 +314,11 @@ The group-uniform shifts above move whole units, so members whose own TFD predec
 
 `computePackedPullLeftShifts` (runs after `applyPackedDepthShifts`, before `placeClustersPackedGrid`):
 
-1. Sweeps clusters in ascending depth, lower bound computed at visit time — pulls cascade through `A -> B -> C` chains and fan-outs within one sweep.
-2. For each slack cluster, scans candidate columns leftmost-first; a candidate is accepted only if a skeleton-free re-measure of the pack tree (`measurePackedSceneForDepths` — same lane cursor math + skyline pack, no element work) does not grow global width **and no pack node grows in height** (`fitsWithinBaseline` — every lane/vpc/region/account/provider node, not just the root). The per-node check matters: a root-only guard lets local regressions hide inside band slack — a region whose sibling pins the account band can double in height (receiver lanes pulled back over sibling lanes' spans and stacked) without moving the global bounds.
-3. Up to 4 sweeps (later sweeps catch pulls that become feasible after earlier accepts); eval budget scales with clusterCount × columnCount, `pipelinePackedPullLeftCapped: true` in meta if hit.
-4. Contiguous depth re-compaction + the same `depth(source) < depth(target)` invariant check as the shift pass (violation ⇒ pass returns no shifts).
+1. Sweeps clusters in ascending depth, lower bound (`max(depth(pred)) + 1` over collapsed-edge predecessors) computed at visit time — pulls cascade through `A -> B -> C` chains and fan-outs within one sweep.
+2. For each slack cluster, scans candidate columns leftmost-first from the lower bound and stops at the **first** accepted candidate; a candidate is accepted only if a skeleton-free re-measure of the pack tree (`measurePackedSceneForDepths` — same lane cursor math + skyline pack, no element work; candidate depths compacted to contiguous columns before measuring) does not grow global width **and no pack node grows in height** (`fitsWithinBaseline` — every lane/vpc/region/account/provider node, not just the root). The per-node check matters: a root-only guard lets local regressions hide inside band slack — a region whose sibling pins the account band can double in height (receiver lanes pulled back over sibling lanes' spans and stacked) without moving the global bounds. The per-node comparison is sound because the pack-node set depends only on lane membership (`laneKey`), never on depths — candidate and baseline measures always cover identical keys. Each accepted pull becomes the new baseline.
+3. Up to `PACKED_PULL_LEFT_SWEEPS = 4` sweeps (later sweeps catch pulls that become feasible after earlier accepts free space; a sweep with no accepts terminates the loop). Eval budget = `max(2000, clusterCount × columnCount × 2)` measure calls; `pipelinePackedPullLeftCapped: true` in meta if hit (pulls truncated, not failed).
+4. Contiguous depth re-compaction + the same `depth(source) < depth(target)` invariant check as the shift pass (violation ⇒ pass returns no shifts). Like the shift pass, pull-left is skipped entirely when prep detected a TFD cycle.
+5. The result is adapted via `pullLeftShiftsAsDepthShifts` and applied through the same `applyPackedDepthShifts` (which recomputes `maxDepth` and `columnX` with `PACKED_COLUMN_GAP`), then `placeClustersPackedGrid` runs once on the final depths.
 
 v2 result (compound + packed): 41 pulls, no topology frame grows in height, `aws_sns_topic.ops` x 13,712 → 6,666 px.
 

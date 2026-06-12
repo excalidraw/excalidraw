@@ -1,0 +1,153 @@
+/**
+ * Ancillary resource hydration for pipeline view: enumerate plan resources
+ * that are not part of the .tfd dataflow graph and bundle them into
+ * per-topology-scope "Unconnected" strips (see terraformPipelineLayoutShared
+ * for strip geometry and placement integration).
+ */
+
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+
+import { isTopologyPlacementResourceType } from "./terraformPrimaryVisibility";
+import {
+  buildCompactPipelinePrimaryCluster,
+  buildTopologyPrimaryClusterSkeletonForPipeline,
+} from "./terraformTopologyLayout";
+import {
+  ancillaryStripFrameId,
+  buildFallbackCluster,
+  regionScopeKey,
+  resourceTypeFor,
+  vpcScopeKey,
+  type AncillaryStrip,
+  type PipelineLayoutPrep,
+  type PipelinePlacement,
+} from "./terraformPipelineLayoutShared";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
+
+/**
+ * Plan addresses that belong on the canvas but are absent from the TFD graph:
+ * placement-worthy managed resources that are neither a TFD cluster nor a
+ * satellite of a drawn primary. A satellite whose owner is itself drawn (as a
+ * cluster or as another ancillary card) is excluded — it is rendered (or
+ * revealed on expand) under that owner instead of as a standalone card.
+ */
+export function collectAncillaryAddresses(
+  nodes: TerraformPlanNodesMap,
+  clusterIds: ReadonlySet<string>,
+  satelliteOwners: ReadonlyMap<string, string>,
+): string[] {
+  const candidates = new Set<string>();
+  for (const address of Object.keys(nodes)) {
+    if (address.startsWith("__") || clusterIds.has(address)) {
+      continue;
+    }
+    if (!isTopologyPlacementResourceType(resourceTypeFor(nodes, address))) {
+      continue;
+    }
+    candidates.add(address);
+  }
+  const out: string[] = [];
+  for (const address of candidates) {
+    const owner = satelliteOwners.get(address);
+    if (owner && (clusterIds.has(owner) || candidates.has(owner))) {
+      continue;
+    }
+    out.push(address);
+  }
+  return out.sort();
+}
+
+function stampAncillary(
+  skeleton: ExcalidrawElementSkeleton[],
+): ExcalidrawElementSkeleton[] {
+  return skeleton.map((el) => ({
+    ...el,
+    customData: {
+      ...(el.customData ?? {}),
+      terraformPipelineAncillary: true,
+    },
+  }));
+}
+
+export function buildAncillaryStrips(
+  nodes: TerraformPlanNodesMap,
+  plan: unknown,
+  prep: PipelineLayoutPrep,
+  options: { compact: boolean },
+): AncillaryStrip[] {
+  const clusterIds = new Set(prep.clusters.map((c) => c.id));
+  const addresses = collectAncillaryAddresses(
+    nodes,
+    clusterIds,
+    prep.satelliteOwners,
+  );
+  const byScope = new Map<string, AncillaryStrip>();
+
+  for (const address of addresses) {
+    const placement: PipelinePlacement = prep.placementByAddress.get(
+      address,
+    ) ?? {
+      providerFamily: "terraform",
+      accountId: "unknown-account",
+      region: "unknown-region",
+      vpcId: null,
+    };
+    const vKey = vpcScopeKey(placement);
+    const scopeRole = vKey ? ("vpc" as const) : ("region" as const);
+    const scopeKey = vKey ?? regionScopeKey(placement);
+    let strip = byScope.get(scopeKey);
+    if (!strip) {
+      strip = {
+        scopeRole,
+        scopeKey,
+        placement: {
+          providerFamily: placement.providerFamily,
+          accountId: placement.accountId,
+          region: placement.region,
+          vpcId: scopeRole === "vpc" ? placement.vpcId : null,
+        },
+        stripFrameId: ancillaryStripFrameId(scopeKey),
+        cards: [],
+      };
+      byScope.set(scopeKey, strip);
+    }
+
+    const clusterPlacement = {
+      accountId: placement.accountId,
+      region: placement.region,
+      vpcId: placement.vpcId,
+      subnetTier: placement.subnetTier,
+      subnetSignature: placement.subnetSignature,
+    };
+    let build = options.compact
+      ? buildCompactPipelinePrimaryCluster(
+          address,
+          nodes,
+          plan,
+          clusterPlacement,
+        )
+      : buildTopologyPrimaryClusterSkeletonForPipeline(
+          address,
+          nodes,
+          plan,
+          clusterPlacement,
+        );
+    if (build.skeleton.length === 0 || build.width <= 0 || build.height <= 0) {
+      build = buildFallbackCluster(address, nodes, plan, placement);
+    }
+    strip.cards.push({
+      address,
+      placement,
+      build: { ...build, skeleton: stampAncillary(build.skeleton) },
+    });
+  }
+
+  return [...byScope.values()].sort((a, b) =>
+    a.scopeKey.localeCompare(b.scopeKey),
+  );
+}
+
+export function countAncillaryCards(strips: readonly AncillaryStrip[]): number {
+  return strips.reduce((total, strip) => total + strip.cards.length, 0);
+}

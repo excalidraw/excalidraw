@@ -34,6 +34,8 @@ export type TerraformImportSession = {
   pipelinePacked?: boolean;
   /** Packed only — pull slack clusters to their leftmost TFD-feasible column. */
   pipelinePackedPullLeft?: boolean;
+  /** Pipeline — draw non-TFD resources in per-hull "Unconnected" strips. */
+  pipelineIncludeAncillary?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

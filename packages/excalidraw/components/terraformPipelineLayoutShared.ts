@@ -63,6 +63,30 @@ export type PipelineLayoutPrep = {
   maxDepth: number;
   columnX: number[];
   depthResult: { depths: Map<string, number>; hasCycle: boolean };
+  /** satellite address -> owning primary address (all plan primaries). */
+  satelliteOwners: ReadonlyMap<string, string>;
+  /** Every plan address -> topology placement (unknown-* fallbacks included). */
+  placementByAddress: ReadonlyMap<string, PipelinePlacement>;
+};
+
+export type AncillaryCard = {
+  address: string;
+  /** True placement incl. subnet info (kept on the card for expand-on-click). */
+  placement: PipelinePlacement;
+  build: PipelinePrimaryClusterBuildResult;
+};
+
+/**
+ * One "Unconnected" strip of non-TFD resources, hosted at the bottom of its
+ * deepest topology hull (VPC when the resources have a vpcId, else region).
+ */
+export type AncillaryStrip = {
+  scopeRole: "vpc" | "region";
+  scopeKey: string;
+  /** Scope-level placement — subnet info dropped so no subnetZone frame forms. */
+  placement: PipelinePlacement;
+  stripFrameId: string;
+  cards: AncillaryCard[];
 };
 
 export const PIPELINE_MARGIN = 50;
@@ -227,7 +251,7 @@ export function pipelineFrameCustomData(
   };
 }
 
-function buildFallbackCluster(
+export function buildFallbackCluster(
   address: string,
   nodes: TerraformPlanNodesMap,
   plan: unknown,
@@ -373,6 +397,24 @@ export function laneKey(p: PipelinePlacement): string {
   ].join("\0");
 }
 
+export function providerScopeKey(p: PipelinePlacement): string {
+  return p.providerFamily;
+}
+
+export function accountScopeKey(p: PipelinePlacement): string {
+  return [p.providerFamily, p.accountId].join("\0");
+}
+
+export function regionScopeKey(p: PipelinePlacement): string {
+  return [p.providerFamily, p.accountId, p.region].join("\0");
+}
+
+export function vpcScopeKey(p: PipelinePlacement): string | null {
+  return p.vpcId
+    ? [p.providerFamily, p.accountId, p.region, p.vpcId].join("\0")
+    : null;
+}
+
 export function translateSkeleton(
   skeleton: ExcalidrawElementSkeleton[],
   dx: number,
@@ -481,10 +523,147 @@ export function layoutLaneClusters(
   return { skeleton, layoutBoxes, laneBottomY };
 }
 
-export function placeClustersClassicGrid(prep: PipelineLayoutPrep): {
+export const ANCILLARY_STRIP_STROKE = "#94a3b8";
+/** Default wrap for strips whose scope has no TFD lanes (~4 compact cards). */
+export const ANCILLARY_DEFAULT_WRAP_WIDTH =
+  4 * 276 + 3 * PIPELINE_CLUSTER_GAP_Y + 2 * PIPELINE_FRAME_PAD;
+
+export function ancillaryStripFrameId(scopeKey: string): string {
+  return `tf-pipeline:ancillaryStrip:${encodeURIComponent(scopeKey)}`;
+}
+
+function ancillaryStripRows(
+  strip: AncillaryStrip,
+  wrapWidth: number,
+): {
+  effectiveWrap: number;
+  positions: { card: AncillaryCard; x: number; y: number }[];
+  width: number;
+  height: number;
+} {
+  const pad = PIPELINE_FRAME_PAD;
+  const gap = PIPELINE_CLUSTER_GAP_Y;
+  const maxCardWidth = Math.max(0, ...strip.cards.map((c) => c.build.width));
+  const effectiveWrap = Math.max(wrapWidth, maxCardWidth + 2 * pad);
+  const positions: { card: AncillaryCard; x: number; y: number }[] = [];
+  let x = pad;
+  let y = pad;
+  let rowHeight = 0;
+  let usedWidth = 0;
+  for (const card of strip.cards) {
+    if (x > pad && x + card.build.width > effectiveWrap - pad) {
+      x = pad;
+      y += rowHeight + gap;
+      rowHeight = 0;
+    }
+    positions.push({ card, x, y });
+    usedWidth = Math.max(usedWidth, x + card.build.width);
+    rowHeight = Math.max(rowHeight, card.build.height);
+    x += card.build.width + gap;
+  }
+  return {
+    effectiveWrap,
+    positions,
+    width: Math.min(effectiveWrap, usedWidth + pad),
+    height: y + rowHeight + pad,
+  };
+}
+
+/**
+ * Wrapping flow grid of ancillary cluster cards inside a muted "Unconnected"
+ * frame, built at origin. Rows wrap at the host scope's content width so the
+ * strip grows the hull downward, not sideways (a single card wider than the
+ * scope is the only case that can widen it).
+ */
+export function layoutAncillaryStrip(
+  strip: AncillaryStrip,
+  wrapWidth: number,
+): {
+  skeleton: ExcalidrawElementSkeleton[];
+  width: number;
+  height: number;
+  boxes: Map<string, TerraformDependencyLayoutBox>;
+} {
+  const rows = ancillaryStripRows(strip, wrapWidth);
+  const skeleton: ExcalidrawElementSkeleton[] = [];
+  const boxes = new Map<string, TerraformDependencyLayoutBox>();
+  for (const { card, x, y } of rows.positions) {
+    skeleton.push(...translateSkeleton(card.build.skeleton, x, y));
+    boxes.set(card.build.clusterFrameId, {
+      x,
+      y,
+      width: card.build.width,
+      height: card.build.height,
+    });
+  }
+  skeleton.push({
+    type: "frame",
+    id: strip.stripFrameId,
+    name: "Unconnected",
+    x: 0,
+    y: 0,
+    width: rows.width,
+    height: rows.height,
+    strokeColor: ANCILLARY_STRIP_STROKE,
+    backgroundColor: "transparent",
+    children: strip.cards.map((c) => c.build.clusterFrameId),
+    customData: pipelineFrameCustomData(
+      "ancillaryStrip",
+      strip.placement,
+      strip.stripFrameId,
+      { terraformPipelineAncillary: true },
+    ),
+  });
+  boxes.set(strip.stripFrameId, {
+    x: 0,
+    y: 0,
+    width: rows.width,
+    height: rows.height,
+  });
+  return { skeleton, width: rows.width, height: rows.height, boxes };
+}
+
+/** Height/width-only mirror of `layoutAncillaryStrip` for packed measuring. */
+export function measureAncillaryStrip(
+  strip: AncillaryStrip,
+  wrapWidth: number,
+): { width: number; height: number } {
+  const rows = ancillaryStripRows(strip, wrapWidth);
+  return { width: rows.width, height: rows.height };
+}
+
+/**
+ * Wrap a placed strip as a pseudo-cluster so `emitTopologyContextFrames`
+ * hulls the strip frame into its vpc/region frame like any cluster frame.
+ */
+export function ancillaryStripAsPseudoCluster(
+  strip: AncillaryStrip,
+  placedBox: TerraformDependencyLayoutBox,
+): PipelineCluster {
+  const id = `__ancillary__:${strip.scopeKey}`;
+  return {
+    id,
+    primaryAddress: id,
+    firstSequence: Number.MAX_SAFE_INTEGER,
+    depth: 0,
+    placement: strip.placement,
+    build: {
+      skeleton: [],
+      width: placedBox.width,
+      height: placedBox.height,
+      clusterFrameId: strip.stripFrameId,
+    },
+  };
+}
+
+export function placeClustersClassicGrid(
+  prep: PipelineLayoutPrep,
+  ancillaryStrips?: readonly AncillaryStrip[],
+): {
   skeleton: ExcalidrawElementSkeleton[];
   layoutBoxes: Map<string, TerraformDependencyLayoutBox>;
   laneEntries: [string, PipelineCluster[]][];
+  ancillaryClusters: PipelineCluster[];
 } {
   const lanes = new Map<string, PipelineCluster[]>();
   for (const cluster of prep.clusters) {
@@ -496,9 +675,61 @@ export function placeClustersClassicGrid(prep: PipelineLayoutPrep): {
   );
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const layoutBoxes = new Map<string, TerraformDependencyLayoutBox>();
+  const ancillaryClusters: PipelineCluster[] = [];
+
+  const pendingStrips = new Map(
+    (ancillaryStrips ?? []).map((strip) => [strip.scopeKey, strip]),
+  );
+  const scopeSpans = new Map<string, { minX: number; maxX: number }>();
 
   let laneY = PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
+
+  // Strips are emitted at scope boundaries of the untouched lane order, so a
+  // strip lands as the bottom band of its vpc/region hull and the no-strip
+  // output stays byte-identical.
+  const placeStrip = (scopeKey: string | null): void => {
+    if (scopeKey == null) {
+      return;
+    }
+    const strip = pendingStrips.get(scopeKey);
+    if (!strip) {
+      return;
+    }
+    pendingStrips.delete(scopeKey);
+    const span = scopeSpans.get(scopeKey);
+    const stripX = span ? span.minX : PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
+    const wrapWidth = span
+      ? span.maxX - span.minX
+      : ANCILLARY_DEFAULT_WRAP_WIDTH;
+    const laid = layoutAncillaryStrip(strip, wrapWidth);
+    skeleton.push(...translateSkeleton(laid.skeleton, stripX, laneY));
+    for (const [id, box] of laid.boxes) {
+      layoutBoxes.set(id, { ...box, x: box.x + stripX, y: box.y + laneY });
+    }
+    ancillaryClusters.push(
+      ancillaryStripAsPseudoCluster(
+        strip,
+        layoutBoxes.get(strip.stripFrameId)!,
+      ),
+    );
+    laneY += laid.height + PIPELINE_LANE_GAP_Y + PIPELINE_FRAME_PAD * 4;
+  };
+
+  let currentVpcKey: string | null = null;
+  let currentRegionKey: string | null = null;
   for (const [, laneClusters] of laneEntries) {
+    const placement = laneClusters[0]!.placement;
+    const vpcKey = vpcScopeKey(placement);
+    const regionKey = regionScopeKey(placement);
+    if (currentVpcKey !== vpcKey) {
+      placeStrip(currentVpcKey);
+    }
+    if (currentRegionKey !== regionKey) {
+      placeStrip(currentRegionKey);
+    }
+    currentVpcKey = vpcKey;
+    currentRegionKey = regionKey;
+
     const laneLayout = layoutLaneClusters(
       laneClusters,
       prep.columnX,
@@ -509,10 +740,30 @@ export function placeClustersClassicGrid(prep: PipelineLayoutPrep): {
     for (const [id, box] of laneLayout.layoutBoxes) {
       layoutBoxes.set(id, box);
     }
+    if (pendingStrips.size > 0) {
+      for (const scopeKey of vpcKey ? [vpcKey, regionKey] : [regionKey]) {
+        let span = scopeSpans.get(scopeKey);
+        if (!span) {
+          span = { minX: Infinity, maxX: -Infinity };
+          scopeSpans.set(scopeKey, span);
+        }
+        for (const box of laneLayout.layoutBoxes.values()) {
+          span.minX = Math.min(span.minX, box.x);
+          span.maxX = Math.max(span.maxX, box.x + box.width);
+        }
+      }
+    }
     laneY = laneLayout.laneBottomY;
   }
+  placeStrip(currentVpcKey);
+  placeStrip(currentRegionKey);
+  for (const scopeKey of [...pendingStrips.keys()].sort((a, b) =>
+    a.localeCompare(b),
+  )) {
+    placeStrip(scopeKey);
+  }
 
-  return { skeleton, layoutBoxes, laneEntries };
+  return { skeleton, layoutBoxes, laneEntries, ancillaryClusters };
 }
 
 export function preparePipelineLayout(
@@ -602,5 +853,13 @@ export function preparePipelineLayout(
   const maxDepth = Math.max(0, ...clusters.map((c) => c.depth));
   const columnX = computeGlobalColumnX(clusters, maxDepth);
 
-  return { clusters, collapsedEdges, maxDepth, columnX, depthResult };
+  return {
+    clusters,
+    collapsedEdges,
+    maxDepth,
+    columnX,
+    depthResult,
+    satelliteOwners,
+    placementByAddress,
+  };
 }
