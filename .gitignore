@@ -144,9 +144,7 @@ tools/graph-layout-rag/data/indexes/
 tools/graph-layout-rag/data/lancedb/
 tools/graph-layout-rag/data/manifest.json
 tools/graph-layout-rag/data/ingest_state.json
-tools/graph-layout-rag/data/harvest.log
-tools/graph-layout-rag/data/ingest.log
-tools/graph-layout-rag/data/ingest-run.log
+tools/graph-layout-rag/data/*.log
 tools/graph-layout-rag/data/harvest.db
 tools/graph-layout-rag/data/harvest_checkpoint.json
 tools/graph-layout-rag/**/__pycache__/

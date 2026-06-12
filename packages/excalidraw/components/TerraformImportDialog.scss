@@ -1,778 +1,926 @@
 @use "../css/variables.module" as *;
 
 .excalidraw {
+  .TerraformImportDialog {
+    .Island {
+      padding-bottom: 0;
+    }
+
+    .Dialog__content {
+      margin: 0 -2.5rem;
+    }
+
+    .Dialog__title {
+      margin: 0 0 0.25rem;
+      padding: 0 0 0.75rem;
+    }
+  }
+
   .TerraformImportModal {
-    // Shared interactive control tokens (modern-web-guidance: explicit states)
-    --tf-control-radius: 0.5rem;
-    --tf-control-min-height: 2.5rem;
-    --tf-control-border: var(--color-gray-30);
-    --tf-control-border-hover: var(--color-brand-hover);
-    --tf-control-border-active: var(--color-brand-active);
-    --tf-control-border-focus: var(--color-primary);
-    --tf-control-bg: var(--color-surface-lowest);
-    --tf-control-bg-hover: var(--color-primary-light);
-    --tf-control-text: var(--color-on-surface);
-    --tf-control-text-muted: var(--color-gray-60);
-    --tf-control-focus-ring: 0 0 0 2px var(--color-surface-lowest),
+    --tf-radius-sm: 0.5rem;
+    --tf-radius: 0.75rem;
+    --tf-border: var(--color-gray-30);
+    --tf-muted: var(--color-gray-60);
+    --tf-focus: 0 0 0 2px var(--color-surface-lowest),
       0 0 0 4px var(--color-primary);
-    --tf-file-btn-bg: var(--color-primary);
-    --tf-file-btn-bg-hover: var(--color-brand-hover);
-    --tf-file-btn-bg-active: var(--color-brand-active);
-    --tf-file-btn-text: var(--color-on-primary, var(--color-surface-lowest));
-    --tf-transition: 150ms ease-out;
 
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    gap: 1.25rem;
+    padding: 0 2.5rem;
+    font-family: "Assistant";
+    color: var(--color-on-surface);
     user-select: none;
 
-    & > h3 {
-      font-family: "Assistant";
-      font-weight: 700;
-      font-size: 1.313rem;
-      line-height: 130%;
-      padding: 0;
+    h3,
+    p,
+    dl,
+    dd {
       margin: 0;
     }
 
-    // Labels wrapping form controls
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-family: "Assistant";
-      font-weight: 600;
-      font-size: 0.875rem;
-      color: var(--tf-control-text);
+    h3 {
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    button,
+    input,
+    select,
+    summary {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    summary:focus-visible {
+      outline: none;
+      box-shadow: var(--tf-focus);
     }
 
     input[type="text"],
+    input[type="number"],
     select {
-      font-family: var(--font-family);
-      font-weight: 500;
-      font-size: 0.875rem;
-      min-height: var(--tf-control-min-height);
-      padding: 0.5rem 0.875rem;
-      border-radius: var(--tf-control-radius);
-      border: 1px solid var(--tf-control-border);
-      background-color: var(--tf-control-bg);
-      color: var(--tf-control-text);
-      transition: border-color var(--tf-transition),
-        box-shadow var(--tf-transition), background-color var(--tf-transition);
-
-      &::placeholder {
-        color: var(--color-gray-40);
-        font-weight: 400;
-      }
-
-      &:hover:not(:disabled) {
-        border-color: var(--tf-control-border-hover);
-      }
-
-      &:focus-visible {
-        outline: none;
-        border-color: var(--tf-control-border-focus);
-        box-shadow: var(--tf-control-focus-ring);
-      }
-
-      &:disabled {
-        cursor: not-allowed;
-        border-color: var(--color-gray-20);
-        background-color: var(--color-surface-low);
-        color: var(--tf-control-text-muted);
-      }
-    }
-
-    select {
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    // —— File input (Choose File) ——
-    input[type="file"] {
-      font-family: var(--font-family);
-      font-size: 0.8125rem;
-      font-weight: 500;
+      box-sizing: border-box;
+      min-height: 2.5rem;
       width: 100%;
-      max-width: 100%;
-      min-height: var(--tf-control-min-height);
-      padding: 0.375rem 0.75rem;
-      border-radius: var(--tf-control-radius);
-      border: 1px solid var(--tf-control-border);
-      background-color: var(--tf-control-bg);
-      color: var(--tf-control-text);
-      cursor: pointer;
-      transition: border-color var(--tf-transition),
-        background-color var(--tf-transition), box-shadow var(--tf-transition);
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius-sm);
+      background: var(--color-surface-lowest);
+      color: var(--color-on-surface);
 
       &:hover:not(:disabled) {
-        border-color: var(--tf-control-border-hover);
-        background-color: var(--tf-control-bg-hover);
-      }
-
-      &:active:not(:disabled) {
-        border-color: var(--tf-control-border-active);
-      }
-
-      &:focus-visible {
-        outline: none;
-        border-color: var(--tf-control-border-focus);
-        box-shadow: var(--tf-control-focus-ring);
+        border-color: var(--color-brand-hover);
       }
 
       &:disabled {
         cursor: not-allowed;
-        border-color: var(--color-gray-20);
-        background-color: var(--color-surface-low);
-        color: var(--tf-control-text-muted);
-      }
-
-      &::file-selector-button {
-        font-family: var(--font-family);
-        font-weight: 600;
-        font-size: 0.8125rem;
-        line-height: 1.25;
-        padding: 0.4rem 0.875rem;
-        margin-right: 0.75rem;
-        border-radius: calc(var(--tf-control-radius) - 2px);
-        border: none;
-        background-color: var(--tf-file-btn-bg);
-        color: var(--tf-file-btn-text);
-        cursor: pointer;
-        transition: background-color var(--tf-transition),
-          transform var(--tf-transition);
-      }
-
-      &:hover:not(:disabled)::file-selector-button {
-        background-color: var(--tf-file-btn-bg-hover);
-      }
-
-      &:active:not(:disabled)::file-selector-button {
-        background-color: var(--tf-file-btn-bg-active);
-      }
-
-      &:disabled::file-selector-button {
-        background-color: var(--color-gray-40);
-        color: var(--color-surface-lowest);
-        cursor: not-allowed;
+        opacity: 0.6;
       }
     }
 
-    // Secondary / tertiary text buttons
-    &__addBundle,
-    &__bundleRemove {
-      font-family: "Assistant";
-      font-size: 0.875rem;
-      font-weight: 600;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem 0.35rem;
-      border-radius: 0.25rem;
-      transition: color var(--tf-transition),
-        background-color var(--tf-transition);
-
-      &:focus-visible {
-        outline: none;
-        box-shadow: var(--tf-control-focus-ring);
-      }
-    }
-
-    &__addBundle {
-      align-self: flex-start;
-      color: var(--color-primary);
-      padding: 0.35rem 0.5rem;
-
-      &:hover:not(:disabled) {
-        text-decoration: underline;
-        background-color: var(--tf-control-bg-hover);
-      }
-
-      &:disabled {
-        color: var(--tf-control-text-muted);
-        cursor: not-allowed;
-        text-decoration: none;
-      }
-    }
-
-    &__bundleRemove {
-      color: var(--color-danger);
-      padding: 0.25rem 0.5rem;
-
-      &:hover:not(:disabled) {
-        text-decoration: underline;
-        background-color: var(--color-danger-background, #ffe3e3);
-      }
-    }
-
-    &__presetButtons button {
-      font-family: "Assistant";
-      font-size: 0.8125rem;
-      font-weight: 600;
-      border: 1px solid var(--tf-control-border);
-      border-radius: 0.375rem;
-      background: var(--tf-control-bg);
-      color: var(--tf-control-text);
-      padding: 0.4rem 0.65rem;
-      cursor: pointer;
-      transition: border-color var(--tf-transition),
-        background-color var(--tf-transition), box-shadow var(--tf-transition);
-
-      &:hover:not(:disabled) {
-        border-color: var(--tf-control-border-hover);
-        background-color: var(--tf-control-bg-hover);
-      }
-
-      &:active:not(:disabled) {
-        border-color: var(--tf-control-border-active);
-      }
-
-      &:focus-visible {
-        outline: none;
-        box-shadow: var(--tf-control-focus-ring);
-      }
-
-      &:disabled {
-        border-color: var(--color-gray-20);
-        background-color: var(--color-surface-low);
-        color: var(--tf-control-text-muted);
-        cursor: not-allowed;
-      }
-    }
-
-    &__section {
+    &__intro {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
 
-      & > h4 {
-        font-family: "Assistant";
-        font-weight: 600;
-        font-size: 1rem;
-        margin: 0;
-        color: var(--color-on-surface);
-      }
-    }
-
-    &__divider {
-      width: 100%;
-      height: 1px;
-      background-color: var(--color-gray-20);
-    }
-
-    &__viewSelector {
-      &__options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 8px;
-        width: 100%;
-      }
-
-      &__option {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 0.625rem 0.875rem;
-        border-radius: var(--tf-control-radius);
-        border: 1px solid var(--tf-control-border);
-        background-color: transparent;
-        font-family: "Assistant";
-        cursor: pointer;
-        user-select: none;
-        transition: border-color var(--tf-transition),
-          background-color var(--tf-transition), box-shadow var(--tf-transition);
-
-        input[type="radio"] {
-          position: absolute;
-          opacity: 0;
-          pointer-events: none;
-          width: 0;
-          height: 0;
-        }
-
-        &:hover:not(&--disabled) {
-          border-color: var(--tf-control-border-hover);
-          background-color: var(--tf-control-bg-hover);
-        }
-
-        &:has(input[type="radio"]:focus-visible) {
-          outline: none;
-          border-color: var(--tf-control-border-focus);
-          box-shadow: var(--tf-control-focus-ring);
-        }
-
-        &--checked,
-        &--checked:hover:not(&--disabled) {
-          border-color: var(--color-primary);
-          background-color: var(--color-primary-light);
-          box-shadow: 0 0 0 1px var(--color-primary) inset;
-        }
-
-        &--disabled,
-        &--disabled:hover {
-          border-color: var(--color-gray-20);
-          background-color: var(--color-surface-low);
-          box-shadow: none;
-          cursor: not-allowed;
-
-          .TerraformImportModal__viewSelector__label,
-          .TerraformImportModal__viewSelector__description {
-            color: var(--tf-control-text-muted);
-          }
-        }
-      }
-
-      &__label {
-        font-weight: 600;
+      & > p {
+        max-width: 42rem;
+        color: var(--tf-muted);
         font-size: 0.875rem;
-        color: var(--color-on-surface);
-      }
-
-      &__description {
-        font-weight: 400;
-        font-size: 0.75rem;
-        color: var(--color-gray-60);
+        line-height: 1.45;
       }
     }
 
-    &__viewSubOptionRow {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 6px;
-    }
+    &__instructions,
+    &__advanced {
+      position: relative;
 
-    &__viewSubOptionLabel {
-      font-family: "Assistant";
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: var(--tf-control-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
-
-    &__viewSubOption {
-      display: flex;
-      flex-direction: row;
-      gap: 4px;
-
-      &__btn {
-        font-family: "Assistant";
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.2rem 0.55rem;
+      summary {
+        width: fit-content;
+        padding: 0.25rem 0.4rem;
         border-radius: 0.375rem;
-        border: 1px solid var(--tf-control-border);
-        background: var(--color-surface-lowest);
-        color: var(--tf-control-text-muted);
-        cursor: pointer;
-        transition: border-color var(--tf-transition),
-          background-color var(--tf-transition), color var(--tf-transition);
-
-        &:hover {
-          border-color: var(--tf-control-border-hover);
-          background-color: var(--tf-control-bg-hover);
-          color: var(--tf-control-text);
-        }
-
-        &:focus-visible {
-          outline: none;
-          box-shadow: var(--tf-control-focus-ring);
-        }
-
-        &--active {
-          border-color: var(--color-primary);
-          background-color: var(--color-primary-light);
-          color: var(--color-primary);
-          box-shadow: 0 0 0 1px var(--color-primary) inset;
-
-          &:hover {
-            background-color: var(--color-primary-light);
-            border-color: var(--color-primary);
-          }
-        }
-      }
-    }
-
-    &__modulePacking {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--tf-control-border);
-      border-radius: var(--tf-control-radius);
-      background-color: var(--color-surface-low);
-
-      h5 {
-        margin: 0;
-        font-family: "Assistant";
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--color-on-surface);
-      }
-
-      &__modes {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      &__params {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      &__paramsHeader {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-      }
-
-      &__paramsTitle {
-        font-family: "Assistant";
+        color: var(--color-primary);
         font-size: 0.8125rem;
         font-weight: 600;
-        color: var(--color-gray-70);
-      }
-
-      &__reset {
-        border: none;
-        background: none;
-        padding: 0;
-        font-family: "Assistant";
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--color-primary);
         cursor: pointer;
-        text-decoration: underline;
-
-        &:hover {
-          color: var(--color-primary-darker);
-        }
-      }
-
-      &__paramGrid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-        gap: 0.625rem 0.75rem;
-      }
-
-      &__param {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        font-family: "Assistant";
-        font-size: 0.75rem;
-        color: var(--color-on-surface);
-
-        span:first-child {
-          font-weight: 600;
-        }
-
-        input[type="number"],
-        select {
-          width: 100%;
-          padding: 0.35rem 0.5rem;
-          border: 1px solid var(--tf-control-border);
-          border-radius: var(--tf-control-radius);
-          font-family: "Assistant";
-          font-size: 0.8125rem;
-          background-color: var(--color-surface-high);
-          color: var(--color-on-surface);
-        }
-
-        &--checkbox {
-          flex-direction: row;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 0.35rem;
-
-          input[type="checkbox"] {
-            margin: 0;
-          }
-        }
-      }
-
-      &__hint {
-        display: block;
-        width: 100%;
-        font-weight: 400;
-        font-size: 0.6875rem;
-        color: var(--color-gray-60);
-        line-height: 1.3;
-      }
-    }
-
-    &__error {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: var(--tf-control-radius);
-      background-color: #ffe3e3;
-      color: #c92a2a;
-      font-family: "Assistant";
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    &__settings__buttons {
-      display: flex;
-      flex-direction: row;
-      gap: 11px;
-
-      .ExcButton[disabled] {
-        &.ExcButton--variant-filled,
-        &:hover {
-          --back-color: var(--color-primary) !important;
-          --text-color: var(--color-on-primary) !important;
-          opacity: 0.5;
-        }
-      }
-    }
-
-    &__muted {
-      display: block;
-      font-weight: 400;
-      font-size: 0.75rem;
-      color: var(--color-gray-60);
-      line-height: 1.35;
-
-      code {
-        font-family: var(--font-family);
-        font-size: 0.7rem;
       }
     }
 
     &__instructions {
-      width: 100%;
-      border: 1px solid var(--color-gray-30);
-      border-radius: var(--tf-control-radius);
-      background-color: var(--color-surface-low);
+      flex: 0 0 auto;
 
-      &Summary {
-        list-style-position: outside;
-        padding: 0.625rem 0.875rem 0.625rem 1.75rem;
+      &[open] {
+        width: 100%;
+      }
+    }
+
+    &__instructionsBody {
+      margin-top: 0.625rem;
+      padding: 0.875rem;
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-low);
+      font-size: 0.8125rem;
+      line-height: 1.4;
+      user-select: text;
+    }
+
+    &__commandGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.625rem;
+      margin-top: 0.75rem;
+
+      strong {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+
+      pre {
         margin: 0;
-        font-family: "Assistant";
-        font-weight: 600;
-        font-size: 0.9375rem;
-        color: var(--color-on-surface);
-        cursor: pointer;
-        user-select: none;
-        border-radius: var(--tf-control-radius);
-
-        &:focus-visible {
-          outline: none;
-          box-shadow: var(--tf-control-focus-ring);
-        }
-
-        &::-webkit-details-marker {
-          color: var(--color-gray-60);
-        }
-      }
-
-      &[open] > summary {
-        border-bottom: 1px solid var(--color-gray-20);
-      }
-
-      &Body {
-        padding: 0.75rem 0.875rem 0.875rem;
-        user-select: text;
-        cursor: auto;
-      }
-
-      &Lead,
-      &Foot {
-        margin: 0 0 0.75rem;
-        font-family: "Assistant";
-        font-weight: 400;
-        font-size: 0.8125rem;
-        line-height: 1.45;
-        color: var(--color-gray-70);
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        code {
-          font-family: var(--font-family);
-          font-size: 0.7rem;
-          font-weight: 600;
-          color: var(--color-on-surface);
-        }
-      }
-
-      &Foot {
-        margin-top: 0.75rem;
-        margin-bottom: 0;
-      }
-
-      &Steps {
-        margin: 0;
-        padding-left: 1.25rem;
-        font-family: "Assistant";
-        font-size: 0.8125rem;
-        line-height: 1.45;
-        color: var(--color-on-surface);
-
-        li {
-          margin-bottom: 0.75rem;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-
-        strong {
-          display: block;
-          margin-bottom: 0.35rem;
-          font-weight: 600;
-        }
-      }
-
-      &Code {
-        margin: 0.35rem 0 0;
-        padding: 0.5rem 0.625rem;
-        border-radius: 0.375rem;
-        background-color: var(--color-gray-10);
-        border: 1px solid var(--color-gray-20);
+        padding: 0.5rem;
         overflow-x: auto;
-        font-family: var(--font-family);
+        border: 1px solid var(--color-gray-20);
+        border-radius: 0.375rem;
+        background: var(--color-surface-lowest);
         font-size: 0.6875rem;
-        line-height: 1.4;
-        color: var(--color-on-surface);
-        white-space: pre;
-
-        code {
-          font-family: inherit;
-          font-size: inherit;
-          background: none;
-          border: none;
-          padding: 0;
-        }
       }
+    }
+
+    &__presetCard,
+    &__panel {
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-lowest);
+    }
+
+    &__presetCard {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+      padding: 1rem;
+      border-color: var(--color-primary-light-darker);
+      background: linear-gradient(
+        135deg,
+        var(--color-surface-primary-container),
+        var(--color-surface-lowest) 65%
+      );
+    }
+
+    &__sectionHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+
+      p {
+        margin-top: 0.2rem;
+        color: var(--tf-muted);
+        font-size: 0.75rem;
+        line-height: 1.35;
+      }
+    }
+
+    &__eyebrow {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--color-primary);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    &__badge {
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      font-size: 0.6875rem;
+      font-weight: 700;
+    }
+
+    &__presetMain {
+      display: grid;
+      grid-template-columns: minmax(14rem, 1fr) auto;
+      align-items: end;
+      gap: 0.75rem;
+    }
+
+    &__presetActions,
+    &__buttonRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    &__presetSummary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.5rem;
+
+      div {
+        padding: 0.5rem 0.625rem;
+        border-radius: var(--tf-radius-sm);
+        background: color-mix(
+          in srgb,
+          var(--color-surface-lowest) 72%,
+          transparent
+        );
+      }
+
+      dt {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+      }
+
+      dd {
+        margin-top: 0.1rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+    }
+
+    &__advanced {
+      border-top: 1px solid var(--color-gray-20);
+      padding-top: 0.5rem;
+
+      &[open] summary {
+        margin-bottom: 0.625rem;
+      }
+    }
+
+    &__buttonRow button,
+    &__activePreset button {
+      padding: 0.4rem 0.625rem;
+      border: 1px solid var(--tf-border);
+      border-radius: 0.375rem;
+      background: var(--color-surface-lowest);
+      color: var(--color-on-surface);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-brand-hover);
+        background: var(--color-primary-light);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+
+    &__buttonRow &__dangerButton {
+      color: var(--color-danger-color);
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-danger);
+        background: var(--color-danger-background);
+      }
+    }
+
+    &__workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.85fr);
+      align-items: start;
+      gap: 1rem;
+    }
+
+    &__panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
     }
 
     &__bundles {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      width: 100%;
+      gap: 0.75rem;
     }
 
     &__bundle {
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 12px;
-      border: 1px solid var(--color-gray-30);
-      border-radius: var(--tf-control-radius);
-      background-color: var(--color-surface-low);
+      gap: 0.75rem;
+      min-width: 0;
+      margin: 0;
+      padding: 0.875rem;
+      border: 1px solid var(--color-gray-20);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-low);
+
+      legend {
+        padding: 0 0.35rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+      }
     }
 
-    &__bundleHeader {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    &__bundleTitle {
-      font-family: "Assistant";
+    &__bundleRemove {
+      position: absolute;
+      top: 0.45rem;
+      right: 0.5rem;
+      padding: 0.25rem 0.4rem;
+      border: 0;
+      border-radius: 0.3rem;
+      background: transparent;
+      color: var(--color-danger);
+      font-size: 0.6875rem;
       font-weight: 600;
-      font-size: 0.875rem;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--color-danger-background);
+      }
+    }
+
+    &__controlLabel {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--color-on-surface);
+      font-size: 0.75rem;
+      font-weight: 600;
+
+      span {
+        color: var(--tf-muted);
+        font-weight: 400;
+      }
+    }
+
+    &__filePair,
+    &__optionalGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.625rem;
+    }
+
+    &__filePicker {
+      position: relative;
+      display: block;
+      min-width: 0;
+
+      input[type="file"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      &:has(input:focus-visible) &Text {
+        box-shadow: var(--tf-focus);
+      }
+
+      &:hover &Text {
+        border-color: var(--color-brand-hover);
+        background: var(--color-primary-light);
+      }
+    }
+
+    &__filePickerText {
+      display: block;
+      min-width: 0;
+      padding: 0.625rem 0.75rem;
+      overflow: hidden;
+      border: 1px dashed var(--tf-border);
+      border-radius: var(--tf-radius-sm);
+      background: var(--color-surface-lowest);
+      color: var(--color-primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    &__addBundle {
+      align-self: flex-start;
+      padding: 0.35rem 0.5rem;
+      border: 0;
+      border-radius: 0.375rem;
+      background: transparent;
+      color: var(--color-primary);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: var(--color-primary-light);
+      }
+    }
+
+    &__optionalCard {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      min-width: 0;
+      padding: 0.75rem;
+      border: 1px solid var(--color-gray-20);
+      border-radius: var(--tf-radius);
+
+      & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      strong {
+        font-size: 0.8125rem;
+      }
+
+      span {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+        line-height: 1.3;
+      }
     }
 
     &__fileList {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
       margin: 0;
-      padding-left: 1.25rem;
-      font-family: "Assistant";
-      font-size: 0.8125rem;
-      color: var(--color-gray-70);
+      padding: 0;
+      list-style: none;
+
+      li {
+        display: flex;
+        gap: 0.35rem;
+        min-width: 0;
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+
+        span:last-child {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        span:first-child {
+          color: var(--color-primary);
+        }
+      }
     }
 
-    &__presetSummary {
-      display: grid;
-      gap: 4px;
-      font-family: "Assistant";
-      font-size: 0.8125rem;
-      color: var(--color-gray-70);
+    &__activePreset {
+      padding: 0.875rem;
+      border: 1px solid var(--color-primary-light-darker);
+      border-radius: var(--tf-radius);
+      background: var(--color-primary-light);
+
+      summary {
+        margin-top: 0.625rem;
+        color: var(--color-primary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+
+    &__activePresetHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+
+      div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      strong {
+        font-size: 0.875rem;
+      }
+
+      span {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+      }
     }
 
     &__presetManifest {
-      width: 100%;
+      max-width: 100%;
+      margin-top: 0.625rem;
       overflow-x: auto;
-      border: 1px solid var(--color-gray-30);
-      border-radius: var(--tf-control-radius);
-      background-color: var(--color-surface-low);
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius-sm);
+      background: var(--color-surface-lowest);
 
       table {
         width: 100%;
         border-collapse: collapse;
-        font-family: "Assistant";
-        font-size: 0.8125rem;
+        font-size: 0.6875rem;
+      }
+
+      caption {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
       }
 
       th,
       td {
+        padding: 0.45rem;
+        border-bottom: 1px solid var(--color-gray-20);
         text-align: left;
         vertical-align: top;
-        padding: 0.5rem 0.625rem;
-        border-bottom: 1px solid var(--color-gray-20);
-      }
-
-      th {
-        font-weight: 600;
-        color: var(--color-on-surface);
-        background-color: var(--color-surface-lowest);
       }
 
       code {
-        font-family: var(--font-family);
-        font-size: 0.75rem;
+        font-size: 0.625rem;
         word-break: break-all;
       }
     }
 
-    &__presetButtons {
+    &__viewSelector {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    &__viewOption {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: flex-start;
+      gap: 0.625rem;
+      padding: 0.75rem;
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius);
+      cursor: pointer;
+
+      input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+
+      &:has(input:focus-visible) {
+        box-shadow: var(--tf-focus);
+      }
+
+      &:hover:not(&--disabled) {
+        border-color: var(--color-brand-hover);
+        background: var(--color-primary-light);
+      }
+
+      & > span:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      strong {
+        font-size: 0.8125rem;
+      }
+
+      span span,
+      em {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+        font-style: normal;
+        line-height: 1.35;
+      }
+
+      em {
+        color: var(--color-primary);
+        font-weight: 600;
+      }
+
+      &--checked {
+        border-color: var(--color-primary);
+        background: var(--color-primary-light);
+        box-shadow: 0 0 0 1px var(--color-primary) inset;
+      }
+
+      &--disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+    }
+
+    &__viewOptionIndicator {
+      display: grid;
+      width: 1rem;
+      height: 1rem;
+      margin-top: 0.05rem;
+      place-items: center;
+      border: 1.5px solid var(--tf-border);
+      border-radius: 50%;
+
+      span {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: transparent;
+      }
+
+      .TerraformImportModal__viewOption--checked & {
+        border-color: var(--color-primary);
+
+        span {
+          background: var(--color-primary);
+        }
+      }
+    }
+
+    &__layoutSettings,
+    &__modulePacking {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border: 1px solid var(--color-gray-20);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-low);
+    }
+
+    &__layoutSettingsHeader {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+
+      strong {
+        font-size: 0.8125rem;
+      }
+
+      span {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+      }
+    }
+
+    &__layoutSettingsGrid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    &__segmentedControl {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 0.25rem;
+    }
+
+    &__segmentedButton {
+      padding: 0.3rem 0.5rem;
+      border: 1px solid var(--tf-border);
+      border-radius: 0.375rem;
+      background: var(--color-surface-lowest);
+      color: var(--tf-muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--color-brand-hover);
+      }
+
+      &--active {
+        border-color: var(--color-primary);
+        background: var(--color-primary-light);
+        color: var(--color-primary);
+        box-shadow: 0 0 0 1px var(--color-primary) inset;
+      }
+    }
+
+    &__modulePacking {
+      margin: 0;
+
+      h5 {
+        margin: 0;
+        font-size: 0.8125rem;
+      }
+
+      &__modes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      &__params,
+      &__param {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      &__paramsHeader {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      &__paramsTitle {
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      &__reset {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--color-primary);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      &__paramGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+
+      &__param {
+        font-size: 0.6875rem;
+
+        &--checkbox {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
+
+      &__hint {
+        width: 100%;
+        color: var(--tf-muted);
+        font-size: 0.625rem;
+      }
+    }
+
+    &__developerTools {
+      padding: 0.75rem;
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-low);
+    }
+
+    &__developerToolsBody {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    &__artifactForm {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.625rem;
+    }
+
+    &__artifactList {
+      margin: 0;
+      padding-left: 1.25rem;
+      font-size: 0.6875rem;
+    }
+
+    &__muted {
+      color: var(--tf-muted);
+      font-size: 0.75rem;
+    }
+
+    &__messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    &__error,
+    &__warnings {
+      padding: 0.75rem;
+      border-radius: var(--tf-radius);
+      font-size: 0.75rem;
+    }
+
+    &__error {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      border: 1px solid var(--color-danger);
+      background: var(--color-danger-background);
+      color: var(--color-danger-color);
     }
 
     &__warnings {
-      width: 100%;
-      border: 1px solid var(--color-warning);
-      border-radius: var(--tf-control-radius);
-      background-color: var(
-        --color-warning-background,
-        var(--color-surface-low)
-      );
-      padding: 0.5rem 0.75rem;
-      font-family: "Assistant";
-      font-size: 0.8125rem;
-      color: var(--color-on-surface);
+      border: 1px solid var(--color-warning-dark);
+      background: var(--color-warning-background);
 
       summary {
-        cursor: pointer;
         font-weight: 600;
-        border-radius: 0.25rem;
-        padding: 0.125rem 0.25rem;
-
-        &:focus-visible {
-          outline: none;
-          box-shadow: var(--tf-control-focus-ring);
-        }
+        cursor: pointer;
       }
 
       ul {
         margin: 0.5rem 0 0;
         padding-left: 1.25rem;
+      }
+    }
+
+    &__footer {
+      position: sticky;
+      z-index: 2;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 0 -2.5rem;
+      padding: 0.875rem 2.5rem 1rem;
+      border-top: 1px solid var(--tf-border);
+      background: color-mix(
+        in srgb,
+        var(--color-surface-lowest) 94%,
+        transparent
+      );
+      backdrop-filter: blur(10px);
+    }
+
+    &__footerSummary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+
+      strong {
+        font-size: 0.8125rem;
+      }
+
+      span {
+        color: var(--tf-muted);
+        font-size: 0.6875rem;
+      }
+    }
+  }
+
+  @media screen and (max-width: 800px) {
+    .TerraformImportDialog {
+      .Island {
+        padding: 1.25rem 1rem 0;
+      }
+
+      .Dialog__content {
+        margin: 0 -1rem;
+      }
+    }
+
+    .TerraformImportModal {
+      gap: 1rem;
+      padding: 0 1rem;
+
+      &__intro,
+      &__presetMain {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      &__workspace {
+        grid-template-columns: 1fr;
+      }
+
+      &__presetSummary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      &__footer {
+        margin: 0 -1rem;
+        padding: 0.75rem 1rem 1rem;
+      }
+    }
+  }
+
+  @media screen and (max-width: 520px) {
+    .TerraformImportModal {
+      &__filePair,
+      &__optionalGrid,
+      &__artifactForm,
+      &__modulePacking__paramGrid {
+        grid-template-columns: 1fr;
+      }
+
+      &__presetActions {
+        .ExcButton {
+          width: 100%;
+        }
+      }
+
+      &__footer {
+        align-items: stretch;
+        flex-direction: column;
+
+        .ExcButton {
+          width: 100%;
+        }
       }
     }
   }

@@ -136,6 +136,7 @@ describe("TerraformImportModal", () => {
       pipelineCompact: true,
       pipelineLayoutVariant: "classic",
       pipelinePacked: false,
+      pipelinePackedPullLeft: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -158,6 +159,7 @@ describe("TerraformImportModal", () => {
       pipelineCompact: true,
       pipelineLayoutVariant: "compound",
       pipelinePacked: false,
+      pipelinePackedPullLeft: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -230,11 +232,11 @@ describe("TerraformImportModal", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
       expect(
-        screen.getByRole("button", { name: /use preset manifest/i }),
+        screen.getByRole("button", { name: /edit before import/i }),
       ).not.toBeDisabled(),
     );
     fireEvent.click(
-      screen.getByRole("button", { name: /use preset manifest/i }),
+      screen.getByRole("button", { name: /edit before import/i }),
     );
     fireEvent.click(screen.getByRole("radio", { name: /module view/i }));
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
@@ -354,13 +356,13 @@ describe("TerraformImportModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("shows preset manifest table when Use preset manifest is clicked", async () => {
+  it("shows preset manifest table when Edit before import is clicked", async () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
       expect(screen.getAllByRole("combobox").length).toBeGreaterThan(0),
     );
     fireEvent.click(
-      screen.getByRole("button", { name: /use preset manifest/i }),
+      screen.getByRole("button", { name: /edit before import/i }),
     );
     expect(
       screen.getByText(
@@ -392,10 +394,10 @@ describe("TerraformImportModal", () => {
     render(<TerraformImportModal onCloseRequest={vi.fn()} />);
     await waitFor(() =>
       expect(
-        screen.getByRole("button", { name: /load & import/i }),
+        screen.getByRole("button", { name: /import preset/i }),
       ).not.toBeDisabled(),
     );
-    fireEvent.click(screen.getByRole("button", { name: /load & import/i }));
+    fireEvent.click(screen.getByRole("button", { name: /import preset/i }));
 
     await waitFor(() =>
       expect(loadTerraformImportPresetSources).toHaveBeenCalled(),
@@ -404,5 +406,41 @@ describe("TerraformImportModal", () => {
     const sources = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][0];
     expect(sources.planDotBundles).toHaveLength(1);
     expect(sources.tfdLabels).toEqual(["pipeline.tfd"]);
+  });
+
+  it("keeps preset management and developer tools collapsed by default", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+
+    expect(
+      screen.getByText("Manage presets").closest("details"),
+    ).not.toHaveAttribute("open");
+    expect(
+      screen.getByText("Developer tools").closest("details"),
+    ).not.toHaveAttribute("open");
+  });
+
+  it("shows selected state file names", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/state \(/i), {
+      target: {
+        files: [
+          textFileLike(JSON.stringify({ resources: [] }), "prod.tfstate"),
+        ],
+      },
+    });
+
+    expect(screen.getByText("prod.tfstate")).toBeInTheDocument();
+  });
+
+  it("shows pipeline settings only when Pipeline view is selected", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+
+    expect(screen.queryByText("Pipeline settings")).toBeNull();
+    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
+    expect(screen.getByText("Pipeline settings")).toBeInTheDocument();
+    expect(
+      screen.getByRole("group", { name: /pipeline height packing/i }),
+    ).toBeInTheDocument();
   });
 });
