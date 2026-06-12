@@ -615,16 +615,26 @@ const PACKED_PULL_LEFT_SWEEPS = 4;
  */
 const PACKED_PULL_LEFT_MIN_EVAL_BUDGET = 2000;
 
+type PackedSceneMeasure = {
+  width: number;
+  height: number;
+  /** Inflated height per pack node (lane/vpc/region/account/provider/root). */
+  nodeHeights: Map<string, number>;
+};
+
 /**
- * Measure the packed scene (width/height) for a candidate depth assignment
- * without materializing skeletons. Mirrors `layoutLaneClusters` per-column
- * cursor math and the `placeClustersPackedGrid` pack tree exactly; candidate
- * depths are compacted to contiguous columns first, like the shift passes.
+ * Measure the packed scene for a candidate depth assignment without
+ * materializing skeletons. Mirrors `layoutLaneClusters` per-column cursor
+ * math and the `placeClustersPackedGrid` pack tree exactly; candidate depths
+ * are compacted to contiguous columns first, like the shift passes. Per-node
+ * heights are reported so callers can detect local regressions: the node set
+ * depends only on lane membership (`laneKey`), never on depths, so candidate
+ * and baseline measures always cover identical keys.
  */
 function measurePackedSceneForDepths(
   prep: PipelineLayoutPrep,
   depths: ReadonlyMap<string, number>,
-): { width: number; height: number } {
+): PackedSceneMeasure {
   const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
   const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
   const depthOf = (c: PipelineCluster): number =>
@@ -676,7 +686,35 @@ function measurePackedSceneForDepths(
     lane.height = maxY + 2 * lane.pad;
   }
   packNode(root);
-  return { width: root.x1 - root.x0, height: root.height };
+  const nodeHeights = new Map<string, number>([[root.key, root.height]]);
+  for (const node of nodesByKey.values()) {
+    nodeHeights.set(node.key, node.height);
+  }
+  return { width: root.x1 - root.x0, height: root.height, nodeHeights };
+}
+
+/**
+ * Never-regress acceptance for a pull candidate. The height check is
+ * hierarchical — every pack node, not just the root — because a root-only
+ * guard lets local regressions hide inside band slack: a region whose
+ * sibling pins the account band can double in height (receiver lanes pulled
+ * back over their sibling lanes' spans and stacked) without moving the
+ * global bounds at all.
+ */
+function fitsWithinBaseline(
+  measured: PackedSceneMeasure,
+  baseline: PackedSceneMeasure,
+): boolean {
+  if (measured.width > baseline.width) {
+    return false;
+  }
+  for (const [key, height] of measured.nodeHeights) {
+    const baselineHeight = baseline.nodeHeights.get(key);
+    if (baselineHeight == null || height > baselineHeight) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -685,9 +723,11 @@ function measurePackedSceneForDepths(
  * predecessors are shallow end up far right of their lower bound
  * (`max(depth(pred)) + 1`). This pass greedily pulls each such cluster to its
  * leftmost feasible column: a pull is kept only if the re-measured packed
- * scene does not grow in height or width, which protects the side-by-side
- * banding the group shifts bought (pulling a whole shifted unit back would
- * collide with its sibling's span, force stacking, and be reverted).
+ * scene does not grow in global width and **no pack node grows in height**
+ * (see `fitsWithinBaseline`), which protects the side-by-side banding the
+ * group shifts bought at every topology level (pulling a receiver lane back
+ * over its sibling's span would stack them and grow their region, even when
+ * the global bounds — pinned by some other band — would not move).
  *
  * Sweeps visit clusters in ascending depth with bounds computed at visit
  * time, so pulls cascade through chains and fan-outs within one sweep;
@@ -748,10 +788,7 @@ export function computePackedPullLeftShifts(
         trial.set(cluster.id, candidate);
         evals += 1;
         const measured = measurePackedSceneForDepths(prep, trial);
-        if (
-          measured.height <= baseline.height &&
-          measured.width <= baseline.width
-        ) {
+        if (fitsWithinBaseline(measured, baseline)) {
           depths.set(cluster.id, candidate);
           baseline = measured;
           pullCount += 1;

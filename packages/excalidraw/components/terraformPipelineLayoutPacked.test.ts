@@ -372,6 +372,55 @@ describe("computePackedPullLeftShifts", () => {
     );
   });
 
+  it("rejects pulls that stack lanes inside a region sitting in band slack", () => {
+    // Mirror of the v2 acct-02 regression: us-west-2 holds an app lane
+    // (w0→w1) and a db lane (db0, fed from w0) that pass 1 shifted right to
+    // sit beside the app lane. A tall sibling region pins the account band,
+    // so pulling db0 back over the app lane's span would stack the lanes —
+    // growing the us-west-2 region — without moving the global bounds
+    // (height is pinned by the tall region, width even shrinks because db0's
+    // old column empties). The hierarchical guard must reject the pull.
+    const appLane = (id: string) => ({
+      id,
+      placement: placementOf("acct1", "us-west-2", "vpc-1", "app"),
+    });
+    const prep = applyPackedDepthShifts(
+      makePrep(
+        [
+          appLane("w0"),
+          appLane("w1"),
+          {
+            id: "db0",
+            placement: placementOf("acct1", "us-west-2", "vpc-1", "db"),
+          },
+          {
+            id: "big",
+            placement: placementOf("acct1", "us-east-1"),
+            height: 2400,
+          },
+        ],
+        [
+          ["w0", "w1"],
+          ["w0", "db0"],
+        ],
+      ),
+      {
+        // Pass-1 style shifts: db lane beside the app lane; the tall region
+        // in columns disjoint from us-west-2 so the two share a Y band.
+        shiftedDepths: new Map([
+          ["db0", 2],
+          ["big", 3],
+        ]),
+        shiftCount: 2,
+        groupShiftCount: 1,
+      },
+    );
+
+    const pull = computePackedPullLeftShifts(prep);
+    expect(pull.pullCount).toBe(0);
+    expect(pull.shiftedDepths.size).toBe(0);
+  });
+
   it("returns no shifts when the collapsed edge graph has a cycle", () => {
     const prep = makePrep(
       [
@@ -610,6 +659,44 @@ describe("packed pull-left compound pipeline on staging-extended-localstack-v2",
       expect(pulled.height).toBeLessThanOrEqual(packed.height + 1);
       expect(pulled.width).toBeLessThanOrEqual(packed.width + 1);
       expectNoOverlappingFramesPerRole(pulled.elements);
+
+      // Hierarchical guard: no topology frame may grow in height either —
+      // local stacking inside band slack (the acct-02 non-us-east-1 db-lane
+      // regression) is invisible to global bounds.
+      const frameHeights = (elements: readonly LooseElement[]) => {
+        const out = new Map<string, { height: number; name: string }>();
+        for (const el of elements) {
+          if (el.type !== "frame" || el.isDeleted) {
+            continue;
+          }
+          const role = el.customData?.terraformTopologyRole;
+          const key = el.customData?.terraformTopologyKey;
+          if (
+            typeof role !== "string" ||
+            typeof key !== "string" ||
+            role === "primaryCluster"
+          ) {
+            continue;
+          }
+          out.set(`${role}:${key}`, {
+            height: el.height,
+            name: `${role} ${(el as { name?: string | null }).name ?? ""}`,
+          });
+        }
+        return out;
+      };
+      const packedFrames = frameHeights(packed.elements);
+      const pulledFrames = frameHeights(pulled.elements);
+      for (const [key, pulledFrame] of pulledFrames) {
+        const packedFrame = packedFrames.get(key);
+        if (!packedFrame) {
+          continue;
+        }
+        expect(
+          pulledFrame.height,
+          `frame height grew: ${pulledFrame.name} (${key})`,
+        ).toBeLessThanOrEqual(packedFrame.height + 1);
+      }
 
       // Motivating clusters: deep group-shifted members with shallow TFD
       // predecessors must move left.

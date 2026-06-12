@@ -289,11 +289,11 @@ The group-uniform shifts above move whole units, so members whose own TFD predec
 `computePackedPullLeftShifts` (runs after `applyPackedDepthShifts`, before `placeClustersPackedGrid`):
 
 1. Sweeps clusters in ascending depth, lower bound computed at visit time — pulls cascade through `A -> B -> C` chains and fan-outs within one sweep.
-2. For each slack cluster, scans candidate columns leftmost-first; a candidate is accepted only if a skeleton-free re-measure of the pack tree (`measurePackedSceneForDepths` — same lane cursor math + skyline pack, no element work) does not grow scene height or width. This protects packed's side-by-side banding: pulling a whole shifted unit back would collide with its sibling's span, force stacking, and be reverted.
+2. For each slack cluster, scans candidate columns leftmost-first; a candidate is accepted only if a skeleton-free re-measure of the pack tree (`measurePackedSceneForDepths` — same lane cursor math + skyline pack, no element work) does not grow global width **and no pack node grows in height** (`fitsWithinBaseline` — every lane/vpc/region/account/provider node, not just the root). The per-node check matters: a root-only guard lets local regressions hide inside band slack — a region whose sibling pins the account band can double in height (receiver lanes pulled back over sibling lanes' spans and stacked) without moving the global bounds.
 3. Up to 4 sweeps (later sweeps catch pulls that become feasible after earlier accepts); eval budget scales with clusterCount × columnCount, `pipelinePackedPullLeftCapped: true` in meta if hit.
 4. Contiguous depth re-compaction + the same `depth(source) < depth(target)` invariant check as the shift pass (violation ⇒ pass returns no shifts).
 
-v2 result (compound + packed): 39 pulls, height/width unchanged, `aws_sns_topic.ops` moves ~2,710 px left.
+v2 result (compound + packed): 41 pulls, no topology frame grows in height, `aws_sns_topic.ops` x 13,712 → 6,666 px.
 
 **Tests:** `terraformPipelineLayoutPacked.test.ts`, `terraformPipelineLaneDebug.test.ts`
 
