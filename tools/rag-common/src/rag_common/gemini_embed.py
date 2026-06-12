@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from pathlib import Path
 
 from rag_common.config import EmbedConfig, EmbedStats, LocalEmbedMode
 from rag_common.env import PLACEHOLDER_CREDENTIAL_PATHS, valid_gemini_auth
+from rag_common.gemini_rate_limit import estimate_tokens, get_rate_limiter
 
 try:
     from google.genai import types as genai_types
@@ -18,6 +20,7 @@ log = logging.getLogger("rag_common.gemini")
 BATCH_SIZE_V1 = 64
 BATCH_SIZE_V2_DEFAULT = 1
 MAX_RETRIES = 8
+MAX_RATE_LIMIT_RETRIES = 64
 MAX_INPUT_CHARS_V1 = 8000
 MAX_INPUT_CHARS_V2 = 8192
 
@@ -27,7 +30,7 @@ class GeminiEmbedError(Exception):
 
 
 class GeminiFatalError(GeminiEmbedError):
-    """Auth or rate-limit failure — caller may fall back to local."""
+    """Auth failure — caller may fall back to local."""
 
 
 def is_gemini_embedding_2(model: str) -> bool:
@@ -51,7 +54,15 @@ def _is_auth_error(exc: BaseException) -> bool:
 
 
 def _is_fatal(exc: BaseException) -> bool:
-    return _is_auth_error(exc) or _is_rate_limit(exc)
+    return _is_auth_error(exc)
+
+
+def _parse_retry_after(exc: BaseException) -> int | None:
+    msg = str(exc)
+    match = re.search(r"retry[- ]?after[:\s]+(\d+)", msg, re.IGNORECASE)
+    if match:
+        return int(match.group(1))
+    return None
 
 
 def _use_vertex() -> bool:
@@ -147,7 +158,7 @@ def _batch_size(cfg: EmbedConfig) -> int:
     return BATCH_SIZE_V1
 
 
-def _embed_one(
+def _embed_one_raw(
     client,
     text: str,
     *,
@@ -169,10 +180,61 @@ def _embed_one(
         raise GeminiEmbedError(
             f"expected 1 embedding for single input, got {len(embeddings)}"
         )
-    batch_tokens = len(text.split())
+    batch_tokens = estimate_tokens(text)
     if stats is not None:
         stats.add(tokens=batch_tokens, requests=1)
     return list(embeddings[0].values)
+
+
+def _embed_one(
+    client,
+    text: str,
+    *,
+    cfg: EmbedConfig,
+    stats: EmbedStats | None,
+) -> list[float]:
+    limiter = get_rate_limiter()
+    tokens = estimate_tokens(text)
+    rate_attempt = 0
+    other_attempt = 0
+
+    while True:
+        limiter.acquire(tokens)
+        try:
+            result = _embed_one_raw(client, text, cfg=cfg, stats=stats)
+            limiter.note_success()
+            return result
+        except GeminiFatalError:
+            raise
+        except Exception as exc:
+            if _is_auth_error(exc):
+                raise GeminiFatalError(str(exc)) from exc
+            if _is_rate_limit(exc):
+                rate_attempt += 1
+                if rate_attempt >= MAX_RATE_LIMIT_RETRIES:
+                    raise GeminiEmbedError(
+                        f"gemini rate limit persisted after {rate_attempt} attempts: {exc}"
+                    ) from exc
+                wait = limiter.note_rate_limit(retry_after=_parse_retry_after(exc))
+                log.warning(
+                    "gemini embed rate limited (attempt %d), retry in %.0fs: %s",
+                    rate_attempt,
+                    wait,
+                    exc,
+                )
+                time.sleep(wait)
+                continue
+            other_attempt += 1
+            if other_attempt >= MAX_RETRIES:
+                raise GeminiEmbedError(str(exc)) from exc
+            wait = 2**other_attempt
+            log.warning(
+                "gemini embed attempt %d failed (%s), retry in %ds",
+                other_attempt,
+                exc,
+                wait,
+            )
+            time.sleep(wait)
 
 
 def _embed_batch_v1(
@@ -187,7 +249,13 @@ def _embed_batch_v1(
     if genai_types is None:
         raise GeminiFatalError("google-genai is not installed; install rag-common[gemini]")
 
-    for attempt in range(MAX_RETRIES):
+    limiter = get_rate_limiter()
+    batch_tokens = sum(estimate_tokens(t) for t in batch)
+    rate_attempt = 0
+    other_attempt = 0
+
+    while True:
+        limiter.acquire(batch_tokens)
         try:
             response = client.models.embed_content(
                 model=cfg.model,
@@ -199,9 +267,9 @@ def _embed_batch_v1(
                 raise GeminiEmbedError(
                     f"expected {len(batch)} embeddings, got {len(embeddings)}"
                 )
-            batch_tokens = sum(len(t.split()) for t in batch)
             if stats is not None:
                 stats.add(tokens=batch_tokens, requests=1)
+            limiter.note_success()
             log.info(
                 "gemini embed batch %d/%d size=%d tokens~=%d",
                 batch_num,
@@ -210,24 +278,41 @@ def _embed_batch_v1(
                 batch_tokens,
             )
             return [list(item.values) for item in embeddings]
+        except GeminiFatalError:
+            raise
         except Exception as exc:
-            if _is_fatal(exc) and attempt == MAX_RETRIES - 1:
+            if _is_auth_error(exc):
                 raise GeminiFatalError(str(exc)) from exc
-            if attempt == MAX_RETRIES - 1:
+            if _is_rate_limit(exc):
+                rate_attempt += 1
+                if rate_attempt >= MAX_RATE_LIMIT_RETRIES:
+                    raise GeminiEmbedError(
+                        f"gemini rate limit persisted after {rate_attempt} attempts: {exc}"
+                    ) from exc
+                wait = limiter.note_rate_limit(retry_after=_parse_retry_after(exc))
+                log.warning(
+                    "gemini embed batch %d/%d rate limited (attempt %d), retry in %.0fs: %s",
+                    batch_num,
+                    total_batches,
+                    rate_attempt,
+                    wait,
+                    exc,
+                )
+                time.sleep(wait)
+                continue
+            other_attempt += 1
+            if other_attempt >= MAX_RETRIES:
                 raise GeminiEmbedError(str(exc)) from exc
-            wait = 2**attempt
-            if _is_fatal(exc):
-                wait = max(wait, 15)
+            wait = 2**other_attempt
             log.warning(
                 "gemini embed batch %d/%d attempt %d failed (%s), retry in %ds",
                 batch_num,
                 total_batches,
-                attempt + 1,
+                other_attempt,
                 exc,
                 wait,
             )
             time.sleep(wait)
-    return []
 
 
 def _embed_batch_v2(
@@ -249,30 +334,7 @@ def _embed_batch_v2(
             mode=mode,
             title=title,
         )
-        for attempt in range(MAX_RETRIES):
-            try:
-                vectors.append(_embed_one(client, prepared, cfg=cfg, stats=stats))
-                break
-            except GeminiFatalError:
-                raise
-            except Exception as exc:
-                if attempt == MAX_RETRIES - 1:
-                    if _is_fatal(exc):
-                        raise GeminiFatalError(str(exc)) from exc
-                    raise GeminiEmbedError(str(exc)) from exc
-                wait = 2**attempt
-                if _is_fatal(exc):
-                    wait = max(wait, 15)
-                log.warning(
-                    "gemini-2 embed item %d in batch %d/%d attempt %d failed (%s), retry in %ds",
-                    i + 1,
-                    batch_num,
-                    total_batches,
-                    attempt + 1,
-                    exc,
-                    wait,
-                )
-                time.sleep(wait)
+        vectors.append(_embed_one(client, prepared, cfg=cfg, stats=stats))
     log.info(
         "gemini-2 embed batch %d/%d size=%d mode=%s",
         batch_num,

@@ -178,6 +178,20 @@ uv run graph-layout-rag query "Sugiyama layering" --embed-profile gemini-2 --jso
 
 Requires `rag-common[gemini]` (included in `uv sync` for this package).
 
+**Adaptive rate limiting (gemini-2):** ingest paces `embed_content` to a sliding tokens-per-minute budget so Vertex 429s are rare. Tune in `.env` after checking [Vertex quotas](https://cloud.google.com/vertex-ai/docs/generative-ai/quotas-genai):
+
+```bash
+RAG_GEMINI_TOKENS_PER_MIN=100000   # raise gradually if logs stay 429-free
+RAG_GEMINI_RATE_HEADROOM=0.85
+RAG_GEMINI_MIN_INTERVAL_MS=50
+```
+
+Learned budget persists in `~/.cache/rag-common/gemini_rate_state.json` across resume runs. **Resume after interrupt** (keeps indexed chunks — no `--force` / `--rebuild`):
+
+```bash
+uv run graph-layout-rag ingest -v
+```
+
 Then `uv run graph-layout-rag ingest --force --rebuild`. Typical full corpus (~1,679 PDFs + 1,119 metadata-only, ~60k chunks, ~770 tokens/chunk):
 
 | Model                    | Est. cost (one-time) | Est. time  |

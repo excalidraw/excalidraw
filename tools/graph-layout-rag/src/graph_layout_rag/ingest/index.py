@@ -199,7 +199,7 @@ def upsert_chunks(
         stats=stats,
         workers=workers,
         prefix=ENV_PREFIX,
-        allow_fallback=True,
+        allow_fallback=not is_gemini_embedding_2(cfg.model),
         probe=False,
         titles=titles,
     )
