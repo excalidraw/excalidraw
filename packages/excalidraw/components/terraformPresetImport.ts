@@ -46,6 +46,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineCompact?: boolean;
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   pipelinePacked?: boolean;
+  pipelinePackedPullLeft?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   signal?: AbortSignal;
@@ -61,6 +62,7 @@ export const runTerraformImportWithView = async ({
   pipelineCompact,
   pipelineLayoutVariant,
   pipelinePacked,
+  pipelinePackedPullLeft,
   importedTfdTexts,
   preset = null,
   signal,
@@ -74,7 +76,12 @@ export const runTerraformImportWithView = async ({
     moduleLayoutOptions:
       layoutMode === "module" ? moduleLayoutOptions : undefined,
     ...(layoutMode === "pipeline"
-      ? { pipelineCompact, pipelineLayoutVariant, pipelinePacked }
+      ? {
+          pipelineCompact,
+          pipelineLayoutVariant,
+          pipelinePacked,
+          pipelinePackedPullLeft,
+        }
       : {}),
     importedTfdTexts,
     preset,
@@ -89,6 +96,7 @@ export type RunTerraformPresetImportOptions = {
   pipelineCompact?: boolean;
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   pipelinePacked?: boolean;
+  pipelinePackedPullLeft?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
 };
@@ -129,6 +137,7 @@ export const runTerraformPresetImport = async (
     pipelineCompact: options.pipelineCompact,
     pipelineLayoutVariant: options.pipelineLayoutVariant,
     pipelinePacked: options.pipelinePacked,
+    pipelinePackedPullLeft: options.pipelinePackedPullLeft,
     importedTfdTexts: presetSources.tfdTexts,
     preset,
     signal: options.signal,

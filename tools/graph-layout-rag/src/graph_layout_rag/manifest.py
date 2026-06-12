@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -50,10 +51,12 @@ def load_manifest() -> Manifest:
 def save_manifest(manifest: Manifest) -> None:
     manifest.updatedAt = _now_iso()
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(
+    tmp = MANIFEST_PATH.with_suffix(".json.tmp")
+    tmp.write_text(
         f"{manifest.model_dump_json(indent=2)}\n",
         encoding="utf-8",
     )
+    os.replace(tmp, MANIFEST_PATH)
 
 
 def upsert_item(manifest: Manifest, item: ManifestItem) -> None:

@@ -35,6 +35,8 @@ def _retry_item(item: ManifestItem, *, dry_run: bool) -> ManifestItem:
             tags=item.tags,
             pdf_urls=extra_urls,
             dry_run=dry_run,
+            include_archive=True,
+            include_paywall_guesses=True,
         )
         resolved.id = item.id
         if resolved.status == "ok" or (resolved.abstract and not item.abstract):
@@ -60,7 +62,9 @@ def _retry_item(item: ManifestItem, *, dry_run: bool) -> ManifestItem:
     if doi and not dry_run:
         work = _openalex_by_doi(doi)
         dest = PDF_DIR / f"{item.id}.pdf"
-        for url in pick_pdf_urls(doi, work, extra_urls):
+        for url in pick_pdf_urls(
+            doi, work, extra_urls, include_archive=True, include_paywall_guesses=True
+        ):
             insecure = any(h in url for h in ("infotech.monash.edu", "it.monash.edu", "marvl."))
             try:
                 dl = download_to_file(dest, url, verify=not insecure)

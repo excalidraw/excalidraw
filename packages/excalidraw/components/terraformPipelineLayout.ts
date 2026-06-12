@@ -8,8 +8,11 @@ import {
 import {
   applyPackedDepthShifts,
   computePackedDepthShifts,
+  computePackedPullLeftShifts,
   placeClustersPackedGrid,
+  pullLeftShiftsAsDepthShifts,
   EMPTY_PACKED_DEPTH_SHIFTS,
+  EMPTY_PACKED_PULL_LEFT_SHIFTS,
 } from "./terraformPipelineLayoutPacked";
 import { emitTopologyContextFrames } from "./terraformPipelineTopologyFrames";
 
@@ -19,7 +22,7 @@ import type { TerraformImportWarning } from "./terraformImportMerge";
 export async function buildTerraformPipelineExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
-  options?: { compact?: boolean; packed?: boolean },
+  options?: { compact?: boolean; packed?: boolean; packedPullLeft?: boolean },
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: Record<string, unknown>;
@@ -27,11 +30,20 @@ export async function buildTerraformPipelineExcalidrawScene(
 }> {
   const compact = options?.compact !== false;
   const packed = options?.packed === true;
+  const packedPullLeft = packed && options?.packedPullLeft === true;
   let prep = preparePipelineLayout(nodes, plan, compact);
   let packedShifts = EMPTY_PACKED_DEPTH_SHIFTS;
+  let pullLeftShifts = EMPTY_PACKED_PULL_LEFT_SHIFTS;
   if (packed) {
     packedShifts = computePackedDepthShifts(prep);
     prep = applyPackedDepthShifts(prep, packedShifts);
+    if (packedPullLeft) {
+      pullLeftShifts = computePackedPullLeftShifts(prep);
+      prep = applyPackedDepthShifts(
+        prep,
+        pullLeftShiftsAsDepthShifts(pullLeftShifts),
+      );
+    }
   }
   const { skeleton, layoutBoxes } = packed
     ? placeClustersPackedGrid(prep)
@@ -56,6 +68,15 @@ export async function buildTerraformPipelineExcalidrawScene(
             pipelinePackedApplied: true,
             pipelinePackedDepthShiftCount: packedShifts.shiftCount,
             pipelinePackedGroupShiftCount: packedShifts.groupShiftCount,
+          }
+        : {}),
+      ...(packedPullLeft
+        ? {
+            pipelinePackedPullLeftApplied: true,
+            pipelinePackedPullLeftCount: pullLeftShifts.pullCount,
+            ...(pullLeftShifts.evalCapReached
+              ? { pipelinePackedPullLeftCapped: true }
+              : {}),
           }
         : {}),
     },

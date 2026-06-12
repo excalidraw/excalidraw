@@ -71,6 +71,7 @@ export const useTerraformImportDialog = ({
   const [pipelineLayoutVariant, setPipelineLayoutVariant] =
     useState<PipelineLayoutVariant>("classic");
   const [pipelinePacked, setPipelinePacked] = useState(false);
+  const [pipelinePackedPullLeft, setPipelinePackedPullLeft] = useState(false);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
@@ -235,6 +236,7 @@ export const useTerraformImportDialog = ({
       pipelineCompact,
       pipelineLayoutVariant,
       pipelinePacked,
+      pipelinePackedPullLeft,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -355,6 +357,7 @@ export const useTerraformImportDialog = ({
             pipelineCompact,
             pipelineLayoutVariant,
             pipelinePacked,
+            pipelinePackedPullLeft,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -441,6 +444,7 @@ export const useTerraformImportDialog = ({
           pipelineCompact,
           pipelineLayoutVariant,
           pipelinePacked,
+          pipelinePackedPullLeft,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -636,6 +640,7 @@ export const useTerraformImportDialog = ({
     pipelineCompact,
     pipelineLayoutVariant,
     pipelinePacked,
+    pipelinePackedPullLeft,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -665,6 +670,7 @@ export const useTerraformImportDialog = ({
     setPipelineCompact,
     setPipelineLayoutVariant,
     setPipelinePacked,
+    setPipelinePackedPullLeft,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

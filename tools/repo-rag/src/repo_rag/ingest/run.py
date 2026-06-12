@@ -22,7 +22,7 @@ from repo_rag.ingest.index import (
     update_ingest_metadata,
     upsert_chunks,
 )
-from repo_rag.paths import EMBED_COST_PER_MILLION_TOKENS, REPO_ROOT
+from repo_rag.paths import REPO_ROOT
 
 log = get_logger("index")
 
@@ -137,12 +137,17 @@ def _bulk_upsert(
 @click.option("--force", is_flag=True, help="Re-index all files regardless of sha256.")
 @click.option("--rebuild", is_flag=True, help="Drop and recreate vector + BM25 indexes.")
 @click.option(
+    "--embed-profile",
+    default=None,
+    help="Named embed profile (overrides RAG_EMBED_PROFILE / REPO_RAG_EMBED_PROFILE).",
+)
+@click.option(
     "--workers",
     default=None,
     type=int,
     help="Parallel workers for chunking + embed API (default: REPO_RAG_WORKERS or 8).",
 )
-def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
+def index_cmd(force: bool, rebuild: bool, embed_profile: str | None, workers: int | None) -> None:
     """Harvest repo files, chunk, embed with OpenAI, and index."""
     started = time.monotonic()
     n_workers = resolve_workers(workers)
@@ -153,7 +158,7 @@ def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
 
     state = load_ingest_state()
     file_hashes: dict[str, str] = dict(state.get("files", {}))
-    config = prepare_embed_config()
+    config = prepare_embed_config(profile=embed_profile)
     stats = EmbedStats()
 
     if embed_config_mismatch(state, config) and not rebuild:
@@ -221,7 +226,13 @@ def index_cmd(force: bool, rebuild: bool, workers: int | None) -> None:
 
     total = lance_chunk_count()
     elapsed = time.monotonic() - started
-    run_cost = (stats.tokens / 1_000_000) * EMBED_COST_PER_MILLION_TOKENS if effective.backend == "openai" else 0.0
+    from rag_common.config import embed_cost_per_million
+
+    run_cost = (
+        (stats.tokens / 1_000_000) * embed_cost_per_million(effective.backend)
+        if effective.is_remote
+        else 0.0
+    )
     indexed = len(new_hashes)
     log.info(
         "index done files=%d skipped=%d chunks_written=%d total_chunks=%d "

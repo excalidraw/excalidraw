@@ -10,6 +10,7 @@ export type TerraformDemoUrlParams = {
   pack?: ModulePackingMode;
   pipelineVariant?: PipelineLayoutVariant;
   packed?: boolean;
+  packedPullLeft?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -84,17 +85,32 @@ export const parseTerraformDemoUrlParams = (
     pipelineVariant = normalized;
   }
 
-  const packedRaw = params.get("packed");
-  let packed: boolean | undefined;
-  if (packedRaw != null && packedRaw.trim() !== "") {
-    const normalized = packedRaw.trim().toLowerCase();
-    if (normalized === "1" || normalized === "true") {
-      packed = true;
-    } else if (normalized === "0" || normalized === "false") {
-      packed = false;
-    } else {
-      return null;
+  const parseBooleanParam = (name: string): boolean | undefined | null => {
+    const raw = params.get(name);
+    if (raw == null || raw.trim() === "") {
+      return undefined;
     }
+    const normalized = raw.trim().toLowerCase();
+    if (normalized === "1" || normalized === "true") {
+      return true;
+    }
+    if (normalized === "0" || normalized === "false") {
+      return false;
+    }
+    return null;
+  };
+
+  let packed = parseBooleanParam("packed");
+  if (packed === null) {
+    return null;
+  }
+  const packedPullLeft = parseBooleanParam("packedPullLeft");
+  if (packedPullLeft === null) {
+    return null;
+  }
+  // Pull-left only exists within packed mode, so the param implies it.
+  if (packedPullLeft === true && packed !== false) {
+    packed = true;
   }
 
   return {
@@ -103,6 +119,7 @@ export const parseTerraformDemoUrlParams = (
     ...(pack ? { pack } : {}),
     ...(pipelineVariant ? { pipelineVariant } : {}),
     ...(packed != null ? { packed } : {}),
+    ...(packedPullLeft != null ? { packedPullLeft } : {}),
   };
 };
 

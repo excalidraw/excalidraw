@@ -127,6 +127,8 @@ export type TerraformPlanParsingOptions = {
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Pipeline layout: enable cross-lane column slack packing (experimental). */
   pipelinePacked?: boolean;
+  /** Packed only: pull slack clusters to their leftmost TFD-feasible column. */
+  pipelinePackedPullLeft?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

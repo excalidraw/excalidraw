@@ -123,6 +123,7 @@
     "graph-rag:harvest": "cd tools/graph-layout-rag && uv run graph-layout-rag harvest",
     "graph-rag:ingest": "cd tools/graph-layout-rag && uv run graph-layout-rag ingest",
     "graph-rag:query": "cd tools/graph-layout-rag && uv run graph-layout-rag query",
+    "graph-rag:catalog": "cd tools/graph-layout-rag && uv run graph-layout-rag catalog",
     "repo-rag:index": "cd tools/repo-rag && uv run repo-rag index",
     "repo-rag:query": "cd tools/repo-rag && uv run repo-rag query",
     "repo-rag:status": "cd tools/repo-rag && uv run repo-rag status",

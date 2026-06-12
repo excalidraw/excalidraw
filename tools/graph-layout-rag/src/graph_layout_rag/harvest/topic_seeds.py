@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from graph_layout_rag.harvest.doi_resolver import resolve_doi_with_fallbacks
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.parallel import parallel_map
@@ -86,6 +88,15 @@ TOPIC_PDF_SEEDS = [
         "url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/spe.4380211102",
         "doi": "10.1002/spe.4380211102",
         "source": "wiley",
+        "tags": ["force-directed", "elastic"],
+    },
+    {
+        "id": "eades-1984-spring-heuristic",
+        "title": "A Heuristic for Graph Drawing",
+        "authors": ["Eades"],
+        "year": 1984,
+        "url": "https://www.cs.ubc.ca/~will/536E/papers/Eades1984.pdf",
+        "source": "ubc",
         "tags": ["force-directed", "elastic"],
     },
 ]
@@ -327,6 +338,53 @@ TOPIC_DOI_SEEDS: list[dict] = [
         "tags": ["graph-drawing", "gd2022"],
         "title_hint": "Graph Drawing GD 2022 proceedings",
     },
+    {
+        "doi": "10.7155/jgaa.00001",
+        "tags": ["crossing", "layered"],
+        "title_hint": "2-Layer Straightline Crossing Minimization (Jünger & Mutzel)",
+        "pdf_urls": [
+            "https://jgaa.info/index.php/jgaa/article/download/paper1/2965/2771"
+        ],
+    },
+    {
+        "doi": "10.7155/jgaa.00088",
+        "tags": ["crossing", "layered"],
+        "title_hint": "Simple and Efficient Bilayer Cross Counting",
+        "pdf_urls": ["https://jgaa.info/index.php/jgaa/article/download/paper88/2965/2771"],
+    },
+    {
+        "doi": "10.1007/3-540-44541-2_22",
+        "tags": ["layer-assignment", "layered"],
+        "title_hint": "A Fast Layout Algorithm for k-Level Graphs (Buchheim, Jünger & Leipert)",
+    },
+    {
+        "doi": "10.1007/3-540-45848-4_2",
+        "tags": ["layer-assignment", "layered"],
+        "title_hint": "How to Layer a Directed Acyclic Graph (Healy & Nikolov)",
+    },
+    {
+        "doi": "10.1007/978-3-540-31843-9_29",
+        "tags": ["force-directed", "multilevel"],
+        "title_hint": "Drawing Large Graphs with a Potential-Field-Based Multilevel Algorithm",
+    },
+    {
+        "doi": "10.1137/0604033",
+        "tags": ["crossing", "planar"],
+        "title_hint": "Crossing Number is NP-Complete (Garey & Johnson)",
+        "pdf_urls": [
+            "https://learn.fmi.uni-sofia.bg/pluginfile.php/160153/mod_resource/content/4/Crossing-Number-Is-NP-Complete_Garey_Johnson.pdf"
+        ],
+    },
+    {
+        "doi": "10.1109/TVCG.2006.67",
+        "tags": ["constraints", "layered"],
+        "title_hint": "Drawing Directed Graphs Using Quadratic Programming (DIG-COLA TVCG)",
+    },
+    {
+        "doi": "10.1007/978-3-540-31843-9_17",
+        "tags": ["layered", "sugiyama"],
+        "title_hint": "An Efficient Implementation of Sugiyama's Algorithm",
+    },
 ]
 
 # Pipeline layout research threads: compaction, packing, overlap, VPSC/containment
@@ -338,7 +396,7 @@ PIPELINE_LAYOUT_DOI_SEEDS: list[dict] = [
         "pdf_urls": ["http://marvl.infotech.monash.edu/~dwyer/papers/fnr.pdf"],
     },
     {
-        "doi": "10.1109/TVCG.2006.197",
+        "doi": "10.1109/TVCG.2006.156",
         "tags": ["constraints", "compound", "overlap"],
         "title_hint": "IPSep-CoLa separation constraint layout",
         "pdf_urls": ["http://marvl.infotech.monash.edu/~dwyer/papers/ipsepcola.pdf"],
@@ -427,16 +485,16 @@ TOPIC_METADATA_SEEDS = [
     },
     {
         "id": "research-thread-layer-assignment",
-        "title": "Layer reassignment with slack / ALAP scheduling",
-        "authors": ["Gansner", "Nikolov", "Tarassov"],
+        "title": "Minimum-width graph layering with dummy nodes",
+        "authors": ["Nikolov", "Tarassov", "Branke"],
         "year": 2005,
-        "url": "https://graphviz.org/documentation/TSE93.pdf",
+        "url": "https://doi.org/10.1145/1064546.1180618",
         "source": "research-thread",
-        "tags": ["layer-assignment", "research-thread"],
+        "tags": ["layer-assignment", "research-thread", "minimum-width"],
         "abstract": (
-            "Network simplex balance, node promotion layering, minimum-width layering with "
-            "dummy nodes, Coffman-Graham scheduling. Queries: minimum width layering dummy "
-            "nodes; node promotion layering; ALAP as-late-as-possible scheduling DAG."
+            "Gansner TSE93 covers network simplex rank assignment in dot. This JEA paper "
+            "(Nikolov, Tarassov, Branke) evaluates heuristics for minimum-width layering "
+            "with dummy nodes. Related: node promotion, Coffman-Graham, ALAP scheduling."
         ),
     },
     {
@@ -549,7 +607,13 @@ def _download_pdf_seed(spec: dict, *, dry_run: bool) -> ManifestItem:
     return item
 
 
-def harvest_topic_seeds(*, dry_run: bool = False, workers: int | None = None) -> list[ManifestItem]:
+def harvest_topic_seeds(
+    *,
+    dry_run: bool = False,
+    workers: int | None = None,
+    on_doi_batch: Callable[[list[ManifestItem]], None] | None = None,
+    doi_batch_size: int = 10,
+) -> list[ManifestItem]:
     results: list[ManifestItem] = []
 
     results.extend(
@@ -567,10 +631,17 @@ def harvest_topic_seeds(*, dry_run: bool = False, workers: int | None = None) ->
             tags=[*spec.get("tags", []), "topic-seed"],
             pdf_urls=spec.get("pdf_urls"),
             dry_run=dry_run,
+            include_archive=False,
+            include_paywall_guesses=False,
         )
 
     all_doi_seeds = [*TOPIC_DOI_SEEDS, *PIPELINE_LAYOUT_DOI_SEEDS]
-    results.extend(parallel_map(_resolve_doi_seed, all_doi_seeds, workers=workers))
+    for start in range(0, len(all_doi_seeds), doi_batch_size):
+        batch = all_doi_seeds[start : start + doi_batch_size]
+        batch_items = parallel_map(_resolve_doi_seed, batch, workers=workers)
+        results.extend(batch_items)
+        if on_doi_batch and batch_items:
+            on_doi_batch(batch_items)
 
     for spec in TOPIC_METADATA_SEEDS:
         results.append(

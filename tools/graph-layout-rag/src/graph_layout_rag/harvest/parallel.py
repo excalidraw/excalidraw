@@ -51,13 +51,21 @@ def parallel_map(
     results: list[R | None] = [None] * len(items)
     done = 0
     lock = threading.Lock()
-    progress_every = max(1, len(items) // 20)
+    progress_every = max(1, min(10, len(items) // 20))
 
     with ThreadPoolExecutor(max_workers=n) as pool:
         futures = {pool.submit(func, item): idx for idx, item in enumerate(items)}
         for future in as_completed(futures):
             idx = futures[future]
-            results[idx] = future.result()
+            try:
+                results[idx] = future.result()
+            except Exception as exc:
+                log.exception(
+                    "%s: worker failed at index %d: %s",
+                    label or "parallel_map",
+                    idx,
+                    exc,
+                )
             with lock:
                 done += 1
                 if label and (done % progress_every == 0 or done == len(items)):

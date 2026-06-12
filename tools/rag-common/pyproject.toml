@@ -11,6 +11,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
+gemini = [
+    "google-genai>=1.0.0",
+]
+mlx = [
+    "mlx-embeddings>=0.1.0",
+]
 
 [build-system]
 requires = ["hatchling"]

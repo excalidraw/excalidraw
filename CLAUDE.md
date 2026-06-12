@@ -54,7 +54,7 @@ See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLin
 
 ### Repo RAG (code + docs search)
 
-Local hybrid search over this monorepo (AST chunking, BM25 + vector). Embeddings use shared [`tools/rag-common`](../tools/rag-common): OpenAI `text-embedding-3-large` by default, local `all-MiniLM-L6-v2` when `RAG_EMBED_BACKEND=auto` and OpenAI is unavailable.
+Local hybrid search over this monorepo (AST chunking, BM25 + vector). Embeddings use shared [`tools/rag-common`](../tools/rag-common) with named profiles (`RAG_EMBED_PROFILE` / `--embed-profile`): OpenAI, Gemini, or local MLX/ST; legacy `RAG_EMBED_BACKEND=auto` still works.
 
 ```bash
 cd tools/repo-rag && uv sync && cp .env.example .env  # set OPENAI_API_KEY in .env
@@ -67,14 +67,17 @@ See [tools/repo-rag/README.md](tools/repo-rag/README.md). Agent skill: [.agents/
 
 ### Graph layout RAG (literature search)
 
-Local vector search over harvested graph-drawing papers (LanceDB). Same embed stack as repo-rag via `tools/rag-common` — OpenAI first, local fallback with `RAG_EMBED_BACKEND=auto`.
+Local vector search over harvested graph-drawing papers (LanceDB). Same embed stack as repo-rag via `tools/rag-common` — pick a profile (`mlx-qwen4b`, `openai-large`, `gemini`, etc.) with `RAG_EMBED_PROFILE` or `--embed-profile`.
 
 ```bash
-cd tools/graph-layout-rag && uv sync
+cd tools/graph-layout-rag && uv sync && cp .env.example .env
 yarn graph-rag:harvest
-yarn graph-rag:ingest -- --force --rebuild   # required after embed model change
+yarn graph-rag:ingest -- --force --rebuild   # first build or after embed model change
+yarn graph-rag:ingest -- -v                  # resume after interrupt (incremental; no --force)
 yarn graph-rag:query "VPSC separation constraints" --tag constraints --json
 ```
+
+Embeddings: OpenAI (~$5–7 one-time, ~1h full corpus) or local **Qwen3-4B MLX 4-bit** on Apple Silicon (free, ~10–15h; set `RAG_LOCAL_EMBED_QUANT=4bit` in `.env`). Ingest checkpoints per batch in `data/ingest_state.json` + LanceDB — stop/resume without `--force`. Do not query during ingest on 24 GB Mac.
 
 See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md).
 

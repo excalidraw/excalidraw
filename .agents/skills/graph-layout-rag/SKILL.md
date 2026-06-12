@@ -32,11 +32,10 @@ Local vector search over a harvested graph-drawing corpus (target ~2.8k catalog 
 ```bash
 # One-time setup
 cd tools/graph-layout-rag && uv sync
-# OPENAI_API_KEY optional — RAG_EMBED_BACKEND=auto uses local MiniLM if unavailable
+cp .env.example .env   # see Embedding section below
 
-# Pipeline (rebuild required when switching openai ↔ local backends)
 yarn graph-rag:harvest
-yarn graph-rag:ingest -- --force --rebuild   # after embed model change
+yarn graph-rag:ingest -- --force --rebuild   # first build or after embed model change
 yarn graph-rag:query "network simplex rank assignment dot" --top 8 --json
 ```
 
@@ -46,8 +45,45 @@ Direct CLI (more flags):
 cd tools/graph-layout-rag
 uv run graph-layout-rag query "…" --top 8 --json
 uv run graph-layout-rag query "…" --tag compound --json
-uv run graph-layout-rag ingest --force   # re-index after harvest
+uv run graph-layout-rag ingest -v            # resume incremental ingest (no --force)
 ```
+
+### Ingest (embed + index)
+
+**Checkpointing:** no `--resume` flag. After each batch (`GRAPH_RAG_INGEST_DOC_BATCH` docs, default 10), LanceDB + `data/indexes/{profile}/ingest_state.json` are updated. Stop anytime; resume with:
+
+```bash
+cd tools/graph-layout-rag
+uv run graph-layout-rag ingest -v 2>&1 | tee -a data/ingest-run.log
+```
+
+Use **`--force --rebuild`** only for first full build or when changing embed model/dims/backend.
+
+| Goal | Command |
+|------|---------|
+| First build / new embed model | `ingest --force --rebuild -v` |
+| Resume after interrupt | `ingest -v` (no `--force`, no `--rebuild`) |
+| Re-embed all, keep table | `ingest --force` |
+| Drop table, fresh first batch | `ingest --rebuild` |
+
+**Pick an embed profile explicitly** (`uv run graph-layout-rag embed profiles`):
+
+| Profile | Use when |
+|---------|----------|
+| `mlx-qwen4b` | Free local ingest on Apple Silicon (MLX 4-bit, ~10–15+ active hours full corpus) |
+| `openai-large` | Fast cloud ingest (~$5–7, ~30–90 min) with `OPENAI_API_KEY` |
+| `gemini` | Cloud ingest via `GEMINI_API_KEY` / `GOOGLE_API_KEY` (embedding-001) |
+| `gemini-2` | **Gemini Embedding 2** @ 3072 via Vertex AI (`GOOGLE_GENAI_USE_VERTEXAI` + project) or API key |
+
+Set `RAG_EMBED_PROFILE=mlx-qwen4b` in `.env` or pass `--embed-profile mlx-qwen4b` on **both** `ingest` and `query`. For Vertex Embedding 2: `RAG_EMBED_PROFILE=gemini-2` + GCP creds in `.env` (see README). Legacy `RAG_EMBED_BACKEND=local` + model env vars still work as the implicit `default` profile.
+
+**Per-profile indexes:** each profile writes to `data/indexes/{profile}/` (own LanceDB + ingest_state). Build multiple indexes for A/B testing without conflict; list with `uv run graph-layout-rag embed indexes`.
+
+**Cloud one-time ingest:** `RAG_EMBED_PROFILE=openai-large` + `OPENAI_API_KEY`. Query cost negligible (~$0).
+
+**Do not `query` during ingest** on 24 GB Mac (OOM risk — embed model loaded twice).
+
+Logs: `data/ingest.log` (`-v` for debug). Embed progress: `embed progress: N/M texts (+Xs, total Ys)`.
 
 ### Harvest (refresh / expand corpus)
 
@@ -94,7 +130,14 @@ uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
 }
 ```
 
-Filter flags: `--tag compound`, `--source handbook`, `--year-min 1990`
+Filter flags: `--tag compound`, `--category packing`, `--pdf-only`, `--source handbook`, `--year-min 1990`
+
+Pipeline research: see [docs/pipeline-rag-queries.md](../../../docs/pipeline-rag-queries.md).
+
+```bash
+yarn graph-rag:query "left edge channel assignment" --category packing --pdf-only --json
+yarn graph-rag:catalog --category compaction --limit 20
+```
 
 ### Query tags
 
@@ -113,7 +156,7 @@ Filter flags: `--tag compound`, `--source handbook`, `--year-min 1990`
 
 ## Reading full papers (after search)
 
-Only items with `status: "ok"` in the manifest have local PDFs (~455). Metadata-only entries have title/abstract only — no full text.
+Only items with `status: "ok"` in the manifest have local PDFs (~2,088; target ~3,088 after pipeline harvest). Metadata-only entries have title/abstract only — no full text.
 
 ### 1. Resolve path from `doc_id`
 
@@ -173,7 +216,7 @@ If `status` is `metadata_only`, use `title`, `abstract`, `doi`, and `url` from m
 
 **High-signal sources:** `graphviz.org`, `handbook`, `topic-seed`, `elk-bibliography`, curated seeds. **Noisier:** OpenAlex long tail (some off-topic PDFs). Prefer top-ranked hits with layout-related tags.
 
-**Index:** LanceDB at `tools/graph-layout-rag/data/lancedb/` (~21k chunks, ~4k chars each with overlap). Query ranks chunks; multiple chunks per paper exist — use `doc_id` + `page` to read contiguous text.
+**Index:** LanceDB at `tools/graph-layout-rag/data/indexes/{profile}/lancedb/` (target ~60k chunks for full harvest: ~35 chunks/PDF avg + metadata-only stubs). Chunks ~4k chars with overlap. Query ranks chunks; multiple chunks per paper exist — use `doc_id` + `page` to read contiguous text. Check `data/indexes/{profile}/ingest_state.json` / `batch done` lines in `data/ingest.log` for build progress.
 
 ## Example queries
 
@@ -192,9 +235,10 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 ## Prerequisites
 
 - Python 3.11+, `uv` installed
-- `cd tools/graph-layout-rag && uv sync` once
-- `OPENAI_API_KEY` optional with `RAG_EMBED_BACKEND=auto` (shared via `tools/rag-common`)
-- Embeddings: OpenAI `text-embedding-3-large` (3072 dims) or local `all-MiniLM-L6-v2` (384 dims). Re-run `ingest --force --rebuild` after switching backends.
+- `cd tools/graph-layout-rag && uv sync` once (pulls `rag-common[mlx]` for Apple Silicon 4-bit)
+- Embeddings via `tools/rag-common`: OpenAI `text-embedding-3-large`, or local Qwen3 (MLX 4-bit on Darwin, Sentence Transformers otherwise)
+- Re-run `ingest --force --rebuild` after switching embed backend/model/dims
+- `OPENAI_API_KEY` only required for `RAG_EMBED_BACKEND=openai` or `auto` with valid key
 
 ## Paths (all gitignored except example manifest)
 
@@ -202,8 +246,10 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 |------|----------|
 | `tools/graph-layout-rag/data/manifest.json` | Catalog: id, status, localPath, doi, abstract |
 | `tools/graph-layout-rag/data/raw/pdf/` | Downloaded PDFs |
-| `tools/graph-layout-rag/data/lancedb/` | Vector index |
+| `tools/graph-layout-rag/data/indexes/{profile}/` | Per-profile vector index + ingest checkpoint |
+| `tools/graph-layout-rag/data/ingest.log` | Ingest structured log |
 | `tools/graph-layout-rag/data/harvest.log` | Harvest run log |
+| `tools/graph-layout-rag/data/harvest_checkpoint.json` | Harvest resume state |
 
 ## Related docs
 
@@ -212,6 +258,9 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 
 ## Do not
 
-- Commit `data/raw/`, `data/lancedb/`, `data/manifest.json`, or `data/harvest.log`
+- Commit `data/raw/`, `data/indexes/`, `data/manifest.json`, or log files
+- Run `query` while `ingest` is active on a memory-constrained Mac (OOM)
+- Resume ingest with `--force --rebuild` (re-does everything)
 - Assume every manifest entry has a PDF — check `status` first
 - Treat query `excerpt` as the full paper — use deep-read steps above
+- Mix embed backends between ingest and query (vectors incompatible without rebuild)

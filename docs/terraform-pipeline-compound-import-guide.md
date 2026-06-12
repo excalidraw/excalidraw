@@ -1,6 +1,8 @@
 # Terraform import pipeline + Compound layout — agent guide
 
-Start here if you need to understand **how Terraform preset/plan import reaches the canvas** and **how Pipeline view Compound layout places resources**. This doc is self-contained; deeper references are linked at the end.
+**Pipeline overview (all toggles: Compact/Full, Classic/Compound, Stacked/Packed):** [terraform-pipeline-import-agent-guide.md](./terraform-pipeline-import-agent-guide.md)
+
+Start here if you need **Compound layout algorithm detail** — phases, hull frames, arrow parenting. For the full import flow and toggle matrix, read the overview above first.
 
 ---
 

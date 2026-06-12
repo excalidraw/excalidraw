@@ -5,7 +5,7 @@ from __future__ import annotations
 from graph_layout_rag.harvest.log import get_logger
 from graph_layout_rag.harvest.relevance import is_layout_relevant
 from graph_layout_rag.manifest import Manifest, ManifestItem
-from graph_layout_rag.paths import PKG_ROOT
+from graph_layout_rag.paths import PDF_DIR, PKG_ROOT
 
 MIN_PDF_BYTES = 10_000
 
@@ -48,4 +48,16 @@ def verify_manifest(manifest: Manifest, *, downgrade: bool = True) -> dict[str, 
             item.sha256 = None
             stats["downgraded"] += 1
 
+    stats.update(_orphan_stats(manifest))
     return stats
+
+
+def _orphan_stats(manifest: Manifest) -> dict[str, int]:
+    """PDFs on disk without a matching ok manifest entry."""
+    ok_ids = {item.id for item in manifest.items if item.status == "ok"}
+    orphan_pdfs = 0
+    if PDF_DIR.exists():
+        for path in PDF_DIR.glob("*.pdf"):
+            if path.stem not in ok_ids:
+                orphan_pdfs += 1
+    return {"orphan_pdfs": orphan_pdfs}

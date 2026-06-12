@@ -151,6 +151,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Pipeline packed mode — push sink-only groups right and re-pack lanes in Y. Default false. */
   pipelinePacked?: boolean;
+  /** Packed only — pull slack clusters to their leftmost TFD-feasible column. Default false. */
+  pipelinePackedPullLeft?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -175,7 +177,9 @@ async function layoutTerraformSceneFromSources(
   // Packed pipeline scenes are not part of the KV layout cache key yet; skip
   // the cache so a packed import never returns the cached stacked layout.
   const skipLayoutCache =
-    layoutMode === "pipeline" && options.pipelinePacked === true;
+    layoutMode === "pipeline" &&
+    (options.pipelinePacked === true ||
+      options.pipelinePackedPullLeft === true);
   if (presetId && !skipLayoutCache) {
     const cached = await fetchPresetLayoutCache(
       presetId,
@@ -200,6 +204,7 @@ async function layoutTerraformSceneFromSources(
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
+            pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -265,6 +270,7 @@ export const runTerraformImportFromSources = async (
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
+            pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

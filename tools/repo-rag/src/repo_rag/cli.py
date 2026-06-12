@@ -46,12 +46,49 @@ def main(ctx: click.Context, verbose: bool, log_file: str | None, enable_log_fil
 main.add_command(index_cmd, name="index")
 
 
+@main.group("embed")
+def embed_group() -> None:
+    """Embedding profile helpers."""
+
+
+@embed_group.command("profiles")
+@click.option("--json", "as_json", is_flag=True, help="Emit JSON for LLM agents.")
+def embed_profiles_cmd(as_json: bool) -> None:
+    """List named embed profiles (backend, model, dimensions)."""
+    from repo_rag.ingest.embed import list_embed_profiles
+
+    rows = list_embed_profiles()
+    if as_json:
+        payload = [
+            {
+                "name": name,
+                "backend": backend,
+                "model": model,
+                "dimensions": dims,
+                "quant": quant,
+            }
+            for name, backend, model, dims, quant in rows
+        ]
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    click.echo(f"{'Profile':<22} {'Backend':<8} {'Dims':>5}  Model")
+    for name, backend, model, dims, quant in rows:
+        quant_note = f" quant={quant}" if quant else ""
+        click.echo(f"{name:<22} {backend:<8} {dims:>5}  {model}{quant_note}")
+
+
 @main.command("query")
 @click.argument("text")
 @click.option("--top", default=8, show_default=True)
 @click.option("--source-type", default=None, help="Filter: handoff, terraform, code, app, test, doc")
 @click.option("--package", default=None, help="Filter by package name.")
 @click.option("--path-contains", default=None, help="Filter file_path substring.")
+@click.option(
+    "--embed-profile",
+    default=None,
+    help="Named embed profile (must match index; see: embed profiles).",
+)
 @click.option("--json", "as_json", is_flag=True, help="Emit JSON for LLM agents.")
 def query_cmd(
     text: str,
@@ -59,6 +96,7 @@ def query_cmd(
     source_type: str | None,
     package: str | None,
     path_contains: str | None,
+    embed_profile: str | None,
     as_json: bool,
 ) -> None:
     """Hybrid semantic + BM25 search over the indexed repo."""
@@ -78,6 +116,7 @@ def query_cmd(
         source_type=source_type,
         package=package,
         path_contains=path_contains,
+        embed_profile=embed_profile,
     )
     elapsed = time.monotonic() - started
     log.info("query done results=%d elapsed_s=%.3f", len(results), elapsed)
@@ -118,8 +157,10 @@ def status_cmd() -> None:
         "embed_backend": state.get("embed_backend", indexed.backend if indexed else resolved.backend),
         "embed_model": state.get("embed_model", indexed.model if indexed else resolved.model),
         "embed_dims": state.get("embed_dims", indexed.dimensions if indexed else resolved.dimensions),
+        "embed_profile": state.get("embed_profile", indexed.profile if indexed else resolved.profile),
         "resolved_backend": resolved.backend,
         "resolved_model": resolved.model,
+        "resolved_profile": resolved.profile,
         "total_tokens_embedded": state.get("total_tokens_embedded", 0),
         "estimated_cost_usd": state.get("estimated_cost_usd", 0.0),
         "last_indexed_at": state.get("last_indexed_at"),

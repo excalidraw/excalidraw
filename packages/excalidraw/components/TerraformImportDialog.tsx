@@ -36,6 +36,7 @@ export const TerraformImportModal = ({
     pipelineCompact,
     pipelineLayoutVariant,
     pipelinePacked,
+    pipelinePackedPullLeft,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -64,6 +65,7 @@ export const TerraformImportModal = ({
     setPipelineCompact,
     setPipelineLayoutVariant,
     setPipelinePacked,
+    setPipelinePackedPullLeft,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,
@@ -659,22 +661,48 @@ writer -> bucket`}</code>
                               : ""
                           }`}
                           aria-pressed={!pipelinePacked}
-                          onClick={() => setPipelinePacked(false)}
+                          onClick={() => {
+                            setPipelinePacked(false);
+                            setPipelinePackedPullLeft(false);
+                          }}
                         >
                           Stacked
                         </button>
                         <button
                           type="button"
                           className={`TerraformImportModal__viewSubOption__btn${
-                            pipelinePacked
+                            pipelinePacked && !pipelinePackedPullLeft
                               ? " TerraformImportModal__viewSubOption__btn--active"
                               : ""
                           }`}
-                          aria-pressed={pipelinePacked}
+                          aria-pressed={
+                            pipelinePacked && !pipelinePackedPullLeft
+                          }
                           title="Push receive-only groups into later columns and pack boxes side by side to reduce diagram height"
-                          onClick={() => setPipelinePacked(true)}
+                          onClick={() => {
+                            setPipelinePacked(true);
+                            setPipelinePackedPullLeft(false);
+                          }}
                         >
                           Packed
+                        </button>
+                        <button
+                          type="button"
+                          className={`TerraformImportModal__viewSubOption__btn${
+                            pipelinePacked && pipelinePackedPullLeft
+                              ? " TerraformImportModal__viewSubOption__btn--active"
+                              : ""
+                          }`}
+                          aria-pressed={
+                            pipelinePacked && pipelinePackedPullLeft
+                          }
+                          title="Packed, then pull each cluster to its leftmost column allowed by .tfd dependencies without growing the diagram"
+                          onClick={() => {
+                            setPipelinePacked(true);
+                            setPipelinePackedPullLeft(true);
+                          }}
+                        >
+                          Packed + pull-left
                         </button>
                       </div>
                     </div>

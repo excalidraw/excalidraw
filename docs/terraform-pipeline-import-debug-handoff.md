@@ -2,7 +2,9 @@
 
 Guide for another agent working on **Terraform import → pipeline layout → Excalidraw canvas**, or debugging why pipeline import fails / looks wrong.
 
-**Compound pipeline overview:** [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md)
+**Start here for the full pipeline picture:** [terraform-pipeline-import-agent-guide.md](./terraform-pipeline-import-agent-guide.md) (Compact/Full, Classic/Compound, Stacked/Packed)
+
+**Compound algorithm detail:** [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md)
 
 Related docs:
 

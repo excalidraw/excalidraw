@@ -5,7 +5,7 @@ import httpx
 from graph_layout_rag.harvest.doi_resolver import pick_pdf_urls
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.parallel import parallel_map
-from graph_layout_rag.harvest.relevance import is_layout_relevant
+from graph_layout_rag.harvest.relevance import is_layout_relevant, is_pipeline_relevant
 from graph_layout_rag.manifest import ManifestItem, relative_local_path, slug_id
 from graph_layout_rag.paths import PDF_DIR
 
@@ -69,6 +69,18 @@ TOPIC_QUERIES: dict[str, list[str]] = {
         "cluster busting clutter reduction graph layout",
         "node overlap removal graph visualization",
     ],
+    "coordinate-assignment": [
+        "horizontal coordinate assignment layered graph",
+        "Brandes Köpf coordinate assignment blocks",
+        "x coordinate assignment within layer",
+        "vertical alignment layered graph drawing",
+    ],
+    "routing": [
+        "orthogonal edge routing graph drawing",
+        "port routing hierarchical graph",
+        "connector routing layered graph",
+        "wire routing channel assignment",
+    ],
     "elk-kieler": [
         "ELK layered layout eclipse",
         "KIELER graph layout",
@@ -128,6 +140,22 @@ TOPIC_QUERIES: dict[str, list[str]] = {
         "planar graph embedding drawing",
         "planarity testing layout",
     ],
+}
+
+PIPELINE_TOPIC_KEYS: tuple[str, ...] = (
+    "layer-assignment",
+    "crossing",
+    "compound",
+    "constraints",
+    "coordinate-assignment",
+    "routing",
+    "compaction",
+    "packing",
+    "overlap",
+)
+
+PIPELINE_TOPIC_QUERIES: dict[str, list[str]] = {
+    key: TOPIC_QUERIES[key] for key in PIPELINE_TOPIC_KEYS if key in TOPIC_QUERIES
 }
 
 KEY_AUTHORS = [
@@ -312,16 +340,24 @@ def harvest_openalex(
     oa_only: bool = True,
     workers: int | None = None,
     existing_ids: set[str] | None = None,
+    pipeline_only: bool = False,
 ) -> list[ManifestItem]:
     by_id: dict[str, ManifestItem] = {}
     skip_ids = existing_ids or set()
+    topic_map = PIPELINE_TOPIC_QUERIES if pipeline_only else TOPIC_QUERIES
 
     def add_work(work: dict, topic: str | None = None) -> None:
         if len(by_id) >= max_works:
             return
         title = work.get("display_name") or ""
         abstract = _abstract_from_inverted_index(work.get("abstract_inverted_index"))
-        if not is_layout_relevant(title, abstract):
+        if pipeline_only:
+            if not is_layout_relevant(title, abstract, strict=True):
+                return
+            if topic and not is_pipeline_relevant(title, abstract):
+                if not any(k in title.lower() for k in (topic.replace("-", " "), topic)):
+                    return
+        elif not is_layout_relevant(title, abstract):
             return
         item = _work_to_item(work, topic=topic)
         if item.id in skip_ids:
@@ -333,7 +369,7 @@ def harvest_openalex(
             by_id.setdefault(item.id, item)
 
     if use_topic_queries:
-        for topic, queries in TOPIC_QUERIES.items():
+        for topic, queries in topic_map.items():
             for query in queries:
                 if len(by_id) >= max_works:
                     break
@@ -344,39 +380,39 @@ def harvest_openalex(
                     if len(by_id) >= max_works:
                         break
 
-    for query in SEARCH_QUERIES:
-        if len(by_id) >= max_works:
-            break
-        for work in _search_openalex(query, per_page=80, max_results=80, oa_only=oa_only):
-            add_work(work)
+    if not pipeline_only:
+        for query in SEARCH_QUERIES:
             if len(by_id) >= max_works:
                 break
+            for work in _search_openalex(query, per_page=80, max_results=80, oa_only=oa_only):
+                add_work(work)
+                if len(by_id) >= max_works:
+                    break
 
-    for author in KEY_AUTHORS:
-        if len(by_id) >= max_works:
-            break
-        for work in _search_openalex(
-            f"graph drawing {author}",
-            per_page=40,
-            max_results=40,
-            oa_only=oa_only,
-        ):
-            add_work(work)
+        for author in KEY_AUTHORS:
             if len(by_id) >= max_works:
                 break
+            for work in _search_openalex(
+                f"graph drawing {author}",
+                per_page=40,
+                max_results=40,
+                oa_only=oa_only,
+            ):
+                add_work(work)
+                if len(by_id) >= max_works:
+                    break
 
-    # Concept-filtered pass for high-precision OA works
-    if len(by_id) < max_works:
-        for work in _search_openalex(
-            "graph drawing layout",
-            per_page=100,
-            max_results=min(200, max_works - len(by_id)),
-            oa_only=oa_only,
-            use_concept_filter=True,
-        ):
-            add_work(work)
-            if len(by_id) >= max_works:
-                break
+        if len(by_id) < max_works:
+            for work in _search_openalex(
+                "graph drawing layout",
+                per_page=100,
+                max_results=min(200, max_works - len(by_id)),
+                oa_only=oa_only,
+                use_concept_filter=True,
+            ):
+                add_work(work)
+                if len(by_id) >= max_works:
+                    break
 
     items = list(by_id.values())
     return parallel_map(

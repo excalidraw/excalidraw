@@ -21,7 +21,9 @@ import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 import {
   applyPackedDepthShifts,
   computePackedDepthShifts,
+  computePackedPullLeftShifts,
   placeClustersPackedGrid,
+  pullLeftShiftsAsDepthShifts,
 } from "./terraformPipelineLayoutPacked";
 import {
   computeDepths,
@@ -270,6 +272,132 @@ describe("computePackedDepthShifts", () => {
   });
 });
 
+describe("computePackedPullLeftShifts", () => {
+  /**
+   * Chain a0→a1→a2 in us-east-1 plus s0 in us-west-1 fed from a0. A manual
+   * shift parks s0 at column 5 (simulating a group-uniform over-shift); its
+   * TFD lower bound is 1.
+   */
+  function overShiftedPrep(extraChain: string[] = []): PipelineLayoutPrep {
+    const inUsEast1 = (id: string) => ({
+      id,
+      placement: placementOf("acct1", "us-east-1"),
+    });
+    const inUsWest1 = (id: string) => ({
+      id,
+      placement: placementOf("acct1", "us-west-1"),
+    });
+    const chain = ["s0", ...extraChain];
+    const prep = makePrep(
+      [
+        inUsEast1("a0"),
+        inUsEast1("a1"),
+        inUsEast1("a2"),
+        ...chain.map(inUsWest1),
+      ],
+      [
+        ["a0", "a1"],
+        ["a1", "a2"],
+        ["a0", "s0"],
+        ...chain.slice(1).map((id, i): [string, string] => [chain[i]!, id]),
+      ],
+    );
+    const manualShift = new Map(chain.map((id, i) => [id, 5 + i]));
+    return applyPackedDepthShifts(prep, {
+      shiftedDepths: manualShift,
+      shiftCount: manualShift.size,
+      groupShiftCount: 1,
+    });
+  }
+
+  it("pulls a slack cluster to its leftmost column that does not regress height", () => {
+    const prep = overShiftedPrep();
+    const pull = computePackedPullLeftShifts(prep);
+    const shifts = pullLeftShiftsAsDepthShifts(pull);
+
+    // Bound is 1, but columns 1–2 sit inside us-east-1's span: pulling there
+    // would stack the regions vertically (height regression), so those
+    // candidates are rejected and the cluster lands at column 3.
+    expect(pull.pullCount).toBe(1);
+    expect(depthAfter(prep, shifts, "s0")).toBe(3);
+    expectEdgesMonotone(prep, shifts);
+  });
+
+  it("cascades pulls through a chain within one sweep", () => {
+    const prep = overShiftedPrep(["s1", "s2"]);
+    const pull = computePackedPullLeftShifts(prep);
+    const shifts = pullLeftShiftsAsDepthShifts(pull);
+
+    // s0 lands at 3 (left of that overlaps us-east-1); pulling s0 lowers
+    // s1's bound to 4 and s1's pull lowers s2's bound to 5 — all in one sweep.
+    expect(pull.pullCount).toBe(3);
+    expect(depthAfter(prep, shifts, "s0")).toBe(3);
+    expect(depthAfter(prep, shifts, "s1")).toBe(4);
+    expect(depthAfter(prep, shifts, "s2")).toBe(5);
+    expectEdgesMonotone(prep, shifts);
+  });
+
+  it("does not regress packed scene height or width", () => {
+    const prep = overShiftedPrep(["s1", "s2"]);
+    const before = placeClustersPackedGrid(prep);
+    const pulled = applyPackedDepthShifts(
+      prep,
+      pullLeftShiftsAsDepthShifts(computePackedPullLeftShifts(prep)),
+    );
+    const after = placeClustersPackedGrid(pulled);
+
+    const sizeOf = (
+      boxes: Map<
+        string,
+        { x: number; y: number; width: number; height: number }
+      >,
+    ) => {
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      for (const box of boxes.values()) {
+        minX = Math.min(minX, box.x);
+        minY = Math.min(minY, box.y);
+        maxX = Math.max(maxX, box.x + box.width);
+        maxY = Math.max(maxY, box.y + box.height);
+      }
+      return { width: maxX - minX, height: maxY - minY };
+    };
+    expect(sizeOf(after.layoutBoxes).height).toBeLessThanOrEqual(
+      sizeOf(before.layoutBoxes).height,
+    );
+    expect(sizeOf(after.layoutBoxes).width).toBeLessThanOrEqual(
+      sizeOf(before.layoutBoxes).width,
+    );
+  });
+
+  it("returns no shifts when the collapsed edge graph has a cycle", () => {
+    const prep = makePrep(
+      [
+        { id: "x", placement: placementOf("acct1", "us-east-1") },
+        { id: "y", placement: placementOf("acct1", "us-east-1") },
+      ],
+      [
+        ["x", "y"],
+        ["y", "x"],
+      ],
+    );
+    const pull = computePackedPullLeftShifts(prep);
+    expect(pull.pullCount).toBe(0);
+    expect(pull.shiftedDepths.size).toBe(0);
+  });
+
+  it("is deterministic", () => {
+    const a = computePackedPullLeftShifts(overShiftedPrep(["s1", "s2"]));
+    const b = computePackedPullLeftShifts(overShiftedPrep(["s1", "s2"]));
+    expect([...a.shiftedDepths.entries()]).toEqual([
+      ...b.shiftedDepths.entries(),
+    ]);
+    expect(a.pullCount).toBe(b.pullCount);
+  });
+});
+
 describe("placeClustersPackedGrid", () => {
   it("packs shifted regions beside the source region without overlaps", () => {
     const basePrep = fanOutPrep();
@@ -356,7 +484,11 @@ function expectNoOverlappingFramesPerRole(
   }
 }
 
-async function buildPresetPipelineScene(presetId: string, packed: boolean) {
+async function buildPresetPipelineScene(
+  presetId: string,
+  packed: boolean,
+  packedPullLeft = false,
+) {
   const raw = getTerraformImportPresetSourcesFromDb(presetId);
   expect(raw).not.toBeNull();
   const sources = resolveSourcesWithTfdComposition(
@@ -376,16 +508,35 @@ async function buildPresetPipelineScene(presetId: string, packed: boolean) {
       layoutMode: "pipeline",
       pipelineLayoutVariant: "compound",
       pipelinePacked: packed,
+      pipelinePackedPullLeft: packedPullLeft,
     },
   );
   const elements = body.elements as LooseElement[];
-  const [, minY, , maxY] = getCommonBounds(elements as ExcalidrawElement[]);
+  const [minX, minY, maxX, maxY] = getCommonBounds(
+    elements as ExcalidrawElement[],
+  );
   return {
     elements,
     meta: (body.meta ?? {}) as Record<string, unknown>,
     sources,
     height: maxY - minY,
+    width: maxX - minX,
   };
+}
+
+function primaryClusterX(
+  elements: readonly LooseElement[],
+  address: string,
+): number {
+  const frame = elements.find(
+    (el) =>
+      el.type === "frame" &&
+      !el.isDeleted &&
+      el.customData?.terraformTopologyRole === "primaryCluster" &&
+      el.customData?.terraformPrimaryAddress === address,
+  );
+  expect(frame, `primaryCluster frame for ${address}`).toBeTruthy();
+  return frame!.x;
 }
 
 describe("packed compound pipeline on staging-extended-localstack-v2", () => {
@@ -435,6 +586,53 @@ describe("packed compound pipeline on staging-extended-localstack-v2", () => {
         const target = placed.layoutBoxes.get(edge.target)!;
         expect(source.x).toBeLessThan(target.x);
       }
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
+  );
+});
+
+describe("packed pull-left compound pipeline on staging-extended-localstack-v2", () => {
+  it(
+    "pulls slack clusters left without growing the scene",
+    async () => {
+      const presetId = "staging-extended-localstack-v2";
+      const packed = await buildPresetPipelineScene(presetId, true);
+      const pulled = await buildPresetPipelineScene(presetId, true, true);
+
+      // Flag off ⇒ pull-left leaves no trace (regression backstop).
+      expect(packed.meta.pipelinePackedPullLeftApplied).toBeUndefined();
+      expect(pulled.meta.pipelinePackedPullLeftApplied).toBe(true);
+      expect(pulled.meta.pipelinePackedPullLeftCount as number).toBeGreaterThan(
+        0,
+      );
+
+      // Never-regress guard: the pulled scene cannot be taller or wider.
+      expect(pulled.height).toBeLessThanOrEqual(packed.height + 1);
+      expect(pulled.width).toBeLessThanOrEqual(packed.width + 1);
+      expectNoOverlappingFramesPerRole(pulled.elements);
+
+      // Motivating clusters: deep group-shifted members with shallow TFD
+      // predecessors must move left.
+      const watched = [
+        "aws_sns_topic.ops",
+        "aws_dynamodb_table.regional_events_east",
+        'aws_s3_bucket.lake_replica_west["raw"]',
+        "aws_sqs_queue.regional_writer_west",
+      ];
+      const deltas = watched.map((address) => ({
+        address,
+        packedX: primaryClusterX(packed.elements, address),
+        pulledX: primaryClusterX(pulled.elements, address),
+      }));
+      // eslint-disable-next-line no-console -- intentional diagnostic output
+      console.log(
+        "\n[pipeline:pull-left-deltas]\n",
+        JSON.stringify(deltas, null, 2),
+      );
+      const opsDelta = deltas.find((d) => d.address === "aws_sns_topic.ops")!;
+      expect(opsDelta.pulledX).toBeLessThan(opsDelta.packedX);
+      const movedLeft = deltas.filter((d) => d.pulledX < d.packedX);
+      expect(movedLeft.length).toBeGreaterThanOrEqual(2);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
   );

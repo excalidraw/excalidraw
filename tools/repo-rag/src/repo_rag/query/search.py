@@ -77,12 +77,18 @@ def search(
     source_type: str | None = None,
     package: str | None = None,
     path_contains: str | None = None,
+    embed_profile: str | None = None,
 ) -> list[dict[str, Any]]:
-    config = embed_config_from_env()
     state = load_ingest_state()
     indexed = embed_config_from_state(state)
-    if indexed is not None:
-        config = indexed
+    if embed_profile:
+        config = embed_config_from_env(profile=embed_profile)
+        if indexed is not None:
+            from repo_rag.ingest.index import ensure_embed_config_matches
+
+            ensure_embed_config_matches(state, config)
+    else:
+        config = indexed if indexed is not None else embed_config_from_env()
 
     dense = _dense_search(
         query,

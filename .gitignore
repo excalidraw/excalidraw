@@ -140,12 +140,23 @@ scripts/benchmark-landing-results.json
 tools/graph-layout-rag/.env
 tools/graph-layout-rag/.venv/
 tools/graph-layout-rag/data/raw/
+tools/graph-layout-rag/data/indexes/
 tools/graph-layout-rag/data/lancedb/
 tools/graph-layout-rag/data/manifest.json
 tools/graph-layout-rag/data/ingest_state.json
 tools/graph-layout-rag/data/harvest.log
+tools/graph-layout-rag/data/ingest.log
+tools/graph-layout-rag/data/ingest-run.log
+tools/graph-layout-rag/data/harvest.db
+tools/graph-layout-rag/data/harvest_checkpoint.json
 tools/graph-layout-rag/**/__pycache__/
 tools/graph-layout-rag/.pytest_cache/
+
+# Shared RAG embed library — Python venv and caches (see tools/rag-common/.gitignore)
+tools/rag-common/.env
+tools/rag-common/.venv/
+tools/rag-common/**/__pycache__/
+tools/rag-common/.pytest_cache/
 
 # Repo RAG — local indexes and Python venv (see tools/repo-rag/.gitignore)
 tools/repo-rag/.env

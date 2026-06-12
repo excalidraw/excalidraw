@@ -416,6 +416,7 @@ type LayoutSceneContext = {
   pipelineCompact?: boolean;
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   pipelinePacked?: boolean;
+  pipelinePackedPullLeft?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -432,6 +433,7 @@ async function buildPipelineLayoutSceneBody(
       const pipelineScene = await buildPipeline(ctx.nodes5, ctx.plan, {
         compact: ctx.pipelineCompact !== false,
         packed: ctx.pipelinePacked === true,
+        packedPullLeft: ctx.pipelinePackedPullLeft === true,
       });
       emitLocalParseDebug({
         phase: "pipelineLayout",
@@ -445,6 +447,9 @@ async function buildPipelineLayoutSceneBody(
           {
             ...pipelineScene.meta,
             ...(ctx.pipelinePacked ? { pipelinePacked: true } : {}),
+            ...(ctx.pipelinePacked && ctx.pipelinePackedPullLeft
+              ? { pipelinePackedPullLeft: true }
+              : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
           },
@@ -816,6 +821,7 @@ export async function layoutTerraformFromSources(
     pipelineCompact: options?.pipelineCompact,
     pipelineLayoutVariant: options?.pipelineLayoutVariant,
     pipelinePacked: options?.pipelinePacked === true,
+    pipelinePackedPullLeft: options?.pipelinePackedPullLeft === true,
     colorMode: options?.colorMode,
   };
 

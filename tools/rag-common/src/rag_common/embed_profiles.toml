@@ -1,0 +1,40 @@
+# Built-in embedding profiles for rag-common consumers (graph-layout-rag, repo-rag).
+# Override or extend via RAG_EMBED_PROFILES_PATH and/or tool-local embed_profiles.toml.
+
+[profiles.openai-large]
+backend = "openai"
+model = "text-embedding-3-large"
+dimensions = 1024
+
+[profiles.openai-small]
+backend = "openai"
+model = "text-embedding-3-small"
+dimensions = 1024
+
+[profiles.gemini]
+backend = "gemini"
+model = "gemini-embedding-001"
+dimensions = 768
+
+[profiles.gemini-2]
+backend = "gemini"
+# Vertex often exposes -preview before GA stable id; override with RAG_GEMINI_EMBED_MODEL
+model = "gemini-embedding-2-preview"
+dimensions = 3072
+
+[profiles.mlx-qwen4b]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 1024
+quant = "4bit"
+
+[profiles."mlx-qwen0.6b"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+[profiles.local-fp16-qwen4b]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 1024

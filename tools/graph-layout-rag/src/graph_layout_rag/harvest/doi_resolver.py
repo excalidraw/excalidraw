@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import logging
 import re
+from collections.abc import Callable
 
-import httpx
-
+from graph_layout_rag.harvest.archive_fallback import archive_pdf_urls
+from graph_layout_rag.harvest.doi_validate import is_well_formed_doi
 from graph_layout_rag.harvest.download import download_to_file
+from graph_layout_rag.harvest.http_client import get_json
+from graph_layout_rag.harvest.ledger import set_harvest_stage, update_document
 from graph_layout_rag.harvest.parallel import parallel_map
 from graph_layout_rag.manifest import ManifestItem, relative_local_path, slug_id
 from graph_layout_rag.paths import PDF_DIR
+
+log = logging.getLogger("graph_layout_rag.harvest.doi")
 
 USER_AGENT = "mailto:graph-layout-rag@excalidraw-tf.local"
 UNPAYWALL_EMAIL = "graph-layout-rag@excalidraw-tf.local"
@@ -15,6 +21,9 @@ OPENALEX_API = "https://api.openalex.org/works"
 S2_API = "https://api.semanticscholar.org/graph/v1/paper/DOI:"
 
 _PMC_ID_RE = re.compile(r"PMC\d+", re.I)
+_MAX_CANDIDATE_URLS = 12
+_MAX_FAILED_URL_ATTEMPTS = 6
+_MAX_OPENALEX_LOCATION_URLS = 5
 
 
 def _abstract_from_inverted_index(idx: dict | None) -> str | None:
@@ -26,29 +35,20 @@ def _abstract_from_inverted_index(idx: dict | None) -> str | None:
 
 
 def _openalex_by_doi(doi: str) -> dict | None:
-    with httpx.Client(timeout=30.0) as client:
-        res = client.get(
-            f"{OPENALEX_API}/https://doi.org/{doi}",
-            headers={"User-Agent": USER_AGENT},
-        )
-        if res.status_code != 200:
-            return None
-        return res.json()
+    return get_json(f"{OPENALEX_API}/https://doi.org/{doi}", timeout=30.0)
 
 
 def _semantic_scholar_pdf(doi: str) -> str | None:
-    with httpx.Client(timeout=30.0) as client:
-        res = client.get(
-            f"{S2_API}{doi}",
-            params={"fields": "title,openAccessPdf"},
-            headers={"User-Agent": USER_AGENT},
-        )
-        if res.status_code != 200:
-            return None
-        data = res.json()
-        oa = data.get("openAccessPdf") or {}
-        url = oa.get("url") or ""
-        return url if url else None
+    data = get_json(
+        f"{S2_API}{doi}",
+        params={"fields": "title,openAccessPdf"},
+        timeout=30.0,
+    )
+    if not data:
+        return None
+    oa = data.get("openAccessPdf") or {}
+    url = oa.get("url") or ""
+    return url if url else None
 
 
 def _springer_pdf_url(doi: str) -> str | None:
@@ -73,10 +73,18 @@ def _plos_pdf_url(doi: str) -> str | None:
     return f"https://journals.plos.org/plosone/article/file?id={doi}&type=printable"
 
 
-def _hal_pdf_url(doi: str) -> str | None:
-    if doi.startswith("10.48550/") or doi.startswith("10.1007/"):
-        return None
-    return f"https://hal.science/hal-{doi.replace('/', '-')}/document"
+def _openalex_has_oa_pdf(work: dict | None) -> bool:
+    """True when OpenAlex already surfaced a likely PDF URL."""
+    if not work:
+        return False
+    for key in ("best_oa_location", "primary_location"):
+        loc = work.get(key) or {}
+        if loc.get("pdf_url"):
+            return True
+    if _openalex_location_pdfs(work):
+        return True
+    oa = work.get("open_access") or {}
+    return bool(oa.get("oa_url"))
 
 
 def _pmc_id_from_work(work: dict | None) -> str | None:
@@ -99,7 +107,6 @@ def _pmc_pdf_urls(doi: str, work: dict | None) -> list[str]:
     urls: list[str] = []
     pmc_id = _pmc_id_from_work(work)
     if not pmc_id and doi.startswith("10.1371/"):
-        # PLOS/BMC often in PMC; Unpaywall usually has PMC id — try lookup via work ids
         if work:
             for ext_id in work.get("ids") or {}:
                 if ext_id.lower() == "pmcid" and work["ids"][ext_id]:
@@ -115,24 +122,22 @@ def _pmc_pdf_urls(doi: str, work: dict | None) -> list[str]:
 
 
 def _unpaywall_pdf(doi: str) -> list[str]:
+    data = get_json(
+        f"https://api.unpaywall.org/v2/{doi}",
+        params={"email": UNPAYWALL_EMAIL},
+        timeout=30.0,
+    )
+    if not data:
+        return []
     urls: list[str] = []
-    with httpx.Client(timeout=30.0) as client:
-        res = client.get(
-            f"https://api.unpaywall.org/v2/{doi}",
-            params={"email": UNPAYWALL_EMAIL},
-            headers={"User-Agent": USER_AGENT},
-        )
-        if res.status_code != 200:
-            return urls
-        data = res.json()
-        best = data.get("best_oa_location") or {}
+    best = data.get("best_oa_location") or {}
+    for key in ("url_for_pdf", "url"):
+        if best.get(key):
+            urls.append(best[key])
+    for loc in data.get("oa_locations") or []:
         for key in ("url_for_pdf", "url"):
-            if best.get(key):
-                urls.append(best[key])
-        for loc in data.get("oa_locations") or []:
-            for key in ("url_for_pdf", "url"):
-                if loc.get(key):
-                    urls.append(loc[key])
+            if loc.get(key):
+                urls.append(loc[key])
     return urls
 
 
@@ -161,6 +166,8 @@ def _openalex_location_pdfs(work: dict | None) -> list[str]:
     for loc in work.get("locations") or []:
         if loc.get("pdf_url"):
             urls.append(loc["pdf_url"])
+        if len(urls) >= _MAX_OPENALEX_LOCATION_URLS:
+            break
     return urls
 
 
@@ -177,11 +184,30 @@ def _direct_pdf_urls(urls: list[str]) -> list[str]:
     return direct + other
 
 
-def pick_pdf_urls(doi: str, work: dict | None, extra_urls: list[str] | None = None) -> list[str]:
+def _dedupe_urls(urls: list[str]) -> list[str]:
+    seen: set[str] = set()
+    unique: list[str] = []
+    for u in urls:
+        if u and u not in seen:
+            seen.add(u)
+            unique.append(u)
+    return unique
+
+
+def pick_pdf_urls(
+    doi: str,
+    work: dict | None,
+    extra_urls: list[str] | None = None,
+    *,
+    include_archive: bool = False,
+    include_paywall_guesses: bool = True,
+) -> list[str]:
     """Return candidate PDF URLs in priority order."""
-    tier1: list[str] = []  # known direct PDF patterns
-    tier2: list[str] = []  # OA locations with pdf_url
-    tier3: list[str] = []  # unpaywall / S2 / publisher guesses
+    tier1: list[str] = []
+    tier2: list[str] = []
+    tier3: list[str] = []
+    tier_paywall: list[str] = []
+    tier4: list[str] = []
 
     if extra_urls:
         tier1.extend(extra_urls)
@@ -209,31 +235,35 @@ def pick_pdf_urls(doi: str, work: dict | None, extra_urls: list[str] | None = No
         if open_access.get("oa_url"):
             tier2.append(open_access["oa_url"])
 
-    tier3.extend(_unpaywall_pdf(doi))
-    s2 = _semantic_scholar_pdf(doi)
-    if s2:
-        tier3.append(s2)
+    # Skip slow Unpaywall + S2 when OpenAlex already has OA PDF hints.
+    if not _openalex_has_oa_pdf(work):
+        tier3.extend(_unpaywall_pdf(doi))
+        s2 = _semantic_scholar_pdf(doi)
+        if s2:
+            tier3.append(s2)
+
     wiley = _wiley_pdf_url(doi)
     if wiley:
         tier3.append(wiley)
-    acm = _acm_pdf_url(doi)
-    if acm:
-        tier3.append(acm)
-    ieee = _ieee_pdf_url(doi)
-    if ieee:
-        tier3.append(ieee)
-    hal = _hal_pdf_url(doi)
-    if hal:
-        tier3.append(hal)
 
-    combined = _direct_pdf_urls(tier1) + _direct_pdf_urls(tier2) + _direct_pdf_urls(tier3)
-    seen: set[str] = set()
-    unique: list[str] = []
-    for u in combined:
-        if u and u not in seen:
-            seen.add(u)
-            unique.append(u)
-    return unique
+    if include_paywall_guesses:
+        acm = _acm_pdf_url(doi)
+        if acm:
+            tier_paywall.append(acm)
+        ieee = _ieee_pdf_url(doi)
+        if ieee:
+            tier_paywall.append(ieee)
+
+    if include_archive:
+        tier4.extend(archive_pdf_urls(doi))
+
+    return _dedupe_urls(
+        _direct_pdf_urls(tier1)
+        + _direct_pdf_urls(tier2)
+        + _direct_pdf_urls(tier3)
+        + _direct_pdf_urls(tier_paywall)
+        + (_direct_pdf_urls(tier4) if include_archive else [])
+    )
 
 
 def resolve_doi_with_fallbacks(
@@ -244,7 +274,26 @@ def resolve_doi_with_fallbacks(
     pdf_urls: list[str] | None = None,
     dry_run: bool = False,
     verify: bool = True,
+    include_archive: bool = False,
+    include_paywall_guesses: bool = True,
 ) -> ManifestItem:
+    if not is_well_formed_doi(doi):
+        log.debug("skipping malformed DOI %s", doi)
+        doc_id = slug_id(f"doi-{doi}")
+        return ManifestItem(
+            id=doc_id,
+            title=f"DOI {doi}",
+            authors=[],
+            year=None,
+            source=source,
+            url=f"https://doi.org/{doi}",
+            localPath=f"data/raw/pdf/{doc_id}.pdf",
+            contentType="application/pdf",
+            status="metadata_only",
+            tags=[*(tags or []), "graph-drawing"],
+            doi=doi,
+        )
+
     work = _openalex_by_doi(doi)
     authors: list[str] = []
     title = f"DOI {doi}"
@@ -277,27 +326,83 @@ def resolve_doi_with_fallbacks(
     )
 
     if dry_run:
-        candidates = pick_pdf_urls(doi, work, pdf_urls)
+        candidates = pick_pdf_urls(
+            doi,
+            work,
+            pdf_urls,
+            include_archive=False,
+            include_paywall_guesses=include_paywall_guesses,
+        )
         if candidates:
             item.url = candidates[0]
             item.status = "failed"
         return item
 
     dest = PDF_DIR / f"{doc_id}.pdf"
-    for url in pick_pdf_urls(doi, work, pdf_urls):
-        insecure = any(h in url for h in ("infotech.monash.edu", "it.monash.edu", "marvl."))
-        try:
-            dl = download_to_file(dest, url, verify=verify if not insecure else False)
-            if dl.get("ok"):
-                item.status = "ok"
-                item.url = url
-                item.sha256 = dl.get("sha256")
-                item.localPath = relative_local_path(dest)
-                return item
-            dest.unlink(missing_ok=True)
-        except Exception:
-            dest.unlink(missing_ok=True)
+    set_harvest_stage("doi-resolve")
+    had_transient = False
 
+    def _try_urls(urls: list[str]) -> bool:
+        nonlocal had_transient
+        failures = 0
+        for url in urls[:_MAX_CANDIDATE_URLS]:
+            insecure = any(h in url for h in ("infotech.monash.edu", "it.monash.edu", "marvl."))
+            try:
+                dl = download_to_file(
+                    dest,
+                    url,
+                    verify=verify if not insecure else False,
+                    expected_sha256=item.sha256,
+                    doc_id=doc_id,
+                    doi=doi,
+                    stage="doi-resolve",
+                )
+                if dl.get("ok"):
+                    item.status = "ok"
+                    item.url = url
+                    item.sha256 = dl.get("sha256")
+                    item.localPath = relative_local_path(dest)
+                    update_document(
+                        doc_id,
+                        final_status="ok",
+                        winning_url=url,
+                        last_outcome="ok",
+                    )
+                    return True
+                if dl.get("transient"):
+                    had_transient = True
+                failures += 1
+                dest.unlink(missing_ok=True)
+                if failures >= _MAX_FAILED_URL_ATTEMPTS:
+                    break
+            except Exception:
+                failures += 1
+                dest.unlink(missing_ok=True)
+                if failures >= _MAX_FAILED_URL_ATTEMPTS:
+                    break
+        return False
+
+    if _try_urls(
+        pick_pdf_urls(
+            doi,
+            work,
+            pdf_urls,
+            include_archive=False,
+            include_paywall_guesses=include_paywall_guesses,
+        )
+    ):
+        return item
+
+    if include_archive and _try_urls(archive_pdf_urls(doi)):
+        return item
+
+    if had_transient and item.tags is not None and "rate_limited" not in item.tags:
+        item.tags = [*item.tags, "rate_limited"]
+    update_document(
+        doc_id,
+        final_status=item.status,
+        last_outcome="rate_limited" if had_transient else item.status,
+    )
     return item
 
 
@@ -308,13 +413,53 @@ def resolve_dois(
     tags: list[str] | None = None,
     dry_run: bool = False,
     workers: int | None = None,
+    include_archive: bool = False,
+    on_batch: Callable[[list[ManifestItem]], None] | None = None,
+    batch_size: int = 30,
 ) -> list[ManifestItem]:
     def _resolve(doi: str) -> ManifestItem:
-        return resolve_doi_with_fallbacks(
-            doi, source=source, tags=tags, dry_run=dry_run
-        )
+        try:
+            return resolve_doi_with_fallbacks(
+                doi,
+                source=source,
+                tags=tags,
+                dry_run=dry_run,
+                include_archive=include_archive,
+            )
+        except Exception as exc:
+            log.warning("DOI resolve failed for %s: %s", doi, exc)
+            doc_id = slug_id(f"doi-{doi}")
+            return ManifestItem(
+                id=doc_id,
+                title=f"DOI {doi}",
+                authors=[],
+                year=None,
+                source=source,
+                url=f"https://doi.org/{doi}",
+                localPath=f"data/raw/pdf/{doc_id}.pdf",
+                contentType="application/pdf",
+                status="metadata_only",
+                tags=[*(tags or []), "graph-drawing"],
+                doi=doi,
+            )
 
-    return parallel_map(_resolve, dois, workers=workers, label="doi-resolve")
+    if not dois:
+        return []
+
+    if on_batch is None or batch_size <= 0 or len(dois) <= batch_size:
+        results = parallel_map(_resolve, dois, workers=workers, label="doi-resolve")
+        if on_batch and results:
+            on_batch(results)
+        return results
+
+    results: list[ManifestItem] = []
+    for start in range(0, len(dois), batch_size):
+        batch = dois[start : start + batch_size]
+        batch_items = parallel_map(_resolve, batch, workers=workers, label="doi-resolve")
+        results.extend(batch_items)
+        if batch_items:
+            on_batch(batch_items)
+    return results
 
 
 # Alias for bibliography module

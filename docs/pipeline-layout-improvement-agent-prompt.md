@@ -68,16 +68,17 @@ Use local RAG + web search to pick approaches; cite sources in your design.
 **Local RAG (required reading):**
 
 1. Read skill: `.agents/skills/graph-layout-rag/SKILL.md`
-2. Search: `yarn graph-rag:query "<topic>" --top 8 --json` from repo root
-3. Deep-read PDFs via `doc_id` + manifest `localPath` (skill section “Reading full papers”)
+2. Read query pack: `docs/pipeline-rag-queries.md`
+3. Search: `yarn graph-rag:query "<topic>" --category <slug> --pdf-only --top 8 --json` from repo root
+4. Deep-read PDFs via `doc_id` + manifest `localPath` (skill section “Reading full papers”)
 
 Example queries:
 
 ```bash
-yarn graph-rag:query "network simplex rank assignment layered digraph" --top 8 --json
-yarn graph-rag:query "compound graph nested multi-layer groups" --top 8 --json
-yarn graph-rag:query "minimum width graph layering node promotion" --top 8 --json
-yarn graph-rag:query "ELK port constraints layered" --tag elk --json
+yarn graph-rag:query "network simplex rank assignment layered digraph" --category layer-assignment --pdf-only --json
+yarn graph-rag:query "compound graph nested multi-layer groups" --category compound --pdf-only --json
+yarn graph-rag:query "left edge algorithm channel routing" --category packing --pdf-only --json
+yarn graph-rag:query "VPSC separation constraints" --category constraints --pdf-only --json
 ```
 
 You may also search the **public web** (Graphviz dot, ELK layered, Sugiyama surveys, dagre, Mermaid layout) for algorithms not in the corpus.

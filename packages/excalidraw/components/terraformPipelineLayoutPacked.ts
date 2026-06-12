@@ -4,6 +4,7 @@ import {
   computeGlobalColumnX,
   laneKey,
   layoutLaneClusters,
+  PIPELINE_CLUSTER_GAP_Y,
   PIPELINE_FRAME_PAD,
   PIPELINE_LANE_GAP_Y,
   PIPELINE_MARGIN,
@@ -426,6 +427,72 @@ function packSiblings(children: PackNode[]): number {
   return bottom;
 }
 
+function groupClustersIntoLanes(
+  clusters: readonly PipelineCluster[],
+): [string, PipelineCluster[]][] {
+  const lanes = new Map<string, PipelineCluster[]>();
+  for (const cluster of clusters) {
+    const key = laneKey(cluster.placement);
+    lanes.set(key, [...(lanes.get(key) ?? []), cluster]);
+  }
+  return [...lanes.entries()].sort(([a], [b]) => a.localeCompare(b));
+}
+
+/** Insert the provider→account→region→vpc→lane chain for one lane key. */
+function insertLanePackNode(
+  root: PackNode,
+  nodesByKey: Map<string, PackNode>,
+  key: string,
+  sample: PipelineCluster,
+): PackNode {
+  const ensureChild = (
+    parent: PackNode,
+    childKey: string,
+    role: PackRole,
+    pad: number,
+  ): PackNode => {
+    let node = nodesByKey.get(childKey);
+    if (!node) {
+      node = newPackNode(childKey, role, pad);
+      nodesByKey.set(childKey, node);
+      parent.children.push(node);
+    }
+    return node;
+  };
+  const provider = ensureChild(
+    root,
+    providerKeyOf(sample),
+    "provider",
+    PIPELINE_FRAME_PAD,
+  );
+  const account = ensureChild(
+    provider,
+    accountKeyOf(sample),
+    "account",
+    PIPELINE_FRAME_PAD,
+  );
+  const region = ensureChild(
+    account,
+    regionKeyOf(sample),
+    "region",
+    PIPELINE_FRAME_PAD,
+  );
+  const vpcKey = vpcKeyOf(sample);
+  const laneParent = vpcKey
+    ? ensureChild(region, vpcKey, "vpc", PIPELINE_FRAME_PAD)
+    : region;
+  const hasSubnetFrame =
+    sample.placement.vpcId != null &&
+    sample.placement.vpcId !== "" &&
+    sample.placement.subnetSignature != null;
+  return ensureChild(
+    laneParent,
+    `lane:${key}`,
+    "lane",
+    hasSubnetFrame ? PIPELINE_FRAME_PAD : 0,
+  );
+}
+
 function packNode(node: PackNode): void {
   if (node.children.length === 0) {
     return;
@@ -461,66 +528,13 @@ export function placeClustersPackedGrid(prep: PipelineLayoutPrep): {
   layoutBoxes: Map<string, TerraformDependencyLayoutBox>;
   laneEntries: [string, PipelineCluster[]][];
 } {
-  const lanes = new Map<string, PipelineCluster[]>();
-  for (const cluster of prep.clusters) {
-    const key = laneKey(cluster.placement);
-    lanes.set(key, [...(lanes.get(key) ?? []), cluster]);
-  }
-  const laneEntries = [...lanes.entries()].sort(([a], [b]) =>
-    a.localeCompare(b),
-  );
+  const laneEntries = groupClustersIntoLanes(prep.clusters);
 
   const root = newPackNode("__root__", "root", 0);
   const nodesByKey = new Map<string, PackNode>();
-  const ensureChild = (
-    parent: PackNode,
-    key: string,
-    role: PackRole,
-    pad: number,
-  ): PackNode => {
-    let node = nodesByKey.get(key);
-    if (!node) {
-      node = newPackNode(key, role, pad);
-      nodesByKey.set(key, node);
-      parent.children.push(node);
-    }
-    return node;
-  };
 
   for (const [key, laneClusters] of laneEntries) {
-    const sample = laneClusters[0]!;
-    const provider = ensureChild(
-      root,
-      providerKeyOf(sample),
-      "provider",
-      PIPELINE_FRAME_PAD,
-    );
-    const account = ensureChild(
-      provider,
-      accountKeyOf(sample),
-      "account",
-      PIPELINE_FRAME_PAD,
-    );
-    const region = ensureChild(
-      account,
-      regionKeyOf(sample),
-      "region",
-      PIPELINE_FRAME_PAD,
-    );
-    const vpcKey = vpcKeyOf(sample);
-    const laneParent = vpcKey
-      ? ensureChild(region, vpcKey, "vpc", PIPELINE_FRAME_PAD)
-      : region;
-    const hasSubnetFrame =
-      sample.placement.vpcId != null &&
-      sample.placement.vpcId !== "" &&
-      sample.placement.subnetSignature != null;
-    const lane = ensureChild(
-      laneParent,
-      `lane:${key}`,
-      "lane",
-      hasSubnetFrame ? PIPELINE_FRAME_PAD : 0,
-    );
+    const lane = insertLanePackNode(root, nodesByKey, key, laneClusters[0]!);
 
     const laneLayout = layoutLaneClusters(
       laneClusters,
@@ -576,4 +590,221 @@ export function placeClustersPackedGrid(prep: PipelineLayoutPrep): {
   materialize(root, PIPELINE_MARGIN);
 
   return { skeleton, layoutBoxes, laneEntries };
+}
+
+export type PackedPullLeftResult = {
+  /** clusterId -> new depth, only for clusters whose depth changed. */
+  shiftedDepths: Map<string, number>;
+  pullCount: number;
+  evalCapReached: boolean;
+};
+
+export const EMPTY_PACKED_PULL_LEFT_SHIFTS: PackedPullLeftResult = {
+  shiftedDepths: new Map(),
+  pullCount: 0,
+  evalCapReached: false,
+};
+
+/** Feasibility re-sweeps; bound cascades already converge within one sweep. */
+const PACKED_PULL_LEFT_SWEEPS = 4;
+
+/**
+ * Floor for the measure-evaluation budget. The effective budget scales with
+ * clusterCount × columnCount so deep pull cascades are not truncated on large
+ * presets; hitting the cap is reported via meta rather than failing silently.
+ */
+const PACKED_PULL_LEFT_MIN_EVAL_BUDGET = 2000;
+
+/**
+ * Measure the packed scene (width/height) for a candidate depth assignment
+ * without materializing skeletons. Mirrors `layoutLaneClusters` per-column
+ * cursor math and the `placeClustersPackedGrid` pack tree exactly; candidate
+ * depths are compacted to contiguous columns first, like the shift passes.
+ */
+function measurePackedSceneForDepths(
+  prep: PipelineLayoutPrep,
+  depths: ReadonlyMap<string, number>,
+): { width: number; height: number } {
+  const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
+  const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
+  const depthOf = (c: PipelineCluster): number =>
+    depthRemap.get(depths.get(c.id) ?? c.depth) ?? 0;
+  const maxDepth = usedDepths.length - 1;
+
+  const columnWidths = Array.from({ length: maxDepth + 1 }, () => 260);
+  for (const cluster of prep.clusters) {
+    const d = depthOf(cluster);
+    columnWidths[d] = Math.max(columnWidths[d]!, cluster.build.width);
+  }
+  const columnX: number[] = [];
+  let x = PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
+  for (let i = 0; i <= maxDepth; i++) {
+    columnX[i] = x;
+    x += columnWidths[i]! + PACKED_COLUMN_GAP;
+  }
+
+  const root = newPackNode("__root__", "root", 0);
+  const nodesByKey = new Map<string, PackNode>();
+  for (const [key, laneClusters] of groupClustersIntoLanes(prep.clusters)) {
+    const lane = insertLanePackNode(root, nodesByKey, key, laneClusters[0]!);
+    const colY = new Map<number, number>();
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let maxY = 0;
+    const ordered = [...laneClusters].sort(
+      (a, b) =>
+        depthOf(a) - depthOf(b) ||
+        a.firstSequence - b.firstSequence ||
+        a.id.localeCompare(b.id),
+    );
+    for (const cluster of ordered) {
+      const d = depthOf(cluster);
+      const cx = columnX[d]!;
+      const cy = colY.get(d) ?? 0;
+      minX = Math.min(minX, cx);
+      maxX = Math.max(maxX, cx + cluster.build.width);
+      maxY = Math.max(maxY, cy + cluster.build.height);
+      colY.set(d, cy + cluster.build.height + PIPELINE_CLUSTER_GAP_Y);
+      lane.minDepth = Math.min(lane.minDepth, d);
+      lane.minFirstSequence = Math.min(
+        lane.minFirstSequence,
+        cluster.firstSequence,
+      );
+    }
+    lane.x0 = minX - lane.pad;
+    lane.x1 = maxX + lane.pad;
+    lane.height = maxY + 2 * lane.pad;
+  }
+  packNode(root);
+  return { width: root.x1 - root.x0, height: root.height };
+}
+
+/**
+ * Pass 1.5 (opt-in) — per-cluster leftward compaction after the group-uniform
+ * depth shifts. Group shifts move whole units, so members whose own TFD
+ * predecessors are shallow end up far right of their lower bound
+ * (`max(depth(pred)) + 1`). This pass greedily pulls each such cluster to its
+ * leftmost feasible column: a pull is kept only if the re-measured packed
+ * scene does not grow in height or width, which protects the side-by-side
+ * banding the group shifts bought (pulling a whole shifted unit back would
+ * collide with its sibling's span, force stacking, and be reverted).
+ *
+ * Sweeps visit clusters in ascending depth with bounds computed at visit
+ * time, so pulls cascade through chains and fan-outs within one sweep;
+ * additional sweeps only catch pulls that become feasible after earlier
+ * accepts free space. `A -> B ⇒ depth(A) < depth(B)` holds by construction
+ * and is re-verified before returning.
+ */
+export function computePackedPullLeftShifts(
+  prep: PipelineLayoutPrep,
+): PackedPullLeftResult {
+  if (prep.depthResult.hasCycle || prep.clusters.length === 0) {
+    return EMPTY_PACKED_PULL_LEFT_SHIFTS;
+  }
+
+  const depths = new Map(prep.clusters.map((c) => [c.id, c.depth]));
+  const predsByTarget = new Map<string, string[]>();
+  for (const edge of prep.collapsedEdges) {
+    predsByTarget.set(edge.target, [
+      ...(predsByTarget.get(edge.target) ?? []),
+      edge.source,
+    ]);
+  }
+  const boundOf = (id: string): number => {
+    let bound = 0;
+    for (const pred of predsByTarget.get(id) ?? []) {
+      bound = Math.max(bound, (depths.get(pred) ?? 0) + 1);
+    }
+    return bound;
+  };
+
+  const evalBudget = Math.max(
+    PACKED_PULL_LEFT_MIN_EVAL_BUDGET,
+    prep.clusters.length * (prep.maxDepth + 1) * 2,
+  );
+  let evals = 0;
+  let evalCapReached = false;
+  let baseline = measurePackedSceneForDepths(prep, depths);
+  let pullCount = 0;
+
+  for (let sweep = 0; sweep < PACKED_PULL_LEFT_SWEEPS; sweep++) {
+    let accepted = false;
+    const ordered = [...prep.clusters].sort(
+      (a, b) =>
+        (depths.get(a.id) ?? 0) - (depths.get(b.id) ?? 0) ||
+        a.firstSequence - b.firstSequence ||
+        a.id.localeCompare(b.id),
+    );
+    for (const cluster of ordered) {
+      const current = depths.get(cluster.id) ?? 0;
+      const bound = boundOf(cluster.id);
+      // Scan leftmost-first so the cluster lands as far left as feasible.
+      for (let candidate = bound; candidate < current; candidate++) {
+        if (evals >= evalBudget) {
+          evalCapReached = true;
+          break;
+        }
+        const trial = new Map(depths);
+        trial.set(cluster.id, candidate);
+        evals += 1;
+        const measured = measurePackedSceneForDepths(prep, trial);
+        if (
+          measured.height <= baseline.height &&
+          measured.width <= baseline.width
+        ) {
+          depths.set(cluster.id, candidate);
+          baseline = measured;
+          pullCount += 1;
+          accepted = true;
+          break;
+        }
+      }
+      if (evalCapReached) {
+        break;
+      }
+    }
+    if (!accepted || evalCapReached) {
+      break;
+    }
+  }
+
+  if (pullCount === 0) {
+    return { ...EMPTY_PACKED_PULL_LEFT_SHIFTS, evalCapReached };
+  }
+
+  // Compact used depths to contiguous columns (pulls can empty columns).
+  const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
+  const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
+  for (const [id, depth] of depths) {
+    depths.set(id, depthRemap.get(depth)!);
+  }
+
+  const shiftedDepths = new Map<string, number>();
+  for (const cluster of prep.clusters) {
+    const depth = depths.get(cluster.id)!;
+    if (depth !== cluster.depth) {
+      shiftedDepths.set(cluster.id, depth);
+    }
+  }
+  if (shiftedDepths.size === 0) {
+    return { ...EMPTY_PACKED_PULL_LEFT_SHIFTS, evalCapReached };
+  }
+  for (const edge of prep.collapsedEdges) {
+    if ((depths.get(edge.source) ?? 0) >= (depths.get(edge.target) ?? 0)) {
+      return { ...EMPTY_PACKED_PULL_LEFT_SHIFTS, evalCapReached };
+    }
+  }
+
+  return { shiftedDepths, pullCount, evalCapReached };
+}
+
+/** Adapt a pull-left result for `applyPackedDepthShifts`. */
+export function pullLeftShiftsAsDepthShifts(
+  pull: PackedPullLeftResult,
+): PackedDepthShiftResult {
+  return {
+    shiftedDepths: pull.shiftedDepths,
+    shiftCount: pull.shiftedDepths.size,
+    groupShiftCount: 0,
+  };
 }

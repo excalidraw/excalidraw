@@ -12,6 +12,7 @@ def test_topic_pdf_seed_ids():
     assert "elk-eclipse-layout-kernel-arxiv" in ids
     assert "sander-compound-directed-graphs" in ids
     assert "stratisfimal-layout" in ids
+    assert "eades-1984-spring-heuristic" in ids
 
 
 def test_topic_doi_seed_count():

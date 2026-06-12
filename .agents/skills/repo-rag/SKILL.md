@@ -132,7 +132,8 @@ yarn repo-rag:query "layout worker client parity" --top 5 --json
 
 After RAG hits, read these for invariants (not always in top snippets):
 
-- [docs/terraform-pipeline-compound-import-guide.md](../../../docs/terraform-pipeline-compound-import-guide.md) — **start here**: import flow + compound algorithm
+- [docs/terraform-pipeline-import-agent-guide.md](../../../docs/terraform-pipeline-import-agent-guide.md) — **start here**: pipeline import + Compact/Full, Classic/Compound, Stacked/Packed
+- [docs/terraform-pipeline-compound-import-guide.md](../../../docs/terraform-pipeline-compound-import-guide.md) — compound algorithm phases
 - [docs/terraform-pipeline-import-debug-handoff.md](../../../docs/terraform-pipeline-import-debug-handoff.md) — import flow + profiler
 - [docs/pipeline-compound-layout-agent-handoff.md](../../../docs/pipeline-compound-layout-agent-handoff.md) — compound layout code map
 - [docs/terraform-import-presets-agent-handoff.md](../../../docs/terraform-import-presets-agent-handoff.md) — presets + fixtures

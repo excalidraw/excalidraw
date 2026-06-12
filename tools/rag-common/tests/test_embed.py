@@ -17,7 +17,7 @@ def test_truncate_disallowed_special_tokens():
 def test_auto_no_key_uses_local():
     cfg = resolve_embed_config()
     assert cfg.backend == "local"
-    assert cfg.dimensions == 384
+    assert cfg.dimensions == 1024
 
 
 @patch.dict("os.environ", {"RAG_EMBED_BACKEND": "local"}, clear=True)

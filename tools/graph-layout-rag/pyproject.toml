@@ -12,7 +12,7 @@ dependencies = [
   "openai>=1.40.0",
   "pydantic>=2.7.0",
   "pymupdf>=1.24.0",
-  "rag-common",
+  "rag-common[gemini,mlx]",
   "tiktoken>=0.7.0",
 ]
 
@@ -21,6 +21,7 @@ rag-common = { path = "../rag-common", editable = true }
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
+mlx = ["rag-common[mlx]"]
 
 [project.scripts]
 graph-layout-rag = "graph_layout_rag.cli:main"
