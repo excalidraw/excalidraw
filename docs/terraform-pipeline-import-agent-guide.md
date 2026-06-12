@@ -618,6 +618,17 @@ See [.agents/skills/repo-rag/SKILL.md](../.agents/skills/repo-rag/SKILL.md).
 
 ---
 
+## Related docs
+
+| Doc | Purpose |
+| --- | --- |
+| [excalidraw-canvas-architecture.md](./excalidraw-canvas-architecture.md) | Canvas render layers, Terraform runtime hooks, debugging slow pan/zoom/hover/expand |
+| [terraform-canvas-runtime-performance.md](./terraform-canvas-runtime-performance.md) | Dev-only runtime experiments, benchmark profiles, and append-only results |
+| [terraform-import-performance-log.md](./terraform-import-performance-log.md) | Import/layout wall-clock and profiler hotspots |
+| [terraform-pipeline-compound-import-guide.md](./terraform-pipeline-compound-import-guide.md) | Compound frame hierarchy phase-by-phase |
+
+---
+
 ## Constraints (do not violate)
 
 1. **TFD precedence** for column order (unless packed depth shifts apply)

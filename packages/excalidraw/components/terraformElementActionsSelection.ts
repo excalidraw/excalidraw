@@ -40,14 +40,12 @@ export const terraformFocusSceneSig = (
 
 export const terraformFocusInputsSig = (
   activeFocusNodePath: string | null,
-  hoveredElementIds: Readonly<{ [id: string]: true }>,
   selectedElementIds: Readonly<{ [id: string]: true }>,
   pins: AppState["terraformEdgeLayerPins"],
   viewBackgroundColor: string,
 ) =>
   [
     activeFocusNodePath ?? "",
-    Object.keys(hoveredElementIds).sort().join(","),
     Object.keys(selectedElementIds).sort().join(","),
     pins ? JSON.stringify(pins) : "",
     viewBackgroundColor,

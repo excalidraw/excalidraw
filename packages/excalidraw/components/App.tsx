@@ -448,6 +448,7 @@ import {
   isTerraformResourceElement,
 } from "./terraformElementMetadata";
 import { shouldShowTerraformPipelineFrameName } from "./terraformLod";
+import { getTerraformRuntimePerformanceSnapshot } from "./terraformRuntimePerformance";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -2209,6 +2210,8 @@ class App extends React.Component<AppProps, AppState> {
         terraformLodPreset: this.state.terraformLodPreset,
         selectedElementIds: this.state.selectedElementIds,
         terraformEdgeHoverPeekKey: this.state.terraformEdgeHoverPeekKey,
+        terraformRuntimePerformanceRevision:
+          getTerraformRuntimePerformanceSnapshot().version,
       });
     this.visibleElements = visibleElements;
 

@@ -3,6 +3,15 @@ import {
   ExcalLogo,
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import {
+  areAllTerraformRuntimeExperimentsEnabled,
+  getTerraformRuntimePerformanceSnapshot,
+  patchTerraformRuntimePerformanceSettings,
+  resetTerraformRuntimePerformanceSettings,
+  setAllTerraformRuntimeExperiments,
+  subscribeTerraformRuntimePerformance,
+  type TerraformRuntimePerformanceSettings,
+} from "@excalidraw/excalidraw/components/terraformRuntimePerformance";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -14,6 +23,127 @@ import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
+
+const TerraformRuntimePerformanceMenu = ({
+  refresh,
+}: {
+  refresh: () => void;
+}) => {
+  const snapshot = React.useSyncExternalStore(
+    subscribeTerraformRuntimePerformance,
+    getTerraformRuntimePerformanceSnapshot,
+    getTerraformRuntimePerformanceSnapshot,
+  );
+  const settings = snapshot.value;
+  const update = (patch: Partial<TerraformRuntimePerformanceSettings>) => {
+    patchTerraformRuntimePerformanceSettings(patch);
+    refresh();
+  };
+
+  const toggle = (
+    key: keyof Pick<
+      TerraformRuntimePerformanceSettings,
+      | "hideAwsIconGlyphsBelowZoom"
+      | "suppressHoverFocusBelowZoom"
+      | "debounceHoverFocus"
+      | "suppressFrameClippingBelowZoom"
+      | "skipBindingRepairDuringFocus"
+    >,
+    testId: string,
+    label: string,
+  ) => (
+    <MainMenu.Item
+      data-testid={testId}
+      onSelect={(event) => {
+        event.preventDefault();
+        update({ [key]: !settings[key] });
+      }}
+    >
+      <input type="checkbox" readOnly checked={settings[key]} /> {label}
+    </MainMenu.Item>
+  );
+
+  return (
+    <MainMenu.Sub>
+      <MainMenu.Sub.Trigger data-testid="terraform-runtime-performance-submenu">
+        Terraform canvas performance
+      </MainMenu.Sub.Trigger>
+      <MainMenu.Sub.Content>
+        <MainMenu.Item
+          data-testid="terraform-runtime-enable-all"
+          onSelect={(event) => {
+            event.preventDefault();
+            setAllTerraformRuntimeExperiments(
+              !areAllTerraformRuntimeExperimentsEnabled(settings),
+            );
+            refresh();
+          }}
+        >
+          <input
+            type="checkbox"
+            readOnly
+            checked={areAllTerraformRuntimeExperimentsEnabled(settings)}
+          />{" "}
+          Enable all experiments
+        </MainMenu.Item>
+        {toggle(
+          "hideAwsIconGlyphsBelowZoom",
+          "terraform-runtime-hide-icons",
+          "Hide AWS icon primitives below threshold",
+        )}
+        {toggle(
+          "suppressHoverFocusBelowZoom",
+          "terraform-runtime-suppress-hover",
+          "Suppress relationship hover below threshold",
+        )}
+        {toggle(
+          "debounceHoverFocus",
+          "terraform-runtime-debounce-hover",
+          "Debounce relationship hover",
+        )}
+        {toggle(
+          "suppressFrameClippingBelowZoom",
+          "terraform-runtime-suppress-clipping",
+          "Suppress Terraform frame clipping below threshold",
+        )}
+        {toggle(
+          "skipBindingRepairDuringFocus",
+          "terraform-runtime-skip-binding-repair",
+          "Skip binding repair during focus updates",
+        )}
+        <MainMenu.Separator />
+        {([0.2, 0.3, 0.4] as const).map((threshold) => (
+          <MainMenu.Item
+            key={threshold}
+            data-testid={`terraform-runtime-threshold-${threshold * 100}`}
+            onSelect={(event) => {
+              event.preventDefault();
+              update({ lowZoomThreshold: threshold });
+            }}
+          >
+            <input
+              type="radio"
+              readOnly
+              checked={settings.lowZoomThreshold === threshold}
+            />{" "}
+            {threshold * 100}% threshold
+          </MainMenu.Item>
+        ))}
+        <MainMenu.Separator />
+        <MainMenu.Item
+          data-testid="terraform-runtime-reset"
+          onSelect={(event) => {
+            event.preventDefault();
+            resetTerraformRuntimePerformanceSettings();
+            refresh();
+          }}
+        >
+          Reset experiments
+        </MainMenu.Item>
+      </MainMenu.Sub.Content>
+    </MainMenu.Sub>
+  );
+};
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -69,21 +199,24 @@ export const AppMainMenu: React.FC<{
         </>
       )}
       {isDevEnv() && (
-        <MainMenu.Item
-          icon={eyeIcon}
-          onSelect={() => {
-            if (window.visualDebug) {
-              delete window.visualDebug;
-              saveDebugState({ enabled: false });
-            } else {
-              window.visualDebug = { data: [] };
-              saveDebugState({ enabled: true });
-            }
-            props?.refresh();
-          }}
-        >
-          Visual Debug
-        </MainMenu.Item>
+        <>
+          <TerraformRuntimePerformanceMenu refresh={props.refresh} />
+          <MainMenu.Item
+            icon={eyeIcon}
+            onSelect={() => {
+              if (window.visualDebug) {
+                delete window.visualDebug;
+                saveDebugState({ enabled: false });
+              } else {
+                window.visualDebug = { data: [] };
+                saveDebugState({ enabled: true });
+              }
+              props?.refresh();
+            }}
+          >
+            Visual Debug
+          </MainMenu.Item>
+        </>
       )}
       <MainMenu.Separator />
       <MainMenu.DefaultItems.Preferences />

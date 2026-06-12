@@ -33,6 +33,10 @@ import {
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
+import {
+  getTerraformRuntimePerformanceSnapshot,
+  shouldSuppressTerraformFrameClip,
+} from "../components/terraformRuntimePerformance";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
@@ -241,6 +245,8 @@ const _renderStaticScene = ({
   }
 
   const { renderGrid = true, isExporting } = renderConfig;
+  const terraformRuntimeSettings =
+    getTerraformRuntimePerformanceSnapshot().value;
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -323,6 +329,12 @@ const _renderStaticScene = ({
           const frame = getTargetFrame(element, elementsMap, appState);
           if (
             frame &&
+            !shouldSuppressTerraformFrameClip(
+              element,
+              appState,
+              renderConfig,
+              terraformRuntimeSettings,
+            ) &&
             shouldApplyFrameClip(
               element,
               frame,
@@ -440,6 +452,12 @@ const _renderStaticScene = ({
 
           if (
             frame &&
+            !shouldSuppressTerraformFrameClip(
+              element,
+              appState,
+              renderConfig,
+              terraformRuntimeSettings,
+            ) &&
             shouldApplyFrameClip(
               element,
               frame,

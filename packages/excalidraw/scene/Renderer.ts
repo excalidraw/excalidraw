@@ -15,6 +15,10 @@ import {
   filterTerraformLodVisibleElements,
   isTerraformLodScene,
 } from "../components/terraformLod";
+import {
+  filterTerraformRuntimeVisibleElements,
+  getTerraformRuntimePerformanceSnapshot,
+} from "../components/terraformRuntimePerformance";
 
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
@@ -116,6 +120,8 @@ export class Renderer {
         terraformLodPreset,
         selectedElementIds,
         terraformEdgeHoverPeekKey,
+        terraformRuntimePerformanceRevision:
+          _terraformRuntimePerformanceRevision,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
       }: {
@@ -134,6 +140,7 @@ export class Renderer {
         terraformLodPreset: AppState["terraformLodPreset"];
         selectedElementIds: AppState["selectedElementIds"];
         terraformEdgeHoverPeekKey: AppState["terraformEdgeHoverPeekKey"];
+        terraformRuntimePerformanceRevision: number;
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
@@ -169,6 +176,12 @@ export class Renderer {
             elementsMap,
           );
         }
+
+        visibleElements = filterTerraformRuntimeVisibleElements(
+          visibleElements,
+          zoom.value,
+          getTerraformRuntimePerformanceSnapshot().value,
+        );
 
         return { elementsMap, visibleElements };
       },

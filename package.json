@@ -82,6 +82,7 @@
     "purge:terraform-layout-cache:preview": "node scripts/terraform/purge-terraform-layout-cache.mjs --preview",
     "export:brand-assets": "node scripts/export-brand-assets.mjs",
     "benchmark:landing": "node scripts/benchmark-landing.mjs",
+    "benchmark:terraform-canvas": "node scripts/terraform/benchmark-canvas-runtime.mjs",
     "benchmark:landing:preview": "node scripts/benchmark-landing.mjs --url https://terraform-feature.ainur-chb.pages.dev --label preview",
     "export:terraform-presets-test-db": "node excalidraw-app/dev/exportTerraformPresetsTestDb.mjs",
     "export:terraform-presets-d1": "node excalidraw-app/dev/exportTerraformPresetsToD1.mjs",

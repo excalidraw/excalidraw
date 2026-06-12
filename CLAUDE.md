@@ -52,6 +52,12 @@ yarn health           # fix + typecheck + eslint + arch + knip + depcheck
 
 See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLint scopes, Oxlint rollout, and SonarQube Community Build setup.
 
+### Terraform import and canvas performance
+
+- **Import/layout wall-clock:** [docs/terraform-import-performance-log.md](docs/terraform-import-performance-log.md)
+- **Canvas runtime (pan/zoom/hover/expand after import):** [docs/excalidraw-canvas-architecture.md](docs/excalidraw-canvas-architecture.md)
+- **Pipeline import toggles (compact/compound/packed/ancillary):** [docs/terraform-pipeline-import-agent-guide.md](docs/terraform-pipeline-import-agent-guide.md)
+
 ### Repo RAG (code + docs search)
 
 Local hybrid search over this monorepo (AST chunking, BM25 + vector). Embeddings use shared [`tools/rag-common`](../tools/rag-common) with named profiles (`RAG_EMBED_PROFILE` / `--embed-profile`): OpenAI, Gemini, or local MLX/ST; legacy `RAG_EMBED_BACKEND=auto` still works.
