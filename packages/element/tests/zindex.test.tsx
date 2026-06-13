@@ -1509,4 +1509,24 @@ describe("z-indexing with frames", () => {
       ],
     });
   });
+
+  it("send to back / bring to front of a grouped frame child (in group-editing mode) must not duplicate elements", () => {
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", groupIds: ["g1"] },
+        { id: "F1_2", frameId: "F1", groupIds: ["g1"], isSelected: true },
+        { id: "F1", type: "frame" },
+        { id: "F2_1", frameId: "F2", groupIds: ["g2"] },
+        { id: "F2_2", frameId: "F2", groupIds: ["g2"] },
+        { id: "F2", type: "frame" },
+      ],
+      appState: { editingGroupId: "g1" },
+      operations: [
+        // -∞ (send to back, within the frame)
+        [actionSendToBack, ["F1_2", "F1_1", "F1", "F2_1", "F2_2", "F2"]],
+        // +∞ (bring to front, within the frame)
+        [actionBringToFront, ["F1_1", "F1", "F1_2", "F2_1", "F2_2", "F2"]],
+      ],
+    });
+  });
 });

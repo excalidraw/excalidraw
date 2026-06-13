@@ -402,6 +402,15 @@ const shiftElementsToEnd = (
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
+
+  // Nothing to move (e.g. `elementsToBeMoved` is empty because all selected
+  // elements were frame children handled in a prior pass). Bail out early —
+  // otherwise `leadingIndex`/`trailingIndex` below resolve to `undefined` and
+  // the resulting `slice()` calls overlap, duplicating elements.
+  if (indicesToMove.length === 0) {
+    return elements;
+  }
+
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
 
