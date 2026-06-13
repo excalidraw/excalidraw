@@ -590,6 +590,7 @@ let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+const MIDDLE_MOUSE_BUTTON_MASK = 4;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -12812,6 +12813,24 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       event.preventDefault();
+
+      if (event.buttons & MIDDLE_MOUSE_BUTTON_MASK && event.deltaY) {
+        this.translateCanvas((state) => ({
+          ...getStateForZoom(
+            {
+              viewportX: event.clientX,
+              viewportY: event.clientY,
+              nextZoom: getNormalizedZoom(
+                state.zoom.value + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP),
+              ),
+            },
+            state,
+          ),
+          shouldCacheIgnoreZoom: true,
+        }));
+        this.resetShouldCacheIgnoreZoomDebounced();
+        return;
+      }
 
       if (isPanning) {
         return;
