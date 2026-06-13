@@ -315,12 +315,46 @@ const getTargetElementsMap = <T extends ExcalidrawElement>(
   }, new Map<string, ExcalidrawElement>());
 };
 
+const hasSameElementIds = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+) => {
+  if (prevElements.length !== nextElements.length) {
+    console.error(
+      "z-index reordering failed: resulting array have different lengths",
+    );
+    return false;
+  }
+
+  const prevElementIdCounts = new Map<ExcalidrawElement["id"], number>();
+  for (const element of prevElements) {
+    prevElementIdCounts.set(
+      element.id,
+      (prevElementIdCounts.get(element.id) || 0) + 1,
+    );
+  }
+
+  for (const element of nextElements) {
+    const count = prevElementIdCounts.get(element.id);
+    if (!count) {
+      console.error(
+        "z-index reordering failed: element id mismatch / duplicate ids",
+      );
+      return false;
+    }
+    prevElementIdCounts.set(element.id, count - 1);
+  }
+
+  return true;
+};
+
 const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
   scene: Scene,
 ) => {
+  const originalElements = elements;
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
 
@@ -390,6 +424,10 @@ const shiftElementsByOne = (
             ...trailingElements,
           ];
   });
+
+  if (!hasSameElementIds(originalElements, elements)) {
+    return originalElements;
+  }
 
   syncMovedIndices(elements, targetElementsMap);
 
@@ -498,6 +536,10 @@ const shiftElementsToEnd = (
           ...targetElements,
           ...trailingElements,
         ];
+
+  if (!hasSameElementIds(elements, nextElements)) {
+    return elements;
+  }
 
   syncMovedIndices(nextElements, targetElementsMap);
 
