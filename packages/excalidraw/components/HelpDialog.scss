@@ -16,6 +16,13 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    &__searchBar {
+      display: flex;
+      padding: 4px;
+      width: 100%;
     }
 
     &__btn {
@@ -78,6 +85,20 @@
       &__island--editor {
         grid-area: 1 / 2 / 3 / 3;
       }
+    }
+
+    &__islands-container--filtered {
+      .HelpDialog__island--tools,
+      .HelpDialog__island--view,
+      .HelpDialog__island--editor {
+        grid-area: auto;
+      }
+    }
+
+    &__no-results {
+      margin: 0;
+      color: var(--text-secondary-color);
+      font-size: 0.875rem;
     }
 
     &__island {
