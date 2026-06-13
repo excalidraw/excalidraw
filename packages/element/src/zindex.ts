@@ -552,7 +552,7 @@ function shiftElementsAccountingForFrames(
 
   for (const [frameId, children] of frameChildrenSets) {
     nextElements = shiftFunction(
-      allElements,
+      nextElements,
       appState,
       direction,
       frameId,

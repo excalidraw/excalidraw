@@ -1510,6 +1510,25 @@ describe("z-indexing with frames", () => {
     });
   });
 
+  it("bringing to front / sending to back children of MULTIPLE frames at once moves all of them", () => {
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame" },
+        { id: "F2_1", frameId: "F2", isSelected: true },
+        { id: "F2_2", frameId: "F2" },
+        { id: "F2", type: "frame" },
+      ],
+      operations: [
+        // +∞: each selected child moves to the front of its own frame
+        [actionBringToFront, ["F1_2", "F1", "F1_1", "F2_2", "F2", "F2_1"]],
+        // -∞: each selected child moves to the back of its own frame
+        [actionSendToBack, ["F1_1", "F1_2", "F1", "F2_1", "F2_2", "F2"]],
+      ],
+    });
+  });
+
   it("send to back / bring to front of a grouped frame child (in group-editing mode) must not duplicate elements", () => {
     assertZindex({
       elements: [
