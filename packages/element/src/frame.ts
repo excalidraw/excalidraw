@@ -569,7 +569,8 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       continue;
     }
 
-    if (element.frameId && element.frameId !== frame.id) {
+    // skip elements already in target frame
+    if (element.frameId && element.frameId === frame.id) {
       continue;
     }
 
