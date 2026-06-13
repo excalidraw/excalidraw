@@ -1,5 +1,7 @@
 import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
+import { isFiniteNumber } from "@excalidraw/math";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -414,8 +416,8 @@ const shiftElementsToEnd = (
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
 
-  let leadingIndex: number;
-  let trailingIndex: number;
+  let leadingIndex: number | undefined;
+  let trailingIndex: number | undefined;
   if (direction === "left") {
     if (containingFrame) {
       leadingIndex = findIndex(elements, (el) =>
@@ -458,6 +460,19 @@ const shiftElementsToEnd = (
 
   if (leadingIndex === -1) {
     leadingIndex = 0;
+  }
+
+  const isValidIndex = (index: number | undefined): index is number => {
+    return isFiniteNumber(index) && index >= 0;
+  };
+
+  if (
+    !isValidIndex(leadingIndex) ||
+    !isValidIndex(trailingIndex) ||
+    leadingIndex > trailingIndex ||
+    indicesToMove.some((index) => index < leadingIndex || index > trailingIndex)
+  ) {
+    return elements;
   }
 
   for (let index = leadingIndex; index < trailingIndex + 1; index++) {

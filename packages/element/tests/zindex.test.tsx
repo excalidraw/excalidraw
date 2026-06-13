@@ -1664,3 +1664,35 @@ describe("z-index reordering with broken contiguity (invariant-violating input)"
     ]);
   });
 });
+
+describe("z-index reordering with inconsistent group-editing state", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("does not duplicate or drop elements when selected elements fall outside the edited group scope", () => {
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"], isSelected: true },
+        { id: "C", groupIds: ["g1"] },
+        { id: "X", groupIds: ["g2"] },
+        { id: "Y", groupIds: ["g2"] },
+        { id: "R" },
+      ],
+      appState: { editingGroupId: "g2" },
+      operations: [[actionSendToBack, ["A", "C", "X", "Y", "R"]]],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"] },
+        { id: "C", groupIds: ["g1"] },
+        { id: "X", groupIds: ["g2"], isSelected: true },
+        { id: "Y", groupIds: ["g2"] },
+        { id: "R" },
+      ],
+      appState: { editingGroupId: "g1" },
+      operations: [[actionBringToFront, ["A", "C", "X", "Y", "R"]]],
+    });
+  });
+});
