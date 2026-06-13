@@ -13,6 +13,7 @@ ENV_PATH = PKG_ROOT / ".env"
 ENV_EXAMPLE_PATH = PKG_ROOT / ".env.example"
 REPO_RAG_ENV_PATH = REPO_RAG_ROOT / ".env"
 DATA_DIR = PKG_ROOT / "data"
+RETRIEVAL_INDEXES_DIR = DATA_DIR / "retrieval-indexes"
 RAW_DIR = DATA_DIR / "raw"
 PDF_DIR = RAW_DIR / "pdf"
 HTML_DIR = RAW_DIR / "html"
@@ -36,6 +37,8 @@ class ProfileIndexPaths:
     root: Path
     lance_dir: Path
     ingest_state: Path
+    bm25_dir: Path
+    ingest_status: Path | None = None
 
 
 def indexes_root() -> Path:
@@ -69,6 +72,8 @@ def profile_index_paths(profile: str | None = None) -> ProfileIndexPaths:
         root=root,
         lance_dir=root / "lancedb",
         ingest_state=root / "ingest_state.json",
+        ingest_status=root / "ingest_status.json",
+        bm25_dir=root / "bm25",
     )
 
 
@@ -85,6 +90,8 @@ def list_profile_indexes() -> list[ProfileIndexPaths]:
             root=child,
             lance_dir=child / "lancedb",
             ingest_state=child / "ingest_state.json",
+            ingest_status=child / "ingest_status.json",
+            bm25_dir=child / "bm25",
         )
         if paths.lance_dir.is_dir() or paths.ingest_state.is_file():
             out.append(paths)

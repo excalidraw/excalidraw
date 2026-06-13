@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 import signal
 import time
-from typing import Any
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Callable
 
 import click
 
 from graph_layout_rag.harvest.arxiv import harvest_arxiv
+from graph_layout_rag.harvest.arxiv_bulk import harvest_arxiv_category
+from graph_layout_rag.harvest.citations import harvest_forward_citations
 from graph_layout_rag.harvest.bibliography import (
     download_bibliography_pdfs,
     filter_relevant_dois_resumable,
@@ -25,6 +28,7 @@ from graph_layout_rag.harvest.checkpoint import (
     load_checkpoint,
     save_checkpoint,
 )
+from graph_layout_rag.harvest.crossref import harvest_crossref
 from graph_layout_rag.harvest.curated import harvest_curated
 from graph_layout_rag.harvest.deferred_retry import run_deferred_retries
 from graph_layout_rag.harvest.dblp import harvest_dblp
@@ -160,6 +164,38 @@ def _run_early_stages(manifest, log, *, kw, skip_topic_seeds: bool, skip_elk_bib
             _save_progress(manifest, "elk-bibliography", log)
 
 
+def _run_concurrent_discovery(
+    sources: list[tuple[str, str, Callable[[], list]]],
+    log,
+) -> list[tuple[str, str, list]]:
+    """Fetch independent discovery sources concurrently.
+
+    Each source hits a different rate-limited domain, so running them in
+    parallel saturates all domains at once instead of serially. Network fetches
+    run in threads; merging/checkpointing stays on the caller's thread. Returns
+    ``(stage, label, items)`` in the input order (failures yield an empty list).
+    """
+    if not sources:
+        return []
+
+    def _fetch(spec: tuple[str, str, Callable[[], list]]) -> list:
+        stage, label, fn = spec
+        t0 = time.monotonic()
+        log.info("=== discovery source start: %s ===", label)
+        try:
+            items = fn()
+        except Exception as exc:  # match _run_stage: log and continue
+            log.exception("discovery source failed: %s — %s", label, exc)
+            return []
+        log.info("=== discovery source done: %s (%.1fs, %d items) ===", label, time.monotonic() - t0, len(items))
+        return items
+
+    click.echo(f"Discovering from {len(sources)} sources concurrently...")
+    with ThreadPoolExecutor(max_workers=len(sources)) as pool:
+        results = list(pool.map(_fetch, sources))
+    return [(stage, label, items) for (stage, label, _), items in zip(sources, results)]
+
+
 def _run_discovery_pass(
     manifest,
     log,
@@ -170,86 +206,114 @@ def _run_discovery_pass(
     max_dblp: int,
     max_semantic_scholar: int,
     max_arxiv: int,
+    max_crossref: int,
+    max_forward_citations: int,
     skip_openalex: bool,
     skip_dblp: bool,
     skip_semantic_scholar: bool,
     skip_arxiv: bool,
+    skip_crossref: bool,
+    skip_forward_citations: bool,
     target: int | None,
     dry_run: bool,
     pipeline_only: bool = False,
 ) -> None:
+    # Snapshot ids/count once so concurrent sources don't read interleaved state.
+    existing_ids = _existing_ids(manifest)
+    base_count = len(manifest.items)
+    below_target = target is None or base_count < target
+
+    sources: list[tuple[str, str, Callable[[], list]]] = []
+
+    if not skip_crossref:
+        sources.append(
+            (
+                "crossref",
+                f"Crossref venues (JGAA/CGTA/GD, max {max_crossref})",
+                lambda: harvest_crossref(
+                    max_works=max_crossref, existing_ids=existing_ids, **kw
+                ),
+            )
+        )
+
     if not skip_openalex:
         cap = max_openalex
-        label = "OpenAlex pipeline topics" if pipeline_only else "OpenAlex"
-        _run_stage(
-            f"{label} (max {cap}, {max_openalex_per_topic}/topic)",
-            log,
-            lambda: _merge_items(
-                manifest,
-                harvest_openalex(
+        oa_label = "OpenAlex pipeline topics" if pipeline_only else "OpenAlex"
+        sources.append(
+            (
+                "openalex",
+                f"{oa_label} (max {cap}, {max_openalex_per_topic}/topic)",
+                lambda cap=cap: harvest_openalex(
                     max_works=cap,
                     max_per_topic=max_openalex_per_topic,
                     use_topic_queries=True,
                     oa_only=True,
-                    existing_ids=_existing_ids(manifest),
+                    existing_ids=existing_ids,
                     pipeline_only=pipeline_only,
                     **kw,
                 ),
-            ),
+            )
         )
-        if not dry_run:
-            _save_progress(manifest, "openalex", log)
 
     if not skip_arxiv:
         arxiv_cap = max_arxiv
         if target:
-            arxiv_cap = min(arxiv_cap, max(50, target - len(manifest.items)))
-        _run_stage(
-            f"arXiv (max {arxiv_cap})",
-            log,
-            lambda: _merge_items(
-                manifest,
-                harvest_arxiv(max_works=arxiv_cap, existing_ids=_existing_ids(manifest), **kw),
-            ),
+            arxiv_cap = min(arxiv_cap, max(50, target - base_count))
+        sources.append(
+            (
+                "arxiv",
+                f"arXiv keyword + cs.CG category (max {arxiv_cap} each)",
+                # Both hit export.arxiv.org — keep them in one domain thread (polite),
+                # still concurrent with the other sources' domains.
+                lambda cap=arxiv_cap: [
+                    *harvest_arxiv(max_works=cap, existing_ids=existing_ids, **kw),
+                    *harvest_arxiv_category(max_works=cap, existing_ids=existing_ids, **kw),
+                ],
+            )
         )
-        if not dry_run:
-            _save_progress(manifest, "arxiv", log)
 
     if not skip_dblp and not pipeline_only:
-        _run_stage(
-            f"DBLP (max {max_dblp})",
-            log,
-            lambda: _merge_items(
-                manifest,
-                harvest_dblp(max_works=max_dblp, existing_ids=_existing_ids(manifest), **kw),
-            ),
+        sources.append(
+            (
+                "dblp",
+                f"DBLP (max {max_dblp})",
+                lambda: harvest_dblp(max_works=max_dblp, existing_ids=existing_ids, **kw),
+            )
         )
-        if not dry_run:
-            _save_progress(manifest, "dblp", log)
 
-    if (
-        not skip_semantic_scholar
-        and not pipeline_only
-        and (target is None or len(manifest.items) < target)
-    ):
+    if not skip_semantic_scholar and not pipeline_only and below_target:
         s2_cap = max_semantic_scholar
         if target:
-            s2_cap = min(s2_cap, max(50, target - len(manifest.items)))
-        _run_stage(
-            f"Semantic Scholar (max {s2_cap})",
-            log,
-            lambda: _merge_items(
-                manifest,
-                harvest_semantic_scholar(
-                    max_works=s2_cap,
-                    existing_ids=_existing_ids(manifest),
-                    **kw,
+            s2_cap = min(s2_cap, max(50, target - base_count))
+        sources.append(
+            (
+                "semantic-scholar",
+                f"Semantic Scholar (max {s2_cap})",
+                lambda cap=s2_cap: harvest_semantic_scholar(
+                    max_works=cap, existing_ids=existing_ids, **kw
                 ),
-            ),
+            )
         )
-        if not dry_run:
-            _save_progress(manifest, "semantic-scholar", log)
 
+    if not skip_forward_citations:
+        sources.append(
+            (
+                "forward-citation",
+                f"Forward citations of seeds (max {max_forward_citations})",
+                lambda: harvest_forward_citations(
+                    max_works=max_forward_citations, existing_ids=existing_ids, **kw
+                ),
+            )
+        )
+
+    # Concurrent network fetch; sequential merge + checkpoint (single-threaded).
+    for stage, label, items in _run_concurrent_discovery(sources, log):
+        added = _merge_items(manifest, items)
+        log.info("merged %s: +%d new (%d fetched)", stage, added, len(items))
+        if not dry_run:
+            _save_progress(manifest, stage, log)
+
+    # Broad top-up depends on the merged count, so it runs after the merge.
     if not skip_openalex and target and len(manifest.items) < target and not pipeline_only:
         extra = min(800, target - len(manifest.items) + 100)
         broad_cap = len(manifest.items) + extra
@@ -493,6 +557,8 @@ def _execute_harvest(
     max_dblp: int,
     max_semantic_scholar: int,
     max_arxiv: int,
+    max_crossref: int,
+    max_forward_citations: int,
     max_bib_dois: int,
     bib_passes: int,
     retry_passes: int,
@@ -500,6 +566,8 @@ def _execute_harvest(
     skip_openalex: bool,
     skip_dblp: bool,
     skip_arxiv: bool,
+    skip_crossref: bool,
+    skip_forward_citations: bool,
     skip_bibliography: bool,
     skip_topic_seeds: bool,
     skip_elk_bibliography: bool,
@@ -633,10 +701,14 @@ def _execute_harvest(
                 max_dblp=max_dblp,
                 max_semantic_scholar=max_semantic_scholar,
                 max_arxiv=max_arxiv,
+                max_crossref=max_crossref,
+                max_forward_citations=max_forward_citations,
                 skip_openalex=skip_openalex,
                 skip_dblp=skip_dblp,
                 skip_semantic_scholar=skip_semantic_scholar,
                 skip_arxiv=skip_arxiv,
+                skip_crossref=skip_crossref,
+                skip_forward_citations=skip_forward_citations,
                 target=target,
                 dry_run=dry_run,
                 pipeline_only=pipeline_harvest,
@@ -743,6 +815,20 @@ def harvest_options(f):
     f = click.option("--max-dblp", default=None, type=int)(f)
     f = click.option("--max-semantic-scholar", default=None, type=int)(f)
     f = click.option("--max-arxiv", default=None, type=int)(f)
+    f = click.option(
+        "--max-crossref",
+        default=600,
+        show_default=True,
+        type=int,
+        help="Max Crossref venue-targeted works per pass (JGAA/CGTA/GD/LIPIcs).",
+    )(f)
+    f = click.option(
+        "--max-forward-citations",
+        default=300,
+        show_default=True,
+        type=int,
+        help="Max forward-citation works per pass (papers citing high-signal seeds).",
+    )(f)
     f = click.option("--max-bib-dois", default=None, type=int, help="Max bibliography DOIs per pass.")(f)
     f = click.option("--bib-passes", default=1, show_default=True)(f)
     f = click.option("--retry-passes", default=1, show_default=True)(f)
@@ -750,6 +836,8 @@ def harvest_options(f):
     f = click.option("--skip-openalex", is_flag=True)(f)
     f = click.option("--skip-dblp", is_flag=True)(f)
     f = click.option("--skip-arxiv", is_flag=True)(f)
+    f = click.option("--skip-crossref", is_flag=True, help="Skip Crossref venue-targeted discovery.")(f)
+    f = click.option("--skip-forward-citations", is_flag=True, help="Skip forward-citation discovery.")(f)
     f = click.option("--skip-bibliography", is_flag=True)(f)
     f = click.option("--skip-topic-seeds", is_flag=True)(f)
     f = click.option("--skip-elk-bibliography", is_flag=True)(f)
@@ -840,6 +928,8 @@ def harvest_group(
     max_dblp: int | None,
     max_semantic_scholar: int | None,
     max_arxiv: int | None,
+    max_crossref: int,
+    max_forward_citations: int,
     max_bib_dois: int | None,
     bib_passes: int,
     retry_passes: int,
@@ -847,6 +937,8 @@ def harvest_group(
     skip_openalex: bool,
     skip_dblp: bool,
     skip_arxiv: bool,
+    skip_crossref: bool,
+    skip_forward_citations: bool,
     skip_bibliography: bool,
     skip_topic_seeds: bool,
     skip_elk_bibliography: bool,
@@ -870,6 +962,8 @@ def harvest_group(
             max_dblp=max_dblp,
             max_semantic_scholar=max_semantic_scholar,
             max_arxiv=max_arxiv,
+            max_crossref=max_crossref,
+            max_forward_citations=max_forward_citations,
             max_bib_dois=max_bib_dois,
             bib_passes=bib_passes,
             retry_passes=retry_passes,
@@ -877,6 +971,8 @@ def harvest_group(
             skip_openalex=skip_openalex,
             skip_dblp=skip_dblp,
             skip_arxiv=skip_arxiv,
+            skip_crossref=skip_crossref,
+            skip_forward_citations=skip_forward_citations,
             skip_bibliography=skip_bibliography,
             skip_topic_seeds=skip_topic_seeds,
             skip_elk_bibliography=skip_elk_bibliography,
@@ -902,6 +998,8 @@ def harvest_run_cmd(
     max_dblp: int | None,
     max_semantic_scholar: int | None,
     max_arxiv: int | None,
+    max_crossref: int,
+    max_forward_citations: int,
     max_bib_dois: int | None,
     bib_passes: int,
     retry_passes: int,
@@ -909,6 +1007,8 @@ def harvest_run_cmd(
     skip_openalex: bool,
     skip_dblp: bool,
     skip_arxiv: bool,
+    skip_crossref: bool,
+    skip_forward_citations: bool,
     skip_bibliography: bool,
     skip_topic_seeds: bool,
     skip_elk_bibliography: bool,
@@ -931,6 +1031,8 @@ def harvest_run_cmd(
         max_dblp=max_dblp,
         max_semantic_scholar=max_semantic_scholar,
         max_arxiv=max_arxiv,
+        max_crossref=max_crossref,
+        max_forward_citations=max_forward_citations,
         max_bib_dois=max_bib_dois,
         bib_passes=bib_passes,
         retry_passes=retry_passes,
@@ -938,6 +1040,8 @@ def harvest_run_cmd(
         skip_openalex=skip_openalex,
         skip_dblp=skip_dblp,
         skip_arxiv=skip_arxiv,
+        skip_crossref=skip_crossref,
+        skip_forward_citations=skip_forward_citations,
         skip_bibliography=skip_bibliography,
         skip_topic_seeds=skip_topic_seeds,
         skip_elk_bibliography=skip_elk_bibliography,
@@ -1015,6 +1119,80 @@ def harvest_report_cmd(
             f"{row['created_at']} {row['outcome']:14} "
             f"transient={row['transient']} {row['doc_id'] or '-':40} {row['url'][:80]}"
         )
+
+
+@harvest_group.command("prune")
+@click.option("--apply", "apply_", is_flag=True, help="Actually delete; default is a dry-run preview.")
+@click.option("--yes", is_flag=True, help="Required with --apply to confirm destructive deletion.")
+@click.option("--sample", default=20, show_default=True, type=int, help="Pruned titles to preview.")
+def harvest_prune_cmd(apply_: bool, yes: bool, sample: int) -> None:
+    """Drop off-topic items and delete their PDFs (precision-first).
+
+    Curated/high-signal sources are always kept. Dry-run unless --apply --yes.
+    """
+    from graph_layout_rag.harvest.prune import apply_prune, plan_prune, signal_stats
+
+    manifest = load_manifest()
+    before = signal_stats(manifest.items)
+    plan = plan_prune(manifest)
+
+    click.echo(
+        f"Before: total={before['total']} ok={before['ok']} "
+        f"strong_ratio={before['strong_ratio']:.0%}"
+    )
+    click.echo(f"Plan: keep={plan.n_keep} prune={plan.n_prune}")
+    if plan.prune:
+        click.echo(f"Sample of {min(sample, plan.n_prune)} items to prune:")
+        for item in plan.prune[:sample]:
+            click.echo(f"  - [{item.source}] {item.title[:80]}")
+
+    after = signal_stats(plan.keep)
+    click.echo(
+        f"After:  total={after['total']} ok={after['ok']} "
+        f"strong_ratio={after['strong_ratio']:.0%}"
+    )
+
+    if not apply_:
+        click.echo("\nDry-run — nothing changed. Re-run with --apply --yes to delete.")
+        return
+    if not yes:
+        click.echo("\nRefusing to delete without --yes. Aborting.")
+        raise SystemExit(1)
+
+    stats = apply_prune(manifest, plan)
+    click.echo(
+        f"\nPruned: removed_items={stats['removed_items']} "
+        f"deleted_pdfs={stats['deleted_pdfs']} kept={stats['kept']} "
+        f"(backup: data/manifest.bak.json)"
+    )
+
+
+@harvest_group.command("enrich")
+@click.option("--dry-run", is_flag=True, help="Report what would be filled; do not save.")
+@click.option(
+    "--workers",
+    default=DEFAULT_WORKERS,
+    show_default=True,
+    type=int,
+    help="Parallel OpenAlex lookups.",
+)
+def harvest_enrich_cmd(dry_run: bool, workers: int) -> None:
+    """Backfill missing abstracts on items that have a DOI (via OpenAlex).
+
+    Re-queries OpenAlex for every item with a DOI but no abstract and fills it
+    in. Downloads no PDFs. Dry-run reports counts without writing.
+    """
+    from graph_layout_rag.harvest.enrich import enrich_manifest
+
+    manifest = load_manifest()
+    stats = enrich_manifest(manifest, workers=workers, dry_run=dry_run)
+    if not dry_run and stats["enriched"]:
+        save_manifest(manifest)
+    click.echo(
+        f"enrich: scanned={stats['scanned']} candidates={stats['candidates']} "
+        f"{'would_fill' if dry_run else 'filled'}={stats['enriched']} "
+        f"skipped={stats['skipped']}"
+    )
 
 
 # Backward-compatible alias for cli.py

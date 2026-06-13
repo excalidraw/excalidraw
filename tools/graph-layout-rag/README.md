@@ -23,7 +23,8 @@ uv run graph-layout-rag embed profiles   # list built-in profiles
 | `openai-large` | openai | `text-embedding-3-large` | 1024 | Fast cloud ingest (~$5–7 full corpus) |
 | `openai-small` | openai | `text-embedding-3-small` | 1024 | Cheaper cloud |
 | `gemini` | gemini | `gemini-embedding-001` | 768 | `GEMINI_API_KEY` or `GOOGLE_API_KEY` |
-| `gemini-2` | gemini | `gemini-embedding-2` | 3072 | Vertex AI (recommended) or AI Studio key |
+| `gemini-2` | gemini | `gemini-embedding-2-preview` | 3072 | Preserved fixed-window baseline |
+| `gemini-2-structure-v1` | gemini | `gemini-embedding-2-preview` | 3072 | Fresh 3072-dim index; separate from the gemini-2 baseline |
 | `mlx-qwen4b` | local | `Qwen/Qwen3-Embedding-4B` (MLX 4-bit) | 1024 | Free Apple Silicon ingest |
 | `mlx-qwen0.6b` | local | `Qwen/Qwen3-Embedding-0.6B` (MLX 4-bit) | 1024 | Faster local |
 | `local-fp16-qwen4b` | local | Qwen3-4B FP16 (ST/MPS) | 1024 | Heavier RAM |
@@ -53,7 +54,9 @@ Downloads PDFs and metadata into `data/manifest.json` and `data/raw/`. Sources:
 - [GD Handbook](https://cs.brown.edu/people/rtamassi/gdhandbook/) — chapter PDFs
 - **Topic seeds** — ELK/Mermaid, Sugiyama, Sander compound graphs, Stratisfimal, layer reassignment, constraints, **compaction**, **packing**, **overlap** research threads
 - **ELK bibliography** — DOIs from the ELK survey paper
+- **Library docs** — OGDF, ELK, dagre, Graphviz engine/algorithm pages (implementer-grade source for compaction/packing/routing)
 - OpenAlex (paginated, topic queries + graph-drawing concept filter) + DBLP + Semantic Scholar
+- **Crossref venues** — JGAA/CGTA/GD/LIPIcs plus visualization (TVCG, CGF/EuroVis, InfoVis, PacificVis) and VLSI CAD (TCAD, DAC, ICCAD, ISPD); broad journals are strict relevance-gated
 - **arXiv** (cs.CG / cs.DS graph layout queries)
 - Bibliography chain from seed PDFs (relevance-filtered DOIs)
 - Paywalled books as `metadata_only` stubs
@@ -77,12 +80,62 @@ uv run graph-layout-rag harvest --dry-run
 | `--resume` | Skip one-time seed stages; keep discovery passes |
 | `--max-passes 5` | Discovery loop iterations |
 | `harvest verify` | Re-check ok PDFs on disk; downgrade invalid |
+| `harvest enrich` | Backfill missing abstracts via OpenAlex (no downloads); run before `prune` |
 
 **Query tags:** `layer-assignment`, `compound`, `constraints`, `compaction`, `packing`, `overlap`, `elk`, `sugiyama`, `crossing`, `grouped`, `ports`, `research-thread`
 
 ### Ingest
 
-Extracts text with PyMuPDF, chunks (~4000 chars, 600 overlap), embeds, indexes in LanceDB at `data/indexes/{profile}/lancedb/` (one index per embed profile).
+Extracts Markdown-aware structural blocks, targets ~800-token chunks (1200 hard max) with complete-paragraph overlap, deduplicates identical PDFs by SHA-256, then embeds and indexes LanceDB + BM25 under `data/indexes/{profile}/`.
+
+```bash
+uv run graph-layout-rag ingest status --embed-profile gemini-2-structure-v1 --json
+uv run graph-layout-rag eval retrieval --embed-profile gemini-2-structure-v1 --json
+```
+
+## Retrieval benchmark
+
+The production query default is **hybrid retrieval**: Gemini dense search fused
+with Tantivy BM25 using RRF `k=60`. Local reranking is off by default because the
+current benchmark found lower quality and materially higher memory pressure.
+See [the benchmark assessment](../../docs/graph-layout-rag-retrieval-benchmark-assessment.md)
+for measured results, confidence, and limitations.
+
+Validate labels before comparing retrieval strategies:
+
+```bash
+uv run graph-layout-rag eval validate-gold --json
+```
+
+Run the hardware-safe current-index benchmark. Each strategy runs in an isolated
+subprocess and writes resumable results under `data/eval/runs/`:
+
+```bash
+yarn graph-rag:eval -- \
+  --embed-profile gemini-2-structure-v1 \
+  --no-llm-transforms --report -v
+```
+
+Paid Google Ranking API strategies require explicit opt-in and default to a
+500-unit hard cap:
+
+```bash
+yarn graph-rag:eval -- \
+  --embed-profile gemini-2-structure-v1 \
+  --strategy hybrid_google_fast --strategy hybrid_google_default \
+  --cloud-rerank --allow-cloud-cost --max-cloud-ranking-units 500 --report -v
+```
+
+Optional learned sparse and late-interaction experiments always create new,
+immutable indexes:
+
+```bash
+uv sync --extra retrieval-experiments
+uv run graph-layout-rag eval build-retrieval-index \
+  --base-profile gemini-2-structure-v1 --kind splade
+uv run graph-layout-rag eval build-retrieval-index \
+  --base-profile gemini-2-structure-v1 --kind colbert
+```
 
 ```bash
 uv run graph-layout-rag ingest -v           # incremental (resume) — default after first build
@@ -91,9 +144,32 @@ uv run graph-layout-rag ingest --rebuild    # drop vector table, recreate on fir
 uv run graph-layout-rag ingest --force --rebuild   # full rebuild (required after embed model change)
 ```
 
+Local PDF extraction (`pymupdf` or `docling`) runs in a bounded process pool while the
+parent process embeds and checkpoints completed documents. `GRAPH_RAG_EXTRACT_WORKERS`
+defaults to `4`; `0` or `1` selects serial extraction. Completed outcomes cross a bounded
+`GRAPH_RAG_EXTRACT_QUEUE_DOCS` queue (default `2 * GRAPH_RAG_INGEST_DOC_BATCH`), so a
+slow embedding batch cannot buffer the corpus in memory. Gemini PDF extraction stays serial at the document level because
+it already parallelizes page API calls internally.
+
+Docling is configured with:
+
+```bash
+GRAPH_RAG_PDF_BACKEND=docling
+GRAPH_RAG_DOCLING_OCR=0
+GRAPH_RAG_DOCLING_TABLES=1
+GRAPH_RAG_DOCLING_TIMEOUT_S=600
+GRAPH_RAG_DOCLING_DEVICE=auto
+GRAPH_RAG_DOCLING_THREADS=2
+GRAPH_RAG_INGEST_DOC_BATCH=25
+GRAPH_RAG_EXTRACT_QUEUE_DOCS=50
+```
+
+Each extraction process caches one Docling `DocumentConverter`. Invalid Docling option
+values log a warning and use the defaults above.
+
 #### Resume / checkpointing (no `--resume` flag)
 
-Ingest checkpoints **per batch** (every `GRAPH_RAG_INGEST_DOC_BATCH` docs, default 10):
+Ingest checkpoints **per batch** (every `GRAPH_RAG_INGEST_DOC_BATCH` docs, default 25):
 
 1. Chunks flushed to **`data/indexes/{profile}/lancedb/`**
 2. Doc ids + sha256 saved to **`data/indexes/{profile}/ingest_state.json`**
@@ -108,6 +184,24 @@ uv run graph-layout-rag ingest -v 2>&1 | tee -a data/ingest-run.log
 ```
 
 Already-indexed docs are skipped when manifest `sha256` matches `ingest_state.json`. Harvest uses `--resume`; ingest uses **incremental mode by default**.
+
+#### Progress and ETA
+
+The ingest process writes atomic live telemetry to
+`data/indexes/{profile}/ingest_status.json`. It reports the current phase, canonical
+document totals, processed versus fully checkpointed documents, queued batch work,
+elapsed time, throughput, and a blended ETA:
+
+```bash
+uv run graph-layout-rag ingest status --embed-profile mlx-qwen4b
+uv run graph-layout-rag ingest status --embed-profile mlx-qwen4b --json
+tail -f data/ingest.log
+```
+
+INFO progress logs are emitted every 25 canonical documents or 30 seconds by default.
+Tune them with `GRAPH_RAG_INGEST_PROGRESS_LOG_EVERY` and
+`GRAPH_RAG_INGEST_PROGRESS_LOG_INTERVAL_S`. Local embedding progress also reports
+text throughput and an ETA for the active batch.
 
 #### Multi-profile indexes (A/B testing)
 
@@ -128,7 +222,7 @@ In `.env` (profile replaces hand-tuning five+ vars):
 
 ```bash
 RAG_EMBED_PROFILE=mlx-qwen4b
-GRAPH_RAG_INGEST_DOC_BATCH=10       # lower if RAM pressure; 25+ batches spike unified memory on MPS
+GRAPH_RAG_INGEST_DOC_BATCH=10       # optional lower-memory override for local MPS embedding
 ```
 
 Or legacy env:
@@ -140,7 +234,7 @@ RAG_LOCAL_EMBED_DIMS=1024
 RAG_LOCAL_EMBED_QUANT=4bit          # MLX via mlx-embeddings (~2.1 GB weights)
 ```
 
-Requires `rag-common[mlx]` (included in `uv sync` for this package). Progress: `data/ingest.log` and stderr (`embed progress: N/M texts (+Xs, total Ys)`). Use `-v` for per-doc chunk logs.
+Requires `rag-common[mlx]` (included in `uv sync` for this package). Progress: `data/ingest.log` and stderr (`embed progress: N/M texts (... texts/s, eta ...)`). Use `-v` for per-doc extraction logs.
 
 **Prevent sleep during long runs:**
 
@@ -178,15 +272,24 @@ uv run graph-layout-rag query "Sugiyama layering" --embed-profile gemini-2 --jso
 
 Requires `rag-common[gemini]` (included in `uv sync` for this package).
 
+**Concurrency (gemini-2):** Vertex embeds one instance per request, so throughput comes
+from concurrent requests, not batching. Ingest fans `embed_content` calls across
+`GRAPH_RAG_WORKERS` threads (default 48 for Gemini) that share the adaptive rate limiter — order is
+preserved. Raise `GRAPH_RAG_WORKERS` to speed a full `--rebuild` as long as the TPM budget
+below stays the binding throttle.
+
 **Adaptive rate limiting (gemini-2):** ingest paces `embed_content` to a sliding tokens-per-minute budget so Vertex 429s are rare. Tune in `.env` after checking [Vertex quotas](https://cloud.google.com/vertex-ai/docs/generative-ai/quotas-genai):
 
 ```bash
-RAG_GEMINI_TOKENS_PER_MIN=100000   # raise gradually if logs stay 429-free
-RAG_GEMINI_RATE_HEADROOM=0.85
-RAG_GEMINI_MIN_INTERVAL_MS=50
+RAG_GEMINI_TOKENS_PER_MIN=2000000
+RAG_GEMINI_RATE_HEADROOM=0.95
+RAG_GEMINI_MIN_INTERVAL_MS=5
+GRAPH_RAG_WORKERS=48                 # concurrent embed requests (shares the TPM budget)
 ```
 
-Learned budget persists in `~/.cache/rag-common/gemini_rate_state.json` across resume runs. **Resume after interrupt** (keeps indexed chunks — no `--force` / `--rebuild`):
+Learned budget persists in `~/.cache/rag-common/gemini_rate_state.json` across resume runs.
+After increasing quota, remove that file once so an older reduced budget does not constrain
+the new run. **Resume after interrupt** (keeps indexed chunks — no `--force` / `--rebuild`):
 
 ```bash
 uv run graph-layout-rag ingest -v
@@ -229,6 +332,11 @@ After switching embed models or dims, run **`ingest --force --rebuild`** (vector
 
 ### Query
 
+Retrieval is **hybrid by default**: dense vectors (LanceDB cosine) fused with BM25 lexical
+hits (Tantivy) via reciprocal rank fusion, then optionally reranked by a local
+cross-encoder. Metadata filters (`--tag`, `--category`, `--year-min`) are pushed into the
+dense search as a prefilter so selective filters no longer silently drop hits.
+
 JSON output for LLM agents:
 
 ```bash
@@ -237,7 +345,28 @@ uv run graph-layout-rag query "constraint graph one-dimensional compaction" --ta
 uv run graph-layout-rag query "left edge algorithm channel routing" --tag packing --json
 uv run graph-layout-rag query "VPSC separation constraints overlap removal" --tag constraints --json
 uv run graph-layout-rag query "left edge channel assignment" --category packing --pdf-only --json
+
+# Retrieval controls
+uv run graph-layout-rag query "stress majorization neato" --rerank --json   # cross-encoder rerank
+uv run graph-layout-rag query "stress majorization neato" --no-hybrid --json # dense-only (skip BM25)
 ```
+
+| Flag / env | Effect |
+| --- | --- |
+| `--hybrid` / `--no-hybrid` | Fuse BM25 + dense (default on). Degrades to dense if no BM25 index yet. |
+| `--rerank` / `--no-rerank` | Local cross-encoder rerank, overrides `RAG_RERANK_ENABLED`. |
+| `RAG_RERANK_ENABLED=true` | Default-on reranking without the flag. |
+| `RAG_RERANK_MODEL` | Cross-encoder id (default `BAAI/bge-reranker-v2-m3`; downloads on first use). |
+| `RAG_RERANK_TOP` | Override the number of reranked results returned. |
+
+JSON results gain `dense_rank` / `sparse_rank` (fusion provenance), `fusion_score`,
+`rerank_score` (when reranked), and `page_end` (chunk page span). Reranking is **off by
+default**; run it on demand. **Do not rerank while ingest is running** on a 24 GB Mac —
+loading the cross-encoder alongside the embed model risks OOM.
+
+> **Rebuild note:** the BM25 index, chunk page-spans, and the enriched gemini-2 embed
+> bodies are produced during ingest. To populate them on an existing corpus, run
+> `ingest --force --rebuild` once. Until then, `--hybrid` falls back to dense-only.
 
 ### Catalog
 
@@ -282,3 +411,5 @@ Harvest attempts legal open-access downloads only. Paywalled books remain metada
 ## Agent handoff
 
 When debugging Terraform pipeline vertical height or researching layout algorithms, run query before deep-diving source papers. See `.agents/skills/graph-layout-rag/SKILL.md`.
+
+Full architecture (harvest, ingest, query, tests): [ARCHITECTURE.md](./ARCHITECTURE.md)

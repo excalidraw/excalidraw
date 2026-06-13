@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from rag_common.config import EmbedConfig, EmbedStats, LocalEmbedMode
@@ -21,8 +22,11 @@ BATCH_SIZE_V1 = 64
 BATCH_SIZE_V2_DEFAULT = 1
 MAX_RETRIES = 8
 MAX_RATE_LIMIT_RETRIES = 64
+# Char-count safety guards (NOT the model token limit). v1 accepts ~2048 tokens;
+# v2 accepts ~8192 tokens (~32k chars), so this guard only trims pathological inputs
+# while leaving headroom for enriched (Topics/Tags) chunk bodies.
 MAX_INPUT_CHARS_V1 = 8000
-MAX_INPUT_CHARS_V2 = 8192
+MAX_INPUT_CHARS_V2 = 24000
 
 
 class GeminiEmbedError(Exception):
@@ -54,7 +58,11 @@ def _is_auth_error(exc: BaseException) -> bool:
 
 
 def _is_fatal(exc: BaseException) -> bool:
-    return _is_auth_error(exc)
+    msg = str(exc).lower()
+    return _is_auth_error(exc) or (
+        ("404" in msg or "not_found" in msg)
+        and ("model" in msg or "publisher model" in msg)
+    )
 
 
 def _parse_retry_after(exc: BaseException) -> int | None:
@@ -153,8 +161,8 @@ def format_gemini2_text(
 
 
 def _batch_size(cfg: EmbedConfig) -> int:
-    if is_gemini_embedding_2(cfg.model):
-        return max(1, int(os.getenv("RAG_GEMINI_EMBED_BATCH", str(BATCH_SIZE_V2_DEFAULT))))
+    # Only gemini-embedding-001 (v1) supports server-side batching; v2 goes one
+    # instance per request and gets throughput from concurrency instead.
     return BATCH_SIZE_V1
 
 
@@ -207,7 +215,7 @@ def _embed_one(
         except GeminiFatalError:
             raise
         except Exception as exc:
-            if _is_auth_error(exc):
+            if _is_fatal(exc):
                 raise GeminiFatalError(str(exc)) from exc
             if _is_rate_limit(exc):
                 rate_attempt += 1
@@ -281,7 +289,7 @@ def _embed_batch_v1(
         except GeminiFatalError:
             raise
         except Exception as exc:
-            if _is_auth_error(exc):
+            if _is_fatal(exc):
                 raise GeminiFatalError(str(exc)) from exc
             if _is_rate_limit(exc):
                 rate_attempt += 1
@@ -315,32 +323,46 @@ def _embed_batch_v1(
             time.sleep(wait)
 
 
-def _embed_batch_v2(
+def _embed_v2_concurrent(
     client,
-    batch: list[str],
+    texts: list[str],
     *,
-    batch_num: int,
-    total_batches: int,
     cfg: EmbedConfig,
     stats: EmbedStats | None,
     mode: LocalEmbedMode,
     titles: list[str] | None,
+    workers: int,
 ) -> list[list[float]]:
-    vectors: list[list[float]] = []
-    for i, raw in enumerate(batch):
-        title = titles[i] if titles and i < len(titles) else None
-        prepared = format_gemini2_text(
+    """Embed gemini-embedding-2 texts one request each, fanned out across a thread pool.
+
+    Vertex v2 accepts a single instance per ``embed_content`` call, so throughput comes
+    from concurrent requests (not batching). The shared ``GeminiRateLimiter`` is the true
+    throttle; ``ThreadPoolExecutor.map`` preserves input order.
+    """
+    prepared = [
+        format_gemini2_text(
             _truncate(raw, model=cfg.model),
             mode=mode,
-            title=title,
+            title=(titles[i] if titles and i < len(titles) else None),
         )
-        vectors.append(_embed_one(client, prepared, cfg=cfg, stats=stats))
+        for i, raw in enumerate(texts)
+    ]
+    total = len(prepared)
+    if total == 0:
+        return []
+
+    workers = max(1, min(workers, total))
+    if workers == 1:
+        vectors = [_embed_one(client, t, cfg=cfg, stats=stats) for t in prepared]
+        log.info("gemini-2 embedded %d text(s) serially (mode=%s)", total, mode)
+        return vectors
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        vectors = list(
+            pool.map(lambda t: _embed_one(client, t, cfg=cfg, stats=stats), prepared)
+        )
     log.info(
-        "gemini-2 embed batch %d/%d size=%d mode=%s",
-        batch_num,
-        total_batches,
-        len(batch),
-        mode,
+        "gemini-2 embedded %d text(s) (mode=%s, workers=%d)", total, mode, workers
     )
     return vectors
 
@@ -378,6 +400,7 @@ def embed_gemini_texts(
     probe: bool = True,
     mode: LocalEmbedMode = "document",
     titles: list[str] | None = None,
+    workers: int = 1,
 ) -> list[list[float]]:
     if not texts:
         return []
@@ -388,56 +411,52 @@ def embed_gemini_texts(
     if titles is not None and len(titles) != len(texts):
         raise ValueError(f"titles length {len(titles)} != texts length {len(texts)}")
 
+    client = _client()
+
+    if is_gemini_embedding_2(config.model):
+        log.info(
+            "gemini-2 embedding %d texts model=%s dims=%d mode=%s workers=%d",
+            len(texts),
+            config.model,
+            config.dimensions,
+            mode,
+            workers,
+        )
+        return _embed_v2_concurrent(
+            client,
+            texts,
+            cfg=config,
+            stats=stats,
+            mode=mode,
+            titles=titles,
+            workers=workers,
+        )
+
+    # gemini-embedding-001 (v1): server-side batching is supported.
     prepared = [_truncate(t, model=config.model) for t in texts]
     batch_sz = _batch_size(config)
     batches = [prepared[i : i + batch_sz] for i in range(0, len(prepared), batch_sz)]
-    title_batches: list[list[str] | None] = []
-    if titles is not None:
-        for i in range(0, len(titles), batch_sz):
-            title_batches.append(titles[i : i + batch_sz])
-    else:
-        title_batches = [None] * len(batches)
-
     total_batches = len(batches)
-    v2 = is_gemini_embedding_2(config.model)
 
     log.info(
-        "gemini embedding %d texts in %d batch(es) model=%s dims=%d v2=%s mode=%s",
+        "gemini embedding %d texts in %d batch(es) model=%s dims=%d mode=%s",
         len(prepared),
         total_batches,
         config.model,
         config.dimensions,
-        v2,
         mode,
     )
 
-    client = _client()
     vectors: list[list[float]] = []
-    for batch_num, (batch, batch_titles) in enumerate(
-        zip(batches, title_batches, strict=True), start=1
-    ):
-        if v2:
-            vectors.extend(
-                _embed_batch_v2(
-                    client,
-                    batch,
-                    batch_num=batch_num,
-                    total_batches=total_batches,
-                    cfg=config,
-                    stats=stats,
-                    mode=mode,
-                    titles=batch_titles,
-                )
+    for batch_num, batch in enumerate(batches, start=1):
+        vectors.extend(
+            _embed_batch_v1(
+                client,
+                batch,
+                batch_num=batch_num,
+                total_batches=total_batches,
+                cfg=config,
+                stats=stats,
             )
-        else:
-            vectors.extend(
-                _embed_batch_v1(
-                    client,
-                    batch,
-                    batch_num=batch_num,
-                    total_batches=total_batches,
-                    cfg=config,
-                    stats=stats,
-                )
-            )
+        )
     return vectors

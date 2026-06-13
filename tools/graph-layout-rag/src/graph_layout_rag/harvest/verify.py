@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from graph_layout_rag.harvest.log import get_logger
-from graph_layout_rag.harvest.relevance import is_layout_relevant
+from graph_layout_rag.harvest.relevance import CURATED_SOURCES, is_layout_relevant
 from graph_layout_rag.manifest import Manifest, ManifestItem
 from graph_layout_rag.paths import PDF_DIR, PKG_ROOT
 
@@ -21,7 +21,7 @@ def _pdf_valid(item: ManifestItem) -> tuple[bool, str]:
         return False, "not a PDF"
     if len(data) < MIN_PDF_BYTES:
         return False, f"too small ({len(data)} bytes)"
-    if not is_layout_relevant(item.title, item.abstract):
+    if item.source not in CURATED_SOURCES and not is_layout_relevant(item.title, item.abstract):
         return False, "off-topic"
     return True, "ok"
 

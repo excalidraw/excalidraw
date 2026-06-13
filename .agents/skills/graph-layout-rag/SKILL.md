@@ -5,7 +5,10 @@ description: Query local graph drawing / layout theory RAG corpus. Use when rese
 
 # Graph layout RAG
 
-Local vector search over a harvested graph-drawing corpus (target ~2.8k catalog entries, ~2k full PDFs). Built for agents researching layered layout, crossing minimization, compound graphs, and Terraform pipeline height.
+Local hybrid search over a harvested graph-drawing corpus. The production
+`gemini-2-structure-v1` index combines Gemini dense vectors, Tantivy BM25, and
+reciprocal rank fusion. Built for agents researching layered layout, crossing
+minimization, compound graphs, and Terraform pipeline height.
 
 ## When to use
 
@@ -39,6 +42,10 @@ yarn graph-rag:ingest -- --force --rebuild   # first build or after embed model 
 yarn graph-rag:query "network simplex rank assignment dot" --top 8 --json
 ```
 
+Query defaults to **hybrid retrieval**. Do not add `--rerank` by default: the
+current benchmark found lower quality and substantially higher memory pressure.
+Use `--no-hybrid` only for deliberate dense-only comparisons.
+
 Direct CLI (more flags):
 
 ```bash
@@ -50,7 +57,9 @@ uv run graph-layout-rag ingest -v            # resume incremental ingest (no --f
 
 ### Ingest (embed + index)
 
-**Checkpointing:** no `--resume` flag. After each batch (`GRAPH_RAG_INGEST_DOC_BATCH` docs, default 10), LanceDB + `data/indexes/{profile}/ingest_state.json` are updated. Stop anytime; resume with:
+**Checkpointing:** no `--resume` flag. After each batch
+(`GRAPH_RAG_INGEST_DOC_BATCH` docs, default 25), LanceDB, Tantivy BM25, and
+`data/indexes/{profile}/ingest_state.json` are updated. Stop anytime; resume with:
 
 ```bash
 cd tools/graph-layout-rag
@@ -73,15 +82,18 @@ Use **`--force --rebuild`** only for first full build or when changing embed mod
 | `mlx-qwen4b` | Free local ingest on Apple Silicon (MLX 4-bit, ~10–15+ active hours full corpus) |
 | `openai-large` | Fast cloud ingest (~$5–7, ~30–90 min) with `OPENAI_API_KEY` |
 | `gemini` | Cloud ingest via `GEMINI_API_KEY` / `GOOGLE_API_KEY` (embedding-001) |
-| `gemini-2` | **Gemini Embedding 2** @ 3072 via Vertex AI (`GOOGLE_GENAI_USE_VERTEXAI` + project) or API key |
+| `gemini-2` | Gemini Embedding 2 fixed-window baseline |
+| `gemini-2-structure-v1` | **Production profile:** Gemini Embedding 2 @ 3072, Docling extraction, structure-aware chunks |
 
-Set `RAG_EMBED_PROFILE=mlx-qwen4b` in `.env` or pass `--embed-profile mlx-qwen4b` on **both** `ingest` and `query`. For Vertex Embedding 2: `RAG_EMBED_PROFILE=gemini-2` + GCP creds in `.env` (see README). Legacy `RAG_EMBED_BACKEND=local` + model env vars still work as the implicit `default` profile.
+Set `RAG_EMBED_PROFILE=gemini-2-structure-v1` in `.env` or pass the same
+`--embed-profile` on both ingest and query. Query and ingest vector spaces must
+match. Legacy backend/model env vars still work as the implicit `default` profile.
 
 **Per-profile indexes:** each profile writes to `data/indexes/{profile}/` (own LanceDB + ingest_state). Build multiple indexes for A/B testing without conflict; list with `uv run graph-layout-rag embed indexes`.
 
 **Cloud one-time ingest:** `RAG_EMBED_PROFILE=openai-large` + `OPENAI_API_KEY`. Query cost negligible (~$0).
 
-**Do not `query` during ingest** on 24 GB Mac (OOM risk — embed model loaded twice).
+**Do not query, benchmark, or rerank during ingest** on a 24 GB Mac.
 
 Logs: `data/ingest.log` (`-v` for debug). Embed progress: `embed progress: N/M texts (+Xs, total Ys)`.
 
@@ -131,6 +143,90 @@ uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
 ```
 
 Filter flags: `--tag compound`, `--category packing`, `--pdf-only`, `--source handbook`, `--year-min 1990`
+
+### Retrieval behavior
+
+Default retrieval:
+
+```text
+Gemini query embedding → local LanceDB dense search
+Query text             → local Tantivy BM25
+Dense + BM25           → RRF k=60 → filters → results
+```
+
+- `--hybrid` is the default.
+- `--no-hybrid` selects dense-only search.
+- `--rerank` explicitly loads a local cross-encoder; do not use it by default.
+- Query embeddings use the configured cloud or local profile; LanceDB and BM25
+  indexes remain local.
+- `--tag` is an exact tag match. Category, tag, source, and PDF filters are
+  applied after fusion; retrieval widens the candidate pool to compensate.
+- Query returns snippets, not the full source.
+
+## Retrieval benchmark
+
+The current benchmark supports corrected true recall, hit rate, MAP, MRR,
+nDCG, catalog/PDF tracks, immutable run artifacts, resume, and memory guards.
+
+```bash
+cd tools/graph-layout-rag
+
+# Validate gold labels first
+uv run graph-layout-rag eval validate-gold --json
+
+# Hardware-safe current-index sweep; each strategy runs in a fresh subprocess
+uv run graph-layout-rag eval benchmark \
+  --embed-profile gemini-2-structure-v1 \
+  --no-llm-transforms --report -v
+```
+
+For the 24 GB M4 Pro, defaults are:
+
+- Require 8 GB available memory before starting a strategy.
+- Abort a worker above 10 GB RSS.
+- Abort below 3 GB available memory.
+- Abort after more than 2 GB swap growth.
+- Resume interrupted runs with the same `--run-dir` plus `--resume`.
+
+Paid Google Ranking API strategies require explicit acknowledgement and are
+capped at 500 ranking units by default:
+
+```bash
+uv run graph-layout-rag eval benchmark \
+  --embed-profile gemini-2-structure-v1 \
+  --strategy hybrid_google_fast --strategy hybrid_google_default \
+  --cloud-rerank --allow-cloud-cost --max-cloud-ranking-units 500 --report -v
+```
+
+Optional learned-sparse and late-interaction indexes are immutable and never
+overwrite the production index:
+
+```bash
+uv sync --extra retrieval-experiments
+uv run graph-layout-rag eval build-retrieval-index \
+  --base-profile gemini-2-structure-v1 --kind splade
+uv run graph-layout-rag eval build-retrieval-index \
+  --base-profile gemini-2-structure-v1 --kind colbert
+
+# Benchmark one immutable experimental index explicitly
+uv run graph-layout-rag eval benchmark \
+  --embed-profile gemini-2-structure-v1 \
+  --retrieval-index data/retrieval-indexes/gemini-2-structure-v1/<index-id> \
+  --strategy splade --strategy dense_splade --report -v
+```
+
+Experimental index strategies must match the index kind: use `splade` or
+`dense_splade` with a SPLADE index and `colbert` with a ColBERT index.
+
+**Current decision:** keep default hybrid RRF `k=60`. Hybrid materially beat
+dense-only and BM25-only on the current 30-query gold set. RRF `k=100` improved
+nDCG by less than `0.001`, which is not meaningful. Local MiniLM/BGE rerankers
+reduced quality; BGE also triggered the swap guard.
+
+Treat benchmark conclusions as directional, not universal. The gold set has
+30 queries and 23 unique relevant documents, no hidden holdout, and no
+confidence intervals. See
+[docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md).
 
 Pipeline research: see [docs/pipeline-rag-queries.md](../../../docs/pipeline-rag-queries.md).
 
@@ -216,7 +312,11 @@ If `status` is `metadata_only`, use `title`, `abstract`, `doi`, and `url` from m
 
 **High-signal sources:** `graphviz.org`, `handbook`, `topic-seed`, `elk-bibliography`, curated seeds. **Noisier:** OpenAlex long tail (some off-topic PDFs). Prefer top-ranked hits with layout-related tags.
 
-**Index:** LanceDB at `tools/graph-layout-rag/data/indexes/{profile}/lancedb/` (target ~60k chunks for full harvest: ~35 chunks/PDF avg + metadata-only stubs). Chunks ~4k chars with overlap. Query ranks chunks; multiple chunks per paper exist — use `doc_id` + `page` to read contiguous text. Check `data/indexes/{profile}/ingest_state.json` / `batch done` lines in `data/ingest.log` for build progress.
+**Index:** LanceDB + Tantivy BM25 under
+`tools/graph-layout-rag/data/indexes/{profile}/`. Production chunks use
+`markdown-structure-v1`: ~800 target tokens, 1200 hard max, and ~120-token
+paragraph overlap. Query ranks chunks; multiple chunks per paper exist. Use
+`doc_id`, `page`, and `page_end` to read contiguous text.
 
 ## Example queries
 
@@ -247,19 +347,24 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 | `tools/graph-layout-rag/data/manifest.json` | Catalog: id, status, localPath, doi, abstract |
 | `tools/graph-layout-rag/data/raw/pdf/` | Downloaded PDFs |
 | `tools/graph-layout-rag/data/indexes/{profile}/` | Per-profile vector index + ingest checkpoint |
+| `tools/graph-layout-rag/data/retrieval-indexes/` | Immutable optional SPLADE/ColBERT indexes |
+| `tools/graph-layout-rag/data/eval/runs/` | Immutable resumable benchmark runs |
 | `tools/graph-layout-rag/data/ingest.log` | Ingest structured log |
 | `tools/graph-layout-rag/data/harvest.log` | Harvest run log |
 | `tools/graph-layout-rag/data/harvest_checkpoint.json` | Harvest resume state |
 
 ## Related docs
 
-- [tools/graph-layout-rag/README.md](../../tools/graph-layout-rag/README.md)
-- [docs/terraform-pipeline-import-debug-handoff.md](../../docs/terraform-pipeline-import-debug-handoff.md) — pipeline height diagnostic
+- [tools/graph-layout-rag/README.md](../../../tools/graph-layout-rag/README.md)
+- [tools/graph-layout-rag/ARCHITECTURE.md](../../../tools/graph-layout-rag/ARCHITECTURE.md) — full harvest/ingest/query/test internals
+- [docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md) — measured results, confidence, and default decision
+- [docs/terraform-pipeline-import-debug-handoff.md](../../../docs/terraform-pipeline-import-debug-handoff.md) — pipeline height diagnostic
 
 ## Do not
 
 - Commit `data/raw/`, `data/indexes/`, `data/manifest.json`, or log files
 - Run `query` while `ingest` is active on a memory-constrained Mac (OOM)
+- Enable local reranking by default; benchmark it explicitly under memory guards
 - Resume ingest with `--force --rebuild` (re-does everything)
 - Assume every manifest entry has a PDF — check `status` first
 - Treat query `excerpt` as the full paper — use deep-read steps above

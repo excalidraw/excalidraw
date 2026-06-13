@@ -82,3 +82,43 @@ def test_uncategorized_generic_title():
 def test_ports_maps_to_constraints_and_routing():
     assert "constraints" in categories_from_tags(["ports"])
     assert "routing" in categories_from_tags(["ports"])
+
+
+def test_expanded_compaction_keywords():
+    item = _item(
+        title="Optimal Compaction of Orthogonal Grid Drawings",
+        tags=["graph-drawing"],
+        abstract="We minimize total edge length via two-dimensional compaction.",
+    )
+    categories, methods = classify_item(item)
+    assert "compaction" in categories
+    assert methods[categories.index("compaction")] == "keyword"
+
+
+def test_expanded_packing_keywords():
+    item = _item(
+        title="Disconnected Graph Layout and the Polyomino Packing Approach",
+        tags=["graph-drawing"],
+        abstract="We pack disconnected components using a polyomino packing heuristic.",
+    )
+    categories, _ = classify_item(item)
+    assert "packing" in categories
+
+
+def test_expanded_overlap_keywords():
+    item = _item(
+        title="Efficient Node Overlap Removal Using a Proximity Stress Model",
+        tags=["graph-drawing"],
+        abstract="PRISM removes node overlap with a proximity stress model.",
+    )
+    categories, _ = classify_item(item)
+    assert "overlap" in categories
+
+
+def test_new_tag_maps():
+    assert "coordinate-assignment" in categories_from_tags(["brandes-koepf"])
+    assert "packing" in categories_from_tags(["disconnected"])
+    assert "overlap" in categories_from_tags(["prism"])
+    # orthogonal touches both routing and compaction
+    cats = categories_from_tags(["orthogonal"])
+    assert "routing" in cats and "compaction" in cats

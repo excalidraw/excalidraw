@@ -127,10 +127,14 @@ def download_to_file(
     last_content_type: str | None = None
     last_retry_after: int | None = None
 
+    # Tight, per-operation timeouts so dead/trickling connections fail fast.
+    # A single bare timeout=120 lets slow servers stall a worker for minutes,
+    # which (under the concurrent discovery pool) freezes the whole harvest.
+    _timeout = httpx.Timeout(connect=15.0, read=30.0, write=30.0, pool=10.0)
     for attempt in range(1, _MAX_RETRIES + 1):
         wait_for_domain(domain)
         try:
-            with httpx.Client(follow_redirects=True, timeout=120.0, verify=verify) as client:
+            with httpx.Client(follow_redirects=True, timeout=_timeout, verify=verify) as client:
                 res = client.get(
                     url,
                     headers={

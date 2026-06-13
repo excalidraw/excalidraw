@@ -13,6 +13,7 @@ dependencies = [
   "pydantic>=2.7.0",
   "pymupdf>=1.24.0",
   "rag-common[gemini,mlx]",
+  "tantivy>=0.22.0",
   "tiktoken>=0.7.0",
 ]
 
@@ -22,6 +23,8 @@ rag-common = { path = "../rag-common", editable = true }
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
 mlx = ["rag-common[mlx]"]
+docling = ["docling>=2.0.0"]
+retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
 
 [project.scripts]
 graph-layout-rag = "graph_layout_rag.cli:main"

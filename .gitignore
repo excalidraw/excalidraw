@@ -141,8 +141,13 @@ tools/graph-layout-rag/.env
 tools/graph-layout-rag/.venv/
 tools/graph-layout-rag/data/raw/
 tools/graph-layout-rag/data/indexes/
+tools/graph-layout-rag/data/retrieval-indexes/
+tools/graph-layout-rag/data/eval/
 tools/graph-layout-rag/data/lancedb/
 tools/graph-layout-rag/data/manifest.json
+tools/graph-layout-rag/data/manifest.*.json
+tools/graph-layout-rag/data/manifest.bak.json
+!tools/graph-layout-rag/data/manifest.example.json
 tools/graph-layout-rag/data/ingest_state.json
 tools/graph-layout-rag/data/*.log
 tools/graph-layout-rag/data/harvest.db

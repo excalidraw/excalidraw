@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from graph_layout_rag.ingest.index import chunk_count, describe_profile_index, save_ingest_state
+from graph_layout_rag.ingest.index import (
+    chunk_count,
+    chunking_fingerprint_mismatch,
+    describe_profile_index,
+    save_ingest_state,
+)
 from graph_layout_rag.paths import (
     list_profile_indexes,
     profile_index_paths,
@@ -62,3 +67,13 @@ def test_describe_profile_index_reads_state(tmp_path, monkeypatch):
     assert row["embed_model"] == "text-embedding-3-large"
     assert row["embed_dims"] == 1024
     assert row["chunks"] == chunk_count(paths)
+
+
+def test_chunking_fingerprint_change_requires_rebuild():
+    current = {"strategy": "markdown-structure-v1", "target_tokens": 800}
+    assert not chunking_fingerprint_mismatch({}, current)
+    assert not chunking_fingerprint_mismatch({"chunking_fingerprint": current}, current)
+    assert chunking_fingerprint_mismatch(
+        {"chunking_fingerprint": {"strategy": "fixed-window"}},
+        current,
+    )

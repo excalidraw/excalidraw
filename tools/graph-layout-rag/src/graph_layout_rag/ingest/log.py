@@ -40,13 +40,19 @@ def setup_ingest_logging(
     file_handler.setFormatter(fmt)
     logger.addHandler(file_handler)
 
-    # Surface rag_common local embed progress (e.g. "24/645 texts") in ingest log.
-    embed_logger = logging.getLogger("rag_common.local")
-    embed_logger.handlers.clear()
-    embed_logger.setLevel(logging.INFO)
-    embed_logger.propagate = False
-    embed_logger.addHandler(console)
-    embed_logger.addHandler(file_handler)
+    # Surface backend progress and retries in the ingest log.
+    for logger_name in (
+        "rag_common.embed",
+        "rag_common.local",
+        "rag_common.openai",
+        "rag_common.gemini",
+    ):
+        embed_logger = logging.getLogger(logger_name)
+        embed_logger.handlers.clear()
+        embed_logger.setLevel(logging.INFO)
+        embed_logger.propagate = False
+        embed_logger.addHandler(console)
+        embed_logger.addHandler(file_handler)
 
     _LOGGER = logger
     logger.info("logging to %s (verbose=%s)", path, verbose)

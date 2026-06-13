@@ -163,12 +163,18 @@ def embed_local_texts(
         if device == "mps":
             _release_mps_memory()
         now = time.monotonic()
+        elapsed = now - t0
+        rate = end / elapsed if elapsed else 0.0
+        eta = (total - end) / rate if rate else 0.0
         log.info(
-            "embed progress: %d/%d texts (+%.1fs, total %.1fs)",
+            "embed progress: %d/%d texts (%.1f%%, +%.1fs, total %.1fs, %.2f texts/s, eta %.1fs)",
             end,
             total,
+            end / total * 100,
             now - t_step,
-            now - t0,
+            elapsed,
+            rate,
+            eta,
         )
         t_step = now
 

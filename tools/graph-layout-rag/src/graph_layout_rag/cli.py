@@ -11,6 +11,7 @@ from graph_layout_rag.env import load_env_file
 from graph_layout_rag.harvest.run import harvest_group
 from graph_layout_rag.ingest.run import ingest_cmd
 from graph_layout_rag.query.search import search
+from graph_layout_rag.query.retrieve import DEFAULT_HYBRID
 
 load_env_file()
 
@@ -22,6 +23,22 @@ def main() -> None:
 
 main.add_command(harvest_group, name="harvest")
 main.add_command(ingest_cmd, name="ingest")
+
+
+@main.group("eval")
+def eval_group() -> None:
+    """Retrieval evaluation commands."""
+
+
+from graph_layout_rag.eval.retrieval import retrieval_eval_cmd  # noqa: E402
+from graph_layout_rag.eval.benchmark import benchmark_cmd  # noqa: E402
+from graph_layout_rag.eval.commands import validate_gold_cmd  # noqa: E402
+from graph_layout_rag.eval.experimental_index import build_retrieval_index_cmd  # noqa: E402
+
+eval_group.add_command(retrieval_eval_cmd, name="retrieval")
+eval_group.add_command(benchmark_cmd, name="benchmark")
+eval_group.add_command(validate_gold_cmd, name="validate-gold")
+eval_group.add_command(build_retrieval_index_cmd, name="build-retrieval-index")
 
 
 @main.group("embed")
@@ -86,6 +103,7 @@ def embed_indexes_cmd(as_json: bool) -> None:
 @main.command("query")
 @click.argument("text")
 @click.option("--top", default=8, show_default=True)
+@click.option("--max-per-doc", default=2, show_default=True, type=click.IntRange(min=1))
 @click.option("--tag", default=None, help="Filter by tag substring.")
 @click.option("--category", default=None, help="Filter by pipeline category slug.")
 @click.option("--pdf-only", is_flag=True, help="Exclude metadata-only documents.")
@@ -96,16 +114,32 @@ def embed_indexes_cmd(as_json: bool) -> None:
     default=None,
     help="Named embed profile (must match index; see: embed profiles).",
 )
+@click.option(
+    "--rerank/--no-rerank",
+    "rerank",
+    default=None,
+    help="Local cross-encoder rerank (overrides RAG_RERANK_ENABLED).",
+)
+@click.option(
+    "--hybrid/--no-hybrid",
+    "hybrid",
+    default=DEFAULT_HYBRID,
+    show_default=True,
+    help="Fuse BM25 lexical search with dense vectors.",
+)
 @click.option("--json", "as_json", is_flag=True, help="Emit JSON for LLM agents.")
 def query_cmd(
     text: str,
     top: int,
+    max_per_doc: int,
     tag: str | None,
     category: str | None,
     pdf_only: bool,
     source: str | None,
     year_min: int | None,
     embed_profile: str | None,
+    rerank: bool | None,
+    hybrid: bool,
     as_json: bool,
 ) -> None:
     """Semantic search over the graph layout corpus."""
@@ -125,6 +159,9 @@ def query_cmd(
             source=source,
             year_min=year_min,
             embed_profile=embed_profile,
+            rerank=rerank,
+            hybrid=hybrid,
+            max_per_doc=max_per_doc,
         )
     except ValueError as exc:
         click.echo(str(exc), err=True)

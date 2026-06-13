@@ -11,7 +11,8 @@ from rag_common.gemini_rate_limit import (
 
 
 @pytest.fixture(autouse=True)
-def _reset_limiter():
+def _reset_limiter(tmp_path, monkeypatch):
+    monkeypatch.setenv("RAG_GEMINI_RATE_STATE_PATH", str(tmp_path / "rate-state.json"))
     reset_rate_limiter()
     yield
     reset_rate_limiter()
@@ -48,6 +49,7 @@ def test_note_rate_limit_lowers_budget():
     wait = limiter.note_rate_limit()
     assert wait >= 60
     assert limiter._budget < before  # noqa: SLF001
+    assert limiter.snapshot()["rate_limit_429_count"] == 1
 
 
 @patch.dict(
@@ -66,9 +68,46 @@ def test_note_success_raises_budget():
     assert limiter._budget > start  # noqa: SLF001
 
 
+@patch.dict(
+    "os.environ",
+    {
+        "RAG_GEMINI_TOKENS_PER_MIN": "10000",
+        "RAG_GEMINI_RATE_HEADROOM": "0.5",
+        "RAG_GEMINI_MIN_INTERVAL_MS": "0",
+    },
+    clear=False,
+)
+def test_snapshot_reports_budget_and_window_utilization():
+    limiter = GeminiRateLimiter()
+    limiter.acquire(1000)
+    snapshot = limiter.snapshot()
+    assert snapshot["cap_tokens_per_minute"] == 10000
+    assert snapshot["budget_tokens_per_minute"] == 5000
+    assert snapshot["window_tokens"] == 1000
+    assert snapshot["budget_utilization_percent"] == 20.0
+
+
 def test_estimate_tokens():
     assert estimate_tokens("one two three") == 3
     assert estimate_tokens("") == 1
+    assert estimate_tokens("x" * 100) == 25
+    assert estimate_tokens(" ".join(["x"] * 30)) == 30
+
+
+@patch.dict(
+    "os.environ",
+    {
+        "RAG_GEMINI_TOKENS_PER_MIN": "5000",
+        "RAG_GEMINI_RATE_HEADROOM": "0.2",
+        "RAG_GEMINI_MIN_INTERVAL_MS": "0",
+    },
+    clear=False,
+)
+def test_oversized_request_progresses_when_window_empty():
+    limiter = GeminiRateLimiter()
+    assert limiter._budget == 1000  # noqa: SLF001
+    limiter.acquire(4000)
+    assert limiter._window_tokens() == 4000  # noqa: SLF001
 
 
 @patch.dict(

@@ -121,12 +121,18 @@ def embed_mlx_q4_texts(
         all_vectors.extend(_truncate_and_normalize_row(v, config.dimensions) for v in chunk_vecs)
         requests += max(1, math.ceil((end - start) / batch_size))
         now = time.monotonic()
+        elapsed = now - t0
+        rate = end / elapsed if elapsed else 0.0
+        eta = (total - end) / rate if rate else 0.0
         log.info(
-            "embed progress: %d/%d texts (+%.1fs, total %.1fs)",
+            "embed progress: %d/%d texts (%.1f%%, +%.1fs, total %.1fs, %.2f texts/s, eta %.1fs)",
             end,
             total,
+            end / total * 100,
             now - t_step,
-            now - t0,
+            elapsed,
+            rate,
+            eta,
         )
         t_step = now
 

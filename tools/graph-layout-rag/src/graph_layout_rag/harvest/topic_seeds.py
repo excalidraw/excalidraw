@@ -99,6 +99,15 @@ TOPIC_PDF_SEEDS = [
         "source": "ubc",
         "tags": ["force-directed", "elastic"],
     },
+    {
+        "id": "hu-2005-efficient-high-quality-fdp",
+        "title": "Efficient, High-Quality Force-Directed Graph Drawing",
+        "authors": ["Hu"],
+        "year": 2005,
+        "url": "http://yifanhu.net/PUB/graph_draw_small.pdf",
+        "source": "yifanhu",
+        "tags": ["force-directed", "multilevel", "sfdp"],
+    },
 ]
 
 # Resolved via doi_resolver (OpenAlex / S2 / Springer)
@@ -385,6 +394,71 @@ TOPIC_DOI_SEEDS: list[dict] = [
         "tags": ["layered", "sugiyama"],
         "title_hint": "An Efficient Implementation of Sugiyama's Algorithm",
     },
+    # --- canonical works added to fill coverage gaps (tree, orthogonal/TSM,
+    #     force-directed evaluation, coordinate assignment, surveys) ---
+    {
+        "doi": "10.1109/TSE.1981.234519",
+        "tags": ["tree", "tidy-tree"],
+        "title_hint": "Tidier Drawings of Trees (Reingold & Tilford)",
+    },
+    {
+        "doi": "10.1007/3-540-36151-0_32",
+        "tags": ["tree", "tidy-tree"],
+        "title_hint": "Improving Walker's Algorithm to Run in Linear Time (Buchheim et al.)",
+    },
+    {
+        "doi": "10.1002/spe.2213",
+        "tags": ["tree", "tidy-tree"],
+        "title_hint": "Drawing non-layered tidy trees in linear time (van der Ploeg)",
+    },
+    {
+        "doi": "10.7155/jgaa.00154",
+        "tags": ["force-directed", "evaluation", "multilevel"],
+        "title_hint": "Large-Graph Layout Algorithms at Work: An Experimental Study (Hachul & Jünger)",
+    },
+    {
+        "doi": "10.1137/0216030",
+        "tags": ["routing", "orthogonal", "compaction"],
+        "title_hint": "On embedding a graph in the grid with the minimum number of bends (Tamassia)",
+    },
+    {
+        "doi": "10.1109/TSE.1986.6312989",
+        "tags": ["routing", "orthogonal"],
+        "title_hint": "A Layout Algorithm for Data Flow Diagrams (GIOTTO, Batini-Nardelli-Tamassia)",
+    },
+    {
+        "doi": "10.1016/0925-7721(94)00014-X",
+        "tags": ["survey", "bibliography", "graph-drawing"],
+        "title_hint": "Algorithms for Drawing Graphs: an Annotated Bibliography (Di Battista et al.)",
+    },
+    {
+        "doi": "10.7155/jgaa.00474",
+        "tags": ["coordinate-assignment", "layered"],
+        "title_hint": "A Flow Formulation for Horizontal Coordinate Assignment with Prescribed Width",
+        "pdf_urls": ["https://arxiv.org/pdf/1806.06617.pdf"],
+    },
+    {
+        "doi": "10.1007/11618058_40",
+        "tags": ["routing", "orthogonal", "ports"],
+        "title_hint": "Incremental Connector Routing (Wybrow, Marriott, Stuckey)",
+    },
+    # --- adaptagrams / libavoid / libcola (routing + constraints) ---
+    {
+        "doi": "10.1007/978-3-642-31223-6_8",
+        "tags": ["routing", "orthogonal", "ports", "hyperedge"],
+        "title_hint": "Orthogonal Hyperedge Routing (Wybrow, Marriott, Stuckey)",
+    },
+    {
+        "doi": "10.1109/TVCG.2008.130",
+        "tags": ["constraints", "compound", "overlap"],
+        "title_hint": "Exploration of Networks using Overview+Detail with Constraint-Based Cooperative Layout",
+    },
+    {
+        "doi": "10.1007/978-3-662-45803-7_27",
+        "tags": ["constraints", "routing", "ports", "stress", "elk"],
+        "title_hint": "Stress-Minimizing Orthogonal Layout of Data Flow Diagrams with Ports",
+        "pdf_urls": ["https://arxiv.org/pdf/1408.4626.pdf"],
+    },
 ]
 
 # Pipeline layout research threads: compaction, packing, overlap, VPSC/containment
@@ -466,6 +540,43 @@ PIPELINE_LAYOUT_DOI_SEEDS: list[dict] = [
             "https://cecs.uci.edu/~papers/compendium94-03/papers/2000/dac00/pdffiles/27_1.pdf"
         ],
     },
+    # --- compaction (orthogonal grid drawings; complexity) ---
+    {
+        "doi": "10.1007/3-540-48777-8_23",
+        "tags": ["compaction", "orthogonal"],
+        "title_hint": "Optimal Compaction of Orthogonal Grid Drawings (Klau & Mutzel)",
+    },
+    {
+        "doi": "10.1016/S0925-7721(01)00010-4",
+        "tags": ["compaction", "orthogonal"],
+        "title_hint": "On the complexity of orthogonal compaction (Patrignani)",
+    },
+    # --- coordinate assignment (layered x-placement) ---
+    {
+        "doi": "10.7155/jgaa.00126",
+        "tags": ["coordinate-assignment", "layered", "sugiyama"],
+        "title_hint": "An Efficient Implementation of Sugiyama's Algorithm for Layered Graph Drawing (JGAA)",
+        "pdf_urls": ["https://jgaa.info/index.php/jgaa/article/download/paper126/2965/2771"],
+    },
+    # --- packing (disconnected component / polyomino packing) ---
+    {
+        "doi": "10.1007/3-540-45848-4_30",
+        "tags": ["packing", "disconnected"],
+        "title_hint": "Disconnected Graph Layout and the Polyomino Packing Approach (Freivalds et al.)",
+    },
+    # --- overlap removal (proximity stress; growing-tree) ---
+    {
+        "doi": "10.1007/978-3-642-00219-9_20",
+        "tags": ["overlap", "prism", "stress"],
+        "title_hint": "Efficient Node Overlap Removal Using a Proximity Stress Model (PRISM, Gansner & Hu)",
+        "pdf_urls": ["https://yifanhu.net/PUB/overlap.pdf"],
+    },
+    {
+        "doi": "10.1007/978-3-319-50106-2_3",
+        "tags": ["overlap", "node-overlap-removal"],
+        "title_hint": "Node Overlap Removal by Growing a Tree (Nachmanson et al.)",
+        "pdf_urls": ["https://arxiv.org/pdf/1608.02653.pdf"],
+    },
 ]
 
 TOPIC_METADATA_SEEDS = [
@@ -481,6 +592,70 @@ TOPIC_METADATA_SEEDS = [
             "Mermaid supports multiple layout engines: dagre (layered/Sugiyama-style), "
             "elk (Eclipse Layout Kernel for compound graphs and ports), tidy-tree, and "
             "cose-bilkent force-directed. Configure via flowchart defaultRenderer."
+        ),
+    },
+    {
+        "id": "thesis-ruegg-sugiyama-prescribed-areas",
+        "title": "Sugiyama Layouts for Prescribed Drawing Areas (PhD dissertation)",
+        "authors": ["Ulf Rüegg"],
+        "year": 2018,
+        "url": "https://macau.uni-kiel.de/receive/macau_mods_00002268",
+        "source": "kiel",
+        "tags": ["layered", "sugiyama", "layer-assignment", "wrapping", "elk", "thesis"],
+        "abstract": (
+            "PhD dissertation (Kiel Computer Science Series 2018/1) on layered (Sugiyama) "
+            "graph drawing constrained to prescribed/fixed drawing areas: generalized "
+            "layering, wrapping of layered graphs, node promotion, and aspect-ratio-aware "
+            "layout in the KIELER/ELK layered algorithm."
+        ),
+    },
+    {
+        "id": "thesis-klau-orthogonal-placement",
+        "title": "A Combinatorial Approach to Orthogonal Placement Problems (PhD dissertation)",
+        "authors": ["Gunnar W. Klau"],
+        "year": 2002,
+        "url": "https://publikationen.sulb.uni-saarland.de/handle/20.500.11880/25889",
+        "source": "saarland",
+        "tags": ["compaction", "orthogonal", "constraints", "packing", "thesis"],
+        "abstract": (
+            "PhD dissertation on orthogonal placement: optimal two-dimensional compaction "
+            "of orthogonal grid drawings via constraint graphs and integer programming, "
+            "the relationship between compaction and rectangle packing / dissection, and "
+            "branch-and-cut for minimizing total edge length and drawing area. Foundational "
+            "for compaction and packing in graph drawing."
+        ),
+    },
+    {
+        "id": "thesis-schulze-layered-port-constraints",
+        "title": "Drawing Layered Graphs with Port Constraints (dissertation/works)",
+        "authors": ["Christoph Daniel Schulze"],
+        "year": 2014,
+        "url": "https://rtsys.informatik.uni-kiel.de/~biblio/",
+        "source": "kiel",
+        "tags": ["layered", "ports", "constraints", "routing", "elk", "edge-labels", "thesis"],
+        "abstract": (
+            "Layered drawing of graphs with port constraints and edge-label placement in "
+            "the KIELER/ELK layered algorithm: port ordering, north/south port routing, "
+            "hierarchical/compound handling, and label management for data-flow diagrams."
+        ),
+    },
+    {
+        "id": "elk-dagre-engine-docs",
+        "title": "ELK and dagre layout engine algorithms (layered, force, stress, rectangle packing)",
+        "authors": ["Eclipse Layout Kernel", "dagre"],
+        "year": 2024,
+        "url": "https://eclipse.dev/elk/reference/algorithms.html",
+        "source": "elk",
+        "tags": ["elk", "dagre", "layered", "force-directed", "packing", "routing"],
+        "abstract": (
+            "The Eclipse Layout Kernel (ELK) provides ELK Layered (Sugiyama-style "
+            "layer-based layout with port and compound-graph support), ELK Force and "
+            "ELK Stress (force-directed / stress majorization), ELK Mr. Tree, ELK "
+            "Radial, ELK Box and ELK Rectangle Packing, ELK DisCo disconnected "
+            "component packing, and ELK SpOre compaction / overlap removal; it also "
+            "bridges to the Graphviz algorithms (dot, neato, fdp, circo, twopi) and "
+            "to libavoid for orthogonal connector routing. dagre is a JavaScript "
+            "layered (Sugiyama) layout engine used by Mermaid and React Flow."
         ),
     },
     {

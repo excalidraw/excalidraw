@@ -18,7 +18,12 @@ dimensions = 768
 
 [profiles.gemini-2]
 backend = "gemini"
-# Vertex often exposes -preview before GA stable id; override with RAG_GEMINI_EMBED_MODEL
+# Preserve the existing fixed-window baseline index.
+model = "gemini-embedding-2-preview"
+dimensions = 3072
+
+[profiles.gemini-2-structure-v1]
+backend = "gemini"
 model = "gemini-embedding-2-preview"
 dimensions = 3072
 

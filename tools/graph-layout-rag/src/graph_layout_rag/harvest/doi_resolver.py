@@ -294,7 +294,8 @@ def resolve_doi_with_fallbacks(
             doi=doi,
         )
 
-    work = _openalex_by_doi(doi)
+    # Dry runs must be deterministic and offline; metadata enrichment is optional.
+    work = None if dry_run else _openalex_by_doi(doi)
     authors: list[str] = []
     title = f"DOI {doi}"
     year: int | None = None
@@ -326,13 +327,8 @@ def resolve_doi_with_fallbacks(
     )
 
     if dry_run:
-        candidates = pick_pdf_urls(
-            doi,
-            work,
-            pdf_urls,
-            include_archive=False,
-            include_paywall_guesses=include_paywall_guesses,
-        )
+        # Do not call Unpaywall/Semantic Scholar during a dry run.
+        candidates = list(pdf_urls or [])
         if candidates:
             item.url = candidates[0]
             item.status = "failed"

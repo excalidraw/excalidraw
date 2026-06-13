@@ -5,8 +5,13 @@ __pycache__/
 .pytest_cache/
 data/raw/
 data/indexes/
+data/retrieval-indexes/
+data/eval/
 data/lancedb/
 data/manifest.json
+data/manifest.*.json
+data/manifest.bak.json
+!data/manifest.example.json
 data/ingest_state.json
 data/*.log
 data/harvest.db

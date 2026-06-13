@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import httpx
 
+from graph_layout_rag.catalog.taxonomy import categories_from_keywords, categories_from_tags
 from graph_layout_rag.harvest.doi_resolver import pick_pdf_urls
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.parallel import parallel_map
@@ -204,6 +205,21 @@ def _abstract_from_inverted_index(idx: dict | None) -> str | None:
     return " ".join(word for _, word in pairs)[:4000]
 
 
+def _topic_supported(topic: str, title: str, abstract: str | None) -> bool:
+    """True when the work itself supports the discovery topic.
+
+    Prevents the OpenAlex query label (e.g. ``dagre``, ``uml-layout``) from being
+    stamped onto every returned work regardless of relevance. A topic sticks only
+    when its literal phrase appears in the text, or the topic maps to a pipeline
+    category that the text genuinely matches via keyword phrases.
+    """
+    hay = f"{title} {abstract or ''}".lower()
+    if topic in hay or topic.replace("-", " ") in hay:
+        return True
+    cats = categories_from_tags([topic])
+    return bool(cats and (cats & categories_from_keywords(hay)))
+
+
 def _work_to_item(work: dict, *, topic: str | None = None) -> ManifestItem:
     doi_raw = work.get("doi") or ""
     doi = doi_raw.replace("https://doi.org/", "") if doi_raw else None
@@ -216,9 +232,12 @@ def _work_to_item(work: dict, *, topic: str | None = None) -> ManifestItem:
     title = work.get("display_name") or ""
     abstract = _abstract_from_inverted_index(work.get("abstract_inverted_index"))
     doc_id = slug_id(f"openalex-{doi or work.get('id', '').split('/')[-1] or title}")
-    tags = ["openalex", "graph-drawing"]
-    if topic:
-        tags.append(topic)
+    # Tags come from the work's OWN text, not the query label. The discovery
+    # topic is only added when the work independently supports it.
+    tags = {"openalex", "graph-drawing"}
+    tags |= categories_from_keywords(f"{title} {abstract or ''}")
+    if topic and _topic_supported(topic, title, abstract):
+        tags.add(topic)
     return ManifestItem(
         id=doc_id,
         title=title or doc_id,
@@ -229,7 +248,7 @@ def _work_to_item(work: dict, *, topic: str | None = None) -> ManifestItem:
         localPath=f"data/raw/pdf/{doc_id}.pdf" if pdf_url else None,
         contentType="application/pdf" if pdf_url else "text/metadata",
         status="metadata_only" if not pdf_url else "failed",
-        tags=tags,
+        tags=sorted(tags),
         doi=doi,
         abstract=abstract,
     )
@@ -357,14 +376,15 @@ def harvest_openalex(
             if topic and not is_pipeline_relevant(title, abstract):
                 if not any(k in title.lower() for k in (topic.replace("-", " "), topic)):
                     return
-        elif not is_layout_relevant(title, abstract):
+        elif not is_layout_relevant(title, abstract, strict=True):
             return
         item = _work_to_item(work, topic=topic)
         if item.id in skip_ids:
             return
         existing = by_id.get(item.id)
-        if existing and topic and topic not in existing.tags:
-            existing.tags = sorted(set([*existing.tags, topic]))
+        if existing:
+            if topic and topic not in existing.tags and _topic_supported(topic, title, abstract):
+                existing.tags = sorted(set([*existing.tags, topic]))
         else:
             by_id.setdefault(item.id, item)
 

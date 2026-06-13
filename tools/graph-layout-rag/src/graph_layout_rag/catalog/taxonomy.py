@@ -46,9 +46,12 @@ TAG_TO_CATEGORIES: dict[str, list[str]] = {
     "ports": ["constraints", "routing"],
     # coordinate-assignment
     "coordinate-assignment": ["coordinate-assignment"],
+    "brandes-koepf": ["coordinate-assignment"],
+    "tidy-tree": ["coordinate-assignment"],
     # routing
     "routing": ["routing"],
     "channel-routing": ["routing"],
+    "orthogonal": ["routing", "compaction"],
     # compaction
     "compaction": ["compaction"],
     "compact": ["compaction"],
@@ -60,10 +63,13 @@ TAG_TO_CATEGORIES: dict[str, list[str]] = {
     "floorplanning": ["packing"],
     "sequence-pair": ["packing"],
     "b-star-tree": ["packing"],
+    "disconnected": ["packing"],
     # overlap
     "overlap": ["overlap"],
     "mental-map": ["overlap"],
     "clutter": ["overlap"],
+    "prism": ["overlap"],
+    "node-overlap-removal": ["overlap"],
 }
 
 # Title/abstract phrase lists per pipeline category (keyword fallback).
@@ -129,7 +135,13 @@ CATEGORY_KEYWORDS: dict[str, list[str]] = {
         "brandes-köpf",
         "brandes and köpf",
         "x coordinate assignment",
+        "x-coordinate assignment",
         "node positioning within layer",
+        "median heuristic",
+        "priority method",
+        "tidy tree",
+        "tidier drawings of trees",
+        "horizontal compaction",
     ],
     "routing": [
         "edge routing",
@@ -144,16 +156,27 @@ CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "compaction": [
         "compaction",
         "one-dimensional compaction",
+        "1d compaction",
         "two-dimensional compaction",
+        "2d compaction",
+        "orthogonal compaction",
+        "longest-path compaction",
+        "longest path compaction",
+        "pushback",
         "symbolic layout compaction",
         "constraint graph compaction",
+        "dual graph compaction",
         "scanline compaction",
         "shadow propagation",
+        "minimize total edge length",
     ],
     "packing": [
         "strip packing",
         "skyline heuristic",
         "rectangular packing",
+        "rectangle packing",
+        "bin packing",
+        "guillotine",
         "left edge algorithm",
         "left-edge algorithm",
         "bottom-left",
@@ -161,14 +184,24 @@ CATEGORY_KEYWORDS: dict[str, list[str]] = {
         "b*-tree",
         "b-star tree",
         "floorplan packing",
+        "polyomino packing",
+        "component packing",
+        "disconnected components",
+        "disconnected graph layout",
     ],
     "overlap": [
         "overlap removal",
         "node overlap",
+        "node overlap removal",
+        "remove node overlap",
         "mental map",
         "layout adjustment",
         "cluster busting",
         "clutter reduction",
+        "proximity stress",
+        "prism",
+        "force scan",
+        "growing a tree",
     ],
 }
 

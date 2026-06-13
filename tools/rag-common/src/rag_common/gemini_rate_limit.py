@@ -13,9 +13,9 @@ from pathlib import Path
 log = logging.getLogger("rag_common.gemini")
 
 WINDOW_SEC = 60.0
-DEFAULT_TOKENS_PER_MIN = 100_000
-DEFAULT_HEADROOM = 0.85
-DEFAULT_MIN_INTERVAL_MS = 50
+DEFAULT_TOKENS_PER_MIN = 2_000_000
+DEFAULT_HEADROOM = 0.95
+DEFAULT_MIN_INTERVAL_MS = 5
 _MIN_BUDGET = 1_000
 
 _limiter: GeminiRateLimiter | None = None
@@ -23,7 +23,7 @@ _limiter_lock = threading.Lock()
 
 
 def estimate_tokens(text: str) -> int:
-    return max(1, len(text.split()))
+    return max(1, len(text) // 4, len(text.split()))
 
 
 def _tokens_per_min_cap() -> int:
@@ -91,6 +91,7 @@ class GeminiRateLimiter:
         self._budget = persisted if persisted is not None else self._cap * _headroom()
         self._budget = min(self._budget, self._cap)
         self._last_request_at = 0.0
+        self._rate_limit_count = 0
 
     def _prune(self, now: float) -> None:
         cutoff = now - WINDOW_SEC
@@ -108,7 +109,11 @@ class GeminiRateLimiter:
                 now = time.time()
                 self._prune(now)
                 window_tokens = self._window_tokens()
-                if window_tokens + tokens <= self._budget:
+                # A single request may exceed the adaptive budget. Admit it only into
+                # an empty window so AIMD can recover without deadlocking the caller.
+                if window_tokens + tokens <= self._budget or (
+                    not self._window and tokens <= self._cap
+                ):
                     since_last = now - self._last_request_at
                     if since_last < min_gap:
                         wait = min_gap - since_last
@@ -132,6 +137,7 @@ class GeminiRateLimiter:
         with self._lock:
             self._cap = _tokens_per_min_cap()
             self._budget = max(_MIN_BUDGET, self._budget * 0.5)
+            self._rate_limit_count += 1
             _save_budget(self._state_path, self._budget)
             wait = float(max(60, retry_after or 0))
             log.info(
@@ -141,6 +147,27 @@ class GeminiRateLimiter:
                 wait,
             )
         return wait
+
+    def snapshot(self) -> dict[str, int | float]:
+        """Return thread-safe limiter telemetry for ingest status reporting."""
+        with self._lock:
+            now = time.time()
+            self._prune(now)
+            window_tokens = self._window_tokens()
+            return {
+                "cap_tokens_per_minute": self._cap,
+                "budget_tokens_per_minute": int(self._budget),
+                "window_tokens": window_tokens,
+                "budget_utilization_percent": round(
+                    (window_tokens / self._budget * 100) if self._budget else 0.0,
+                    2,
+                ),
+                "cap_utilization_percent": round(
+                    (window_tokens / self._cap * 100) if self._cap else 0.0,
+                    2,
+                ),
+                "rate_limit_429_count": self._rate_limit_count,
+            }
 
 
 def get_rate_limiter() -> GeminiRateLimiter:

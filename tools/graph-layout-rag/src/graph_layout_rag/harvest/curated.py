@@ -91,6 +91,73 @@ CURATED_METADATA = [
 ]
 
 
+# Implementer-grade documentation for the layout engines this corpus models.
+# HTML-scraped (``content_url``) into the abstract via ``_extract_blog_text``.
+# Distinct from research papers: these describe the *actual* compaction/packing/
+# routing modules in OGDF, ELK, dagre, and Graphviz that the pipeline mirrors.
+LIBRARY_DOCS = [
+    {
+        "id": "ogdf-modules-overview",
+        "title": "OGDF — Open Graph Drawing Framework: module overview",
+        "authors": ["OGDF Contributors"],
+        "year": 2024,
+        "url": "https://ogdf.github.io/",
+        "source": "ogdf",
+        "tags": [
+            "ogdf", "source-code-docs", "layered", "planar",
+            "orthogonal", "compaction", "packing", "routing",
+        ],
+        "content_url": "https://ogdf.github.io/doc/ogdf/",
+    },
+    {
+        "id": "elk-layered-algorithm-reference",
+        "title": "ELK Layered — algorithm reference (phases and intermediate processors)",
+        "authors": ["Eclipse Layout Kernel"],
+        "year": 2024,
+        "url": "https://eclipse.dev/elk/reference/algorithms/org-eclipse-elk-layered.html",
+        "source": "elk",
+        "tags": [
+            "elk", "source-code-docs", "layered", "sugiyama",
+            "coordinate-assignment", "crossing", "ports",
+        ],
+        "content_url": "https://eclipse.dev/elk/reference/algorithms/org-eclipse-elk-layered.html",
+    },
+    {
+        "id": "elk-layout-options-reference",
+        "title": "ELK — layout options reference (spacing, node placement, compaction)",
+        "authors": ["Eclipse Layout Kernel"],
+        "year": 2024,
+        "url": "https://eclipse.dev/elk/reference/options.html",
+        "source": "elk",
+        "tags": ["elk", "source-code-docs", "compaction", "packing", "constraints"],
+        "content_url": "https://eclipse.dev/elk/reference/options.html",
+    },
+    {
+        "id": "dagre-layout-algorithm-wiki",
+        "title": "dagre — layout algorithm internals (rank, order, position)",
+        "authors": ["dagre contributors"],
+        "year": 2023,
+        "url": "https://github.com/dagrejs/dagre/wiki",
+        "source": "dagre",
+        "tags": [
+            "dagre", "source-code-docs", "layered", "sugiyama",
+            "layer-assignment", "coordinate-assignment",
+        ],
+        "content_url": "https://github.com/dagrejs/dagre/wiki",
+    },
+    {
+        "id": "graphviz-dot-layout-docs",
+        "title": "Graphviz — dot layout engine documentation",
+        "authors": ["Graphviz"],
+        "year": 2024,
+        "url": "https://graphviz.org/docs/layouts/dot/",
+        "source": "graphviz.org",
+        "tags": ["graphviz", "dot", "source-code-docs", "layered", "layer-assignment"],
+        "content_url": "https://graphviz.org/docs/layouts/dot/",
+    },
+]
+
+
 def _extract_blog_text(url: str, *, max_chars: int = 12000) -> str:
     html = fetch_text(url)
     soup = BeautifulSoup(html, "html.parser")
@@ -119,7 +186,7 @@ def harvest_curated(*, dry_run: bool = False, workers: int | None = None) -> lis
         )
     )
 
-    for spec in CURATED_METADATA:
+    for spec in [*CURATED_METADATA, *LIBRARY_DOCS]:
         abstract = spec.get("abstract", "")
         if spec.get("content_url") and not dry_run:
             try:

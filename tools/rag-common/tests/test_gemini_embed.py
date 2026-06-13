@@ -27,6 +27,12 @@ def test_is_gemini_embedding_2():
     assert not is_gemini_embedding_2("gemini-embedding-001")
 
 
+def test_missing_model_is_fatal_configuration_error():
+    from rag_common.gemini_embed import _is_fatal
+
+    assert _is_fatal(RuntimeError("404 NOT_FOUND Publisher Model gemini-embedding-2 was not found"))
+
+
 def test_format_gemini2_text():
     assert format_gemini2_text("hello", mode="query") == "task: search result | query: hello"
     assert (
@@ -127,6 +133,52 @@ def test_embed_gemini_v2_per_chunk(mock_client_fn, mock_types):
     assert mock_client.models.embed_content.call_count == 2
     first_call = mock_client.models.embed_content.call_args_list[0]
     assert "title: Doc A | text: body one" in str(first_call)
+
+
+@patch.dict(
+    "os.environ",
+    {
+        "GOOGLE_GENAI_USE_VERTEXAI": "true",
+        "GOOGLE_CLOUD_PROJECT": "my-project",
+        "GOOGLE_CLOUD_LOCATION": "us-central1",
+        **_RATE_ENV,
+    },
+    clear=True,
+)
+@patch("rag_common.gemini_embed.genai_types")
+@patch("rag_common.gemini_embed._client")
+def test_embed_gemini_v2_concurrent_preserves_order(mock_client_fn, mock_types):
+    """workers>1 fans out across threads but must return vectors in input order."""
+    import threading
+
+    mock_types.EmbedContentConfig = MagicMock()
+    mock_client = MagicMock()
+    mock_client_fn.return_value = mock_client
+
+    barrier = threading.Barrier(4)
+
+    def _embed_content(*, model, contents, config):
+        # Encode the input index into the returned vector so we can verify ordering.
+        idx = int(str(contents).split("idx=")[1].split(" ")[0])
+        # Force interleaving: every worker waits until all are in-flight.
+        try:
+            barrier.wait(timeout=5)
+        except threading.BrokenBarrierError:
+            pass
+        emb = MagicMock()
+        emb.values = [float(idx)]
+        resp = MagicMock()
+        resp.embeddings = [emb]
+        return resp
+
+    mock_client.models.embed_content.side_effect = _embed_content
+
+    cfg = gemini_config(model="gemini-embedding-2", dimensions=1, profile="gemini-2")
+    texts = [f"idx={i} body" for i in range(4)]
+    vectors = embed_gemini_texts(texts, config=cfg, probe=False, workers=4)
+
+    assert [v[0] for v in vectors] == [0.0, 1.0, 2.0, 3.0]
+    assert mock_client.models.embed_content.call_count == 4
 
 
 @patch.dict(

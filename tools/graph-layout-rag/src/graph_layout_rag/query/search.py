@@ -1,43 +1,82 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from typing import Any
 
-import lancedb
-
-from graph_layout_rag.catalog.classify import build_catalog
 from graph_layout_rag.catalog.taxonomy import PIPELINE_CATEGORIES
-from graph_layout_rag.ingest.embed import ENV_PREFIX, embed_config_from_env, embed_query
-from graph_layout_rag.ingest.index import (
-    _table_names,
-    embed_config_from_state,
-    load_ingest_state,
+from graph_layout_rag.query.retrieve import (
+    RetrieveFilters,
+    DEFAULT_HYBRID,
+    catalog_maps,
+    diversify_candidates,
+    retrieve_candidates,
+    retrieve_multi_query,
 )
-from graph_layout_rag.manifest import load_manifest
-from graph_layout_rag.paths import CHUNKS_TABLE, profile_index_paths
+from rag_common.rerank import rerank as rerank_candidates
 
 
-@lru_cache(maxsize=1)
-def _catalog_maps() -> tuple[dict[str, frozenset[str]], frozenset[str]]:
-    """doc_id -> pipeline categories; set of doc_ids with local PDFs."""
-    entries = build_catalog(status="ok")
-    by_doc: dict[str, frozenset[str]] = {}
-    pdf_ids: set[str] = set()
-    for entry in entries:
-        if entry.has_pdf:
-            pdf_ids.add(entry.doc_id)
-        if entry.categories:
-            by_doc[entry.doc_id] = frozenset(entry.categories)
-    return by_doc, frozenset(pdf_ids)
+def format_results(
+    reranked: list[dict[str, Any]],
+    *,
+    top: int,
+    max_per_doc: int,
+) -> list[dict[str, Any]]:
+    category_map, _ = catalog_maps()
+    out: list[dict[str, Any]] = []
+    final_counts: dict[str, int] = {}
 
+    for row in reranked:
+        doc_id = row.get("doc_id") or ""
+        if final_counts.get(doc_id, 0) >= max_per_doc:
+            continue
 
-@lru_cache(maxsize=1)
-def _manifest_pdf_ids() -> frozenset[str]:
-    return frozenset(
-        item.id
-        for item in load_manifest().items
-        if item.status == "ok" and item.localPath
-    )
+        text = row.get("text") or ""
+        excerpt = text[:400] + ("..." if len(text) > 400 else "")
+
+        pipeline_categories = [
+            c.strip()
+            for c in (row.get("pipeline_categories") or "").split(",")
+            if c.strip()
+        ]
+        if not pipeline_categories and doc_id in category_map:
+            pipeline_categories = sorted(category_map[doc_id])
+
+        if "rerank_score" in row:
+            score = round(float(row["rerank_score"]), 4)
+        elif "fusion_score" in row:
+            score = round(float(row["fusion_score"]), 6)
+        else:
+            score = round(float(row.get("score", 0.0)), 4)
+
+        entry: dict[str, Any] = {
+            "score": score,
+            "title": row.get("title"),
+            "excerpt": excerpt,
+            "source_url": row.get("source_url"),
+            "page": row.get("page"),
+            "page_end": row.get("page_end"),
+            "tags": [t for t in (row.get("tags") or "").split(",") if t],
+            "pipeline_categories": pipeline_categories,
+            "doc_id": doc_id,
+            "section_path": row.get("section_path") or "",
+            "alias_doc_ids": [value for value in (row.get("alias_doc_ids") or "").split(",") if value],
+            "alias_source_urls": [value for value in (row.get("alias_source_urls") or "").split(",") if value],
+            "alias_dois": [value for value in (row.get("alias_dois") or "").split(",") if value],
+            "canonical_sha256": row.get("canonical_sha256") or None,
+        }
+        if "rerank_score" in row:
+            entry["rerank_score"] = round(float(row["rerank_score"]), 4)
+        if "fusion_score" in row:
+            entry["fusion_score"] = round(float(row["fusion_score"]), 6)
+        if "dense_rank" in row:
+            entry["dense_rank"] = row["dense_rank"]
+        if "sparse_rank" in row:
+            entry["sparse_rank"] = row["sparse_rank"]
+        out.append(entry)
+        final_counts[doc_id] = final_counts.get(doc_id, 0) + 1
+        if len(out) >= top:
+            break
+
+    return out
 
 
 def search(
@@ -50,111 +89,115 @@ def search(
     category: str | None = None,
     pdf_only: bool = False,
     embed_profile: str | None = None,
+    rerank: bool | None = None,
+    hybrid: bool = DEFAULT_HYBRID,
+    max_per_doc: int = 2,
 ) -> list[dict[str, Any]]:
     if category and category not in PIPELINE_CATEGORIES:
         raise ValueError(
             f"Unknown category {category!r}. Choose from: {', '.join(PIPELINE_CATEGORIES)}"
         )
 
-    paths = profile_index_paths(embed_profile)
-    if not paths.lance_dir.is_dir():
-        raise ValueError(
-            f"No index for profile {paths.profile!r} at {paths.root}. "
-            f"Run: graph-layout-rag ingest --embed-profile {paths.profile}"
-        )
-
-    db = lancedb.connect(str(paths.lance_dir))
-    if CHUNKS_TABLE not in _table_names(db):
-        raise ValueError(
-            f"No chunks table for profile {paths.profile!r}. "
-            f"Run: graph-layout-rag ingest --embed-profile {paths.profile}"
-        )
-
-    state = load_ingest_state(paths)
-    indexed = embed_config_from_state(state)
-    if embed_profile:
-        config = embed_config_from_env(profile=embed_profile)
-        if indexed is not None:
-            from graph_layout_rag.ingest.index import ensure_embed_config_matches
-
-            ensure_embed_config_matches(state, config)
-    else:
-        config = indexed if indexed is not None else embed_config_from_env()
-
-    table = db.open_table(CHUNKS_TABLE)
-    vector = embed_query(
+    filters = RetrieveFilters(
+        tag=tag,
+        source=source,
+        year_min=year_min,
+        category=category,
+        pdf_only=pdf_only,
+    )
+    candidates = retrieve_candidates(
         query,
-        config=config,
-        prefix=ENV_PREFIX,
-        allow_fallback=False,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        filters=filters,
     )
-
-    fetch_limit = top * (12 if category or pdf_only else 4)
-    results = (
-        table.search(vector)
-        .metric("cosine")
-        .limit(fetch_limit)
-        .to_list()
+    diverse = diversify_candidates(
+        candidates,
+        max_per_doc=5,
+        limit=max(top * max_per_doc, 50),
     )
+    reranked = rerank_candidates(
+        query,
+        diverse,
+        top=max(top * max_per_doc, top),
+        enabled=rerank,
+    )
+    return format_results(reranked, top=top, max_per_doc=max_per_doc)
 
-    category_map, catalog_pdf_ids = _catalog_maps()
-    manifest_pdf_ids = _manifest_pdf_ids()
 
-    filtered: list[dict[str, Any]] = []
-    for row in results:
-        doc_id = row.get("doc_id") or ""
+def search_raw(
+    query: str,
+    *,
+    top: int = 20,
+    embed_profile: str | None = None,
+    hybrid: bool = DEFAULT_HYBRID,
+    sparse_only: bool = False,
+    filters: RetrieveFilters | None = None,
+    rerank: bool | None = None,
+    max_per_doc: int = 2,
+    rerank_query: str | None = None,
+    pool: int | None = None,
+    rrf_k: int = 60,
+    dense_weight: float = 1.0,
+    sparse_weight: float = 1.0,
+    rerank_model: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return formatted results for eval strategies (doc_id + score fields)."""
+    candidates = retrieve_candidates(
+        query,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        sparse_only=sparse_only,
+        filters=filters,
+        pool=pool,
+        rrf_k=rrf_k,
+        dense_weight=dense_weight,
+        sparse_weight=sparse_weight,
+    )
+    diverse = diversify_candidates(
+        candidates,
+        max_per_doc=5,
+        limit=max(top * max_per_doc, 50),
+    )
+    reranked = rerank_candidates(
+        rerank_query or query,
+        diverse,
+        top=max(top * max_per_doc, top),
+        enabled=rerank,
+        model_name=rerank_model,
+    )
+    return format_results(reranked, top=top, max_per_doc=max_per_doc)
 
-        if pdf_only and doc_id not in manifest_pdf_ids and doc_id not in catalog_pdf_ids:
-            continue
 
-        if category:
-            row_cats = {
-                c.strip()
-                for c in (row.get("pipeline_categories") or "").split(",")
-                if c.strip()
-            }
-            if not row_cats:
-                row_cats = set(category_map.get(doc_id, ()))
-            if category not in row_cats:
-                continue
-
-        if tag and tag not in (row.get("tags") or "").split(","):
-            continue
-        if source and source not in (row.get("source_url") or ""):
-            if source not in (row.get("tags") or ""):
-                doc_tags = row.get("tags") or ""
-                if source not in doc_tags:
-                    continue
-        year = row.get("year")
-        if year_min is not None and year is not None and year < year_min:
-            continue
-
-        text = row.get("text") or ""
-        excerpt = text[:400] + ("..." if len(text) > 400 else "")
-        distance = row.get("_distance")
-        score = 1.0 - distance if distance is not None else 0.0
-
-        pipeline_categories = [
-            c.strip()
-            for c in (row.get("pipeline_categories") or "").split(",")
-            if c.strip()
-        ]
-        if not pipeline_categories and doc_id in category_map:
-            pipeline_categories = sorted(category_map[doc_id])
-
-        filtered.append(
-            {
-                "score": round(score, 4),
-                "title": row.get("title"),
-                "excerpt": excerpt,
-                "source_url": row.get("source_url"),
-                "page": row.get("page"),
-                "tags": [t for t in (row.get("tags") or "").split(",") if t],
-                "pipeline_categories": pipeline_categories,
-                "doc_id": doc_id,
-            }
-        )
-        if len(filtered) >= top:
-            break
-
-    return filtered
+def search_multi_raw(
+    queries: list[str],
+    *,
+    top: int = 20,
+    embed_profile: str | None = None,
+    hybrid: bool = DEFAULT_HYBRID,
+    filters: RetrieveFilters | None = None,
+    rerank: bool | None = None,
+    max_per_doc: int = 2,
+    rerank_query: str | None = None,
+) -> list[dict[str, Any]]:
+    candidates = retrieve_multi_query(
+        queries,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        filters=filters,
+    )
+    diverse = diversify_candidates(
+        candidates,
+        max_per_doc=5,
+        limit=max(top * max_per_doc, 50),
+    )
+    reranked = rerank_candidates(
+        rerank_query or queries[0],
+        diverse,
+        top=max(top * max_per_doc, top),
+        enabled=rerank,
+    )
+    return format_results(reranked, top=top, max_per_doc=max_per_doc)

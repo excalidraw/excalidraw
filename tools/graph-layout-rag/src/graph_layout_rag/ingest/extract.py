@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 
 from graph_layout_rag.manifest import ManifestItem
@@ -9,6 +10,14 @@ from graph_layout_rag.pdf_text import PdfExtractResult, extract_pages_from_path
 
 log = logging.getLogger("graph_layout_rag.ingest.extract")
 
+PDF_BACKENDS = ("pymupdf", "docling", "gemini")
+
+
+def default_pdf_backend() -> str:
+    """Backend used unless overridden; opt into Docling via GRAPH_RAG_PDF_BACKEND."""
+    backend = os.getenv("GRAPH_RAG_PDF_BACKEND", "pymupdf").strip().lower()
+    return backend if backend in PDF_BACKENDS else "pymupdf"
+
 
 @dataclass
 class PageText:
@@ -16,14 +25,29 @@ class PageText:
     text: str
 
 
-def extract_pdf_result(item: ManifestItem) -> PdfExtractResult:
+def extract_pdf_result(
+    item: ManifestItem, *, clean: bool = True, backend: str = "pymupdf"
+) -> PdfExtractResult:
     if not item.localPath:
         return PdfExtractResult(open_error="no localPath")
-    return extract_pages_from_path(PKG_ROOT / item.localPath)
+    path = PKG_ROOT / item.localPath
+    if backend == "pymupdf":
+        return extract_pages_from_path(path, clean=clean)
+    if backend == "docling":
+        from graph_layout_rag.docling_text import extract_pages_docling
+
+        return extract_pages_docling(path, clean=clean)
+    if backend == "gemini":
+        from graph_layout_rag.gemini_vision_text import extract_pages_gemini
+
+        return extract_pages_gemini(path, clean=clean)
+    raise ValueError(f"Unknown PDF backend {backend!r}. Choose from: {', '.join(PDF_BACKENDS)}")
 
 
-def extract_pdf_pages(item: ManifestItem) -> list[PageText]:
-    result = extract_pdf_result(item)
+def extract_pdf_pages(
+    item: ManifestItem, *, clean: bool = True, backend: str = "pymupdf"
+) -> list[PageText]:
+    result = extract_pdf_result(item, clean=clean, backend=backend)
     if result.open_error:
         log.warning("PDF open failed for %s: %s", item.id, result.open_error)
         return []

@@ -94,6 +94,7 @@ def embed_texts(
                 probe=probe,
                 mode=mode,
                 titles=titles,
+                workers=workers or 1,
             )
             if stats is not None:
                 stats.set_effective_config(cfg)
@@ -145,6 +146,7 @@ def embed_query(
     config: EmbedConfig | None = None,
     prefix: str = "",
     allow_fallback: bool = True,
+    probe: bool = False,
 ) -> list[float]:
     return embed_texts(
         [text],
@@ -152,6 +154,6 @@ def embed_query(
         prefix=prefix,
         allow_fallback=allow_fallback,
         workers=1,
-        probe=True,
+        probe=probe,
         mode="query",
     )[0]
