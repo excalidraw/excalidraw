@@ -7,7 +7,6 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
-  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -24,13 +23,12 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
-  getDiamondBaseCorners,
+  getAllMidpoints,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
-  hitElementItself,
   isArrowElement,
   isBindableElement,
   isElbowArrow,
@@ -38,7 +36,6 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
-  maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
   getActiveTextElement,
@@ -413,145 +410,42 @@ const renderBindingHighlightForBindableElement_simple = (
       break;
   }
 
+  // Draw midpoint indicators
   if (
     appState.isMidpointSnappingEnabled &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
-    // Draw midpoint indicators
-    const linearElement = appState.selectedLinearElement;
-    const arrow =
-      linearElement?.elementId &&
-      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-    const cursorIsInsideBindable =
-      pointerCoords &&
-      hitElementItself({
-        point: pointerCoords,
-        element: suggestedBinding.element,
-        elementsMap,
-        threshold: 0,
-        overrideShouldTestInside: true,
-      });
+    context.save();
 
-    const isElbow =
-      (arrow && isElbowArrow(arrow)) ||
-      (appState.activeTool.type === "arrow" &&
-        appState.currentItemArrowType === "elbow");
+    const midpointRadius = 4 / appState.zoom.value;
 
-    if (!cursorIsInsideBindable || isElbow) {
-      context.save();
-
-      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
-
-      let midpoints: GlobalPoint[];
-      if (suggestedBinding.element.type === "diamond") {
-        const center = elementCenterPoint(
-          suggestedBinding.element,
-          elementsMap,
-        );
-        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
-          (curve) => {
-            const point = bezierEquation(curve, 0.5);
-            const rotatedPoint = pointRotateRads(
-              point,
-              center,
-              suggestedBinding.element.angle,
-            );
-
-            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-          },
-        );
-      } else {
-        const basePoints = [
-          {
-            x: suggestedBinding.element.width,
-            y: suggestedBinding.element.height / 2,
-          }, // RIGHT
-          {
-            x: suggestedBinding.element.width / 2,
-            y: suggestedBinding.element.height,
-          }, // BOTTOM
-          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
-          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
-        ];
-        midpoints = basePoints.map((point) => {
-          const globalPoint = pointFrom<GlobalPoint>(
-            point.x + suggestedBinding.element.x,
-            point.y + suggestedBinding.element.y,
-          );
-          const rotatedPoint = pointRotateRads(
-            globalPoint,
-            center,
-            suggestedBinding.element.angle,
-          );
-          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-        });
-      }
-
-      const hoveredMidpoint =
-        pointerCoords &&
-        midpoints.reduce(
-          (
-            closestIdx: {
-              idx: number;
-              distance: number;
-            },
-            point,
-            idx,
-          ) => {
-            const distance = pointDistance(point, pointerCoords);
-            if (idx === -1 || distance < closestIdx.distance) {
-              return { idx, distance };
-            }
-            return closestIdx;
-          },
-          {
-            idx: -1,
-            distance: Infinity,
-          },
-        );
-
-      const midpointRadius = 4 / appState.zoom.value;
-      const highlightThreshold =
-        maxBindingDistance_simple(appState.zoom) +
-        suggestedBinding.element.strokeWidth / 2;
-
-      midpoints.forEach((midpoint, idx) => {
-        const isHighlighted =
-          (!cursorIsInsideBindable || isElbow) &&
-          hoveredMidpoint?.idx === idx &&
-          hoveredMidpoint.distance <= highlightThreshold;
-
-        // also render midpoint if cursor close but not highlighted
-        // (for elbows, always show all points)
-        const isShown =
-          !isHighlighted &&
-          (isElbow ||
-            (idx === hoveredMidpoint?.idx &&
-              hoveredMidpoint.distance <= highlightThreshold * 2));
-
-        if (isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(3, 93, 161, 1)`
-              : `rgba(106, 189, 252, 1)`;
-
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else if (isShown) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.8)`
-              : `rgba(65, 65, 65, 0.5)`;
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        }
-      });
-
-      context.restore();
+    // Render base midpoints
+    const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
+    for (const midpoint of midpoints) {
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(0, 0, 0, 0.8)`
+          : `rgba(65, 65, 65, 0.5)`;
+      context.beginPath();
+      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+      context.fill();
     }
+
+    // Render the highlighted midpoint if any
+    const midpoint = appState.suggestedBinding?.midPoint;
+    if (midpoint) {
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, 1)`
+          : `rgba(106, 189, 252, 1)`;
+
+      context.beginPath();
+      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+      context.fill();
+    }
+
+    context.restore();
   }
 };
 
