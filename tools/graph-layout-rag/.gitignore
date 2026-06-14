@@ -16,4 +16,5 @@ data/ingest_state.json
 data/*.log
 data/harvest.db
 data/harvest_checkpoint.json
+data/bibliography-scan-cache/
 # Keep data/manifest.example.json tracked; ignore live harvest output above.

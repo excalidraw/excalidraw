@@ -152,6 +152,7 @@ tools/graph-layout-rag/data/ingest_state.json
 tools/graph-layout-rag/data/*.log
 tools/graph-layout-rag/data/harvest.db
 tools/graph-layout-rag/data/harvest_checkpoint.json
+tools/graph-layout-rag/data/bibliography-scan-cache/
 tools/graph-layout-rag/**/__pycache__/
 tools/graph-layout-rag/.pytest_cache/
 

@@ -2,8 +2,16 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import httpx
+import pytest
 
-from graph_layout_rag.harvest.download import download_to_file
+from graph_layout_rag.harvest.download import close_thread_clients, download_to_file
+
+
+@pytest.fixture(autouse=True)
+def reset_thread_clients():
+    close_thread_clients()
+    yield
+    close_thread_clients()
 
 
 def test_download_rejects_non_pdf(tmp_path: Path):

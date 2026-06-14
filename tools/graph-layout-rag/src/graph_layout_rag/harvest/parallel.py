@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import threading
+from collections import deque
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from typing import TypeVar
 
 from graph_layout_rag.harvest.log import get_logger
@@ -17,6 +18,7 @@ R = TypeVar("R")
 DEFAULT_WORKERS = 32
 MAX_WORKERS = 128
 _workers: int = DEFAULT_WORKERS
+_stop_event = threading.Event()
 
 
 def set_workers(workers: int) -> None:
@@ -26,6 +28,18 @@ def set_workers(workers: int) -> None:
 
 def get_workers() -> int:
     return _workers
+
+
+def request_stop() -> None:
+    _stop_event.set()
+
+
+def clear_stop() -> None:
+    _stop_event.clear()
+
+
+def stop_requested() -> bool:
+    return _stop_event.is_set()
 
 
 def parallel_map(
@@ -50,25 +64,43 @@ def parallel_map(
 
     results: list[R | None] = [None] * len(items)
     done = 0
-    lock = threading.Lock()
     progress_every = max(1, min(10, len(items) // 20))
+    pending_items = deque(enumerate(items))
+    in_flight: dict[Future[R], int] = {}
+    max_in_flight = min(len(items), max(n, n * 2))
 
     with ThreadPoolExecutor(max_workers=n) as pool:
-        futures = {pool.submit(func, item): idx for idx, item in enumerate(items)}
-        for future in as_completed(futures):
-            idx = futures[future]
-            try:
-                results[idx] = future.result()
-            except Exception as exc:
-                log.exception(
-                    "%s: worker failed at index %d: %s",
-                    label or "parallel_map",
-                    idx,
-                    exc,
-                )
-            with lock:
+        def submit_available() -> None:
+            while pending_items and len(in_flight) < max_in_flight and not stop_requested():
+                idx, item = pending_items.popleft()
+                in_flight[pool.submit(func, item)] = idx
+
+        submit_available()
+        while in_flight:
+            completed, _ = wait(in_flight, return_when=FIRST_COMPLETED)
+            for future in completed:
+                idx = in_flight.pop(future)
+                try:
+                    results[idx] = future.result()
+                except Exception as exc:
+                    log.exception(
+                        "%s: worker failed at index %d: %s",
+                        label or "parallel_map",
+                        idx,
+                        exc,
+                    )
                 done += 1
                 if label and (done % progress_every == 0 or done == len(items)):
                     log.info("%s: %d/%d done", label, done, len(items))
+            submit_available()
 
+        if stop_requested() and pending_items:
+            log.warning(
+                "%s: stop requested; skipped %d unsubmitted item(s)",
+                label or "parallel_map",
+                len(pending_items),
+            )
+
+    if stop_requested():
+        return [result for result in results if result is not None]
     return results  # type: ignore[return-value]

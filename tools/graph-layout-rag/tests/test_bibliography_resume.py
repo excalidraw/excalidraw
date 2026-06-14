@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from graph_layout_rag.harvest.bibliography import (
+    _positive_env_int,
     filter_relevant_dois_resumable,
     pending_bibliography_resolve_dois,
     select_bibliography_dois,
@@ -31,6 +32,13 @@ def test_relevance_resumes_skips_openalex_for_known_decisions():
     assert openalex.call_args[0][0] == "10.1007/new-paper"
     assert decisions["10.1145/1234567.1234567"] is True
     assert "10.1007/new-paper" in decisions
+
+
+def test_positive_env_int(monkeypatch):
+    monkeypatch.setenv("GRAPH_RAG_TEST_INT", "32")
+    assert _positive_env_int("GRAPH_RAG_TEST_INT", 8) == 32
+    monkeypatch.setenv("GRAPH_RAG_TEST_INT", "invalid")
+    assert _positive_env_int("GRAPH_RAG_TEST_INT", 8) == 8
 
 
 def test_select_bibliography_dois_caps_relevant():

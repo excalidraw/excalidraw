@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import os
 import re
+import hashlib
+import json
+import threading
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from graph_layout_rag.harvest.checkpoint import RELEVANCE_CHECKPOINT_EVERY, RESOLVE_BATCH_SIZE
@@ -12,7 +17,7 @@ from graph_layout_rag.harvest.log import get_logger
 from graph_layout_rag.harvest.parallel import parallel_map
 from graph_layout_rag.harvest.tags_inference import infer_harvest_tags
 from graph_layout_rag.manifest import ManifestItem, load_manifest, relative_local_path
-from graph_layout_rag.paths import PKG_ROOT, PDF_DIR
+from graph_layout_rag.paths import BIBLIOGRAPHY_SCAN_CACHE_DIR, PKG_ROOT, PDF_DIR
 
 DOI_RE = re.compile(r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+", re.IGNORECASE)
 
@@ -41,7 +46,21 @@ SEED_TAGS = {
     "constraints",
 }
 DEFAULT_MAX_BIB_DOIS = 300
-BIB_RELEVANCE_WORKERS_CAP = 8
+BIB_RELEVANCE_WORKERS_DEFAULT = 24
+BIB_RELEVANCE_CHECKPOINT_DEFAULT = 200
+BIB_SCAN_WORKERS_DEFAULT = 8
+BIB_SCAN_CACHE_VERSION = 1
+
+
+def _positive_env_int(name: str, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
 
 
 def extract_dois_from_text(text: str) -> list[str]:
@@ -53,6 +72,60 @@ def read_pdf_text(local_relative: str) -> str:
 
     result = extract_pages_from_path(PKG_ROOT / local_relative)
     return "\n".join(text for _, text in result.pages)
+
+
+def _scan_cache_path(sha256: str) -> Path:
+    return BIBLIOGRAPHY_SCAN_CACHE_DIR / f"v{BIB_SCAN_CACHE_VERSION}" / f"{sha256}.json"
+
+
+def _file_sha256(path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _scan_seed_pdf(item) -> dict[str, Any]:
+    path = PKG_ROOT / item.localPath
+    sha256 = _file_sha256(path)
+    cache_path = _scan_cache_path(sha256)
+    if cache_path.is_file():
+        try:
+            cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            if cached.get("version") == BIB_SCAN_CACHE_VERSION:
+                cached["cache_hit"] = True
+                return cached
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    try:
+        text = read_pdf_text(item.localPath)
+        record = {
+            "version": BIB_SCAN_CACHE_VERSION,
+            "sha256": sha256,
+            "item_id": item.id,
+            "chars": len(text),
+            "dois": sorted(extract_dois_from_text(text)),
+            "error": None,
+            "cache_hit": False,
+        }
+    except Exception as exc:
+        record = {
+            "version": BIB_SCAN_CACHE_VERSION,
+            "sha256": sha256,
+            "item_id": item.id,
+            "chars": 0,
+            "dois": [],
+            "error": str(exc),
+            "cache_hit": False,
+        }
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = cache_path.with_suffix(f".{threading.get_ident()}.tmp")
+    tmp.write_text(json.dumps(record, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp, cache_path)
+    return record
 
 
 def _doi_relevance_decision(doi: str) -> bool:
@@ -82,7 +155,7 @@ def filter_relevant_dois_resumable(
     workers: int | None,
     relevance_decisions: dict[str, bool],
     on_decisions_batch: Callable[[dict[str, bool]], None] | None = None,
-    checkpoint_every: int = RELEVANCE_CHECKPOINT_EVERY,
+    checkpoint_every: int | None = None,
 ) -> dict[str, bool]:
     log = get_logger()
     if not dois:
@@ -97,7 +170,15 @@ def filter_relevant_dois_resumable(
         )
         return decisions
 
-    relevance_workers = min(workers or BIB_RELEVANCE_WORKERS_CAP, BIB_RELEVANCE_WORKERS_CAP)
+    relevance_workers_cap = _positive_env_int(
+        "GRAPH_RAG_BIB_RELEVANCE_WORKERS",
+        BIB_RELEVANCE_WORKERS_DEFAULT,
+    )
+    relevance_workers = min(workers or relevance_workers_cap, relevance_workers_cap)
+    checkpoint_every = checkpoint_every or _positive_env_int(
+        "GRAPH_RAG_BIB_RELEVANCE_CHECKPOINT_EVERY",
+        max(RELEVANCE_CHECKPOINT_EVERY, BIB_RELEVANCE_CHECKPOINT_DEFAULT),
+    )
     log.info(
         "bibliography: checking relevance for %d candidate DOI(s) (%d already done, %d workers)",
         len(pending),
@@ -156,6 +237,7 @@ def scan_bibliography_candidates(
     *,
     max_dois: int = DEFAULT_MAX_BIB_DOIS,
     bib_state: dict[str, Any] | None = None,
+    workers: int | None = None,
 ) -> list[str]:
     log = get_logger()
     if bib_state:
@@ -181,26 +263,37 @@ def scan_bibliography_candidates(
     ]
     log.info("bibliography: scanning %d seed PDF(s) for DOIs (max_dois=%d)", len(seeds), max_dois)
 
-    for idx, item in enumerate(seeds, 1):
-        log.info("bibliography: seed %d/%d — %s", idx, len(seeds), item.id)
-        try:
-            text = read_pdf_text(item.localPath)
-            page_hint = f"{len(text)} chars" if text else "empty"
-            raw_dois = extract_dois_from_text(text)
-            plausible = [d for d in raw_dois if is_plausible_bibliography_doi(d)]
-            new_dois = [d for d in plausible if d not in known and d not in candidates]
-            candidates.update(new_dois)
-            log.info(
-                "bibliography: %s — %s, %d DOI(s) in text, %d new (%d candidates)",
-                item.id,
-                page_hint,
-                len(raw_dois),
-                len(new_dois),
-                len(candidates),
-            )
-        except Exception as exc:
-            log.warning("bibliography: failed reading %s: %s", item.id, exc)
+    scan_workers_cap = _positive_env_int("GRAPH_RAG_BIB_SCAN_WORKERS", BIB_SCAN_WORKERS_DEFAULT)
+    scan_workers = min(workers or scan_workers_cap, scan_workers_cap)
+    records = parallel_map(_scan_seed_pdf, seeds, workers=scan_workers, label="bibliography-scan")
+    cache_hits = sum(1 for record in records if record and record.get("cache_hit"))
+    log.info(
+        "bibliography: scan cache hits=%d misses=%d workers=%d",
+        cache_hits,
+        len(records) - cache_hits,
+        scan_workers,
+    )
+
+    for idx, (item, record) in enumerate(zip(seeds, records), 1):
+        if not record:
             continue
+        if record.get("error"):
+            log.warning("bibliography: failed reading %s: %s", item.id, record["error"])
+            continue
+        raw_dois = record["dois"]
+        plausible = [d for d in raw_dois if is_plausible_bibliography_doi(d)]
+        new_dois = [d for d in plausible if d not in known and d not in candidates]
+        candidates.update(new_dois)
+        log.info(
+            "bibliography: seed %d/%d — %s, %d chars, %d DOI(s), %d new (%d candidates)",
+            idx,
+            len(seeds),
+            item.id,
+            record["chars"],
+            len(raw_dois),
+            len(new_dois),
+            len(candidates),
+        )
 
         if len(candidates) >= max_dois * 3:
             log.info(
@@ -225,7 +318,7 @@ def collect_bibliography_dois(
     max_dois: int = DEFAULT_MAX_BIB_DOIS,
     workers: int | None = None,
 ) -> list[str]:
-    candidates = scan_bibliography_candidates(max_dois=max_dois)
+    candidates = scan_bibliography_candidates(max_dois=max_dois, workers=workers)
     if not candidates:
         return []
     decisions = filter_relevant_dois_resumable(candidates, workers=workers, relevance_decisions={})

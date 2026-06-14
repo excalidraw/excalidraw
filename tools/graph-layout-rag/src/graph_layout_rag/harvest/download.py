@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import threading
 import time
 from pathlib import Path
 
@@ -24,6 +25,31 @@ USER_AGENT = (
 DEFAULT_MIN_PDF_BYTES = 10_000
 _MAX_RETRIES = 4
 _RETRYABLE_STATUSES = {202, 429, 500, 502, 503, 504}
+_clients = threading.local()
+
+
+def _client(*, verify: bool, timeout: httpx.Timeout) -> httpx.Client:
+    clients = getattr(_clients, "clients", None)
+    if clients is None:
+        clients = {}
+        _clients.clients = clients
+    client = clients.get(verify)
+    if client is None:
+        client = httpx.Client(
+            follow_redirects=True,
+            timeout=timeout,
+            verify=verify,
+            limits=httpx.Limits(max_connections=8, max_keepalive_connections=4),
+        )
+        clients[verify] = client
+    return client
+
+
+def close_thread_clients() -> None:
+    clients = getattr(_clients, "clients", {})
+    for client in clients.values():
+        client.close()
+    _clients.clients = {}
 
 
 def _is_valid_pdf(data: bytes, *, min_bytes: int) -> bool:
@@ -78,10 +104,10 @@ def _finish(
 def fetch_text(url: str, timeout: float = 60.0) -> str:
     domain = domain_from_url(url)
     wait_for_domain(domain)
-    with httpx.Client(follow_redirects=True, timeout=timeout) as client:
-        res = client.get(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,*/*"})
-        res.raise_for_status()
-        return res.text
+    client = _client(verify=True, timeout=httpx.Timeout(timeout))
+    res = client.get(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html,*/*"})
+    res.raise_for_status()
+    return res.text
 
 
 def download_to_file(
@@ -134,14 +160,13 @@ def download_to_file(
     for attempt in range(1, _MAX_RETRIES + 1):
         wait_for_domain(domain)
         try:
-            with httpx.Client(follow_redirects=True, timeout=_timeout, verify=verify) as client:
-                res = client.get(
-                    url,
-                    headers={
-                        "User-Agent": USER_AGENT,
-                        "Accept": "application/pdf,text/html,*/*",
-                    },
-                )
+            res = _client(verify=verify, timeout=_timeout).get(
+                url,
+                headers={
+                    "User-Agent": USER_AGENT,
+                    "Accept": "application/pdf,text/html,*/*",
+                },
+            )
         except httpx.HTTPError as exc:
             log.debug("download error for %s (attempt %d): %s", url[:120], attempt, exc)
             if attempt < _MAX_RETRIES:

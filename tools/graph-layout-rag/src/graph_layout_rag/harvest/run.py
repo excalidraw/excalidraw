@@ -38,7 +38,13 @@ from graph_layout_rag.harvest.handbook import harvest_handbook
 from graph_layout_rag.harvest.ledger import init_db, query_attempts, set_harvest_run, set_harvest_stage, summary
 from graph_layout_rag.harvest.log import setup_harvest_logging
 from graph_layout_rag.harvest.openalex import harvest_openalex
-from graph_layout_rag.harvest.parallel import DEFAULT_WORKERS, MAX_WORKERS, set_workers
+from graph_layout_rag.harvest.parallel import (
+    DEFAULT_WORKERS,
+    MAX_WORKERS,
+    clear_stop,
+    request_stop,
+    set_workers,
+)
 from graph_layout_rag.harvest.retry import retry_unresolved_multi_pass
 from graph_layout_rag.harvest.semantic_scholar import harvest_semantic_scholar
 from graph_layout_rag.harvest.topic_seeds import harvest_topic_seeds
@@ -358,7 +364,7 @@ def _run_bibliography_pass(
             candidates = list(bib_state["candidates"])
             log.info("bibliography: resume — %d saved candidate DOI(s)", len(candidates))
         else:
-            candidates = scan_bibliography_candidates(max_dois=max_bib_dois)
+            candidates = scan_bibliography_candidates(max_dois=max_bib_dois, workers=workers)
             if not candidates:
                 return
             bib_state = {
@@ -595,6 +601,7 @@ def _execute_harvest(
 
     def _on_sigint(_signum, _frame) -> None:
         interrupted["flag"] = True
+        request_stop()
         log.warning("SIGINT received — saving manifest and checkpoint")
         m = manifest_holder.get("manifest")
         if m is not None:
@@ -618,6 +625,7 @@ def _execute_harvest(
             save_checkpoint(data)
         click.echo("\nInterrupted — progress saved. Re-run with --resume to continue.")
 
+    clear_stop()
     signal.signal(signal.SIGINT, _on_sigint)
 
     manifest = load_manifest()
