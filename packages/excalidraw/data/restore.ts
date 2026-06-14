@@ -54,6 +54,11 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import {
+  elementOverlapsWithFrame,
+  isFrameLikeElement,
+} from "@excalidraw/element";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -744,20 +749,78 @@ const repairBoundElement = (
 };
 
 /**
- * Remove an element's frameId if its containing frame is non-existent
+ * Remove an element's frameId if:
+ *  - its containing frame is non-existent (or isn't actually a frame), or
+ *  - the element no longer (precisely) overlaps its containing frame.
+ *
+ * Frame membership is treated atomically per group: a grouped element keeps its
+ * frameId as long as ANY element of its (outermost) group still overlaps the
+ * frame, so we never split a group across frame membership. Bound text inherits
+ * its container's geometry/membership.
  *
  * NOTE mutates elements.
  */
 const repairFrameMembership = (
   element: Mutable<ExcalidrawElement>,
   elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+  /** elements bucketed by outermost groupId (see `restoreElements`) */
+  elementsByGroup: Map<string, Mutable<ExcalidrawElement>[]>,
+  /** memoizes the overlap decision per `${frameId}:${groupId}` */
+  checkedFrameGroups: Map<string, boolean>,
 ) => {
-  if (element.frameId) {
-    const containingFrame = elementsMap.get(element.frameId);
+  if (!element.frameId) {
+    return;
+  }
 
-    if (!containingFrame) {
-      element.frameId = null;
+  const containingFrame = elementsMap.get(element.frameId);
+
+  // frame no longer exists (or the frameId doesn't point to a frame)
+  if (!containingFrame || !isFrameLikeElement(containingFrame)) {
+    element.frameId = null;
+    return;
+  }
+
+  // don't recompute geometry for deleted elements
+  if (element.isDeleted) {
+    return;
+  }
+
+  // a bound text follows its container's geometry / membership
+  const geometryElement =
+    isTextElement(element) && element.containerId
+      ? elementsMap.get(element.containerId) ?? element
+      : element;
+
+  const outerGroupId =
+    geometryElement.groupIds[geometryElement.groupIds.length - 1];
+
+  let overlapsFrame: boolean;
+  if (outerGroupId) {
+    const cacheKey = `${containingFrame.id}:${outerGroupId}`;
+    const cached = checkedFrameGroups.get(cacheKey);
+    if (cached !== undefined) {
+      overlapsFrame = cached;
+    } else {
+      // group membership is atomic — keep the element as long as ANY element
+      // of its group still overlaps the frame, so we never split a group.
+      const groupElements = elementsByGroup.get(outerGroupId) ?? [
+        geometryElement,
+      ];
+      overlapsFrame = groupElements.some((groupElement) =>
+        elementOverlapsWithFrame(groupElement, containingFrame, elementsMap),
+      );
+      checkedFrameGroups.set(cacheKey, overlapsFrame);
     }
+  } else {
+    overlapsFrame = elementOverlapsWithFrame(
+      geometryElement,
+      containingFrame,
+      elementsMap,
+    );
+  }
+
+  if (!overlapsFrame) {
+    element.frameId = null;
   }
 };
 
@@ -836,9 +899,32 @@ export const restoreElements = <T extends ExcalidrawElement>(
 
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
+
+  // index elements by their outermost groupId once, so frame-membership repair
+  // can resolve a group's members in O(1) instead of scanning all elements per
+  // group (getElementsInGroup) — a big win on large, heavily-grouped scenes.
+  const elementsByGroup = new Map<string, Mutable<ExcalidrawElement>[]>();
+  for (const element of restoredElements) {
+    const outerGroupId = element.groupIds[element.groupIds.length - 1];
+    if (outerGroupId) {
+      const members = elementsByGroup.get(outerGroupId);
+      if (members) {
+        members.push(element);
+      } else {
+        elementsByGroup.set(outerGroupId, [element]);
+      }
+    }
+  }
+
+  const checkedFrameGroups = new Map<string, boolean>();
   for (const element of restoredElements) {
     if (element.frameId) {
-      repairFrameMembership(element, restoredElementsMap);
+      repairFrameMembership(
+        element,
+        restoredElementsMap,
+        elementsByGroup,
+        checkedFrameGroups,
+      );
     }
 
     if (isTextElement(element) && element.containerId) {

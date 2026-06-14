@@ -3,6 +3,7 @@ import {
   Excalidraw,
 } from "@excalidraw/excalidraw";
 import { arrayToMap } from "@excalidraw/common";
+import { degreesToRadians, pointFrom } from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
@@ -13,6 +14,8 @@ import {
 } from "@excalidraw/excalidraw/tests/test-utils";
 
 import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+
+import type { Degrees } from "@excalidraw/math";
 
 import { elementOverlapsWithFrame } from "../src/frame";
 
@@ -152,6 +155,108 @@ describe("adding elements to frames", () => {
         arrayToMap(h.elements),
       ),
     ).toBe(true);
+  });
+
+  it("uses precise geometry (not the bounding box) to detect frame overlap", () => {
+    // a 300x200 frame at the origin, with shapes positioned just outside each
+    // corner so that their bounding box clips the frame but their actual
+    // outline does not. The precise `isElementIntersectingFrame` must report
+    // no overlap.
+    const overlapFrame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 200,
+    });
+    // clips the bottom-right corner; the rhombus tip stays out
+    const diamond = API.createElement({
+      type: "diamond",
+      x: 290,
+      y: 175,
+      width: 100,
+      height: 100,
+    });
+    // clips the bottom-left corner; rotated (NOT 45°, which would degenerate
+    // into an axis-aligned square whose shape fills its AABB)
+    const diamondRotated = API.createElement({
+      type: "diamond",
+      x: -50,
+      y: 195,
+      width: 100,
+      height: 100,
+      angle: degreesToRadians(45 as Degrees),
+    });
+    // clips the top-left corner; the curve doesn't reach the corner
+    const ellipse = API.createElement({
+      type: "ellipse",
+      x: -90,
+      y: -90,
+      width: 100,
+      height: 100,
+    });
+    // clips the top edge; the polyline weaves outside the frame
+    const line = API.createElement({
+      type: "line",
+      x: 130,
+      y: -20,
+      width: 293,
+      height: 183,
+      points: [
+        pointFrom(0, 0),
+        pointFrom(-165, -96),
+        pointFrom(-293, -16),
+        pointFrom(-162, 87),
+      ],
+    });
+    // clips the bottom-left corner; the stroke stays outside
+    const freedraw = API.createElement({
+      type: "freedraw",
+      x: -15,
+      y: 180,
+      width: 207,
+      height: 209,
+      points: [
+        pointFrom(0, 0),
+        pointFrom(-69, 99),
+        pointFrom(-33, 183),
+        pointFrom(48, 209),
+        pointFrom(124, 195),
+        pointFrom(138, 145),
+        pointFrom(123, 85),
+      ],
+    });
+    // clips the top-right corner, but its rounded corner is cut away from
+    // exactly that corner — so its actual outline stays outside
+    const roundedRect = API.createElement({
+      type: "rectangle",
+      x: 295,
+      y: -100,
+      width: 160,
+      height: 110,
+      roundness: { type: 3 },
+    });
+
+    API.setElements([
+      overlapFrame,
+      diamond,
+      diamondRotated,
+      ellipse,
+      line,
+      freedraw,
+      roundedRect,
+    ]);
+    const elementsMap = arrayToMap(h.elements);
+    const f = overlapFrame as ExcalidrawFrameLikeElement;
+
+    expect(elementOverlapsWithFrame(diamond, f, elementsMap)).toBe(false);
+    expect(elementOverlapsWithFrame(diamondRotated, f, elementsMap)).toBe(
+      false,
+    );
+    expect(elementOverlapsWithFrame(ellipse, f, elementsMap)).toBe(false);
+    expect(elementOverlapsWithFrame(line, f, elementsMap)).toBe(false);
+    expect(elementOverlapsWithFrame(freedraw, f, elementsMap)).toBe(false);
+    expect(elementOverlapsWithFrame(roundedRect, f, elementsMap)).toBe(false);
   });
 
   it("should not add a newly created element to a frame behind a non-frame element", () => {
