@@ -227,7 +227,12 @@ export const actionFinalize = register<FormData>({
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
           });
-          if (isBindingElement(element) && element.endBinding) {
+          if (
+            isBindingElement(element) &&
+            element.endBinding &&
+            // after slicing the trailing point a <2-point arrow may be left
+            element.points.length > 1
+          ) {
             const newArrow = !!appState.newElement;
             const draggedPoints: PointsPositionUpdates = new Map([
               [
