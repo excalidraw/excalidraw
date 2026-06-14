@@ -41,6 +41,214 @@ eval_group.add_command(validate_gold_cmd, name="validate-gold")
 eval_group.add_command(build_retrieval_index_cmd, name="build-retrieval-index")
 
 
+@eval_group.command("related")
+@click.option("--variant", "variants", multiple=True, help="Restrict to these variants (repeatable).")
+@click.option("--folds", default=150, show_default=True, help="Max leave-one-out folds.")
+@click.option("--min-refs", default=1, show_default=True, help="Min in-corpus references to be a seed.")
+@click.option("--embed-model", type=click.Choice(["scincl", "specter2"]), default="scincl", show_default=True)
+@click.option("--report", is_flag=True, help="Also write a markdown report next to -o.")
+@click.option("-o", "--output", type=click.Path(), default=None, help="Write JSON payload here.")
+def eval_related_cmd(
+    variants: tuple[str, ...], folds: int, min_refs: int, embed_model: str,
+    report: bool, output: str | None,
+) -> None:
+    """Leave-one-out citation-prediction A/B for the `find related papers` rankers."""
+    from pathlib import Path
+
+    from graph_layout_rag.eval.related_eval import run_related_eval, write_related_report
+
+    try:
+        payload = run_related_eval(
+            variants=list(variants) or None, max_cases=folds,
+            min_refs=min_refs, embed_model=embed_model,
+        )
+    except RuntimeError as exc:
+        click.echo(str(exc), err=True)
+        sys.exit(1)
+
+    if output:
+        out_path = Path(output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        if report:
+            write_related_report(payload, out_path.with_suffix(".md"))
+            click.echo(f"Report: {out_path.with_suffix('.md')}")
+
+    for r in sorted(payload["results"], key=lambda x: -x.get("mrr", 0)):
+        click.echo(
+            f"{r['variant']:<16} MRR={r.get('mrr', 0):.3f} nDCG@10={r.get('ndcg@10', 0):.3f} "
+            f"R@10={r.get('recall@10', 0):.3f} HR@10={r.get('hit_rate@10', 0):.3f} "
+            f"p95={r.get('latency_ms_p95', 0):.0f}ms"
+        )
+    if payload.get("variants_skipped"):
+        click.echo(f"Skipped (no doc vectors): {', '.join(payload['variants_skipped'])}", err=True)
+
+
+@main.group("cite")
+def cite_group() -> None:
+    """Citation graph: enrich from OpenAlex/Semantic Scholar, find related papers."""
+
+
+@cite_group.command("enrich")
+@click.option("--force", is_flag=True, help="Re-fetch OpenAlex records already enriched.")
+@click.option("--workers", default=16, show_default=True, help="Parallel OpenAlex fetchers.")
+@click.option("--no-s2", is_flag=True, help="Skip the Semantic Scholar isInfluential pass.")
+@click.option(
+    "--incoming/--no-incoming",
+    default=True,
+    show_default=True,
+    help="Fetch incoming citations from Semantic Scholar (revives co-citation).",
+)
+@click.option("--incoming-cap", default=500, show_default=True, help="Cap incoming citers per paper.")
+@click.option("--incoming-workers", default=32, show_default=True, help="Parallel S2 incoming fetchers (no throttle).")
+def cite_enrich_cmd(force: bool, workers: int, no_s2: bool, incoming: bool, incoming_cap: int, incoming_workers: int) -> None:
+    """Build/refresh data/citations.sqlite from the manifest DOIs.
+
+    OpenAlex supplies outgoing references + counts; Semantic Scholar supplies incoming
+    citations (the half OpenAlex meters) so co-citation and the backward PPR signal work.
+    The incoming pass resumes on its own marker — safe to re-run without --force.
+    """
+    from graph_layout_rag.harvest.cite_enrich import enrich_citations
+
+    stats = enrich_citations(
+        force=force, workers=workers, with_s2=not no_s2,
+        incoming=incoming, incoming_cap=incoming_cap, incoming_workers=incoming_workers,
+    )
+    click.echo(json.dumps(stats, indent=2))
+
+
+@cite_group.command("stats")
+def cite_stats_cmd() -> None:
+    """Show citation-graph counts."""
+    from graph_layout_rag import citation_store as cs
+
+    if not cs.CITATIONS_DB_PATH.exists():
+        click.echo("No citation store yet. Run: graph-layout-rag cite enrich")
+        sys.exit(1)
+    db = cs.connect()
+    click.echo(json.dumps(cs.counts(db), indent=2))
+    db.close()
+
+
+@cite_group.command("embed-related")
+@click.option(
+    "--model",
+    type=click.Choice(["scincl", "specter2"]),
+    default="scincl",
+    show_default=True,
+    help="Citation-trained doc embedding to build.",
+)
+@click.option("--rebuild", is_flag=True, help="Drop and rebuild the doc-vector table.")
+@click.option("--batch-size", default=16, show_default=True)
+def cite_embed_related_cmd(model: str, rebuild: bool, batch_size: int) -> None:
+    """Build per-document SciNCL/SPECTER2 vectors over the whole manifest (incl. metadata-only)."""
+    from graph_layout_rag.doc_vectors import build_doc_vectors
+
+    count = build_doc_vectors(model, rebuild=rebuild, batch_size=batch_size)
+    click.echo(json.dumps({"model": model, "doc_vectors": count}, indent=2))
+
+
+# Fused relatedness weights, tuned on the leave-one-out eval: co-citation leads (it became
+# the strongest signal once incoming citations were backfilled), undirected PPR + coupling
+# cover the gaps, embedding is a light topical tiebreak. Re-tune via `eval related`.
+_FUSED_WEIGHTS = {
+    "w_ppr": 0.6, "w_ppr_fwd": 0.0, "w_ppr_bwd": 0.0,
+    "w_coupling": 0.3, "w_cocitation": 1.5, "w_prior": 0.02, "w_embedding": 0.15,
+}
+
+
+@cite_group.command("related")
+@click.argument("doc_id")
+@click.option("--top", default=15, show_default=True)
+@click.option(
+    "--signal",
+    type=click.Choice(["graph", "embedding", "fused"]),
+    default="fused",
+    show_default=True,
+    help="graph = citation structure; embedding = SciNCL/SPECTER2 cosine; fused = both.",
+)
+@click.option(
+    "--model",
+    type=click.Choice(["scincl", "specter2"]),
+    default="scincl",
+    show_default=True,
+    help="Doc-embedding model for the embedding/fused signals.",
+)
+@click.option("--json", "as_json", is_flag=True, help="Emit JSON.")
+def cite_related_cmd(doc_id: str, top: int, signal: str, model: str, as_json: bool) -> None:
+    """Papers most related to DOC_ID (citation structure, embedding, or both)."""
+    from graph_layout_rag import citation_store as cs
+    from graph_layout_rag.doc_vectors import embedding_scores, has_doc_vectors, related_by_embedding
+    from graph_layout_rag.query.citation_rank import load_graph, related_to_docs
+
+    if signal == "embedding":
+        if not has_doc_vectors(model):
+            click.echo(f"No {model} doc vectors. Run: graph-layout-rag cite embed-related --model {model}", err=True)
+            sys.exit(1)
+        emb = related_by_embedding(model, doc_id, top=top)
+        if not emb:
+            click.echo(f"{doc_id!r} has no doc vector (not in manifest?).", err=True)
+            sys.exit(1)
+        if as_json:
+            click.echo(json.dumps({"seed": doc_id, "signal": signal, "model": model, "related": emb}, indent=2))
+            return
+        for i, r in enumerate(emb, 1):
+            click.echo(f"{i:2d}. [{r['score']:.3f}] {r['doc_id']}  (embedding)")
+        return
+
+    if not cs.CITATIONS_DB_PATH.exists():
+        click.echo("No citation store yet. Run: graph-layout-rag cite enrich", err=True)
+        sys.exit(1)
+    db = cs.connect()
+    graph = load_graph(db)
+    if doc_id not in graph.doc_to_oa:
+        click.echo(f"{doc_id!r} has no citation node (no DOI enriched?).", err=True)
+        sys.exit(1)
+
+    weights: dict | None = None
+    embed_scores_by_doc: dict[str, float] | None = None
+    if signal == "fused":
+        weights = dict(_FUSED_WEIGHTS)
+        if has_doc_vectors(model):
+            embed_scores_by_doc = embedding_scores(model, [doc_id])
+        else:
+            weights["w_embedding"] = 0.0
+
+    results = related_to_docs(
+        db, [doc_id], top=top, graph=graph,
+        weights=weights, embed_scores_by_doc=embed_scores_by_doc,
+    )
+    rows = [
+        {
+            "doc_id": r.doc_id,
+            "score": round(r.score, 4),
+            "ppr": round(r.ppr, 4),
+            "ppr_fwd": round(r.ppr_fwd, 4),
+            "ppr_bwd": round(r.ppr_bwd, 4),
+            "coupling": round(r.coupling, 3),
+            "co_citation": round(r.cocitation, 3),
+            "embedding": round(r.embedding, 3),
+            "citation_prior": round(r.prior, 2),
+            "shared_references": r.shared_refs,
+            "shared_citations": r.shared_citations,
+        }
+        for r in results
+    ]
+    db.close()
+    if as_json:
+        click.echo(json.dumps({"seed": doc_id, "signal": signal, "model": model, "related": rows}, indent=2))
+        return
+    for i, r in enumerate(rows, 1):
+        why = []
+        if r["shared_references"]:
+            why.append(f"{r['shared_references']} shared refs")
+        if r["shared_citations"]:
+            why.append(f"{r['shared_citations']} co-citations")
+        if r["embedding"]:
+            why.append(f"emb {r['embedding']:.2f}")
+        click.echo(f"{i:2d}. [{r['score']:.3f}] {r['doc_id']}  ({', '.join(why) or 'PPR'})")
+
+
 @main.group("embed")
 def embed_group() -> None:
     """Embedding profile helpers."""

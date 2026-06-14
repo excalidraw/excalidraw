@@ -4,6 +4,7 @@ import time
 from typing import Any
 
 import lancedb
+from rag_common.rerank import rerank as rerank_candidates
 
 from repo_rag.ingest.bm25 import search_bm25
 from repo_rag.ingest.embed import ENV_PREFIX, EmbedConfig, embed_config_from_env, embed_query
@@ -78,6 +79,7 @@ def search(
     package: str | None = None,
     path_contains: str | None = None,
     embed_profile: str | None = None,
+    rerank: bool | None = None,
 ) -> list[dict[str, Any]]:
     state = load_ingest_state()
     indexed = embed_config_from_state(state)
@@ -90,14 +92,18 @@ def search(
     else:
         config = indexed if indexed is not None else embed_config_from_env()
 
-    dense = _dense_search(
-        query,
-        limit=40,
-        config=config,
-        source_type=source_type,
-        package=package,
-        path_contains=path_contains,
-    )
+    try:
+        dense = _dense_search(
+            query,
+            limit=40,
+            config=config,
+            source_type=source_type,
+            package=package,
+            path_contains=path_contains,
+        )
+    except Exception as exc:
+        log.warning("dense search unavailable; continuing with BM25: %s", exc)
+        dense = []
     sparse = search_bm25(
         query,
         limit=40,
@@ -107,15 +113,25 @@ def search(
     )
 
     merged = reciprocal_rank_fusion(dense, sparse, top=max(top, 20))
+    # Retrieve wide, rerank narrow: a cross-encoder reorders the fused candidates
+    # by query-document relevance. Code relevance hinges on file path + symbol, so
+    # prepend those to the chunk body for the reranker (it never sees the metadata
+    # otherwise). No-op passthrough (plain top-k slice) when reranking is disabled
+    # or the model is unavailable — see rag_common.rerank.
+    for row in merged:
+        header = " ".join(filter(None, (row.get("file_path"), row.get("symbol"))))
+        row["_rerank_text"] = f"{header}\n{row.get('text') or ''}" if header else (row.get("text") or "")
+    ranked = rerank_candidates(query, merged, top=top, text_key="_rerank_text", enabled=rerank)
     log.debug(
-        "hybrid dense=%d sparse=%d merged=%d",
+        "hybrid dense=%d sparse=%d merged=%d ranked=%d",
         len(dense),
         len(sparse),
         len(merged),
+        len(ranked),
     )
 
     results: list[dict[str, Any]] = []
-    for row in merged[:top]:
+    for row in ranked:
         text = row.get("text") or ""
         excerpt = text[:600] + ("..." if len(text) > 600 else "")
         tags = []
@@ -127,17 +143,18 @@ def search(
         if row.get("source_type") == "terraform":
             tags.append("terraform")
 
-        results.append(
-            {
-                "score": row.get("score"),
-                "file_path": row.get("file_path"),
-                "symbol": row.get("symbol"),
-                "source_type": row.get("source_type"),
-                "package": row.get("package"),
-                "start_line": row.get("start_line"),
-                "chunk_id": row.get("id"),
-                "excerpt": excerpt,
-                "tags": tags,
-            }
-        )
+        result = {
+            "score": row.get("score"),
+            "file_path": row.get("file_path"),
+            "symbol": row.get("symbol"),
+            "source_type": row.get("source_type"),
+            "package": row.get("package"),
+            "start_line": row.get("start_line"),
+            "chunk_id": row.get("id"),
+            "excerpt": excerpt,
+            "tags": tags,
+        }
+        if row.get("rerank_score") is not None:
+            result["rerank_score"] = row.get("rerank_score")
+        results.append(result)
     return results

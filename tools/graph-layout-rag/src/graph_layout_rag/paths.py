@@ -19,11 +19,17 @@ PDF_DIR = RAW_DIR / "pdf"
 HTML_DIR = RAW_DIR / "html"
 MANIFEST_PATH = DATA_DIR / "manifest.json"
 HARVEST_DB_PATH = DATA_DIR / "harvest.db"
+CITATIONS_DB_PATH = DATA_DIR / "citations.sqlite"
 HARVEST_CHECKPOINT_PATH = DATA_DIR / "harvest_checkpoint.json"
 BIBLIOGRAPHY_SCAN_CACHE_DIR = DATA_DIR / "bibliography-scan-cache"
 HARVEST_LOG_PATH = DATA_DIR / "harvest.log"
 INGEST_LOG_PATH = DATA_DIR / "ingest.log"
 CHUNKS_TABLE = "chunks"
+
+# Citation-relatedness doc vectors (SciNCL/SPECTER2) — one small LanceDB per model,
+# keyed by doc_id, independent of the chunk indexes.
+RELATED_DIR = DATA_DIR / "related"
+DOC_VECTORS_TABLE = "doc_vectors"
 
 # Deprecated: single shared index (use profile_index_paths instead).
 LANCE_DIR = DATA_DIR / "lancedb"
@@ -40,6 +46,10 @@ class ProfileIndexPaths:
     ingest_state: Path
     bm25_dir: Path
     ingest_status: Path | None = None
+
+
+def related_lance_dir(model: str) -> Path:
+    return RELATED_DIR / sanitize_profile_name(model) / "lancedb"
 
 
 def indexes_root() -> Path:

@@ -22,6 +22,11 @@ def _open_or_create_index() -> tantivy.Index:
     schema_builder = tantivy.SchemaBuilder()
     schema_builder.add_text_field("id", stored=True)
     schema_builder.add_text_field("file_path", stored=True)
+    # Untokenized mirror of file_path so delete-by-file matches the whole path as a
+    # single term. Deleting on the tokenized `file_path` field is a no-op (the term
+    # dictionary holds the path's *tokens*, never the full path), which silently
+    # leaks stale chunks on every incremental reindex. See delete_chunks_for_file.
+    schema_builder.add_text_field("file_path_raw", tokenizer_name="raw")
     schema_builder.add_text_field("symbol", stored=True)
     schema_builder.add_text_field("source_type", stored=True)
     schema_builder.add_text_field("package", stored=True)
@@ -42,7 +47,7 @@ def delete_chunks_for_file(file_path: str) -> None:
         return
     index = _open_or_create_index()
     writer = index.writer()
-    writer.delete_documents("file_path", file_path)
+    writer.delete_documents("file_path_raw", file_path)
     writer.commit()
     index.reload()
 
@@ -65,6 +70,7 @@ def upsert_chunks(chunks: list[TextChunk], *, rebuild: bool = False) -> int:
             tantivy.Document(
                 id=chunk.chunk_id,
                 file_path=chunk.file_path,
+                file_path_raw=chunk.file_path,
                 symbol=chunk.symbol,
                 source_type=chunk.source_type,
                 package=chunk.package,
@@ -111,12 +117,17 @@ def search_bm25(
 
     hits = searcher.search(parsed, limit)
     results: list[dict] = []
+    seen: set[str] = set()
     for score, doc_address in hits.hits:
         doc = searcher.doc(doc_address)
+        chunk_id = doc.get_first("id")
+        if chunk_id in seen:
+            continue
+        seen.add(chunk_id)
         results.append(
             {
                 "score": float(score),
-                "id": doc.get_first("id"),
+                "id": chunk_id,
                 "file_path": doc.get_first("file_path"),
                 "symbol": doc.get_first("symbol"),
                 "source_type": doc.get_first("source_type"),

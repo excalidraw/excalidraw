@@ -1,6 +1,6 @@
 ---
 name: graph-layout-rag
-description: Query local graph drawing / layout theory RAG corpus. Use when researching Terraform pipeline layout height, Sugiyama/dot layering, neato stress majorization, ELK/Mermaid/dagre, compound grouping, layer reassignment, or graph layout literature. After search, read full PDFs via manifest doc_id.
+description: Query local graph drawing / layout theory RAG corpus. Use when researching Terraform pipeline layout height, Sugiyama/dot layering, neato stress majorization, ELK/Mermaid/dagre, compound grouping, layer reassignment, or graph layout literature. After search, read full PDFs via manifest doc_id. Also supports "find papers related to this paper" via the citation graph (cite related).
 ---
 
 # Graph layout RAG
@@ -18,6 +18,7 @@ minimization, compound graphs, and Terraform pipeline height.
 - **Separation constraints**, stress majorization (neato), orthogonal routing
 - **VLSI compaction**, **strip packing / track assignment**, **mental-map overlap removal**
 - Finding primary sources before changing `terraformPipelineLayout.ts`
+- Expanding from a **known paper to its related neighborhood** (shared refs / co-citations) — see [Find related papers](#find-related-papers-citation-graph)
 
 ## Agent workflow (recommended)
 
@@ -250,6 +251,86 @@ yarn graph-rag:catalog --category compaction --limit 20
 | `packing` | Skyline strip packing, left-edge track assignment | `left edge algorithm channel routing track assignment` |
 | `overlap` | Mental map adjustment, cluster busting, PRISM | `layout adjustment mental map graph drawing` |
 
+## Find related papers (citation graph)
+
+A capability **separate from `query`**. `query` answers *"papers about a topic"* (text
+search). `cite related` answers *"papers related to **this** paper"* (citation structure +
+citation-trained embeddings) — the Connected Papers use case. Use it to expand from a known
+seed paper to its neighborhood (shared references, co-citations, topically-near work).
+
+The data lives in `data/citations.sqlite` (a graph of references, incoming citations,
+authorship) plus per-model doc-vector tables under `data/related/`.
+
+### One-time setup
+
+```bash
+cd tools/graph-layout-rag
+# 1. Build the citation graph: OpenAlex references + Semantic Scholar incoming citations.
+#    --incoming (default) is what makes co-citation work — it is the strongest signal.
+uv run graph-layout-rag cite enrich --no-s2 --incoming-workers 32
+uv run graph-layout-rag cite stats          # papers / cite_edges / influential / incoming coverage
+
+# 2. Build citation-trained doc embeddings (title+abstract, CLS-pooled) for ALL manifest
+#    items — including metadata-only papers with no PDF.
+uv run graph-layout-rag cite embed-related --model scincl --rebuild
+uv run graph-layout-rag cite embed-related --model specter2 --rebuild
+```
+
+`cite enrich` is **idempotent and resumable** — a paper is only marked done on a successful
+S2 fetch, so just re-run it to mop up any papers dropped under load (see S2 note below).
+
+### Find related to a seed
+
+```bash
+uv run graph-layout-rag cite related <doc_id> --signal fused --top 10 --json
+```
+
+| Flag | Values | Notes |
+|------|--------|-------|
+| `--signal` | `fused` (default), `graph`, `embedding` | `fused` = co-citation + PPR + coupling + embedding; **recommended** |
+| `--model` | `scincl` (default), `specter2` | doc-embedding model for `embedding`/`fused` |
+| `--top` / `--json` | | JSON gives per-signal provenance per result |
+
+Output rows carry **why-related provenance**: `shared_references`, `shared_citations`
+(co-citations), `embedding` cosine, and the per-signal sub-scores. The seed `doc_id` **must
+have a DOI that got enriched** — not every manifest entry is in the graph; if it says
+"no citation node", that paper has no DOI/edges.
+
+### What actually wins (measured)
+
+`eval related` is a self-supervised A/B: it hides one real citation from a paper and asks each
+ranker to recover it (`eval/metrics.py`; no hand-labeling). On the current corpus (150 folds):
+
+| Ranker | MRR | nDCG@10 | R@10 | Verdict |
+|--------|----:|--------:|-----:|---------|
+| `related_v2` (fused, tuned) | **0.225** | **0.265** | **0.433** | **best — the `fused` default** |
+| `cocitation_only` | 0.201 | 0.234 | 0.367 | strongest *single* signal (needs `--incoming`) |
+| `ppr_undirected` | 0.141 | 0.185 | 0.393 | good recall |
+| `coupling_only` | 0.085 | 0.100 | 0.187 | shared references alone is weak |
+| `scincl` / `specter2` | 0.04–0.06 | | | embeddings are **weak at citation-link prediction** (they capture topical, not citation, similarity) — a light tiebreak in `fused`, not a primary signal |
+| `ppr_directional` | 0.040 | | | node-split PPR lost to undirected here; weight 0 by default |
+
+Re-tune the `fused` weights (in `cli.py` / `eval/related_eval.py` `_FUSED_WEIGHTS`) and confirm with:
+
+```bash
+uv run graph-layout-rag eval related --folds 150 --report -o data/eval/related-ab.json
+```
+
+### Important caveats
+
+- **Do not fuse citation signal into `query` ranking.** A separate A/B showed it *hurts*
+  query→doc retrieval (relatedness optimizes seed-similarity, not query-relevance). Keep these
+  worlds separate: `query` for topics, `cite related` for seed expansion.
+- **Co-citation depends on `cite enrich --incoming`.** Without the Semantic Scholar incoming pass
+  the graph has only outgoing references and co-citation is dead (OpenAlex meters its `cites:`
+  filter, so it can't supply incoming edges).
+- **S2 is hammered with no throttle / no backoff** (`--incoming-workers 32`,
+  `rate_limit.py` `_NO_BACKOFF`). It finishes ~1300 papers in seconds but ~20% get 429-dropped
+  once the shared anonymous pool budget (5000 req / 5 min) is spent. Those papers stay unmarked;
+  **wait ~5 min for the window to reset and re-run `cite enrich --no-s2`** to retry just them.
+- SPECTER2 uses the **base** model (CLS-pooled), not the proximity adapter — the `adapters` lib
+  pins `transformers<4.58` and conflicts with the MLX embed stack.
+
 ## Reading full papers (after search)
 
 Only items with `status: "ok"` in the manifest have local PDFs (~2,088; target ~3,088 after pipeline harvest). Metadata-only entries have title/abstract only — no full text.
@@ -347,6 +428,8 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 | `tools/graph-layout-rag/data/manifest.json` | Catalog: id, status, localPath, doi, abstract |
 | `tools/graph-layout-rag/data/raw/pdf/` | Downloaded PDFs |
 | `tools/graph-layout-rag/data/indexes/{profile}/` | Per-profile vector index + ingest checkpoint |
+| `tools/graph-layout-rag/data/citations.sqlite` | Citation graph: references, incoming citations, authorship |
+| `tools/graph-layout-rag/data/related/{model}/` | Per-model (scincl/specter2) doc-vector tables |
 | `tools/graph-layout-rag/data/retrieval-indexes/` | Immutable optional SPLADE/ColBERT indexes |
 | `tools/graph-layout-rag/data/eval/runs/` | Immutable resumable benchmark runs |
 | `tools/graph-layout-rag/data/ingest.log` | Ingest structured log |
@@ -362,8 +445,10 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 
 ## Do not
 
-- Commit `data/raw/`, `data/indexes/`, `data/manifest.json`, or log files
+- Commit `data/raw/`, `data/indexes/`, `data/manifest.json`, `data/citations.sqlite`, `data/related/`, or log files
 - Run `query` while `ingest` is active on a memory-constrained Mac (OOM)
+- Fuse citation/relatedness signal into `query` ranking — it hurts query→doc retrieval; keep `cite related` standalone
+- Expect `cite related` to work on a seed without an enriched DOI (run `cite enrich` first)
 - Enable local reranking by default; benchmark it explicitly under memory guards
 - Resume ingest with `--force --rebuild` (re-does everything)
 - Assume every manifest entry has a PDF — check `status` first

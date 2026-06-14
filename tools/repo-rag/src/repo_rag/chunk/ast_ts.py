@@ -210,6 +210,6 @@ def chunk_typescript(entry: FileEntry, content: str) -> list[TextChunk]:
 def chunk_file(entry: FileEntry, content: str) -> list[TextChunk]:
     if entry.path.endswith((".md", ".mdx")):
         return chunk_markdown(entry, content)
-    if entry.path.endswith((".ts", ".tsx")):
+    if entry.path.endswith((".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts")):
         return chunk_typescript(entry, content)
     return _fallback_file_chunks(entry, content)

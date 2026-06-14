@@ -17,11 +17,15 @@ def reciprocal_rank_fusion(
 
     for rank, row in enumerate(dense_results, start=1):
         chunk_id = row["id"]
+        if chunk_id in payloads and payloads[chunk_id].get("dense_rank"):
+            continue
         scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (RRF_K + rank)
         payloads[chunk_id] = {**row, "dense_rank": rank, "dense_score": row.get("score")}
 
     for rank, row in enumerate(sparse_results, start=1):
         chunk_id = row["id"]
+        if chunk_id in payloads and payloads[chunk_id].get("sparse_rank"):
+            continue
         scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (RRF_K + rank)
         base = payloads.get(chunk_id, {})
         base.update(row)

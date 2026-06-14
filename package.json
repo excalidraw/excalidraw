@@ -127,6 +127,7 @@
     "graph-rag:catalog": "cd tools/graph-layout-rag && uv run graph-layout-rag catalog",
     "graph-rag:eval": "cd tools/graph-layout-rag && uv run graph-layout-rag eval benchmark",
     "repo-rag:index": "cd tools/repo-rag && uv run repo-rag index",
+    "repo-rag:watch": "cd tools/repo-rag && uv run --extra watch repo-rag watch",
     "repo-rag:query": "cd tools/repo-rag && uv run repo-rag query",
     "repo-rag:status": "cd tools/repo-rag && uv run repo-rag status",
     "health": "yarn fix && yarn test:typecheck && yarn test:code && yarn lint:arch && yarn knip && yarn depcheck",

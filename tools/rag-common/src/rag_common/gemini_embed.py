@@ -155,7 +155,7 @@ def format_gemini2_text(
 ) -> str:
     """Embedding-2 asymmetric RAG formatting (task prefixes, not task_type param)."""
     if mode == "query":
-        return f"task: search result | query: {text}"
+        return f"task: code retrieval | query: {text}"
     doc_title = title if title else "none"
     return f"title: {doc_title} | text: {text}"
 

@@ -358,6 +358,69 @@ class ExperimentalIndexStrategy:
         return format_results(experimental, top=top, max_per_doc=2)
 
 
+@dataclass
+class CitationGraphStrategy:
+    """Hybrid text retrieval re-ranked by citation-graph relatedness (RRF-fused).
+
+    Seeds = the top distinct docs from the text ranking; every candidate doc in the wide
+    pool is scored for relatedness to those seeds (PPR + bibliographic coupling +
+    co-citation + citation prior) and that ranking is RRF-fused back into the text ranking.
+    Degrades to plain hybrid when no citation store exists.
+    """
+
+    name: str = "hybrid_citation"
+    seed_docs: int = 5
+    pool: int = 120
+    alpha: float = float(os.getenv("GRAPH_RAG_CITATION_ALPHA", "0.5"))  # max fractional boost
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        from graph_layout_rag.query.citation_rank import citation_doc_ranking, load_graph_cached
+        from graph_layout_rag.query.retrieve import retrieve_candidates
+        from graph_layout_rag.query.search import format_results
+
+        candidates = retrieve_candidates(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=True,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            pool=self.pool,
+        )
+        graph = load_graph_cached()
+        if not candidates or graph is None:
+            return format_results(candidates, top=top, max_per_doc=2)
+
+        seen: set[str] = set()
+        seeds: list[str] = []
+        for row in candidates:
+            doc = row.get("doc_id")
+            if doc and doc not in seen:
+                seen.add(doc)
+                seeds.append(doc)
+            if len(seeds) >= self.seed_docs:
+                break
+        cand_docs = [d for d in {row.get("doc_id") for row in candidates} if d]
+        scores = citation_doc_ranking(None, seeds, cand_docs, graph=graph)  # type: ignore[arg-type]
+        if not scores:
+            return format_results(candidates, top=top, max_per_doc=2)
+
+        # Text-primary fusion: multiply each chunk's text score by (1 + alpha*citation_norm).
+        # Multiplicative on the (wide-spread) dense/fusion score keeps query relevance the
+        # backbone; citation only re-orders among comparably-relevant docs. Equal-weight RRF
+        # of the two rankings is catastrophic here because citation optimizes relatedness to
+        # the seeds, not relevance to the query.
+        cmax = max(scores.values()) or 1.0
+        for row in candidates:
+            base = row.get("fusion_score") or row.get("score") or 0.0
+            cnorm = scores.get(row.get("doc_id"), 0.0) / cmax
+            row["citation_norm"] = round(cnorm, 4)
+            row["fusion_score"] = round(base * (1.0 + self.alpha * cnorm), 6)
+        candidates.sort(key=lambda r: r["fusion_score"], reverse=True)
+        return format_results(candidates, top=top, max_per_doc=2)
+
+
 def _filters(case: EvalCase, *, use_category: bool, use_pdf_only: bool) -> RetrieveFilters:
     return RetrieveFilters(
         category=case.category if use_category else None,
@@ -382,6 +445,7 @@ OFFLINE_STRATEGIES: tuple[str, ...] = (
     "hybrid_category",
     "hybrid_pdf_only",
     "hybrid_category_rerank",
+    "hybrid_citation",
 )
 
 LLM_STRATEGIES: tuple[str, ...] = (
@@ -423,6 +487,7 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         HybridCategoryStrategy(),
         HybridPdfOnlyStrategy(),
         HybridCategoryRerankStrategy(),
+        CitationGraphStrategy(),
         MultiQueryStrategy(),
         HyDEStrategy(),
         StepBackStrategy(),

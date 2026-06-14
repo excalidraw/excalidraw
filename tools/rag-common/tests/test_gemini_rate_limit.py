@@ -55,6 +55,24 @@ def test_note_rate_limit_lowers_budget():
 @patch.dict(
     "os.environ",
     {
+        "RAG_GEMINI_TOKENS_PER_MIN": "2000000",
+        "RAG_GEMINI_RATE_HEADROOM": "1.0",
+        "RAG_GEMINI_MIN_INTERVAL_MS": "0",
+    },
+    clear=False,
+)
+def test_concurrent_rate_limit_burst_only_reduces_once():
+    limiter = GeminiRateLimiter()
+    limiter.note_rate_limit()
+    first = limiter._budget  # noqa: SLF001
+    limiter.note_rate_limit()
+    assert first == 1000000
+    assert limiter._budget == first  # noqa: SLF001
+
+
+@patch.dict(
+    "os.environ",
+    {
         "RAG_GEMINI_TOKENS_PER_MIN": "10000",
         "RAG_GEMINI_RATE_HEADROOM": "0.5",
         "RAG_GEMINI_MIN_INTERVAL_MS": "0",

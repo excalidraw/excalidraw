@@ -9,6 +9,9 @@ def _reset_logging() -> None:
     root = logging.getLogger("repo_rag")
     root.handlers.clear()
     root.setLevel(logging.WARNING)
+    common = logging.getLogger("rag_common")
+    common.handlers.clear()
+    common.setLevel(logging.WARNING)
 
 
 def test_setup_logging_verbose(tmp_path):
@@ -30,3 +33,11 @@ def test_setup_logging_respects_level(tmp_path):
     text = log_file.read_text(encoding="utf-8")
     assert "hidden" not in text
     assert "visible" in text
+
+
+def test_setup_logging_captures_rag_common(tmp_path):
+    _reset_logging()
+    log_file = tmp_path / "test.log"
+    setup_logging(verbose=True, log_file=log_file)
+    logging.getLogger("rag_common.openai").info("throughput")
+    assert "throughput" in log_file.read_text(encoding="utf-8")

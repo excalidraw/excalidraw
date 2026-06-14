@@ -18,11 +18,15 @@ dimensions = 768
 
 [profiles.gemini-2]
 backend = "gemini"
-# Preserve the existing fixed-window baseline index.
 model = "gemini-embedding-2-preview"
 dimensions = 3072
 
 [profiles.gemini-2-structure-v1]
+backend = "gemini"
+model = "gemini-embedding-2-preview"
+dimensions = 3072
+
+[profiles.gemini-2-code-3072]
 backend = "gemini"
 model = "gemini-embedding-2-preview"
 dimensions = 3072
@@ -43,3 +47,12 @@ quant = "4bit"
 backend = "local"
 model = "Qwen/Qwen3-Embedding-4B"
 dimensions = 1024
+
+# Code-specialized, max fidelity: Qwen3-Embedding-4B at native 2560 dims, full
+# precision (no Matryoshka truncation, no quant). Tops MTEB-Code (~80.7) — the
+# recommended local profile for code retrieval when quality matters over speed.
+# Free on Apple Silicon (MLX); slower + more memory than the 4-bit mlx-qwen4b.
+[profiles.qwen3-code]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 2560

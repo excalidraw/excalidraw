@@ -4,6 +4,7 @@ import logging
 import os
 import threading
 import time
+from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import tiktoken
@@ -17,6 +18,7 @@ log = logging.getLogger("rag_common.openai")
 MAX_INPUT_TOKENS = 8191
 BATCH_SIZE = 64
 MAX_RETRIES = 8
+PROGRESS_WINDOW_SECONDS = 60.0
 
 
 class OpenAIEmbedError(Exception):
@@ -25,6 +27,55 @@ class OpenAIEmbedError(Exception):
 
 class OpenAIFatalError(OpenAIEmbedError):
     """Auth or rate-limit failure — caller may fall back to local."""
+
+
+@dataclass
+class _Progress:
+    total_batches: int
+    total_texts: int
+    estimated_tokens: int
+    started: float = field(default_factory=time.monotonic)
+    completed_batches: int = 0
+    completed_texts: int = 0
+    completed_tokens: int = 0
+    active: int = 0
+    peak_active: int = 0
+    recent: list[tuple[float, int]] = field(default_factory=list)
+    lock: threading.Lock = field(default_factory=threading.Lock)
+
+    def start_batch(self) -> int:
+        with self.lock:
+            self.active += 1
+            self.peak_active = max(self.peak_active, self.active)
+            return self.active
+
+    def finish_batch(self, texts: int, tokens: int) -> dict[str, float | int]:
+        now = time.monotonic()
+        with self.lock:
+            self.active -= 1
+            self.completed_batches += 1
+            self.completed_texts += texts
+            self.completed_tokens += tokens
+            self.recent.append((now, tokens))
+            cutoff = now - PROGRESS_WINDOW_SECONDS
+            self.recent = [(ts, count) for ts, count in self.recent if ts >= cutoff]
+            elapsed = max(now - self.started, 0.001)
+            recent_span = max(now - self.recent[0][0], 1.0) if self.recent else elapsed
+            cumulative_tpm = self.completed_tokens / elapsed * 60
+            rolling_tpm = sum(count for _, count in self.recent) / recent_span * 60
+            remaining = max(self.estimated_tokens - self.completed_tokens, 0)
+            eta = remaining / (cumulative_tpm / 60) if cumulative_tpm else 0
+            return {
+                "completed_batches": self.completed_batches,
+                "completed_texts": self.completed_texts,
+                "completed_tokens": self.completed_tokens,
+                "active": self.active,
+                "peak_active": self.peak_active,
+                "elapsed": elapsed,
+                "cumulative_tpm": cumulative_tpm,
+                "rolling_tpm": rolling_tpm,
+                "eta": eta,
+            }
 
 
 def _encoding():
@@ -61,8 +112,11 @@ def _embed_batch(
     total_batches: int,
     cfg: EmbedConfig,
     stats: EmbedStats | None,
+    progress: _Progress | None = None,
 ) -> list[list[float]]:
     for attempt in range(MAX_RETRIES):
+        active = progress.start_batch() if progress is not None else 1
+        started = time.monotonic()
         try:
             response = client.embeddings.create(
                 input=batch,
@@ -74,15 +128,40 @@ def _embed_batch(
             )
             if stats is not None:
                 stats.add(tokens=batch_tokens, requests=1)
+            elapsed = max(time.monotonic() - started, 0.001)
             log.info(
-                "openai embed batch %d/%d size=%d tokens=%d",
+                "openai embed batch %d/%d size=%d tokens=%d latency_s=%.2f batch_tpm=%.0f active_at_start=%d",
                 batch_num,
                 total_batches,
                 len(batch),
                 batch_tokens,
+                elapsed,
+                batch_tokens / elapsed * 60,
+                active,
             )
+            if progress is not None:
+                snapshot = progress.finish_batch(len(batch), batch_tokens)
+                log.info(
+                    "openai progress batches=%d/%d texts=%d/%d tokens=%d/%d "
+                    "elapsed_s=%.1f cumulative_tpm=%.0f rolling_tpm=%.0f active=%d peak_active=%d eta_s=%.1f",
+                    snapshot["completed_batches"],
+                    progress.total_batches,
+                    snapshot["completed_texts"],
+                    progress.total_texts,
+                    snapshot["completed_tokens"],
+                    progress.estimated_tokens,
+                    snapshot["elapsed"],
+                    snapshot["cumulative_tpm"],
+                    snapshot["rolling_tpm"],
+                    snapshot["active"],
+                    snapshot["peak_active"],
+                    snapshot["eta"],
+                )
             return [item.embedding for item in response.data]
         except Exception as exc:
+            if progress is not None:
+                with progress.lock:
+                    progress.active -= 1
             if is_quota_error(exc) or is_auth_error(exc):
                 raise OpenAIFatalError(str(exc)) from exc
             if attempt == MAX_RETRIES - 1:
@@ -138,18 +217,23 @@ def embed_openai_texts(
         probe_openai(config, stats=stats)
 
     prepared = [truncate_to_token_limit(t) for t in texts]
+    estimated_tokens = sum(count_tokens(text) for text in prepared)
     batches = [prepared[i : i + BATCH_SIZE] for i in range(0, len(prepared), BATCH_SIZE)]
     total_batches = len(batches)
     n_workers = resolve_workers(workers, prefix=prefix)
 
     log.info(
-        "openai embedding %d texts in %d batch(es) workers=%d model=%s dims=%d",
+        "openai embedding start texts=%d estimated_tokens=%d batches=%d batch_size=%d "
+        "workers=%d model=%s dims=%d",
         len(prepared),
+        estimated_tokens,
         total_batches,
+        BATCH_SIZE,
         min(n_workers, total_batches),
         config.model,
         config.dimensions,
     )
+    progress = _Progress(total_batches, len(prepared), estimated_tokens)
 
     if total_batches == 1 or n_workers == 1:
         client = OpenAI(api_key=api_key)
@@ -163,8 +247,19 @@ def embed_openai_texts(
                     total_batches=total_batches,
                     cfg=config,
                     stats=stats,
+                    progress=progress,
                 )
             )
+        elapsed = max(time.monotonic() - progress.started, 0.001)
+        log.info(
+            "openai embedding done texts=%d tokens=%d requests=%d elapsed_s=%.1f average_tpm=%.0f peak_active=%d",
+            len(vectors),
+            progress.completed_tokens,
+            progress.completed_batches,
+            elapsed,
+            progress.completed_tokens / elapsed * 60,
+            progress.peak_active,
+        )
         return vectors
 
     batch_vectors: list[list[list[float]] | None] = [None] * total_batches
@@ -180,6 +275,7 @@ def embed_openai_texts(
             total_batches=total_batches,
             cfg=config,
             stats=stats,
+            progress=progress,
         )
         return batch_num - 1, vecs
 
@@ -192,4 +288,15 @@ def embed_openai_texts(
             idx, vecs = future.result()
             batch_vectors[idx] = vecs
 
-    return [v for batch in batch_vectors if batch for v in batch]
+    vectors = [v for batch in batch_vectors if batch for v in batch]
+    elapsed = max(time.monotonic() - progress.started, 0.001)
+    log.info(
+        "openai embedding done texts=%d tokens=%d requests=%d elapsed_s=%.1f average_tpm=%.0f peak_active=%d",
+        len(vectors),
+        progress.completed_tokens,
+        progress.completed_batches,
+        elapsed,
+        progress.completed_tokens / elapsed * 60,
+        progress.peak_active,
+    )
+    return vectors

@@ -11,8 +11,13 @@ _domain_gaps: dict[str, float] = {}
 _domain_last: dict[str, float] = {}
 _domain_locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
 
+# Domains we hammer: no inter-request gap, no 429 backoff. The Semantic Scholar shared
+# anonymous pool is large, so we trade politeness for throughput and rely on retries/reruns
+# rather than throttling to absorb the occasional drop under load.
+_NO_BACKOFF: frozenset[str] = frozenset({"api.semanticscholar.org"})
+
 DEFAULT_GAPS: dict[str, float] = {
-    "api.semanticscholar.org": 1.0,
+    "api.semanticscholar.org": 0.0,
     "api.openalex.org": 0.1,
     "api.unpaywall.org": 0.05,
     "api.core.ac.uk": 0.2,
@@ -50,8 +55,8 @@ def wait_for_domain(domain: str) -> None:
 
 
 def note_rate_limit(domain: str, *, retry_after: int | None = None) -> None:
-    """Increase gap after 429; optional Retry-After seconds."""
-    if not domain:
+    """Increase gap after 429; optional Retry-After seconds. No-op for hammered domains."""
+    if not domain or domain in _NO_BACKOFF:
         return
     with _domain_locks[domain]:
         current = gap_for(domain)

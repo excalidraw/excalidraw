@@ -18,6 +18,9 @@ def build_prefixed_text(chunk: TextChunk) -> str:
         lines.append(f"# tags: {', '.join(chunk.tags)}")
     if chunk.is_test:
         lines.append("# is_test: true")
+    if chunk.context:
+        # Contextual Retrieval: situating blurb flows into both embedding and BM25.
+        lines.append(f"# context: {chunk.context}")
     lines.append("")
     lines.append(chunk.text)
     return "\n".join(lines)

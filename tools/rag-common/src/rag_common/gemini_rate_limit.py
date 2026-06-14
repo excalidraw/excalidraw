@@ -16,6 +16,7 @@ WINDOW_SEC = 60.0
 DEFAULT_TOKENS_PER_MIN = 2_000_000
 DEFAULT_HEADROOM = 0.95
 DEFAULT_MIN_INTERVAL_MS = 5
+RATE_LIMIT_COOLDOWN_SEC = 30.0
 _MIN_BUDGET = 1_000
 
 _limiter: GeminiRateLimiter | None = None
@@ -92,6 +93,7 @@ class GeminiRateLimiter:
         self._budget = min(self._budget, self._cap)
         self._last_request_at = 0.0
         self._rate_limit_count = 0
+        self._last_rate_limit_at = 0.0
 
     def _prune(self, now: float) -> None:
         cutoff = now - WINDOW_SEC
@@ -135,15 +137,20 @@ class GeminiRateLimiter:
 
     def note_rate_limit(self, *, retry_after: int | None = None) -> float:
         with self._lock:
+            now = time.time()
             self._cap = _tokens_per_min_cap()
-            self._budget = max(_MIN_BUDGET, self._budget * 0.5)
             self._rate_limit_count += 1
-            _save_budget(self._state_path, self._budget)
+            reduced = now - self._last_rate_limit_at >= RATE_LIMIT_COOLDOWN_SEC
+            if reduced:
+                self._budget = max(_MIN_BUDGET, self._budget * 0.5)
+                self._last_rate_limit_at = now
+                _save_budget(self._state_path, self._budget)
             wait = float(max(60, retry_after or 0))
             log.info(
-                "gemini rate limit: budget=%d tpm (cap=%d), sleeping %.0fs",
+                "gemini rate limit: budget=%d tpm (cap=%d), reduced=%s, sleeping %.0fs",
                 int(self._budget),
                 self._cap,
+                reduced,
                 wait,
             )
         return wait

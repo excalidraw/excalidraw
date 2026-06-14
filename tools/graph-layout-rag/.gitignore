@@ -8,6 +8,9 @@ data/indexes/
 data/retrieval-indexes/
 data/eval/
 data/lancedb/
+data/related/
+data/citations.sqlite
+data/citations.sqlite-*
 data/manifest.json
 data/manifest.*.json
 data/manifest.bak.json

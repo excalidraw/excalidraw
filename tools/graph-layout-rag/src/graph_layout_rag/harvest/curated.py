@@ -58,6 +58,17 @@ CURATED_PDFS = [
         "tags": ["grouped", "grid", "constraints", "ieeevis", "hn"],
         "hn_note": "Recommended by Graphviz on HN 34580064 for grouped/hierarchical blocks.",
     },
+    {
+        # Canonical-coverage seed: open PDF (Stanford VIS group).
+        "id": "bostock-d3-data-driven-documents-2011",
+        "title": "D3: Data-Driven Documents",
+        "authors": ["Bostock", "Ogievetsky", "Heer"],
+        "year": 2011,
+        "url": "http://vis.stanford.edu/files/2011-D3-InfoVis.pdf",
+        "doi": "10.1109/tvcg.2011.185",
+        "source": "stanford",
+        "tags": ["d3", "visualization", "toolkit", "web", "canonical-seed"],
+    },
 ]
 
 CURATED_METADATA = [
@@ -87,6 +98,99 @@ CURATED_METADATA = [
             "-Gmode=hier. Recommended by Graphviz on HN 34580064."
         ),
         "hn_note": "IEEE TVCG; paywalled — metadata stub unless an OA PDF is found later.",
+    },
+    # --- Canonical-coverage seeds (gap-fill, 2026-06-14). Paywalled/old; seeded
+    # with DOI + real abstract so they are useful metadata units and the
+    # retry/bibliography-resolve stages can upgrade to full PDF if an OA copy exists.
+    {
+        "id": "de-fraysseix-pach-pollack-planar-grid-1990",
+        "title": "How to Draw a Planar Graph on a Grid",
+        "authors": ["de Fraysseix", "Pach", "Pollack"],
+        "year": 1990,
+        "url": "https://doi.org/10.1007/BF02122694",
+        "doi": "10.1007/bf02122694",
+        "source": "springer",
+        "tags": ["planar", "straight-line", "grid", "canonical-seed"],
+        "abstract": (
+            "Proves every n-vertex planar graph has a planar straight-line drawing on a "
+            "(2n-4) x (n-2) integer grid, computable in linear time via a canonical vertex "
+            "ordering and the incremental 'shift' method. Foundational grid-drawing result."
+        ),
+    },
+    {
+        "id": "brandes-pich-pivot-mds-2007",
+        "title": "Eigensolver Methods for Progressive Multidimensional Scaling of Large Data (PivotMDS)",
+        "authors": ["Brandes", "Pich"],
+        "year": 2007,
+        "url": "https://doi.org/10.1007/978-3-540-70904-6_6",
+        "doi": "10.1007/978-3-540-70904-6_6",
+        "source": "springer",
+        "tags": ["mds", "stress", "force-directed", "scalable", "canonical-seed"],
+        "abstract": (
+            "Introduces PivotMDS, a sampling-based approximation of classical multidimensional "
+            "scaling that scales graph layout to large graphs by computing positions from "
+            "graph-theoretic distances to a small set of pivot vertices via a power-iteration "
+            "eigensolver. Complements full stress majorization."
+        ),
+    },
+    {
+        "id": "walker-node-positioning-general-trees-1990",
+        "title": "A Node-Positioning Algorithm for General Trees",
+        "authors": ["Walker"],
+        "year": 1990,
+        "url": "https://doi.org/10.1002/spe.4380201404",
+        "doi": "10.1002/spe.4380201404",
+        "source": "wiley",
+        "tags": ["tree", "node-positioning", "reingold-tilford", "canonical-seed"],
+        "abstract": (
+            "Extends Reingold-Tilford tidy tree drawing to general n-ary trees, positioning "
+            "subtrees recursively and 'apportioning' to remove overlap between adjacent "
+            "subtrees. Original is O(n^2); later made linear-time by Buchheim, Junger, Leipert."
+        ),
+    },
+    {
+        "id": "wetherell-shannon-tidy-trees-1979",
+        "title": "Tidy Drawings of Trees",
+        "authors": ["Wetherell", "Shannon"],
+        "year": 1979,
+        "url": "https://doi.org/10.1109/TSE.1979.234212",
+        "doi": "10.1109/tse.1979.234212",
+        "source": "ieee",
+        "tags": ["tree", "tidy", "canonical-seed"],
+        "abstract": (
+            "Early algorithms for aesthetically positioning trees under tidiness criteria "
+            "(minimal width, parents centered over children, isomorphic subtrees drawn "
+            "identically). Direct precursor to the Reingold-Tilford tree-drawing algorithm."
+        ),
+    },
+    {
+        "id": "booth-lueker-pq-trees-1976",
+        "title": "Testing for the Consecutive Ones Property, Interval Graphs, and Graph Planarity Using PQ-Tree Algorithms",
+        "authors": ["Booth", "Lueker"],
+        "year": 1976,
+        "url": "https://doi.org/10.1016/S0022-0000(76)80045-1",
+        "doi": "10.1016/s0022-0000(76)80045-1",
+        "source": "elsevier",
+        "tags": ["planarity", "pq-tree", "data-structure", "canonical-seed"],
+        "abstract": (
+            "Introduces the PQ-tree data structure, giving linear-time tests for the "
+            "consecutive-ones property, interval graph recognition, and graph planarity. "
+            "Foundational machinery for planar embedding used in many graph-drawing pipelines."
+        ),
+    },
+    {
+        "id": "fary-straight-line-planar-1948",
+        "title": "On Straight-Line Representation of Planar Graphs",
+        "authors": ["Fary"],
+        "year": 1948,
+        "url": "https://zbmath.org/0030.17902",
+        "source": "curated",
+        "tags": ["planar", "straight-line", "theory", "canonical-seed"],
+        "abstract": (
+            "Fary's theorem: every simple planar graph admits a planar straight-line drawing; "
+            "any planar graph drawn with curved edges can be redrawn with straight segments "
+            "and no crossings. Existence result underpinning straight-line grid algorithms."
+        ),
     },
 ]
 

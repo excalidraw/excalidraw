@@ -14,3 +14,12 @@ def test_rrf_merges_dense_and_sparse():
     ids = [m["id"] for m in merged]
     assert "b" in ids
     assert ids[0] == "b"
+
+
+def test_rrf_deduplicates_repeated_ranked_hits():
+    repeated = [
+        {"id": "a", "score": 3.0, "file_path": "a.ts"},
+        {"id": "a", "score": 2.0, "file_path": "a.ts"},
+    ]
+    merged = reciprocal_rank_fusion([], repeated, top=3)
+    assert [row["id"] for row in merged] == ["a"]

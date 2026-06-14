@@ -34,7 +34,7 @@ def test_missing_model_is_fatal_configuration_error():
 
 
 def test_format_gemini2_text():
-    assert format_gemini2_text("hello", mode="query") == "task: search result | query: hello"
+    assert format_gemini2_text("hello", mode="query") == "task: code retrieval | query: hello"
     assert (
         format_gemini2_text("body", mode="document", title="Paper")
         == "title: Paper | text: body"

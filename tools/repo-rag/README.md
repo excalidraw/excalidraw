@@ -25,9 +25,14 @@ For secrets, prefer copying the template: `cp .env.example .env` and edit `.env`
 
 ```bash
 yarn repo-rag:index    # harvest + chunk + embed + index (incremental)
+yarn repo-rag:watch    # live re-embed changed files on save (needs --extra watch)
 yarn repo-rag:query "how does compound pipeline layout work" --top 8 --json
 yarn repo-rag:status   # chunk counts, model, token/cost totals
 ```
+
+The JSON-first explorer also exposes `search`, `symbol`, `neighbors`, `read`,
+`context`, and `explain`. The SQLite graph and BM25 commands remain available
+when embedding providers are offline.
 
 Direct CLI:
 
@@ -40,6 +45,33 @@ uv run repo-rag query "terraformPipelineLayoutCompound" --top 5 --json
 uv run repo-rag query "preset loader" --source-type handoff --json
 uv run repo-rag harvest            # manifest only, no API calls
 ```
+
+## Live watch (keep the index fresh)
+
+`repo-rag watch` runs a foreground daemon that re-embeds changed files **as you save**,
+so search always reflects the current tree without a manual re-index:
+
+```bash
+cd tools/repo-rag
+uv sync --extra watch          # one-time: installs watchfiles
+yarn repo-rag:watch            # or: uv run --extra watch repo-rag watch
+```
+
+How it behaves:
+
+- **Per-save reindex is incremental** — only files whose `sha256` changed are re-chunked
+  and re-embedded (vector + BM25), typically within ~1–4s of a save. Saves are debounced.
+- **The graph is deferred** — the symbol/import/call graph is a full-file scan (~6–8s), so
+  it is *not* rebuilt on every save; it reconciles once editing goes idle (~15s) or on the
+  next `repo-rag index`.
+- **The embed profile is pinned** to whatever the existing index was built with (read from
+  `data/ingest_state.json`). The watcher never re-resolves the profile from the environment,
+  so it can't silently fall back to a weaker model mid-session. Build an index first
+  (`repo-rag index --force --rebuild --embed-profile <profile>`) before watching.
+- **Git-tracked only** — like the indexer, harvest is seeded from `git ls-files`. Edits to
+  tracked files are picked up live; a brand-new file is only indexed after `git add`.
+
+Querying while the watcher runs is safe (LanceDB is versioned; the per-save write is quick).
 
 ## Configuration
 
@@ -93,6 +125,9 @@ Example index output:
 ```
 
 Set `REPO_RAG_LOG=1` in `.env` to always write the log file without passing `--log`.
+
+Remote OpenAI indexing logs include estimated tokens, request latency, batch TPM,
+rolling and cumulative TPM, active and peak concurrency, progress, and ETA.
 
 ## Agent workflow
 
