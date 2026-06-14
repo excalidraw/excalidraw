@@ -231,3 +231,11 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("whyp.it audio embedding", () => {
+  it("should validate whyp.it domain by default", () => {
+    expect(
+      embeddableURLValidator("https://whyp.it/tracks/293120/example", undefined),
+    ).toBe(true);
+  });
+});
