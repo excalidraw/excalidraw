@@ -20,6 +20,7 @@ import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionRe
 import { layoutTerraformViaWorkers } from "./terraformLayoutWorkerClient";
 import {
   applyPackedDepthShifts,
+  computeBalanceShifts,
   computePackedDepthShifts,
   computePackedPullLeftShifts,
   placeClustersPackedGrid,
@@ -29,6 +30,7 @@ import {
   ancillaryStripFrameId,
   computeDepths,
   computeGlobalColumnX,
+  computeWidthBudgetedDepths,
   placeClustersClassicGrid,
   vpcScopeKey,
   type AncillaryStrip,
@@ -799,4 +801,179 @@ describe("packed pull-left compound pipeline on staging-extended-localstack-v2",
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
   );
+});
+
+describe("computeBalanceShifts", () => {
+  // One lane: chain a0->a1->a2->a3 plus slack node c (a0->c->a3) and two
+  // sinks e1,e2 (a0->e1, a0->e2). Longest-path crowds column 1 (a1,c,e1,e2);
+  // balance should relieve it by moving slack nodes to emptier feasible columns.
+  function crowdedLanePrep(): PipelineLayoutPrep {
+    const here = (id: string) => ({
+      id,
+      placement: placementOf("acct1", "us-east-1"),
+    });
+    return makePrep(
+      [
+        here("a0"),
+        here("a1"),
+        here("a2"),
+        here("a3"),
+        here("c"),
+        here("e1"),
+        here("e2"),
+      ],
+      [
+        ["a0", "a1"],
+        ["a1", "a2"],
+        ["a2", "a3"],
+        ["a0", "c"],
+        ["c", "a3"],
+        ["a0", "e1"],
+        ["a0", "e2"],
+      ],
+    );
+  }
+
+  const maxColumnOccupancy = (
+    prep: PipelineLayoutPrep,
+    shifts: ReturnType<typeof computeBalanceShifts>,
+  ): number => {
+    const occ = new Map<number, number>();
+    for (const cluster of prep.clusters) {
+      const d = shifts.shiftedDepths.get(cluster.id) ?? cluster.depth;
+      occ.set(d, (occ.get(d) ?? 0) + 1);
+    }
+    return Math.max(...occ.values());
+  };
+
+  it("relieves a crowded column without growing scene width", () => {
+    const prep = crowdedLanePrep();
+    const before = maxColumnOccupancy(prep, {
+      shiftedDepths: new Map(),
+    } as never);
+    const shifts = computeBalanceShifts(prep);
+    expect(shifts.shiftCount).toBeGreaterThan(0);
+    // Never widen: no shifted depth exceeds the original maxDepth.
+    for (const d of shifts.shiftedDepths.values()) {
+      expect(d).toBeLessThanOrEqual(prep.maxDepth);
+    }
+    expect(maxColumnOccupancy(prep, shifts)).toBeLessThan(before);
+  });
+
+  it("preserves strict left-to-right TFD order", () => {
+    const prep = crowdedLanePrep();
+    const shifts = computeBalanceShifts(prep);
+    expectEdgesMonotone(prep, shifts);
+  });
+
+  it("is deterministic across repeated runs", () => {
+    const a = computeBalanceShifts(crowdedLanePrep());
+    const b = computeBalanceShifts(crowdedLanePrep());
+    expect([...a.shiftedDepths.entries()].sort()).toEqual(
+      [...b.shiftedDepths.entries()].sort(),
+    );
+  });
+
+  it("returns no shifts on a cyclic graph", () => {
+    const prep = makePrep(
+      [
+        { id: "x", placement: placementOf("acct1", "us-east-1") },
+        { id: "y", placement: placementOf("acct1", "us-east-1") },
+      ],
+      [
+        ["x", "y"],
+        ["y", "x"],
+      ],
+    );
+    expect(computeBalanceShifts(prep).shiftCount).toBe(0);
+  });
+});
+
+describe("computeWidthBudgetedDepths (experimental Phase A)", () => {
+  const cluster = (
+    id: string,
+    firstSequence: number,
+    height = 100,
+  ): PipelineCluster =>
+    ({
+      id,
+      primaryAddress: id,
+      firstSequence,
+      depth: 0,
+      placement: placementOf("acct1", "us-east-1"),
+      build: { skeleton: [], width: 200, height, clusterFrameId: `f-${id}` },
+    } as unknown as PipelineCluster);
+
+  const longestPath = (
+    edges: Array<[string, string]>,
+    ids: string[],
+  ): Map<string, number> =>
+    computeDepths(
+      edges.map(([source, target], i) => ({ source, target, sequence: i })),
+      ids,
+    ).depths;
+
+  it("preserves TFD order: depth(source) < depth(target) for every edge", () => {
+    // Diamond + tail: a→b, a→c, b→d, c→d, d→e
+    const edges: Array<[string, string]> = [
+      ["a", "b"],
+      ["a", "c"],
+      ["b", "d"],
+      ["c", "d"],
+      ["d", "e"],
+    ];
+    const ids = ["a", "b", "c", "d", "e"];
+    const clusters = ids.map((id, i) => cluster(id, i));
+    const depths = computeWidthBudgetedDepths(
+      edges.map(([source, target], i) => ({ source, target, sequence: i })),
+      clusters,
+      longestPath(edges, ids),
+    );
+    for (const [s, t] of edges) {
+      expect(depths.get(s)!, `${s}->${t}`).toBeLessThan(depths.get(t)!);
+    }
+  });
+
+  it("spreads a slack cluster rightward past its ASAP column", () => {
+    // a→b→c→d (chain) plus a→d (long edge): b,c have slack and should move
+    // right of their longest-path column toward the middle of the chain.
+    const edges: Array<[string, string]> = [
+      ["a", "b"],
+      ["b", "c"],
+      ["c", "d"],
+      ["a", "d"],
+    ];
+    const ids = ["a", "b", "c", "d"];
+    const clusters = ids.map((id, i) => cluster(id, i));
+    const lp = longestPath(edges, ids);
+    const depths = computeWidthBudgetedDepths(
+      edges.map(([source, target], i) => ({ source, target, sequence: i })),
+      clusters,
+      lp,
+    );
+    // Critical path endpoints unchanged; maxDepth preserved.
+    const maxLp = Math.max(...lp.values());
+    expect(Math.max(...depths.values())).toBe(maxLp);
+    expect(depths.get("a")).toBe(0);
+    expect(depths.get("d")).toBe(maxLp);
+  });
+
+  it("is deterministic", () => {
+    const edges: Array<[string, string]> = [
+      ["a", "b"],
+      ["a", "c"],
+      ["b", "d"],
+    ];
+    const ids = ["a", "b", "c", "d"];
+    const clusters = ids.map((id, i) => cluster(id, i));
+    const lp = longestPath(edges, ids);
+    const e = edges.map(([source, target], i) => ({
+      source,
+      target,
+      sequence: i,
+    }));
+    const first = computeWidthBudgetedDepths(e, clusters, lp);
+    const second = computeWidthBudgetedDepths(e, clusters, lp);
+    expect([...second.entries()].sort()).toEqual([...first.entries()].sort());
+  });
 });

@@ -8,22 +8,29 @@ export const TerraformImportPipelineSettings = ({
   pipelinePacked,
   pipelinePackedPullLeft,
   pipelineIncludeAncillary,
+  pipelineSemanticPlacement,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
   setPipelinePackedPullLeft,
   setPipelineIncludeAncillary,
+  setPipelineSemanticPlacement,
+  showPlacement = true,
 }: {
   pipelineCompact: boolean;
   pipelineLayoutVariant: PipelineLayoutVariant;
   pipelinePacked: boolean;
   pipelinePackedPullLeft: boolean;
   pipelineIncludeAncillary: boolean;
+  pipelineSemanticPlacement: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
   setPipelinePackedPullLeft: (pullLeft: boolean) => void;
   setPipelineIncludeAncillary: (includeAncillary: boolean) => void;
+  setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
+  /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
+  showPlacement?: boolean;
 }) => {
   const option = (
     label: string,
@@ -110,6 +117,24 @@ export const TerraformImportPipelineSettings = ({
             )}
           </div>
         </div>
+        {showPlacement && (
+          <div role="group" aria-label="Pipeline semantic placement">
+            <span className="TerraformImportModal__controlLabel">
+              Placement
+            </span>
+            <div className="TerraformImportModal__segmentedControl">
+              {option("Default", !pipelineSemanticPlacement, () =>
+                setPipelineSemanticPlacement(false),
+              )}
+              {option(
+                "Semantic",
+                pipelineSemanticPlacement,
+                () => setPipelineSemanticPlacement(true),
+                "Nesting-aware placement: force distinct account/region bands and straighten dataflow arrows",
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

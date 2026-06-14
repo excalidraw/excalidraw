@@ -12,6 +12,7 @@ export type TerraformDemoUrlParams = {
   packed?: boolean;
   packedPullLeft?: boolean;
   ancillary?: boolean;
+  semanticPlace?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -117,6 +118,10 @@ export const parseTerraformDemoUrlParams = (
   if (ancillary === null) {
     return null;
   }
+  const semanticPlace = parseBooleanParam("semanticPlace");
+  if (semanticPlace === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -126,6 +131,7 @@ export const parseTerraformDemoUrlParams = (
     ...(packed != null ? { packed } : {}),
     ...(packedPullLeft != null ? { packedPullLeft } : {}),
     ...(ancillary != null ? { ancillary } : {}),
+    ...(semanticPlace != null ? { semanticPlace } : {}),
   };
 };
 

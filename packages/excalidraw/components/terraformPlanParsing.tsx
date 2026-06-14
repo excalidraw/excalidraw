@@ -106,7 +106,7 @@ export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
   /** Preferred layout mode. `semanticLayout` is retained as a backwards-compatible input. */
-  layoutMode?: "module" | "semantic" | "pipeline";
+  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
   /** Module-view intra-module packing (ignored when semanticLayout is true). */
@@ -131,6 +131,11 @@ export type TerraformPlanParsingOptions = {
   pipelinePackedPullLeft?: boolean;
   /** Pipeline: also draw non-TFD resources in per-hull "Unconnected" strips. */
   pipelineIncludeAncillary?: boolean;
+  /**
+   * Pipeline (opt-in, default off): nesting-aware semantic placement —
+   * role-based forced topology bands + deterministic dataflow straightening.
+   */
+  pipelineSemanticPlacement?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

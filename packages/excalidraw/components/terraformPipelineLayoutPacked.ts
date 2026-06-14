@@ -21,6 +21,7 @@ import {
   type PipelineCluster,
   type PipelineLayoutPrep,
   type PipelinePlacement,
+  type PlaceClustersOptions,
 } from "./terraformPipelineLayoutShared";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
@@ -364,6 +365,12 @@ type PackNode = {
   laneBoxes?: Map<string, TerraformDependencyLayoutBox>;
   minDepth: number;
   minFirstSequence: number;
+  /**
+   * Experimental Phase B: barycenter-derived vertical rank (lower = top). When
+   * set on sibling nodes it is the primary `packSiblings` ordering key; left
+   * undefined for the default/semantic paths so their order is byte-identical.
+   */
+  orderRank?: number;
   /** Inflated rect; x fixed globally, height fixed, top assigned by packing. */
   x0: number;
   x1: number;
@@ -388,12 +395,23 @@ function newPackNode(key: string, role: PackRole, pad: number): PackNode {
 }
 
 function packSiblings(children: PackNode[]): number {
-  const ordered = [...children].sort(
-    (a, b) =>
+  const ordered = [...children].sort((a, b) => {
+    // Experimental Phase B: when both siblings carry a barycenter rank, it wins.
+    // Otherwise fall through to the default keys, keeping non-experimental output
+    // byte-identical.
+    if (
+      a.orderRank != null &&
+      b.orderRank != null &&
+      a.orderRank !== b.orderRank
+    ) {
+      return a.orderRank - b.orderRank;
+    }
+    return (
       a.minDepth - b.minDepth ||
       a.minFirstSequence - b.minFirstSequence ||
-      a.key.localeCompare(b.key),
-  );
+      a.key.localeCompare(b.key)
+    );
+  });
   const placed: PackNode[] = [];
   for (const child of ordered) {
     const candidates = [0];
@@ -577,19 +595,85 @@ function attachAncillaryStripNodes(
   }
 }
 
-function packNode(node: PackNode): void {
+/**
+ * Forced vertical stack: children occupy strictly disjoint Y bands, ordered by
+ * declared (model) order — minimum descendant TFD sequence, then stable key.
+ * Ignores X entirely, so siblings can never share a vertical band (R2 / the
+ * REGION_SUBNET_VERTICAL_BANDS intent). `PIPELINE_LANE_GAP_Y` (96) exceeds the
+ * frame title height, so a lower band's title never intrudes on the band above.
+ */
+function forcedStackSiblings(children: PackNode[]): number {
+  const ordered = [...children].sort(
+    (a, b) =>
+      a.minFirstSequence - b.minFirstSequence || a.key.localeCompare(b.key),
+  );
+  let cursor = 0;
+  let bottom = 0;
+  for (const child of ordered) {
+    child.localY = cursor;
+    bottom = Math.max(bottom, child.localY + child.height);
+    cursor += child.height + PIPELINE_LANE_GAP_Y;
+  }
+  return bottom;
+}
+
+/**
+ * Select child-placement policy from the PARENT role. Forced vertical bands for
+ * root→provider→account (global region/account isolation) and for subnet-zone
+ * lanes under a VPC; overlap-aware compact packing retained elsewhere (regions,
+ * region-direct lanes, primary clusters within a subnet). VPC mixes both: its
+ * subnet-zone lanes (pad>0) are forced apart, vpc-direct lanes (pad==0) pack
+ * compactly below the forced band so neither overlaps the other.
+ */
+function packChildren(node: PackNode, semantic: boolean): number {
+  if (!semantic) {
+    return packSiblings(node.children);
+  }
+  if (
+    node.role === "root" ||
+    node.role === "provider" ||
+    node.role === "account"
+  ) {
+    return forcedStackSiblings(node.children);
+  }
+  if (node.role === "vpc") {
+    const subnetLanes = node.children.filter((c) => c.pad > 0);
+    if (subnetLanes.length === 0) {
+      return packSiblings(node.children);
+    }
+    const forcedBottom = forcedStackSiblings(subnetLanes);
+    const directLanes = node.children.filter((c) => c.pad === 0);
+    if (directLanes.length === 0) {
+      return forcedBottom;
+    }
+    const directBottom = packSiblings(directLanes);
+    const offset = forcedBottom + PIPELINE_LANE_GAP_Y;
+    for (const child of directLanes) {
+      child.localY += offset;
+    }
+    return offset + directBottom;
+  }
+  return packSiblings(node.children);
+}
+
+function packNode(node: PackNode, semantic: boolean): void {
   if (node.children.length === 0) {
     return;
   }
   for (const child of node.children) {
-    packNode(child);
+    packNode(child, semantic);
     node.minDepth = Math.min(node.minDepth, child.minDepth);
     node.minFirstSequence = Math.min(
       node.minFirstSequence,
       child.minFirstSequence,
     );
+    // Phase B: a scope's rank is the topmost (smallest) rank among its lanes, so
+    // sibling scopes order by their barycenter just like individual lanes.
+    if (child.orderRank != null) {
+      node.orderRank = Math.min(node.orderRank ?? Infinity, child.orderRank);
+    }
   }
-  const contentBottom = packSiblings(node.children);
+  const contentBottom = packChildren(node, semantic);
   for (const child of node.children) {
     node.x0 = Math.min(node.x0, child.x0);
     node.x1 = Math.max(node.x1, child.x1);
@@ -597,6 +681,232 @@ function packNode(node: PackNode): void {
   node.x0 -= node.pad;
   node.x1 += node.pad;
   node.height = contentBottom + 2 * node.pad;
+}
+
+/**
+ * Pass 3 (semantic only) — deterministic dataflow straightening. Each compact,
+ * single-occupant lane (`pad === 0`, i.e. NOT a forced subnet-zone band) is
+ * shifted rigidly in Y toward the vertical center of its dominant TFD
+ * predecessor, but only within its parent's content band and only when no
+ * X-overlapping sibling would collide. Because shifts stay inside the parent
+ * content, the hull frames emitted afterwards never grow and forced bands stay
+ * intact. Forced (subnet-zone) lanes are never moved. Deterministic: ascending
+ * depth, model-order tiebreak, current-position overlap checks.
+ */
+function straightenCompactLanes(
+  root: PackNode,
+  prep: PipelineLayoutPrep,
+): void {
+  const parentOf = new Map<PackNode, PackNode>();
+  const absTop = new Map<PackNode, number>();
+  const laneNodes: PackNode[] = [];
+  const walk = (node: PackNode, top: number): void => {
+    absTop.set(node, top);
+    const contentTop = top + node.pad;
+    for (const child of node.children) {
+      parentOf.set(child, node);
+      walk(child, contentTop + child.localY);
+    }
+    if (node.laneClusters && node.laneClusters.length > 0) {
+      laneNodes.push(node);
+    }
+  };
+  walk(root, PIPELINE_MARGIN);
+
+  const centerY = new Map<string, number>();
+  for (const lane of laneNodes) {
+    for (const cluster of lane.laneClusters!) {
+      const box = lane.laneBoxes?.get(cluster.id);
+      const top = absTop.get(lane)! + lane.pad + (box ? box.y : 0);
+      const h = box ? box.height : cluster.build.height;
+      centerY.set(cluster.id, top + h / 2);
+    }
+  }
+
+  const domPred = new Map<string, string>();
+  const domSeq = new Map<string, number>();
+  for (const edge of prep.collapsedEdges) {
+    const cur = domSeq.get(edge.target);
+    if (cur == null || edge.sequence < cur) {
+      domSeq.set(edge.target, edge.sequence);
+      domPred.set(edge.target, edge.source);
+    }
+  }
+
+  const eligible = laneNodes
+    .filter((lane) => lane.pad === 0 && (lane.laneClusters?.length ?? 0) === 1)
+    .sort(
+      (a, b) =>
+        a.laneClusters![0]!.depth - b.laneClusters![0]!.depth ||
+        a.minFirstSequence - b.minFirstSequence ||
+        a.key.localeCompare(b.key),
+    );
+
+  for (const lane of eligible) {
+    const cluster = lane.laneClusters![0]!;
+    const pred = domPred.get(cluster.id);
+    const predY = pred != null ? centerY.get(pred) : undefined;
+    const parent = parentOf.get(lane);
+    if (predY == null || !parent) {
+      continue;
+    }
+    let dy = predY - centerY.get(cluster.id)!;
+    if (dy === 0) {
+      continue;
+    }
+    // Clamp to the parent content band so the parent hull cannot grow.
+    const laneTop = absTop.get(lane)!;
+    const laneBottom = laneTop + lane.height;
+    const parentTop = absTop.get(parent)! + parent.pad;
+    const parentBottom = absTop.get(parent)! + parent.height - parent.pad;
+    dy = Math.max(parentTop - laneTop, Math.min(parentBottom - laneBottom, dy));
+    if (dy === 0) {
+      continue;
+    }
+    const newTop = laneTop + dy;
+    const newBottom = laneBottom + dy;
+    let blocked = false;
+    for (const sib of parent.children) {
+      if (sib === lane) {
+        continue;
+      }
+      const xClear =
+        lane.x1 + PACKED_HORIZONTAL_SHARE_CLEARANCE <= sib.x0 ||
+        sib.x1 + PACKED_HORIZONTAL_SHARE_CLEARANCE <= lane.x0;
+      if (xClear) {
+        continue;
+      }
+      const sibTop = absTop.get(sib)!;
+      const sibBottom = sibTop + sib.height;
+      const yClear =
+        newBottom + PIPELINE_LANE_GAP_Y <= sibTop ||
+        sibBottom + PIPELINE_LANE_GAP_Y <= newTop;
+      if (!yClear) {
+        blocked = true;
+        break;
+      }
+    }
+    if (blocked) {
+      continue;
+    }
+    lane.localY += dy;
+    absTop.set(lane, newTop);
+    centerY.set(cluster.id, centerY.get(cluster.id)! + dy);
+  }
+}
+
+/**
+ * Experimental Phase B — compound barycenter crossing reduction at lane
+ * granularity. Lanes are horizontal bands spanning all columns, so the
+ * crossing-relevant degree of freedom is the *vertical order of lanes*. We run
+ * a few barycenter sweeps over the lane graph (lifted from the collapsed TFD
+ * edges), then adopt the result only if it strictly reduces an abstract
+ * lane-crossing count — otherwise we keep model order. Returns `laneKey -> rank`
+ * (lower = top) or `null` when model order already wins. Deterministic
+ * (model-order tiebreaks throughout). Reordering is consumed per nesting scope
+ * by `packSiblings`, so cluster contiguity / drawable hulls are preserved.
+ */
+function computeLaneBarycenterRanks(
+  laneEntries: readonly [string, PipelineCluster[]][],
+  collapsedEdges: readonly { source: string; target: string }[],
+): Map<string, number> | null {
+  if (laneEntries.length <= 2) {
+    return null;
+  }
+  const minSeq = new Map<string, number>();
+  const laneOf = new Map<string, string>();
+  for (const [key, clusters] of laneEntries) {
+    minSeq.set(key, Math.min(...clusters.map((c) => c.firstSequence)));
+    for (const c of clusters) {
+      laneOf.set(c.id, key);
+    }
+  }
+  const modelOrder = laneEntries
+    .map(([key]) => key)
+    .sort((a, b) => minSeq.get(a)! - minSeq.get(b)! || a.localeCompare(b));
+
+  const adj = new Map<string, Map<string, number>>();
+  const laneEdges: [string, string][] = [];
+  for (const edge of collapsedEdges) {
+    const la = laneOf.get(edge.source);
+    const lb = laneOf.get(edge.target);
+    if (!la || !lb || la === lb) {
+      continue;
+    }
+    laneEdges.push([la, lb]);
+    for (const [x, y] of [
+      [la, lb],
+      [lb, la],
+    ] as const) {
+      let row = adj.get(x);
+      if (!row) {
+        row = new Map();
+        adj.set(x, row);
+      }
+      row.set(y, (row.get(y) ?? 0) + 1);
+    }
+  }
+  if (laneEdges.length === 0) {
+    return null;
+  }
+
+  const indexOf = (order: readonly string[]): Map<string, number> => {
+    const m = new Map<string, number>();
+    order.forEach((key, i) => m.set(key, i));
+    return m;
+  };
+  const crossings = (order: readonly string[]): number => {
+    const idx = indexOf(order);
+    const chords = laneEdges.map(([a, b]) => {
+      const ia = idx.get(a)!;
+      const ib = idx.get(b)!;
+      return ia < ib ? ([ia, ib] as const) : ([ib, ia] as const);
+    });
+    let total = 0;
+    for (let i = 0; i < chords.length; i++) {
+      const [a1, b1] = chords[i]!;
+      for (let j = i + 1; j < chords.length; j++) {
+        const [a2, b2] = chords[j]!;
+        if (
+          (a1 < a2 && a2 < b1 && b1 < b2) ||
+          (a2 < a1 && a1 < b2 && b2 < b1)
+        ) {
+          total += 1;
+        }
+      }
+    }
+    return total;
+  };
+
+  let order = [...modelOrder];
+  for (let pass = 0; pass < 4; pass++) {
+    const idx = indexOf(order);
+    const bary = new Map<string, number>();
+    for (const key of order) {
+      const neighbours = adj.get(key);
+      if (!neighbours || neighbours.size === 0) {
+        bary.set(key, idx.get(key)!);
+        continue;
+      }
+      let sum = 0;
+      let weight = 0;
+      for (const [n, w] of neighbours) {
+        sum += idx.get(n)! * w;
+        weight += w;
+      }
+      bary.set(key, sum / weight);
+    }
+    order = [...order].sort(
+      (a, b) => bary.get(a)! - bary.get(b)! || idx.get(a)! - idx.get(b)!,
+    );
+  }
+
+  if (crossings(order) >= crossings(modelOrder)) {
+    return null;
+  }
+  const ranks = new Map<string, number>();
+  order.forEach((key, i) => ranks.set(key, i));
+  return ranks;
 }
 
 /**
@@ -610,6 +920,7 @@ function packNode(node: PackNode): void {
 export function placeClustersPackedGrid(
   prep: PipelineLayoutPrep,
   ancillaryStrips?: readonly AncillaryStrip[],
+  options?: PlaceClustersOptions,
 ): {
   skeleton: ExcalidrawElementSkeleton[];
   layoutBoxes: Map<string, TerraformDependencyLayoutBox>;
@@ -621,8 +932,16 @@ export function placeClustersPackedGrid(
   const root = newPackNode("__root__", "root", 0);
   const nodesByKey = new Map<string, PackNode>();
 
+  const laneRanks =
+    options?.experimentalLayout === true
+      ? computeLaneBarycenterRanks(laneEntries, prep.collapsedEdges)
+      : null;
+
   for (const [key, laneClusters] of laneEntries) {
     const lane = insertLanePackNode(root, nodesByKey, key, laneClusters[0]!);
+    if (laneRanks) {
+      lane.orderRank = laneRanks.get(key);
+    }
 
     const laneLayout = layoutLaneClusters(
       laneClusters,
@@ -674,7 +993,10 @@ export function placeClustersPackedGrid(
     );
   }
 
-  packNode(root);
+  packNode(root, options?.semanticPlacement === true);
+  if (options?.semanticPlacement === true) {
+    straightenCompactLanes(root, prep);
+  }
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const layoutBoxes = new Map<string, TerraformDependencyLayoutBox>();
@@ -748,6 +1070,7 @@ function measurePackedSceneForDepths(
   prep: PipelineLayoutPrep,
   depths: ReadonlyMap<string, number>,
   ancillaryStrips?: readonly AncillaryStrip[],
+  semantic = false,
 ): PackedSceneMeasure {
   const usedDepths = [...new Set(depths.values())].sort((a, b) => a - b);
   const depthRemap = new Map(usedDepths.map((depth, index) => [depth, index]));
@@ -812,7 +1135,7 @@ function measurePackedSceneForDepths(
       },
     );
   }
-  packNode(root);
+  packNode(root, semantic);
   const nodeHeights = new Map<string, number>([[root.key, root.height]]);
   for (const node of nodesByKey.values()) {
     nodeHeights.set(node.key, node.height);
@@ -865,6 +1188,7 @@ function fitsWithinBaseline(
 export function computePackedPullLeftShifts(
   prep: PipelineLayoutPrep,
   ancillaryStrips?: readonly AncillaryStrip[],
+  semantic = false,
 ): PackedPullLeftResult {
   if (prep.depthResult.hasCycle || prep.clusters.length === 0) {
     return EMPTY_PACKED_PULL_LEFT_SHIFTS;
@@ -892,7 +1216,12 @@ export function computePackedPullLeftShifts(
   );
   let evals = 0;
   let evalCapReached = false;
-  let baseline = measurePackedSceneForDepths(prep, depths, ancillaryStrips);
+  let baseline = measurePackedSceneForDepths(
+    prep,
+    depths,
+    ancillaryStrips,
+    semantic,
+  );
   let pullCount = 0;
 
   for (let sweep = 0; sweep < PACKED_PULL_LEFT_SWEEPS; sweep++) {
@@ -919,6 +1248,7 @@ export function computePackedPullLeftShifts(
           prep,
           trial,
           ancillaryStrips,
+          semantic,
         );
         if (fitsWithinBaseline(measured, baseline)) {
           depths.set(cluster.id, candidate);
@@ -974,6 +1304,98 @@ export function pullLeftShiftsAsDepthShifts(
   return {
     shiftedDepths: pull.shiftedDepths,
     shiftCount: pull.shiftedDepths.size,
+    groupShiftCount: 0,
+  };
+}
+
+/**
+ * R3 balance — move each slack cluster to the LEAST-occupied feasible column
+ * within its own lane (Gansner TSE93 `balance()`), reducing fan-out "walls" of
+ * cards stacked in one column and shrinking lane height. A cluster's feasible
+ * column range is `[max(depth(pred))+1, min(depth(succ))-1]` clamped to the
+ * current `[0, maxDepth]` so the scene never widens. TFD order is preserved by
+ * construction and re-verified before returning. Skipped on cycle.
+ *
+ * NOT enabled by default: on staging-extended-localstack-v2 it trades a small
+ * height reduction for a large CROSSING increase (spreading clusters across
+ * columns lengthens and crosses more arrows), which regresses dataflow
+ * readability. Kept available as a height-vs-crossings knob for callers/presets
+ * that prefer compaction over straightness. See docs/pipeline-semantic-placement-audit.md.
+ */
+export function computeBalanceShifts(
+  prep: PipelineLayoutPrep,
+): PackedDepthShiftResult {
+  if (prep.depthResult.hasCycle || prep.clusters.length === 0) {
+    return EMPTY_PACKED_DEPTH_SHIFTS;
+  }
+  const depths = new Map(prep.clusters.map((c) => [c.id, c.depth]));
+  const preds = new Map<string, string[]>();
+  const succs = new Map<string, string[]>();
+  for (const edge of prep.collapsedEdges) {
+    preds.set(edge.target, [...(preds.get(edge.target) ?? []), edge.source]);
+    succs.set(edge.source, [...(succs.get(edge.source) ?? []), edge.target]);
+  }
+  const laneById = new Map(
+    prep.clusters.map((c) => [c.id, laneKey(c.placement)]),
+  );
+  const occ = new Map<string, number>();
+  const cell = (lane: string, d: number) => `${lane}\0${d}`;
+  for (const c of prep.clusters) {
+    const k = cell(laneById.get(c.id)!, depths.get(c.id)!);
+    occ.set(k, (occ.get(k) ?? 0) + 1);
+  }
+
+  const ordered = [...prep.clusters].sort(
+    (a, b) => a.firstSequence - b.firstSequence || a.id.localeCompare(b.id),
+  );
+  for (const cluster of ordered) {
+    const cur = depths.get(cluster.id)!;
+    let lo = 0;
+    for (const p of preds.get(cluster.id) ?? []) {
+      lo = Math.max(lo, (depths.get(p) ?? 0) + 1);
+    }
+    let hi = prep.maxDepth;
+    for (const s of succs.get(cluster.id) ?? []) {
+      hi = Math.min(hi, (depths.get(s) ?? 0) - 1);
+    }
+    if (hi <= lo) {
+      continue;
+    }
+    const lane = laneById.get(cluster.id)!;
+    let bestD = cur;
+    let bestOcc = (occ.get(cell(lane, cur)) ?? 1) - 1;
+    for (let d = lo; d <= hi; d++) {
+      const o = (occ.get(cell(lane, d)) ?? 0) - (d === cur ? 1 : 0);
+      if (o < bestOcc) {
+        bestOcc = o;
+        bestD = d;
+      }
+    }
+    if (bestD !== cur) {
+      occ.set(cell(lane, cur), (occ.get(cell(lane, cur)) ?? 1) - 1);
+      occ.set(cell(lane, bestD), (occ.get(cell(lane, bestD)) ?? 0) + 1);
+      depths.set(cluster.id, bestD);
+    }
+  }
+
+  const shiftedDepths = new Map<string, number>();
+  for (const cluster of prep.clusters) {
+    const d = depths.get(cluster.id)!;
+    if (d !== cluster.depth) {
+      shiftedDepths.set(cluster.id, d);
+    }
+  }
+  if (shiftedDepths.size === 0) {
+    return EMPTY_PACKED_DEPTH_SHIFTS;
+  }
+  for (const edge of prep.collapsedEdges) {
+    if ((depths.get(edge.source) ?? 0) >= (depths.get(edge.target) ?? 0)) {
+      return EMPTY_PACKED_DEPTH_SHIFTS;
+    }
+  }
+  return {
+    shiftedDepths,
+    shiftCount: shiftedDepths.size,
     groupShiftCount: 0,
   };
 }

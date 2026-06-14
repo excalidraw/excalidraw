@@ -418,6 +418,8 @@ type LayoutSceneContext = {
   pipelinePacked?: boolean;
   pipelinePackedPullLeft?: boolean;
   pipelineIncludeAncillary?: boolean;
+  pipelineSemanticPlacement?: boolean;
+  pipelineExperimentalLayout?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -436,6 +438,8 @@ async function buildPipelineLayoutSceneBody(
         packed: ctx.pipelinePacked === true,
         packedPullLeft: ctx.pipelinePackedPullLeft === true,
         includeAncillary: ctx.pipelineIncludeAncillary === true,
+        semanticPlacement: ctx.pipelineSemanticPlacement === true,
+        experimentalLayout: ctx.pipelineExperimentalLayout === true,
       });
       emitLocalParseDebug({
         phase: "pipelineLayout",
@@ -454,6 +458,12 @@ async function buildPipelineLayoutSceneBody(
               : {}),
             ...(ctx.pipelineIncludeAncillary
               ? { pipelineIncludeAncillary: true }
+              : {}),
+            ...(ctx.pipelineSemanticPlacement
+              ? { pipelineSemanticPlacement: true }
+              : {}),
+            ...(ctx.pipelineExperimentalLayout
+              ? { pipelineExperimentalLayout: true }
               : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
@@ -709,7 +719,10 @@ export async function layoutTerraformFromSources(
     options?.layoutMode ??
     (options?.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
-  const pipelineLayout = layoutMode === "pipeline";
+  // Experimental view rides the pipeline builder (needs TFD edges, same
+  // validation + routing) with the Phase A/B engine enabled.
+  const pipelineLayout =
+    layoutMode === "pipeline" || layoutMode === "experimental";
   if (sources.planDotBundles.length > 0) {
     terraformImportProfilerMeasure("prep.cache", () => {
       buildTerraformImportPrepCache(sources, options);
@@ -828,6 +841,8 @@ export async function layoutTerraformFromSources(
     pipelinePacked: options?.pipelinePacked === true,
     pipelinePackedPullLeft: options?.pipelinePackedPullLeft === true,
     pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
+    pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
+    pipelineExperimentalLayout: layoutMode === "experimental",
     colorMode: options?.colorMode,
   };
 

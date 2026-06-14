@@ -20,7 +20,7 @@ export type TerraformImportSession = {
   sources: TerraformPlanParsingSources;
   sourceFingerprint?: string;
   semanticLayout: boolean;
-  layoutMode?: "module" | "semantic" | "pipeline";
+  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
   pipelineCompact?: boolean;
@@ -36,6 +36,8 @@ export type TerraformImportSession = {
   pipelinePackedPullLeft?: boolean;
   /** Pipeline — draw non-TFD resources in per-hull "Unconnected" strips. */
   pipelineIncludeAncillary?: boolean;
+  /** Pipeline — nesting-aware semantic placement (forced bands + straightening). */
+  pipelineSemanticPlacement?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

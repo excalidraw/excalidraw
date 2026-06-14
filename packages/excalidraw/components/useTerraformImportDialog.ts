@@ -74,9 +74,23 @@ export const useTerraformImportDialog = ({
   const [pipelinePackedPullLeft, setPipelinePackedPullLeft] = useState(false);
   const [pipelineIncludeAncillary, setPipelineIncludeAncillary] =
     useState(false);
+  const [pipelineSemanticPlacement, setPipelineSemanticPlacement] =
+    useState(false);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
+
+  // Experimental view runs the Phase A/B engine, which needs Packed (Phase B
+  // ordering lives in the packed path) and competes with Semantic placement.
+  // Default it to Packed and clear Semantic so the panel reflects what runs.
+  const handleSetView = useCallback((next: TerraformView) => {
+    setView(next);
+    if (next === "experimental") {
+      setPipelinePacked(true);
+      setPipelinePackedPullLeft(false);
+      setPipelineSemanticPlacement(false);
+    }
+  }, []);
   const [loading, setLoading] = useState(false);
   const [layoutProgress, setLayoutProgress] = useState<string | null>(null);
   const layoutAbortRef = useRef<AbortController | null>(null);
@@ -240,6 +254,7 @@ export const useTerraformImportDialog = ({
       pipelinePacked,
       pipelinePackedPullLeft,
       pipelineIncludeAncillary,
+      pipelineSemanticPlacement,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -300,7 +315,7 @@ export const useTerraformImportDialog = ({
         builtin: false,
         description: "User-defined Terraform import preset.",
         rootPath,
-        view,
+        view: view === "experimental" ? "pipeline" : view,
         stacks,
         tfdPaths:
           embeddedTfd.length > 0
@@ -323,7 +338,7 @@ export const useTerraformImportDialog = ({
         name: presetName,
         builtin: false,
         rootPath,
-        view,
+        view: view === "experimental" ? "pipeline" : view,
         hasContent: true,
       };
     }
@@ -362,6 +377,7 @@ export const useTerraformImportDialog = ({
             pipelinePacked,
             pipelinePackedPullLeft,
             pipelineIncludeAncillary,
+            pipelineSemanticPlacement,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -450,6 +466,7 @@ export const useTerraformImportDialog = ({
           pipelinePacked,
           pipelinePackedPullLeft,
           pipelineIncludeAncillary,
+          pipelineSemanticPlacement,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -625,7 +642,7 @@ export const useTerraformImportDialog = ({
       await saveTerraformImportCompositionViaApi({
         id: toPresetId(nameInput),
         name: nameInput.trim(),
-        defaultView: view,
+        defaultView: view === "experimental" ? "pipeline" : view,
         tfdContent,
       });
     } catch (err) {
@@ -647,6 +664,7 @@ export const useTerraformImportDialog = ({
     pipelinePacked,
     pipelinePackedPullLeft,
     pipelineIncludeAncillary,
+    pipelineSemanticPlacement,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -672,12 +690,13 @@ export const useTerraformImportDialog = ({
     stateOnly,
     setStateFiles,
     setTfdFiles,
-    setView,
+    setView: handleSetView,
     setPipelineCompact,
     setPipelineLayoutVariant,
     setPipelinePacked,
     setPipelinePackedPullLeft,
     setPipelineIncludeAncillary,
+    setPipelineSemanticPlacement,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

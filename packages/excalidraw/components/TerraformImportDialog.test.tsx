@@ -137,6 +137,8 @@ describe("TerraformImportModal", () => {
       pipelineLayoutVariant: "classic",
       pipelinePacked: false,
       pipelinePackedPullLeft: false,
+      pipelineIncludeAncillary: false,
+      pipelineSemanticPlacement: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -160,6 +162,8 @@ describe("TerraformImportModal", () => {
       pipelineLayoutVariant: "compound",
       pipelinePacked: false,
       pipelinePackedPullLeft: false,
+      pipelineIncludeAncillary: false,
+      pipelineSemanticPlacement: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });

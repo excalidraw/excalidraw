@@ -73,9 +73,11 @@ import {
   ZoomOutIcon,
 } from "../icons";
 import {
+  getTerraformImportSession,
   updateTerraformImportSessionLodEnabled,
   updateTerraformImportSessionLodPreset,
 } from "../terraformImportSession";
+import { runTerraformImportFromSources } from "../terraformSceneApply";
 import {
   TERRAFORM_LOD_DEFAULT_PRESET,
   type TerraformLodPreset,
@@ -418,6 +420,70 @@ export const TerraformZoomLod = () => {
   );
 };
 TerraformZoomLod.displayName = "TerraformZoomLod";
+
+/**
+ * Experimental view — a fourth Terraform layout (peer of module / semantic /
+ * pipeline) that re-lays the current pipeline-capable scene with the Phase A
+ * width-budgeted columns + Phase B barycenter ordering engine. Switchable only
+ * from the main menu. Visible whenever the current scene is a pipeline-family
+ * Terraform scene (pipeline or already-experimental) — those always carry the
+ * `.tfd` dataflow the engine needs, whether it came from the import dialog or a
+ * preset's `sources.tfdTexts`.
+ */
+export const TerraformExperimentalView = () => {
+  const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
+  useExcalidrawElements();
+  const elements = app.scene.getElementsIncludingDeleted();
+
+  const session = getTerraformImportSession();
+  const isPipelineFamily =
+    session?.layoutMode === "pipeline" ||
+    session?.layoutMode === "experimental";
+  if (!hasTerraformResourceNodes(elements) || !session || !isPipelineFamily) {
+    return null;
+  }
+
+  const active = session.layoutMode === "experimental";
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={active}
+      data-testid="terraform-experimental-view"
+      onSelect={(event) => {
+        event.preventDefault();
+        const current = getTerraformImportSession();
+        if (!current) {
+          return;
+        }
+        void runTerraformImportFromSources(app, setAppState, current.sources, {
+          semanticLayout: false,
+          // Toggle: experimental ⇄ pipeline (reusing the scene's pipeline dials).
+          layoutMode: active ? "pipeline" : "experimental",
+          pipelineCompact: current.pipelineCompact,
+          pipelineLayoutVariant: active
+            ? current.pipelineLayoutVariant ?? "compound"
+            : "compound",
+          pipelinePacked: active ? current.pipelinePacked === true : true,
+          pipelinePackedPullLeft: active
+            ? current.pipelinePackedPullLeft === true
+            : false,
+          pipelineIncludeAncillary: current.pipelineIncludeAncillary === true,
+          terraformLodEnabled: current.terraformLodEnabled,
+          terraformLodPreset: current.terraformLodPreset,
+          colorMode: current.colorMode,
+          importedTfdTexts: current.importedTfdTexts,
+          preset: current.preset,
+          scrollToContent: true,
+        });
+      }}
+      aria-label="Experimental view — width-budgeted, barycenter-ordered pipeline layout"
+    >
+      Experimental view
+    </DropdownMenuItemCheckbox>
+  );
+};
+TerraformExperimentalView.displayName = "TerraformExperimentalView";
 
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();

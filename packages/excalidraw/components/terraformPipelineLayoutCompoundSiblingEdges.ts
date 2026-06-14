@@ -28,6 +28,8 @@ export type CompoundTopologyFrameEdge = {
   parentFrameId: string;
   role: TopologyFrameRole;
   sequence: number;
+  /** Number of declared dataflow edges aggregated into this one connector. */
+  weight: number;
 };
 
 const pathsEqual = (a: readonly string[], b: readonly string[]): boolean =>
@@ -40,7 +42,7 @@ const pathsEqual = (a: readonly string[], b: readonly string[]): boolean =>
 export function resolveSiblingTopologyFramePair(
   sourcePath: readonly string[],
   targetPath: readonly string[],
-): Omit<CompoundTopologyFrameEdge, "sequence"> | null {
+): Omit<CompoundTopologyFrameEdge, "sequence" | "weight"> | null {
   if (pathsEqual(sourcePath, targetPath)) {
     return null;
   }
@@ -113,8 +115,11 @@ export function collectCompoundTopologyFrameEdges(
 
     const key = `${pair.parentFrameId}|||${pair.sourceFrameId}|||${pair.targetFrameId}`;
     const existing = deduped.get(key);
-    if (!existing || edge.sequence < existing.sequence) {
-      deduped.set(key, { ...pair, sequence: edge.sequence });
+    if (!existing) {
+      deduped.set(key, { ...pair, sequence: edge.sequence, weight: 1 });
+    } else {
+      existing.weight += 1;
+      existing.sequence = Math.min(existing.sequence, edge.sequence);
     }
   }
 
@@ -151,6 +156,14 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
     const endX = endPoint.x;
     const endY = endPoint.y;
 
+    // Heavier relationships read as thicker connectors: base 4px, +1px per
+    // doubling of aggregated edge count, capped so a single dial does not
+    // dominate the scene.
+    const strokeWidth = Math.min(
+      4 + Math.round(Math.log2(Math.max(1, edge.weight)) * 1.5),
+      10,
+    );
+
     skeleton.push({
       type: "arrow",
       id: `tf-topology-frame-flow-${edgeIndex}`,
@@ -162,7 +175,7 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
         pointFrom<LocalPoint>(0, 0),
         pointFrom<LocalPoint>(endX - startX, endY - startY),
       ],
-      strokeWidth: 4,
+      strokeWidth,
       strokeColor: TERRAFORM_TOPOLOGY_FRAME_FLOW_STROKE,
       strokeStyle: "dashed",
       startArrowhead: null,
@@ -191,6 +204,7 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
           topologyRole: edge.role,
           parentFrameId: edge.parentFrameId,
           aggregated: true,
+          weight: edge.weight,
         },
       },
     });

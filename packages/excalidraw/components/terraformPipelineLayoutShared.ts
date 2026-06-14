@@ -387,6 +387,69 @@ export function computeDepths(
   return { depths, hasCycle: true };
 }
 
+/**
+ * Experimental width-budgeted column assignment (Phase A).
+ *
+ * The pipeline's natural longest-path layering is ASAP — every cluster sits as
+ * far LEFT as its TFD predecessors allow, which crowds early columns and crams
+ * receivers next to their producers. Phase A instead pushes each cluster as far
+ * RIGHT as it can go without crossing a successor (ALAP within its slack window),
+ * so a chain spreads across columns and each cluster sits adjacent to the
+ * consumers it feeds — the "push nodes deeper than they strictly need to be"
+ * intuition that reads wider / flatter and keeps the left-to-right flow honest.
+ *
+ * `dL(v) = maxDepth − (longest path in edges from v to any sink)` is the latest
+ * column `v` can occupy while every edge still satisfies `depth(src) < depth(tgt)`
+ * — so the result is order-safe by construction. Deterministic: pure function of
+ * the longest-path depths. Critical-path clusters (zero slack) do not move, so
+ * `maxDepth` is preserved.
+ */
+export function computeWidthBudgetedDepths(
+  collapsedEdges: readonly { source: string; target: string }[],
+  clusters: readonly PipelineCluster[],
+  longestPathDepths: ReadonlyMap<string, number>,
+): Map<string, number> {
+  const ids = clusters.map((c) => c.id);
+  const d0 = new Map(ids.map((id) => [id, longestPathDepths.get(id) ?? 0]));
+  if (ids.length === 0) {
+    return d0;
+  }
+  const maxDepth = Math.max(0, ...d0.values());
+
+  const succs = new Map<string, string[]>();
+  for (const e of collapsedEdges) {
+    succs.set(e.source, [...(succs.get(e.source) ?? []), e.target]);
+  }
+
+  // Longest path (in edges) from each node to a sink. Process in descending d0
+  // order so every successor is resolved before the node itself (d0 is a valid
+  // topological layering: d0(src) < d0(tgt)).
+  const toSink = new Map<string, number>(ids.map((id) => [id, 0]));
+  const byDepthDesc = [...ids].sort(
+    (a, b) => d0.get(b)! - d0.get(a)! || a.localeCompare(b),
+  );
+  for (const id of byDepthDesc) {
+    let best = 0;
+    for (const s of succs.get(id) ?? []) {
+      best = Math.max(best, 1 + (toSink.get(s) ?? 0));
+    }
+    toSink.set(id, best);
+  }
+
+  // Center each cluster within its order-safe slack window [d0, dL]. This
+  // spreads chains rightward (wider/flatter than pure ASAP) without collapsing
+  // them onto their successors the way pure ALAP does — which keeps edges short
+  // and avoids the crossing blow-up ALAP causes. Zero-slack (critical-path)
+  // clusters stay put, preserving maxDepth.
+  const depths = new Map<string, number>();
+  for (const id of ids) {
+    const lo = d0.get(id)!;
+    const hi = maxDepth - (toSink.get(id) ?? 0);
+    depths.set(id, Math.round((lo + hi) / 2));
+  }
+  return depths;
+}
+
 export function laneKey(p: PipelinePlacement): string {
   return [
     p.providerFamily,
@@ -656,9 +719,17 @@ export function ancillaryStripAsPseudoCluster(
   };
 }
 
+export type PlaceClustersOptions = {
+  /** Opt-in nesting-aware semantic placement (forced bands + straightening). */
+  semanticPlacement?: boolean;
+  /** Experimental view: width-budgeted columns (Phase A) + barycenter order (Phase B). */
+  experimentalLayout?: boolean;
+};
+
 export function placeClustersClassicGrid(
   prep: PipelineLayoutPrep,
   ancillaryStrips?: readonly AncillaryStrip[],
+  _options?: PlaceClustersOptions,
 ): {
   skeleton: ExcalidrawElementSkeleton[];
   layoutBoxes: Map<string, TerraformDependencyLayoutBox>;
@@ -766,10 +837,16 @@ export function placeClustersClassicGrid(
   return { skeleton, layoutBoxes, laneEntries, ancillaryClusters };
 }
 
+export type PreparePipelineLayoutOptions = {
+  /** Experimental Phase A: width-budgeted column assignment in place of longest-path. */
+  experimentalLayout?: boolean;
+};
+
 export function preparePipelineLayout(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
   compact: boolean,
+  options?: PreparePipelineLayoutOptions,
 ): PipelineLayoutPrep {
   const declared = nodes[DECLARED_DATAFLOW_ORDERED_KEY];
   if (!Array.isArray(declared) || declared.length === 0) {
@@ -850,6 +927,29 @@ export function preparePipelineLayout(
     };
   });
 
+  // Phase A (experimental): re-assign columns with a per-column height budget so
+  // tall TFD columns spill deeper and the scene reads wider/flatter. Needs the
+  // built cluster heights, so it runs after the cluster map. Order-safe by
+  // construction, with a verify-or-abort guard that falls back to longest-path.
+  let effectiveDepthResult = depthResult;
+  if (options?.experimentalLayout && !depthResult.hasCycle) {
+    const budgeted = computeWidthBudgetedDepths(
+      collapsedEdges,
+      clusters,
+      depthResult.depths,
+    );
+    const valid = collapsedEdges.every(
+      (edge) =>
+        (budgeted.get(edge.source) ?? 0) < (budgeted.get(edge.target) ?? 0),
+    );
+    if (valid) {
+      for (const cluster of clusters) {
+        cluster.depth = budgeted.get(cluster.id) ?? cluster.depth;
+      }
+      effectiveDepthResult = { depths: budgeted, hasCycle: false };
+    }
+  }
+
   const maxDepth = Math.max(0, ...clusters.map((c) => c.depth));
   const columnX = computeGlobalColumnX(clusters, maxDepth);
 
@@ -858,7 +958,7 @@ export function preparePipelineLayout(
     collapsedEdges,
     maxDepth,
     columnX,
-    depthResult,
+    depthResult: effectiveDepthResult,
     satelliteOwners,
     placementByAddress,
   };

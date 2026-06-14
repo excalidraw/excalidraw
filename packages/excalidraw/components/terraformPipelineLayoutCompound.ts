@@ -44,6 +44,8 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
     packed?: boolean;
     packedPullLeft?: boolean;
     includeAncillary?: boolean;
+    semanticPlacement?: boolean;
+    experimentalLayout?: boolean;
   },
 ): Promise<{
   elements: ExcalidrawElement[];
@@ -54,7 +56,11 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
   const packed = options?.packed === true;
   const packedPullLeft = packed && options?.packedPullLeft === true;
   const includeAncillary = options?.includeAncillary === true;
-  let prep = preparePipelineLayout(nodes, plan, compact);
+  const semanticPlacement = options?.semanticPlacement === true;
+  const experimentalLayout = options?.experimentalLayout === true;
+  let prep = preparePipelineLayout(nodes, plan, compact, {
+    experimentalLayout,
+  });
   const ancillaryStrips = includeAncillary
     ? buildAncillaryStrips(nodes, plan, prep, { compact })
     : [];
@@ -64,7 +70,11 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
     packedShifts = computePackedDepthShifts(prep);
     prep = applyPackedDepthShifts(prep, packedShifts);
     if (packedPullLeft) {
-      pullLeftShifts = computePackedPullLeftShifts(prep, ancillaryStrips);
+      pullLeftShifts = computePackedPullLeftShifts(
+        prep,
+        ancillaryStrips,
+        semanticPlacement,
+      );
       prep = applyPackedDepthShifts(
         prep,
         pullLeftShiftsAsDepthShifts(pullLeftShifts),
@@ -72,8 +82,14 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
     }
   }
   const { skeleton, layoutBoxes, ancillaryClusters } = packed
-    ? placeClustersPackedGrid(prep, ancillaryStrips)
-    : placeClustersClassicGrid(prep, ancillaryStrips);
+    ? placeClustersPackedGrid(prep, ancillaryStrips, {
+        semanticPlacement,
+        experimentalLayout,
+      })
+    : placeClustersClassicGrid(prep, ancillaryStrips, {
+        semanticPlacement,
+        experimentalLayout,
+      });
 
   buildCompoundFramesFromLayoutBoxes(
     skeleton,
@@ -109,6 +125,8 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
       pipelineEdgeCount: prep.collapsedEdges.length,
       pipelineTopologyFrameEdgeCount,
       pipelineColumnCount: prep.maxDepth + 1,
+      ...(semanticPlacement ? { pipelineSemanticPlacement: true } : {}),
+      ...(experimentalLayout ? { pipelineExperimentalLayout: true } : {}),
       ...(packed
         ? {
             pipelinePackedApplied: true,

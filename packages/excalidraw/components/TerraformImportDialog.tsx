@@ -56,6 +56,7 @@ export const TerraformImportModal = ({
     pipelinePacked,
     pipelinePackedPullLeft,
     pipelineIncludeAncillary,
+    pipelineSemanticPlacement,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -502,7 +503,9 @@ terraform show -json tfplan > plan.json`}</code>
             {VIEW_OPTIONS.map((option) => {
               const checked = view === option.value;
               const disabled =
-                (option.value === "semantic" || option.value === "pipeline") &&
+                (option.value === "semantic" ||
+                  option.value === "pipeline" ||
+                  option.value === "experimental") &&
                 semanticViewDisabled;
               const descriptionId = `terraform-view-${option.value}-description`;
               return (
@@ -539,20 +542,26 @@ terraform show -json tfplan > plan.json`}</code>
               );
             })}
           </div>
-          {view === "pipeline" && !semanticViewDisabled && (
-            <TerraformImportPipelineSettings
-              pipelineCompact={pipelineCompact}
-              pipelineLayoutVariant={pipelineLayoutVariant}
-              pipelinePacked={pipelinePacked}
-              pipelinePackedPullLeft={pipelinePackedPullLeft}
-              pipelineIncludeAncillary={pipelineIncludeAncillary}
-              setPipelineCompact={dialog.setPipelineCompact}
-              setPipelineLayoutVariant={dialog.setPipelineLayoutVariant}
-              setPipelinePacked={dialog.setPipelinePacked}
-              setPipelinePackedPullLeft={dialog.setPipelinePackedPullLeft}
-              setPipelineIncludeAncillary={dialog.setPipelineIncludeAncillary}
-            />
-          )}
+          {(view === "pipeline" || view === "experimental") &&
+            !semanticViewDisabled && (
+              <TerraformImportPipelineSettings
+                pipelineCompact={pipelineCompact}
+                pipelineLayoutVariant={pipelineLayoutVariant}
+                pipelinePacked={pipelinePacked}
+                pipelinePackedPullLeft={pipelinePackedPullLeft}
+                pipelineIncludeAncillary={pipelineIncludeAncillary}
+                pipelineSemanticPlacement={pipelineSemanticPlacement}
+                setPipelineCompact={dialog.setPipelineCompact}
+                setPipelineLayoutVariant={dialog.setPipelineLayoutVariant}
+                setPipelinePacked={dialog.setPipelinePacked}
+                setPipelinePackedPullLeft={dialog.setPipelinePackedPullLeft}
+                setPipelineIncludeAncillary={dialog.setPipelineIncludeAncillary}
+                setPipelineSemanticPlacement={
+                  dialog.setPipelineSemanticPlacement
+                }
+                showPlacement={view !== "experimental"}
+              />
+            )}
           {view === "module" && (
             <TerraformModulePackingSettings
               options={moduleLayoutOptions}

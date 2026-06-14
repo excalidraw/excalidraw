@@ -19,7 +19,11 @@ import type React from "react";
 
 type SetAppState = React.Component<any, AppState>["setState"];
 
-export type TerraformLayoutMode = "module" | "semantic" | "pipeline";
+export type TerraformLayoutMode =
+  | "module"
+  | "semantic"
+  | "pipeline"
+  | "experimental";
 
 export const deriveLayoutModeFromView = (
   view: TerraformView,
@@ -27,6 +31,9 @@ export const deriveLayoutModeFromView = (
 ): TerraformLayoutMode => {
   const canUseSemanticView =
     sources.planDotBundles.length > 0 || sources.states.length > 0;
+  if (view === "experimental" && canUseSemanticView) {
+    return "experimental";
+  }
   if (view === "pipeline" && canUseSemanticView) {
     return "pipeline";
   }
@@ -48,6 +55,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelinePacked?: boolean;
   pipelinePackedPullLeft?: boolean;
   pipelineIncludeAncillary?: boolean;
+  pipelineSemanticPlacement?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   signal?: AbortSignal;
@@ -65,6 +73,7 @@ export const runTerraformImportWithView = async ({
   pipelinePacked,
   pipelinePackedPullLeft,
   pipelineIncludeAncillary,
+  pipelineSemanticPlacement,
   importedTfdTexts,
   preset = null,
   signal,
@@ -72,18 +81,21 @@ export const runTerraformImportWithView = async ({
 }: RunTerraformImportFromSourcesArgs): Promise<RunTerraformImportFromSourcesResult> => {
   const layoutMode = deriveLayoutModeFromView(view, sources);
   const semanticLayout = layoutMode === "semantic";
+  const isPipelineFamily =
+    layoutMode === "pipeline" || layoutMode === "experimental";
   return runTerraformImportFromSources(app, setAppState, sources, {
     semanticLayout,
-    layoutMode: layoutMode === "pipeline" ? "pipeline" : undefined,
+    layoutMode: isPipelineFamily ? layoutMode : undefined,
     moduleLayoutOptions:
       layoutMode === "module" ? moduleLayoutOptions : undefined,
-    ...(layoutMode === "pipeline"
+    ...(isPipelineFamily
       ? {
           pipelineCompact,
           pipelineLayoutVariant,
           pipelinePacked,
           pipelinePackedPullLeft,
           pipelineIncludeAncillary,
+          pipelineSemanticPlacement,
         }
       : {}),
     importedTfdTexts,
@@ -101,6 +113,7 @@ export type RunTerraformPresetImportOptions = {
   pipelinePacked?: boolean;
   pipelinePackedPullLeft?: boolean;
   pipelineIncludeAncillary?: boolean;
+  pipelineSemanticPlacement?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
 };
@@ -143,6 +156,7 @@ export const runTerraformPresetImport = async (
     pipelinePacked: options.pipelinePacked,
     pipelinePackedPullLeft: options.pipelinePackedPullLeft,
     pipelineIncludeAncillary: options.pipelineIncludeAncillary,
+    pipelineSemanticPlacement: options.pipelineSemanticPlacement,
     importedTfdTexts: presetSources.tfdTexts,
     preset,
     signal: options.signal,

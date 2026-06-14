@@ -1,4 +1,4 @@
-export type TerraformView = "module" | "semantic" | "pipeline";
+export type TerraformView = "module" | "semantic" | "pipeline" | "experimental";
 
 export type PipelineLayoutVariant = "classic" | "compound";
 
@@ -27,6 +27,12 @@ export const VIEW_OPTIONS: ReadonlyArray<{
     label: "Pipeline view",
     description:
       "Left-to-right .tfd dataflow columns with topology context frames.",
+  },
+  {
+    value: "experimental",
+    label: "Experimental view",
+    description:
+      "Pipeline dataflow with width-budgeted columns + barycenter ordering (wider/flatter; experimental).",
   },
   {
     value: "module",

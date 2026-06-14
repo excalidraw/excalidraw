@@ -193,7 +193,7 @@ describe("terraform relationship focus", () => {
     expect(byId.get("text:sg")?.strokeColor).toBe("#000000");
   });
 
-  it("reveals direct dependency edges and direct neighbor nodes", () => {
+  it("reveals the multi-hop dependency neighborhood with degree-of-interest falloff", () => {
     const elements = [
       resource("aws_instance.web"),
       resource("aws_security_group.sg", { isDeleted: true }),
@@ -232,11 +232,13 @@ describe("terraform relationship focus", () => {
     expect(
       byId.get("node:aws_security_group.sg")?.customData?.terraformFocusPreview,
     ).toBe(true);
+    // aws_vpc.main is two hops out (web → sg → vpc): revealed at the farther
+    // degree-of-interest level, and the sg→vpc edge lights as in-neighborhood.
     expect(byId.get("edge:sg-vpc")?.opacity).toBe(100);
-    expect(byId.get("edge:sg-vpc")?.strokeColor).toBe(expectedWashedStroke(15));
+    expect(byId.get("edge:sg-vpc")?.strokeColor).toBe(expectedWashedStroke(85));
     expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
     expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe(
-      expectedWashedStroke(25),
+      expectedWashedStroke(55),
     );
   });
 

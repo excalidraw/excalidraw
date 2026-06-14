@@ -141,7 +141,7 @@ export const applyTerraformExcalidrawScene = (
 
 export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
-  layoutMode?: "module" | "semantic" | "pipeline";
+  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
   pipelineCompact?: boolean;
@@ -155,6 +155,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelinePackedPullLeft?: boolean;
   /** Pipeline — draw non-TFD resources in per-hull "Unconnected" strips. Default false. */
   pipelineIncludeAncillary?: boolean;
+  /** Pipeline — nesting-aware semantic placement (forced bands + straightening). Default false. */
+  pipelineSemanticPlacement?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -172,17 +174,20 @@ export type RunTerraformImportFromSourcesResult = {
 async function layoutTerraformSceneFromSources(
   sources: TerraformPlanParsingSources,
   options: RunTerraformImportFromSourcesOptions,
-  layoutMode: "module" | "semantic" | "pipeline",
+  layoutMode: "module" | "semantic" | "pipeline" | "experimental",
   moduleLayoutOptions: TerraformModuleLayoutOptions,
 ): Promise<TerraformExcalidrawScenePayload> {
   const presetId = options.preset?.id?.trim();
   // Packed and ancillary pipeline scenes are not part of the KV layout cache
   // key yet; skip the cache so such imports never return the default layout.
+  // Experimental view is never cached.
   const skipLayoutCache =
-    layoutMode === "pipeline" &&
-    (options.pipelinePacked === true ||
-      options.pipelinePackedPullLeft === true ||
-      options.pipelineIncludeAncillary === true);
+    layoutMode === "experimental" ||
+    (layoutMode === "pipeline" &&
+      (options.pipelinePacked === true ||
+        options.pipelinePackedPullLeft === true ||
+        options.pipelineIncludeAncillary === true ||
+        options.pipelineSemanticPlacement === true));
   if (presetId && !skipLayoutCache) {
     const cached = await fetchPresetLayoutCache(
       presetId,
@@ -202,14 +207,15 @@ async function layoutTerraformSceneFromSources(
       ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions:
         layoutMode === "module" ? moduleLayoutOptions : undefined,
-      ...(layoutMode === "pipeline"
+      ...(layoutMode === "pipeline" || layoutMode === "experimental"
         ? {
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
-            pipelineIncludeAncillary:
-              options.pipelineIncludeAncillary === true,
+            pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
+            pipelineSemanticPlacement:
+              options.pipelineSemanticPlacement === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -229,7 +235,7 @@ export const runTerraformImportFromSources = async (
 ): Promise<RunTerraformImportFromSourcesResult> => {
   const moduleLayoutOptions =
     options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
-  const layoutMode: "module" | "semantic" | "pipeline" =
+  const layoutMode: "module" | "semantic" | "pipeline" | "experimental" =
     options.layoutMode ?? (options.semanticLayout ? "semantic" : "module");
   const sourceFingerprint = terraformImportPrepFingerprint(sources);
   const importedTfdTexts = options.importedTfdTexts ?? [];
@@ -270,14 +276,15 @@ export const runTerraformImportFromSources = async (
       terraformLodEnabled: options.terraformLodEnabled !== false,
       terraformLodPreset:
         options.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
-      ...(layoutMode === "pipeline"
+      ...(layoutMode === "pipeline" || layoutMode === "experimental"
         ? {
             pipelineCompact: options.pipelineCompact !== false,
             pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
-            pipelineIncludeAncillary:
-              options.pipelineIncludeAncillary === true,
+            pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
+            pipelineSemanticPlacement:
+              options.pipelineSemanticPlacement === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

@@ -11,6 +11,7 @@ Start here if you need to understand **how Terraform import works in Pipeline vi
 | [terraform-import-presets-agent-handoff.md](./terraform-import-presets-agent-handoff.md) | Preset DB, source loading, multi-state bundles |
 | [staging-extended-localstack-v2-pipeline-handoff.md](./staging-extended-localstack-v2-pipeline-handoff.md) | v2 preset: multi-account TFD, LocalStack export, parity |
 | [pipeline-compound-layout-agent-handoff.md](./pipeline-compound-layout-agent-handoff.md) | Compound layout code map + literature refs |
+| [pipeline-semantic-placement-agent-handoff.md](./pipeline-semantic-placement-agent-handoff.md) | Deep semantic audit mission: placement, coherence, salience, RAG research |
 
 ---
 
@@ -52,8 +53,9 @@ When the user selects **Pipeline** in the import dialog (or `view=pipeline` on `
 | **Layout** | `pipelineLayoutVariant` | `classic` \| `compound` | **Classic** |
 | **Height** | `pipelinePacked` (+ `pipelinePackedPullLeft`) | Stacked \| Packed \| Packed + pull-left | **Stacked** (`false`) |
 | **Resources** | `pipelineIncludeAncillary` | `false` = Dataflow only, `true` = All resources | **Dataflow only** (`false`) |
+| **Placement** | `pipelineSemanticPlacement` | `false` = Default, `true` = Semantic | **Default** (`false`) |
 
-**Default import:** Compact + Classic + Stacked + Dataflow only.
+**Default import:** Compact + Classic + Stacked + Dataflow only + Default placement.
 
 ### Detail: Compact vs Full
 
@@ -101,6 +103,29 @@ Controls **vertical compaction** and optional **column slack reuse**. Works for 
 
 Packed (and pull-left) skips the KV layout cache (cache key does not include these flags yet). See **Packed mode** section below.
 
+### Placement: Default vs Semantic (opt-in)
+
+**Flag:** `pipelineSemanticPlacement` · **UI:** Placement → "Default / Semantic" · **URL:** `&semanticPlace=1` · **Default:** off (output is byte-identical unless enabled)
+
+Controls **how sibling lanes are ordered and where clusters sit vertically**. Implements the readability recommendations R1–R5 from [pipeline-semantic-placement-audit.md](./pipeline-semantic-placement-audit.md), gated behind one opt-in flag so the default path is unchanged.
+
+| Mode | `pipelineSemanticPlacement` | Effect |
+| --- | --- | --- |
+| **Default** | `false` (default) | Opportunistic skyline packing; sibling lanes share Y bands; byte-identical to pre-feature output |
+| **Semantic** | `true` | **Forced topology bands** (no broken hierarchies): `root/provider/account/region` children stack in distinct vertical bands ordered by min descendant `firstSequence`; subnet zones forced under their VPC. Then **scoped arrow straightening** nudges single-cluster compact lanes toward their dominant TFD predecessor's center Y — clamped to the parent band and rejected on any sibling Y-collision, so it never introduces overlap or reordering |
+
+What Semantic guarantees (the acceptance gate, enforced by `terraformPipelineCollisionDiagnostics.ts`):
+
+- **No overlaps / no broken hierarchies** — region/account vertical band-share = 0; no region–region, same-VPC subnet–subnet, frame-title-vs-cluster, or non-ancestor topology-frame rectangle overlaps.
+- **TFD order preserved** — every collapsed edge keeps `depth(source) < depth(target)`; `semanticEdgeViolations` = 0.
+- **Determinism** — stable sort keys (`firstSequence`, topology key, `id`); repeated runs byte-identical.
+
+**Trade-off:** forced bands grow scene height (compact ≈ 7.5k → 12–14k px; full ≈ 25k → 45k px on v2). On sparse graphs straightening is near-no-op and cross-band edges correctly stay diagonal. R5 (weighted sibling-frame connectors) and R4 (multi-hop hover focus) ride along independently of this flag.
+
+**Recommended readability config:** **Compact + Compound + Packed + pull-left + Semantic** — distinct account/region bands, straightened spine, weighted connectors, multi-hop hover, no overlaps on drag. Full + ancillary remain drill-down modes (they hurt dataflow legibility).
+
+Scene meta records `pipelineSemanticPlacement: true` when active. Like packed, semantic placement skips the KV layout cache.
+
 ---
 
 ## Combination matrix (2 × 2 × 2)
@@ -126,6 +151,7 @@ Scene **meta** records the active flags, e.g.:
   pipelinePackedPullLeft?: true,  // when pull-left requested
   pipelinePackedPullLeftApplied?: true, pipelinePackedPullLeftCount?,
   pipelinePackedPullLeftCapped?: true,  // eval budget hit (pulls truncated)
+  pipelineSemanticPlacement?: true,     // forced bands + scoped straightening
   pipelineClusterCount, pipelineEdgeCount, pipelineColumnCount,
   pipelineTopologyFrameEdgeCount?, // compound only
 }
@@ -188,6 +214,7 @@ Parsed by `terraformDemoUrlParams.ts` → `TerraformDemoAutoImport.tsx`:
 | `pipelineVariant=classic\|compound` | `pipelineLayoutVariant` | Optional; default classic |
 | `packed=1\|true` | `pipelinePacked: true` | Optional; default stacked |
 | `packedPullLeft=1\|true` | `pipelinePackedPullLeft: true` | Optional; implies `packed=1` unless `packed=0` given |
+| `semanticPlace=1\|true` | `pipelineSemanticPlacement: true` | Optional; forced topology bands + scoped arrow straightening |
 | _(no param)_ | `pipelineCompact: true` | Compact/Full **not** exposed in demo URL; always compact unless user toggles in dialog |
 
 ---
