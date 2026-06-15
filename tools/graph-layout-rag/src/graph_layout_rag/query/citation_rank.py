@@ -303,8 +303,16 @@ def related_to_docs(
     ``weights`` overrides the default `rank_related` signal weights; ``embed_scores_by_doc``
     supplies a per-doc cosine signal (SciNCL/SPECTER2) which is mapped into oa-id space.
     """
+    from graph_layout_rag.query.identity import canonical_identity_map
+
     g = graph or load_graph(db)
-    seed_oas = {g.doc_to_oa[d] for d in seed_doc_ids if d in g.doc_to_oa}
+    identities = canonical_identity_map()
+    seed_candidates = {
+        candidate
+        for doc_id in seed_doc_ids
+        for candidate in identities.component_doc_ids(doc_id)
+    }
+    seed_oas = {g.doc_to_oa[d] for d in seed_candidates if d in g.doc_to_oa}
     if not seed_oas:
         return []
     if corpus_only:
@@ -319,7 +327,23 @@ def related_to_docs(
     ranked = rank_related(g, seed_oas, candidates, embed_scores=embed_scores, **(weights or {}))
     if corpus_only:
         ranked = [r for r in ranked if r.doc_id]
-    return ranked[:top]
+
+    canonical_seed_ids = {
+        identities.canonicalize_doc_id(doc_id)
+        for doc_id in seed_doc_ids
+    }
+    deduplicated: list[RelatedResult] = []
+    seen: set[str] = set()
+    for result in ranked:
+        canonical_doc_id = identities.canonicalize_doc_id(result.doc_id)
+        if canonical_doc_id in canonical_seed_ids or canonical_doc_id in seen:
+            continue
+        result.doc_id = canonical_doc_id
+        deduplicated.append(result)
+        seen.add(canonical_doc_id)
+        if len(deduplicated) >= top:
+            break
+    return deduplicated
 
 
 def citation_doc_ranking(

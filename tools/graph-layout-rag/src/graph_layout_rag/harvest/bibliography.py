@@ -15,6 +15,7 @@ from graph_layout_rag.harvest.doi_validate import filter_plausible_bibliography_
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.log import get_logger
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.relevance import is_known_offtopic_doi, is_layout_relevant
 from graph_layout_rag.harvest.tags_inference import infer_harvest_tags
 from graph_layout_rag.manifest import ManifestItem, load_manifest, relative_local_path
 from graph_layout_rag.paths import BIBLIOGRAPHY_SCAN_CACHE_DIR, PKG_ROOT, PDF_DIR
@@ -129,8 +130,10 @@ def _scan_seed_pdf(item) -> dict[str, Any]:
 
 
 def _doi_relevance_decision(doi: str) -> bool:
-    from graph_layout_rag.harvest.relevance import is_layout_relevant
-
+    # Fast-reject: known off-topic journal families (PLOS, BMC, Nature, PNAS…)
+    # checked before any API call so we never waste OpenAlex quota on these.
+    if is_known_offtopic_doi(doi):
+        return False
     work = _openalex_by_doi(doi)
     if work:
         abstract_idx = work.get("abstract_inverted_index")

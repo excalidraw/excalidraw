@@ -5,16 +5,16 @@ import sys
 
 import click
 
+from graph_layout_rag.env import load_env_file
+
+load_env_file()
+
 from graph_layout_rag.catalog.classify import build_catalog, summarize_catalog
 from graph_layout_rag.catalog.taxonomy import PIPELINE_CATEGORIES, UNCATEGORIZED
-from graph_layout_rag.env import load_env_file
 from graph_layout_rag.harvest.run import harvest_group
 from graph_layout_rag.ingest.run import ingest_cmd
 from graph_layout_rag.query.search import search
 from graph_layout_rag.query.retrieve import DEFAULT_HYBRID
-
-load_env_file()
-
 
 @click.group()
 def main() -> None:
@@ -34,11 +34,15 @@ from graph_layout_rag.eval.retrieval import retrieval_eval_cmd  # noqa: E402
 from graph_layout_rag.eval.benchmark import benchmark_cmd  # noqa: E402
 from graph_layout_rag.eval.commands import validate_gold_cmd  # noqa: E402
 from graph_layout_rag.eval.experimental_index import build_retrieval_index_cmd  # noqa: E402
+from graph_layout_rag.eval.pool_commands import diagnostics_cmd, judge_cmd, pool_cmd  # noqa: E402
 
 eval_group.add_command(retrieval_eval_cmd, name="retrieval")
 eval_group.add_command(benchmark_cmd, name="benchmark")
 eval_group.add_command(validate_gold_cmd, name="validate-gold")
 eval_group.add_command(build_retrieval_index_cmd, name="build-retrieval-index")
+eval_group.add_command(pool_cmd, name="pool")
+eval_group.add_command(judge_cmd, name="judge")
+eval_group.add_command(diagnostics_cmd, name="diagnostics")
 
 
 @eval_group.command("related")
@@ -100,7 +104,7 @@ def cite_group() -> None:
     help="Fetch incoming citations from Semantic Scholar (revives co-citation).",
 )
 @click.option("--incoming-cap", default=500, show_default=True, help="Cap incoming citers per paper.")
-@click.option("--incoming-workers", default=32, show_default=True, help="Parallel S2 incoming fetchers (no throttle).")
+@click.option("--incoming-workers", default=32, show_default=True, help="Parallel S2 incoming fetchers.")
 def cite_enrich_cmd(force: bool, workers: int, no_s2: bool, incoming: bool, incoming_cap: int, incoming_workers: int) -> None:
     """Build/refresh data/citations.sqlite from the manifest DOIs.
 
@@ -178,17 +182,40 @@ _FUSED_WEIGHTS = {
 def cite_related_cmd(doc_id: str, top: int, signal: str, model: str, as_json: bool) -> None:
     """Papers most related to DOC_ID (citation structure, embedding, or both)."""
     from graph_layout_rag import citation_store as cs
-    from graph_layout_rag.doc_vectors import embedding_scores, has_doc_vectors, related_by_embedding
+    from graph_layout_rag.doc_vectors import (
+        embedding_scores,
+        has_doc_vectors,
+        load_all_vectors,
+        related_by_embedding,
+    )
     from graph_layout_rag.query.citation_rank import load_graph, related_to_docs
+    from graph_layout_rag.query.identity import canonical_identity_map
+
+    identities = canonical_identity_map()
+    seed_doc_ids = identities.component_doc_ids(doc_id)
 
     if signal == "embedding":
         if not has_doc_vectors(model):
             click.echo(f"No {model} doc vectors. Run: graph-layout-rag cite embed-related --model {model}", err=True)
             sys.exit(1)
-        emb = related_by_embedding(model, doc_id, top=top)
+        vectors = load_all_vectors(model)
+        vector_seed = next((candidate for candidate in seed_doc_ids if candidate in vectors), None)
+        emb = related_by_embedding(model, vector_seed, top=max(top * 4, top)) if vector_seed else []
         if not emb:
             click.echo(f"{doc_id!r} has no doc vector (not in manifest?).", err=True)
             sys.exit(1)
+        canonical_seed = identities.canonicalize_doc_id(doc_id)
+        seen: set[str] = set()
+        canonical_emb: list[dict] = []
+        for row in emb:
+            canonical = identities.canonicalize_doc_id(row["doc_id"])
+            if canonical == canonical_seed or canonical in seen:
+                continue
+            canonical_emb.append({**row, "doc_id": canonical})
+            seen.add(canonical)
+            if len(canonical_emb) >= top:
+                break
+        emb = canonical_emb
         if as_json:
             click.echo(json.dumps({"seed": doc_id, "signal": signal, "model": model, "related": emb}, indent=2))
             return
@@ -201,7 +228,7 @@ def cite_related_cmd(doc_id: str, top: int, signal: str, model: str, as_json: bo
         sys.exit(1)
     db = cs.connect()
     graph = load_graph(db)
-    if doc_id not in graph.doc_to_oa:
+    if not any(candidate in graph.doc_to_oa for candidate in seed_doc_ids):
         click.echo(f"{doc_id!r} has no citation node (no DOI enriched?).", err=True)
         sys.exit(1)
 
@@ -210,7 +237,7 @@ def cite_related_cmd(doc_id: str, top: int, signal: str, model: str, as_json: bo
     if signal == "fused":
         weights = dict(_FUSED_WEIGHTS)
         if has_doc_vectors(model):
-            embed_scores_by_doc = embedding_scores(model, [doc_id])
+            embed_scores_by_doc = embedding_scores(model, list(seed_doc_ids))
         else:
             weights["w_embedding"] = 0.0
 
@@ -311,7 +338,13 @@ def embed_indexes_cmd(as_json: bool) -> None:
 @main.command("query")
 @click.argument("text")
 @click.option("--top", default=8, show_default=True)
-@click.option("--max-per-doc", default=2, show_default=True, type=click.IntRange(min=1))
+@click.option(
+    "--max-per-doc",
+    default=2,
+    show_default=True,
+    type=click.IntRange(min=1),
+    help="Maximum evidence passages retained for each canonical paper.",
+)
 @click.option("--tag", default=None, help="Filter by tag substring.")
 @click.option("--category", default=None, help="Filter by pipeline category slug.")
 @click.option("--pdf-only", is_flag=True, help="Exclude metadata-only documents.")
@@ -335,6 +368,14 @@ def embed_indexes_cmd(as_json: bool) -> None:
     show_default=True,
     help="Fuse BM25 lexical search with dense vectors.",
 )
+@click.option(
+    "--expand",
+    type=click.Choice(["off", "auto", "force"]),
+    default="off",
+    show_default=True,
+    help="LLM query expansion (multi-query + step-back) for vague queries. "
+    "auto = only when the query looks vague/under-served; force = always.",
+)
 @click.option("--json", "as_json", is_flag=True, help="Emit JSON for LLM agents.")
 def query_cmd(
     text: str,
@@ -348,6 +389,7 @@ def query_cmd(
     embed_profile: str | None,
     rerank: bool | None,
     hybrid: bool,
+    expand: str,
     as_json: bool,
 ) -> None:
     """Semantic search over the graph layout corpus."""
@@ -370,6 +412,7 @@ def query_cmd(
             rerank=rerank,
             hybrid=hybrid,
             max_per_doc=max_per_doc,
+            expand=expand,
         )
     except ValueError as exc:
         click.echo(str(exc), err=True)

@@ -8,7 +8,9 @@ from graph_layout_rag.query.citation_rank import (
     co_citation,
     personalized_pagerank,
     rank_related,
+    related_to_docs,
 )
+from graph_layout_rag.query.identity import CanonicalIdentityMap
 
 
 def _toy() -> CitationGraph:
@@ -67,3 +69,32 @@ def test_rank_related_returns_corpus_neighbors():
     assert docs[0] == "doc-b"
     top = ranked[0]
     assert top.shared_refs >= 1 and top.shared_citations >= 1
+
+
+def test_related_to_docs_resolves_seed_alias_and_deduplicates_results(monkeypatch):
+    g = _toy()
+    g.oa_to_doc["Wb2"] = "doc-b-alias"
+    g.doc_to_oa["doc-b-alias"] = "Wb2"
+    g.add_edge("Wb2", "R1")
+    identities = CanonicalIdentityMap(
+        canonical_by_doc={
+            "doc-a": "doc-a",
+            "doc-a-alias": "doc-a",
+            "doc-b": "doc-b",
+            "doc-b-alias": "doc-b",
+            "doc-c": "doc-c",
+        },
+        aliases_by_canonical={
+            "doc-a": ("doc-a-alias",),
+            "doc-b": ("doc-b-alias",),
+            "doc-c": (),
+        },
+    )
+    monkeypatch.setattr(
+        "graph_layout_rag.query.identity.canonical_identity_map",
+        lambda: identities,
+    )
+
+    ranked = related_to_docs(None, ["doc-a-alias"], graph=g, top=10)
+    assert ranked
+    assert [result.doc_id for result in ranked].count("doc-b") == 1

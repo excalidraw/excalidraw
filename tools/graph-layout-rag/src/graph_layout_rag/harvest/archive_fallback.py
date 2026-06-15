@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 
 from graph_layout_rag.harvest.http_client import get_json
+from graph_layout_rag.harvest.providers import CORE, OutcomeKind
 
 CDX_API = "https://web.archive.org/cdx/search/cdx"
 CORE_SEARCH = "https://api.core.ac.uk/v3/search/works"
@@ -55,14 +56,16 @@ def _core_pdf_urls(doi: str) -> list[str]:
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
 
-    data = get_json(
+    outcome = CORE.request(
+        "GET",
         CORE_SEARCH,
         params={"q": f'doi:"{doi}"', "limit": "3"},
         headers=headers,
         timeout=45.0,
     )
-    if not data:
+    if outcome.kind is not OutcomeKind.SUCCESS:
         return []
+    data = outcome.data or {}
 
     urls: list[str] = []
     for hit in data.get("results") or []:

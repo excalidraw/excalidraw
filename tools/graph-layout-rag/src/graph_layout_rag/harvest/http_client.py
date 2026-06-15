@@ -76,9 +76,14 @@ def get_json(
         if res.status_code in _RETRYABLE and attempt < _MAX_ATTEMPTS - 1:
             retry_after = parse_retry_after(dict(res.headers))
             if res.status_code == 429:
+                # Hard quota exhaustion (retry_after in minutes/hours): don't bump the rate limiter
+                # gap (that would serialize all threads for 30s each); just bail so the caller
+                # can fall back immediately without blocking other workers.
+                if retry_after and retry_after > 60:
+                    return None
                 note_rate_limit(domain, retry_after=retry_after)
             wait = retry_after if retry_after else 2**attempt * (3 if res.status_code == 429 else 1)
-            time.sleep(wait)
+            time.sleep(min(wait, 60))
             continue
 
         return None

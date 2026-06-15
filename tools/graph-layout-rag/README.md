@@ -56,6 +56,9 @@ Downloads PDFs and metadata into `data/manifest.json` and `data/raw/`. Sources:
 - **ELK bibliography** — DOIs from the ELK survey paper
 - **Library docs** — OGDF, ELK, dagre, Graphviz engine/algorithm pages (implementer-grade source for compaction/packing/routing)
 - OpenAlex (paginated, topic queries + graph-drawing concept filter) + DBLP + Semantic Scholar
+- **Complete trusted venues** — schema.org-driven DROPS GD 2024/2025 plus strictly
+  filtered SoCG, and the fully paginated JGAA archive with direct PDF links. A
+  separate source checkpoint fetches only newly configured volumes/issues on rerun.
 - **Crossref venues** — JGAA/CGTA/GD/LIPIcs plus visualization (TVCG, CGF/EuroVis, InfoVis, PacificVis) and VLSI CAD (TCAD, DAC, ICCAD, ISPD); broad journals are strict relevance-gated
 - **arXiv** (cs.CG / cs.DS graph layout queries)
 - Bibliography chain from seed PDFs (relevance-filtered DOIs)
@@ -71,6 +74,20 @@ uv run graph-layout-rag ingest --force --rebuild
 uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
 uv run graph-layout-rag harvest --dry-run
 ```
+
+`--workers` is the process-wide active PDF download budget, including downloads started by
+concurrent discovery sources. Provider API calls use separate shared policies and persistent
+thread-local clients. Semantic Scholar defaults to 32 concurrent requests, cools down after
+429s, and resumes unfinished requests in the same run. OpenAlex is capped at 100 RPS and
+reserves metered work from the configured daily free-dollar budget; free singleton lookups
+continue after that budget is exhausted. End-of-run provider summaries report throughput,
+outcomes, retries, cooldowns, peak concurrency, and OpenAlex budget usage.
+
+Set `OPENALEX_API_KEY` in `.env`. Optional overrides include
+`GRAPH_RAG_OPENALEX_CONCURRENCY`, `GRAPH_RAG_OPENALEX_RPS`,
+`GRAPH_RAG_OPENALEX_FREE_BUDGET_USD`, `GRAPH_RAG_S2_CONCURRENCY`,
+`GRAPH_RAG_S2_COOLDOWN_SECONDS`, and `GRAPH_RAG_CORE_RPS`. CORE defaults to the documented
+anonymous `10/min`, or personal-key `25/min` when `CORE_API_KEY` is set.
 
 | Flag | Purpose |
 | --- | --- |
@@ -96,10 +113,13 @@ uv run graph-layout-rag eval retrieval --embed-profile gemini-2-structure-v1 --j
 ## Retrieval benchmark
 
 The production query default is **hybrid retrieval**: Gemini dense search fused
-with Tantivy BM25 using RRF `k=60`. Local reranking is off by default because the
-current benchmark found lower quality and materially higher memory pressure.
-See [the benchmark assessment](../../docs/graph-layout-rag-retrieval-benchmark-assessment.md)
-for measured results, confidence, and limitations.
+with Tantivy BM25 using RRF `k=60`. On a **de-biased, multi-system-pooled +
+LLM-judged** gold set, hybrid is the measured winner on both tracks (catalog
+0.765 / pdf 0.696 nDCG@10); BM25 alone is mid-pack and dense converges with it.
+HyDE query expansion wins the pdf track. Local reranking is off by default (no
+gain, higher memory). Full results, methodology, and the pooling-bias correction
+that overturned the earlier "BM25 wins" verdict:
+[the bake-off report](../../docs/graph-layout-rag-architecture-bakeoff-2026.md).
 
 Validate labels before comparing retrieval strategies:
 
@@ -131,10 +151,31 @@ immutable indexes:
 
 ```bash
 uv sync --extra retrieval-experiments
-uv run graph-layout-rag eval build-retrieval-index \
+# ColBERT/SPLADE need a Docker Qdrant server (local-mode multivector OOMs 24 GB):
+docker run -d --name graphrag-qdrant -p 6333:6333 qdrant/qdrant   # latest = 1.18.2
+export GRAPH_RAG_QDRANT_URL=http://localhost:6333
+uv run --with pylance --extra retrieval-experiments graph-layout-rag eval build-retrieval-index \
   --base-profile gemini-2-structure-v1 --kind splade
-uv run graph-layout-rag eval build-retrieval-index \
+uv run --with pylance --extra retrieval-experiments graph-layout-rag eval build-retrieval-index \
   --base-profile gemini-2-structure-v1 --kind colbert
+```
+
+#### De-biased evaluation (multi-system pooling)
+
+⚠️ Never expand the gold set from a single retriever — that caused **pooling
+bias** and a false "BM25 wins" verdict (see the bake-off report). The gold set is
+now backed by diverse-pool + LLM-judged qrels at `data/eval/qrels/<track>/qrels.json`;
+benchmark with `--qrels`. Build/refresh them with:
+
+```bash
+uv run graph-layout-rag eval pool  --track catalog --embed-profile gemini-2-structure-v1 \
+  --system bm25 --system dense --system hybrid --system hyde --system multi_query \
+  --system splade --system colbert --splade-index <dir> --colbert-index <dir>
+uv run graph-layout-rag eval judge --track catalog               # gemini-3.1-pro, source-blind, cached
+uv run graph-layout-rag eval diagnostics --track catalog --embed-profile gemini-2-structure-v1 \
+  --qrels data/eval/qrels/catalog/qrels.json --strategy bm25 --strategy dense --strategy hybrid
+uv run graph-layout-rag eval benchmark --embed-profile gemini-2-structure-v1 \
+  --qrels data/eval/qrels/catalog/qrels.json --report -v
 ```
 
 ```bash
@@ -334,8 +375,15 @@ After switching embed models or dims, run **`ingest --force --rebuild`** (vector
 
 Retrieval is **hybrid by default**: dense vectors (LanceDB cosine) fused with BM25 lexical
 hits (Tantivy) via reciprocal rank fusion, then optionally reranked by a local
-cross-encoder. Metadata filters (`--tag`, `--category`, `--year-min`) are pushed into the
-dense search as a prefilter so selective filters no longer silently drop hits.
+cross-encoder. Query results are grouped by canonical paper identity (DOI, PDF SHA-256,
+local path, and provider external ids) and retain the top evidence passages for that paper.
+`year_min` is pushed into dense search; other selective filters widen the retrieval pool
+before post-fusion filtering.
+
+Canonical grouping is derived from the current manifest at query time. It does not require
+re-ingesting an existing index when aliases are added or merged. `doc_id` remains the id of
+the winning indexed row; use `canonical_doc_id` as the paper-level identity and
+`alias_doc_ids` to resolve alternate metadata or local PDF records.
 
 JSON output for LLM agents:
 
@@ -355,18 +403,72 @@ uv run graph-layout-rag query "stress majorization neato" --no-hybrid --json # d
 | --- | --- |
 | `--hybrid` / `--no-hybrid` | Fuse BM25 + dense (default on). Degrades to dense if no BM25 index yet. |
 | `--rerank` / `--no-rerank` | Local cross-encoder rerank, overrides `RAG_RERANK_ENABLED`. |
+| `--max-per-doc` | Maximum evidence passages nested under each canonical paper result. |
 | `RAG_RERANK_ENABLED=true` | Default-on reranking without the flag. |
 | `RAG_RERANK_MODEL` | Cross-encoder id (default `BAAI/bge-reranker-v2-m3`; downloads on first use). |
 | `RAG_RERANK_TOP` | Override the number of reranked results returned. |
 
-JSON results gain `dense_rank` / `sparse_rank` (fusion provenance), `fusion_score`,
-`rerank_score` (when reranked), and `page_end` (chunk page span). Reranking is **off by
-default**; run it on demand. **Do not rerank while ingest is running** on a 24 GB Mac —
-loading the cross-encoder alongside the embed model risks OOM.
+JSON results gain `canonical_doc_id`, identity aliases, nested `evidence`,
+`dense_rank` / `sparse_rank` (fusion provenance), `fusion_score`, `rerank_score`
+(when reranked), and `page_end` (chunk page span). Reranking is **off by default**; run it
+on demand. **Do not rerank while ingest is running** on a 24 GB Mac — loading the
+cross-encoder alongside the embed model risks OOM.
+
+Representative result:
+
+```json
+{
+  "score": 0.032522,
+  "title": "A Technique for Drawing Directed Graphs",
+  "excerpt": "The rank assignment is formulated...",
+  "page": 20,
+  "page_end": 21,
+  "doc_id": "gansner-tse93",
+  "canonical_doc_id": "gansner-tse93",
+  "alias_doc_ids": ["graphviz-a-method-for-drawing-directed-graphs"],
+  "evidence": [
+    {
+      "excerpt": "The rank assignment is formulated...",
+      "page": 20,
+      "page_end": 21,
+      "section_path": "4. Rank assignment",
+      "chunk_id": "gansner-tse93:20:0",
+      "score": 0.032522
+    },
+    {
+      "excerpt": "The network simplex procedure...",
+      "page": 22,
+      "page_end": 22,
+      "section_path": "4. Rank assignment",
+      "chunk_id": "gansner-tse93:22:0",
+      "score": 0.031746
+    }
+  ]
+}
+```
+
+`--top` counts canonical papers. `--max-per-doc` controls the number of evidence passages
+nested under each paper. The top-level excerpt/page mirror the highest-ranked evidence
+passage for compatibility with existing callers.
 
 > **Rebuild note:** the BM25 index, chunk page-spans, and the enriched gemini-2 embed
 > bodies are produced during ingest. To populate them on an existing corpus, run
 > `ingest --force --rebuild` once. Until then, `--hybrid` falls back to dense-only.
+
+### Related papers
+
+Use citation structure when starting from a known paper rather than a topic query:
+
+```bash
+uv run graph-layout-rag cite related gansner-tse93 --signal fused --top 10 --json
+```
+
+`cite related` accepts either a canonical or alias `doc_id`. It checks all ids in the
+canonical identity component for a citation-graph node and deduplicates returned neighbors
+to canonical papers. The default fused signal combines co-citation, undirected personalized
+PageRank, bibliographic coupling, and a light citation-trained embedding signal. Keep this
+separate from topic `query` ranking; citation relatedness did not improve query relevance in
+the current evaluation.
 
 ### Catalog
 
@@ -400,6 +502,7 @@ See [docs/pipeline-rag-queries.md](../../docs/pipeline-rag-queries.md) for categ
 - `data/indexes/` — per-profile vector indexes (`{profile}/lancedb/`, `{profile}/ingest_state.json`)
 - `data/manifest.json` — harvest output
 - `data/harvest_checkpoint.json` — harvest resume state
+- `data/trusted_venue_checkpoint.json` — completed DROPS volumes and JGAA issues
 - `data/harvest.log` — harvest run log
 - `data/ingest.log`, `data/ingest-run.log` — ingest structured log / tee output
 - `.venv/`, `.env`

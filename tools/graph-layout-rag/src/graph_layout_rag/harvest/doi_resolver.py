@@ -10,6 +10,7 @@ from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.http_client import get_json
 from graph_layout_rag.harvest.ledger import set_harvest_stage, update_document
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.providers import OPENALEX, SEMANTIC_SCHOLAR, OutcomeKind
 from graph_layout_rag.manifest import ManifestItem, relative_local_path, slug_id
 from graph_layout_rag.paths import PDF_DIR
 
@@ -35,17 +36,22 @@ def _abstract_from_inverted_index(idx: dict | None) -> str | None:
 
 
 def _openalex_by_doi(doi: str) -> dict | None:
-    return get_json(f"{OPENALEX_API}/https://doi.org/{doi}", timeout=30.0)
+    outcome = OPENALEX.request_openalex(
+        "GET", f"{OPENALEX_API}/https://doi.org/{doi}", operation="singleton", timeout=30.0
+    )
+    return outcome.data if outcome.kind is OutcomeKind.SUCCESS else None
 
 
 def _semantic_scholar_pdf(doi: str) -> str | None:
-    data = get_json(
+    outcome = SEMANTIC_SCHOLAR.request(
+        "GET",
         f"{S2_API}{doi}",
         params={"fields": "title,openAccessPdf"},
         timeout=30.0,
     )
-    if not data:
+    if outcome.kind is not OutcomeKind.SUCCESS:
         return None
+    data = outcome.data or {}
     oa = data.get("openAccessPdf") or {}
     url = oa.get("url") or ""
     return url if url else None

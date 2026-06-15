@@ -1,6 +1,6 @@
 ---
 name: graph-layout-rag
-description: Query local graph drawing / layout theory RAG corpus. Use when researching Terraform pipeline layout height, Sugiyama/dot layering, neato stress majorization, ELK/Mermaid/dagre, compound grouping, layer reassignment, or graph layout literature. After search, read full PDFs via manifest doc_id. Also supports "find papers related to this paper" via the citation graph (cite related).
+description: Query the local graph drawing / layout theory RAG corpus. Topic search returns canonical papers with ranked evidence passages; cite related expands from a known paper through the citation graph. Use for Terraform pipeline layout height, Sugiyama/dot layering, neato stress majorization, ELK/Mermaid/dagre, compound grouping, layer reassignment, graph layout literature, and full-PDF deep reading.
 ---
 
 # Graph layout RAG
@@ -24,12 +24,14 @@ minimization, compound graphs, and Terraform pipeline height.
 
 ```
 1. Search     → yarn graph-rag:query "…" --top 8 --json
-2. Shortlist  → pick results by score, title, tags; note doc_id and page
-3. Deep read  → if excerpt is not enough, load full PDF text (see below)
+2. Shortlist  → pick canonical papers by score/title; inspect their evidence passages
+3. Deep read  → load the full PDF using canonical_doc_id or one of alias_doc_ids
 4. Cite       → use source_url + page from query result or manifest
 ```
 
-**Query returns snippets only** (~400 chars per hit). For proofs, algorithms, or quotes you need step 3.
+**Query returns canonical paper results, not raw chunk hits.** Each paper has a
+top-level best excerpt plus an `evidence` array of ranked passages (~400 chars
+each). For proofs, algorithms, or quotes you still need step 3.
 
 ## Commands (from repo root)
 
@@ -112,7 +114,7 @@ uv run graph-layout-rag ingest --force
 | `--deep-harvest` | OpenAlex 4k, arXiv 500, bib 1200 DOIs, 3 retry/bib passes |
 | `--target-pdfs 2000` | Stop when ok PDF count reaches N |
 | `--target 2800` | Catalog entry ceiling |
-| `--workers 48` | Parallel downloads (sweet spot 32–64) |
+| `--workers 48` | Global active PDF download budget (sweet spot 32–64) |
 | `--resume` | Skip seed stages; continue discovery passes |
 | `harvest verify` | Validate ok PDFs on disk |
 | `-v` | Verbose console logging |
@@ -136,14 +138,30 @@ uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
       "excerpt": "…400 char snippet…",
       "source_url": "https://graphviz.org/documentation/TSE93.pdf",
       "page": 20,
+      "page_end": 21,
       "tags": ["dot", "hierarchical", "graphviz"],
-      "doc_id": "gansner-tse93"
+      "doc_id": "gansner-tse93",
+      "canonical_doc_id": "gansner-tse93",
+      "alias_doc_ids": ["graphviz-a-method-for-drawing-directed-graphs"],
+      "evidence": [
+        {
+          "excerpt": "…best passage…",
+          "page": 20,
+          "page_end": 21,
+          "section_path": "4. Rank assignment",
+          "chunk_id": "gansner-tse93:20:0",
+          "score": 0.63
+        }
+      ]
     }
   ]
 }
 ```
 
 Filter flags: `--tag compound`, `--category packing`, `--pdf-only`, `--source handbook`, `--year-min 1990`
+
+`--max-per-doc` controls how many evidence passages are retained under each
+canonical paper result; it does not allow duplicate paper rows.
 
 ### Retrieval behavior
 
@@ -158,11 +176,17 @@ Dense + BM25           → RRF k=60 → filters → results
 - `--hybrid` is the default.
 - `--no-hybrid` selects dense-only search.
 - `--rerank` explicitly loads a local cross-encoder; do not use it by default.
+- Results are grouped by canonical paper identity after retrieval and reranking.
+- Canonical identity components are derived at query time from normalized DOI,
+  PDF SHA-256, local path, and provider external IDs. No re-ingest is required
+  when the manifest gains aliases.
+- `doc_id` identifies the winning indexed row. Use `canonical_doc_id` for
+  deduplication/evaluation and `alias_doc_ids` when resolving a local PDF.
 - Query embeddings use the configured cloud or local profile; LanceDB and BM25
   indexes remain local.
 - `--tag` is an exact tag match. Category, tag, source, and PDF filters are
   applied after fusion; retrieval widens the candidate pool to compensate.
-- Query returns snippets, not the full source.
+- Query returns evidence snippets, not the full source.
 
 ## Retrieval benchmark
 
@@ -217,17 +241,42 @@ uv run graph-layout-rag eval benchmark \
 ```
 
 Experimental index strategies must match the index kind: use `splade` or
-`dense_splade` with a SPLADE index and `colbert` with a ColBERT index.
+`dense_splade` with a SPLADE index and `colbert` with a ColBERT index. **ColBERT
+(and SPLADE) need a Docker Qdrant server** — local-mode multivector search OOMs
+the 24 GB guard. Start `docker run -d --name graphrag-qdrant -p 6333:6333
+qdrant/qdrant` and `export GRAPH_RAG_QDRANT_URL=http://localhost:6333` before
+building/benchmarking them (`qdrant/qdrant:latest` = 1.18.2).
 
-**Current decision:** keep default hybrid RRF `k=60`. Hybrid materially beat
-dense-only and BM25-only on the current 30-query gold set. RRF `k=100` improved
-nDCG by less than `0.001`, which is not meaningful. Local MiniLM/BGE rerankers
-reduced quality; BGE also triggered the swap guard.
+### De-biased evaluation (multi-system pooling — REQUIRED for trustworthy numbers)
 
-Treat benchmark conclusions as directional, not universal. The gold set has
-30 queries and 23 unique relevant documents, no hidden holdout, and no
-confidence intervals. See
-[docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md).
+⚠️ **Do not expand the gold set from a single retriever.** The earlier gold set
+was BM25-pooled, which produced **pooling bias** and a false "BM25 wins"
+verdict. The gold set is now backed by **diverse-pool + LLM-judged qrels** at
+`data/eval/qrels/<track>/qrels.json`; always benchmark with `--qrels`.
+
+```bash
+# 1. pool a diverse candidate set; 2. LLM-judge (UMBRELA 0-3, source-blind);
+# 3. diagnostics (hole rate / bpref); 4. bake-off on the neutral qrels.
+uv run graph-layout-rag eval pool --track catalog --embed-profile gemini-2-structure-v1 \
+  --system bm25 --system dense --system hybrid --system hyde --system multi_query \
+  --system splade --system colbert --splade-index <dir> --colbert-index <dir>
+uv run graph-layout-rag eval judge --track catalog          # gemini-3.1-pro, cached per (model,case,doc)
+uv run graph-layout-rag eval diagnostics --track catalog --embed-profile gemini-2-structure-v1 \
+  --qrels data/eval/qrels/catalog/qrels.json --strategy bm25 --strategy dense --strategy hybrid
+uv run graph-layout-rag eval benchmark --embed-profile gemini-2-structure-v1 \
+  --qrels data/eval/qrels/catalog/qrels.json --report -v
+```
+
+**Current decision (corrected, on the neutral judge):** keep default **hybrid
+RRF** — it is the measured winner on both tracks (catalog 0.765, pdf 0.696),
+**not** a tie with BM25. On the neutral judge BM25 falls to mid-pack (≈0.70) and
+dense converges with it; the old "BM25 is a free equal-quality fallback" claim
+is **withdrawn**. `rrf_k=20` is a small consistent win. **HyDE expansion wins
+the pdf track** — use `--expand auto`/`force` for deep-read/vague queries.
+Reranking still adds nothing (local CE hurts; LLM rerank = no gain, +56 s/query).
+SPLADE/ColBERT remain bottom. Full results + methodology:
+[docs/graph-layout-rag-architecture-bakeoff-2026.md](../../../docs/graph-layout-rag-architecture-bakeoff-2026.md).
+Gold set: 49 catalog / 47 pdf cases, **949 judged-relevant docs** (was ~136).
 
 Pipeline research: see [docs/pipeline-rag-queries.md](../../../docs/pipeline-rag-queries.md).
 
@@ -293,8 +342,10 @@ uv run graph-layout-rag cite related <doc_id> --signal fused --top 10 --json
 
 Output rows carry **why-related provenance**: `shared_references`, `shared_citations`
 (co-citations), `embedding` cosine, and the per-signal sub-scores. The seed `doc_id` **must
-have a DOI that got enriched** — not every manifest entry is in the graph; if it says
-"no citation node", that paper has no DOI/edges.
+resolve to a canonical identity component with an enriched citation node. The command accepts
+an alias `doc_id`, checks all identities in its canonical component, and deduplicates related
+results back to canonical paper ids. If it says "no citation node", no alias in that component
+has usable graph edges.
 
 ### What actually wins (measured)
 
@@ -324,10 +375,9 @@ uv run graph-layout-rag eval related --folds 150 --report -o data/eval/related-a
 - **Co-citation depends on `cite enrich --incoming`.** Without the Semantic Scholar incoming pass
   the graph has only outgoing references and co-citation is dead (OpenAlex meters its `cites:`
   filter, so it can't supply incoming edges).
-- **S2 is hammered with no throttle / no backoff** (`--incoming-workers 32`,
-  `rate_limit.py` `_NO_BACKOFF`). It finishes ~1300 papers in seconds but ~20% get 429-dropped
-  once the shared anonymous pool budget (5000 req / 5 min) is spent. Those papers stay unmarked;
-  **wait ~5 min for the window to reset and re-run `cite enrich --no-s2`** to retry just them.
+- **S2 incoming completion is automatic.** `--incoming-workers 32` bursts through the shared
+  provider policy; 429s open an S2-only cooldown, then unfinished requests resume. Successful
+  and terminal-not-found papers receive idempotent completion markers.
 - SPECTER2 uses the **base** model (CLS-pooled), not the proximity adapter — the `adapters` lib
   pins `transformers<4.58` and conflicts with the MLX embed stack.
 
@@ -335,15 +385,19 @@ uv run graph-layout-rag eval related --folds 150 --report -o data/eval/related-a
 
 Only items with `status: "ok"` in the manifest have local PDFs (~2,088; target ~3,088 after pipeline harvest). Metadata-only entries have title/abstract only — no full text.
 
-### 1. Resolve path from `doc_id`
+### 1. Resolve path from a query result
 
 ```bash
 cd tools/graph-layout-rag
 uv run python3 -c "
 import json
-doc_id = 'gansner-tse93'  # from query result
+result = {
+    'canonical_doc_id': 'gansner-tse93',
+    'alias_doc_ids': ['graphviz-a-method-for-drawing-directed-graphs'],
+}
 items = {i['id']: i for i in json.load(open('data/manifest.json'))['items']}
-item = items[doc_id]
+candidate_ids = [result['canonical_doc_id'], *result.get('alias_doc_ids', [])]
+item = next(items[doc_id] for doc_id in candidate_ids if items[doc_id].get('localPath'))
 print('status:', item['status'])
 print('localPath:', item.get('localPath'))
 print('url:', item.get('url'))
@@ -396,8 +450,9 @@ If `status` is `metadata_only`, use `title`, `abstract`, `doi`, and `url` from m
 **Index:** LanceDB + Tantivy BM25 under
 `tools/graph-layout-rag/data/indexes/{profile}/`. Production chunks use
 `markdown-structure-v1`: ~800 target tokens, 1200 hard max, and ~120-token
-paragraph overlap. Query ranks chunks; multiple chunks per paper exist. Use
-`doc_id`, `page`, and `page_end` to read contiguous text.
+paragraph overlap. Query ranks chunks, then groups them into canonical paper
+results. Use each result's `evidence`, `canonical_doc_id`, aliases, `page`, and
+`page_end` to choose contiguous text for deep reading.
 
 ## Example queries
 
@@ -432,6 +487,8 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 | `tools/graph-layout-rag/data/related/{model}/` | Per-model (scincl/specter2) doc-vector tables |
 | `tools/graph-layout-rag/data/retrieval-indexes/` | Immutable optional SPLADE/ColBERT indexes |
 | `tools/graph-layout-rag/data/eval/runs/` | Immutable resumable benchmark runs |
+| `tools/graph-layout-rag/data/eval/pool/{track}/pool.json` | Diverse multi-system candidate pool (for judging) |
+| `tools/graph-layout-rag/data/eval/qrels/{track}/qrels.json` | De-biased LLM-judged graded relevance labels (`--qrels`) |
 | `tools/graph-layout-rag/data/ingest.log` | Ingest structured log |
 | `tools/graph-layout-rag/data/harvest.log` | Harvest run log |
 | `tools/graph-layout-rag/data/harvest_checkpoint.json` | Harvest resume state |
@@ -440,7 +497,8 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 
 - [tools/graph-layout-rag/README.md](../../../tools/graph-layout-rag/README.md)
 - [tools/graph-layout-rag/ARCHITECTURE.md](../../../tools/graph-layout-rag/ARCHITECTURE.md) — full harvest/ingest/query/test internals
-- [docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md) — measured results, confidence, and default decision
+- [docs/graph-layout-rag-architecture-bakeoff-2026.md](../../../docs/graph-layout-rag-architecture-bakeoff-2026.md) — **current** bake-off: pooling-bias correction, neutral-judge verdict (hybrid wins), per-arm decisions
+- [docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md) — older single-label benchmark assessment (superseded by the bake-off report)
 - [docs/terraform-pipeline-import-debug-handoff.md](../../../docs/terraform-pipeline-import-debug-handoff.md) — pipeline height diagnostic
 
 ## Do not
@@ -449,6 +507,7 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 - Run `query` while `ingest` is active on a memory-constrained Mac (OOM)
 - Fuse citation/relatedness signal into `query` ranking — it hurts query→doc retrieval; keep `cite related` standalone
 - Expect `cite related` to work on a seed without an enriched DOI (run `cite enrich` first)
+- Ignore `canonical_doc_id` and deduplicate by `doc_id` alone
 - Enable local reranking by default; benchmark it explicitly under memory guards
 - Resume ingest with `--force --rebuild` (re-does everything)
 - Assume every manifest entry has a PDF — check `status` first

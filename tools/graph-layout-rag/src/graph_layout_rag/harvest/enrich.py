@@ -25,6 +25,7 @@ from graph_layout_rag.harvest.openalex import (
     _fetch_by_doi,
 )
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.providers import SEMANTIC_SCHOLAR, OutcomeKind
 from graph_layout_rag.harvest.rate_limit import (
     domain_from_url,
     note_rate_limit,
@@ -87,23 +88,16 @@ def _from_crossref(doi: str) -> str | None:
 
 
 def _from_semantic_scholar(doi: str) -> str | None:
-    wait_for_domain(_S2_DOMAIN)
-    try:
-        with httpx.Client(timeout=30.0) as client:
-            res = client.get(
-                f"{_S2_API}/DOI:{doi}",
-                params={"fields": "abstract"},
-                headers={"User-Agent": _UA},
-            )
-        if res.status_code == 429:
-            note_rate_limit(_S2_DOMAIN)
-            return None
-        if res.status_code != 200:
-            return None
-        data = res.json()
-    except Exception:
+    outcome = SEMANTIC_SCHOLAR.request(
+        "GET",
+        f"{_S2_API}/DOI:{doi}",
+        params={"fields": "abstract"},
+        headers={"User-Agent": _UA},
+        timeout=30.0,
+    )
+    if outcome.kind is not OutcomeKind.SUCCESS:
         return None
-    note_success(_S2_DOMAIN)
+    data = outcome.data or {}
     return _clean(data.get("abstract"))
 
 

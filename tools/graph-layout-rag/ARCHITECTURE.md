@@ -74,7 +74,7 @@ This corpus supports agents researching **Terraform pipeline layout height** in 
 flowchart TB
   subgraph harvest [Harvest]
     Seeds[Curated seeds] --> Manifest
-    Discovery[OpenAlex arXiv DBLP S2 Crossref citations] --> Manifest
+    Discovery[Trusted venues OpenAlex arXiv DBLP S2 Crossref citations] --> Manifest
     BibChain[Bibliography chain] --> Manifest
     Manifest[manifest.json] --> PDFs[data/raw/pdf/]
     Ledger[harvest.db ledger]
@@ -144,6 +144,8 @@ tools/graph-layout-rag/
 | `data/raw/html/` | Scraped HTML (curated blog posts) | yes |
 | `data/harvest.db` | SQLite download attempt ledger | yes |
 | `data/harvest_checkpoint.json` | Harvest resume state | yes |
+| `data/trusted_venue_checkpoint.json` | Incremental DROPS volume / JGAA issue state | yes |
+| `data/citations.sqlite` | Canonical citation nodes/edges, provider aliases, and edge provenance | yes |
 | `data/harvest.log` | Harvest structured log | yes |
 | `data/ingest.log` | Ingest structured log | yes |
 | `data/indexes/{profile}/lancedb/` | LanceDB vector index | yes |
@@ -438,11 +440,12 @@ Discovery sources run concurrently within each pass (see §4.3). Each module ret
 | Module | Function | `source` | Strategy |
 |--------|----------|----------|----------|
 | `crossref.py` | `harvest_crossref` | `crossref` | Venue queries (JGAA, CGTA, GD, LIPIcs; visualization: TVCG/CGF/InfoVis/PacificVis; VLSI CAD: TCAD/DAC/ICCAD/ISPD) via Crossref API; broad journals strict-gated; DOI resolve + download |
+| `trusted_venues.py` | `harvest_trusted_venues` | `drops`, `jgaa` | Complete GD 2024/2025 DROPS schema.org records, strict relevant SoCG records, and paginated JGAA archive PDFs; incremental per-volume/issue checkpoint |
 | `openalex.py` | `harvest_openalex` | `openalex` | Topic queries + graph-drawing concept filter `C41217795`; cursor pagination; relevance filter |
 | `arxiv.py` | `harvest_arxiv` | `arxiv` | 12 queries in cs.CG/DS/GR; Atom API; 0.5s delay |
 | `arxiv_bulk.py` | `harvest_arxiv_category` | `arxiv` | Deep pagination of entire **cs.CG** category; strict layout gate (complements keyword search) |
 | `dblp.py` | `harvest_dblp` | `dblp` | 14 queries; JSON API with 429 backoff |
-| `semantic_scholar.py` | `harvest_semantic_scholar` | `semantic-scholar` | 15 queries; 1.1s delay |
+| `semantic_scholar.py` | `harvest_semantic_scholar` | `semantic-scholar` | Independent queries in parallel through shared S2 policy |
 | `citations.py` | `harvest_forward_citations` | `openalex` | OpenAlex **cites:** filter on high-signal seed DOIs (up to 40 seeds); captures newer citing work |
 
 OpenAlex broad pass runs when target PDF count is not met after standard discovery (skipped in `--pipeline-harvest` mode).
@@ -496,7 +499,7 @@ Source modules
     ↓
 download_to_file()  ← rate_limit.wait_for_domain()
     ↓                  ledger.log_attempt() / classify_outcome()
-parallel_map()       ← ThreadPoolExecutor (DEFAULT_WORKERS=32, MAX=128)
+parallel_map() / streaming_parallel_map() ← bounded ThreadPoolExecutor helpers
     ↓
 PDF_DIR / data/raw/pdf/{id}.pdf
 ```
@@ -514,6 +517,7 @@ PDF_DIR / data/raw/pdf/{id}.pdf
 
 - `set_workers(n)` / `get_workers()` — global worker count, clamped `[1, 128]`
 - `parallel_map(func, items, workers, label)` — preserves order; logs ~5% progress
+- `streaming_parallel_map(...)` — one persistent executor; yields results as completed
 
 #### `rate_limit.py`
 
@@ -521,15 +525,17 @@ Per-domain adaptive gaps (thread-safe):
 
 | Domain | Default gap |
 |--------|-------------|
-| OpenAlex | 0.1s |
-| Semantic Scholar | 1.0s |
+| OpenAlex | Shared policy; max 100 RPS; metered work reserves daily free budget |
+| Semantic Scholar | Shared policy; aggressive concurrency plus circuit-breaker cooldown |
 | Unpaywall | 0.05s |
 | CORE | 0.2s |
 | Wayback | 0.5s |
 | DBLP | 0.2s |
 | doi.org | 0.1s |
 
-`note_rate_limit`: doubles gap (max 30s) on 429.
+Provider policies add persistent clients, concurrency semaphores, RPS pacing, typed outcomes,
+retries, circuit breaking, and metrics. S2 successful and terminal-not-found requests get
+completion markers; retryable failures resume automatically.
 `note_success`: decays gap toward default (×0.75).
 
 #### `http_client.py` — `get_json`
@@ -667,7 +673,7 @@ Runs automatically at end of harvest; also available as `harvest verify`.
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--dry-run` | off | Discover only; no downloads |
-| `--workers` | 32 | Parallel threads (max 128) |
+| `--workers` | 32 | Process-wide active PDF download budget (max 128) |
 | `--target` | mode-dependent | Min manifest item count |
 | `--target-pdfs` | mode-dependent | Stop when ok PDF count reached |
 | `--max-openalex` | preset | OpenAlex works per pass |
@@ -1009,10 +1015,11 @@ Retrieve-wide pool:
   sparse: BM25 search (limit=pool)  [if hybrid]
   fuse: reciprocal_rank_fusion or merge_rankings (RRF_K=60)
 Post-fusion Python filters (tag, category, pdf_only, source, year_min)
-Per-doc diversity cap (max 5 candidates per doc in rerank pool)
+Canonical identity resolution (DOI, SHA-256, path, provider external ids)
+Per-canonical-paper diversity cap (max 5 candidates in rerank pool)
 Optional cross-encoder rerank on top candidates
-Per-doc result cap (`max_per_doc`, default 2)
-Format JSON results (400-char excerpts)
+Group by canonical paper and retain evidence (`max_per_doc`, default 2)
+Format JSON paper results (400-char evidence excerpts)
 ```
 
 **Pool sizing:**
@@ -1046,7 +1053,7 @@ score(chunk_id) += 1 / (60 + rank)   # for each list (sparse then dense)
 | `resolve_retrieve_context(embed_profile)` | Open LanceDB + load embed config; cached per profile |
 | `retrieve_candidates(query, …)` | Single-query dense/hybrid retrieval before rerank |
 | `retrieve_multi_query(queries, …)` | Per-query hybrid retrieve + `merge_rankings` |
-| `diversify_candidates(candidates, …)` | Cap chunks per doc in rerank pool |
+| `diversify_candidates(candidates, …)` | Cap chunks per canonical paper in rerank pool |
 | `clear_retrieve_caches()` | Reset context + query-vector caches (eval harness) |
 
 Query vectors are cached in-process by `(model, dimensions, query_text)` so benchmark sweeps re-embed each unique query once across strategies.
@@ -1074,7 +1081,7 @@ Optional Vertex generative transforms for eval strategies (not used by default `
 | `category` | Python post-fusion | Must be in `pipeline_categories` (row field or catalog fallback) |
 | `tag` | Python post-fusion | **Exact match** on comma-split tags (CLI help says "substring" but code is exact) |
 | `source` | Python post-fusion | Substring in `source_url` OR in `tags` |
-| `max_per_doc` | Python post-rerank | Cap chunks returned per `doc_id` (default 2) |
+| `max_per_doc` | Python post-rerank | Evidence passages retained per canonical paper (default 2) |
 
 Category must be one of `PIPELINE_CATEGORIES` or query raises `ValueError`.
 
@@ -1111,11 +1118,22 @@ Rerank pool: up to 5 chunks per doc in filtered candidates, then `diverse_candid
       "tags": ["dot", "hierarchical", "graphviz"],
       "pipeline_categories": ["layer-assignment"],
       "doc_id": "gansner-tse93",
+      "canonical_doc_id": "gansner-tse93",
       "section_path": "Introduction > Rank Assignment",
       "alias_doc_ids": [],
       "alias_source_urls": [],
       "alias_dois": [],
       "canonical_sha256": "a1b2c3…",
+      "evidence": [
+        {
+          "chunk_id": "gansner-tse93:7",
+          "excerpt": "…400 char snippet from chunk.text…",
+          "page": 20,
+          "page_end": 21,
+          "section_path": "Introduction > Rank Assignment",
+          "score": 0.63
+        }
+      ],
       "fusion_score": 0.016393,
       "dense_rank": 3,
       "sparse_rank": 1,
@@ -1127,7 +1145,8 @@ Rerank pool: up to 5 chunks per doc in filtered candidates, then `diverse_candid
 
 **Score precedence:** `rerank_score` > `fusion_score` > dense `score`.
 
-Query returns **snippets only** (~400 chars). For proofs, algorithms, or quotes, deep-read the full PDF (see §10).
+Query returns canonical papers with evidence snippets (~400 chars). For proofs, algorithms,
+or quotes, deep-read the full PDF (see §10).
 
 ---
 

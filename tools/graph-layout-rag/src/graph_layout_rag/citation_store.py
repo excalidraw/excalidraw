@@ -84,6 +84,18 @@ def init_schema(db: sqlite3.Connection) -> None:
           is_influential INTEGER NOT NULL DEFAULT 0,
           PRIMARY KEY(src_oa, dst_oa)
         );
+        CREATE TABLE IF NOT EXISTS paper_aliases(
+          provider TEXT NOT NULL,
+          external_id TEXT NOT NULL,
+          oa_id TEXT NOT NULL,
+          PRIMARY KEY(provider, external_id)
+        );
+        CREATE TABLE IF NOT EXISTS cite_provenance(
+          src_oa TEXT NOT NULL,
+          dst_oa TEXT NOT NULL,
+          provider TEXT NOT NULL,
+          PRIMARY KEY(src_oa, dst_oa, provider)
+        );
         CREATE TABLE IF NOT EXISTS authorship(
           author_key TEXT NOT NULL,
           doc_id TEXT NOT NULL,
@@ -91,6 +103,8 @@ def init_schema(db: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS cites_src ON cites(src_oa);
         CREATE INDEX IF NOT EXISTS cites_dst ON cites(dst_oa);
+        CREATE INDEX IF NOT EXISTS paper_aliases_oa ON paper_aliases(oa_id);
+        CREATE INDEX IF NOT EXISTS cite_provenance_edge ON cite_provenance(src_oa, dst_oa);
         CREATE INDEX IF NOT EXISTS papers_doc ON papers(doc_id);
         CREATE INDEX IF NOT EXISTS papers_doi ON papers(doi);
         CREATE INDEX IF NOT EXISTS authorship_author ON authorship(author_key);
@@ -140,7 +154,12 @@ def upsert_paper(
     )
 
 
-def add_cites(db: sqlite3.Connection, edges: Iterable[tuple[str, str, int]]) -> int:
+def add_cites(
+    db: sqlite3.Connection,
+    edges: Iterable[tuple[str, str, int]],
+    *,
+    provider: str | None = None,
+) -> int:
     """Bulk upsert (src_oa, dst_oa, is_influential). is_influential is OR-ed in once set."""
     rows = [(s, d, int(infl)) for s, d, infl in edges if s and d and s != d]
     if not rows:
@@ -153,7 +172,39 @@ def add_cites(db: sqlite3.Connection, edges: Iterable[tuple[str, str, int]]) -> 
         """,
         rows,
     )
+    if provider:
+        db.executemany(
+            """
+            INSERT OR IGNORE INTO cite_provenance(src_oa, dst_oa, provider)
+            VALUES(?,?,?)
+            """,
+            ((src, dst, provider) for src, dst, _ in rows),
+        )
     return len(rows)
+
+
+def upsert_alias(
+    db: sqlite3.Connection, *, provider: str, external_id: str | None, oa_id: str
+) -> None:
+    if not provider or not external_id or not oa_id:
+        return
+    db.execute(
+        """
+        INSERT INTO paper_aliases(provider, external_id, oa_id) VALUES(?,?,?)
+        ON CONFLICT(provider, external_id) DO UPDATE SET oa_id=excluded.oa_id
+        """,
+        (provider.lower(), external_id, oa_id),
+    )
+
+
+def oa_id_for_alias(
+    db: sqlite3.Connection, *, provider: str, external_id: str
+) -> str | None:
+    row = db.execute(
+        "SELECT oa_id FROM paper_aliases WHERE provider=? AND external_id=?",
+        (provider.lower(), external_id),
+    ).fetchone()
+    return row[0] if row else None
 
 
 def set_influential_by_doi(db: sqlite3.Connection, src_doi: str, dst_doi: str) -> int:
@@ -245,6 +296,8 @@ def counts(db: sqlite3.Connection) -> dict[str, int]:
         "papers": db.execute("SELECT count(*) FROM papers").fetchone()[0],
         "corpus_papers": db.execute("SELECT count(*) FROM papers WHERE in_corpus=1").fetchone()[0],
         "cite_edges": db.execute("SELECT count(*) FROM cites").fetchone()[0],
+        "citation_provenance": db.execute("SELECT count(*) FROM cite_provenance").fetchone()[0],
+        "paper_aliases": db.execute("SELECT count(*) FROM paper_aliases").fetchone()[0],
         "influential_edges": db.execute("SELECT count(*) FROM cites WHERE is_influential=1").fetchone()[0],
         "papers_with_incoming": db.execute(
             "SELECT count(*) FROM papers WHERE in_corpus=1 AND incoming_at IS NOT NULL"

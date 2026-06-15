@@ -14,25 +14,24 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-import httpx
-
 from graph_layout_rag import citation_store as cs
 from graph_layout_rag.harvest.log import get_logger
-from graph_layout_rag.harvest.openalex import OPENALEX_API
-from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.openalex import _fetch_by_doi
+from graph_layout_rag.harvest.parallel import parallel_map, streaming_parallel_map
+from graph_layout_rag.harvest.providers import (
+    SEMANTIC_SCHOLAR,
+    OutcomeKind,
+    RequestOutcome,
+    log_provider_summaries,
+)
 from graph_layout_rag.manifest import load_manifest
 
 # OpenAlex meters filter/search queries (the `cites:` form returns 429 "insufficient
 # budget" for anonymous callers) but the direct entity GET `works/doi:{doi}` is free and
 # already carries referenced_works + cited_by_count + authorships. `mailto` as a *query
 # param* is what puts us in the polite pool (it is ignored in the User-Agent).
-_OA_MAIL = "graph-layout-rag@excalidraw-tf.local"
-_WORK_FIELDS = "id,doi,display_name,publication_year,cited_by_count,referenced_works,authorships"
 S2_BATCH_API = "https://api.semanticscholar.org/graph/v1/paper/batch"
 S2_GRAPH_API = "https://api.semanticscholar.org/graph/v1"
-# We hammer the shared S2 pool with high concurrency and no backoff (see _s2_incoming_pass).
-# Robustness comes not from throttling but from the resume marker: a paper is only marked
-# done on a *successful* fetch, so any request dropped under load is simply retried on rerun.
 _S2_PAGE = 1000  # max page size the citations endpoint accepts
 _S2_INCOMING_WORKERS = 32
 
@@ -55,15 +54,7 @@ def _citer_node_id(doi: str | None, paper_id: str | None, corpus_oa_by_doi: dict
 
 
 def _fetch_work_by_doi(doi: str) -> dict | None:
-    url = f"{OPENALEX_API}/doi:{doi}"
-    try:
-        with httpx.Client(timeout=30.0) as client:
-            res = client.get(url, params={"mailto": _OA_MAIL, "select": _WORK_FIELDS})
-            if res.status_code != 200:
-                return None
-            return res.json()
-    except httpx.HTTPError:
-        return None
+    return _fetch_by_doi(doi)
 
 
 def _now() -> str:
@@ -98,10 +89,16 @@ def _write_record(db, rec: dict, ts: str) -> None:
         title=rec["title"], year=rec["year"], cited_by_count=rec["cbc"],
         in_corpus=True, enriched_at=ts,
     )
+    cs.upsert_alias(db, provider="openalex", external_id=rec["oa_id"], oa_id=rec["oa_id"])
+    cs.upsert_alias(db, provider="doi", external_id=rec["doi"], oa_id=rec["oa_id"])
     # Outgoing references: minimal external nodes + edges (corpus refs already keyed by oa_id).
     for ref in rec["refs"]:
         cs.upsert_paper(db, oa_id=ref)
-    cs.add_cites(db, ((rec["oa_id"], ref, 0) for ref in rec["refs"]))
+    cs.add_cites(
+        db,
+        ((rec["oa_id"], ref, 0) for ref in rec["refs"]),
+        provider="openalex",
+    )
 
 
 def _s2_influential_pass(db, dois: list[str], log) -> int:
@@ -110,20 +107,17 @@ def _s2_influential_pass(db, dois: list[str], log) -> int:
     for i in range(0, len(dois), 400):
         chunk = dois[i:i + 400]
         body = {"ids": [f"DOI:{d}" for d in chunk]}
-        try:
-            with httpx.Client(timeout=90.0) as client:
-                res = client.post(
-                    S2_BATCH_API,
-                    params={"fields": "externalIds,references.externalIds,references.isInfluential"},
-                    json=body,
-                )
-            if res.status_code != 200:
-                log.warning("s2 batch %d-%d: HTTP %d", i, i + len(chunk), res.status_code)
-                continue
-            papers = res.json()
-        except httpx.HTTPError as exc:
-            log.warning("s2 batch %d-%d failed: %s", i, i + len(chunk), exc)
+        outcome = SEMANTIC_SCHOLAR.request(
+            "POST",
+            S2_BATCH_API,
+            params={"fields": "externalIds,references.externalIds,references.isInfluential"},
+            json=body,
+            timeout=90.0,
+        )
+        if outcome.kind is not OutcomeKind.SUCCESS:
+            log.warning("s2 batch %d-%d failed: %s", i, i + len(chunk), outcome.kind.value)
             continue
+        papers = outcome.data or []
         for paper, src_doi in zip(papers, chunk):
             if not paper:
                 continue
@@ -141,11 +135,11 @@ def db_set_influential(db, src_doi: str, dst_doi: str) -> int:
     return cs.set_influential_by_doi(db, src_doi, dst_doi)
 
 
-def _fetch_s2_incoming(doi: str, *, cap: int) -> list[dict] | None:
+def _fetch_s2_incoming(doi: str, *, cap: int) -> RequestOutcome:
     """Citers of a DOI from Semantic Scholar's free citations endpoint, paginated.
 
-    Returns ``[{doi, paper_id, year, is_influential}]`` (newest pages first), or None if the
-    paper isn't found / the API errors. Honors the shared-pool throttle between pages.
+    Returns a typed outcome containing ``[{doi, paper_id, year, is_influential}]``.
+    Terminal misses are distinct from retryable provider failures.
     """
     url = f"{S2_GRAPH_API}/paper/DOI:{doi}/citations"
     fields = "externalIds,year,isInfluential"
@@ -153,16 +147,12 @@ def _fetch_s2_incoming(doi: str, *, cap: int) -> list[dict] | None:
     offset = 0
     while len(out) < cap:
         params = {"fields": fields, "limit": str(min(_S2_PAGE, cap - len(out))), "offset": str(offset)}
-        try:
-            with httpx.Client(timeout=90.0) as client:
-                res = client.get(url, params=params)
-            if res.status_code == 404:
-                return None
-            if res.status_code != 200:
-                return out or None
-            payload = res.json()
-        except httpx.HTTPError:
-            return out or None
+        outcome = SEMANTIC_SCHOLAR.request("GET", url, params=params, timeout=90.0)
+        if outcome.kind is OutcomeKind.TERMINAL_MISS:
+            return outcome
+        if outcome.kind is not OutcomeKind.SUCCESS:
+            return outcome
+        payload = outcome.data or {}
         data = payload.get("data") or []
         for item in data:
             citing = item.get("citingPaper") or {}
@@ -177,7 +167,7 @@ def _fetch_s2_incoming(doi: str, *, cap: int) -> list[dict] | None:
         if nxt is None or not data:
             break
         offset = nxt
-    return out[:cap]
+    return RequestOutcome(OutcomeKind.SUCCESS, data=out[:cap], status_code=200)
 
 
 def _s2_incoming_pass(
@@ -189,10 +179,9 @@ def _s2_incoming_pass(
     edge citer -> corpus_paper. This is what revives `in_adj` (and therefore co-citation and
     the backward PPR signal), since OpenAlex meters the equivalent query.
 
-    Network fetches run in parallel (`workers` threads, no throttle / no backoff); SQLite
-    writes stay on the main thread. A paper is only marked done when its fetch *succeeded*
-    (non-None), so anything dropped under load is left for the next run to retry. We process
-    in batches so progress is committed as we go.
+    Network fetches use one long-lived bounded executor. SQLite writes stay on the main
+    thread and checkpoint progressively. Successful and terminal-not-found responses are
+    marked complete; retryable failures remain pending.
     """
     corpus_oa_by_doi = cs.corpus_oa_by_doi(db)
     done = cs.incoming_done_dois(db)
@@ -204,19 +193,20 @@ def _s2_incoming_pass(
     new_influential = 0
     failed = 0
     processed = 0
-    batch = max(checkpoint_every, workers)
-    for start in range(0, len(todo), batch):
-        chunk = todo[start:start + batch]
-        fetched = parallel_map(
-            lambda s: (s, _fetch_s2_incoming(s["doi"], cap=cap)),
-            chunk, workers=workers, label=None,
-        )
+    terminal_misses = 0
+    for _, (spec, outcome) in streaming_parallel_map(
+        lambda s: (s, _fetch_s2_incoming(s["doi"], cap=cap)),
+        todo,
+        workers=workers,
+    ):
         ts = _now()
-        for spec, citers in fetched:
-            target_oa = corpus_oa_by_doi[spec["doi"]]
-            if citers is None:  # fetch failed under load — leave unmarked so a rerun retries
-                failed += 1
-                continue
+        target_oa = corpus_oa_by_doi[spec["doi"]]
+        if not outcome.complete:
+            failed += 1
+        else:
+            citers = outcome.data or []
+            if outcome.kind is OutcomeKind.TERMINAL_MISS:
+                terminal_misses += 1
             edges: list[tuple[str, str, int]] = []
             for c in citers:
                 node = _citer_node_id(c["doi"], c["paper_id"], corpus_oa_by_doi)
@@ -224,18 +214,26 @@ def _s2_incoming_pass(
                     continue
                 in_corpus = bool(c["doi"] and c["doi"] in corpus_oa_by_doi)
                 cs.upsert_paper(db, oa_id=node, doi=c["doi"], year=c["year"], in_corpus=in_corpus)
+                cs.upsert_alias(db, provider="semantic-scholar", external_id=c["paper_id"], oa_id=node)
+                cs.upsert_alias(db, provider="doi", external_id=c["doi"], oa_id=node)
                 infl = 1 if c["is_influential"] else 0
                 edges.append((node, target_oa, infl))
                 new_influential += infl
-            new_edges += cs.add_cites(db, edges)
+            new_edges += cs.add_cites(db, edges, provider="semantic-scholar")
             cs.mark_incoming_done(db, target_oa, ts)
-        processed += len(chunk)
-        db.commit()
-        log.info("cite enrich: S2 incoming %d/%d papers, %d edges (%d fetch-fails)",
-                 processed, len(todo), new_edges, failed)
+        processed += 1
+        if processed % max(1, checkpoint_every) == 0 or processed == len(todo):
+            db.commit()
+            log.info("cite enrich: S2 incoming %d/%d papers, %d edges (%d fetch-fails)",
+                     processed, len(todo), new_edges, failed)
     log.info("cite enrich: S2 incoming done, %d edges (%d influential, %d fetch-fails to retry)",
              new_edges, new_influential, failed)
-    return {"incoming_edges": new_edges, "incoming_influential": new_influential, "incoming_failed": failed}
+    return {
+        "incoming_edges": new_edges,
+        "incoming_influential": new_influential,
+        "incoming_failed": failed,
+        "incoming_terminal_misses": terminal_misses,
+    }
 
 
 def enrich_citations(
@@ -318,5 +316,6 @@ def enrich_citations(
 
     stats = cs.counts(db)
     db.close()
+    log_provider_summaries()
     log.info("cite enrich done: %s", stats)
     return stats

@@ -104,3 +104,31 @@ def parallel_map(
     if stop_requested():
         return [result for result in results if result is not None]
     return results  # type: ignore[return-value]
+
+
+def streaming_parallel_map(
+    func: Callable[[T], R],
+    items: list[T],
+    *,
+    workers: int | None = None,
+    max_in_flight: int | None = None,
+):
+    """Yield ``(input_index, result)`` as work completes from one bounded executor."""
+    if not items:
+        return
+    n = max(1, workers if workers is not None else _workers)
+    bound = min(len(items), max_in_flight or max(n, n * 2))
+    pending_items = deque(enumerate(items))
+    in_flight: dict[Future[R], int] = {}
+    with ThreadPoolExecutor(max_workers=n) as pool:
+        while pending_items and len(in_flight) < bound:
+            idx, item = pending_items.popleft()
+            in_flight[pool.submit(func, item)] = idx
+        while in_flight:
+            completed, _ = wait(in_flight, return_when=FIRST_COMPLETED)
+            for future in completed:
+                idx = in_flight.pop(future)
+                yield idx, future.result()
+                if pending_items and not stop_requested():
+                    next_idx, item = pending_items.popleft()
+                    in_flight[pool.submit(func, item)] = next_idx

@@ -1,9 +1,13 @@
 from pathlib import Path
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
 
+from graph_layout_rag.harvest import download
 from graph_layout_rag.harvest.download import close_thread_clients, download_to_file
 
 
@@ -116,3 +120,24 @@ def test_download_respects_retry_after(tmp_path: Path):
 
     assert result["ok"] is True
     assert any(call.args[0] == 5 for call in sleep_mock.call_args_list)
+
+
+def test_global_download_limit_bounds_nested_pools(tmp_path: Path, monkeypatch):
+    active = peak = 0
+    lock = threading.Lock()
+
+    def fake_download(*args, **kwargs):
+        nonlocal active, peak
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        time.sleep(0.02)
+        with lock:
+            active -= 1
+        return {"ok": True}
+
+    monkeypatch.setattr(download, "_download_to_file_unbounded", fake_download)
+    download.set_download_limit(3)
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        list(pool.map(lambda i: download_to_file(tmp_path / f"{i}.pdf", f"https://x/{i}"), range(12)))
+    assert peak == 3

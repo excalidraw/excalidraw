@@ -225,6 +225,12 @@ def upsert_chunks(
     else:
         texts = [embed_input_text(c) for c in chunks]
         titles = None
+    # Contextual Retrieval (opt-in via a *contextual* embed profile): prepend an
+    # LLM context line to the embed/BM25 text. Production profiles are untouched.
+    from graph_layout_rag.ingest.contextual import augment_texts_for_context, is_contextual_profile
+
+    if is_contextual_profile(cfg.profile):
+        texts = augment_texts_for_context(chunks, texts)
     doc_ids = len({c.doc_id for c in chunks})
     profile_note = f" profile={cfg.profile}" if cfg.profile else ""
     log.info(

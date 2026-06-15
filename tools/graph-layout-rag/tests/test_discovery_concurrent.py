@@ -26,6 +26,7 @@ def test_concurrent_discovery_merges_all_sources(monkeypatch):
     monkeypatch.setattr(run_mod, "harvest_arxiv", lambda **k: [_item("ax1", "arxiv")])
     monkeypatch.setattr(run_mod, "harvest_arxiv_category", lambda **k: [])
     monkeypatch.setattr(run_mod, "harvest_dblp", lambda **k: [_item("db1", "dblp")])
+    monkeypatch.setattr(run_mod, "harvest_trusted_venues", lambda **k: [])
     monkeypatch.setattr(
         run_mod, "harvest_semantic_scholar", lambda **k: [_item("s2a", "semantic-scholar")]
     )
@@ -68,6 +69,7 @@ def test_one_source_failure_does_not_abort_pass(monkeypatch):
     monkeypatch.setattr(run_mod, "harvest_arxiv", _boom)
     monkeypatch.setattr(run_mod, "harvest_arxiv_category", lambda **k: [])
     monkeypatch.setattr(run_mod, "harvest_dblp", lambda **k: [_item("db1", "dblp")])
+    monkeypatch.setattr(run_mod, "harvest_trusted_venues", lambda **k: [])
     monkeypatch.setattr(run_mod, "harvest_semantic_scholar", lambda **k: [_item("s2a", "semantic-scholar")])
 
     run_mod._run_discovery_pass(

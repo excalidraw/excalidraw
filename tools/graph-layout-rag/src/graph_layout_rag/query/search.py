@@ -11,7 +11,28 @@ from graph_layout_rag.query.retrieve import (
     retrieve_candidates,
     retrieve_multi_query,
 )
+from graph_layout_rag.query.identity import canonical_identity_map, split_values
 from rag_common.rerank import rerank as rerank_candidates
+
+
+def _score(row: dict[str, Any]) -> float:
+    if "rerank_score" in row:
+        return round(float(row["rerank_score"]), 4)
+    if "fusion_score" in row:
+        return round(float(row["fusion_score"]), 6)
+    return round(float(row.get("score", 0.0)), 4)
+
+
+def _evidence(row: dict[str, Any]) -> dict[str, Any]:
+    text = row.get("text") or ""
+    return {
+        "excerpt": text[:400] + ("..." if len(text) > 400 else ""),
+        "page": row.get("page"),
+        "page_end": row.get("page_end"),
+        "section_path": row.get("section_path") or "",
+        "chunk_id": row.get("id"),
+        "score": _score(row),
+    }
 
 
 def format_results(
@@ -21,16 +42,23 @@ def format_results(
     max_per_doc: int,
 ) -> list[dict[str, Any]]:
     category_map, _ = catalog_maps()
-    out: list[dict[str, Any]] = []
-    final_counts: dict[str, int] = {}
-
+    identities = canonical_identity_map()
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    ordered_ids: list[str] = []
     for row in reranked:
-        doc_id = row.get("doc_id") or ""
-        if final_counts.get(doc_id, 0) >= max_per_doc:
-            continue
+        canonical_doc_id = identities.canonical_doc_id(row)
+        if canonical_doc_id not in grouped:
+            grouped[canonical_doc_id] = []
+            ordered_ids.append(canonical_doc_id)
+        if len(grouped[canonical_doc_id]) < max_per_doc:
+            grouped[canonical_doc_id].append(row)
 
-        text = row.get("text") or ""
-        excerpt = text[:400] + ("..." if len(text) > 400 else "")
+    out: list[dict[str, Any]] = []
+    for canonical_doc_id in ordered_ids:
+        evidence_rows = grouped[canonical_doc_id]
+        row = evidence_rows[0]
+        doc_id = row.get("doc_id") or ""
+        evidence = [_evidence(candidate) for candidate in evidence_rows]
 
         pipeline_categories = [
             c.strip()
@@ -40,28 +68,23 @@ def format_results(
         if not pipeline_categories and doc_id in category_map:
             pipeline_categories = sorted(category_map[doc_id])
 
-        if "rerank_score" in row:
-            score = round(float(row["rerank_score"]), 4)
-        elif "fusion_score" in row:
-            score = round(float(row["fusion_score"]), 6)
-        else:
-            score = round(float(row.get("score", 0.0)), 4)
-
         entry: dict[str, Any] = {
-            "score": score,
+            "score": _score(row),
             "title": row.get("title"),
-            "excerpt": excerpt,
+            "excerpt": evidence[0]["excerpt"],
             "source_url": row.get("source_url"),
             "page": row.get("page"),
             "page_end": row.get("page_end"),
             "tags": [t for t in (row.get("tags") or "").split(",") if t],
             "pipeline_categories": pipeline_categories,
             "doc_id": doc_id,
+            "canonical_doc_id": canonical_doc_id,
             "section_path": row.get("section_path") or "",
-            "alias_doc_ids": [value for value in (row.get("alias_doc_ids") or "").split(",") if value],
-            "alias_source_urls": [value for value in (row.get("alias_source_urls") or "").split(",") if value],
-            "alias_dois": [value for value in (row.get("alias_dois") or "").split(",") if value],
+            "alias_doc_ids": identities.aliases(canonical_doc_id, row),
+            "alias_source_urls": split_values(row.get("alias_source_urls")),
+            "alias_dois": split_values(row.get("alias_dois")),
             "canonical_sha256": row.get("canonical_sha256") or None,
+            "evidence": evidence,
         }
         if "rerank_score" in row:
             entry["rerank_score"] = round(float(row["rerank_score"]), 4)
@@ -72,11 +95,58 @@ def format_results(
         if "sparse_rank" in row:
             entry["sparse_rank"] = row["sparse_rank"]
         out.append(entry)
-        final_counts[doc_id] = final_counts.get(doc_id, 0) + 1
         if len(out) >= top:
             break
 
     return out
+
+
+def _expand_candidates(
+    query: str,
+    *,
+    top: int,
+    embed_profile: str | None,
+    hybrid: bool,
+    filters: RetrieveFilters,
+) -> list[dict[str, Any]] | None:
+    """Run query transforms (multi-query + step-back) and re-retrieve.
+
+    Returns fused candidates, or None if the LLM is unavailable so the caller
+    falls back to the single-shot result.
+    """
+    from graph_layout_rag.query.transforms import multi_query_rewrites, step_back_query
+
+    queries = [query]
+    try:
+        queries.extend(multi_query_rewrites(query))
+        queries.append(step_back_query(query))
+    except RuntimeError:
+        return None
+    # De-dup while preserving order.
+    seen: set[str] = set()
+    unique = [q for q in queries if not (q in seen or seen.add(q))]
+    return retrieve_multi_query(
+        unique,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        filters=filters,
+    )
+
+
+def _should_expand(query: str, candidates: list[dict[str, Any]]) -> bool:
+    """Auto-gate: expand vague / under-served queries only.
+
+    Heuristic — expand when the query reads like a short/colloquial question
+    (few content words) or retrieval came back thin. Keeps normal keyword
+    queries on the fast single-shot path.
+    """
+    words = [w for w in query.split() if len(w) > 2]
+    if len(words) <= 4:
+        return True
+    if len(candidates) < 3:
+        return True
+    return False
 
 
 def search(
@@ -92,11 +162,14 @@ def search(
     rerank: bool | None = None,
     hybrid: bool = DEFAULT_HYBRID,
     max_per_doc: int = 2,
+    expand: str = "off",
 ) -> list[dict[str, Any]]:
     if category and category not in PIPELINE_CATEGORIES:
         raise ValueError(
             f"Unknown category {category!r}. Choose from: {', '.join(PIPELINE_CATEGORIES)}"
         )
+    if expand not in ("off", "auto", "force"):
+        raise ValueError(f"expand must be off|auto|force, got {expand!r}")
 
     filters = RetrieveFilters(
         tag=tag,
@@ -112,6 +185,16 @@ def search(
         hybrid=hybrid,
         filters=filters,
     )
+    if expand == "force" or (expand == "auto" and _should_expand(query, candidates)):
+        expanded = _expand_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=hybrid,
+            filters=filters,
+        )
+        if expanded:
+            candidates = expanded
     diverse = diversify_candidates(
         candidates,
         max_per_doc=5,

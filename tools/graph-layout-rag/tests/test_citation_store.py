@@ -61,3 +61,23 @@ def test_authorship_and_counts(tmp_path, monkeypatch):
     assert cs.coauthored_doc_ids(db, "doc-a") == {"doc-b"}  # shared "sugiyama"
     c = cs.counts(db)
     assert c["corpus_papers"] == 1 and c["cite_edges"] == 0 and c["authorship_edges"] == 4
+
+
+def test_aliases_and_citation_provenance(tmp_path, monkeypatch):
+    db = _db(tmp_path, monkeypatch)
+    cs.upsert_paper(db, oa_id="W1", doi="10.1/a")
+    cs.upsert_paper(db, oa_id="W2", doi="10.1/b")
+    cs.upsert_alias(db, provider="DOI", external_id="10.1/a", oa_id="W1")
+    cs.add_cites(db, [("W1", "W2", 0)], provider="openalex")
+    cs.add_cites(db, [("W1", "W2", 1)], provider="semantic-scholar")
+    db.commit()
+
+    assert cs.oa_id_for_alias(db, provider="doi", external_id="10.1/a") == "W1"
+    providers = {
+        row[0]
+        for row in db.execute(
+            "SELECT provider FROM cite_provenance WHERE src_oa='W1' AND dst_oa='W2'"
+        )
+    }
+    assert providers == {"openalex", "semantic-scholar"}
+    assert cs.counts(db)["citation_provenance"] == 2

@@ -29,6 +29,15 @@ def test_case_metrics_distinguishes_hit_rate_from_true_recall():
     assert metrics["recall@5"] == 0.5
 
 
+def test_case_metrics_matches_result_aliases():
+    metrics = case_metrics(
+        [{"doc_id": "canonical", "alias_doc_ids": ["relevant-alias"]}],
+        {"relevant-alias"},
+    )
+    assert metrics["mrr"] == 1.0
+    assert metrics["recall@10"] == 1.0
+
+
 def test_aggregate_and_category_metrics():
     rows = [
         {"category": "compound", "mrr": 1.0, "map@10": 1.0, "ndcg@10": 1.0, "hit_rate@5": 1.0, "hit_rate@10": 1.0, "hit_rate@20": 1.0, "recall@5": 1.0, "recall@10": 1.0, "recall@20": 1.0},

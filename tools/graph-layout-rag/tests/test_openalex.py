@@ -1,6 +1,5 @@
-from unittest.mock import MagicMock, patch
-
 from graph_layout_rag.harvest.openalex import _search_openalex, _topic_supported, _work_to_item
+from graph_layout_rag.harvest.providers import OutcomeKind, RequestOutcome
 
 
 def test_search_openalex_paginates_with_cursor():
@@ -13,21 +12,23 @@ def test_search_openalex_paginates_with_cursor():
         "meta": {"next_cursor": None},
     }
 
-    with patch("graph_layout_rag.harvest.openalex.httpx.Client") as client_cls:
-        client = MagicMock()
-        client.__enter__ = MagicMock(return_value=client)
-        client.__exit__ = MagicMock(return_value=False)
-        client.get.side_effect = [
-            MagicMock(status_code=200, json=MagicMock(return_value=page1)),
-            MagicMock(status_code=200, json=MagicMock(return_value=page2)),
-        ]
-        client_cls.return_value = client
+    calls = []
+    def fake_request(method, url, **kwargs):
+        calls.append(kwargs)
+        payload = page1 if len(calls) == 1 else page2
+        return RequestOutcome(OutcomeKind.SUCCESS, data=payload, status_code=200)
 
+    from graph_layout_rag.harvest import openalex
+    original = openalex.OPENALEX.request_openalex
+    openalex.OPENALEX.request_openalex = fake_request
+    try:
         results = _search_openalex("layered graph", per_page=1, max_results=3, oa_only=True)
+    finally:
+        openalex.OPENALEX.request_openalex = original
 
     assert len(results) == 2
-    assert client.get.call_count == 2
-    second_params = client.get.call_args_list[1].kwargs["params"]
+    assert len(calls) == 2
+    second_params = calls[1]["params"]
     assert second_params["cursor"] == "cursor-2"
 
 

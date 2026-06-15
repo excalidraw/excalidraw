@@ -5,38 +5,62 @@ from collections import Counter
 from statistics import mean
 from typing import Any, Iterable, Mapping, Sequence
 
+from graph_layout_rag.query.identity import canonical_identity_map
+
 
 def doc_ids_from_results(results: Sequence[Mapping[str, Any]]) -> list[str]:
-    return [str(row.get("doc_id") or "") for row in results]
+    return [str(row.get("canonical_doc_id") or row.get("doc_id") or "") for row in results]
+
+
+def _result_identities(row: Mapping[str, Any]) -> set[str]:
+    values = {
+        str(row.get("doc_id") or ""),
+        str(row.get("canonical_doc_id") or ""),
+    }
+    values.update(str(value) for value in (row.get("alias_doc_ids") or []))
+    values.discard("")
+    return values
 
 
 def case_metrics(
     results: Sequence[Mapping[str, Any]],
     relevant: set[str] | frozenset[str],
 ) -> dict[str, float]:
-    ids = doc_ids_from_results(results)
-    relevant_set = set(relevant)
-    first = next((idx + 1 for idx, doc_id in enumerate(ids) if doc_id in relevant_set), None)
+    canonical_by_doc = canonical_identity_map().canonical_by_doc
+
+    def canonicalize(value: str) -> str:
+        return canonical_by_doc.get(value, value)
+
+    identities = [
+        {canonicalize(value) for value in _result_identities(row)}
+        for row in results
+    ]
+    relevant_set = {canonicalize(value) for value in relevant}
+    first = next(
+        (idx + 1 for idx, row_ids in enumerate(identities) if row_ids & relevant_set),
+        None,
+    )
 
     seen_relevant: set[str] = set()
     dcg = 0.0
     precision_sum = 0.0
-    for idx, doc_id in enumerate(ids[:10]):
-        if doc_id in relevant_set and doc_id not in seen_relevant:
+    for idx, row_ids in enumerate(identities[:10]):
+        matched = sorted((row_ids & relevant_set) - seen_relevant)
+        for doc_id in matched:
             dcg += 1.0 / math.log2(idx + 2)
             seen_relevant.add(doc_id)
             precision_sum += len(seen_relevant) / (idx + 1)
 
     ideal = sum(1.0 / math.log2(idx + 2) for idx in range(min(len(relevant_set), 10)))
-    unique_ids = list(dict.fromkeys(ids))
 
     def hit_rate(k: int) -> float:
-        return float(bool(relevant_set & set(unique_ids[:k])))
+        return float(any(row_ids & relevant_set for row_ids in identities[:k]))
 
     def recall(k: int) -> float:
         if not relevant_set:
             return 0.0
-        return len(relevant_set & set(unique_ids[:k])) / len(relevant_set)
+        found = set().union(*(row_ids & relevant_set for row_ids in identities[:k]))
+        return len(found) / len(relevant_set)
 
     return {
         "hit_rate@5": hit_rate(5),
@@ -92,7 +116,10 @@ def crowding_and_duplicates(
     *,
     expected_count: int,
 ) -> tuple[float, float]:
-    counts = Counter(str(row.get("doc_id") or "") for row in results)
+    counts = Counter(
+        str(row.get("canonical_doc_id") or row.get("doc_id") or "")
+        for row in results
+    )
     crowding = float(max(counts.values(), default=0))
     shas = [row.get("canonical_sha256") for row in results if row.get("canonical_sha256")]
     duplicate_rate = (len(shas) - len(set(shas))) / max(1, expected_count)

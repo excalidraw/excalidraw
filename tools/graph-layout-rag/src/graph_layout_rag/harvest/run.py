@@ -45,21 +45,21 @@ from graph_layout_rag.harvest.parallel import (
     request_stop,
     set_workers,
 )
+from graph_layout_rag.harvest.download import set_download_limit
+from graph_layout_rag.harvest.providers import log_provider_summaries
 from graph_layout_rag.harvest.retry import retry_unresolved_multi_pass
 from graph_layout_rag.harvest.semantic_scholar import harvest_semantic_scholar
 from graph_layout_rag.harvest.topic_seeds import harvest_topic_seeds
+from graph_layout_rag.harvest.trusted_venues import harvest_trusted_venues
 from graph_layout_rag.harvest.verify import verify_manifest
 from graph_layout_rag.manifest import load_manifest, save_manifest, upsert_item
 
 
 def _merge_items(manifest, items) -> int:
-    added = 0
-    existing_ids = {i.id for i in manifest.items}
+    before = len(manifest.items)
     for item in items:
-        if item.id not in existing_ids:
-            added += 1
         upsert_item(manifest, item)
-    return added
+    return len(manifest.items) - before
 
 
 def _counts(manifest) -> tuple[int, int, int, int]:
@@ -230,6 +230,15 @@ def _run_discovery_pass(
     below_target = target is None or base_count < target
 
     sources: list[tuple[str, str, Callable[[], list]]] = []
+
+    if not pipeline_only:
+        sources.append(
+            (
+                "trusted-venues",
+                "Complete trusted venues (DROPS GD/SoCG and JGAA)",
+                lambda: harvest_trusted_venues(**kw),
+            )
+        )
 
     if not skip_crossref:
         sources.append(
@@ -591,6 +600,7 @@ def _execute_harvest(
         verbose=verbose,
     )
     set_workers(workers)
+    set_download_limit(workers)
     init_db()
     set_harvest_run(None)
     set_harvest_stage("harvest")
@@ -797,6 +807,7 @@ def _execute_harvest(
 
     total, ok, meta, failed = _counts(manifest)
     summary = f"Done: {total} items (ok={ok}, metadata_only={meta}, failed={failed})"
+    log_provider_summaries()
     log.info(summary)
     click.echo(summary)
     if target_pdfs and ok < target_pdfs:

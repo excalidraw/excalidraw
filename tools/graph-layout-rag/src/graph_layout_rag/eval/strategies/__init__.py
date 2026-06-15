@@ -194,6 +194,79 @@ class HybridCategoryRerankStrategy:
 
 
 @dataclass
+class HybridLLMRerankStrategy:
+    """Hybrid retrieve + RankGPT-style listwise LLM reranking of the top pool."""
+
+    name: str = "hybrid_llm_rerank"
+    requires_llm: bool = True
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        from graph_layout_rag.query.retrieve import diversify_candidates, retrieve_candidates
+        from graph_layout_rag.query.search import format_results
+        from rag_common.rerank import rerank_listwise_llm
+
+        candidates = retrieve_candidates(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=True,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+        )
+        diverse = diversify_candidates(candidates, max_per_doc=5, limit=max(top * 2, 50))
+        reranked = rerank_listwise_llm(
+            case.query, diverse, top=max(top * 2, top), enabled=True, pool=min(20, len(diverse))
+        )
+        return format_results(reranked, top=top, max_per_doc=2)
+
+
+@dataclass
+class HybridLocalRerankStrategy:
+    """Hybrid + local cross-encoder rerank with the full (uncapped) char budget.
+
+    Tests whether lifting MAX_RERANK_CHARS rescues the local reranker that
+    truncation previously handicapped. Model is overridable via RAG_RERANK_MODEL
+    (e.g. a Qwen3-Reranker / jina-reranker checkpoint).
+    """
+
+    name: str = "hybrid_local_rerank"
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        os.environ.setdefault("RAG_RERANK_MAX_CHARS", "8000")
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=True,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=True,
+            rerank_model=os.getenv("RAG_RERANK_MODEL") or None,
+        )
+
+
+@dataclass
+class AgenticStrategy:
+    """Iterative deep-research loop (decompose -> gather -> listwise judge -> iterate)."""
+
+    name: str = "agentic"
+    requires_llm: bool = True
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        from graph_layout_rag.query.agent import deep_research
+
+        return deep_research(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            max_per_doc=2,
+        )
+
+
+@dataclass
 class MultiQueryStrategy:
     name: str = "multi_query"
     requires_llm: bool = True
@@ -446,6 +519,7 @@ OFFLINE_STRATEGIES: tuple[str, ...] = (
     "hybrid_pdf_only",
     "hybrid_category_rerank",
     "hybrid_citation",
+    "hybrid_local_rerank",
 )
 
 LLM_STRATEGIES: tuple[str, ...] = (
@@ -453,6 +527,8 @@ LLM_STRATEGIES: tuple[str, ...] = (
     "hyde",
     "step_back",
     "multi_query_rerank",
+    "hybrid_llm_rerank",
+    "agentic",
 )
 
 CLOUD_STRATEGIES: tuple[str, ...] = (
@@ -488,6 +564,9 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         HybridPdfOnlyStrategy(),
         HybridCategoryRerankStrategy(),
         CitationGraphStrategy(),
+        HybridLocalRerankStrategy(),
+        HybridLLMRerankStrategy(),
+        AgenticStrategy(),
         MultiQueryStrategy(),
         HyDEStrategy(),
         StepBackStrategy(),

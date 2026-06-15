@@ -10,7 +10,7 @@ from graph_layout_rag.paths import DATA_DIR
 
 log = logging.getLogger("graph_layout_rag.query.transforms")
 
-DEFAULT_EVAL_LLM_MODEL = "gemini-2.0-flash"
+DEFAULT_EVAL_LLM_MODEL = "gemini-2.5-flash"
 CACHE_PATH = DATA_DIR / "eval" / "transform_cache.json"
 
 
@@ -56,7 +56,9 @@ def _generate_text(prompt: str) -> str:
     except ImportError as exc:
         raise RuntimeError("Gemini client unavailable for query transforms") from exc
 
-    client = _client()
+    from rag_common.gemini_embed import llm_location
+
+    client = _client(location=llm_location())
     model = eval_llm_model()
     response = client.models.generate_content(model=model, contents=prompt)
     text = (getattr(response, "text", None) or "").strip()

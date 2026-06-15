@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import httpx
-
 from graph_layout_rag.catalog.taxonomy import categories_from_keywords, categories_from_tags
 from graph_layout_rag.harvest.doi_resolver import pick_pdf_urls
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.providers import OPENALEX, OutcomeKind
 from graph_layout_rag.harvest.relevance import is_layout_relevant, is_pipeline_relevant
 from graph_layout_rag.manifest import ManifestItem, relative_local_path, slug_id
 from graph_layout_rag.paths import PDF_DIR
@@ -282,14 +281,14 @@ def _search_openalex(
         if filters:
             params["filter"] = ",".join(filters)
 
-        with httpx.Client(timeout=60.0) as client:
-            res = client.get(
-                OPENALEX_API,
-                params=params,
-                headers={"User-Agent": "mailto:graph-layout-rag@excalidraw-tf.local"},
-            )
-            res.raise_for_status()
-            payload = res.json()
+        outcome = OPENALEX.request_openalex(
+            "GET", OPENALEX_API, operation="search", params=params, timeout=60.0
+        )
+        if outcome.kind is OutcomeKind.BUDGET_EXHAUSTED:
+            break
+        if outcome.kind is not OutcomeKind.SUCCESS:
+            break
+        payload = outcome.data or {}
 
         page = payload.get("results") or []
         results.extend(page)
@@ -302,11 +301,8 @@ def _search_openalex(
 
 def _fetch_by_doi(doi: str) -> dict | None:
     url = f"{OPENALEX_API}/https://doi.org/{doi}"
-    with httpx.Client(timeout=30.0) as client:
-        res = client.get(url, headers={"User-Agent": "mailto:graph-layout-rag@excalidraw-tf.local"})
-        if res.status_code != 200:
-            return None
-        return res.json()
+    outcome = OPENALEX.request_openalex("GET", url, operation="singleton", timeout=30.0)
+    return outcome.data if outcome.kind is OutcomeKind.SUCCESS else None
 
 
 def _try_download_pdf(item: ManifestItem, url: str, *, dry_run: bool) -> bool:
@@ -389,16 +385,22 @@ def harvest_openalex(
             by_id.setdefault(item.id, item)
 
     if use_topic_queries:
-        for topic, queries in topic_map.items():
-            for query in queries:
+        query_specs = [(topic, query) for topic, queries in topic_map.items() for query in queries]
+        fetched = parallel_map(
+            lambda spec: _search_openalex(
+                spec[1], per_page=max_per_topic, max_results=max_per_topic, oa_only=oa_only
+            ),
+            query_specs,
+            workers=min(workers or 32, len(query_specs)),
+            label="openalex-search",
+        )
+        for (topic, _), works in zip(query_specs, fetched):
+            for work in works:
+                add_work(work, topic=topic)
                 if len(by_id) >= max_works:
                     break
-                for work in _search_openalex(
-                    query, per_page=max_per_topic, max_results=max_per_topic, oa_only=oa_only
-                ):
-                    add_work(work, topic=topic)
-                    if len(by_id) >= max_works:
-                        break
+            if len(by_id) >= max_works:
+                break
 
     if not pipeline_only:
         for query in SEARCH_QUERIES:

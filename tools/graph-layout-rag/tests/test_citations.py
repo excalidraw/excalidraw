@@ -1,6 +1,5 @@
-from unittest.mock import MagicMock, patch
-
 from graph_layout_rag.harvest import citations as cit
+from graph_layout_rag.harvest.providers import OutcomeKind, RequestOutcome
 from graph_layout_rag.manifest import Manifest, ManifestItem
 
 
@@ -22,21 +21,18 @@ def test_seed_dois_picks_high_signal_with_doi(monkeypatch):
     assert cit._seed_dois(max_seeds=10) == ["10.1/a", "10.1/d"]
 
 
-def test_search_cites_paginates():
+def test_search_cites_paginates(monkeypatch):
     page1 = {"results": [{"doi": "https://doi.org/10.1/x"}], "meta": {"next_cursor": "c2"}}
     page2 = {"results": [], "meta": {"next_cursor": None}}
-    with patch("graph_layout_rag.harvest.citations.httpx.Client") as cc:
-        client = MagicMock()
-        client.__enter__ = MagicMock(return_value=client)
-        client.__exit__ = MagicMock(return_value=False)
-        client.get.side_effect = [
-            MagicMock(status_code=200, raise_for_status=MagicMock(), json=MagicMock(return_value=page1)),
-            MagicMock(status_code=200, raise_for_status=MagicMock(), json=MagicMock(return_value=page2)),
-        ]
-        cc.return_value = client
-        out = cit._search_cites("W1", max_results=50)
+    calls = []
+    pages = iter([page1, page2])
+    def fake_request(*args, **kwargs):
+        calls.append(kwargs)
+        return RequestOutcome(OutcomeKind.SUCCESS, data=next(pages), status_code=200)
+    monkeypatch.setattr(cit.OPENALEX, "request_openalex", fake_request)
+    out = cit._search_cites("W1", max_results=50)
     assert len(out) == 1
-    assert cc.return_value.get.call_args_list[0].kwargs["params"]["filter"] == "cites:W1"
+    assert calls[0]["params"]["filter"] == "cites:W1"
 
 
 def test_harvest_strict_filters_and_dedups(monkeypatch):

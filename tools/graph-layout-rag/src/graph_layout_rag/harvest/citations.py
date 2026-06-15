@@ -8,8 +8,6 @@ relevance signal, so yield is high-precision.
 
 from __future__ import annotations
 
-import httpx
-
 from graph_layout_rag.harvest.doi_resolver import resolve_doi_with_fallbacks
 from graph_layout_rag.harvest.log import get_logger
 from graph_layout_rag.harvest.openalex import (
@@ -18,6 +16,7 @@ from graph_layout_rag.harvest.openalex import (
     _fetch_by_doi,
 )
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.providers import OPENALEX, OutcomeKind
 from graph_layout_rag.harvest.relevance import is_layout_relevant
 from graph_layout_rag.manifest import ManifestItem, load_manifest, slug_id
 
@@ -70,13 +69,12 @@ def _search_cites(openalex_id: str, *, max_results: int) -> list[dict]:
             "sort": "cited_by_count:desc",
             "cursor": cursor,
         }
-        try:
-            with httpx.Client(timeout=60.0) as client:
-                res = client.get(OPENALEX_API, params=params, headers={"User-Agent": USER_AGENT})
-                res.raise_for_status()
-                payload = res.json()
-        except Exception:
+        outcome = OPENALEX.request_openalex(
+            "GET", OPENALEX_API, operation="list", params=params, timeout=60.0
+        )
+        if outcome.kind is not OutcomeKind.SUCCESS:
             break
+        payload = outcome.data or {}
         page = payload.get("results") or []
         results.extend(page)
         cursor = payload.get("meta", {}).get("next_cursor")

@@ -18,6 +18,7 @@ from graph_layout_rag.ingest.index import (
 from graph_layout_rag.manifest import load_manifest
 from graph_layout_rag.paths import CHUNKS_TABLE, profile_index_paths
 from graph_layout_rag.query.hybrid import merge_rankings, reciprocal_rank_fusion
+from graph_layout_rag.query.identity import canonical_identity_map, clear_identity_cache
 
 DEFAULT_HYBRID = True
 
@@ -68,6 +69,7 @@ _VECTOR_CACHE: dict[tuple[str, int, str], list[float]] = {}
 def clear_retrieve_caches() -> None:
     _CONTEXT_CACHE.clear()
     _VECTOR_CACHE.clear()
+    clear_identity_cache()
 
 
 def resolve_retrieve_context(*, embed_profile: str | None = None) -> RetrieveContext:
@@ -300,13 +302,14 @@ def diversify_candidates(
     max_per_doc: int = 5,
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
+    identities = canonical_identity_map()
     counts: dict[str, int] = {}
     out: list[dict[str, Any]] = []
     for row in candidates:
-        doc_id = row.get("doc_id") or ""
-        if counts.get(doc_id, 0) >= max_per_doc:
+        canonical_doc_id = identities.canonical_doc_id(row)
+        if counts.get(canonical_doc_id, 0) >= max_per_doc:
             continue
-        counts[doc_id] = counts.get(doc_id, 0) + 1
+        counts[canonical_doc_id] = counts.get(canonical_doc_id, 0) + 1
         out.append(row)
         if limit is not None and len(out) >= limit:
             break

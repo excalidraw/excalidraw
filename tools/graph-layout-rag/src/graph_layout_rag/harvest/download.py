@@ -26,6 +26,19 @@ DEFAULT_MIN_PDF_BYTES = 10_000
 _MAX_RETRIES = 4
 _RETRYABLE_STATUSES = {202, 429, 500, 502, 503, 504}
 _clients = threading.local()
+_download_semaphore: threading.BoundedSemaphore | None = None
+_download_limit = 0
+_download_lock = threading.Lock()
+
+
+def set_download_limit(limit: int) -> None:
+    """Set the process-wide active PDF download budget."""
+    global _download_semaphore, _download_limit
+    limit = max(1, limit)
+    with _download_lock:
+        if limit != _download_limit:
+            _download_limit = limit
+            _download_semaphore = threading.BoundedSemaphore(limit)
 
 
 def _client(*, verify: bool, timeout: httpx.Timeout) -> httpx.Client:
@@ -126,6 +139,28 @@ def download_to_file(
     if dry_run:
         return {"ok": False, "dry_run": True, "sha256": None, "content_type": None}
 
+    if _download_semaphore is None:
+        set_download_limit(32)
+    assert _download_semaphore is not None
+    with _download_semaphore:
+        return _download_to_file_unbounded(
+            dest, url, verify=verify, min_bytes=min_bytes, require_pdf=require_pdf,
+            expected_sha256=expected_sha256, doc_id=doc_id, doi=doi, stage=stage,
+        )
+
+
+def _download_to_file_unbounded(
+    dest: Path,
+    url: str,
+    *,
+    verify: bool,
+    min_bytes: int,
+    require_pdf: bool,
+    expected_sha256: str | None,
+    doc_id: str | None,
+    doi: str | None,
+    stage: str | None,
+) -> dict:
     domain = domain_from_url(url)
     log = get_logger()
     dest.parent.mkdir(parents=True, exist_ok=True)

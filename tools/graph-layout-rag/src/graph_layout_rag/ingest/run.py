@@ -193,21 +193,39 @@ def _metadata_outcome(
 
 def _extract_pdf_task(task: ExtractionTask) -> ExtractionOutcome:
     """Extract and chunk one PDF. This top-level worker is process-pool picklable."""
+    from graph_layout_rag.ingest.extract_cache import get as cache_get, put as cache_put
+
     started = time.monotonic()
-    pages = extract_pdf_pages(task.item, backend=task.pdf_backend)
     aliases = task.aliases or []
-    if pages:
+    sha256 = task.item.sha256 or ""
+
+    # Cache hit: skip Docling/MuPDF entirely
+    cached = cache_get(sha256, task.pdf_backend) if sha256 else None
+    if cached is not None:
         return ExtractionOutcome(
             task.item,
-            chunk_pages(
-                task.item,
-                pages,
-                pipeline_categories=task.pipeline_categories,
-                alias_doc_ids=sorted(item.id for item in aliases),
-                alias_source_urls=sorted({item.url for item in aliases if item.url}),
-                alias_dois=sorted({item.doi for item in aliases if item.doi}),
-                canonical_sha256=task.item.sha256,
-            ),
+            cached,
+            aliases=aliases,
+            elapsed_seconds=time.monotonic() - started,
+            reason="cache_hit",
+        )
+
+    pages = extract_pdf_pages(task.item, backend=task.pdf_backend)
+    if pages:
+        chunks = chunk_pages(
+            task.item,
+            pages,
+            pipeline_categories=task.pipeline_categories,
+            alias_doc_ids=sorted(item.id for item in aliases),
+            alias_source_urls=sorted({item.url for item in aliases if item.url}),
+            alias_dois=sorted({item.doi for item in aliases if item.doi}),
+            canonical_sha256=sha256,
+        )
+        if sha256:
+            cache_put(sha256, task.pdf_backend, chunks)
+        return ExtractionOutcome(
+            task.item,
+            chunks,
             aliases=aliases,
             elapsed_seconds=time.monotonic() - started,
         )

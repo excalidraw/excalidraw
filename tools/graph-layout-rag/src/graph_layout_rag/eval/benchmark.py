@@ -69,7 +69,10 @@ def evaluate_strategy(
                 "query": case.query,
                 "category": case.category,
                 "relevant_doc_ids": sorted(case.relevant_doc_ids),
-                "top_doc_ids": [row["doc_id"] for row in results[:10]],
+                "top_doc_ids": [
+                    row.get("canonical_doc_id") or row["doc_id"]
+                    for row in results[:10]
+                ],
                 "latency_ms": round(latency * 1000, 2),
                 **metrics,
             }
@@ -413,6 +416,13 @@ def _default_run_dir(embed_profile: str) -> Path:
     default=None,
     help="Write JSON results (default: data/eval/{profile}-benchmark.json).",
 )
+@click.option(
+    "--qrels",
+    "qrels_path",
+    type=click.Path(path_type=Path, exists=True),
+    default=None,
+    help="Judged qrels file to overlay onto the gold set (de-biased relevance labels).",
+)
 @click.option("--report", is_flag=True, help="Also write markdown report next to JSON output.")
 @click.option("-v", "--verbose", is_flag=True, help="Log per-strategy progress to stderr.")
 @click.option("--json", "as_json", is_flag=True, help="Print JSON to stdout.")
@@ -433,6 +443,7 @@ def benchmark_cmd(
     max_process_rss_gb: float,
     abort_available_gb: float,
     max_swap_growth_gb: float,
+    qrels_path: Path | None,
     output_path: Path | None,
     report: bool,
     verbose: bool,
@@ -446,6 +457,10 @@ def benchmark_cmd(
         os.environ["GRAPH_RAG_MAX_CLOUD_RANKING_UNITS"] = str(max_cloud_ranking_units)
     if retrieval_index:
         os.environ["GRAPH_RAG_EXPERIMENTAL_INDEX"] = str(retrieval_index)
+    # Propagates to isolated strategy workers (subprocesses inherit env), so
+    # gold_cases() overlays the judged labels there too.
+    if qrels_path:
+        os.environ["GRAPH_RAG_QRELS_PATH"] = str(qrels_path)
     run_dir = run_dir or _default_run_dir(embed_profile)
     if run_dir.exists() and any(run_dir.iterdir()) and not resume:
         raise click.ClickException(
@@ -468,6 +483,7 @@ def benchmark_cmd(
         abort_available_gb=abort_available_gb,
         max_swap_growth_gb=max_swap_growth_gb,
     )
+    payload["qrels"] = str(qrels_path) if qrels_path else None
 
     if output_path is None:
         output_path = run_dir / "benchmark.json"

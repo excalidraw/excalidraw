@@ -95,6 +95,18 @@ def _vertex_location() -> str:
     ).strip()
 
 
+def llm_location() -> str:
+    """Region for text-generation (LLM) calls.
+
+    Decoupled from the embedding region: newer Gemini generate models (e.g.
+    gemini-3.5-flash, gemini-3.1-pro-preview) are served from the ``global``
+    endpoint, while gemini-embedding-2 is region-pinned (us-central1). Set
+    ``RAG_LLM_LOCATION`` to point generate calls at ``global`` without moving
+    the embedding client.
+    """
+    return (os.getenv("RAG_LLM_LOCATION") or _vertex_location()).strip()
+
+
 def _gemini_api_key() -> str:
     for key in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
         value = os.getenv(key)
@@ -124,13 +136,13 @@ def _clear_invalid_adc_path() -> None:
             os.environ.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
 
 
-def _client():
+def _client(location: str | None = None):
     from google import genai
 
     if _use_vertex():
         _clear_invalid_adc_path()
         project = _vertex_project()
-        location = _vertex_location()
+        location = (location or _vertex_location()).strip()
         if not project:
             raise GeminiFatalError(
                 "GOOGLE_GENAI_USE_VERTEXAI=true but GOOGLE_CLOUD_PROJECT is missing"

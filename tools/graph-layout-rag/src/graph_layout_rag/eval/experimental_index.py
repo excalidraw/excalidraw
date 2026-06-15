@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import time
 from datetime import datetime, timezone
@@ -69,6 +70,25 @@ def _qdrant():
     return QdrantClient, models, SparseTextEmbedding, LateInteractionTextEmbedding
 
 
+def _connect(QdrantClient, index_dir: Path, index_id: str, *, meta: dict | None = None):
+    """Connect to Qdrant. Server (out-of-process, no OOM) when GRAPH_RAG_QDRANT_URL
+    is set — uses a per-index collection so multiple indexes coexist; else local
+    on-disk mode (one 'chunks' collection per index dir).
+
+    Returns (client, collection_name).
+    """
+    # On search, honor the collection recorded at build time.
+    if meta is not None:
+        url = meta.get("qdrant_url") or os.getenv("GRAPH_RAG_QDRANT_URL")
+        collection = meta.get("collection", "chunks")
+    else:
+        url = os.getenv("GRAPH_RAG_QDRANT_URL")
+        collection = index_id if url else "chunks"
+    if url:
+        return QdrantClient(url=url, timeout=120), collection
+    return QdrantClient(path=str(index_dir / "qdrant")), collection
+
+
 def build_experimental_index(
     *,
     base_profile: str,
@@ -90,8 +110,7 @@ def build_experimental_index(
     index_dir.mkdir(parents=True)
 
     QdrantClient, models, SparseTextEmbedding, LateInteractionTextEmbedding = _qdrant()
-    client = QdrantClient(path=str(index_dir / "qdrant"))
-    collection = "chunks"
+    client, collection = _connect(QdrantClient, index_dir, index_id)
     started = time.monotonic()
 
     texts = [(row.get("text") or "")[:8000] for row in rows]
@@ -147,6 +166,8 @@ def build_experimental_index(
         "index_id": index_id,
         "kind": kind,
         "model": model_name,
+        "collection": collection,
+        "qdrant_url": os.getenv("GRAPH_RAG_QDRANT_URL") or None,
         "base_profile": base_profile,
         "corpus_fingerprint": fingerprint,
         "chunks": len(rows),
@@ -174,7 +195,7 @@ def search_experimental(
         raise ValueError(
             f"Strategy requires {expected_kind!r} index, got {meta['kind']!r}: {index_dir}"
         )
-    client = QdrantClient(path=str(index_dir / "qdrant"))
+    client, collection = _connect(QdrantClient, index_dir, meta["index_id"], meta=meta)
     if meta["kind"] == "splade":
         vector = next(SparseTextEmbedding(model_name=meta["model"]).query_embed(query))
         query_vector = (
@@ -189,7 +210,7 @@ def search_experimental(
         query_vector = ("colbert", vector)
     name, value = query_vector
     response = client.query_points(
-        collection_name="chunks",
+        collection_name=collection,
         query=value,
         using=name,
         limit=limit,

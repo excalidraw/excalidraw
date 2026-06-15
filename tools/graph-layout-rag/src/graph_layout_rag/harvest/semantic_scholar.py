@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import time
-
-import httpx
-
 from graph_layout_rag.harvest.doi_resolver import resolve_doi_with_fallbacks
 from graph_layout_rag.harvest.download import download_to_file
 from graph_layout_rag.harvest.parallel import parallel_map
+from graph_layout_rag.harvest.providers import SEMANTIC_SCHOLAR, OutcomeKind
 from graph_layout_rag.harvest.relevance import is_layout_relevant
 from graph_layout_rag.manifest import ManifestItem, relative_local_path, slug_id
 from graph_layout_rag.paths import PDF_DIR
@@ -36,22 +33,16 @@ SEARCH_QUERIES = [
 
 
 def _search_s2(query: str, limit: int = 50, offset: int = 0) -> list[dict]:
-    time.sleep(1.1)  # S2 rate limit without API key
     params = {
         "query": query,
         "limit": str(limit),
         "offset": str(offset),
         "fields": "title,authors,year,externalIds,openAccessPdf,abstract",
     }
-    with httpx.Client(timeout=60.0) as client:
-        res = client.get(
-            S2_SEARCH,
-            params=params,
-            headers={"User-Agent": USER_AGENT},
-        )
-        if res.status_code != 200:
-            return []
-        return res.json().get("data") or []
+    outcome = SEMANTIC_SCHOLAR.request(
+        "GET", S2_SEARCH, params=params, headers={"User-Agent": USER_AGENT}, timeout=60.0
+    )
+    return (outcome.data or {}).get("data") or [] if outcome.kind is OutcomeKind.SUCCESS else []
 
 
 def _paper_to_item(paper: dict) -> ManifestItem:
@@ -124,22 +115,26 @@ def harvest_semantic_scholar(
     by_id: dict[str, ManifestItem] = {}
     skip_ids = existing_ids or set()
 
-    for query in SEARCH_QUERIES:
+    query_specs = [(query, offset) for query in SEARCH_QUERIES for offset in (0, per_query)]
+    searched = parallel_map(
+        lambda spec: _search_s2(spec[0], per_query, offset=spec[1]),
+        query_specs,
+        workers=min(workers or 32, len(query_specs)),
+        label="semantic-scholar-search",
+    )
+    for papers in searched:
         if len(by_id) >= max_works:
             break
-        for offset in (0, per_query):
+        for paper in papers:
             if len(by_id) >= max_works:
                 break
-            for paper in _search_s2(query, per_query, offset=offset):
-                if len(by_id) >= max_works:
-                    break
-                title = paper.get("title") or ""
-                abstract = paper.get("abstract")
-                if not is_layout_relevant(title, abstract):
-                    continue
-                item = _paper_to_item(paper)
-                if item.id not in skip_ids:
-                    by_id.setdefault(item.id, item)
+            title = paper.get("title") or ""
+            abstract = paper.get("abstract")
+            if not is_layout_relevant(title, abstract):
+                continue
+            item = _paper_to_item(paper)
+            if item.id not in skip_ids:
+                by_id.setdefault(item.id, item)
 
     return parallel_map(
         lambda item: _finalize_s2_item(item, dry_run=dry_run),
