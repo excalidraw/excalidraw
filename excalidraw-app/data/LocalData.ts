@@ -112,7 +112,7 @@ const isQuotaExceededError = (error: any) => {
   return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
-type SavingLockTypes = "collaboration";
+type SavingLockTypes = "collaboration" | "scene-history-preview";
 
 export class LocalData {
   private static _save = debounce(
