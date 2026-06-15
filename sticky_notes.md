@@ -5,6 +5,11 @@
 > helpers, the tool system, and prior-art PR #10001. All load-bearing `file:line`
 > references below were verified directly against the working tree (branch
 > `dwelle/less-noisy-tests`).
+>
+> **Confirmed decisions (owner):** (1) **new element type** `"stickynote"`;
+> (2) sizing = **font-fit + Y-shrink** (fixed width, content-hugging height with a
+> drag-set ceiling, font shrinks past the ceiling); (3) **user-pickable base font size**
+> — the picker sets a per-element maximum that auto-fit caps regrow at.
 
 ---
 
@@ -39,8 +44,8 @@ A new **Sticky Note** primitive for Excalidraw.
    transform) by being added to those existing `case` lists, so it inherits ~all geometry
    for free; only **rendering** and **text-sizing behavior** are bespoke. This matches the
    product's "first-class tool" intent and avoids polluting the rectangle type / the
-   "convert shape" UX the owner objected to. The attribute alternative is fully specced in
-   §5 as the fallback. **This is the #1 decision to confirm.**
+   "convert shape" UX the owner objected to. The attribute alternative is documented in
+   §5 as the (rejected) fallback. **Confirmed by owner.**
 
 2. **One bound `text` element** per sticky note (reusing the entire existing bound-text
    machinery — `containerId` / `boundElements`, `textWysiwyg`, `redrawTextBoundingBox`).
@@ -235,8 +240,19 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
 ```
 - Add to `ExcalidrawElement` union, to `ExcalidrawRectanguloidElement`,
   `ExcalidrawBindableElement`, and `ExcalidrawTextContainer`.
-- `maxHeight` is the single new field (see §6.4 for why; it can be elided if we adopt the
-  simpler "fixed box" sizing model — open question §10).
+- `maxHeight` is the new field on the **container** (the vertical growth ceiling; see §6.4).
+
+**Per-element base font size (because font is user-pickable).** The bound `text` element's
+`fontSize` always holds the *auto-fitted* size (so all measurement/render code is reused
+unchanged). The user's chosen size — the cap the fit may regrow up to — is stored as a new
+**optional, additive** field on the text element:
+```ts
+// ExcalidrawTextElement (additive, optional; only meaningful for sticky-bound text)
+fontSizeMax?: number;   // user-picked base; auto-fit never exceeds it. defaults to fontSize
+```
+Rationale: Excalidraw's font-size action (`changeFontSize`) already targets the bound text
+element, so the picker naturally writes `fontSizeMax` there and triggers a re-fit. Keeping it
+optional/defaulted means non-sticky text and restore are unaffected.
 
 `typeChecks.ts`: add `isStickyNoteElement`; include `"stickynote"` in
 `isTextBindableContainer`, `isBindableElement`, the `isExcalidrawElement` switch, and the
@@ -256,8 +272,8 @@ Defaults (in `@excalidraw/common/constants.ts`): a yellow-ish `backgroundColor`,
 `fillStyle:"solid"`, `roughness:0`, `roundness` small/sharp, `DEFAULT_STICKY_NOTE_SIZE`
 (square), and font constants:
 ```ts
-export const STICKY_NOTE_MIN_FONT_SIZE = 8;
-export const STICKY_NOTE_MAX_FONT_SIZE = 36;   // base/regrow ceiling
+export const STICKY_NOTE_MIN_FONT_SIZE = 8;    // auto-fit floor
+export const STICKY_NOTE_DEFAULT_FONT_SIZE = 28; // initial `fontSizeMax` at creation
 export const STICKY_NOTE_FONT_STEP = 2;        // snap, avoids 13.7px sizes
 export const DEFAULT_STICKY_NOTE_SIZE = 160;
 export const STICKY_NOTE_PADDING = 12;         // roomier than BOUND_TEXT_PADDING
@@ -282,6 +298,11 @@ export const STICKY_NOTE_PADDING = 12;         // roomier than BOUND_TEXT_PADDIN
   editing** (call the same path `startTextEditing` uses) so the user types immediately —
   the expected sticky UX. Respect tool-lock.
 - i18n `toolBar.stickynote: "Sticky note"`.
+- **Font-size picker:** sticky notes expose the standard font-size control in shape actions
+  (it targets the bound text). Intercept `changeFontSize` so that for sticky-bound text it
+  writes `fontSizeMax` (the user's chosen cap) and re-runs the fit, rather than setting the
+  rendered `fontSize` directly. Other text props (family, color, align) reuse the normal
+  bound-text path.
 
 ### 6.3 Rendering (the special style)
 Branch in `drawElementOnCanvas` (`renderElement.ts:~394`) for `case "stickynote"`:
@@ -301,8 +322,10 @@ Branch in `drawElementOnCanvas` (`renderElement.ts:~394`) for `case "stickynote"
 **Model (recommended): fixed width, font-fit, Y-shrink-to-content, capped regrow.**
 
 Per sticky note: fixed `width W` (horizontal resize sets it; defines wrap width),
-`maxHeight` (vertical growth ceiling; set by drag-resize / creation), padding `P`, font
-bounds `[MIN, MAX]` with step.
+`maxHeight` (vertical growth ceiling; set by drag-resize / creation), padding `P`, and font
+bounds `[MIN, MAX]` with step — where **`MAX` = the bound text's per-element `fontSizeMax`**
+(the user's picked base; defaults to `STICKY_NOTE_DEFAULT_FONT_SIZE`) and
+`MIN = STICKY_NOTE_MIN_FONT_SIZE`.
 
 On **every** recompute (typing, paste, programmatic, restore, H/W resize), compute:
 ```
@@ -335,9 +358,11 @@ function computeStickyNoteTextLayout(W, maxHeight, text, font, lineHeight):
 - Mutate the **bound text** (`text, fontSize, width, height`, then position via
   `computeBoundTextPosition`) **and** the **sticky note** (`height = boxH`) in the same
   handler. `maxHeight` only changes when the user drag-resizes vertically.
-- **Regrow cap = `MAX`** (a stable constant), so it works on *all* paths, fixing #10001's
-  edit-session-only cap. If we instead want "cap at the user's chosen size", store that as
-  `MAX` per element (see open question on manual font control, §10).
+- **Regrow cap = `MAX` = the element's `fontSizeMax`** (the user's picked base), read from the
+  element on every path — so deleting text regrows the font only up to the size the user
+  chose, consistently across typing/paste/restore/resize. This fixes #10001's
+  edit-session-only cap *and* honors the user-pickable base size. Changing the font picker
+  updates `fontSizeMax` and re-fits.
 - **Why `maxHeight` exists:** it's the stable ceiling that makes the two behaviors
   non-circular — the box auto-shrinks to content but never auto-grows past `maxHeight`;
   beyond it, the font (not the box) absorbs overflow. Drag-resizing the box vertically sets a
@@ -427,7 +452,10 @@ math (`textElement.test.ts`), and the `autoResize:false`-on-manual-resize behavi
 - `element/src/types.ts`: `ExcalidrawStickyNoteElement` + union/grouping membership.
 - `element/src/typeChecks.ts`: `isStickyNoteElement`; add to bindable/container/rectanguloid
   predicates + `isExcalidrawElement` switch.
-- `element/src/newElement.ts`: `newStickyNoteElement`.
+- `element/src/types.ts`: add optional `fontSizeMax?` to `ExcalidrawTextElement`.
+- `element/src/newElement.ts`: `newStickyNoteElement`; default the bound text's `fontSizeMax`
+  to `STICKY_NOTE_DEFAULT_FONT_SIZE` when creating sticky-bound text.
+- `data/restore.ts`: default `fontSizeMax ?? fontSize` in the `text` restore case.
 - `common/src/constants.ts`: sticky defaults + font constants; add to `DEFAULT_ELEMENT_PROPS`
   where appropriate.
 - `excalidraw/data/restore.ts`: `case "stickynote"`.
@@ -444,6 +472,9 @@ math (`textElement.test.ts`), and the `autoResize:false`-on-manual-resize behavi
 - `excalidraw/types.ts` `ToolType`; `components/icons.tsx`; `components/Actions.tsx` dropdown;
   optional `actions/actionStickyNote.ts` + import in `App.tsx`; `App.tsx` pointer-down branch
   + auto-edit; `locales/en.json`.
+- `actions/actionProperties.tsx` `changeFontSize`: for sticky-bound text, write `fontSizeMax`
+  + re-fit (instead of setting the rendered `fontSize`). Ensure the font-size picker shows in
+  shape actions when a sticky / its bound text is selected or being edited.
 
 **Phase 4 — Sizing behavior.**
 - `element/src/stickyNote.ts` (new): `computeStickyNoteTextLayout`.
@@ -480,21 +511,21 @@ math (`textElement.test.ts`), and the `autoResize:false`-on-manual-resize behavi
 
 ---
 
-## 10. Open questions / risks
-1. **Modeling (must confirm): new type vs. attribute** (§5). Spec assumes new type.
-2. **Sizing semantics (must confirm):** the recommended *fixed-width / font-fit / Y-shrink /
-   capped-regrow* model with a `maxHeight` ceiling (§6.4) vs. the simpler *fixed-box,
-   font-only* model (no Y-shrink, no `maxHeight`). The brief's "resize container Y-axis down"
-   points to the former; confirm. Also confirm the reading of "if text is below some min size"
-   = "when text needs less vertical space than the box, shrink the box (down to MIN_BOX_H)."
-3. **Manual font control:** do stickies expose a font-size picker (then `MAX` = user choice,
-   stored per element) or is font fully automatic (then `MAX` is the constant, no extra
-   field, less customization — aligns with the owner's anti-customization stance)? Affects
-   whether we need a per-element base-size field.
-4. **Overflow at MIN font:** when even `MIN` overflows the ceiling — clip, or allow the box to
-   grow past `maxHeight`? Recommend clip (sticky stays put); confirm.
+## 10. Decisions & remaining open questions
+
+**Decided (owner):**
+1. ✅ **Modeling:** new element type `"stickynote"` (rectanguloid container). — §5.1, §6.1
+2. ✅ **Sizing:** font-fit + Y-shrink with a drag-set `maxHeight` ceiling. — §6.4. (Working
+   reading of "if text is below some min size" = "when text needs less vertical space than the
+   box, shrink the box down to a minimum height"; flag if you meant otherwise.)
+3. ✅ **Font control:** user-pickable base size via the font picker → stored per element as
+   `fontSizeMax`, the auto-fit regrow cap. — §6.1, §6.2, §6.4.
+
+**Still open (lower-stakes, sensible defaults assumed — speak up to change):**
+4. **Overflow at MIN font:** when even `MIN` overflows the ceiling — clip (recommended; sticky
+   stays put) vs. allow the box to grow past `maxHeight`.
 5. **Padding:** dedicated `STICKY_NOTE_PADDING` (roomier) vs. reuse `BOUND_TEXT_PADDING`. No
    per-element margin selector (avoid #10001's customization).
-6. **Default look:** color/shadow/folded-corner — needs a visual pass (CDP).
-7. **Scope creep risk:** keep v1 to one bound text + auto-fit + solid render; defer
+6. **Min box height & default size/color/shadow/folded-corner** — needs a visual pass (CDP).
+7. **Scope:** v1 = one bound text + auto-fit + font picker + solid render; defer
    shadows/folded-corner/color presets behind flags.
