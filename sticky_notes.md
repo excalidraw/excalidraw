@@ -142,7 +142,9 @@ a sticky can be created or mutated by a generic path (§3.4 constructor, restore
 property actions — see §8):
 - `backgroundColor`: transparent → `DEFAULT_STICKY_NOTE_BG`.
 - `fillStyle: "solid"`, `roughness: 0` (the flat sticky look).
-- `roundness`: the fixed sticky roundness.
+- `roundness`: the existing rectangle default —
+  `getDefaultRoundnessTypeForElement(el)` (= `{ type: ROUNDNESS.ADAPTIVE_RADIUS }`); no new
+  roundness constant is needed.
 
 ### 3.6 Restore
 `packages/excalidraw/data/restore.ts`: an additive `case "stickynote"` mirroring the
@@ -366,8 +368,11 @@ each per-type branch gains a `stickynote` arm identical to `rectangle`.
    `computeBoundTextGeometry` shared by `redrawTextBoundingBox` (grow-only) and
    `updateWysiwygStyle` (grow+shrink) — the single hook for the sticky branch. Guarded by
    `textWysiwyg.test.tsx` and `textElement.test.ts`.
-2. Have `refreshTextDimensions` and `redrawTextBoundingBox` share that one geometry calc
-   without changing their public contracts.
+2. Have `refreshTextDimensions` and `redrawTextBoundingBox` share that one geometry calc.
+   `refreshTextDimensions` stays text-only (its public contract is unchanged), so the sticky
+   sites that need the container half — `App.tsx updateElement` and `restore.ts` — call the
+   lower-level `computeBoundTextGeometry` (or a thin companion returning `containerUpdates`)
+   directly and apply both halves (§8.1), rather than relying on `refreshTextDimensions` alone.
 3. `originalContainerCache` (global, height-only, reset inconsistently) is **not used** by
    stickies (the `maxHeight` field replaces the "remembered original height"). Broader removal
    of the global is optional and out of scope for v1.
@@ -391,7 +396,10 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
 - `element/src/typeChecks.ts`: `isStickyNoteElement` + membership in bindable / container /
   rectanguloid predicates and the `isExcalidrawElement` switch.
 - `element/src/newElement.ts`: `newStickyNoteElement` + `clampStickyNoteProps`.
-- `common/src/constants.ts`: sticky constants, `TOOL_TYPE` entry, `DEFAULT_ELEMENT_PROPS`.
+- `common/src/constants.ts`: sticky constants (§3.4) + `TOOL_TYPE` entry. Do **not** touch the
+  global `DEFAULT_ELEMENT_PROPS` (it feeds `_newElementBase` defaults for *all* elements);
+  sticky-specific defaults (bg, fill, roughness, roundness) live in the dedicated constants and
+  are applied only via `newStickyNoteElement` / `clampStickyNoteProps`.
 - `data/restore.ts`: `case "stickynote"` (+ clamp); `AllowedExcalidrawActiveTools.stickynote`;
   preserve `fontSizeMax` only if present in the `text` case.
 - Resolve every other exhaustive switch the compiler flags by adding `"stickynote"` to the
