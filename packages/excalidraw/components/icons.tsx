@@ -1249,6 +1249,26 @@ export const SloppinessCartoonistIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const FreedrawPressureConstantIcon = createIcon(
+  <path
+    d="M4 10h12"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const FreedrawPressureSensitiveIcon = createIcon(
+  <path
+    d="M4 10C6 9.5 10 8 16 7L16 13C10 12 6 10.5 4 10Z"
+    fill="currentColor"
+    stroke="none"
+  />,
+  modifiedTablerIconProps,
+);
+
 export const EdgeSharpIcon = createIcon(
   <svg strokeWidth="1.5">
     <path d="M3.33334 9.99998V6.66665C3.33334 6.04326 3.33403 4.9332 3.33539 3.33646C4.95233 3.33436 6.06276 3.33331 6.66668 3.33331H10" />

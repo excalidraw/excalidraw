@@ -70,6 +70,7 @@ import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -104,6 +105,8 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  FreedrawPressureConstantIcon,
+  FreedrawPressureSensitiveIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -654,6 +657,62 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
       </div>
     </fieldset>
   ),
+});
+
+export const actionChangeSimulatePressure = register<boolean>({
+  name: "changeSimulatePressure",
+  label: "labels.simulatePressure",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (el.type !== "freedraw") {
+          return el;
+        }
+        return newElementWith(el, {
+          variableStrokeWidth: value,
+        }) as ExcalidrawElement;
+      }),
+      appState: { ...appState, currentItemVariableStrokeWidth: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const variableStrokeWidth =
+      getFormValue(
+        elements,
+        app,
+        (element) => (element as ExcalidrawFreeDrawElement).variableStrokeWidth,
+        (element) => element.type === "freedraw",
+        (hasSelection) =>
+          hasSelection ? null : appState.currentItemVariableStrokeWidth,
+      ) ?? appState.currentItemVariableStrokeWidth;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.simulatePressure")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="simulatePressure"
+            options={[
+              {
+                value: false,
+                text: t("labels.pressureConstant"),
+                icon: FreedrawPressureConstantIcon,
+              },
+              {
+                value: true,
+                text: t("labels.pressureSensitive"),
+                icon: FreedrawPressureSensitiveIcon,
+              },
+            ]}
+            value={variableStrokeWidth}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeStrokeStyle = register<

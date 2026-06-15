@@ -203,7 +203,7 @@ export const SelectedShapeActions = ({
 
       {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
+        renderAction("changeSimulatePressure")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
