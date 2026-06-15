@@ -3,7 +3,10 @@ import { vi } from "vitest";
 
 import { KEYS, reseed } from "@excalidraw/common";
 
-import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawLinearElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
@@ -17,6 +20,7 @@ import {
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
+import { API } from "./helpers/api";
 
 unmountComponent();
 
@@ -92,6 +96,85 @@ describe("remove shape in non linear elements", () => {
 });
 
 describe("multi point mode in linear elements", () => {
+  it("round arrow can add an intermediate point inside its start rectangle", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    API.setElements([
+      API.createElement({
+        type: "rectangle",
+        id: "startRect",
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 200,
+      }),
+    ]);
+
+    fireEvent.click(getByToolName("arrow"));
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.pointerDown(canvas, { clientX: 150, clientY: 150 });
+    fireEvent.pointerUp(canvas, { clientX: 150, clientY: 150 });
+
+    fireEvent.pointerMove(canvas, { clientX: 220, clientY: 180 });
+    fireEvent.pointerDown(canvas, { clientX: 220, clientY: 180 });
+    fireEvent.pointerUp(canvas, { clientX: 220, clientY: 180 });
+    fireEvent.pointerMove(canvas, { clientX: 300, clientY: 250 });
+
+    fireEvent.pointerDown(canvas, { clientX: 300, clientY: 250 });
+    fireEvent.pointerUp(canvas, { clientX: 300, clientY: 250 });
+    fireEvent.keyDown(document, {
+      key: KEYS.ENTER,
+    });
+
+    const element = h.elements.find(
+      (element): element is ExcalidrawLinearElement => element.type === "arrow",
+    );
+
+    expect(element).toBeDefined();
+    expect(element!.roundness).not.toBeNull();
+    expect(element!.points).toEqual([
+      [0, 0],
+      [70, 30],
+      [150, 100],
+    ]);
+  });
+
+  it("arrow still auto-finalizes when reaching a different rectangle", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    API.setElements([
+      API.createElement({
+        type: "rectangle",
+        id: "startRect",
+        x: 100,
+        y: 100,
+        width: 100,
+        height: 100,
+      }),
+      API.createElement({
+        type: "rectangle",
+        id: "endRect",
+        x: 300,
+        y: 100,
+        width: 100,
+        height: 100,
+      }),
+    ]);
+
+    fireEvent.click(getByToolName("arrow"));
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.pointerDown(canvas, { clientX: 150, clientY: 150 });
+    fireEvent.pointerUp(canvas, { clientX: 150, clientY: 150 });
+    fireEvent.pointerMove(canvas, { clientX: 350, clientY: 150 });
+
+    const element = h.elements.find(
+      (element): element is ExcalidrawArrowElement => element.type === "arrow",
+    );
+
+    expect(element).toBeDefined();
+    expect(element!.endBinding?.elementId).toBe("endRect");
+  });
+
   it("arrow", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool

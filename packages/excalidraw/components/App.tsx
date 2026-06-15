@@ -7112,16 +7112,32 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
+        const globalPoint = pointFrom<GlobalPoint>(
+          scenePointerX,
+          scenePointerY,
+        );
+        const elementsMap = this.scene.getNonDeletedElementsMap();
         const hoveredElement =
           isArrowElement(this.state.newElement) &&
           isBindingEnabled(this.state) &&
           getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            globalPoint,
             this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
+            elementsMap,
             maxBindingDistance_simple(this.state.zoom),
           );
-        if (hoveredElement) {
+        const isInsideStartBoundElement =
+          hoveredElement &&
+          isArrowElement(multiElement) &&
+          hoveredElement.id === multiElement.startBinding?.elementId &&
+          hitElementItself({
+            point: globalPoint,
+            element: hoveredElement,
+            threshold: 0,
+            elementsMap,
+            overrideShouldTestInside: true,
+          });
+        if (hoveredElement && !isInsideStartBoundElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: event.nativeEvent,
             sceneCoords: {
@@ -9265,22 +9281,37 @@ class App extends React.Component<AppProps, AppState> {
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
 
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const bindingPoint = pointFrom<GlobalPoint>(
+        this.lastPointerMoveCoords?.x ??
+          rx + multiElement.points[multiElement.points.length - 1][0],
+        this.lastPointerMoveCoords?.y ??
+          ry + multiElement.points[multiElement.points.length - 1][1],
+      );
       const hoveredElementForBinding =
         isBindingEnabled(this.state) &&
         getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(
-            this.lastPointerMoveCoords?.x ??
-              rx + multiElement.points[multiElement.points.length - 1][0],
-            this.lastPointerMoveCoords?.y ??
-              ry + multiElement.points[multiElement.points.length - 1][1],
-          ),
+          bindingPoint,
           this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
+          elementsMap,
         );
+      const isInsideStartBoundElement =
+        hoveredElementForBinding &&
+        isArrowElement(multiElement) &&
+        hoveredElementForBinding.id === multiElement.startBinding?.elementId &&
+        hitElementItself({
+          point: bindingPoint,
+          element: hoveredElementForBinding,
+          threshold: 0,
+          elementsMap,
+          overrideShouldTestInside: true,
+        });
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) && hoveredElementForBinding) ||
+        (isBindingElement(multiElement) &&
+          hoveredElementForBinding &&
+          !isInsideStartBoundElement) ||
         (multiElement.points.length > 1 &&
           lastCommittedPoint &&
           pointDistance(
