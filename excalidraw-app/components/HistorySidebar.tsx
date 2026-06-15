@@ -22,7 +22,10 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import { LocalData } from "../data/LocalData";
-import { SceneHistory } from "../data/SceneHistory";
+import {
+  isSceneHistoryDeltaRecordable,
+  SceneHistory,
+} from "../data/SceneHistory";
 
 import "./HistorySidebar.scss";
 
@@ -167,6 +170,7 @@ export const SceneHistoryProvider = ({
 }: SceneHistoryProviderProps) => {
   const sessionIdRef = useRef(createSessionId());
   const recordQueueRef = useRef(Promise.resolve());
+  const isMountedRef = useRef(false);
   const pendingRestoreRef = useRef<{ sourceEntryId: string } | null>(null);
   const [historyData, setHistoryData] = useState<SceneHistoryData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -186,6 +190,14 @@ export const SceneHistoryProvider = ({
   }, []);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!excalidrawAPI) {
       setHistoryData(null);
       setIsLoading(false);
@@ -194,10 +206,9 @@ export const SceneHistoryProvider = ({
 
     let isActive = true;
 
-    const initializeHistory = async () => {
-      setIsLoading(true);
-
-      try {
+    setIsLoading(true);
+    recordQueueRef.current = recordQueueRef.current
+      .then(async () => {
         const scene = getCurrentScene(excalidrawAPI);
         const thumbnail = await createHistoryThumbnail(
           scene.elements,
@@ -212,24 +223,23 @@ export const SceneHistoryProvider = ({
           thumbnail,
         });
 
-        if (isActive) {
+        if (isActive && isMountedRef.current) {
           setHistoryState(nextHistoryData);
           setErrorMessage(null);
         }
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error(error);
 
-        if (isActive) {
+        if (isActive && isMountedRef.current) {
           setErrorMessage("History is unavailable");
         }
-      } finally {
-        if (isActive) {
+      })
+      .finally(() => {
+        if (isActive && isMountedRef.current) {
           setIsLoading(false);
         }
-      }
-    };
-
-    initializeHistory();
+      });
 
     return () => {
       isActive = false;
@@ -241,16 +251,24 @@ export const SceneHistoryProvider = ({
       return;
     }
 
-    return excalidrawAPI.onIncrement((increment) => {
+    let isActive = true;
+    const unsubscribe = excalidrawAPI.onIncrement((increment) => {
       if (increment.type !== "durable" || !("delta" in increment)) {
         return;
       }
 
       const restoreMetadata = pendingRestoreRef.current;
+      if (!isSceneHistoryDeltaRecordable(increment.delta)) {
+        if (restoreMetadata) {
+          pendingRestoreRef.current = null;
+        }
+        return;
+      }
+
+      const scene = getCurrentScene(excalidrawAPI);
       pendingRestoreRef.current = null;
       recordQueueRef.current = recordQueueRef.current
         .then(async () => {
-          const scene = getCurrentScene(excalidrawAPI);
           const thumbnail = await createHistoryThumbnail(
             scene.elements,
             scene.appState,
@@ -267,14 +285,23 @@ export const SceneHistoryProvider = ({
             restoreSourceId: restoreMetadata?.sourceEntryId,
           });
 
-          setHistoryState(nextHistoryData);
-          setErrorMessage(null);
+          if (isActive && isMountedRef.current) {
+            setHistoryState(nextHistoryData);
+            setErrorMessage(null);
+          }
         })
         .catch((error) => {
           console.error(error);
-          setErrorMessage("History was not saved");
+          if (isActive && isMountedRef.current) {
+            setErrorMessage("History was not saved");
+          }
         });
     });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
   }, [excalidrawAPI, setHistoryState]);
 
   const value = useMemo(
@@ -307,6 +334,8 @@ export const HistorySidebar = ({
     markNextChangeAsRestore,
   } = useSceneHistoryContext();
   const previewOriginRef = useRef<PreviewOrigin | null>(null);
+  const previewRequestIdRef = useRef(0);
+  const isMountedRef = useRef(false);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [previewEntryId, setPreviewEntryId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -324,12 +353,21 @@ export const HistorySidebar = ({
   const visibleErrorMessage = errorMessage || historyErrorMessage;
 
   useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isPreviewing) {
       setSelectedEntryId(historyData?.currentEntryId ?? null);
     }
   }, [historyData?.currentEntryId, isPreviewing]);
 
   const cancelPreview = useCallback(() => {
+    previewRequestIdRef.current++;
     const origin = previewOriginRef.current;
 
     if (!origin) {
@@ -384,6 +422,8 @@ export const HistorySidebar = ({
       return;
     }
 
+    const requestId = ++previewRequestIdRef.current;
+
     try {
       if (!previewOriginRef.current) {
         previewOriginRef.current = getCurrentScene(excalidrawAPI);
@@ -391,6 +431,10 @@ export const HistorySidebar = ({
       }
 
       const target = await SceneHistory.reconstruct(entry.id);
+
+      if (!isMountedRef.current || previewRequestIdRef.current !== requestId) {
+        return;
+      }
 
       if (!target) {
         setErrorMessage("Version could not be restored");
@@ -411,6 +455,10 @@ export const HistorySidebar = ({
       setPreviewEntryId(entry.id);
       setErrorMessage(null);
     } catch (error) {
+      if (!isMountedRef.current || previewRequestIdRef.current !== requestId) {
+        return;
+      }
+
       console.error(error);
       setErrorMessage("Version could not be previewed");
     }
@@ -422,6 +470,7 @@ export const HistorySidebar = ({
     }
 
     setIsRestoring(true);
+    previewRequestIdRef.current++;
 
     try {
       const target = await SceneHistory.reconstruct(selectedEntry.id);

@@ -1,4 +1,7 @@
+import type { StoreDelta } from "@excalidraw/element";
+
 import {
+  isSceneHistoryDeltaRecordable,
   reconstructSceneHistoryData,
   trimSceneHistoryData,
 } from "./SceneHistory";
@@ -45,6 +48,36 @@ const createNameDelta = (from: string | null, to: string) => ({
   },
 });
 
+const createStoreDelta = (
+  delta: Partial<{
+    elements: {
+      added: Record<string, unknown>;
+      removed: Record<string, unknown>;
+      updated: Record<string, unknown>;
+    };
+    appState: {
+      delta: {
+        deleted: Record<string, unknown>;
+        inserted: Record<string, unknown>;
+      };
+    };
+  }> = {},
+) =>
+  ({
+    id: "delta",
+    elements: delta.elements ?? {
+      added: {},
+      removed: {},
+      updated: {},
+    },
+    appState: delta.appState ?? {
+      delta: {
+        deleted: {},
+        inserted: {},
+      },
+    },
+  } as unknown as StoreDelta);
+
 const createEntry = (index: number): SceneHistoryEntry => {
   const name = `v${index}`;
 
@@ -72,6 +105,48 @@ const createHistoryData = (entries: SceneHistoryEntry[]): SceneHistoryData => ({
 });
 
 describe("SceneHistory", () => {
+  it("does not record transient-only app state deltas", () => {
+    const delta = createStoreDelta({
+      appState: {
+        delta: {
+          deleted: {
+            selectedElementIds: {},
+          },
+          inserted: {
+            selectedElementIds: {
+              elementId: true,
+            },
+          },
+        },
+      },
+    });
+
+    expect(isSceneHistoryDeltaRecordable(delta)).toBe(false);
+  });
+
+  it("records element and scene-level app state deltas", () => {
+    const elementDelta = createStoreDelta({
+      elements: {
+        added: {},
+        removed: {},
+        updated: {
+          elementId: {
+            deleted: {
+              version: 1,
+            },
+            inserted: {
+              version: 2,
+            },
+          },
+        },
+      },
+    });
+    const nameDelta = createNameDelta(null, "v1") as unknown as StoreDelta;
+
+    expect(isSceneHistoryDeltaRecordable(elementDelta)).toBe(true);
+    expect(isSceneHistoryDeltaRecordable(nameDelta)).toBe(true);
+  });
+
   it("reconstructs a target entry from the previous snapshot and deltas", () => {
     const historyData = createHistoryData([
       createEntry(0),

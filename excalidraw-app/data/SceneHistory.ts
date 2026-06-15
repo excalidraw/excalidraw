@@ -24,6 +24,10 @@ const HISTORY_VERSION = 1;
 const MAX_HISTORY_ENTRIES = 120;
 const SNAPSHOT_INTERVAL = 20;
 const LOCAL_DOCUMENT_ID = "local-default";
+const RECORDABLE_APP_STATE_KEYS = new Set<keyof ObservedAppState>([
+  "name",
+  "viewBackgroundColor",
+]);
 
 export type SceneHistoryEntryKind = "initial" | "change" | "restore";
 
@@ -238,12 +242,41 @@ const countObjectKeys = (value: unknown) => {
   return value && typeof value === "object" ? Object.keys(value).length : 0;
 };
 
+const getRecordableAppStateKeyCount = (delta: SerializedStoreDelta) => {
+  const keys = new Set([
+    ...Object.keys(delta.appState.delta.deleted),
+    ...Object.keys(delta.appState.delta.inserted),
+  ]);
+  let count = 0;
+
+  for (const key of keys) {
+    if (RECORDABLE_APP_STATE_KEYS.has(key as keyof ObservedAppState)) {
+      count++;
+    }
+  }
+
+  return count;
+};
+
+const isSerializedStoreDeltaRecordable = (delta: SerializedStoreDelta) => {
+  return (
+    countObjectKeys(delta.elements.added) > 0 ||
+    countObjectKeys(delta.elements.removed) > 0 ||
+    countObjectKeys(delta.elements.updated) > 0 ||
+    getRecordableAppStateKeyCount(delta) > 0
+  );
+};
+
+export const isSceneHistoryDeltaRecordable = (delta: StoreDelta): boolean => {
+  return isSerializedStoreDeltaRecordable(serializeDelta(delta));
+};
+
 export const describeStoreDelta = (delta: StoreDelta): string => {
   const serializedDelta = serializeDelta(delta);
   const added = countObjectKeys(serializedDelta.elements.added);
   const removed = countObjectKeys(serializedDelta.elements.removed);
   const updated = countObjectKeys(serializedDelta.elements.updated);
-  const appState = countObjectKeys(serializedDelta.appState.delta.inserted);
+  const appState = getRecordableAppStateKeyCount(serializedDelta);
   const parts: string[] = [];
 
   if (added) {
@@ -447,6 +480,11 @@ export class SceneHistory {
     restoreSourceId,
   }: SceneHistoryAppend) {
     const historyData = await SceneHistoryIndexedDBAdapter.load(documentId);
+    const serializedDelta = serializeDelta(delta);
+
+    if (!isSerializedStoreDeltaRecordable(serializedDelta)) {
+      return historyData;
+    }
 
     if (!historyData.entries.length) {
       return SceneHistory.ensureInitialized({
@@ -475,7 +513,7 @@ export class SceneHistory {
           : describeStoreDelta(delta),
       thumbnail,
       fileIds: getReferencedFileIds(elements),
-      delta: serializeDelta(delta),
+      delta: serializedDelta,
       restoreSourceId,
       snapshot: isCheckpoint
         ? createSceneHistorySnapshot({ elements, appState })
