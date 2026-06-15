@@ -54,6 +54,11 @@ import {
 } from "./textElement";
 import { getLineHeightInPx } from "./textMeasurements";
 import {
+  getStyledFontString,
+  getTextSegments,
+  measureSegmentWidth,
+} from "./textFormatting";
+import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
@@ -554,40 +559,59 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
-        context.font = getFontString(element);
-        context.fillStyle = applyDarkModeFilter(
-          element.strokeColor,
-          renderConfig.theme === THEME.DARK,
-        );
         context.textAlign = element.textAlign as CanvasTextAlign;
 
-        // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        let originalOffset = 0;
 
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-
-        const lineHeightPx = getLineHeightInPx(
-          element.fontSize,
-          element.lineHeight,
-        );
-
-        const verticalOffset = getVerticalOffset(
-          element.fontFamily,
-          element.fontSize,
-          lineHeightPx,
-        );
-
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+          const line = lines[lineIndex];
+          const segments = getTextSegments(line, element, originalOffset);
+          const maxLineFontSize = segments.reduce(
+            (maxFontSize, segment) =>
+              Math.max(maxFontSize, segment.style.fontSize),
+            element.fontSize,
           );
+          const lineHeightPx = getLineHeightInPx(
+            maxLineFontSize,
+            element.lineHeight,
+          );
+          const verticalOffset = getVerticalOffset(
+            element.fontFamily,
+            maxLineFontSize,
+            lineHeightPx,
+          );
+          const lineWidth = segments.reduce(
+            (width, segment) =>
+              width + measureSegmentWidth(segment, element.lineHeight),
+            0,
+          );
+          const lineStartX =
+            element.textAlign === "center"
+              ? (element.width - lineWidth) / 2
+              : element.textAlign === "right"
+              ? element.width - lineWidth
+              : 0;
+          let segmentX = lineStartX;
+
+          for (const segment of segments) {
+            context.font = getStyledFontString(segment.style);
+            context.fillStyle = applyDarkModeFilter(
+              segment.style.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            );
+            context.fillText(
+              segment.text,
+              segmentX,
+              lineIndex * lineHeightPx + verticalOffset,
+            );
+            segmentX += measureSegmentWidth(segment, element.lineHeight);
+          }
+
+          originalOffset += line.length;
+          if (element.originalText[originalOffset] === "\n") {
+            originalOffset += 1;
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {
