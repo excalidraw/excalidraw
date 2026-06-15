@@ -9257,11 +9257,12 @@ class App extends React.Component<AppProps, AppState> {
           : { end: { mode: undefined } };
 
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const boundOutsideToSameElement =
-        start?.mode === "inside" &&
-        end?.mode === "inside" &&
+      // Auto-confirm when both ends bind to the SAME element and the end point
+      // lands on the outline rather than inside it
+      const endOutsideSameElement =
+        start?.mode != null &&
+        end.mode != null &&
         start.element.id === end.element.id &&
-        !isPointInElement(start.focusPoint, start.element, elementsMap) &&
         !isPointInElement(end.focusPoint, end.element, elementsMap);
       const boundOutsideFromElsewhere =
         end.mode === "orbit" &&
@@ -9279,7 +9280,7 @@ class App extends React.Component<AppProps, AppState> {
       // clicking inside commit zone → finalize arrow
       if (
         boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
-        boundOutsideToSameElement || // Both outside same element: Bind immediately
+        endOutsideSameElement || // End outside the start's element: Bind immediately
         (multiElement.points.length > 1 && lastCommittedPointIsInsideCommitZone)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {
