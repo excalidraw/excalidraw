@@ -9231,7 +9231,7 @@ class App extends React.Component<AppProps, AppState> {
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
       const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
-      const { end } =
+      const { start, end } =
         isBindingElement(multiElement) && isBindingEnabled(this.state)
           ? getBindingStrategyForDraggingBindingElementEndpoints(
               multiElement,
@@ -9256,19 +9256,31 @@ class App extends React.Component<AppProps, AppState> {
             )
           : { end: { mode: undefined } };
 
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const boundOutsideToSameElement =
+        start?.mode === "inside" &&
+        end?.mode === "inside" &&
+        start.element.id === end.element.id &&
+        !isPointInElement(start.focusPoint, start.element, elementsMap) &&
+        !isPointInElement(end.focusPoint, end.element, elementsMap);
+      const boundOutsideFromElsewhere =
+        end.mode === "orbit" &&
+        multiElement.startBinding?.elementId !== end.element?.id;
+      const lastCommittedPointIsInsideCommitZone =
+        lastCommittedPoint &&
+        pointDistance(
+          pointFrom(
+            pointerDownState.origin.x - rx,
+            pointerDownState.origin.y - ry,
+          ),
+          lastCommittedPoint,
+        ) < LINE_CONFIRM_THRESHOLD;
+
       // clicking inside commit zone → finalize arrow
       if (
-        (end.mode === "orbit" &&
-          multiElement.startBinding?.elementId !== end.element?.id) || // Outside -> orbit: Bind immediately
-        (multiElement.points.length > 1 &&
-          lastCommittedPoint &&
-          pointDistance(
-            pointFrom(
-              pointerDownState.origin.x - rx,
-              pointerDownState.origin.y - ry,
-            ),
-            lastCommittedPoint,
-          ) < LINE_CONFIRM_THRESHOLD)
+        boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
+        boundOutsideToSameElement || // Both outside same element: Bind immediately
+        (multiElement.points.length > 1 && lastCommittedPointIsInsideCommitZone)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {
           event: event.nativeEvent,
