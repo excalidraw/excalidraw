@@ -2,8 +2,9 @@
 
 A dedicated **Sticky Note** primitive for Excalidraw: a first-class, always-filled text
 container whose text auto-fits its box (font shrinks on overflow; the box hugs its content
-vertically). This document is the authoritative design. All `file:line` references were
-verified against the working tree (branch `dwelle/less-noisy-tests`).
+vertically). This document is the authoritative design. All `file:line` references are against
+the `master` working tree and may drift as the code evolves — confirm before relying on a line
+number.
 
 ---
 
@@ -19,6 +20,8 @@ verified against the working tree (branch `dwelle/less-noisy-tests`).
   - On overflow, the **font shrinks** until the text fits (down to a minimum).
   - When the text needs less vertical space than the box, the box **shrinks on the Y axis**
     down to hug the content (down to a minimum height).
+  - If the text still overflows at the minimum font size, the box **grows** vertically to keep
+    all text visible — it is never clipped.
   - All resizing happens **in the same render frame** as the edit — no layout-shift flash —
     on typing, paste, programmatic changes, and restore.
 - **Font size is user-pickable:** the picker sets a per-element maximum; auto-fit never grows
@@ -34,7 +37,9 @@ verified against the working tree (branch `dwelle/less-noisy-tests`).
    container*. It is added to the existing `rectangle`/rectanguloid `case` lists across
    geometry code (bounds, collision, shape, transform, resize), so it inherits rectangle
    geometry; only **rendering** and **text-sizing** are bespoke. The `assertNever` exhaustive
-   switches make the compiler enumerate every site to touch.
+   switches surface *many* of the sites to touch at compile time, but several critical sites
+   are boolean OR-chains or default-returning switches that the compiler will **not** flag —
+   these are tracked by an explicit checklist (§3.3) so none is missed.
 
 2. **One bound `text` element** per sticky, using the existing `containerId` / `boundElements`
    linkage, `textWysiwyg` editor, and recompute helpers. A sticky is just a container with a
@@ -64,7 +69,7 @@ verified against the working tree (branch `dwelle/less-noisy-tests`).
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
     type: "stickynote";
-    /** vertical auto-size ceiling; set whenever the box height is finalized (§6) */
+    /** font-shrink threshold; set whenever the box height is finalized (§6) */
     maxHeight: number;
   }>;
 ```
@@ -73,10 +78,12 @@ The base type already carries everything else a sticky needs (`backgroundColor`,
 union and to the grouping types `ExcalidrawRectanguloidElement`, `ExcalidrawBindableElement`,
 and `ExcalidrawTextContainer`.
 
-`maxHeight` is the only new container field. It is the box's vertical ceiling: the box
-auto-shrinks to content but never auto-grows past `maxHeight`; beyond it the font absorbs
-overflow. It is (re)set whenever the box height is finalized — drag-to-size end,
-click-to-place, and vertical resize — never at `0×0` construction.
+`maxHeight` is the only new container field. It is the **font-shrink threshold**: the font is
+the largest size (≤ the user's base) whose wrapped text fits within `maxHeight`, shrinking when
+content would exceed it. The rendered box height always hugs its content at that fitted font —
+shrinking below `maxHeight` for short text, and growing past it only once the font has bottomed
+out at `MIN` (text is never clipped). `maxHeight` is (re)set whenever the box height is
+finalized — drag-to-size end, click-to-place, and vertical resize — never at `0×0` construction.
 
 ### 3.2 Per-element base font size
 The font is user-pickable, so the bound `text` element's `fontSize` always holds the
@@ -94,13 +101,32 @@ bound-text `fontSize` from `currentItemFontSize` (`App.tsx:6228`). For stickies:
 - **Restore:** preserve `fontSizeMax` only if present; never default it for other text.
 - Everywhere `fontSizeMax` is read, resolve `fontSizeMax ?? fontSize`.
 
-### 3.3 Type guards
-`packages/element/src/typeChecks.ts`: add `isStickyNoteElement`, and include `"stickynote"`
-in `isTextBindableContainer` (`:230`), `isBindableElement`, the `isExcalidrawElement` switch
-(`:244`), and the rectanguloid predicate used by bounds (`_isRectanguloidElement`,
-`bounds.ts`). Deliberately **exclude** it from `isFlowchartNodeElement` (`:274`) and the
-"convert shape type" set — a sticky is not a flowchart node and does not convert to a generic
-shape.
+### 3.3 Type guards & membership checklist
+Add `isStickyNoteElement` to `typeChecks.ts`. Then `"stickynote"` must be added to a mix of
+exhaustive switches (compiler-flagged) **and** boolean OR-chains / default-returning switches
+(compiler-silent — silently wrong if missed). Explicit checklist:
+
+**Compiler-flagged (exhaustive `assertNever` switches):**
+- `typeChecks.isExcalidrawElement` (`:244`).
+
+**NOT compiler-flagged — must add manually:**
+- `comparisons.hasBackground` (`comparisons.ts:3`) — **critical**: if omitted,
+  `hasBackground("stickynote")` is `false`, breaking the always-fill invariant *and* body
+  hit-testing (`shouldTestInside`/binding gate on it). Decide `hasStrokeColor` too (include if
+  stickies have a visible border).
+- `typeChecks.isTextBindableContainer` (`:230`), `isBindableElement`, `isRectangularElement`
+  (`:214`, binding distance), `isEligibleFrameChildType` (`:396`, so stickies can live in
+  frames) — all boolean/`default`-switch.
+- `bounds._isRectanguloidElement` (rectanguloid grouping for bounds/segments).
+- `shape.getElementShape` (`:1074`, default switch → add to the polygon group),
+  `_generateElementShape`, `generateRoughOptions` (rectangle arm).
+- `collision.intersectElementWithLineSegment` (rectangle arm) — `shouldTestInside` follows
+  from `hasBackground` once that's set.
+- Canvas render switch (`renderElement.ts:881`) + `drawElementOnCanvas` (`:394`).
+- SVG render switch (`staticSvgScene.ts:142`).
+
+**Deliberately excluded:** `isFlowchartNodeElement` (`:274`) and the "convert shape type" set —
+a sticky is not a flowchart node and does not convert to a generic shape.
 
 ### 3.4 Constants & constructor
 `packages/common/src/constants.ts`:
@@ -156,22 +182,28 @@ survives reload. In the `text` case, preserve `fontSizeMax` only if present.
 
 ## 4. Rendering
 
-Bound text already renders immediately after its container in the static scene
-(`staticScene.ts:357`), so no change is needed there.
+**Canvas** — branch in `drawElementOnCanvas` (`renderElement.ts:387`, rectangle arm at `:394`)
+for `case "stickynote"`: paint a **solid** rounded-rect fill with `roughness: 0` (no sketchy
+stroke). Add `"stickynote"` to the rectangle arm of `_generateElementShape` and
+`generateRoughOptions` (`shape.ts`) so geometry and `ShapeCache` invalidation are shared;
+override only the paint style.
 
-Sticky background — branch in `drawElementOnCanvas` (`renderElement.ts:387`, rectangle arm at
-`:394`) for `case "stickynote"`:
-- Paint a **solid** rounded-rect fill with `roughness: 0` (no sketchy stroke).
-- Add `"stickynote"` to the rectangle arm of `_generateElementShape` and
-  `generateRoughOptions` (`shape.ts`) so geometry and `ShapeCache` invalidation are shared;
-  override only the paint style.
-- Optional polish (behind a flag, pending a visual pass): subtle drop shadow / 1px darker
-  border / folded corner.
+**SVG export** — adding `"stickynote"` to `shape.ts` alone does **not** guarantee SVG parity,
+because if the canvas path bypasses RoughJS for a flat fill the SVG path must do the equivalent.
+Add an explicit `case "stickynote"` to the SVG shape switch (`staticSvgScene.ts:142`) that emits
+a flat solid rounded-`<rect>` (no rough path), matching the canvas look.
 
-Because the background invariant is enforced at the data level (§3.5), `hasBackground(
-"stickynote")` is `true` and the stored color is never transparent, so body hit-testing
+Optional polish (behind a flag, pending a visual pass): subtle drop shadow / 1px darker border /
+folded corner.
+
+Because the background invariant is enforced at the data level (§3.5) and `hasBackground` lists
+`"stickynote"` (§3.3), the stored color is never transparent and body hit-testing
 (`collision.ts:82` `shouldTestInside`) and binding traversal (`collision.ts:330`) work with no
 special-casing.
+
+Bound text renders as a separate element immediately after the container
+(`staticScene.ts:357`, SVG `staticSvgScene.ts:757`) and is **never clipped** — the box always
+grows to fit the text (§6), so no clip path is needed on any surface.
 
 ---
 
@@ -226,10 +258,12 @@ keeps the **container**:
 
 ## 6. Sizing & font-fit
 
-A sticky has a fixed width `W` (horizontal resize sets it; defines the wrap width), a vertical
-ceiling `maxHeight`, padding `P = BOUND_TEXT_PADDING`, and font bounds `[MIN, MAX]` snapped to
-`STICKY_NOTE_FONT_STEP`, where `MIN = STICKY_NOTE_MIN_FONT_SIZE` and `MAX = fontSizeMax ??
-fontSize`.
+A sticky has a fixed width `W` (horizontal resize sets it; defines the wrap width), a
+font-shrink threshold `maxHeight` (set by vertical resize), padding `P = BOUND_TEXT_PADDING`,
+and font bounds `[MIN, MAX]` snapped to `STICKY_NOTE_FONT_STEP`, where
+`MIN = STICKY_NOTE_MIN_FONT_SIZE` and `MAX = fontSizeMax ?? fontSize`. The box height always
+hugs the content at the fitted font; `maxHeight` only governs how large the font may grow
+before it must shrink.
 
 The layout helper takes the **unwrapped** `originalText` and produces the wrapped render text
 itself — it must never receive already-wrapped text, or repeated recomputes would bake soft
@@ -238,27 +272,27 @@ always wrap from `originalText`).
 
 ```
 computeStickyNoteTextLayout(W, maxHeight, originalText, fontFamily, lineHeight, MIN, MAX):
-  availW   = W - 2P
-  ceilingH = maxHeight - 2P
+  availW   = max(W - 2P, 1)                     // clamp so wrapText never gets <=0 / NaN
+  ceilingH = max(maxHeight - 2P, 0)
 
   fit(size):                                   // 1 wrap + 1 measure
      wrapped = wrapText(originalText, fontString(size), availW)
      h       = measureText(wrapped, fontString(size), lineHeight).height
      return { wrapped, h }
 
-  { wrapped, h } = fit(MAX)                     // fast path: try the user's base first
-  if h <= ceilingH:
-     fontSize = MAX
-     contentH = h
-     boxH     = clamp(contentH + 2P, STICKY_NOTE_MIN_HEIGHT, maxHeight)   // Y-shrink to content
-  else:
-     fontSize = largest snapped size in [MIN, MAX] with fit().h <= ceilingH   // binary search
-     { wrapped, h } = fit(fontSize)
-     contentH = h
-     boxH     = maxHeight                       // pinned to the ceiling; font absorbed overflow
+  // Largest snapped size in [MIN, MAX] whose wrapped height fits the ceiling.
+  // Fast path: try MAX first. If even MIN overflows the ceiling, fall back to MIN.
+  fontSize = largestSnappedFit([MIN, MAX], ceilingH) ?? MIN     // binary search
+  { wrapped, h } = fit(fontSize)
+
+  // The box ALWAYS hugs its content at the fitted font:
+  //  - content shorter than the ceiling -> box shrinks below maxHeight (Y-shrink)
+  //  - content taller than the ceiling only because the font bottomed out at MIN ->
+  //    box grows past maxHeight so all text stays visible (never clipped)
+  boxH = max(h + 2P, STICKY_NOTE_MIN_HEIGHT)
 
   return {
-    textUpdates:      { text: wrapped, fontSize, width: textWidth(wrapped), height: contentH,
+    textUpdates:      { text: wrapped, fontSize, width: textWidth(wrapped), height: h,
                         ...computeBoundTextPosition(...) },   // x, y inside the box
     containerUpdates: { height: boxH /*, y: see anchoring */ },
   }
@@ -270,13 +304,19 @@ computeStickyNoteTextLayout(W, maxHeight, originalText, fontFamily, lineHeight, 
 - **Resize semantics** (`handleBindTextResize` extension): horizontal drag → new `W` (re-wrap
   + re-fit); vertical / corner drag → new `maxHeight` (re-fit). The sticky path supersedes the
   container's autogrow.
-- **Anchoring (`containerUpdates.y`):** during typing / auto-recompute the **top edge stays
-  fixed** (height changes downward, `y` unchanged). During an explicit resize from a north
-  handle (`n`/`ne`/`nw`), preserve the dragged handle by adjusting `y` exactly as the existing
-  code does (`textElement.ts:192–204`). So `containerUpdates` may include `y`; the typing path
-  omits it.
-- **Overflow at `MIN`:** if even `MIN` overflows `ceilingH`, the text is clipped (the box
-  stays put). The box does not grow past `maxHeight`.
+- **Anchoring:** the anchor is the box's **local top edge** (the note grows/shrinks downward in
+  its own frame). For an **unrotated** sticky this just means `y` is unchanged on auto-recompute.
+  For a **rotated** sticky, holding raw `x/y` while `height` changes moves the rotated
+  top-edge midpoint and the note visibly drifts; so when `height` changes by Δ the helper must
+  also adjust `x/y` to keep the rotated top-edge midpoint fixed (same rotation-aware
+  recomputation the resize handles use — cf. `textElement.ts:192–204`, generalized for the
+  angle). Therefore `containerUpdates` may include `x` and `y`. On an explicit resize, preserve
+  the dragged handle instead (n/ne/nw anchor the bottom). A rotated-sticky edit/resize test
+  guards this.
+- **Overflow at `MIN`:** if even `MIN` overflows `ceilingH`, the font stays at `MIN` and the box
+  **grows** vertically past `maxHeight` to keep all text visible (the box always hugs its
+  content; text is never clipped). `maxHeight` itself is unchanged — deleting text lets the box
+  shrink back below it and the font regrow.
 
 **Performance:** the binary search over the snapped `[MIN, MAX]` range is ≤ ~4–5 `fit()`
 iterations (1 `wrapText` + 1 `measureText` each); the fast path makes the common "it fits" case
@@ -335,24 +375,35 @@ explicitly at each site:
    - `restore.ts` must also `Object.assign` the container element (it has no `scene`).
 
 ### 8.2 Invariant enforcement across generic actions
-Generic style/property actions can otherwise violate sticky invariants. Route them through the
-two normalizers (`clampStickyNoteProps` §3.5; a `setStickyBaseFontSize(textEl, size)` that
-writes `fontSizeMax` + re-fits):
+Enforcement must be at the **action (perform) level**, not just UI hiding — actions also run via
+shortcuts, the command palette, and the programmatic API, none of which respect a hidden
+control. Hiding controls is cosmetic only. Route every mutation through the two normalizers
+(`clampStickyNoteProps` §3.5; a `setStickyBaseFontSize(textEl, size)` that writes `fontSizeMax`
++ re-fits):
 
-- **Font size** (rendered `fontSize` is derived; the user edits `fontSizeMax`):
+- **Font size** (rendered `fontSize` is derived; the user edits `fontSizeMax`). All of these
+  must, for stickies, operate on `fontSizeMax ?? fontSize` and write via `setStickyBaseFontSize`:
   - `actionProperties.tsx` `changeFontSize` (write) and the picker `value` getter (`:813`,
     currently returns bound-text `fontSize`) → display `fontSizeMax ?? fontSize`.
+  - **Relative** font actions `actionIncreaseFontSize` / `actionDecreaseFontSize`
+    (`actionProperties.tsx:852/876`) compute `Math.round(element.fontSize * step)` from the
+    *rendered* (fitted) size — for stickies they must step from `fontSizeMax ?? fontSize`.
   - Stats panels mutate `fontSize` directly: `Stats/FontSize.tsx:67`, `Stats/MultiFontSize.tsx:83`.
-  - All of the above go through `setStickyBaseFontSize` for stickies.
+- **Style props (`fillStyle`, `roughness`, `roundness`).** The actions that write these
+  (`actionProperties.tsx:465/605/1497`) must **clamp or no-op** for sticky targets (route the
+  result through `clampStickyNoteProps`) — not merely hide the control.
 - **Paste styles** `actionStyles.ts` copies `backgroundColor/fillStyle/roughness/roundness`
   (`:99`) and bound-text `fontSize` (`:117`) directly. For a sticky target, run the result
   through `clampStickyNoteProps` (so a transparent/sketchy source can't un-sticky it) and route
   the copied font size through `setStickyBaseFontSize`.
-- **Background-color action/UI:** disallow `transparent` for stickies (clamp to
+- **Background-color action:** disallow `transparent` for stickies at the action level (clamp to
   `DEFAULT_STICKY_NOTE_BG`).
-- **Property controls that don't apply** to the flat sticky look (fill style, sloppiness/
-  roughness) are hidden for stickies in shape actions (keeps the UI minimal); roundness is
-  fixed. (Exact panel set pending the visual pass — §11.)
+- **Bind existing text** (`actionBoundText.tsx:156`, "create container from selection"): on
+  binding text to a sticky, also set `fontSizeMax = existing fontSize` and run the sticky layout
+  (alongside its existing `redrawTextBoundingBox` call), so a pre-existing text element fits the
+  sticky immediately.
+- **UI (cosmetic):** hide the fill-style / sloppiness controls and fix roundness for stickies in
+  shape actions to keep the panel minimal. Exact panel set pending the visual pass (§12).
 
 ---
 
@@ -390,11 +441,9 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
   autogrow/autoshrink sites through it with each caller's existing grow/shrink policy
   (grow-only / grow+shrink). `yarn test` must stay green.
 
-**Phase 1 — Data model & type plumbing (compiler-guided).**
+**Phase 1 — Data model & type plumbing.**
 - `element/src/types.ts`: `ExcalidrawStickyNoteElement` + union/grouping membership; add
   optional `fontSizeMax?` to `ExcalidrawTextElement`.
-- `element/src/typeChecks.ts`: `isStickyNoteElement` + membership in bindable / container /
-  rectanguloid predicates and the `isExcalidrawElement` switch.
 - `element/src/newElement.ts`: `newStickyNoteElement` + `clampStickyNoteProps`.
 - `common/src/constants.ts`: sticky constants (§3.4) + `TOOL_TYPE` entry. Do **not** touch the
   global `DEFAULT_ELEMENT_PROPS` (it feeds `_newElementBase` defaults for *all* elements);
@@ -402,13 +451,18 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
   are applied only via `newStickyNoteElement` / `clampStickyNoteProps`.
 - `data/restore.ts`: `case "stickynote"` (+ clamp); `AllowedExcalidrawActiveTools.stickynote`;
   preserve `fontSizeMax` only if present in the `text` case.
-- Resolve every other exhaustive switch the compiler flags by adding `"stickynote"` to the
-  existing `rectangle` arm (bounds, collision, shape, transform, distance, transformHandles,
-  frame/clip, `comparisons.hasBackground`, …).
+- **Work the §3.3 membership checklist explicitly** — the compiler flags only the exhaustive
+  `assertNever` switches; the boolean OR-chains / `default`-returning switches
+  (`comparisons.hasBackground` ⚠️, `isRectangularElement`, `isEligibleFrameChildType`,
+  `getElementShape`, `_isRectanguloidElement`, the SVG/canvas render switches, …) must be hit by
+  hand. After this phase run `yarn test:typecheck` for the compiler-flagged ones.
 
 **Phase 2 — Rendering.**
-- `renderElement.ts` `drawElementOnCanvas` sticky paint; `shape.ts` rectangle arm (solid,
-  roughness 0). Verify static + interactive scenes and SVG export (`staticSvgScene`).
+- `renderElement.ts` `drawElementOnCanvas` + canvas render switch: sticky paint; `shape.ts`
+  rectangle arm (solid, roughness 0).
+- **SVG:** explicit `case "stickynote"` in `staticSvgScene.ts:142` emitting a flat solid rounded
+  `<rect>` (parity with canvas; §4).
+- Verify static + interactive scenes and SVG export. (No text clipping — the box grows to fit.)
 
 **Phase 3 — Tool, creation & lifecycle.**
 - `excalidraw/types.ts`, `components/icons.tsx`, `Actions.tsx` (desktop), `MobileToolBar.tsx`
@@ -424,15 +478,20 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
   `App.tsx updateElement` and `restore.ts` (§8.1). Make the normal-text paste pre-size
   sticky-aware (§7).
 
-**Phase 5 — Font cap & invariant enforcement across generic actions.**
-- `setStickyBaseFontSize` + route `actionProperties.tsx` (`changeFontSize` + picker value),
-  `Stats/FontSize.tsx`, `Stats/MultiFontSize.tsx`, and `actionStyles.ts` font copy through it.
-- Run `actionStyles.ts` paste result and the background-color action through
-  `clampStickyNoteProps`; hide fill/roughness controls for stickies in shape actions.
+**Phase 5 — Font cap & invariant enforcement across generic actions (perform-level, §8.2).**
+- `setStickyBaseFontSize` + route `actionProperties.tsx` (`changeFontSize` + picker value +
+  **`actionIncrease/DecreaseFontSize`**), `Stats/FontSize.tsx`, `Stats/MultiFontSize.tsx`, and
+  `actionStyles.ts` font copy through it (step from `fontSizeMax ?? fontSize`).
+- Clamp/no-op `fillStyle`/`roughness`/`roundness` writes for stickies in
+  `actionProperties.tsx:465/605/1497`, the paste-styles result, and the background-color action
+  (via `clampStickyNoteProps`) — at the perform level, not just UI. Hide the irrelevant controls.
+- `actionBoundText.tsx:156` (bind existing text): set `fontSizeMax = existing fontSize` + run
+  sticky layout when binding to a sticky.
 
 **Phase 6 — Resize semantics.**
 - `handleBindTextResize`: horizontal → new `W`; vertical/corner → new `maxHeight`; anchoring
-  per §6. Ensure no `autoResize` toggling fights the sticky path.
+  per §6 (incl. rotation-aware `x/y` adjustment). Ensure no `autoResize` toggling fights the
+  sticky path.
 
 **Phase 7 — Tests & visual polish (§11, §12).**
 
@@ -444,20 +503,25 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
 ## 11. Testing plan
 
 - **Unit (`packages/element/tests/`):** `computeStickyNoteTextLayout` — overflow shrinks the
-  font (to `MIN`, snapped); short text Y-shrinks the box to content (to `STICKY_NOTE_MIN_HEIGHT`);
-  width resize re-wraps + re-fits; vertical resize changes the ceiling; takes unwrapped
-  `originalText` and is idempotent across repeated recomputes (no baked soft wraps); regrow caps
-  at `fontSizeMax`. `clampStickyNoteProps`, type guards, `newStickyNoteElement` defaults, restore
+  font (to `MIN`, snapped); **no-fit at `MIN`** returns `MIN` and grows the box past `maxHeight`
+  to fit (no crash); short text Y-shrinks the box to content (to `STICKY_NOTE_MIN_HEIGHT`);
+  width resize re-wraps + re-fits; vertical resize changes the ceiling; degenerate inputs
+  (`W < 2P`, empty text) don't NaN/loop; takes unwrapped `originalText` and is idempotent across
+  repeated recomputes (no baked soft wraps); regrow caps at `fontSizeMax`. `clampStickyNoteProps`,
+  `hasBackground("stickynote") === true`, type guards, `newStickyNoteElement` defaults, restore
   round-trip (incl. transparent-bg clamp).
 - **Editor (`textWysiwyg.test.tsx`):** typing past the box shrinks the font in place; deleting
   regrows + Y-shrinks; paste (both clipboard kinds) fits in one update; assert the text
   `fontSize`/`height` and the container `height` are mutually consistent after a single input
-  event (no flash). Empty submit keeps the sticky, deletes the bound text.
-- **Generic-action invariants:** paste-styles from a transparent/sketchy source keeps the
-  sticky solid + non-transparent and routes font through `fontSizeMax`; Stats font edit and the
-  picker honor/display `fontSizeMax`; background action rejects transparent.
-- **Render/snapshot:** sticky renders solid; body is hit-testable/bindable
-  (assert `shouldTestInside`); SVG export.
+  event (no flash). Empty submit keeps the sticky, deletes the bound text. **Rotated sticky:**
+  typing/Y-shrink keeps the visual top edge fixed (no drift); resize anchors the dragged handle.
+- **Generic-action invariants (perform-level):** paste-styles from a transparent/sketchy source
+  keeps the sticky solid + non-transparent and routes font through `fontSizeMax`; Stats font
+  edit, the picker, and **relative font shortcuts** honor/step from `fontSizeMax`;
+  `fillStyle`/`roughness`/`roundness` actions clamp/no-op; background action rejects transparent;
+  **binding pre-existing text** to a sticky sets `fontSizeMax = existing fontSize` and fits.
+- **Render/snapshot:** sticky renders solid (canvas + SVG parity); body is hit-testable/bindable
+  (assert `shouldTestInside`); **over-min text grows the box** (all text visible, no clipping).
 - **Tool plumbing:** restored sticky tool survives; click-to-place creates a default square and
   enters edit (not deleted as invisibly-small); desktop + mobile dropdowns.
 - **Manual via CDP** (`http://localhost:3006`, port 9223): create, type a paragraph (font
