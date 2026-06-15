@@ -226,7 +226,10 @@ export const useAIStreamingCanvasPreview = ({
         captureUpdate: result.isComplete
           ? CaptureUpdateAction.IMMEDIATELY
           : CaptureUpdateAction.NEVER,
-        regenerateIds: result.isComplete,
+        // Streaming payload ids are stable server-side. Preserving them lets
+        // the final render replace the tombstoned preview instead of appending
+        // a fresh copy with regenerated ids.
+        regenerateIds: false,
         selectInsertedElements: result.isComplete,
         intermediatePreviewElement: !result.isComplete,
       };

@@ -131,7 +131,47 @@ const CommitPreviewHarness = ({
       "message-1",
     );
     commitStreamingCanvasPreview();
-  }, [applyStreamingCanvasPreviewResult, commitStreamingCanvasPreview, skeletons]);
+  }, [
+    applyStreamingCanvasPreviewResult,
+    commitStreamingCanvasPreview,
+    skeletons,
+  ]);
+
+  return null;
+};
+
+const FinalPreviewHarness = ({
+  app,
+  previewSkeletons,
+  finalSkeletons,
+}: {
+  app: AppClassProperties;
+  previewSkeletons: ExcalidrawElementSkeleton[];
+  finalSkeletons: ExcalidrawElementSkeleton[];
+}) => {
+  const didRunRef = useRef(false);
+  const [removeGeneratedElementsByMessageId] = useState(() => vi.fn());
+  const [commitQueuedGenerationReplacements] = useState(() => vi.fn());
+  const { applyStreamingCanvasPreviewResult } = useAIStreamingCanvasPreview({
+    app,
+    removeGeneratedElementsByMessageId,
+    commitQueuedGenerationReplacements,
+  });
+
+  useEffect(() => {
+    if (didRunRef.current) {
+      return;
+    }
+    didRunRef.current = true;
+    applyStreamingCanvasPreviewResult(
+      { skeletons: previewSkeletons, isComplete: false },
+      "message-1",
+    );
+    applyStreamingCanvasPreviewResult(
+      { skeletons: finalSkeletons, isComplete: true },
+      "message-1",
+    );
+  }, [applyStreamingCanvasPreviewResult, finalSkeletons, previewSkeletons]);
 
   return null;
 };
@@ -279,5 +319,66 @@ describe("useAIStreamingCanvasPreview", () => {
       tombstonedPreviewElement.version,
     );
     expect(setup.getElements()).toEqual([committedPreviewElement]);
+  });
+
+  it("replaces the preview with the same-id final result", async () => {
+    const setup = createMockApp();
+
+    render(
+      <FinalPreviewHarness
+        app={setup.app}
+        previewSkeletons={[
+          {
+            type: "rectangle",
+            id: "stable-preview-id",
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10,
+          },
+        ]}
+        finalSkeletons={[
+          {
+            type: "ellipse",
+            id: "stable-preview-id",
+            x: 20,
+            y: 20,
+            width: 30,
+            height: 30,
+          },
+        ]}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(setup.syncActionResult).toHaveBeenCalledTimes(2);
+    });
+
+    expect(setup.updateScene).toHaveBeenCalledTimes(1);
+    const tombstonedPreviewElement = setup.updateScene.mock.calls[0][0]
+      .elements[0] as ExcalidrawElement;
+    expect(tombstonedPreviewElement).toMatchObject({
+      id: "stable-preview-id",
+      isDeleted: true,
+    });
+
+    const finalSync = setup.syncActionResult.mock.calls[1][0];
+    expect(finalSync.captureUpdate).toBe(CaptureUpdateAction.IMMEDIATELY);
+    const finalElements = finalSync.elements as ExcalidrawElement[];
+    expect(finalElements).toHaveLength(1);
+
+    const finalElement = finalElements[0];
+    expect(finalElement).toMatchObject({
+      id: "stable-preview-id",
+      type: "ellipse",
+      isDeleted: false,
+    });
+    expect(
+      finalElement.customData?.[INTERMEDIATE_PREVIEW_ELEMENT_KEY],
+    ).toBeUndefined();
+    expect(finalElement.version).toBeGreaterThan(
+      tombstonedPreviewElement.version,
+    );
+    expect(setup.getElements()).toEqual([finalElement]);
   });
 });
