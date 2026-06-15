@@ -71,6 +71,8 @@ export default defineConfig({
     setupFiles: ["./setupTests.ts"],
     globals: true,
     environment: "jsdom",
+    // don't list skipped tests in the failure tree — keeps output readable
+    hideSkippedTests: true,
     coverage: {
       reporter: ["text", "json-summary", "json", "html", "lcovonly"],
       // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
