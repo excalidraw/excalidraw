@@ -145,7 +145,7 @@ describe("paste text as single lines", () => {
     const text = "\n\n\n\n\n";
     pasteWithCtrlCmdV(text);
     await waitFor(async () => {
-      await sleep(50); // elements lenght will always be zero if we don't wait, since paste is async
+      await sleep(50); // elements length will always be zero if we don't wait, since paste is async
       expect(h.elements.length).toEqual(0);
     });
   });

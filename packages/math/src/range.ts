@@ -47,7 +47,7 @@ export const rangesOverlap = (
 };
 
 /**
- * Given two ranges,return ther intersection of the two ranges if any e.g. the
+ * Given two ranges, return the intersection of the two ranges if any e.g. the
  * intersection of [1, 3] and [2, 4] is [2, 3].
  *
  * @param param0 The first range to compare

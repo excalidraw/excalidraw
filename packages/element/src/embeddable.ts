@@ -231,7 +231,7 @@ export const getEmbedLink = (
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
-    //warning deliberately ommited so it is displayed only once per link
+    //warning deliberately omitted so it is displayed only once per link
     //same link next time will be served from cache
     embeddedLinkCache.set(originalLink, {
       link,

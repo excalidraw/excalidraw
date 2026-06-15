@@ -127,7 +127,7 @@ describe("collaboration", () => {
     });
 
     await waitFor(() => {
-      // altough the updates get batched,
+      // although the updates get batched,
       // we expect two ephemeral increments for each update,
       // and each such update should have the expected change
       expect(ephemeralIncrements.length).toBe(2);

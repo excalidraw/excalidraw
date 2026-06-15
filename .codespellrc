@@ -1,0 +1,14 @@
+[codespell]
+# Ref: https://github.com/codespell-project/codespell
+skip = .git,.gitignore,.gitattributes,*.svg,*.lock,*.css,*.sfd,.codespellrc,*/locales/*,__snapshots__,CHANGELOG.md,.npm,.cache,*/woff2/*
+check-hidden = true
+# Ignore camelCase/PascalCase identifiers (common in code) and URLs
+ignore-regex = \b[a-z]+[A-Z]\w*\b|\b[A-Z][a-z]+[A-Z]\w*\b|https?://\S+
+# slite - product name (Slite.com)
+# cros - Chrome OS identifier (CrOS)
+# smal - example substring in comments
+# whats - colloquial text in test data strings
+# preceeded - variable/method name in textWrapping.ts
+# implementors - valid English word
+# re-use - valid English word
+ignore-words-list = slite,cros,smal,whats,preceeded,implementors,re-use

@@ -26,4 +26,6 @@ coverage
 dev-dist
 html
 meta*.json
+.cache
 .claude
+.npm

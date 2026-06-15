@@ -57,7 +57,7 @@ const strokeGrid = (
   context: CanvasRenderingContext2D,
   /** grid cell pixel size */
   gridSize: number,
-  /** setting to 1 will disble bold lines */
+  /** setting to 1 will disable bold lines */
   gridStep: number,
   scrollX: number,
   scrollY: number,

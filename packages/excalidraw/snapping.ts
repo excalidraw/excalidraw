@@ -1108,7 +1108,7 @@ const createGapSnapLines = (
 export const snapResizingElements = (
   // use the latest elements to create snap lines
   selectedElements: ExcalidrawElement[],
-  // while using the original elements to appy dragOffset to calculate snaps
+  // while using the original elements to apply dragOffset to calculate snaps
   selectedOriginalElements: ExcalidrawElement[],
   app: AppClassProperties,
   event: KeyboardModifiersObject,

@@ -181,7 +181,7 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
   });
 
-  it("flipping bound arrow shouldn't flip arrowheads if selected alongside non-arrow eleemnt", () => {
+  it("flipping bound arrow shouldn't flip arrowheads if selected alongside non-arrow element", () => {
     const rect = API.createElement({
       type: "rectangle",
       boundElements: [{ type: "arrow", id: "arrow1" }],

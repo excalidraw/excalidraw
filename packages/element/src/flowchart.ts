@@ -506,7 +506,7 @@ export class FlowChartNavigator {
   // nodes that are ONE link away (successor and predecessor both included)
   private sameLevelNodes: ExcalidrawElement[] = [];
   private sameLevelIndex: number = 0;
-  // set it to the opposite of the defalut creation direction
+  // set it to the opposite of the default creation direction
   private direction: LinkDirection | null = null;
   // for speedier navigation
   private visitedNodes: Set<ExcalidrawElement["id"]> = new Set();
