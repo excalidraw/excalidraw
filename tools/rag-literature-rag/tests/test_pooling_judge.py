@@ -49,16 +49,19 @@ def test_graded_labels_extracts_grades():
 # ---- judge prompt + parsing ----
 
 def test_judge_prompt_is_source_blind():
+    # Sentinel system names that cannot appear in the rubric vocabulary (the rubric
+    # legitimately mentions "dense", "colbert", etc. as retrieval methods), so the
+    # test isolates real leakage of the per-doc systems/score rather than colliding.
     doc = {
         "title": "Network Simplex for Layer Assignment",
         "abstract": "We assign layers via network simplex.",
         "excerpt": "ranking via simplex...",
-        "systems": {"dense": 1, "colbert": 3},  # must NOT leak into the prompt
+        "systems": {"ZZSYSALPHA": 1, "ZZSYSBETA": 3},  # must NOT leak into the prompt
         "score": 0.99,
     }
     prompt = build_judge_prompt("layer assignment", doc)
-    assert "dense" not in prompt
-    assert "colbert" not in prompt
+    assert "ZZSYSALPHA" not in prompt
+    assert "ZZSYSBETA" not in prompt
     assert "systems" not in prompt
     assert "0.99" not in prompt
     # but the substance is present

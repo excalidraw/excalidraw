@@ -121,7 +121,15 @@ def _parse_grade(text: str) -> tuple[int, str]:
 
 
 def _judge_one(query: str, doc: dict[str, Any], model: str) -> tuple[int, str]:
-    from rag_common.gemini_embed import _client, llm_location
+    import time
+
+    from rag_common.gemini_embed import (
+        _client,
+        _is_fatal,
+        _is_rate_limit,
+        _parse_retry_after,
+        llm_location,
+    )
 
     client = _client(location=llm_location())
     prompt = build_judge_prompt(query, doc)
@@ -132,11 +140,23 @@ def _judge_one(query: str, doc: dict[str, Any], model: str) -> tuple[int, str]:
         config = types.GenerateContentConfig(temperature=0.0)
     except Exception:  # noqa: BLE001
         config = None
-    if config is not None:
-        response = client.models.generate_content(model=model, contents=prompt, config=config)
-    else:
-        response = client.models.generate_content(model=model, contents=prompt)
-    return _parse_grade(getattr(response, "text", None) or "")
+
+    # Retry rate-limit (429) failures so a quota burst during a large judging run
+    # is not cached as a permanent grade-0 — which would silently contaminate qrels.
+    last_exc: Exception | None = None
+    for attempt in range(4):
+        try:
+            if config is not None:
+                response = client.models.generate_content(model=model, contents=prompt, config=config)
+            else:
+                response = client.models.generate_content(model=model, contents=prompt)
+            return _parse_grade(getattr(response, "text", None) or "")
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if _is_fatal(exc) or not _is_rate_limit(exc):
+                raise
+            time.sleep(min(_parse_retry_after(exc) or (2 ** attempt), 30))
+    raise last_exc if last_exc else RuntimeError("judge failed")
 
 
 def _judge_workers() -> int:
@@ -177,16 +197,20 @@ def judge_pool(pool: dict[str, Any], *, model: str | None = None) -> dict[str, A
         return key, {"grade": grade, "reason": reason}
 
     if misses:
-        done = 0
+        done = cached = 0
         with ThreadPoolExecutor(max_workers=_judge_workers()) as pool_exec:
             for key, verdict in pool_exec.map(_run, misses):
-                cache[key] = verdict
+                # Do not persist error verdicts: a poisoned grade-0 would silently
+                # contaminate qrels. Leaving them out means they retry next run.
+                if "judge_error" not in str(verdict.get("reason", "")):
+                    cache[key] = verdict
+                    cached += 1
                 done += 1
                 if done % 200 == 0:
                     _save_cache(cache)
-                    log.info("judged %d/%d", done, len(misses))
+                    log.info("judged %d/%d (%d ok)", done, len(misses), cached)
         _save_cache(cache)
-        log.info("judged %d new (query, doc) pairs", len(misses))
+        log.info("judged %d new pairs (%d ok, %d errored→will retry)", done, cached, done - cached)
 
     cases_out: dict[str, dict[str, dict[str, Any]]] = {}
     for key, case_id, doc_id, _query, doc in work:
