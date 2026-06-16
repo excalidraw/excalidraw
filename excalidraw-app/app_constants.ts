@@ -4,6 +4,19 @@ export const INITIAL_SCENE_UPDATE_TIMEOUT = 5000;
 export const FILE_UPLOAD_TIMEOUT = 300;
 export const LOAD_IMAGES_TIMEOUT = 500;
 export const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
+export const SUPABASE_SYNC_DEBOUNCE_MS = 2000;
+
+// Single-writer / multi-reader lock tunables (mirror 0002_board_locks.sql, which is the source of
+// truth for the server-side LEASE_TTL / REQUEST_TTL). The client mirrors them as constants.
+//   HEARTBEAT (5s) — writer renew interval (<< 25s lease so 1–4 missed beats are safe).
+//   POLL      (4s) — reader poll interval (read_lock_state).
+//   LEASE     (25s) — server lease TTL passed to claim/renew (lock_expires_at = heartbeat + this).
+//   ACK_GRACE (12s) — how long a takeover requester waits for the writer to ack before presuming
+//                     it dead and claiming the (by then lease-expired) lock.
+export const SUPABASE_LOCK_HEARTBEAT_MS = 5000;
+export const SUPABASE_LOCK_POLL_MS = 4000;
+export const SUPABASE_LOCK_LEASE_SECONDS = 25;
+export const SUPABASE_TAKEOVER_ACK_GRACE_MS = 12000;
 export const SYNC_BROWSER_TABS_TIMEOUT = 50;
 export const CURSOR_SYNC_TIMEOUT = 33; // ~30fps
 export const DELETED_ELEMENT_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
@@ -42,6 +55,9 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_THEME: "excalidraw-theme",
   LOCAL_STORAGE_DEBUG: "excalidraw-debug",
+  LOCAL_STORAGE_SUPABASE_META: "excalidraw-supabase-meta",
+  // per-TAB writer/reader session id (sessionStorage, NOT localStorage — two tabs must differ).
+  SESSION_STORAGE_SUPABASE_SESSION_ID: "excalidraw-supabase-session-id",
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
 

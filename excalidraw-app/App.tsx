@@ -129,6 +129,14 @@ import {
   localStorageQuotaExceededAtom,
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
+import { isSupabaseSyncEnabled } from "./data/supabase/featureFlags";
+import { useSupabaseSync } from "./data/supabase/useSupabaseSync";
+import { userIdAtom, sessionAtom } from "./data/supabase/sessionAtom";
+import { syncStatusAtom } from "./data/supabase/syncStatusAtom";
+import { signOut } from "./data/supabase/auth";
+import { SyncStatusButton } from "./components/SyncStatusButton";
+import { ReadOnlyBanner } from "./components/ReadOnlyBanner";
+import { SignInDialog } from "./components/SignInDialog";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
@@ -223,10 +231,15 @@ const initializeScene = async (opts: {
 > => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
-  const jsonBackendMatch = window.location.hash.match(
-    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
-  );
-  const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
+  // When Supabase sync is enabled, shared-backend / collab links are disabled:
+  // never match the `#json=` / `#url=` import hashes so no externally-shared
+  // scene is loaded. Dormant share/import code stays intact.
+  const jsonBackendMatch = isSupabaseSyncEnabled()
+    ? null
+    : window.location.hash.match(/^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  const externalUrlMatch = isSupabaseSyncEnabled()
+    ? null
+    : window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
 
@@ -245,7 +258,12 @@ const initializeScene = async (opts: {
     appState: restoreAppState(localDataState?.appState, null),
   };
 
-  let roomLinkData = getCollaborationLinkData(window.location.href);
+  // Flag-on: never treat the URL as an external collaboration scene (no room
+  // start). `getCollaborationLinkData` is already neutralized under the flag in
+  // `data/index.ts`; this is the matching guard at the call site.
+  let roomLinkData = isSupabaseSyncEnabled()
+    ? null
+    : getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -406,9 +424,23 @@ const ExcalidrawWrapper = () => {
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
-    return isCollaborationLink(window.location.href);
+    // Flag-on: collab is disabled, so a `#room=` URL must not flag the app as
+    // collaborating (keeps the `is-collaborating` class off). `isCollaborationLink`
+    // itself is left intact for the dormant collab path.
+    return isSupabaseSyncEnabled()
+      ? false
+      : isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+
+  // Supabase sync (additive; entirely no-op unless `isSupabaseSyncEnabled()`).
+  // The hook accepts a null excalidrawAPI and no-ops until the API + session
+  // exist; it must be called unconditionally to satisfy the Rules of Hooks.
+  const supabaseSync = useSupabaseSync({ excalidrawAPI });
+  const supabaseUserId = useAtomValue(userIdAtom);
+  const supabaseSession = useAtomValue(sessionAtom);
+  const supabaseSyncStatus = useAtomValue(syncStatusAtom);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -520,7 +552,15 @@ const ExcalidrawWrapper = () => {
   );
 
   useEffect(() => {
-    if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
+    // When Supabase sync is enabled, <Collab> is not mounted, so `collabAPI`
+    // stays null forever. Without this guard the effect would early-return and
+    // the initial-state promise would never resolve (app stuck on the loading
+    // spinner). Under the flag we proceed straight to initializeScene, which
+    // already treats the flag-on case as "no external scene".
+    if (
+      !excalidrawAPI ||
+      (!isCollabDisabled && !collabAPI && !isSupabaseSyncEnabled())
+    ) {
       return;
     }
 
@@ -715,6 +755,13 @@ const ExcalidrawWrapper = () => {
       });
     }
 
+    // Notify the Supabase sync engine of the change (fire-and-forget, debounced
+    // internally; NOT gated by isSavePaused). No-op when the flag is off /
+    // signed-out.
+    if (isSupabaseSyncEnabled()) {
+      supabaseSync.notifyChange();
+    }
+
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(
@@ -787,10 +834,14 @@ const ExcalidrawWrapper = () => {
 
   const localStorageQuotaExceeded = useAtomValue(localStorageQuotaExceededAtom);
 
-  const onCollabDialogOpen = useCallback(
-    () => setShareDialogState({ isOpen: true, type: "collaborationOnly" }),
-    [setShareDialogState],
-  );
+  const onCollabDialogOpen = useCallback(() => {
+    // Flag-on: collab/share is disabled; opening the collab dialog is a no-op
+    // (callers are also gated). Dormant dialog code stays intact.
+    if (isSupabaseSyncEnabled()) {
+      return;
+    }
+    setShareDialogState({ isOpen: true, type: "collaborationOnly" });
+  }, [setShareDialogState]);
 
   // ---------------------------------------------------------------------------
   // onExport — intercepts file save to wait for pending image loads
@@ -952,8 +1003,41 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
+        // Single-writer/multi-reader: a reader is HARD read-only via this controlled prop (§0).
+        // The hook returns `false` whenever the flag is off / signed-out / writer, so this is
+        // identical to today's behaviour unless the Supabase-sync flag is on AND this session is a
+        // reader. No existing `viewModeEnabled` prop is passed, so there is nothing to combine.
+        viewModeEnabled={supabaseSync.viewModeEnabled}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+          if (isMobile) {
+            return null;
+          }
+
+          // Supabase sync renders its status pill in place of the collab
+          // trigger. Evaluated BEFORE the `!collabAPI` early-return because
+          // collab is unmounted under the flag, so `collabAPI` is always null
+          // (B1 restructure).
+          if (isSupabaseSyncEnabled()) {
+            return (
+              <div className="excalidraw-ui-top-right">
+                <SyncStatusButton
+                  status={supabaseSync.status}
+                  lastSyncedAt={supabaseSync.lastSyncedAt}
+                  error={supabaseSyncStatus.error}
+                  onSyncNow={supabaseSync.syncNow}
+                  isSignedIn={!!supabaseUserId}
+                  onRequestSignIn={() => setIsSignInOpen(true)}
+                  role={supabaseSync.role}
+                  onTakeOver={() => {
+                    void supabaseSync.takeOver();
+                  }}
+                  takeoverInFlight={supabaseSync.lock.takeoverInFlight}
+                />
+              </div>
+            );
+          }
+
+          if (!collabAPI || isCollabDisabled) {
             return null;
           }
 
@@ -986,13 +1070,21 @@ const ExcalidrawWrapper = () => {
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
-          isCollabEnabled={!isCollabDisabled}
+          isCollabEnabled={!isCollabDisabled && !isSupabaseSyncEnabled()}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
+          isSupabaseSyncEnabled={isSupabaseSyncEnabled()}
+          isSignedIn={!!supabaseUserId}
+          userEmail={supabaseSession?.user?.email ?? null}
+          onSyncNow={supabaseSync.syncNow}
+          onRequestSignIn={() => setIsSignInOpen(true)}
+          onSignOut={() => {
+            void signOut();
+          }}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
-          isCollabEnabled={!isCollabDisabled}
+          isCollabEnabled={!isCollabDisabled && !isSupabaseSyncEnabled()}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
@@ -1028,6 +1120,14 @@ const ExcalidrawWrapper = () => {
             {t("alerts.localStorageQuotaExceeded")}
           </div>
         )}
+        {isSupabaseSyncEnabled() && supabaseSync.role === "reader" && (
+          <ReadOnlyBanner
+            onTakeOver={() => {
+              void supabaseSync.takeOver();
+            }}
+            takeoverInFlight={supabaseSync.lock.takeoverInFlight}
+          />
+        )}
         {latestShareableLink && (
           <ShareableLinkDialog
             link={latestShareableLink}
@@ -1035,26 +1135,35 @@ const ExcalidrawWrapper = () => {
             setErrorMessage={setErrorMessage}
           />
         )}
-        {excalidrawAPI && !isCollabDisabled && (
+        {excalidrawAPI && !isCollabDisabled && !isSupabaseSyncEnabled() && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
 
-        <ShareDialog
-          collabAPI={collabAPI}
-          onExportToBackend={async () => {
-            if (excalidrawAPI) {
-              try {
-                await onExportToBackend(
-                  excalidrawAPI.getSceneElements(),
-                  excalidrawAPI.getAppState(),
-                  excalidrawAPI.getFiles(),
-                );
-              } catch (error: any) {
-                setErrorMessage(error.message);
+        {!isSupabaseSyncEnabled() && (
+          <ShareDialog
+            collabAPI={collabAPI}
+            onExportToBackend={async () => {
+              if (excalidrawAPI) {
+                try {
+                  await onExportToBackend(
+                    excalidrawAPI.getSceneElements(),
+                    excalidrawAPI.getAppState(),
+                    excalidrawAPI.getFiles(),
+                  );
+                } catch (error: any) {
+                  setErrorMessage(error.message);
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+        )}
+
+        {isSupabaseSyncEnabled() && (
+          <SignInDialog
+            open={isSignInOpen}
+            onClose={() => setIsSignInOpen(false)}
+          />
+        )}
 
         <AppSidebar />
 
@@ -1069,6 +1178,8 @@ const ExcalidrawWrapper = () => {
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
+              // Flag-on: collab is disabled, hide the command.
+              predicate: () => !isSupabaseSyncEnabled(),
               keywords: [
                 "team",
                 "multiplayer",
@@ -1110,7 +1221,8 @@ const ExcalidrawWrapper = () => {
             {
               label: t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
-              predicate: true,
+              // Flag-on: shareable links are disabled, hide the command.
+              predicate: () => !isSupabaseSyncEnabled(),
               icon: share,
               keywords: [
                 "link",

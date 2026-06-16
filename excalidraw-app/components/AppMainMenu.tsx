@@ -2,6 +2,8 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  playerPlayIcon,
+  usersIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -21,6 +23,14 @@ export const AppMainMenu: React.FC<{
   isCollabEnabled: boolean;
   theme: Theme | "system";
   refresh: () => void;
+  // Supabase sync (all gated on `isSupabaseSyncEnabled`; flag-off renders today's
+  // menu exactly).
+  isSupabaseSyncEnabled?: boolean;
+  isSignedIn?: boolean;
+  userEmail?: string | null;
+  onSyncNow?: () => void;
+  onRequestSignIn?: () => void;
+  onSignOut?: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -39,6 +49,40 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
+      {props.isSupabaseSyncEnabled && (
+        <>
+          <MainMenu.Item
+            icon={playerPlayIcon}
+            onSelect={() => props.onSyncNow?.()}
+            disabled={!props.isSignedIn}
+          >
+            Sync now
+          </MainMenu.Item>
+          {props.isSignedIn ? (
+            <>
+              {props.userEmail && (
+                <MainMenu.Item icon={usersIcon} onSelect={() => {}}>
+                  {props.userEmail}
+                </MainMenu.Item>
+              )}
+              <MainMenu.Item
+                icon={loginIcon}
+                onSelect={() => props.onSignOut?.()}
+              >
+                Sign out
+              </MainMenu.Item>
+            </>
+          ) : (
+            <MainMenu.Item
+              icon={loginIcon}
+              onSelect={() => props.onRequestSignIn?.()}
+            >
+              Sign in to sync
+            </MainMenu.Item>
+          )}
+          <MainMenu.Separator />
+        </>
+      )}
       <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${

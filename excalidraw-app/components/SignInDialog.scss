@@ -1,0 +1,50 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  .SignInDialog {
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-top: 0.25rem;
+    }
+
+    &__description {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-primary-color);
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    // The library TextField renders its own label + input; just give it room.
+    .ExcTextField {
+      width: 100%;
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.25rem;
+    }
+
+    &__confirmation {
+      margin: 0;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-success-lighter, rgba(48, 164, 108, 0.12));
+      color: var(--color-success-text, #0b7a4b);
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    &__error {
+      margin: 0;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-danger-background, rgba(219, 49, 49, 0.1));
+      color: var(--color-danger, #db3131);
+      font-size: 0.8125rem;
+    }
+  }
+}

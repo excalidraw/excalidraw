@@ -1,0 +1,181 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  .excalidraw-sync-status-button {
+    position: relative;
+    display: inline-flex;
+
+    &__pill {
+      // The library Button (outlineButtonStyles) is a fixed-size SQUARE
+      // (width/height = --default-button-size), which clips a text label and
+      // makes it overlap the neighbouring top-right buttons. Relax to auto
+      // width/height with horizontal padding so the pill sizes to its text.
+      width: auto;
+      height: var(--default-button-size);
+      min-width: 0;
+      padding: 0 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      white-space: nowrap;
+      font-family: "Assistant";
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    &__glyph {
+      display: inline-flex;
+      line-height: 1;
+    }
+
+    // Spinner ring shown while status === "syncing" (replaces the glyph).
+    &__spinner {
+      display: inline-block;
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      border: 2px solid var(--color-gray-40, rgba(0, 0, 0, 0.18));
+      border-top-color: var(--color-primary, #6965db);
+      animation: excalidraw-sync-status-spin 0.7s linear infinite;
+      flex: 0 0 auto;
+    }
+
+    &__caret {
+      display: inline-flex;
+      line-height: 1;
+      opacity: 0.7;
+      font-size: 0.625rem;
+    }
+
+    // 4 state color cues (color the glyph)
+    &__pill--synced .excalidraw-sync-status-button__glyph {
+      color: var(--color-success-text);
+    }
+
+    &__pill--syncing .excalidraw-sync-status-button__glyph {
+      color: var(--text-primary-color);
+      display: inline-block;
+      animation: excalidraw-sync-status-spin 1s linear infinite;
+    }
+
+    &__pill--error {
+      color: var(--color-danger);
+
+      .excalidraw-sync-status-button__glyph {
+        color: var(--color-danger);
+      }
+    }
+
+    &__pill--offline {
+      color: var(--color-gray-5);
+
+      .excalidraw-sync-status-button__glyph {
+        color: var(--color-gray-5);
+      }
+    }
+
+    &__pill--idle .excalidraw-sync-status-button__glyph {
+      color: var(--text-primary-color);
+    }
+
+    // Reader (HARD read-only) — a distinct, muted pill so it reads as "view-only",
+    // visibly different from the writer's status states.
+    &__pill--reader {
+      color: var(--color-muted-darker, var(--color-gray-60));
+
+      .excalidraw-sync-status-button__glyph {
+        color: var(--color-muted-darker, var(--color-gray-60));
+      }
+    }
+  }
+
+  .excalidraw-sync-status-popover {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    right: 0;
+    z-index: 100;
+
+    box-sizing: border-box;
+    min-width: 12rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+
+    background: var(--popup-bg-color, var(--island-bg-color));
+    border: 1px solid var(--default-border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+
+    font-family: "Assistant";
+    font-size: 0.75rem;
+    color: var(--text-primary-color);
+
+    &__time {
+      padding: 0.125rem 0.25rem;
+      opacity: 0.8;
+    }
+
+    &__separator {
+      border-top: 1px solid var(--default-border-color);
+      margin: 0.125rem 0;
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+
+      width: 100%;
+      padding: 0.375rem 0.25rem;
+
+      border: none;
+      border-radius: 0.375rem;
+      background: transparent;
+      color: inherit;
+
+      font-family: inherit;
+      font-size: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+
+    &__item--takeover {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    &__error {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.375rem;
+
+      padding: 0.25rem;
+      color: var(--color-danger);
+      word-break: break-word;
+    }
+  }
+}
+
+@keyframes excalidraw-sync-status-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

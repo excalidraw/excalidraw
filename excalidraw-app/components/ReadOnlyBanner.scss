@@ -1,0 +1,67 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  // Top-center, mirrors the app's `.alert` placement (index.scss) so it sits below the toolbar and
+  // does NOT fight the top-right sync pill. The container ignores pointer events (so it never
+  // blocks the canvas/toolbar); the action button re-enables them.
+  .excalidraw-readonly-banner {
+    pointer-events: none;
+    position: absolute;
+    top: 6.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+
+    max-width: min(90vw, 32rem);
+    padding: 0.5rem 0.875rem;
+
+    background-color: var(--color-warning);
+    color: var(--color-text-warning);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+    font-family: "Assistant";
+    font-size: 0.875rem;
+    line-height: 1.4;
+
+    &__glyph {
+      display: inline-flex;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    &__text {
+      white-space: nowrap;
+    }
+
+    &__action {
+      pointer-events: auto;
+      flex: 0 0 auto;
+
+      padding: 0.25rem 0.625rem;
+
+      border: 1px solid var(--color-primary);
+      border-radius: var(--border-radius-md);
+      background: var(--color-primary);
+      color: var(--color-icon-white, #ffffff);
+
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--color-primary-darker, var(--color-primary));
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+    }
+  }
+}

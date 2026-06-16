@@ -80,6 +80,14 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
+### Optional: self-hosted Supabase sync
+
+The app can optionally persist a single working board (and its image files) per user to your own
+[Supabase](https://supabase.com) project, behind email magic-link auth. It is gated by the
+`VITE_APP_FEATURE_SUPABASE_SYNC` build flag (off by default; when on, live collaboration and share
+links are hidden). See [`supabase/README.md`](./supabase/README.md) for provisioning and the env
+vars in [`excalidraw-app/.env.example`](./excalidraw-app/.env.example).
+
 ## Quick start
 
 **Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).

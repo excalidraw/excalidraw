@@ -37,6 +37,7 @@ import {
 
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+import { isSupabaseSyncEnabled } from "./supabase/featureFlags";
 
 import type { WS_SUBTYPES } from "../app_constants";
 
@@ -136,6 +137,12 @@ export const isCollaborationLink = (link: string) => {
 };
 
 export const getCollaborationLinkData = (link: string) => {
+  // When Supabase sync is enabled, live collaboration is disabled: never treat
+  // a `#room=` URL as a collaboration link so no room is ever started. Dormant
+  // collab code is kept intact; this only neutralizes the entry point.
+  if (isSupabaseSyncEnabled()) {
+    return null;
+  }
   const hash = new URL(link).hash;
   const match = hash.match(RE_COLLAB_LINK);
   if (match && match[2].length !== 22) {

@@ -17,6 +17,13 @@ interface ImportMetaEnv {
 
   VITE_APP_FIREBASE_CONFIG: string;
 
+  // Supabase sync (online persistence backend)
+  VITE_APP_SUPABASE_URL: string;
+  VITE_APP_SUPABASE_ANON_KEY: string;
+
+  // Enable Supabase sync (set to "true" to enable)
+  VITE_APP_FEATURE_SUPABASE_SYNC: string;
+
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
