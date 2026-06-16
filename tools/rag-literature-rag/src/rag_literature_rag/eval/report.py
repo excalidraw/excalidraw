@@ -59,7 +59,7 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
     results = payload["results"]
     completed = [row for row in results if "mrr" in row]
     if not completed:
-        return "# Graph Layout RAG — Retrieval Evaluation Report\n\n_No strategies completed._\n"
+        return "# RAG Literature — Retrieval Evaluation Report\n\n_No strategies completed._\n"
     best = max(completed, key=lambda row: (row["mrr"], row["ndcg@10"], row["recall@10"]))
     offline = [row for row in completed if not row["requires_llm"]]
     llm = [row for row in completed if row["requires_llm"]]
@@ -77,7 +77,7 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
     best_balanced = max(balanced, key=lambda row: row["ndcg@10"], default=None)
 
     parts = [
-        "# Graph Layout RAG — Retrieval Evaluation Report\n\n",
+        "# RAG Literature — Retrieval Evaluation Report\n\n",
         f"Generated: {payload['generated_at']}\n\n",
         "## Executive summary\n\n",
         f"- **Index profile:** `{payload['embed_profile']}`\n",
@@ -96,10 +96,10 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
         "## SOTA patterns reviewed\n\n",
         "| Pattern | Role in this corpus |\n",
         "| --- | --- |\n",
-        "| Hybrid BM25 + dense + RRF | Captures exact algorithm names (network simplex, VPSC, left-edge) |\n",
+        "| Hybrid BM25 + dense + RRF | Captures exact method names (ColBERT, Self-RAG, RRF, HyDE, REPLUG) |\n",
         "| Cross-encoder rerank | Improves precision from a wide candidate pool |\n",
-        "| Category / pdf_only filters | Best precision for Terraform pipeline research threads |\n",
-        "| Multi-query expansion | Helps ambiguous agent phrasing; may add noise on precise terms |\n",
+        "| Category / pdf_only filters | Best precision for specific RAG sub-topic threads |\n",
+        "| Multi-query expansion | Helps ambiguous research phrasing; may add noise on precise terms |\n",
         "| HyDE | Hypothetical passage embedding for vague exploratory queries |\n",
         "| Step-back | Broader abstraction for over-specific factual queries |\n\n",
         "## Methodology\n\n",
@@ -132,14 +132,13 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
             _failure_section(results),
             "## Agent playbook\n\n",
             "```bash\n",
-            "# Default pipeline research query\n",
-            "yarn graph-rag:query \"network simplex rank assignment\" \\\n",
-            "  --embed-profile gemini-2-structure-v1 \\\n",
-            "  --category layer-assignment --pdf-only --json\n\n",
+            "# Default RAG-literature research query\n",
+            "yarn rag-lit:query \"Self-RAG reflection tokens\" \\\n",
+            "  --embed-profile gemini-2-structure-v1 --json\n\n",
             "# Run offline benchmark\n",
-            "yarn graph-rag:eval -- --embed-profile gemini-2-structure-v1\n\n",
+            "yarn rag-lit:eval -- --embed-profile gemini-2-structure-v1\n\n",
             "# Full benchmark including LLM transforms\n",
-            "yarn graph-rag:eval -- --embed-profile gemini-2-structure-v1 --llm-transforms\n",
+            "yarn rag-lit:eval -- --embed-profile gemini-2-structure-v1 --llm-transforms\n",
             "```\n\n",
             "## Limitations and next steps\n\n",
             "- Gold labels are manually curated for ~30 cases; expand toward 50+ for regression testing.\n",

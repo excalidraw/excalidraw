@@ -32,10 +32,18 @@ CACHE_PATH = DATA_DIR / "eval" / "judge_cache.json"
 MAX_ABSTRACT_CHARS = 1500
 MAX_EXCERPT_CHARS = 800
 
+# Domain rubric version — included in the judge cache key so that changing the
+# domain framing (or the scale wording) invalidates stale grades instead of
+# silently reusing them. Bump when _RUBRIC's meaning changes.
+_RUBRIC_VERSION = "rag-v2"
+
 _RUBRIC = (
-    "You are a relevance assessor for a graph-drawing / graph-layout literature "
-    "search engine. Rate how well the DOCUMENT satisfies the information need "
-    "behind the QUERY, on this 0-3 scale:\n"
+    "You are a relevance assessor for a retrieval-augmented generation (RAG) "
+    "literature search engine. Documents are research papers on RAG and neural "
+    "information retrieval (e.g. dense/sparse retrieval, hybrid search, "
+    "reranking and late interaction, GraphRAG, agentic and self-correcting RAG, "
+    "query rewriting, chunking, and RAG evaluation). Rate how well the DOCUMENT "
+    "satisfies the information need behind the QUERY, on this 0-3 scale:\n"
     "  3 = Perfectly relevant: directly about the query's method/topic; a "
     "searcher wanting this query would want this document.\n"
     "  2 = Highly relevant: substantially on-topic and useful, even if not the "
@@ -154,7 +162,7 @@ def judge_pool(pool: dict[str, Any], *, model: str | None = None) -> dict[str, A
     for case_id, case in pool["cases"].items():
         query = case["query"]
         for doc_id, doc in case["pooled"].items():
-            key = f"{model}:{case_id}:{doc_id}"
+            key = f"{model}:{_RUBRIC_VERSION}:{case_id}:{doc_id}"
             work.append((key, case_id, doc_id, query, doc))
 
     misses = [w for w in work if w[0] not in cache]

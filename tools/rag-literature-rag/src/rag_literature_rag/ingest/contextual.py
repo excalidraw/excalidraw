@@ -53,16 +53,22 @@ def _save_cache(cache: dict[str, str]) -> None:
     os.replace(tmp, CACHE_PATH)
 
 
+# Domain tag in the cache key: changing the context prompt's domain framing
+# invalidates stale (graph-drawing) context lines instead of reusing them.
+_CONTEXT_VERSION = "rag-v2"
+
+
 def _cache_key(chunk: TextChunk) -> str:
     fp = chunk.canonical_sha256 or chunk.doc_id
-    return f"{fp}:{chunk.chunk_index}"
+    return f"{_CONTEXT_VERSION}:{fp}:{chunk.chunk_index}"
 
 
 def _generate_context(title: str, section_path: str, body: str, model: str) -> str:
     from rag_common.gemini_embed import _client, llm_location
 
     prompt = (
-        "You add retrieval context to a chunk from a graph drawing / layout theory paper.\n"
+        "You add retrieval context to a chunk from a retrieval-augmented "
+        "generation (RAG) / neural information retrieval research paper.\n"
         f"Document title: {title}\n"
         f"Section: {section_path or '(unknown)'}\n"
         "Chunk:\n"
