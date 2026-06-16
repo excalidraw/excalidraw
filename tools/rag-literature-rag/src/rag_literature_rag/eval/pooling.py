@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -52,6 +53,20 @@ POOL_DIR = DATA_DIR / "eval" / "pool"
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _pool_workers() -> int:
+    """Concurrent cases to pool at once (RAG_LIT_POOL_WORKERS, default 8).
+
+    The per-query embed/transform calls are issued one-at-a-time *within* a case, so
+    the serial loop wastes the available rate-limit budget. Pooling cases concurrently
+    is the real speedup (the rate limiter caps total throughput, not request issuance).
+    """
+    raw = os.getenv("RAG_LIT_POOL_WORKERS", "8").strip()
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return 8
 
 
 def _manifest_lookup() -> dict[str, Any]:
@@ -91,8 +106,7 @@ def build_pool(
             continue
         active.append(name)
 
-    case_pools: dict[str, Any] = {}
-    for case in cases:
+    def _pool_one(case: Any) -> tuple[str, dict[str, Any]]:
         pooled: dict[str, dict[str, Any]] = {}
 
         def _record(row: dict[str, Any], system: str, rank: int) -> None:
@@ -162,14 +176,32 @@ def build_pool(
             else:
                 entry["abstract"] = None
 
-        case_pools[case.id] = {
+        log.info("pooled %s: %d candidates from %d systems", case.id, len(pooled), len(active))
+        return case.id, {
             "query": case.query,
             "category": case.category,
             "pdf_only": case.pdf_only,
             "curated_relevant": sorted(case.relevant_doc_ids),
             "pooled": pooled,
         }
-        log.info("pooled %s: %d candidates from %d systems", case.id, len(pooled), len(active))
+
+    # Pool cases concurrently — each case is independent (its `pooled` dict is local)
+    # and the embed client + shared GeminiRateLimiter are thread-safe (the judge uses
+    # the same pattern). This removes the one-request-at-a-time serial bottleneck; the
+    # rate limiter, not request issuance, becomes the real ceiling. Experimental indexes
+    # mutate a process-global env var, so fall back to serial when any are active.
+    workers = _pool_workers()
+    if experimental_indexes:
+        workers = 1
+    case_pools: dict[str, Any] = {}
+    if workers > 1:
+        with ThreadPoolExecutor(max_workers=workers) as pool_exec:
+            for case_id, case_dict in pool_exec.map(_pool_one, cases):
+                case_pools[case_id] = case_dict
+    else:
+        for case in cases:
+            case_id, case_dict = _pool_one(case)
+            case_pools[case_id] = case_dict
 
     return {
         "version": 1,
