@@ -68,7 +68,10 @@ def main() -> int:
     load_env_file()  # Vertex creds + RAG_LLM_LOCATION + context model for the LLM/embed calls
     src = profile_index_paths(SRC_PROFILE)
     db = lancedb.connect(str(src.lance_dir))
-    rows = db.open_table(CHUNKS_TABLE).to_pandas().drop(columns=["vector"]).to_dict("records")
+    # Arrow (not to_pandas, which needs pylance); drop the heavy vector column.
+    tbl = db.open_table(CHUNKS_TABLE)
+    cols = [n for n in tbl.schema.names if n != "vector"]
+    rows = tbl.search().select(cols).limit(0).to_arrow().to_pylist()
     print(f"read {len(rows)} chunks from {SRC_PROFILE}", flush=True)
 
     chunks = [_row_to_chunk(r) for r in rows]
