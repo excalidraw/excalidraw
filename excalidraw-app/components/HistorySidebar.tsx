@@ -27,10 +27,13 @@ import { getCollaborationLinkData } from "../data";
 import {
   createCollabRestoreElements,
   isSceneHistoryDeltaRecordable,
-  reconstructSceneHistoryData,
+  resetTransientAppState,
   SceneHistory,
 } from "../data/SceneHistory";
-import { subscribeSceneHistoryFromFirebase } from "../data/firebase";
+import {
+  loadSceneHistoryEntryFromFirebase,
+  subscribeSceneHistoryFromFirebase,
+} from "../data/firebase";
 
 import "./HistorySidebar.scss";
 
@@ -247,14 +250,34 @@ export const SceneHistoryProvider = ({
   const reconstructEntry = useCallback(
     async (entryId: string) => {
       if (isSharedHistory) {
-        return historyData
-          ? reconstructSceneHistoryData(historyData, entryId)
-          : null;
+        if (!collabRoomId || !collabRoomKey || !historyData) {
+          return null;
+        }
+
+        const payload = await loadSceneHistoryEntryFromFirebase({
+          roomId: collabRoomId,
+          roomKey: collabRoomKey,
+          entryId,
+        });
+        const entry = historyData.entries.find((item) => item.id === entryId);
+
+        if (!payload || !entry) {
+          return null;
+        }
+
+        return {
+          entry,
+          elements: payload.elements,
+          appState: resetTransientAppState(
+            payload.appState as Partial<AppState>,
+          ),
+          files: {} as BinaryFiles,
+        };
       }
 
       return SceneHistory.reconstruct(entryId);
     },
-    [historyData, isSharedHistory],
+    [collabRoomId, collabRoomKey, historyData, isSharedHistory],
   );
 
   useEffect(() => {
@@ -326,7 +349,6 @@ export const SceneHistoryProvider = ({
 
     const unsubscribe = subscribeSceneHistoryFromFirebase({
       roomId: collabRoomId,
-      roomKey: collabRoomKey,
       onChange: (nextHistoryData) => {
         if (isActive && isMountedRef.current) {
           setHistoryState(nextHistoryData);
@@ -646,6 +668,7 @@ export const HistorySidebar = ({
         appState: {
           ...excalidrawAPI.getAppState(),
           ...target.appState,
+          viewModeEnabled: origin?.appState.viewModeEnabled ?? false,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       });
