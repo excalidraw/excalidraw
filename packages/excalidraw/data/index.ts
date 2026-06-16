@@ -114,7 +114,7 @@ export const exportCanvas = async (
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
-    exportingFrame: ExcalidrawFrameLikeElement | null;
+    exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
   },
 ) => {
   if (elements.length === 0) {

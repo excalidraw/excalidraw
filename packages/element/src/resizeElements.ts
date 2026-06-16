@@ -721,8 +721,8 @@ const getResizedOrigin = (
 export const resizeSingleElement = (
   nextWidth: number,
   nextHeight: number,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
+  latestElement: NonDeletedExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
   handleDirection: TransformHandleDirection,

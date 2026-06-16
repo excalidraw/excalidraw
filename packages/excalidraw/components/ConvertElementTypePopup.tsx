@@ -71,6 +71,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -191,7 +192,7 @@ const Panel = ({
   elements,
 }: {
   app: App;
-  elements: ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
 }) => {
   const conversionType = getConversionTypeFromElements(elements);
 
@@ -453,7 +454,7 @@ export const convertElementTypes = (
       ];
 
     if (nextType && isConvertibleGenericType(nextType)) {
-      const convertedElements: Record<string, ExcalidrawElement> = {};
+      const convertedElements: Record<string, NonDeletedExcalidrawElement> = {};
 
       for (const element of convertibleGenericElements) {
         const convertedElement = convertElementType(element, nextType, app);
@@ -628,7 +629,7 @@ export const convertElementTypes = (
 };
 
 export const getConversionTypeFromElements = (
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
 ): ConversionType => {
   if (elements.length === 0) {
     return null;
@@ -668,22 +669,29 @@ const toCacheKey = (
 };
 
 const filterGenericConvetibleElements = <T extends ExcalidrawElement>(
-  elements: T[],
+  elements: readonly T[],
 ) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
-    T &
-      (
-        | ExcalidrawRectangleElement
-        | ExcalidrawDiamondElement
-        | ExcalidrawEllipseElement
-      )
+    T extends NonDeletedExcalidrawElement
+      ? NonDeleted<
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
+        >
+      :
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
   >;
 
 const filterLinearConvertibleElements = <T extends ExcalidrawElement>(
-  elements: T[],
+  elements: readonly T[],
 ) =>
-  elements.filter((element) => isEligibleLinearElement(element)) as (T &
-    ExcalidrawLinearElement)[];
+  elements.filter((element) =>
+    isEligibleLinearElement(element),
+  ) as (T extends NonDeletedExcalidrawElement
+    ? NonDeleted<ExcalidrawLinearElement>
+    : ExcalidrawLinearElement)[];
 
 const THRESHOLD = 20;
 const isVert = (a: LocalPoint, b: LocalPoint) => a[0] === b[0];
@@ -821,7 +829,7 @@ const convertElementType = <
   element: TElement,
   targetType: ConvertibleTypes,
   app: AppClassProperties,
-): ExcalidrawElement => {
+): NonDeletedExcalidrawElement => {
   if (!isValidConversion(element.type, targetType)) {
     if (!isProdEnv()) {
       throw Error(`Invalid conversion from ${element.type} to ${targetType}.`);

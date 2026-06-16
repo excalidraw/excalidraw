@@ -169,14 +169,14 @@ describe("elbow arrow routing", () => {
       y: -150,
       width: 100,
       height: 100,
-    }) as ExcalidrawBindableElement;
+    }) as NonDeleted<ExcalidrawBindableElement>;
     const rectangle2 = API.createElement({
       type: "rectangle",
       x: 50,
       y: 50,
       width: 100,
       height: 100,
-    }) as ExcalidrawBindableElement;
+    }) as NonDeleted<ExcalidrawBindableElement>;
     const arrow = API.createElement({
       type: "arrow",
       elbowed: true,

@@ -187,7 +187,7 @@ export class Scene {
     // selection-related options
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
-  }): NonDeleted<ExcalidrawElement>[] {
+  }): NonDeletedExcalidrawElement[] {
     const hash = hashSelectionOpts(opts);
 
     const elements = opts?.elements || this.nonDeletedElements;

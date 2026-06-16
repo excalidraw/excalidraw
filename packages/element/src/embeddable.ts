@@ -13,9 +13,9 @@ import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
+  NonDeletedExcalidrawElement,
 } from "./types";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
@@ -401,7 +401,7 @@ export const getEmbedLink = (
 
 export const createPlaceholderEmbeddableLabel = (
   element: ExcalidrawIframeLikeElement,
-): ExcalidrawElement => {
+): NonDeletedExcalidrawElement => {
   let text: string;
   if (isIframeElement(element)) {
     text = "IFrame element";

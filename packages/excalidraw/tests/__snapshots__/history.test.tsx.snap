@@ -12627,9 +12627,9 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id5",
+  "id": "id10",
   "index": "a1",
-  "isDeleted": true,
+  "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -12655,15 +12655,15 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "roughness": 1,
   "roundness": null,
   "simulatePressure": false,
-  "strokeColor": "#1e1e1e",
+  "strokeColor": "#e03131",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 5,
+  "version": 4,
   "width": 50,
-  "x": 40,
-  "y": -20,
+  "x": 130,
+  "y": -30,
 }
 `;
 
@@ -12717,7 +12717,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 }
 `;
 
-exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of elements 1`] = `3`;
+exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of elements 1`] = `2`;
 
 exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of renders 1`] = `12`;
 
@@ -12807,7 +12807,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
     "elements": {
       "added": {},
       "removed": {
-        "id9": {
+        "id10": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -12817,7 +12817,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             "frameId": null,
             "groupIds": [],
             "height": 10,
-            "index": "a2",
+            "index": "a1",
             "isDeleted": false,
             "link": null,
             "locked": false,
@@ -12861,7 +12861,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
       },
       "updated": {},
     },
-    "id": "id11",
+    "id": "id12",
   },
 ]
 `;

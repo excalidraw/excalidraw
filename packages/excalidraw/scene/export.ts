@@ -42,7 +42,6 @@ import { newTextElement } from "@excalidraw/element";
 import type { Bounds } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeleted,
@@ -191,7 +190,7 @@ export const exportToCanvas = async (
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
+    exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   },
   createCanvas: (
     width: number,
@@ -308,7 +307,7 @@ export const exportToSvg = async (
      * if true, all embeddables passed in will be rendered when possible.
      */
     renderEmbeddables?: boolean;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
+    exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
   },
@@ -565,7 +564,7 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
 ): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);

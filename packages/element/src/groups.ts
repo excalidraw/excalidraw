@@ -17,6 +17,7 @@ import type {
   NonDeleted,
   ElementsMapOrArray,
   ElementsMap,
+  NonDeletedExcalidrawElement,
 } from "./types";
 
 export const selectGroup = (
@@ -319,15 +320,14 @@ export const removeFromSelectedGroups = (
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
 
-export const getMaximumGroups = (
-  elements: ExcalidrawElement[],
+export const getMaximumGroups = <
+  T extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
+  elements: T[],
   elementsMap: ElementsMap,
-): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
-  elements.forEach((element: ExcalidrawElement) => {
+): T[][] => {
+  const groups: Map<String, T[]> = new Map<String, T[]>();
+  elements.forEach((element: T) => {
     const groupId =
       element.groupIds.length === 0
         ? element.id
@@ -338,7 +338,7 @@ export const getMaximumGroups = (
     // Include bound text if present when grouping
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      currentGroupMembers.push(boundTextElement);
+      currentGroupMembers.push(boundTextElement as T);
     }
     groups.set(groupId, [...currentGroupMembers, element]);
   });
@@ -409,7 +409,7 @@ export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: Readonly<AppState>,
-): ExcalidrawElement[][] => {
+): NonDeletedExcalidrawElement[][] => {
   const selectedGroupIds = getSelectedGroupIds(appState);
   const unboundElements = selectedElements.filter(
     (element) => !isBoundToContainer(element),
@@ -475,5 +475,7 @@ export const getSelectedElementsByGroup = (
       addToGroupsMap(element, selectedGroupId);
     }
   });
-  return Array.from(groups.values()).concat(Array.from(elements.values()));
+  return Array.from(groups.values()).concat(
+    Array.from(elements.values()),
+  ) as NonDeletedExcalidrawElement[][];
 };
