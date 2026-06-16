@@ -2511,7 +2511,7 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: ExcalidrawFrameLikeElement | null },
+    opts: { exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -2589,7 +2589,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private async onMagicFrameGenerate(
-    magicFrame: ExcalidrawMagicFrameElement,
+    magicFrame: Readonly<NonDeleted<ExcalidrawMagicFrameElement>>,
     source: "button" | "upstream",
   ) {
     const generateDiagramToCode = this.plugins.diagramToCode?.generate;
@@ -2703,7 +2703,9 @@ class App extends React.Component<AppProps, AppState> {
       this.setActiveTool({ type: TOOL_TYPE.magicframe });
       trackEvent("ai", "tool-select (empty-selection)", "d2c");
     } else {
-      const selectedMagicFrame: ExcalidrawMagicFrameElement | false =
+      const selectedMagicFrame:
+        | NonDeleted<ExcalidrawMagicFrameElement>
+        | false =
         selectedElements.length === 1 &&
         isMagicFrameElement(selectedElements[0]) &&
         selectedElements[0];
@@ -2721,7 +2723,7 @@ class App extends React.Component<AppProps, AppState> {
 
       trackEvent("ai", "tool-select (existing selection)", "d2c");
 
-      let frame: ExcalidrawMagicFrameElement;
+      let frame: NonDeleted<ExcalidrawMagicFrameElement>;
       if (selectedMagicFrame) {
         // a single magicframe already selected -> use it
         frame = selectedMagicFrame;
@@ -5662,7 +5664,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   elementsMap.get(
                     element.startBinding.elementId,
-                  ) as ExcalidrawBindableElement,
+                  ) as NonDeleted<ExcalidrawBindableElement>,
                   "start",
                   elementsMap,
                 ),
@@ -5677,7 +5679,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   elementsMap.get(
                     element.endBinding.elementId,
-                  ) as ExcalidrawBindableElement,
+                  ) as NonDeleted<ExcalidrawBindableElement>,
                   "end",
                   elementsMap,
                 ),
@@ -5942,7 +5944,7 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private handleTextWysiwyg(
-    element: ExcalidrawTextElement,
+    element: NonDeleted<ExcalidrawTextElement>,
     {
       isExistingElement = false,
       initialCaretSceneCoords = null,
@@ -5980,7 +5982,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     textWysiwyg({
-      id: element.id,
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
@@ -9867,7 +9868,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeCacheReferenceSnapPoints(
     event: KeyboardModifiersObject,
-    selectedElements: ExcalidrawElement[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {
     if (
@@ -9891,7 +9892,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeCacheVisibleGaps(
     event: KeyboardModifiersObject,
-    selectedElements: ExcalidrawElement[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {
     if (

@@ -1136,8 +1136,8 @@ export type NullableGridSize =
   | null;
 
 export type GenerateDiagramToCode = (props: {
-  frame: ExcalidrawMagicFrameElement;
-  children: readonly ExcalidrawElement[];
+  frame: NonDeleted<ExcalidrawMagicFrameElement>;
+  children: readonly NonDeletedExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
 
 export type Offsets = Partial<{

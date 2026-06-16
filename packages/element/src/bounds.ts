@@ -62,6 +62,7 @@ import type {
   ExcalidrawRectanguloidElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "./types";
 
 export type RectangleBox = {
@@ -1027,7 +1028,7 @@ export const getCommonBounds = (
 };
 
 export const getDraggedElementsBounds = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   dragOffset: { x: number; y: number },
 ) => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);

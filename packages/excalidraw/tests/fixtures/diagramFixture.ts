@@ -1,5 +1,7 @@
 import { VERSIONS } from "@excalidraw/common";
 
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   diamondFixture,
   ellipseFixture,
@@ -24,9 +26,21 @@ export const diagramFactory = ({
 } = {}) => ({
   ...diagramFixture,
   elements: [
-    { ...diamondFixture, ...elementOverrides },
-    { ...ellipseFixture, ...elementOverrides },
-    { ...rectangleFixture, ...elementOverrides },
+    {
+      ...diamondFixture,
+      ...elementOverrides,
+      isDeleted: false,
+    } as NonDeletedExcalidrawElement,
+    {
+      ...ellipseFixture,
+      ...elementOverrides,
+      isDeleted: false,
+    } as NonDeletedExcalidrawElement,
+    {
+      ...rectangleFixture,
+      ...elementOverrides,
+      isDeleted: false,
+    } as NonDeletedExcalidrawElement,
   ],
   ...overrides,
 });

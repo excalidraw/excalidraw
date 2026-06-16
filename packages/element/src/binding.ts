@@ -63,6 +63,8 @@ import {
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
+import { isNonDeletedElement } from ".";
+
 import type { Scene } from "./Scene";
 
 import type { ElementUpdate } from "./mutateElement";
@@ -1023,7 +1025,7 @@ export const bindOrUnbindBindingElements = (
 
 export const bindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
-  hoveredElement: ExcalidrawBindableElement,
+  hoveredElement: NonDeleted<ExcalidrawBindableElement>,
   mode: BindMode,
   startOrEnd: "start" | "end",
   scene: Scene,
@@ -1110,10 +1112,10 @@ export const unbindBindingElement = (
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
 export const updateBoundElements = (
-  changedElement: ExcalidrawElement,
+  changedElement: NonDeletedExcalidrawElement,
   scene: Scene,
   options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+    simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
   },
 ) => {
@@ -1134,13 +1136,17 @@ export const updateBoundElements = (
     });
   }
 
-  const visitor = (boundElement: ExcalidrawElement | undefined) => {
-    if (!isArrowElement(boundElement) || boundElement.isDeleted) {
-      return;
+  const visitor = (element: ExcalidrawElement | undefined) => {
+    // SAFETY: This should never happen, but log it just in case
+    if (element && !isNonDeletedElement(element)) {
+      console.error(
+        "[NONDELETED][INVARIANT] updateBoundElements(): `isDeleted: true` in visitor",
+      );
     }
 
-    // checked above to not be deleted
-    const element = boundElement as NonDeleted<ExcalidrawArrowElement>;
+    if (!isArrowElement(element) || !isNonDeletedElement(element)) {
+      return;
+    }
 
     // In case the boundElements are stale
     if (!doesNeedUpdate(element, changedElement)) {
@@ -1283,7 +1289,7 @@ export const updateBindings = (
   scene: Scene,
   appState: AppState,
   options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+    simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     newSize?: { width: number; height: number };
   },
 ) => {
@@ -1963,8 +1969,8 @@ export const calculateFixedPointForElbowArrowBinding = (
 };
 
 export const calculateFixedPointForNonElbowArrowBinding = (
-  linearElement: ExcalidrawArrowElement,
-  hoveredElement: ExcalidrawBindableElement,
+  linearElement: NonDeleted<ExcalidrawArrowElement>,
+  hoveredElement: NonDeleted<ExcalidrawBindableElement>,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   focusPoint?: GlobalPoint,

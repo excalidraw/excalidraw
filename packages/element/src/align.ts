@@ -7,7 +7,7 @@ import { getSelectedElementsByGroup } from "./groups";
 import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
-import type { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -15,12 +15,12 @@ export interface Alignment {
 }
 
 export const alignElements = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
   alignment: Alignment,
   scene: Scene,
   appState: Readonly<AppState>,
-): ExcalidrawElement[] => {
-  const groups: ExcalidrawElement[][] = getSelectedElementsByGroup(
+): NonDeletedExcalidrawElement[] => {
+  const groups = getSelectedElementsByGroup(
     selectedElements,
     scene.getNonDeletedElementsMap(),
     appState,

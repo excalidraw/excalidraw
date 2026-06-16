@@ -27,7 +27,11 @@ import {
   type StrokeWidthKey,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  getNonDeletedElements,
+  isNonDeletedElement,
+} from "@excalidraw/element";
 
 import {
   bindBindingElement,
@@ -185,13 +189,13 @@ export const changeProperty = (
     }),
   );
 
-  return elements.map((element) => {
+  return elements.filter(isNonDeletedElement).map((element) => {
     if (
       selectedElementIds.get(element.id) ||
       element.id === appState.editingTextElement?.id
     ) {
       // selected & editing elements are non-deleted
-      return callback(element as NonDeletedExcalidrawElement);
+      return callback(element);
     }
     return element;
   });
@@ -2047,7 +2051,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
         if (newElement.startBinding) {
           const startElement = elementsMap.get(
             newElement.startBinding.elementId,
-          ) as ExcalidrawBindableElement;
+          ) as NonDeleted<ExcalidrawBindableElement>;
           if (startElement) {
             bindBindingElement(
               newElement,
@@ -2061,7 +2065,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
         if (newElement.endBinding) {
           const endElement = elementsMap.get(
             newElement.endBinding.elementId,
-          ) as ExcalidrawBindableElement;
+          ) as NonDeleted<ExcalidrawBindableElement>;
           if (endElement) {
             bindBindingElement(
               newElement,

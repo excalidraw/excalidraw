@@ -11,7 +11,10 @@ import { isFrameLikeElement } from "@excalidraw/element";
 import { getElementsInResizingFrame } from "@excalidraw/element";
 import { replaceAllElementsInFrame } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -26,7 +29,7 @@ import type { AppState } from "../../types";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   scene: Scene;
   appState: AppState;
 }

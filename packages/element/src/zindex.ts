@@ -12,6 +12,8 @@ import { getSelectedElements } from "./selection";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { getHoveredElementForBinding } from "./collision";
 
+import { getNonDeletedElements } from ".";
+
 import type { Scene } from "./Scene";
 import type {
   ExcalidrawArrowElement,
@@ -19,7 +21,6 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
   OrderedExcalidrawElement,
 } from "./types";
 
@@ -164,8 +165,8 @@ export const moveArrowAboveBindable = (
     ? hit
     : getHoveredElementForBinding(
         point,
-        // callers that omit `hit` pass non-deleted elements
-        elements as readonly Ordered<NonDeletedExcalidrawElement>[],
+        // SAFETY: callers that omit `hit` pass non-deleted elements
+        getNonDeletedElements(elements),
         elementsMap,
       );
 

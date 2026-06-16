@@ -18,19 +18,20 @@ import {
 } from "@excalidraw/excalidraw/scene/export";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
 
 type ExportOpts = {
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameLikeElement | null;
+  exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   getDimensions?: (
     width: number,
     height: number,

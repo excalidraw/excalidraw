@@ -334,7 +334,7 @@ const bindLinearElementToElement = (
 
       bindBindingElement(
         linearElement,
-        startBoundElement as ExcalidrawBindableElement,
+        startBoundElement as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "start",
         scene,
@@ -410,7 +410,7 @@ const bindLinearElementToElement = (
 
       bindBindingElement(
         linearElement,
-        endBoundElement as ExcalidrawBindableElement,
+        endBoundElement as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "end",
         scene,

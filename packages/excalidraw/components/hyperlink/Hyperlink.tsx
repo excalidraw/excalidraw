@@ -32,7 +32,6 @@ import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,
-  ExcalidrawElement,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -370,7 +369,7 @@ const getCoordsForPopover = (
 };
 
 export const getContextMenuLabel = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);

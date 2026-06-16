@@ -30,6 +30,7 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import {
+  type NonDeleted,
   type ElementsMap,
   type ExcalidrawBindableElement,
   type ExcalidrawElement,
@@ -277,8 +278,8 @@ const addNewNode = (
   );
 
   const bindingArrow = createBindingArrow(
-    element,
-    nextNode,
+    element as NonDeleted<ExcalidrawFlowchartNodeElement>,
+    nextNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
     direction,
     appState,
     scene,
@@ -355,8 +356,8 @@ export const addNewNodes = (
     );
 
     const bindingArrow = createBindingArrow(
-      startNode,
-      nextNode,
+      startNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
+      nextNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
       direction,
       appState,
       scene,
@@ -370,8 +371,8 @@ export const addNewNodes = (
 };
 
 const createBindingArrow = (
-  startBindingElement: ExcalidrawFlowchartNodeElement,
-  endBindingElement: ExcalidrawFlowchartNodeElement,
+  startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
+  endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,
   appState: AppState,
   scene: Scene,

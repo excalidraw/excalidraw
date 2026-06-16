@@ -96,7 +96,9 @@ export const getElementsWithinSelection = <T extends ExcalidrawElement>(
   });
 };
 
-export const getVisibleAndNonSelectedElements = <T extends ExcalidrawElement>(
+export const getVisibleAndNonSelectedElements = <
+  T extends NonDeletedExcalidrawElement,
+>(
   elements: readonly T[],
   selectedElements: readonly ExcalidrawElement[],
   appState: AppState,
