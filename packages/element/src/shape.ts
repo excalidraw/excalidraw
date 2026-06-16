@@ -1221,7 +1221,7 @@ export const getFreedrawOutlinePoints = (
 
   const laserPointer = new LaserPointer({
     size: element.strokeWidth * 4.25,
-    streamline: 0.5,
+    streamline: 0.7,
     simplify: 0,
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });
