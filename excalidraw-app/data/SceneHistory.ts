@@ -61,6 +61,7 @@ export type SceneHistoryEntry = {
   sequence: number;
   createdAt: number;
   sessionId: string;
+  author?: string | null;
   parentId: string | null;
   summary: string;
   thumbnail: string | null;

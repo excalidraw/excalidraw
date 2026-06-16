@@ -150,6 +150,19 @@
     }
   }
 
+  .history-sidebar__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
   .history-sidebar__entry-body {
     display: flex;
     flex-direction: column;

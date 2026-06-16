@@ -123,6 +123,7 @@ type FirebaseSceneHistoryEntryMeta = {
   sequence: number;
   createdAt: number;
   sessionId: string;
+  author?: string;
   parentId: string | null;
   summary: string;
   fileIds: FileId[];
@@ -143,6 +144,7 @@ type FirebaseSceneHistoryAppend = {
   roomId: string;
   roomKey: string;
   sessionId: string;
+  author?: string;
   elements: readonly OrderedExcalidrawElement[];
   appState: AppState;
   thumbnail?: string | null;
@@ -247,6 +249,7 @@ const buildSceneHistoryDataFromMeta = (
       sequence: storedEntry.sequence,
       createdAt: storedEntry.createdAt,
       sessionId: storedEntry.sessionId,
+      author: storedEntry.author ?? null,
       parentId: storedEntry.parentId ?? null,
       summary: storedEntry.summary,
       thumbnail: null,
@@ -486,6 +489,7 @@ export const appendSceneHistoryToFirebase = async ({
   roomId,
   roomKey,
   sessionId,
+  author,
   elements,
   appState,
   thumbnail = null,
@@ -528,6 +532,8 @@ export const appendSceneHistoryToFirebase = async ({
       sequence,
       createdAt,
       sessionId,
+      // Firestore rejects `undefined`, so only include when present.
+      ...(author ? { author } : {}),
       parentId: meta?.currentEntryId ?? null,
       summary:
         entryKind === "initial"

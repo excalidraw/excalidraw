@@ -195,6 +195,43 @@ const getEntryTitle = (entry: SceneHistoryEntry) => {
   return `Version ${entry.sequence}`;
 };
 
+const getAuthorInitials = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (!parts.length) {
+    return "?";
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const getAuthorColor = (key: string) => {
+  let hash = 0;
+
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  }
+
+  return `hsl(${Math.abs(hash) % 360}, 60%, 45%)`;
+};
+
+const getEntryAuthorLabel = (
+  entry: SceneHistoryEntry,
+  currentSessionId: string,
+) => {
+  const isCurrentSession = entry.sessionId === currentSessionId;
+
+  if (entry.author) {
+    return isCurrentSession ? `${entry.author} (you)` : entry.author;
+  }
+
+  return isCurrentSession ? "This session" : "Previous session";
+};
+
 const useSceneHistoryContext = () => {
   const context = useContext(SceneHistoryContext);
 
@@ -225,6 +262,10 @@ export const SceneHistoryProvider = ({
   const collabRoomId = collabHistorySource?.roomId ?? null;
   const collabRoomKey = collabHistorySource?.roomKey ?? null;
   const isSharedHistory = !!collabHistorySource;
+  const historySessionId =
+    isSharedHistory && collabAPI
+      ? collabAPI.getSceneHistorySessionId()
+      : sessionIdRef.current;
 
   const setHistoryState = useCallback((nextHistoryData: SceneHistoryData) => {
     setHistoryData(nextHistoryData);
@@ -436,13 +477,14 @@ export const SceneHistoryProvider = ({
       isLoading,
       errorMessage,
       isSharedHistory,
-      sessionId: sessionIdRef.current,
+      sessionId: historySessionId,
       markNextChangeAsRestore,
       reconstructEntry,
     }),
     [
       errorMessage,
       historyData,
+      historySessionId,
       isLoading,
       isSharedHistory,
       markNextChangeAsRestore,
@@ -731,7 +773,15 @@ export const HistorySidebar = ({
               >
                 <span className="history-sidebar__marker" />
                 <span className="history-sidebar__thumbnail">
-                  {entry.thumbnail ? (
+                  {entry.author ? (
+                    <span
+                      className="history-sidebar__avatar"
+                      style={{ backgroundColor: getAuthorColor(entry.author) }}
+                      title={entry.author}
+                    >
+                      {getAuthorInitials(entry.author)}
+                    </span>
+                  ) : entry.thumbnail ? (
                     <img alt="" src={entry.thumbnail} />
                   ) : (
                     <span>
@@ -755,11 +805,7 @@ export const HistorySidebar = ({
                     <time dateTime={new Date(entry.createdAt).toISOString()}>
                       {formatEntryTime(entry.createdAt)}
                     </time>
-                    <span>
-                      {entry.sessionId === sessionId
-                        ? "This session"
-                        : "Previous session"}
-                    </span>
+                    <span>{getEntryAuthorLabel(entry, sessionId)}</span>
                   </span>
                 </span>
               </button>
