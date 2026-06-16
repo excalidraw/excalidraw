@@ -22,6 +22,7 @@ import {
 
 import {
   deconstructDiamondElement,
+  deconstructStarElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
   getDiamondBaseCorners,
@@ -325,10 +326,12 @@ const renderBindingHighlightForBindableElement_simple = (
           context.stroke();
           break;
         case "diamond":
+        case "star":
           {
-            const [segments, curves] = deconstructDiamondElement(
-              suggestedBinding.element,
-            );
+            const [segments, curves] =
+              suggestedBinding.element.type === "star"
+                ? deconstructStarElement(suggestedBinding.element)
+                : deconstructDiamondElement(suggestedBinding.element);
 
             // Draw each line segment individually
             segments.forEach((segment) => {
@@ -666,11 +669,12 @@ const renderBindingHighlightForBindableElement_complex = (
           context.stroke();
           break;
         case "diamond":
+        case "star":
           {
-            const [segments, curves] = deconstructDiamondElement(
-              element,
-              offset,
-            );
+            const [segments, curves] =
+              element.type === "star"
+                ? deconstructStarElement(element, offset)
+                : deconstructDiamondElement(element, offset);
 
             // Draw each line segment individually
             segments.forEach((segment) => {

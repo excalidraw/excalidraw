@@ -450,6 +450,7 @@ export const TOOL_TYPE = {
   lasso: "lasso",
   rectangle: "rectangle",
   diamond: "diamond",
+  star: "star",
   ellipse: "ellipse",
   arrow: "arrow",
   line: "line",

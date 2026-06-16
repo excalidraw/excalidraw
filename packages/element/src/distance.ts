@@ -10,6 +10,7 @@ import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
+  deconstructStarElement,
   deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
@@ -19,6 +20,7 @@ import { elementCenterPoint } from "./bounds";
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
+  ExcalidrawStarElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
@@ -43,6 +45,8 @@ export const distanceToElement = (
       return distanceToRectanguloidElement(element, elementsMap, p);
     case "diamond":
       return distanceToDiamondElement(element, elementsMap, p);
+    case "star":
+      return distanceToStarElement(element, elementsMap, p);
     case "ellipse":
       return distanceToEllipseElement(element, elementsMap, p);
     case "line":
@@ -108,6 +112,18 @@ const distanceToDiamondElement = (
       .map((a) => curvePointDistance(a, rotatedPoint))
       .filter((d): d is number => d !== null),
   );
+};
+
+const distanceToStarElement = (
+  element: ExcalidrawStarElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+): number => {
+  const center = elementCenterPoint(element, elementsMap);
+  const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
+  const [sides] = deconstructStarElement(element);
+
+  return Math.min(...sides.map((s) => distanceToLineSegment(rotatedPoint, s)));
 };
 
 /**
