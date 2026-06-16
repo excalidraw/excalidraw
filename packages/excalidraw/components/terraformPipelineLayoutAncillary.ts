@@ -7,7 +7,10 @@
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
-import { isTopologyPlacementResourceType } from "./terraformPrimaryVisibility";
+import {
+  isPrimaryVisibleResourceType,
+  isTopologyPlacementResourceType,
+} from "./terraformPrimaryVisibility";
 import {
   buildCompactPipelinePrimaryCluster,
   buildTopologyPrimaryClusterSkeletonForPipeline,
@@ -120,6 +123,11 @@ export function buildAncillaryStrips(
       subnetTier: placement.subnetTier,
       subnetSignature: placement.subnetSignature,
     };
+    const buildInvalid = (b: {
+      skeleton: unknown[];
+      width: number;
+      height: number;
+    }) => b.skeleton.length === 0 || b.width <= 0 || b.height <= 0;
     let build = options.compact
       ? buildCompactPipelinePrimaryCluster(
           address,
@@ -133,7 +141,24 @@ export function buildAncillaryStrips(
           plan,
           clusterPlacement,
         );
-    if (build.skeleton.length === 0 || build.width <= 0 || build.height <= 0) {
+    // A primary-visible resource (Lambda / S3 / ECS / SQS / RDS / KMS / module)
+    // must never degrade to a bare fallback card: it carries the same primary
+    // grouping connected primaries get. If the full builder bailed (empty/zero
+    // skeleton), fall back to the compact primary cluster — a category-colored,
+    // expandable card (satellites revealed on expand) — *before* the generic
+    // bare fallback. Only genuinely non-primary leftovers take the bare path.
+    if (
+      buildInvalid(build) &&
+      isPrimaryVisibleResourceType(resourceTypeFor(nodes, address))
+    ) {
+      build = buildCompactPipelinePrimaryCluster(
+        address,
+        nodes,
+        plan,
+        clusterPlacement,
+      );
+    }
+    if (buildInvalid(build)) {
       build = buildFallbackCluster(address, nodes, plan, placement);
     }
     strip.cards.push({

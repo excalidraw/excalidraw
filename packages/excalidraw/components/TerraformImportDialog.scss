@@ -669,10 +669,74 @@
       }
     }
 
+    &__layoutSettingsBody {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
     &__layoutSettingsGrid {
       display: flex;
+      flex: 1 1 18rem;
+      min-width: 14rem;
       flex-direction: column;
       gap: 0.625rem;
+    }
+
+    &__layoutHelp {
+      display: flex;
+      flex: 1 1 13rem;
+      min-width: 11rem;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.6rem 0.65rem;
+      border: 1px solid var(--color-gray-20);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-lowest);
+    }
+
+    &__layoutHelpTitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+
+    &__layoutHelpBody {
+      margin: 0;
+      font-size: 0.6875rem;
+      line-height: 1.45;
+      color: var(--tf-muted);
+    }
+
+    &__layoutHelpDev {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      margin-top: 0.1rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid var(--color-gray-20);
+    }
+
+    &__layoutHelpDevLabel {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--tf-muted);
+    }
+
+    &__layoutHelpDevText {
+      font-size: 0.6875rem;
+      line-height: 1.4;
+      color: var(--color-on-surface);
+    }
+
+    &__layoutHelpDevRefs {
+      font-family: var(--ui-font-mono, ui-monospace, monospace);
+      font-size: 0.625rem;
+      line-height: 1.4;
+      color: var(--tf-muted);
     }
 
     &__segmentedControl {

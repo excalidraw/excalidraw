@@ -430,23 +430,27 @@ async function buildPipelineLayoutSceneBody(
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
     async () => {
-      const pipelineScene =
+      // Shared as a variable (not a literal) so v2 — which reads only `compact`
+      // / `includeAncillary` — tolerates the extra classic/compound keys.
+      const pipelineOptions = {
+        compact: ctx.pipelineCompact !== false,
+        includeAncillary: ctx.pipelineIncludeAncillary === true,
+        packed: ctx.pipelinePacked === true,
+        packedPullLeft: ctx.pipelinePackedPullLeft === true,
+        semanticPlacement: ctx.pipelineSemanticPlacement === true,
+        experimentalLayout: ctx.pipelineExperimentalLayout === true,
+      };
+      const buildPipeline =
         ctx.pipelineLayoutVariant === "v2"
-          ? await buildTerraformPipelineV2ExcalidrawScene(
-              ctx.nodes5,
-              ctx.plan,
-              { compact: ctx.pipelineCompact !== false },
-            )
-          : await (ctx.pipelineLayoutVariant === "compound"
-              ? buildTerraformCompoundPipelineExcalidrawScene
-              : buildTerraformPipelineExcalidrawScene)(ctx.nodes5, ctx.plan, {
-              compact: ctx.pipelineCompact !== false,
-              packed: ctx.pipelinePacked === true,
-              packedPullLeft: ctx.pipelinePackedPullLeft === true,
-              includeAncillary: ctx.pipelineIncludeAncillary === true,
-              semanticPlacement: ctx.pipelineSemanticPlacement === true,
-              experimentalLayout: ctx.pipelineExperimentalLayout === true,
-            });
+          ? buildTerraformPipelineV2ExcalidrawScene
+          : ctx.pipelineLayoutVariant === "compound"
+          ? buildTerraformCompoundPipelineExcalidrawScene
+          : buildTerraformPipelineExcalidrawScene;
+      const pipelineScene = await buildPipeline(
+        ctx.nodes5,
+        ctx.plan,
+        pipelineOptions,
+      );
       emitLocalParseDebug({
         phase: "pipelineLayout",
         meta: pipelineScene.meta,
