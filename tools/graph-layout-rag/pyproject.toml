@@ -17,6 +17,16 @@ dependencies = [
   "tiktoken>=0.7.0",
 ]
 
+[tool.uv]
+# The GPU extras (onnxruntime-gpu + nvidia-*-cu12) are installed on the x86_64
+# Linux GPU box. The lock is generated on Apple Silicon (aarch64), so without
+# this uv may pin nvidia wheels that only ship aarch64 builds (e.g. cudnn
+# 9.23.2.1), which then fail to install on the box. Requiring the x86_64-linux
+# environment forces uv to resolve versions that have wheels for both.
+required-environments = [
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
 [tool.uv.sources]
 rag-common = { path = "../rag-common", editable = true }
 
