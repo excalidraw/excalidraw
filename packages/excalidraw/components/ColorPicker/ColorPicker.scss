@@ -421,6 +421,12 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &.color-picker-input--invalid {
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+      outline: none;
+    }
   }
 
   .color-picker-label-swatch-container {

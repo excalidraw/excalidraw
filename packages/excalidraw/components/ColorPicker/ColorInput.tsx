@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
@@ -29,6 +29,7 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
@@ -40,15 +41,25 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
+      const normalizedColor = normalizeInputColor(value);
 
-      if (color) {
-        onChange(color);
+      if (normalizedColor) {
+        onChange(normalizedColor);
+        setIsInvalid(false);
+      } else {
+        setIsInvalid(value.trim().length > 0);
       }
       setInnerValue(value);
     },
     [onChange],
   );
+
+  const invalidColorTitle = useMemo(() => {
+    if (!isInvalid) {
+      return undefined;
+    }
+    return t("errors.invalidColor");
+  }, [isInvalid]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
@@ -74,14 +85,19 @@ export const ColorInput = ({
         ref={activeSection === "hex" ? inputRef : undefined}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
-        className="color-picker-input"
+        className={clsx("color-picker-input", {
+          "color-picker-input--invalid": isInvalid,
+        })}
         aria-label={label}
+        title={invalidColorTitle}
+        aria-invalid={isInvalid}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsInvalid(false);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
