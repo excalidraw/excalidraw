@@ -37,6 +37,7 @@ from rag_literature_rag.eval.experimental_index import build_retrieval_index_cmd
 from rag_literature_rag.eval.pool_commands import (  # noqa: E402
     corpus_health_cmd,
     diagnostics_cmd,
+    gen_gold_cmd,
     judge_cmd,
     pool_cmd,
 )
@@ -49,6 +50,7 @@ eval_group.add_command(pool_cmd, name="pool")
 eval_group.add_command(judge_cmd, name="judge")
 eval_group.add_command(diagnostics_cmd, name="diagnostics")
 eval_group.add_command(corpus_health_cmd, name="corpus-health")
+eval_group.add_command(gen_gold_cmd, name="gen-gold")
 
 
 @eval_group.command("related")

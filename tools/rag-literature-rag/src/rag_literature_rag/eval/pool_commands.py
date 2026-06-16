@@ -150,6 +150,120 @@ def diagnostics_cmd(
     click.echo(format_diagnostics_table(payload))
 
 
+# Rough Gemini-Flash judge cost: ~500 input + ~30 output tokens per (query,doc)
+# pair. gemini-2.5-flash ≈ $0.30/1M in, $2.50/1M out → ~$0.00023/judgment. Used
+# only for the pre-spend budget gate; actual spend is dominated by cache reuse.
+_JUDGE_USD_PER_PAIR = 0.00023
+
+
+def _count_judge_misses(pool: dict, model: str) -> int:
+    """How many (query,doc) pairs in this pool are NOT already in the judge cache."""
+    from rag_literature_rag.eval.judge import _RUBRIC_VERSION, _load_cache
+
+    cache = _load_cache()
+    misses = 0
+    for case_id, case in pool["cases"].items():
+        for doc_id in case["pooled"]:
+            if f"{model}:{_RUBRIC_VERSION}:{case_id}:{doc_id}" not in cache:
+                misses += 1
+    return misses
+
+
+@click.command("gen-gold")
+@click.option("--embed-profile", required=True)
+@click.option("--n-catalog", default=300, show_default=True, type=click.IntRange(min=0))
+@click.option("--n-pdf", default=200, show_default=True, type=click.IntRange(min=0))
+@click.option("--hard-frac", default=0.2, show_default=True, type=click.FloatRange(0.0, 1.0))
+@click.option("--seed", default=1234, show_default=True, type=int)
+@click.option("--budget-usd", default=10.0, show_default=True, type=float,
+              help="Refuse to judge if the estimated cache-miss spend exceeds this.")
+@click.option("--depth", default=20, show_default=True, type=click.IntRange(min=1))
+@click.option("--gen-only", is_flag=True, help="Generate + write cases.json; skip pool/judge.")
+@click.option("-v", "--verbose", is_flag=True)
+def gen_gold_cmd(
+    embed_profile: str,
+    n_catalog: int,
+    n_pdf: int,
+    hard_frac: float,
+    seed: int,
+    budget_usd: float,
+    depth: int,
+    gen_only: bool,
+    verbose: bool,
+) -> None:
+    """Generate a stratified synthetic gold set (DataMorgana/ARES style) and judge it.
+
+    System-blind Flash query generation grounded in sampled corpus docs, anti-leakage
+    + de-dup filters, then the existing multi-system pool → UMBRELA judge pipeline. The
+    curated-42 set is untouched; synthetic cases live in data/eval/gold_synth/cases.json
+    and only enter the eval when RAG_LIT_SYNTH_GOLD=1.
+    """
+    import os
+
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
+    from rag_literature_rag.env import load_env_file
+    from rag_literature_rag.eval.gold_synth import (
+        CASES_PATH,
+        build_synth_cases,
+        write_cases,
+    )
+
+    load_env_file()  # Vertex creds + LLM location for Flash generation/judging
+
+    cases, manifest = build_synth_cases(
+        embed_profile,
+        n_catalog=n_catalog,
+        n_pdf=n_pdf,
+        hard_frac=hard_frac,
+        seed=seed,
+    )
+    write_cases(cases, manifest)
+    click.echo(f"Wrote {CASES_PATH} — {manifest['total_cases']} synthetic cases")
+    click.echo(json.dumps(manifest, indent=2))
+    if gen_only:
+        return
+
+    # Route the synthetic set through the existing pool→judge pipeline.
+    os.environ["RAG_LIT_SYNTH_GOLD"] = "1"
+    from rag_literature_rag.eval.judge import judge_agreement, judge_model, judge_pool
+    from rag_literature_rag.eval.pooling import build_pool, pool_path, write_pool
+    from rag_literature_rag.eval.qrels import DEFAULT_RELEVANCE_THRESHOLD, write_qrels
+    from rag_literature_rag.paths import DATA_DIR
+
+    model = judge_model()
+    pools: dict[str, dict] = {}
+    total_misses = 0
+    for track in ("catalog", "pdf-deep-read"):
+        payload = build_pool(track, depth=depth, embed_profile=embed_profile)  # type: ignore[arg-type]
+        write_pool(payload, pool_path(track))  # type: ignore[arg-type]
+        pools[track] = payload
+        misses = _count_judge_misses(payload, model)
+        total_misses += misses
+        click.echo(f"pooled {track}: {payload['case_count']} cases, {misses} judge cache-misses")
+
+    est = total_misses * _JUDGE_USD_PER_PAIR
+    click.echo(f"\nEstimated judge spend: ${est:.2f} ({total_misses} new pairs, model={model})")
+    if est > budget_usd:
+        raise click.ClickException(
+            f"Estimated ${est:.2f} exceeds --budget-usd {budget_usd:.2f}; "
+            "raise the budget or lower --n-catalog/--n-pdf. Pools written, nothing judged."
+        )
+
+    for track, payload in pools.items():
+        cases_out = judge_pool(payload, model=model)
+        out_path = DATA_DIR / "eval" / "qrels" / track / "qrels.json"
+        agreement = judge_agreement(cases_out)
+        write_qrels(
+            out_path,
+            cases_out,
+            judge_model=model,
+            relevance_threshold=DEFAULT_RELEVANCE_THRESHOLD,
+            extra={"track": track, "synthetic": True, "judge_agreement": agreement},
+        )
+        click.echo(f"judged {track} → {out_path}  agreement={json.dumps(agreement)}")
+
+
 @click.command("corpus-health")
 @click.option("--embed-profile", required=True)
 @click.option("--track", type=click.Choice(EVAL_TRACKS), default="catalog", show_default=True)
