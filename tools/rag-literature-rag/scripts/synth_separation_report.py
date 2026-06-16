@@ -78,7 +78,8 @@ def report(run_dir: Path) -> None:
         rows = []
         for f in files:
             d = json.loads(Path(f).read_text())
-            if d.get("status") and d["status"] != "ok":
+            # Benchmark marks success as "completed"; only skip genuine failures.
+            if d.get("status") in ("failed", "aborted", "oom"):
                 continue
             cm, sm, nc, ns = _split_means(d)
             if cm is None or sm is None or ns == 0:
