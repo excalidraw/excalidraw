@@ -113,16 +113,27 @@ def augment_texts_for_context(chunks: list[TextChunk], texts: list[str]) -> list
             return i, ""
 
     if misses:
-        done = 0
+        done = failed = 0
         with ThreadPoolExecutor(max_workers=_context_workers()) as pool:
             for i, ctx in pool.map(_gen, misses):
-                cache[keys[i]] = ctx
+                # Only cache successful (non-empty) generations. Caching an empty
+                # failure (e.g. a 429) would make it a permanent cache hit and
+                # silently embed that chunk WITHOUT context — contaminating any
+                # contextual-vs-plain A/B. Empty results stay misses and retry.
+                if ctx:
+                    cache[keys[i]] = ctx
+                else:
+                    failed += 1
                 done += 1
                 if done % 500 == 0:  # periodic checkpoint for long unattended runs
                     _save_cache(cache)
                     log.info("contextual augmentation: %d/%d context lines", done, len(misses))
         _save_cache(cache)
-        log.info("contextual augmentation: generated %d new context line(s)", len(misses))
+        log.info(
+            "contextual augmentation: generated %d new context line(s), %d failed (will retry)",
+            len(misses) - failed,
+            failed,
+        )
 
     return [
         (f"Context: {cache[k]}\n{t}" if cache.get(k) else t)
