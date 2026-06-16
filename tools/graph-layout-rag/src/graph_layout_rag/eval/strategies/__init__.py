@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -105,6 +106,61 @@ class HybridTunedStrategy:
             dense_weight=self.dense_weight,
             sparse_weight=self.sparse_weight,
         )
+
+
+@dataclass
+class HybridAggregateStrategy:
+    """Experimental: re-rank papers by a *corroboration-aware* aggregation of
+    their chunk scores instead of the production single-best-chunk (max-pool).
+
+    Tests two suspected biases of the default grouping:
+      * #2 deeper fusion pool (``pool`` >> default 80) so long documents do not
+        crowd shorter relevant papers out of the fused candidate set;
+      * #5 corroboration — ``sum_topk`` rewards papers with several on-topic
+        passages; ``count_boost`` adds a capped log bonus for multiple hits.
+    ``max`` reproduces the production aggregation at the deeper pool, isolating
+    the pool-depth effect from the aggregation effect.
+    """
+
+    name: str
+    pool: int = 200
+    rrf_k: int = 20
+    aggregate: str = "sum_topk"  # "max" | "sum_topk" | "count_boost"
+    topk: int = 3
+    count_lambda: float = 0.10
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        rows = search_raw(
+            case.query,
+            top=max(top, 50),
+            embed_profile=embed_profile,
+            hybrid=True,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            pool=self.pool,
+            rrf_k=self.rrf_k,
+            max_per_doc=5,
+        )
+        rescored: list[dict[str, Any]] = []
+        for row in rows:
+            scores = sorted(
+                (float(e.get("score") or 0.0) for e in row.get("evidence") or []),
+                reverse=True,
+            ) or [float(row.get("score") or 0.0)]
+            best = scores[0]
+            if self.aggregate == "sum_topk":
+                agg = sum(scores[: self.topk])
+            elif self.aggregate == "count_boost":
+                agg = best * (1.0 + self.count_lambda * math.log1p(len(scores) - 1))
+            else:
+                agg = best
+            new_row = dict(row)
+            new_row["score"] = agg
+            rescored.append(new_row)
+        rescored.sort(key=lambda r: r["score"], reverse=True)
+        return rescored[: max(top, 50)]
 
 
 @dataclass
@@ -542,8 +598,19 @@ EXPERIMENTAL_STRATEGIES: tuple[str, ...] = (
     "colbert",
 )
 
+# Experimental paper-level aggregation arms (A/B only; not in the default run).
+AGGREGATION_STRATEGIES: tuple[str, ...] = (
+    "hybrid_deep",
+    "hybrid_agg_sum3",
+    "hybrid_agg_count",
+)
+
 ALL_STRATEGIES: tuple[str, ...] = (
-    OFFLINE_STRATEGIES + LLM_STRATEGIES + CLOUD_STRATEGIES + EXPERIMENTAL_STRATEGIES
+    OFFLINE_STRATEGIES
+    + LLM_STRATEGIES
+    + CLOUD_STRATEGIES
+    + EXPERIMENTAL_STRATEGIES
+    + AGGREGATION_STRATEGIES
 )
 
 
@@ -576,6 +643,9 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         ExperimentalIndexStrategy("splade", "splade"),
         ExperimentalIndexStrategy("splade", "dense_splade", fuse_dense=True),
         ExperimentalIndexStrategy("colbert", "colbert"),
+        HybridAggregateStrategy("hybrid_deep", pool=200, aggregate="max"),
+        HybridAggregateStrategy("hybrid_agg_sum3", pool=200, aggregate="sum_topk", topk=3),
+        HybridAggregateStrategy("hybrid_agg_count", pool=200, aggregate="count_boost"),
     ]
     return {strategy.name: strategy for strategy in strategies}
 

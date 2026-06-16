@@ -56,9 +56,7 @@ Downloads PDFs and metadata into `data/manifest.json` and `data/raw/`. Sources:
 - **ELK bibliography** — DOIs from the ELK survey paper
 - **Library docs** — OGDF, ELK, dagre, Graphviz engine/algorithm pages (implementer-grade source for compaction/packing/routing)
 - OpenAlex (paginated, topic queries + graph-drawing concept filter) + DBLP + Semantic Scholar
-- **Complete trusted venues** — schema.org-driven DROPS GD 2024/2025 plus strictly
-  filtered SoCG, and the fully paginated JGAA archive with direct PDF links. A
-  separate source checkpoint fetches only newly configured volumes/issues on rerun.
+- **Complete trusted venues** — schema.org-driven DROPS GD 2024/2025 plus strictly filtered SoCG, and the fully paginated JGAA archive with direct PDF links. A separate source checkpoint fetches only newly configured volumes/issues on rerun.
 - **Crossref venues** — JGAA/CGTA/GD/LIPIcs plus visualization (TVCG, CGF/EuroVis, InfoVis, PacificVis) and VLSI CAD (TCAD, DAC, ICCAD, ISPD); broad journals are strict relevance-gated
 - **arXiv** (cs.CG / cs.DS graph layout queries)
 - Bibliography chain from seed PDFs (relevance-filtered DOIs)
@@ -75,19 +73,9 @@ uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
 uv run graph-layout-rag harvest --dry-run
 ```
 
-`--workers` is the process-wide active PDF download budget, including downloads started by
-concurrent discovery sources. Provider API calls use separate shared policies and persistent
-thread-local clients. Semantic Scholar defaults to 32 concurrent requests, cools down after
-429s, and resumes unfinished requests in the same run. OpenAlex is capped at 100 RPS and
-reserves metered work from the configured daily free-dollar budget; free singleton lookups
-continue after that budget is exhausted. End-of-run provider summaries report throughput,
-outcomes, retries, cooldowns, peak concurrency, and OpenAlex budget usage.
+`--workers` is the process-wide active PDF download budget, including downloads started by concurrent discovery sources. Provider API calls use separate shared policies and persistent thread-local clients. Semantic Scholar defaults to 32 concurrent requests, cools down after 429s, and resumes unfinished requests in the same run. OpenAlex is capped at 100 RPS and reserves metered work from the configured daily free-dollar budget; free singleton lookups continue after that budget is exhausted. End-of-run provider summaries report throughput, outcomes, retries, cooldowns, peak concurrency, and OpenAlex budget usage.
 
-Set `OPENALEX_API_KEY` in `.env`. Optional overrides include
-`GRAPH_RAG_OPENALEX_CONCURRENCY`, `GRAPH_RAG_OPENALEX_RPS`,
-`GRAPH_RAG_OPENALEX_FREE_BUDGET_USD`, `GRAPH_RAG_S2_CONCURRENCY`,
-`GRAPH_RAG_S2_COOLDOWN_SECONDS`, and `GRAPH_RAG_CORE_RPS`. CORE defaults to the documented
-anonymous `10/min`, or personal-key `25/min` when `CORE_API_KEY` is set.
+Set `OPENALEX_API_KEY` in `.env`. Optional overrides include `GRAPH_RAG_OPENALEX_CONCURRENCY`, `GRAPH_RAG_OPENALEX_RPS`, `GRAPH_RAG_OPENALEX_FREE_BUDGET_USD`, `GRAPH_RAG_S2_CONCURRENCY`, `GRAPH_RAG_S2_COOLDOWN_SECONDS`, and `GRAPH_RAG_CORE_RPS`. CORE defaults to the documented anonymous `10/min`, or personal-key `25/min` when `CORE_API_KEY` is set.
 
 | Flag | Purpose |
 | --- | --- |
@@ -112,14 +100,7 @@ uv run graph-layout-rag eval retrieval --embed-profile gemini-2-structure-v1 --j
 
 ## Retrieval benchmark
 
-The production query default is **hybrid retrieval**: Gemini dense search fused
-with Tantivy BM25 using RRF `k=60`. On a **de-biased, multi-system-pooled +
-LLM-judged** gold set, hybrid is the measured winner on both tracks (catalog
-0.765 / pdf 0.696 nDCG@10); BM25 alone is mid-pack and dense converges with it.
-HyDE query expansion wins the pdf track. Local reranking is off by default (no
-gain, higher memory). Full results, methodology, and the pooling-bias correction
-that overturned the earlier "BM25 wins" verdict:
-[the bake-off report](../../docs/graph-layout-rag-architecture-bakeoff-2026.md).
+The production query default is **hybrid retrieval**: Gemini dense search fused with Tantivy BM25 using RRF `k=20` over a pool of ≥80 fused candidates (both tuned on the de-biased qrels). On a **de-biased, multi-system-pooled + LLM-judged** gold set, hybrid is the measured winner on both tracks (catalog 0.768 / pdf 0.715 nDCG@10); BM25 alone is mid-pack and dense converges with it. HyDE query expansion wins the pdf track. Local reranking is off by default (no gain, higher memory). Full results, methodology, and the pooling-bias correction that overturned the earlier "BM25 wins" verdict: [the bake-off report](../../docs/graph-layout-rag-architecture-bakeoff-2026.md).
 
 Validate labels before comparing retrieval strategies:
 
@@ -127,8 +108,7 @@ Validate labels before comparing retrieval strategies:
 uv run graph-layout-rag eval validate-gold --json
 ```
 
-Run the hardware-safe current-index benchmark. Each strategy runs in an isolated
-subprocess and writes resumable results under `data/eval/runs/`:
+Run the hardware-safe current-index benchmark. Each strategy runs in an isolated subprocess and writes resumable results under `data/eval/runs/`:
 
 ```bash
 yarn graph-rag:eval -- \
@@ -136,8 +116,7 @@ yarn graph-rag:eval -- \
   --no-llm-transforms --report -v
 ```
 
-Paid Google Ranking API strategies require explicit opt-in and default to a
-500-unit hard cap:
+Paid Google Ranking API strategies require explicit opt-in and default to a 500-unit hard cap:
 
 ```bash
 yarn graph-rag:eval -- \
@@ -146,8 +125,7 @@ yarn graph-rag:eval -- \
   --cloud-rerank --allow-cloud-cost --max-cloud-ranking-units 500 --report -v
 ```
 
-Optional learned sparse and late-interaction experiments always create new,
-immutable indexes:
+Optional learned sparse and late-interaction experiments always create new, immutable indexes:
 
 ```bash
 uv sync --extra retrieval-experiments
@@ -160,12 +138,30 @@ uv run --with pylance --extra retrieval-experiments graph-layout-rag eval build-
   --base-profile gemini-2-structure-v1 --kind colbert
 ```
 
+**Remote GPU box (Ubuntu + RTX 3060 Ti, SSH-only):** use `retrieval-experiments-gpu` (fastembed-gpu + sentence-transformers). Cannot install alongside CPU `fastembed` in the same venv.
+
+```bash
+# On Ubuntu after ssh user@gpu-host
+cd ~/excalidraw-tf/tools/graph-layout-rag
+uv sync --extra retrieval-experiments-gpu
+export GRAPH_RAG_QDRANT_URL=http://127.0.0.1:6333
+export GRAPH_RAG_ENCODE_DEVICE=cuda
+uv run python scripts/bench_encode_device.py --sample 512 --batch-size 8 --models splade,colbert,splade_v3
+```
+
+| Kind | Default (small) | Recommended upgrade | VRAM batch hint (3060 Ti) |
+| --- | --- | --- | --- |
+| SPLADE | `prithivida/Splade_PP_en_v1` | `naver/splade-v3` (PyTorch) | batch 16–32 |
+| ColBERT | `answerdotai/answerai-colbert-small-v1` | `jinaai/jina-colbert-v2` | batch 4–8 |
+| ColBERT | — | `colbert-ir/colbertv2.0` | batch 8–16 |
+
+Pass `--model` and `--encode-device cuda` to `eval build-retrieval-index`. SPLADE-v3 models (`naver/splade-v3`, `naver/splade-v3-distilbert`) use sentence-transformers SparseEncoder, not fastembed.
+
+Mac ↔ Ubuntu sync: set `GRAPH_RAG_GPU_SSH` in `.env`, then `scripts/gpu_sync_to_remote.sh` / `scripts/gpu_sync_from_remote.sh`. Long encode jobs: `tmux new -s graphrag-encode` on Ubuntu. Full A/B matrix: `scripts/gpu_build_ab_indexes.sh`.
+
 #### De-biased evaluation (multi-system pooling)
 
-⚠️ Never expand the gold set from a single retriever — that caused **pooling
-bias** and a false "BM25 wins" verdict (see the bake-off report). The gold set is
-now backed by diverse-pool + LLM-judged qrels at `data/eval/qrels/<track>/qrels.json`;
-benchmark with `--qrels`. Build/refresh them with:
+⚠️ Never expand the gold set from a single retriever — that caused **pooling bias** and a false "BM25 wins" verdict (see the bake-off report). The gold set is now backed by diverse-pool + LLM-judged qrels at `data/eval/qrels/<track>/qrels.json`; benchmark with `--qrels`. Build/refresh them with:
 
 ```bash
 uv run graph-layout-rag eval pool  --track catalog --embed-profile gemini-2-structure-v1 \
@@ -185,12 +181,7 @@ uv run graph-layout-rag ingest --rebuild    # drop vector table, recreate on fir
 uv run graph-layout-rag ingest --force --rebuild   # full rebuild (required after embed model change)
 ```
 
-Local PDF extraction (`pymupdf` or `docling`) runs in a bounded process pool while the
-parent process embeds and checkpoints completed documents. `GRAPH_RAG_EXTRACT_WORKERS`
-defaults to `4`; `0` or `1` selects serial extraction. Completed outcomes cross a bounded
-`GRAPH_RAG_EXTRACT_QUEUE_DOCS` queue (default `2 * GRAPH_RAG_INGEST_DOC_BATCH`), so a
-slow embedding batch cannot buffer the corpus in memory. Gemini PDF extraction stays serial at the document level because
-it already parallelizes page API calls internally.
+Local PDF extraction (`pymupdf` or `docling`) runs in a bounded process pool while the parent process embeds and checkpoints completed documents. `GRAPH_RAG_EXTRACT_WORKERS` defaults to `4`; `0` or `1` selects serial extraction. Completed outcomes cross a bounded `GRAPH_RAG_EXTRACT_QUEUE_DOCS` queue (default `2 * GRAPH_RAG_INGEST_DOC_BATCH`), so a slow embedding batch cannot buffer the corpus in memory. Gemini PDF extraction stays serial at the document level because it already parallelizes page API calls internally.
 
 Docling is configured with:
 
@@ -205,8 +196,7 @@ GRAPH_RAG_INGEST_DOC_BATCH=25
 GRAPH_RAG_EXTRACT_QUEUE_DOCS=50
 ```
 
-Each extraction process caches one Docling `DocumentConverter`. Invalid Docling option
-values log a warning and use the defaults above.
+Each extraction process caches one Docling `DocumentConverter`. Invalid Docling option values log a warning and use the defaults above.
 
 #### Resume / checkpointing (no `--resume` flag)
 
@@ -228,10 +218,7 @@ Already-indexed docs are skipped when manifest `sha256` matches `ingest_state.js
 
 #### Progress and ETA
 
-The ingest process writes atomic live telemetry to
-`data/indexes/{profile}/ingest_status.json`. It reports the current phase, canonical
-document totals, processed versus fully checkpointed documents, queued batch work,
-elapsed time, throughput, and a blended ETA:
+The ingest process writes atomic live telemetry to `data/indexes/{profile}/ingest_status.json`. It reports the current phase, canonical document totals, processed versus fully checkpointed documents, queued batch work, elapsed time, throughput, and a blended ETA:
 
 ```bash
 uv run graph-layout-rag ingest status --embed-profile mlx-qwen4b
@@ -239,10 +226,7 @@ uv run graph-layout-rag ingest status --embed-profile mlx-qwen4b --json
 tail -f data/ingest.log
 ```
 
-INFO progress logs are emitted every 25 canonical documents or 30 seconds by default.
-Tune them with `GRAPH_RAG_INGEST_PROGRESS_LOG_EVERY` and
-`GRAPH_RAG_INGEST_PROGRESS_LOG_INTERVAL_S`. Local embedding progress also reports
-text throughput and an ETA for the active batch.
+INFO progress logs are emitted every 25 canonical documents or 30 seconds by default. Tune them with `GRAPH_RAG_INGEST_PROGRESS_LOG_EVERY` and `GRAPH_RAG_INGEST_PROGRESS_LOG_INTERVAL_S`. Local embedding progress also reports text throughput and an ETA for the active batch.
 
 #### Multi-profile indexes (A/B testing)
 
@@ -313,11 +297,7 @@ uv run graph-layout-rag query "Sugiyama layering" --embed-profile gemini-2 --jso
 
 Requires `rag-common[gemini]` (included in `uv sync` for this package).
 
-**Concurrency (gemini-2):** Vertex embeds one instance per request, so throughput comes
-from concurrent requests, not batching. Ingest fans `embed_content` calls across
-`GRAPH_RAG_WORKERS` threads (default 48 for Gemini) that share the adaptive rate limiter — order is
-preserved. Raise `GRAPH_RAG_WORKERS` to speed a full `--rebuild` as long as the TPM budget
-below stays the binding throttle.
+**Concurrency (gemini-2):** Vertex embeds one instance per request, so throughput comes from concurrent requests, not batching. Ingest fans `embed_content` calls across `GRAPH_RAG_WORKERS` threads (default 48 for Gemini) that share the adaptive rate limiter — order is preserved. Raise `GRAPH_RAG_WORKERS` to speed a full `--rebuild` as long as the TPM budget below stays the binding throttle.
 
 **Adaptive rate limiting (gemini-2):** ingest paces `embed_content` to a sliding tokens-per-minute budget so Vertex 429s are rare. Tune in `.env` after checking [Vertex quotas](https://cloud.google.com/vertex-ai/docs/generative-ai/quotas-genai):
 
@@ -328,9 +308,7 @@ RAG_GEMINI_MIN_INTERVAL_MS=5
 GRAPH_RAG_WORKERS=48                 # concurrent embed requests (shares the TPM budget)
 ```
 
-Learned budget persists in `~/.cache/rag-common/gemini_rate_state.json` across resume runs.
-After increasing quota, remove that file once so an older reduced budget does not constrain
-the new run. **Resume after interrupt** (keeps indexed chunks — no `--force` / `--rebuild`):
+Learned budget persists in `~/.cache/rag-common/gemini_rate_state.json` across resume runs. After increasing quota, remove that file once so an older reduced budget does not constrain the new run. **Resume after interrupt** (keeps indexed chunks — no `--force` / `--rebuild`):
 
 ```bash
 uv run graph-layout-rag ingest -v
@@ -373,17 +351,9 @@ After switching embed models or dims, run **`ingest --force --rebuild`** (vector
 
 ### Query
 
-Retrieval is **hybrid by default**: dense vectors (LanceDB cosine) fused with BM25 lexical
-hits (Tantivy) via reciprocal rank fusion, then optionally reranked by a local
-cross-encoder. Query results are grouped by canonical paper identity (DOI, PDF SHA-256,
-local path, and provider external ids) and retain the top evidence passages for that paper.
-`year_min` is pushed into dense search; other selective filters widen the retrieval pool
-before post-fusion filtering.
+Retrieval is **hybrid by default**: dense vectors (LanceDB cosine) fused with BM25 lexical hits (Tantivy) via reciprocal rank fusion, then optionally reranked by a local cross-encoder. Query results are grouped by canonical paper identity (DOI, PDF SHA-256, local path, and provider external ids) and retain the top evidence passages for that paper. `year_min` is pushed into dense search; other selective filters widen the retrieval pool before post-fusion filtering.
 
-Canonical grouping is derived from the current manifest at query time. It does not require
-re-ingesting an existing index when aliases are added or merged. `doc_id` remains the id of
-the winning indexed row; use `canonical_doc_id` as the paper-level identity and
-`alias_doc_ids` to resolve alternate metadata or local PDF records.
+Canonical grouping is derived from the current manifest at query time. It does not require re-ingesting an existing index when aliases are added or merged. `doc_id` remains the id of the winning indexed row; use `canonical_doc_id` as the paper-level identity and `alias_doc_ids` to resolve alternate metadata or local PDF records.
 
 JSON output for LLM agents:
 
@@ -408,11 +378,7 @@ uv run graph-layout-rag query "stress majorization neato" --no-hybrid --json # d
 | `RAG_RERANK_MODEL` | Cross-encoder id (default `BAAI/bge-reranker-v2-m3`; downloads on first use). |
 | `RAG_RERANK_TOP` | Override the number of reranked results returned. |
 
-JSON results gain `canonical_doc_id`, identity aliases, nested `evidence`,
-`dense_rank` / `sparse_rank` (fusion provenance), `fusion_score`, `rerank_score`
-(when reranked), and `page_end` (chunk page span). Reranking is **off by default**; run it
-on demand. **Do not rerank while ingest is running** on a 24 GB Mac — loading the
-cross-encoder alongside the embed model risks OOM.
+JSON results gain `canonical_doc_id`, identity aliases, nested `evidence`, `dense_rank` / `sparse_rank` (fusion provenance), `fusion_score`, `rerank_score` (when reranked), and `page_end` (chunk page span). Reranking is **off by default**; run it on demand. **Do not rerank while ingest is running** on a 24 GB Mac — loading the cross-encoder alongside the embed model risks OOM.
 
 Representative result:
 
@@ -447,13 +413,9 @@ Representative result:
 }
 ```
 
-`--top` counts canonical papers. `--max-per-doc` controls the number of evidence passages
-nested under each paper. The top-level excerpt/page mirror the highest-ranked evidence
-passage for compatibility with existing callers.
+`--top` counts canonical papers. `--max-per-doc` controls the number of evidence passages nested under each paper. The top-level excerpt/page mirror the highest-ranked evidence passage for compatibility with existing callers.
 
-> **Rebuild note:** the BM25 index, chunk page-spans, and the enriched gemini-2 embed
-> bodies are produced during ingest. To populate them on an existing corpus, run
-> `ingest --force --rebuild` once. Until then, `--hybrid` falls back to dense-only.
+> **Rebuild note:** the BM25 index, chunk page-spans, and the enriched gemini-2 embed bodies are produced during ingest. To populate them on an existing corpus, run `ingest --force --rebuild` once. Until then, `--hybrid` falls back to dense-only.
 
 ### Related papers
 
@@ -463,12 +425,7 @@ Use citation structure when starting from a known paper rather than a topic quer
 uv run graph-layout-rag cite related gansner-tse93 --signal fused --top 10 --json
 ```
 
-`cite related` accepts either a canonical or alias `doc_id`. It checks all ids in the
-canonical identity component for a citation-graph node and deduplicates returned neighbors
-to canonical papers. The default fused signal combines co-citation, undirected personalized
-PageRank, bibliographic coupling, and a light citation-trained embedding signal. Keep this
-separate from topic `query` ranking; citation relatedness did not improve query relevance in
-the current evaluation.
+`cite related` accepts either a canonical or alias `doc_id`. It checks all ids in the canonical identity component for a citation-graph node and deduplicates returned neighbors to canonical papers. The default fused signal combines co-citation, undirected personalized PageRank, bibliographic coupling, and a light citation-trained embedding signal. Keep this separate from topic `query` ranking; citation relatedness did not improve query relevance in the current evaluation.
 
 ### Catalog
 

@@ -87,6 +87,19 @@ Embeddings: OpenAI (~$5–7 one-time, ~1h full corpus) or local **Qwen3-4B MLX 4
 
 See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md).
 
+### RAG literature RAG (RAG research papers)
+
+Local hybrid search over core retrieval-augmented generation research (foundations, GraphRAG, agentic RAG, evaluation). Same embed stack as repo-rag via `tools/rag-common`.
+
+```bash
+cd tools/rag-literature-rag && uv sync && cp .env.example .env
+yarn rag-lit:harvest -- --deep-harvest --target-pdfs 1000 --resume -v
+yarn rag-lit:ingest -- --force --rebuild
+yarn rag-lit:query "Self-RAG reflection tokens" --tag self-correcting --json
+```
+
+See [tools/rag-literature-rag/README.md](tools/rag-literature-rag/README.md). Agent skill: [.agents/skills/rag-literature-rag/SKILL.md](.agents/skills/rag-literature-rag/SKILL.md).
+
 ## Architecture Notes
 
 ### Build System

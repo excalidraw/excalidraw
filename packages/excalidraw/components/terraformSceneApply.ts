@@ -184,7 +184,8 @@ async function layoutTerraformSceneFromSources(
   const skipLayoutCache =
     layoutMode === "experimental" ||
     (layoutMode === "pipeline" &&
-      (options.pipelinePacked === true ||
+      (options.pipelineLayoutVariant === "v2" ||
+        options.pipelinePacked === true ||
         options.pipelinePackedPullLeft === true ||
         options.pipelineIncludeAncillary === true ||
         options.pipelineSemanticPlacement === true));

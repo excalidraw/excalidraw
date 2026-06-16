@@ -1,0 +1,40 @@
+[project]
+name = "rag-literature-rag"
+version = "0.1.0"
+description = "Local RAG corpus for retrieval-augmented generation research literature"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12.0",
+  "click>=8.1.0",
+  "httpx>=0.27.0",
+  "lancedb>=0.15.0",
+  "openai>=1.40.0",
+  "pydantic>=2.7.0",
+  "pymupdf>=1.24.0",
+  "rag-common[gemini,mlx]",
+  "tantivy>=0.22.0",
+  "tiktoken>=0.7.0",
+]
+
+[tool.uv.sources]
+rag-common = { path = "../rag-common", editable = true }
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+mlx = ["rag-common[mlx]"]
+docling = ["docling>=2.0.0"]
+retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
+
+[project.scripts]
+rag-literature-rag = "rag_literature_rag.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_literature_rag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

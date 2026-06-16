@@ -1,5 +1,6 @@
 from graph_layout_rag.harvest.relevance import (
     is_layout_relevant,
+    is_off_topic,
     is_pipeline_relevant,
     layout_relevance_score,
 )
@@ -86,3 +87,33 @@ def test_generic_network_without_drawing_context_scores_low():
 
 def test_off_topic_keyword_hard_rejects():
     assert layout_relevance_score("Graph drawing of protein interaction genome networks") == -100
+
+
+# --- regression: off-topic keywords must match at a word boundary, not mid-word ---
+# "rna" (RNA) is a substring of external/internal/journal/alternating/tournament;
+# a plain substring test hard-killed core planar/upward graph-drawing papers.
+
+OFF_TOPIC_SUBSTRING_FALSE_POSITIVES = [
+    ("Orthogonal Drawing of Planar Graphs", "We fix the external face and route edges."),
+    ("Upward Planar Drawing", "internal vertices are placed by layer; the external boundary"),
+    ("Drawing non-layered tidy trees in linear time", None),
+    ("Crossing minimization with an alternating layer sweep", None),
+    ("Drawing tournaments and round-robin schedules as layered graphs", None),
+]
+
+
+def test_off_topic_substring_does_not_kill_layout_terms():
+    for title, abstract in OFF_TOPIC_SUBSTRING_FALSE_POSITIVES:
+        assert not is_off_topic(title, abstract), title
+        assert layout_relevance_score(title, abstract) > 0, title
+
+
+def test_off_topic_word_boundary_still_rejects_real_offtopic():
+    # Standalone off-topic words and intended morphological variants still fire.
+    for title in [
+        "RNA secondary structure prediction",
+        "Phylogenetic analysis of microbiome diversity",
+        "Genome-wide association study in cancer patients",
+    ]:
+        assert is_off_topic(title), title
+        assert layout_relevance_score(title) == -100, title

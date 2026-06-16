@@ -153,6 +153,8 @@ tools/graph-layout-rag/data/*.log
 tools/graph-layout-rag/data/harvest.db
 tools/graph-layout-rag/data/harvest_checkpoint.json
 tools/graph-layout-rag/data/bibliography-scan-cache/
+tools/graph-layout-rag/data/extract_cache/
+tools/graph-layout-rag/data/embed_cache/
 tools/graph-layout-rag/**/__pycache__/
 tools/graph-layout-rag/.pytest_cache/
 
@@ -172,3 +174,25 @@ tools/repo-rag/data/ingest_state.json
 tools/repo-rag/data/repo-rag.log
 tools/repo-rag/**/__pycache__/
 tools/repo-rag/.pytest_cache/
+
+# RAG literature RAG — local harvest corpus and Python venv (see tools/rag-literature-rag/.gitignore)
+tools/rag-literature-rag/.env
+tools/rag-literature-rag/.venv/
+tools/rag-literature-rag/data/raw/
+tools/rag-literature-rag/data/indexes/
+tools/rag-literature-rag/data/retrieval-indexes/
+tools/rag-literature-rag/data/eval/
+tools/rag-literature-rag/data/lancedb/
+tools/rag-literature-rag/data/manifest.json
+tools/rag-literature-rag/data/manifest.*.json
+tools/rag-literature-rag/data/manifest.bak.json
+!tools/rag-literature-rag/data/manifest.example.json
+tools/rag-literature-rag/data/ingest_state.json
+tools/rag-literature-rag/data/*.log
+tools/rag-literature-rag/data/harvest.db
+tools/rag-literature-rag/data/harvest_checkpoint.json
+tools/rag-literature-rag/data/bibliography-scan-cache/
+tools/rag-literature-rag/data/extract_cache/
+tools/rag-literature-rag/data/embed_cache/
+tools/rag-literature-rag/**/__pycache__/
+tools/rag-literature-rag/.pytest_cache/

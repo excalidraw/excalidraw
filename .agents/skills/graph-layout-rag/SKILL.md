@@ -5,10 +5,7 @@ description: Query the local graph drawing / layout theory RAG corpus. Topic sea
 
 # Graph layout RAG
 
-Local hybrid search over a harvested graph-drawing corpus. The production
-`gemini-2-structure-v1` index combines Gemini dense vectors, Tantivy BM25, and
-reciprocal rank fusion. Built for agents researching layered layout, crossing
-minimization, compound graphs, and Terraform pipeline height.
+Local hybrid search over a harvested graph-drawing corpus. The production `gemini-2-structure-v1` index combines Gemini dense vectors, Tantivy BM25, and reciprocal rank fusion. Built for agents researching layered layout, crossing minimization, compound graphs, and Terraform pipeline height.
 
 ## When to use
 
@@ -29,9 +26,7 @@ minimization, compound graphs, and Terraform pipeline height.
 4. Cite       → use source_url + page from query result or manifest
 ```
 
-**Query returns canonical paper results, not raw chunk hits.** Each paper has a
-top-level best excerpt plus an `evidence` array of ranked passages (~400 chars
-each). For proofs, algorithms, or quotes you still need step 3.
+**Query returns canonical paper results, not raw chunk hits.** Each paper has a top-level best excerpt plus an `evidence` array of ranked passages (~400 chars each). For proofs, algorithms, or quotes you still need step 3.
 
 ## Commands (from repo root)
 
@@ -45,9 +40,7 @@ yarn graph-rag:ingest -- --force --rebuild   # first build or after embed model 
 yarn graph-rag:query "network simplex rank assignment dot" --top 8 --json
 ```
 
-Query defaults to **hybrid retrieval**. Do not add `--rerank` by default: the
-current benchmark found lower quality and substantially higher memory pressure.
-Use `--no-hybrid` only for deliberate dense-only comparisons.
+Query defaults to **hybrid retrieval**. Do not add `--rerank` by default: the current benchmark found lower quality and substantially higher memory pressure. Use `--no-hybrid` only for deliberate dense-only comparisons.
 
 Direct CLI (more flags):
 
@@ -60,9 +53,7 @@ uv run graph-layout-rag ingest -v            # resume incremental ingest (no --f
 
 ### Ingest (embed + index)
 
-**Checkpointing:** no `--resume` flag. After each batch
-(`GRAPH_RAG_INGEST_DOC_BATCH` docs, default 25), LanceDB, Tantivy BM25, and
-`data/indexes/{profile}/ingest_state.json` are updated. Stop anytime; resume with:
+**Checkpointing:** no `--resume` flag. After each batch (`GRAPH_RAG_INGEST_DOC_BATCH` docs, default 25), LanceDB, Tantivy BM25, and `data/indexes/{profile}/ingest_state.json` are updated. Stop anytime; resume with:
 
 ```bash
 cd tools/graph-layout-rag
@@ -71,26 +62,24 @@ uv run graph-layout-rag ingest -v 2>&1 | tee -a data/ingest-run.log
 
 Use **`--force --rebuild`** only for first full build or when changing embed model/dims/backend.
 
-| Goal | Command |
-|------|---------|
-| First build / new embed model | `ingest --force --rebuild -v` |
-| Resume after interrupt | `ingest -v` (no `--force`, no `--rebuild`) |
-| Re-embed all, keep table | `ingest --force` |
-| Drop table, fresh first batch | `ingest --rebuild` |
+| Goal                          | Command                                    |
+| ----------------------------- | ------------------------------------------ |
+| First build / new embed model | `ingest --force --rebuild -v`              |
+| Resume after interrupt        | `ingest -v` (no `--force`, no `--rebuild`) |
+| Re-embed all, keep table      | `ingest --force`                           |
+| Drop table, fresh first batch | `ingest --rebuild`                         |
 
 **Pick an embed profile explicitly** (`uv run graph-layout-rag embed profiles`):
 
 | Profile | Use when |
-|---------|----------|
+| --- | --- |
 | `mlx-qwen4b` | Free local ingest on Apple Silicon (MLX 4-bit, ~10–15+ active hours full corpus) |
 | `openai-large` | Fast cloud ingest (~$5–7, ~30–90 min) with `OPENAI_API_KEY` |
 | `gemini` | Cloud ingest via `GEMINI_API_KEY` / `GOOGLE_API_KEY` (embedding-001) |
 | `gemini-2` | Gemini Embedding 2 fixed-window baseline |
 | `gemini-2-structure-v1` | **Production profile:** Gemini Embedding 2 @ 3072, Docling extraction, structure-aware chunks |
 
-Set `RAG_EMBED_PROFILE=gemini-2-structure-v1` in `.env` or pass the same
-`--embed-profile` on both ingest and query. Query and ingest vector spaces must
-match. Legacy backend/model env vars still work as the implicit `default` profile.
+Set `RAG_EMBED_PROFILE=gemini-2-structure-v1` in `.env` or pass the same `--embed-profile` on both ingest and query. Query and ingest vector spaces must match. Legacy backend/model env vars still work as the implicit `default` profile.
 
 **Per-profile indexes:** each profile writes to `data/indexes/{profile}/` (own LanceDB + ingest_state). Build multiple indexes for A/B testing without conflict; list with `uv run graph-layout-rag embed indexes`.
 
@@ -110,7 +99,7 @@ uv run graph-layout-rag ingest --force
 ```
 
 | Flag | Purpose |
-|------|---------|
+| --- | --- |
 | `--deep-harvest` | OpenAlex 4k, arXiv 500, bib 1200 DOIs, 3 retry/bib passes |
 | `--target-pdfs 2000` | Stop when ok PDF count reaches N |
 | `--target 2800` | Catalog entry ceiling |
@@ -160,8 +149,7 @@ uv run graph-layout-rag harvest --skip-openalex --skip-dblp --max-openalex 50
 
 Filter flags: `--tag compound`, `--category packing`, `--pdf-only`, `--source handbook`, `--year-min 1990`
 
-`--max-per-doc` controls how many evidence passages are retained under each
-canonical paper result; it does not allow duplicate paper rows.
+`--max-per-doc` controls how many evidence passages are retained under each canonical paper result; it does not allow duplicate paper rows.
 
 ### Retrieval behavior
 
@@ -170,28 +158,22 @@ Default retrieval:
 ```text
 Gemini query embedding → local LanceDB dense search
 Query text             → local Tantivy BM25
-Dense + BM25           → RRF k=60 → filters → results
+Dense + BM25           → RRF k=20 (pool ≥80) → filters → results
 ```
 
 - `--hybrid` is the default.
 - `--no-hybrid` selects dense-only search.
 - `--rerank` explicitly loads a local cross-encoder; do not use it by default.
 - Results are grouped by canonical paper identity after retrieval and reranking.
-- Canonical identity components are derived at query time from normalized DOI,
-  PDF SHA-256, local path, and provider external IDs. No re-ingest is required
-  when the manifest gains aliases.
-- `doc_id` identifies the winning indexed row. Use `canonical_doc_id` for
-  deduplication/evaluation and `alias_doc_ids` when resolving a local PDF.
-- Query embeddings use the configured cloud or local profile; LanceDB and BM25
-  indexes remain local.
-- `--tag` is an exact tag match. Category, tag, source, and PDF filters are
-  applied after fusion; retrieval widens the candidate pool to compensate.
+- Canonical identity components are derived at query time from normalized DOI, PDF SHA-256, local path, and provider external IDs. No re-ingest is required when the manifest gains aliases.
+- `doc_id` identifies the winning indexed row. Use `canonical_doc_id` for deduplication/evaluation and `alias_doc_ids` when resolving a local PDF.
+- Query embeddings use the configured cloud or local profile; LanceDB and BM25 indexes remain local.
+- `--tag` is an exact tag match. Category, tag, source, and PDF filters are applied after fusion; retrieval widens the candidate pool to compensate.
 - Query returns evidence snippets, not the full source.
 
 ## Retrieval benchmark
 
-The current benchmark supports corrected true recall, hit rate, MAP, MRR,
-nDCG, catalog/PDF tracks, immutable run artifacts, resume, and memory guards.
+The current benchmark supports corrected true recall, hit rate, MAP, MRR, nDCG, catalog/PDF tracks, immutable run artifacts, resume, and memory guards.
 
 ```bash
 cd tools/graph-layout-rag
@@ -213,8 +195,7 @@ For the 24 GB M4 Pro, defaults are:
 - Abort after more than 2 GB swap growth.
 - Resume interrupted runs with the same `--run-dir` plus `--resume`.
 
-Paid Google Ranking API strategies require explicit acknowledgement and are
-capped at 500 ranking units by default:
+Paid Google Ranking API strategies require explicit acknowledgement and are capped at 500 ranking units by default:
 
 ```bash
 uv run graph-layout-rag eval benchmark \
@@ -223,8 +204,7 @@ uv run graph-layout-rag eval benchmark \
   --cloud-rerank --allow-cloud-cost --max-cloud-ranking-units 500 --report -v
 ```
 
-Optional learned-sparse and late-interaction indexes are immutable and never
-overwrite the production index:
+Optional learned-sparse and late-interaction indexes are immutable and never overwrite the production index:
 
 ```bash
 uv sync --extra retrieval-experiments
@@ -240,19 +220,11 @@ uv run graph-layout-rag eval benchmark \
   --strategy splade --strategy dense_splade --report -v
 ```
 
-Experimental index strategies must match the index kind: use `splade` or
-`dense_splade` with a SPLADE index and `colbert` with a ColBERT index. **ColBERT
-(and SPLADE) need a Docker Qdrant server** — local-mode multivector search OOMs
-the 24 GB guard. Start `docker run -d --name graphrag-qdrant -p 6333:6333
-qdrant/qdrant` and `export GRAPH_RAG_QDRANT_URL=http://localhost:6333` before
-building/benchmarking them (`qdrant/qdrant:latest` = 1.18.2).
+Experimental index strategies must match the index kind: use `splade` or `dense_splade` with a SPLADE index and `colbert` with a ColBERT index. **ColBERT (and SPLADE) need a Docker Qdrant server** — local-mode multivector search OOMs the 24 GB guard. Start `docker run -d --name graphrag-qdrant -p 6333:6333 qdrant/qdrant` and `export GRAPH_RAG_QDRANT_URL=http://localhost:6333` before building/benchmarking them (`qdrant/qdrant:latest` = 1.18.2).
 
 ### De-biased evaluation (multi-system pooling — REQUIRED for trustworthy numbers)
 
-⚠️ **Do not expand the gold set from a single retriever.** The earlier gold set
-was BM25-pooled, which produced **pooling bias** and a false "BM25 wins"
-verdict. The gold set is now backed by **diverse-pool + LLM-judged qrels** at
-`data/eval/qrels/<track>/qrels.json`; always benchmark with `--qrels`.
+⚠️ **Do not expand the gold set from a single retriever.** The earlier gold set was BM25-pooled, which produced **pooling bias** and a false "BM25 wins" verdict. The gold set is now backed by **diverse-pool + LLM-judged qrels** at `data/eval/qrels/<track>/qrels.json`; always benchmark with `--qrels`.
 
 ```bash
 # 1. pool a diverse candidate set; 2. LLM-judge (UMBRELA 0-3, source-blind);
@@ -267,16 +239,7 @@ uv run graph-layout-rag eval benchmark --embed-profile gemini-2-structure-v1 \
   --qrels data/eval/qrels/catalog/qrels.json --report -v
 ```
 
-**Current decision (corrected, on the neutral judge):** keep default **hybrid
-RRF** — it is the measured winner on both tracks (catalog 0.765, pdf 0.696),
-**not** a tie with BM25. On the neutral judge BM25 falls to mid-pack (≈0.70) and
-dense converges with it; the old "BM25 is a free equal-quality fallback" claim
-is **withdrawn**. `rrf_k=20` is a small consistent win. **HyDE expansion wins
-the pdf track** — use `--expand auto`/`force` for deep-read/vague queries.
-Reranking still adds nothing (local CE hurts; LLM rerank = no gain, +56 s/query).
-SPLADE/ColBERT remain bottom. Full results + methodology:
-[docs/graph-layout-rag-architecture-bakeoff-2026.md](../../../docs/graph-layout-rag-architecture-bakeoff-2026.md).
-Gold set: 49 catalog / 47 pdf cases, **949 judged-relevant docs** (was ~136).
+**Current decision (corrected, on the neutral judge):** keep default **hybrid RRF** — it is the measured winner on both tracks (catalog 0.768, pdf 0.715), **not** a tie with BM25. On the neutral judge BM25 falls to mid-pack (≈0.70) and dense converges with it; the old "BM25 is a free equal-quality fallback" claim is **withdrawn**. **`rrf_k=20` + pool ≥80 are now the shipped defaults** (raised from k=60 / pool 40; default `hybrid` reproduces the old `hybrid_rrf20` arm at 0.768 catalog). **HyDE expansion wins the pdf track** — use `--expand auto`/`force` for deep-read/vague queries. Reranking still adds nothing (local CE hurts; LLM rerank = no gain, +56 s/query). SPLADE/ColBERT remain bottom. Full results + methodology: [docs/graph-layout-rag-architecture-bakeoff-2026.md](../../../docs/graph-layout-rag-architecture-bakeoff-2026.md). Gold set: 49 catalog / 47 pdf cases, **949 judged-relevant docs** (was ~136).
 
 Pipeline research: see [docs/pipeline-rag-queries.md](../../../docs/pipeline-rag-queries.md).
 
@@ -292,7 +255,7 @@ yarn graph-rag:catalog --category compaction --limit 20
 ### Pipeline layout research threads
 
 | Tag | Topics | Example query |
-|-----|--------|---------------|
+| --- | --- | --- |
 | `layer-assignment` | Network simplex, ALAP, node promotion, min-width dummy nodes | `ALAP as-late-as-possible layer reassignment` |
 | `compaction` | VLSI 1D constraint graphs, scanline compaction | `constraint graph one-dimensional compaction longest path` |
 | `constraints` | VPSC, IPSep-CoLa, cluster containment | `VPSC separation constraints overlap removal` |
@@ -302,13 +265,9 @@ yarn graph-rag:catalog --category compaction --limit 20
 
 ## Find related papers (citation graph)
 
-A capability **separate from `query`**. `query` answers *"papers about a topic"* (text
-search). `cite related` answers *"papers related to **this** paper"* (citation structure +
-citation-trained embeddings) — the Connected Papers use case. Use it to expand from a known
-seed paper to its neighborhood (shared references, co-citations, topically-near work).
+A capability **separate from `query`**. `query` answers _"papers about a topic"_ (text search). `cite related` answers _"papers related to **this** paper"_ (citation structure + citation-trained embeddings) — the Connected Papers use case. Use it to expand from a known seed paper to its neighborhood (shared references, co-citations, topically-near work).
 
-The data lives in `data/citations.sqlite` (a graph of references, incoming citations,
-authorship) plus per-model doc-vector tables under `data/related/`.
+The data lives in `data/citations.sqlite` (a graph of references, incoming citations, authorship) plus per-model doc-vector tables under `data/related/`.
 
 ### One-time setup
 
@@ -325,8 +284,7 @@ uv run graph-layout-rag cite embed-related --model scincl --rebuild
 uv run graph-layout-rag cite embed-related --model specter2 --rebuild
 ```
 
-`cite enrich` is **idempotent and resumable** — a paper is only marked done on a successful
-S2 fetch, so just re-run it to mop up any papers dropped under load (see S2 note below).
+`cite enrich` is **idempotent and resumable** — a paper is only marked done on a successful S2 fetch, so just re-run it to mop up any papers dropped under load (see S2 note below).
 
 ### Find related to a seed
 
@@ -335,31 +293,25 @@ uv run graph-layout-rag cite related <doc_id> --signal fused --top 10 --json
 ```
 
 | Flag | Values | Notes |
-|------|--------|-------|
+| --- | --- | --- |
 | `--signal` | `fused` (default), `graph`, `embedding` | `fused` = co-citation + PPR + coupling + embedding; **recommended** |
 | `--model` | `scincl` (default), `specter2` | doc-embedding model for `embedding`/`fused` |
-| `--top` / `--json` | | JSON gives per-signal provenance per result |
+| `--top` / `--json` |  | JSON gives per-signal provenance per result |
 
-Output rows carry **why-related provenance**: `shared_references`, `shared_citations`
-(co-citations), `embedding` cosine, and the per-signal sub-scores. The seed `doc_id` **must
-resolve to a canonical identity component with an enriched citation node. The command accepts
-an alias `doc_id`, checks all identities in its canonical component, and deduplicates related
-results back to canonical paper ids. If it says "no citation node", no alias in that component
-has usable graph edges.
+Output rows carry **why-related provenance**: `shared_references`, `shared_citations` (co-citations), `embedding` cosine, and the per-signal sub-scores. The seed `doc_id` \*\*must resolve to a canonical identity component with an enriched citation node. The command accepts an alias `doc_id`, checks all identities in its canonical component, and deduplicates related results back to canonical paper ids. If it says "no citation node", no alias in that component has usable graph edges.
 
 ### What actually wins (measured)
 
-`eval related` is a self-supervised A/B: it hides one real citation from a paper and asks each
-ranker to recover it (`eval/metrics.py`; no hand-labeling). On the current corpus (150 folds):
+`eval related` is a self-supervised A/B: it hides one real citation from a paper and asks each ranker to recover it (`eval/metrics.py`; no hand-labeling). On the current corpus (150 folds):
 
 | Ranker | MRR | nDCG@10 | R@10 | Verdict |
-|--------|----:|--------:|-----:|---------|
+| --- | --: | --: | --: | --- |
 | `related_v2` (fused, tuned) | **0.225** | **0.265** | **0.433** | **best — the `fused` default** |
-| `cocitation_only` | 0.201 | 0.234 | 0.367 | strongest *single* signal (needs `--incoming`) |
+| `cocitation_only` | 0.201 | 0.234 | 0.367 | strongest _single_ signal (needs `--incoming`) |
 | `ppr_undirected` | 0.141 | 0.185 | 0.393 | good recall |
 | `coupling_only` | 0.085 | 0.100 | 0.187 | shared references alone is weak |
-| `scincl` / `specter2` | 0.04–0.06 | | | embeddings are **weak at citation-link prediction** (they capture topical, not citation, similarity) — a light tiebreak in `fused`, not a primary signal |
-| `ppr_directional` | 0.040 | | | node-split PPR lost to undirected here; weight 0 by default |
+| `scincl` / `specter2` | 0.04–0.06 |  |  | embeddings are **weak at citation-link prediction** (they capture topical, not citation, similarity) — a light tiebreak in `fused`, not a primary signal |
+| `ppr_directional` | 0.040 |  |  | node-split PPR lost to undirected here; weight 0 by default |
 
 Re-tune the `fused` weights (in `cli.py` / `eval/related_eval.py` `_FUSED_WEIGHTS`) and confirm with:
 
@@ -369,17 +321,10 @@ uv run graph-layout-rag eval related --folds 150 --report -o data/eval/related-a
 
 ### Important caveats
 
-- **Do not fuse citation signal into `query` ranking.** A separate A/B showed it *hurts*
-  query→doc retrieval (relatedness optimizes seed-similarity, not query-relevance). Keep these
-  worlds separate: `query` for topics, `cite related` for seed expansion.
-- **Co-citation depends on `cite enrich --incoming`.** Without the Semantic Scholar incoming pass
-  the graph has only outgoing references and co-citation is dead (OpenAlex meters its `cites:`
-  filter, so it can't supply incoming edges).
-- **S2 incoming completion is automatic.** `--incoming-workers 32` bursts through the shared
-  provider policy; 429s open an S2-only cooldown, then unfinished requests resume. Successful
-  and terminal-not-found papers receive idempotent completion markers.
-- SPECTER2 uses the **base** model (CLS-pooled), not the proximity adapter — the `adapters` lib
-  pins `transformers<4.58` and conflicts with the MLX embed stack.
+- **Do not fuse citation signal into `query` ranking.** A separate A/B showed it _hurts_ query→doc retrieval (relatedness optimizes seed-similarity, not query-relevance). Keep these worlds separate: `query` for topics, `cite related` for seed expansion.
+- **Co-citation depends on `cite enrich --incoming`.** Without the Semantic Scholar incoming pass the graph has only outgoing references and co-citation is dead (OpenAlex meters its `cites:` filter, so it can't supply incoming edges).
+- **S2 incoming completion is automatic.** `--incoming-workers 32` bursts through the shared provider policy; 429s open an S2-only cooldown, then unfinished requests resume. Successful and terminal-not-found papers receive idempotent completion markers.
+- SPECTER2 uses the **base** model (CLS-pooled), not the proximity adapter — the `adapters` lib pins `transformers<4.58` and conflicts with the MLX embed stack.
 
 ## Reading full papers (after search)
 
@@ -440,19 +385,14 @@ If `status` is `metadata_only`, use `title`, `abstract`, `doi`, and `url` from m
 ## Corpus quality (expectations)
 
 | Layer | ~Count | Use |
-|-------|--------|-----|
+| --- | --- | --- |
 | Full PDFs (`ok`) | ~2,000 (target) | Deep reading, accurate quotes |
 | Metadata only | ~500–800 | Discovery, citations; abstract when present |
 | Failed | varies | Retry with `harvest --deep-harvest --resume` |
 
 **High-signal sources:** `graphviz.org`, `handbook`, `topic-seed`, `elk-bibliography`, curated seeds. **Noisier:** OpenAlex long tail (some off-topic PDFs). Prefer top-ranked hits with layout-related tags.
 
-**Index:** LanceDB + Tantivy BM25 under
-`tools/graph-layout-rag/data/indexes/{profile}/`. Production chunks use
-`markdown-structure-v1`: ~800 target tokens, 1200 hard max, and ~120-token
-paragraph overlap. Query ranks chunks, then groups them into canonical paper
-results. Use each result's `evidence`, `canonical_doc_id`, aliases, `page`, and
-`page_end` to choose contiguous text for deep reading.
+**Index:** LanceDB + Tantivy BM25 under `tools/graph-layout-rag/data/indexes/{profile}/`. Production chunks use `markdown-structure-v1`: ~800 target tokens, 1200 hard max, and ~120-token paragraph overlap. Query ranks chunks, then groups them into canonical paper results. Use each result's `evidence`, `canonical_doc_id`, aliases, `page`, and `page_end` to choose contiguous text for deep reading.
 
 ## Example queries
 
@@ -479,7 +419,7 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 ## Paths (all gitignored except example manifest)
 
 | Path | Contents |
-|------|----------|
+| --- | --- |
 | `tools/graph-layout-rag/data/manifest.json` | Catalog: id, status, localPath, doi, abstract |
 | `tools/graph-layout-rag/data/raw/pdf/` | Downloaded PDFs |
 | `tools/graph-layout-rag/data/indexes/{profile}/` | Per-profile vector index + ingest checkpoint |

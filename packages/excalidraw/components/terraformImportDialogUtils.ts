@@ -1,6 +1,6 @@
 export type TerraformView = "module" | "semantic" | "pipeline" | "experimental";
 
-export type PipelineLayoutVariant = "classic" | "compound";
+export type PipelineLayoutVariant = "classic" | "compound" | "v2";
 
 export const MAX_PLAN_BUNDLES = 10;
 

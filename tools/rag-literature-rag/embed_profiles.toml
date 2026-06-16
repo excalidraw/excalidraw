@@ -1,0 +1,10 @@
+# Tool-local embed profiles (merged over rag-common built-ins; see ingest/embed.py).
+
+# Contextual Retrieval A/B index: same embedding as the production
+# gemini-2-structure-v1, but ingest prepends an LLM-generated context line to each
+# chunk's embed/BM25 text (see ingest/contextual.py). Builds to its own index dir
+# data/indexes/gemini-2-contextual-v1/ and never touches production.
+[profiles.gemini-2-contextual-v1]
+backend = "gemini"
+model = "gemini-embedding-2-preview"
+dimensions = 3072

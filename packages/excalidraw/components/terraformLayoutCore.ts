@@ -36,6 +36,7 @@ import {
   buildTerraformCompoundPipelineExcalidrawScene,
   buildTerraformPipelineExcalidrawScene,
 } from "./terraformPipelineLayout";
+import { buildTerraformPipelineV2ExcalidrawScene } from "./terraformPipelineLayoutV2";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -429,18 +430,23 @@ async function buildPipelineLayoutSceneBody(
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
     async () => {
-      const buildPipeline =
-        ctx.pipelineLayoutVariant === "compound"
-          ? buildTerraformCompoundPipelineExcalidrawScene
-          : buildTerraformPipelineExcalidrawScene;
-      const pipelineScene = await buildPipeline(ctx.nodes5, ctx.plan, {
-        compact: ctx.pipelineCompact !== false,
-        packed: ctx.pipelinePacked === true,
-        packedPullLeft: ctx.pipelinePackedPullLeft === true,
-        includeAncillary: ctx.pipelineIncludeAncillary === true,
-        semanticPlacement: ctx.pipelineSemanticPlacement === true,
-        experimentalLayout: ctx.pipelineExperimentalLayout === true,
-      });
+      const pipelineScene =
+        ctx.pipelineLayoutVariant === "v2"
+          ? await buildTerraformPipelineV2ExcalidrawScene(
+              ctx.nodes5,
+              ctx.plan,
+              { compact: ctx.pipelineCompact !== false },
+            )
+          : await (ctx.pipelineLayoutVariant === "compound"
+              ? buildTerraformCompoundPipelineExcalidrawScene
+              : buildTerraformPipelineExcalidrawScene)(ctx.nodes5, ctx.plan, {
+              compact: ctx.pipelineCompact !== false,
+              packed: ctx.pipelinePacked === true,
+              packedPullLeft: ctx.pipelinePackedPullLeft === true,
+              includeAncillary: ctx.pipelineIncludeAncillary === true,
+              semanticPlacement: ctx.pipelineSemanticPlacement === true,
+              experimentalLayout: ctx.pipelineExperimentalLayout === true,
+            });
       emitLocalParseDebug({
         phase: "pipelineLayout",
         meta: pipelineScene.meta,

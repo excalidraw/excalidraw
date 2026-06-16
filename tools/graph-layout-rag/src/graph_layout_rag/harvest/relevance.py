@@ -11,6 +11,8 @@ co-occur with a visualization-context word.
 
 from __future__ import annotations
 
+import re
+
 # High-signal, hand-curated harvest sources. Items from these are always kept by
 # the relevance gates (verify downgrade, prune) regardless of score — they are
 # foundational seeds whose titles/abstracts may be terse.
@@ -316,6 +318,21 @@ OFF_TOPIC_KEYWORDS = frozenset(
     }
 )
 
+# Off-topic keywords match at a *left* word boundary (so morphological variants
+# like "phylogen" -> "phylogenetics" / "metabol" -> "metabolism" still fire) but
+# NOT mid-word. A plain ``"rna" in hay`` substring test matched "exte`rna`l",
+# "inte`rna`l", "jou`rna`l", "alte`rna`ting", "tou`rna`ment" — core graph-drawing
+# vocabulary ("external face", "internal vertices") — and hard-killed those
+# papers at discovery. The boundary anchor removes that false negative.
+_OFF_TOPIC_RE = re.compile(
+    r"\b(?:" + "|".join(re.escape(k) for k in sorted(OFF_TOPIC_KEYWORDS, key=len, reverse=True)) + r")"
+)
+
+
+def is_off_topic(title: str, abstract: str | None = None) -> bool:
+    """True if the title/abstract hits an off-topic keyword at a word boundary."""
+    return bool(_OFF_TOPIC_RE.search(_haystack(title, abstract)))
+
 
 def _haystack(title: str, abstract: str | None) -> str:
     return f"{title} {abstract or ''}".lower()
@@ -332,7 +349,7 @@ def layout_relevance_score(title: str, abstract: str | None = None) -> int:
     present, and a hard -100 if any off-topic keyword appears.
     """
     hay = _haystack(title, abstract)
-    if any(k in hay for k in OFF_TOPIC_KEYWORDS):
+    if _OFF_TOPIC_RE.search(hay):
         return -100
     score = 3 * sum(1 for term in STRONG_LAYOUT_TERMS if term in hay)
     if any(ctx in hay for ctx in DRAWING_CONTEXT_TERMS):

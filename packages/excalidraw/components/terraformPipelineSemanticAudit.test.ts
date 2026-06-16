@@ -137,7 +137,7 @@ describe("pipeline semantic placement audit", () => {
       }
       // eslint-disable-next-line no-console -- intentional diagnostic output
       console.log(
-        "\n[pipeline:semantic-audit]\n" + JSON.stringify(out, null, 2),
+        `\n[pipeline:semantic-audit]\n${JSON.stringify(out, null, 2)}`,
       );
       expect(Object.keys(out).length).toBe(configs.length);
 

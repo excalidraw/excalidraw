@@ -57,8 +57,8 @@ Key persists in `tools/repo-rag/.env` (gitignored). Requires network for cloud e
 List profiles: `cd tools/repo-rag && uv run repo-rag embed profiles`
 
 | Profile | Backend | Dims | Use when |
-|---------|---------|------|----------|
-| *(default / legacy env)* | openai | 3072 | `text-embedding-3-large` — current production index |
+| --- | --- | --- | --- |
+| _(default / legacy env)_ | openai | 3072 | `text-embedding-3-large` — current production index |
 | `openai-large` | openai | 1024 | Smaller OpenAI vectors |
 | `gemini-2` | gemini | 3072 | `gemini-embedding-2-preview` — match graph-layout-rag vector space |
 | `gemini` | gemini | 768 | `gemini-embedding-001` (older) |
@@ -118,7 +118,7 @@ uv run repo-rag eval benchmark --compare                     # rerank off vs on,
 ## Query filters
 
 | Flag | Values | Use |
-|------|--------|-----|
+| --- | --- | --- |
 | `--source-type` | `handoff`, `terraform`, `code`, `app`, `test`, `doc` | Narrow corpus |
 | `--package` | `@excalidraw/excalidraw`, `excalidraw-app`, … | Package scope |
 | `--path-contains` | substring | e.g. `pipeline`, `terraformTopology` |
@@ -130,7 +130,7 @@ uv run repo-rag eval benchmark --compare                     # rerank off vs on,
 
 "Retrieve wide, rerank narrow": after RRF, a local cross-encoder (`bge-reranker-v2-m3`, MPS/CPU, no API) can reorder candidates. Enable per-query with `--rerank` or globally with `RAG_RERANK_ENABLED=1`. Degrades to a plain top-k slice if the model/dep is unavailable. Adds a `rerank_score` to JSON output.
 
-- **Measured on this repo (gemini-2 index):** reranking lifts MRR 0.637→0.684 / nDCG 0.68→0.70 **but only because** search feeds the reranker `file_path + symbol + text`; on raw chunk text alone it *hurt* (nDCG→0.61). It ~2× latency — keep it off by default, use for precision-sensitive lookups.
+- **Measured on this repo (gemini-2 index):** reranking lifts MRR 0.637→0.684 / nDCG 0.68→0.70 **but only because** search feeds the reranker `file_path + symbol + text`; on raw chunk text alone it _hurt_ (nDCG→0.61). It ~2× latency — keep it off by default, use for precision-sensitive lookups.
 - Re-validate after any embed-profile or query-set change: `RAG_RERANK_ENABLED=1 uv run repo-rag eval benchmark --compare`.
 
 ## Query output (`--json`)
@@ -157,7 +157,7 @@ uv run repo-rag eval benchmark --compare                     # rerank off vs on,
 ## Indexed corpus
 
 | Tier | Paths | `source_type` |
-|------|-------|---------------|
+| --- | --- | --- |
 | Handoffs | `CLAUDE.md`, `README.md`, `docs/*.md`, `REGION_SUBNET_VERTICAL_BANDS_PLAN.md` | `handoff` |
 | Terraform | `packages/excalidraw/components/terraform*` | `terraform` |
 | Core | `packages/{excalidraw,element,common,math,utils}/**` | `code` |
@@ -223,17 +223,17 @@ After RAG hits, read these for invariants (not always in top snippets):
 
 ## Pair with graph-layout-rag
 
-| Question type | Tool |
-|---------------|------|
-| Where is X in this codebase? | **repo-rag** (this skill) |
-| Why is pipeline tall? Sugiyama? ELK compound? | **graph-layout-rag** |
+| Question type                                 | Tool                      |
+| --------------------------------------------- | ------------------------- |
+| Where is X in this codebase?                  | **repo-rag** (this skill) |
+| Why is pipeline tall? Sugiyama? ELK compound? | **graph-layout-rag**      |
 
 Use `gemini-2` on both if you want the same embedding model family; chunking still differs (AST/code vs PDF structure-aware).
 
 ## Troubleshooting
 
 | Problem | Fix |
-|---------|-----|
+| --- | --- |
 | `No results` | Run `yarn repo-rag:index`; check `yarn repo-rag:status` |
 | `OPENAI_API_KEY is required` | Set key in `tools/repo-rag/.env`, or use `RAG_EMBED_BACKEND=local` / `mlx-qwen4b` |
 | Embed model/profile mismatch | `yarn repo-rag:index --force --rebuild` with matching `--embed-profile` |

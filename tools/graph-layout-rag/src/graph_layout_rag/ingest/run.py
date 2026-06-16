@@ -847,11 +847,15 @@ def _execute_ingest(
 
         run_cost = (stats.tokens / 1_000_000) * embed_cost_per_million(effective.backend)
         cost_note = f" Embed: {stats.tokens} tokens (~${run_cost:.4f})."
+    from graph_layout_rag.ingest.embed_cache import cache_stats as embed_cache_stats
+
+    ec = embed_cache_stats()
     summary = (
         f"Ingested {ingested} docs ({written} new chunks written, {skipped} skipped"
         f"{f', {missing} missing PDFs' if missing else ''}). "
         f"Backend: {effective.backend}. "
-        f"Index total: {total} chunks.{cost_note}"
+        f"Index total: {total} chunks.{cost_note} "
+        f"Embed cache: {ec['entries']} entries (~{ec['size_mb']} MB)."
     )
     log.info(
         "ingest done in %.1fs — %d docs, %d chunks written, %d skipped, %d missing, index=%d",

@@ -48,7 +48,7 @@ Query    →  hybrid retrieval + optional rerank → JSON snippets for agents
 ### Target corpus scale
 
 | Layer | Approximate count | Use |
-|-------|-------------------|-----|
+| --- | --- | --- |
 | Catalog entries (`manifest.json`) | ~2,800 (target) | Discovery, metadata, filtering |
 | Full PDFs (`status: ok`) | ~2,000–3,088 | Deep reading, accurate quotes |
 | Metadata-only stubs | ~500–800 | Citations; title/abstract when present |
@@ -89,7 +89,7 @@ flowchart TB
   subgraph query [Query]
     QEmbed[query embed] --> Dense[cosine search]
     QEmbed --> Sparse[BM25 search]
-    Dense --> RRF["RRF fusion k=60"]
+    Dense --> RRF["RRF fusion k=20"]
     Sparse --> RRF
     RRF --> Filters[tag category pdf_only]
     Filters --> Rerank[optional cross-encoder]
@@ -138,7 +138,7 @@ tools/graph-layout-rag/
 ### Path reference (`paths.py`)
 
 | Path | Role | Gitignored |
-|------|------|------------|
+| --- | --- | --- |
 | `data/manifest.json` | Catalog of all harvested works | yes |
 | `data/raw/pdf/{id}.pdf` | Downloaded PDF files | yes |
 | `data/raw/html/` | Scraped HTML (curated blog posts) | yes |
@@ -172,8 +172,7 @@ tools/graph-layout-rag/
 
 ## 3. Manifest schema
 
-**Source:** `manifest.py`
-**Path:** `data/manifest.json`
+**Source:** `manifest.py` **Path:** `data/manifest.json`
 
 The manifest is the **single source of truth** for what was harvested, whether a local PDF exists, and how ingest should treat each document.
 
@@ -206,7 +205,7 @@ class Manifest(BaseModel):
 ### Status semantics
 
 | Status | Meaning | Ingest behavior |
-|--------|---------|-----------------|
+| --- | --- | --- |
 | `ok` | Valid PDF on disk; passed verify checks | Extract PDF text → chunk → embed |
 | `metadata_only` | Known work, no downloadable PDF | Chunk title/abstract/authors only |
 | `failed` | Download attempted but no valid PDF | Skipped by ingest |
@@ -214,7 +213,7 @@ class Manifest(BaseModel):
 ### Common `source` values
 
 | Source | Origin |
-|--------|--------|
+| --- | --- |
 | `graphviz.org` | Graphviz theory page crawl |
 | `handbook` | GD Handbook chapter PDFs |
 | `book` | Paywalled textbook metadata stubs |
@@ -232,7 +231,7 @@ class Manifest(BaseModel):
 ### Helper functions
 
 | Function | Purpose |
-|----------|---------|
+| --- | --- |
 | `slug_id(text)` | Kebab-case ID from title/DOI/URL |
 | `load_manifest()` | Read JSON → `Manifest` (empty if missing) |
 | `save_manifest(manifest)` | Atomic write via `.json.tmp` + `os.replace` |
@@ -248,7 +247,12 @@ class Manifest(BaseModel):
 {
   "id": "gansner-tse93",
   "title": "A Technique for Drawing Directed Graphs",
-  "authors": ["Emden R. Gansner", "Eleftherios Koutsofios", "Stephen C. North", "Kiem-Phong Vo"],
+  "authors": [
+    "Emden R. Gansner",
+    "Eleftherios Koutsofios",
+    "Stephen C. North",
+    "Kiem-Phong Vo"
+  ],
   "year": 1993,
   "source": "graphviz.org",
   "url": "https://graphviz.org/documentation/TSE93.pdf",
@@ -268,7 +272,12 @@ class Manifest(BaseModel):
 {
   "id": "di-battista-1999",
   "title": "Graph Drawing: Algorithms for the Visualization of Graphs",
-  "authors": ["Giuseppe Di Battista", "Peter Eades", "Roberto Tamassia", "Ioannis G. Tolli"],
+  "authors": [
+    "Giuseppe Di Battista",
+    "Peter Eades",
+    "Roberto Tamassia",
+    "Ioannis G. Tolli"
+  ],
   "year": 1999,
   "source": "book",
   "url": "https://doi.org/10.5555/304094.304095",
@@ -299,13 +308,12 @@ class Manifest(BaseModel):
 
 ## 4. Harvest subsystem
 
-**Entry:** `harvest/run.py` (CLI group registered in `cli.py`)
-**Purpose:** Discover graph-drawing literature, download open-access PDFs, build `manifest.json`.
+**Entry:** `harvest/run.py` (CLI group registered in `cli.py`) **Purpose:** Discover graph-drawing literature, download open-access PDFs, build `manifest.json`.
 
 ### 4.1 CLI surface
 
 | Command | Function | Purpose |
-|---------|----------|---------|
+| --- | --- | --- |
 | `graph-layout-rag harvest` | `_execute_harvest` | Full harvest pipeline (default) |
 | `graph-layout-rag harvest run` | Same | Explicit alias |
 | `graph-layout-rag harvest verify` | `verify_manifest` | Re-check ok PDFs on disk |
@@ -319,7 +327,7 @@ class Manifest(BaseModel):
 Three preset profiles control caps and behavior:
 
 | Setting | Normal (default) | `--deep-harvest` | `--pipeline-harvest` |
-|---------|------------------|------------------|----------------------|
+| --- | --- | --- | --- |
 | OpenAlex max works | 200 | 4,000 | 6,000 |
 | OpenAlex per topic | 30 | 80 | 120 |
 | DBLP max | 120 | 400 | 0 (skipped) |
@@ -423,7 +431,7 @@ Discovery sources within each pass run **concurrently** (`_run_concurrent_discov
 ### 4.4 Early seed sources
 
 | Module | Function | `source` tag | Mechanism |
-|--------|----------|--------------|-----------|
+| --- | --- | --- | --- |
 | `graphviz_theory.py` | `harvest_graphviz_theory` | `graphviz.org` | Crawl graphviz.org/theory/; merge `GRAPHVIZ_KNOWN_PDFS`; parallel download |
 | `handbook.py` | `harvest_handbook` | `handbook` | Crawl GD Handbook index; download chapter PDFs |
 | `books.py` | `book_metadata_stubs` | `book` | 3 paywalled textbook metadata stubs |
@@ -438,7 +446,7 @@ Topic seeds include ELK/Mermaid, Sugiyama, Sander compound graphs, Stratisfimal,
 Discovery sources run concurrently within each pass (see §4.3). Each module returns `ManifestItem` lists merged by `_merge_items`.
 
 | Module | Function | `source` | Strategy |
-|--------|----------|----------|----------|
+| --- | --- | --- | --- |
 | `crossref.py` | `harvest_crossref` | `crossref` | Venue queries (JGAA, CGTA, GD, LIPIcs; visualization: TVCG/CGF/InfoVis/PacificVis; VLSI CAD: TCAD/DAC/ICCAD/ISPD) via Crossref API; broad journals strict-gated; DOI resolve + download |
 | `trusted_venues.py` | `harvest_trusted_venues` | `drops`, `jgaa` | Complete GD 2024/2025 DROPS schema.org records, strict relevant SoCG records, and paginated JGAA archive PDFs; incremental per-volume/issue checkpoint |
 | `openalex.py` | `harvest_openalex` | `openalex` | Topic queries + graph-drawing concept filter `C41217795`; cursor pagination; relevance filter |
@@ -455,7 +463,7 @@ OpenAlex broad pass runs when target PDF count is not met after standard discove
 Precision-first cleanup for noisy OpenAlex long tail:
 
 | Function | Purpose |
-|----------|---------|
+| --- | --- |
 | `plan_prune(manifest)` | Read-only partition into keep/prune |
 | `apply_prune(manifest, plan)` | Delete pruned PDFs, retag survivors, save manifest (requires confirmation) |
 | `clean_tags(item)` | Strip leaked topic tags from discovered survivors; recompute from title/abstract |
@@ -485,7 +493,7 @@ Harvests papers **cited by** already-downloaded seed PDFs:
   "bibliography": {
     "max_dois": 1200,
     "candidates": ["10.1007/...", "..."],
-    "relevance": {"10.1007/...": true, "10.1029/...": false},
+    "relevance": { "10.1007/...": true, "10.1029/...": false },
     "selected": ["10.1007/..."],
     "resolved_dois": ["10.1007/..."]
   }
@@ -524,7 +532,7 @@ PDF_DIR / data/raw/pdf/{id}.pdf
 Per-domain adaptive gaps (thread-safe):
 
 | Domain | Default gap |
-|--------|-------------|
+| --- | --- |
 | OpenAlex | Shared policy; max 100 RPS; metered work reserves daily free budget |
 | Semantic Scholar | Shared policy; aggressive concurrency plus circuit-breaker cooldown |
 | Unpaywall | 0.05s |
@@ -533,10 +541,7 @@ Per-domain adaptive gaps (thread-safe):
 | DBLP | 0.2s |
 | doi.org | 0.1s |
 
-Provider policies add persistent clients, concurrency semaphores, RPS pacing, typed outcomes,
-retries, circuit breaking, and metrics. S2 successful and terminal-not-found requests get
-completion markers; retryable failures resume automatically.
-`note_success`: decays gap toward default (×0.75).
+Provider policies add persistent clients, concurrency semaphores, RPS pacing, typed outcomes, retries, circuit breaking, and metrics. S2 successful and terminal-not-found requests get completion markers; retryable failures resume automatically. `note_success`: decays gap toward default (×0.75).
 
 #### `http_client.py` — `get_json`
 
@@ -575,7 +580,7 @@ Used by DOI resolver and archive fallbacks (not PDF downloads). 5 attempts; User
 ### 4.10 Retry passes
 
 | Module | When | Strategy |
-|--------|------|----------|
+| --- | --- | --- |
 | `retry.py` | End of each discovery loop pass | Re-resolve `failed` + `metadata_only` items with DOI or `.pdf` URL; full DOI tier chain + archive |
 | `deferred_retry.py` | After all discovery passes | Query ledger for transient failures; 30s cooldown; direct re-download only |
 
@@ -598,17 +603,17 @@ documents (
 
 **Outcome taxonomy** (`classify_outcome`):
 
-| Outcome | Transient | Meaning |
-|---------|-----------|---------|
-| `ok` | no | Valid PDF downloaded |
-| `not_pdf` | no | Response was not PDF |
-| `too_small` | no | Below 10KB minimum |
-| `network_error` | yes | Connection/timeout error |
-| `rate_limited` | yes | HTTP 429/503/502/504/202 |
-| `forbidden` | no | HTTP 403/401 |
-| `not_found` | no | HTTP 404 |
-| `http_error` | varies | Other HTTP errors |
-| `unknown` | no | Unclassified failure |
+| Outcome         | Transient | Meaning                  |
+| --------------- | --------- | ------------------------ |
+| `ok`            | no        | Valid PDF downloaded     |
+| `not_pdf`       | no        | Response was not PDF     |
+| `too_small`     | no        | Below 10KB minimum       |
+| `network_error` | yes       | Connection/timeout error |
+| `rate_limited`  | yes       | HTTP 429/503/502/504/202 |
+| `forbidden`     | no        | HTTP 403/401             |
+| `not_found`     | no        | HTTP 404                 |
+| `http_error`    | varies    | Other HTTP errors        |
+| `unknown`       | no        | Unclassified failure     |
 
 **Key functions:** `init_db`, `log_attempt`, `update_document`, `summary`, `query_attempts`, `transient_doc_urls`.
 
@@ -627,7 +632,7 @@ JSON at `data/harvest_checkpoint.json`.
   "failed": 134,
   "discovery_pass": 2,
   "bib_pass": 1,
-  "bibliography": { }
+  "bibliography": {}
 }
 ```
 
@@ -647,6 +652,7 @@ JSON at `data/harvest_checkpoint.json`.
 **`relevance.py`:**
 
 - `is_layout_relevant(title, abstract, strict=False)` — rejects off-topic keywords (genomics, clinical, etc.); requires ≥1 layout keyword (normal) or ≥2 (strict)
+- `is_off_topic(title, abstract)` — off-topic keyword gate. Matches `OFF_TOPIC_KEYWORDS` at a **left word boundary** (`\b…`), so morphological variants still fire (`phylogen`→`phylogenetics`) but the keyword is not matched mid-word. This fixed a 2026-06 bias bug: a plain substring test let `rna` (RNA) match `exte`rna`l` / `inte`rna`l` / `jou`rna`l`, hard-killing core planar/upward-drawing papers at discovery (incl. "tidy trees", "Upward Planarization", and the GD symposium proceedings). Used by `layout_relevance_score` → `-100`.
 - `is_pipeline_relevant(title, abstract)` — uses `categories_from_keywords` from catalog taxonomy; used in pipeline-harvest OpenAlex mode
 
 **`tags_inference.py`:**
@@ -671,7 +677,7 @@ Runs automatically at end of harvest; also available as `harvest verify`.
 ### 4.15 Harvest CLI flags
 
 | Flag | Default | Purpose |
-|------|---------|---------|
+| --- | --- | --- |
 | `--dry-run` | off | Discover only; no downloads |
 | `--workers` | 32 | Process-wide active PDF download budget (max 128) |
 | `--target` | mode-dependent | Min manifest item count |
@@ -707,8 +713,7 @@ Runs automatically at end of harvest; also available as `harvest verify`.
 
 ## 5. PDF extraction and ingestion
 
-**Entry:** `ingest/run.py`
-**Purpose:** Extract text from PDFs (or metadata stubs), chunk, embed, index in LanceDB + Tantivy BM25.
+**Entry:** `ingest/run.py` **Purpose:** Extract text from PDFs (or metadata stubs), chunk, embed, index in LanceDB + Tantivy BM25.
 
 ### 5.1 Ingest flow
 
@@ -755,7 +760,7 @@ Metadata-only items with DOIs already covered by a canonical PDF are also skippe
 ### 5.3 Skip / include logic (`_classify_ingest_item`)
 
 | Manifest status | Behavior |
-|-----------------|----------|
+| --- | --- |
 | `ok` + `localPath` | Skip if sha256 unchanged (unless `--force`); extract PDF; fallback to title/abstract if empty |
 | `metadata_only` | Skip if doc id already in state (unless `--force`); chunk metadata text only |
 | Other (`failed`) | Skipped |
@@ -763,7 +768,7 @@ Metadata-only items with DOIs already covered by a canonical PDF are also skippe
 ### 5.4 PDF extraction backends
 
 | Backend | Module | When to use |
-|---------|--------|-------------|
+| --- | --- | --- |
 | `pymupdf` (default) | `pdf_text.py` + `ingest/extract.py` | Production ingest |
 | `docling` | `docling_text.py` | Optional ML layout; `uv sync --extra docling` |
 | `gemini` | `gemini_vision_text.py` | A/B only; one vision API call per page |
@@ -793,8 +798,7 @@ Set via `GRAPH_RAG_PDF_BACKEND`. Changing backend invalidates both dense and BM2
 - Process pooling applies only to local backends (`pymupdf`, `docling`)
 - Pending PDF futures are bounded to `max(2 * workers, 2)` (six by default)
 - Completed outcomes are bounded by `GRAPH_RAG_EXTRACT_QUEUE_DOCS` (default `2 * GRAPH_RAG_INGEST_DOC_BATCH`)
-- Extraction overlaps parent-process embedding without moving index/checkpoint writes
-  out of the parent process
+- Extraction overlaps parent-process embedding without moving index/checkpoint writes out of the parent process
 - Completed PDFs may be indexed out of manifest order
 - Gemini documents are excluded from the process pool
 
@@ -809,7 +813,7 @@ Set via `GRAPH_RAG_PDF_BACKEND`. Changing backend invalidates both dense and BM2
 #### Diagnostic subcommands
 
 | Command | Module | Purpose |
-|---------|--------|---------|
+| --- | --- | --- |
 | `ingest check-pdfs` | `check_pdfs.py` | MuPDF extraction diagnostics on ok PDFs |
 | `ingest compare-extract` | `compare_extract.py` | A/B metrics across backends (hyphen breaks, headings, timing, cost) |
 
@@ -820,7 +824,7 @@ Set via `GRAPH_RAG_PDF_BACKEND`. Changing backend invalidates both dense and BM2
 **Constants:**
 
 | Constant | Value | Role |
-|----------|-------|------|
+| --- | --- | --- |
 | `TARGET_TOKENS` | 800 | Preferred chunk size |
 | `MAX_TOKENS` | 1200 | Hard ceiling |
 | `MIN_PREFERRED_TOKENS` | 200 | Merge small tail into previous chunk |
@@ -862,7 +866,7 @@ class TextChunk:
 **Embed text enrichment** (not stored in index `text` field):
 
 | Function | Used for | Format |
-|----------|----------|--------|
+| --- | --- | --- |
 | `embed_input_text()` | Most backends | `Title: …\nSection: …\nTopics: …\nTags: …\n---\n{text}` |
 | `embed_body_text()` | Gemini Embedding 2 | Section/Topics/Tags prefix only (title passed separately) |
 
@@ -888,7 +892,7 @@ Thin wrapper over `rag-common`:
 **Built-in profiles** (`rag_common/embed_profiles.toml`):
 
 | Profile | Backend | Model | Dims | Notes |
-|---------|---------|-------|------|-------|
+| --- | --- | --- | --- | --- |
 | `openai-large` | openai | text-embedding-3-large | 1024 | Fast cloud (~$5–7 full corpus) |
 | `openai-small` | openai | text-embedding-3-small | 1024 | Cheaper cloud |
 | `gemini` | gemini | gemini-embedding-001 | 768 | AI Studio key |
@@ -912,26 +916,26 @@ Each profile writes to `data/indexes/{profile}/` — build multiple indexes for 
 
 **Row schema:**
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `id` | string | `{doc_id}:{chunk_index}` |
-| `doc_id` | string | Manifest id |
-| `title` | string | |
-| `text` | string | Raw chunk body (for excerpts) |
-| `page` | int \| null | Start page |
-| `page_end` | int \| null | End page |
-| `section_path` | string | Heading breadcrumb |
-| `alias_doc_ids` | string | Comma-joined duplicate manifest ids |
-| `alias_source_urls` | string | Comma-joined alias URLs |
-| `alias_dois` | string | Comma-joined alias DOIs |
-| `canonical_sha256` | string | PDF content hash for dedup |
-| `chunk_index` | int | |
-| `source_url` | string | |
-| `year` | int \| null | |
-| `tags` | string | Comma-joined |
-| `pipeline_categories` | string | Comma-joined |
-| `authors` | string | Comma-joined |
-| `vector` | float[] | Embed dims per profile |
+| Field                 | Type        | Notes                               |
+| --------------------- | ----------- | ----------------------------------- |
+| `id`                  | string      | `{doc_id}:{chunk_index}`            |
+| `doc_id`              | string      | Manifest id                         |
+| `title`               | string      |                                     |
+| `text`                | string      | Raw chunk body (for excerpts)       |
+| `page`                | int \| null | Start page                          |
+| `page_end`            | int \| null | End page                            |
+| `section_path`        | string      | Heading breadcrumb                  |
+| `alias_doc_ids`       | string      | Comma-joined duplicate manifest ids |
+| `alias_source_urls`   | string      | Comma-joined alias URLs             |
+| `alias_dois`          | string      | Comma-joined alias DOIs             |
+| `canonical_sha256`    | string      | PDF content hash for dedup          |
+| `chunk_index`         | int         |                                     |
+| `source_url`          | string      |                                     |
+| `year`                | int \| null |                                     |
+| `tags`                | string      | Comma-joined                        |
+| `pipeline_categories` | string      | Comma-joined                        |
+| `authors`             | string      | Comma-joined                        |
+| `vector`              | float[]     | Embed dims per profile              |
 
 **Upsert semantics:**
 
@@ -972,12 +976,12 @@ pdf_backend, chunking_fingerprint, total_tokens_embedded, estimated_cost_usd, la
 
 **No `--resume` flag** — incremental ingest is the default. Already-indexed docs skipped when manifest `sha256` matches state.
 
-| Goal | Command |
-|------|---------|
-| First build / new embed model | `ingest --force --rebuild -v` |
-| Resume after interrupt | `ingest -v` (no `--force`, no `--rebuild`) |
-| Re-embed all, keep table | `ingest --force` |
-| Drop table, fresh first batch | `ingest --rebuild` |
+| Goal                          | Command                                    |
+| ----------------------------- | ------------------------------------------ |
+| First build / new embed model | `ingest --force --rebuild -v`              |
+| Resume after interrupt        | `ingest -v` (no `--force`, no `--rebuild`) |
+| Re-embed all, keep table      | `ingest --force`                           |
+| Drop table, fresh first batch | `ingest --rebuild`                         |
 
 At most one in-flight batch (~≤50 docs by default) is lost on interrupt and re-embedded on resume.
 
@@ -986,7 +990,7 @@ At most one in-flight batch (~≤50 docs by default) is lost on interrupt and re
 **Extraction env:**
 
 | Variable | Default | Purpose |
-|----------|---------|---------|
+| --- | --- | --- |
 | `GRAPH_RAG_EXTRACT_WORKERS` | `4` | Local PDF worker processes (`0`/`1` = serial) |
 | `GRAPH_RAG_EXTRACT_QUEUE_DOCS` | `2 × GRAPH_RAG_INGEST_DOC_BATCH` | Bounded completed-outcome queue |
 | `GRAPH_RAG_DOCLING_OCR` | `0` | Enable Docling OCR |
@@ -1013,7 +1017,7 @@ Embed query vector (probe=False; vector cached by model+dims+query text)
 Retrieve-wide pool:
   dense: LanceDB cosine search (limit=pool)
   sparse: BM25 search (limit=pool)  [if hybrid]
-  fuse: reciprocal_rank_fusion or merge_rankings (RRF_K=60)
+  fuse: reciprocal_rank_fusion or merge_rankings (RRF_K=20)
 Post-fusion Python filters (tag, category, pdf_only, source, year_min)
 Canonical identity resolution (DOI, SHA-256, path, provider external ids)
 Per-canonical-paper diversity cap (max 5 candidates in rerank pool)
@@ -1026,17 +1030,17 @@ Format JSON paper results (400-char evidence excerpts)
 
 ```python
 selective = bool(category or pdf_only or tag or source)
-pool = max(40, top * (12 if selective else 4))
+pool = max(80, top * (12 if selective else 4))
 ```
 
-Wider pool when filters are selective so post-fusion filtering does not silently drop all hits.
+Wider pool when filters are selective so post-fusion filtering does not silently drop all hits. The floor of 80 (raised from 40) was validated on the de-biased qrels: the deeper fused pool surfaces more distinct papers before per-canonical grouping, with no regression on either track.
 
 ### 6.2 Hybrid retrieval (`query/hybrid.py`)
 
-**Reciprocal Rank Fusion** with `RRF_K = 60`:
+**Reciprocal Rank Fusion** with `RRF_K = 20`:
 
 ```
-score(chunk_id) += 1 / (60 + rank)   # for each list (sparse then dense)
+score(chunk_id) += 1 / (20 + rank)   # for each list (sparse then dense)
 ```
 
 - Key: chunk `id` (`doc_id:chunk_index`)
@@ -1049,7 +1053,7 @@ score(chunk_id) += 1 / (60 + rank)   # for each list (sparse then dense)
 ### 6.2a Retrieval core (`query/retrieve.py`)
 
 | Function | Purpose |
-|----------|---------|
+| --- | --- |
 | `resolve_retrieve_context(embed_profile)` | Open LanceDB + load embed config; cached per profile |
 | `retrieve_candidates(query, …)` | Single-query dense/hybrid retrieval before rerank |
 | `retrieve_multi_query(queries, …)` | Per-query hybrid retrieve + `merge_rankings` |
@@ -1063,7 +1067,7 @@ Query vectors are cached in-process by `(model, dimensions, query_text)` so benc
 Optional Vertex generative transforms for eval strategies (not used by default `query` CLI):
 
 | Function | Strategy | Purpose |
-|----------|----------|---------|
+| --- | --- | --- |
 | `multi_query_rewrites(query, n=3)` | `multi_query` | Alternative phrasings |
 | `hyde_passage(query)` | `hyde` | Hypothetical answer passage for embedding |
 | `step_back_query(query)` | `step_back` | Broader abstract query |
@@ -1075,7 +1079,7 @@ Optional Vertex generative transforms for eval strategies (not used by default `
 ### 6.3 Filter semantics (code-as-truth)
 
 | Filter | Where applied | Semantics |
-|--------|---------------|-----------|
+| --- | --- | --- |
 | `year_min` | LanceDB prefilter + Python | `(year >= N) OR (year IS NULL)` in dense; Python also skips `year < N` |
 | `pdf_only` | Python post-fusion | Doc must be in manifest (`status=ok` + `localPath`) or catalog `has_pdf` |
 | `category` | Python post-fusion | Must be in `pipeline_categories` (row field or catalog fallback) |
@@ -1145,8 +1149,7 @@ Rerank pool: up to 5 chunks per doc in filtered candidates, then `diverse_candid
 
 **Score precedence:** `rerank_score` > `fusion_score` > dense `score`.
 
-Query returns canonical papers with evidence snippets (~400 chars). For proofs, algorithms,
-or quotes, deep-read the full PDF (see §10).
+Query returns canonical papers with evidence snippets (~400 chars). For proofs, algorithms, or quotes, deep-read the full PDF (see §10).
 
 ---
 
@@ -1171,7 +1174,7 @@ coordinate-assignment, routing, compaction, packing, overlap
 ### 7.2 Classifier (`catalog/classify.py`)
 
 | Function | Returns |
-|----------|---------|
+| --- | --- |
 | `classify_item(item)` | `(categories, methods)` where methods are `"tag"` or `"keyword"` per category |
 | `build_catalog()` | List of `CatalogEntry` with doc_id, title, year, source, status, categories, has_pdf, tags, off_topic |
 | `summarize_catalog()` | Counts by category, uncategorized, by source, off-topic |
@@ -1195,7 +1198,7 @@ Pluggable retrieval benchmark framework for A/B testing embed profiles, fusion m
 **Modules:**
 
 | Module | Role |
-|--------|------|
+| --- | --- |
 | `eval/gold_cases.py` | 30 labeled `EvalCase` rows (query, relevant doc_ids, category, pdf_only) |
 | `eval/metrics.py` | Doc-level recall@k, MRR, nDCG@10, per-category aggregates |
 | `eval/strategies/` | Pluggable retrieval strategies (offline + optional LLM) |
@@ -1231,14 +1234,14 @@ uv run graph-layout-rag eval retrieval \
 ```
 
 | Command | Purpose |
-|---------|---------|
+| --- | --- |
 | `eval benchmark` | Run gold-set sweep across strategies; write JSON + optional markdown report |
 | `eval retrieval` | Back-compat: dense / hybrid / reranked only |
 
 **Benchmark flags:**
 
 | Flag | Purpose |
-|------|---------|
+| --- | --- |
 | `--embed-profile` | Required; must match a built index |
 | `--strategy` | Repeatable; default all offline strategies (or all if `--llm-transforms`) |
 | `--llm-transforms` / `--no-llm-transforms` | Enable HyDE, multi-query, step-back strategies |
@@ -1270,7 +1273,7 @@ Sources: original 4-case eval set, [docs/pipeline-rag-queries.md](../../docs/pip
 ### 8.3 Retrieval strategies (`eval/strategies/`)
 
 | Strategy ID | LLM? | Description |
-|-------------|------|-------------|
+| --- | --- | --- |
 | `dense` | no | Dense-only cosine search |
 | `hybrid` | no | BM25 + dense RRF (default query mode) |
 | `hybrid_rerank` | no | Hybrid + cross-encoder rerank |
@@ -1287,7 +1290,7 @@ Sources: original 4-case eval set, [docs/pipeline-rag-queries.md](../../docs/pip
 Doc-level hit: any chunk from a relevant `doc_id` in top-k counts as recall.
 
 | Metric | Description |
-|--------|-------------|
+| --- | --- |
 | `recall@5`, `recall@10`, `recall@20` | Binary: any relevant doc in top-k |
 | `mrr` | Reciprocal rank of first relevant doc |
 | `ndcg@10` | Binary relevance nDCG (deduped per doc_id) |
@@ -1353,32 +1356,32 @@ Pass extra args after `--` for yarn scripts.
 
 ### Query flags
 
-| Flag | Default | Effect |
-|------|---------|--------|
-| `--top` | 8 | Number of results |
-| `--max-per-doc` | 2 | Max chunks returned per document |
-| `--tag` | none | Exact tag filter |
-| `--category` | none | Pipeline category slug |
-| `--pdf-only` | off | Exclude metadata-only docs |
-| `--source` | none | Filter by source URL or tag substring |
-| `--year-min` | none | Minimum publication year |
-| `--embed-profile` | env | Must match built index |
-| `--rerank/--no-rerank` | env default | Cross-encoder rerank |
-| `--hybrid/--no-hybrid` | on | Fuse BM25 + dense |
-| `--json` | off | JSON output for agents |
+| Flag                   | Default     | Effect                                |
+| ---------------------- | ----------- | ------------------------------------- |
+| `--top`                | 8           | Number of results                     |
+| `--max-per-doc`        | 2           | Max chunks returned per document      |
+| `--tag`                | none        | Exact tag filter                      |
+| `--category`           | none        | Pipeline category slug                |
+| `--pdf-only`           | off         | Exclude metadata-only docs            |
+| `--source`             | none        | Filter by source URL or tag substring |
+| `--year-min`           | none        | Minimum publication year              |
+| `--embed-profile`      | env         | Must match built index                |
+| `--rerank/--no-rerank` | env default | Cross-encoder rerank                  |
+| `--hybrid/--no-hybrid` | on          | Fuse BM25 + dense                     |
+| `--json`               | off         | JSON output for agents                |
 
 ### Catalog flags
 
-| Flag | Effect |
-|------|--------|
-| `--status ok\|metadata_only\|failed` | Filter by manifest status |
-| `--category SLUG` | Filter by pipeline category |
-| `--uncategorized` | Items with no category |
-| `--doc-id ID` | Single document detail |
-| `--limit N` | Cap listing |
-| `--include-orphans` | PDFs on disk not in manifest |
-| `--flag-off-topic` | Mark off-topic via relevance check |
-| `--json` | JSON output |
+| Flag                                 | Effect                             |
+| ------------------------------------ | ---------------------------------- |
+| `--status ok\|metadata_only\|failed` | Filter by manifest status          |
+| `--category SLUG`                    | Filter by pipeline category        |
+| `--uncategorized`                    | Items with no category             |
+| `--doc-id ID`                        | Single document detail             |
+| `--limit N`                          | Cap listing                        |
+| `--include-orphans`                  | PDFs on disk not in manifest       |
+| `--flag-off-topic`                   | Mark off-topic via relevance check |
+| `--json`                             | JSON output                        |
 
 ---
 
@@ -1386,21 +1389,21 @@ Pass extra args after `--` for yarn scripts.
 
 ### Harvest
 
-| Variable | Purpose |
-|----------|---------|
+| Variable       | Purpose                                       |
+| -------------- | --------------------------------------------- |
 | `CORE_API_KEY` | CORE API for archive PDF fallbacks (optional) |
 
 ### Embed profiles (recommended)
 
 | Variable | Purpose |
-|----------|---------|
+| --- | --- |
 | `RAG_EMBED_PROFILE` | Named profile: `mlx-qwen4b`, `openai-large`, `gemini`, `gemini-2`, etc. |
 | `GRAPH_RAG_EMBED_PROFILE` | Tool-specific override of `RAG_EMBED_PROFILE` |
 
 ### Gemini / Vertex AI
 
 | Variable | Purpose |
-|----------|---------|
+| --- | --- |
 | `GOOGLE_GENAI_USE_VERTEXAI` | Use Vertex AI instead of AI Studio |
 | `GOOGLE_CLOUD_PROJECT` | GCP project ID |
 | `GOOGLE_CLOUD_LOCATION` | e.g. `us-central1` |
@@ -1414,7 +1417,7 @@ Pass extra args after `--` for yarn scripts.
 ### PDF extraction backend
 
 | Variable | Default | Purpose |
-|----------|---------|---------|
+| --- | --- | --- |
 | `GRAPH_RAG_PDF_BACKEND` | `pymupdf` | `pymupdf`, `docling`, or `gemini` |
 | `GRAPH_RAG_GEMINI_VISION_MODEL` | — | Vision model for gemini backend |
 | `GRAPH_RAG_GEMINI_VISION_LOCATION` | — | e.g. `global` for gemini-3.x |
@@ -1426,20 +1429,20 @@ Pass extra args after `--` for yarn scripts.
 
 ### Legacy embed backend
 
-| Variable | Purpose |
-|----------|---------|
-| `RAG_EMBED_BACKEND` | `auto`, `openai`, `local`, `gemini` |
-| `OPENAI_API_KEY` | Required for OpenAI embed |
-| `RAG_OPENAI_EMBED_MODEL` | e.g. `text-embedding-3-large` |
-| `RAG_OPENAI_EMBED_DIMS` | e.g. `1024` |
-| `RAG_LOCAL_EMBED_MODEL` | e.g. `Qwen/Qwen3-Embedding-4B` |
-| `RAG_LOCAL_EMBED_DIMS` | e.g. `1024` |
-| `RAG_LOCAL_EMBED_QUANT` | e.g. `4bit` (MLX) |
+| Variable                 | Purpose                             |
+| ------------------------ | ----------------------------------- |
+| `RAG_EMBED_BACKEND`      | `auto`, `openai`, `local`, `gemini` |
+| `OPENAI_API_KEY`         | Required for OpenAI embed           |
+| `RAG_OPENAI_EMBED_MODEL` | e.g. `text-embedding-3-large`       |
+| `RAG_OPENAI_EMBED_DIMS`  | e.g. `1024`                         |
+| `RAG_LOCAL_EMBED_MODEL`  | e.g. `Qwen/Qwen3-Embedding-4B`      |
+| `RAG_LOCAL_EMBED_DIMS`   | e.g. `1024`                         |
+| `RAG_LOCAL_EMBED_QUANT`  | e.g. `4bit` (MLX)                   |
 
 ### Ingest tuning
 
 | Variable | Default | Purpose |
-|----------|---------|---------|
+| --- | --- | --- |
 | `GRAPH_RAG_INGEST_DOC_BATCH` | 25 | Docs per flush/checkpoint |
 | `GRAPH_RAG_INGEST_SCAN_LOG_EVERY` | 100 | Scan progress log interval |
 | `GRAPH_RAG_INGEST_PROGRESS_LOG_EVERY` | 25 | Emit progress/ETA INFO log after this many canonical documents |
@@ -1453,7 +1456,7 @@ Pass extra args after `--` for yarn scripts.
 ### Reranking
 
 | Variable | Default | Purpose |
-|----------|---------|---------|
+| --- | --- | --- |
 | `RAG_RERANK_ENABLED` | false | Default-on reranking |
 | `RAG_RERANK_MODEL` | `BAAI/bge-reranker-v2-m3` | Cross-encoder model |
 | `RAG_RERANK_TOP` | — | Override rerank result count |
@@ -1461,7 +1464,7 @@ Pass extra args after `--` for yarn scripts.
 ### Eval / query transforms
 
 | Variable | Default | Purpose |
-|----------|---------|---------|
+| --- | --- | --- |
 | `GRAPH_RAG_EVAL_LLM_MODEL` | `gemini-2.0-flash` | Vertex model for HyDE / multi-query / step-back |
 
 ---
@@ -1607,14 +1610,13 @@ If `status` is `metadata_only`, use `title`, `abstract`, `doi`, `url` from manif
 
 ### 11.8 Corpus quality expectations
 
-| Layer | Use |
-|-------|-----|
-| Full PDFs (`ok`) | Deep reading, accurate quotes |
-| Metadata only | Discovery, citations |
-| Failed | Retry with `harvest --deep-harvest --resume` |
+| Layer            | Use                                          |
+| ---------------- | -------------------------------------------- |
+| Full PDFs (`ok`) | Deep reading, accurate quotes                |
+| Metadata only    | Discovery, citations                         |
+| Failed           | Retry with `harvest --deep-harvest --resume` |
 
-**High-signal sources:** `graphviz.org`, `handbook`, `topic-seed`, `elk-bibliography`, curated seeds.
-**Noisier:** OpenAlex long tail (some off-topic PDFs). Prefer top-ranked hits with layout-related tags.
+**High-signal sources:** `graphviz.org`, `handbook`, `topic-seed`, `elk-bibliography`, curated seeds. **Noisier:** OpenAlex long tail (some off-topic PDFs). Prefer top-ranked hits with layout-related tags.
 
 ---
 
@@ -1636,7 +1638,7 @@ uv run pytest -k "doi"                    # name filter
 ### Test inventory (~172 tests across 33 modules)
 
 | Area | Test file | What it covers |
-|------|-----------|----------------|
+| --- | --- | --- |
 | Manifest | `test_manifest.py` | `slug_id`, `upsert_item` replace semantics |
 | Embed | `test_embed.py` | Local embed via rag-common (mocked SentenceTransformer) |
 | OpenAlex | `test_openalex.py` | Cursor pagination |
@@ -1694,7 +1696,7 @@ Expect ~170 passed, 2 skipped without a built index.
 ### Extending tests
 
 | Change | Add tests in |
-|--------|--------------|
+| --- | --- |
 | New harvest source | Mock HTTP responses; test item shape and `source` tag |
 | New DOI tier | `test_doi_resolver.py` |
 | New PDF backend | Backend routing + graceful degradation (see `test_docling_text.py`) |
@@ -1711,7 +1713,7 @@ Expect ~170 passed, 2 skipped without a built index.
 All Python modules under `src/graph_layout_rag/`:
 
 | Module | Responsibility |
-|--------|----------------|
+| --- | --- |
 | `__init__.py` | Package marker |
 | `cli.py` | Click CLI: harvest, ingest, embed, eval, query, catalog |
 | `env.py` | `.env` load order |
@@ -1720,11 +1722,11 @@ All Python modules under `src/graph_layout_rag/`:
 | `pdf_text.py` | PyMuPDF extraction, de-hyphenation, NFKC, `PdfExtractResult` |
 | `docling_text.py` | Docling Markdown extraction backend |
 | `gemini_vision_text.py` | Gemini vision per-page transcription backend |
-| **catalog/** | |
+| **catalog/** |  |
 | `catalog/__init__.py` | Package marker |
 | `catalog/taxonomy.py` | Pipeline categories, tag→category map, keywords |
 | `catalog/classify.py` | `classify_item`, `build_catalog`, `summarize_catalog` |
-| **harvest/** | |
+| **harvest/** |  |
 | `harvest/__init__.py` | Package marker |
 | `harvest/run.py` | Harvest orchestration, CLI group, preset modes |
 | `harvest/graphviz_theory.py` | Graphviz theory page crawl |
@@ -1758,7 +1760,7 @@ All Python modules under `src/graph_layout_rag/`:
 | `harvest/prune.py` | Precision-first corpus prune |
 | `harvest/enrich.py` | Backfill missing abstracts via OpenAlex |
 | `harvest/log.py` | Harvest logging setup |
-| **ingest/** | |
+| **ingest/** |  |
 | `ingest/__init__.py` | Package marker |
 | `ingest/run.py` | Ingest orchestration, batch checkpointing |
 | `ingest/extract.py` | PDF backend router, metadata fallback |
@@ -1771,7 +1773,7 @@ All Python modules under `src/graph_layout_rag/`:
 | `ingest/status.py` | Live ingest telemetry (`ingest_status.json`) |
 | `ingest/check_pdfs.py` | MuPDF extraction diagnostics CLI |
 | `ingest/compare_extract.py` | Backend A/B comparison CLI |
-| **eval/** | |
+| **eval/** |  |
 | `eval/__init__.py` | Package marker |
 | `eval/gold_cases.py` | 30-case gold evaluation set (`EvalCase`) |
 | `eval/metrics.py` | recall@k, MRR, nDCG, per-category aggregates |
@@ -1779,7 +1781,7 @@ All Python modules under `src/graph_layout_rag/`:
 | `eval/benchmark.py` | Benchmark runner, `eval benchmark` CLI |
 | `eval/report.py` | Markdown report from benchmark JSON |
 | `eval/retrieval.py` | Legacy `eval retrieval` CLI (dense/hybrid/reranked) |
-| **query/** | |
+| **query/** |  |
 | `query/retrieve.py` | Low-level retrieval: embed, LanceDB, BM25, RRF, filters, caches |
 | `query/search.py` | `search()` wrapper: retrieve → rerank → JSON format |
 | `query/hybrid.py` | `reciprocal_rank_fusion`, `merge_rankings` |
@@ -1831,7 +1833,7 @@ All Python modules under `src/graph_layout_rag/`:
 ### Documentation vs code discrepancies
 
 | Topic | README/SKILL says | Code does |
-|-------|-------------------|-----------|
+| --- | --- | --- |
 | Ingest batch size | default 10 | default **25** (`GRAPH_RAG_INGEST_DOC_BATCH`) |
 | `--tag` filter | "substring" in CLI help | **exact** tag match on comma-split tags |
 | Dense prefilters | tag/category pushed into LanceDB | only **`year_min`** prefiltered in dense search |

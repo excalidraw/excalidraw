@@ -11,7 +11,7 @@ import lancedb
 
 from rag_common.gemini_embed import is_gemini_embedding_2
 
-from graph_layout_rag.ingest import bm25
+from graph_layout_rag.ingest import bm25, embed_cache
 from graph_layout_rag.ingest.chunk import TextChunk, embed_body_text, embed_input_text
 from graph_layout_rag.ingest.log import get_logger
 from graph_layout_rag.ingest.embed import (
@@ -244,22 +244,47 @@ def upsert_chunks(
         paths.root,
     )
     t0 = time.monotonic()
-    vectors = embed_texts(
-        texts,
-        config=cfg,
-        stats=stats,
-        workers=workers,
-        prefix=ENV_PREFIX,
-        allow_fallback=not is_gemini_embedding_2(cfg.model),
-        probe=False,
-        titles=titles,
-    )
+    # Persistent embedding cache: only the chunks whose (embed config + title + text)
+    # are not already on disk hit the embedding API. Unchanged chunks on a
+    # --force/--rebuild cost nothing.
+    keys = [
+        embed_cache.cache_key(
+            backend=cfg.backend,
+            model=cfg.model,
+            dims=cfg.dimensions,
+            profile=cfg.profile,
+            title=titles[i] if titles else None,
+            text=texts[i],
+        )
+        for i in range(len(texts))
+    ]
+    cached = embed_cache.get_many(keys, dims=cfg.dimensions)
+    miss_idx = [i for i, v in enumerate(cached) if v is None]
+    if miss_idx:
+        miss_vectors = embed_texts(
+            [texts[i] for i in miss_idx],
+            config=cfg,
+            stats=stats,
+            workers=workers,
+            prefix=ENV_PREFIX,
+            allow_fallback=not is_gemini_embedding_2(cfg.model),
+            probe=False,
+            titles=[titles[i] for i in miss_idx] if titles else None,
+        )
+        embed_cache.put_many([keys[i] for i in miss_idx], miss_vectors)
+        for i, vec in zip(miss_idx, miss_vectors):
+            cached[i] = vec
+    if any(v is None for v in cached):
+        raise RuntimeError("embed cache stitch left unfilled vectors")
+    vectors = [v for v in cached if v is not None]
     embed_s = time.monotonic() - t0
     if phase_stats is not None:
         phase_stats.embedding_seconds += embed_s
     log.info(
-        "embed phase done chunks=%d elapsed_s=%.1f chunks_per_second=%.2f",
+        "embed phase done chunks=%d cache_hits=%d cache_misses=%d elapsed_s=%.1f chunks_per_second=%.2f",
         len(chunks),
+        len(chunks) - len(miss_idx),
+        len(miss_idx),
         embed_s,
         len(chunks) / embed_s if embed_s else 0.0,
     )

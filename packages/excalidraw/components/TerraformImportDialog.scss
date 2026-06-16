@@ -356,6 +356,13 @@
       }
     }
 
+    &__controlNote {
+      grid-column: 1 / -1;
+      color: var(--tf-muted);
+      font-size: 0.75rem;
+      line-height: 1.35;
+    }
+
     &__filePair,
     &__optionalGrid {
       display: grid;

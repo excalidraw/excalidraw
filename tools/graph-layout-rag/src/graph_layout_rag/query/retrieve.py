@@ -121,7 +121,11 @@ def _pool_size(*, top: int, filters: RetrieveFilters) -> int:
     selective = bool(
         filters.category or filters.pdf_only or filters.tag or filters.source or filters.year_min
     )
-    return max(40, top * (12 if selective else 4))
+    # Floor of 80 fused candidates: the de-biased bake-off found pool 80 matched
+    # or beat the old 40-deep default on both tracks (the deeper fusion pool
+    # surfaces more distinct papers before per-doc grouping). Selective filters
+    # still widen further since they prune post-fusion.
+    return max(80, top * (12 if selective else 4))
 
 
 def _embed_vector(query: str, *, config: EmbedConfig) -> list[float]:
@@ -217,7 +221,7 @@ def retrieve_candidates(
     context: RetrieveContext | None = None,
     vector: Sequence[float] | None = None,
     bm25_query: str | None = None,
-    rrf_k: int = 60,
+    rrf_k: int = 20,
     dense_weight: float = 1.0,
     sparse_weight: float = 1.0,
 ) -> list[dict[str, Any]]:

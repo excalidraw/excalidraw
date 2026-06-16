@@ -21,6 +21,7 @@ const VALID_VIEWS = new Set<TerraformView>(["module", "semantic", "pipeline"]);
 const VALID_PIPELINE_VARIANTS = new Set<PipelineLayoutVariant>([
   "classic",
   "compound",
+  "v2",
 ]);
 const VALID_PACK_MODES = new Set<ModulePackingMode>([
   "default",

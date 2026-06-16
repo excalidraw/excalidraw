@@ -221,7 +221,7 @@ def search_raw(
     max_per_doc: int = 2,
     rerank_query: str | None = None,
     pool: int | None = None,
-    rrf_k: int = 60,
+    rrf_k: int = 20,
     dense_weight: float = 1.0,
     sparse_weight: float = 1.0,
     rerank_model: str | None = None,

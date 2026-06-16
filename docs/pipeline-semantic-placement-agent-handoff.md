@@ -379,12 +379,12 @@ yarn hydrate:terraform-preset staging-extended-localstack-v2
 
 ### RAG + repo search
 
-| Tool | Command / path |
-| --- | --- |
+| Tool                   | Command / path                             |
+| ---------------------- | ------------------------------------------ |
 | Graph layout RAG skill | `.agents/skills/graph-layout-rag/SKILL.md` |
-| Query | `yarn graph-rag:query "…" --top 8 --json` |
-| Repo code RAG skill | `.agents/skills/repo-rag/SKILL.md` |
-| Pipeline query pack | `docs/pipeline-rag-queries.md` |
+| Query                  | `yarn graph-rag:query "…" --top 8 --json`  |
+| Repo code RAG skill    | `.agents/skills/repo-rag/SKILL.md`         |
+| Pipeline query pack    | `docs/pipeline-rag-queries.md`             |
 
 ---
 
