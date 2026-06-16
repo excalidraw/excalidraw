@@ -13,19 +13,27 @@ import { HistorySidebar, SceneHistoryProvider } from "./HistorySidebar";
 
 import "./AppSidebar.scss";
 
+import type { CollabAPI } from "../collab/Collab";
+
 type AppSidebarProps = {
+  collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI | null;
   isCollaborating: boolean;
 };
 
 export const AppSidebar = ({
+  collabAPI,
   excalidrawAPI,
   isCollaborating,
 }: AppSidebarProps) => {
   const { theme, openSidebar } = useUIAppState();
 
   return (
-    <SceneHistoryProvider excalidrawAPI={excalidrawAPI}>
+    <SceneHistoryProvider
+      collabAPI={collabAPI}
+      excalidrawAPI={excalidrawAPI}
+      isCollaborating={isCollaborating}
+    >
       <DefaultSidebar>
         <DefaultSidebar.TabTriggers>
           {excalidrawAPI && (
@@ -77,6 +85,7 @@ export const AppSidebar = ({
         {excalidrawAPI && (
           <Sidebar.Tab tab="history">
             <HistorySidebar
+              collabAPI={collabAPI}
               excalidrawAPI={excalidrawAPI}
               isCollaborating={isCollaborating}
             />

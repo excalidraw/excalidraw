@@ -1,8 +1,10 @@
 import {
   getInitializedImageElements,
   getObservedAppState,
+  newElementWith,
   StoreDelta,
 } from "@excalidraw/element";
+import { bumpElementVersions } from "@excalidraw/excalidraw/data/restore";
 import { createStore, get, set } from "idb-keyval";
 
 import type {
@@ -20,8 +22,8 @@ import type {
 
 import { STORAGE_KEYS } from "../app_constants";
 
-const HISTORY_VERSION = 1;
-const MAX_HISTORY_ENTRIES = 120;
+export const SCENE_HISTORY_VERSION = 1;
+export const MAX_SCENE_HISTORY_ENTRIES = 120;
 const SNAPSHOT_INTERVAL = 20;
 const LOCAL_DOCUMENT_ID = "local-default";
 const RECORDABLE_APP_STATE_KEYS = new Set<keyof ObservedAppState>([
@@ -69,7 +71,7 @@ export type SceneHistoryEntry = {
 };
 
 export type SceneHistoryData = {
-  version: typeof HISTORY_VERSION;
+  version: typeof SCENE_HISTORY_VERSION;
   documentId: string;
   currentEntryId: string | null;
   entries: SceneHistoryEntry[];
@@ -103,7 +105,7 @@ const store = createStore(
   `${STORAGE_KEYS.IDB_SCENE_HISTORY}-store`,
 );
 
-const createId = () => {
+export const createSceneHistoryId = () => {
   return (
     globalThis.crypto?.randomUUID?.() ??
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
@@ -117,7 +119,7 @@ const cloneSerializable = <T>(value: T): T => {
 const createEmptyHistory = (
   documentId = LOCAL_DOCUMENT_ID,
 ): SceneHistoryData => ({
-  version: HISTORY_VERSION,
+  version: SCENE_HISTORY_VERSION,
   documentId,
   currentEntryId: null,
   entries: [],
@@ -140,7 +142,7 @@ const normalizeObservedAppState = (appState: AppState): ObservedAppState => {
   });
 };
 
-const resetTransientAppState = (
+export const resetTransientAppState = (
   appState: Partial<AppState>,
 ): Partial<AppState> => {
   return {
@@ -166,7 +168,25 @@ export const createSceneHistorySnapshot = ({
   appState: normalizeObservedAppState(appState),
 });
 
-const getReferencedFileIds = (
+export const createCollabRestoreElements = (
+  targetElements: readonly OrderedExcalidrawElement[],
+  currentElements: readonly OrderedExcalidrawElement[],
+): OrderedExcalidrawElement[] => {
+  const targetIds = new Set(targetElements.map((element) => element.id));
+  const bumpedTargetElements = bumpElementVersions(
+    targetElements,
+    currentElements,
+  ) as OrderedExcalidrawElement[];
+  const deletedCurrentOnlyElements = currentElements
+    .filter((element) => !targetIds.has(element.id))
+    .map((element) =>
+      newElementWith(element, { isDeleted: true }, true),
+    ) as OrderedExcalidrawElement[];
+
+  return bumpedTargetElements.concat(deletedCurrentOnlyElements);
+};
+
+export const getReferencedFileIds = (
   elements: readonly ExcalidrawElement[],
 ): FileId[] => {
   const ids = new Set<FileId>();
@@ -352,14 +372,14 @@ export const reconstructSceneHistoryData = (
 export const trimSceneHistoryData = (
   historyData: SceneHistoryData,
 ): SceneHistoryData => {
-  if (historyData.entries.length <= MAX_HISTORY_ENTRIES) {
+  if (historyData.entries.length <= MAX_SCENE_HISTORY_ENTRIES) {
     return {
       ...historyData,
       files: pruneFiles(historyData.entries, historyData.files),
     };
   }
 
-  const firstKeptIndex = historyData.entries.length - MAX_HISTORY_ENTRIES;
+  const firstKeptIndex = historyData.entries.length - MAX_SCENE_HISTORY_ENTRIES;
   const firstKeptEntry = historyData.entries[firstKeptIndex];
   const reconstructedFirstEntry = reconstructSceneHistoryData(
     historyData,
@@ -404,7 +424,7 @@ class SceneHistoryIndexedDBAdapter {
       );
 
       if (
-        historyData?.version === HISTORY_VERSION &&
+        historyData?.version === SCENE_HISTORY_VERSION &&
         historyData.documentId === documentId
       ) {
         return historyData;
@@ -441,7 +461,7 @@ export class SceneHistory {
     }
 
     const entry: SceneHistoryEntry = {
-      id: createId(),
+      id: createSceneHistoryId(),
       kind: "initial",
       sequence: 0,
       createdAt: Date.now(),
@@ -501,7 +521,7 @@ export class SceneHistory {
     const sequence = (lastEntry?.sequence ?? -1) + 1;
     const isCheckpoint = sequence % SNAPSHOT_INTERVAL === 0;
     const entry: SceneHistoryEntry = {
-      id: createId(),
+      id: createSceneHistoryId(),
       kind,
       sequence,
       createdAt: Date.now(),

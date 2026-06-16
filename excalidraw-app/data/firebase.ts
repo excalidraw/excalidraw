@@ -10,8 +10,14 @@ import { getSceneVersion } from "@excalidraw/element";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
+  collection,
   doc,
   getDoc,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
   runTransaction,
   Bytes,
 } from "firebase/firestore";
@@ -28,15 +34,32 @@ import type {
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
+  ObservedAppState,
 } from "@excalidraw/excalidraw/types";
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
+import {
+  createSceneHistoryId,
+  createSceneHistorySnapshot,
+  getReferencedFileIds,
+  MAX_SCENE_HISTORY_ENTRIES,
+  resetTransientAppState,
+  SCENE_HISTORY_VERSION,
+} from "./SceneHistory";
+
 import { getSyncableElements } from ".";
 
 import type { SyncableExcalidrawElement } from ".";
+import type {
+  SceneHistoryData,
+  SceneHistoryEntry,
+  SceneHistoryEntryKind,
+  SceneHistorySnapshot,
+} from "./SceneHistory";
 import type Portal from "../collab/Portal";
 import type { Socket } from "socket.io-client";
+import type { Unsubscribe } from "firebase/firestore";
 
 // private
 // -----------------------------------------------------------------------------
@@ -90,6 +113,39 @@ type FirebaseStoredScene = {
   ciphertext: Bytes;
 };
 
+type FirebaseSceneHistoryPayload = SceneHistorySnapshot & {
+  thumbnail: string | null;
+};
+
+type FirebaseStoredSceneHistoryEntry = Omit<
+  SceneHistoryEntry,
+  "delta" | "snapshot" | "thumbnail"
+> & {
+  historyVersion: typeof SCENE_HISTORY_VERSION;
+  sceneVersion: number;
+  iv: Bytes;
+  ciphertext: Bytes;
+};
+
+type FirebaseSceneHistoryMetadata = {
+  historyVersion: typeof SCENE_HISTORY_VERSION;
+  currentEntryId: string | null;
+  currentSceneVersion: number | null;
+  lastSequence: number;
+  updatedAt: number;
+};
+
+type FirebaseSceneHistoryAppend = {
+  roomId: string;
+  roomKey: string;
+  sessionId: string;
+  elements: readonly OrderedExcalidrawElement[];
+  appState: AppState;
+  thumbnail?: string | null;
+  kind?: Extract<SceneHistoryEntryKind, "change" | "restore">;
+  restoreSourceId?: string;
+};
+
 const encryptElements = async (
   key: string,
   elements: readonly ExcalidrawElement[],
@@ -113,6 +169,93 @@ const decryptElements = async (
     new Uint8Array(decrypted),
   );
   return JSON.parse(decodedData);
+};
+
+const encryptSceneHistoryPayload = async (
+  key: string,
+  payload: FirebaseSceneHistoryPayload,
+): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
+  const json = JSON.stringify(payload);
+  const encoded = new TextEncoder().encode(json);
+  const { encryptedBuffer, iv } = await encryptData(key, encoded);
+
+  return { ciphertext: encryptedBuffer, iv };
+};
+
+const decryptSceneHistoryPayload = async (
+  data: FirebaseStoredSceneHistoryEntry,
+  roomKey: string,
+): Promise<FirebaseSceneHistoryPayload> => {
+  const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
+  const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
+
+  const decrypted = await decryptData(iv, ciphertext, roomKey);
+  const decodedData = new TextDecoder("utf-8").decode(
+    new Uint8Array(decrypted),
+  );
+  return JSON.parse(decodedData);
+};
+
+const getSceneHistoryMetaRef = (roomId: string) => {
+  return doc(_getFirestore(), "sceneHistory", roomId);
+};
+
+const getSceneHistoryEntriesRef = (roomId: string) => {
+  return collection(getSceneHistoryMetaRef(roomId), "entries");
+};
+
+const getSceneHistoryEntriesQuery = (roomId: string) => {
+  return query(
+    getSceneHistoryEntriesRef(roomId),
+    orderBy("sequence", "desc"),
+    limit(MAX_SCENE_HISTORY_ENTRIES),
+  );
+};
+
+const createEmptySceneHistoryData = (roomId: string): SceneHistoryData => ({
+  version: SCENE_HISTORY_VERSION,
+  documentId: `collab:${roomId}`,
+  currentEntryId: null,
+  entries: [],
+  files: {},
+});
+
+const decodeFirebaseSceneHistoryEntries = async (
+  roomId: string,
+  roomKey: string,
+  storedEntries: FirebaseStoredSceneHistoryEntry[],
+): Promise<SceneHistoryData> => {
+  const entries = await Promise.all(
+    [...storedEntries].reverse().map(async (storedEntry) => {
+      const payload = await decryptSceneHistoryPayload(storedEntry, roomKey);
+      const entry: SceneHistoryEntry = {
+        id: storedEntry.id,
+        kind: storedEntry.kind,
+        sequence: storedEntry.sequence,
+        createdAt: storedEntry.createdAt,
+        sessionId: storedEntry.sessionId,
+        parentId: storedEntry.parentId,
+        summary: storedEntry.summary,
+        thumbnail: payload.thumbnail,
+        fileIds: storedEntry.fileIds,
+        restoreSourceId: storedEntry.restoreSourceId,
+        snapshot: {
+          elements: payload.elements,
+          appState: resetTransientAppState(
+            payload.appState as Partial<AppState>,
+          ) as ObservedAppState,
+        },
+      };
+
+      return entry;
+    }),
+  );
+
+  return {
+    ...createEmptySceneHistoryData(roomId),
+    currentEntryId: entries[entries.length - 1]?.id ?? null,
+    entries,
+  };
 };
 
 class FirebaseSceneVersionCache {
@@ -269,6 +412,128 @@ export const loadFromFirebase = async (
   }
 
   return elements;
+};
+
+export const loadSceneHistoryFromFirebase = async ({
+  roomId,
+  roomKey,
+}: {
+  roomId: string;
+  roomKey: string;
+}): Promise<SceneHistoryData> => {
+  const snapshot = await getDocs(getSceneHistoryEntriesQuery(roomId));
+  const storedEntries = snapshot.docs.map(
+    (doc) => doc.data() as FirebaseStoredSceneHistoryEntry,
+  );
+
+  return decodeFirebaseSceneHistoryEntries(roomId, roomKey, storedEntries);
+};
+
+export const subscribeSceneHistoryFromFirebase = ({
+  roomId,
+  roomKey,
+  onChange,
+  onError,
+}: {
+  roomId: string;
+  roomKey: string;
+  onChange: (historyData: SceneHistoryData) => void;
+  onError: (error: Error) => void;
+}): Unsubscribe => {
+  let updateId = 0;
+
+  return onSnapshot(
+    getSceneHistoryEntriesQuery(roomId),
+    (snapshot) => {
+      const currentUpdateId = ++updateId;
+      const storedEntries = snapshot.docs.map(
+        (doc) => doc.data() as FirebaseStoredSceneHistoryEntry,
+      );
+
+      decodeFirebaseSceneHistoryEntries(roomId, roomKey, storedEntries)
+        .then((historyData) => {
+          if (currentUpdateId === updateId) {
+            onChange(historyData);
+          }
+        })
+        .catch(onError);
+    },
+    onError,
+  );
+};
+
+export const appendSceneHistoryToFirebase = async ({
+  roomId,
+  roomKey,
+  sessionId,
+  elements,
+  appState,
+  thumbnail = null,
+  kind = "change",
+  restoreSourceId,
+}: FirebaseSceneHistoryAppend) => {
+  const sceneVersion = getSceneVersion(elements);
+  const payload: FirebaseSceneHistoryPayload = {
+    ...createSceneHistorySnapshot({ elements, appState }),
+    thumbnail,
+  };
+  const { ciphertext, iv } = await encryptSceneHistoryPayload(roomKey, payload);
+  const firestore = _getFirestore();
+  const metaRef = getSceneHistoryMetaRef(roomId);
+  const entryId = createSceneHistoryId();
+  const entryRef = doc(getSceneHistoryEntriesRef(roomId), entryId);
+  const createdAt = Date.now();
+
+  return runTransaction(firestore, async (transaction) => {
+    const metaSnapshot = await transaction.get(metaRef);
+    const meta = metaSnapshot.exists()
+      ? (metaSnapshot.data() as FirebaseSceneHistoryMetadata)
+      : null;
+
+    if (
+      meta?.historyVersion === SCENE_HISTORY_VERSION &&
+      meta.currentSceneVersion === sceneVersion &&
+      kind !== "restore"
+    ) {
+      return null;
+    }
+
+    const sequence = (meta?.lastSequence ?? -1) + 1;
+    const entryKind = sequence === 0 ? "initial" : kind;
+    const entry: FirebaseStoredSceneHistoryEntry = {
+      historyVersion: SCENE_HISTORY_VERSION,
+      id: entryId,
+      kind: entryKind,
+      sequence,
+      createdAt,
+      sessionId,
+      parentId: meta?.currentEntryId ?? null,
+      summary:
+        entryKind === "initial"
+          ? "Initial version"
+          : entryKind === "restore"
+          ? "Restored previous version"
+          : "Shared scene updated",
+      fileIds: getReferencedFileIds(elements),
+      restoreSourceId,
+      sceneVersion,
+      ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
+      iv: Bytes.fromUint8Array(iv),
+    };
+
+    const nextMetadata: FirebaseSceneHistoryMetadata = {
+      historyVersion: SCENE_HISTORY_VERSION,
+      currentEntryId: entry.id,
+      currentSceneVersion: sceneVersion,
+      lastSequence: sequence,
+      updatedAt: createdAt,
+    };
+
+    transaction.set(entryRef, entry);
+    transaction.set(metaRef, nextMetadata, { merge: true });
+
+    return entry;
+  });
 };
 
 export const loadFilesFromFirebase = async (

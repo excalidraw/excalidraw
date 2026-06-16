@@ -23,22 +23,30 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import { LocalData } from "../data/LocalData";
+import { getCollaborationLinkData } from "../data";
 import {
+  createCollabRestoreElements,
   isSceneHistoryDeltaRecordable,
+  reconstructSceneHistoryData,
   SceneHistory,
 } from "../data/SceneHistory";
+import { subscribeSceneHistoryFromFirebase } from "../data/firebase";
 
 import "./HistorySidebar.scss";
 
+import type { CollabAPI } from "../collab/Collab";
 import type { SceneHistoryData, SceneHistoryEntry } from "../data/SceneHistory";
 
 type HistorySidebarProps = {
+  collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
   isCollaborating: boolean;
 };
 
 type SceneHistoryProviderProps = {
+  collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI | null;
+  isCollaborating: boolean;
   children: React.ReactNode;
 };
 
@@ -46,8 +54,15 @@ type SceneHistoryContextValue = {
   historyData: SceneHistoryData | null;
   isLoading: boolean;
   errorMessage: string | null;
+  isSharedHistory: boolean;
   sessionId: string;
   markNextChangeAsRestore: (sourceEntryId: string) => void;
+  reconstructEntry: (entryId: string) => Promise<{
+    entry: SceneHistoryEntry;
+    elements: OrderedExcalidrawElement[];
+    appState: Partial<AppState>;
+    files: BinaryFiles;
+  } | null>;
 };
 
 type PreviewOrigin = {
@@ -58,16 +73,38 @@ type PreviewOrigin = {
 
 const THUMBNAIL_MAX_WIDTH = 160;
 const THUMBNAIL_MAX_HEIGHT = 96;
+const SCENE_HISTORY_PREVIEW_LOCK = "scene-history-preview";
 
 const SceneHistoryContext = createContext<SceneHistoryContextValue | null>(
   null,
 );
+
+type CollabHistorySource = {
+  roomId: string;
+  roomKey: string;
+};
 
 const createSessionId = () => {
   return (
     globalThis.crypto?.randomUUID?.() ??
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
   );
+};
+
+const getCollabHistorySource = (
+  collabAPI: CollabAPI | null,
+  isCollaborating: boolean,
+): CollabHistorySource | null => {
+  if (!collabAPI || !isCollaborating) {
+    return null;
+  }
+
+  const activeRoomLink = collabAPI.getActiveRoomLink();
+  if (!activeRoomLink) {
+    return null;
+  }
+
+  return getCollaborationLinkData(activeRoomLink);
 };
 
 const createHistoryThumbnail = async (
@@ -166,7 +203,9 @@ const useSceneHistoryContext = () => {
 };
 
 export const SceneHistoryProvider = ({
+  collabAPI,
   excalidrawAPI,
+  isCollaborating,
   children,
 }: SceneHistoryProviderProps) => {
   const sessionIdRef = useRef(createSessionId());
@@ -176,19 +215,47 @@ export const SceneHistoryProvider = ({
   const [historyData, setHistoryData] = useState<SceneHistoryData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const collabHistorySource = getCollabHistorySource(
+    collabAPI,
+    isCollaborating,
+  );
+  const collabRoomId = collabHistorySource?.roomId ?? null;
+  const collabRoomKey = collabHistorySource?.roomKey ?? null;
+  const isSharedHistory = !!collabHistorySource;
 
   const setHistoryState = useCallback((nextHistoryData: SceneHistoryData) => {
     setHistoryData(nextHistoryData);
   }, []);
 
-  const markNextChangeAsRestore = useCallback((sourceEntryId: string) => {
-    pendingRestoreRef.current = { sourceEntryId };
-    window.setTimeout(() => {
-      if (pendingRestoreRef.current?.sourceEntryId === sourceEntryId) {
-        pendingRestoreRef.current = null;
+  const markNextChangeAsRestore = useCallback(
+    (sourceEntryId: string) => {
+      if (isSharedHistory) {
+        collabAPI?.markNextHistorySaveAsRestore(sourceEntryId);
+        return;
       }
-    }, 500);
-  }, []);
+
+      pendingRestoreRef.current = { sourceEntryId };
+      window.setTimeout(() => {
+        if (pendingRestoreRef.current?.sourceEntryId === sourceEntryId) {
+          pendingRestoreRef.current = null;
+        }
+      }, 500);
+    },
+    [collabAPI, isSharedHistory],
+  );
+
+  const reconstructEntry = useCallback(
+    async (entryId: string) => {
+      if (isSharedHistory) {
+        return historyData
+          ? reconstructSceneHistoryData(historyData, entryId)
+          : null;
+      }
+
+      return SceneHistory.reconstruct(entryId);
+    },
+    [historyData, isSharedHistory],
+  );
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -199,7 +266,7 @@ export const SceneHistoryProvider = ({
   }, []);
 
   useEffect(() => {
-    if (!excalidrawAPI) {
+    if (!excalidrawAPI || isSharedHistory) {
       setHistoryData(null);
       setIsLoading(false);
       return;
@@ -245,10 +312,46 @@ export const SceneHistoryProvider = ({
     return () => {
       isActive = false;
     };
-  }, [excalidrawAPI, setHistoryState]);
+  }, [excalidrawAPI, isSharedHistory, setHistoryState]);
 
   useEffect(() => {
-    if (!excalidrawAPI) {
+    if (!excalidrawAPI || !collabRoomId || !collabRoomKey) {
+      return;
+    }
+
+    let isActive = true;
+
+    setHistoryData(null);
+    setIsLoading(true);
+
+    const unsubscribe = subscribeSceneHistoryFromFirebase({
+      roomId: collabRoomId,
+      roomKey: collabRoomKey,
+      onChange: (nextHistoryData) => {
+        if (isActive && isMountedRef.current) {
+          setHistoryState(nextHistoryData);
+          setErrorMessage(null);
+          setIsLoading(false);
+        }
+      },
+      onError: (error) => {
+        console.error(error);
+
+        if (isActive && isMountedRef.current) {
+          setErrorMessage("Shared history is unavailable");
+          setIsLoading(false);
+        }
+      },
+    });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
+  }, [collabRoomId, collabRoomKey, excalidrawAPI, setHistoryState]);
+
+  useEffect(() => {
+    if (!excalidrawAPI || isSharedHistory) {
       return;
     }
 
@@ -303,17 +406,26 @@ export const SceneHistoryProvider = ({
       isActive = false;
       unsubscribe();
     };
-  }, [excalidrawAPI, setHistoryState]);
+  }, [excalidrawAPI, isSharedHistory, setHistoryState]);
 
   const value = useMemo(
     () => ({
       historyData,
       isLoading,
       errorMessage,
+      isSharedHistory,
       sessionId: sessionIdRef.current,
       markNextChangeAsRestore,
+      reconstructEntry,
     }),
-    [errorMessage, historyData, isLoading, markNextChangeAsRestore],
+    [
+      errorMessage,
+      historyData,
+      isLoading,
+      isSharedHistory,
+      markNextChangeAsRestore,
+      reconstructEntry,
+    ],
   );
 
   return (
@@ -324,6 +436,7 @@ export const SceneHistoryProvider = ({
 };
 
 export const HistorySidebar = ({
+  collabAPI,
   excalidrawAPI,
   isCollaborating,
 }: HistorySidebarProps) => {
@@ -331,8 +444,10 @@ export const HistorySidebar = ({
     historyData,
     isLoading,
     errorMessage: historyErrorMessage,
+    isSharedHistory,
     sessionId,
     markNextChangeAsRestore,
+    reconstructEntry,
   } = useSceneHistoryContext();
   const previewOriginRef = useRef<PreviewOrigin | null>(null);
   const previewRequestIdRef = useRef(0);
@@ -352,6 +467,27 @@ export const HistorySidebar = ({
   );
   const isPreviewing = !!previewEntryId;
   const visibleErrorMessage = errorMessage || historyErrorMessage;
+
+  const addTargetFilesToScene = useCallback(
+    async (target: {
+      elements: readonly OrderedExcalidrawElement[];
+      files: BinaryFiles;
+    }) => {
+      addFilesToScene(excalidrawAPI, target.files);
+
+      if (isSharedHistory && collabAPI) {
+        const { loadedFiles } = await collabAPI.fetchImageFilesFromFirebase({
+          elements: target.elements,
+          forceFetchFiles: true,
+        });
+
+        if (loadedFiles.length) {
+          excalidrawAPI.addFiles(loadedFiles);
+        }
+      }
+    },
+    [collabAPI, excalidrawAPI, isSharedHistory],
+  );
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -381,24 +517,20 @@ export const HistorySidebar = ({
       appState: origin.appState,
       captureUpdate: CaptureUpdateAction.NEVER,
     });
-    LocalData.resumeSave("scene-history-preview");
+    LocalData.resumeSave(SCENE_HISTORY_PREVIEW_LOCK);
+    collabAPI?.resumeSync(SCENE_HISTORY_PREVIEW_LOCK);
     previewOriginRef.current = null;
     setPreviewEntryId(null);
     setSelectedEntryId(historyData?.currentEntryId ?? null);
-  }, [excalidrawAPI, historyData?.currentEntryId]);
-
-  useEffect(() => {
-    if (isCollaborating && previewOriginRef.current) {
-      cancelPreview();
-    }
-  }, [cancelPreview, isCollaborating]);
+  }, [collabAPI, excalidrawAPI, historyData?.currentEntryId]);
 
   useEffect(() => {
     return () => {
       const origin = previewOriginRef.current;
 
       if (!origin || excalidrawAPI.isDestroyed) {
-        LocalData.resumeSave("scene-history-preview");
+        LocalData.resumeSave(SCENE_HISTORY_PREVIEW_LOCK);
+        collabAPI?.resumeSync(SCENE_HISTORY_PREVIEW_LOCK);
         return;
       }
 
@@ -408,13 +540,14 @@ export const HistorySidebar = ({
         appState: origin.appState,
         captureUpdate: CaptureUpdateAction.NEVER,
       });
-      LocalData.resumeSave("scene-history-preview");
+      LocalData.resumeSave(SCENE_HISTORY_PREVIEW_LOCK);
+      collabAPI?.resumeSync(SCENE_HISTORY_PREVIEW_LOCK);
       previewOriginRef.current = null;
     };
-  }, [excalidrawAPI]);
+  }, [collabAPI, excalidrawAPI]);
 
   const previewEntry = async (entry: SceneHistoryEntry) => {
-    if (isCollaborating || isRestoring) {
+    if (isRestoring) {
       return;
     }
 
@@ -428,21 +561,25 @@ export const HistorySidebar = ({
     try {
       if (!previewOriginRef.current) {
         previewOriginRef.current = getCurrentScene(excalidrawAPI);
-        LocalData.pauseSave("scene-history-preview");
+        LocalData.pauseSave(SCENE_HISTORY_PREVIEW_LOCK);
+        if (isSharedHistory && isCollaborating) {
+          collabAPI?.pauseSync(SCENE_HISTORY_PREVIEW_LOCK);
+        }
       }
 
-      const target = await SceneHistory.reconstruct(entry.id);
+      const target = await reconstructEntry(entry.id);
 
       if (!isMountedRef.current || previewRequestIdRef.current !== requestId) {
         return;
       }
 
       if (!target) {
+        cancelPreview();
         setErrorMessage("Version could not be restored");
         return;
       }
 
-      addFilesToScene(excalidrawAPI, target.files);
+      await addTargetFilesToScene(target);
       excalidrawAPI.updateScene({
         elements: target.elements,
         appState: {
@@ -461,6 +598,7 @@ export const HistorySidebar = ({
       }
 
       console.error(error);
+      cancelPreview();
       setErrorMessage("Version could not be previewed");
     }
   };
@@ -474,7 +612,7 @@ export const HistorySidebar = ({
     previewRequestIdRef.current++;
 
     try {
-      const target = await SceneHistory.reconstruct(selectedEntry.id);
+      const target = await reconstructEntry(selectedEntry.id);
       const origin = previewOriginRef.current;
 
       if (!target) {
@@ -491,18 +629,29 @@ export const HistorySidebar = ({
         });
       }
 
-      LocalData.resumeSave("scene-history-preview");
+      LocalData.resumeSave(SCENE_HISTORY_PREVIEW_LOCK);
+      collabAPI?.resumeSync(SCENE_HISTORY_PREVIEW_LOCK);
       previewOriginRef.current = null;
       markNextChangeAsRestore(selectedEntry.id);
-      addFilesToScene(excalidrawAPI, target.files);
+      await addTargetFilesToScene(target);
+      const restoredElements =
+        isSharedHistory && isCollaborating
+          ? createCollabRestoreElements(
+              target.elements,
+              excalidrawAPI.getSceneElementsIncludingDeleted() as readonly OrderedExcalidrawElement[],
+            )
+          : target.elements;
       excalidrawAPI.updateScene({
-        elements: target.elements,
+        elements: restoredElements,
         appState: {
           ...excalidrawAPI.getAppState(),
           ...target.appState,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       });
+      if (isSharedHistory && isCollaborating) {
+        collabAPI?.syncElements(restoredElements);
+      }
       excalidrawAPI.setToast({ message: "Version restored" });
       setPreviewEntryId(null);
       setErrorMessage(null);
@@ -525,9 +674,9 @@ export const HistorySidebar = ({
         )}
       </div>
 
-      {isCollaborating && (
+      {isCollaborating && isSharedHistory && (
         <div className="history-sidebar__notice">
-          Restore is paused during live collaboration.
+          Shared history is synced for this room.
         </div>
       )}
 
@@ -551,7 +700,7 @@ export const HistorySidebar = ({
                   "history-sidebar__entry--selected": isSelected,
                   "history-sidebar__entry--current": isCurrent,
                 })}
-                disabled={isCollaborating || isRestoring}
+                disabled={isRestoring}
                 key={entry.id}
                 onClick={() => previewEntry(entry)}
                 role="listitem"
@@ -610,7 +759,7 @@ export const HistorySidebar = ({
           <Button
             className="history-sidebar__restore-button"
             onSelect={restoreSelectedEntry}
-            disabled={isCollaborating || isRestoring}
+            disabled={isRestoring}
           >
             Restore
           </Button>

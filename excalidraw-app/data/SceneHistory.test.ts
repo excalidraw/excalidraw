@@ -1,6 +1,8 @@
 import type { StoreDelta } from "@excalidraw/element";
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 
 import {
+  createCollabRestoreElements,
   isSceneHistoryDeltaRecordable,
   reconstructSceneHistoryData,
   trimSceneHistoryData,
@@ -104,6 +106,25 @@ const createHistoryData = (entries: SceneHistoryEntry[]): SceneHistoryData => ({
   files: {},
 });
 
+const createElement = ({
+  id,
+  isDeleted = false,
+  version,
+  versionNonce = version,
+}: {
+  id: string;
+  isDeleted?: boolean;
+  version: number;
+  versionNonce?: number;
+}) =>
+  ({
+    id,
+    isDeleted,
+    updated: version,
+    version,
+    versionNonce,
+  } as OrderedExcalidrawElement);
+
 describe("SceneHistory", () => {
   it("does not record transient-only app state deltas", () => {
     const delta = createStoreDelta({
@@ -175,5 +196,25 @@ describe("SceneHistory", () => {
     expect(trimmedHistoryData.entries[0].snapshot).toBeDefined();
     expect(trimmedHistoryData.entries[0].delta).toBeUndefined();
     expect(target?.appState.name).toBe("v121");
+  });
+
+  it("creates collab restore elements with bumped targets and deletion tombstones", () => {
+    const restoredElements = createCollabRestoreElements(
+      [createElement({ id: "existing", version: 1, versionNonce: 10 })],
+      [
+        createElement({ id: "existing", version: 5, versionNonce: 20 }),
+        createElement({ id: "newer", version: 3 }),
+      ],
+    );
+    const existingElement = restoredElements.find(
+      (element) => element.id === "existing",
+    );
+    const deletedElement = restoredElements.find(
+      (element) => element.id === "newer",
+    );
+
+    expect(existingElement?.version).toBeGreaterThan(5);
+    expect(deletedElement?.isDeleted).toBe(true);
+    expect(deletedElement?.version).toBeGreaterThan(3);
   });
 });
