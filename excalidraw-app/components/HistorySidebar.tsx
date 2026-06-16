@@ -13,6 +13,7 @@ import { CaptureUpdateAction } from "@excalidraw/excalidraw";
 import { Button } from "@excalidraw/excalidraw/components/Button";
 import { getNonDeletedElements } from "@excalidraw/element";
 import { exportToCanvas } from "@excalidraw/utils/export";
+import { isTestEnv } from "@excalidraw/common";
 
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 import type {
@@ -76,7 +77,7 @@ const createHistoryThumbnail = async (
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
 
-  if (!nonDeletedElements.length) {
+  if (!nonDeletedElements.length || isTestEnv()) {
     return null;
   }
 
