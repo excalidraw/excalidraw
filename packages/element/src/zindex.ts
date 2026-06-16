@@ -1,5 +1,7 @@
 import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
+import { isFiniteNumber } from "@excalidraw/math";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -319,12 +321,46 @@ const getTargetElementsMap = <T extends ExcalidrawElement>(
   }, new Map<string, ExcalidrawElement>());
 };
 
+const hasSameElementIds = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+) => {
+  if (prevElements.length !== nextElements.length) {
+    console.error(
+      "z-index reordering failed: resulting array have different lengths",
+    );
+    return false;
+  }
+
+  const prevElementIdCounts = new Map<ExcalidrawElement["id"], number>();
+  for (const element of prevElements) {
+    prevElementIdCounts.set(
+      element.id,
+      (prevElementIdCounts.get(element.id) || 0) + 1,
+    );
+  }
+
+  for (const element of nextElements) {
+    const count = prevElementIdCounts.get(element.id);
+    if (!count) {
+      console.error(
+        "z-index reordering failed: element id mismatch / duplicate ids",
+      );
+      return false;
+    }
+    prevElementIdCounts.set(element.id, count - 1);
+  }
+
+  return true;
+};
+
 const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
   scene: Scene,
 ) => {
+  const originalElements = elements;
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
 
@@ -395,6 +431,10 @@ const shiftElementsByOne = (
           ];
   });
 
+  if (!hasSameElementIds(originalElements, elements)) {
+    return originalElements;
+  }
+
   syncMovedIndices(elements, targetElementsMap);
 
   return elements;
@@ -408,11 +448,20 @@ const shiftElementsToEnd = (
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
+
+  // Nothing to move (e.g. `elementsToBeMoved` is empty because all selected
+  // elements were frame children handled in a prior pass). Bail out early —
+  // otherwise `leadingIndex`/`trailingIndex` below resolve to `undefined` and
+  // the resulting `slice()` calls overlap, duplicating elements.
+  if (indicesToMove.length === 0) {
+    return elements;
+  }
+
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
 
-  let leadingIndex: number;
-  let trailingIndex: number;
+  let leadingIndex: number | undefined;
+  let trailingIndex: number | undefined;
   if (direction === "left") {
     if (containingFrame) {
       leadingIndex = findIndex(elements, (el) =>
@@ -457,6 +506,19 @@ const shiftElementsToEnd = (
     leadingIndex = 0;
   }
 
+  const isValidIndex = (index: number | undefined): index is number => {
+    return isFiniteNumber(index) && index >= 0;
+  };
+
+  if (
+    !isValidIndex(leadingIndex) ||
+    !isValidIndex(trailingIndex) ||
+    leadingIndex > trailingIndex ||
+    indicesToMove.some((index) => index < leadingIndex || index > trailingIndex)
+  ) {
+    return elements;
+  }
+
   for (let index = leadingIndex; index < trailingIndex + 1; index++) {
     if (!indicesToMove.includes(index)) {
       displacedElements.push(elements[index]);
@@ -480,6 +542,10 @@ const shiftElementsToEnd = (
           ...targetElements,
           ...trailingElements,
         ];
+
+  if (!hasSameElementIds(elements, nextElements)) {
+    return elements;
+  }
 
   syncMovedIndices(nextElements, targetElementsMap);
 
@@ -549,7 +615,7 @@ function shiftElementsAccountingForFrames(
 
   for (const [frameId, children] of frameChildrenSets) {
     nextElements = shiftFunction(
-      allElements,
+      nextElements,
       appState,
       direction,
       frameId,

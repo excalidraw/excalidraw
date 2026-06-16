@@ -568,10 +568,6 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       continue;
     }
 
-    if (element.frameId && element.frameId !== frame.id) {
-      continue;
-    }
-
     finalElementsToAdd.add(element);
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
