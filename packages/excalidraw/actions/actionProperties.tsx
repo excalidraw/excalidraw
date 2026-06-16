@@ -189,10 +189,11 @@ export const changeProperty = (
     }),
   );
 
-  return elements.filter(isNonDeletedElement).map((element) => {
+  return elements.map((element) => {
     if (
-      selectedElementIds.get(element.id) ||
-      element.id === appState.editingTextElement?.id
+      isNonDeletedElement(element) &&
+      (selectedElementIds.get(element.id) ||
+        element.id === appState.editingTextElement?.id)
     ) {
       // selected & editing elements are non-deleted
       return callback(element);
