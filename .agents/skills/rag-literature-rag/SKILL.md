@@ -86,13 +86,32 @@ Categories: `foundations`, `dense-retrieval`, `graphrag`, `agentic`, `evaluation
 ## Eval
 
 ```bash
+uv run rag-literature-rag eval corpus-health --embed-profile gemini-2-structure-v1  # read-only, no LLM
 uv run rag-literature-rag eval validate-gold --json
 uv run rag-literature-rag eval pool --track catalog --system bm25 --system dense --system hybrid
 uv run rag-literature-rag eval judge --track catalog
 uv run rag-literature-rag eval benchmark --embed-profile gemini-2-structure-v1 --qrels data/eval/qrels/catalog/qrels.json --report
+uv run rag-literature-rag eval diagnostics --track catalog --embed-profile gemini-2-structure-v1 --qrels data/eval/qrels/catalog/qrels.json
 ```
 
-Never expand gold labels from a single retriever (pooling bias). Use multi-system pool + LLM judge.
+Never expand gold labels from a single retriever (pooling bias). Use multi-system pool + LLM judge, and judge wins on `eval diagnostics` (hole_rate@k / bpref), not raw nDCG.
+
+### Synthetic gold expansion (`eval gen-gold`)
+
+The 42-case curated set **cannot distinguish retrieval methods** (they cluster in a ~0.11 nDCG band). To make the eval discriminate, generate a large stratified synthetic gold set: system-blind Flash queries grounded in corpus docs, anti-leakage + de-dup filtered, then the existing pool→judge pipeline. Opt-in via `RAG_LIT_SYNTH_GOLD=1`; curated-42 stays the default.
+
+```bash
+uv run rag-literature-rag eval gen-gold --embed-profile gemini-2-structure-v1 \
+  --n-catalog 300 --n-pdf 200 --hard-frac 0.2 --budget-usd 12 -v   # ~$10 flash, budget-gated
+uv run python scripts/synth_separation_report.py                    # curated-vs-synthetic spread + Spearman
+```
+
+### Established results (do not re-litigate — see `docs/eval-findings.md`)
+
+- **Quality is data/measurement-bound, not algorithm-bound.** Biggest win was the full-text extraction fix (+0.23 nDCG, ~10× chunks), not any retriever.
+- **Method ranking is stable:** dense ≈ hybrid_dense2 lead, hybrid close, **bm25 trails**. Reranking, citation fusion, multi_query, ColBERT/SPLADE-v3 all **lose**; HyDE only +0.02. Default stays **hybrid**.
+- On 531 synthetic cases the method spread widens **3.5–4×**, agrees with the human anchor (Spearman 0.83–0.94), pooling-unbiased (hole@10 = 0). `hybrid_category` overfits the 42 (0.35 vs 0.63) — a strategy the small set hid.
+- **Quota:** `gemini-3.5-flash` is global-endpoint-only under Dynamic Shared Quota — no per-project limit to raise, regional round-robin can't work; ~24 judge workers is the clean ceiling.
 
 ## Paths
 
