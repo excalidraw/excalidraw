@@ -5,7 +5,7 @@ import logging
 import os
 import platform
 import time
-from functools import lru_cache
+from typing import TYPE_CHECKING
 
 from sentence_transformers import SentenceTransformer
 
@@ -14,8 +14,12 @@ from rag_common.config import (
     EmbedConfig,
     EmbedStats,
     LocalEmbedMode,
+    use_cuda_bnb_4bit,
     use_mlx_q4_embed,
 )
+
+if TYPE_CHECKING:
+    pass
 
 log = logging.getLogger("rag_common.local")
 
@@ -27,6 +31,8 @@ MPS_ENCODE_CHUNK = 24
 MPS_BATCH_SIZE = 4
 MAX_EMBED_CHARS = 3000
 
+_model_cache: dict[tuple[str, str, bool], SentenceTransformer] = {}
+
 
 def _mps_encode_chunk() -> int:
     return int(os.getenv("RAG_MPS_ENCODE_CHUNK", str(MPS_ENCODE_CHUNK)))
@@ -34,6 +40,10 @@ def _mps_encode_chunk() -> int:
 
 def _mps_batch_size() -> int:
     return int(os.getenv("RAG_MPS_BATCH_SIZE", str(MPS_BATCH_SIZE)))
+
+
+def _cuda_batch_size() -> int:
+    return int(os.getenv("RAG_CUDA_BATCH_SIZE", str(LOCAL_BATCH_SIZE)))
 
 
 def _release_mps_memory() -> None:
@@ -68,33 +78,106 @@ def _prepare_texts(texts: list[str], *, model_name: str, mode: LocalEmbedMode) -
     return texts
 
 
-def _model_kwargs(model_name: str) -> dict:
+def _base_model_kwargs(model_name: str) -> dict:
     if _model_family(model_name) == "qwen3" and platform.system() == "Darwin":
         return {"attn_implementation": "eager"}
     return {}
 
 
-def _local_device(model_name: str) -> str | None:
-    """Pick device for local encode. Qwen3 on Apple Silicon uses MPS + eager (not CPU)."""
-    if _model_family(model_name) != "qwen3" or platform.system() != "Darwin":
-        return None
+def resolve_local_embed_device(model_name: str) -> str | None:
+    """Pick device for local encode from RAG_LOCAL_EMBED_DEVICE or sensible defaults."""
+    raw = os.getenv("RAG_LOCAL_EMBED_DEVICE", "auto").strip().lower()
+    if raw == "cpu":
+        return "cpu"
+    if raw == "mps":
+        return "mps"
+    if raw == "cuda":
+        return "cuda"
+    if raw not in ("", "auto"):
+        log.warning("unknown RAG_LOCAL_EMBED_DEVICE=%r; using auto", raw)
+
+    if _model_family(model_name) == "qwen3" and platform.system() == "Darwin":
+        try:
+            import torch
+
+            if torch.backends.mps.is_available():
+                return "mps"
+        except ImportError:
+            pass
+
     try:
         import torch
 
-        if torch.backends.mps.is_available():
-            return "mps"
+        if torch.cuda.is_available():
+            return "cuda"
     except ImportError:
         pass
     return None
 
 
-@lru_cache(maxsize=4)
-def _get_model(model_name: str) -> SentenceTransformer:
-    log.info("loading local embed model %s", model_name)
-    mk = _model_kwargs(model_name)
+def _local_batch_size(device: str | None) -> int:
+    if device == "mps":
+        return _mps_batch_size()
+    if device == "cuda":
+        return _cuda_batch_size()
+    return LOCAL_BATCH_SIZE
+
+
+def _bnb_4bit_model_kwargs() -> dict | None:
+    try:
+        import torch
+        from transformers import BitsAndBytesConfig
+    except ImportError as exc:
+        log.warning("bitsandbytes 4-bit requested but import failed (%s); using FP16", exc)
+        return None
+
+    return {
+        "quantization_config": BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+        ),
+        "device_map": {"": 0},
+    }
+
+
+def _load_sentence_transformer(
+    model_name: str,
+    *,
+    device: str | None,
+    bnb_4bit: bool,
+) -> SentenceTransformer:
+    mk = _base_model_kwargs(model_name)
+    if bnb_4bit:
+        bnb_kwargs = _bnb_4bit_model_kwargs()
+        if bnb_kwargs is not None:
+            try:
+                log.info("loading local embed model %s (CUDA 4-bit)", model_name)
+                return SentenceTransformer(model_name, model_kwargs={**mk, **bnb_kwargs})
+            except Exception as exc:
+                log.warning("4-bit load failed for %s (%s); falling back to FP16", model_name, exc)
+
+    log.info(
+        "loading local embed model %s device=%s",
+        model_name,
+        device or "default",
+    )
     if mk:
-        return SentenceTransformer(model_name, model_kwargs=mk)
-    return SentenceTransformer(model_name)
+        return SentenceTransformer(model_name, model_kwargs=mk, device=device)
+    return SentenceTransformer(model_name, device=device)
+
+
+def _get_model_for_config(config: EmbedConfig) -> SentenceTransformer:
+    device = resolve_local_embed_device(config.model)
+    bnb_4bit = use_cuda_bnb_4bit(config) and device == "cuda"
+    key = (config.model, device or "", bnb_4bit)
+    cached = _model_cache.get(key)
+    if cached is not None:
+        return cached
+    model = _load_sentence_transformer(config.model, device=device, bnb_4bit=bnb_4bit)
+    _model_cache[key] = model
+    return model
 
 
 def embed_local_texts(
@@ -120,30 +203,33 @@ def embed_local_texts(
                 exc,
             )
 
-    model = _get_model(config.model)
+    model = _get_model_for_config(config)
     prepared = [
         t[:MAX_EMBED_CHARS] if len(t) > MAX_EMBED_CHARS else t
         for t in _prepare_texts(texts, model_name=config.model, mode=mode)
     ]
     family = _model_family(config.model)
 
+    device = resolve_local_embed_device(config.model)
+    batch_size = _local_batch_size(device)
+    encode_chunk = _mps_encode_chunk() if device == "mps" else LOCAL_PROGRESS_CHUNKS
+
     log.info(
-        "local embedding %d texts model=%s dims=%d mode=%s",
+        "local embedding %d texts model=%s dims=%d mode=%s device=%s batch=%d",
         len(texts),
         config.model,
         config.dimensions,
         mode,
+        device or "default",
+        batch_size,
     )
 
-    device = _local_device(config.model)
-    batch_size = _mps_batch_size() if device == "mps" else LOCAL_BATCH_SIZE
-    encode_chunk = _mps_encode_chunk() if device == "mps" else LOCAL_PROGRESS_CHUNKS
     encode_kwargs: dict = {
         "batch_size": batch_size,
         "show_progress_bar": False,
         "normalize_embeddings": True,
     }
-    if device:
+    if device and not use_cuda_bnb_4bit(config):
         encode_kwargs["device"] = device
     if family == "qwen3" and mode == "query":
         encode_kwargs["prompt_name"] = "query"

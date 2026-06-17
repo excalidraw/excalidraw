@@ -36,6 +36,8 @@ mlx = ["rag-common[mlx]"]
 docling = ["docling>=2.0.0"]
 retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
 retrieval-experiments-gpu = [
+  "accelerate>=0.33.0",
+  "bitsandbytes>=0.43.0",
   "qdrant-client[fastembed-gpu]>=1.14.0",
   "onnxruntime-gpu>=1.19.2,<1.27.0",
   "nvidia-cublas-cu12",

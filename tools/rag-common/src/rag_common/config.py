@@ -39,6 +39,21 @@ def use_mlx_q4_embed(model_name: str, config: EmbedConfig | None = None) -> bool
         return False
     return mlx_q4_model_id(model_name) is not None
 
+
+def use_cuda_bnb_4bit(config: EmbedConfig | None = None) -> bool:
+    """True when profile/env requests 4-bit quant on a CUDA host (bitsandbytes path)."""
+    quant = local_embed_quant(config)
+    if quant not in ("4bit", "q4"):
+        return False
+    if platform.system() == "Darwin":
+        return False
+    try:
+        import torch
+
+        return bool(torch.cuda.is_available())
+    except ImportError:
+        return False
+
 EmbedBackend = Literal["openai", "local", "gemini"]
 LocalEmbedMode = Literal["query", "document"]
 

@@ -56,3 +56,10 @@ dimensions = 1024
 backend = "local"
 model = "Qwen/Qwen3-Embedding-4B"
 dimensions = 2560
+
+# CUDA dense embed (Ubuntu GPU box): Qwen3-0.6B @ 1024, 4-bit via bitsandbytes when available.
+[profiles."cuda-qwen0.6b-1024"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"

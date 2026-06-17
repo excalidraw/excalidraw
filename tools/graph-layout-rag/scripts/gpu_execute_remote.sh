@@ -68,10 +68,10 @@ ssh "${SSH_HOST}" bash -lc "
   tmux kill-session -t graphrag-encode 2>/dev/null || true
   tmux new-session -d -s graphrag-encode \
     'export PATH=\"\${HOME}/.local/bin:\${PATH}\"; cd ~/${REMOTE_ROOT}/tools/graph-layout-rag; \
+     ulimit -n 65536; source scripts/gpu_env.sh; \
      export GRAPH_RAG_QDRANT_URL=http://127.0.0.1:6333 GRAPH_RAG_ENCODE_DEVICE=cuda; \
      ./scripts/gpu_build_ab_indexes.sh && ./scripts/gpu_run_benchmark.sh; \
-     echo PIPELINE_DONE >> data/eval/gpu_pipeline.log' \
-    2>&1 | tee -a data/eval/gpu_pipeline.log
+     echo PIPELINE_DONE >> data/eval/gpu_pipeline.log'
   echo \"Started tmux session graphrag-encode. Tail: ssh ${SSH_HOST} tmux attach -t graphrag-encode\"
 "
 

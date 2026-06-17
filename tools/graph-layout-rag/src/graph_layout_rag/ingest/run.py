@@ -928,9 +928,11 @@ def ingest_group(
 
 from graph_layout_rag.ingest.check_pdfs import check_pdfs_cmd  # noqa: E402
 from graph_layout_rag.ingest.compare_extract import compare_extract_cmd  # noqa: E402
+from graph_layout_rag.ingest.reembed import reembed_cmd  # noqa: E402
 
 ingest_group.add_command(check_pdfs_cmd, name="check-pdfs")
 ingest_group.add_command(compare_extract_cmd, name="compare-extract")
 ingest_group.add_command(ingest_status_cmd, name="status")
+ingest_group.add_command(reembed_cmd, name="reembed")
 
 ingest_cmd = ingest_group

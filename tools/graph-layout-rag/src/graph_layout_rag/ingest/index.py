@@ -5,7 +5,7 @@ import os
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal
 
 import lancedb
 
@@ -210,6 +210,8 @@ def upsert_chunks(
     workers: int | None = None,
     profile: str | ProfileIndexPaths | None = None,
     phase_stats: IndexPhaseStats | None = None,
+    skip_bm25: bool = False,
+    delete_scope: Literal["doc_id", "chunk_id"] = "doc_id",
 ) -> int:
     if not chunks:
         return 0
@@ -304,9 +306,14 @@ def upsert_chunks(
         db.create_table(CHUNKS_TABLE, data=rows)
     else:
         table = db.open_table(CHUNKS_TABLE)
-        for doc_id in sorted({chunk.doc_id for chunk in chunks}):
-            escaped = doc_id.replace("'", "''")
-            table.delete(f"doc_id = '{escaped}'")
+        if delete_scope == "chunk_id":
+            for row in rows:
+                escaped = str(row["id"]).replace("'", "''")
+                table.delete(f"id = '{escaped}'")
+        else:
+            for doc_id in sorted({chunk.doc_id for chunk in chunks}):
+                escaped = doc_id.replace("'", "''")
+                table.delete(f"doc_id = '{escaped}'")
         log.debug("upserting %d row(s) into %s", len(rows), CHUNKS_TABLE)
         table.add(rows)
     lance_s = time.monotonic() - lance_started
@@ -315,12 +322,15 @@ def upsert_chunks(
     log.info("lancedb phase done rows=%d elapsed_s=%.1f", len(rows), lance_s)
 
     # Mirror the dense write into the BM25 lexical index (same enriched body text).
-    bm25_started = time.monotonic()
-    bm25.upsert_chunks(chunks, texts, index_dir=paths.bm25_dir, rebuild=rebuild)
-    bm25_s = time.monotonic() - bm25_started
-    if phase_stats is not None:
-        phase_stats.bm25_seconds += bm25_s
-    log.info("bm25 phase done rows=%d elapsed_s=%.1f", len(chunks), bm25_s)
+    if skip_bm25:
+        bm25_s = 0.0
+    else:
+        bm25_started = time.monotonic()
+        bm25.upsert_chunks(chunks, texts, index_dir=paths.bm25_dir, rebuild=rebuild)
+        bm25_s = time.monotonic() - bm25_started
+        if phase_stats is not None:
+            phase_stats.bm25_seconds += bm25_s
+        log.info("bm25 phase done rows=%d elapsed_s=%.1f", len(chunks), bm25_s)
 
     log.info(
         "index batch phases done chunks=%d embed_s=%.1f lancedb_s=%.1f bm25_s=%.1f total_s=%.1f",
