@@ -1,0 +1,1582 @@
+# RFC: Recursive Compound Layered Layout (RCLL) for Terraform Pipeline View
+
+| Field | Value |
+| --- | --- |
+| **Status** | Draft RFC — open for peer + agent review |
+| **Version** | 0.5 |
+| **Date** | 2026-06-16 |
+| **Author** | Layout design working session (Claude + Tushar Sariya) |
+| **Reviewers** | _(pending — peer + agent)_ |
+| **Supersedes** | The `Stacked / Packed / Packed+pull-left / Semantic` placement-toggle stack (proposed) |
+| **Scope** | Placement algorithm for **Pipeline view** only (Semantic and Module views unchanged) |
+| **Implementation** | Not started. This document is the agreed source of truth; code follows review. |
+
+## Abstract
+
+Pipeline view renders Terraform declared-dataflow (`.tfd`) graphs as Excalidraw diagrams. The current engine produces diagrams that are **far too tall** and **hard to read as dataflow** because it performs graph _layering_ (columns) and a vertical _packing_ pass but omits the **ordering** and **coordinate-assignment** phases that the graph-drawing literature treats as mandatory for a compound layered graph. This RFC specifies **Recursive Compound Layered Layout (RCLL)**: a single algorithm that runs the classic **Sugiyama hierarchical pipeline** (_layer → order → center → compact_) **recursively inside every topology hull**, governed by an explicit **priority lattice** that makes hard structure (TFD order, hull nesting, fan-out columns) and human readability (hub centering) **senior** to height/width compaction. It reads left-to-right, centers hubs over their fan-outs, keeps fan-outs column-aligned, pushes _free_ nodes right to reclaim vertical space, and packs left so the diagram does not sprawl horizontally. The design is grounded in primary literature (Sugiyama, Gansner, Brandes–Köpf, Sander, Doğrusöz, Rüegg, Jünger–Mutzel–Spisla, Dwyer–Marriott, Domrös, and others), and every constraint, requirement, preference, flexibility, decision, and rejected alternative is recorded here so the design can be evolved without losing context.
+
+## Change log
+
+| Version | Date | Change |
+| --- | --- | --- |
+| 0.1 | 2026-06-16 | Initial RFC consolidating nine clarifying decisions and the literature survey. |
+| 0.2 | 2026-06-16 | Added §22 (modular "Lego" pipeline architecture) and §23 (human-factors readability principles, engine practice, optional extras EXT-1…EXT-12, references R21–R30, harvest candidates). |
+| 0.3 | 2026-06-16 | Added §24 (implementation order & build sequence — milestones M0–M12, each shippable behind the flag, with a decision gate + acceptance criteria; dependency graph; minimum-viable-readable cut). |
+| 0.4 | 2026-06-16 | Robustness pass: added §25 assumptions/preconditions, §26 edge cases & degenerate inputs, §27 failure modes & fallback ladder, §28 configuration & module API surface, §29 observability & debugging, §30 determinism spec (normative), §31 interactions with existing editor features, §32 backward compatibility & migration, §33 risk register, §34 consolidated decision log, §35 test fixture matrix. Surfaced DEC-7 (huge fan-out) and DEC-8 (SCC cycle handling). |
+| 0.5 | 2026-06-16 | Visual pass: inline Mermaid diagrams in §5/§7/§22/§24/§27; added **§36 Appendix C — Visual glossary** (structural Mermaid, geometric ASCII before/after, and a decision card with a figure for every DEC-1…8, D1…12, EXT-1…12, and tiers T1…7). Repaired §1/§13/§26 table rendering. |
+
+---
+
+## Table of contents
+
+1. [Glossary & notation](#1-glossary--notation)
+2. [Motivation](#2-motivation)
+3. [Goals and non-goals](#3-goals-and-non-goals)
+4. [Requirements catalogue](#4-requirements-catalogue)
+5. [The priority lattice](#5-the-priority-lattice)
+6. [Inputs & data model](#6-inputs--data-model)
+7. [Algorithm specification](#7-algorithm-specification)
+8. [Per-level placement policy](#8-per-level-placement-policy)
+9. [Coordinate assignment (centering)](#9-coordinate-assignment-centering)
+10. [Compaction (push-right & pack-left)](#10-compaction-push-right--pack-left)
+11. [Hybrid column model](#11-hybrid-column-model)
+12. [Edge routing & compound frame parenting](#12-edge-routing--compound-frame-parenting)
+13. [Invariants & acceptance gates](#13-invariants--acceptance-gates)
+14. [Open design decisions](#14-open-design-decisions)
+15. [Alternatives considered (whole-approach)](#15-alternatives-considered-whole-approach)
+16. [Complexity, performance & determinism budget](#16-complexity-performance--determinism-budget)
+17. [Verification & metrics](#17-verification--metrics)
+18. [Migration, rollout & toggle consolidation](#18-migration-rollout--toggle-consolidation)
+19. [References](#19-references)
+20. [Appendix A — worked example: the v2 org spine](#20-appendix-a--worked-example-the-v2-org-spine)
+21. [Appendix B — implementation file map](#21-appendix-b--implementation-file-map)
+22. [Modular ("Lego") pipeline architecture](#22-modular-lego-pipeline-architecture)
+23. [Human-factors readability — principles, engine practice & optional extras](#23-human-factors-readability--principles-engine-practice--optional-extras)
+24. [Implementation order & build sequence (milestones)](#24-implementation-order--build-sequence-milestones)
+25. [Assumptions & preconditions](#25-assumptions--preconditions)
+26. [Edge cases & degenerate inputs](#26-edge-cases--degenerate-inputs)
+27. [Failure modes & graceful degradation](#27-failure-modes--graceful-degradation)
+28. [Configuration & module API surface](#28-configuration--module-api-surface)
+29. [Observability & debugging](#29-observability--debugging)
+30. [Determinism specification (normative)](#30-determinism-specification-normative)
+31. [Interactions with existing editor features](#31-interactions-with-existing-editor-features)
+32. [Backward compatibility & migration](#32-backward-compatibility--migration)
+33. [Risk register](#33-risk-register)
+34. [Consolidated decision log](#34-consolidated-decision-log)
+35. [Test fixture matrix](#35-test-fixture-matrix)
+36. [Appendix C — Visual glossary](#36-appendix-c--visual-glossary)
+
+---
+
+## 1. Glossary & notation
+
+Precise definitions used throughout. Where a term already exists in code, the symbol is given.
+
+| Term | Definition |
+| --- | --- |
+| **TFD** | "Terraform dataflow" — declared `A -> B` edges parsed from `.tfd` files, resolved to plan node keys. The semantic dataflow the diagram exists to show. Stored under `DECLARED_DATAFLOW_ORDERED_KEY`. |
+| **Cluster** (`PipelineCluster`) | A primary resource node after _satellite collapse_ (e.g. an ALB plus its listeners/target groups collapses to one cluster). The atomic placeable leaf. Carries `id`, `primaryAddress`, `firstSequence`, `depth`, `placement`, `build` (skeleton + width/height). |
+| **Collapsed edge** (`CollapsedPipelineEdge`) | A TFD edge after its endpoints are mapped to their owning clusters; self-loops dropped. |
+| **TFD DAG** `D` | The directed graph over clusters formed by collapsed edges. Assumed acyclic (cycles trigger fallback, [CON-2](#4-requirements-catalogue)). |
+| **Topology / hull hierarchy** | The nesting `root → provider → account → region → vpc → subnetZone → cluster`, from `buildPlacementMap` / `topologyAddressPlacementMap`. Truthful; never invented ([CON-7](#4-requirements-catalogue)). |
+| **Hull** (a.k.a. context frame, container) | An Excalidraw frame drawn around a topology group. A **derived** rectangle = bounding box of its laid-out children + padding. Roles: `root`, `provider`, `account`, `region`, `vpc`, `subnetZone`, `primaryCluster`. |
+| **Lane** (legacy) | The current engine's unit of vertical stacking: one unique `laneKey = provider\0account\0region\0vpc\0subnetSignature`. RCLL replaces lane-stacking with recursive packing; the term is retained only for comparison. |
+| **Band** | A vertical (Y) interval reserved for one sibling under a _forced_ policy. "Forced bands" ⇒ sibling hulls occupy disjoint Y intervals (subject to the staircase exception, [DEC-1](#14-open-design-decisions)). |
+| **Column / layer** | A discrete TFD hop index along **X**. `columnX[d]` maps a column index to an X pixel offset. Our layering axis is **horizontal**; our cross-axis is **vertical (Y)** — the transpose of the usual graph-drawing convention (note this when reading cited papers, whose "horizontal coordinate" = our **Y**). |
+| **Column floor** `LB(v)` | The minimum legal column of cluster `v` = longest-path distance from a TFD source. Enforces [CON-1](#4-requirements-catalogue). |
+| **Slack** | `slack(v) = UB(v) − LB(v)`, where `UB(v)` is the rightmost column `v` may occupy without forcing any successor past its own floor. A node with `slack > 0` _may_ be pushed right. |
+| **Fan-out set** | `out(u) = {v : u→v}`. When it has ≥ 2 members, the targets form a fan-out set subject to [T4](#5-the-priority-lattice) (shared column) and `u` is a **hub** subject to [T5](#5-the-priority-lattice) (centered over them). |
+| **Fan-in set** | `in(w) = {u : u→w}`. When it has ≥ 2 members, `w` is centered over its sources ([T5](#5-the-priority-lattice)); sources are **not** forced to share a column ([decided](#4-requirements-catalogue), `PREF`/`FLEX-4`). |
+| **Pinned vs free** | A node/hull is **pinned** if it belongs to any fan-out set, or if moving it would break a [T4](#5-the-priority-lattice)/[T5](#5-the-priority-lattice) relation. Otherwise **free**. Only free nodes are push-right candidates ([T6](#5-the-priority-lattice)); pack-left ([T7](#5-the-priority-lattice)) moves free nodes individually and fan-out groups as rigid units. |
+| **Hull→hull edge** | A TFD dependency between two sibling hulls. Either _declared_ (e.g. `organization_root -> workload_account`) or _up-projected_ (a cluster→cluster edge whose endpoints sit in two different child subtrees of a container). Drives [T3](#5-the-priority-lattice). |
+| **Staircase** | The visual result of [T3](#5-the-priority-lattice): a dependent hull placed down-and-right of the hull it depends on. |
+| **LCA** | Lowest common ancestor in the topology tree. A cross-hull edge or fan-out set is evaluated at the LCA container where its endpoints first become siblings. |
+| **Centering / balance** | Placing a node at the **median** cross-axis position of its connected neighbors (Brandes–Köpf). "Balanced" variant averages candidate alignments. |
+| **VPSC** | Variable Placement with Separation Constraints — a deterministic 1-D quadratic projection that moves points minimally to satisfy ordered separation constraints (Dwyer–Marriott). Used once on Y to enforce bands + non-overlap + clamp centering. |
+| **Aspect target** | The desired width:height ratio that defines "horizontal but not excessive" ([FLEX-3](#4-requirements-catalogue), [DEC-4](#14-open-design-decisions)). |
+
+Spacing constants (existing; tunable, [FLEX-8](#4-requirements-catalogue)): `PIPELINE_MARGIN=50`, `PIPELINE_FRAME_PAD=28`, `PIPELINE_COLUMN_GAP=150`, `PIPELINE_CLUSTER_GAP_Y=36`, `PIPELINE_LANE_GAP_Y=96`, `PIPELINE_FRAME_TITLE_HEIGHT = FRAME_STYLE.nameFontSize × FRAME_STYLE.nameLineHeight + nameOffsetY`.
+
+---
+
+## 2. Motivation
+
+### 2.1 What's wrong today (measured)
+
+From `docs/pipeline-semantic-placement-audit.md` and the lane-debug tests, canonical preset `staging-extended-localstack-v2`:
+
+| Config | W × H (px) | Cols | TFD arrows | Crossings | Near-straight | Median ΔY | Region band-share |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| defaults (classic+compact+stacked) | 8,038 × **18,522** | 16 | 145 | 249 | 14 % | 1,221 | 0 |
+| compound+compact+packed+pullLeft | 12,466 × **7,520** | 23 | 145 | 142 | 17 % | 353 | 6 |
+| canonical (compound+full+packed+pullLeft+ancillary) | 15,255 × **25,387** | 24 | 145 | 137 | 12 % | 931 | 7 |
+
+Three structural problems:
+
+1. **Too tall.** Every `account × region × vpc × subnet` becomes its own vertically stacked lane. Height is dominated by lane count, not by content.
+2. **Not legible as dataflow.** Only 12–17 % of arrows are near-straight; median vertical deviation is 350–1,221 px. There is no crossing-reduction phase and no coordinate-assignment phase, so a node's Y is an accident of pack order. Hubs are **not** centered over their fan-outs.
+3. **Confusing controls.** `Stacked / Packed / Packed+pull-left / Semantic` are four code paths on a single conceptual axis (how aggressively to convert vertical stacking into readable horizontal flow), each with subtly different cache and invariant behavior.
+
+### 2.2 Why it matters
+
+The diagram's purpose is to let a human **read the dataflow**. Humans read **left to right**, expect a **parent centered over the things it fans out to** (not aligned to the first child), expect **siblings of a fan-out to line up in a column**, and tolerate some extra height to get that alignment. They are frustrated by excessive scrolling in either axis. The current engine optimizes geometry (height, then width) but not _reading_. RCLL reframes the problem as **readability-first hierarchical layout with compaction subordinate to readability**.
+
+### 2.3 Why a redesign rather than a patch
+
+The audit's own conclusion: the missing pieces are the **ordering** and **coordinate-assignment** phases — i.e. half of the Sugiyama framework. Bolting them onto the current two-pass packer (which is itself two greedy passes fighting each other, §[3 of the design plan]) is more fragile than running the standard framework recursively. The user has authorized a full rewrite of the pipeline import layout.
+
+---
+
+## 3. Goals and non-goals
+
+### Goals
+
+- **G1.** Read left-to-right; TFD order is always visually honored.
+- **G2.** Hubs centered over fan-outs; fan-out targets column-aligned.
+- **G3.** Reduce vertical height by pushing _free_ nodes/hulls right (using TFD slack), then pack left to avoid excessive width — "horizontal but not excessive."
+- **G4.** Preserve a clean, truthful hull hierarchy (nested, non-overlapping; forced bands where configured).
+- **G5.** Replace four placement toggles with one algorithm plus a small set of meaningful dials.
+- **G6.** Deterministic, single-pass, runs inline at import (no iterative solver, no UI dependency in layout core).
+- **G7.** Keep Compound group-drag (drag a hull → its resources and in-group arrows move).
+
+### Non-goals
+
+- **N1.** Changing `.tfd` syntax or the topology placement map.
+- **N2.** Embedding a full external layout engine (ELK) at runtime (we borrow its algorithms, not its binary).
+- **N3.** Touching Semantic or Module views.
+- **N4.** Edge bundling / orthogonal routing beyond what's needed for legibility (future work).
+- **N5.** Zoom/scale-based detail hiding (explicitly rejected — see [§15](#15-alternatives-considered-whole-approach)).
+
+---
+
+## 4. Requirements catalogue
+
+Tagging: **CON** = hard constraint (never violated); **REQ** = functional requirement; **PREF** = soft preference (optimized, may yield to higher tiers); **FLEX** = flexibility/tunable. Each item: statement · rationale · source · enforcement. "Source" cites a user decision, a paper ([§19](#19-references)), or the audit.
+
+### Hard constraints (CON)
+
+| ID | Statement | Rationale | Source | Enforced by |
+| --- | --- | --- | --- | --- |
+| **CON-1** | For every collapsed TFD edge `u→v`, `column(u) < column(v)`; fan-out targets from one source **may** share a column. | TFD precedence is the semantic spine of the diagram. | User; existing invariant; Sugiyama [R1] | Layering ([§7.2a](#7-algorithm-specification)); verified per-container and globally. |
+| **CON-2** | A cycle in `D` (or in any container's hull-edge DAG) triggers a **localized** fallback (flatten that subtree to model-order stacking) — not a global flatten. | Correctness without nuking the whole scene (current code aborts globally). | User; §3.3 of design plan | `computeDepths` cycle flag, per-subtree. |
+| **CON-3** | Hull frames are properly nested; every child lies inside its parent's content box. | Truthful containment; group-drag. | Existing; Sander [R6] | Hull = derived bbox + pad; VPSC containment ([§9](#9-coordinate-assignment-centering)). |
+| **CON-4** | No two **non-ancestor** hull frames overlap (rectangles or title areas). | Clean hierarchy reading. | User; REGION_SUBNET plan | Final-scene categorized collision diagnostic = 0 ([§13](#13-invariants--acceptance-gates)). |
+| **CON-5** | At levels whose policy is _forced_, sibling hulls occupy **distinct vertical bands** (subject to the [DEC-1](#14-open-design-decisions) staircase exception). | Ownership clarity ("which account am I in"). | User (forced bands) | Forced-stack placement ([§8](#8-per-level-placement-policy)). |
+| **CON-6** | A one-way hull→hull TFD edge `A→B` ⇒ `A` strictly left of (lower column than) `B`. | The org spine must read L→R at the hull level. | User | Hull staircase layering ([§7.2a](#7-algorithm-specification), [§11](#11-hybrid-column-model)). |
+| **CON-7** | Topology (account/region/vpc/subnet) comes from the placement map; never fabricated. | Diagram must reflect reality. | Existing | `buildPlacementMap`. |
+| **CON-8** | Layout is **deterministic**: identical inputs ⇒ byte-identical output across runs. | Stable diffs, caching, reproducibility. | Existing | Stable sort keys `(firstSequence, topology key, id)`; tie-broken everywhere. |
+| **CON-9** | Layout runs **single-pass on the main thread**, with **no iterative force loop**, and `terraformLayoutCore` imports **no UI**. | Import latency; dependency-cruiser boundary. | Existing; `yarn lint:arch` | Greedy phases + one-shot VPSC projection only. |
+| **CON-10** | Pipeline import requires ≥1 resolved TFD edge, else HTTP-style 400. | Pipeline is defined by TFD. | Existing | Prep guard. |
+| **CON-11** | The algorithm works in both **Compact** (primary card only) and **Full** (satellites inline) detail modes. | Content toggle is orthogonal to placement. | Existing | Size-driven packing (hull size varies; algorithm unchanged). |
+
+### Functional requirements (REQ)
+
+| ID | Statement | Source |
+| --- | --- | --- |
+| **REQ-1** | Layout is a **recursive pass over the compound tree**: each container lays out its children, is sized, then is treated as one box by its parent. | Doğrusöz [R8]; Sander [R6]; ELK recursive [R9] |
+| **REQ-2** | **Layering** assigns each cluster a column ≥ `LB(v)` (longest-path floor), honoring CON-1/CON-6. | Sugiyama [R1]; Gansner [R2] |
+| **REQ-3** | **Fan-out targets share a column** (the deepest required among them) — applies to clusters **and** hulls (recursively, at the LCA). | User; Sugiyama aesthetic |
+| **REQ-4** | **Free nodes with slack are pushed right** to share rows, reducing height. Pinned (fan-out) members are never pushed. | User; Gansner `balance()` [R2]; MinWidth [R3] |
+| **REQ-5** | An **ordering phase** sequences nodes within each column to reduce crossings (barycenter, deterministic tiebreak). | Forster [R7]; Sugiyama [R1] |
+| **REQ-6** | A **coordinate-assignment phase** centers every node on the median Y of its connected neighbors (both directions), clamped to its band. | Brandes–Köpf [R10]; Rüegg size-aware [R12] |
+| **REQ-7** | **Hybrid columns:** the `root→provider→account` spine is aligned on one global grid; columns inside each hull are local. | User |
+| **REQ-8** | A **pack-left** width pass pulls free nodes and whole fan-out groups left (groups as rigid units), adjusting Y, toward the aspect target; it never opens a new row. | User; Domrös [R13] |
+| **REQ-9** | Build, per container, a **hull-edge DAG** by up-projecting cross-subtree TFD edges and adding declared hull→hull edges. | User; this RFC |
+| **REQ-10** | Emit TFD arrows and hull→hull connectors; **parent each arrow to its LCA topology frame** so group-drag moves it. | Existing Compound; Excalidraw frame model |
+| **REQ-11** | Instrument **readability metrics** (fan-out column rate, hub-centering rate, median ΔY, near-straight %, aspect) and the categorized collision diagnostic. | Audit; this RFC |
+
+### Soft preferences (PREF) — optimized within higher tiers
+
+| ID | Statement | Source |
+| --- | --- | --- |
+| **PREF-1** | Center hubs over fan-outs (T5). Strong, but yields to band clamp + non-overlap (CON-3/4/5). | User; Brandes–Köpf [R10] |
+| **PREF-2** | Minimize edge crossings. | Sugiyama [R1]; Forster [R7] |
+| **PREF-3** | Maximize near-straight edges (minimize ΔY). | Brandes–Köpf [R10]; Jünger–Mutzel–Spisla [R11] |
+| **PREF-4** | Keep aspect ratio near the target (not excessively wide or tall). | Rüegg [R4]; Jabrayilov et al. [R5] |
+| **PREF-5** | Minimize height (within readability). | User; Gansner [R2] |
+| **PREF-6** | Minimize width (within readability + height). | User; Domrös [R13] |
+| **PREF-7** | Stability / mental-map preservation across re-imports and on expand. | Dwyer–Marriott–Wybrow [R14] |
+
+### Flexibilities (FLEX) — tunables exposed for reviewers / future change
+
+| ID | Knob | Default | Notes |
+| --- | --- | --- | --- |
+| **FLEX-1** | Per-level placement policy (forced vs packed) | forced at provider/account/region/vpc; packed at subnetZone interior & region-direct resources | [§8](#8-per-level-placement-policy) |
+| **FLEX-2** | Forced-band staircase Y-overlap | **on (recommended)** | [DEC-1](#14-open-design-decisions) |
+| **FLEX-3** | Aspect target (ratio / viewport / height-first) | height-first then pack-left | [DEC-4](#14-open-design-decisions) |
+| **FLEX-4** | Fan-in handling | center target, **do not** force source column | chosen; symmetric column-forcing available |
+| **FLEX-5** | Centering tolerance ε | TBD ([DEC-6](#14-open-design-decisions)) | for metrics + acceptance |
+| **FLEX-6** | Dummy nodes for long edges | off (v1) | [DEC-5](#14-open-design-decisions) |
+| **FLEX-7** | Cross-hull fan-out evaluation | at LCA container | [DEC-2](#14-open-design-decisions) |
+| **FLEX-8** | Spacing constants (`PIPELINE_*`) | as today | tune for density |
+| **FLEX-9** | `.tfd`-authored edge weights (spine emphasis) | none | [DEC-4](#14-open-design-decisions) |
+
+---
+
+## 5. The priority lattice
+
+The lattice is the central design device. **Higher tiers are satisfied first and are never violated by lower tiers; each lower tier optimizes only within the freedom the tiers above leave.** This converts a "delicate balance of many rules" into a deterministic resolution order.
+
+| Tier | Rule | Kind | Maps to |
+| --- | --- | --- | --- |
+| **T1** | TFD precedence (`u→v ⇒ col(u) < col(v)`; fan-out may share a column) | Hard | CON-1 |
+| **T2** | Hull nesting + forced bands where configured | Hard | CON-3, CON-4, CON-5 |
+| **T3** | Hull→hull dependency staircase (`A→B ⇒ A` left of `B`) | Hard | CON-6 |
+| **T4** | Fan-out shared column (resources **and** hulls) | Readability-hard | REQ-3 |
+| **T5** | Centering / balance (median; both directions; hub over fan-out, convergence over sources) | Readability (senior to compaction; yields to T2 clamp) | REQ-6, PREF-1/2/3 |
+| **T6** | Height compaction — push **free** nodes right to share rows | Optimize within T1–T5 | REQ-4, PREF-5 |
+| **T7** | Width compaction (pack-left) — pull free nodes & whole fan-out groups left, adjust Y, toward aspect | Optimize within T1–T6 | REQ-8, PREF-4/6 |
+
+```mermaid
+flowchart TD
+  T1["T1 · TFD precedence — hard"] --> T2["T2 · Hull nesting / forced bands — hard"]
+  T2 --> T3["T3 · Hull→hull staircase — hard"]
+  T3 --> T4["T4 · Fan-out shared column — readability-hard"]
+  T4 --> T5["T5 · Centering / balance — readability"]
+  T5 --> T6["T6 · Height compaction: push free right — optimize"]
+  T6 --> T7["T7 · Width compaction: pack-left — optimize"]
+```
+
+_Read top→down as "senior to": a lower tier may use only the freedom the tiers above leave, and may never violate a higher one._
+
+**Free vs pinned (the operative rule for T6/T7):** a node/hull is _pinned_ iff it is a member of some fan-out target set (T4) or moving it would break a T4/T5 relation; else _free_. T6 moves only free nodes. T7 moves free nodes individually and **fan-out groups as rigid units** (translating a group preserves its shared column and its hub's centering offset).
+
+**Conflict-resolution examples (each user statement → tier interaction):**
+
+- "Fan-out should stay in the same column _even though we are taller than we need to be_" → **T4 > T6**.
+- "Center A on C, not inline with B" → **T5** (median, not first-child alignment).
+- "Move free resources/hulls right to reduce vertical height" → **T6**, free only.
+- "Post-pass, pack left and adjust Y so we are not excessively wide" → **T7**.
+- "Apply fan-out + centering recursively to hulls" → T3/T4/T5 evaluated at the **LCA** at every level.
+- "If one hull depends on another (one-way edge), place it deeper" → **T3** (hard).
+
+---
+
+## 6. Inputs & data model
+
+### 6.1 Inputs (unchanged from today)
+
+- `plan.json` (+ optional state) → resource nodes, types, attributes.
+- `.tfd` → `bind` aliases + `A -> B` declared edges → `nodes[DECLARED_DATAFLOW_ORDERED_KEY]`.
+- `graph.dot` → carried in bundles; not used for hop order.
+- Topology placement via `buildPlacementMap` / `topologyAddressPlacementMap`.
+
+### 6.2 Core types
+
+```ts
+type TopologyRole =
+  | "root"
+  | "provider"
+  | "account"
+  | "region"
+  | "vpc"
+  | "subnetZone"
+  | "primaryCluster";
+
+type PipelineCluster = {
+  id: string;
+  primaryAddress: string;
+  firstSequence: number; // min TFD declaration order touching this cluster (tiebreak)
+  depthFloor: number; // LB(v): longest-path column floor (CON-1)
+  placement: PipelinePlacement; // topology path
+  build: { skeleton; width; height; clusterFrameId };
+};
+
+type CompoundNode = {
+  // a node in the compound tree T
+  key: string;
+  role: TopologyRole;
+  level: number;
+  minDescendantSequence: number; // min firstSequence over descendants (forced-stack ordering)
+  cluster?: PipelineCluster; // set iff role === "primaryCluster"
+  children: CompoundNode[];
+  // filled during layout:
+  box?: { x: number; y: number; width: number; height: number }; // local then global
+  localColumn?: number;
+};
+
+type HullEdge = { from: string; to: string; weight: number; declared: boolean };
+```
+
+### 6.3 Derived structures (new)
+
+- **Per-container hull-edge DAG** `D_H` (REQ-9):
+  - _Up-projection:_ for each collapsed edge `u→v`, find the LCA container `H`; let `Cu`, `Cv` be the child subtrees of `H` containing `u`, `v`. If `Cu ≠ Cv`, add `Cu→Cv` to `D_H` (accumulate weight = count of underlying edges).
+  - _Declared:_ add any `.tfd` edge already expressed between container addresses (the org spine) at the level where both endpoints are children of the same container.
+  - `D_H` must be acyclic; a cycle triggers CON-2 localized fallback for `H`.
+- **Fan-out / fan-in sets:** `out(u)`, `in(w)` over `D` (clusters) and over each `D_H` (hulls).
+- **Slack:** `LB` from longest-path on `D`; `UB(v) = min over successors s of (col(s) − 1)`, with `UB = maxColumn` for sinks. `slack(v) = UB(v) − LB(v)`.
+
+---
+
+## 7. Algorithm specification
+
+RCLL is one recursive procedure over the compound tree `T`. Each container runs four Sugiyama phases locally (layer → order → center → compact-Y via policy), is sized, and bubbles up. Two global passes follow (top-spine alignment, pack-left), then finalize. For each phase below: **Purpose · I/O · Options considered (papers) · Chosen · Why · How · Determinism · Complexity.**
+
+```mermaid
+flowchart LR
+  P0["Phase 0 · Prep"] --> P1["Phase 1 · recursive per container (post-order)"]
+  P1 --> P2["Phase 2 · top-spine align"]
+  P2 --> P3["Phase 3 · pack-left"]
+  P3 --> P4["Phase 4 · finalize + arrows"]
+  subgraph inner["Phase 1 inner, per container"]
+    direction LR
+    a["1a layer (T1/T3/T4)"] --> b["1b push-right (T6)"] --> c["1c order (crossings)"] --> d["1d center (T5)"] --> e["1e size hull"]
+  end
+  P1 -.-> inner
+```
+
+### 7.1 Phase 0 — Prep (reuse + extend)
+
+**Purpose.** Build placeable clusters, the TFD DAG, slack, the compound tree, fan-out sets, and the per-container hull-edge DAGs.
+
+**I/O.** In: plan + `.tfd` + placement map. Out: `{ clusters, D, LB/UB/slack, tree T, fanout sets, D_H per container }`.
+
+**How.** Reuse `preparePipelineLayout` (satellite collapse, edge collapse, skeleton build, `computeDepths` for `LB`). **Add:** `UB`/`slack` computation; compound-tree construction with explicit `root`/`primaryCluster` roles (per REGION_SUBNET `PackedTreeNode`); fan-out/fan-in sets; hull-edge up-projection (REQ-9). Cycle handling per CON-2 (localized).
+
+**Determinism.** All maps iterated in `(firstSequence, key)` order. **Complexity.** `O(V + E)` for DAG/longest-path; `O(E · depth(T))` for up-projection (LCA via precomputed paths).
+
+### 7.2 Phase 1 — Recursive container layout (post-order)
+
+Visit `T` bottom-up. For container `H` with children `C₁…Cₖ` (each already sized with `box`):
+
+#### (a) Layering — assign each child a **local column** (T1, T3, T4)
+
+**Purpose.** Horizontal positions honoring TFD, the hull staircase, and fan-out column sharing.
+
+**Options considered.**
+
+- _Longest-path (ALAP/ASAP)._ Simple, `O(V+E)`; gives tight floors but no balancing. (Sugiyama [R1].)
+- _Coffman–Graham width-bounded._ Bounds layer width; classic for "not too wide." ([R16].)
+- _Network simplex (dot)._ Minimizes weighted total edge length; supports edge weights/min-lengths; enables `balance()`. ([R2].)
+- _MinWidth / node promotion._ Explicit width control + dummy-node reduction. ([R3].)
+
+**Chosen.** **Longest-path floors `LB` (T1/CON-1)** + **hull staircase from `D_H` (T3/CON-6)** + **fan-out pinning (T4):** every fan-out set's targets get a shared column = `max LB` over the set. Network-simplex/`balance()` is folded into Phase 1(b) as the slack-distribution mechanism rather than the base layering (keeps the base deterministic and edge-weight-free unless [FLEX-9](#4-requirements-catalogue) is set).
+
+**Why.** Floors are the minimal structure that satisfies CON-1; the staircase satisfies CON-6; fan-out pinning is REQ-3. Deferring balancing to a separate, clearly-scoped step keeps the base layering trivially deterministic and lets T6 own all height optimization.
+
+**How.** Longest-path on `D` restricted to `H`'s children for local columns; longest-path on `D_H` for the staircase order; union the two column constraints; for each `out(u)` with `≥2` targets in `H`, set all targets to `max LB`. Record `localColumn` per child.
+
+**Determinism.** Longest-path is order-independent; ties broken by `firstSequence`. **Complexity.** `O(kH + EH)` per container.
+
+#### (b) Free-node push-right — height compaction in X (T6)
+
+**Purpose.** Use slack to let free children land in columns where they can **share a row** with others (fewer rows ⇒ less height), without disturbing pinned fan-out members.
+
+**Options considered.**
+
+- _Gansner `balance()`._ Move a node with slack to the **least-crowded** column among its feasible range. ([R2].)
+- _MinWidth promotion._ Promote nodes to reduce the widest layer / dummy count. ([R3].)
+- _Current group-uniform depth shift._ Coarse, moves whole units; overshoots (rejected, §3.2/§3.1).
+
+**Chosen.** **`balance()`-style per-node slack distribution**, restricted to _free_ nodes, with the objective "minimize resulting row count of `H`" (estimated by the packing in (d)).
+
+**Why.** Per-node (not per-group) granularity (fixes §3.2); single placement (no overshoot/undo, fixes §3.1); directly serves PREF-5 while respecting T1–T5.
+
+**How.** For each free child in ascending `LB`, evaluate candidate columns in `[LB, UB]`; pick the one minimizing the incremental row count of the container's packing (d). This is a local, greedy, deterministic choice; pinned members are skipped.
+
+**Determinism.** Candidate scan in fixed order; ties → smallest column then `firstSequence`. **Complexity.** `O(kH · slackMax)` candidate evaluations, each an incremental skyline test.
+
+#### (c) Ordering — within-column sequence (PREF-2)
+
+**Purpose.** Reduce crossings by sequencing nodes within each column (and ordering forced bands).
+
+**Options considered.**
+
+- _Barycenter / median heuristic._ Standard, fast, effective. ([R1].)
+- _Sifting._ Better quality, slower. (Crossing literature.)
+- _Forster compound crossing reduction._ Each crossing owned by a unique hierarchy node ⇒ minimize locally per container, sum globally. ([R7].)
+
+**Chosen.** **Per-container barycenter** of cross-column neighbors, applied **only when it strictly reduces a measured crossing count**, else **model order** (`firstSequence`).
+
+**Why.** Forster proves locality (this is the right scope); the "only if it reduces a measured count, else model order" rule keeps it deterministic and prevents the instability that disabled `balance()` in the current code (§3.5).
+
+**How.** Compute barycenters from already-placed neighbor Y (available bottom-up); count crossings with a polyline-aware counter ([DEC-6](#14-open-design-decisions)); accept the reorder iff strictly fewer.
+
+**Determinism.** Strict-improvement gate + stable tiebreak. **Complexity.** `O(kH log kH)` per column.
+
+#### (d) Coordinate assignment in Y — centering + policy (T5, T2)
+
+This is the phase the current engine lacks. Two sub-cases by the container's policy ([§8](#8-per-level-placement-policy)):
+
+- **Forced-band children** → distinct bands, stacked top→down in `(D_H topological order, minDescendantSequence, key)`. A dependency staircase that makes two forced siblings X-disjoint **may** let the deeper one rise into the predecessor's Y-range ([DEC-1](#14-open-design-decisions)).
+- **Packed children** → **center** each on the median Y of its connected neighbors (Brandes–Köpf, two-sided, size-aware), then **clamp** to `H`'s band and remove overlaps with a **single deterministic VPSC projection**.
+
+Full detail in [§9](#9-coordinate-assignment-centering).
+
+#### (e) Size the hull
+
+`H.box = boundingBox(children) + PIPELINE_FRAME_PAD (+ title height)`. `H` now behaves as one box for its parent (Doğrusöz cart-on-cart [R8]; Sander [R6]).
+
+### 7.3 Phase 2 — Top-spine global alignment (REQ-7)
+
+**Purpose.** Make `root→provider→account` hops read as aligned columns across the whole diagram while keeping sub-hull columns local.
+
+**Chosen / How.** After recursion, recompute a single global `columnX[]` for the spine levels from the org hull-edge DAG (longest-path on declared hull edges), translate each account subtree to its global spine column, preserve intra-account local columns. See [§11](#11-hybrid-column-model).
+
+**Determinism/Complexity.** Longest-path on a small DAG; `O(#accounts)`.
+
+### 7.4 Phase 3 — Pack-left width compaction (T7, REQ-8)
+
+Detailed in [§10.2](#10-compaction-push-right--pack-left). Pull free nodes and whole fan-out groups left, adjust Y, toward the aspect target; never opens a row; never violates T1–T5.
+
+### 7.5 Phase 4 — Finalize & compound semantics (reuse)
+
+Translate local→global per subtree (`applyCompoundHierarchicalLayout`, normalization-only); emit hull frames as derived bboxes; append TFD arrows + hull→hull connectors; parent each arrow to its LCA frame; `convertToExcalidrawElements`; mirror labels, icons, visibility, z-order. See [§12](#12-edge-routing--compound-frame-parenting).
+
+### 7.6 Reference pseudocode
+
+```text
+RCLL(H):
+  for c in H.children: RCLL(c)                          # bottom-up sizing (7.2e gives H boxes)
+  D_H   = upproject(H) ∪ declared_hull_edges(H)         # 6.3 / REQ-9
+  cols  = longestPath(D restricted to H) ⋈ longestPath(D_H)   # 7.2a  T1+T3
+  pin_fanout_columns(cols, fanoutSets(H))               # 7.2a  T4
+  for c in freeChildren(H) by ascending LB:             # 7.2b  T6
+      c.localColumn = argmin_{col in [LB,UB]} rowCount(pack(H | c@col))
+  orderWithinColumns(H)                                 # 7.2c  PREF-2 (strict-improve gate)
+  if policy(H.role) == FORCED:                          # 7.2d  T2
+      placeForcedBands(H)        # staircase Y-overlap per DEC-1
+  else:                                                 # 7.2d  T5
+      centerY_median(H.children) ; clampToBand(H) ; vpscProject(H)
+  H.box = bbox(H.children) + pad                        # 7.2e
+
+# after the recursion returns to root:
+alignTopSpineGlobal(root..account)                      # Phase 2  REQ-7
+packLeft(aspectTarget)                                  # Phase 3  T7 (groups as units)
+finalizeAndParentArrows()                               # Phase 4  REQ-10
+```
+
+---
+
+## 8. Per-level placement policy
+
+Each topology level has a **policy** selecting how its _children_ are placed in Y. Policy is chosen by the **parent role** (REGION_SUBNET plan convention), and each level is independently toggleable ([FLEX-1](#4-requirements-catalogue)).
+
+| Parent role | Children placed | **Default policy** | Notes |
+| --- | --- | --- | --- |
+| `root` | providers | **forced band** | usually 1 provider |
+| `provider` | accounts | **forced band** | org spine; staircase by hull edges (CON-6) |
+| `account` | regions | **forced band** | dominant height driver on sparse graphs ([DEC-3](#14-open-design-decisions)) |
+| `region` | VPCs + region-direct resources | **packed** (row-share) | center + VPSC |
+| `vpc` | subnet zones + VPC-direct resources | **forced band** (subnet zones) + packed (direct resources) | same-VPC subnets distinct bands; different VPCs may reuse a Y band when X-disjoint |
+| `subnetZone` | primary clusters | **packed** (row-share) | center + VPSC |
+
+**Forced policy semantics.** Children get disjoint vertical bands, ordered by `(topological order on D_H, minDescendantSequence, key)`; band advance uses the **title-aware** collision hull (`topologyFrameCollisionHull`). X position follows the staircase (CON-6). Y-overlap between X-disjoint staircase siblings is governed by [DEC-1](#14-open-design-decisions).
+
+**Packed policy semantics.** Children are row-packed (push-right [§10.1](#10-compaction-push-right--pack-left) already chose columns) and centered ([§9](#9-coordinate-assignment-centering)); two children share a Y band only when their pad-inflated X spans are disjoint with clearance.
+
+**Why this default split.** Forced bands at provider/account/region/vpc give the clean ownership reading the user asked for; packed interiors (region resources, subnets, clusters) are where most height can be reclaimed without harming hierarchy reading. The split is the user's explicit "forced + packed" decision. [DEC-3](#14-open-design-decisions) flags that **region** is the highest-leverage level to _consider_ flipping to packed on tall/sparse graphs.
+
+---
+
+## 9. Coordinate assignment (centering)
+
+The heart of readability (T5; REQ-6; PREF-1/2/3). Our cross-axis is **Y** (transpose of the cited papers' "horizontal coordinate").
+
+### 9.1 Goal
+
+Place each node so it is **centered on the median Y of its connected neighbors**, in **both directions** (a hub centered over its fan-out targets; a convergence node centered over its sources), **clamped** to its hull band, with **no overlaps**.
+
+### 9.2 Options considered
+
+| Option | Source | Trade-off |
+| --- | --- | --- |
+| **Brandes–Köpf** median alignment (4 passes: up/down × left/right, then balance = average) | [R10] | Linear, deterministic, centers parents over children naturally; the standard. |
+| **Size- & port-aware BK** | [R12] | Extends BK to real node sizes and ports (our cards/hulls have real sizes) — needed for correctness. |
+| **Network-simplex x-coord (dot)** | [R2] | Higher quality straightening, heavier; not needed at our scale and less obviously deterministic. |
+| **Flow formulation with prescribed width** | [R11] | Directly trades straightness vs cross-axis extent under a budget — the principled aspect knob (their width = our height). |
+| **Priority method (classic Sugiyama)** | [R1] | Simple iterative; lower quality than BK. |
+
+### 9.3 Chosen
+
+**Brandes–Köpf, two-sided, size-aware** ([R10]+[R12]) for the desired Y, then **clamp + de-overlap via one deterministic VPSC projection** ([R14]/VPSC). The aspect/straightness trade ([R11]) informs the weight used when centering competes with height (T5 vs T6) but is applied as a static weight, not an iterative solve (CON-9).
+
+### 9.4 Why
+
+BK is linear-time, deterministic, and _by construction_ centers a node on its median neighbor — exactly "A centered on C, not inline with B." Size-aware is mandatory because our nodes are real rectangles. VPSC is the deterministic, single-shot way to enforce band separation (CON-5), containment (CON-3), and non-overlap (CON-4) after centering — no force loop (CON-9).
+
+### 9.5 How
+
+1. **Desired Y** `des(v)` = median Y of `v`'s placed neighbors (both directions). For a hub with an even-sized fan-out, median = midpoint of the two central targets (true centering).
+2. **Cross-hull fan-out** ([DEC-2](#14-open-design-decisions)): when a fan-out set spans multiple forced bands (e.g. org root → three account hulls), evaluate the hub's `des` at the **LCA container** using the child-hull centers, then clamp to the hub's own band.
+3. **Clamp** `des(v)` into `H`'s content band.
+4. **VPSC projection** on the container's children: minimize `Σ wᵥ (yᵥ − des(v))²` subject to ordered separation constraints (band separation for forced policy; non-overlap with `PIPELINE_CLUSTER_GAP_Y` for packed). Weight `wᵥ` higher on the spine ([FLEX-9](#4-requirements-catalogue)).
+5. **ε acceptance:** a hub is "centered" if `|y(hub) − des(hub)| ≤ ε` ([FLEX-5](#4-requirements-catalogue), [DEC-6](#14-open-design-decisions)); reported by the readability metric (REQ-11).
+
+### 9.6 Determinism & complexity
+
+BK is `O(V+E)`; the VPSC active-set projection is deterministic and near-linear in practice on the small per-container constraint sets. No randomness.
+
+---
+
+## 10. Compaction (push-right & pack-left)
+
+Compaction is **subordinate** to T1–T5. Two distinct, single-purpose passes (replacing the current two-passes-that-fight design, §3.1).
+
+### 10.1 Push-right (T6, height) — Phase 1(b)
+
+Already specified in [§7.2b](#7-algorithm-specification). Key properties: per-node (not per-group); free nodes only; chooses each node's final column once (no overshoot); objective = minimize container row count. This is `balance()` ([R2]) restricted to free nodes with a packing-aware objective.
+
+### 10.2 Pack-left (T7, width) — Phase 3
+
+**Purpose.** After everything is placed, the diagram may be wider than necessary. Pull things left to approach the aspect target without re-introducing height.
+
+**Options considered.**
+
+- _Current separate pull-left pass._ Leftmost-feasible per cluster; geometric only; runs after a group-uniform push that overshoots (rejected as a pair, §3.1).
+- _Order-preserving rectpacking (Domrös)._ Reading-direction, whitespace-elimination, model-order preserving. ([R13].)
+- _Left-edge / FFDH level packing._ The concrete primitive. ([R15], [R16].)
+
+**Chosen.** A single **order-preserving left-pack** ([R13]) that moves **free nodes individually** and **fan-out groups as rigid units** (a group translates with its shared column and centering intact), **never opening a new row**, toward the aspect target.
+
+**Why.** "Never opens a row" guarantees it cannot fight T6 (height) — the two compaction passes are now orthogonal, not adversarial. Moving fan-out groups as units preserves T4/T5 (the user's explicit "move whole fan-out group as a unit" decision). Domrös gives the order-preserving guarantee that keeps the result readable.
+
+**How.** Sweep columns left→right; for each free node / group, decrease its column to the minimum `≥ LB` that keeps it in its current row(s) without overlap and respects T1–T5; recompute `columnX`; stop when the aspect target is met or no move helps.
+
+**Determinism & complexity.** Fixed sweep order; `O(V)` moves each with an `O(row)` overlap check.
+
+---
+
+## 11. Hybrid column model
+
+**Decision (REQ-7):** _align the top spine globally; keep columns local below._
+
+- **Global (spine):** `root → provider → account`. A single `columnX[]` is computed from the **declared org hull-edges** (`organization_root -> OUs -> accounts`) by longest-path; each account hull is translated so its left edge sits at its global spine column. Effect: account hops line up across the whole diagram (the org spine reads as a clean L→R staircase).
+- **Local (interior):** inside each account, regions/VPCs/subnets/resources use the **local columns** computed during recursion (Phase 1a/b). A resource at "local hop 3" in account A need not share an X with "local hop 3" in account B.
+
+**Why not fully global (current design).** A single diagram-wide grid forces a deep narrow hull to reserve a full-width column everywhere, wasting space and capping packing (§3.4).
+
+**Why not fully local.** Then the org spine would not read as aligned hops — losing the single most important top-level reading cue.
+
+**Cross-account edges.** A resource→resource edge across accounts is drawn as a connector parented to the LCA (provider/root); the _account-level_ dependency (if any) is what drives the spine staircase (CON-6), not the individual resource edge.
+
+---
+
+## 12. Edge routing & compound frame parenting
+
+- **TFD arrows:** one per collapsed edge, routed from source cluster box to target cluster box (center or binding point). Carry `relationship` with collapsed endpoints + original pre-collapse source/target/sequence (as today).
+- **Hull→hull connectors:** for an edge whose endpoints diverge as siblings under their LCA, emit one aggregated connector between the two **hull frames**, stroke width scaled by aggregated **weight** (REQ-10; audit R5). Deduped per `(parentFrame, sourceFrame, targetFrame)`.
+- **Frame parenting (group-drag, REQ-10/G7):** append each arrow id to the `children` of its **LCA topology frame** before `convertToExcalidrawElements`, so `getFrameDescendants` moves arrows with the frame. Cross-provider edges (empty LCA path) stay at scene root.
+- **Centering for hubs uses binding points** where available ([R12] port-aware), so the arrow leaves the hub centered.
+
+---
+
+## 13. Invariants & acceptance gates
+
+All must hold for every preset, in **Compact and Full**, on repeated runs. Each maps to a CON/REQ and a test.
+
+| Gate | Assertion | Maps to |
+| --- | --- | --- |
+| **TFD order** | `col(u) < col(v)` for every collapsed edge (per-container and global). | CON-1 |
+| **Hull staircase** | `col(A) < col(B)` for every hull→hull edge `A→B`; account order matches org `.tfd`. | CON-6 |
+| **Containment** | Every child rectangle ⊆ parent content box. | CON-3 |
+| **No overlap** | Final-scene categorized collision count = 0: `region-region`, `same-vpc-subnet-subnet`, `frame-title-primary-cluster`, `non-ancestor-topology-frame` (ancestor containment excluded). | CON-4 |
+| **Forced bands** | At forced levels, sibling bands disjoint in Y (modulo [DEC-1](#14-open-design-decisions) staircase). | CON-5 |
+| **Fan-out columns** | Every fan-out set's targets share a column. | REQ-3/T4 |
+| **Centering** | hub within ε of its fan-out median; convergence node within ε of its sources' median (post-clamp). | REQ-6/T5 |
+| **Determinism** | Two builds byte-identical. | CON-8 |
+| **Acyclic guard** | `semanticEdgeViolations = []`; cycles localized. | CON-1/2 |
+
+Diagnostic instrument: port the REGION_SUBNET plan's `FinalSceneCollision` classifier + the audit's `terraformPipelineCollisionDiagnostics.ts`/`terraformPipelineSemanticAudit.test.ts`.
+
+---
+
+## 14. Open design decisions
+
+Each: question · options · recommendation · reversal cost.
+
+### DEC-1 — Forced-band Y-overlap on a staircase (largest height lever)
+
+When a hull→hull dependency makes two forced siblings X-disjoint (the deeper one pushed right past the predecessor), may the deeper one rise to **overlap the predecessor's Y-range**?
+
+- **(A) No** — bands never overlap in Y (literal "each its own band"). Tallest; simplest.
+- **(B) Yes, on dependency only (recommended)** — a deeper, X-disjoint, dependent sibling may rise. Without this, hull-level push-right buys _no_ height (it only adds width), contradicting the height lever (T6/G3).
+- **Reversal cost:** low — a single predicate in `placeForcedBands`.
+
+### DEC-2 — Cross-hull fan-out clamping
+
+A hub whose fan-out targets live in different forced bands (e.g. `organization_root → workload / ingestion / security`) cannot be centered inside one band.
+
+- **Recommended:** evaluate T4/T5 at the **LCA container**; center the hub on the child-hulls' median; clamp to the hub's own band.
+- **Reversal cost:** low — affects only `des()` computation for cross-band hubs.
+
+### DEC-3 — Default region policy (density tension)
+
+On sparse presets, forced-band stacking of near-empty regions dominates height; RCLL's interior packing cannot touch it.
+
+- **Options:** region **forced** (cleanest ownership, tallest) vs region **packed** (shorter, regions may share Y bands when X-disjoint).
+- **Recommended:** keep **forced** as default but treat region as the first knob to flip ([FLEX-1](#4-requirements-catalogue)) on tall graphs; pair with [DEC-1](#14-open-design-decisions)(B).
+- **Reversal cost:** trivial — it is a per-level toggle.
+
+### DEC-4 — Aspect target & authority
+
+What is "horizontal but not excessive"?
+
+- **Options:** fixed ratio (~16:9); viewport-fit; **height-first then pack-left** (the literal user phrasing).
+- **Recommended:** **height-first then pack-left** for v1 (matches the user's words), with a Jünger–Mutzel–Spisla-style width budget ([R11]) available as a later knob ([FLEX-3](#4-requirements-catalogue)).
+- **Reversal cost:** medium — changes the T7 stopping criterion and possibly the centering weight.
+
+### DEC-5 — Dummy nodes for column-skipping edges
+
+BK straightens long edges best with dummy-node chains (element-count cost).
+
+- **Recommended:** **off in v1** ([FLEX-6](#4-requirements-catalogue)); revisit if straightness targets aren't met.
+- **Reversal cost:** medium — adds a dummy-insertion step + element bookkeeping.
+
+### DEC-6 — Centering ε and crossing metric fidelity
+
+- **Recommended:** choose ε (e.g. ≤ ½ `PIPELINE_CLUSTER_GAP_Y`) and a **polyline-aware** crossing counter before trusting absolute readability numbers (current metric is a straight chord).
+- **Reversal cost:** low — metric/threshold only.
+
+### DEC-7 — Huge fan-out handling (surfaced by §26)
+
+A single source fanning out to many targets (e.g. `1 → 200`) makes the shared fan-out column (T4) extremely tall.
+
+- **Options:** (A) keep one tall column (faithful, may need scrolling); (B) **wrap** the fan-out into a multi-column grid block within the hop (compact, but breaks the "one clean column" reading); (C) wrap only past a threshold `N`.
+- **Recommended:** (C) one column until `|out(u)| > N` (e.g. 24), then grid-wrap inside the hop band; expose `N` as a tunable.
+- **Reversal cost:** low — local to the fan-out placement module.
+
+### DEC-8 — Cycle handling within a strongly-connected component (surfaced by §27)
+
+CON-2 says cycles fall back **locally**, but not _how_ the SCC's internal order is drawn.
+
+- **Options:** (A) **break the cycle** with a minimum feedback-arc-set heuristic and draw one edge as a visible back-edge; (B) collapse the SCC and **model-order stack** its members in a shared column band, marking a `pipeline_cycle` warning.
+- **Recommended:** (B) for v1 (deterministic, no back-edge ambiguity); revisit (A) if cycles are common.
+- **Reversal cost:** medium — changes the layering input for the affected subtree.
+
+---
+
+## 15. Alternatives considered (whole-approach)
+
+Each with its literature, so the design can pivot.
+
+| Alternative | Description | Papers | Why not chosen |
+| --- | --- | --- | --- |
+| **Merge current push/pull sweeps** | Keep the two-pass packer but unify sweeps. | (internal) | Still global-grid-bound (§3.4), group-uniform (§3.2), no ordering/centering — doesn't reach the readability goal. |
+| **Full constraint solver (stress / IPSep-CoLa)** | Treat the whole scene as one constrained optimization, iterate to convergence. | IPSep-CoLa [R17]; stress majorization | Non-deterministic / slow at v2 scale; violates CON-8/CON-9. We borrow only the **one-shot VPSC projection** ([R14]) as a finisher. |
+| **Top-down scaling compound** | Fix parent sizes, scale children to fit; hide detail by zoom. | Kasperowski–von Hanxleden [R9]; ELK `topdownLayout` | Hides detail via scale; we need full-detail static (N5). Cited as recursion precedent only. |
+| **Network-simplex reassignment alone** | Re-rank with dot's network simplex + balance, keep current packer. | Gansner [R2] | A _component_ of RCLL (Phase 1a/b), not a whole solution — no nesting recursion, no centering, no fan-out columns. |
+| **Treemap / squarified packing** | Pack hulls as a treemap for area efficiency. | treemap literature | Destroys L→R dataflow reading; topology becomes area, not flow. |
+| **Pure tidy-tree (Reingold–Tilford/Walker)** | Treat as a tree, contour-pack. | [R18][r19][R20] | The graph is a DAG, not a tree; but its **contour-merge + parent-centering** ideas are reused inside packed containers. |
+| **Bounded-span upward-planar** | Bound edge span to compact. | Span literature | Requires edge reversal/relaxations incompatible with hard TFD order. |
+| **RCLL (chosen)** | Recursive compound Sugiyama + priority lattice + hybrid columns. | [R1][r2][R6][r7][R8][r10][R11][r12][R13][r14] | Matches the user's mental model exactly; deterministic; localizes failure; per-node + per-hull granularity; one algorithm + a few dials. |
+
+---
+
+## 16. Complexity, performance & determinism budget
+
+- **Complexity.** Phase 0 `O(V+E)`. Phase 1 per container `O(kH log kH + EH + kH·slack)`; summed over the tree `≈ O((V+E) log V)` for realistic slack. Phase 2 `O(#accounts)`. Phase 3 `O(V·row)`. No super-linear blowups; comparable to the current packer.
+- **Performance.** Pipeline layout runs on the main thread (CON-9). On v2 (~145 edges, ~hundreds of clusters) the constant factors are small; the VPSC projection runs on tiny per-container constraint sets. Target: no worse than today's packed path (which already does multiple relaxation sweeps).
+- **Determinism (CON-8).** Every ordering uses `(firstSequence, topology key, id)`; barycenter reorder is gated on strict improvement; VPSC active-set is deterministic. No RNG, no time-dependent state.
+- **Caching.** Like packed/semantic today, RCLL output should **skip** (or extend the key of) the KV layout cache until the cache key includes the new dials ([FLEX-1..9](#4-requirements-catalogue)).
+
+---
+
+## 17. Verification & metrics
+
+Extend the existing harness (no browser for core checks).
+
+**New readability metrics (REQ-11):**
+
+- Fan-out column rate (target ~100 %).
+- Hub-centering rate within ε (target high; pick ε per [DEC-6](#14-open-design-decisions)).
+- Median edge ΔY (target ↓ from 350–1,221 px).
+- Near-straight % (target ↑ from 12–17 %).
+- Aspect ratio W:H vs target.
+
+**Geometry / correctness:**
+
+- `terraformPipelineLaneDebug.test.ts` (`VITEST_TERRAFORM_VERBOSE=1`): before/after height/width on v2 vs baselines (stacked ~18.5k px; packed ~7.5k px).
+- Final-scene categorized collision diagnostic = 0, `semanticEdgeViolations = []` (Compact **and** Full).
+- Order invariants: `col(u)<col(v)` for clusters and hull edges; org staircase matches `.tfd`; fan-out column equality.
+
+**Determinism:** build twice; compare geometry byte-for-byte.
+
+**Kernel unit tests:** push-right shares a row only when X-disjoint; free vs pinned classification; pack-left never opens a row and moves fan-out groups as units; centering within ε; cycle → localized fallback.
+
+**Manual:** `yarn seed:terraform-presets && yarn start`; import v2; verify L→R spine staircase, hubs centered over fan-outs, fan-outs column-aligned, drag a hull moves contents + arrows.
+
+Commands:
+
+```bash
+VITEST_TERRAFORM_VERBOSE=1 yarn vitest run \
+  packages/excalidraw/components/terraformPipelineLaneDebug.test.ts -t "staging-extended-localstack-v2"
+yarn vitest run packages/excalidraw/components/terraformPipelineLayout.test.ts
+yarn vitest run packages/excalidraw/components/terraformPipelineLayoutCompound.test.ts
+yarn vitest run packages/excalidraw/components/terraformPipelineLayoutPacked.test.ts   # replaced/retired
+```
+
+---
+
+## 18. Migration, rollout & toggle consolidation
+
+- **Build behind a flag** (e.g. `pipelineLayoutVariant: "rcll"`), keeping the existing builders until RCLL passes the gates on all presets.
+- **Consolidation target:** RCLL supersedes `Stacked / Packed / Packed+pull-left / Semantic`. The surviving dials become: **per-level forced/packed policy** ([FLEX-1](#4-requirements-catalogue)), **aspect target** ([FLEX-3](#4-requirements-catalogue)), and the [DEC-1](#14-open-design-decisions) staircase toggle. `Compact/Full` (detail) and `Dataflow-only/All` (which resources) remain orthogonal **content** toggles. `Classic/Compound` collapses: RCLL always produces compound frame parenting (group-drag) — "Classic" (arrows at root) becomes unnecessary.
+- **Cache:** extend the KV layout cache key with the RCLL dials, or skip cache for RCLL until then.
+- **Docs:** update `terraform-pipeline-import-agent-guide.md` and `terraform-pipeline-compound-import-guide.md` to describe RCLL and retire the four-toggle matrix.
+
+---
+
+## 19. References
+
+Corpus IDs are local `graph-layout-rag` `doc_id`s (deep-read via the skill: resolve `localPath` from `data/manifest.json`, then extract). Public links/DOIs given where known. Tier/role annotations show where each is used (or why an alternative is listed).
+
+**Core framework**
+
+- **[R1] Sugiyama, Tagawa, Toda — _Methods for Visual Understanding of Hierarchical System Structures_**, IEEE SMC 1981. doi:10.1109/TSMC.1981.4308636. — The four-phase framework (layer/order/coordinate) RCLL runs recursively. _(T1, PREF-2/3)_
+- **[R2] Gansner, Koutsofios, North, Vo — _A Technique for Drawing Directed Graphs_ (dot)**, IEEE TSE 1993. doi:10.1109/32.221135 · https://graphviz.org/documentation/TSE93.pdf · corpus `gansner-tse93`. — Network-simplex ranks; `balance()` slack distribution. _(T1, T6)_
+- **[R3] Nikolov, Tarassov, Branke — minimum-width layering / node promotion** (and Kiel _Minimum-Width Layerings_ revisit). corpus `kiel-minimum-width-layering`, `openalex-10-21941-bii-1701`. — Width control + dummy-node reduction at layering. _(T6, alternative for 7.2a)_
+- **[R4] Rüegg — _Sugiyama Layouts for Prescribed Drawing Areas_**, KCSS 2018/1 (dissertation). corpus `forward-10-21941-kcss-2018-1`. — Fitting layered drawings to a prescribed area / aspect. _(PREF-4, DEC-4)_
+- **[R5] Jabrayilov, Mallach, Mutzel, Rüegg, von Hanxleden — _Compact Layered Drawings of General Directed Graphs_**, GD 2016, LNCS 9801. doi:10.1007/978-3-319-50106-2*17 · arXiv:1609.01755 · corpus `forward-10-48550-arxiv-1609-01755`. — Bounding one axis to fix aspect (they reverse arcs; we use slack + recursion since TFD is hard). *(PREF-4/5)\_
+
+**Compound / recursive**
+
+- **[R6] Sander — _Layout of Compound Directed Graphs_**, Tech. Report A/03/96, Univ. des Saarlandes, 1996. corpus `sander-compound-directed-graphs`. — Clusters span the contiguous level range of their children; hulls derived. _(T2, REQ-1)_
+- **[R7] Forster — _Applying Crossing Reduction Strategies to Layered Compound Graphs_**, GD 2002, LNCS 2528. doi:10.1007/3-540-36151-0*26 (see also Forster, \_Crossings in Clustered Level Graphs*, dissertation 2005). — Crossing ownership per hierarchy node ⇒ minimize locally per container. _(PREF-2, 7.2c)_
+- **[R8] Doğrusöz, Giral, Çetintaş, Çivril, Demir — _A Compound Graph Layout Algorithm for Biological Pathways_ (CoSE)**, GD 2004, LNCS 3383. doi:10.1007/978-3-540-31843-9*45 · corpus `s2-10-1007-978-3-540-31843-9-45`. — Recursive "cart-on-cart" nested layout. *(REQ-1)\_
+- **[R9] Kasperowski, von Hanxleden — _Top-Down Drawings of Compound Graphs_**, 2023. arXiv:2312.07319 · corpus `openalex-10-48550-arxiv-2312-07319`. Plus ELK `topdownLayout` / `hierarchyHandling=INCLUDE_CHILDREN` / `aspectRatio` — https://eclipse.dev/elk/reference. — Recursive compound precedent; **rejected scaling** (N5). _(alternative, §15)_
+
+**Coordinate assignment / centering**
+
+- **[R10] Brandes, Köpf — _Fast and Simple Horizontal Coordinate Assignment_**, GD 2001, LNCS 2265. doi:10.1007/3-540-45848-4*3 · corpus `brandes-koepf-horizontal-coordinate-assignment`. Erratum: arXiv:2008.01252 · corpus `forward-10-48550-arxiv-2008-01252`. — Median alignment → centers hub over fan-out; our axis is Y. *(T5, REQ-6)\_
+- **[R11] Jünger, Mutzel, Spisla — _A Flow Formulation for Horizontal Coordinate Assignment with Prescribed Width_**, GD 2018, LNCS 11282. doi:10.1007/978-3-030-04414-5*13 · corpus `forward-10-1007-978-3-030-04414-5-13`, `jgaa-2417`. — Straightness vs cross-axis extent under a budget (their width = our height). *(PREF-3/4, T5-vs-T6/T7, DEC-4)\_
+- **[R12] Rüegg, Schulze, Carstens, von Hanxleden — _Size- and Port-Aware Horizontal Node Coordinate Assignment_**, GD 2015, LNCS 9411. doi:10.1007/978-3-319-27261-0*12 · corpus `doi-10-1007-978-3-319-27261-0-12`. — BK with real node sizes + ports. *(T5, REQ-6, §12)\_
+
+**Constraints / packing**
+
+- **[R13] Domrös — _Model Order_ (rectpacking in ELK)**, KCSS 2025/3. doi:10.21941/kcss/2025/3 · corpus `openalex-10-21941-kcss-2025-3`. — Order-preserving rectangle packing, reading-direction, whitespace elimination. _(T7, REQ-8, §10.2)_
+- **[R14] Dwyer, Marriott, Stuckey — _Fast Node Overlap Removal_ (VPSC)**, GD 2005, LNCS 3843. doi:10.1007/11618058*15. And \*\*Dwyer, Marriott, Wybrow — \_Topology-Preserving Constrained Graph Layout*\*_, GD 2008, LNCS 5417. doi:10.1007/978-3-642-00219-9_22 · corpus `doi-10-1007-978-3-642-00219-9-22`. — Deterministic 1-D separation/containment projection used once on Y. _(T2 enforce, §9.5)\*
+- **[R15] Freivalds, Doğrusöz, Kikusts — _Disconnected Graph Layout and the Polyomino Packing Approach_**, GD 2001, LNCS 2265. doi:10.1007/3-540-45848-4*30 · corpus `doi-10-1007-3-540-45848-4-30`. — FFDH level packing primitive. *(§10)\_
+- **[R16] Coffman, Graham — _Optimal Scheduling for Two-Processor Systems_**, Acta Informatica 1972. doi:10.1007/BF00288685. (Width-bounded layering = transposed scheduling; see also Healy & Nikolov, _Hierarchical Drawing Algorithms_, Handbook of Graph Drawing & Visualization, CRC 2013, corpus `handbook-hierarchical`.) _(7.2a/b alternative)_
+- **[R17] Dwyer, Koren, Marriott — _IPSep-CoLa: An Incremental Procedure for Separation Constraint Layout of Graphs_**, IEEE TVCG 2006. doi:10.1109/TVCG.2006.156. _(alternative, §15)_
+
+**Tree packing (reused inside packed containers)**
+
+- **[R18] Reingold, Tilford — _Tidier Drawings of Trees_**, IEEE TSE 1981. doi:10.1109/TSE.1981.234519 · corpus `doi-10-1109-tse-1981-234519`. _(parent-centering aesthetic)_
+- **[R19] Buchheim, Jünger, Leipert — _Improving Walker's Algorithm to Run in Linear Time_**, GD 2002. doi:10.1007/3-540-36151-0*32 · corpus `doi-10-1007-3-540-36151-0-32`. *(contour merge)\_
+- **[R20] van der Ploeg — _Drawing Non-Layered Tidy Trees in Linear Time_**, SPE 2013. doi:10.1002/spe.2213 · corpus `doi-10-1002-spe-2213`. — Variable node sizes; the analog for packing variable-size hulls. _(§10, REQ-1)_
+
+---
+
+## 20. Appendix A — worked example: the v2 org spine
+
+`pipeline.tfd` declares (abbreviated):
+
+```text
+organization_root -> workloads_ou, data_platform_ou, security_ou      # fan-out (hub)
+workloads_ou      -> workload_account
+data_platform_ou  -> ingestion_account
+security_ou       -> security_account
+workload_account  -> ecs_producer, queue_consumer, ecs_alb            # fan-out inside account
+ingestion_account -> ingest_fifo_queue, kinesis_*, eks_cluster, ...
+security_account  -> cloudtrail_org, config_recorder, audit_bucket, ops_topic
+```
+
+RCLL behavior:
+
+1. **Hull-edge up-projection** (REQ-9) at `root`/`provider`: `organization_root` fans out to three **account hulls** → `D_root` has `org → {workload, ingestion, security}` (hull→hull, declared).
+2. **T4 at root:** the three account hulls **share a column** (one→many). **T3/CON-6:** each is right of `organization_root`'s column. **Phase 2** aligns these on the global spine grid (REQ-7).
+3. **T5 / DEC-2:** `organization_root` is **centered** on the median Y of the three account hulls (centered on `ingestion`, the middle one — _not_ aligned to `workload`).
+4. **Forced bands (CON-5):** the three accounts occupy distinct Y bands; with [DEC-1](#14-open-design-decisions)(B), because they're X-disjoint from the org root they may rise beside it, shortening the spine.
+5. **Inside each account (recursion):** e.g. `workload_account → {ecs_producer, queue_consumer, ecs_alb}` is a fan-out → those three share a **local** column and `workload_account`'s entry is centered on them; the long `api1..api16` cascade lays out as L→R hops; **free** resources (e.g. `ops_topic`, forced deep by a single late edge) are **pushed right** only if free, then **packed left** as a group/individual to trim width.
+
+Result: a left-to-right org staircase, hubs centered over fan-outs, fan-outs column-aligned, accounts in clean bands, height reclaimed where slack exists, width trimmed by pack-left.
+
+---
+
+## 21. Appendix B — implementation file map
+
+Rewrite-friendly (per the user). Likely touched:
+
+| File | Change |
+| --- | --- |
+| `terraformPipelineLayoutShared.ts` | Prep extensions: `UB`/`slack`, compound tree with `root`/`primaryCluster` roles, fan-out sets, hull-edge up-projection; layering (7.2a). |
+| `terraformPipelineLayoutPacked.ts` | **Retired/replaced** by the RCLL kernel (push-right 7.2b, pack-left §10.2). |
+| `terraformPipelineTopologyFrames.ts` | Hull-edge DAG helpers; role additions; derived hull boxes. |
+| **new** `terraformPipelineCoordinateAssignment.ts` | Brandes–Köpf size-aware centering + VPSC projection (§9). |
+| `terraformPipelineLayoutCompoundHierarchy.ts` | Stays normalization-only (local→global translate, metadata stamp). |
+| `terraformPipelineLayoutFinalize.ts` | Arrows + hull→hull connectors + LCA frame parenting (§12). |
+| `terraformLayoutCore.ts` | Route `pipelineLayoutVariant: "rcll"`; thread the new dials. |
+| `terraformPipelineCollisionDiagnostics.ts` / audit test | Final-scene categorized collision gate (§13) + readability metrics (REQ-11). |
+| `TerraformImportDialog.tsx` / session / URL params | Consolidated dials (§18). |
+
+---
+
+## 22. Modular ("Lego") pipeline architecture
+
+RCLL is deliberately built as a sequence of **stages**, each implemented by a swappable **module**. The goal is that pieces — the layering strategy, the router, the compaction passes, the visual encoding — can be replaced or adjusted independently ("like Lego") without breaking correctness or one another.
+
+```mermaid
+flowchart LR
+  S0["0 Prep"] --> S1a["1a Layer"] --> S1b["1b Push-right"] --> S1c["1c Order"] --> S1d["1d Center"] --> S1dp["1d+ Straighten"] --> S2["2 Spine"] --> S3["3 Pack-left"] --> S4["4 Route"] --> SR["R Encode"]
+  SX["X Cross-cutting · determinism · no-back-edge · collision + faithfulness gates"] -. guards every stage .-> S0
+```
+
+_Each stage is a pluggable module; the priority lattice (§5) is the interface contract every module must honor (§22.1)._
+
+### 22.1 The module contract — the priority lattice _is_ the interface
+
+The thing that makes the pieces composable is the **priority lattice (§5)**. It is not just a conflict-resolution device; it is the **contract every module must honor**:
+
+- **Input:** the partially-laid-out compound tree + lattice state (column floors `LB`/`UB`/slack, fan-out/fan-in sets, per-container hull-edge DAGs, current boxes).
+- **Output:** an updated tree that **still satisfies every tier at or above the module's own tier**, and is **deterministic** (CON-8).
+- **Rule:** a module may optimize only tiers at or below its own; it must **never violate a higher tier**. (E.g. a compaction module — tier T6/T7 — may move free nodes but must not break a fan-out column (T4) or a forced band (T2).)
+
+Because the contract is the lattice, **any** module that preserves T1–T5 can be dropped in. This is why every item in §23 can be expressed as a pluggable module (or an additional pass) rather than a rewrite.
+
+### 22.2 Stage / strategy registry
+
+| Stage | Default module | Swappable alternatives | Tiers it may touch |
+| --- | --- | --- | --- |
+| **0 Prep** | satellite + edge collapse; compound tree; floors `LB`; slack `UB`; fan-out sets; hull-edge up-projection | _(fixed)_ | builds T1/T3/T4 inputs |
+| **1a Layering** | longest-path floors + hull staircase + fan-out pinning | network-simplex (Gansner [R2]); Coffman–Graham [R16]; MinWidth / node promotion [R3] | T1, T3, T4 |
+| **1b Height compaction** | `balance()` push-right of _free_ nodes | off; MinWidth promotion [R3] | T6 (within T1–T5) |
+| **1c Ordering** | barycenter w/ strict-improvement gate | sifting; off | PREF-2 (crossings) |
+| **1d Coordinate (Y)** | forced-band placement OR Brandes–Köpf size-aware centering + VPSC clamp [R10][r12][R14] | priority method [R1]; network-simplex x-coord [R2] | T5 (clamped by T2) |
+| **1d+ Path straightening** | off | spine-scoped whole-path straightening (± dummy nodes) [R10] | PREF-3 (within T5) |
+| **2 Spine alignment** | hybrid (global top spine, local below) | fully global; fully local | T3 / REQ-7 |
+| **3 Width compaction** | order-preserving pack-left, fan-out groups as units [R13] | off; aspect-targeted [R4][r11] | T7 |
+| **4 Routing** | straight arrows + LCA frame parenting | orthogonal + ports [R29]; edge-path bundling [R27] | rendering (no tier) |
+| **R Encoding (render)** | current styling | hull tinting + spine color + legend; salience / focus+context; grid-snap | rendering (no tier) |
+| **X Cross-cutting** | determinism, no-back-edge, collision gate | mental-map preservation [R26]; faithfulness metric [R28]; aspect/viewport target [R4][r11] | guards T1–T5 |
+
+> Implementation note: model each stage as a function `(tree, lattice, options) → tree` with the contract above; register strategies in a small table keyed by `options`. The new dials in §18 select modules; defaults reproduce the recommended RCLL behavior.
+
+---
+
+## 23. Human-factors readability — principles, engine practice & optional extras
+
+This section catalogues readability enhancements. Most are **optional extras** (pluggable modules per §22). Each carries **Pros / Cons / Fit / Default / Rec** so reviewers can include, defer, or drop it. The corpus already contains nearly all the underlying research (IDs below).
+
+### 23.1 Principles ranked by evidence
+
+| Rank | Principle | Evidence (corpus `doc_id`) | RCLL action |
+| --- | --- | --- | --- |
+| 1 | **Minimize edge crossings** — by far the strongest comprehension factor. | Purchase `doi-10-1007-bfb0021827`, `doi-10-1016-s0953-5438-00-00032-1`, `s2-10-1007-3-540-44541-2-2` | EXT-1 (Stage 1c primary objective). |
+| 2 | **Support path-tracing** — people read along geodesic paths; smooth, monotone paths read faster. | Huang/Eades/Hong `doi-10-1109-pacificvis-2009-4906848`, `doi-10-1057-ivs-2009-10` | EXT-2 (whole-path straightening). |
+| 3 | **Few bends + one consistent direction.** | Purchase (bends); layered core [R1] | EXT-12; routing (Stage 4). |
+| 4 | **Symmetry / alignment / equal spacing** — weaker but positive; isomorphic substructures identical. | Purchase; Ware `doi-10-1057-palgrave-ivs-9500013` | EXT-7. |
+| 5 | **Preserve the mental map** across expand / re-import. | Archambault & Purchase `openalex-10-1007-978-3-642-36763-2-42`, `openalex-10-1007-978-3-540-70904-6-19` | EXT-9. |
+| 6 | **Faithfulness** — geometry must not imply false relationships. | `crossref-10-1007-978-3-642-36763-2-55`, `arxiv-2208-14095v1`, `s2-10-1109-pacificvis60374-2024-00029` | EXT-10. |
+| 7 | **Manage clutter via level-of-detail** — overcrowding is the #1 practitioner complaint. | LOD `openalex-10-1109-tvcg-2012-238`; fisheye `graphviz-fisheye`; overview+detail `doi-10-1109-tvcg-2008-130` | EXT-8. |
+
+### 23.2 How the engines organize for readability
+
+| Engine | Mechanisms worth borrowing |
+| --- | --- |
+| **Graphviz / dot** | Network-simplex ranks; crossing min by **median + transpose**; **spline** routing; `rankdir=LR`; `weight`/`constraint`/`group`/`samerank`; `nodesep`/`ranksep`; `subgraph cluster_*`. |
+| **ELK Layered** | Brandes–Köpf placement; orthogonal/polyline/spline `edgeRouting`; **port constraints/sides** (dataflow ports); `hierarchyHandling=INCLUDE_CHILDREN`; **`considerModelOrder`** (stability); `aspectRatio`; rich `spacing`. (`elk-eclipse-layout-kernel-arxiv`, `elk-dagre-engine-docs`.) |
+| **Mermaid (dagre / ELK)** | dagre = simple layered default; ELK for complex graphs; `direction LR`; subgraph containers. |
+| **D2 / TALA** | **TALA is purpose-built for software-architecture readability**: container-aware, near-orthogonal, grid-like, keeps related things together; D2 `grid` layouts. (Product — see harvest.) |
+| **Structurizr / C4** | **Level-of-abstraction discipline** (Context→Container→Component); auto-layout + manual nudges; **auto-generated legend**. (Simon Brown.) |
+| **Ilograph** | Interactive **perspectives** + hierarchy navigation (LOD / overview+detail). |
+| **Cloudcraft / Hava** | Auto-group by **account/region/VPC/subnet**; explicit boundary containers; consistent vendor icons. |
+| **draw.io / vendor guides** | Containers/swimlanes for boundaries; **color = environment** paired with pattern; compact legend (solid=sync, dashed=async). |
+
+### 23.3 Optional extras catalogue
+
+Each maps to a stage/module in §22.2.
+
+**Edge & path (Stages 1c / 1d+ / 4)**
+
+- **EXT-1 — Crossing-reduction as a first-class objective.** Promote crossing minimization from a strict-improvement tiebreak to a primary objective (allow modest extra height/width to cut crossings).
+  - _Pros:_ Crossings are empirically the #1 readability factor (Purchase) — biggest legibility win per unit effort.
+  - _Cons:_ Can fight compaction (crossing-free layouts are sometimes larger); needs a **polyline-aware** crossing counter (today's straight-chord metric mis-counts elbow arrows); adds compute.
+  - _Fit:_ Stage 1c (ordering). _Default:_ **on**. _Rec:_ **yes** — highest ROI.
+- **EXT-2 — Whole-path straightening (geodesic continuity).** Straighten an entire TFD chain (org→account→trunk→api→datastore) into one smooth, monotone line, not edge-by-edge.
+  - _Pros:_ People trace _paths_, not edges (Huang/Eades/Hong); a straight spine is far easier to follow.
+  - _Cons:_ Straightening column-skipping edges needs **dummy nodes** (extra elements/bookkeeping); straightening one path can bend others (must choose which paths win — the spine).
+  - _Fit:_ Stage 1d+. _Default:_ **off** (spine-scoped opt-in). _Rec:_ **yes, scoped** to spine/critical paths; dummy nodes are a separate decision (DEC-5).
+- **EXT-3 — Orthogonal routing + ordered ports.** Right-angle routing leaving source-right, entering target-left, with ports ordered to avoid near-node crossings.
+  - _Pros:_ Reads like a **pipeline/circuit** — the exact mental model here; this _is_ a dataflow diagram; ELK and D2/TALA default to it; aligns with the column structure. Ports = Excalidraw binding points.
+  - _Cons:_ Adds **bends** (Purchase: bends hurt, less than crossings); routing + port assignment is real engineering (channel/track assignment); can look busy if overused.
+  - _Fit:_ Stage 4 (routing). _Default:_ **toggle** (orthogonal vs smooth). _Rec:_ **strong yes** for this domain — the pipeline metaphor is the point.
+- **EXT-4 — Edge-Path bundling.** Bundle near-parallel cross-hull / fan-out edge families along actual graph paths (low-ambiguity variant).
+  - _Pros:_ Cuts clutter on dense graphs (the #1 complaint); the "Edge-Path" variant stays unambiguous.
+  - _Cons:_ **Any** bundling trades individual-edge traceability for cleanliness; adds routing complexity; can clash visually with EXT-3.
+  - _Fit:_ Stage 4, aggregated cross-hull connectors only (keep within-hull fan-outs crisp). _Default:_ **off**. _Rec:_ **optional / later** — only if density hurts; ambiguity risk.
+
+**Encoding & salience (Stage R — rendering, no placement risk)**
+
+- **EXT-5 — Nested hull tinting + spine color + auto-legend.** Tint hull backgrounds by role/account, color the spine, auto-generate a legend.
+  - _Pros:_ Gestalt "common region" makes nesting readable at a glance; color is the fastest "which account" channel; legend removes guesswork. Pure rendering — no placement risk.
+  - _Cons:_ Must be accessibility-safe (pair color with outline/pattern; don't rely on hue alone); too many tints become noise; legend takes canvas space.
+  - _Fit:_ Stage R. _Default:_ **on**. _Rec:_ **yes** — cheap, big perceived-quality gain.
+- **EXT-6 — Salience (focus + context).** Heavier strokes on the spine/critical path, dim the periphery, highlight a full path on hover.
+  - _Pros:_ Directs the eye to the story; complements EXT-2; builds on existing weighted connectors (R5)
+    - multi-hop hover (R4).
+  - _Cons:_ Needs spine/importance detection; interactive highlighting is runtime work, not layout.
+  - _Fit:_ Stage R + runtime. _Default:_ **partial** (extend existing). _Rec:_ **yes, incremental**.
+- **EXT-7 — Symmetry / grid-snap / uniform fan-outs.** Snap to a grid, equalize within-column gaps, draw repeated structures (api1..16) identically.
+  - _Pros:_ Tidy, professional, predictable; symmetry is a (weaker) validated aesthetic; uniform combs read as "same kind of thing."
+  - _Cons:_ Grid-snap can waste space or fight tight packing; lowest legibility payoff here.
+  - _Fit:_ Stage R / post-coordinate finishing pass. _Default:_ **off**. _Rec:_ **low priority** polish.
+- **EXT-8 — Progressive disclosure / level-of-detail.** Make "collapsed overview, expand on demand" the explicit core model (Compact default + click-to-expand + degree-of-interest hover).
+  - _Pros:_ The single most effective clutter remedy (C4; cloud best-practice "don't draw a dozen boxes"); largely already built (Compact + expand + R4 hover).
+  - _Cons:_ Mostly a stance/doc commitment, not new math; expand-overlap still needs EXT-9.
+  - _Fit:_ Product/UX + EXT-9. _Default:_ **on** (Compact default). _Rec:_ **yes** — formalize what exists.
+
+**Stability & correctness (Stage X — cross-cutting)**
+
+- **EXT-9 — Mental-map-preserving expand + stable re-import.** On expand, push neighbors _minimally_ (constrained) instead of overlapping; on re-import reuse prior positions (`terraformCompoundLocal` is already written but unused).
+  - _Pros:_ Preserving positions measurably aids orientation (Archambault/Purchase); fixes today's "expand overlaps siblings" wart; makes re-imports diff-friendly.
+  - _Cons:_ Constrained neighbor-pushing is real work (topology-preserving move); re-import anchoring has edge cases when the graph changed shape.
+  - _Fit:_ expand path + finalize (reuses the VPSC projection). _Default:_ **on**. _Rec:_ **yes** — fixes a known defect.
+- **EXT-10 — Faithfulness guardrail.** A metric/check ensuring geometry never implies a relationship that isn't there (accidental alignment/clusters); geometric clusters == real hulls.
+  - _Pros:_ Prevents "lies" in the diagram; cluster-faithfulness is a current (2024) metric; cheap as a gate.
+  - _Cons:_ A guardrail, not a visible feature; thresholds need care.
+  - _Fit:_ metrics / acceptance gates (§13, §17). _Default:_ **on (as a test)**. _Rec:_ **yes** — low cost, prevents regressions.
+- **EXT-11 — Aspect-ratio / viewport fit.** Target a specific width:height (e.g. the screen) explicitly rather than "shortest then trim width."
+  - _Pros:_ Best matches "horizontal but not excessive"; ARCOL (2026) is exactly aspect-ratio-constrained orthogonal layout; fits a viewport without dual-axis scrolling.
+  - _Cons:_ Adds a real objective/knob (which ratio? whose viewport?); can conflict with forced-band height.
+  - _Fit:_ Stage 3 / this is DEC-4. _Default:_ **decide the target** (screen-ish ratio recommended). _Rec:_ **yes** — pick the target.
+- **EXT-12 — No-back-edge routing.** Guarantee nothing ever _looks_ like it flows backward/up-left; route long column-spanning edges cleanly.
+  - _Pros:_ Cheap; reinforces L→R reading; TFD order already guarantees the logical direction.
+  - _Cons:_ Essentially none — a routing constraint.
+  - _Fit:_ Stage 4. _Default:_ **on**. _Rec:_ **yes** — free.
+
+### 23.4 References added (R21–R30)
+
+- **[R21] Purchase, Cohen, James — _Validating Graph Drawing Aesthetics_**, GD 1995. doi:10.1007/BFb0021827 · `doi-10-1007-bfb0021827`. _(crossings ≫ bends > symmetry)_
+- **[R22] Purchase — _Effective information visualisation: a study of graph drawing aesthetics and algorithms_**, Interacting with Computers 2000. doi:10.1016/S0953-5438(00)00032-1 · `doi-10-1016-s0953-5438-00-00032-1`.
+- **[R23] Purchase, Allder, Carrington — _User Preference of Graph Layout Aesthetics: A UML Study_**, GD 2000. `s2-10-1007-3-540-44541-2-2`.
+- **[R24] Ware, Purchase, Colpoys, McGill — _Cognitive Measurements of Graph Aesthetics_**, Information Visualization 2002. doi:10.1057/palgrave.ivs.9500013 · `doi-10-1057-palgrave-ivs-9500013`.
+- **[R25] Huang, Eades, Hong — _A Graph Reading Behavior: Geodesic-Path Tendency_**, PacificVis 2009 (`doi-10-1109-pacificvis-2009-4906848`); and **_Measuring Effectiveness of Graph Visualizations: A Cognitive Load Perspective_**, Information Visualization 2009 (doi:10.1057/ivs.2009.10 · `doi-10-1057-ivs-2009-10`).
+- **[R26] Archambault, Purchase — _Mental Map Preservation Helps User Orientation in Dynamic Graphs_**, GD 2012. `openalex-10-1007-978-3-642-36763-2-42`. (See also _How Important Is the "Mental Map"?_ `openalex-10-1007-978-3-540-70904-6-19`.)
+- **[R27] Wallinger et al. — _Edge-Path Bundling: A Less Ambiguous Edge Bundling Approach_**, IEEE TVCG 2022. doi:10.1109/TVCG.2021.3114795 · `doi-10-1109-tvcg-2021-3114795`. (Confluent: Bach et al. `doi-10-1109-tvcg-2016-2598958`; power-confluent `doi-10-1109-tvcg-2019-2944619`.)
+- **[R28] Faithfulness — _On the Faithfulness of Graph Visualizations_** `crossref-10-1007-978-3-642-36763-2-55`; **_Shape-Faithful Graph Drawings_** `arxiv-2208-14095v1`; **_Cluster-Faithful Graph Visualization_**, PacificVis 2024 `s2-10-1109-pacificvis60374-2024-00029`.
+- **[R29] Orthogonal / dataflow routing — Spönemann et al. _Port Constraints in Hierarchical Layout of Data Flow Diagrams_** `elk-10-1007-978-3-642-11805-0-14`; **Wybrow, Marriott, Stuckey _Orthogonal Hyperedge Routing_** doi:10.1007/978-3-642-31223-6\*10 · `doi-10-1007-978-3-642-31223-6-10`; \*\*Hegemann, Wolff \_A Simple Pipeline for Orthogonal Graph Drawing**\* arXiv:2309.01671 · `arxiv-2309-01671v2`; **ARCOL: _Aspect Ratio Constrained Orthogonal Layout_\*\* (2026) `openalex-w7148176492`.
+- **[R30] Engines — _The Eclipse Layout Kernel_** arXiv:2311.00533 · `elk-eclipse-layout-kernel-arxiv`; ELK/dagre docs `elk-dagre-engine-docs`; LOD rendering `openalex-10-1109-tvcg-2012-238`; topological fisheye `graphviz-fisheye`; overview+detail constraint layout `doi-10-1109-tvcg-2008-130`.
+
+### 23.5 Harvest candidates
+
+The corpus is already strong; these are the gaps worth adding for full context.
+
+- **HOLA — _Human-like Orthogonal Network Layout_** (Kieffer, Dwyer, Marriott, Wybrow), IEEE TVCG 2016, doi:10.1109/TVCG.2015.2467451. **Harvest** — most on-point missing academic source; pairs with EXT-3 (ARCOL, by overlapping authors, is already in-corpus).
+- **Practitioner / product docs (harvest selectively as doc entries; precedent: `elk-dagre-engine-docs`).** D2 / TALA (https://d2lang.com, https://terrastruct.com); C4 (https://c4model.com) / Structurizr (https://structurizr.com); Ilograph (https://www.ilograph.com); Cloudcraft (https://www.cloudcraft.co); Hava (https://www.hava.io); Azure Well-Architected diagrams (https://learn.microsoft.com/azure/well-architected/architect-role/design-diagrams); Graphviz attrs (https://graphviz.org/doc/info/attrs.html); ELK reference (https://eclipse.dev/elk/reference.html); Mermaid (https://mermaid.js.org); dagre wiki (https://github.com/dagrejs/dagre/wiki). Highest value: **D2/TALA** and **C4/Structurizr**.
+- **GraphMaps — _Browsing Large Graphs as Interactive Maps_**, arXiv:1506.06745. **Optional** — the LOD theme is already covered by `openalex-10-1109-tvcg-2012-238` + `graphviz-fisheye`.
+- **Ware — _Information Visualization: Perception for Design_** (book). **Context reference** — abstract only if harvested; read directly for perception foundations.
+
+---
+
+## 24. Implementation order & build sequence (milestones)
+
+This is the **careful, piece-by-piece build order** — the assembly instructions for the Lego pieces of §22. It is not the runtime phase order (§7); it is the _construction_ order, sequenced by dependency and risk so each step is small, verifiable, and reversible, with a real decision made before the next piece is added.
+
+### 24.1 Rules of the build
+
+1. **Everything ships behind the `pipelineLayoutVariant: "rcll"` flag.** The existing builders stay intact until the core (M0–M8) passes the gates; nothing user-facing changes until then.
+2. **Correctness first, readability second, optional extras last.** Hard tiers (T1–T3) and clean hulls (T2) before centering (T5), before compaction (T6/T7), before EXT-\*.
+3. **Measure before you change.** M0 stands up the metrics so every later milestone is a _measured_ decision, not a guess.
+4. **Each milestone ends with a decision gate** — it resolves a specific `DEC-*` / `FLEX-*` / `EXT-*` choice using the M0 metrics — **and acceptance criteria** (an invariant or metric that must hold).
+5. **Each milestone is reversible** (a module/flag toggle per §22). A milestone that regresses a gate is reverted, not patched over.
+
+### 24.2 Milestone table
+
+| # | Milestone | Adds (stage/EXT) | Decision gate | Acceptance criteria |
+| --- | --- | --- | --- | --- |
+| **M0** | Scaffolding + measurement harness | `rcll` flag routing (delegates to old builder); collision diagnostic + readability metrics (§13/§17) | Pick the **polyline-aware crossing counter** ([DEC-6](#14-open-design-decisions)) | Flag routes; all metrics compute; **v2 baselines recorded**; existing tests green |
+| **M1** | Prep + compound tree (Stage 0) | compound tree (`root`/`primaryCluster`), `UB`/slack, fan-out/fan-in sets, hull-edge up-projection `D_H`, localized cycle fallback | Cross-hull fan-out at the **LCA** ([DEC-2](#14-open-design-decisions)) | `D_H` acyclic or localized fallback; fan-out sets + slack correct on v2; deterministic. _No placement change yet._ |
+| **M2** | Layering (Stage 1a) | longest-path floors (CON-1) + hull staircase (CON-6) + **fan-out column pinning** (T4) | Fan-out shared column = `max LB` over the set | CON-1, CON-6 hold; **fan-out-column rate = 100 %** on v2; deterministic |
+| **M3** | Recursion + forced bands + hull frames (Stages 1d-forced / 2-frames) | recursive container layout; forced-band policy; derived hull boxes; collision gate (CON-3/4/5) | [DEC-1](#14-open-design-decisions) staircase Y-overlap; [DEC-3](#14-open-design-decisions) default region policy | **Collision count = 0** (compact **and** full); forced bands disjoint; containment holds |
+| **M4** | Hybrid top-spine alignment (Stage 2) | global align `root→provider→account`; local below ([REQ-7](#4-requirements-catalogue)) | Confirm hybrid vs full-global/full-local | account order == org `.tfd`; spine columns globally aligned |
+| — | **▸ Checkpoint A — "correct skeleton":** TFD-correct, hierarchy-clean, frames correct. Can replace `Stacked`/`Packed` _correctness_. Readability not yet improved. First internally-shippable cut. |  |  |  |
+| **M5** | Coordinate assignment / **centering** (Stage 1d-packed) | Brandes–Köpf size-aware centering + VPSC clamp; hub-over-fan-out / convergence-over-sources (T5); cross-hull at LCA | ε tolerance ([DEC-6](#14-open-design-decisions)); spine-vs-rest centering **weight** | **hub-centering rate ≥ target within ε**; 0 overlaps; **median ΔY ↓** vs baseline |
+| **M6** | Ordering / crossing reduction (Stage 1c) — **EXT-1** | barycenter + strict-improve gate; optional promote to primary objective | [EXT-1](#23-human-factors-readability--principles-engine-practice--optional-extras) on/off; size-vs-crossings budget | **crossings ↓** vs baseline; deterministic; no higher-tier regression |
+| **M7** | Height compaction: free-node **push-right** (Stage 1b) — T6 | `balance()` push-right of _free_ nodes; re-center after | free/pinned classification; re-center vs not | **container height ↓** where slack exists; T4/T5 preserved |
+| **M8** | Width compaction: **pack-left** + aspect (Stage 3) — T7, **EXT-11** | order-preserving pack-left, fan-out groups as units; aspect target | [DEC-4](#14-open-design-decisions) aspect target value | **width ↓**, height not regressed, **aspect near target** |
+| — | **▸ Checkpoint B — "v1 RCLL":** full core (correct + centered + compact). Replaces all four placement toggles. This is the candidate to flip the default / retire `Stacked/Packed/pull-left/Semantic`. |  |  |  |
+| **M9** | Routing: **orthogonal + ports** + no-back-edge (Stage 4) — **EXT-3, EXT-12** | right-angle routing, source-right→target-left ports; back-edge guard | [EXT-3](#23-human-factors-readability--principles-engine-practice--optional-extras) default (orthogonal vs smooth toggle) | ports consistent; **0 visual back-edges**; bends bounded; group-drag intact |
+| **M10** | Encoding: hull tinting + spine color + legend + salience (Stage R) — **EXT-5, EXT-6** | nested tints, colored spine, auto-legend; heavy-spine/dim-periphery + hover path-highlight | palette + accessibility (color **paired with outline**) | legend present; contrast AA; **no placement change**; salience reads |
+| **M11** | Stability: mental-map expand + re-import + faithfulness — **EXT-9, EXT-10** | minimal-push expand; wire `terraformCompoundLocal`; faithfulness metric | re-import anchoring policy | expand no longer overlaps siblings; **faithfulness metric green**; re-import diff-minimal |
+| **M12** | Remaining extras (independent) — **EXT-2, EXT-4, EXT-7, EXT-8** | whole-path straightening (±dummy [DEC-5](#14-open-design-decisions)); edge-path bundling; symmetry/grid-snap; progressive-disclosure formalization | per-extra: [DEC-5](#14-open-design-decisions) dummy nodes; [EXT-4](#23-human-factors-readability--principles-engine-practice--optional-extras) ambiguity acceptance | each extra improves its metric **without regressing M0–M8 invariants** |
+
+### 24.3 Dependency graph & reordering freedom
+
+```mermaid
+flowchart LR
+  M0["M0 harness"] --> M1["M1 prep/tree"] --> M2["M2 layering"] --> M3["M3 forced bands"] --> M4["M4 spine"]
+  M4 --> M5["M5 centering"]
+  M5 --> M6["M6 crossings"] --> M7["M7 push-right"] --> M8["M8 pack-left"]
+  M5 --> M9["M9 orthogonal route"]
+  M5 --> M10["M10 color/legend"]
+  M5 --> M11["M11 stability"]
+  M5 --> M12["M12 remaining extras"]
+  M4 -. "Checkpoint A: correct skeleton" .-> M5
+  M8 -. "Checkpoint B: v1 RCLL — flip default" .-> M9
+```
+
+_Core M0–M8 is linear (M6 ⇄ M7 may swap — keep the better-scoring order). M9–M12 are mutually independent extras; each needs only M0 metrics + a real placement (≥ M5), so reorder freely._
+
+- **Core (M0–M8) is linear** by dependency. **M6 and M7 may swap** (ordering vs height-compaction); run both, keep the order that scores better on the M0 metrics.
+- **M9–M12 are mutually independent** optional extras; each depends only on M0 (metrics) + a real placement (≥ M5). Pick the order by value: typically **M9 (orthogonal) then M10 (color/legend)** give the biggest additional human-readability per unit risk.
+- Every milestone is a module toggle (§22), so any can be disabled to bisect a regression.
+
+### 24.4 Minimum-viable-readable cuts
+
+- **M0–M5** already a large readability jump: correct hierarchy + **fan-out columns** + **centered hubs** (fixes the two things the current engine most visibly lacks).
+- **M0–M8** = full core RCLL; the line at which to consider flipping the default.
+- **+ M9 + M10** = the biggest additional readability bump (pipeline routing + color/legend) for comparatively low risk; recommended fast-follows after the core.
+
+### 24.5 Per-milestone deliverables (definition of done)
+
+For **every** milestone: (a) the module(s) behind the `rcll` flag; (b) unit tests for the new module honoring the §22 contract (preserves higher tiers, deterministic); (c) the relevant gate added to the acceptance suite (§13/§17); (d) a one-line entry in the change log recording the decision made at its gate. No milestone is "done" until its acceptance criteria pass on `staging-extended-localstack-v2` in **both** Compact and Full.
+
+---
+
+## 25. Assumptions & preconditions
+
+What must hold of the inputs for RCLL to behave as specified. Each is checked; a violated assumption routes to the named handling, never a crash.
+
+| ID | Assumption | If violated |
+| --- | --- | --- |
+| **A1** | ≥1 resolved TFD edge (CON-10). | 400 (pipeline undefined without dataflow). |
+| **A2** | Every cluster resolves to a topology path rooted at a provider. | Attach to a synthetic `unknown` bucket at the nearest known level; never invent a real account/region (CON-7). §26. |
+| **A3** | Cluster addresses are unique within a bundle; multi-state uses the `stackId::` namespace. | Existing loader rule; duplicates are namespaced, not merged. |
+| **A4** | Each cluster's skeleton build returns positive width/height. | `buildFallbackCluster` (existing): labeled rectangle. |
+| **A5** | Node and hull sizes are known before placement (bottom-up sizing needs leaf sizes first). | Sizing is post-order; a missing size uses the fallback box. |
+| **A6** | TFD edges are directed and, after cycle handling (CON-2/DEC-8), form a DAG per container. | SCC handling per DEC-8. |
+| **A7** | Topology depth is bounded (`root…subnetZone`, 6 levels). | Extra levels (if ever added) extend the role enum + policy table; algorithm is level-count-agnostic. |
+| **A8** | Spacing/geometry constants are positive and title height is finite. | Constants are validated at load; non-finite ⇒ defaults. |
+
+---
+
+## 26. Edge cases & degenerate inputs
+
+The robustness core: every degenerate input has a defined, tested behavior. "Fallback" references the ladder in §27.
+
+| Input | Expected behavior | Authority |
+| --- | --- | --- |
+| Empty graph / 0 resolved edges | HTTP-style 400. | CON-10 |
+| Single cluster | One card + its hull chain; no edges; no band/centering math. | trivial |
+| Two clusters, no edge between them, but ≥1 edge elsewhere | Both placed; the unconnected one is a disconnected component (below). | §26 disconnected |
+| **Cycle in `D`** | Localized fallback; SCC drawn per **DEC-8** (default: model-order stack in a shared column band + `pipeline_cycle` warning). Never a global flatten (CON-2). | CON-2, DEC-8 |
+| Self-loop | Dropped at edge-collapse (existing). | prep |
+| Parallel / multi-edges | Collapsed to one edge with `weight = count`; weight feeds connector stroke + spine emphasis. | §6.3 |
+| **Disconnected components** | Each component laid out independently, then placed as siblings under their LCA via region packing (Domrös order-preserving), ordered by `firstSequence`. | REQ-8 |
+| **Huge fan-out** (`1 → many`) | One shared column until out-degree > N; beyond, grid-wrap within the hop band. | **DEC-7** |
+| Deep chain (very long linear path) | Wide by nature; accepted (TFD is linear). Pack-left/aspect trim only non-chain slack. | PREF-4/6 |
+| **Missing topology** (no account/region) | Synthetic `unknown` bucket at the nearest known level; truthful (no invented real topology). | A2, CON-7 |
+| Cluster whose edges span inconsistent paths | Cluster placed by **its own** placement path; each edge up-projects to its own LCA. | §6.3 |
+| Satellite with no primary owner | Promoted to its own primary cluster. | prep |
+| Duplicate addresses across bundles | Namespaced `stackId::` (existing). | A3 |
+| Hull with a single child | Hull = child bbox + pad; no band/stack logic. | §7.2e |
+| Fan-out targets in different forced bands | Cross-hull centering at the LCA (hub centered on child-hull medians, clamped to its band). | DEC-2 |
+| No edges create depth (all column 0) | Degenerate single column; render as a vertical stack (still valid; signals "no flow"). | T1 |
+| Wider than viewport after pack-left | Accepted — flow is genuinely wide; aspect is a preference, not a hard cap. | PREF-4 |
+| Module emits non-finite / overlapping coordinates | Output rejected; module skipped; prior tree kept; recorded in `rcllDegraded`. | §27, §30 |
+
+---
+
+## 27. Failure modes & graceful degradation
+
+**The fallback ladder (normative).** Each rung is a valid layout by the induction "the previous rung satisfied the higher tiers." If a stage cannot satisfy its §22 contract (throws, times out, or emits an invalid tree — overlap, non-finite, higher-tier violation), it is **skipped** and the previous tree is kept; the scene meta's `rcllDegraded` lists every skipped module so degradation is observable, not silent.
+
+```mermaid
+flowchart TD
+  F0["Full RCLL — centered + compacted + routed"] -->|"centering/compaction infeasible"| F1["Forced-band placement only (skip centering, push-right, pack-left)"]
+  F1 -->|"a container still can't place"| F2["Local forced stack for THAT container only (rest of scene unaffected)"]
+  F2 -->|"global placement fails"| F3["Classic grid stacking (today's Stacked builder)"]
+  F3 -->|"prep/skeletons fail"| F4["Fallback cluster rectangles (buildFallbackCluster)"]
+  F4 -->|"no resolved edges"| F5["HTTP-style 400"]
+```
+
+**Properties:**
+
+- **Locality (CON-2).** A failure inside one container degrades only that container; siblings keep the full treatment.
+- **Per-module guard.** Every stage is wrapped: validate output is finite, non-overlapping (per its tier), and tier-preserving before accepting it.
+- **Timeouts.** `perStageTimeoutMs` (§28) bounds each stage; a timeout = skip = fall back one rung.
+- **Determinism preserved on fallback.** Each rung is itself deterministic, so a degraded layout is still byte-identical on re-run (CON-8).
+
+---
+
+## 28. Configuration & module API surface
+
+The concrete contract implementers and reviewers share. Options are additive; defaults reproduce the recommended RCLL behavior.
+
+```ts
+type RcllOptions = {
+  // policy (FLEX-1, §8)
+  levelPolicy: Partial<Record<TopologyRole, "forced" | "packed">>; // default §8 table
+  staircaseBandOverlap: boolean; // DEC-1, default true
+
+  // objective (FLEX-3 / DEC-4)
+  aspect:
+    | { mode: "height-first" } // default
+    | { mode: "ratio"; ratio: number }
+    | { mode: "viewport" };
+
+  // modules — each "off" or a strategy id (§22.2 registry)
+  layering: "longest-path" | "network-simplex" | "coffman-graham"; // default longest-path
+  ordering: "barycenter" | "off"; // default barycenter
+  centering: "brandes-koepf" | "priority" | "off"; // default brandes-koepf
+  heightCompaction: "balance-pushright" | "off"; // default balance-pushright
+  widthCompaction: "pack-left" | "off"; // default pack-left
+  routing: "straight" | "orthogonal-ports"; // default straight (EXT-3 toggle)
+
+  // optional extras (EXT-*) — booleans, defaults per §23.3
+  pathStraightening: boolean; // EXT-2 (default off)
+  edgeBundling: boolean; // EXT-4 (default off)
+  hullTinting: boolean; // EXT-5 (default on)
+  salience: boolean; // EXT-6 (default partial/on)
+  gridSnap: boolean; // EXT-7 (default off)
+  mentalMapExpand: boolean; // EXT-9 (default on)
+  noBackEdge: boolean; // EXT-12 (default on)
+  faithfulnessCheck: boolean; // EXT-10 (default on)
+
+  // limits & tolerances (§16, §30, DEC-6/DEC-7)
+  maxClusters?: number; // bail to classic grid above this
+  perStageTimeoutMs?: number; // per-module timeout (§27)
+  centeringEpsilonPx?: number; // ε for "centered" (DEC-6)
+  hugeFanoutThreshold?: number; // N for DEC-7 grid-wrap
+  coordRoundingPx?: number; // determinism snap (§30), default 1
+};
+
+// §22 module contract
+type Lattice = {
+  /* LB/UB/slack, fanout/fanin sets, hull-edge DAGs, boxes */
+};
+type StageResult = { tree: CompoundNode; meta: Record<string, unknown> };
+type Stage = (
+  tree: CompoundNode,
+  lattice: Lattice,
+  opts: RcllOptions,
+) => StageResult;
+// registry: Record<string, Stage>; selection driven by RcllOptions; each Stage honors §22.1.
+```
+
+**Dialog / URL mapping (extends §18):** each geometry-affecting option maps to a demo URL param and a dialog control; the consolidated dial set is `levelPolicy`, `aspect`, `routing`, plus the staircase/extras toggles. Content toggles (Compact/Full, Dataflow-only/All) remain separate.
+
+---
+
+## 29. Observability & debugging
+
+So a bad layout is diagnosable from artifacts, not guesswork.
+
+**Scene meta (extends existing `[terraform:local-parse]` `pipelineLayout.meta`):**
+
+```ts
+{
+  layoutEngine: "pipeline",
+  pipelineVariant: "rcll",
+  rcllModules: { layering, ordering, centering, heightCompaction, widthCompaction, routing },
+  rcllDegraded: string[],          // modules skipped via the fallback ladder (§27)
+  counts: { clusters, edges, columns, fanoutSets },
+  readability: { crossings, hubsCenteredPct, medianDeltaYPx, nearStraightPct, aspect },
+  gates: { collisions, semanticEdgeViolations },   // must be 0 / []
+  warnings: string[],              // e.g. "pipeline_cycle", "unknown_topology_bucket"
+}
+```
+
+**Profiler spans (extends `terraformImportProfile`):** `rcll.prep`, `rcll.layer`, `rcll.order`, `rcll.center`, `rcll.pushright`, `rcll.spine`, `rcll.packleft`, `rcll.route`, `rcll.finalize`.
+
+**Debug toggles (localStorage):** dump per-container boxes; overlay the column grid; draw band boundaries; log each decision-gate choice. (Mirror the existing `terraformImportProfile` pattern.)
+
+**Diagnosis playbook (symptom → look here):**
+
+| Symptom | Inspect |
+| --- | --- |
+| Arrows diagonal / hubs off-center | `centering` ran? `readability.hubsCenteredPct`, `medianDeltaYPx`; `rcllDegraded`. |
+| Overlap / collision | `gates.collisions`; which module is in `rcllDegraded`; band policy (§8). |
+| Wrong column / back-edge | `layering`; the container's hull-edge DAG `D_H`; `gates.semanticEdgeViolations`. |
+| Too tall | region policy (DEC-3); `staircaseBandOverlap` (DEC-1); `counts.columns` vs forced bands. |
+| Too wide | `widthCompaction` ran? `aspect`; deep-chain edge case (§26). |
+| Non-deterministic diff | §30; check tie-break keys + `coordRoundingPx`. |
+
+---
+
+## 30. Determinism specification (normative)
+
+CON-8 in detail. **All** layout-affecting ordering MUST follow these rules; this is the single source for tie-breaking.
+
+1. **Canonical sort key (everywhere a set is ordered):** `(primaryStructuralKey, firstSequence, topologyKey, id)` where `primaryStructuralKey` is the stage-relevant order (e.g. `LB`/column for layering; topological order on `D_H` for forced stacks; barycenter for ordering). Lower wins; the final `id` guarantees total order.
+2. **No incidental iteration order.** Never let `Map`/`Set`/object-key iteration decide geometry; copy to an array and sort by rule 1 first.
+3. **Explicit comparators only.** No locale-dependent or default string sort; use a fixed comparator.
+4. **No nondeterministic sources.** No RNG, `Date.now`, identity hashing, or floating wall-clock in layout. (Element `id`/`versionNonce` come from the existing deterministic convert path keyed by stable identity, so reconciliation is stable.)
+5. **Float discipline.** Snap emitted coordinates to `coordRoundingPx` (default 1 px); snap VPSC outputs before use. Prefer integer/rational arithmetic where feasible to avoid cross-platform drift.
+6. **Re-run guarantee.** Build twice → byte-identical element arrays (positions, ids, order). Enforced by a determinism test (§17, §35).
+7. **Fallback determinism.** Every rung of the §27 ladder is itself deterministic.
+
+---
+
+## 31. Interactions with existing editor features
+
+RCLL must not break features that already work. Each is specified.
+
+| Feature | Interaction |
+| --- | --- |
+| **Compact→Full expand** | EXT-9 mental-map: rebuild the cluster, push neighbors minimally; because RCLL is deterministic, untouched regions don't jump. Expand is its own history entry. |
+| **Multi-hop hover focus (R4)** | Unaffected; EXT-6 salience extends it (path highlight). |
+| **Compound group-drag (REQ-10)** | Preserved: arrows parented to LCA topology frame; `getFrameDescendants` moves them. |
+| **Export (SVG/PNG/canvas)** | Pure geometry; tinting/legend (EXT-5) are real elements, so they export. No RCLL-only export path. |
+| **Collaboration / reconciliation** | Deterministic ids + stable z-order + fractional index. A re-layout is an element-update diff; note a full re-import is a **large** diff — fine for import, not intended for live multi-user re-layout. |
+| **Undo/redo** | Import = one history entry (existing); expand/collapse = their own entries. |
+| **KV layout cache** | Cache key MUST include every geometry-affecting `RcllOptions`; otherwise skip cache (as packed/semantic do today). Recommend: include and cache. |
+| **Z-order / nesting** | hull frames behind children; tint behind frames; connectors above frames; legend top-most. |
+
+---
+
+## 32. Backward compatibility & migration
+
+| Concern | Position |
+| --- | --- |
+| **`customData` fields** | Keep all existing (`terraformTopologyRole/Key/Path`, `terraformCompoundLayout/ParentKey/Local`, `terraformPipelineExpandable/Expanded/Placement`). RCLL adds only **additive** fields; old readers ignore unknown keys. |
+| **Already-imported scenes** | Static; no migration. Re-import to obtain an RCLL layout. |
+| **`terraformCompoundLocal`** | Previously written-but-unread; EXT-9 begins reading it — implementation MUST tolerate its absence (old scenes) and shape drift. |
+| **Scene meta** | Additive keys only; old consumers unaffected. |
+| **Default flip** | The only user-visible change (Checkpoint B); flag-gated and reversible (§18, §36-style kill switch in §33). |
+| **`.tfd` syntax** | Unchanged (N1). Optional FLEX-9 edge weights are additive and ignored if absent. |
+| **Public API / re-exports** | No changes to `packages/excalidraw` public exports; RCLL lives in the terraform layout core. |
+
+---
+
+## 33. Risk register
+
+| Risk | Likelihood | Impact | Mitigation | Early warning |
+| --- | --- | --- | --- | --- |
+| Forced bands still too tall on sparse graphs | Med | High | DEC-3 region-packed toggle + DEC-1 staircase overlap | `readability.aspect`, height vs baseline |
+| Centering ↔ compaction instability/thrash | Med | Med | Strict-improve gates; single-pass; determinism test | non-deterministic diff; oscillating metrics |
+| VPSC infeasible / pathological constraints | Low | High | Fallback ladder to forced-only; finite-check | `rcllDegraded` contains `center` |
+| Performance on very large plans | Med | Med | `perStageTimeoutMs`, `maxClusters` bail to classic; profiler spans | span durations; bail count |
+| Orthogonal routing looks cluttered | Med | Med | EXT-3 is a toggle; default smooth until M9 proven | bend count; review |
+| Crossing counter inaccuracy misguides M6/M8 | Med | Med | Polyline-aware counter before trusting numbers (DEC-6) | counter vs visual spot-check |
+| Re-layout diff too large for collab | Low | Med | Import-only context; documented (§31) | n/a |
+| Scope creep across 12 extras | High | Med | Milestone gates (§24), each reversible; checkpoints A/B | milestone slippage |
+| Determinism breaks across platforms | Low | High | Coord rounding, explicit comparators, CI determinism test | cross-platform diff |
+| Packing introduces misleading alignments | Low | High | Faithfulness gate EXT-10 | faithfulness metric |
+| **Kill switch** | — | — | The `pipelineLayoutVariant` flag reverts to the existing builders instantly; RCLL ships off by default until Checkpoint B. | — |
+
+---
+
+## 34. Consolidated decision log
+
+The single registry of **settled** decisions. Open items live in §14 (DEC-1…DEC-8); per-extra defaults in §23.3; per-milestone gate decisions are recorded in the change log as they are made (§24.5).
+
+| ID | Decision | Rationale | Set | Revisitable? |
+| --- | --- | --- | --- | --- |
+| **D1** | Design the one algorithm now; rollout decided at review (report-first). | User scope answer. | v0.1 | n/a |
+| **D2** | Forced vertical bands at chosen levels (no X-disjoint sibling band-sharing). | Ownership clarity. | v0.1 | via FLEX-1 |
+| **D3** | Hybrid columns: global top spine, local below. | Aligned org hops without space waste. | v0.1 | yes (§11) |
+| **D4** | Height lever = push **free** nodes right, then pack left. | User's literal height/width model. | v0.1 | tunable |
+| **D5** | Forced + packed policy split across levels. | Clarity at containers, compaction inside. | v0.1 | via FLEX-1 |
+| **D6** | Per-level forced toggle; one-way hull→hull edge ⇒ dependent hull deeper/right. | Per-density control + hull-level L→R. | v0.1 | toggle |
+| **D7** | Fan-out targets share a column even when it costs height. | Human expectation. | v0.1 | no (core) |
+| **D8** | Center on median in both directions; forced shared **column** for fan-out only (not fan-in). | Hub-over-children reading; keep fan-in free for compaction. | v0.1 | no (core) |
+| **D9** | Readability senior to compaction; move fan-out groups as rigid units; apply fan-out+centering recursively to hulls. | The priority lattice. | v0.1 | no (core) |
+| **D10** | Modular "Lego" pipeline; the priority lattice is the module contract. | Swap/adjust pieces safely. | v0.2 | no (architecture) |
+| **D11** | Build order M0–M12, each behind the flag with a gate. | Careful incremental build. | v0.3 | yes (sequence) |
+| **D12** | Robustness contract: defined behavior for every degenerate input + a fallback ladder. | Resilience. | v0.4 | no (core) |
+
+---
+
+## 35. Test fixture matrix
+
+Synthetic minimal fixtures (fast, no preset DB) exercise one behavior each; the real preset is the integration backstop. Each asserts the named invariant/metric.
+
+| Fixture | Exercises | Asserts | Edge case |
+| --- | --- | --- | --- |
+| `fanout-column` | one source → 3 targets | targets share a column (T4); rate 100 % | §26 fan-out |
+| `hub-centering` | hub over even/odd fan-out | hub Y within ε of median (T5) | DEC-2/DEC-6 |
+| `forced-bands` | 2 regions, 1 account | distinct Y bands; containment | CON-5 |
+| `staircase` | hull A→B dependency | B deeper than A; (DEC-1) Y-overlap behavior | CON-6 |
+| `cross-hull-fanout` | root → 3 accounts | LCA centering; spine aligned | DEC-2 |
+| `cycle` | A→B→A | localized fallback; `pipeline_cycle`; no global flatten | CON-2/DEC-8 |
+| `disconnected` | 2 components | both placed; order by firstSequence | §26 disconnected |
+| `missing-topology` | cluster w/o account | `unknown` bucket; no invented topology | A2/CON-7 |
+| `huge-fanout` | 1 → N>threshold | grid-wrap; no runaway column | DEC-7 |
+| `deep-chain` | 30-hop linear | width accepted; no false compaction | §26 deep chain |
+| `degenerate-no-depth` | nodes, no depth-creating edges | single column vertical stack, still valid | §26 |
+| `determinism` | any of the above ×2 | byte-identical builds | CON-8/§30 |
+| `module-failure` (inject) | force a stage to throw | falls back one rung; `rcllDegraded` set | §27 |
+| `staging-extended-localstack-v2` | full integration | gates 0; readability ↑ vs baseline; both Compact & Full | §17 |
+
+Run via the existing `terraformPipeline*` test harness; the determinism and collision gates are wired into the acceptance suite (§13, §17).
+
+---
+
+## 36. Appendix C — Visual glossary
+
+A figure for every concept and every decision, so the whole design can be understood visually. **Structural** diagrams use Mermaid; **geometric** diagrams use ASCII "before/after" sketches that show real relative position. Convention throughout: **X = TFD/column axis, increasing →**; **Y = cross/row axis, increasing ↓**. Captions tie each figure to its section/ID.
+
+### C.1 Structural concepts (Mermaid)
+
+**C.1.1 Compound topology tree** (§6) — the nesting every hull/cluster lives in.
+
+```mermaid
+flowchart TD
+  root["root"] --> prov["provider (aws)"]
+  prov --> acc1["account: workload"]
+  prov --> acc2["account: ingestion"]
+  prov --> acc3["account: security"]
+  acc1 --> reg1["region: us-east-1"]
+  reg1 --> vpc1["vpc: app"]
+  vpc1 --> sz1["subnetZone: private"]
+  sz1 --> c1["primaryCluster: ecs_producer"]
+  sz1 --> c2["primaryCluster: api1"]
+  reg1 --> rdirect["primaryCluster: region-direct (no VPC)"]
+```
+
+**C.1.2 TFD DAG `D` vs hull-edge up-projection `D_H`** (§6.3) — cluster edges roll up to sibling-hull edges at their LCA container.
+
+```mermaid
+flowchart LR
+  subgraph Dsub["TFD DAG D (clusters)"]
+    a["ecs_producer (acct A)"] --> b["ingest_fifo (acct B)"]
+  end
+  subgraph DHsub["D_H at root/provider (hulls)"]
+    A["hull: account A"] --> B["hull: account B"]
+  end
+  a -. "up-project to LCA" .-> A
+  b -. "up-project to LCA" .-> B
+```
+
+**C.1.3 Fan-out & fan-in sets** (§6, T4/T5) — hubs and convergence nodes.
+
+```mermaid
+flowchart LR
+  hub["hub u"] --> t1["target B"]
+  hub --> t2["target C"]
+  hub --> t3["target D"]
+  s1["source P"] --> w["convergence w"]
+  s2["source Q"] --> w
+  classDef pin fill:#eef,stroke:#669;
+  class t1,t2,t3 pin;
+```
+
+_Fan-out targets B/C/D (shaded) are **pinned** to a shared column (T4); the hub is centered on their median (T5). Sources P/Q are **not** column-forced (FLEX-4), but `w` is centered on them._
+
+**C.1.4 Data model (ER)** (§6.2) — the objects passed between stages.
+
+```mermaid
+classDiagram
+  class CompoundNode {
+    key
+    role
+    minDescendantSequence
+    box
+    localColumn
+  }
+  class PipelineCluster {
+    id
+    primaryAddress
+    firstSequence
+    depthFloor_LB
+    width
+    height
+  }
+  class HullEdge {
+    from
+    to
+    weight
+    declared
+  }
+  class Lattice {
+    floors_LB_UB_slack
+    fanoutSets
+    hullEdgeDAGs
+  }
+  CompoundNode "1" o-- "many" CompoundNode : children
+  CompoundNode "1" --> "0..1" PipelineCluster : leaf
+  Lattice "1" --> "many" HullEdge : per-container
+```
+
+**C.1.5 Decision → stage map** (§22/§24) — which decision tunes which module.
+
+```mermaid
+flowchart LR
+  DEC1["DEC-1 staircase overlap"] --> C["1d Centering / forced-band Y"]
+  DEC2["DEC-2 cross-hull LCA"] --> C
+  DEC3["DEC-3 region policy"] --> C
+  DEC4["DEC-4 aspect"] --> W["3 Pack-left"]
+  DEC5["DEC-5 dummy nodes"] --> P["1d+ Path-straighten"]
+  DEC6["DEC-6 epsilon + crossing metric"] --> O["1c Ordering"]
+  DEC7["DEC-7 huge fan-out"] --> L["1a Layering"]
+  DEC8["DEC-8 SCC cycle"] --> L
+  EXT1["EXT-1 crossings"] --> O
+  EXT3["EXT-3 orthogonal + ports"] --> R["4 Routing"]
+  EXT5["EXT-5 tint / legend"] --> E["R Encoding"]
+  EXT9["EXT-9 mental-map"] --> X["X Cross-cutting"]
+  EXT10["EXT-10 faithfulness"] --> X
+  EXT11["EXT-11 aspect / viewport"] --> W
+  EXT12["EXT-12 no-back-edge"] --> R
+```
+
+### C.2 Geometric concepts (ASCII before/after)
+
+**C.2.1 Fan-out centering — D7/D8, T5.** Hub centered on the median child, not inline with the first.
+
+```text
+  BAD (inline with first child)        GOOD (centered on median)
+  A ── B                                      ┌─ B
+       C                               A ──────┼─ C
+       D                                      └─ D
+  (A aligned to B; reads lopsided)     (A centered over B/C/D)
+```
+
+**C.2.2 Hull staircase — CON-6 / D6.** A one-way hull→hull edge puts the dependent hull deeper (→) and lower (↓).
+
+```text
+   col0        col1
+  ┌───────┐
+  │ hull A│──────┐
+  └───────┘      ▼
+              ┌───────┐
+              │ hull B│      (A → B  ⇒  B is right of and below A)
+              └───────┘
+```
+
+**C.2.3 Forced bands vs packed row-share — D2 / D5 / §8.**
+
+```text
+  FORCED (each sibling its own band)     PACKED (X-disjoint siblings share a row)
+  ┌─ region us-east-1 ───────┐           ┌─ region us-east-1 ─┐ ┌─ region us-west-2 ┐
+  │ ...                      │           │ ...                │ │ ...               │
+  └──────────────────────────┘          └────────────────────┘ └───────────────────┘
+  ┌─ region us-west-2 ───────┐            (side-by-side; shorter)
+  │ ...                      │
+  └──────────────────────────┘
+  (distinct rows; taller, cleanest ownership)
+```
+
+**C.2.4 Push-right → row-share — T6 (height ↓).** A _free_ node with slack moves right into an existing row instead of opening a new one.
+
+```text
+  BEFORE (free node F at its floor)     AFTER (F pushed right to share a row)
+  col0   col1   col2                    col0   col1   col2
+  A      B                              A      B      F
+  F                                     (F joined row 0; one fewer row)
+  (F alone on row 1 → taller)
+```
+
+**C.2.5 Pack-left — T7 (width ↓), fan-out group moves as a unit.**
+
+```text
+  BEFORE (slack on the left)            AFTER (pulled left, group intact)
+  col0        col2   col3               col0   col1   col2
+  A                  ┌B                  A      ┌B
+                     │C                         │C
+                     └D                         └D
+  (gap at col1; too wide)               (B/C/D kept its shared column + centering)
+```
+
+**C.2.6 Hybrid columns — D3 / §11.** Spine columns align globally; columns inside an account are local.
+
+```text
+  GLOBAL spine grid:   col0      col1        col2
+                       root ──> account ──> account ...   (aligned across whole diagram)
+  LOCAL inside acctA:  [ hop0  hop1  hop2 ]  (its own column origins)
+  LOCAL inside acctB:  [ hop0 hop1 ]         (need not match acctA's hop X)
+```
+
+**C.2.7 DEC-1 — forced-band Y-overlap on a staircase.**
+
+```text
+  OPTION A (no overlap; taller)         OPTION B (recommended; X-disjoint may rise)
+  ┌A┐                                   ┌A┐ ┌B┐
+  └─┘                                   └─┘ └─┘   (B rose beside A; shorter)
+      ┌B┐
+      └─┘
+```
+
+**C.2.8 DEC-2 — cross-hull fan-out at the LCA.** Hub centers on child-hull medians, clamped to its band.
+
+```text
+  org_root ─┬─> [account: workload ]
+            ├─> [account: ingestion]   (hub centered on the 3 hull centers,
+            └─> [account: security ]    evaluated at the LCA = provider/root)
+```
+
+**C.2.9 DEC-7 — huge fan-out.**
+
+```text
+  OPTION A (one tall column)            OPTION B (grid-wrap past N)
+  u ─ t1                                u ─ t1 t5 t9
+      t2                                    t2 t6 t10
+      t3   ... (200 rows)                   t3 t7 t11
+      tN                                    t4 t8 ...   (bounded height)
+```
+
+### C.3 Decision cards
+
+Every decision is represented. Open decisions show **A vs B**; settled decisions (D-series) and extras (EXT-series) show the chosen behavior. Figures are reused where one drawing covers several IDs.
+
+**C.3.1 Open decisions (DEC-1…DEC-8)**
+
+| ID | Figure | One-line |
+| --- | --- | --- |
+| DEC-1 | C.2.7 | Forced-band staircase: no-overlap (A) vs rise-beside (B, rec). |
+| DEC-2 | C.2.8 | Cross-hull fan-out centered at the LCA. |
+| DEC-3 | C.2.3 | Region **forced** (taller, cleanest) vs **packed** (shorter). |
+| DEC-4 | below | Aspect target: `height-first` \| `ratio` \| `viewport`. |
+| DEC-5 | below | Dummy nodes for column-skipping edges: off (v1) vs on (straighter). |
+| DEC-6 | C.1.5 | ε tolerance + polyline-aware crossing counter (feeds 1c). |
+| DEC-7 | C.2.9 | Huge fan-out: tall column (A) vs grid-wrap past N (B, rec). |
+| DEC-8 | below | SCC cycle: break with back-edge vs model-order stack (rec). |
+
+```text
+DEC-4 aspect modes:
+  height-first → [tall? then pull width]      ratio 16:9 → [ ■■■■■ ]      viewport → fit screen box
+
+DEC-5 dummy nodes (edge skips col1):
+  OFF:  A ─────────────▶ C   (diagonal over col1)
+  ON:   A ─▶ (•) ─▶ C        (• = dummy in col1 ⇒ straight, costs an element)
+
+DEC-8 cycle A→B→A:
+  BREAK:  A ─▶ B ╌╌▶ A   (one visible back-edge)
+  STACK:  [ A  B ]  one shared column band, model order  (recommended; no back-edge)
+```
+
+**C.3.2 Settled decisions (D1…D12)**
+
+| ID | Figure | Decision (settled) |
+| --- | --- | --- |
+| D1 | — (process) | Report-first; rollout at review. |
+| D2 | C.2.3 | Forced sibling bands (no X-share) at chosen levels. |
+| D3 | C.2.6 | Hybrid columns: global spine, local below. |
+| D4 | C.2.4 + C.2.5 | Push free right (height), then pack left (width). |
+| D5 | C.2.3 | Forced + packed policy split by level. |
+| D6 | C.2.2 | Per-level forced toggle; hull→hull dep ⇒ deeper/right. |
+| D7 | C.2.9 / C.1.3 | Fan-out shares a column even if taller. |
+| D8 | C.2.1 | Center on median both ways; column-force fan-out only. |
+| D9 | C.3.3 | Readability senior to compaction; groups move as units; recursive to hulls. |
+| D10 | C.1.5 + §22 fig | Modular Lego; the lattice is the module contract. |
+| D11 | §24 fig | Build order M0–M12 behind the flag. |
+| D12 | §27 fig | Robustness contract + fallback ladder. |
+
+**C.3.3 The priority lattice (T1…T7)** — the senior→junior order that D9 encodes (also inline at §5).
+
+```mermaid
+flowchart TD
+  T1["T1 TFD precedence (hard)"] --> T2["T2 Hull nesting / forced bands (hard)"]
+  T2 --> T3["T3 Hull→hull staircase (hard)"]
+  T3 --> T4["T4 Fan-out shared column (readability-hard)"]
+  T4 --> T5["T5 Centering / balance (readability)"]
+  T5 --> T6["T6 Height compaction: push free right (optimize)"]
+  T6 --> T7["T7 Width compaction: pack left (optimize)"]
+```
+
+_Read top→down as "senior to": a lower tier may optimize only within the freedom the tiers above leave; it must never violate a higher one. This single rule is the module contract (D10)._
+
+**C.3.4 Optional extras (EXT-1…EXT-12)** — on/off or before/after for each.
+
+```text
+EXT-1  crossings      X X   →   ⫝ ⫝   (untangle; #1 readability factor)
+EXT-2  path-straight  zig-zag spine  →  ──────── straight spine
+EXT-3  orthogonal     ╲ diagonal     →  └─┐ right-angle + ports (src-right→tgt-left)
+EXT-4  bundling       ╳╳╳ many lines →  ═══ one bundle (cross-hull only)
+EXT-5  tint+legend    plain hulls    →  shaded by account + [legend]
+EXT-6  salience       flat strokes   →  heavy spine, dim periphery, hover-path
+EXT-7  grid-snap      jittery gaps   →  even grid, uniform combs
+EXT-8  LOD/expand     all open       →  [collapsed] → click → [expanded]
+EXT-9  mental-map     expand overlaps→  neighbors pushed minimally (stable)
+EXT-10 faithfulness   accidental row →  guarded: geometry == real clusters
+EXT-11 aspect/view    very tall      →  fit toward target ratio
+EXT-12 no-back-edge   A◀──B (up-left)→  A──▶B (always forward)
+```
+
+_Defaults per §23.3: on by default — EXT-1, EXT-5, EXT-9, EXT-10, EXT-12 (and EXT-6 partial); toggle — EXT-3; off until proven — EXT-2, EXT-4, EXT-7; EXT-8 already largely present; EXT-11 target per DEC-4._
+
+---
+
+_End of RFC 0.5. This document is the agreed source of truth for the RCLL design discussion; amend via the change log._
