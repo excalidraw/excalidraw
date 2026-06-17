@@ -670,23 +670,23 @@ export const actionChangeSimulatePressure = register<boolean>({
           return el;
         }
         return newElementWith(el, {
-          variableStrokeWidth: value,
+          constantStrokeWidth: value,
         }) as ExcalidrawElement;
       }),
-      appState: { ...appState, currentItemVariableStrokeWidth: value },
+      appState: { ...appState, currentItemVariableStrokeWidth: !value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
-    const variableStrokeWidth =
+    const constantStrokeWidth =
       getFormValue(
         elements,
         app,
-        (element) => (element as ExcalidrawFreeDrawElement).variableStrokeWidth,
+        (element) => (element as ExcalidrawFreeDrawElement).constantStrokeWidth,
         (element) => element.type === "freedraw",
         (hasSelection) =>
-          hasSelection ? null : appState.currentItemVariableStrokeWidth,
-      ) ?? appState.currentItemVariableStrokeWidth;
+          hasSelection ? null : !appState.currentItemVariableStrokeWidth,
+      ) ?? !appState.currentItemVariableStrokeWidth;
 
     return (
       <fieldset>
@@ -696,17 +696,17 @@ export const actionChangeSimulatePressure = register<boolean>({
             group="simulatePressure"
             options={[
               {
-                value: false,
+                value: true,
                 text: t("labels.pressureConstant"),
                 icon: FreedrawPressureConstantIcon,
               },
               {
-                value: true,
+                value: false,
                 text: t("labels.pressureSensitive"),
                 icon: FreedrawPressureSensitiveIcon,
               },
             ]}
-            value={variableStrokeWidth}
+            value={constantStrokeWidth}
             onChange={(value) => updateData(value)}
           />
         </div>

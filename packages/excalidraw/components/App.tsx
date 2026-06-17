@@ -4304,6 +4304,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemVariableStrokeWidth: true,
       };
     });
   };
@@ -7808,6 +7809,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
+          currentItemVariableStrokeWidth: true,
         };
       });
     }
@@ -9039,7 +9041,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
-      variableStrokeWidth: this.state.currentItemVariableStrokeWidth,
+      constantStrokeWidth: !this.state.currentItemVariableStrokeWidth,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],

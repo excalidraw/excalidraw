@@ -483,7 +483,7 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         points,
         simulatePressure: element.simulatePressure,
-        variableStrokeWidth: element.variableStrokeWidth ?? false,
+        constantStrokeWidth: element.constantStrokeWidth ?? false,
         pressures,
       });
     }

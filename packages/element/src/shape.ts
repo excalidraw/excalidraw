@@ -1175,7 +1175,7 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ) => {
-  if (element.variableStrokeWidth) {
+  if (!element.constantStrokeWidth) {
     const inputPoints = element.simulatePressure
       ? element.points
       : element.points.length
