@@ -19,8 +19,7 @@ cp .env.example .env
 
 ## Local-first embedding
 
-1. **Mac:** build secondary `gemini-2` index (~$0.42, ~10k chunks):
-   `RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild`
+1. **Mac:** build secondary `gemini-2` index (~$0.42, ~10k chunks): `RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild`
 2. **GPU reembed:** `RAG_GPU_TOOL=tools/repo-rag tools/repo-rag/scripts/gpu_dense_reembed.sh`
 3. **Query:** `yarn repo-rag:query "…" --embed-profile cuda-qwen0.6b-1024 --json`
 
