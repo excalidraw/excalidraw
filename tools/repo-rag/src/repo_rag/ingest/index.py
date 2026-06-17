@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal
 
 import lancedb
 
@@ -11,18 +12,44 @@ from repo_rag.chunk.types import TextChunk
 from repo_rag.ingest.embed import ENV_PREFIX, EmbedConfig, EmbedStats, embed_config_from_env, embed_texts, prepare_embed_config
 from rag_common.config import embed_cost_per_million
 
-from repo_rag.paths import CHUNKS_TABLE, INGEST_STATE_PATH, LANCE_DIR
+from repo_rag.paths import CHUNKS_TABLE, ProfileIndexPaths, profile_index_paths
+
+__all__ = [
+    "load_ingest_state",
+    "save_ingest_state",
+    "delete_chunks_for_file",
+    "upsert_chunks",
+    "chunk_count",
+    "update_ingest_metadata",
+    "embed_config_from_state",
+    "embed_config_mismatch",
+    "ensure_embed_config_matches",
+    "_table_names",
+]
 
 
-def load_ingest_state() -> dict[str, Any]:
-    if not INGEST_STATE_PATH.exists():
+def _paths(profile: str | ProfileIndexPaths | None) -> ProfileIndexPaths:
+    if isinstance(profile, ProfileIndexPaths):
+        return profile
+    return profile_index_paths(profile)
+
+
+def load_ingest_state(profile: str | ProfileIndexPaths | None = None) -> dict[str, Any]:
+    paths = _paths(profile)
+    if not paths.ingest_state.is_file():
         return {}
-    return json.loads(INGEST_STATE_PATH.read_text(encoding="utf-8"))
+    return json.loads(paths.ingest_state.read_text(encoding="utf-8"))
 
 
-def save_ingest_state(state: dict[str, Any]) -> None:
-    INGEST_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    INGEST_STATE_PATH.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+def save_ingest_state(
+    state: dict[str, Any],
+    profile: str | ProfileIndexPaths | None = None,
+) -> None:
+    paths = _paths(profile)
+    paths.root.mkdir(parents=True, exist_ok=True)
+    tmp = paths.ingest_state.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, paths.ingest_state)
 
 
 def _table_names(db: lancedb.DBConnection) -> list[str]:
@@ -50,10 +77,14 @@ def _chunk_row(chunk: TextChunk, vector: list[float], prefixed: str) -> dict[str
     }
 
 
-def delete_chunks_for_file(file_path: str) -> None:
-    if not LANCE_DIR.exists():
+def delete_chunks_for_file(
+    file_path: str,
+    profile: str | ProfileIndexPaths | None = None,
+) -> None:
+    paths = _paths(profile)
+    if not paths.lance_dir.exists():
         return
-    db = lancedb.connect(str(LANCE_DIR))
+    db = lancedb.connect(str(paths.lance_dir))
     if CHUNKS_TABLE not in _table_names(db):
         return
     table = db.open_table(CHUNKS_TABLE)
@@ -71,10 +102,13 @@ def upsert_chunks(
     config: EmbedConfig | None = None,
     stats: EmbedStats | None = None,
     workers: int | None = None,
+    profile: str | ProfileIndexPaths | None = None,
+    delete_scope: Literal["file_path", "chunk_id"] = "chunk_id",
 ) -> int:
     if not chunks:
         return 0
 
+    paths = _paths(profile)
     cfg = config or embed_config_from_env()
     prefixed = [build_prefixed_text(c) for c in chunks]
     vectors = embed_texts(
@@ -88,8 +122,8 @@ def upsert_chunks(
     )
     rows = [_chunk_row(c, v, p) for c, v, p in zip(chunks, vectors, prefixed)]
 
-    LANCE_DIR.mkdir(parents=True, exist_ok=True)
-    db = lancedb.connect(str(LANCE_DIR))
+    paths.lance_dir.mkdir(parents=True, exist_ok=True)
+    db = lancedb.connect(str(paths.lance_dir))
     tables = _table_names(db)
 
     if rebuild or CHUNKS_TABLE not in tables:
@@ -99,21 +133,30 @@ def upsert_chunks(
         return len(rows)
 
     table = db.open_table(CHUNKS_TABLE)
-    ids = [r["id"] for r in rows]
-    if ids:
-        id_list = ", ".join(f"'{i}'" for i in ids)
-        try:
-            table.delete(f"id IN ({id_list})")
-        except Exception:
-            pass
+    if delete_scope == "chunk_id":
+        ids = [r["id"] for r in rows]
+        if ids:
+            id_list = ", ".join(f"'{i}'" for i in ids)
+            try:
+                table.delete(f"id IN ({id_list})")
+            except Exception:
+                pass
+    else:
+        for file_path in sorted({chunk.file_path for chunk in chunks}):
+            safe = file_path.replace("'", "''")
+            try:
+                table.delete(f"file_path = '{safe}'")
+            except Exception:
+                pass
     table.add(rows)
     return len(rows)
 
 
-def chunk_count() -> int:
-    if not LANCE_DIR.exists():
+def chunk_count(profile: str | ProfileIndexPaths | None = None) -> int:
+    paths = _paths(profile)
+    if not paths.lance_dir.exists():
         return 0
-    db = lancedb.connect(str(LANCE_DIR))
+    db = lancedb.connect(str(paths.lance_dir))
     if CHUNKS_TABLE not in _table_names(db):
         return 0
     return db.open_table(CHUNKS_TABLE).count_rows()

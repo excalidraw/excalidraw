@@ -24,12 +24,31 @@ uv run graph-layout-rag embed profiles   # list built-in profiles
 | `openai-small` | openai | `text-embedding-3-small` | 1024 | Cheaper cloud |
 | `gemini` | gemini | `gemini-embedding-001` | 768 | `GEMINI_API_KEY` or `GOOGLE_API_KEY` |
 | `gemini-2` | gemini | `gemini-embedding-2-preview` | 3072 | Preserved fixed-window baseline |
-| `gemini-2-structure-v1` | gemini | `gemini-embedding-2-preview` | 3072 | Fresh 3072-dim index; separate from the gemini-2 baseline |
+| `gemini-2-structure-v1` | gemini | `gemini-embedding-2-preview` | 3072 | Secondary cloud build; source for GPU reembed |
+| `cuda-qwen0.6b-1024` | local | `Qwen/Qwen3-Embedding-0.6B` (CUDA FP16) | 1024 | **Production query profile** (GPU reembed from gemini secondary) |
 | `mlx-qwen4b` | local | `Qwen/Qwen3-Embedding-4B` (MLX 4-bit) | 1024 | Free Apple Silicon ingest |
 | `mlx-qwen0.6b` | local | `Qwen/Qwen3-Embedding-0.6B` (MLX 4-bit) | 1024 | Faster local |
 | `local-fp16-qwen4b` | local | Qwen3-4B FP16 (ST/MPS) | 1024 | Heavier RAM |
 
 API key and embed env load from `tools/graph-layout-rag/.env`, sibling `tools/repo-rag/.env`, or `.env.example`. See **Embedding & ingest** below.
+
+## Local-first embedding
+
+Production query profile: **`cuda-qwen0.6b-1024`** (Qwen3-Embedding-0.6B @ 1024 dims on RTX 3060 Ti, $0 API). Build the **secondary** `gemini-2-structure-v1` index once on Mac/Vertex, then GPU re-embed:
+
+```bash
+# Mac: build secondary (if missing)
+RAG_EMBED_PROFILE=gemini-2-structure-v1 uv run graph-layout-rag ingest --force --rebuild
+
+# Mac → GPU box → Mac (shared scripts in tools/rag-common/scripts/)
+RAG_GPU_TOOL=tools/graph-layout-rag \
+  tools/graph-layout-rag/scripts/gpu_dense_reembed.sh
+
+# Query (default from .env)
+yarn graph-rag:query "layered graph drawing" --top 8 --json
+```
+
+Benchmark (catalog qrels, hybrid nDCG@10): gemini-2-structure-v1 **0.768** vs cuda-qwen0.6b-1024 **0.718**.
 
 ## Pipeline
 

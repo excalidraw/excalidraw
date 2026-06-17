@@ -28,7 +28,7 @@ from repo_rag.ingest.run import run_index
 from repo_rag.graph import build_graph
 from repo_rag.harvest.walk import harvest_repo
 from repo_rag.logging_config import get_logger
-from repo_rag.paths import REPO_ROOT
+from repo_rag.paths import REPO_ROOT, profile_index_paths
 
 log = get_logger("watch")
 
@@ -83,7 +83,7 @@ def watch_cmd() -> None:
             f"watch needs the 'watch' extra: cd tools/repo-rag && uv sync --extra watch ({exc})"
         )
 
-    state = load_ingest_state()
+    state = load_ingest_state(profile_index_paths())
     indexed = embed_config_from_state(state)
     profile = state.get("embed_profile")
     if indexed is None or not profile:

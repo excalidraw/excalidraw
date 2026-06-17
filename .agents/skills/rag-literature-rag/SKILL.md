@@ -5,7 +5,7 @@ description: Query the local RAG methodology research corpus. Use when designing
 
 # RAG literature RAG
 
-Local hybrid search over core retrieval-augmented generation papers. Production profile: `gemini-2-structure-v1` (Gemini Embedding 2 @ 3072, Docling, structure-aware chunks).
+Local hybrid search over core retrieval-augmented generation papers. **Production query profile:** `cuda-qwen0.6b-1024`. **Secondary build:** `gemini-2-structure-v1` (Gemini Embedding 2 @ 3072, Docling, structure-aware chunks).
 
 ## When to use
 
@@ -50,11 +50,14 @@ Checkpointing: resume with `ingest -v` (no `--force`). Use `--force --rebuild` o
 
 | Profile | Use when |
 |---------|----------|
-| `gemini-2-structure-v1` | **Production** — structure-aware chunks @ 3072 |
+| `cuda-qwen0.6b-1024` | **Production query** — GPU reembed from gemini secondary |
+| `gemini-2-structure-v1` | Secondary cloud build @ 3072 |
 | `openai-large` | Fast cloud one-time ingest |
 | `mlx-qwen4b` | Free local Apple Silicon ingest |
 
-Set `RAG_EMBED_PROFILE=gemini-2-structure-v1` in `.env`. Query and ingest profiles must match.
+Set `RAG_EMBED_PROFILE=cuda-qwen0.6b-1024` in `.env`. Query and ingest profiles must match the index you built.
+
+GPU reembed: `RAG_GPU_TOOL=tools/rag-literature-rag tools/rag-literature-rag/scripts/gpu_dense_reembed.sh`
 
 **Do not query or benchmark during ingest** on a 24 GB Mac.
 
@@ -75,7 +78,7 @@ uv run rag-literature-rag harvest enrich
 
 ## Query
 
-Default: **hybrid** (dense + BM25 + RRF k=60). Do not add `--rerank` by default.
+Default: **hybrid** (dense + BM25 + RRF k=20). Do not add `--rerank` by default.
 
 ```bash
 uv run rag-literature-rag query "reciprocal rank fusion hybrid retrieval" --category hybrid-retrieval --json

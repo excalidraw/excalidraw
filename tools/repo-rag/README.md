@@ -1,6 +1,6 @@
 # Repo RAG
 
-Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, hybrid BM25 + vector search. Embeddings default to OpenAI `text-embedding-3-large` and **automatically fall back** to local `all-MiniLM-L6-v2` when no valid API key or OpenAI is unavailable (`RAG_EMBED_BACKEND=auto`).
+Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, hybrid BM25 + vector search. **Local-first** production profile: `cuda-qwen0.6b-1024` (GPU reembed from `gemini-2` secondary). Per-profile indexes live under `data/indexes/{profile}/` (legacy flat `data/lancedb/` still works when `data/indexes/` is empty).
 
 Separate from [`tools/graph-layout-rag`](../graph-layout-rag) (external graph-drawing papers).
 
@@ -14,8 +14,15 @@ Requires Python 3.11+ and [uv](https://github.com/astral-sh/uv).
 cd tools/repo-rag
 uv sync
 cp .env.example .env
-# Edit .env and set OPENAI_API_KEY=sk-... (optional with RAG_EMBED_BACKEND=auto — uses local MiniLM if missing)
+# Edit .env — set RAG_EMBED_PROFILE=cuda-qwen0.6b-1024 (default) or gemini-2 for secondary build
 ```
+
+## Local-first embedding
+
+1. **Mac:** build secondary `gemini-2` index (~$0.42, ~10k chunks):
+   `RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild`
+2. **GPU reembed:** `RAG_GPU_TOOL=tools/repo-rag tools/repo-rag/scripts/gpu_dense_reembed.sh`
+3. **Query:** `yarn repo-rag:query "…" --embed-profile cuda-qwen0.6b-1024 --json`
 
 The key is read from `tools/repo-rag/.env` on every CLI run (gitignored). If `.env` is missing, **`.env.example` is used as fallback**. Shell `export OPENAI_API_KEY=...` overrides both.
 
@@ -145,7 +152,7 @@ Excluded: `node_modules/`, `dist/`, snapshots, lockfiles, binaries.
 
 ## Gitignored data
 
-- `data/lancedb/` — vector index
-- `data/bm25/` — BM25 index
-- `data/manifest.json`, `data/ingest_state.json`
+- `data/indexes/{profile}/` — per-profile vector + BM25 + ingest state
+- `data/lancedb/`, `data/bm25/` — legacy flat layout (fallback)
+- `data/manifest.json`, `data/graph.sqlite`
 - `.venv/`

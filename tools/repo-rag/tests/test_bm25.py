@@ -8,6 +8,7 @@ pin that behavior so a live watcher can't drift the index.
 
 import repo_rag.ingest.bm25 as bm25
 from repo_rag.chunk.types import TextChunk
+from repo_rag.paths import ProfileIndexPaths
 
 
 def _chunk(file_path: str, i: int) -> TextChunk:
@@ -25,7 +26,14 @@ def _chunk(file_path: str, i: int) -> TextChunk:
 
 
 def _isolate(tmp_path, monkeypatch):
-    monkeypatch.setattr(bm25, "BM25_DIR", tmp_path / "bm25")
+    paths = ProfileIndexPaths(
+        profile="test",
+        root=tmp_path,
+        lance_dir=tmp_path / "lancedb",
+        ingest_state=tmp_path / "ingest_state.json",
+        bm25_dir=tmp_path / "bm25",
+    )
+    monkeypatch.setattr(bm25, "profile_index_paths", lambda profile=None: paths)
 
 
 def test_delete_by_file_actually_removes_chunks(tmp_path, monkeypatch):

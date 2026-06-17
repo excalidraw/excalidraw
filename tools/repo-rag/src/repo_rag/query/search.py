@@ -14,7 +14,7 @@ from repo_rag.ingest.index import (
     load_ingest_state,
 )
 from repo_rag.logging_config import get_logger
-from repo_rag.paths import CHUNKS_TABLE, LANCE_DIR
+from repo_rag.paths import CHUNKS_TABLE, ProfileIndexPaths, profile_index_paths
 from repo_rag.query.hybrid import reciprocal_rank_fusion
 
 log = get_logger("search")
@@ -25,14 +25,15 @@ def _dense_search(
     *,
     limit: int,
     config: EmbedConfig,
+    index_paths: ProfileIndexPaths,
     source_type: str | None = None,
     package: str | None = None,
     path_contains: str | None = None,
 ) -> list[dict[str, Any]]:
-    if not LANCE_DIR.exists():
+    if not index_paths.lance_dir.exists():
         return []
 
-    db = lancedb.connect(str(LANCE_DIR))
+    db = lancedb.connect(str(index_paths.lance_dir))
     if CHUNKS_TABLE not in _table_names(db):
         return []
 
@@ -81,7 +82,8 @@ def search(
     embed_profile: str | None = None,
     rerank: bool | None = None,
 ) -> list[dict[str, Any]]:
-    state = load_ingest_state()
+    index_paths = profile_index_paths(embed_profile)
+    state = load_ingest_state(index_paths)
     indexed = embed_config_from_state(state)
     if embed_profile:
         config = embed_config_from_env(profile=embed_profile)
@@ -97,6 +99,7 @@ def search(
             query,
             limit=40,
             config=config,
+            index_paths=index_paths,
             source_type=source_type,
             package=package,
             path_contains=path_contains,
@@ -110,6 +113,7 @@ def search(
         source_type=source_type,
         package=package,
         path_contains=path_contains,
+        profile=index_paths,
     )
 
     merged = reciprocal_rank_fusion(dense, sparse, top=max(top, 20))

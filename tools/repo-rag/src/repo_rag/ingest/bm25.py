@@ -6,26 +6,35 @@ import tantivy
 
 from repo_rag.chunk.prefix import build_prefixed_text
 from repo_rag.chunk.types import TextChunk
-from repo_rag.paths import BM25_DIR
+from repo_rag.paths import ProfileIndexPaths, profile_index_paths
 
 INDEX_SUBDIR = "index"
 
 
-def _index_path() -> Path:
-    return BM25_DIR / INDEX_SUBDIR
+def _resolve_bm25_dir(
+    profile: str | ProfileIndexPaths | None = None,
+    index_dir: Path | None = None,
+) -> Path:
+    if index_dir is not None:
+        return index_dir
+    if isinstance(profile, ProfileIndexPaths):
+        return profile.bm25_dir
+    return profile_index_paths(profile).bm25_dir
 
 
-def _open_or_create_index() -> tantivy.Index:
-    path = _index_path()
-    path.mkdir(parents=True, exist_ok=True)
+def _index_path(
+    profile: str | ProfileIndexPaths | None = None,
+    index_dir: Path | None = None,
+) -> Path:
+    return _resolve_bm25_dir(profile, index_dir) / INDEX_SUBDIR
+
+
+def _open_or_create_index(index_path: Path) -> tantivy.Index:
+    index_path.mkdir(parents=True, exist_ok=True)
 
     schema_builder = tantivy.SchemaBuilder()
     schema_builder.add_text_field("id", stored=True)
     schema_builder.add_text_field("file_path", stored=True)
-    # Untokenized mirror of file_path so delete-by-file matches the whole path as a
-    # single term. Deleting on the tokenized `file_path` field is a no-op (the term
-    # dictionary holds the path's *tokens*, never the full path), which silently
-    # leaks stale chunks on every incremental reindex. See delete_chunks_for_file.
     schema_builder.add_text_field("file_path_raw", tokenizer_name="raw")
     schema_builder.add_text_field("symbol", stored=True)
     schema_builder.add_text_field("source_type", stored=True)
@@ -37,31 +46,44 @@ def _open_or_create_index() -> tantivy.Index:
     schema_builder.add_integer_field("is_test", stored=True)
     schema = schema_builder.build()
 
-    if (path / "meta.json").exists():
-        return tantivy.Index(schema, path=str(path))
-    return tantivy.Index(schema, path=str(path))
+    if (index_path / "meta.json").exists():
+        return tantivy.Index(schema, path=str(index_path))
+    return tantivy.Index(schema, path=str(index_path))
 
 
-def delete_chunks_for_file(file_path: str) -> None:
-    if not _index_path().exists():
+def delete_chunks_for_file(
+    file_path: str,
+    profile: str | ProfileIndexPaths | None = None,
+    *,
+    index_dir: Path | None = None,
+) -> None:
+    path = _index_path(profile, index_dir)
+    if not path.exists():
         return
-    index = _open_or_create_index()
+    index = _open_or_create_index(path)
     writer = index.writer()
     writer.delete_documents("file_path_raw", file_path)
     writer.commit()
     index.reload()
 
 
-def upsert_chunks(chunks: list[TextChunk], *, rebuild: bool = False) -> int:
-    if rebuild and _index_path().exists():
+def upsert_chunks(
+    chunks: list[TextChunk],
+    *,
+    rebuild: bool = False,
+    index_dir: Path | None = None,
+    profile: str | ProfileIndexPaths | None = None,
+) -> int:
+    path = _index_path(profile, index_dir)
+    if rebuild and path.exists():
         import shutil
 
-        shutil.rmtree(_index_path())
+        shutil.rmtree(path)
 
     if not chunks:
         return 0
 
-    index = _open_or_create_index()
+    index = _open_or_create_index(path)
     writer = index.writer()
 
     for chunk in chunks:
@@ -94,11 +116,13 @@ def search_bm25(
     source_type: str | None = None,
     package: str | None = None,
     path_contains: str | None = None,
+    profile: str | ProfileIndexPaths | None = None,
 ) -> list[dict]:
-    if not _index_path().exists():
+    path = _index_path(profile)
+    if not path.exists():
         return []
 
-    index = _open_or_create_index()
+    index = _open_or_create_index(path)
     index.reload()
     searcher = index.searcher()
 
@@ -140,9 +164,10 @@ def search_bm25(
     return results
 
 
-def chunk_count() -> int:
-    if not _index_path().exists():
+def chunk_count(profile: str | ProfileIndexPaths | None = None) -> int:
+    path = _index_path(profile)
+    if not path.exists():
         return 0
-    index = _open_or_create_index()
+    index = _open_or_create_index(path)
     index.reload()
     return int(index.searcher().num_docs)

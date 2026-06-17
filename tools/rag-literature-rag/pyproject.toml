@@ -25,6 +25,25 @@ dev = ["pytest>=8.0.0"]
 mlx = ["rag-common[mlx]"]
 docling = ["docling>=2.0.0"]
 retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
+retrieval-experiments-gpu = [
+  "accelerate>=0.33.0",
+  "bitsandbytes>=0.43.0",
+  "qdrant-client[fastembed-gpu]>=1.14.0",
+  "onnxruntime-gpu>=1.19.2,<1.27.0",
+  "nvidia-cublas-cu12",
+  "nvidia-cuda-nvrtc-cu12",
+  "nvidia-cuda-runtime-cu12",
+  "nvidia-cudnn-cu12",
+  "nvidia-cufft-cu12",
+  "nvidia-curand-cu12",
+  "nvidia-cusolver-cu12",
+  "nvidia-cusparse-cu12",
+]
+
+[tool.uv]
+required-environments = [
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
 
 [project.scripts]
 rag-literature-rag = "rag_literature_rag.cli:main"

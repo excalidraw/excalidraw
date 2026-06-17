@@ -58,13 +58,25 @@ See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLin
 - **Canvas runtime (pan/zoom/hover/expand after import):** [docs/excalidraw-canvas-architecture.md](docs/excalidraw-canvas-architecture.md)
 - **Pipeline import toggles (compact/compound/packed/ancillary):** [docs/terraform-pipeline-import-agent-guide.md](docs/terraform-pipeline-import-agent-guide.md)
 
-### Repo RAG (code + docs search)
+### Local-first RAG (all three corpora)
 
-Local hybrid search over this monorepo (AST chunking, BM25 + vector). Embeddings use shared [`tools/rag-common`](../tools/rag-common) with named profiles (`RAG_EMBED_PROFILE` / `--embed-profile`): OpenAI, Gemini, or local MLX/ST; legacy `RAG_EMBED_BACKEND=auto` still works.
+All three tools share [`tools/rag-common`](../tools/rag-common) embed profiles and GPU scripts (`tools/rag-common/scripts/gpu_*.sh`). **Query default:** `cuda-qwen0.6b-1024` (Qwen3-0.6B @ 1024, GPU reembed, $0 API). **Secondary cloud build** (once on Mac/Vertex, then `ingest reembed` on RTX 3060 Ti): `gemini-2-structure-v1` for PDF corpora (graph-layout-rag, rag-literature-rag) or `gemini-2` for repo-rag code AST chunks.
 
 ```bash
-cd tools/repo-rag && uv sync && cp .env.example .env  # set OPENAI_API_KEY in .env
-yarn repo-rag:index
+# Example: rag-literature-rag
+RAG_EMBED_PROFILE=gemini-2-structure-v1 uv run rag-literature-rag ingest --force --rebuild
+RAG_GPU_TOOL=tools/rag-literature-rag tools/rag-literature-rag/scripts/gpu_dense_reembed.sh
+yarn rag-lit:query "Self-RAG" --top 8 --json   # uses cuda-qwen0.6b-1024 from .env
+```
+
+### Repo RAG (code + docs search)
+
+Local hybrid search over this monorepo (AST chunking, BM25 + vector). Per-profile indexes under `data/indexes/{profile}/`.
+
+```bash
+cd tools/repo-rag && uv sync && cp .env.example .env
+yarn repo-rag:index --embed-profile gemini-2   # secondary build (once)
+# GPU reembed → cuda-qwen0.6b-1024, then query with default profile
 yarn repo-rag:query "terraform pipeline compound layout" --top 8 --json
 yarn repo-rag:status
 ```
@@ -73,28 +85,27 @@ See [tools/repo-rag/README.md](tools/repo-rag/README.md). Agent skill: [.agents/
 
 ### Graph layout RAG (literature search)
 
-Local vector search over harvested graph-drawing papers (LanceDB). Same embed stack as repo-rag via `tools/rag-common` — pick a profile (`mlx-qwen4b`, `openai-large`, `gemini`, etc.) with `RAG_EMBED_PROFILE` or `--embed-profile`.
+Local vector search over harvested graph-drawing papers (LanceDB). Production query: `cuda-qwen0.6b-1024`; secondary: `gemini-2-structure-v1`.
 
 ```bash
 cd tools/graph-layout-rag && uv sync && cp .env.example .env
 yarn graph-rag:harvest
-yarn graph-rag:ingest -- --force --rebuild   # first build or after embed model change
+yarn graph-rag:ingest -- --force --rebuild --embed-profile gemini-2-structure-v1  # secondary (once)
+# RAG_GPU_TOOL=tools/graph-layout-rag tools/graph-layout-rag/scripts/gpu_dense_reembed.sh
 yarn graph-rag:ingest -- -v                  # resume after interrupt (incremental; no --force)
 yarn graph-rag:query "VPSC separation constraints" --tag constraints --json
 ```
-
-Embeddings: OpenAI (~$5–7 one-time, ~1h full corpus) or local **Qwen3-4B MLX 4-bit** on Apple Silicon (free, ~10–15h; set `RAG_LOCAL_EMBED_QUANT=4bit` in `.env`). Ingest checkpoints per batch in `data/ingest_state.json` + LanceDB — stop/resume without `--force`. Do not query during ingest on 24 GB Mac.
 
 See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md).
 
 ### RAG literature RAG (RAG research papers)
 
-Local hybrid search over core retrieval-augmented generation research (foundations, GraphRAG, agentic RAG, evaluation). Same embed stack as repo-rag via `tools/rag-common`.
+Local hybrid search over core retrieval-augmented generation research. Same local-first stack as graph-layout-rag.
 
 ```bash
 cd tools/rag-literature-rag && uv sync && cp .env.example .env
 yarn rag-lit:harvest -- --deep-harvest --target-pdfs 1000 --resume -v
-yarn rag-lit:ingest -- --force --rebuild
+yarn rag-lit:ingest -- --force --rebuild --embed-profile gemini-2-structure-v1
 yarn rag-lit:query "Self-RAG reflection tokens" --tag self-correcting --json
 ```
 

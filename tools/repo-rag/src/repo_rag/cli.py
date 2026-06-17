@@ -20,8 +20,9 @@ from repo_rag.ingest import bm25 as bm25_index
 from repo_rag.ingest.embed import embed_config_from_env
 from repo_rag.ingest.index import chunk_count, embed_config_from_state, load_ingest_state
 from repo_rag.ingest.run import index_cmd
+from repo_rag.ingest.reembed import reembed_cmd
 from repo_rag.watch import watch_cmd
-from repo_rag.paths import DEFAULT_LOG_FILE
+from repo_rag.paths import DEFAULT_LOG_FILE, list_profile_indexes, profile_index_paths
 from repo_rag.query.search import search
 from repo_rag.eval import benchmark, compare
 
@@ -48,6 +49,7 @@ def main(ctx: click.Context, verbose: bool, log_file: str | None, enable_log_fil
 
 
 main.add_command(index_cmd, name="index")
+main.add_command(reembed_cmd, name="reembed")
 main.add_command(watch_cmd, name="watch")
 
 
@@ -236,16 +238,24 @@ def benchmark_cmd(limit: int | None, k: int, rerank: bool | None, do_compare: bo
 
 
 @main.command("status")
-def status_cmd() -> None:
+@click.option(
+    "--embed-profile",
+    default=None,
+    help="Show stats for a specific profile index (default: active from env).",
+)
+def status_cmd(embed_profile: str | None) -> None:
     """Show index stats, embed model, and estimated cost."""
-    state = load_ingest_state()
-    resolved = embed_config_from_env()
+    index_paths = profile_index_paths(embed_profile)
+    state = load_ingest_state(index_paths)
+    resolved = embed_config_from_env(profile=embed_profile)
     indexed = embed_config_from_state(state)
     manifest = harvest_repo()
 
     payload = {
-        "chunks_lance": chunk_count(),
-        "chunks_bm25": bm25_index.chunk_count(),
+        "index_profile": index_paths.profile,
+        "index_path": str(index_paths.root),
+        "chunks_lance": chunk_count(index_paths),
+        "chunks_bm25": bm25_index.chunk_count(index_paths),
         "files_in_repo": len(manifest.files),
         "files_indexed": len(state.get("files", {})),
         "embed_backend": state.get("embed_backend", indexed.backend if indexed else resolved.backend),
@@ -259,6 +269,14 @@ def status_cmd() -> None:
         "estimated_cost_usd": state.get("estimated_cost_usd", 0.0),
         "last_indexed_at": state.get("last_indexed_at"),
         "graph": graph_counts(),
+        "profile_indexes": [
+            {
+                "profile": p.profile,
+                "path": str(p.root),
+                "chunks": chunk_count(p),
+            }
+            for p in list_profile_indexes()
+        ],
     }
     click.echo(json.dumps(payload, indent=2))
 

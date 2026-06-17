@@ -14,9 +14,20 @@ Embeddings use shared [`tools/rag-common`](../rag-common) with named profiles (`
 
 | Profile | When |
 | --- | --- |
-| `gemini-2-structure-v1` | Production: Gemini Embedding 2 @ 3072, Docling, structure-aware chunks |
+| `cuda-qwen0.6b-1024` | **Production query** — GPU reembed from gemini secondary |
+| `gemini-2-structure-v1` | Secondary cloud build (Docling, structure-aware chunks @ 3072) |
 | `openai-large` | Fast cloud ingest |
 | `mlx-qwen4b` | Free local ingest on Apple Silicon |
+
+## Local-first embedding
+
+Build `gemini-2-structure-v1` on Mac, GPU re-embed to `cuda-qwen0.6b-1024`, query locally:
+
+```bash
+RAG_EMBED_PROFILE=gemini-2-structure-v1 uv run rag-literature-rag ingest --force --rebuild
+RAG_GPU_TOOL=tools/rag-literature-rag tools/rag-literature-rag/scripts/gpu_dense_reembed.sh
+yarn rag-lit:query "Self-RAG reflection tokens" --top 8 --json
+```
 
 ## Pipeline
 
@@ -45,7 +56,7 @@ Target corpus: **~800–1200 open-access PDFs** (core RAG only; no domain-specif
 
 `foundations`, `dense-retrieval`, `hybrid-retrieval`, `chunking`, `query-expansion`, `reranking`, `self-correcting`, `graphrag`, `agentic`, `memory`, `long-context`, `evaluation`, `training`, `engineering`, `survey`
 
-Default retrieval: **hybrid** (Gemini dense + Tantivy BM25 + RRF k=60).
+Default retrieval: **hybrid** (Gemini dense + Tantivy BM25 + RRF k=20).
 
 ### Eval
 
@@ -57,7 +68,7 @@ yarn rag-lit:eval -- --embed-profile gemini-2-structure-v1 --report -v
 
 Gold set: 42 curated agent-realistic queries in `src/rag_literature_rag/eval/gold_cases.py`. Build neutral qrels with multi-system pooling (`eval pool` → `eval judge`) before comparing strategies, and judge wins on `eval diagnostics` (hole_rate@k / bpref), never raw nDCG (pooling bias).
 
-**Synthetic gold expansion** (`eval gen-gold`): 42 cases can't *distinguish* retrieval methods (they cluster in a ~0.11 nDCG band). Generate a large stratified synthetic gold set to make the eval discriminate — system-blind Flash queries grounded in corpus docs, anti-leakage + de-dup filtered, then the existing pool→judge pipeline. Opt-in via `RAG_LIT_SYNTH_GOLD=1`; curated-42 stays the default.
+**Synthetic gold expansion** (`eval gen-gold`): 42 cases can't _distinguish_ retrieval methods (they cluster in a ~0.11 nDCG band). Generate a large stratified synthetic gold set to make the eval discriminate — system-blind Flash queries grounded in corpus docs, anti-leakage + de-dup filtered, then the existing pool→judge pipeline. Opt-in via `RAG_LIT_SYNTH_GOLD=1`; curated-42 stays the default.
 
 ```bash
 uv run rag-literature-rag eval gen-gold --embed-profile gemini-2-structure-v1 \

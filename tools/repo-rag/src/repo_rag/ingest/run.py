@@ -26,7 +26,7 @@ from repo_rag.ingest.index import (
     update_ingest_metadata,
     upsert_chunks,
 )
-from repo_rag.paths import REPO_ROOT
+from repo_rag.paths import REPO_ROOT, profile_index_paths
 
 log = get_logger("index")
 
@@ -109,13 +109,13 @@ def _chunk_entries_parallel(
     return all_chunks, file_hashes, errors
 
 
-def _purge_changed_files(paths: list[str]) -> None:
+def _purge_changed_files(paths: list[str], index_paths) -> None:
     if not paths:
         return
     log.info("purging %d changed file(s) from indexes", len(paths))
     for path in paths:
-        delete_chunks_for_file(path)
-        bm25_index.delete_chunks_for_file(path)
+        delete_chunks_for_file(path, index_paths)
+        bm25_index.delete_chunks_for_file(path, profile=index_paths)
 
 
 def _bulk_upsert(
@@ -125,13 +125,21 @@ def _bulk_upsert(
     config: EmbedConfig,
     stats: EmbedStats,
     workers: int,
+    index_paths,
 ) -> int:
     if not chunks:
         return 0
 
     if rebuild or len(chunks) <= LANCE_WRITE_BATCH:
-        written = upsert_chunks(chunks, rebuild=rebuild, config=config, stats=stats, workers=workers)
-        bm25_index.upsert_chunks(chunks, rebuild=rebuild)
+        written = upsert_chunks(
+            chunks,
+            rebuild=rebuild,
+            config=config,
+            stats=stats,
+            workers=workers,
+            profile=index_paths,
+        )
+        bm25_index.upsert_chunks(chunks, rebuild=rebuild, profile=index_paths)
         return written
 
     log.info("bulk upsert %d chunks in batches of %d", len(chunks), LANCE_WRITE_BATCH)
@@ -145,8 +153,9 @@ def _bulk_upsert(
             config=config,
             stats=stats,
             workers=workers,
+            profile=index_paths,
         )
-        bm25_index.upsert_chunks(batch, rebuild=rebuild and first)
+        bm25_index.upsert_chunks(batch, rebuild=rebuild and first, profile=index_paths)
         rebuild = False
         log.info("upsert progress %d/%d chunks", min(i + LANCE_WRITE_BATCH, len(chunks)), len(chunks))
     return total
@@ -184,15 +193,15 @@ def run_index(
         graph_stats = graph_counts()
     log.info("harvested %d files into manifest", len(manifest.files))
 
-    state = load_ingest_state()
-    file_hashes: dict[str, str] = dict(state.get("files", {}))
-    # Inherit the profile the existing index was built with when none is given
-    # explicitly (arg or env). Without this, a bare incremental run resolves to the
-    # local default, embed_config_mismatch fires, and we silently full-rebuild the
-    # whole index with the wrong (weaker) model. Mirrors `repo-rag watch`'s pin.
     effective_profile = resolve_profile_name(prefix=ENV_PREFIX, profile=embed_profile)
+    index_paths = profile_index_paths(effective_profile)
+    state = load_ingest_state(index_paths)
     if not effective_profile:
         effective_profile = state.get("embed_profile") or None
+        if effective_profile:
+            index_paths = profile_index_paths(effective_profile)
+            state = load_ingest_state(index_paths)
+    file_hashes: dict[str, str] = dict(state.get("files", {}))
     config = prepare_embed_config(profile=effective_profile)
     stats = EmbedStats()
 
@@ -223,7 +232,7 @@ def run_index(
         current_paths = {entry.path for entry in manifest.files}
         deleted_paths = sorted(set(file_hashes) - current_paths)
         if deleted_paths:
-            _purge_changed_files(deleted_paths)
+            _purge_changed_files(deleted_paths, index_paths)
             for path in deleted_paths:
                 file_hashes.pop(path, None)
         to_process = [
@@ -237,7 +246,7 @@ def run_index(
 
     changed_paths = [e.path for e in to_process]
     if not rebuild and changed_paths:
-        _purge_changed_files(changed_paths)
+        _purge_changed_files(changed_paths, index_paths)
 
     chunk_started = time.monotonic()
     all_chunks, new_hashes, errors = _chunk_entries_parallel(
@@ -264,6 +273,7 @@ def run_index(
             config=config,
             stats=stats,
             workers=n_workers,
+            index_paths=index_paths,
         )
         log.info("embed+index phase elapsed_s=%.1f", time.monotonic() - embed_started)
 
@@ -272,9 +282,9 @@ def run_index(
     state["contextual"] = contextual
     effective = stats.effective_config or config
     update_ingest_metadata(state, config=effective, run_tokens=stats.tokens)
-    save_ingest_state(state)
+    save_ingest_state(state, index_paths)
 
-    total = lance_chunk_count()
+    total = lance_chunk_count(index_paths)
     elapsed = time.monotonic() - started
     from rag_common.config import embed_cost_per_million
 

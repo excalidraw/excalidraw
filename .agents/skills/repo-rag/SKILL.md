@@ -5,7 +5,7 @@ description: Query local full-repo RAG over excalidraw-tf code and handoff docs.
 
 # Repo RAG
 
-Local hybrid search (BM25 + vector) over **this repo's** TypeScript, tests, and markdown handoffs. AST-chunked at function/class boundaries. Embeddings use shared [`tools/rag-common`](../../../tools/rag-common) **named profiles** (`RAG_EMBED_PROFILE` / `--embed-profile`). Default: OpenAI `text-embedding-3-large` @ 3072; `RAG_EMBED_BACKEND=auto` falls back to local `all-MiniLM-L6-v2` without a valid API key.
+Local hybrid search (BM25 + vector) over **this repo's** TypeScript, tests, and markdown handoffs. AST-chunked at function/class boundaries. **Production query profile:** `cuda-qwen0.6b-1024` (GPU reembed from `gemini-2` secondary). Per-profile indexes under `data/indexes/{profile}/`.
 
 A **SQLite import/call graph** (`data/graph.sqlite`) powers `symbol`, `neighbors`, `read`, `context`, and `explain` — useful for tracing callers and related files without re-querying vectors.
 
@@ -45,8 +45,9 @@ For multi-file tasks, prefer **`context`** (hybrid seeds + 1-hop graph, token-bu
 
 ```bash
 cd tools/repo-rag && uv sync
-cp .env.example .env   # OPENAI_API_KEY optional with RAG_EMBED_BACKEND=auto
-yarn repo-rag:index    # OpenAI ~$0.27 first run (~2M tokens); local fallback is free
+cp .env.example .env   # RAG_EMBED_PROFILE=cuda-qwen0.6b-1024 by default
+# Build secondary once: RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild
+# GPU reembed: RAG_GPU_TOOL=tools/repo-rag tools/repo-rag/scripts/gpu_dense_reembed.sh
 yarn repo-rag:status   # confirm chunks_lance > 0 and graph counts
 ```
 
@@ -58,21 +59,21 @@ List profiles: `cd tools/repo-rag && uv run repo-rag embed profiles`
 
 | Profile | Backend | Dims | Use when |
 | --- | --- | --- | --- |
-| _(default / legacy env)_ | openai | 3072 | `text-embedding-3-large` — current production index |
+| `cuda-qwen0.6b-1024` | local | 1024 | **Production query** — GPU reembed |
+| `gemini-2` | gemini | 3072 | Secondary cloud build (~$0.42 this repo) |
 | `openai-large` | openai | 1024 | Smaller OpenAI vectors |
-| `gemini-2` | gemini | 3072 | `gemini-embedding-2-preview` — match graph-layout-rag vector space |
 | `gemini` | gemini | 768 | `gemini-embedding-001` (older) |
-| `mlx-qwen4b` | local | 1024 | Free Apple Silicon ingest (Qwen3-Embedding-4B, MLX 4-bit) |
-| `qwen3-code` | local | 2560 | **Code-specialized, max fidelity** — Qwen3-Embedding-4B native dims, tops MTEB-Code (~80.7); slower/more memory than 4-bit |
+| `mlx-qwen4b` | local | 1024 | Free Apple Silicon ingest |
+| `qwen3-code` | local | 2560 | Code-specialized Qwen3-4B native dims |
 
 Set profile in `.env` or pass on **both** index and query:
 
 ```bash
 RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild
-RAG_EMBED_PROFILE=gemini-2 uv run repo-rag query "compound pipeline" --top 8 --json
+RAG_EMBED_PROFILE=cuda-qwen0.6b-1024 uv run repo-rag query "compound pipeline" --top 8 --json
 ```
 
-**Single index:** repo-rag writes to `data/lancedb/` (not per-profile dirs like graph-layout-rag). Switching profiles requires `--force --rebuild` and replaces the existing index.
+**Per-profile indexes:** `data/indexes/{profile}/` (lancedb + bm25 + ingest_state.json). Legacy flat `data/lancedb/` still works when `data/indexes/` is empty.
 
 **Gemini-2 cost (this repo, ~2M tokens):** ~$0.42 standard API, ~$0.21 Batch API. Set `GEMINI_EMBED_COST_PER_MILLION=0.20` in `.env` for accurate `status` cost display (default assumes gemini-001 pricing).
 

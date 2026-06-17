@@ -5,7 +5,7 @@ description: Query the local graph drawing / layout theory RAG corpus. Topic sea
 
 # Graph layout RAG
 
-Local hybrid search over a harvested graph-drawing corpus. The production `gemini-2-structure-v1` index combines Gemini dense vectors, Tantivy BM25, and reciprocal rank fusion. Built for agents researching layered layout, crossing minimization, compound graphs, and Terraform pipeline height.
+Local hybrid search over a harvested graph-drawing corpus. **Production query profile:** `cuda-qwen0.6b-1024` (GPU reembed). **Secondary build:** `gemini-2-structure-v1` (Gemini Embedding 2 + Docling + structure-aware chunks). Hybrid = dense + Tantivy BM25 + RRF.
 
 ## When to use
 
@@ -77,7 +77,8 @@ Use **`--force --rebuild`** only for first full build or when changing embed mod
 | `openai-large` | Fast cloud ingest (~$5–7, ~30–90 min) with `OPENAI_API_KEY` |
 | `gemini` | Cloud ingest via `GEMINI_API_KEY` / `GOOGLE_API_KEY` (embedding-001) |
 | `gemini-2` | Gemini Embedding 2 fixed-window baseline |
-| `gemini-2-structure-v1` | **Production profile:** Gemini Embedding 2 @ 3072, Docling extraction, structure-aware chunks |
+| `gemini-2-structure-v1` | Secondary cloud build — source for GPU reembed |
+| `cuda-qwen0.6b-1024` | **Production query profile** — Qwen3-0.6B @ 1024 on CUDA |
 
 Set `RAG_EMBED_PROFILE=gemini-2-structure-v1` in `.env` or pass the same `--embed-profile` on both ingest and query. Query and ingest vector spaces must match. Legacy backend/model env vars still work as the implicit `default` profile.
 

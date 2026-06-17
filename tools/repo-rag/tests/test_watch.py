@@ -31,11 +31,11 @@ def _stub_run_index_io(monkeypatch, calls):
     """Neutralize all of run_index's I/O so only the graph branch is exercised."""
     monkeypatch.setattr(run_mod, "harvest_repo", lambda: RepoManifest(files=[]))
     monkeypatch.setattr(run_mod, "save_manifest", lambda manifest: None)
-    monkeypatch.setattr(run_mod, "load_ingest_state", lambda: {})
-    monkeypatch.setattr(run_mod, "save_ingest_state", lambda state: None)
+    monkeypatch.setattr(run_mod, "load_ingest_state", lambda profile=None: {})
+    monkeypatch.setattr(run_mod, "save_ingest_state", lambda state, profile=None: None)
     monkeypatch.setattr(run_mod, "embed_config_mismatch", lambda state, cfg: False)
     monkeypatch.setattr(run_mod, "update_ingest_metadata", lambda *a, **k: None)
-    monkeypatch.setattr(run_mod, "lance_chunk_count", lambda: 0)
+    monkeypatch.setattr(run_mod, "lance_chunk_count", lambda profile=None: 0)
     monkeypatch.setattr(
         run_mod,
         "prepare_embed_config",
@@ -72,7 +72,7 @@ def test_run_index_builds_graph_by_default(monkeypatch):
 
 def test_watch_requires_pinned_profile(monkeypatch):
     # No prior index / no pinned profile -> refuse to start (never silently re-resolve).
-    monkeypatch.setattr("repo_rag.watch.load_ingest_state", lambda: {})
+    monkeypatch.setattr("repo_rag.watch.load_ingest_state", lambda profile=None: {})
     result = CliRunner().invoke(watch_cmd, [])
     assert result.exit_code != 0
     assert "index --force --rebuild --embed-profile" in result.output
