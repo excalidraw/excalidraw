@@ -6,21 +6,26 @@ reranker parsing + graceful-degradation paths (A3).
 from __future__ import annotations
 
 from graph_layout_rag.eval.strategies import ALL_STRATEGIES, strategy_registry
-from graph_layout_rag.query.search import _should_expand
+from graph_layout_rag.query.search import should_use_hyde
 from rag_common.rerank import _parse_rank_order, rerank_listwise_llm
 
 
-def test_should_expand_short_query() -> None:
-    assert _should_expand("why so tall", []) is True
+def test_should_use_hyde_short_query() -> None:
+    assert should_use_hyde("why so tall", []) is True
 
 
-def test_should_expand_thin_results() -> None:
-    assert _should_expand("network simplex rank assignment layered digraph", []) is True
+def test_should_use_hyde_thin_results() -> None:
+    assert should_use_hyde("network simplex rank assignment layered digraph", []) is True
 
 
-def test_should_expand_skips_normal_query() -> None:
+def test_should_use_hyde_skips_normal_query() -> None:
     cands = [{"doc_id": f"d{i}"} for i in range(5)]
-    assert _should_expand("network simplex rank assignment layered digraph", cands) is False
+    assert should_use_hyde("network simplex rank assignment layered digraph", cands) is False
+
+
+def test_should_use_hyde_pdf_only() -> None:
+    cands = [{"doc_id": f"d{i}"} for i in range(5)]
+    assert should_use_hyde("network simplex rank assignment layered digraph", cands, pdf_only=True)
 
 
 def test_parse_rank_order_is_a_permutation() -> None:
@@ -42,8 +47,9 @@ def test_listwise_passthrough_when_disabled() -> None:
 
 def test_new_strategies_registered() -> None:
     reg = strategy_registry()
-    for name in ("hybrid_llm_rerank", "hybrid_local_rerank"):
+    for name in ("hybrid_llm_rerank", "hybrid_local_rerank", "hybrid_auto_hyde"):
         assert name in reg
         assert name in ALL_STRATEGIES
     assert reg["hybrid_llm_rerank"].requires_llm is True
     assert reg["hybrid_local_rerank"].requires_llm is False
+    assert reg["hybrid_auto_hyde"].requires_llm is True

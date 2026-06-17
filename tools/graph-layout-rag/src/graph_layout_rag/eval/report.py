@@ -105,6 +105,14 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
         "## Methodology\n\n",
         f"- Top-k evaluated: {payload['top']}\n",
         f"- LLM transforms enabled: {payload['llm_transforms']}\n",
+    ]
+    if payload.get("llm_backend"):
+        parts.append(
+            f"- LLM backend: `{payload['llm_backend']}` "
+            f"(`{payload.get('llm_model', '')}`)\n"
+        )
+    parts.extend(
+        [
         "- Metrics: doc-level hit-rate@k, true recall@k, MAP@10, MRR, and nDCG@10\n",
         "- Strategies tested: "
         + ", ".join(f"`{name}`" for name in payload["strategies_tested"])
@@ -112,7 +120,8 @@ def render_markdown_report(payload: dict[str, Any]) -> str:
         "## Results\n\n",
         _metric_table(completed),
         "\n",
-    ]
+        ]
+    )
 
     if offline:
         parts.append("### Offline strategies\n\n")

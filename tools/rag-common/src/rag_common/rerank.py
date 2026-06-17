@@ -195,13 +195,9 @@ def rerank_listwise_llm(
         "Include every index exactly once."
     )
     try:
-        from rag_common.gemini_embed import _client, llm_location
+        from rag_common.local_llm import active_model, generate_text
 
-        client = _client(location=llm_location())
-        response = client.models.generate_content(
-            model=model_name or listwise_llm_model(), contents=prompt
-        )
-        text = (getattr(response, "text", None) or "").strip()
+        text = generate_text(prompt, model=model_name or active_model())
         if not text:
             raise RuntimeError("empty listwise LLM response")
     except Exception as exc:  # noqa: BLE001 — degrade rather than fail a query

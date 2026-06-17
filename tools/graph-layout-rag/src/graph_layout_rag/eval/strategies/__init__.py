@@ -303,6 +303,26 @@ class HybridLocalRerankStrategy:
 
 
 @dataclass
+class HybridAutoHyDEStrategy:
+    """Track-aware router: hybrid for precise catalog; HyDE for pdf or vague queries."""
+
+    name: str = "hybrid_auto_hyde"
+    requires_llm: bool = True
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        from graph_layout_rag.query.search import search_auto_hyde_raw
+
+        return search_auto_hyde_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            pdf_only=case.pdf_only,
+        )
+
+
+@dataclass
 class AgenticStrategy:
     """Iterative deep-research loop (decompose -> gather -> listwise judge -> iterate)."""
 
@@ -582,6 +602,7 @@ LLM_STRATEGIES: tuple[str, ...] = (
     "multi_query",
     "hyde",
     "step_back",
+    "hybrid_auto_hyde",
     "multi_query_rerank",
     "hybrid_llm_rerank",
     "agentic",
@@ -633,6 +654,7 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         CitationGraphStrategy(),
         HybridLocalRerankStrategy(),
         HybridLLMRerankStrategy(),
+        HybridAutoHyDEStrategy(),
         AgenticStrategy(),
         MultiQueryStrategy(),
         HyDEStrategy(),

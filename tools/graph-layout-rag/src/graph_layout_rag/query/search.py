@@ -101,6 +101,37 @@ def format_results(
     return out
 
 
+def retrieve_hyde_candidates(
+    query: str,
+    *,
+    top: int,
+    embed_profile: str | None,
+    hybrid: bool,
+    filters: RetrieveFilters,
+) -> list[dict[str, Any]] | None:
+    """HyDE: embed a hypothetical passage, retrieve with hybrid BM25+dense fusion."""
+    from graph_layout_rag.ingest.embed import ENV_PREFIX, embed_query
+    from graph_layout_rag.query.retrieve import resolve_retrieve_context, retrieve_candidates
+    from graph_layout_rag.query.transforms import hyde_passage
+
+    try:
+        passage = hyde_passage(query)
+    except RuntimeError:
+        return None
+    ctx = resolve_retrieve_context(embed_profile=embed_profile)
+    vector = embed_query(passage, config=ctx.config, prefix=ENV_PREFIX, allow_fallback=False)
+    return retrieve_candidates(
+        query,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        filters=filters,
+        context=ctx,
+        vector=vector,
+        bm25_query=query,
+    )
+
+
 def _expand_candidates(
     query: str,
     *,
@@ -109,24 +140,13 @@ def _expand_candidates(
     hybrid: bool,
     filters: RetrieveFilters,
 ) -> list[dict[str, Any]] | None:
-    """Run query transforms (multi-query + step-back) and re-retrieve.
+    """Run HyDE expansion and re-retrieve.
 
     Returns fused candidates, or None if the LLM is unavailable so the caller
     falls back to the single-shot result.
     """
-    from graph_layout_rag.query.transforms import multi_query_rewrites, step_back_query
-
-    queries = [query]
-    try:
-        queries.extend(multi_query_rewrites(query))
-        queries.append(step_back_query(query))
-    except RuntimeError:
-        return None
-    # De-dup while preserving order.
-    seen: set[str] = set()
-    unique = [q for q in queries if not (q in seen or seen.add(q))]
-    return retrieve_multi_query(
-        unique,
+    return retrieve_hyde_candidates(
+        query,
         top=top,
         embed_profile=embed_profile,
         hybrid=hybrid,
@@ -134,19 +154,28 @@ def _expand_candidates(
     )
 
 
-def _should_expand(query: str, candidates: list[dict[str, Any]]) -> bool:
-    """Auto-gate: expand vague / under-served queries only.
-
-    Heuristic — expand when the query reads like a short/colloquial question
-    (few content words) or retrieval came back thin. Keeps normal keyword
-    queries on the fast single-shot path.
-    """
+def should_use_hyde(
+    query: str,
+    candidates: list[dict[str, Any]],
+    *,
+    pdf_only: bool = False,
+    force: bool = False,
+) -> bool:
+    """Auto-gate: HyDE for pdf-deep-read, vague, or under-served catalog queries."""
+    if force:
+        return True
+    if pdf_only:
+        return True
     words = [w for w in query.split() if len(w) > 2]
     if len(words) <= 4:
         return True
     if len(candidates) < 3:
         return True
     return False
+
+
+def _should_expand(query: str, candidates: list[dict[str, Any]], *, pdf_only: bool = False) -> bool:
+    return should_use_hyde(query, candidates, pdf_only=pdf_only)
 
 
 def search(
@@ -185,7 +214,9 @@ def search(
         hybrid=hybrid,
         filters=filters,
     )
-    if expand == "force" or (expand == "auto" and _should_expand(query, candidates)):
+    if expand == "force" or (
+        expand == "auto" and _should_expand(query, candidates, pdf_only=pdf_only)
+    ):
         expanded = _expand_candidates(
             query,
             top=top,
@@ -284,3 +315,40 @@ def search_multi_raw(
         enabled=rerank,
     )
     return format_results(reranked, top=top, max_per_doc=max_per_doc)
+
+
+def search_auto_hyde_raw(
+    query: str,
+    *,
+    top: int = 20,
+    embed_profile: str | None = None,
+    hybrid: bool = DEFAULT_HYBRID,
+    filters: RetrieveFilters | None = None,
+    pdf_only: bool = False,
+    max_per_doc: int = 2,
+) -> list[dict[str, Any]]:
+    """Eval/CLI router: hybrid by default; HyDE when pdf_only or vague/thin."""
+    filters = filters or RetrieveFilters()
+    candidates = retrieve_candidates(
+        query,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=hybrid,
+        filters=filters,
+    )
+    if should_use_hyde(query, candidates, pdf_only=pdf_only):
+        expanded = retrieve_hyde_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=hybrid,
+            filters=filters,
+        )
+        if expanded:
+            candidates = expanded
+    diverse = diversify_candidates(
+        candidates,
+        max_per_doc=5,
+        limit=max(top * max_per_doc, 50),
+    )
+    return format_results(diverse, top=top, max_per_doc=max_per_doc)

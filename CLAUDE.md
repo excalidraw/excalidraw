@@ -96,7 +96,7 @@ yarn graph-rag:ingest -- -v                  # resume after interrupt (increment
 yarn graph-rag:query "VPSC separation constraints" --tag constraints --json
 ```
 
-See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md).
+See [tools/graph-layout-rag/README.md](tools/graph-layout-rag/README.md). Agent skill: [.agents/skills/graph-layout-rag/SKILL.md](.agents/skills/graph-layout-rag/SKILL.md). **Local LLM (HyDE):** Ollama on RTX 3060 Ti (`desktop` SSH); measured 2026-06-17 — **cuda hybrid still wins** (0.715/0.684 nDCG@10); use `gemma4:e4b` only if enabling `--expand auto`. `./scripts/gpu_execute_local_llm_benchmark.sh` — [docs/graph-layout-rag-local-llm-benchmark-2026.md](docs/graph-layout-rag-local-llm-benchmark-2026.md).
 
 ### RAG literature RAG (RAG research papers)
 

@@ -172,6 +172,34 @@ Dense + BM25           → RRF k=20 (pool ≥80) → filters → results
 - `--tag` is an exact tag match. Category, tag, source, and PDF filters are applied after fusion; retrieval widens the candidate pool to compensate.
 - Query returns evidence snippets, not the full source.
 
+### Local LLM transforms (Ollama on 3060 Ti)
+
+HyDE for `--expand auto` and eval LLM arms run **Ollama on the GPU box** (`GRAPH_RAG_GPU_SSH=desktop`), not on the Mac. Set on `desktop` only:
+
+```bash
+RAG_LLM_BACKEND=ollama
+RAG_OLLAMA_HOST=http://127.0.0.1:11434
+RAG_OLLAMA_MODEL=gemma4:e4b              # if router enabled (see benchmark below)
+# RAG_OLLAMA_MODEL=gemma4:e2b              # fastest; most VRAM headroom
+# RAG_OLLAMA_MODEL=qwen3.5:9b              # avoid on 8 GB — HyDE workers crash co-loaded with cuda embed
+RAG_EMBED_PROFILE=cuda-qwen0.6b-1024
+RAG_LOCAL_EMBED_DEVICE=cuda
+```
+
+**Measured 2026-06-17 (desktop RTX 3060 Ti, neutral qrels):** local Ollama HyDE **did not beat** cuda hybrid. Keep default **`hybrid` (no LLM)** for production query. If enabling `--expand auto`, use **`gemma4:e4b`** (best router score + sub-second p95 when HyDE is skipped).
+
+| Arm | catalog nDCG@10 | pdf nDCG@10 | hybrid_auto_hyde p95 |
+| --- | --: | --: | --: |
+| baseline hybrid (cuda) | **0.715** | **0.684** | — |
+| gemma4:e4b router | 0.710 | 0.678 | 328 / 429 ms |
+| gemma4:e2b router | 0.705 | 0.659 | 328 / 428 ms |
+| qwen3.5:9b router | 0.715 (= hybrid) | 0.684 (= hybrid) | ~11 s (HyDE failed) |
+
+- **`--expand auto`:** HyDE when `pdf_only`, ≤4 content words, or thin retrieval; else plain hybrid.
+- **Benchmark shootout:** `./scripts/gpu_execute_local_llm_benchmark.sh` (from Mac) → runs on desktop. Script preserves explicit `RAG_EMBED_PROFILE` over `.env` (desktop `.env` must not override cuda profile).
+- **Doc:** [docs/graph-layout-rag-local-llm-benchmark-2026.md](../../docs/graph-layout-rag-local-llm-benchmark-2026.md)
+- One-time: `ssh desktop 'curl -fsSL https://ollama.com/install.sh | sh'` (sudo).
+
 ## Retrieval benchmark
 
 The current benchmark supports corrected true recall, hit rate, MAP, MRR, nDCG, catalog/PDF tracks, immutable run artifacts, resume, and memory guards.
@@ -439,6 +467,7 @@ yarn graph-rag:query "stress majorization neato" --top 5 --json
 - [tools/graph-layout-rag/README.md](../../../tools/graph-layout-rag/README.md)
 - [tools/graph-layout-rag/ARCHITECTURE.md](../../../tools/graph-layout-rag/ARCHITECTURE.md) — full harvest/ingest/query/test internals
 - [docs/graph-layout-rag-architecture-bakeoff-2026.md](../../../docs/graph-layout-rag-architecture-bakeoff-2026.md) — **current** bake-off: pooling-bias correction, neutral-judge verdict (hybrid wins), per-arm decisions
+- [docs/graph-layout-rag-local-llm-benchmark-2026.md](../../../docs/graph-layout-rag-local-llm-benchmark-2026.md) — **local Ollama HyDE shootout (2026-06-17):** cuda hybrid still wins; `gemma4:e4b` if router enabled
 - [docs/graph-layout-rag-retrieval-benchmark-assessment.md](../../../docs/graph-layout-rag-retrieval-benchmark-assessment.md) — older single-label benchmark assessment (superseded by the bake-off report)
 - [docs/terraform-pipeline-import-debug-handoff.md](../../../docs/terraform-pipeline-import-debug-handoff.md) — pipeline height diagnostic
 

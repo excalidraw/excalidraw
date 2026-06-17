@@ -138,6 +138,7 @@ def run_benchmark(
     max_swap_growth_gb: float = 2.0,
 ) -> dict[str, Any]:
     from graph_layout_rag.query.retrieve import clear_retrieve_caches, resolve_retrieve_context
+    from rag_common.local_llm import llm_metadata
 
     selected = resolve_strategies(
         strategies,
@@ -222,6 +223,7 @@ def run_benchmark(
         "embed_profile": embed_profile,
         "top": top,
         "llm_transforms": llm_transforms,
+        **llm_metadata(),
         "cloud_rerank": cloud_rerank,
         "retrieval_index": str(retrieval_index) if retrieval_index else None,
         "strategies_tested": [strategy.name for strategy in selected],

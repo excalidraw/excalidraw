@@ -48,7 +48,7 @@ RAG_GPU_TOOL=tools/graph-layout-rag \
 yarn graph-rag:query "layered graph drawing" --top 8 --json
 ```
 
-Benchmark (catalog qrels, hybrid nDCG@10): gemini-2-structure-v1 **0.768** vs cuda-qwen0.6b-1024 **0.718**.
+Benchmark (catalog qrels, hybrid nDCG@10): gemini-2-structure-v1 **0.768** vs cuda-qwen0.6b-1024 **0.718**. Local Ollama HyDE (2026-06-17) did not improve cuda hybrid — see [local LLM benchmark](../../docs/graph-layout-rag-local-llm-benchmark-2026.md).
 
 ## Pipeline
 
@@ -177,6 +177,37 @@ uv run python scripts/bench_encode_device.py --sample 512 --batch-size 8 --model
 Pass `--model` and `--encode-device cuda` to `eval build-retrieval-index`. SPLADE-v3 models (`naver/splade-v3`, `naver/splade-v3-distilbert`) use sentence-transformers SparseEncoder, not fastembed.
 
 Mac ↔ Ubuntu sync: set `GRAPH_RAG_GPU_SSH` in `.env`, then `scripts/gpu_sync_to_remote.sh` / `scripts/gpu_sync_from_remote.sh`. Long encode jobs: `tmux new -s graphrag-encode` on Ubuntu. Full A/B matrix: `scripts/gpu_build_ab_indexes.sh`.
+
+#### Local LLM transforms (Ollama on 3060 Ti)
+
+HyDE and `--expand auto` use **Ollama on the GPU box** (`desktop` over SSH), not the Mac. Dense embed stays on CUDA (`cuda-qwen0.6b-1024`). See [local LLM benchmark doc](../../docs/graph-layout-rag-local-llm-benchmark-2026.md).
+
+**Verdict (2026-06-17 shootout on desktop):** local HyDE did **not** beat cuda hybrid on neutral qrels (baseline **0.715 / 0.684** nDCG@10). Default remains **`hybrid` without LLM**. If you enable the router, set `RAG_OLLAMA_MODEL=gemma4:e4b` on the box; avoid `qwen3.5:9b` co-load on 8 GB (HyDE workers crash).
+
+| Model      |   catalog router |       pdf router | p95 (router) |
+| ---------- | ---------------: | ---------------: | -----------: |
+| gemma4:e4b |            0.710 |            0.678 |  ~330–430 ms |
+| gemma4:e2b |            0.705 |            0.659 |  ~330–430 ms |
+| qwen3.5:9b | 0.715 (= hybrid) | 0.684 (= hybrid) |        ~11 s |
+
+```bash
+# One-time on desktop (sudo):
+ssh desktop 'curl -fsSL https://ollama.com/install.sh | sh && sudo systemctl enable --now ollama'
+
+# From Mac: sync cuda index + run model shootout on desktop
+cd tools/graph-layout-rag
+./scripts/gpu_execute_local_llm_benchmark.sh
+./scripts/gpu_sync_from_remote.sh   # when tmux job finishes (grep LOCAL_LLM_BENCHMARK_DONE on desktop)
+```
+
+On `desktop`, export `RAG_EMBED_PROFILE=cuda-qwen0.6b-1024` before benchmark — `gpu_local_llm_benchmark.sh` preserves an explicit profile over `.env` defaults.
+
+Query with auto HyDE (after setting `RAG_LLM_BACKEND=ollama` on the box):
+
+```bash
+uv run graph-layout-rag query "why so tall" --expand auto --json
+uv run graph-layout-rag query "VPSC constraints" --pdf-only --expand auto --json
+```
 
 #### De-biased evaluation (multi-system pooling)
 

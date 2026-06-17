@@ -38,11 +38,9 @@ def agent_model() -> str:
 
 
 def _llm(prompt: str) -> str:
-    from rag_common.gemini_embed import _client, llm_location
+    from rag_common.local_llm import generate_text
 
-    client = _client(location=llm_location())
-    response = client.models.generate_content(model=agent_model(), contents=prompt)
-    return (getattr(response, "text", None) or "").strip()
+    return generate_text(prompt)
 
 
 def _decompose(query: str) -> list[str]:
