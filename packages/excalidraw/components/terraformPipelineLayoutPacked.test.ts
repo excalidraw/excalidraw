@@ -31,6 +31,7 @@ import {
   computeDepths,
   computeGlobalColumnX,
   computeWidthBudgetedDepths,
+  longestPath,
   placeClustersClassicGrid,
   vpcScopeKey,
   type AncillaryStrip,
@@ -975,5 +976,105 @@ describe("computeWidthBudgetedDepths (experimental Phase A)", () => {
     const first = computeWidthBudgetedDepths(e, clusters, lp);
     const second = computeWidthBudgetedDepths(e, clusters, lp);
     expect([...second.entries()].sort()).toEqual([...first.entries()].sort());
+  });
+});
+
+describe("longestPath (shared helper) + computeDepths regression", () => {
+  const e = (pairs: Array<[string, string]>) =>
+    pairs.map(([from, to]) => ({ from, to }));
+  const rank = (_: string) => 0;
+
+  it("longest-path on a chain: 0,1,2", () => {
+    const { column, hasCycle, unresolved } = longestPath(
+      ["a", "b", "c"],
+      e([
+        ["a", "b"],
+        ["b", "c"],
+      ]),
+      rank,
+    );
+    expect(column.get("a")).toBe(0);
+    expect(column.get("b")).toBe(1);
+    expect(column.get("c")).toBe(2);
+    expect(hasCycle).toBe(false);
+    expect(unresolved.size).toBe(0);
+  });
+
+  it("longest-path on a diamond: convergence sits at the max", () => {
+    // a→b, a→c, b→d, c→d, and a long c-tail c→x→d so d takes the longer path.
+    const { column } = longestPath(
+      ["a", "b", "c", "x", "d"],
+      e([
+        ["a", "b"],
+        ["a", "c"],
+        ["b", "d"],
+        ["c", "x"],
+        ["x", "d"],
+      ]),
+      rank,
+    );
+    expect(column.get("a")).toBe(0);
+    expect(column.get("d")).toBe(3); // a→c→x→d, not a→b→d (=2)
+  });
+
+  it("disconnected nodes each sit at column 0", () => {
+    const { column, hasCycle } = longestPath(["a", "b", "c"], e([]), rank);
+    expect(column.get("a")).toBe(0);
+    expect(column.get("b")).toBe(0);
+    expect(column.get("c")).toBe(0);
+    expect(hasCycle).toBe(false);
+  });
+
+  it("flags a cycle and reports the cyclic nodes as unresolved", () => {
+    const { hasCycle, unresolved } = longestPath(
+      ["a", "b", "c"],
+      e([
+        ["a", "b"],
+        ["b", "c"],
+        ["c", "a"],
+      ]),
+      rank,
+    );
+    expect(hasCycle).toBe(true);
+    expect([...unresolved].sort()).toEqual(["a", "b", "c"]);
+  });
+
+  it("computeDepths still longest-paths an acyclic graph (regression)", () => {
+    // a→b, a→c, b→d, c→d, d→e — same fixture as the TFD-order test above.
+    const { depths, hasCycle } = computeDepths(
+      [
+        ["a", "b"],
+        ["a", "c"],
+        ["b", "d"],
+        ["c", "d"],
+        ["d", "e"],
+      ].map(([source, target], i) => ({ source, target, sequence: i })),
+      ["a", "b", "c", "d", "e"],
+    );
+    expect(hasCycle).toBe(false);
+    expect(depths.get("a")).toBe(0);
+    expect(depths.get("b")).toBe(1);
+    expect(depths.get("c")).toBe(1);
+    expect(depths.get("d")).toBe(2);
+    expect(depths.get("e")).toBe(3);
+  });
+
+  it("computeDepths clamps cyclic clusters to firstSequence (regression)", () => {
+    // a→b→c→a cycle (sequences 0,1,2); d hangs off b but is also unreachable
+    // by Kahn since b never settles — every node falls back to firstSequence.
+    const { depths, hasCycle } = computeDepths(
+      [
+        { source: "a", target: "b", sequence: 0 },
+        { source: "b", target: "c", sequence: 1 },
+        { source: "c", target: "a", sequence: 2 },
+        { source: "b", target: "d", sequence: 3 },
+      ],
+      ["a", "b", "c", "d"],
+    );
+    expect(hasCycle).toBe(true);
+    // cyclic nodes fall back to their firstSequence (min sequence touching them)
+    expect(depths.get("a")).toBe(0);
+    expect(depths.get("b")).toBe(0);
+    expect(depths.get("c")).toBe(1);
   });
 });

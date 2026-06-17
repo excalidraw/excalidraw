@@ -3,6 +3,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { buildTerraformCompoundPipelineExcalidrawScene } from "./terraformPipelineLayoutCompound";
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
 import { preparePipelineLayout } from "./terraformPipelineLayoutShared";
+import { layeringStage } from "./terraformPipelineRcllLayering";
 import {
   buildRcllModel,
   summarizeRcllModel,
@@ -35,13 +36,16 @@ type RcllBuildOptions = {
 export type RcllPipelineStage = { name: string; stage: Stage };
 
 /**
- * Ordered stage pipeline. **M0 registers zero stages** — the list is empty, so
- * the pipeline is a no-op and control falls through to the compound fallback
- * rung in the builder. M1+ push real stages here (import/layer/order/center/…);
- * each must honor the §22.1 contract (optimize only its own tier, never violate
- * a higher one) and be deterministic.
+ * Ordered stage pipeline. **M2 registers the first real stage: layering (Stage
+ * 1a).** It writes `localColumn` on the tree (TFD precedence + hull staircase +
+ * fan-out column pinning) and changes NO geometry — the picture is still drawn by
+ * the compound fallback rung. Later milestones push more stages (order/center/…);
+ * each must honor the §22.1 contract (optimize only its own tier, never violate a
+ * higher one) and be deterministic.
  */
-const RCLL_STAGES: readonly RcllPipelineStage[] = [];
+const RCLL_STAGES: readonly RcllPipelineStage[] = [
+  { name: "layering", stage: layeringStage },
+];
 
 /** Result of running the stage pipeline (§27/§29). */
 export type RunRcllPipelineResult = {
@@ -99,21 +103,21 @@ export function runRcllPipeline(
 /**
  * RCLL pipeline builder (RFC docs/pipeline-rcll-layout-design.md).
  *
- * **Milestone M0** — stand up the ELK-style **import → pipeline → export** seam
- * plus the §29 observability/meta contract, with ZERO stages. The compound
- * builder is the §27 fallback rung, so output is identical to the compound view
- * (zero placement change). M0 proves the routing, the §28 contract types, and
- * the measurement baseline — *not* the algorithm. Rollback: the
- * `pipelineLayoutVariant` kill-switch (§33) reverts to compound/classic.
+ * **Through M2** — the ELK-style **import → pipeline → export** seam + the §29
+ * observability/meta contract. Import (M1) builds the tree + lattice; the
+ * pipeline runs the layering stage (M2) which writes `localColumn`; export still
+ * delegates the picture to the compound builder (§27 fallback rung), so output is
+ * geometry-identical to the compound view (zero placement change — M3 turns
+ * columns into pixels). Rollback: the `pipelineLayoutVariant` kill-switch (§33)
+ * reverts to compound/classic.
  */
 export async function buildTerraformPipelineRcllExcalidrawScene(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
   options?: RcllBuildOptions,
-  // Injectable for tests (Issue 1, eng-review): defaults to the empty M0
-  // registry, so production routing is unchanged. A test passes dummy stages to
-  // exercise the §27 guard + the ran/degraded/stageMeta → scene-meta mapping
-  // end-to-end. M1+ register real stages by editing RCLL_STAGES.
+  // Injectable for tests (eng-review): defaults to the production RCLL_STAGES.
+  // A test passes dummy stages to exercise the §27 guard + the
+  // ran/degraded/stageMeta → scene-meta mapping end-to-end.
   stages: readonly RcllPipelineStage[] = RCLL_STAGES,
 ): Promise<{
   elements: ExcalidrawElement[];
@@ -124,22 +128,25 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   const includeAncillary = options?.includeAncillary === true;
   const rcllOptions: RcllOptions = { compact, includeAncillary };
 
-  // import (M1): build the compound tree + lattice from the shared prep, ONCE.
+  // import: build the compound tree + lattice from the shared prep, ONCE.
   // `preparePipelineLayout` also enforces the .tfd gate (CON-10) — a throw here
   // surfaces as the same HTTP-400 the compound path raises. No try/catch: the
-  // model is data-only at M1 and degenerate inputs are covered by no-throw tests
+  // model is data-only and degenerate inputs are covered by no-throw tests
   // (a model-build bug should surface loudly, not silently blank the view).
   const prep = preparePipelineLayout(nodes, plan, compact, {});
   const { tree, lattice } = buildRcllModel(prep);
 
-  // pipeline (M1: still ZERO registered stages → no-op; the real tree/lattice
-  // pass through unchanged and the drawing comes from the fallback rung).
-  const { ran, degraded, stageMeta } = runRcllPipeline(
-    stages,
-    tree,
-    lattice,
-    rcllOptions,
-  );
+  // pipeline (M2: the layering stage writes `localColumn` on the tree). We READ
+  // the stage output tree (`laidOutTree`) — the seam was built to thread the tree
+  // forward, and M3+ placement stages will mutate geometry through it. Keeping
+  // the returned tree also means scene meta reflects the laid-out model, not the
+  // pre-stage one.
+  const {
+    tree: laidOutTree,
+    ran,
+    degraded,
+    stageMeta,
+  } = runRcllPipeline(stages, tree, lattice, rcllOptions);
 
   // export — §27 fallback rung: the compound builder, fed the SAME prep so the
   // skeleton build runs once (not twice). Geometry ≡ compound.
@@ -159,19 +166,21 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     meta: {
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
-      rcllMilestone: "M1",
+      rcllMilestone: "M2",
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
-      // §29: M1 import-phase facts (the tree + lattice this build computed),
+      // §29: import-phase facts (the tree + lattice this build computed),
       // distinct from per-stage rcllStageMeta. Scalars only (CON-8 determinism):
       // a count makes the model observable for the acceptance gate without
-      // serializing the maps. Geometry is still the compound fallback's.
-      rcllModel: summarizeRcllModel(tree, lattice),
-      // §29: per-stage diagnostics, keyed by stage name. Empty at M0 (no stages
-      // emit meta); populated as M1+ stages surface StageResult.meta. Note the
-      // §29 shape deviation: `rcllModules` is {stages,fallback} at M0, not the
-      // spec's {layering,ordering,…} — that fills in as named stages land (M1+).
+      // serializing the maps. Computed from the LAID-OUT tree (the pipeline
+      // output). Geometry is still the compound fallback's.
+      rcllModel: summarizeRcllModel(laidOutTree, lattice),
+      // §29: per-stage diagnostics, keyed by stage name. At M2 this carries the
+      // layering gate metrics under `layering` (fanoutColumnRate, con1/con6
+      // violations, maxLocalColumn) — the model-level acceptance gate. Note the
+      // §29 shape deviation: `rcllModules` is {stages,fallback}, not the spec's
+      // {layering,ordering,…} — that fills in as more named stages land.
       rcllStageMeta: stageMeta,
       counts: {
         clusters: fallback.meta.pipelineClusterCount,

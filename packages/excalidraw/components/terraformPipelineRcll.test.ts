@@ -1,13 +1,15 @@
 /**
  * Integration test for the RCLL pipeline view (RFC docs/pipeline-rcll-layout-design.md)
- * — milestone M0 — on staging-extended-localstack-v2.
+ * — through milestone M2 — on staging-extended-localstack-v2.
  *
- * M0 stands up the ELK-style import → pipeline → export seam with ZERO stages;
- * the compound builder is the §27 fallback rung, so RCLL output is
- * geometrically identical to the compound view (zero placement change). This
- * test gates the M0 contract, not the (not-yet-built) algorithm:
- *   - routing: meta.pipelineVariant === "rcll" + the M0 seam shape
+ * The seam is import → pipeline → export; the compound builder is the §27
+ * fallback rung. Through M2 the layering stage writes localColumn on the model
+ * but the compound builder still draws the picture, so RCLL output stays
+ * geometrically identical to the compound view (M3 turns columns into pixels).
+ * This test gates the seam + the M2 model-level acceptance gate:
+ *   - routing: meta.pipelineVariant === "rcll" + seam shape
  *     (rcllMilestone / rcllModules / rcllDegraded)
+ *   - M2 gate (rcllStageMeta.layering): fan-out-column rate = 1.0, CON-1/CON-6 = 0
  *   - delegate ≡ compound: equality over an element-geometry projection
  *     (NOT the whole scene/meta — meta diverges by design)
  *   - gates unchanged vs compound (collisions, semanticEdgeViolations)
@@ -116,7 +118,7 @@ const geometry = (els: readonly ExcalidrawElement[]): GeomCell[] =>
     return cell;
   });
 
-describe("pipeline view rcll (M0)", () => {
+describe("pipeline view rcll (M2)", () => {
   it(
     "staging-extended-localstack-v2 — routes to rcll, geometry ≡ compound, gates unchanged, deterministic",
     async () => {
@@ -135,16 +137,41 @@ describe("pipeline view rcll (M0)", () => {
           pipelineCompact: compact,
         });
 
-        // Routing + seam shape. M1 still registers ZERO stages (geometry ≡
-        // compound); the milestone bump + rcllModel block are the only deltas.
+        // Routing + seam shape. M2 registers the layering stage; it writes
+        // localColumn on the model but changes NO geometry (still ≡ compound).
         expect(rcll.meta.pipelineVariant, `${mode} variant`).toBe("rcll");
-        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M1");
+        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M2");
         expect(rcll.meta.rcllModules, `${mode} modules`).toEqual({
-          stages: [],
+          stages: ["layering"],
           fallback: "compound",
         });
         expect(rcll.meta.rcllDegraded, `${mode} degraded`).toEqual([]);
         expect(rcll.elements.length, `${mode} non-empty`).toBeGreaterThan(0);
+
+        // M2 acceptance gate (model-level, per-container D_H). The layering
+        // stage surfaces its metrics under rcllStageMeta.layering. On v2 every
+        // non-cyclic fan-out set co-columns (rate = 1.0) and no D_H edge breaks
+        // TFD precedence (CON-1) or the hull staircase (CON-6). Cyclic
+        // containers are excused (§13 acyclic guard).
+        const layeringMeta = (
+          rcll.meta.rcllStageMeta as Record<string, Record<string, number>>
+        ).layering;
+        expect(
+          layeringMeta.con1Violations,
+          `${mode} CON-1 (TFD precedence) holds`,
+        ).toBe(0);
+        expect(
+          layeringMeta.con6Violations,
+          `${mode} CON-6 (hull staircase) holds`,
+        ).toBe(0);
+        expect(
+          layeringMeta.fanoutSetCount,
+          `${mode} has fan-out sets to measure`,
+        ).toBeGreaterThan(0);
+        expect(
+          layeringMeta.fanoutColumnRate,
+          `${mode} fan-out-column rate = 100%`,
+        ).toBe(1);
 
         // M1: the import phase computed a real tree + lattice. The model block
         // is scalar, finite, and plausible on the real preset (fan-out sets and

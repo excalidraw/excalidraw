@@ -322,19 +322,82 @@ export function buildFallbackCluster(
   };
 }
 
+/**
+ * Longest-path layering on a DAG, shared by every column/depth consumer (RCLL
+ * §7.2a, RFC docs/pipeline-rcll-layout-design.md). Kahn's algorithm assigns each
+ * node the length of the longest path reaching it (`col(v) = max over preds p of
+ * col(p)+1`, sources at 0); the result is order-independent, so it is
+ * deterministic regardless of edge/node ordering. `rankOf` only breaks ties in
+ * the processing queue (cosmetic — does not change the returned columns), kept so
+ * callers reproduce a stable, byte-identical traversal.
+ *
+ * On a cycle the nodes on/behind it never settle (their indegree never reaches
+ * 0); they are returned in `unresolved` with `hasCycle = true`, and each caller
+ * applies its OWN fallback (e.g. `computeDepths` clamps them to `firstSequence`;
+ * the RCLL layering stacks a cyclic container's children sequentially). The
+ * helper itself stays minimal — longest-path + cycle detection, no policy.
+ *
+ *   nodeKeys ─┐
+ *   edges  ───┼─► Kahn longest-path ─► column (settled nodes)
+ *   rankOf ───┘                     └─► unresolved (cyclic) + hasCycle
+ */
+export function longestPath(
+  nodeKeys: readonly string[],
+  edges: readonly { from: string; to: string }[],
+  rankOf: (key: string) => number,
+): {
+  column: Map<string, number>;
+  hasCycle: boolean;
+  unresolved: ReadonlySet<string>;
+} {
+  const indegree = new Map<string, number>(nodeKeys.map((k) => [k, 0]));
+  const outgoing = new Map<string, string[]>();
+  for (const edge of edges) {
+    const list = outgoing.get(edge.from);
+    if (list) {
+      list.push(edge.to);
+    } else {
+      outgoing.set(edge.from, [edge.to]);
+    }
+    indegree.set(edge.to, (indegree.get(edge.to) ?? 0) + 1);
+    if (!indegree.has(edge.from)) {
+      indegree.set(edge.from, 0);
+    }
+  }
+  const cmp = (a: string, b: string): number =>
+    rankOf(a) - rankOf(b) || a.localeCompare(b);
+  const ready = nodeKeys
+    .filter((k) => (indegree.get(k) ?? 0) === 0)
+    .sort(cmp);
+  const column = new Map<string, number>(nodeKeys.map((k) => [k, 0]));
+  let visited = 0;
+  while (ready.length > 0) {
+    const id = ready.shift()!;
+    visited += 1;
+    for (const to of outgoing.get(id) ?? []) {
+      column.set(to, Math.max(column.get(to) ?? 0, (column.get(id) ?? 0) + 1));
+      const nextIn = (indegree.get(to) ?? 0) - 1;
+      indegree.set(to, nextIn);
+      if (nextIn === 0) {
+        ready.push(to);
+        ready.sort(cmp);
+      }
+    }
+  }
+  const unresolved = new Set<string>();
+  for (const k of nodeKeys) {
+    if ((indegree.get(k) ?? 0) > 0) {
+      unresolved.add(k);
+    }
+  }
+  return { column, hasCycle: visited < nodeKeys.length, unresolved };
+}
+
 export function computeDepths(
   clusterEdges: Array<{ source: string; target: string; sequence: number }>,
   clusterIds: readonly string[],
 ): { depths: Map<string, number>; hasCycle: boolean } {
-  const indegree = new Map(clusterIds.map((id) => [id, 0]));
-  const outgoing = new Map<
-    string,
-    Array<{ target: string; sequence: number }>
-  >();
-  for (const edge of clusterEdges) {
-    outgoing.set(edge.source, [...(outgoing.get(edge.source) ?? []), edge]);
-    indegree.set(edge.target, (indegree.get(edge.target) ?? 0) + 1);
-  }
+  // Tiebreak rank: min TFD sequence touching a cluster (0 if it touches none).
   const firstSeq = new Map<string, number>();
   for (const edge of clusterEdges) {
     firstSeq.set(
@@ -346,45 +409,17 @@ export function computeDepths(
       Math.min(firstSeq.get(edge.target) ?? edge.sequence, edge.sequence),
     );
   }
-  const ready = clusterIds
-    .filter((id) => (indegree.get(id) ?? 0) === 0)
-    .sort(
-      (a, b) =>
-        (firstSeq.get(a) ?? 0) - (firstSeq.get(b) ?? 0) || a.localeCompare(b),
-    );
-  const depths = new Map(clusterIds.map((id) => [id, 0]));
-  let visited = 0;
-  while (ready.length > 0) {
-    const id = ready.shift()!;
-    visited += 1;
-    for (const edge of (outgoing.get(id) ?? []).sort(
-      (a, b) => a.sequence - b.sequence,
-    )) {
-      depths.set(
-        edge.target,
-        Math.max(depths.get(edge.target) ?? 0, (depths.get(id) ?? 0) + 1),
-      );
-      const nextIn = (indegree.get(edge.target) ?? 0) - 1;
-      indegree.set(edge.target, nextIn);
-      if (nextIn === 0) {
-        ready.push(edge.target);
-        ready.sort(
-          (a, b) =>
-            (firstSeq.get(a) ?? 0) - (firstSeq.get(b) ?? 0) ||
-            a.localeCompare(b),
-        );
-      }
-    }
+  const { column, hasCycle, unresolved } = longestPath(
+    clusterIds,
+    clusterEdges.map((e) => ({ from: e.source, to: e.target })),
+    (id) => firstSeq.get(id) ?? 0,
+  );
+  // Cyclic clusters never settled a longest-path floor; clamp each to its
+  // firstSequence (the prior behaviour — keeps the depth bounded + deterministic).
+  for (const id of unresolved) {
+    column.set(id, firstSeq.get(id) ?? 0);
   }
-  if (visited === clusterIds.length) {
-    return { depths, hasCycle: false };
-  }
-  for (const id of clusterIds) {
-    if ((indegree.get(id) ?? 0) > 0) {
-      depths.set(id, firstSeq.get(id) ?? 0);
-    }
-  }
-  return { depths, hasCycle: true };
+  return { depths: column, hasCycle };
 }
 
 /**
