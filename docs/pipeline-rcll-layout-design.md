@@ -1254,7 +1254,9 @@ RCLL must not break features that already work. Each is specified.
 
 ## 34. Consolidated decision log
 
-The single registry of **settled** decisions. Open items live in §14 (DEC-1…DEC-8); per-extra defaults in §23.3; per-milestone gate decisions are recorded in the change log as they are made (§24.5).
+The single registry of **settled** decisions. Open items live in §14 (DEC-1…DEC-8); per-extra defaults in §23.3. **Design-time** decisions (the algorithm itself) are **D1–D12** below; **as-built implementation** decisions made at each milestone's gate/eng-review are **§34.1 (DI-\*)**. The change log (top of doc) is the narrative; §34.1 is the structured registry.
+
+### 34.0 Design-time decisions (D-\*)
 
 | ID | Decision | Rationale | Set | Revisitable? |
 | --- | --- | --- | --- | --- |
@@ -1270,6 +1272,34 @@ The single registry of **settled** decisions. Open items live in §14 (DEC-1…D
 | **D10** | Modular "Lego" pipeline; the priority lattice is the module contract. | Swap/adjust pieces safely. | v0.2 | no (architecture) |
 | **D11** | Build order M0–M12, each behind the flag with a gate. | Careful incremental build. | v0.3 | yes (sequence) |
 | **D12** | Robustness contract: defined behavior for every degenerate input + a fallback ladder. | Resilience. | v0.4 | no (core) |
+
+### 34.1 Implementation decision log (DI-\*, per-milestone, as built)
+
+Every settled build decision, in the order made. `Origin` cites the eng-review finding ID (`F#`/`Issue #`) or clarifying question (`Q#`) it came from. These are the ground-truth record behind the change-log rows; the git commit for each milestone carries the same decisions in prose.
+
+| ID | Milestone | Decision | Rationale | Revisitable? |
+| --- | --- | --- | --- | --- |
+| **DI-M0a-1** | M0a | Export `runRcllPipeline` + take `stages` as a default param. | Lets the §27 fallback guard be unit-tested end-to-end (Issue 1). | no |
+| **DI-M0a-2** | M0a | `runRcllPipeline` collects `StageResult.meta` (was a dead field). | §28 contract; M1+ stages surface diagnostics. | no |
+| **DI-M0a-3** | M0a | `rcll` skips the KV layout cache; dialog hides the Layout-variant control; stale `view:"experimental"` migrates to `"semantic"`. | The view forces `rcll`; cache/UI must not fight it. | no |
+| **DI-M0b-1** | M0b | Polyline-aware crossing counter; de-dupe per arrow **pair**; a 2-point arrow reduces to the old chord count. | DEC-6; future orthogonal routing (M9) must measure honestly without regressing today's numbers. | no |
+| **DI-M0b-2** | M0b | ΔY / near-straight use the polyline **vertical extent** (`max_y − min_y`), not endpoint Δy. | An elbow jog with equal endpoints must read as deviating. | no |
+| **DI-M0b-3** | M0b | Every rate carries a companion count; rate = 0 on an empty denominator (never a vacuous 1.0). | Honest metrics when nothing resolves (Full-mode 0/0). | no |
+| **DI-M0b-4** | M0b | Gate dials: ε = 36px (`PIPELINE_CLUSTER_GAP_Y`), fan-out column tol = 75px (`PIPELINE_COLUMN_GAP`/2), near-straight ≤ 24px. | Tuned to the card grid; local consts in the diagnostics leaf (arch-clean). | tunable (FLEX-5) |
+| **DI-M0b-5** | M0b | Hub-centering measured in **both** directions (fan-out hubs + fan-in convergence). | §13 centering gate is two-sided; `hubCount ≠ fanoutSetCount`. | no |
+| **DI-M1-1** | M1 | Leaf `CompoundNode`s keyed by **`cluster.id`**, not the topology-path prefix. | Path excludes the resource, so same-subnet siblings would collide and drop their `D_H` edge (F2 — was a P1 correctness bug). | no (core) |
+| **DI-M1-2** | M1 | Declared box→box edges merged into `D_H` by `(from,to)` **without** summing weight. | Avoids double-counting when a declared edge coincides with an up-projected one (F1). | no |
+| **DI-M1-3** | M1 | Inline the successor map in `computeUpperBounds` (declined a shared helper). | Smallest diff; only the 3rd consumer. **Superseded by DI-M2-4** when a 4th appeared. | superseded |
+| **DI-M1-4** | M1 | Import is **unguarded** (no try/catch around `buildRcllModel`). | A model-build bug should surface loudly, not silently blank the view; degenerate-input no-throw tests are the compensating control (F3). | revisit if real inputs prove fragile |
+| **DI-M1-5** | M1 | `UB` clamped `≥ LB` so `slack ≥ 0`. | A cycle artifact in `computeDepths` can otherwise yield negative slack that would mislead the M7 push-right. | no |
+| **DI-M1-6** | M1 | DEC-2 realized: cross-hull fan-out up-projected to the **LCA container** via `lcaTopologyPath`. | Evaluate fan-out/centering where both ends are visible. | no (core) |
+| **DI-M1-7** | M1 | Compound builder takes an optional `prep`; RCLL shares its prep with the fallback. | Skeleton build runs once, not twice (no ~2× regression). | no |
+| **DI-M1-8** | M1 | Container cycles in `D_H` are **detected + flagged only**; the localized fallback is M3. | Nothing to act on without a placement; v2 has 6 such containers (up-projecting a DAG is not a DAG). | M3 acts |
+| **DI-M2-1** | M2 | Layering is **model-only**: write `localColumn`, change no geometry; the gate is asserted on the model. | Keeps M3 the first-geometry boundary; ships no collisions mid-campaign (collision gate is M3). (Q1) | no (campaign rule) |
+| **DI-M2-2** | M2 | Cyclic containers get **sequential columns** `0,1,2…` and are **excused** from the CON-1/CON-6 gate. | Longest-path is undefined on a loop; M2 only needs sane numbers, smarter handling is M3. (Q2) | M3 refines |
+| **DI-M2-3** | M2 | Fan-out pinning is **junior to precedence (T1 > T4)**: a target internally preceded by another keeps its later column. Algorithm = pin to set-max → forward-relax → **measure** (assert rate = 1.0, an un-aligned set is a documented finding, never a silent weakening). | Precedence is hard; co-columning is readability-hard. v2 hit 1.0, so no union-find column-classes needed. (Issue 3) | escalate to column-classes only if a preset misses 1.0 |
+| **DI-M2-4** | M2 | Extracted shared `longestPath(nodeKeys, edges, rankOf) → {column, hasCycle, unresolved}`; `computeDepths` routes through it (byte-identical, regression-tested); each caller keeps its own cyclic fallback. | The 4th consumer appeared (**supersedes DI-M1-3**); kept minimal to avoid an over-parameterized helper. (Issue 2) | no |
+| **DI-M2-5** | M2 | Layering stage is a **pure transform** (clones the tree); the builder is rewired to consume `runRcllPipeline().tree`. | Honors the §22.1 contract and threads the tree forward for M3+ placement; closes the latent "builder drops the pipeline tree" gap. (Issue 1) | no |
 
 ---
 
