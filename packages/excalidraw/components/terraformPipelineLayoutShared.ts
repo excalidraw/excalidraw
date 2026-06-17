@@ -366,9 +366,7 @@ export function longestPath(
   }
   const cmp = (a: string, b: string): number =>
     rankOf(a) - rankOf(b) || a.localeCompare(b);
-  const ready = nodeKeys
-    .filter((k) => (indegree.get(k) ?? 0) === 0)
-    .sort(cmp);
+  const ready = nodeKeys.filter((k) => (indegree.get(k) ?? 0) === 0).sort(cmp);
   const column = new Map<string, number>(nodeKeys.map((k) => [k, 0]));
   let visited = 0;
   while (ready.length > 0) {
@@ -549,6 +547,28 @@ export function boundsOf(
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }
 
+/**
+ * Cumulative left-edge X offsets for a row of columns: column `i` starts at
+ * `startX + Σ_{j<i} (widths[j] + gap)`. The arithmetic kernel shared by the
+ * global TFD grid (`computeGlobalColumnX`, columns = cluster depths) and the
+ * per-container RCLL placement (M3a, columns = `localColumn` over child boxes) —
+ * the two differ only in how `widths` is derived, not in the offset math.
+ * Empty `widths` ⇒ `[]`; a single column ⇒ `[startX]`.
+ */
+export function columnOffsetsFromWidths(
+  widths: readonly number[],
+  startX: number,
+  gap: number = PIPELINE_COLUMN_GAP,
+): number[] {
+  const offsets: number[] = [];
+  let x = startX;
+  for (let i = 0; i < widths.length; i++) {
+    offsets[i] = x;
+    x += widths[i]! + gap;
+  }
+  return offsets;
+}
+
 export function computeGlobalColumnX(
   clusters: readonly PipelineCluster[],
   maxDepth: number,
@@ -560,13 +580,11 @@ export function computeGlobalColumnX(
       ...clusters.filter((c) => c.depth === depth).map((c) => c.build.width),
     ),
   );
-  const columnX: number[] = [];
-  let x = PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5;
-  for (let i = 0; i < columnWidths.length; i++) {
-    columnX[i] = x;
-    x += columnWidths[i]! + columnGap;
-  }
-  return columnX;
+  return columnOffsetsFromWidths(
+    columnWidths,
+    PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5,
+    columnGap,
+  );
 }
 
 export function layoutLaneClusters(

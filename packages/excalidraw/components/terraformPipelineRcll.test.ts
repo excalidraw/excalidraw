@@ -1,20 +1,22 @@
 /**
  * Integration test for the RCLL pipeline view (RFC docs/pipeline-rcll-layout-design.md)
- * — through milestone M2 — on staging-extended-localstack-v2.
+ * — through milestone M3a — on staging-extended-localstack-v2.
  *
  * The seam is import → pipeline → export; the compound builder is the §27
- * fallback rung. Through M2 the layering stage writes localColumn on the model
- * but the compound builder still draws the picture, so RCLL output stays
- * geometrically identical to the compound view (M3 turns columns into pixels).
- * This test gates the seam + the M2 model-level acceptance gate:
- *   - routing: meta.pipelineVariant === "rcll" + seam shape
- *     (rcllMilestone / rcllModules / rcllDegraded)
+ * fallback rung. M3a registers the placement stage: layering (M2) writes
+ * localColumn, placement (M3a) turns columns into a global box per node, and
+ * export draws RCLL's OWN geometry from those boxes (no longer ≡ compound). This
+ * test gates the seam + the M2 + M3a acceptance gates:
+ *   - routing: meta.pipelineVariant === "rcll" + seam shape (M3a milestone,
+ *     stages [layering, placement], rcllDegraded)
  *   - M2 gate (rcllStageMeta.layering): fan-out-column rate = 1.0, CON-1/CON-6 = 0
- *   - delegate ≡ compound: equality over an element-geometry projection
- *     (NOT the whole scene/meta — meta diverges by design)
- *   - gates unchanged vs compound (collisions, semanticEdgeViolations)
+ *   - M3a gate (rcllStageMeta.placement): containment = 0, forced bands disjoint = 0
+ *   - first geometry: the picture is NOT equal to compound (placement changed it)
+ *   - collision gate = 0 on RCLL's own geometry; no semantic edge violations
  *   - determinism (CON-8): a second build is byte-identical in geometry AND
  *     meta (meta carries no timings, so it must be reproducible)
+ *   - §27 fallback: a throwing 'placement' stage degrades to compound (keys off ran)
+ *   - pipeline_cycle_container warning emitted on v2 (6 cyclic D_H containers)
  *   - the pipeline .tfd validation gate is inherited (rcll + 0 edges → 400)
  *   - preset round-trip: a view:"rcll" preset normalizes back to "rcll"
  *
@@ -118,9 +120,9 @@ const geometry = (els: readonly ExcalidrawElement[]): GeomCell[] =>
     return cell;
   });
 
-describe("pipeline view rcll (M2)", () => {
+describe("pipeline view rcll (M3a)", () => {
   it(
-    "staging-extended-localstack-v2 — routes to rcll, geometry ≡ compound, gates unchanged, deterministic",
+    "staging-extended-localstack-v2 — routes to rcll, draws own geometry, collision-free, deterministic",
     async () => {
       for (const compact of [true, false]) {
         const mode = compact ? "compact" : "full";
@@ -129,20 +131,20 @@ describe("pipeline view rcll (M2)", () => {
           layoutMode: "rcll",
           pipelineCompact: compact,
         });
-        // Same two knobs the RCLL builder re-passes to the fallback rung; the
-        // rest (packed/pullLeft/semantic) default off on both sides.
+        // The compound view, for the geometry-DIVERGENCE check below (M3a draws
+        // its OWN picture, so it must NO LONGER match compound).
         const compound = await layout("staging-extended-localstack-v2", {
           layoutMode: "pipeline",
           pipelineLayoutVariant: "compound",
           pipelineCompact: compact,
         });
 
-        // Routing + seam shape. M2 registers the layering stage; it writes
-        // localColumn on the model but changes NO geometry (still ≡ compound).
+        // Routing + seam shape. M3a registers layering + placement; placement
+        // RAN, so export drew RCLL's own boxes (not the compound fallback).
         expect(rcll.meta.pipelineVariant, `${mode} variant`).toBe("rcll");
-        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M2");
+        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M3a");
         expect(rcll.meta.rcllModules, `${mode} modules`).toEqual({
-          stages: ["layering"],
+          stages: ["layering", "placement"],
           fallback: "compound",
         });
         expect(rcll.meta.rcllDegraded, `${mode} degraded`).toEqual([]);
@@ -172,6 +174,25 @@ describe("pipeline view rcll (M2)", () => {
           layeringMeta.fanoutColumnRate,
           `${mode} fan-out-column rate = 100%`,
         ).toBe(1);
+
+        // M3a placement gate (model-level, rcllStageMeta.placement): every child
+        // box is contained in its parent (CON-3) and no forced-level sibling
+        // bands overlap in Y (CON-5, DEC-1 off ⇒ strictly disjoint).
+        const placementMeta = (
+          rcll.meta.rcllStageMeta as Record<string, Record<string, number>>
+        ).placement;
+        expect(
+          placementMeta.containmentViolations,
+          `${mode} containment (CON-3) holds`,
+        ).toBe(0);
+        expect(
+          placementMeta.forcedBandViolations,
+          `${mode} forced bands disjoint (CON-5)`,
+        ).toBe(0);
+        expect(
+          placementMeta.placedLeafCount,
+          `${mode} placed every leaf`,
+        ).toBeGreaterThan(0);
 
         // M1: the import phase computed a real tree + lattice. The model block
         // is scalar, finite, and plausible on the real preset (fan-out sets and
@@ -240,20 +261,32 @@ describe("pipeline view rcll (M2)", () => {
           ).toBe(true);
         }
 
-        // Delegate ≡ compound: identical drawing (geometry projection only).
-        expect(geometry(rcll.elements), `${mode} geometry ≡ compound`).toEqual(
-          geometry(compound.elements),
-        );
+        // M3a draws its OWN geometry: the picture must NO LONGER match compound
+        // (this is what retired the "geometry ≡ compound" invariant — proof that
+        // placement actually changed the picture).
+        expect(
+          geometry(rcll.elements),
+          `${mode} geometry ≠ compound (placement changed the picture)`,
+        ).not.toEqual(geometry(compound.elements));
 
-        // Gates unchanged vs compound.
+        // Headline M3a acceptance: the collision gate is ZERO on RCLL's own
+        // geometry (CON-3/4/5) — the structural gate the user locked.
         expect(
           rcll.diagnostics.collisionCount,
-          `${mode} collisions == compound`,
-        ).toBe(compound.diagnostics.collisionCount);
+          `${mode} RCLL geometry is collision-free`,
+        ).toBe(0);
+        // `semanticEdgeViolations` is OBSERVED, not gated, at M3a. It is an RFC
+        // §13 routing/ordering goal that M4 (global top-spine, REQ-7) drives
+        // down: compound aligns every cluster on ONE global column grid
+        // (computeGlobalColumnX by depth), so cross-container edges read forward;
+        // RCLL M3a deliberately uses LOCAL per-container columns (§11), so some
+        // cross-container edges read backward in global X until the M4 spine
+        // lands. The structural gate the user locked is collision = 0 (above),
+        // not this. We assert only that it is a finite count (recorded in meta).
         expect(
-          rcll.diagnostics.semanticEdgeViolations,
-          `${mode} edge violations == compound`,
-        ).toEqual(compound.diagnostics.semanticEdgeViolations);
+          Array.isArray(rcll.diagnostics.semanticEdgeViolations),
+          `${mode} semantic-edge violations is an array (observed, not gated)`,
+        ).toBe(true);
 
         // Determinism (CON-8): a second build is byte-identical in geometry.
         const rcll2 = await layout("staging-extended-localstack-v2", {
@@ -514,9 +547,80 @@ describe("rcll builder maps stage results into scene meta", () => {
       });
       expect(scene.meta.rcllDegraded).toEqual(["threw"]);
       expect(scene.meta.rcllStageMeta).toEqual({ ranWithMeta: { probe: 7 } });
-      // Stages operate on the internal tree only; geometry still comes from the
-      // compound fallback, so the scene is non-empty and unaffected by injection.
+      // No "placement" in ran → export takes the compound fallback path, so the
+      // scene is non-empty and milestone reports M2 (placement did not run).
       expect(scene.elements.length).toBeGreaterThan(0);
+      expect(scene.meta.rcllMilestone).toBe("M2");
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
+  );
+
+  it(
+    "a throwing 'placement' stage degrades and export falls back to compound (§27, A2)",
+    async () => {
+      const raw = getTerraformImportPresetSourcesFromDb(
+        "staging-extended-localstack-v2",
+      );
+      const sources = resolveSourcesWithTfdComposition(
+        raw! as TerraformImportPresetSources,
+      );
+      const bundle = sources.planDotBundles[0]!;
+      const graph = graphlibDot.read("digraph G {}\n");
+      const nodes = buildTerraformLocalImportNodesMap(
+        bundle.plan,
+        graph,
+        [],
+        {},
+      );
+      applyTfdOverlayToNodes(nodes, sources.tfdTexts, sources.tfdLabels);
+
+      // A stage NAMED "placement" that throws → ran omits "placement" → export
+      // keys off `ran` (not box presence) and takes the compound fallback.
+      const scene = await buildTerraformPipelineRcllExcalidrawScene(
+        nodes,
+        bundle.plan,
+        { compact: true },
+        [stage("placement", throwStage)],
+      );
+      expect(scene.meta.rcllDegraded).toEqual(["placement"]);
+      expect(scene.meta.rcllMilestone).toBe("M2"); // placement did not run
+      expect(scene.elements.length).toBeGreaterThan(0); // compound drew the scene
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
+  );
+
+  it(
+    "emits a pipeline_cycle_container warning on v2 (6 cyclic D_H containers)",
+    async () => {
+      const raw = getTerraformImportPresetSourcesFromDb(
+        "staging-extended-localstack-v2",
+      );
+      const sources = resolveSourcesWithTfdComposition(
+        raw! as TerraformImportPresetSources,
+      );
+      const bundle = sources.planDotBundles[0]!;
+      const graph = graphlibDot.read("digraph G {}\n");
+      const nodes = buildTerraformLocalImportNodesMap(
+        bundle.plan,
+        graph,
+        [],
+        {},
+      );
+      applyTfdOverlayToNodes(nodes, sources.tfdTexts, sources.tfdLabels);
+
+      // Default RCLL_STAGES (placement runs) → boxes path → cycle-container warning.
+      const scene = await buildTerraformPipelineRcllExcalidrawScene(
+        nodes,
+        bundle.plan,
+        {
+          compact: true,
+        },
+      );
+      expect(scene.meta.rcllMilestone).toBe("M3a");
+      expect(
+        scene.warnings.some((w) => w.code === "pipeline_cycle_container"),
+        "v2 has cyclic D_H containers → warning present",
+      ).toBe(true);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
   );

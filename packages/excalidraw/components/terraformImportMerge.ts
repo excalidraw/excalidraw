@@ -16,7 +16,10 @@ export type TerraformImportWarning = {
     | "variable_mismatch"
     | "duplicate_tfd_bind"
     | "tfd_error"
-    | "pipeline_cycle";
+    | "pipeline_cycle"
+    // RCLL M3a: a dependency cycle between sibling topology hulls (the
+    // up-projected D_H). Distinct from "pipeline_cycle" (cluster-level D).
+    | "pipeline_cycle_container";
   message: string;
   address?: string;
   source?: string;

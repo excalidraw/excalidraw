@@ -1,14 +1,32 @@
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
 import { buildTerraformCompoundPipelineExcalidrawScene } from "./terraformPipelineLayoutCompound";
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
-import { preparePipelineLayout } from "./terraformPipelineLayoutShared";
+import {
+  preparePipelineLayout,
+  translateSkeleton,
+} from "./terraformPipelineLayoutShared";
+import {
+  appendPipelineEdgeSkeletons,
+  convertPipelineSkeletonToElements,
+  pipelineCycleWarnings,
+} from "./terraformPipelineLayoutFinalize";
+import {
+  applyCompoundHierarchicalLayout,
+  assignCompoundEdgeFrameParents,
+} from "./terraformPipelineLayoutCompoundHierarchy";
+import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
+import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
 import { layeringStage } from "./terraformPipelineRcllLayering";
+import { placementStage } from "./terraformPipelineRcllPlacement";
 import {
   buildRcllModel,
   summarizeRcllModel,
 } from "./terraformPipelineRcllModel";
 
+import type { PipelineLayoutPrep } from "./terraformPipelineLayoutShared";
+import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import type { TerraformImportWarning } from "./terraformImportMerge";
 import type {
@@ -36,15 +54,21 @@ type RcllBuildOptions = {
 export type RcllPipelineStage = { name: string; stage: Stage };
 
 /**
- * Ordered stage pipeline. **M2 registers the first real stage: layering (Stage
- * 1a).** It writes `localColumn` on the tree (TFD precedence + hull staircase +
- * fan-out column pinning) and changes NO geometry — the picture is still drawn by
- * the compound fallback rung. Later milestones push more stages (order/center/…);
- * each must honor the §22.1 contract (optimize only its own tier, never violate a
- * higher one) and be deterministic.
+ * Ordered stage pipeline.
+ *
+ * - **layering (M2, Stage 1a)** writes `localColumn` per container (TFD precedence
+ *   + hull staircase + fan-out column pinning) — model-only.
+ * - **placement (M3a, Stage 1d/2)** turns `localColumn` into a global `box` per
+ *   node (forced bands / packed column-stack / mixed vpc; cyclic → M2 columns).
+ *   This is the FIRST stage that produces geometry — when it runs, export draws
+ *   from the boxes instead of delegating to the compound fallback rung.
+ *
+ * Each stage honors the §22.1 contract (optimize only its own tier, never violate
+ * a higher one) and is deterministic. Later milestones push more stages.
  */
 const RCLL_STAGES: readonly RcllPipelineStage[] = [
   { name: "layering", stage: layeringStage },
+  { name: "placement", stage: placementStage },
 ];
 
 /** Result of running the stage pipeline (§27/§29). */
@@ -101,15 +125,102 @@ export function runRcllPipeline(
 }
 
 /**
+ * Build the scene from the **RCLL-placed tree** (M3a, when the placement stage
+ * ran). Leaf cluster cards are emitted at their global `box`; every other piece
+ * is the SAME placement-agnostic machinery the compound builder uses, so frames,
+ * group-drag metadata, arrows, and parenting fall out for free:
+ *
+ *   leaf boxes ─► buildCompoundFramesFromLayoutBoxes (hulls = boundsOf+pad)
+ *             ─► applyCompoundHierarchicalLayout (provider reanchor + group-drag)
+ *             ─► append edge + hull-connector skeletons ─► assign frame parents
+ *             ─► convertPipelineSkeletonToElements
+ *
+ * Note: ancillary ("Unconnected") strips are NOT drawn here — the RCLL model has
+ * no ancillary (M1), and the RCLL view does not enable it; a documented M3a
+ * limitation (same class as multi-provider banding).
+ */
+async function buildSceneFromBoxedTree(
+  tree: CompoundNode,
+  prep: PipelineLayoutPrep,
+  nodes: TerraformPlanNodesMap,
+): Promise<{ elements: ExcalidrawElement[]; frameEdgeCount: number }> {
+  const skeleton: ExcalidrawElementSkeleton[] = [];
+  const layoutBoxes = new Map<string, TerraformDependencyLayoutBox>();
+
+  const emitLeaves = (node: CompoundNode): void => {
+    if (node.cluster && node.box) {
+      const built = node.cluster.build;
+      // A cluster skeleton is NOT origin-normalized: its frame element sits at a
+      // local (frameX, frameY) offset (e.g. a card whose content starts below a
+      // label). Translate so the frame's top-left lands EXACTLY at the placed
+      // box — otherwise layoutBoxes (box-based, drives the derived hull frames)
+      // and the rendered card (offset by the skeleton origin) disagree, and a
+      // card renders outside its own band → frame-title-primary-cluster
+      // collisions. (`layoutLaneClusters` solves the same problem by reading the
+      // frame's actual post-translate box; we pre-compensate instead so the
+      // box == placement coordinate the banding math already reasoned about.)
+      const frameEl = built.skeleton.find(
+        (el) => el.id === built.clusterFrameId,
+      );
+      const flx = typeof frameEl?.x === "number" ? frameEl.x : 0;
+      const fly = typeof frameEl?.y === "number" ? frameEl.y : 0;
+      skeleton.push(
+        ...translateSkeleton(
+          built.skeleton,
+          node.box.x - flx,
+          node.box.y - fly,
+        ),
+      );
+      const placed = {
+        x: node.box.x,
+        y: node.box.y,
+        width:
+          typeof frameEl?.width === "number" ? frameEl.width : node.box.width,
+        height:
+          typeof frameEl?.height === "number"
+            ? frameEl.height
+            : node.box.height,
+      };
+      layoutBoxes.set(node.cluster.id, { ...placed });
+      layoutBoxes.set(built.clusterFrameId, { ...placed });
+    }
+    for (const child of node.children) {
+      emitLeaves(child);
+    }
+  };
+  emitLeaves(tree);
+
+  buildCompoundFramesFromLayoutBoxes(skeleton, prep.clusters, layoutBoxes);
+  applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
+  appendPipelineEdgeSkeletons(
+    nodes,
+    prep.collapsedEdges,
+    skeleton,
+    layoutBoxes,
+  );
+  const frameEdgeCount = appendCompoundTopologyFrameEdgeSkeletons(
+    prep.collapsedEdges,
+    prep.clusters,
+    skeleton,
+    layoutBoxes,
+  );
+  assignCompoundEdgeFrameParents(skeleton, prep.clusters);
+  const elements = await convertPipelineSkeletonToElements(skeleton);
+  return { elements, frameEdgeCount };
+}
+
+/**
  * RCLL pipeline builder (RFC docs/pipeline-rcll-layout-design.md).
  *
- * **Through M2** — the ELK-style **import → pipeline → export** seam + the §29
- * observability/meta contract. Import (M1) builds the tree + lattice; the
- * pipeline runs the layering stage (M2) which writes `localColumn`; export still
- * delegates the picture to the compound builder (§27 fallback rung), so output is
- * geometry-identical to the compound view (zero placement change — M3 turns
- * columns into pixels). Rollback: the `pipelineLayoutVariant` kill-switch (§33)
- * reverts to compound/classic.
+ * **Through M3a** — the ELK-style **import → pipeline → export** seam + the §29
+ * observability/meta contract. Import (M1) builds the tree + lattice; the pipeline
+ * runs layering (M2, `localColumn`) then placement (M3a, global `box`). **Export
+ * branches on whether placement RAN** (`ran.includes("placement")` — the §27
+ * guard's own bookkeeping, not a box-presence sniff): if it ran, the picture is
+ * drawn from the RCLL boxes (first real geometry — no longer ≡ compound); if it
+ * degraded, export falls back to the compound builder (the §27 fallback rung).
+ * Rollback: the `pipelineLayoutVariant` kill-switch (§33) reverts to
+ * compound/classic.
  */
 export async function buildTerraformPipelineRcllExcalidrawScene(
   nodes: TerraformPlanNodesMap,
@@ -136,11 +247,9 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   const prep = preparePipelineLayout(nodes, plan, compact, {});
   const { tree, lattice } = buildRcllModel(prep);
 
-  // pipeline (M2: the layering stage writes `localColumn` on the tree). We READ
-  // the stage output tree (`laidOutTree`) — the seam was built to thread the tree
-  // forward, and M3+ placement stages will mutate geometry through it. Keeping
-  // the returned tree also means scene meta reflects the laid-out model, not the
-  // pre-stage one.
+  // pipeline: layering (M2 → `localColumn`) then placement (M3a → global `box`).
+  // We READ the stage output tree (`laidOutTree`) — placement mutates geometry
+  // through it, and scene meta reflects the laid-out model.
   const {
     tree: laidOutTree,
     ran,
@@ -148,44 +257,65 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     stageMeta,
   } = runRcllPipeline(stages, tree, lattice, rcllOptions);
 
-  // export — §27 fallback rung: the compound builder, fed the SAME prep so the
-  // skeleton build runs once (not twice). Geometry ≡ compound.
-  const fallback = await buildTerraformCompoundPipelineExcalidrawScene(
-    nodes,
-    plan,
-    { compact, includeAncillary, prep },
-  );
+  // export — M3a branch (eng-review A2): if placement RAN, draw RCLL's own
+  // geometry from the placed boxes; otherwise fall back to the compound builder
+  // (the §27 fallback rung, fed the SAME prep so the skeleton build runs once).
+  // Branching on `ran` (not a box-presence sniff) keeps export in lockstep with
+  // the guard's bookkeeping — a degraded placement can never take the boxes path.
+  const placed = ran.includes("placement");
+  let elements: ExcalidrawElement[];
+  let warnings: TerraformImportWarning[];
+  if (placed) {
+    const built = await buildSceneFromBoxedTree(laidOutTree, prep, nodes);
+    elements = built.elements;
+    // Cluster-level cycle warning (D) + the container-level cycle warning (D_H,
+    // the 6 cyclic containers on v2 — M3a places them via M2's sequential columns).
+    warnings = [...pipelineCycleWarnings(prep.depthResult)];
+    if ((lattice.cyclicContainers?.size ?? 0) > 0) {
+      warnings.push({
+        code: "pipeline_cycle_container",
+        message:
+          "Pipeline view detected a dependency cycle between sibling topology hulls; those containers were laid out in declaration order.",
+      });
+    }
+  } else {
+    const fallback = await buildTerraformCompoundPipelineExcalidrawScene(
+      nodes,
+      plan,
+      { compact, includeAncillary, prep },
+    );
+    elements = fallback.elements;
+    warnings = fallback.warnings;
+  }
 
   // §29 readability + gates — reuse the existing diagnostics (deterministic,
   // read-only over elements). Counts/flags only in meta; NEVER timings (a
-  // duration would break the byte-identical / determinism test).
-  const diagnostics = diagnosePipelineScene(fallback.elements);
+  // duration would break the byte-identical / determinism test). Now reflects
+  // RCLL's OWN geometry when placement ran (no longer ≡ compound).
+  const diagnostics = diagnosePipelineScene(elements);
 
   return {
-    elements: fallback.elements,
+    elements,
     meta: {
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
-      rcllMilestone: "M2",
+      rcllMilestone: placed ? "M3a" : "M2",
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
       // §29: import-phase facts (the tree + lattice this build computed),
       // distinct from per-stage rcllStageMeta. Scalars only (CON-8 determinism):
       // a count makes the model observable for the acceptance gate without
-      // serializing the maps. Computed from the LAID-OUT tree (the pipeline
-      // output). Geometry is still the compound fallback's.
+      // serializing the maps. Computed from the LAID-OUT tree (the pipeline output).
       rcllModel: summarizeRcllModel(laidOutTree, lattice),
-      // §29: per-stage diagnostics, keyed by stage name. At M2 this carries the
-      // layering gate metrics under `layering` (fanoutColumnRate, con1/con6
-      // violations, maxLocalColumn) — the model-level acceptance gate. Note the
-      // §29 shape deviation: `rcllModules` is {stages,fallback}, not the spec's
-      // {layering,ordering,…} — that fills in as more named stages land.
+      // §29: per-stage diagnostics, keyed by stage name — layering (M2) +
+      // placement (M3a) gate metrics. The §29 shape deviation noted at M2 holds:
+      // `rcllModules` is {stages,fallback}, not the spec's {layering,ordering,…}.
       rcllStageMeta: stageMeta,
       counts: {
-        clusters: fallback.meta.pipelineClusterCount,
-        edges: fallback.meta.pipelineEdgeCount,
-        columns: fallback.meta.pipelineColumnCount,
+        clusters: prep.clusters.length,
+        edges: prep.collapsedEdges.length,
+        columns: prep.maxDepth + 1,
       },
       readability: {
         crossings: diagnostics.dataflow.crossings,
@@ -204,6 +334,6 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
         semanticEdgeViolations: diagnostics.semanticEdgeViolations.length,
       },
     },
-    warnings: fallback.warnings,
+    warnings,
   };
 }

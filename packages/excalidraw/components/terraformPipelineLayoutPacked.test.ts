@@ -28,6 +28,7 @@ import {
 } from "./terraformPipelineLayoutPacked";
 import {
   ancillaryStripFrameId,
+  columnOffsetsFromWidths,
   computeDepths,
   computeGlobalColumnX,
   computeWidthBudgetedDepths,
@@ -1076,5 +1077,53 @@ describe("longestPath (shared helper) + computeDepths regression", () => {
     expect(depths.get("a")).toBe(0);
     expect(depths.get("b")).toBe(0);
     expect(depths.get("c")).toBe(1);
+  });
+});
+
+describe("columnOffsetsFromWidths (shared helper) + computeGlobalColumnX regression", () => {
+  it("returns [] for no columns", () => {
+    expect(columnOffsetsFromWidths([], 100, 10)).toEqual([]);
+  });
+
+  it("places a single column at startX", () => {
+    expect(columnOffsetsFromWidths([260], 100, 10)).toEqual([100]);
+  });
+
+  it("accumulates width + gap left to right", () => {
+    // 100, 100+(200+10)=310, 310+(50+10)=370
+    expect(columnOffsetsFromWidths([200, 50, 999], 100, 10)).toEqual([
+      100, 310, 370,
+    ]);
+  });
+
+  it("computeGlobalColumnX output is byte-identical after routing through the helper (regression)", () => {
+    // Synthetic clusters at depths 0,1,2 with known widths; the floor of 260
+    // and the PIPELINE_MARGIN + 5·PAD start must be preserved exactly.
+    const mk = (id: string, depth: number, width: number): PipelineCluster => ({
+      id,
+      primaryAddress: id,
+      firstSequence: depth,
+      depth,
+      placement: {} as PipelinePlacement,
+      build: {
+        skeleton: [],
+        width,
+        height: 96,
+        clusterFrameId: `${id}:frame`,
+      },
+    });
+    const clusters = [
+      mk("a", 0, 300),
+      mk("b", 1, 100), // below the 260 floor → column width clamps to 260
+      mk("c", 2, 420),
+    ];
+    const columnX = computeGlobalColumnX(clusters, 2);
+    // Re-derive the expected offsets the old inline loop would have produced.
+    const start = 50 + 28 * 5; // PIPELINE_MARGIN + PIPELINE_FRAME_PAD * 5
+    expect(columnX).toEqual([
+      start,
+      start + 300 + 150,
+      start + 300 + 150 + 260 + 150,
+    ]);
   });
 });
