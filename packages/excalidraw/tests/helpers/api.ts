@@ -200,6 +200,9 @@ export class API {
       ? ExcalidrawTextElement["containerId"]
       : never;
     points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
+    strokeShape?: T extends "freedraw"
+      ? ExcalidrawFreeDrawElement["strokeShape"]
+      : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -317,6 +320,8 @@ export class API {
           type: type as "freedraw",
           simulatePressure: true,
           points: rest.points,
+          strokeShape:
+            rest.strokeShape ?? appState.currentItemStrokeShape,
           ...base,
         });
         break;

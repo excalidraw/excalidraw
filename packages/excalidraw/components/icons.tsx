@@ -1186,6 +1186,53 @@ export const StrokeWidthExtraBoldIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const StrokeShapePencilIcon = createIcon(
+  <path
+    d="M2.5 12.25C6.4 8.9 10.2 8.1 17.5 7.75"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeWidth="1.6"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeShapeMarkerIcon = createIcon(
+  <path
+    d="M3 11.5C7.8 9.4 12.1 9 17 8.5"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="butt"
+    strokeWidth="4"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeShapeBrushIcon = createIcon(
+  <path
+    d="M2.5 13.5C5.3 11.6 7.3 8.2 10.4 7.1C13.1 6.2 15.4 7.2 17.5 6.5C15.4 8.9 13.1 10.6 10.2 11.2C7.5 11.8 5 12.4 2.5 13.5Z"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeShapeTechnicalIcon = createIcon(
+  <path
+    d="M2.5 12.5L7.5 9L11.5 10.25L17.5 7.5"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="square"
+    strokeLinejoin="miter"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeShapeCalligraphyIcon = createIcon(
+  <path d="M3 14L5.2 9.4L16.8 6L14.6 10.6L3 14Z" fill="currentColor" />,
+  modifiedTablerIconProps,
+);
+
 export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <path

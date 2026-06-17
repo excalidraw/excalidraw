@@ -8990,7 +8990,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure = event.pointerType !== "pen";
 
     const element = newFreeDrawElement({
       type: elementType,
@@ -9005,6 +9005,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeShape: this.state.currentItemStrokeShape,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],

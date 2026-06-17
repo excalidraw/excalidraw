@@ -240,6 +240,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "seed": Any<Number>,
   "simulatePressure": true,
   "strokeColor": "#1e1e1e",
+  "strokeShape": "pencil",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "freedraw",

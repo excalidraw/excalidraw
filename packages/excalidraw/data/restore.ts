@@ -25,6 +25,7 @@ import {
   normalizeArrowhead,
   isPointInElement,
   isValidPolygon,
+  normalizeFreedrawStrokeShape,
   projectFixedPointOntoDiagonal,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
@@ -484,6 +485,7 @@ export const restoreElement = (
         points,
         simulatePressure: element.simulatePressure,
         pressures,
+        strokeShape: normalizeFreedrawStrokeShape(element.strokeShape),
       });
     }
     case "image":
@@ -1055,6 +1057,9 @@ export const restoreAppState = (
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
+  nextAppState.currentItemStrokeShape = normalizeFreedrawStrokeShape(
+    nextAppState.currentItemStrokeShape,
+  );
 
   return {
     ...nextAppState,

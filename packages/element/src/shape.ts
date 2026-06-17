@@ -63,6 +63,7 @@ import {
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
+import { getFreedrawStrokeOptions } from "./freedraw";
 
 import type {
   ExcalidrawElement,
@@ -1181,15 +1182,14 @@ export const getFreedrawOutlinePoints = (
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0.5]];
 
-  return getStroke(inputPoints as number[][], {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: true,
-  }) as [number, number][];
+  return getStroke(
+    inputPoints as number[][],
+    getFreedrawStrokeOptions(
+      element.strokeShape,
+      element.strokeWidth,
+      element.simulatePressure,
+    ),
+  ) as [number, number][];
 };
 
 const med = (A: number[], B: number[]) => {

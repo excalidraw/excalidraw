@@ -7,7 +7,10 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element";
+import {
+  newElementWith,
+  normalizeFreedrawStrokeShape,
+} from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
@@ -151,6 +154,17 @@ export const actionPasteStyles = register({
             newElement = newElementWith(newElement, {
               startArrowhead: elementStylesToCopyFrom.startArrowhead,
               endArrowhead: elementStylesToCopyFrom.endArrowhead,
+            });
+          }
+
+          if (
+            newElement.type === "freedraw" &&
+            elementStylesToCopyFrom.type === "freedraw"
+          ) {
+            newElement = newElementWith(newElement, {
+              strokeShape: normalizeFreedrawStrokeShape(
+                elementStylesToCopyFrom.strokeShape,
+              ),
             });
           }
 

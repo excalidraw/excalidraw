@@ -19,7 +19,13 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
-import { getDefaultAppState } from "../../appState";
+import { serializeAsJSON } from "../../data/json";
+import {
+  cleanAppStateForExport,
+  clearAppStateForDatabase,
+  clearAppStateForLocalStorage,
+  getDefaultAppState,
+} from "../../appState";
 
 import type { ImportedDataState } from "../../data/types";
 
@@ -158,6 +164,60 @@ describe("restoreElements", () => {
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
     });
+  });
+
+  it("should normalize missing and unknown freedraw stroke shapes", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      strokeShape: "brush",
+    });
+    const { strokeShape: _strokeShape, ...legacyElement } = freedrawElement;
+
+    expect(
+      (
+        restore.restoreElements(
+          [legacyElement as ExcalidrawFreeDrawElement],
+          null,
+        )[0] as ExcalidrawFreeDrawElement
+      ).strokeShape,
+    ).toBe("pencil");
+    expect(
+      (
+        restore.restoreElements(
+          [{ ...freedrawElement, strokeShape: "unknown" } as any],
+          null,
+        )[0] as ExcalidrawFreeDrawElement
+      ).strokeShape,
+    ).toBe("pencil");
+  });
+
+  it("should preserve freedraw stroke shape across document serialization", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      strokeShape: "calligraphy",
+    });
+    const serialized = JSON.parse(
+      serializeAsJSON(
+        [freedrawElement],
+        {
+          ...getDefaultAppState(),
+          currentItemStrokeShape: "marker",
+        },
+        {},
+        "local",
+      ),
+    );
+
+    expect(serialized.elements[0].strokeShape).toBe("calligraphy");
+    expect(serialized.appState.currentItemStrokeShape).toBeUndefined();
+    expect(
+      (
+        restore.restoreElements(
+          serialized.elements,
+          null,
+        )[0] as ExcalidrawFreeDrawElement
+      ).strokeShape,
+    ).toBe("calligraphy");
   });
 
   it("should restore only valid freedraw points and keep pressures aligned", () => {
@@ -640,6 +700,32 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("normalizes the current freedraw stroke shape", () => {
+    expect(
+      restore.restoreAppState(null, {
+        currentItemStrokeShape: "brush",
+      }).currentItemStrokeShape,
+    ).toBe("brush");
+    expect(
+      restore.restoreAppState(null, {
+        currentItemStrokeShape: "unknown",
+      } as any).currentItemStrokeShape,
+    ).toBe("pencil");
+    expect(restore.restoreAppState(null, null).currentItemStrokeShape).toBe(
+      "pencil",
+    );
+  });
+
+  it("persists the current stroke shape only in browser state", () => {
+    const appState = {
+      currentItemStrokeShape: "calligraphy",
+    } as const;
+
+    expect(clearAppStateForLocalStorage(appState)).toEqual(appState);
+    expect(cleanAppStateForExport(appState)).toEqual({});
+    expect(clearAppStateForDatabase(appState)).toEqual({});
+  });
+
   it("when appState is null it should return the local app state property", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";

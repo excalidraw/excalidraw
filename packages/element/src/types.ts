@@ -384,12 +384,20 @@ export type ExcalidrawElbowArrowElement = Merge<
   }
 >;
 
+export type StrokeShape =
+  | "pencil"
+  | "marker"
+  | "brush"
+  | "technical"
+  | "calligraphy";
+
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    strokeShape: StrokeShape;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

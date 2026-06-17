@@ -24,6 +24,7 @@ import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+import { normalizeFreedrawStrokeShape } from "./freedraw";
 
 import { isLineElement } from "./typeChecks";
 
@@ -445,6 +446,7 @@ export const newFreeDrawElement = (
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
     pressures?: ExcalidrawFreeDrawElement["pressures"];
+    strokeShape?: ExcalidrawFreeDrawElement["strokeShape"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
   return {
@@ -452,6 +454,7 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    strokeShape: normalizeFreedrawStrokeShape(opts.strokeShape),
   };
 };
 

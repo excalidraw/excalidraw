@@ -83,4 +83,30 @@ describe("actionStyles", () => {
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
   });
+
+  it("should copy freedraw stroke shape between freedraw elements", () => {
+    const brush = API.createElement({
+      type: "freedraw",
+      strokeShape: "brush",
+    });
+    const pencil = API.createElement({
+      type: "freedraw",
+      strokeShape: "pencil",
+    });
+    API.setElements([brush, pencil]);
+
+    API.setSelectedElements([brush]);
+    Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
+      Keyboard.codeDown(CODES.C);
+    });
+    API.setSelectedElements([pencil]);
+    Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
+      Keyboard.codeDown(CODES.V);
+    });
+
+    expect(h.elements[1]).toMatchObject({
+      id: pencil.id,
+      strokeShape: "brush",
+    });
+  });
 });

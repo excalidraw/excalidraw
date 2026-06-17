@@ -25,7 +25,12 @@ import {
   FONT_SIZES,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  DEFAULT_FREEDRAW_STROKE_SHAPE,
+  FREEDRAW_STROKE_SHAPES,
+  getNonDeletedElements,
+} from "@excalidraw/element";
 
 import {
   bindBindingElement,
@@ -75,6 +80,7 @@ import type {
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
+  StrokeShape,
 } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
@@ -131,6 +137,11 @@ import {
   ArrowheadCardinalityOneOrManyIcon,
   ArrowheadCardinalityZeroOrManyIcon,
   ArrowheadCardinalityZeroOrOneIcon,
+  StrokeShapeBrushIcon,
+  StrokeShapeCalligraphyIcon,
+  StrokeShapeMarkerIcon,
+  StrokeShapePencilIcon,
+  StrokeShapeTechnicalIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -150,6 +161,8 @@ import {
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
+
+import type { JSX } from "react";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
@@ -596,6 +609,57 @@ export const actionChangeStrokeWidth = register<
               hasSelection ? null : appState.currentItemStrokeWidth,
           )}
           onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
+});
+
+const strokeShapeIcons: Record<StrokeShape, JSX.Element> = {
+  pencil: StrokeShapePencilIcon,
+  marker: StrokeShapeMarkerIcon,
+  brush: StrokeShapeBrushIcon,
+  technical: StrokeShapeTechnicalIcon,
+  calligraphy: StrokeShapeCalligraphyIcon,
+};
+
+export const actionChangeStrokeShape = register<StrokeShape>({
+  name: "changeStrokeShape",
+  label: "labels.strokeShape",
+  trackEvent: false,
+  perform: (elements, appState, value) => ({
+    elements: changeProperty(elements, appState, (element) =>
+      element.type === "freedraw"
+        ? newElementWith(element, { strokeShape: value })
+        : element,
+    ),
+    appState: { ...appState, currentItemStrokeShape: value },
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+  }),
+  PanelComponent: ({ elements, appState, updateData, app }) => (
+    <fieldset>
+      <legend>{t("labels.strokeShape")}</legend>
+      <div className="buttonList buttonList--strokeShape">
+        <RadioSelection
+          group="stroke-shape"
+          options={FREEDRAW_STROKE_SHAPES.map((strokeShape) => ({
+            value: strokeShape,
+            text: t(`labels.strokeShape_${strokeShape}`),
+            icon: strokeShapeIcons[strokeShape],
+            testId: `strokeShape-${strokeShape}`,
+          }))}
+          value={getFormValue(
+            elements,
+            app,
+            (element) =>
+              element.type === "freedraw"
+                ? element.strokeShape
+                : DEFAULT_FREEDRAW_STROKE_SHAPE,
+            (element) => element.type === "freedraw",
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemStrokeShape,
+          )}
+          onChange={updateData}
         />
       </div>
     </fieldset>

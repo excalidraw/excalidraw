@@ -12,6 +12,7 @@ import {
   DEFAULT_GRID_STEP,
   isTestEnv,
 } from "@excalidraw/common";
+import { DEFAULT_FREEDRAW_STROKE_SHAPE } from "@excalidraw/element";
 
 import type { AppState, NormalizedZoomValue } from "./types";
 
@@ -36,6 +37,7 @@ export const getDefaultAppState = (): Omit<
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+    currentItemStrokeShape: DEFAULT_FREEDRAW_STROKE_SHAPE,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
@@ -169,6 +171,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemRoughness: { browser: true, export: false, server: false },
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
+  currentItemStrokeShape: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
