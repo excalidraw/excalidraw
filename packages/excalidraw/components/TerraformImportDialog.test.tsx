@@ -169,6 +169,40 @@ describe("TerraformImportModal", () => {
     });
   });
 
+  it("RCLL view: imports as layoutMode rcll + hides the Layout variant control", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+
+    // The Classic/Compound/V2 control is present under Pipeline view...
+    fireEvent.click(screen.getByRole("radio", { name: /pipeline view/i }));
+    expect(
+      screen.queryByRole("button", { name: /^compound$/i }),
+    ).toBeInTheDocument();
+
+    // ...and hidden under RCLL view (the view forces its own variant).
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+    expect(
+      screen.queryByRole("button", { name: /^compound$/i }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    // Routes as the rcll family + compact on. pipelineLayoutVariant is NOT
+    // pinned here: the dialog may pass a stale variant and the layout core
+    // forces "rcll" at context build (covered by terraformPipelineRcll.test.ts).
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        semanticLayout: false,
+        layoutMode: "rcll",
+        pipelineCompact: true,
+      }),
+    );
+  });
+
   it("passes semanticLayout false for module view", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],

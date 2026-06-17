@@ -110,25 +110,6 @@ describe("pipeline semantic placement audit", () => {
             pipelineSemanticPlacement: true,
           },
         ],
-        // Experimental view (Phase A width-budgeted columns + Phase B barycenter
-        // ordering) vs its exact default twin — same toggles, engine off vs on.
-        [
-          "default twin (compound+full+packed)",
-          {
-            pipelineLayoutVariant: "compound",
-            pipelineCompact: false,
-            pipelinePacked: true,
-          },
-        ],
-        [
-          "EXPERIMENTAL (compound+full+packed)",
-          {
-            layoutMode: "experimental",
-            pipelineLayoutVariant: "compound",
-            pipelineCompact: false,
-            pipelinePacked: true,
-          },
-        ],
       ];
 
       const out: Record<string, Awaited<ReturnType<typeof layout>>> = {};
@@ -158,38 +139,6 @@ describe("pipeline semantic placement audit", () => {
         ).toBe(0);
         expect(d.semanticEdgeViolations, `${label} edge order`).toEqual([]);
       }
-
-      // Experimental view gate. The invariants must always hold: no overlaps /
-      // no broken hierarchies and TFD left-to-right order preserved. The Phase A
-      // slack-window column spreading also reliably yields a flatter scene
-      // (lower height) than its default twin — the "wider/flatter" goal.
-      // NOTE: crossings currently rise vs the default's tuned ASAP+packed-shift
-      // ordering; lane-level Phase B does not yet absorb the intra-column
-      // crossings spreading introduces (cluster-level ordering is the follow-up).
-      const exp = out["EXPERIMENTAL (compound+full+packed)"]!;
-      const base = out["default twin (compound+full+packed)"]!;
-      const e = exp.diagnostics;
-      expect(e.collisionCount, "experimental collisions").toBe(0);
-      expect(e.semanticEdgeViolations, "experimental edge order").toEqual([]);
-      expect(
-        exp.bounds.height,
-        "experimental height vs default twin (flatter)",
-      ).toBeLessThanOrEqual(base.bounds.height);
-
-      // Determinism: a second build is byte-identical in geometry.
-      const exp2 = await layout("staging-extended-localstack-v2", {
-        layoutMode: "experimental",
-        pipelineLayoutVariant: "compound",
-        pipelineCompact: false,
-        pipelinePacked: true,
-      });
-      expect(exp2.bounds, "experimental determinism (bounds)").toEqual(
-        exp.bounds,
-      );
-      expect(
-        exp2.diagnostics.dataflow.crossings,
-        "experimental determinism (crossings)",
-      ).toBe(e.dataflow.crossings);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 4,
   );

@@ -505,7 +505,7 @@ terraform show -json tfplan > plan.json`}</code>
               const disabled =
                 (option.value === "semantic" ||
                   option.value === "pipeline" ||
-                  option.value === "experimental") &&
+                  option.value === "rcll") &&
                 semanticViewDisabled;
               const descriptionId = `terraform-view-${option.value}-description`;
               return (
@@ -542,7 +542,7 @@ terraform show -json tfplan > plan.json`}</code>
               );
             })}
           </div>
-          {(view === "pipeline" || view === "experimental") &&
+          {(view === "pipeline" || view === "rcll") &&
             !semanticViewDisabled && (
               <TerraformImportPipelineSettings
                 pipelineCompact={pipelineCompact}
@@ -559,7 +559,8 @@ terraform show -json tfplan > plan.json`}</code>
                 setPipelineSemanticPlacement={
                   dialog.setPipelineSemanticPlacement
                 }
-                showPlacement={view !== "experimental"}
+                showPlacement={view !== "rcll"}
+                showVariant={view !== "rcll"}
               />
             )}
           {view === "module" && (

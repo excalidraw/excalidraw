@@ -20,7 +20,7 @@ export type TerraformImportSession = {
   sources: TerraformPlanParsingSources;
   sourceFingerprint?: string;
   semanticLayout: boolean;
-  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
+  layoutMode?: import("./terraformImportDialogUtils").TerraformLayoutMode;
   moduleLayoutOptions: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. */
   pipelineCompact?: boolean;

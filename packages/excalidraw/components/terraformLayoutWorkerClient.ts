@@ -130,8 +130,7 @@ export async function layoutTerraformViaWorkers(
     options.layoutMode ??
     (options.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
-  const pipelineLayout =
-    layoutMode === "pipeline" || layoutMode === "experimental";
+  const pipelineLayout = layoutMode === "pipeline" || layoutMode === "rcll";
 
   const runSequential = async () => {
     const result = await layoutTerraformFromSources(sources, options);

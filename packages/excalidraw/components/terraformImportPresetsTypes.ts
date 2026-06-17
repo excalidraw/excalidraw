@@ -2,7 +2,11 @@ import importPresetsCatalog from "../assets/import-presets.catalog.json";
 
 import type { TerraformPlanDotBundle } from "./terraformPlanParsing";
 
-export type TerraformImportPresetView = "semantic" | "module" | "pipeline";
+export type TerraformImportPresetView =
+  | "semantic"
+  | "module"
+  | "pipeline"
+  | "rcll";
 
 export type TerraformImportPresetWarning = {
   code: "missing_state_file" | "missing_optional_tfd" | "composition_error";
@@ -148,6 +152,8 @@ export function normalizeTerraformImportPreset(
       ? "module"
       : value.view === "pipeline"
       ? "pipeline"
+      : value.view === "rcll"
+      ? "rcll"
       : "semantic";
   const rootPath =
     typeof value.rootPath === "string" ? value.rootPath.trim() : "";

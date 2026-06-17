@@ -37,6 +37,7 @@ import {
   buildTerraformPipelineExcalidrawScene,
 } from "./terraformPipelineLayout";
 import { buildTerraformPipelineV2ExcalidrawScene } from "./terraformPipelineLayoutV2";
+import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -420,7 +421,6 @@ type LayoutSceneContext = {
   pipelinePackedPullLeft?: boolean;
   pipelineIncludeAncillary?: boolean;
   pipelineSemanticPlacement?: boolean;
-  pipelineExperimentalLayout?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -438,10 +438,11 @@ async function buildPipelineLayoutSceneBody(
         packed: ctx.pipelinePacked === true,
         packedPullLeft: ctx.pipelinePackedPullLeft === true,
         semanticPlacement: ctx.pipelineSemanticPlacement === true,
-        experimentalLayout: ctx.pipelineExperimentalLayout === true,
       };
       const buildPipeline =
-        ctx.pipelineLayoutVariant === "v2"
+        ctx.pipelineLayoutVariant === "rcll"
+          ? buildTerraformPipelineRcllExcalidrawScene
+          : ctx.pipelineLayoutVariant === "v2"
           ? buildTerraformPipelineV2ExcalidrawScene
           : ctx.pipelineLayoutVariant === "compound"
           ? buildTerraformCompoundPipelineExcalidrawScene
@@ -471,9 +472,6 @@ async function buildPipelineLayoutSceneBody(
               : {}),
             ...(ctx.pipelineSemanticPlacement
               ? { pipelineSemanticPlacement: true }
-              : {}),
-            ...(ctx.pipelineExperimentalLayout
-              ? { pipelineExperimentalLayout: true }
               : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
@@ -729,10 +727,9 @@ export async function layoutTerraformFromSources(
     options?.layoutMode ??
     (options?.semanticLayout === true ? "semantic" : "module");
   const semanticLayout = layoutMode === "semantic";
-  // Experimental view rides the pipeline builder (needs TFD edges, same
-  // validation + routing) with the Phase A/B engine enabled.
-  const pipelineLayout =
-    layoutMode === "pipeline" || layoutMode === "experimental";
+  // RCLL view rides the pipeline family (needs TFD edges, same validation +
+  // routing); M0 delegates to the compound builder via the §27 fallback rung.
+  const pipelineLayout = layoutMode === "pipeline" || layoutMode === "rcll";
   if (sources.planDotBundles.length > 0) {
     terraformImportProfilerMeasure("prep.cache", () => {
       buildTerraformImportPrepCache(sources, options);
@@ -847,12 +844,14 @@ export async function layoutTerraformFromSources(
     addressToStack,
     deferDecorations: options?.deferDecorations === true,
     pipelineCompact: options?.pipelineCompact,
-    pipelineLayoutVariant: options?.pipelineLayoutVariant,
+    // Force the variant for RCLL so a stale-session/default variant can't
+    // mis-route to the plain pipeline builder (dispatch keys on the variant).
+    pipelineLayoutVariant:
+      layoutMode === "rcll" ? "rcll" : options?.pipelineLayoutVariant,
     pipelinePacked: options?.pipelinePacked === true,
     pipelinePackedPullLeft: options?.pipelinePackedPullLeft === true,
     pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
     pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
-    pipelineExperimentalLayout: layoutMode === "experimental",
     colorMode: options?.colorMode,
   };
 

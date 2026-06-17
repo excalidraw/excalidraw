@@ -80,13 +80,13 @@ export const useTerraformImportDialog = ({
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
 
-  // Experimental view runs the Phase A/B engine, which needs Packed (Phase B
-  // ordering lives in the packed path) and competes with Semantic placement.
-  // Default it to Packed and clear Semantic so the panel reflects what runs.
+  // RCLL view delegates to the compound builder at M0 (its own algorithm lands
+  // across later milestones) and does not expose the height/placement dials.
+  // Reset them so a stale panel state can't ride along into the import.
   const handleSetView = useCallback((next: TerraformView) => {
     setView(next);
-    if (next === "experimental") {
-      setPipelinePacked(true);
+    if (next === "rcll") {
+      setPipelinePacked(false);
       setPipelinePackedPullLeft(false);
       setPipelineSemanticPlacement(false);
     }
@@ -315,7 +315,7 @@ export const useTerraformImportDialog = ({
         builtin: false,
         description: "User-defined Terraform import preset.",
         rootPath,
-        view: view === "experimental" ? "pipeline" : view,
+        view,
         stacks,
         tfdPaths:
           embeddedTfd.length > 0
@@ -338,7 +338,7 @@ export const useTerraformImportDialog = ({
         name: presetName,
         builtin: false,
         rootPath,
-        view: view === "experimental" ? "pipeline" : view,
+        view,
         hasContent: true,
       };
     }
@@ -642,7 +642,7 @@ export const useTerraformImportDialog = ({
       await saveTerraformImportCompositionViaApi({
         id: toPresetId(nameInput),
         name: nameInput.trim(),
-        defaultView: view === "experimental" ? "pipeline" : view,
+        defaultView: view,
         tfdContent,
       });
     } catch (err) {

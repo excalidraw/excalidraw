@@ -9,7 +9,10 @@ import {
   type RunTerraformImportFromSourcesResult,
 } from "./terraformSceneApply";
 
-import type { TerraformView } from "./terraformImportDialogUtils";
+import type {
+  TerraformLayoutMode,
+  TerraformView,
+} from "./terraformImportDialogUtils";
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 import type { TerraformImportPreset } from "./terraformImportPresetsTypes";
 import type { TerraformImportPresetWarning } from "./terraformImportPresetsTypes";
@@ -19,11 +22,7 @@ import type React from "react";
 
 type SetAppState = React.Component<any, AppState>["setState"];
 
-export type TerraformLayoutMode =
-  | "module"
-  | "semantic"
-  | "pipeline"
-  | "experimental";
+export type { TerraformLayoutMode };
 
 export const deriveLayoutModeFromView = (
   view: TerraformView,
@@ -31,8 +30,8 @@ export const deriveLayoutModeFromView = (
 ): TerraformLayoutMode => {
   const canUseSemanticView =
     sources.planDotBundles.length > 0 || sources.states.length > 0;
-  if (view === "experimental" && canUseSemanticView) {
-    return "experimental";
+  if (view === "rcll" && canUseSemanticView) {
+    return "rcll";
   }
   if (view === "pipeline" && canUseSemanticView) {
     return "pipeline";
@@ -81,8 +80,7 @@ export const runTerraformImportWithView = async ({
 }: RunTerraformImportFromSourcesArgs): Promise<RunTerraformImportFromSourcesResult> => {
   const layoutMode = deriveLayoutModeFromView(view, sources);
   const semanticLayout = layoutMode === "semantic";
-  const isPipelineFamily =
-    layoutMode === "pipeline" || layoutMode === "experimental";
+  const isPipelineFamily = layoutMode === "pipeline" || layoutMode === "rcll";
   return runTerraformImportFromSources(app, setAppState, sources, {
     semanticLayout,
     layoutMode: isPipelineFamily ? layoutMode : undefined,

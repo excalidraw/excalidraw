@@ -106,7 +106,7 @@ export type TerraformPlanParsingOptions = {
   /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
   semanticLayout?: boolean;
   /** Preferred layout mode. `semanticLayout` is retained as a backwards-compatible input. */
-  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
+  layoutMode?: import("./terraformImportDialogUtils").TerraformLayoutMode;
   /** Optional `.tfd` arrow-only dataflow overlay (single file; prefer `tfdTexts` on sources). */
   dataflowLinks?: string;
   /** Module-view intra-module packing (ignored when semanticLayout is true). */

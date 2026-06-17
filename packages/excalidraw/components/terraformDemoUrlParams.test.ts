@@ -108,6 +108,25 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
       expect(parseTerraformDemoUrlParams("?preset=bad id")).toBeNull();
     });
+
+    it("parses view=rcll (deep-link)", () => {
+      expect(
+        parseTerraformDemoUrlParams(
+          "?preset=staging-extended-localstack-v2&view=rcll",
+        ),
+      ).toEqual({
+        presetId: "staging-extended-localstack-v2",
+        view: "rcll",
+      });
+    });
+
+    it("rejects the retired view=experimental (graceful, no auto-import)", () => {
+      // Experimental was removed at M0; a stale deep-link must degrade to null,
+      // not crash or silently import the wrong view.
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=experimental"),
+      ).toBeNull();
+    });
   });
 
   describe("hasTerraformDemoAutoImportQuery", () => {

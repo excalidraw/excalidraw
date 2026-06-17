@@ -1,6 +1,14 @@
-export type TerraformView = "module" | "semantic" | "pipeline" | "experimental";
+export type TerraformView = "module" | "semantic" | "pipeline" | "rcll";
 
-export type PipelineLayoutVariant = "classic" | "compound" | "v2";
+/**
+ * Internal layout mode. Same closed set as {@link TerraformView}; kept as a
+ * named alias so view→mode plumbing reads clearly and can diverge later. Single
+ * source of truth — annotate `layoutMode` with this instead of re-spelling the
+ * union inline, so adding/removing a view is enforced by the compiler everywhere.
+ */
+export type TerraformLayoutMode = TerraformView;
+
+export type PipelineLayoutVariant = "classic" | "compound" | "v2" | "rcll";
 
 export const MAX_PLAN_BUNDLES = 10;
 
@@ -29,10 +37,10 @@ export const VIEW_OPTIONS: ReadonlyArray<{
       "Left-to-right .tfd dataflow columns with topology context frames.",
   },
   {
-    value: "experimental",
-    label: "Experimental view",
+    value: "rcll",
+    label: "RCLL view",
     description:
-      "Pipeline dataflow with width-budgeted columns + barycenter ordering (wider/flatter; experimental).",
+      "Recursive compound layered dataflow — left-to-right, hubs centered over fan-outs, column-aligned fan-outs (experimental).",
   },
   {
     value: "module",

@@ -17,7 +17,12 @@ export type TerraformDemoUrlParams = {
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const VALID_VIEWS = new Set<TerraformView>(["module", "semantic", "pipeline"]);
+const VALID_VIEWS = new Set<TerraformView>([
+  "module",
+  "semantic",
+  "pipeline",
+  "rcll",
+]);
 const VALID_PIPELINE_VARIANTS = new Set<PipelineLayoutVariant>([
   "classic",
   "compound",

@@ -141,7 +141,7 @@ export const applyTerraformExcalidrawScene = (
 
 export type RunTerraformImportFromSourcesOptions = {
   semanticLayout: boolean;
-  layoutMode?: "module" | "semantic" | "pipeline" | "experimental";
+  layoutMode?: import("./terraformImportDialogUtils").TerraformLayoutMode;
   moduleLayoutOptions?: TerraformModuleLayoutOptions;
   /** Pipeline compact mode — primary-card-only clusters, satellites added on click. Default true. */
   pipelineCompact?: boolean;
@@ -174,15 +174,15 @@ export type RunTerraformImportFromSourcesResult = {
 async function layoutTerraformSceneFromSources(
   sources: TerraformPlanParsingSources,
   options: RunTerraformImportFromSourcesOptions,
-  layoutMode: "module" | "semantic" | "pipeline" | "experimental",
+  layoutMode: import("./terraformImportDialogUtils").TerraformLayoutMode,
   moduleLayoutOptions: TerraformModuleLayoutOptions,
 ): Promise<TerraformExcalidrawScenePayload> {
   const presetId = options.preset?.id?.trim();
   // Packed and ancillary pipeline scenes are not part of the KV layout cache
   // key yet; skip the cache so such imports never return the default layout.
-  // Experimental view is never cached.
+  // RCLL view is never cached (M0 delegates; no cache key for its dials yet).
   const skipLayoutCache =
-    layoutMode === "experimental" ||
+    layoutMode === "rcll" ||
     (layoutMode === "pipeline" &&
       (options.pipelineLayoutVariant === "v2" ||
         options.pipelinePacked === true ||
@@ -208,10 +208,12 @@ async function layoutTerraformSceneFromSources(
       ...(options.layoutMode ? { layoutMode } : {}),
       moduleLayoutOptions:
         layoutMode === "module" ? moduleLayoutOptions : undefined,
-      ...(layoutMode === "pipeline" || layoutMode === "experimental"
+      ...(layoutMode === "pipeline" || layoutMode === "rcll"
         ? {
             pipelineCompact: options.pipelineCompact !== false,
-            pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+            pipelineLayoutVariant:
+              options.pipelineLayoutVariant ??
+              (layoutMode === "rcll" ? "rcll" : "classic"),
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
@@ -236,7 +238,7 @@ export const runTerraformImportFromSources = async (
 ): Promise<RunTerraformImportFromSourcesResult> => {
   const moduleLayoutOptions =
     options.moduleLayoutOptions ?? DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS;
-  const layoutMode: "module" | "semantic" | "pipeline" | "experimental" =
+  const layoutMode: import("./terraformImportDialogUtils").TerraformLayoutMode =
     options.layoutMode ?? (options.semanticLayout ? "semantic" : "module");
   const sourceFingerprint = terraformImportPrepFingerprint(sources);
   const importedTfdTexts = options.importedTfdTexts ?? [];
@@ -277,10 +279,12 @@ export const runTerraformImportFromSources = async (
       terraformLodEnabled: options.terraformLodEnabled !== false,
       terraformLodPreset:
         options.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
-      ...(layoutMode === "pipeline" || layoutMode === "experimental"
+      ...(layoutMode === "pipeline" || layoutMode === "rcll"
         ? {
             pipelineCompact: options.pipelineCompact !== false,
-            pipelineLayoutVariant: options.pipelineLayoutVariant ?? "classic",
+            pipelineLayoutVariant:
+              options.pipelineLayoutVariant ??
+              (layoutMode === "rcll" ? "rcll" : "classic"),
             pipelinePacked: options.pipelinePacked === true,
             pipelinePackedPullLeft: options.pipelinePackedPullLeft === true,
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,

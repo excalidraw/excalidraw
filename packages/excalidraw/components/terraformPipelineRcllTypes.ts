@@ -1,0 +1,95 @@
+/**
+ * RCLL (Recursive Compound Layered Layout) — §28 module-contract types.
+ *
+ * Source of truth: docs/pipeline-rcll-layout-design.md §6.2 (data model) and §28
+ * (module API surface). These are the types the import→pipeline→export seam is
+ * built against. At milestone M0 the pipeline registers ZERO stages and control
+ * falls through to the compound builder (the §27 fallback rung), so nothing here
+ * is exercised yet — but the seam type-checks against the real `Stage` contract,
+ * so later milestones (M1 tree/lattice, M2 layering, …) register stages without
+ * re-cutting the seam. The full `RcllOptions` knob set is filled in as modules
+ * land; M0 needs only the content/detail flags it passes to the fallback.
+ */
+import type { PipelineCluster } from "./terraformPipelineLayoutShared";
+
+/** Topology nesting role (§6.2). */
+export type RcllTopologyRole =
+  | "root"
+  | "provider"
+  | "account"
+  | "region"
+  | "vpc"
+  | "subnetZone"
+  | "primaryCluster";
+
+/** A node in the compound tree T (§6.2); fields filled progressively in layout. */
+export type CompoundNode = {
+  key: string;
+  role: RcllTopologyRole;
+  level: number;
+  /** min `firstSequence` over descendants — forced-stack ordering tiebreak. */
+  minDescendantSequence: number;
+  /** set iff `role === "primaryCluster"`. */
+  cluster?: PipelineCluster;
+  children: CompoundNode[];
+  /** local then global box, assigned during layout. */
+  box?: { x: number; y: number; width: number; height: number };
+  localColumn?: number;
+};
+
+/** A sibling-hull dependency in a container's hull-edge DAG (§6.3, REQ-9). */
+export type HullEdge = {
+  from: string;
+  to: string;
+  weight: number;
+  declared: boolean;
+};
+
+/**
+ * Lattice state threaded between stages (§28): the priority-lattice inputs —
+ * column floors/ceilings + slack, fan-out/fan-in sets, per-container hull-edge
+ * DAGs. Populated at M1; fields are optional so the seam compiles before the
+ * producers exist.
+ */
+export type Lattice = {
+  /** LB(v): longest-path column floor, by cluster id. */
+  floor?: ReadonlyMap<string, number>;
+  /** UB(v): rightmost legal column, by cluster id. */
+  ceil?: ReadonlyMap<string, number>;
+  /** slack(v) = UB − LB, by cluster id. */
+  slack?: ReadonlyMap<string, number>;
+  /** out(u): fan-out target ids, by source id. */
+  fanout?: ReadonlyMap<string, readonly string[]>;
+  /** in(w): fan-in source ids, by target id. */
+  fanin?: ReadonlyMap<string, readonly string[]>;
+  /** per-container hull-edge DAG, by container key. */
+  hullEdges?: ReadonlyMap<string, readonly HullEdge[]>;
+};
+
+/**
+ * Options selecting modules + tunables (§28). M0 uses only the pass-through
+ * detail/content flags; the forced/packed policy, aspect, routing, and EXT-*
+ * knobs are added as their modules land.
+ */
+export type RcllOptions = {
+  /** primary-card-only clusters (true) vs satellites inline (false). */
+  compact?: boolean;
+  /** draw non-TFD resources in per-hull "Unconnected" strips. */
+  includeAncillary?: boolean;
+};
+
+/** A stage's output: the updated tree plus stage-scoped meta (§28). */
+export type StageResult = {
+  tree: CompoundNode;
+  meta?: Record<string, unknown>;
+};
+
+/**
+ * The module contract (§22.1 / §28): a deterministic transform that may optimize
+ * only its own tier and must never violate a higher one. M0 registers none.
+ */
+export type Stage = (
+  tree: CompoundNode,
+  lattice: Lattice,
+  opts: RcllOptions,
+) => StageResult;

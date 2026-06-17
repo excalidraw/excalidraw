@@ -140,6 +140,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineIncludeAncillary,
   setPipelineSemanticPlacement,
   showPlacement = true,
+  showVariant = true,
 }: {
   pipelineCompact: boolean;
   pipelineLayoutVariant: PipelineLayoutVariant;
@@ -155,6 +156,8 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
+  /** RCLL view hides the Layout variant + Height — it owns placement (M0 delegates to Compound). */
+  showVariant?: boolean;
 }) => {
   // V2 is a self-contained engine: it pins X to global TFD depth columns and
   // 2-D-packs hulls by construction, so the Height / Resources / Placement
@@ -220,35 +223,43 @@ export const TerraformImportPipelineSettings = ({
               )}
             </div>
           </div>
-          <div role="group" aria-label="Pipeline layout variant">
-            <span className="TerraformImportModal__controlLabel">
-              Layout <span>which placement engine arranges the diagram</span>
-            </span>
-            <div className="TerraformImportModal__segmentedControl">
-              {option(
-                "Classic",
-                pipelineLayoutVariant === "classic",
-                "layout.classic",
-                () => setPipelineLayoutVariant("classic"),
-              )}
-              {option(
-                "Compound",
-                pipelineLayoutVariant === "compound",
-                "layout.compound",
-                () => setPipelineLayoutVariant("compound"),
-              )}
-              {option("V2", pipelineLayoutVariant === "v2", "layout.v2", () =>
-                setPipelineLayoutVariant("v2"),
-              )}
+          {showVariant && (
+            <div role="group" aria-label="Pipeline layout variant">
+              <span className="TerraformImportModal__controlLabel">
+                Layout <span>which placement engine arranges the diagram</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option(
+                  "Classic",
+                  pipelineLayoutVariant === "classic",
+                  "layout.classic",
+                  () => setPipelineLayoutVariant("classic"),
+                )}
+                {option(
+                  "Compound",
+                  pipelineLayoutVariant === "compound",
+                  "layout.compound",
+                  () => setPipelineLayoutVariant("compound"),
+                )}
+                {option("V2", pipelineLayoutVariant === "v2", "layout.v2", () =>
+                  setPipelineLayoutVariant("v2"),
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {isV2 && (
             <div className="TerraformImportModal__controlNote">
               V2 arranges height, packing, and placement automatically. Only the
               Detail and Resources toggles apply.
             </div>
           )}
-          {!isV2 && (
+          {!showVariant && (
+            <div className="TerraformImportModal__controlNote">
+              RCLL arranges layout automatically (M0 delegates to Compound).
+              Only the Detail and Resources toggles apply.
+            </div>
+          )}
+          {!isV2 && showVariant && (
             <div role="group" aria-label="Pipeline height packing">
               <span className="TerraformImportModal__controlLabel">
                 Height <span>trade vertical height for width</span>
