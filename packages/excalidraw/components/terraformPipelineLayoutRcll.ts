@@ -2,6 +2,11 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { buildTerraformCompoundPipelineExcalidrawScene } from "./terraformPipelineLayoutCompound";
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
+import { preparePipelineLayout } from "./terraformPipelineLayoutShared";
+import {
+  buildRcllModel,
+  summarizeRcllModel,
+} from "./terraformPipelineRcllModel";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import type { TerraformImportWarning } from "./terraformImportMerge";
@@ -119,29 +124,29 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   const includeAncillary = options?.includeAncillary === true;
   const rcllOptions: RcllOptions = { compact, includeAncillary };
 
-  // import (M0 stub: no tree/lattice yet — M1 builds them from the prep).
-  const emptyTree: CompoundNode = {
-    key: "__rcll_root__",
-    role: "root",
-    level: 0,
-    minDescendantSequence: 0,
-    children: [],
-  };
-  const emptyLattice: Lattice = {};
+  // import (M1): build the compound tree + lattice from the shared prep, ONCE.
+  // `preparePipelineLayout` also enforces the .tfd gate (CON-10) — a throw here
+  // surfaces as the same HTTP-400 the compound path raises. No try/catch: the
+  // model is data-only at M1 and degenerate inputs are covered by no-throw tests
+  // (a model-build bug should surface loudly, not silently blank the view).
+  const prep = preparePipelineLayout(nodes, plan, compact, {});
+  const { tree, lattice } = buildRcllModel(prep);
 
-  // pipeline (M0: empty → no-op; control falls through to the fallback rung).
+  // pipeline (M1: still ZERO registered stages → no-op; the real tree/lattice
+  // pass through unchanged and the drawing comes from the fallback rung).
   const { ran, degraded, stageMeta } = runRcllPipeline(
     stages,
-    emptyTree,
-    emptyLattice,
+    tree,
+    lattice,
     rcllOptions,
   );
 
-  // export — §27 fallback rung: the compound builder. Geometry ≡ compound.
+  // export — §27 fallback rung: the compound builder, fed the SAME prep so the
+  // skeleton build runs once (not twice). Geometry ≡ compound.
   const fallback = await buildTerraformCompoundPipelineExcalidrawScene(
     nodes,
     plan,
-    { compact, includeAncillary },
+    { compact, includeAncillary, prep },
   );
 
   // §29 readability + gates — reuse the existing diagnostics (deterministic,
@@ -154,10 +159,15 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     meta: {
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
-      rcllMilestone: "M0b",
+      rcllMilestone: "M1",
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
+      // §29: M1 import-phase facts (the tree + lattice this build computed),
+      // distinct from per-stage rcllStageMeta. Scalars only (CON-8 determinism):
+      // a count makes the model observable for the acceptance gate without
+      // serializing the maps. Geometry is still the compound fallback's.
+      rcllModel: summarizeRcllModel(tree, lattice),
       // §29: per-stage diagnostics, keyed by stage name. Empty at M0 (no stages
       // emit meta); populated as M1+ stages surface StageResult.meta. Note the
       // §29 shape deviation: `rcllModules` is {stages,fallback} at M0, not the

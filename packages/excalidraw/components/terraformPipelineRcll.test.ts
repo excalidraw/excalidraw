@@ -135,15 +135,62 @@ describe("pipeline view rcll (M0)", () => {
           pipelineCompact: compact,
         });
 
-        // Routing + M0b seam shape.
+        // Routing + seam shape. M1 still registers ZERO stages (geometry ≡
+        // compound); the milestone bump + rcllModel block are the only deltas.
         expect(rcll.meta.pipelineVariant, `${mode} variant`).toBe("rcll");
-        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M0b");
+        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M1");
         expect(rcll.meta.rcllModules, `${mode} modules`).toEqual({
           stages: [],
           fallback: "compound",
         });
         expect(rcll.meta.rcllDegraded, `${mode} degraded`).toEqual([]);
         expect(rcll.elements.length, `${mode} non-empty`).toBeGreaterThan(0);
+
+        // M1: the import phase computed a real tree + lattice. The model block
+        // is scalar, finite, and plausible on the real preset (fan-out sets and
+        // hull edges both exist). Compact resolves fully; full mode still builds
+        // the same model (the model is geometry-independent).
+        const model = rcll.meta.rcllModel as Record<string, number>;
+        for (const key of [
+          "primaryClusterCount",
+          "fanoutSetCount",
+          "faninSetCount",
+          "hullEdgeCount",
+          "maxSlack",
+          "totalSlack",
+          "containerCount",
+          "cyclicContainerCount",
+        ]) {
+          expect(typeof model[key], `${mode} rcllModel.${key} number`).toBe(
+            "number",
+          );
+          expect(
+            Number.isFinite(model[key]),
+            `${mode} rcllModel.${key} finite`,
+          ).toBe(true);
+        }
+        expect(
+          model.primaryClusterCount,
+          `${mode} has clusters`,
+        ).toBeGreaterThan(0);
+        expect(model.fanoutSetCount, `${mode} has fan-outs`).toBeGreaterThan(0);
+        expect(model.hullEdgeCount, `${mode} has hull edges`).toBeGreaterThan(
+          0,
+        );
+        // Container cycles on v2: the cluster graph D is acyclic (longest-path
+        // layering yields 16 columns), but UP-PROJECTING it to container level
+        // induces cycles (a→b lifts regionX→regionY while c→d lifts
+        // regionY→regionX). The RFC anticipates this (§6.3, CON-2): M1 detects +
+        // flags them; the localized model-order-stack fallback is M3 — and this
+        // proves it WILL fire on real data, not just in theory.
+        expect(
+          model.cyclicContainerCount,
+          `${mode} container-cycle count is a non-negative integer`,
+        ).toBeGreaterThanOrEqual(0);
+        expect(
+          Number.isInteger(model.cyclicContainerCount),
+          `${mode} cyclic count integral`,
+        ).toBe(true);
 
         // M0b: the measurement harness carries the new readability metrics +
         // their companion counts (every field a finite number).

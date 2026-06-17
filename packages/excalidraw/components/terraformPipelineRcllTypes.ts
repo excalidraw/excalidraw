@@ -64,6 +64,13 @@ export type Lattice = {
   fanin?: ReadonlyMap<string, readonly string[]>;
   /** per-container hull-edge DAG, by container key. */
   hullEdges?: ReadonlyMap<string, readonly HullEdge[]>;
+  /**
+   * Container keys whose hull-edge DAG `D_H` contains a cycle (CON-2). M1 flags
+   * these only; the localized model-order-stack fallback for a cyclic subtree is
+   * M3 (when boxes are first placed). Independent of `computeDepths`' global
+   * cluster-level `hasCycle`.
+   */
+  cyclicContainers?: ReadonlySet<string>;
 };
 
 /**

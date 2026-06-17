@@ -18,6 +18,8 @@ import {
   placeClustersClassicGrid,
   preparePipelineLayout,
 } from "./terraformPipelineLayoutShared";
+
+import type { PipelineLayoutPrep } from "./terraformPipelineLayoutShared";
 import {
   applyPackedDepthShifts,
   computePackedDepthShifts,
@@ -46,6 +48,14 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
     includeAncillary?: boolean;
     semanticPlacement?: boolean;
     experimentalLayout?: boolean;
+    /**
+     * Pre-built prep, reused when a caller (the RCLL builder) already ran
+     * `preparePipelineLayout` for its own model — avoids a second skeleton build
+     * (~2× the wall-clock of this view). Back-compat: omitted ⇒ build our own,
+     * identical to before. Safe to share because the only in-place mutation of
+     * `prep` is the packed branch, which the RCLL fallback never enables.
+     */
+    prep?: PipelineLayoutPrep;
   },
 ): Promise<{
   elements: ExcalidrawElement[];
@@ -58,9 +68,11 @@ export async function buildTerraformCompoundPipelineExcalidrawScene(
   const includeAncillary = options?.includeAncillary === true;
   const semanticPlacement = options?.semanticPlacement === true;
   const experimentalLayout = options?.experimentalLayout === true;
-  let prep = preparePipelineLayout(nodes, plan, compact, {
-    experimentalLayout,
-  });
+  let prep =
+    options?.prep ??
+    preparePipelineLayout(nodes, plan, compact, {
+      experimentalLayout,
+    });
   const ancillaryStrips = includeAncillary
     ? buildAncillaryStrips(nodes, plan, prep, { compact })
     : [];
