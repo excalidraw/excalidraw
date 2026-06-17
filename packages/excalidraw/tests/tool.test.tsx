@@ -7,7 +7,7 @@ import { Excalidraw } from "../index";
 import { getToolbarTools } from "../components/shapes";
 
 import { Pointer } from "./helpers/ui";
-import { act, render } from "./test-utils";
+import { act, fireEvent, GlobalTestState, render } from "./test-utils";
 
 import type { AppClassProperties, ExcalidrawImperativeAPI } from "../types";
 
@@ -90,5 +90,43 @@ describe("getToolbarTools()", () => {
 
     expect(toolValues.filter((value) => value === "lasso")).toHaveLength(1);
     expect(toolValues.filter((value) => value === "selection")).toHaveLength(0);
+  });
+
+  it("includes star in toolbar tools", () => {
+    const toolValues = getToolValues("selection");
+
+    expect(toolValues).toContain("star");
+  });
+});
+
+describe("star tool", () => {
+  const h = window.h;
+
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("is selectable from the toolbar", () => {
+    expect(h.state.activeTool.type).toBe("selection");
+
+    fireEvent.click(GlobalTestState.renderResult.getByToolName("star"));
+
+    expect(h.state.activeTool.type).toBe("star");
+  });
+
+  it("can be activated via setActiveTool API", async () => {
+    const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
+    await render(
+      <Excalidraw
+        onExcalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+      />,
+    );
+    const excalidrawAPI = await excalidrawAPIPromise;
+
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "star" });
+    });
+
+    expect(h.state.activeTool.type).toBe("star");
   });
 });

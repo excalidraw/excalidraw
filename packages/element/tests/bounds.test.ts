@@ -8,6 +8,7 @@ import {
   elementsOverlappingBBox,
   getElementAbsoluteCoords,
   getElementBounds,
+  getStarPoints,
 } from "../src/bounds";
 
 import type { ExcalidrawElement, ExcalidrawLinearElement } from "../src/types";
@@ -205,5 +206,21 @@ describe("elementsOverlappingBBox()", () => {
         ],
       }),
     ).toEqual([rectInside]);
+  });
+});
+
+describe("getStarPoints()", () => {
+  it("returns 10 vertices with the top point at the center-top of the bounding box", () => {
+    const element = API.createElement({
+      type: "star",
+      width: 100,
+      height: 80,
+    });
+
+    const points = getStarPoints(element);
+
+    expect(points).toHaveLength(10);
+    expect(points[0][0]).toBeCloseTo(50);
+    expect(points[0][1]).toBeCloseTo(0);
   });
 });

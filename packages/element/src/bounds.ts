@@ -45,6 +45,7 @@ import {
 import { getElementShape } from "./shape";
 import {
   deconstructDiamondElement,
+  deconstructStarElement,
   deconstructRectanguloidElement,
 } from "./utils";
 import { intersectElementWithLineSegment } from "./collision";
@@ -200,6 +201,22 @@ export class ElementBounds {
       const maxX = Math.max(x11, x12, x22, x21);
       const maxY = Math.max(y11, y12, y22, y21);
       bounds = [minX, minY, maxX, maxY];
+    } else if (element.type === "star") {
+      const starPoints = getStarPoints(element).map(([px, py]) =>
+        pointRotateRads(
+          pointFrom(x1 + px, y1 + py),
+          pointFrom(cx, cy),
+          element.angle,
+        ),
+      );
+      const xs = starPoints.map((p) => p[0]);
+      const ys = starPoints.map((p) => p[1]);
+      bounds = [
+        Math.min(...xs),
+        Math.min(...ys),
+        Math.max(...xs),
+        Math.max(...ys),
+      ];
     } else if (element.type === "ellipse") {
       const w = (x2 - x1) / 2;
       const h = (y2 - y1) / 2;
@@ -366,6 +383,9 @@ export const getElementLineSegments = (
     const rotatedSides = getRotatedSides(sides, center, element.angle);
 
     return [...rotatedSides, ...cornerSegments];
+  } else if (element.type === "star") {
+    const [sides] = deconstructStarElement(element);
+    return getRotatedSides(sides, center, element.angle);
   } else if (shape.type === "polygon") {
     if (isTextElement(element)) {
       const container = getContainerElement(element, elementsMap);
@@ -532,6 +552,29 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
+};
+
+/** Returns 10 local [x, y] vertices (5 outer + 5 inner) for a star shape. */
+export const getStarPoints = (
+  element: ExcalidrawElement,
+): [number, number][] => {
+  const cx = element.width / 2;
+  const cy = element.height / 2;
+  const outerRx = Math.max(cx, 1);
+  const outerRy = Math.max(cy, 1);
+  const innerRx = outerRx * 0.4;
+  const innerRy = outerRy * 0.4;
+  const points: [number, number][] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+    const isOuter = i % 2 === 0;
+    const rx = isOuter ? outerRx : innerRx;
+    const ry = isOuter ? outerRy : innerRy;
+    points.push([cx + rx * Math.cos(angle), cy + ry * Math.sin(angle)]);
+  }
+
+  return points;
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
