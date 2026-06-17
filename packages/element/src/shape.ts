@@ -1,4 +1,5 @@
 import { simplify } from "points-on-curve";
+import { getStroke } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
@@ -1174,57 +1175,37 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ) => {
-  let inputPoints: [number, number, number][];
-
-  if (element.variableStrokeWidth && element.simulatePressure) {
-    const distances: number[] = [];
-    for (let i = 0; i < element.points.length; i++) {
-      if (i === 0) {
-        distances.push(0);
-      } else {
-        const prev = element.points[i - 1];
-        const curr = element.points[i];
-        const dx = curr[0] - prev[0];
-        const dy = curr[1] - prev[1];
-        distances.push(Math.sqrt(dx * dx + dy * dy));
-      }
-    }
-    const smoothstep = (t: number) => t * t * (3 - 2 * t);
-    inputPoints = element.points.length
-      ? element.points.map(([x, y], i) => {
-          const t = Math.max(0, Math.min(1, distances[i] / 24));
-          const eased = smoothstep(t);
-          const thickness = 1 - eased;
-          return [x, y, Math.max(0.1, Math.min(1, thickness))] as [
-            number,
-            number,
-            number,
-          ];
-        })
-      : [[0, 0, 1]];
-  } else if (element.variableStrokeWidth) {
-    inputPoints = element.points.length
+  if (element.variableStrokeWidth) {
+    const inputPoints = element.simulatePressure
+      ? element.points
+      : element.points.length
       ? element.points.map(
           ([x, y], i) =>
-            [x, y, element.pressures[i] * element.strokeWidth] as [
-              number,
-              number,
-              number,
-            ],
+            [x, y, element.pressures[i]] as [number, number, number],
         )
-      : [[0, 0, 1]];
-  } else {
-    inputPoints = element.points.length
-      ? element.points.map(([x, y]) => [x, y, 1])
-      : [[0, 0, 1]];
+      : [[0, 0, 0.5]];
+
+    return getStroke(inputPoints as number[][], {
+      simulatePressure: element.simulatePressure,
+      size: element.strokeWidth * 4.25,
+      thinning: 0.6,
+      smoothing: 0.5,
+      streamline: 0.5,
+      easing: (t) => Math.sin((t * Math.PI) / 2),
+      last: true,
+    }) as [number, number][];
   }
 
   const laserPointer = new LaserPointer({
-    size: element.strokeWidth * 4.25,
+    size: element.strokeWidth * 1.4,
     streamline: 0.3,
     simplify: 0,
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });
+
+  const inputPoints: [number, number, number][] = element.points.length
+    ? element.points.map(([x, y]) => [x, y, 1])
+    : [[0, 0, 1]];
 
   for (const point of inputPoints) {
     laserPointer.addPoint(point);
