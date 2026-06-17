@@ -135,15 +135,36 @@ describe("pipeline view rcll (M0)", () => {
           pipelineCompact: compact,
         });
 
-        // Routing + M0 seam shape.
+        // Routing + M0b seam shape.
         expect(rcll.meta.pipelineVariant, `${mode} variant`).toBe("rcll");
-        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M0");
+        expect(rcll.meta.rcllMilestone, `${mode} milestone`).toBe("M0b");
         expect(rcll.meta.rcllModules, `${mode} modules`).toEqual({
           stages: [],
           fallback: "compound",
         });
         expect(rcll.meta.rcllDegraded, `${mode} degraded`).toEqual([]);
         expect(rcll.elements.length, `${mode} non-empty`).toBeGreaterThan(0);
+
+        // M0b: the measurement harness carries the new readability metrics +
+        // their companion counts (every field a finite number).
+        const readability = rcll.meta.readability as Record<string, unknown>;
+        for (const key of [
+          "crossings",
+          "fanoutColumnRate",
+          "fanoutSetCount",
+          "hubCenteringRate",
+          "hubCount",
+          "aspect",
+        ]) {
+          expect(
+            typeof readability[key],
+            `${mode} readability.${key} is a number`,
+          ).toBe("number");
+          expect(
+            Number.isFinite(readability[key] as number),
+            `${mode} readability.${key} finite`,
+          ).toBe(true);
+        }
 
         // Delegate ≡ compound: identical drawing (geometry projection only).
         expect(geometry(rcll.elements), `${mode} geometry ≡ compound`).toEqual(

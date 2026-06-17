@@ -154,7 +154,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     meta: {
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
-      rcllMilestone: "M0",
+      rcllMilestone: "M0b",
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
@@ -174,6 +174,11 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
         medianDeltaYPx: diagnostics.dataflow.medianVerticalDeviationPx,
         meanDeltaYPx: diagnostics.dataflow.meanVerticalDeviationPx,
         nearStraightPct: diagnostics.dataflow.fractionNearStraight,
+        fanoutColumnRate: diagnostics.dataflow.fanoutColumnRate,
+        fanoutSetCount: diagnostics.dataflow.fanoutSetCount,
+        hubCenteringRate: diagnostics.dataflow.hubCenteringRate,
+        hubCount: diagnostics.dataflow.hubCount,
+        aspect: diagnostics.dataflow.aspect,
       },
       gates: {
         collisions: diagnostics.collisionCount,

@@ -51,8 +51,25 @@ export type PipelineSceneDiagnostics = {
     medianVerticalDeviationPx: number;
     meanVerticalDeviationPx: number;
     fractionNearStraight: number;
+    // RCLL readability metrics (REQ-11 / §17). Rates are fractions in [0,1];
+    // each pairs with a count so a vacuous 0/0 reads as 0 with count 0, not a
+    // misleading 1.0 (RFC DEC-6 gate; see *_PX tolerances below).
+    fanoutColumnRate: number;
+    fanoutSetCount: number;
+    hubCenteringRate: number;
+    hubCount: number;
+    aspect: number;
   };
 };
+
+// Metric tolerances, derived from the layout spacing in
+// terraformPipelineLayoutShared.ts (kept local so this diagnostics leaf does
+// not depend on the heavy layout module). If that spacing changes, update here.
+//   FANOUT_COLUMN_TOLERANCE_PX = PIPELINE_COLUMN_GAP (150) / 2
+//   CENTERING_EPSILON_PX       = PIPELINE_CLUSTER_GAP_Y (36)
+const FANOUT_COLUMN_TOLERANCE_PX = 75;
+const CENTERING_EPSILON_PX = 36;
+const NEAR_STRAIGHT_MAX_PX = 24;
 
 const TOPOLOGY_ROLES = new Set([
   "provider",
@@ -101,20 +118,63 @@ const relOf = (el: ExcalidrawElement) => {
 
 type Seg = { x1: number; y1: number; x2: number; y2: number };
 
-function arrowSegment(el: ExcalidrawElement): Seg | null {
+// Polyline-aware arrow geometry (RFC DEC-6). The previous counter collapsed
+// every arrow to a single first→last chord, which mis-counts crossings and
+// vertical travel once arrows have bends (e.g. M9 orthogonal routing). We now
+// keep all consecutive segments (for crossings) and the polyline's vertical
+// extent max_y−min_y (for the ΔY / near-straight metrics). A 2-point straight
+// arrow yields exactly one segment whose extent == |Δy|, so today's geometry is
+// unchanged — verified by the two-point-regression fixture.
+type ArrowGeometry = { segments: Seg[]; verticalExtent: number };
+
+function arrowGeometry(el: ExcalidrawElement): ArrowGeometry | null {
   const pts = (el as { points?: ReadonlyArray<readonly [number, number]> })
     .points;
   if (!Array.isArray(pts) || pts.length < 2) {
     return null;
   }
-  const first = pts[0]!;
-  const last = pts[pts.length - 1]!;
-  return {
-    x1: el.x + first[0],
-    y1: el.y + first[1],
-    x2: el.x + last[0],
-    y2: el.y + last[1],
-  };
+  const segments: Seg[] = [];
+  let minY = el.y + pts[0]![1];
+  let maxY = minY;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i]!;
+    const b = pts[i + 1]!;
+    segments.push({
+      x1: el.x + a[0],
+      y1: el.y + a[1],
+      x2: el.x + b[0],
+      y2: el.y + b[1],
+    });
+    const ay = el.y + a[1];
+    const by = el.y + b[1];
+    minY = Math.min(minY, ay, by);
+    maxY = Math.max(maxY, ay, by);
+  }
+  return { segments, verticalExtent: maxY - minY };
+}
+
+/** True if any segment of arrow `a` crosses any segment of arrow `b`. */
+function arrowsCross(a: ArrowGeometry, b: ArrowGeometry): boolean {
+  for (const sa of a.segments) {
+    for (const sb of b.segments) {
+      if (segmentsCross(sa, sb)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Median with even-length midpoint averaging (RFC §9.5 centering median). */
+function median(values: number[]): number {
+  if (values.length === 0) {
+    return 0;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1]! + sorted[mid]!) / 2
+    : sorted[mid]!;
 }
 
 function orient(
@@ -261,6 +321,7 @@ export function diagnosePipelineScene(
     }
   }
   const centerX = (f: Frame) => f.x + f.width / 2;
+  const centerY = (f: Frame) => f.y + f.height / 2;
   const semanticEdgeViolations: SemanticEdgeViolation[] = [];
 
   const allArrows = elements.filter((el) => el.type === "arrow");
@@ -285,20 +346,126 @@ export function diagnosePipelineScene(
     }
   }
 
-  // dataflow metrics
-  const segs = tfdArrows.map(arrowSegment).filter((s): s is Seg => s != null);
+  // dataflow metrics — polyline-aware (RFC DEC-6).
+  const geoms = tfdArrows
+    .map(arrowGeometry)
+    .filter((g): g is ArrowGeometry => g != null);
+  // Crossings: count each arrow PAIR at most once, even if multiple of their
+  // segments intersect ("edges that cross", not segment intersections). For
+  // 2-point arrows this reduces to the previous chord-vs-chord count.
   let crossings = 0;
-  for (let i = 0; i < segs.length; i++) {
-    for (let j = i + 1; j < segs.length; j++) {
-      if (segmentsCross(segs[i]!, segs[j]!)) {
+  for (let i = 0; i < geoms.length; i++) {
+    for (let j = i + 1; j < geoms.length; j++) {
+      if (arrowsCross(geoms[i]!, geoms[j]!)) {
         crossings += 1;
       }
     }
   }
-  const dys = segs.map((s) => Math.abs(s.y2 - s.y1)).sort((a, b) => a - b);
-  const median = dys.length ? dys[Math.floor(dys.length / 2)]! : 0;
-  const mean = dys.length ? dys.reduce((a, b) => a + b, 0) / dys.length : 0;
-  const nearStraight = dys.filter((d) => d <= 24).length;
+  // Vertical deviation / near-straight use the polyline's vertical extent
+  // (max_y−min_y), so an orthogonal jog reads as deviating even when its
+  // endpoints share a Y. Equals |Δy| for a straight arrow.
+  const dys = geoms.map((g) => g.verticalExtent).sort((a, b) => a - b);
+  const medianDeltaY = dys.length ? dys[Math.floor(dys.length / 2)]! : 0;
+  const meanDeltaY = dys.length
+    ? dys.reduce((a, b) => a + b, 0) / dys.length
+    : 0;
+  const nearStraight = dys.filter((d) => d <= NEAR_STRAIGHT_MAX_PX).length;
+
+  // Fan-out / convergence readability (REQ-3/T4, REQ-6/T5). Reconstruct sets
+  // from the TFD arrow relationships and resolve endpoints to primary-cluster
+  // frames by terraformPrimaryAddress (same map as the semantic-edge gate).
+  // Coverage depends on the builder: under the compound fallback this resolves
+  // in Compact (every cluster card carries terraformPrimaryAddress) but is
+  // empty in Full, where the inlined-satellite cluster frames carry no such
+  // address — so Full reads 0 with fanoutSetCount/hubCount 0 (the companion
+  // counts make that "measured nothing" explicit rather than a false 1.0).
+  // RCLL geometry (M2+) tags frames consistently, closing the Full gap.
+  const targetsBySource = new Map<string, Set<string>>();
+  const sourcesByTarget = new Map<string, Set<string>>();
+  const addTo = (map: Map<string, Set<string>>, key: string, value: string) => {
+    let set = map.get(key);
+    if (!set) {
+      set = new Set();
+      map.set(key, set);
+    }
+    set.add(value);
+  };
+  for (const arrow of tfdArrows) {
+    const r = relOf(arrow)!;
+    const source = r.source as string;
+    const target = r.target as string;
+    if (source === target) {
+      continue;
+    }
+    addTo(targetsBySource, source, target);
+    addTo(sourcesByTarget, target, source);
+  }
+
+  // fanoutColumnRate: of fan-out sets with ≥2 resolvable targets, the fraction
+  // whose targets share a column (centerX spread ≤ tolerance).
+  let fanoutSetCount = 0;
+  let fanoutColumnAligned = 0;
+  // hubCenteringRate: of nodes that fan out OR converge (≥2 resolvable
+  // neighbours) and resolve to a frame, the fraction centered within ε on the
+  // median of those neighbours (both directions, RFC §13 gate).
+  let hubCount = 0;
+  let hubCentered = 0;
+  const evaluate = (
+    nodeAddr: string,
+    neighbours: Set<string>,
+    countColumn: boolean,
+  ) => {
+    const neighbourFrames = [...neighbours]
+      .map((addr) => frameByAddress.get(addr))
+      .filter((f): f is Frame => f != null);
+    if (neighbourFrames.length < 2) {
+      return;
+    }
+    if (countColumn) {
+      fanoutSetCount += 1;
+      const xs = neighbourFrames.map(centerX);
+      if (Math.max(...xs) - Math.min(...xs) <= FANOUT_COLUMN_TOLERANCE_PX) {
+        fanoutColumnAligned += 1;
+      }
+    }
+    const node = frameByAddress.get(nodeAddr);
+    if (node) {
+      hubCount += 1;
+      if (
+        Math.abs(centerY(node) - median(neighbourFrames.map(centerY))) <=
+        CENTERING_EPSILON_PX
+      ) {
+        hubCentered += 1;
+      }
+    }
+  };
+  for (const [source, targets] of targetsBySource) {
+    evaluate(source, targets, true);
+  }
+  for (const [target, sources] of sourcesByTarget) {
+    evaluate(target, sources, false);
+  }
+
+  // aspect = content bounding box W:H over topology frames + clusters.
+  const aspectEls = [...frames, ...primaryClusters];
+  let aspect = 0;
+  if (aspectEls.length > 0) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const el of aspectEls) {
+      minX = Math.min(minX, el.x);
+      minY = Math.min(minY, el.y);
+      maxX = Math.max(maxX, el.x + el.width);
+      maxY = Math.max(maxY, el.y + el.height);
+    }
+    const height = maxY - minY;
+    aspect = height > 0 ? (maxX - minX) / height : 0;
+  }
+
+  const rate = (numerator: number, denominator: number) =>
+    denominator > 0 ? Math.round((numerator / denominator) * 100) / 100 : 0;
 
   return {
     collisionCount: collisions.length,
@@ -310,13 +477,16 @@ export function diagnosePipelineScene(
     },
     semanticEdgeViolations,
     dataflow: {
-      tfdArrowCount: segs.length,
+      tfdArrowCount: geoms.length,
       crossings,
-      medianVerticalDeviationPx: Math.round(median * 100) / 100,
-      meanVerticalDeviationPx: Math.round(mean * 100) / 100,
-      fractionNearStraight: segs.length
-        ? Math.round((nearStraight / segs.length) * 100) / 100
-        : 0,
+      medianVerticalDeviationPx: Math.round(medianDeltaY * 100) / 100,
+      meanVerticalDeviationPx: Math.round(meanDeltaY * 100) / 100,
+      fractionNearStraight: rate(nearStraight, geoms.length),
+      fanoutColumnRate: rate(fanoutColumnAligned, fanoutSetCount),
+      fanoutSetCount,
+      hubCenteringRate: rate(hubCentered, hubCount),
+      hubCount,
+      aspect: Math.round(aspect * 100) / 100,
     },
   };
 }
