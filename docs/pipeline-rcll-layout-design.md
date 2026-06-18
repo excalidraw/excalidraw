@@ -9,7 +9,35 @@
 | **Reviewers** | _(pending — peer + agent)_ |
 | **Supersedes** | The `Stacked / Packed / Packed+pull-left / Semantic` placement-toggle stack (proposed) |
 | **Scope** | Placement algorithm for **Pipeline view** only (Semantic and Module views unchanged) |
-| **Implementation** | Not started. This document is the agreed source of truth; code follows review. |
+| **Implementation** | **In progress — M0a/M0b/M1/M2/M3a (+ 2 hardening passes)/M3b shipped** behind `pipelineLayoutVariant:"rcll"`. This document is the source of truth; it is kept in lockstep with the code (see Document discipline). |
+
+## Document discipline (NORMATIVE)
+
+This RFC is not a one-time proposal — it is the **living, authoritative description of the
+as-built code**. The following are hard rules (RFC-2119 MUST/MUST NOT), on the same footing
+as the [hard constraints (CON-\*)](#4-requirements-catalogue):
+
+- **DOC-1 — Faithful correspondence.** The RFC **MUST** describe the RCLL pipeline code with **no
+  ambiguity**. Every normative statement here **MUST** match the code as shipped. If prose and code
+  disagree, that is a defect in exactly one of them and **MUST** be reconciled; a *deliberate,
+  not-yet-closed* gap is recorded in [§34.2](#342-implemented-vs-specified-delta-as-built-m3a-hardening)
+  (the implemented-vs-specified delta) and nowhere else — silent drift is forbidden.
+- **DOC-2 — Append on every change.** A change to the RCLL pipeline code **MUST**, in the **same
+  change-set**, update this RFC: a **change-log** row (the narrative), a **[§34.1](#341-implementation-decision-log-di--per-milestone-as-built) DI-\*** row per
+  settled decision, the **[§34.3](#343-commit-map-what-each-commit-implemented--decided--amended) commit map** (decision ↔ commit; the hash is backfilled in the
+  immediately-following docs commit), and any new **[§34.4](#344-decision-dependency-graph-blast-radius) dependency edges**. A code change that
+  leaves this doc untouched is **incomplete** unless it is a pure no-op (refactor with identical
+  behaviour AND identical decisions).
+- **DOC-3 — Supersede, never delete.** A reversed or replaced decision **MUST** be marked
+  `superseded` (naming the superseding ID), **MUST NOT** be removed. The supersession lineage is the
+  audit trail ([§34.4](#344-decision-dependency-graph-blast-radius) draws it).
+- **DOC-4 — Findings vs choices.** A decision premised on a **measurement** (e.g. a Step-0 probe
+  result) **MUST** record that premise. If the measurement later changes, every decision downstream of
+  it in [§34.4](#344-decision-dependency-graph-blast-radius) **MUST** be re-evaluated before relying on it.
+- **DOC-5 — Decisions are auditable.** Every settled decision is traceable end-to-end: change-log →
+  DI-\* (rationale + revisitability) → commit map (hash) → dependency graph (blast radius). A reviewer
+  **MUST** be able to answer "why is the code this way, what did it replace, and what breaks if we
+  change it" from this document alone.
 
 ## Abstract
 
@@ -1381,42 +1409,113 @@ Retroactive audit trail: every RCLL commit linked to the work it carries. `Imple
 
 ### 34.4 Decision dependency graph (blast radius)
 
-The change-log is the **narrative**, §34.1 the **registry**, §34.3 the **commit↔decision** map. This section adds the missing axis: **what depends on what**, so a reversal's blast radius is explicit. Convention going forward: each DI/DEC row should name its **premises** (decisions/findings it rests on) and its **dependents** follow from the reverse edges here. Edges read **A → B = "B depends on A; reverting A forces re-deciding B"**. Supersession (`A ⊟ B` = B supersedes A) is a different relation and is drawn dashed.
+The change-log is the **narrative**, [§34.1](#341-implementation-decision-log-di--per-milestone-as-built) the **registry**, [§34.3](#343-commit-map-what-each-commit-implemented--decided--amended) the **commit↔decision** map. This section adds the missing axis: **what depends on what**, so a reversal's blast radius is explicit (DOC-4/DOC-5). Two relations:
+
+- **Depends-on** — `A → B` means **"B rests on A; reverting/changing A forces re-deciding B."** B's premises are A.
+- **Supersession** — `A ⊟ B` means **B replaced A** (drawn dashed). The superseded row is retained (DOC-3); its dependents move to the superseding row.
+
+**Premise roots** (not themselves DI-decisions): the design-time decisions **D1–D12** + the priority lattice **T1–T7** (the algorithm), the hard constraints **CON-\***, the open decisions **DEC-\***, and **measured findings** (e.g. the M1 "`D_H` has 6 cyclic containers" probe, the M3b Step-0 "v2 provider is one cyclic container" probe). A finding root that changes invalidates everything below it (DOC-4).
+
+#### Complete dependency table (every DI-\*)
+
+| DI | Depends on (premises) | Supersession |
+| --- | --- | --- |
+| **DI-M0a-1** | §28 seam contract | — |
+| **DI-M0a-2** | DI-M0a-1 | — |
+| **DI-M0a-3** | §18/§32 view routing | — |
+| **DI-M0b-1** | DEC-6 | — |
+| **DI-M0b-2** | DEC-6 | — |
+| **DI-M0b-3** | DEC-6 | — |
+| **DI-M0b-4** | DEC-6, FLEX-5 | tunable |
+| **DI-M0b-5** | DEC-6, §13 centering | — |
+| **DI-M1-1** | §6.2 compound tree | — |
+| **DI-M1-2** | DI-M1-1 | — |
+| **DI-M1-3** | `computeUpperBounds` | ⊟ by **DI-M2-4** |
+| **DI-M1-4** | — (unguarded import) | revisit |
+| **DI-M1-5** | `computeDepths` | — |
+| **DI-M1-6** | DEC-2, DI-M1-1 | — |
+| **DI-M1-7** | DI-M0a-1 | — |
+| **DI-M1-8** | DI-M1-6 (`D_H`), finding "DAG up-projects to non-DAG" | acted on by DI-M2-2, DI-M3a-5/12/16, DI-M3b-1 |
+| **DI-M2-1** | DI-M1-1, DI-M1-6 | — |
+| **DI-M2-2** | DI-M1-8 | ⊟ by **DI-M3a-12** |
+| **DI-M2-3** | DI-M2-1, T1>T4 | — |
+| **DI-M2-4** | DI-M1-3 (4th consumer) | supersedes **DI-M1-3** |
+| **DI-M2-5** | DI-M0a-1 | — |
+| **DI-M3a-1** | DI-M2-1 | — |
+| **DI-M3a-2** | DI-M2-1 | M5/M7 refine |
+| **DI-M3a-3** | DI-M3a-1 | ⊟ by **DI-M3a-11** |
+| **DI-M3a-4** | DI-M3a-1, DEC-1 | moot after **DI-M3b-6** |
+| **DI-M3a-5** | DI-M1-8, DI-M2-2 | ⊟ by **DI-M3a-12** |
+| **DI-M3a-6** | DI-M2-5 | — |
+| **DI-M3a-7** | reanchor (compound) | — |
+| **DI-M3a-8** | footprint/title model | used by DI-M3b-5 |
+| **DI-M3a-9** | DI-M3a-8 | — |
+| **DI-M3a-10** | DI-M2-4 (extract pattern) | used by DI-M3b-1 |
+| **DI-M3a-11** | DI-M3a-3, CON-1, CON-6, finding "100% of v2 backward edges are cyclic-LCA" | supersedes **DI-M3a-3** |
+| **DI-M3a-12** | DI-M3a-11, DI-M3a-5, DI-M2-2 | supersedes **DI-M2-2**; ⊟ by **DI-M3a-16** |
+| **DI-M3a-13** | DI-M3a-12, EXT-12 | moot after **DI-M3a-16** |
+| **DI-M3a-14** | DI-M3a-11 | — |
+| **DI-M3a-15** | finding (`isDeleted` false-0) | flag |
+| **DI-M3a-16** | DI-M3a-11, DI-M1-8, CON-12, user report (same-column subnets) | supersedes **DI-M3a-12**; ⊟ refined by **DI-M3b-1** |
+| **DI-M3a-17** | DI-M3a-11 | — |
+| **DI-M3b-1** | **Step-0 finding (M3b)**, DI-M3a-16, DI-M1-8, DI-M1-1, DI-M2-4, DI-M3a-10, DEC-8(C) | refines **DI-M3a-16** (per-SCC vs global) |
+| **DI-M3b-2** | DI-M3b-1, CON-12 | — |
+| **DI-M3b-3** | DI-M3b-1, DI-M3a-11, CON-1, CON-12 | supersedes DI-M3a-16's LCA-keyed excusal |
+| **DI-M3b-4** | DI-M3b-1, DI-M3a-3 | supersedes the forced-only Y-overlap metric |
+| **DI-M3b-5** | DI-M3b-1, DI-M2-4, DI-M3a-8 | — |
+| **DI-M3b-6** | DI-M3b-1, DEC-1, DI-M3a-4 | moots **DI-M3a-4** |
+
+#### Lineage — cyclic placement (the most-evolved chain)
 
 ```mermaid
 flowchart TD
-  S0["Step 0 finding (M3b)\nv2 provider is ONE cyclic container;\n4 accounts on a column-0 axis; DEC-1 forced lever = no-op"]
-  DEC8C["DEC-8(C)\nspurious hull cycle → swimlane"]
-  CON1["CON-1 / CON-6\nTFD precedence + width-aware staircase"]
-  CON12["CON-12\niron rule (no backward, no same-column)"]
-  KER["shared kernels\nlongestPath · columnOffsetsFromWidths"]
-
-  DIM3b1["DI-M3b-1\nSCC-decompose D_H (swimlane / staircase)"]
-  DIM3b2["DI-M3b-2\nmulti-hull SCC flatten REQUIRED"]
-  DIM3b3["DI-M3b-3\ngate re-based on cluster-graph D SCCs"]
-  DIM3b4["DI-M3b-4\nforcedBand→siblingOverlap (2D)"]
-  DIM3b5["DI-M3b-5\nnormalized rigid box · canonical order · Tarjan→shared"]
-  DIM3b6["DI-M3b-6\nDEC-1 default on (staircaseBandOverlap)"]
-
-  DIM3a16["DI-M3a-16\nglobal dissolve (one axis / container)"]
-  DIM3a4["DI-M3a-4\nDEC-1 OFF (M3a)"]
-
-  S0 --> DIM3b1
-  DEC8C --> DIM3b1
-  KER --> DIM3b1
-  DIM3b1 --> DIM3b2
-  DIM3b1 --> DIM3b3
-  DIM3b1 --> DIM3b4
-  DIM3b1 --> DIM3b5
-  DIM3b1 --> DIM3b6
-  CON1 --> DIM3b3
-  DIM3b3 --> CON12
-  DIM3b2 --> CON12
-  DIM3a16 -. superseded by .-> DIM3b1
-  DIM3a4 -. moot after .-> DIM3b6
+  F1["finding (M1): D_H has 6 cyclic<br/>containers; D acyclic"]
+  S0["finding (Step 0, M3b): v2 provider is<br/>ONE cyclic container, accounts on column-0 axis"]
+  M1_8["DI-M1-8<br/>detect + flag cycles only"]
+  M2_2["DI-M2-2<br/>cyclic → sequential columns 0,1,2…"]
+  M3a5["DI-M3a-5<br/>place via M2 seq columns"]
+  M3a12["DI-M3a-12<br/>DEC-8(B) SCC condense → one column"]
+  M3a16["DI-M3a-16<br/>DEC-8(C) swimlane: global shared axis"]
+  M3b1["DI-M3b-1<br/>SCC decompose: 2-way swimlane / 1-way staircase"]
+  F1 --> M1_8
+  M1_8 --> M2_2 --> M3a5
+  M3a5 -. ⊟ .-> M3a12
+  M2_2 -. ⊟ .-> M3a12
+  M3a12 -. ⊟ .-> M3a16
+  M3a16 -. ⊟ refined .-> M3b1
+  S0 --> M3b1
+  M1_8 --> M3b1
 ```
 
-**How to use it (worked example).** If we revert **DI-M3b-1** (stop SCC-decomposing), the reverse edges show the fallout: **DI-M3b-2/3/4/5/6 all collapse** (they exist only to support the SCC model), and we fall back to **DI-M3a-16** (global dissolve) — which reintroduces v2's column-0 Y-stack (the −12%/−6% win is lost) and, critically, makes **DI-M3b-3**'s re-based gate moot, so **CON-12** loses its honest verifier on real data. Conversely, **DI-M3b-3** (gate re-base) is load-bearing for **CON-12** independent of the rest: even if the placement changed again, the gate must key off cluster-graph `D` SCCs or it goes blind. Premises that are **findings, not choices** (Step 0) are drawn as roots — if the finding changes (e.g. a future preset's provider is *not* one cyclic container), re-evaluate every decision downstream of it.
+#### Lineage — the iron rule (CON-12)
+
+```mermaid
+flowchart TD
+  CON1["CON-1 / CON-6<br/>precedence + width-aware staircase"]
+  M3a3["DI-M3a-3<br/>semanticEdgeViolations observed, not gated"]
+  M3a11["DI-M3a-11<br/>iron rule GATED on boxes (backwardEdgeGate)"]
+  M3a16b["DI-M3a-16<br/>+ no-same-column half; LCA-keyed excusal"]
+  M3a17["DI-M3a-17<br/>gate keys off box LEFT EDGE"]
+  M3b3["DI-M3b-3<br/>excusal RE-BASED on cluster-graph D SCCs"]
+  M3b4["DI-M3b-4<br/>forcedBand → siblingOverlap (2D)"]
+  CON12(["CON-12 (hard constraint)"])
+  M3a3 -. ⊟ .-> M3a11
+  CON1 --> M3a11
+  M3a11 --> M3a16b
+  M3a11 --> M3a17
+  M3a16b -. ⊟ excusal .-> M3b3
+  M3a11 --> M3b3
+  M3b3 --> CON12
+  M3a17 --> CON12
+  M3a3 -. ⊟ metric .-> M3b4
+  M3b4 --> CON12
+```
+
+**Worked examples (blast radius).**
+
+- Revert **DI-M3b-1** (stop SCC-decomposing) → its dependents **DI-M3b-2/3/4/5/6 all collapse**, and placement falls back to **DI-M3a-16** (global dissolve): v2's column-0 Y-stack returns (−12%/−6% lost) and **DI-M3b-3**'s re-based gate is moot, so **CON-12** loses its honest verifier on real data.
+- Change the **Step-0 finding** (a future preset's provider is *not* one cyclic container) → by DOC-4, re-evaluate **DI-M3b-1** and everything below it; the swimlane/staircase split may no longer be the right shape.
+- **DI-M3b-3** (gate re-base) is load-bearing for **CON-12** *independent* of the placement: even if the geometry changed again, the gate MUST key off cluster-graph `D` SCCs or it goes blind once most edges sit under a cyclic container.
 
 ---
 
