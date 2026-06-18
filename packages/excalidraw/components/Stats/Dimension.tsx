@@ -3,6 +3,7 @@ import { clamp, round } from "@excalidraw/math";
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
+  getNonDeletedElements,
   getUncroppedWidthAndHeight,
 } from "@excalidraw/element";
 import { resizeSingleElement } from "@excalidraw/element";
@@ -266,11 +267,13 @@ const handleDimensionChange: DragInputCallbackType<
 
       // Handle highlighting frame element candidates
       if (isFrameLikeElement(latestElement)) {
-        const nextElementsInFrame = getElementsInResizingFrame(
-          scene.getElementsIncludingDeleted(),
-          latestElement,
-          originalAppState,
-          scene.getNonDeletedElementsMap(),
+        const nextElementsInFrame = getNonDeletedElements(
+          getElementsInResizingFrame(
+            scene.getElementsIncludingDeleted(),
+            latestElement,
+            originalAppState,
+            scene.getNonDeletedElementsMap(),
+          ),
         );
 
         setAppState({
