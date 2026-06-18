@@ -186,8 +186,8 @@ describe("pipeline view rcll (M3a)", () => {
           `${mode} containment (CON-3) holds`,
         ).toBe(0);
         expect(
-          placementMeta.forcedBandViolations,
-          `${mode} forced bands disjoint (CON-5)`,
+          placementMeta.siblingOverlapViolations,
+          `${mode} no 2D overlap among any container's children (CON-4/5)`,
         ).toBe(0);
         expect(
           placementMeta.placedLeafCount,

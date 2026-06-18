@@ -56,6 +56,8 @@ type RcllBuildOptions = {
   packedPullLeft?: boolean;
   semanticPlacement?: boolean;
   experimentalLayout?: boolean;
+  /** DEC-1 (default true): X-disjoint cyclic SCC groups rise to share Y. */
+  staircaseBandOverlap?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -345,7 +347,11 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
 }> {
   const compact = options?.compact !== false;
   const includeAncillary = options?.includeAncillary === true;
-  const rcllOptions: RcllOptions = { compact, includeAncillary };
+  const rcllOptions: RcllOptions = {
+    compact,
+    includeAncillary,
+    staircaseBandOverlap: options?.staircaseBandOverlap,
+  };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
   // `preparePipelineLayout` also enforces the .tfd gate (CON-10) — a throw here
@@ -413,7 +419,6 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
         boxByKey(laidOutTree),
         prep.collapsedEdges,
         prep.clusters,
-        lattice.cyclicContainers ?? new Set<string>(),
       )
     : {
         acyclicBackwardEdges: 0,

@@ -1,20 +1,18 @@
 /**
- * RCLL (Recursive Compound Layered Layout) — Milestone M3a: Placement
- * (Stage 1d-forced / 2-frames, first geometry).
+ * RCLL (Recursive Compound Layered Layout) — Placement (Stage 1d/2). M3a drew the
+ * first geometry; **M3b** added hull-aware cyclic placement (this file's headline).
  *
  * Source of truth: docs/pipeline-rcll-layout-design.md §7.2 (recursive container
  * layout), §8 (per-level forced/packed policy), §11 (local columns), §13 (CON-3/4/5
- * gates), §22 (stage contract). M3a decisions: see RFC §34.1 DI-M3a-*.
+ * + CON-12 gates), §22 (stage contract). Decisions: RFC §34.1 DI-M3a-* / DI-M3b-*.
  *
- * This is the FIRST stage that produces geometry. M2 wrote `localColumn` on every
- * node; M3a turns those columns into a global `box` per node, from which the export
- * step derives hull frames (`emitTopologyContextFrames` = `boundsOf(childBoxes)+pad`)
- * and routes arrows. No centering (M5), no row-sharing (M7), no staircase Y-overlap
- * (M3b) — this is the honest, un-compacted Sugiyama coordinate.
+ * M2 wrote `localColumn` per container; placement turns those columns into a global
+ * `box` per node, from which export derives hull frames (`boundsOf(childBoxes)+pad`)
+ * and routes arrows. No centering (M5) or push-right (M7) yet.
  *
- *   localColumn (M2) ──► columnX (per container)  ──┐
- *   tree + roles    ──► policy (forced/packed/…)  ──┼─► node.box (local) ─► globalize ─► node.box (global px)
- *   cyclicContainers ──► packed via M2's seq cols ──┘
+ *   localColumn (M2) ──► columnX (per container)   ──┐
+ *   tree + roles     ──► policy (forced/packed/…)  ──┼─► node.box (local) ─► globalize ─► box (global px)
+ *   D_H cyclic ──► SCC decompose: 2-way → swimlane, 1-way → staircase + DEC-1 Y-rise ┘
  *
  * ## The box model (why it is collision-free by construction)
  *
@@ -42,15 +40,12 @@
 import {
   boundsOf,
   columnOffsetsFromWidths,
+  longestPath,
   PIPELINE_CLUSTER_GAP_Y,
   PIPELINE_COLUMN_GAP,
   PIPELINE_FRAME_PAD,
+  stronglyConnectedComponents,
 } from "./terraformPipelineLayoutShared";
-import {
-  lcaTopologyPath,
-  topologyPathForCluster,
-  topologyRoleAndKeyFromPath,
-} from "./terraformPipelineTopologyFrames";
 import { PIPELINE_FRAME_TITLE_HEIGHT } from "./terraformPipelineTopologyGeometry";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
@@ -60,11 +55,21 @@ import type {
 } from "./terraformPipelineLayoutShared";
 import type {
   CompoundNode,
+  HullEdge,
   Lattice,
   RcllOptions,
   RcllTopologyRole,
   StageResult,
 } from "./terraformPipelineRcllTypes";
+
+/** Threaded placement context (avoids param sprawl through the recursion). */
+type PlaceCtx = {
+  cyclic: ReadonlySet<string>;
+  floor: ReadonlyMap<string, number>;
+  hullEdges: ReadonlyMap<string, readonly HullEdge[]>;
+  /** DEC-1: X-disjoint SCC groups rise to share Y (default true). */
+  staircaseOverlap: boolean;
+};
 
 /** Synthetic compound-tree root key (mirrors terraformPipelineRcllModel). */
 const RCLL_ROOT_KEY = "__rcll_root__";
@@ -79,13 +84,11 @@ type Policy = "passthrough" | "forced" | "packed" | "mixed";
  * stacking (eng-review A3).
  *
  * **Cyclic containers are NOT routed here.** A container whose hull-edge graph
- * `D_H` is cyclic is handled by the **swimlane** dispatch in `sizeAndArrange`
- * (`arrangeLaneSubtree`) BEFORE policy is consulted — the spurious hull cycle
- * (up-projection of an acyclic `D` is not a DAG, §26) is dissolved onto a shared
- * cluster column axis so its interior containers become Y-lanes. This supersedes
- * the earlier "cyclic ⇒ packed + DEC-8(B) SCC shared column" (DI-M3a-12), which
- * cured backward edges by making sibling hulls SHARE a column — violating the
- * extended iron rule (no TFD edge shares a column, [CON-12]). See §26 / DEC-8(C).
+ * `D_H` is cyclic is handled by `arrangeCyclicContainer` in `sizeAndArrange` BEFORE
+ * policy is consulted (DEC-8(C) refined, M3b): its `D_H` is decomposed into SCCs —
+ * a multi-hull SCC (mutual 2-way cycle) becomes one swimlane (shared axis), the
+ * one-way condensation is staircased with a DEC-1 Y-rise. The cluster graph `D` is
+ * acyclic, so hull cycles never force resource columns (CON-12 holds). See §26.
  */
 export function policyForContainer(role: RcllTopologyRole): Policy {
   switch (role) {
@@ -240,14 +243,17 @@ function denseClusterColumns(
   return col;
 }
 
-/** Build the shared column axis for a cyclic subtree (column X from per-column
- * max cluster width over ALL of the subtree's leaves). */
+/** Build the shared column axis for a swimlane (column X from per-column max
+ * cluster width over ALL leaves under the given node set). Scoped to ONE SCC
+ * group's members (DEC-8(C) refined) — NOT the whole cyclic container. */
 function buildLaneContext(
-  node: CompoundNode,
+  nodes: readonly CompoundNode[],
   floor: ReadonlyMap<string, number>,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
-  collectClusterLeaves(node, leaves);
+  for (const n of nodes) {
+    collectClusterLeaves(n, leaves);
+  }
   const colByCluster = denseClusterColumns(leaves, floor);
   const maxCol = leaves.reduce(
     (m, l) => Math.max(m, colByCluster.get(l.cluster!.id) ?? 0),
@@ -262,27 +268,70 @@ function buildLaneContext(
   return { columnX, colByCluster };
 }
 
+const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
+  a.minDescendantSequence - b.minDescendantSequence ||
+  a.key.localeCompare(b.key);
+
 /**
- * **Swimlane placement** for a cyclic container subtree (DEC-8(C), §26) — the
- * resolution for a *spurious* hull cycle (the cluster graph `D` is acyclic; the
- * cycle exists only in the up-projected hull graph `D_H`, e.g. `public⇄private`
- * from a NAT edge + a reverse SG reference).
- *
- * Instead of collapsing the sibling hulls into one column (the superseded
- * DEC-8(B), which made them read same-column), the subtree's interior is
- * **dissolved onto one shared cluster column axis** (`ctx`): every descendant leaf
- * sits at its shared-column X, and each intermediate container (subnet zone / VPC)
- * becomes a **Y-lane** that spans whatever column range its own clusters occupy.
- * A subnet is therefore "one contiguous frame over multiple columns", and dataflow
- * `A→B→A` reads as forward column steps across vertically-separated lanes — no edge
- * reads backward, no edge shares a column.
- *
- * Coordinates are parent-relative (like `sizeAndArrange`), so `globalize` composes
- * them. Container children are left-aligned at `areaX` (their interior clusters
- * carry the shared column offset, so siblings align in X); leaf children are placed
- * directly at the shared column X, packed in Y per column.
+ * Lay a set of sibling nodes onto a shared column axis `ctx`, relative to
+ * `(originX, originY)`: containers become Y-lanes (stacked top→down, left-aligned
+ * so their interior clusters align in X by `ctx.columnX`); leaf clusters pack per
+ * shared-column below the lanes. Returns the content extent `{right, bottom}`
+ * (before pad). Shared by `arrangeSubtreeOnAxis` (a container's children) and
+ * `arrangeSwimlaneGroup` (one SCC group's members).
  */
-function arrangeLaneSubtree(node: CompoundNode, ctx: LaneContext): void {
+function layoutLanesOnAxis(
+  nodes: readonly CompoundNode[],
+  ctx: LaneContext,
+  originX: number,
+  originY: number,
+): { right: number; bottom: number } {
+  const lanes = nodes.filter((c) => c.children.length > 0).sort(byModelOrder);
+  let cursorY = originY;
+  for (const lane of lanes) {
+    lane.box = {
+      x: originX,
+      y: cursorY,
+      width: lane.box?.width ?? 0,
+      height: lane.box?.height ?? 0,
+    };
+    cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
+  }
+  const leaves = nodes
+    .filter((c) => c.children.length === 0)
+    .sort(byModelOrder);
+  const colCursor = new Map<number, number>();
+  for (const leaf of leaves) {
+    const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
+    const x = originX + (ctx.columnX[col] ?? 0);
+    const y = colCursor.get(col) ?? cursorY;
+    leaf.box = {
+      x,
+      y,
+      width: leaf.box?.width ?? 0,
+      height: leaf.box?.height ?? 0,
+    };
+    colCursor.set(col, y + (leaf.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y);
+  }
+  const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
+  for (const n of nodes) {
+    childBoxes.set(n.key, n.box!);
+  }
+  const bb = boundsOf(
+    nodes.map((c) => c.key),
+    childBoxes,
+  );
+  return { right: bb ? bb.x + bb.width : 0, bottom: bb ? bb.y + bb.height : 0 };
+}
+
+/**
+ * Lay one subtree onto a shared column axis `ctx` (recursive). The node's
+ * footprint box is set at local origin `(0,0)`; its children become Y-lanes /
+ * packed leaves on `ctx`. This is the *member body* of a swimlane group: every
+ * descendant leaf sits at its shared-column X, so cross-member dataflow reads
+ * forward across vertically-separated lanes (no backward, no same-column edge).
+ */
+function arrangeSubtreeOnAxis(node: CompoundNode, ctx: LaneContext): void {
   if (node.children.length === 0) {
     node.box = {
       x: 0,
@@ -293,52 +342,191 @@ function arrangeLaneSubtree(node: CompoundNode, ctx: LaneContext): void {
     return;
   }
   for (const child of node.children) {
-    arrangeLaneSubtree(child, ctx);
+    arrangeSubtreeOnAxis(child, ctx);
   }
+  const titleReserve = rendersTitledFrame(node.role)
+    ? PIPELINE_FRAME_TITLE_HEIGHT
+    : 0;
+  const { right, bottom } = layoutLanesOnAxis(
+    node.children,
+    ctx,
+    PIPELINE_FRAME_PAD,
+    titleReserve + PIPELINE_FRAME_PAD,
+  );
+  node.box = {
+    x: 0,
+    y: 0,
+    width: right + PIPELINE_FRAME_PAD,
+    height: bottom + PIPELINE_FRAME_PAD,
+  };
+}
+
+/**
+ * **Swimlane** placement for a multi-hull SCC group (DEC-8(C) refined). The
+ * members are mutually dependent (a genuine 2-way hull cycle), so they MUST share
+ * ONE column axis (`denseRank(LB)` over the group's clusters) — only on a shared
+ * axis do cross-member resource edges read forward (CON-12). Members lose their
+ * independent banding by necessity; that is the swimlane. The group occupies
+ * local `[0,width] × [0,height]` (normalized at the origin), so the staircase can
+ * place it with a single translation. Returns the normalized rigid box.
+ */
+function arrangeSwimlaneGroup(
+  members: readonly CompoundNode[],
+  floor: ReadonlyMap<string, number>,
+): { width: number; height: number } {
+  const ctx = buildLaneContext(members, floor);
+  for (const m of members) {
+    arrangeSubtreeOnAxis(m, ctx);
+  }
+  const { right, bottom } = layoutLanesOnAxis(members, ctx, 0, 0);
+  return { width: right, height: bottom };
+}
+
+/** One placed SCC group (rigid box + staircase column + tiebreak keys). */
+type SccGroup = {
+  rep: string;
+  members: readonly CompoundNode[];
+  width: number;
+  height: number;
+  col: number;
+  minSeq: number;
+};
+
+/**
+ * DEC-1 Y-rise: the lowest `y ≥ startY` at which a group of width `gw` at column-X
+ * `gx` does not 2D-overlap an already-placed group. Groups at different staircase
+ * columns are X-disjoint (width-aware `columnOffsetsFromWidths`), so they rise to
+ * share a row; same-column groups stack. Each group footprint already reserves its
+ * members' titles (DI-M3a-8), so a positive gap keeps derived frames + titles
+ * disjoint. `staircaseOverlap === false` → a single sequential cursor (no rise).
+ */
+function riseStackY(
+  gx: number,
+  gw: number,
+  placed: readonly { x: number; y: number; w: number; h: number }[],
+  startY: number,
+  staircaseOverlap: boolean,
+): number {
+  let y = startY;
+  for (const p of placed) {
+    const xOverlap = staircaseOverlap ? gx < p.x + p.w && p.x < gx + gw : true;
+    if (xOverlap) {
+      y = Math.max(y, p.y + p.h + PIPELINE_CLUSTER_GAP_Y);
+    }
+  }
+  return y;
+}
+
+/**
+ * **Hull-aware cyclic placement** (DEC-8(C) refined, M3b) — replaces the blunt
+ * "dissolve the whole container onto one axis". A container whose hull graph
+ * `D_H` cycles is decomposed into its strongly-connected components:
+ *
+ *   - **Multi-hull SCC** (mutually-dependent hulls, a real 2-way cycle) → ONE
+ *     **swimlane** (`arrangeSwimlaneGroup`): shared X axis, members as Y-lanes.
+ *   - **Singleton** (no mutual cycle) → recurse via `sizeAndArrange` (full
+ *     forced/packed policy + nested-cycle dispatch), keeping its own structure.
+ *
+ * The **condensation** of the groups (the one-way edges between SCCs) is a DAG,
+ * placed as a **staircase** in X (longest-path + width-aware offsets, CON-6) with
+ * a **DEC-1 Y-rise** (`riseStackY`) so X-disjoint groups share rows — collapsing
+ * the single-axis Y-stack that dominated height. The cluster graph `D` is acyclic,
+ * so cross-group resource edges read forward by the width-aware staircase, and
+ * within-swimlane edges read forward by the shared `LB` axis (CON-12 holds).
+ */
+function arrangeCyclicContainer(node: CompoundNode, ctx: PlaceCtx): void {
+  const childKeys = node.children.map((c) => c.key);
+  const edges = ctx.hullEdges.get(node.key) ?? [];
+  const rep = stronglyConnectedComponents(childKeys, edges);
+
+  // Group children by SCC representative (children stay in model order).
+  const membersByRep = new Map<string, CompoundNode[]>();
+  for (const child of node.children) {
+    const r = rep.get(child.key) ?? child.key;
+    const list = membersByRep.get(r);
+    if (list) {
+      list.push(child);
+    } else {
+      membersByRep.set(r, [child]);
+    }
+  }
+
+  // Size each SCC group as a normalized rigid box at local origin (0,0).
+  const groups: SccGroup[] = [];
+  for (const [r, members] of membersByRep) {
+    let width = 0;
+    let height = 0;
+    if (members.length === 1) {
+      sizeAndArrange(members[0]!, ctx); // singleton: full policy + nested cycles
+      width = members[0]!.box?.width ?? 0;
+      height = members[0]!.box?.height ?? 0;
+    } else {
+      const g = arrangeSwimlaneGroup(members, ctx.floor);
+      width = g.width;
+      height = g.height;
+    }
+    const minSeq = members.reduce(
+      (m, c) => Math.min(m, c.minDescendantSequence),
+      Number.POSITIVE_INFINITY,
+    );
+    groups.push({ rep: r, members, width, height, col: 0, minSeq });
+  }
+
+  // Condensation DAG → group columns (longest-path; rank = group minSeq).
+  const condSeen = new Set<string>();
+  const condEdges: { from: string; to: string }[] = [];
+  for (const e of edges) {
+    const rf = rep.get(e.from) ?? e.from;
+    const rt = rep.get(e.to) ?? e.to;
+    if (rf !== rt) {
+      const k = `${rf}${rt}`;
+      if (!condSeen.has(k)) {
+        condSeen.add(k);
+        condEdges.push({ from: rf, to: rt });
+      }
+    }
+  }
+  const minSeqByRep = new Map(groups.map((g) => [g.rep, g.minSeq]));
+  const { column } = longestPath(
+    groups.map((g) => g.rep),
+    condEdges,
+    (k) => minSeqByRep.get(k) ?? 0,
+  );
+  for (const g of groups) {
+    g.col = column.get(g.rep) ?? 0;
+  }
+
+  // Width-aware staircase X: per-column max group width (CON-6 absolute-coord
+  // forwardness — group col k+1 starts fully right of every box in col k).
+  const maxCol = groups.reduce((m, g) => Math.max(m, g.col), 0);
+  const colWidth = new Array<number>(maxCol + 1).fill(0);
+  for (const g of groups) {
+    colWidth[g.col] = Math.max(colWidth[g.col]!, g.width);
+  }
+  const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
+
+  // Canonical placement order: (col, minSeq, rep) — deterministic (CON-8).
+  groups.sort(
+    (a, b) =>
+      a.col - b.col || a.minSeq - b.minSeq || a.rep.localeCompare(b.rep),
+  );
 
   const titleReserve = rendersTitledFrame(node.role)
     ? PIPELINE_FRAME_TITLE_HEIGHT
     : 0;
-  const areaX = PIPELINE_FRAME_PAD; // a cyclic subtree never contains the root
+  const areaX = PIPELINE_FRAME_PAD;
   const areaY = titleReserve + PIPELINE_FRAME_PAD;
 
-  const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
-    a.minDescendantSequence - b.minDescendantSequence ||
-    a.key.localeCompare(b.key);
-
-  // Container children → disjoint Y-lanes (each spans its own column range),
-  // left-aligned in X (interior clusters carry the shared columns).
-  const lanes = node.children
-    .filter((c) => c.children.length > 0)
-    .sort(byModelOrder);
-  let cursorY = areaY;
-  for (const lane of lanes) {
-    lane.box = {
-      x: areaX,
-      y: cursorY,
-      width: lane.box?.width ?? 0,
-      height: lane.box?.height ?? 0,
-    };
-    cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
-  }
-
-  // Leaf clusters → placed at their shared column X, packed in Y per column,
-  // below the lanes (matches the §8 "mixed" reading: sub-hulls then direct leaves).
-  const leaves = node.children
-    .filter((c) => c.children.length === 0)
-    .sort(byModelOrder);
-  const colCursor = new Map<number, number>();
-  for (const leaf of leaves) {
-    const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
-    const x = areaX + (ctx.columnX[col] ?? 0);
-    const y = colCursor.get(col) ?? cursorY;
-    leaf.box = {
-      x,
-      y,
-      width: leaf.box?.width ?? 0,
-      height: leaf.box?.height ?? 0,
-    };
-    colCursor.set(col, y + (leaf.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y);
+  // Place groups: staircase X + DEC-1 Y-rise; translate members (local origin 0).
+  const placed: { x: number; y: number; w: number; h: number }[] = [];
+  for (const g of groups) {
+    const gx = areaX + (columnX[g.col] ?? 0);
+    const gy = riseStackY(gx, g.width, placed, areaY, ctx.staircaseOverlap);
+    for (const m of g.members) {
+      const b = m.box!;
+      m.box = { x: b.x + gx, y: b.y + gy, width: b.width, height: b.height };
+    }
+    placed.push({ x: gx, y: gy, w: g.width, h: g.height });
   }
 
   const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
@@ -362,16 +550,13 @@ function arrangeLaneSubtree(node: CompoundNode, ctx: LaneContext): void {
  * x/y (relative to the node's own footprint top-left; the parent assigns the real
  * x/y) and the footprint width/height. Leaves take their card size.
  *
- * A non-root container whose `D_H` is **cyclic** is dissolved onto a shared cluster
- * column axis (`arrangeLaneSubtree`, DEC-8(C)) — the outermost cyclic ancestor owns
- * the axis; nested cyclic containers inherit it (they are never reached here once
- * their ancestor took the lane branch).
+ * A non-root container whose `D_H` is **cyclic** is handled by
+ * `arrangeCyclicContainer` (DEC-8(C) refined): its hull graph is decomposed into
+ * SCCs — multi-hull SCC → swimlane (shared axis), one-way condensation → staircase
+ * + DEC-1 Y-rise. Singleton SCC members recurse back through here, so nested cyclic
+ * containers are handled at their own level (not flattened by an ancestor).
  */
-function sizeAndArrange(
-  node: CompoundNode,
-  cyclic: ReadonlySet<string>,
-  floor: ReadonlyMap<string, number>,
-): void {
+function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
   if (node.children.length === 0) {
     const w = node.cluster?.build.width ?? 0;
     const h = node.cluster?.build.height ?? 0;
@@ -379,13 +564,13 @@ function sizeAndArrange(
     return;
   }
 
-  if (cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
-    arrangeLaneSubtree(node, buildLaneContext(node, floor));
+  if (ctx.cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
+    arrangeCyclicContainer(node, ctx);
     return;
   }
 
   for (const child of node.children) {
-    sizeAndArrange(child, cyclic, floor);
+    sizeAndArrange(child, ctx);
   }
 
   const columnX = columnOffsetsFromWidths(
@@ -466,11 +651,16 @@ function globalize(node: CompoundNode, originX: number, originY: number): void {
 export function layoutPlacement(
   tree: CompoundNode,
   lattice: Lattice,
+  opts?: RcllOptions,
 ): CompoundNode {
-  const cyclic = lattice.cyclicContainers ?? new Set<string>();
-  const floor = lattice.floor ?? new Map<string, number>();
+  const ctx: PlaceCtx = {
+    cyclic: lattice.cyclicContainers ?? new Set<string>(),
+    floor: lattice.floor ?? new Map<string, number>(),
+    hullEdges: lattice.hullEdges ?? new Map<string, readonly HullEdge[]>(),
+    staircaseOverlap: opts?.staircaseBandOverlap !== false,
+  };
   const root = cloneNode(tree);
-  sizeAndArrange(root, cyclic, floor);
+  sizeAndArrange(root, ctx);
   globalize(root, 0, 0);
   return root;
 }
@@ -505,20 +695,29 @@ function contains(
   );
 }
 
-/** Strict Y-interval overlap of two boxes. */
-function yOverlap(
+/** Strict 2D-rectangle overlap of two boxes (X AND Y intervals both overlap). */
+function boxesOverlap2D(
   a: TerraformDependencyLayoutBox,
   b: TerraformDependencyLayoutBox,
 ): boolean {
-  return a.y < b.y + b.height && b.y < a.y + a.height;
+  return (
+    a.x < b.x + b.width &&
+    b.x < a.x + a.width &&
+    a.y < b.y + b.height &&
+    b.y < a.y + a.height
+  );
 }
 
 /**
  * Scalar acceptance metrics for the placed tree (§13 gates, model-level — the
- * final-scene collision gate runs separately in the builder on the elements).
+ * final-scene collision gate runs separately in the builder on the elements, with
+ * the typed region/subnet/frame-title breakdown).
  * - `containmentViolations`: a child box not inside its parent box (CON-3); 0.
- * - `forcedBandViolations`: a pair of sibling bands at a FORCED container that
- *   overlap in Y (CON-5, DEC-1 off ⇒ strictly disjoint); 0.
+ * - `siblingOverlapViolations`: a pair of a container's children that **2D-overlap**
+ *   (X AND Y). Policy-agnostic — covers forced bands, packed columns, swimlane
+ *   lanes, AND risen SCC groups uniformly. The DEC-1 Y-rise is legal precisely
+ *   because risen groups stay X-disjoint, so it does NOT count here (the old
+ *   forced-only Y-overlap check wrongly flagged it). Must be 0 (CON-4/CON-5).
  */
 export function placementMeta(
   tree: CompoundNode,
@@ -526,7 +725,7 @@ export function placementMeta(
 ): Record<string, number> {
   const cyclic = lattice.cyclicContainers ?? new Set<string>();
   let containmentViolations = 0;
-  let forcedBandViolations = 0;
+  let siblingOverlapViolations = 0;
   let placedLeafCount = 0;
   let maxWidthPx = 0;
   let maxDepthPx = 0;
@@ -545,14 +744,12 @@ export function placementMeta(
         containmentViolations += 1;
       }
     }
-    if (policyForContainer(node.role) === "forced") {
-      for (let i = 0; i < node.children.length; i++) {
-        for (let j = i + 1; j < node.children.length; j++) {
-          const a = node.children[i]!.box;
-          const b = node.children[j]!.box;
-          if (a && b && yOverlap(a, b)) {
-            forcedBandViolations += 1;
-          }
+    for (let i = 0; i < node.children.length; i++) {
+      for (let j = i + 1; j < node.children.length; j++) {
+        const a = node.children[i]!.box;
+        const b = node.children[j]!.box;
+        if (a && b && boxesOverlap2D(a, b)) {
+          siblingOverlapViolations += 1;
         }
       }
     }
@@ -564,7 +761,7 @@ export function placementMeta(
 
   return {
     containmentViolations,
-    forcedBandViolations,
+    siblingOverlapViolations,
     placedLeafCount,
     maxWidthPx: Math.round(maxWidthPx),
     maxDepthPx: Math.round(maxDepthPx),
@@ -586,26 +783,36 @@ export function placementMeta(
  * - `|dx| < EPS` → **same column** — `u` and `v` occupy the same column.
  *
  * Both backward and same-column violate the iron rule and are classified by whether
- * the edge's **LCA container is cyclic** (a *genuine* `D` cycle, CON-2 — spurious
- * hull cycles are dissolved into lanes, DEC-8(C), so they no longer appear here):
- * - `acyclic*` — MUST be **0** (the hard gate). The width-aware staircase + the
- *   shared lane axis guarantee every acyclic edge reads strictly forward.
- * - `cyclic*` — excused + counted (a true cycle has no fully-forward drawing),
+ * the edge belongs to a **genuine cluster-graph `D` cycle** — i.e. its two clusters
+ * share a strongly-connected component of `D` (the real resource cycle, CON-2). This
+ * is RE-BASED off the cluster graph, NOT off "the LCA container is cyclic": after the
+ * M3b hull-aware redesign most resource edges have a cyclic *container* as their LCA
+ * (the whole provider is one cyclic container on v2), so an LCA-keyed excusal would
+ * silently excuse every cross-group edge and the gate would go blind. `D` is acyclic
+ * on v2 ⇒ **zero** excused ⇒ the hard gate covers every edge.
+ * - `acyclic*` — MUST be **0** (the hard gate). The width-aware SCC-group staircase
+ *   (cross-group) + the shared swimlane axis (within a group) guarantee forwardness.
+ * - `cyclic*` — excused + counted (a true `D` cycle has no fully-forward drawing),
  *   drawn as explicit back-edges (EXT-12).
  */
 export function backwardEdgeGate(
   boxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
   collapsedEdges: readonly CollapsedPipelineEdge[],
   clusters: readonly PipelineCluster[],
-  cyclicContainers: ReadonlySet<string>,
 ): {
   acyclicBackwardEdges: number;
   cyclicBackwardEdges: number;
   acyclicSameColumnEdges: number;
   cyclicSameColumnEdges: number;
 } {
-  const pathById = new Map<string, readonly string[]>(
-    clusters.map((c) => [c.id, topologyPathForCluster(c)]),
+  // Genuine cluster-level cycles: an edge is excused iff its endpoints share a
+  // strongly-connected component of the CLUSTER graph `D` (CON-2) — not because
+  // their LCA topology container is cyclic (a spurious hull cycle, dissolved by the
+  // SCC-aware placement). On v2 `D` is acyclic ⇒ every cluster is its own singleton
+  // SCC ⇒ nothing is excused.
+  const repD = stronglyConnectedComponents(
+    clusters.map((c) => c.id),
+    collapsedEdges.map((e) => ({ from: e.source, to: e.target })),
   );
   // Half a column gap separates "same column" from a real forward/backward step:
   // adjacent columns' left edges differ by ≥ `colWidth + PIPELINE_COLUMN_GAP`, while
@@ -627,14 +834,9 @@ export function backwardEdgeGate(
     if (dx >= sameColumnEps) {
       continue; // forward — fine
     }
-    const ps = pathById.get(e.source);
-    const pt = pathById.get(e.target);
-    const lca = ps && pt ? lcaTopologyPath(ps, pt) : [];
-    const containerKey =
-      lca.length === 0
-        ? RCLL_ROOT_KEY
-        : topologyRoleAndKeyFromPath(lca)?.key ?? RCLL_ROOT_KEY;
-    const isCyclic = cyclicContainers.has(containerKey);
+    const isCyclic =
+      repD.get(e.source) !== undefined &&
+      repD.get(e.source) === repD.get(e.target);
     if (dx <= -sameColumnEps) {
       isCyclic ? (cyclicBackward += 1) : (acyclicBackward += 1);
     } else {
@@ -659,8 +861,8 @@ export { boxByKey };
 export function placementStage(
   tree: CompoundNode,
   lattice: Lattice,
-  _opts: RcllOptions,
+  opts: RcllOptions,
 ): StageResult {
-  const placed = layoutPlacement(tree, lattice);
+  const placed = layoutPlacement(tree, lattice, opts);
   return { tree: placed, meta: placementMeta(placed, lattice) };
 }

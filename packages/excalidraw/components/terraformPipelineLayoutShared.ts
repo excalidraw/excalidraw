@@ -391,6 +391,85 @@ export function longestPath(
   return { column, hasCycle: visited < nodeKeys.length, unresolved };
 }
 
+/**
+ * Strongly-connected components of a directed graph (Tarjan, iterative).
+ * Returns `nodeKey → representative key` (the lexicographically-smallest member
+ * of its SCC), so the result is deterministic regardless of edge/node order. An
+ * acyclic node is its own singleton SCC. Used to condense a cyclic container's
+ * hull graph `D_H` into a DAG (layering + placement) AND to detect genuine
+ * cluster-level cycles in `D` (the iron-rule gate excuses only those).
+ */
+export function stronglyConnectedComponents(
+  nodeKeys: readonly string[],
+  edges: readonly { from: string; to: string }[],
+): Map<string, string> {
+  const adj = new Map<string, string[]>();
+  for (const k of nodeKeys) {
+    adj.set(k, []);
+  }
+  for (const e of edges) {
+    adj.get(e.from)?.push(e.to);
+  }
+  for (const list of adj.values()) {
+    list.sort(); // deterministic neighbor order
+  }
+
+  let index = 0;
+  const idx = new Map<string, number>();
+  const low = new Map<string, number>();
+  const onStack = new Set<string>();
+  const stack: string[] = [];
+  const rep = new Map<string, string>();
+
+  for (const start of nodeKeys) {
+    if (idx.has(start)) {
+      continue;
+    }
+    const work: { node: string; i: number }[] = [{ node: start, i: 0 }];
+    while (work.length > 0) {
+      const frame = work[work.length - 1]!;
+      const v = frame.node;
+      if (frame.i === 0) {
+        idx.set(v, index);
+        low.set(v, index);
+        index += 1;
+        stack.push(v);
+        onStack.add(v);
+      }
+      const neighbors = adj.get(v) ?? [];
+      if (frame.i < neighbors.length) {
+        const w = neighbors[frame.i]!;
+        frame.i += 1;
+        if (!idx.has(w)) {
+          work.push({ node: w, i: 0 });
+        } else if (onStack.has(w)) {
+          low.set(v, Math.min(low.get(v)!, idx.get(w)!));
+        }
+      } else {
+        if (low.get(v) === idx.get(v)) {
+          const members: string[] = [];
+          let w: string;
+          do {
+            w = stack.pop()!;
+            onStack.delete(w);
+            members.push(w);
+          } while (w !== v);
+          const r = members.reduce((a, b) => (a.localeCompare(b) <= 0 ? a : b));
+          for (const m of members) {
+            rep.set(m, r);
+          }
+        }
+        work.pop();
+        const parent = work[work.length - 1];
+        if (parent) {
+          low.set(parent.node, Math.min(low.get(parent.node)!, low.get(v)!));
+        }
+      }
+    }
+  }
+  return rep;
+}
+
 export function computeDepths(
   clusterEdges: Array<{ source: string; target: string; sequence: number }>,
   clusterIds: readonly string[],

@@ -83,6 +83,13 @@ export type RcllOptions = {
   compact?: boolean;
   /** draw non-TFD resources in per-hull "Unconnected" strips. */
   includeAncillary?: boolean;
+  /**
+   * DEC-1 / FLEX-2 (default **true**): inside a cyclic container, X-disjoint SCC
+   * groups laid out as a staircase **rise** in Y to share rows (the height lever).
+   * `false` = each group stacked sequentially below the last (taller; the
+   * off-switch). Internal only (no dialog/URL surface).
+   */
+  staircaseBandOverlap?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */
