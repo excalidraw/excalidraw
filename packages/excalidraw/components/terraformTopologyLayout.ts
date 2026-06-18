@@ -4748,6 +4748,19 @@ export function buildTopologyPrimaryClusterSkeletonForPipeline(
   const frame = skeleton.find(
     (el) => el.type === "frame" && el.id === clusterFrameId,
   );
+  // RCLL M5 (gate-fix): the topology cluster frame carries the `primaryCluster`
+  // role but not its `terraformPrimaryAddress`, so the rendered hub-centering /
+  // fanout / semantic-edge diagnostics — which resolve hubs by address — go BLIND
+  // in Full mode (the M0b debt). Tag the address here (emit-path only, customData;
+  // geometry-invisible) so the Full-mode rendered metrics resolve, matching the
+  // Compact card builder (`buildFallbackCluster`) and the model-level gate.
+  if (frame) {
+    (frame as { customData?: Record<string, unknown> }).customData = {
+      ...((frame as { customData?: Record<string, unknown> }).customData ?? {}),
+      terraformTopologyRole: "primaryCluster",
+      terraformPrimaryAddress: primaryAddr,
+    };
+  }
   const width =
     typeof frame?.width === "number" ? frame.width : RESOURCE_RECT_W;
   const height =

@@ -51,6 +51,7 @@ import {
   barycenterReorder,
   type OrderableLeaf,
 } from "./terraformPipelineOrdering";
+import { hubCenteringOverBoxes } from "./terraformPipelineCoordinateAssignment";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type {
@@ -81,7 +82,7 @@ type PlaceCtx = {
    * barycenter reorder (strict-improve crossing gate) instead of model order. The
    * A/B toggle. X (columns) is untouched — order only. */
   reorder: boolean;
-  /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 des(v)). */
+  /** out(u): fan-out target cluster ids by source id (M6 adjacency). */
   fanout: ReadonlyMap<string, readonly string[]>;
   /** in(w): fan-in source cluster ids by target id. */
   fanin: ReadonlyMap<string, readonly string[]>;
@@ -318,7 +319,7 @@ type LaneContext = {
   /** M6: barycenter-reorder leaf Y-order within each shared column (strict-improve
    * gated) instead of model order. */
   reorder: boolean;
-  /** M6: out(u) cluster-id adjacency for the barycenter reorder. */
+  /** M6 adjacency: out(u) cluster-id fan-out targets by source id. */
   fanout: ReadonlyMap<string, readonly string[]>;
 };
 
@@ -963,6 +964,9 @@ export function placementMeta(
   let placedLeafCount = 0;
   let maxWidthPx = 0;
   let maxDepthPx = 0;
+  // M5: leaf cluster id → placed box centre-Y, for the model-level centering gate
+  // (deterministic + mode-independent, unlike the rendered frame-address gate).
+  const centerYById = new Map<string, number>();
 
   const walk = (node: CompoundNode): void => {
     if (node.box) {
@@ -971,6 +975,9 @@ export function placementMeta(
     }
     if (node.children.length === 0) {
       placedLeafCount += 1;
+      if (node.cluster && node.box) {
+        centerYById.set(node.cluster.id, node.box.y + node.box.height / 2);
+      }
       return;
     }
     for (const child of node.children) {
@@ -993,6 +1000,17 @@ export function placementMeta(
   };
   walk(tree);
 
+  // M5 acceptance gate: hub-centering rate over the placed leaf boxes. Uses the
+  // lattice fan-out/fan-in adjacency + the shared median/epsilon, so it agrees
+  // with the rendered diagnostic on even fan-out but never goes blind (it reads
+  // boxes, not frame customData). epsilon = PIPELINE_CLUSTER_GAP_Y (== rendered).
+  const centering = hubCenteringOverBoxes(
+    centerYById,
+    lattice.fanout ?? new Map(),
+    lattice.fanin ?? new Map(),
+    PIPELINE_CLUSTER_GAP_Y,
+  );
+
   return {
     containmentViolations,
     siblingOverlapViolations,
@@ -1000,6 +1018,8 @@ export function placementMeta(
     maxWidthPx: Math.round(maxWidthPx),
     maxDepthPx: Math.round(maxDepthPx),
     cyclicContainerCount: cyclic.size,
+    hubCount: centering.hubCount,
+    hubCenteringRate: centering.rate,
   };
 }
 

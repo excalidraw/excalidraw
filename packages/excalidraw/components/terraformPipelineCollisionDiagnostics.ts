@@ -21,6 +21,9 @@ import {
   yIntervalsOverlap,
   type Rect,
 } from "./terraformPipelineTopologyGeometry";
+// M5: the centering median is shared with the model-level acceptance gate so the
+// rendered `hubCenteringRate` and the deterministic model gate never drift.
+import { median } from "./terraformPipelineCoordinateAssignment";
 
 export type CollisionCategory =
   | "region-region"
@@ -163,18 +166,6 @@ function arrowsCross(a: ArrowGeometry, b: ArrowGeometry): boolean {
     }
   }
   return false;
-}
-
-/** Median with even-length midpoint averaging (RFC §9.5 centering median). */
-function median(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? (sorted[mid - 1]! + sorted[mid]!) / 2
-    : sorted[mid]!;
 }
 
 function orient(
