@@ -428,6 +428,72 @@ describe("pipeline view rcll (M4 — swimlane lane-rise)", () => {
   );
 });
 
+describe("pipeline view rcll (M6 — crossing-minimization reorder)", () => {
+  it(
+    "staging-extended-localstack-v2 — reorder ON cuts crossings, all gates 0, deterministic, milestone M6",
+    async () => {
+      for (const compact of [true, false]) {
+        const mode = compact ? "compact" : "full";
+        const off = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+        });
+        const on = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+          pipelineReorder: true,
+        });
+
+        // Milestone bumps to M6 when the reorder is active; off stays M3a.
+        expect(on.meta.rcllMilestone, `${mode} milestone`).toBe("M6");
+        expect(off.meta.rcllMilestone, `${mode} off milestone`).toBe("M3a");
+        expect(on.meta.rcllReorder, `${mode} meta flag`).toBe(true);
+
+        // THE WIN: reorder ON has no MORE crossings than OFF (the per-container
+        // strict-improve gate can only reduce; the global rendered count confirms
+        // no cross-container regression). The readability meta is build-internal
+        // (computed over ALL elements, incl. the isDeleted dataflow arrows).
+        const onCross = (on.meta.readability as Record<string, number>).crossings;
+        const offCross = (off.meta.readability as Record<string, number>)
+          .crossings;
+        expect(onCross, `${mode} crossings ON ≤ OFF`).toBeLessThanOrEqual(
+          offCross,
+        );
+
+        // Every structural gate still holds under reorder ON.
+        const onPlacement = (
+          on.meta.rcllStageMeta as Record<string, Record<string, number>>
+        ).placement;
+        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(0);
+        expect(
+          onPlacement.siblingOverlapViolations,
+          `${mode} sibling overlap`,
+        ).toBe(0);
+        const gates = on.meta.gates as Record<string, number>;
+        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(0);
+        expect(
+          gates.acyclicSameColumnEdges,
+          `${mode} iron rule same-column`,
+        ).toBe(0);
+        expect(on.diagnostics.collisionCount, `${mode} rendered collisions`).toBe(
+          0,
+        );
+
+        // Determinism (CON-8) under reorder ON.
+        const on2 = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+          pipelineReorder: true,
+        });
+        expect(geometry(on2.elements), `${mode} reorder determinism`).toEqual(
+          geometry(on.elements),
+        );
+      }
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
+  );
+});
+
 describe("rcll inherits the pipeline .tfd validation gate", () => {
   it("rcll with zero resolved .tfd edges returns 400", async () => {
     const plan = {

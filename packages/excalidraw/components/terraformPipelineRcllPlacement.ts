@@ -47,6 +47,10 @@ import {
   stronglyConnectedComponents,
 } from "./terraformPipelineLayoutShared";
 import { PIPELINE_FRAME_TITLE_HEIGHT } from "./terraformPipelineTopologyGeometry";
+import {
+  barycenterReorder,
+  type OrderableLeaf,
+} from "./terraformPipelineOrdering";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type {
@@ -73,7 +77,104 @@ type PlaceCtx = {
    * (DEC-1 extended to swimlane interiors) instead of pure Y-stacking. CON-12-safe
    * (leaf shared-column X is preserved). The A/B toggle. */
   swimlaneLaneRise: boolean;
+  /** M6 (default false): within-column leaf order is chosen by a per-container
+   * barycenter reorder (strict-improve crossing gate) instead of model order. The
+   * A/B toggle. X (columns) is untouched — order only. */
+  reorder: boolean;
+  /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 des(v)). */
+  fanout: ReadonlyMap<string, readonly string[]>;
+  /** in(w): fan-in source cluster ids by target id. */
+  fanin: ReadonlyMap<string, readonly string[]>;
 };
+
+/**
+ * M6 within-column reorder. Returns a **stable global sort rank** per child key.
+ * OFF (or no crossing improvement) ⇒ exactly the model order `(mds, key)`, so the
+ * scene stays byte-identical. ON ⇒ leaf clusters are permuted to a per-container
+ * barycenter order **within their column only**; non-leaf children (sub-hulls)
+ * keep their model-order slots. Because the per-column stack groups by column, a
+ * caller that sorts ALL children by this rank gets: containers untouched, leaves
+ * reordered for fewer crossings. `colOf` reads the placement column a child will
+ * occupy (`localColumn` for packed, the shared `denseRank` axis for swimlanes).
+ */
+function reorderRankByKey(
+  children: readonly CompoundNode[],
+  colOf: (child: CompoundNode) => number,
+  ctx: PlaceCtx,
+): Map<string, number> {
+  const model = [...children].sort(
+    (a, b) =>
+      a.minDescendantSequence - b.minDescendantSequence ||
+      a.key.localeCompare(b.key),
+  );
+  const modelRank = new Map<string, number>(model.map((c, i) => [c.key, i]));
+  if (!ctx.reorder) {
+    return modelRank;
+  }
+
+  const leaves = children.filter((c) => c.cluster && c.children.length === 0);
+  if (leaves.length < 2) {
+    return modelRank;
+  }
+  const orderable: OrderableLeaf[] = leaves.map((l) => ({
+    key: l.key,
+    clusterId: l.cluster!.id,
+    col: colOf(l),
+  }));
+  const ids = new Set(orderable.map((o) => o.clusterId));
+  // In-container collapsed edges (both endpoints leaves here), from fan-out.
+  const edges: [string, string][] = [];
+  for (const o of orderable) {
+    for (const t of ctx.fanout.get(o.clusterId) ?? []) {
+      if (ids.has(t)) {
+        edges.push([o.clusterId, t]);
+      }
+    }
+  }
+  const leafColRank = barycenterReorder(
+    orderable,
+    (k) => modelRank.get(k) ?? 0,
+    edges,
+  );
+
+  // Merge: walk model order; at each leaf slot, substitute the leaf that the
+  // barycenter order wants next for that column. Non-leaf slots stay fixed, so
+  // the global rank only permutes leaves within their own column.
+  const colOfKey = new Map(orderable.map((o) => [o.key, o.col]));
+  const leavesByColModel = new Map<number, CompoundNode[]>();
+  for (const c of model) {
+    if (!colOfKey.has(c.key)) {
+      continue;
+    }
+    const col = colOfKey.get(c.key)!;
+    (leavesByColModel.get(col) ?? leavesByColModel.set(col, []).get(col)!).push(
+      c,
+    );
+  }
+  // Within each column, the ordered leaf sequence by barycenter rank.
+  const orderedLeafQueue = new Map<number, CompoundNode[]>();
+  for (const [col, ls] of leavesByColModel) {
+    orderedLeafQueue.set(
+      col,
+      [...ls].sort(
+        (a, b) =>
+          (leafColRank.get(a.key) ?? 0) - (leafColRank.get(b.key) ?? 0) ||
+          (modelRank.get(a.key) ?? 0) - (modelRank.get(b.key) ?? 0),
+      ),
+    );
+  }
+  const cursor = new Map<number, number>();
+  const merged: CompoundNode[] = model.map((c) => {
+    if (!colOfKey.has(c.key)) {
+      return c; // non-leaf slot fixed
+    }
+    const col = colOfKey.get(c.key)!;
+    const i = cursor.get(col) ?? 0;
+    cursor.set(col, i + 1);
+    return orderedLeafQueue.get(col)![i]!;
+  });
+  return new Map<string, number>(merged.map((c, i) => [c.key, i]));
+}
 
 /** Synthetic compound-tree root key (mirrors terraformPipelineRcllModel). */
 const RCLL_ROOT_KEY = "__rcll_root__";
@@ -175,17 +276,22 @@ function placeForcedBands(
 }
 
 /** Packed column-stack: within each column, stack children top→down; columns are
- * independent (X separates them). Order within a column: `(mds, key)`. */
+ * independent (X separates them). Order within a column: `(mds, key)`, or the M6
+ * barycenter reorder when `ctx.reorder` (leaves only; strict-improve gated). */
 function placePackedColumns(
   children: readonly CompoundNode[],
   columnX: readonly number[],
   areaX: number,
   startY: number,
+  ctx: PlaceCtx,
 ): void {
+  const rank = reorderRankByKey(
+    children,
+    (c) => c.localColumn ?? 0,
+    ctx,
+  );
   const ordered = [...children].sort(
-    (a, b) =>
-      a.minDescendantSequence - b.minDescendantSequence ||
-      a.key.localeCompare(b.key),
+    (a, b) => (rank.get(a.key) ?? 0) - (rank.get(b.key) ?? 0),
   );
   const colCursor = new Map<number, number>();
   for (const child of ordered) {
@@ -209,6 +315,11 @@ type LaneContext = {
   colByCluster: ReadonlyMap<string, number>;
   /** M4: X-disjoint lanes rise to share Y rows (vs pure Y-stack). */
   riseLanes: boolean;
+  /** M6: barycenter-reorder leaf Y-order within each shared column (strict-improve
+   * gated) instead of model order. */
+  reorder: boolean;
+  /** M6: out(u) cluster-id adjacency for the barycenter reorder. */
+  fanout: ReadonlyMap<string, readonly string[]>;
 };
 
 /** Collect every descendant **leaf cluster** node under `node`. */
@@ -256,6 +367,8 @@ function buildLaneContext(
   nodes: readonly CompoundNode[],
   floor: ReadonlyMap<string, number>,
   riseLanes: boolean,
+  reorder: boolean,
+  fanout: ReadonlyMap<string, readonly string[]>,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
   for (const n of nodes) {
@@ -272,12 +385,60 @@ function buildLaneContext(
     colWidth[c] = Math.max(colWidth[c]!, l.cluster!.build.width ?? 0);
   }
   const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
-  return { columnX, colByCluster, riseLanes };
+  return { columnX, colByCluster, riseLanes, reorder, fanout };
 }
 
 const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
   a.minDescendantSequence - b.minDescendantSequence ||
   a.key.localeCompare(b.key);
+
+/**
+ * M6 leaf order on a shared swimlane axis. OFF (or no crossing improvement) ⇒
+ * model order — byte-identical to M4. ON ⇒ leaves permuted within their shared
+ * column (`ctx.colByCluster`) by the barycenter reorder; the strict-improve gate
+ * guarantees it never increases crossings. X is untouched (column membership is
+ * fixed by `colByCluster`); only the per-column stacking order changes.
+ */
+function laneLeafOrder(
+  leafNodes: readonly CompoundNode[],
+  ctx: LaneContext,
+): CompoundNode[] {
+  const model = [...leafNodes].sort(byModelOrder);
+  if (!ctx.reorder || model.length < 2) {
+    return model;
+  }
+  const orderable: OrderableLeaf[] = model
+    .filter((l) => l.cluster)
+    .map((l) => ({
+      key: l.key,
+      clusterId: l.cluster!.id,
+      col: ctx.colByCluster.get(l.cluster!.id) ?? 0,
+    }));
+  const ids = new Set(orderable.map((o) => o.clusterId));
+  const edges: [string, string][] = [];
+  for (const o of orderable) {
+    for (const t of ctx.fanout.get(o.clusterId) ?? []) {
+      if (ids.has(t)) {
+        edges.push([o.clusterId, t]);
+      }
+    }
+  }
+  const modelRank = new Map<string, number>(model.map((l, i) => [l.key, i]));
+  const colRank = barycenterReorder(
+    orderable,
+    (k) => modelRank.get(k) ?? 0,
+    edges,
+  );
+  // Sort by shared column first (stable encounter order for the colCursor),
+  // then the per-column barycenter rank, then model order (deterministic).
+  return model.sort(
+    (a, b) =>
+      (ctx.colByCluster.get(a.cluster!.id) ?? 0) -
+        (ctx.colByCluster.get(b.cluster!.id) ?? 0) ||
+      (colRank.get(a.key) ?? 0) - (colRank.get(b.key) ?? 0) ||
+      (modelRank.get(a.key) ?? 0) - (modelRank.get(b.key) ?? 0),
+  );
+}
 
 /**
  * Lay a set of sibling nodes onto a shared column axis `ctx`, relative to
@@ -350,9 +511,10 @@ function layoutLanesOnAxis(
       cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
     }
   }
-  const leaves = nodes
-    .filter((c) => c.children.length === 0)
-    .sort(byModelOrder);
+  // M6: within-column leaf order — barycenter reorder (strict-improve gated) when
+  // ctx.reorder, else model order. The shared `colByCluster` axis is the column.
+  const leafNodes = nodes.filter((c) => c.children.length === 0);
+  const leaves = laneLeafOrder(leafNodes, ctx);
   const colCursor = new Map<number, number>();
   for (const leaf of leaves) {
     const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
@@ -425,10 +587,15 @@ function arrangeSubtreeOnAxis(node: CompoundNode, ctx: LaneContext): void {
  */
 function arrangeSwimlaneGroup(
   members: readonly CompoundNode[],
-  floor: ReadonlyMap<string, number>,
-  riseLanes: boolean,
+  pctx: PlaceCtx,
 ): { width: number; height: number } {
-  const ctx = buildLaneContext(members, floor, riseLanes);
+  const ctx = buildLaneContext(
+    members,
+    pctx.floor,
+    pctx.swimlaneLaneRise,
+    pctx.reorder,
+    pctx.fanout,
+  );
   for (const m of members) {
     arrangeSubtreeOnAxis(m, ctx);
   }
@@ -524,7 +691,7 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
       width = members[0]!.box?.width ?? 0;
       height = members[0]!.box?.height ?? 0;
     } else {
-      const g = arrangeSwimlaneGroup(members, ctx.floor, ctx.swimlaneLaneRise);
+      const g = arrangeSwimlaneGroup(members, ctx);
       width = g.width;
       height = g.height;
     }
@@ -672,9 +839,9 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
     );
     const leafKids = node.children.filter((c) => c.role === "primaryCluster");
     const afterBands = placeForcedBands(containerKids, columnX, areaX, areaY);
-    placePackedColumns(leafKids, columnX, areaX, afterBands);
+    placePackedColumns(leafKids, columnX, areaX, afterBands, ctx);
   } else {
-    placePackedColumns(node.children, columnX, areaX, areaY);
+    placePackedColumns(node.children, columnX, areaX, areaY, ctx);
   }
 
   // Footprint = children bbox + right/bottom PAD (left/top already padded via area).
@@ -722,6 +889,9 @@ export function layoutPlacement(
     hullEdges: lattice.hullEdges ?? new Map<string, readonly HullEdge[]>(),
     staircaseOverlap: opts?.staircaseBandOverlap !== false,
     swimlaneLaneRise: opts?.swimlaneLaneRise === true,
+    reorder: opts?.reorder === true,
+    fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
+    fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
   };
   const root = cloneNode(tree);
   sizeAndArrange(root, ctx);

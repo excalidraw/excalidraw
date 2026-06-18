@@ -99,6 +99,14 @@ export type RcllOptions = {
    * "Swimlanes · Stacked / Compact".
    */
   swimlaneLaneRise?: boolean;
+  /**
+   * M6 (default **false**): crossing minimization (RFC §7.2c). The within-column
+   * leaf Y-order is chosen by a per-container **barycenter** reorder, accepted only
+   * when it **strictly reduces** a model-level crossing count (else model order).
+   * X (columns) is untouched — order only, so the iron rule is unaffected.
+   * `false` ⇒ model-order stacking. The A/B toggle: "Ordering · Off / On".
+   */
+  reorder?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

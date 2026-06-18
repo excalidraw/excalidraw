@@ -14,6 +14,7 @@ export type TerraformDemoUrlParams = {
   ancillary?: boolean;
   semanticPlace?: boolean;
   swimlaneRise?: boolean;
+  reorder?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -133,6 +134,10 @@ export const parseTerraformDemoUrlParams = (
   if (swimlaneRise === null) {
     return null;
   }
+  const reorder = parseBooleanParam("reorder");
+  if (reorder === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -144,6 +149,7 @@ export const parseTerraformDemoUrlParams = (
     ...(ancillary != null ? { ancillary } : {}),
     ...(semanticPlace != null ? { semanticPlace } : {}),
     ...(swimlaneRise != null ? { swimlaneRise } : {}),
+    ...(reorder != null ? { reorder } : {}),
   };
 };
 

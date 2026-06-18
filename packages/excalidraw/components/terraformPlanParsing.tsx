@@ -142,6 +142,8 @@ export type TerraformPlanParsingOptions = {
    * keeping the shared column axis (CON-12-safe).
    */
   pipelineSwimlaneLaneRise?: boolean;
+  /** RCLL M6: per-container barycenter crossing-min reorder (A/B toggle). */
+  pipelineReorder?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

@@ -423,6 +423,8 @@ type LayoutSceneContext = {
   pipelineSemanticPlacement?: boolean;
   /** RCLL M4: X-disjoint swimlane lanes rise to share Y rows. */
   pipelineSwimlaneLaneRise?: boolean;
+  /** RCLL M6: per-container barycenter crossing-min reorder. */
+  pipelineReorder?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -441,6 +443,7 @@ async function buildPipelineLayoutSceneBody(
         packedPullLeft: ctx.pipelinePackedPullLeft === true,
         semanticPlacement: ctx.pipelineSemanticPlacement === true,
         swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
+        reorder: ctx.pipelineReorder === true,
       };
       const buildPipeline =
         ctx.pipelineLayoutVariant === "rcll"
@@ -479,6 +482,7 @@ async function buildPipelineLayoutSceneBody(
             ...(ctx.pipelineSwimlaneLaneRise
               ? { pipelineSwimlaneLaneRise: true }
               : {}),
+            ...(ctx.pipelineReorder ? { pipelineReorder: true } : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
           },
@@ -859,6 +863,7 @@ export async function layoutTerraformFromSources(
     pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
     pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
     pipelineSwimlaneLaneRise: options?.pipelineSwimlaneLaneRise === true,
+    pipelineReorder: options?.pipelineReorder === true,
     colorMode: options?.colorMode,
   };
 

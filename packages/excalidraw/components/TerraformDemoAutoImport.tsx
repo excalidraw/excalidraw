@@ -89,6 +89,7 @@ export const TerraformDemoAutoImport = ({
           pipelineIncludeAncillary: params.ancillary,
           pipelineSemanticPlacement: params.semanticPlace,
           pipelineSwimlaneLaneRise: params.swimlaneRise,
+          pipelineReorder: params.reorder,
           signal,
           onLayoutProgress: (progress) => {
             const label =

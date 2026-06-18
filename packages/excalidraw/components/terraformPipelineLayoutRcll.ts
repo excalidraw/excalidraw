@@ -60,6 +60,8 @@ type RcllBuildOptions = {
   staircaseBandOverlap?: boolean;
   /** M4 (default false): X-disjoint swimlane lanes rise to share Y rows. */
   swimlaneLaneRise?: boolean;
+  /** M6 (default false): per-container barycenter crossing-min reorder. */
+  reorder?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -354,6 +356,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     includeAncillary,
     staircaseBandOverlap: options?.staircaseBandOverlap,
     swimlaneLaneRise: options?.swimlaneLaneRise === true,
+    reorder: options?.reorder === true,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -436,12 +439,16 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
       rcllMilestone: placed
-        ? rcllOptions.swimlaneLaneRise
-          ? "M4"
-          : "M3a"
+        ? rcllOptions.reorder
+          ? "M6"
+          : rcllOptions.swimlaneLaneRise
+            ? "M4"
+            : "M3a"
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
+      // M6: whether the barycenter crossing-min reorder is active.
+      rcllReorder: rcllOptions.reorder === true,
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
