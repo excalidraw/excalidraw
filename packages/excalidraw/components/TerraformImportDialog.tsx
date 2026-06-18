@@ -58,6 +58,7 @@ export const TerraformImportModal = ({
     pipelineIncludeAncillary,
     pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise,
+    pipelineReorder,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -553,6 +554,7 @@ terraform show -json tfplan > plan.json`}</code>
                 pipelineIncludeAncillary={pipelineIncludeAncillary}
                 pipelineSemanticPlacement={pipelineSemanticPlacement}
                 pipelineSwimlaneLaneRise={pipelineSwimlaneLaneRise}
+                pipelineReorder={pipelineReorder}
                 setPipelineCompact={dialog.setPipelineCompact}
                 setPipelineLayoutVariant={dialog.setPipelineLayoutVariant}
                 setPipelinePacked={dialog.setPipelinePacked}
@@ -564,6 +566,7 @@ terraform show -json tfplan > plan.json`}</code>
                 setPipelineSwimlaneLaneRise={
                   dialog.setPipelineSwimlaneLaneRise
                 }
+                setPipelineReorder={dialog.setPipelineReorder}
                 showPlacement={view !== "rcll"}
                 showVariant={view !== "rcll"}
               />

@@ -40,6 +40,8 @@ export type TerraformImportSession = {
   pipelineSemanticPlacement?: boolean;
   /** RCLL M4 — X-disjoint swimlane lanes rise to share Y rows. */
   pipelineSwimlaneLaneRise?: boolean;
+  /** RCLL M6 — per-container barycenter crossing-min reorder. */
+  pipelineReorder?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

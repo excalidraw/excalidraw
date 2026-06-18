@@ -140,6 +140,7 @@ describe("TerraformImportModal", () => {
       pipelineIncludeAncillary: false,
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
+      pipelineReorder: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -166,6 +167,7 @@ describe("TerraformImportModal", () => {
       pipelineIncludeAncillary: false,
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
+      pipelineReorder: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -225,6 +227,30 @@ describe("TerraformImportModal", () => {
       expect.objectContaining({
         layoutMode: "rcll",
         pipelineSwimlaneLaneRise: true,
+      }),
+    );
+  });
+
+  it("RCLL view: Ordering · On threads pipelineReorder true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The RCLL-only Ordering control is present; flip it On (M6 reorder).
+    const onBtn = screen.getByRole("button", { name: /^on$/i });
+    expect(onBtn).toBeInTheDocument();
+    fireEvent.click(onBtn);
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineReorder: true,
       }),
     );
   });

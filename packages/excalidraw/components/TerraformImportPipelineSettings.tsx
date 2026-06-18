@@ -128,6 +128,27 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
     },
   },
+  "ordering.off": {
+    title: "Ordering · Off",
+    body: "Nodes inside each group stack in declaration order. Simplest, but arrows may cross more than necessary.",
+    dev: {
+      implements:
+        "Within-column leaf order = model order (minDescendantSequence, key). No crossing-reduction pass.",
+      refs: ["Sugiyama et al. 1981 (layered drawing)"],
+    },
+  },
+  "ordering.on": {
+    title: "Ordering · On",
+    body: "Inside each group, nodes are reordered to reduce crossing arrows — a node moves next to the ones it connects to. Only applied when it actually cuts crossings, so it never makes a group worse.",
+    dev: {
+      implements:
+        "M6 per-container barycenter reorder with a strict-improve gate (terraformPipelineOrdering.ts): leaves are permuted within their column to minimize a geometric crossing count; accepted only if strictly fewer crossings, else model order. X (columns) untouched — iron rule unaffected.",
+      refs: [
+        "Sugiyama et al. 1981 (barycenter)",
+        "Forster 2005 (crossing reduction)",
+      ],
+    },
+  },
   "resources.allRcll": {
     title: "Resources · All resources (not in this layout)",
     body: "The RCLL layout draws its own geometry and does not yet render the unconnected 'Unconnected' resources — it lays out the dataflow only. Switch to the Compound or Classic layout to see all resources, or keep RCLL for the dataflow view. Ancillary support for RCLL is a planned milestone.",
@@ -160,6 +181,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineIncludeAncillary,
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
+  pipelineReorder,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
@@ -167,6 +189,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineIncludeAncillary,
   setPipelineSemanticPlacement,
   setPipelineSwimlaneLaneRise,
+  setPipelineReorder,
   showPlacement = true,
   showVariant = true,
 }: {
@@ -177,6 +200,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineIncludeAncillary: boolean;
   pipelineSemanticPlacement: boolean;
   pipelineSwimlaneLaneRise: boolean;
+  pipelineReorder: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
@@ -184,6 +208,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineIncludeAncillary: (includeAncillary: boolean) => void;
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
   setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
+  setPipelineReorder: (reorder: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
   /** RCLL view hides the Layout variant + Height — it owns placement (M0 delegates to Compound). */
@@ -300,8 +325,8 @@ export const TerraformImportPipelineSettings = ({
           )}
           {!showVariant && (
             <div className="TerraformImportModal__controlNote">
-              RCLL arranges layout automatically. Only the Detail, Resources, and
-              Swimlanes toggles apply.
+              RCLL arranges layout automatically. Only the Detail, Resources,
+              Swimlanes, and Ordering toggles apply.
             </div>
           )}
           {!showVariant && (
@@ -321,6 +346,21 @@ export const TerraformImportPipelineSettings = ({
                   pipelineSwimlaneLaneRise,
                   "swimlane.compact",
                   () => setPipelineSwimlaneLaneRise(true),
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline ordering">
+              <span className="TerraformImportModal__controlLabel">
+                Ordering <span>reduce crossing arrows within groups</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option("Off", !pipelineReorder, "ordering.off", () =>
+                  setPipelineReorder(false),
+                )}
+                {option("On", pipelineReorder, "ordering.on", () =>
+                  setPipelineReorder(true),
                 )}
               </div>
             </div>

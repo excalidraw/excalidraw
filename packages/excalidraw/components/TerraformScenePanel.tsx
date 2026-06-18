@@ -302,6 +302,7 @@ export const TerraformScenePanel = ({
         pipelineIncludeAncillary: session.pipelineIncludeAncillary === true,
         pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
         pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
+        pipelineReorder: session.pipelineReorder === true,
         importedTfdTexts: session.importedTfdTexts,
         preset: session.preset,
       });

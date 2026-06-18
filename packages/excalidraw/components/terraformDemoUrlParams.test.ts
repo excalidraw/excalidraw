@@ -118,6 +118,23 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses reorder (RCLL M6 A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&reorder=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        reorder: true,
+      });
+      expect(parseTerraformDemoUrlParams("?preset=demo&reorder=0")).toEqual({
+        presetId: "demo",
+        reorder: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&reorder=maybe"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

@@ -159,6 +159,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineSemanticPlacement?: boolean;
   /** RCLL M4 — X-disjoint swimlane lanes rise to share Y rows. Default false. */
   pipelineSwimlaneLaneRise?: boolean;
+  /** RCLL M6 — per-container barycenter crossing-min reorder. Default false. */
+  pipelineReorder?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -223,6 +225,7 @@ async function layoutTerraformSceneFromSources(
               options.pipelineSemanticPlacement === true,
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
+            pipelineReorder: options.pipelineReorder === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -296,6 +299,7 @@ export const runTerraformImportFromSources = async (
               options.pipelineSemanticPlacement === true,
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
+            pipelineReorder: options.pipelineReorder === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
