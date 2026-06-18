@@ -589,6 +589,7 @@
       "menuHint": "Export, preferences, and more...",
       "center_heading": "Diagrams. Made. Simple.",
       "toolbarHint": "Pick a tool & Start drawing!",
+      "selectionToolHint": "Press <kbd>1</kbd> to select this tool",
       "helpHint": "Shortcuts & help"
     }
   },

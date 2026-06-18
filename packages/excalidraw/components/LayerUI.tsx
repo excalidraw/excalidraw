@@ -363,6 +363,7 @@ const LayerUI = ({
                               activeTool={appState.activeTool}
                               UIOptions={UIOptions}
                               app={app}
+                              renderWelcomeScreen={renderWelcomeScreen}
                             />
                           </Stack.Row>
                         </Island>
