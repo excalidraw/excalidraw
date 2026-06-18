@@ -55,15 +55,29 @@ gh_api_pulls_write = re.search(r"\bgh api\b.*\bpulls\b", cmd) and re.search(
     r"\b(-X\s+POST|-X\s+PATCH|-X\s+PUT|-f\b|--method\s+(POST|PATCH|PUT))\b", cmd, re.I
 )
 
-if targets_upstream and (pr_write or gh_api_pulls_write):
-    deny("PR writes to excalidraw/excalidraw are blocked — use --repo chuysmans/excalidraw")
 
-if re.search(r"\bgh pr create\b", cmd):
-    repo_match = re.search(r"--repo\s+(\S+)", cmd)
-    if repo_match:
-        repo = repo_match.group(1).strip("'\"")
-        if repo != ALLOWED_REPO:
-            deny(f"gh pr create --repo must be {ALLOWED_REPO}, got {repo!r}")
+def repo_flag():
+    match = re.search(r"--repo\s+(\S+)", cmd)
+    if not match:
+        return None
+    return match.group(1).strip("'\"")
+
+
+if pr_write:
+    repo = repo_flag()
+    if repo is None:
+        deny(f"gh pr write commands must include --repo {ALLOWED_REPO}")
+    if repo != ALLOWED_REPO:
+        deny(f"gh pr write must target {ALLOWED_REPO}, got {repo!r}")
+
+if gh_api_pulls_write:
+    if BLOCKED_REPO in cmd or BLOCKED_URL in cmd:
+        deny("PR writes to excalidraw/excalidraw are blocked — use --repo chuysmans/excalidraw")
+    repo = repo_flag()
+    if repo is None:
+        deny(f"gh api pulls write must include --repo {ALLOWED_REPO}")
+    if repo != ALLOWED_REPO:
+        deny(f"gh api pulls write must target {ALLOWED_REPO}, got {repo!r}")
 
 allow()
 PY

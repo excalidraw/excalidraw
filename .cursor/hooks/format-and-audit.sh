@@ -8,13 +8,13 @@
 set -euo pipefail
 input="$(cat)"
 
-read -r file_path conversation_id < <(printf '%s' "$input" | python3 -c '
+audit_log=".cursor/ai-edit-audit.log"
+
+read -r file_path < <(printf '%s' "$input" | python3 -c '
 import sys, json
 d = json.load(sys.stdin)
-print((d.get("file_path") or d.get("path") or ""), (d.get("conversation_id") or "unknown"))
-' 2>/dev/null || echo " unknown")
-
-audit_log=".cursor/ai-edit-audit.log"
+print(d.get("file_path") or d.get("path") or "")
+' 2>/dev/null || echo "")
 
 case "$file_path" in
   *.ts|*.tsx|*.js|*.jsx|*.json|*.css|*.scss|*.md)
@@ -22,9 +22,22 @@ case "$file_path" in
     ;;
 esac
 
-ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-printf '{"ts":"%s","actor":"cursor-agent","conversation":"%s","file":"%s"}\n' \
-  "$ts" "$conversation_id" "$file_path" >> "$audit_log"
+python3 - "$input" "$audit_log" <<'PY'
+import json
+import sys
+from datetime import datetime, timezone
+
+payload = json.loads(sys.argv[1])
+audit_log = sys.argv[2]
+entry = {
+    "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "actor": "cursor-agent",
+    "conversation": payload.get("conversation_id") or "unknown",
+    "file": payload.get("file_path") or payload.get("path") or "",
+}
+with open(audit_log, "a", encoding="utf-8") as f:
+    f.write(json.dumps(entry) + "\n")
+PY
 
 echo '{"continue":true}'
 exit 0

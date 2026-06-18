@@ -90,12 +90,20 @@ if isinstance(repo, str) and "/" in repo:
     owner = owner or owner_from_repo
     repo = repo_name
 
-if owner or repo:
-    full = f"{owner}/{repo}" if owner and repo else str(repo or owner)
-    if full != ALLOWED_REPO and (owner == "excalidraw" or full == BLOCKED_REPO):
-        deny(f"GitHub MCP PR write must target {ALLOWED_REPO}, got {full!r}")
+if owner and repo:
+    full = f"{owner}/{repo}"
+elif isinstance(arguments.get("repo") or arguments.get("repository"), str):
+    full = arguments.get("repo") or arguments.get("repository")
+else:
+    full = None
 
-allow()
+if full == ALLOWED_REPO:
+    allow()
+
+if full:
+    deny(f"GitHub MCP PR write must target {ALLOWED_REPO}, got {full!r}")
+
+deny(f"GitHub MCP PR write must explicitly target {ALLOWED_REPO}")
 PY
 )"
 

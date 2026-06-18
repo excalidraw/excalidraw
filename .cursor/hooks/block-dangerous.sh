@@ -29,6 +29,7 @@ PY
 case "$cmd" in
   *"rm -rf"*|*"rm -fr"*)                          deny "recursive force delete (rm -rf)";;
   *"git push"*"--force"*|*"git push -f"*)         deny "force push";;
+  *"git push"*" "[+]*)                            deny "force push (git +refspec)";;
   *"git reset --hard"*)                            deny "hard reset discards work";;
   *"git clean -"*f*)                               deny "git clean wipes untracked files";;
   *"git checkout ."*)                              deny "discards all local changes";;
