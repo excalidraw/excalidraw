@@ -229,6 +229,35 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("RCLL view: 'All resources' is disabled (ancillary not yet drawn in RCLL)", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // RCLL is dataflow-only: "All resources" is inert, so it renders disabled and
+    // "Dataflow only" reads active regardless of stored state — the toggle can't
+    // mislead. (The full reserved-band feature is a deferred RFC milestone.)
+    const allResources = screen.getByRole("button", { name: /^all resources$/i });
+    expect(allResources).toBeDisabled();
+    const dataflowOnly = screen.getByRole("button", { name: /^dataflow only$/i });
+    expect(dataflowOnly).toHaveAttribute("aria-pressed", "true");
+
+    // Clicking the disabled option does NOT flip includeAncillary on the import.
+    fireEvent.click(allResources);
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineIncludeAncillary: false,
+      }),
+    );
+  });
+
   it("passes semanticLayout false for module view", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],

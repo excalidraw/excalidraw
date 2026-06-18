@@ -765,6 +765,15 @@
         color: var(--color-primary);
         box-shadow: 0 0 0 1px var(--color-primary) inset;
       }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+
+        &:hover {
+          border-color: var(--tf-border);
+        }
+      }
     }
 
     &__modulePacking {
