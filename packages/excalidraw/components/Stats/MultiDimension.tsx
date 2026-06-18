@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   getElementsInResizingFrame,
+  getNonDeletedElements,
   isFrameLikeElement,
   replaceAllElementsInFrame,
   updateBoundElements,
@@ -20,7 +21,6 @@ import { getCommonBounds } from "@excalidraw/utils";
 
 import type {
   ElementsMap,
-  ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -277,7 +277,7 @@ const handleDimensionChange: DragInputCallbackType<
 
   const changeInWidth = property === "width" ? accumulatedChange : 0;
   const changeInHeight = property === "height" ? accumulatedChange : 0;
-  const elementsToHighlight: ExcalidrawElement[] = [];
+  const elementsToHighlight: NonDeletedExcalidrawElement[] = [];
 
   for (const atomicUnit of atomicUnits) {
     const elementsInUnit = getElementsInAtomicUnit(
@@ -373,11 +373,13 @@ const handleDimensionChange: DragInputCallbackType<
 
         // Handle highlighting frame element candidates
         if (isFrameLikeElement(latestElement)) {
-          const nextElementsInFrame = getElementsInResizingFrame(
-            scene.getElementsIncludingDeleted(),
-            latestElement,
-            originalAppState,
-            scene.getNonDeletedElementsMap(),
+          const nextElementsInFrame = getNonDeletedElements(
+            getElementsInResizingFrame(
+              scene.getElementsIncludingDeleted(),
+              latestElement,
+              originalAppState,
+              scene.getNonDeletedElementsMap(),
+            ),
           );
 
           elementsToHighlight.push(...nextElementsInFrame);

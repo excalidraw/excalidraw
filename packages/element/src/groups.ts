@@ -14,7 +14,6 @@ import { makeNextSelectedElementIds, getSelectedElements } from "./selection";
 import type {
   GroupId,
   ExcalidrawElement,
-  NonDeleted,
   ElementsMapOrArray,
   ElementsMap,
   NonDeletedExcalidrawElement,
@@ -23,7 +22,7 @@ import type {
 export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[], // Groups might still contain deleted elements
 ): Pick<
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
@@ -266,7 +265,7 @@ export const selectGroupsFromGivenElements = (
 
 export const editGroupForSelectedElement = (
   appState: AppState,
-  element: NonDeleted<ExcalidrawElement>,
+  element: NonDeletedExcalidrawElement,
 ): AppState => {
   return {
     ...appState,
@@ -409,7 +408,7 @@ export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: Readonly<AppState>,
-): NonDeletedExcalidrawElement[][] => {
+) => {
   const selectedGroupIds = getSelectedGroupIds(appState);
   const unboundElements = selectedElements.filter(
     (element) => !isBoundToContainer(element),
@@ -475,7 +474,5 @@ export const getSelectedElementsByGroup = (
       addToGroupsMap(element, selectedGroupId);
     }
   });
-  return Array.from(groups.values()).concat(
-    Array.from(elements.values()),
-  ) as NonDeletedExcalidrawElement[][];
+  return Array.from(groups.values()).concat(Array.from(elements.values()));
 };

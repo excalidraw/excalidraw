@@ -38,6 +38,8 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 
 import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 
+import { isNonDeletedElement } from ".";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -210,24 +212,29 @@ export const duplicateElements = (
 
         processedIds.set(element.id, true);
 
+        // SAFETY: this should never happen, but we
+        // want to make sure we log it if it does
+        if (!isNonDeletedElement(element)) {
+          console.error(
+            "[NONDELETED][INVARIANT] Element to duplicate should be non-deleted",
+          );
+        }
+
         const newElement = duplicateElement(
           appState.editingGroupId,
           groupIdMap,
           element,
           opts.randomizeSeed,
-        );
+        ) as NonDeletedExcalidrawElement;
 
         processedIds.set(newElement.id, true);
 
-        // duplicates are only created from non-deleted elements
-        const duplicatedElement = newElement as NonDeletedExcalidrawElement;
-
-        duplicateElementsMap.set(duplicatedElement.id, duplicatedElement);
-        origIdToDuplicateId.set(element.id, duplicatedElement.id);
-        duplicateIdToOrigElement.set(duplicatedElement.id, element);
+        duplicateElementsMap.set(newElement.id, newElement);
+        origIdToDuplicateId.set(element.id, newElement.id);
+        duplicateIdToOrigElement.set(newElement.id, element);
 
         origElements.push(element);
-        duplicatedElements.push(duplicatedElement);
+        duplicatedElements.push(newElement);
 
         acc.push(newElement);
         return acc;

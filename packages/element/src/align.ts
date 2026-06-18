@@ -4,6 +4,8 @@ import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 import { getSelectedElementsByGroup } from "./groups";
 
+import { getNonDeletedElements } from ".";
+
 import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
@@ -24,7 +26,7 @@ export const alignElements = (
     selectedElements,
     scene.getNonDeletedElementsMap(),
     appState,
-  );
+  ).map(getNonDeletedElements); // Nothing to align on deleted elements
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
   return groups.flatMap((group) => {
@@ -50,7 +52,7 @@ export const alignElements = (
 };
 
 const calculateTranslation = (
-  group: ExcalidrawElement[],
+  group: readonly ExcalidrawElement[],
   selectionBoundingBox: BoundingBox,
   { axis, position }: Alignment,
 ): { x: number; y: number } => {
