@@ -9932,7 +9932,7 @@ class App extends React.Component<AppProps, AppState> {
       // clicking inside commit zone → finalize arrow
       if (
         boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
-        endOutsideSameElement || // End outside the start's element: Bind immediately
+        endOutsideSameElement || // Inside -> orbit: Bind immediately
         (multiElement.points.length > 1 && lastCommittedPointIsInsideCommitZone)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {

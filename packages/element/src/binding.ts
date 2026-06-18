@@ -684,7 +684,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   }
 
   // If binding is disabled and an endpoint is dragged,
-  // we actively break the end binding
+  // we actively break either the start or end binding
   if (!isBindingEnabled(appState)) {
     start = startDragged ? { mode: null } : start;
     end = endDragged ? { mode: null } : end;
