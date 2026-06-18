@@ -19,13 +19,20 @@ import {
 import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
 import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
 import { layeringStage } from "./terraformPipelineRcllLayering";
-import { placementStage } from "./terraformPipelineRcllPlacement";
+import {
+  backwardEdgeGate,
+  boxByKey,
+  placementStage,
+} from "./terraformPipelineRcllPlacement";
 import {
   buildRcllModel,
   summarizeRcllModel,
 } from "./terraformPipelineRcllModel";
 
-import type { PipelineLayoutPrep } from "./terraformPipelineLayoutShared";
+import type {
+  CollapsedPipelineEdge,
+  PipelineLayoutPrep,
+} from "./terraformPipelineLayoutShared";
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import type { TerraformImportWarning } from "./terraformImportMerge";
@@ -93,6 +100,33 @@ export type RunRcllPipelineResult = {
  *
  * Exported for unit testing the guard in isolation (see terraformPipelineRcll.test.ts).
  */
+/**
+ * §27 output validation: every `box` on the tree must be finite. A stage that
+ * emits a non-finite coordinate (e.g. a future VPSC projection over degenerate
+ * constraints at M5) is rejected like a throw — the prior rung is kept. Cheap
+ * (one walk) and de-risks the milestones that do real numeric solving.
+ */
+function treeBoxesFinite(node: CompoundNode): boolean {
+  const b = node.box;
+  if (
+    b &&
+    !(
+      Number.isFinite(b.x) &&
+      Number.isFinite(b.y) &&
+      Number.isFinite(b.width) &&
+      Number.isFinite(b.height)
+    )
+  ) {
+    return false;
+  }
+  for (const child of node.children) {
+    if (!treeBoxesFinite(child)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function runRcllPipeline(
   stages: readonly RcllPipelineStage[],
   tree: CompoundNode,
@@ -106,7 +140,7 @@ export function runRcllPipeline(
   for (const { name, stage } of stages) {
     try {
       const result: StageResult = stage(current, lattice, opts);
-      if (!result || !result.tree) {
+      if (!result || !result.tree || !treeBoxesFinite(result.tree)) {
         degraded.push(name);
         continue;
       }
@@ -143,7 +177,11 @@ async function buildSceneFromBoxedTree(
   tree: CompoundNode,
   prep: PipelineLayoutPrep,
   nodes: TerraformPlanNodesMap,
-): Promise<{ elements: ExcalidrawElement[]; frameEdgeCount: number }> {
+): Promise<{
+  elements: ExcalidrawElement[];
+  frameEdgeCount: number;
+  backEdgesStyled: number;
+}> {
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const layoutBoxes = new Map<string, TerraformDependencyLayoutBox>();
 
@@ -198,6 +236,15 @@ async function buildSceneFromBoxedTree(
     skeleton,
     layoutBoxes,
   );
+  // EXT-12: mark cycle wrap-edges. The iron rule (CON-12) guarantees no ACYCLIC
+  // edge renders backward, so any TFD arrow whose target box reads left of its
+  // source is an intra-cycle wrap-edge — style it as an explicit back-edge so it
+  // reads as an intentional cycle, not a layout error (DEC-8(B) + EXT-12).
+  const backEdgesStyled = styleRcllBackEdges(
+    skeleton,
+    prep.collapsedEdges,
+    layoutBoxes,
+  );
   const frameEdgeCount = appendCompoundTopologyFrameEdgeSkeletons(
     prep.collapsedEdges,
     prep.clusters,
@@ -206,7 +253,60 @@ async function buildSceneFromBoxedTree(
   );
   assignCompoundEdgeFrameParents(skeleton, prep.clusters);
   const elements = await convertPipelineSkeletonToElements(skeleton);
-  return { elements, frameEdgeCount };
+  return { elements, frameEdgeCount, backEdgesStyled };
+}
+
+/** EXT-12 back-edge styling colour — a distinct cycle marker (Excalidraw orange). */
+const RCLL_BACK_EDGE_COLOR = "#e8590c";
+
+/**
+ * Re-style the cycle wrap-edges in place: dashed + a distinct colour + a
+ * `terraformBackEdge` flag (for a future legend/hover). A wrap-edge is a TFD
+ * arrow whose target box center-X reads left of its source — which, given the
+ * CON-12 gate (acyclic backward = 0), is always an intra-cycle edge. Aggregated
+ * hull connectors are left alone. Returns the count styled.
+ */
+function styleRcllBackEdges(
+  skeleton: ExcalidrawElementSkeleton[],
+  collapsedEdges: readonly CollapsedPipelineEdge[],
+  layoutBoxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
+): number {
+  const centerX = (id: string): number | null => {
+    const b = layoutBoxes.get(id);
+    return b ? b.x + b.width / 2 : null;
+  };
+  const backKeys = new Set<string>();
+  for (const e of collapsedEdges) {
+    const cs = centerX(e.source);
+    const ct = centerX(e.target);
+    if (cs != null && ct != null && ct < cs - 1) {
+      backKeys.add(`${e.source} ${e.target}`);
+    }
+  }
+  if (backKeys.size === 0) {
+    return 0;
+  }
+  let styled = 0;
+  for (const el of skeleton) {
+    const cd = el.customData as
+      | { relationship?: { source?: unknown; target?: unknown; aggregated?: unknown } }
+      | undefined;
+    const rel = cd?.relationship;
+    if (
+      !rel ||
+      rel.aggregated === true ||
+      typeof rel.source !== "string" ||
+      typeof rel.target !== "string" ||
+      !backKeys.has(`${rel.source} ${rel.target}`)
+    ) {
+      continue;
+    }
+    (el as { strokeStyle?: string }).strokeStyle = "dashed";
+    (el as { strokeColor?: string }).strokeColor = RCLL_BACK_EDGE_COLOR;
+    (el.customData as Record<string, unknown>).terraformBackEdge = true;
+    styled += 1;
+  }
+  return styled;
 }
 
 /**
@@ -265,11 +365,13 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   const placed = ran.includes("placement");
   let elements: ExcalidrawElement[];
   let warnings: TerraformImportWarning[];
+  let backEdgesStyled = 0;
   if (placed) {
     const built = await buildSceneFromBoxedTree(laidOutTree, prep, nodes);
     elements = built.elements;
+    backEdgesStyled = built.backEdgesStyled;
     // Cluster-level cycle warning (D) + the container-level cycle warning (D_H,
-    // the 6 cyclic containers on v2 — M3a places them via M2's sequential columns).
+    // the 6 cyclic containers on v2 — placed via M2's SCC-condensed columns).
     warnings = [...pipelineCycleWarnings(prep.depthResult)];
     if ((lattice.cyclicContainers?.size ?? 0) > 0) {
       warnings.push({
@@ -293,6 +395,18 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   // duration would break the byte-identical / determinism test). Now reflects
   // RCLL's OWN geometry when placement ran (no longer ≡ compound).
   const diagnostics = diagnosePipelineScene(elements);
+
+  // The iron rule (CON-12), measured on the placed boxes — valid in Compact AND
+  // Full (the rendered `semanticEdgeViolations` goes blind in Full). Only when
+  // placement ran (the fallback rung has no RCLL boxes).
+  const backward = placed
+    ? backwardEdgeGate(
+        boxByKey(laidOutTree),
+        prep.collapsedEdges,
+        prep.clusters,
+        lattice.cyclicContainers ?? new Set<string>(),
+      )
+    : { acyclicBackwardEdges: 0, cyclicBackwardEdges: 0 };
 
   return {
     elements,
@@ -332,6 +446,12 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       gates: {
         collisions: diagnostics.collisionCount,
         semanticEdgeViolations: diagnostics.semanticEdgeViolations.length,
+        // CON-12 iron rule (model-level, both modes): acyclic MUST be 0; cyclic
+        // wrap-edges are excused + counted, and drawn as explicit back-edges
+        // (EXT-12: dashed + distinct colour + `terraformBackEdge`).
+        acyclicBackwardEdges: backward.acyclicBackwardEdges,
+        cyclicBackwardEdges: backward.cyclicBackwardEdges,
+        backEdgesStyled,
       },
     },
     warnings,

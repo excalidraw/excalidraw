@@ -4,8 +4,8 @@
  *
  *   - columnsForContainer: chain, diamond fan-out (T4 co-column), fan-out lifted
  *     to max LB, T1 > T4 (internal precedence wins), hull staircase (CON-6),
- *     cyclic container → sequential columns
- *   - layerTree: every node gets a localColumn; cyclic container stacked; pure
+ *     cyclic container → SCC condensation (cycle shares a column, acyclic forward)
+ *   - layerTree: every node gets a localColumn; cyclic SCC condensed; pure
  *     (input tree never mutated); deterministic over two runs
  *   - layeringMeta: aligned fan-out → rate 1.0; un-aligned (T1>T4) → counted as
  *     un-aligned (rate < 1, never vacuous); CON-1/CON-6 violations = 0; cyclic
@@ -127,16 +127,17 @@ describe("columnsForContainer", () => {
     expect(col.get("H1")!).toBeLessThan(col.get("H2")!);
   });
 
-  it("cyclic container → sequential columns 0,1,2 in model order (no longest-path)", () => {
+  it("cyclic container → SCC condensation: cycle shares a column, acyclic tail reads forward", () => {
     const col = columnsForContainer(
       ["a", "b", "c"],
-      [he("a", "b"), he("b", "a")], // a cycle — ignored
+      [he("a", "b"), he("b", "a"), he("b", "c")], // {a,b} is an SCC; b→c is acyclic
       true,
       rank0,
     );
-    expect(col.get("a")).toBe(0);
-    expect(col.get("b")).toBe(1);
-    expect(col.get("c")).toBe(2);
+    // a and b are one SCC ⇒ same column (no false L→R order on the cycle);
+    // c is downstream of the SCC ⇒ strictly to its right (DEC-8(B), §26).
+    expect(col.get("a")).toBe(col.get("b"));
+    expect(col.get("c")!).toBeGreaterThan(col.get("a")!);
   });
 });
 
@@ -158,12 +159,13 @@ describe("layerTree", () => {
     expect(byKey.get("D")).toBe(2);
   });
 
-  it("stacks a cyclic container's children sequentially", () => {
+  it("condenses a cyclic container's SCC: cycle members share a column", () => {
     const tree = container("r", [leaf("a", 0), leaf("b", 1)]);
     const laid = layerTree(tree, lattice([["r", [he("a", "b"), he("b", "a")]]], ["r"]));
     const byKey = new Map(laid.children.map((c) => [c.key, c.localColumn]));
-    expect(byKey.get("a")).toBe(0);
-    expect(byKey.get("b")).toBe(1);
+    // a↔b is one SCC ⇒ same column (placement stacks them in Y at one X, so the
+    // cycle's wrap-edge does not render backward).
+    expect(byKey.get("a")).toBe(byKey.get("b"));
   });
 
   it("is pure — does not mutate the input tree", () => {

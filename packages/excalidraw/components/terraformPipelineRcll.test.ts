@@ -193,6 +193,15 @@ describe("pipeline view rcll (M3a)", () => {
           placementMeta.placedLeafCount,
           `${mode} placed every leaf`,
         ).toBeGreaterThan(0);
+        // S2: anchor the placed height so every later milestone is a MEASURED
+        // height decision. M3a is pre-compaction (no push-right/pack-left), so
+        // this is a finite-positive sanity anchor, not yet a `< baseline` gate —
+        // M7/M8 drive it down (baselines: packed-compound ~7.5k px, stacked ~18.5k).
+        expect(
+          Number.isFinite(placementMeta.maxDepthPx) &&
+            placementMeta.maxDepthPx > 0,
+          `${mode} placement records a finite positive height (maxDepthPx)`,
+        ).toBe(true);
 
         // M1: the import phase computed a real tree + lattice. The model block
         // is scalar, finite, and plausible on the real preset (fan-out sets and
@@ -275,14 +284,39 @@ describe("pipeline view rcll (M3a)", () => {
           rcll.diagnostics.collisionCount,
           `${mode} RCLL geometry is collision-free`,
         ).toBe(0);
-        // `semanticEdgeViolations` is OBSERVED, not gated, at M3a. It is an RFC
-        // §13 routing/ordering goal that M4 (global top-spine, REQ-7) drives
-        // down: compound aligns every cluster on ONE global column grid
-        // (computeGlobalColumnX by depth), so cross-container edges read forward;
-        // RCLL M3a deliberately uses LOCAL per-container columns (§11), so some
-        // cross-container edges read backward in global X until the M4 spine
-        // lands. The structural gate the user locked is collision = 0 (above),
-        // not this. We assert only that it is a finite count (recorded in meta).
+        // THE IRON RULE (CON-12), gated at the MODEL level on the placed boxes so
+        // it is valid in Compact AND Full (the rendered `semanticEdgeViolations`
+        // below goes blind in Full — primary-cluster frames carry no
+        // `terraformPrimaryAddress`). For every TFD edge whose LCA container is
+        // ACYCLIC, the width-aware staircase (columnOffsetsFromWidths) guarantees
+        // the target box sits right of the source ⇒ ZERO backward edges. This is
+        // not an "M4 will fix it" goal — it holds NOW. (Empirically: 100% of v2's
+        // backward edges had a cyclic LCA; the acyclic count is 0 in both modes.)
+        const gates = rcll.meta.gates as Record<string, number>;
+        expect(
+          gates.acyclicBackwardEdges,
+          `${mode} iron rule: no acyclic edge renders backward (CON-12)`,
+        ).toBe(0);
+        // The genuine cycle wrap-edges (a cycle cannot read fully L→R) are the
+        // only backward edges — excused + counted, to be drawn as explicit
+        // back-edges (EXT-12). They live in the 6 cyclic containers; SCC
+        // condensation (DEC-8(B)) already minimizes them to the irreducible floor.
+        expect(
+          Number.isInteger(gates.cyclicBackwardEdges),
+          `${mode} cyclic wrap-edge count is an integer (excused)`,
+        ).toBe(true);
+        // EXT-12: those wrap-edges are drawn as explicit back-edges (dashed +
+        // distinct colour + terraformBackEdge). v2 has 6 cyclic containers, so
+        // there are wrap-edges to style in both modes. (The dataflow arrows are
+        // `isDeleted` for visibility, so the styled elements are filtered out of
+        // `rcll.elements`; the meta count is the authoritative proof.)
+        expect(
+          Number.isInteger(gates.backEdgesStyled) && gates.backEdgesStyled > 0,
+          `${mode} cycle wrap-edges styled as back-edges (EXT-12)`,
+        ).toBe(true);
+        // `semanticEdgeViolations` is the RENDERED count (frame center-X). It is
+        // OBSERVED, not gated: it double-counts the excused cyclic wrap-edges in
+        // Compact and is blind in Full. The iron rule above is the real gate.
         expect(
           Array.isArray(rcll.diagnostics.semanticEdgeViolations),
           `${mode} semantic-edge violations is an array (observed, not gated)`,

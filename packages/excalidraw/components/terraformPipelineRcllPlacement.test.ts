@@ -17,9 +17,11 @@ import { describe, expect, it } from "vitest";
 import {
   PIPELINE_COLUMN_GAP,
   PIPELINE_FRAME_PAD,
+  type CollapsedPipelineEdge,
   type PipelineCluster,
 } from "./terraformPipelineLayoutShared";
 import {
+  backwardEdgeGate,
   boxByKey,
   layoutPlacement,
   placementMeta,
@@ -27,6 +29,7 @@ import {
   policyForContainer,
 } from "./terraformPipelineRcllPlacement";
 
+import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type { CompoundNode, Lattice } from "./terraformPipelineRcllTypes";
 
 // ── fixtures ────────────────────────────────────────────────────────────────
@@ -94,7 +97,7 @@ describe("policyForContainer", () => {
     expect(policyForContainer("region", false)).toBe("packed");
     expect(policyForContainer("vpc", false)).toBe("mixed");
     expect(policyForContainer("subnetZone", false)).toBe("packed");
-    // cyclic overrides role → packed (M2 sequential columns → strip)
+    // cyclic overrides role → packed (M2 SCC condensation → cycle shares a column)
     expect(policyForContainer("account", true)).toBe("packed");
   });
 });
@@ -337,5 +340,53 @@ describe("placementStage", () => {
     expect(result.tree.box).toBeDefined();
     expect(typeof result.meta!.containmentViolations).toBe("number");
     expect(typeof result.meta!.maxWidthPx).toBe("number");
+  });
+});
+
+// ── backwardEdgeGate (CON-12 iron rule) ────────────────────────────────────────
+
+describe("backwardEdgeGate", () => {
+  // Both clusters sit in one region ⇒ their LCA container is that region; toggling
+  // whether the region key is in `cyclicContainers` exercises both branches.
+  const REGION_KEY = ["aws", "acct", "r"].join(" ");
+  const cl = (id: string): PipelineCluster => ({
+    ...leaf(id, 0, 0).cluster!,
+    placement: {
+      providerFamily: "aws",
+      accountId: "acct",
+      region: "r",
+    } as PipelineCluster["placement"],
+  });
+  const box = (
+    x: number,
+    width = 100,
+  ): TerraformDependencyLayoutBox => ({ x, y: 0, width, height: 50 });
+  const edge = (source: string, target: string): CollapsedPipelineEdge =>
+    ({ source, target } as CollapsedPipelineEdge);
+
+  it("counts no backward edge when the target box is right of the source", () => {
+    const boxes = new Map([["u", box(0)], ["v", box(300)]]);
+    const g = backwardEdgeGate(boxes, [edge("u", "v")], [cl("u"), cl("v")], new Set());
+    expect(g.acyclicBackwardEdges).toBe(0);
+    expect(g.cyclicBackwardEdges).toBe(0);
+  });
+
+  it("flags an acyclic backward edge (target left of source, LCA not cyclic)", () => {
+    const boxes = new Map([["u", box(300)], ["v", box(0)]]);
+    const g = backwardEdgeGate(boxes, [edge("u", "v")], [cl("u"), cl("v")], new Set());
+    expect(g.acyclicBackwardEdges).toBe(1);
+    expect(g.cyclicBackwardEdges).toBe(0);
+  });
+
+  it("excuses a backward edge whose LCA container is cyclic", () => {
+    const boxes = new Map([["u", box(300)], ["v", box(0)]]);
+    const g = backwardEdgeGate(
+      boxes,
+      [edge("u", "v")],
+      [cl("u"), cl("v")],
+      new Set([REGION_KEY]),
+    );
+    expect(g.acyclicBackwardEdges).toBe(0);
+    expect(g.cyclicBackwardEdges).toBe(1);
   });
 });

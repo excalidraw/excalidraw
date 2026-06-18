@@ -46,9 +46,18 @@ import {
   PIPELINE_COLUMN_GAP,
   PIPELINE_FRAME_PAD,
 } from "./terraformPipelineLayoutShared";
+import {
+  lcaTopologyPath,
+  topologyPathForCluster,
+  topologyRoleAndKeyFromPath,
+} from "./terraformPipelineTopologyFrames";
 import { PIPELINE_FRAME_TITLE_HEIGHT } from "./terraformPipelineTopologyGeometry";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
+import type {
+  CollapsedPipelineEdge,
+  PipelineCluster,
+} from "./terraformPipelineLayoutShared";
 import type {
   CompoundNode,
   Lattice,
@@ -67,10 +76,11 @@ type Policy = "passthrough" | "forced" | "packed" | "mixed";
  * Per-level policy by parent role (§8). **`root` is `passthrough`** (children = the
  * providers): M3a places providers at their column X but NOT a Y band — the reused
  * `applyCompoundHierarchicalLayout` in export is the sole owner of provider Y
- * stacking (eng-review A3). A **cyclic** container is treated as `packed`: M2 gave
- * its children sequential columns `0,1,2…`, so packed placement draws them as a
- * left-to-right strip (one child per column) — collision-free + deterministic;
- * the RFC §26/DEC-8(B) shared-band stack is deferred (DI-M3a).
+ * stacking (eng-review A3). A **cyclic** container is treated as `packed`: M2 now
+ * condenses its SCCs (DEC-8(B), §26) so a cycle's members share one `localColumn`;
+ * packed placement stacks same-column members in Y at one X, so no intra-cycle edge
+ * renders backward (the genuine cycle wrap-edge becomes vertical). The container's
+ * *acyclic* members keep distinct forward columns.
  */
 export function policyForContainer(
   role: RcllTopologyRole,
@@ -231,8 +241,12 @@ function sizeAndArrange(node: CompoundNode, cyclic: ReadonlySet<string>): void {
   } else if (policy === "mixed") {
     // vpc: subnet-zone sub-hulls forced into bands, then vpc-direct leaves packed
     // in a block below — disjoint Y regions so the two groups never overlap.
-    const containerKids = node.children.filter((c) => c.children.length > 0);
-    const leafKids = node.children.filter((c) => c.children.length === 0);
+    // Classify by ROLE, not child count: an *empty* subnet-zone (a sub-hull with
+    // no children) must still be banded, not packed among the vpc-direct leaves.
+    const containerKids = node.children.filter(
+      (c) => c.role !== "primaryCluster",
+    );
+    const leafKids = node.children.filter((c) => c.role === "primaryCluster");
     const afterBands = placeForcedBands(containerKids, columnX, areaX, areaY);
     placePackedColumns(leafKids, columnX, areaX, afterBands);
   } else {
@@ -379,6 +393,59 @@ export function placementMeta(
     maxDepthPx: Math.round(maxDepthPx),
     cyclicContainerCount: cyclic.size,
   };
+}
+
+/**
+ * The iron rule (CON-12), measured on the placed boxes — works in BOTH Compact and
+ * Full (boxes exist regardless of frame tagging, unlike the rendered
+ * `semanticEdgeViolations`, which goes blind in Full when primary-cluster frames
+ * carry no `terraformPrimaryAddress`).
+ *
+ * For every collapsed TFD edge `u→v`, the edge reads **backward** when the center-X
+ * of `v`'s box is left of `u`'s. A backward edge is classified by whether its **LCA
+ * container is cyclic**:
+ * - `acyclicBackwardEdges` — backward with an acyclic LCA. The width-aware staircase
+ *   guarantees these never happen; this MUST be **0** (the hard gate). A non-zero
+ *   value is a real layout bug.
+ * - `cyclicBackwardEdges` — backward with a cyclic LCA. These are the irreducible
+ *   cycle wrap-edges (a cycle cannot read fully left→right); **excused** + counted,
+ *   to be drawn as explicit back-edges (EXT-12, deferred).
+ */
+export function backwardEdgeGate(
+  boxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
+  collapsedEdges: readonly CollapsedPipelineEdge[],
+  clusters: readonly PipelineCluster[],
+  cyclicContainers: ReadonlySet<string>,
+): { acyclicBackwardEdges: number; cyclicBackwardEdges: number } {
+  const pathById = new Map<string, readonly string[]>(
+    clusters.map((c) => [c.id, topologyPathForCluster(c)]),
+  );
+  const centerX = (b: TerraformDependencyLayoutBox): number => b.x + b.width / 2;
+  let acyclic = 0;
+  let cyclic = 0;
+  for (const e of collapsedEdges) {
+    const bs = boxes.get(e.source);
+    const bt = boxes.get(e.target);
+    if (!bs || !bt) {
+      continue;
+    }
+    if (centerX(bt) >= centerX(bs) - 1) {
+      continue; // forward (or vertical) — fine
+    }
+    const ps = pathById.get(e.source);
+    const pt = pathById.get(e.target);
+    const lca = ps && pt ? lcaTopologyPath(ps, pt) : [];
+    const containerKey =
+      lca.length === 0
+        ? RCLL_ROOT_KEY
+        : topologyRoleAndKeyFromPath(lca)?.key ?? RCLL_ROOT_KEY;
+    if (cyclicContainers.has(containerKey)) {
+      cyclic += 1;
+    } else {
+      acyclic += 1;
+    }
+  }
+  return { acyclicBackwardEdges: acyclic, cyclicBackwardEdges: cyclic };
 }
 
 /** Re-export for tests. */
