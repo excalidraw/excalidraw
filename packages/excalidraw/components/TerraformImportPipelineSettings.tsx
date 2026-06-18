@@ -110,6 +110,24 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
     body: "Plain packing with no extra adjustment. Boxes in the same account/region may share vertical bands.",
     dev: { implements: "No post-pass on top of the chosen Height packing." },
   },
+  "swimlane.stacked": {
+    title: "Swimlanes · Stacked",
+    body: "Inside a swimlane (mutually-dependent accounts that share a left-to-right axis), nested groups stack straight down. Clearest vertically, but taller.",
+    dev: {
+      implements:
+        "Swimlane interiors laid as pure Y-stacked lanes on the shared denseRank(LB) column axis (M3b arrangeSubtreeOnAxis).",
+      refs: ["Sander 1996 — compound layout"],
+    },
+  },
+  "swimlane.compact": {
+    title: "Swimlanes · Risen",
+    body: "Inside a swimlane, groups whose columns don't overlap slide up to share a row instead of stacking, reclaiming vertical space. The shared left-to-right axis is kept, so the dataflow still reads forward.",
+    dev: {
+      implements:
+        "DEC-1 Y-rise extended to swimlane lanes (M4): each lane's frame is tightened to its content shared-column range while leaf X is preserved (CON-12-safe); X-disjoint lanes share rows via riseStackY.",
+      refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
+    },
+  },
   "placement.semantic": {
     title: "Placement · Semantic",
     body: "Two clean-up passes on top of packing: (1) force each account and region into its own distinct horizontal band so regions never interleave vertically (clearer, but taller), and (2) straighten single-occupant lanes by nudging them toward the one resource that feeds them. It never reorders or overlaps boxes.",
@@ -133,12 +151,14 @@ export const TerraformImportPipelineSettings = ({
   pipelinePackedPullLeft,
   pipelineIncludeAncillary,
   pipelineSemanticPlacement,
+  pipelineSwimlaneLaneRise,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
   setPipelinePackedPullLeft,
   setPipelineIncludeAncillary,
   setPipelineSemanticPlacement,
+  setPipelineSwimlaneLaneRise,
   showPlacement = true,
   showVariant = true,
 }: {
@@ -148,12 +168,14 @@ export const TerraformImportPipelineSettings = ({
   pipelinePackedPullLeft: boolean;
   pipelineIncludeAncillary: boolean;
   pipelineSemanticPlacement: boolean;
+  pipelineSwimlaneLaneRise: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
   setPipelinePackedPullLeft: (pullLeft: boolean) => void;
   setPipelineIncludeAncillary: (includeAncillary: boolean) => void;
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
+  setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
   /** RCLL view hides the Layout variant + Height — it owns placement (M0 delegates to Compound). */
@@ -255,8 +277,29 @@ export const TerraformImportPipelineSettings = ({
           )}
           {!showVariant && (
             <div className="TerraformImportModal__controlNote">
-              RCLL arranges layout automatically (M0 delegates to Compound).
-              Only the Detail and Resources toggles apply.
+              RCLL arranges layout automatically. Only the Detail, Resources, and
+              Swimlanes toggles apply.
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline swimlane height">
+              <span className="TerraformImportModal__controlLabel">
+                Swimlanes <span>height of mutually-dependent groups</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option(
+                  "Stacked",
+                  !pipelineSwimlaneLaneRise,
+                  "swimlane.stacked",
+                  () => setPipelineSwimlaneLaneRise(false),
+                )}
+                {option(
+                  "Risen",
+                  pipelineSwimlaneLaneRise,
+                  "swimlane.compact",
+                  () => setPipelineSwimlaneLaneRise(true),
+                )}
+              </div>
             </div>
           )}
           {!isV2 && showVariant && (

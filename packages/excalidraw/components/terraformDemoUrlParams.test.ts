@@ -99,6 +99,25 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses swimlaneRise (RCLL M4 A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&swimlaneRise=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        swimlaneRise: true,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&swimlaneRise=0"),
+      ).toEqual({
+        presetId: "demo",
+        swimlaneRise: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&swimlaneRise=maybe"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

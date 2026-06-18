@@ -90,6 +90,15 @@ export type RcllOptions = {
    * off-switch). Internal only (no dialog/URL surface).
    */
   staircaseBandOverlap?: boolean;
+  /**
+   * M4 (default **false**): inside a swimlane (a multi-hull SCC group), X-disjoint
+   * **lanes rise** to share Y rows (DEC-1 extended to swimlane interiors) instead of
+   * pure Y-stacking. Each lane's frame is tightened to its content shared-column
+   * range while **leaf X is preserved** (CON-12-safe — cross-member edges stay
+   * forward). `false` ⇒ M3b lane Y-stack. The A/B toggle (dialog + URL):
+   * "Swimlanes · Stacked / Compact".
+   */
+  swimlaneLaneRise?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

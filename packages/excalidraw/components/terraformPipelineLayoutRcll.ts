@@ -58,6 +58,8 @@ type RcllBuildOptions = {
   experimentalLayout?: boolean;
   /** DEC-1 (default true): X-disjoint cyclic SCC groups rise to share Y. */
   staircaseBandOverlap?: boolean;
+  /** M4 (default false): X-disjoint swimlane lanes rise to share Y rows. */
+  swimlaneLaneRise?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -351,6 +353,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     compact,
     includeAncillary,
     staircaseBandOverlap: options?.staircaseBandOverlap,
+    swimlaneLaneRise: options?.swimlaneLaneRise === true,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -432,7 +435,13 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     meta: {
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
-      rcllMilestone: placed ? "M3a" : "M2",
+      rcllMilestone: placed
+        ? rcllOptions.swimlaneLaneRise
+          ? "M4"
+          : "M3a"
+        : "M2",
+      // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
+      rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,

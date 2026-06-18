@@ -69,6 +69,10 @@ type PlaceCtx = {
   hullEdges: ReadonlyMap<string, readonly HullEdge[]>;
   /** DEC-1: X-disjoint SCC groups rise to share Y (default true). */
   staircaseOverlap: boolean;
+  /** M4 (default false): inside a swimlane, X-disjoint lanes RISE to share Y rows
+   * (DEC-1 extended to swimlane interiors) instead of pure Y-stacking. CON-12-safe
+   * (leaf shared-column X is preserved). The A/B toggle. */
+  swimlaneLaneRise: boolean;
 };
 
 /** Synthetic compound-tree root key (mirrors terraformPipelineRcllModel). */
@@ -84,7 +88,7 @@ type Policy = "passthrough" | "forced" | "packed" | "mixed";
  * stacking (eng-review A3).
  *
  * **Cyclic containers are NOT routed here.** A container whose hull-edge graph
- * `D_H` is cyclic is handled by `arrangeCyclicContainer` in `sizeAndArrange` BEFORE
+ * `D_H` is cyclic is handled by `arrangeByHullMatrix` in `sizeAndArrange` BEFORE
  * policy is consulted (DEC-8(C) refined, M3b): its `D_H` is decomposed into SCCs —
  * a multi-hull SCC (mutual 2-way cycle) becomes one swimlane (shared axis), the
  * one-way condensation is staircased with a DEC-1 Y-rise. The cluster graph `D` is
@@ -203,6 +207,8 @@ type LaneContext = {
   columnX: readonly number[];
   /** cluster id → shared column index (every descendant leaf of the cyclic root). */
   colByCluster: ReadonlyMap<string, number>;
+  /** M4: X-disjoint lanes rise to share Y rows (vs pure Y-stack). */
+  riseLanes: boolean;
 };
 
 /** Collect every descendant **leaf cluster** node under `node`. */
@@ -249,6 +255,7 @@ function denseClusterColumns(
 function buildLaneContext(
   nodes: readonly CompoundNode[],
   floor: ReadonlyMap<string, number>,
+  riseLanes: boolean,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
   for (const n of nodes) {
@@ -265,7 +272,7 @@ function buildLaneContext(
     colWidth[c] = Math.max(colWidth[c]!, l.cluster!.build.width ?? 0);
   }
   const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
-  return { columnX, colByCluster };
+  return { columnX, colByCluster, riseLanes };
 }
 
 const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
@@ -280,6 +287,30 @@ const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
  * (before pad). Shared by `arrangeSubtreeOnAxis` (a container's children) and
  * `arrangeSwimlaneGroup` (one SCC group's members).
  */
+/** Min shared-column index over a lane's descendant leaf clusters (or 0). */
+function laneMinColumn(lane: CompoundNode, ctx: LaneContext): number {
+  const leaves: CompoundNode[] = [];
+  collectClusterLeaves(lane, leaves);
+  let min = Number.POSITIVE_INFINITY;
+  for (const l of leaves) {
+    const c = ctx.colByCluster.get(l.cluster!.id) ?? 0;
+    if (c < min) {
+      min = c;
+    }
+  }
+  return Number.isFinite(min) ? min : 0;
+}
+
+/** Shift a node's DIRECT children in X by `dx` (descendants follow via the
+ * hierarchical box.x + origin globalize, so only the direct children move). */
+function translateChildrenX(node: CompoundNode, dx: number): void {
+  for (const child of node.children) {
+    if (child.box) {
+      child.box = { ...child.box, x: child.box.x + dx };
+    }
+  }
+}
+
 function layoutLanesOnAxis(
   nodes: readonly CompoundNode[],
   ctx: LaneContext,
@@ -288,14 +319,36 @@ function layoutLanesOnAxis(
 ): { right: number; bottom: number } {
   const lanes = nodes.filter((c) => c.children.length > 0).sort(byModelOrder);
   let cursorY = originY;
-  for (const lane of lanes) {
-    lane.box = {
-      x: originX,
-      y: cursorY,
-      width: lane.box?.width ?? 0,
-      height: lane.box?.height ?? 0,
-    };
-    cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
+  // M4 (CON-12-safe swimlane lane rise): tighten each lane's frame to its content
+  // shared-column range (leaves keep absolute X — forwardness intact) so X-disjoint
+  // lanes can RISE to share Y rows instead of pure Y-stacking.
+  if (ctx.riseLanes) {
+    const placed: { x: number; y: number; w: number; h: number }[] = [];
+    for (const lane of lanes) {
+      const minCol = laneMinColumn(lane, ctx);
+      const shift = ctx.columnX[minCol] ?? 0;
+      const oldWidth = lane.box?.width ?? 0;
+      const gw = Math.max(0, oldWidth - shift);
+      const gx = originX + shift;
+      const gy = riseStackY(gx, gw, placed, originY, true);
+      translateChildrenX(lane, -shift);
+      lane.box = { x: gx, y: gy, width: gw, height: lane.box?.height ?? 0 };
+      placed.push({ x: gx, y: gy, w: gw, h: lane.box.height ?? 0 });
+    }
+    cursorY = placed.reduce((m, p) => Math.max(m, p.y + p.h), originY);
+    if (placed.length > 0) {
+      cursorY += PIPELINE_CLUSTER_GAP_Y;
+    }
+  } else {
+    for (const lane of lanes) {
+      lane.box = {
+        x: originX,
+        y: cursorY,
+        width: lane.box?.width ?? 0,
+        height: lane.box?.height ?? 0,
+      };
+      cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
+    }
   }
   const leaves = nodes
     .filter((c) => c.children.length === 0)
@@ -373,8 +426,9 @@ function arrangeSubtreeOnAxis(node: CompoundNode, ctx: LaneContext): void {
 function arrangeSwimlaneGroup(
   members: readonly CompoundNode[],
   floor: ReadonlyMap<string, number>,
+  riseLanes: boolean,
 ): { width: number; height: number } {
-  const ctx = buildLaneContext(members, floor);
+  const ctx = buildLaneContext(members, floor, riseLanes);
   for (const m of members) {
     arrangeSubtreeOnAxis(m, ctx);
   }
@@ -418,23 +472,32 @@ function riseStackY(
 }
 
 /**
- * **Hull-aware cyclic placement** (DEC-8(C) refined, M3b) — replaces the blunt
- * "dissolve the whole container onto one axis". A container whose hull graph
- * `D_H` cycles is decomposed into its strongly-connected components:
+ * **Hull-placement decision matrix** (DEC-8(C) refined M3b). The cyclic container's
+ * hull graph `D_H` is decomposed into its strongly-connected components and each
+ * child placed by **edge directionality**:
  *
- *   - **Multi-hull SCC** (mutually-dependent hulls, a real 2-way cycle) → ONE
+ *   - **Multi-member SCC** (a mutual cycle `A↔B` or longer `A→B→C→A`) → ONE
  *     **swimlane** (`arrangeSwimlaneGroup`): shared X axis, members as Y-lanes.
- *   - **Singleton** (no mutual cycle) → recurse via `sizeAndArrange` (full
- *     forced/packed policy + nested-cycle dispatch), keeping its own structure.
+ *   - **Singleton SCC** (no mutual cycle) → recurse via `sizeAndArrange` (applies the
+ *     M3a forced/packed/mixed policy, or re-enters this matrix at a nested cyclic
+ *     container), keeping its own structure.
  *
- * The **condensation** of the groups (the one-way edges between SCCs) is a DAG,
- * placed as a **staircase** in X (longest-path + width-aware offsets, CON-6) with
- * a **DEC-1 Y-rise** (`riseStackY`) so X-disjoint groups share rows — collapsing
- * the single-axis Y-stack that dominated height. The cluster graph `D` is acyclic,
- * so cross-group resource edges read forward by the width-aware staircase, and
- * within-swimlane edges read forward by the shared `LB` axis (CON-12 holds).
+ * The **condensation** (one-way edges between SCC groups) is a DAG, placed as a
+ * **staircase** in X (longest-path + width-aware offsets, CON-6) with a **DEC-1
+ * Y-rise** (`riseStackY`) so X-disjoint groups share rows — collapsing the
+ * single-axis Y-stack that dominated height. A container with **no internal hull
+ * edge** ⇒ all groups at column 0 ⇒ a tight vertical stack ("no edge → share
+ * column"). The cluster graph `D` is acyclic, so cross-group resource edges read
+ * forward by the width-aware staircase, and within-swimlane edges read forward by
+ * the shared `LB` axis (CON-12 holds).
+ *
+ * **Reach:** invoked for cyclic containers (the matrix's swimlane/staircase split is
+ * only needed when `D_H` cycles). Acyclic containers use the M3a forced/packed/mixed
+ * policies, which on every measured preset produce the same placement this matrix
+ * would (longest-path columns + per-column stacking) — see §34.2. The M4 swimlane
+ * lane-rise (`ctx.swimlaneLaneRise`) is applied INSIDE this path via `layoutLanesOnAxis`.
  */
-function arrangeCyclicContainer(node: CompoundNode, ctx: PlaceCtx): void {
+function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
   const childKeys = node.children.map((c) => c.key);
   const edges = ctx.hullEdges.get(node.key) ?? [];
   const rep = stronglyConnectedComponents(childKeys, edges);
@@ -461,7 +524,7 @@ function arrangeCyclicContainer(node: CompoundNode, ctx: PlaceCtx): void {
       width = members[0]!.box?.width ?? 0;
       height = members[0]!.box?.height ?? 0;
     } else {
-      const g = arrangeSwimlaneGroup(members, ctx.floor);
+      const g = arrangeSwimlaneGroup(members, ctx.floor, ctx.swimlaneLaneRise);
       width = g.width;
       height = g.height;
     }
@@ -565,7 +628,7 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
   }
 
   if (ctx.cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
-    arrangeCyclicContainer(node, ctx);
+    arrangeByHullMatrix(node, ctx);
     return;
   }
 
@@ -658,6 +721,7 @@ export function layoutPlacement(
     floor: lattice.floor ?? new Map<string, number>(),
     hullEdges: lattice.hullEdges ?? new Map<string, readonly HullEdge[]>(),
     staircaseOverlap: opts?.staircaseBandOverlap !== false,
+    swimlaneLaneRise: opts?.swimlaneLaneRise === true,
   };
   const root = cloneNode(tree);
   sizeAndArrange(root, ctx);

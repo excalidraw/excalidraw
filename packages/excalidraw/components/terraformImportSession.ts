@@ -38,6 +38,8 @@ export type TerraformImportSession = {
   pipelineIncludeAncillary?: boolean;
   /** Pipeline — nesting-aware semantic placement (forced bands + straightening). */
   pipelineSemanticPlacement?: boolean;
+  /** RCLL M4 — X-disjoint swimlane lanes rise to share Y rows. */
+  pipelineSwimlaneLaneRise?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

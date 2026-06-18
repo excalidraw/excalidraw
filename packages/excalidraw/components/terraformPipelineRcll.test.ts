@@ -363,6 +363,71 @@ describe("pipeline view rcll (M3a)", () => {
   );
 });
 
+describe("pipeline view rcll (M4 — swimlane lane-rise)", () => {
+  it(
+    "staging-extended-localstack-v2 — rise ON is shorter, all gates 0, deterministic, milestone M4",
+    async () => {
+      for (const compact of [true, false]) {
+        const mode = compact ? "compact" : "full";
+        const off = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+        });
+        const on = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+          pipelineSwimlaneLaneRise: true,
+        });
+
+        // Milestone bumps to M4 when the rise is active; off stays M3a.
+        expect(on.meta.rcllMilestone, `${mode} milestone`).toBe("M4");
+        expect(off.meta.rcllMilestone, `${mode} off milestone`).toBe("M3a");
+        expect(on.meta.rcllSwimlaneLaneRise, `${mode} meta flag`).toBe(true);
+
+        const onPlacement = (
+          on.meta.rcllStageMeta as Record<string, Record<string, number>>
+        ).placement;
+        const offPlacement = (
+          off.meta.rcllStageMeta as Record<string, Record<string, number>>
+        ).placement;
+
+        // THE WIN: rise ON is strictly shorter than OFF (swimlane interiors pack).
+        expect(
+          onPlacement.maxDepthPx,
+          `${mode} rise ON shorter than OFF`,
+        ).toBeLessThan(offPlacement.maxDepthPx);
+
+        // CON-12-safe + collision-free: every structural gate holds under rise ON.
+        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(0);
+        expect(
+          onPlacement.siblingOverlapViolations,
+          `${mode} sibling overlap`,
+        ).toBe(0);
+        const gates = on.meta.gates as Record<string, number>;
+        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(0);
+        expect(
+          gates.acyclicSameColumnEdges,
+          `${mode} iron rule same-column`,
+        ).toBe(0);
+        expect(on.diagnostics.collisionCount, `${mode} rendered collisions`).toBe(
+          0,
+        );
+
+        // Determinism (CON-8) under rise ON.
+        const on2 = await layout("staging-extended-localstack-v2", {
+          layoutMode: "rcll",
+          pipelineCompact: compact,
+          pipelineSwimlaneLaneRise: true,
+        });
+        expect(geometry(on2.elements), `${mode} rise determinism`).toEqual(
+          geometry(on.elements),
+        );
+      }
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
+  );
+});
+
 describe("rcll inherits the pipeline .tfd validation gate", () => {
   it("rcll with zero resolved .tfd edges returns 400", async () => {
     const plan = {

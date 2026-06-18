@@ -139,6 +139,7 @@ describe("TerraformImportModal", () => {
       pipelinePackedPullLeft: false,
       pipelineIncludeAncillary: false,
       pipelineSemanticPlacement: false,
+      pipelineSwimlaneLaneRise: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -164,6 +165,7 @@ describe("TerraformImportModal", () => {
       pipelinePackedPullLeft: false,
       pipelineIncludeAncillary: false,
       pipelineSemanticPlacement: false,
+      pipelineSwimlaneLaneRise: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -199,6 +201,30 @@ describe("TerraformImportModal", () => {
         semanticLayout: false,
         layoutMode: "rcll",
         pipelineCompact: true,
+      }),
+    );
+  });
+
+  it("RCLL view: Swimlanes · Compact threads pipelineSwimlaneLaneRise true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The RCLL-only Swimlanes control is present; flip it to Risen (rise on).
+    const risenBtn = screen.getByRole("button", { name: /^risen$/i });
+    expect(risenBtn).toBeInTheDocument();
+    fireEvent.click(risenBtn);
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineSwimlaneLaneRise: true,
       }),
     );
   });

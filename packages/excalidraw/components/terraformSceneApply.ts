@@ -157,6 +157,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineIncludeAncillary?: boolean;
   /** Pipeline — nesting-aware semantic placement (forced bands + straightening). Default false. */
   pipelineSemanticPlacement?: boolean;
+  /** RCLL M4 — X-disjoint swimlane lanes rise to share Y rows. Default false. */
+  pipelineSwimlaneLaneRise?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -219,6 +221,8 @@ async function layoutTerraformSceneFromSources(
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
             pipelineSemanticPlacement:
               options.pipelineSemanticPlacement === true,
+            pipelineSwimlaneLaneRise:
+              options.pipelineSwimlaneLaneRise === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -290,6 +294,8 @@ export const runTerraformImportFromSources = async (
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
             pipelineSemanticPlacement:
               options.pipelineSemanticPlacement === true,
+            pipelineSwimlaneLaneRise:
+              options.pipelineSwimlaneLaneRise === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

@@ -13,6 +13,7 @@ export type TerraformDemoUrlParams = {
   packedPullLeft?: boolean;
   ancillary?: boolean;
   semanticPlace?: boolean;
+  swimlaneRise?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -128,6 +129,10 @@ export const parseTerraformDemoUrlParams = (
   if (semanticPlace === null) {
     return null;
   }
+  const swimlaneRise = parseBooleanParam("swimlaneRise");
+  if (swimlaneRise === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -138,6 +143,7 @@ export const parseTerraformDemoUrlParams = (
     ...(packedPullLeft != null ? { packedPullLeft } : {}),
     ...(ancillary != null ? { ancillary } : {}),
     ...(semanticPlace != null ? { semanticPlace } : {}),
+    ...(swimlaneRise != null ? { swimlaneRise } : {}),
   };
 };
 

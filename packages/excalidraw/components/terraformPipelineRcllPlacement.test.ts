@@ -374,6 +374,94 @@ describe("layoutPlacement — cyclic container → staircase + Y-rise", () => {
   });
 });
 
+// ── swimlane interior lane-rise (M4, swimlaneLaneRise) ──────────────────────────
+
+describe("layoutPlacement — swimlane lane-rise (M4)", () => {
+  // A cyclic `prov` whose two accounts form a 2-way SCC ⇒ ONE swimlane on a shared
+  // denseRank(LB) axis. Each account nests two single-leaf regions whose leaves sit
+  // at DISJOINT shared columns, so the regions are X-disjoint lanes that can RISE to
+  // share a Y row (M4) instead of pure Y-stacking (M3b).
+  //   accA: rA(lA @LB0), rB(lB @LB3)   accB: rC(lC @LB1), rD(lD @LB2)
+  const tree = (): CompoundNode =>
+    container(
+      "prov",
+      [
+        container(
+          "accA",
+          [
+            container("rA", [leaf("lA", 0, 0)], "region"),
+            container("rB", [leaf("lB", 0, 3)], "region"),
+          ],
+          "account",
+        ),
+        container(
+          "accB",
+          [
+            container("rC", [leaf("lC", 0, 1)], "region"),
+            container("rD", [leaf("lD", 0, 2)], "region"),
+          ],
+          "account",
+        ),
+      ],
+      "provider",
+    );
+  const floor = { lA: 0, lC: 1, lD: 2, lB: 3 };
+  const he = {
+    prov: [
+      { from: "accA", to: "accB" },
+      { from: "accB", to: "accA" },
+    ],
+  };
+  const lat = (): Lattice => lattice(["prov"], floor, he);
+
+  it("rise ON makes the swimlane strictly shorter than rise OFF", () => {
+    const on = boxByKey(
+      layoutPlacement(tree(), lat(), { swimlaneLaneRise: true }),
+    );
+    const off = boxByKey(layoutPlacement(tree(), lat()));
+    expect(on.get("prov")!.height).toBeLessThan(off.get("prov")!.height);
+  });
+
+  it("rise ON lifts the second region in an account to share the first's row", () => {
+    const on = boxByKey(
+      layoutPlacement(tree(), lat(), { swimlaneLaneRise: true }),
+    );
+    // rA (col0) and rB (col3) are X-disjoint ⇒ rB rises to rA's top Y.
+    expect(on.get("rB")!.y).toBe(on.get("rA")!.y);
+    expect(overlapXY(on.get("rA")!, on.get("rB")!)).toBe(false);
+  });
+
+  it("CON-12-safe: every leaf keeps the SAME absolute X with rise ON vs OFF", () => {
+    const on = boxByKey(
+      layoutPlacement(tree(), lat(), { swimlaneLaneRise: true }),
+    );
+    const off = boxByKey(layoutPlacement(tree(), lat()));
+    for (const id of ["lA", "lB", "lC", "lD"]) {
+      expect(on.get(id)!.x).toBe(off.get(id)!.x);
+    }
+  });
+
+  it("no sibling 2D overlap with rise ON (collision-safe)", () => {
+    const laid = layoutPlacement(tree(), lat(), { swimlaneLaneRise: true });
+    expect(placementMeta(laid, lat()).siblingOverlapViolations).toBe(0);
+    expect(placementMeta(laid, lat()).containmentViolations).toBe(0);
+  });
+
+  it("deterministic with rise ON (two builds positionally identical)", () => {
+    const a = boxByKey(
+      layoutPlacement(tree(), lat(), { swimlaneLaneRise: true }),
+    );
+    const b = boxByKey(
+      layoutPlacement(tree(), lat(), { swimlaneLaneRise: true }),
+    );
+    for (const id of ["lA", "lB", "lC", "lD", "rA", "rB", "accA", "prov"]) {
+      expect(`${a.get(id)!.x},${a.get(id)!.y}`).toBe(
+        `${b.get(id)!.x},${b.get(id)!.y}`,
+      );
+    }
+  });
+});
+
 // ── degenerate ────────────────────────────────────────────────────────────────
 
 describe("layoutPlacement — degenerate inputs", () => {

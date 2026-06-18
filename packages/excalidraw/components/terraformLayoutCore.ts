@@ -421,6 +421,8 @@ type LayoutSceneContext = {
   pipelinePackedPullLeft?: boolean;
   pipelineIncludeAncillary?: boolean;
   pipelineSemanticPlacement?: boolean;
+  /** RCLL M4: X-disjoint swimlane lanes rise to share Y rows. */
+  pipelineSwimlaneLaneRise?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -438,6 +440,7 @@ async function buildPipelineLayoutSceneBody(
         packed: ctx.pipelinePacked === true,
         packedPullLeft: ctx.pipelinePackedPullLeft === true,
         semanticPlacement: ctx.pipelineSemanticPlacement === true,
+        swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
       };
       const buildPipeline =
         ctx.pipelineLayoutVariant === "rcll"
@@ -472,6 +475,9 @@ async function buildPipelineLayoutSceneBody(
               : {}),
             ...(ctx.pipelineSemanticPlacement
               ? { pipelineSemanticPlacement: true }
+              : {}),
+            ...(ctx.pipelineSwimlaneLaneRise
+              ? { pipelineSwimlaneLaneRise: true }
               : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
@@ -852,6 +858,7 @@ export async function layoutTerraformFromSources(
     pipelinePackedPullLeft: options?.pipelinePackedPullLeft === true,
     pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
     pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
+    pipelineSwimlaneLaneRise: options?.pipelineSwimlaneLaneRise === true,
     colorMode: options?.colorMode,
   };
 

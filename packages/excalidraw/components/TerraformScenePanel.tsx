@@ -301,6 +301,7 @@ export const TerraformScenePanel = ({
         pipelinePackedPullLeft: session.pipelinePackedPullLeft === true,
         pipelineIncludeAncillary: session.pipelineIncludeAncillary === true,
         pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
+        pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
         importedTfdTexts: session.importedTfdTexts,
         preset: session.preset,
       });

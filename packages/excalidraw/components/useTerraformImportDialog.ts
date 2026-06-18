@@ -76,6 +76,10 @@ export const useTerraformImportDialog = ({
     useState(false);
   const [pipelineSemanticPlacement, setPipelineSemanticPlacement] =
     useState(false);
+  // RCLL M4 (rcll-only): swimlane lanes rise to share Y rows. Not reset on view
+  // switch — it is the one dial the RCLL view owns.
+  const [pipelineSwimlaneLaneRise, setPipelineSwimlaneLaneRise] =
+    useState(false);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
@@ -255,6 +259,7 @@ export const useTerraformImportDialog = ({
       pipelinePackedPullLeft,
       pipelineIncludeAncillary,
       pipelineSemanticPlacement,
+      pipelineSwimlaneLaneRise,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -378,6 +383,7 @@ export const useTerraformImportDialog = ({
             pipelinePackedPullLeft,
             pipelineIncludeAncillary,
             pipelineSemanticPlacement,
+            pipelineSwimlaneLaneRise,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -467,6 +473,7 @@ export const useTerraformImportDialog = ({
           pipelinePackedPullLeft,
           pipelineIncludeAncillary,
           pipelineSemanticPlacement,
+          pipelineSwimlaneLaneRise,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -665,6 +672,7 @@ export const useTerraformImportDialog = ({
     pipelinePackedPullLeft,
     pipelineIncludeAncillary,
     pipelineSemanticPlacement,
+    pipelineSwimlaneLaneRise,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -697,6 +705,7 @@ export const useTerraformImportDialog = ({
     setPipelinePackedPullLeft,
     setPipelineIncludeAncillary,
     setPipelineSemanticPlacement,
+    setPipelineSwimlaneLaneRise,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

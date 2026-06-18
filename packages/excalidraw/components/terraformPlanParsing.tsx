@@ -136,6 +136,12 @@ export type TerraformPlanParsingOptions = {
    * role-based forced topology bands + deterministic dataflow straightening.
    */
   pipelineSemanticPlacement?: boolean;
+  /**
+   * RCLL M4 (opt-in, default off): inside a swimlane, X-disjoint lanes rise to
+   * share Y rows (DEC-1 extended to swimlane interiors), reclaiming height while
+   * keeping the shared column axis (CON-12-safe).
+   */
+  pipelineSwimlaneLaneRise?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };
