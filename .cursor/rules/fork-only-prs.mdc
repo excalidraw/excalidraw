@@ -1,0 +1,30 @@
+---
+description: PRs and git pushes must target chuysmans/excalidraw only
+alwaysApply: true
+---
+
+# Fork-only PR policy
+
+This clone uses a **fork workflow**. All publish/PR actions target the fork only.
+
+## Remotes
+
+- **`origin`** → `chuysmans/excalidraw` — all PRs and pushes go here.
+- **`upstream`** → `excalidraw/excalidraw` — **read-only** (fetch, issues, reference code only).
+
+## PR creation
+
+- Always use: `gh pr create --repo chuysmans/excalidraw --base master`
+- You may omit `--repo` only when `git remote get-url origin` confirms `chuysmans/excalidraw`.
+- **Never** pass `--repo excalidraw/excalidraw`.
+- **Never** open PRs against upstream or push to `upstream`.
+
+## GitHub MCP
+
+- When creating/updating/merging PRs via MCP, target **`chuysmans/excalidraw`** only.
+- Reading upstream issues or PRs is allowed.
+
+## Allowed upstream operations
+
+- `git fetch upstream`
+- `gh issue view`, `gh repo view`, read-only API calls against upstream

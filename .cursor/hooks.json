@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": ".cursor/hooks/block-dangerous.sh", "matcher": "Shell" },
+      {
+        "command": ".cursor/hooks/block-upstream-pr.sh",
+        "matcher": "gh |git push",
+        "failClosed": true
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": ".cursor/hooks/block-upstream-mcp.sh",
+        "matcher": "github|pull_request|pull request",
+        "failClosed": true
+      }
+    ],
+    "beforeReadFile": [{ "command": ".cursor/hooks/redact-secrets.sh" }],
+    "afterFileEdit": [{ "command": ".cursor/hooks/format-and-audit.sh" }]
+  }
+}

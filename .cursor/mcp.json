@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "X-MCP-Toolsets": "issues,pull_requests,repos"
+      },
+      "note": "GitHub's official REMOTE MCP server. No Docker, no local runtime, no PAT — Cursor authenticates via OAuth on first use. Scoped to just the toolsets this demo needs: read the issue, read the repo, open the PR. Add 'actions' if you want the agent to inspect CI; add 'code_security'/'dependabot' to pull security findings."
+    }
+  }
+}

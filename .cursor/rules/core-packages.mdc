@@ -1,0 +1,23 @@
+---
+description: Rules for the element model, geometry, and package boundaries
+globs: ["packages/element/**/*.ts", "packages/math/**/*.ts", "packages/common/**/*.ts"]
+alwaysApply: false
+---
+
+# Core Package Rules (element / math / common)
+
+These packages are the foundation the whole app builds on. Changes here ripple everywhere.
+
+- **Respect the dependency direction:** `element → math → common`. Never import "upward"
+  (e.g. `math` must not import from `element`; nothing here imports from `@excalidraw/excalidraw`).
+  If you reach for an upward import, the abstraction is in the wrong package — stop and flag it.
+- **Keep `math` pure.** No DOM, no React, no side effects — deterministic functions only.
+  This is what makes it unit-testable and reusable.
+- **Element changes must preserve invariants:** binding (`boundElements`/`containerId`),
+  z-index ordering, and version/versionNonce bumps. If you change an element's shape, update
+  the corresponding transform + binding logic and add a regression test.
+- **No breaking changes to exported types without a note** — these types are part of the
+  public `@excalidraw/*` surface used by external integrators (VSCode, Obsidian, Notion).
+- **Every behavioral change gets a Vitest test** co-located with the source.
+
+Prefer adding a pure helper in `math`/`common` over inlining geometry in `element`.

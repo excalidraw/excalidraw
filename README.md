@@ -1,124 +1,61 @@
-<a href="https://excalidraw.com/" target="_blank" rel="noopener">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
-    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
-  </picture>
-</a>
+# Excalidraw × Cursor — 201 Demo Scaffold
 
-<h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
-  <a href="https://plus.excalidraw.com/blog">Blog</a> |
-  <a href="https://docs.excalidraw.com">Documentation</a> |
-  <a href="https://plus.excalidraw.com">Excalidraw+</a>
-</h4>
+A drop-in `.cursor/` configuration for the `excalidraw/excalidraw` monorepo that turns the repo into a **governed AI engineering platform**. This is the artifact behind the Cursor 201 deep-dive: every file here exists to make a 500-engineer org's AI usage _consistent, safe, and auditable_.
 
-<div align="center">
-  <h2>
-    An open source virtual hand-drawn style whiteboard. </br>
-    Collaborative and end-to-end encrypted. </br>
-  <br />
-  </h2>
-</div>
+## What's in here
 
-<br />
-<p align="center">
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
-    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
-  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
-  <a href="https://docs.excalidraw.com/docs/introduction/contributing">
-    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
-  <a href="https://discord.gg/UexuTaE">
-    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widget=false"/></a>
-  <a href="https://deepwiki.com/excalidraw/excalidraw">
-    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg" /></a>
-  <a href="https://twitter.com/excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
-</p>
-
-<div align="center">
-  <figure>
-    <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
-    </a>
-    <figcaption>
-      <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
-      </p>
-    </figcaption>
-  </figure>
-</div>
-
-## Features
-
-The Excalidraw editor (npm package) supports:
-
-- 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas-based whiteboard.
-- ✍️&nbsp;Hand-drawn like style.
-- 🌓&nbsp;Dark mode.
-- 🏗️&nbsp;Customizable.
-- 📷&nbsp;Image support.
-- 😀&nbsp;Shape libraries support.
-- 🌐&nbsp;Localization (i18n) support.
-- 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
-- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
-- ➡️&nbsp;Arrow-binding & labeled arrows.
-- 🔙&nbsp;Undo / Redo.
-- 🔍&nbsp;Zoom and panning support.
-
-## Excalidraw.com
-
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
-
-- 📡&nbsp;PWA support (works offline).
-- 🤼&nbsp;Real-time collaboration.
-- 🔒&nbsp;End-to-end encryption.
-- 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
-
-We'll be adding these features as drop-in plugins for the npm package in the future.
-
-## Quick start
-
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
-
-Use `npm` or `yarn` to install the package.
-
-```bash
-npm install react react-dom @excalidraw/excalidraw
-# or
-yarn add react react-dom @excalidraw/excalidraw
+```
+AGENTS.md                         Always-on repo context (architecture, package boundaries, DoD)
+.cursor/
+├── rules/
+│   ├── fork-only-prs.mdc          Always-on — PRs/pushes target chuysmans/excalidraw only
+│   ├── react-components.mdc       Auto-attaches on **/*.tsx — React 19 + action-system conventions
+│   ├── core-packages.mdc          Auto-attaches on packages/element|math|common — boundary rules
+│   └── testing.mdc                Auto-attaches on *.test.* — Vitest conventions
+├── commands/
+│   └── ship-feature.md            /ship-feature — the ticket→plan→code→test→PR workflow
+├── hooks.json                     Wires the lifecycle hooks below
+├── hooks/
+│   ├── block-dangerous.sh         beforeShellExecution — DENIES rm -rf, force-push, push to main…
+│   ├── block-upstream-pr.sh       beforeShellExecution — DENIES PR/push to excalidraw/excalidraw
+│   ├── block-upstream-mcp.sh      beforeMCPExecution — DENIES GitHub MCP PR writes to upstream
+│   ├── redact-secrets.sh          beforeReadFile — withholds .env/.pem/secrets from the model
+│   └── format-and-audit.sh        afterFileEdit — Prettier + appends to ai-edit-audit.log
+└── mcp.json                       GitHub remote MCP server (issues + PRs) — no install, OAuth
 ```
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+## The layered mental model (what to say out loud)
 
-## Contributing
+> Rules and skills change **what the agent knows**. MCP changes **what the agent can do**. Hooks change **what the agent is allowed to do** — deterministically, model can't override.
 
-- Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
-- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
-- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
+## Run the demo
 
-## Integrations
+1. Open the excalidraw repo in Cursor with this `.cursor/` dropped in. Restart so hooks load.
+2. Connect the GitHub MCP server: Cursor will prompt an OAuth login the first time the agent uses it — no PAT, no Docker. (Confirm under Settings → MCP that `github` is green.)
+3. Confirm hooks are live: **Settings → Hooks** shows five registered.
+4. `/ship-feature #1234` — agent reads the GitHub issue via MCP, plans in read-only, then implements.
+5. Watch `react-components.mdc` auto-attach when it edits a `.tsx`.
+6. Let it try a destructive git command → `block-dangerous.sh` **denies it live**.
+7. Let it try `gh pr create --repo excalidraw/excalidraw` → `block-upstream-pr.sh` **denies it live**.
+8. Open `.cursor/ai-edit-audit.log` → every AI-touched file, timestamped.
+9. Agent opens a draft PR on **chuysmans/excalidraw**, linked to the issue ("Closes #1234").
+10. Finale: a Background Agent handed a second issue pre-session returns a draft PR with BugBot review.
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
-- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+## Verify the hooks yourself (no Cursor needed)
 
-## Who's integrating Excalidraw
+```bash
+echo '{"command":"git push --force origin main"}' | ./.cursor/hooks/block-dangerous.sh   # → deny
+echo '{"command":"yarn test"}'                    | ./.cursor/hooks/block-dangerous.sh   # → allow
+echo '{"file_path":"excalidraw-app/.env.production"}' | ./.cursor/hooks/redact-secrets.sh # → deny
 
-[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) • and many others
+echo '{"command":"gh pr create --repo excalidraw/excalidraw --title x"}' \
+  | ./.cursor/hooks/block-upstream-pr.sh   # → deny
+echo '{"command":"gh pr create --repo chuysmans/excalidraw --title x"}' \
+  | ./.cursor/hooks/block-upstream-pr.sh   # → allow
+echo '{"command":"git push upstream master"}' \
+  | ./.cursor/hooks/block-upstream-pr.sh   # → deny
+echo '{"command":"gh issue view 1 --repo excalidraw/excalidraw"}' \
+  | ./.cursor/hooks/block-upstream-pr.sh   # → allow
+```
 
-## Sponsors & support
-
-If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw) or use [Excalidraw+](https://plus.excalidraw.com/).
-
-## Thank you for supporting Excalidraw
-
-[<img src="https://opencollective.com/excalidraw/tiers/sponsors/0/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/0/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/1/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/1/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/2/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/2/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/3/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/3/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/4/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/4/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/5/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/5/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/6/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/6/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/7/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/7/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/8/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/8/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/9/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/9/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/10/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/10/website)
-
-<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
-
-Last but not least, we're thankful to these companies for offering their services for free:
-
-[![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
+Hooks parse JSON with `python3` (ubiquitous) — no `jq` dependency.

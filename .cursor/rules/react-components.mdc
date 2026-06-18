@@ -1,0 +1,22 @@
+---
+description: React 19 component conventions for Excalidraw UI
+globs: ["**/*.tsx"]
+alwaysApply: false
+---
+
+# React / Component Rules (auto-attaches on *.tsx)
+
+- **Function components + hooks only.** No class components, no `React.FC` typing —
+  type props explicitly: `const Panel = ({ id }: PanelProps) => { ... }`.
+- **No business logic in components.** UI components render `appState` and dispatch
+  actions. Element mutations belong in the **Action system** (`actions/`), not in handlers.
+- **Never mutate `appState` or elements directly.** Go through the action/`setState` path so
+  history (undo/redo) stays consistent.
+- **i18n:** user-facing strings come from the translation layer (`t("...")`), never hardcoded.
+- **A11y:** interactive elements need an accessible name (`aria-label` or visible label) and
+  keyboard handling; we ship to assistive-tech users.
+- **Styling:** follow the existing SCSS module pattern in the package; do not add new CSS-in-JS libs.
+- **Performance:** memoize expensive render paths; canvas-adjacent components must avoid
+  re-rendering on every pointer move — throttle and use refs where the existing code does.
+
+When you finish a `.tsx` change, confirm it has a Vitest test and passes `yarn test:typecheck`.

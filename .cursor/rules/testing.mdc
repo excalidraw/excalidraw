@@ -1,0 +1,16 @@
+---
+description: Vitest testing conventions
+globs: ["**/*.test.ts", "**/*.test.tsx", "**/tests/**"]
+alwaysApply: false
+---
+
+# Testing Rules (Vitest)
+
+- **Framework is Vitest**, not Jest — use `vi.fn()`/`vi.mock()`, `describe/it/expect`.
+- **Test behavior, not implementation.** For elements/geometry, assert on outputs and
+  invariants (positions, bindings, z-order), not internal calls.
+- **Co-locate** `*.test.ts(x)` next to the source under test, or under the package's `tests/`.
+- **Deterministic only.** No real timers, no network, no randomness without a seeded/mocked
+  source — Excalidraw uses `versionNonce`/random in places; mock it so snapshots are stable.
+- **Canvas/render tests** use the existing test utilities; don't spin up a real browser.
+- When you add a feature, the test must fail without your change and pass with it.
