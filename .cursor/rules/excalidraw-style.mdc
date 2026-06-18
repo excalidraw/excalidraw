@@ -1,0 +1,32 @@
+---
+description: Excalidraw formatting, linting, and import style
+alwaysApply: true
+---
+
+# Excalidraw Style Rules
+
+Follow the repository tooling as the source of truth:
+
+- Run `yarn fix` for automatic formatting/lint fixes.
+- Run `yarn test:code`, `yarn test:other`, and `yarn test:typecheck` when validating broad changes.
+- Prettier comes from `@excalidraw/prettier-config`: use trailing commas where valid, never wrap prose automatically, and allow JSON files up to `printWidth: 256`.
+- Prettier is enforced for `**/*.{css,scss,json,md,html,yml}` through `yarn prettier --list-different`; JS/TS/TSX style is enforced by ESLint and `prettier/prettier`.
+
+When writing JS, TS, or TSX:
+
+- Use TypeScript type-only imports with separate `import type` statements.
+- Keep imports ordered by builtin, external, internal, parent, sibling, index, object, then type groups, with blank lines between groups and inside groups.
+- Treat `@excalidraw/**` imports as external imports placed after other external packages.
+- Prefer `const`, object shorthand, template strings, arrow callbacks, and dot notation.
+- Do not use `var`, unnecessary ternaries, useless returns, lonely `if` blocks, or `else` after an early return.
+- Avoid unused variables; `_` prefixes are not a substitute for removing dead code unless an API requires the argument.
+- Avoid `console` except `console.warn`, `console.error`, and `console.info`.
+- Use curly braces for control-flow bodies.
+
+Respect package boundaries:
+
+- Do not import from `jotai` directly; use `editor-jotai` or `app-jotai`.
+- In `packages/excalidraw/**/*.{ts,tsx}`, avoid importing from barrel `index.tsx` files; use direct relative imports to the specific module. Type-only imports are allowed.
+- In package `src/**/*.{ts,tsx}` files using `packages/eslintrc.base.json`, do not import runtime values from `@excalidraw/excalidraw`; type-only imports are allowed.
+
+For UI text in JSX, use `t(...)` instead of literal text when the text is user-facing and localizable.
