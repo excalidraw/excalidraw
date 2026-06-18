@@ -76,19 +76,18 @@ type Policy = "passthrough" | "forced" | "packed" | "mixed";
  * Per-level policy by parent role (§8). **`root` is `passthrough`** (children = the
  * providers): M3a places providers at their column X but NOT a Y band — the reused
  * `applyCompoundHierarchicalLayout` in export is the sole owner of provider Y
- * stacking (eng-review A3). A **cyclic** container is treated as `packed`: M2 now
- * condenses its SCCs (DEC-8(B), §26) so a cycle's members share one `localColumn`;
- * packed placement stacks same-column members in Y at one X, so no intra-cycle edge
- * renders backward (the genuine cycle wrap-edge becomes vertical). The container's
- * *acyclic* members keep distinct forward columns.
+ * stacking (eng-review A3).
+ *
+ * **Cyclic containers are NOT routed here.** A container whose hull-edge graph
+ * `D_H` is cyclic is handled by the **swimlane** dispatch in `sizeAndArrange`
+ * (`arrangeLaneSubtree`) BEFORE policy is consulted — the spurious hull cycle
+ * (up-projection of an acyclic `D` is not a DAG, §26) is dissolved onto a shared
+ * cluster column axis so its interior containers become Y-lanes. This supersedes
+ * the earlier "cyclic ⇒ packed + DEC-8(B) SCC shared column" (DI-M3a-12), which
+ * cured backward edges by making sibling hulls SHARE a column — violating the
+ * extended iron rule (no TFD edge shares a column, [CON-12]). See §26 / DEC-8(C).
  */
-export function policyForContainer(
-  role: RcllTopologyRole,
-  cyclic: boolean,
-): Policy {
-  if (cyclic) {
-    return "packed";
-  }
+export function policyForContainer(role: RcllTopologyRole): Policy {
   switch (role) {
     case "root":
       return "passthrough";
@@ -195,12 +194,184 @@ function placePackedColumns(
   }
 }
 
+/** A shared cluster column axis for a swimlane (cyclic) subtree. */
+type LaneContext = {
+  /** left-edge X per shared column (column = dense rank of cluster floor). */
+  columnX: readonly number[];
+  /** cluster id → shared column index (every descendant leaf of the cyclic root). */
+  colByCluster: ReadonlyMap<string, number>;
+};
+
+/** Collect every descendant **leaf cluster** node under `node`. */
+function collectClusterLeaves(node: CompoundNode, out: CompoundNode[]): void {
+  if (node.children.length === 0) {
+    if (node.cluster) {
+      out.push(node);
+    }
+    return;
+  }
+  for (const child of node.children) {
+    collectClusterLeaves(child, out);
+  }
+}
+
+/**
+ * Assign each leaf cluster a **shared column** = the dense rank of its global
+ * longest-path floor (`LB`) among the distinct floors present in the cyclic
+ * subtree. `LB` is a longest-path layering, so a TFD edge `u→v` ⇒ `LB(v) > LB(u)`
+ * ⇒ `rank(v) > rank(u)`: **no TFD edge shares a column** (CON-1/CON-12), by
+ * construction. Dense-ranking removes empty columns so the shared axis is no wider
+ * than the number of distinct depths actually present (bounds the §3.4 width cost).
+ */
+function denseClusterColumns(
+  leaves: readonly CompoundNode[],
+  floor: ReadonlyMap<string, number>,
+): Map<string, number> {
+  const distinctFloors = [
+    ...new Set(leaves.map((l) => floor.get(l.cluster!.id) ?? 0)),
+  ].sort((a, b) => a - b);
+  const rankOfFloor = new Map<number, number>(
+    distinctFloors.map((f, i) => [f, i]),
+  );
+  const col = new Map<string, number>();
+  for (const l of leaves) {
+    col.set(l.cluster!.id, rankOfFloor.get(floor.get(l.cluster!.id) ?? 0) ?? 0);
+  }
+  return col;
+}
+
+/** Build the shared column axis for a cyclic subtree (column X from per-column
+ * max cluster width over ALL of the subtree's leaves). */
+function buildLaneContext(
+  node: CompoundNode,
+  floor: ReadonlyMap<string, number>,
+): LaneContext {
+  const leaves: CompoundNode[] = [];
+  collectClusterLeaves(node, leaves);
+  const colByCluster = denseClusterColumns(leaves, floor);
+  const maxCol = leaves.reduce(
+    (m, l) => Math.max(m, colByCluster.get(l.cluster!.id) ?? 0),
+    0,
+  );
+  const colWidth = new Array<number>(maxCol + 1).fill(0);
+  for (const l of leaves) {
+    const c = colByCluster.get(l.cluster!.id) ?? 0;
+    colWidth[c] = Math.max(colWidth[c]!, l.cluster!.build.width ?? 0);
+  }
+  const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
+  return { columnX, colByCluster };
+}
+
+/**
+ * **Swimlane placement** for a cyclic container subtree (DEC-8(C), §26) — the
+ * resolution for a *spurious* hull cycle (the cluster graph `D` is acyclic; the
+ * cycle exists only in the up-projected hull graph `D_H`, e.g. `public⇄private`
+ * from a NAT edge + a reverse SG reference).
+ *
+ * Instead of collapsing the sibling hulls into one column (the superseded
+ * DEC-8(B), which made them read same-column), the subtree's interior is
+ * **dissolved onto one shared cluster column axis** (`ctx`): every descendant leaf
+ * sits at its shared-column X, and each intermediate container (subnet zone / VPC)
+ * becomes a **Y-lane** that spans whatever column range its own clusters occupy.
+ * A subnet is therefore "one contiguous frame over multiple columns", and dataflow
+ * `A→B→A` reads as forward column steps across vertically-separated lanes — no edge
+ * reads backward, no edge shares a column.
+ *
+ * Coordinates are parent-relative (like `sizeAndArrange`), so `globalize` composes
+ * them. Container children are left-aligned at `areaX` (their interior clusters
+ * carry the shared column offset, so siblings align in X); leaf children are placed
+ * directly at the shared column X, packed in Y per column.
+ */
+function arrangeLaneSubtree(node: CompoundNode, ctx: LaneContext): void {
+  if (node.children.length === 0) {
+    node.box = {
+      x: 0,
+      y: 0,
+      width: node.cluster?.build.width ?? 0,
+      height: node.cluster?.build.height ?? 0,
+    };
+    return;
+  }
+  for (const child of node.children) {
+    arrangeLaneSubtree(child, ctx);
+  }
+
+  const titleReserve = rendersTitledFrame(node.role)
+    ? PIPELINE_FRAME_TITLE_HEIGHT
+    : 0;
+  const areaX = PIPELINE_FRAME_PAD; // a cyclic subtree never contains the root
+  const areaY = titleReserve + PIPELINE_FRAME_PAD;
+
+  const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
+    a.minDescendantSequence - b.minDescendantSequence ||
+    a.key.localeCompare(b.key);
+
+  // Container children → disjoint Y-lanes (each spans its own column range),
+  // left-aligned in X (interior clusters carry the shared columns).
+  const lanes = node.children
+    .filter((c) => c.children.length > 0)
+    .sort(byModelOrder);
+  let cursorY = areaY;
+  for (const lane of lanes) {
+    lane.box = {
+      x: areaX,
+      y: cursorY,
+      width: lane.box?.width ?? 0,
+      height: lane.box?.height ?? 0,
+    };
+    cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
+  }
+
+  // Leaf clusters → placed at their shared column X, packed in Y per column,
+  // below the lanes (matches the §8 "mixed" reading: sub-hulls then direct leaves).
+  const leaves = node.children
+    .filter((c) => c.children.length === 0)
+    .sort(byModelOrder);
+  const colCursor = new Map<number, number>();
+  for (const leaf of leaves) {
+    const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
+    const x = areaX + (ctx.columnX[col] ?? 0);
+    const y = colCursor.get(col) ?? cursorY;
+    leaf.box = {
+      x,
+      y,
+      width: leaf.box?.width ?? 0,
+      height: leaf.box?.height ?? 0,
+    };
+    colCursor.set(col, y + (leaf.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y);
+  }
+
+  const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
+  for (const child of node.children) {
+    childBoxes.set(child.key, child.box!);
+  }
+  const bb = boundsOf(
+    node.children.map((c) => c.key),
+    childBoxes,
+  );
+  node.box = {
+    x: 0,
+    y: 0,
+    width: bb ? bb.x + bb.width + PIPELINE_FRAME_PAD : 0,
+    height: bb ? bb.y + bb.height + PIPELINE_FRAME_PAD : 0,
+  };
+}
+
 /**
  * Size + locally arrange one node (post-order). Sets `node.box` with **local**
  * x/y (relative to the node's own footprint top-left; the parent assigns the real
  * x/y) and the footprint width/height. Leaves take their card size.
+ *
+ * A non-root container whose `D_H` is **cyclic** is dissolved onto a shared cluster
+ * column axis (`arrangeLaneSubtree`, DEC-8(C)) — the outermost cyclic ancestor owns
+ * the axis; nested cyclic containers inherit it (they are never reached here once
+ * their ancestor took the lane branch).
  */
-function sizeAndArrange(node: CompoundNode, cyclic: ReadonlySet<string>): void {
+function sizeAndArrange(
+  node: CompoundNode,
+  cyclic: ReadonlySet<string>,
+  floor: ReadonlyMap<string, number>,
+): void {
   if (node.children.length === 0) {
     const w = node.cluster?.build.width ?? 0;
     const h = node.cluster?.build.height ?? 0;
@@ -208,8 +379,13 @@ function sizeAndArrange(node: CompoundNode, cyclic: ReadonlySet<string>): void {
     return;
   }
 
+  if (cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
+    arrangeLaneSubtree(node, buildLaneContext(node, floor));
+    return;
+  }
+
   for (const child of node.children) {
-    sizeAndArrange(child, cyclic);
+    sizeAndArrange(child, cyclic, floor);
   }
 
   const columnX = columnOffsetsFromWidths(
@@ -224,7 +400,7 @@ function sizeAndArrange(node: CompoundNode, cyclic: ReadonlySet<string>): void {
   const areaX = isRoot ? 0 : PIPELINE_FRAME_PAD;
   const areaY = isRoot ? 0 : titleReserve + PIPELINE_FRAME_PAD;
 
-  const policy = policyForContainer(node.role, cyclic.has(node.key));
+  const policy = policyForContainer(node.role);
   if (policy === "passthrough") {
     // root: providers at column X, all at Y = areaY; reanchor stacks them (A3).
     for (const child of node.children) {
@@ -292,8 +468,9 @@ export function layoutPlacement(
   lattice: Lattice,
 ): CompoundNode {
   const cyclic = lattice.cyclicContainers ?? new Set<string>();
+  const floor = lattice.floor ?? new Map<string, number>();
   const root = cloneNode(tree);
-  sizeAndArrange(root, cyclic);
+  sizeAndArrange(root, cyclic, floor);
   globalize(root, 0, 0);
   return root;
 }
@@ -368,7 +545,7 @@ export function placementMeta(
         containmentViolations += 1;
       }
     }
-    if (policyForContainer(node.role, cyclic.has(node.key)) === "forced") {
+    if (policyForContainer(node.role) === "forced") {
       for (let i = 0; i < node.children.length; i++) {
         for (let j = i + 1; j < node.children.length; j++) {
           const a = node.children[i]!.box;
@@ -396,41 +573,59 @@ export function placementMeta(
 }
 
 /**
- * The iron rule (CON-12), measured on the placed boxes — works in BOTH Compact and
- * Full (boxes exist regardless of frame tagging, unlike the rendered
+ * The **iron rule** (CON-12), measured on the placed boxes — works in BOTH Compact
+ * and Full (boxes exist regardless of frame tagging, unlike the rendered
  * `semanticEdgeViolations`, which goes blind in Full when primary-cluster frames
  * carry no `terraformPrimaryAddress`).
  *
- * For every collapsed TFD edge `u→v`, the edge reads **backward** when the center-X
- * of `v`'s box is left of `u`'s. A backward edge is classified by whether its **LCA
- * container is cyclic**:
- * - `acyclicBackwardEdges` — backward with an acyclic LCA. The width-aware staircase
- *   guarantees these never happen; this MUST be **0** (the hard gate). A non-zero
- *   value is a real layout bug.
- * - `cyclicBackwardEdges` — backward with a cyclic LCA. These are the irreducible
- *   cycle wrap-edges (a cycle cannot read fully left→right); **excused** + counted,
- *   to be drawn as explicit back-edges (EXT-12, deferred).
+ * The rule has **two** halves, both keyed off the **left edge** of each box (the
+ * column indicator — `centerX` is ambiguous because cards in one column have
+ * different widths). For every collapsed TFD edge `u→v`, with `dx = x(v) − x(u)`:
+ * - `dx ≥ +EPS` → **forward** (a real column step right) — fine.
+ * - `dx ≤ −EPS` → **backward** — `v` reads left of `u`.
+ * - `|dx| < EPS` → **same column** — `u` and `v` occupy the same column.
+ *
+ * Both backward and same-column violate the iron rule and are classified by whether
+ * the edge's **LCA container is cyclic** (a *genuine* `D` cycle, CON-2 — spurious
+ * hull cycles are dissolved into lanes, DEC-8(C), so they no longer appear here):
+ * - `acyclic*` — MUST be **0** (the hard gate). The width-aware staircase + the
+ *   shared lane axis guarantee every acyclic edge reads strictly forward.
+ * - `cyclic*` — excused + counted (a true cycle has no fully-forward drawing),
+ *   drawn as explicit back-edges (EXT-12).
  */
 export function backwardEdgeGate(
   boxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
   collapsedEdges: readonly CollapsedPipelineEdge[],
   clusters: readonly PipelineCluster[],
   cyclicContainers: ReadonlySet<string>,
-): { acyclicBackwardEdges: number; cyclicBackwardEdges: number } {
+): {
+  acyclicBackwardEdges: number;
+  cyclicBackwardEdges: number;
+  acyclicSameColumnEdges: number;
+  cyclicSameColumnEdges: number;
+} {
   const pathById = new Map<string, readonly string[]>(
     clusters.map((c) => [c.id, topologyPathForCluster(c)]),
   );
-  const centerX = (b: TerraformDependencyLayoutBox): number => b.x + b.width / 2;
-  let acyclic = 0;
-  let cyclic = 0;
+  // Half a column gap separates "same column" from a real forward/backward step:
+  // adjacent columns' left edges differ by ≥ `colWidth + PIPELINE_COLUMN_GAP`, while
+  // same-column clusters differ only by accumulated nesting pad (a few
+  // `PIPELINE_FRAME_PAD`). Read inside the function — a module-top-level const would
+  // bind `PIPELINE_COLUMN_GAP` during a circular-import dead zone (→ NaN threshold).
+  const sameColumnEps = PIPELINE_COLUMN_GAP / 2;
+  let acyclicBackward = 0;
+  let cyclicBackward = 0;
+  let acyclicSameCol = 0;
+  let cyclicSameCol = 0;
   for (const e of collapsedEdges) {
     const bs = boxes.get(e.source);
     const bt = boxes.get(e.target);
     if (!bs || !bt) {
       continue;
     }
-    if (centerX(bt) >= centerX(bs) - 1) {
-      continue; // forward (or vertical) — fine
+    const dx = bt.x - bs.x;
+    if (dx >= sameColumnEps) {
+      continue; // forward — fine
     }
     const ps = pathById.get(e.source);
     const pt = pathById.get(e.target);
@@ -439,13 +634,19 @@ export function backwardEdgeGate(
       lca.length === 0
         ? RCLL_ROOT_KEY
         : topologyRoleAndKeyFromPath(lca)?.key ?? RCLL_ROOT_KEY;
-    if (cyclicContainers.has(containerKey)) {
-      cyclic += 1;
+    const isCyclic = cyclicContainers.has(containerKey);
+    if (dx <= -sameColumnEps) {
+      isCyclic ? (cyclicBackward += 1) : (acyclicBackward += 1);
     } else {
-      acyclic += 1;
+      isCyclic ? (cyclicSameCol += 1) : (acyclicSameCol += 1);
     }
   }
-  return { acyclicBackwardEdges: acyclic, cyclicBackwardEdges: cyclic };
+  return {
+    acyclicBackwardEdges: acyclicBackward,
+    cyclicBackwardEdges: cyclicBackward,
+    acyclicSameColumnEdges: acyclicSameCol,
+    cyclicSameColumnEdges: cyclicSameCol,
+  };
 }
 
 /** Re-export for tests. */

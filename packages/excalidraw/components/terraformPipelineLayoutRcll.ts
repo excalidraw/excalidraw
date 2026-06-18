@@ -262,24 +262,26 @@ const RCLL_BACK_EDGE_COLOR = "#e8590c";
 /**
  * Re-style the cycle wrap-edges in place: dashed + a distinct colour + a
  * `terraformBackEdge` flag (for a future legend/hover). A wrap-edge is a TFD
- * arrow whose target box center-X reads left of its source — which, given the
- * CON-12 gate (acyclic backward = 0), is always an intra-cycle edge. Aggregated
- * hull connectors are left alone. Returns the count styled.
+ * arrow whose target box LEFT EDGE reads left of its source's — which, given the
+ * CON-12 gate (acyclic backward = 0; spurious hull cycles dissolved into lanes,
+ * DEC-8(C)), is always a *genuine* intra-cycle edge. Aggregated hull connectors are
+ * left alone. Returns the count styled (**0 on v2** — no genuine `D` cycle; this is
+ * the defensive path for a real cluster-graph cycle).
  */
 function styleRcllBackEdges(
   skeleton: ExcalidrawElementSkeleton[],
   collapsedEdges: readonly CollapsedPipelineEdge[],
   layoutBoxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
 ): number {
-  const centerX = (id: string): number | null => {
+  const leftX = (id: string): number | null => {
     const b = layoutBoxes.get(id);
-    return b ? b.x + b.width / 2 : null;
+    return b ? b.x : null;
   };
   const backKeys = new Set<string>();
   for (const e of collapsedEdges) {
-    const cs = centerX(e.source);
-    const ct = centerX(e.target);
-    if (cs != null && ct != null && ct < cs - 1) {
+    const xs = leftX(e.source);
+    const xt = leftX(e.target);
+    if (xs != null && xt != null && xt < xs - 1) {
       backKeys.add(`${e.source} ${e.target}`);
     }
   }
@@ -289,7 +291,13 @@ function styleRcllBackEdges(
   let styled = 0;
   for (const el of skeleton) {
     const cd = el.customData as
-      | { relationship?: { source?: unknown; target?: unknown; aggregated?: unknown } }
+      | {
+          relationship?: {
+            source?: unknown;
+            target?: unknown;
+            aggregated?: unknown;
+          };
+        }
       | undefined;
     const rel = cd?.relationship;
     if (
@@ -371,13 +379,14 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     elements = built.elements;
     backEdgesStyled = built.backEdgesStyled;
     // Cluster-level cycle warning (D) + the container-level cycle warning (D_H,
-    // the 6 cyclic containers on v2 — placed via M2's SCC-condensed columns).
+    // the 6 cyclic containers on v2 — dissolved into shared-axis lanes, DEC-8(C),
+    // so their interior reads strictly left→right by dependency).
     warnings = [...pipelineCycleWarnings(prep.depthResult)];
     if ((lattice.cyclicContainers?.size ?? 0) > 0) {
       warnings.push({
         code: "pipeline_cycle_container",
         message:
-          "Pipeline view detected a dependency cycle between sibling topology hulls; those containers were laid out in declaration order.",
+          "Pipeline view detected a dependency cycle between sibling topology hulls (a side effect of grouping resources into hulls; the underlying resources are acyclic); those containers were laid out as dependency-ordered swimlanes.",
       });
     }
   } else {
@@ -406,7 +415,12 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
         prep.clusters,
         lattice.cyclicContainers ?? new Set<string>(),
       )
-    : { acyclicBackwardEdges: 0, cyclicBackwardEdges: 0 };
+    : {
+        acyclicBackwardEdges: 0,
+        cyclicBackwardEdges: 0,
+        acyclicSameColumnEdges: 0,
+        cyclicSameColumnEdges: 0,
+      };
 
   return {
     elements,
@@ -446,11 +460,16 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       gates: {
         collisions: diagnostics.collisionCount,
         semanticEdgeViolations: diagnostics.semanticEdgeViolations.length,
-        // CON-12 iron rule (model-level, both modes): acyclic MUST be 0; cyclic
-        // wrap-edges are excused + counted, and drawn as explicit back-edges
-        // (EXT-12: dashed + distinct colour + `terraformBackEdge`).
+        // CON-12 iron rule (model-level, both modes) — TWO halves, both MUST be 0
+        // for an acyclic LCA: no TFD edge reads backward AND none shares a column
+        // (spurious hull cycles are dissolved into lanes, DEC-8(C), so they no
+        // longer surface here). The `cyclic*` counts are excused (a genuine `D`
+        // cycle, CON-2) + drawn as explicit back-edges (EXT-12: dashed + distinct
+        // colour + `terraformBackEdge`) — expected 0 on v2 (no genuine `D` cycle).
         acyclicBackwardEdges: backward.acyclicBackwardEdges,
         cyclicBackwardEdges: backward.cyclicBackwardEdges,
+        acyclicSameColumnEdges: backward.acyclicSameColumnEdges,
+        cyclicSameColumnEdges: backward.cyclicSameColumnEdges,
         backEdgesStyled,
       },
     },

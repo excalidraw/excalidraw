@@ -5,9 +5,12 @@
  *
  *   - layoutPlacement: packed column-stack (disjoint X/Y), forced bands (disjoint
  *     Y), staircase X (CON-6 from M2), mixed vpc (bands + leaves below), cyclic
- *     strip, single-child / empty container (finite box), containment, purity,
+ *     container → SWIMLANES (DEC-8(C): shared cluster axis + Y-lanes, no two on one
+ *     column), single-child / empty container (finite box), containment, purity,
  *     determinism
  *   - placementMeta: containment/forced-band violations = 0; leaf count; cyclic count
+ *   - backwardEdgeGate: the iron rule (CON-12) — no acyclic edge reads backward OR
+ *     shares a column; cyclic LCAs excused
  *   - placementStage: clones, returns scalar meta
  *
  * Run: yarn vitest run packages/excalidraw/components/terraformPipelineRcllPlacement.test.ts
@@ -74,8 +77,14 @@ const container = (
   children,
 });
 
-const lattice = (cyclic: string[] = []): Lattice => ({
+const lattice = (
+  cyclic: string[] = [],
+  floor?: Record<string, number>,
+): Lattice => ({
   cyclicContainers: new Set(cyclic),
+  // Lane (swimlane) placement of a cyclic container derives its shared cluster
+  // column axis from the global `LB` floor; supply it for cyclic fixtures.
+  floor: floor ? new Map(Object.entries(floor)) : undefined,
 });
 
 const overlapXY = (
@@ -90,15 +99,16 @@ const overlapXY = (
 // ── policyForContainer ───────────────────────────────────────────────────────
 
 describe("policyForContainer", () => {
-  it("maps roles per §8 and treats cyclic as packed", () => {
-    expect(policyForContainer("root", false)).toBe("passthrough");
-    expect(policyForContainer("provider", false)).toBe("forced");
-    expect(policyForContainer("account", false)).toBe("forced");
-    expect(policyForContainer("region", false)).toBe("packed");
-    expect(policyForContainer("vpc", false)).toBe("mixed");
-    expect(policyForContainer("subnetZone", false)).toBe("packed");
-    // cyclic overrides role → packed (M2 SCC condensation → cycle shares a column)
-    expect(policyForContainer("account", true)).toBe("packed");
+  it("maps roles per §8 (cyclic containers are routed to lanes upstream)", () => {
+    expect(policyForContainer("root")).toBe("passthrough");
+    expect(policyForContainer("provider")).toBe("forced");
+    expect(policyForContainer("account")).toBe("forced");
+    expect(policyForContainer("region")).toBe("packed");
+    expect(policyForContainer("vpc")).toBe("mixed");
+    expect(policyForContainer("subnetZone")).toBe("packed");
+    // Cyclicity no longer overrides the role policy: a cyclic D_H is dissolved into
+    // a shared-axis lane subtree by `arrangeLaneSubtree` BEFORE policy is consulted
+    // (DEC-8(C), supersedes DI-M3a-12's "cyclic → packed shared column").
   });
 });
 
@@ -217,27 +227,87 @@ describe("layoutPlacement — mixed vpc", () => {
   });
 });
 
-// ── cyclic container ──────────────────────────────────────────────────────────
+// ── cyclic container → swimlanes (DEC-8(C)) ────────────────────────────────────
 
-describe("layoutPlacement — cyclic container", () => {
-  // M2 gives a cyclic container sequential columns 0,1,2 → packed draws a strip.
+describe("layoutPlacement — cyclic container → swimlanes", () => {
+  // A spurious hull cycle: a VPC with two subnet zones whose hulls form a 2-way
+  // edge (public⇄private) even though the underlying clusters are acyclic. The
+  // clusters' LB floors interleave across the subnets:
+  //   public:  p0 (LB 0), p1 (LB 2)
+  //   private: q0 (LB 1), q1 (LB 3)
+  // so the dependency chain p0→q0→p1→q1 reads strictly left→right.
   const tree = (): CompoundNode =>
     container(
-      "cyc",
-      [leaf("a", 0, 0), leaf("b", 1, 1), leaf("c", 2, 2)],
-      "account",
+      "vpc",
+      [
+        container("public", [leaf("p0", 0, 0), leaf("p1", 0, 2)], "subnetZone"),
+        container(
+          "private",
+          [leaf("q0", 0, 1), leaf("q1", 0, 3)],
+          "subnetZone",
+        ),
+      ],
+      "vpc",
     );
+  const floor = { p0: 0, q0: 1, p1: 2, q1: 3 };
 
-  it("lays children out as a left-to-right strip, no throw, no overlap", () => {
-    const laid = layoutPlacement(tree(), lattice(["cyc"]));
+  it("dissolves the subnets onto ONE shared column axis (no two on the same X)", () => {
+    const laid = layoutPlacement(tree(), lattice(["vpc"], floor));
     const by = boxByKey(laid);
-    const a = by.get("a")!;
-    const b = by.get("b")!;
-    const c = by.get("c")!;
-    expect(a.x).toBeLessThan(b.x);
-    expect(b.x).toBeLessThan(c.x);
-    expect(overlapXY(a, b)).toBe(false);
-    expect(overlapXY(b, c)).toBe(false);
+    // dense-rank(LB): p0→col0, q0→col1, p1→col2, q1→col3 — four distinct X.
+    const xs = [
+      by.get("p0")!.x,
+      by.get("q0")!.x,
+      by.get("p1")!.x,
+      by.get("q1")!.x,
+    ];
+    expect(xs[0]).toBeLessThan(xs[1]!);
+    expect(xs[1]).toBeLessThan(xs[2]!);
+    expect(xs[2]).toBeLessThan(xs[3]!);
+  });
+
+  it("places the two subnet zones as disjoint Y-lanes (CON-5 preserved)", () => {
+    const laid = layoutPlacement(tree(), lattice(["vpc"], floor));
+    const by = boxByKey(laid);
+    const pub = by.get("public")!;
+    const priv = by.get("private")!;
+    expect(overlapXY(pub, priv)).toBe(false);
+    expect(pub.y + pub.height).toBeLessThanOrEqual(priv.y);
+  });
+
+  it("each subnet frame spans MULTIPLE columns (one contiguous lane)", () => {
+    const laid = layoutPlacement(tree(), lattice(["vpc"], floor));
+    const by = boxByKey(laid);
+    // public wraps p0 (col0) + p1 (col2): its width must exceed a single card.
+    const pub = by.get("public")!;
+    const p0 = by.get("p0")!;
+    expect(pub.width).toBeGreaterThan(p0.width);
+    // p1 (col2) sits to the right of q0 (col1) — the lane truly interleaves.
+    expect(by.get("p1")!.x).toBeGreaterThan(by.get("q0")!.x);
+  });
+
+  it("no TFD edge reads backward OR shares a column (the iron rule, CON-12)", () => {
+    const laid = layoutPlacement(tree(), lattice(["vpc"], floor));
+    const by = boxByKey(laid);
+    const clusters = ["p0", "q0", "p1", "q1"].map((id) => ({
+      ...leaf(id, 0, 0).cluster!,
+      placement: {
+        providerFamily: "aws",
+        accountId: "acct",
+        region: "r",
+        vpcId: "vpc",
+      } as PipelineCluster["placement"],
+    }));
+    const edges = [
+      { source: "p0", target: "q0" },
+      { source: "q0", target: "p1" },
+      { source: "p1", target: "q1" },
+    ] as CollapsedPipelineEdge[];
+    const g = backwardEdgeGate(by, edges, clusters, new Set(["vpc"]));
+    expect(g.acyclicBackwardEdges).toBe(0);
+    expect(g.acyclicSameColumnEdges).toBe(0);
+    expect(g.cyclicBackwardEdges).toBe(0);
+    expect(g.cyclicSameColumnEdges).toBe(0);
   });
 });
 
@@ -357,29 +427,50 @@ describe("backwardEdgeGate", () => {
       region: "r",
     } as PipelineCluster["placement"],
   });
-  const box = (
-    x: number,
-    width = 100,
-  ): TerraformDependencyLayoutBox => ({ x, y: 0, width, height: 50 });
+  const box = (x: number, width = 100): TerraformDependencyLayoutBox => ({
+    x,
+    y: 0,
+    width,
+    height: 50,
+  });
   const edge = (source: string, target: string): CollapsedPipelineEdge =>
     ({ source, target } as CollapsedPipelineEdge);
 
   it("counts no backward edge when the target box is right of the source", () => {
-    const boxes = new Map([["u", box(0)], ["v", box(300)]]);
-    const g = backwardEdgeGate(boxes, [edge("u", "v")], [cl("u"), cl("v")], new Set());
+    const boxes = new Map([
+      ["u", box(0)],
+      ["v", box(300)],
+    ]);
+    const g = backwardEdgeGate(
+      boxes,
+      [edge("u", "v")],
+      [cl("u"), cl("v")],
+      new Set(),
+    );
     expect(g.acyclicBackwardEdges).toBe(0);
     expect(g.cyclicBackwardEdges).toBe(0);
   });
 
   it("flags an acyclic backward edge (target left of source, LCA not cyclic)", () => {
-    const boxes = new Map([["u", box(300)], ["v", box(0)]]);
-    const g = backwardEdgeGate(boxes, [edge("u", "v")], [cl("u"), cl("v")], new Set());
+    const boxes = new Map([
+      ["u", box(300)],
+      ["v", box(0)],
+    ]);
+    const g = backwardEdgeGate(
+      boxes,
+      [edge("u", "v")],
+      [cl("u"), cl("v")],
+      new Set(),
+    );
     expect(g.acyclicBackwardEdges).toBe(1);
     expect(g.cyclicBackwardEdges).toBe(0);
   });
 
   it("excuses a backward edge whose LCA container is cyclic", () => {
-    const boxes = new Map([["u", box(300)], ["v", box(0)]]);
+    const boxes = new Map([
+      ["u", box(300)],
+      ["v", box(0)],
+    ]);
     const g = backwardEdgeGate(
       boxes,
       [edge("u", "v")],
