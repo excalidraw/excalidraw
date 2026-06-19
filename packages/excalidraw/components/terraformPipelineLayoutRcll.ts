@@ -62,6 +62,8 @@ type RcllBuildOptions = {
   swimlaneLaneRise?: boolean;
   /** M6 (default false): per-container barycenter crossing-min reorder. */
   reorder?: boolean;
+  /** M5 (default false): Brandes–Köpf leaf coordinate-assignment / straightening. */
+  straighten?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -357,6 +359,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     staircaseBandOverlap: options?.staircaseBandOverlap,
     swimlaneLaneRise: options?.swimlaneLaneRise === true,
     reorder: options?.reorder === true,
+    straighten: options?.straighten === true,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -439,16 +442,20 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
       rcllMilestone: placed
-        ? rcllOptions.reorder
-          ? "M6"
-          : rcllOptions.swimlaneLaneRise
-            ? "M4"
-            : "M3a"
+        ? rcllOptions.straighten
+          ? "M5"
+          : rcllOptions.reorder
+            ? "M6"
+            : rcllOptions.swimlaneLaneRise
+              ? "M4"
+              : "M3a"
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
       // M6: whether the barycenter crossing-min reorder is active.
       rcllReorder: rcllOptions.reorder === true,
+      // M5: whether Brandes–Köpf leaf straightening is active.
+      rcllStraighten: rcllOptions.straighten === true,
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,

@@ -107,6 +107,15 @@ export type RcllOptions = {
    * `false` ⇒ model-order stacking. The A/B toggle: "Ordering · Off / On".
    */
   reorder?: boolean;
+  /**
+   * M5 (default **false**): coordinate assignment / **straightening** (RFC §9, Axis-1
+   * = Brandes–Köpf). After M6 settles the within-column order, each leaf is assigned a
+   * Y that aligns it with its dataflow neighbours in adjacent columns (the spine reads
+   * flat), replacing the naive top→down stack. **Y only** — column X + within-column
+   * order (M6) untouched, so the iron rule (CON-12) holds. `false` ⇒ plain stack. The
+   * A/B toggle: "Straighten · Off / On".
+   */
+  straighten?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

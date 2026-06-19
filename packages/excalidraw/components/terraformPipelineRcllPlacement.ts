@@ -52,6 +52,10 @@ import {
   type OrderableLeaf,
 } from "./terraformPipelineOrdering";
 import { hubCenteringOverBoxes } from "./terraformPipelineCoordinateAssignment";
+import {
+  straightenColumns,
+  type StraightenLeaf,
+} from "./terraformPipelineStraighten";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type {
@@ -82,9 +86,13 @@ type PlaceCtx = {
    * barycenter reorder (strict-improve crossing gate) instead of model order. The
    * A/B toggle. X (columns) is untouched — order only. */
   reorder: boolean;
-  /** out(u): fan-out target cluster ids by source id (M6 adjacency). */
+  /** M5 (default false): after the per-column stack, assign each leaf a Brandes–Köpf
+   * Y that straightens its adjacent-column dataflow edges (RFC §9 Axis-1). Y only —
+   * X (columns) and within-column ORDER (M6) untouched. The A/B toggle. */
+  straighten: boolean;
+  /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 straighten). */
   fanout: ReadonlyMap<string, readonly string[]>;
-  /** in(w): fan-in source cluster ids by target id. */
+  /** in(w): fan-in source cluster ids by target id (M5 straighten). */
   fanin: ReadonlyMap<string, readonly string[]>;
 };
 
@@ -306,6 +314,63 @@ function placePackedColumns(
     };
     colCursor.set(col, y + (child.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y);
   }
+  // M5 (A1): re-assign leaf Y by Brandes–Köpf straightening, keeping column X +
+  // order. Leaf clusters only — sub-hull containers keep their stack slot.
+  applyStraightening(
+    ordered,
+    (c) => c.localColumn ?? 0,
+    startY,
+    ctx.straighten,
+    ctx.fanout,
+    ctx.fanin,
+  );
+}
+
+/**
+ * M5 (A1 Brandes–Köpf): when `straighten`, rewrite each leaf child's `box.y` to the
+ * straightened Y (X + within-column order untouched). No-op for non-leaf children
+ * (sub-hulls keep their stack slot) and when the flag is off. The child's index in the
+ * already-sorted `ordered` list IS the M6-settled within-column order (per column).
+ */
+function applyStraightening(
+  ordered: readonly CompoundNode[],
+  colOf: (child: CompoundNode) => number,
+  segmentTop: number,
+  straighten: boolean,
+  fanout: ReadonlyMap<string, readonly string[]>,
+  fanin: ReadonlyMap<string, readonly string[]>,
+): void {
+  if (!straighten) {
+    return;
+  }
+  const leaves: StraightenLeaf[] = [];
+  ordered.forEach((child, i) => {
+    if (child.children.length === 0 && child.cluster && child.box) {
+      leaves.push({
+        key: child.key,
+        clusterId: child.cluster.id,
+        col: colOf(child),
+        height: child.box.height ?? 0,
+        order: i,
+      });
+    }
+  });
+  if (leaves.length === 0) {
+    return;
+  }
+  const y = straightenColumns(
+    leaves,
+    fanout,
+    fanin,
+    segmentTop,
+    PIPELINE_CLUSTER_GAP_Y,
+  );
+  for (const child of ordered) {
+    const ny = y.get(child.key);
+    if (ny != null && child.box) {
+      child.box = { ...child.box, y: ny };
+    }
+  }
 }
 
 /** A shared cluster column axis for a swimlane (cyclic) subtree. */
@@ -319,8 +384,12 @@ type LaneContext = {
   /** M6: barycenter-reorder leaf Y-order within each shared column (strict-improve
    * gated) instead of model order. */
   reorder: boolean;
-  /** M6 adjacency: out(u) cluster-id fan-out targets by source id. */
+  /** M5 (A1): Brandes–Köpf straighten leaf Y after the per-column stack. */
+  straighten: boolean;
+  /** M6 adjacency / M5 straighten: out(u) cluster-id fan-out targets by source id. */
   fanout: ReadonlyMap<string, readonly string[]>;
+  /** M5 straighten: in(w) cluster-id fan-in sources by target id. */
+  fanin: ReadonlyMap<string, readonly string[]>;
 };
 
 /** Collect every descendant **leaf cluster** node under `node`. */
@@ -369,7 +438,9 @@ function buildLaneContext(
   floor: ReadonlyMap<string, number>,
   riseLanes: boolean,
   reorder: boolean,
+  straighten: boolean,
   fanout: ReadonlyMap<string, readonly string[]>,
+  fanin: ReadonlyMap<string, readonly string[]>,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
   for (const n of nodes) {
@@ -386,7 +457,15 @@ function buildLaneContext(
     colWidth[c] = Math.max(colWidth[c]!, l.cluster!.build.width ?? 0);
   }
   const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
-  return { columnX, colByCluster, riseLanes, reorder, fanout };
+  return {
+    columnX,
+    colByCluster,
+    riseLanes,
+    reorder,
+    straighten,
+    fanout,
+    fanin,
+  };
 }
 
 const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
@@ -529,6 +608,16 @@ function layoutLanesOnAxis(
     };
     colCursor.set(col, y + (leaf.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y);
   }
+  // M5 (A1): straighten the leaf Y on the shared swimlane axis (column =
+  // colByCluster). Runs after the provisional stack + M6 order, before the bbox.
+  applyStraightening(
+    leaves,
+    (leaf) => ctx.colByCluster.get(leaf.cluster!.id) ?? 0,
+    cursorY,
+    ctx.straighten,
+    ctx.fanout,
+    ctx.fanin,
+  );
   const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
   for (const n of nodes) {
     childBoxes.set(n.key, n.box!);
@@ -595,7 +684,9 @@ function arrangeSwimlaneGroup(
     pctx.floor,
     pctx.swimlaneLaneRise,
     pctx.reorder,
+    pctx.straighten,
     pctx.fanout,
+    pctx.fanin,
   );
   for (const m of members) {
     arrangeSubtreeOnAxis(m, ctx);
@@ -891,6 +982,7 @@ export function layoutPlacement(
     staircaseOverlap: opts?.staircaseBandOverlap !== false,
     swimlaneLaneRise: opts?.swimlaneLaneRise === true,
     reorder: opts?.reorder === true,
+    straighten: opts?.straighten === true,
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
   };
