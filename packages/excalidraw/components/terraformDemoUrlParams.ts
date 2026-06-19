@@ -15,6 +15,7 @@ export type TerraformDemoUrlParams = {
   semanticPlace?: boolean;
   swimlaneRise?: boolean;
   reorder?: boolean;
+  subnetDeBand?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -138,6 +139,10 @@ export const parseTerraformDemoUrlParams = (
   if (reorder === null) {
     return null;
   }
+  const subnetDeBand = parseBooleanParam("subnetDeBand");
+  if (subnetDeBand === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -150,6 +155,7 @@ export const parseTerraformDemoUrlParams = (
     ...(semanticPlace != null ? { semanticPlace } : {}),
     ...(swimlaneRise != null ? { swimlaneRise } : {}),
     ...(reorder != null ? { reorder } : {}),
+    ...(subnetDeBand != null ? { subnetDeBand } : {}),
   };
 };
 

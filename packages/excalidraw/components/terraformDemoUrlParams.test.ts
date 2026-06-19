@@ -135,6 +135,25 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses subnetDeBand (RCLL subnet de-band A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&subnetDeBand=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        subnetDeBand: true,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&subnetDeBand=0"),
+      ).toEqual({
+        presetId: "demo",
+        subnetDeBand: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&subnetDeBand=maybe"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

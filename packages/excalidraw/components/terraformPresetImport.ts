@@ -57,6 +57,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineSemanticPlacement?: boolean;
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
+  pipelineSubnetDeBand?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   signal?: AbortSignal;
@@ -77,6 +78,7 @@ export const runTerraformImportWithView = async ({
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
   pipelineReorder,
+  pipelineSubnetDeBand,
   importedTfdTexts,
   preset = null,
   signal,
@@ -100,6 +102,7 @@ export const runTerraformImportWithView = async ({
           pipelineSemanticPlacement,
           pipelineSwimlaneLaneRise,
           pipelineReorder,
+          pipelineSubnetDeBand,
         }
       : {}),
     importedTfdTexts,
@@ -120,6 +123,7 @@ export type RunTerraformPresetImportOptions = {
   pipelineSemanticPlacement?: boolean;
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
+  pipelineSubnetDeBand?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
 };
@@ -165,6 +169,7 @@ export const runTerraformPresetImport = async (
     pipelineSemanticPlacement: options.pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise: options.pipelineSwimlaneLaneRise,
     pipelineReorder: options.pipelineReorder,
+    pipelineSubnetDeBand: options.pipelineSubnetDeBand,
     importedTfdTexts: presetSources.tfdTexts,
     preset,
     signal: options.signal,

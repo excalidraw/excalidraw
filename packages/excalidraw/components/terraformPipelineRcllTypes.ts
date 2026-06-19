@@ -126,6 +126,15 @@ export type RcllOptions = {
    */
   deDensify?: boolean;
   deDensifyMaxCols?: number;
+  /**
+   * Subnet de-band (PROBE, default **false**): on the swimlane path each subnet is a
+   * Y-lane stacked into its own disjoint band, so VPC height ≈ Σ(subnet bands). This
+   * collapses the subnet level — lifting every subnet's clusters to be direct VPC
+   * children — so all of a VPC's resources share ONE column stack (height → the merged
+   * max-column-occupancy). X (`colByCluster`) is untouched ⇒ CON-12-safe. Throwaway
+   * Phase-0 measurement wiring; suppresses the subnet frame (no annotation visual yet).
+   */
+  subnetDeBand?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

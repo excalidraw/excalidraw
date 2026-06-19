@@ -425,6 +425,8 @@ type LayoutSceneContext = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6: per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
+  /** RCLL subnet de-band: collapse subnet lanes into one VPC stack (frames → rails). */
+  pipelineSubnetDeBand?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -444,6 +446,7 @@ async function buildPipelineLayoutSceneBody(
         semanticPlacement: ctx.pipelineSemanticPlacement === true,
         swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
         reorder: ctx.pipelineReorder === true,
+        subnetDeBand: ctx.pipelineSubnetDeBand === true,
       };
       const buildPipeline =
         ctx.pipelineLayoutVariant === "rcll"
@@ -483,6 +486,9 @@ async function buildPipelineLayoutSceneBody(
               ? { pipelineSwimlaneLaneRise: true }
               : {}),
             ...(ctx.pipelineReorder ? { pipelineReorder: true } : {}),
+            ...(ctx.pipelineSubnetDeBand
+              ? { pipelineSubnetDeBand: true }
+              : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
           },
@@ -864,6 +870,7 @@ export async function layoutTerraformFromSources(
     pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
     pipelineSwimlaneLaneRise: options?.pipelineSwimlaneLaneRise === true,
     pipelineReorder: options?.pipelineReorder === true,
+    pipelineSubnetDeBand: options?.pipelineSubnetDeBand === true,
     colorMode: options?.colorMode,
   };
 

@@ -123,6 +123,7 @@ export function emitTopologyContextFrames(
   skeleton: ExcalidrawElementSkeleton[],
   clusters: readonly PipelineCluster[],
   boxes: Map<string, TerraformDependencyLayoutBox>,
+  subnetDeBand = false,
 ): void {
   const childIdsByKey = new Map<string, string[]>();
   for (const cluster of clusters) {
@@ -130,6 +131,14 @@ export function emitTopologyContextFrames(
   }
 
   for (const level of PIPELINE_TOPOLOGY_LEVELS) {
+    // Subnet de-band: suppress the subnetZone frame. The subnet level no longer
+    // registers a `childIdsByKey` entry, so the VPC level's lookup falls back to each
+    // cluster's own frame id (the `?? cluster.build.clusterFrameId` below) → the VPC
+    // frame parents the cluster frames DIRECTLY. Subnet membership becomes a Phase-1b
+    // annotation, not a containment frame.
+    if (subnetDeBand && level.role === "subnetZone") {
+      continue;
+    }
     const groups = new Map<string, PipelineCluster[]>();
     for (const cluster of clusters) {
       const key = level.keyOf(cluster);
@@ -190,9 +199,12 @@ export function topologyFrameSkeletonId(
   return `tf-pipeline:${role}:${encodeURIComponent(key)}`;
 }
 
-export function topologyPathForCluster(cluster: PipelineCluster): string[] {
+export function topologyPathForCluster(
+  cluster: PipelineCluster,
+  subnetDeBand = false,
+): string[] {
   const p = cluster.placement;
-  if (p.vpcId && p.subnetSignature != null) {
+  if (!subnetDeBand && p.vpcId && p.subnetSignature != null) {
     return [
       p.providerFamily,
       p.accountId,

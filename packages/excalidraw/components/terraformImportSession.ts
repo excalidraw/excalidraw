@@ -42,6 +42,8 @@ export type TerraformImportSession = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
+  /** RCLL subnet de-band — collapse subnet lanes into one VPC stack (frames → rails). */
+  pipelineSubnetDeBand?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */
   colorMode?: TerraformColorMode;
   preset: TerraformImportPreset | null;

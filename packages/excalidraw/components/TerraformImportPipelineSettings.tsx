@@ -149,6 +149,26 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       ],
     },
   },
+  "subnet.boxed": {
+    title: "Subnets · Boxed",
+    body: "Each subnet is drawn as its own boxed lane, stacked vertically inside the VPC. Clearest subnet ownership, but a VPC is as tall as the sum of its subnet lanes.",
+    dev: {
+      implements:
+        "Default RCLL: subnetZone containers are Y-lanes stacked into disjoint bands (layoutLanesOnAxis); VPC height ≈ Σ(subnet bands). Subnet drawn as a real topology frame.",
+      refs: ["Sander 1996 — compound layout"],
+    },
+  },
+  "subnet.debanded": {
+    title: "Subnets · De-banded",
+    body: "Subnet lanes are merged so a VPC's resources share one column stack, then each card carries a colored rail (public / private / intra) with a legend instead of a subnet box. Much shorter (≈ −28% on the staging preset); subnet membership reads from the rail color.",
+    dev: {
+      implements:
+        "Subnet de-band: collapseSubnetsForDeBand lifts each subnet's clusters to direct VPC children (one shared colCursor stack; X / colByCluster untouched → CON-12-safe). Subnet frame suppressed; topology paths truncated to VPC so edges/connectors reparent cleanly. Membership re-encoded as per-card tier rails + a legend (terraformPipelineSubnetAnnotation.ts), gate/diagnostic-invisible.",
+      refs: [
+        "MapSets / BubbleSets (set-membership without overlapping regions)",
+      ],
+    },
+  },
   "resources.allRcll": {
     title: "Resources · All resources (not in this layout)",
     body: "The RCLL layout draws its own geometry and does not yet render the unconnected 'Unconnected' resources — it lays out the dataflow only. Switch to the Compound or Classic layout to see all resources, or keep RCLL for the dataflow view. Ancillary support for RCLL is a planned milestone.",
@@ -182,6 +202,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
   pipelineReorder,
+  pipelineSubnetDeBand,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
@@ -190,6 +211,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement,
   setPipelineSwimlaneLaneRise,
   setPipelineReorder,
+  setPipelineSubnetDeBand,
   showPlacement = true,
   showVariant = true,
 }: {
@@ -201,6 +223,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement: boolean;
   pipelineSwimlaneLaneRise: boolean;
   pipelineReorder: boolean;
+  pipelineSubnetDeBand: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
@@ -209,6 +232,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
   setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
   setPipelineReorder: (reorder: boolean) => void;
+  setPipelineSubnetDeBand: (subnetDeBand: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
   /** RCLL view hides the Layout variant + Height — it owns placement (M0 delegates to Compound). */
@@ -326,7 +350,7 @@ export const TerraformImportPipelineSettings = ({
           {!showVariant && (
             <div className="TerraformImportModal__controlNote">
               RCLL arranges layout automatically. Only the Detail, Resources,
-              Swimlanes, and Ordering toggles apply.
+              Swimlanes, Ordering, and Subnets toggles apply.
             </div>
           )}
           {!showVariant && (
@@ -361,6 +385,24 @@ export const TerraformImportPipelineSettings = ({
                 )}
                 {option("On", pipelineReorder, "ordering.on", () =>
                   setPipelineReorder(true),
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline subnets">
+              <span className="TerraformImportModal__controlLabel">
+                Subnets <span>boxed lanes vs de-banded with color rails</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
+                  setPipelineSubnetDeBand(false),
+                )}
+                {option(
+                  "De-banded",
+                  pipelineSubnetDeBand,
+                  "subnet.debanded",
+                  () => setPipelineSubnetDeBand(true),
                 )}
               </div>
             </div>

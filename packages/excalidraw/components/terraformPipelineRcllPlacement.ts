@@ -97,6 +97,11 @@ type PlaceCtx = {
   deDensify: boolean;
   /** M5b width dial: max brand-new columns de-density may add (default 0 == off). */
   deDensifyMaxCols: number;
+  /** Subnet de-band (PROBE, default false): collapse each VPC's subnet-zone children,
+   * lifting their clusters to direct VPC children so the whole VPC shares one column
+   * stack (height → merged max-column-occupancy). X (`colByCluster`) untouched ⇒
+   * CON-12-safe. A pre-pass tree rewrite in `layoutPlacement`; suppresses subnet frames. */
+  subnetDeBand: boolean;
   /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 straighten). */
   fanout: ReadonlyMap<string, readonly string[]>;
   /** in(w): fan-in source cluster ids by target id (M5 straighten). */
@@ -250,6 +255,43 @@ function cloneNode(node: CompoundNode): CompoundNode {
     children: node.children.map(cloneNode),
     localColumn: node.localColumn,
   };
+}
+
+/**
+ * Subnet de-band (PROBE) pre-pass. Mutates the **cloned** tree (safe — `layoutPlacement`
+ * already cloned): for every `vpc` node whose children include `subnetZone` containers,
+ * lift each subnet's descendant clusters to be **direct** children of the VPC and drop the
+ * subnet container. The VPC then arranges all its resources in ONE shared column stack
+ * (the swimlane leaf path / the `mixed`-policy leaf block), instead of stacking each subnet
+ * into its own disjoint Y band. Height collapses from `Σ(subnet bands)` toward the merged
+ * `max-column-occupancy`. X is set later from the shared `colByCluster`/`localColumn`, so
+ * forwardness (CON-12) is untouched. The subnet frame is suppressed downstream (Phase-0:
+ * no membership annotation yet). Determinism: VPC children re-sorted `(mds, key)`. */
+function collapseSubnetsForDeBand(node: CompoundNode): void {
+  for (const child of node.children) {
+    collapseSubnetsForDeBand(child);
+  }
+  if (node.role !== "vpc") {
+    return;
+  }
+  const hasSubnet = node.children.some((c) => c.role === "subnetZone");
+  if (!hasSubnet) {
+    return;
+  }
+  const lifted: CompoundNode[] = [];
+  for (const child of node.children) {
+    if (child.role === "subnetZone") {
+      collectClusterLeaves(child, lifted);
+    } else {
+      lifted.push(child);
+    }
+  }
+  lifted.sort(
+    (a, b) =>
+      a.minDescendantSequence - b.minDescendantSequence ||
+      a.key.localeCompare(b.key),
+  );
+  node.children = lifted;
 }
 
 /** Per-column max width over a set of already-sized children. */
@@ -827,7 +869,7 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
     const rf = rep.get(e.from) ?? e.from;
     const rt = rep.get(e.to) ?? e.to;
     if (rf !== rt) {
-      const k = `${rf}${rt}`;
+      const k = `${rf}\u0001${rt}`;
       if (!condSeen.has(k)) {
         condSeen.add(k);
         condEdges.push({ from: rf, to: rt });
@@ -1011,10 +1053,14 @@ export function layoutPlacement(
     straighten: opts?.straighten === true,
     deDensify: opts?.deDensify === true,
     deDensifyMaxCols: opts?.deDensifyMaxCols ?? 0,
+    subnetDeBand: opts?.subnetDeBand === true,
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
   };
   const root = cloneNode(tree);
+  if (ctx.subnetDeBand) {
+    collapseSubnetsForDeBand(root);
+  }
   sizeAndArrange(root, ctx);
   globalize(root, 0, 0);
   return root;

@@ -144,6 +144,8 @@ export type TerraformPlanParsingOptions = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6: per-container barycenter crossing-min reorder (A/B toggle). */
   pipelineReorder?: boolean;
+  /** RCLL subnet de-band: collapse subnet lanes into one VPC stack (frames → rails). */
+  pipelineSubnetDeBand?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

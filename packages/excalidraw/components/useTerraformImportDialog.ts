@@ -83,6 +83,7 @@ export const useTerraformImportDialog = ({
   // RCLL M6 (rcll-only): per-container barycenter crossing-min reorder. Like the
   // swimlane dial, not reset on view switch — the RCLL view owns it.
   const [pipelineReorder, setPipelineReorder] = useState(false);
+  const [pipelineSubnetDeBand, setPipelineSubnetDeBand] = useState(false);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
@@ -264,6 +265,7 @@ export const useTerraformImportDialog = ({
       pipelineSemanticPlacement,
       pipelineSwimlaneLaneRise,
       pipelineReorder,
+      pipelineSubnetDeBand,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -389,6 +391,7 @@ export const useTerraformImportDialog = ({
             pipelineSemanticPlacement,
             pipelineSwimlaneLaneRise,
             pipelineReorder,
+            pipelineSubnetDeBand,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -480,6 +483,7 @@ export const useTerraformImportDialog = ({
           pipelineSemanticPlacement,
           pipelineSwimlaneLaneRise,
           pipelineReorder,
+          pipelineSubnetDeBand,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -680,6 +684,7 @@ export const useTerraformImportDialog = ({
     pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise,
     pipelineReorder,
+    pipelineSubnetDeBand,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -714,6 +719,7 @@ export const useTerraformImportDialog = ({
     setPipelineSemanticPlacement,
     setPipelineSwimlaneLaneRise,
     setPipelineReorder,
+    setPipelineSubnetDeBand,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

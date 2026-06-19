@@ -18,6 +18,7 @@ import {
 } from "./terraformPipelineLayoutCompoundHierarchy";
 import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
 import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
+import { appendSubnetMembershipAnnotations } from "./terraformPipelineSubnetAnnotation";
 import { layeringStage } from "./terraformPipelineRcllLayering";
 import {
   backwardEdgeGate,
@@ -68,6 +69,9 @@ type RcllBuildOptions = {
    * (the width dial) must be > 0 for the pass to run. */
   deDensify?: boolean;
   deDensifyMaxCols?: number;
+  /** Subnet de-band (PROBE, default false): collapse subnet lanes so a VPC's resources
+   * share one column stack. Suppresses the subnet frame. Internal/measurement-only. */
+  subnetDeBand?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -189,6 +193,7 @@ async function buildSceneFromBoxedTree(
   tree: CompoundNode,
   prep: PipelineLayoutPrep,
   nodes: TerraformPlanNodesMap,
+  subnetDeBand = false,
 ): Promise<{
   elements: ExcalidrawElement[];
   frameEdgeCount: number;
@@ -240,7 +245,17 @@ async function buildSceneFromBoxedTree(
   };
   emitLeaves(tree);
 
-  buildCompoundFramesFromLayoutBoxes(skeleton, prep.clusters, layoutBoxes);
+  buildCompoundFramesFromLayoutBoxes(
+    skeleton,
+    prep.clusters,
+    layoutBoxes,
+    subnetDeBand,
+  );
+  // Phase 1b: with the subnet frame suppressed, restore subnet membership as a per-card
+  // colored rail + a tier legend (annotation, not containment — gate/diagnostic-invisible).
+  if (subnetDeBand) {
+    appendSubnetMembershipAnnotations(skeleton, prep.clusters, layoutBoxes);
+  }
   applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
   appendPipelineEdgeSkeletons(
     nodes,
@@ -262,8 +277,9 @@ async function buildSceneFromBoxedTree(
     prep.clusters,
     skeleton,
     layoutBoxes,
+    subnetDeBand,
   );
-  assignCompoundEdgeFrameParents(skeleton, prep.clusters);
+  assignCompoundEdgeFrameParents(skeleton, prep.clusters, subnetDeBand);
   const elements = await convertPipelineSkeletonToElements(skeleton);
   return { elements, frameEdgeCount, backEdgesStyled };
 }
@@ -366,6 +382,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     straighten: options?.straighten === true,
     deDensify: options?.deDensify === true,
     deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
+    subnetDeBand: options?.subnetDeBand === true,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -396,7 +413,12 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   let warnings: TerraformImportWarning[];
   let backEdgesStyled = 0;
   if (placed) {
-    const built = await buildSceneFromBoxedTree(laidOutTree, prep, nodes);
+    const built = await buildSceneFromBoxedTree(
+      laidOutTree,
+      prep,
+      nodes,
+      rcllOptions.subnetDeBand === true,
+    );
     elements = built.elements;
     backEdgesStyled = built.backEdgesStyled;
     // Cluster-level cycle warning (D) + the container-level cycle warning (D_H,
@@ -448,7 +470,9 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
       rcllMilestone: placed
-        ? rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
+        ? rcllOptions.subnetDeBand
+          ? "M7s"
+          : rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
           ? "M5b"
           : rcllOptions.straighten
             ? "M5"
@@ -464,6 +488,9 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllReorder: rcllOptions.reorder === true,
       // M5: whether Brandes–Köpf leaf straightening is active.
       rcllStraighten: rcllOptions.straighten === true,
+      // Subnet de-band: subnet lanes collapsed into one VPC column stack (frames
+      // suppressed; resources parent to the VPC).
+      rcllSubnetDeBand: rcllOptions.subnetDeBand === true,
       // M5b: whether de-density (Axis-2 B) is active (toggle AND a positive dial).
       rcllDeDensify:
         rcllOptions.deDensify === true &&

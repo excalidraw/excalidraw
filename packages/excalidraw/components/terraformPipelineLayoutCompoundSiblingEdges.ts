@@ -95,9 +95,13 @@ export function resolveSiblingTopologyFramePair(
 export function collectCompoundTopologyFrameEdges(
   collapsedEdges: readonly CollapsedPipelineEdge[],
   clusters: readonly PipelineCluster[],
+  subnetDeBand = false,
 ): CompoundTopologyFrameEdge[] {
   const pathsByCluster = new Map(
-    clusters.map((cluster) => [cluster.id, topologyPathForCluster(cluster)]),
+    clusters.map((cluster) => [
+      cluster.id,
+      topologyPathForCluster(cluster, subnetDeBand),
+    ]),
   );
   const deduped = new Map<string, CompoundTopologyFrameEdge>();
 
@@ -136,10 +140,12 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
   clusters: readonly PipelineCluster[],
   skeleton: ExcalidrawElementSkeleton[],
   layoutBoxes: Map<string, LayoutBox>,
+  subnetDeBand = false,
 ): number {
   const frameEdges = collectCompoundTopologyFrameEdges(
     collapsedEdges,
     clusters,
+    subnetDeBand,
   );
   let edgeIndex = 0;
 

@@ -161,6 +161,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. Default false. */
   pipelineReorder?: boolean;
+  /** RCLL subnet de-band — collapse subnet lanes into one VPC stack. Default false. */
+  pipelineSubnetDeBand?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -226,6 +228,7 @@ async function layoutTerraformSceneFromSources(
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
+            pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -300,6 +303,7 @@ export const runTerraformImportFromSources = async (
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
+            pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

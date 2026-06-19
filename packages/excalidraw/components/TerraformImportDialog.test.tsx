@@ -141,6 +141,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
+      pipelineSubnetDeBand: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -168,6 +169,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
+      pipelineSubnetDeBand: false,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -251,6 +253,30 @@ describe("TerraformImportModal", () => {
       expect.objectContaining({
         layoutMode: "rcll",
         pipelineReorder: true,
+      }),
+    );
+  });
+
+  it("RCLL view: Subnets · De-banded threads pipelineSubnetDeBand true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The RCLL-only Subnets control is present; flip it to De-banded.
+    const debandBtn = screen.getByRole("button", { name: /^de-banded$/i });
+    expect(debandBtn).toBeInTheDocument();
+    fireEvent.click(debandBtn);
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineSubnetDeBand: true,
       }),
     );
   });
