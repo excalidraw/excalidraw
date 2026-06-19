@@ -357,3 +357,23 @@ export const normalizeInputColor = (color: string): string | null => {
 
   return null;
 };
+
+const HEX_INPUT_PATTERN =
+  /^#?[0-9a-fA-F]{3}$|^#?[0-9a-fA-F]{4}$|^#?[0-9a-fA-F]{6}$|^#?[0-9a-fA-F]{8}$/;
+
+/**
+ * Validates and normalizes hex-only color input for the color picker's hex field.
+ * Accepts exactly 3, 4, 6, or 8 hexadecimal characters, with or without a leading `#`.
+ */
+export const normalizeHexInputColor = (color: string): string | null => {
+  color = color.trim();
+  if (!color || !HEX_INPUT_PATTERN.test(color)) {
+    return null;
+  }
+
+  if (!color.startsWith("#")) {
+    return `#${color}`;
+  }
+
+  return color;
+};
