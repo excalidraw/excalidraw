@@ -798,3 +798,101 @@ describe("rcll builder maps stage results into scene meta", () => {
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 2,
   );
 });
+
+// ── M5b de-density (Axis-2 B) — internal/measurement probe on v2 ────────────────
+// Phase-1 deliverable (no UI): does the SAFE column-preserving single-column spread
+// create Y-room on v2 without breaking any structural gate? Built via the direct
+// builder (deDensify is internal — not threaded through layoutCore). Hard gates must
+// stay 0; the win is LOGGED for the human decision (graduate to a toggle or stop).
+describe("rcll M5b de-density (internal probe, v2)", () => {
+  async function buildV2(options: Record<string, unknown>) {
+    const raw = getTerraformImportPresetSourcesFromDb(
+      "staging-extended-localstack-v2",
+    );
+    const sources = resolveSourcesWithTfdComposition(
+      raw! as TerraformImportPresetSources,
+    );
+    const bundle = sources.planDotBundles[0]!;
+    const graph = graphlibDot.read("digraph G {}\n");
+    const nodes = buildTerraformLocalImportNodesMap(bundle.plan, graph, [], {});
+    applyTfdOverlayToNodes(nodes, sources.tfdTexts, sources.tfdLabels);
+    const scene = await buildTerraformPipelineRcllExcalidrawScene(
+      nodes,
+      bundle.plan,
+      options,
+    );
+    return {
+      meta: scene.meta,
+      elements: scene.elements as ExcalidrawElement[],
+      diagnostics: diagnosePipelineScene(scene.elements as ExcalidrawElement[]),
+    };
+  }
+
+  const placement = (m: Record<string, unknown>) =>
+    (m.rcllStageMeta as Record<string, Record<string, number>>).placement;
+  const gatesOf = (m: Record<string, unknown>) =>
+    m.gates as Record<string, number>;
+
+  // MEASURED no-op on v2 (2026-06-19, maxCols=4, Compact AND Full): ON == OFF on
+  // every metric — height 27763 / width 13354 / nearStraight 0.10 / fanoutColRate
+  // 0.27 / crossings 274 (compact 249); deDensify+straighten == straighten-alone
+  // (nearStraight 0.08, crossings 270). v2's dataflow is cross-container-dominated, so
+  // the SAFE set (no out-of-axis neighbour, no adjacent in-axis neighbour) is empty.
+  // The permanent test asserts the invariants on ONE mode (the full 6-build × 2-mode
+  // measurement was a one-time probe — recorded above, not re-run every CI pass).
+  it(
+    "deDensify ON keeps every structural gate at 0, is deterministic, and the dial gates the pass (compact)",
+    async () => {
+      const MAX = 4;
+      const off = await buildV2({ compact: true });
+      const dialOff = await buildV2({
+        compact: true,
+        deDensify: true,
+        deDensifyMaxCols: 0,
+      });
+      const on = await buildV2({
+        compact: true,
+        deDensify: true,
+        deDensifyMaxCols: MAX,
+      });
+      const on2 = await buildV2({
+        compact: true,
+        deDensify: true,
+        deDensifyMaxCols: MAX,
+      });
+
+      // The dial (maxCols 0) is byte-identical to OFF — the pass cannot fire without a
+      // positive budget, so default behaviour is provably unchanged.
+      expect(
+        geometry(dialOff.elements),
+        "deDensifyMaxCols:0 == OFF (geometry unchanged)",
+      ).toEqual(geometry(off.elements));
+      expect(dialOff.meta.rcllMilestone).toBe("M3a");
+
+      // ON: the milestone rolls up to M5b and EVERY structural gate stays 0.
+      expect(on.meta.rcllMilestone).toBe("M5b");
+      const onPlace = placement(on.meta);
+      const onGates = gatesOf(on.meta);
+      expect(onPlace.containmentViolations, "ON containment (CON-3)").toBe(0);
+      expect(
+        onPlace.siblingOverlapViolations,
+        "ON sibling overlap (CON-4/5)",
+      ).toBe(0);
+      expect(
+        onGates.acyclicBackwardEdges,
+        "ON iron rule: no backward edge (CON-12)",
+      ).toBe(0);
+      expect(
+        onGates.acyclicSameColumnEdges,
+        "ON iron rule: no same-column edge (CON-12)",
+      ).toBe(0);
+      expect(on.diagnostics.collisionCount, "ON collision-free").toBe(0);
+
+      // Determinism (CON-8): a second ON build is byte-identical.
+      expect(geometry(on.elements), "ON deterministic").toEqual(
+        geometry(on2.elements),
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
+  );
+});

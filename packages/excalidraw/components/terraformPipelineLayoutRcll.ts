@@ -64,6 +64,10 @@ type RcllBuildOptions = {
   reorder?: boolean;
   /** M5 (default false): Brandes–Köpf leaf coordinate-assignment / straightening. */
   straighten?: boolean;
+  /** M5b (default false, internal/measurement-only): de-density. `deDensifyMaxCols`
+   * (the width dial) must be > 0 for the pass to run. */
+  deDensify?: boolean;
+  deDensifyMaxCols?: number;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -290,7 +294,7 @@ function styleRcllBackEdges(
     const xs = leftX(e.source);
     const xt = leftX(e.target);
     if (xs != null && xt != null && xt < xs - 1) {
-      backKeys.add(`${e.source} ${e.target}`);
+      backKeys.add(`${e.source}\0${e.target}`);
     }
   }
   if (backKeys.size === 0) {
@@ -313,7 +317,7 @@ function styleRcllBackEdges(
       rel.aggregated === true ||
       typeof rel.source !== "string" ||
       typeof rel.target !== "string" ||
-      !backKeys.has(`${rel.source} ${rel.target}`)
+      !backKeys.has(`${rel.source}\0${rel.target}`)
     ) {
       continue;
     }
@@ -360,6 +364,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     swimlaneLaneRise: options?.swimlaneLaneRise === true,
     reorder: options?.reorder === true,
     straighten: options?.straighten === true,
+    deDensify: options?.deDensify === true,
+    deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -442,13 +448,15 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
       rcllMilestone: placed
-        ? rcllOptions.straighten
-          ? "M5"
-          : rcllOptions.reorder
-            ? "M6"
-            : rcllOptions.swimlaneLaneRise
-              ? "M4"
-              : "M3a"
+        ? rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
+          ? "M5b"
+          : rcllOptions.straighten
+            ? "M5"
+            : rcllOptions.reorder
+              ? "M6"
+              : rcllOptions.swimlaneLaneRise
+                ? "M4"
+                : "M3a"
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
@@ -456,6 +464,10 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllReorder: rcllOptions.reorder === true,
       // M5: whether Brandes–Köpf leaf straightening is active.
       rcllStraighten: rcllOptions.straighten === true,
+      // M5b: whether de-density (Axis-2 B) is active (toggle AND a positive dial).
+      rcllDeDensify:
+        rcllOptions.deDensify === true &&
+        (rcllOptions.deDensifyMaxCols ?? 0) > 0,
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,

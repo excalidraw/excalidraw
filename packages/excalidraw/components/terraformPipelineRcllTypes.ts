@@ -116,6 +116,16 @@ export type RcllOptions = {
    * A/B toggle: "Straighten · Off / On".
    */
   straighten?: boolean;
+  /**
+   * M5b (default **false**): de-density (Axis-2 B, RFC §9.3). On the swimlane path the
+   * dense-rank axis piles independent same-floor clusters into one column; de-density
+   * promotes a SAFE subset one column right to make Y-room for the straightener.
+   * Column-preserving, single-column, forward-only ⇒ CON-12-safe by construction.
+   * **Internal / measurement-only** (not wired to the UI). `deDensifyMaxCols` is the
+   * width dial; 0 (default) disables the pass even when `deDensify` is true.
+   */
+  deDensify?: boolean;
+  deDensifyMaxCols?: number;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

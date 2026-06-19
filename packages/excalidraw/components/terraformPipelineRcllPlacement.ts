@@ -52,6 +52,7 @@ import {
   type OrderableLeaf,
 } from "./terraformPipelineOrdering";
 import { hubCenteringOverBoxes } from "./terraformPipelineCoordinateAssignment";
+import { deDensifyColumns } from "./terraformPipelineDeDensify";
 import {
   straightenColumns,
   type StraightenLeaf,
@@ -90,6 +91,12 @@ type PlaceCtx = {
    * Y that straightens its adjacent-column dataflow edges (RFC §9 Axis-1). Y only —
    * X (columns) and within-column ORDER (M6) untouched. The A/B toggle. */
   straighten: boolean;
+  /** M5b (default false): de-density — promote SAFE independent leaves one column to
+   * thin crowded swimlane columns (Axis-2 B, RFC §9.3; internal/measurement-only).
+   * CON-12-safe by construction (forward single-column move). The A/B toggle. */
+  deDensify: boolean;
+  /** M5b width dial: max brand-new columns de-density may add (default 0 == off). */
+  deDensifyMaxCols: number;
   /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 straighten). */
   fanout: ReadonlyMap<string, readonly string[]>;
   /** in(w): fan-in source cluster ids by target id (M5 straighten). */
@@ -441,12 +448,29 @@ function buildLaneContext(
   straighten: boolean,
   fanout: ReadonlyMap<string, readonly string[]>,
   fanin: ReadonlyMap<string, readonly string[]>,
+  deDensify: boolean,
+  deDensifyMaxCols: number,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
   for (const n of nodes) {
     collectClusterLeaves(n, leaves);
   }
-  const colByCluster = denseClusterColumns(leaves, floor);
+  // M5b (Axis-2 B): the dense-rank axis piles independent same-floor clusters into one
+  // column. De-density rewrites it, promoting SAFE leaves one column right to make
+  // Y-room for the straightener. CON-12-safe by construction (see terraformPipelineDeDensify).
+  const colByCluster =
+    deDensify && deDensifyMaxCols > 0
+      ? deDensifyColumns(
+          leaves.map((l) => ({
+            clusterId: l.cluster!.id,
+            firstSequence: l.cluster!.firstSequence,
+          })),
+          denseClusterColumns(leaves, floor),
+          fanout,
+          fanin,
+          { maxExtraCols: deDensifyMaxCols },
+        )
+      : denseClusterColumns(leaves, floor);
   const maxCol = leaves.reduce(
     (m, l) => Math.max(m, colByCluster.get(l.cluster!.id) ?? 0),
     0,
@@ -687,6 +711,8 @@ function arrangeSwimlaneGroup(
     pctx.straighten,
     pctx.fanout,
     pctx.fanin,
+    pctx.deDensify,
+    pctx.deDensifyMaxCols,
   );
   for (const m of members) {
     arrangeSubtreeOnAxis(m, ctx);
@@ -983,6 +1009,8 @@ export function layoutPlacement(
     swimlaneLaneRise: opts?.swimlaneLaneRise === true,
     reorder: opts?.reorder === true,
     straighten: opts?.straighten === true,
+    deDensify: opts?.deDensify === true,
+    deDensifyMaxCols: opts?.deDensifyMaxCols ?? 0,
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
   };
