@@ -1181,7 +1181,7 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
  */
 const VARIABLE_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for pressure-sensitive strokes. */
-  SIZE_FACTOR: 4.25,
+  SIZE_FACTOR: 2.125,
   THINNING: 0.6,
   SMOOTHING: 0.5,
   STREAMLINE: 0.5,
@@ -1189,7 +1189,7 @@ const VARIABLE_WIDTH_FREEDRAW = {
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
-  SIZE_FACTOR: 1.4,
+  SIZE_FACTOR: 0.7,
   STREAMLINE: 0.3,
 } as const;
 
@@ -1220,6 +1220,52 @@ const getVariableWidthFreedrawOutline = (
   }) as [number, number][];
 };
 
+const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
+  new LaserPointer({
+    size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
+    simplify: 0,
+    sizeMapping: (details) => Math.max(0.1, details.pressure),
+  });
+
+type LaserPointerCacheEntry = {
+  strokeWidth: number;
+  fedCount: number;
+  lastFedPoint: LocalPoint | undefined;
+  laserPointer: LaserPointer;
+};
+
+/**
+ * Bounded LRU cache of in-progress `LaserPointer` instances, so we
+ * don't recreate them during drawing at every frame.
+ */
+export class FreedrawLaserPointerCache {
+  private static capacity = 1;
+  private static cache = new Map<string, LaserPointerCacheEntry>();
+
+  static get = (id: string) => FreedrawLaserPointerCache.cache.get(id);
+
+  static set = (id: string, entry: LaserPointerCacheEntry) => {
+    FreedrawLaserPointerCache.cache.delete(id);
+    FreedrawLaserPointerCache.cache.set(id, entry);
+    while (
+      FreedrawLaserPointerCache.cache.size > FreedrawLaserPointerCache.capacity
+    ) {
+      FreedrawLaserPointerCache.cache.delete(
+        FreedrawLaserPointerCache.cache.keys().next().value!,
+      );
+    }
+  };
+
+  static setCapacityForCollaborators = (collaboratorCount: number) => {
+    const capacity = Math.max(1, collaboratorCount + 1);
+    if (capacity !== FreedrawLaserPointerCache.capacity) {
+      FreedrawLaserPointerCache.capacity = capacity;
+      FreedrawLaserPointerCache.cache = new Map();
+    }
+  };
+}
+
 /**
  * Uniform (constant width) freedraw outline, rendered with the laser-pointer
  * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
@@ -1227,22 +1273,42 @@ const getVariableWidthFreedrawOutline = (
 const getConstantWidthFreedrawOutline = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] => {
-  const laserPointer = new LaserPointer({
-    size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
-    streamline: CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
-    simplify: 0,
-    sizeMapping: (details) => Math.max(0.1, details.pressure),
-  });
+  const { points } = element;
 
-  const inputPoints: [number, number, number][] = element.points.length
-    ? element.points.map(([x, y]) => [x, y, 1])
-    : [[0, 0, 1]];
-
-  for (const point of inputPoints) {
-    laserPointer.addPoint(point);
+  if (points.length === 0) {
+    const laserPointer = createLaserPointer(element);
+    laserPointer.addPoint([0, 0, 1]);
+    return laserPointer
+      .getStrokeOutline()
+      .map(([x, y]) => [x, y] as [number, number]);
   }
 
-  return laserPointer
+  let cached = FreedrawLaserPointerCache.get(element.id);
+
+  const canAppend =
+    cached !== undefined &&
+    cached.strokeWidth === element.strokeWidth &&
+    points.length >= cached.fedCount &&
+    cached.lastFedPoint === points[cached.fedCount - 1];
+
+  if (!cached || !canAppend) {
+    cached = {
+      strokeWidth: element.strokeWidth,
+      fedCount: 0,
+      lastFedPoint: undefined,
+      laserPointer: createLaserPointer(element),
+    };
+  }
+
+  for (let i = cached.fedCount; i < points.length; i++) {
+    cached.laserPointer.addPoint([points[i][0], points[i][1], 1]);
+  }
+  cached.fedCount = points.length;
+  cached.lastFedPoint = points[points.length - 1];
+
+  FreedrawLaserPointerCache.set(element.id, cached);
+
+  return cached.laserPointer
     .getStrokeOutline()
     .map(([x, y]) => [x, y] as [number, number]);
 };
@@ -1250,9 +1316,6 @@ const getConstantWidthFreedrawOutline = (
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] => {
-  // Outlines are memoized per element by `ShapeCache` (invalidated on mutate),
-  // so the helpers below — including the per-call `LaserPointer` instance — are
-  // only evaluated on a cache miss (element create / mutate), not every frame.
   // Unknown/absent modes fall back to the original "variable" rendering.
   return element.freedrawMode === "constant"
     ? getConstantWidthFreedrawOutline(element)
