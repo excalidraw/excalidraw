@@ -4304,7 +4304,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
-        currentItemVariableStrokeWidth: true,
+        currentItemFreedrawMode: "variable",
       };
     });
   };
@@ -7809,7 +7809,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
-          currentItemVariableStrokeWidth: true,
+          currentItemFreedrawMode: "variable",
         };
       });
     }
@@ -9041,11 +9041,13 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
-      constantStrokeWidth: !this.state.currentItemVariableStrokeWidth,
+      freedrawMode: this.state.currentItemFreedrawMode,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
-      pressures: [event.pressure],
+      // pressures are only consumed when rendering a real-pressure stroke, so
+      // skip persisting them while pressure is being simulated
+      pressures: simulatePressure ? [] : [event.pressure],
     });
 
     this.insertNewElement(element);
@@ -10378,7 +10380,9 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
           if (!discardPoint) {
-            const pressures = [...newElement.pressures, event.pressure];
+            const pressures = newElement.simulatePressure
+              ? newElement.pressures
+              : [...newElement.pressures, event.pressure];
 
             this.scene.mutateElement(
               newElement,
@@ -10850,7 +10854,9 @@ class App extends React.Component<AppProps, AppState> {
           dx += 0.0001;
         }
 
-        const pressures = [...newElement.pressures, childEvent.pressure];
+        const pressures = newElement.simulatePressure
+          ? []
+          : [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],

@@ -1249,7 +1249,7 @@ export const SloppinessCartoonistIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const FreedrawPressureConstantIcon = createIcon(
+export const FreedrawConstantModeIcon = createIcon(
   <path
     d="M4 10h12"
     stroke="currentColor"
@@ -1260,7 +1260,7 @@ export const FreedrawPressureConstantIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const FreedrawPressureSensitiveIcon = createIcon(
+export const FreedrawVariableModeIcon = createIcon(
   <path
     d="M4 10C6 9.5 10 8 16 7L16 13C10 12 6 10.5 4 10Z"
     fill="currentColor"

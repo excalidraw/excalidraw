@@ -193,6 +193,29 @@ describe("restoreElements", () => {
     expect(restoredFreedraw.pressures).toEqual([0.1, 0.4]);
   });
 
+  it("should coerce missing or malformed freedrawMode back to 'variable'", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      id: "id-freedraw-mode",
+      points: [pointFrom(0, 0), pointFrom(10, 10)],
+    });
+
+    const [missing, bogusString, bogusNumber, valid] = restore.restoreElements(
+      [
+        { ...freedrawElement, id: "missing", freedrawMode: undefined },
+        { ...freedrawElement, id: "bogusString", freedrawMode: "scribble" },
+        { ...freedrawElement, id: "bogusNumber", freedrawMode: 42 },
+        { ...freedrawElement, id: "valid", freedrawMode: "constant" },
+      ] as any,
+      null,
+    ) as ExcalidrawFreeDrawElement[];
+
+    expect(missing.freedrawMode).toBe("variable");
+    expect(bogusString.freedrawMode).toBe("variable");
+    expect(bogusNumber.freedrawMode).toBe("variable");
+    expect(valid.freedrawMode).toBe("constant");
+  });
+
   it("should restore line and draw elements correctly", () => {
     const lineElement = API.createElement({ type: "line", id: "id-line01" });
 

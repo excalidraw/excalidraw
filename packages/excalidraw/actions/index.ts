@@ -13,7 +13,7 @@ export {
   actionChangeStrokeWidth,
   actionChangeFillStyle,
   actionChangeSloppiness,
-  actionChangeSimulatePressure,
+  actionChangeFreedrawMode,
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,

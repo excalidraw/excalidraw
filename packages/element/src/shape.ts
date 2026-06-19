@@ -1172,33 +1172,64 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
   ) as SVGPathString;
 };
 
-export const getFreedrawOutlinePoints = (
+/**
+ * Freedraw stroke geometry tuning constants.
+ *
+ * These factors are not derived analytically — they were tuned empirically by
+ * visually comparing rendered strokes until they matched the desired feel.
+ * Treat them as magic numbers backed by visual verification.
+ */
+const VARIABLE_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for pressure-sensitive strokes. */
+  SIZE_FACTOR: 4.25,
+  THINNING: 0.6,
+  SMOOTHING: 0.5,
+  STREAMLINE: 0.5,
+} as const;
+
+const CONSTANT_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
+  SIZE_FACTOR: 1.4,
+  STREAMLINE: 0.3,
+} as const;
+
+/**
+ * Pressure-sensitive (variable width) freedraw outline, rendered with
+ * perfect-freehand. This is the original Excalidraw freedraw look.
+ */
+const getVariableWidthFreedrawOutline = (
   element: ExcalidrawFreeDrawElement,
-) => {
-  if (!element.constantStrokeWidth) {
-    const inputPoints = element.simulatePressure
-      ? element.points
-      : element.points.length
-      ? element.points.map(
-          ([x, y], i) =>
-            [x, y, element.pressures[i]] as [number, number, number],
-        )
-      : [[0, 0, 0.5]];
+): [number, number][] => {
+  // If input points are empty (should they ever be?) return a dot
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(
+        ([x, y], i) => [x, y, element.pressures[i]] as [number, number, number],
+      )
+    : [[0, 0, 0.5]];
 
-    return getStroke(inputPoints as number[][], {
-      simulatePressure: element.simulatePressure,
-      size: element.strokeWidth * 4.25,
-      thinning: 0.6,
-      smoothing: 0.5,
-      streamline: 0.5,
-      easing: (t) => Math.sin((t * Math.PI) / 2),
-      last: true,
-    }) as [number, number][];
-  }
+  return getStroke(inputPoints as number[][], {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+    thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
+    smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
+    streamline: VARIABLE_WIDTH_FREEDRAW.STREAMLINE,
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    last: true,
+  }) as [number, number][];
+};
 
+/**
+ * Uniform (constant width) freedraw outline, rendered with the laser-pointer
+ * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
+ */
+const getConstantWidthFreedrawOutline = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
   const laserPointer = new LaserPointer({
-    size: element.strokeWidth * 1.4,
-    streamline: 0.3,
+    size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
     simplify: 0,
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });
@@ -1211,10 +1242,21 @@ export const getFreedrawOutlinePoints = (
     laserPointer.addPoint(point);
   }
 
-  return laserPointer.getStrokeOutline().map(([x, y]) => [x, y]) as [
-    number,
-    number,
-  ][];
+  return laserPointer
+    .getStrokeOutline()
+    .map(([x, y]) => [x, y] as [number, number]);
+};
+
+export const getFreedrawOutlinePoints = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  // Outlines are memoized per element by `ShapeCache` (invalidated on mutate),
+  // so the helpers below — including the per-call `LaserPointer` instance — are
+  // only evaluated on a cache miss (element create / mutate), not every frame.
+  // Unknown/absent modes fall back to the original "variable" rendering.
+  return element.freedrawMode === "constant"
+    ? getConstantWidthFreedrawOutline(element)
+    : getVariableWidthFreedrawOutline(element);
 };
 
 const med = (A: number[], B: number[]) => {

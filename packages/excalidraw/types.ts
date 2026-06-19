@@ -13,6 +13,7 @@ import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   PointerType,
   ExcalidrawLinearElement,
+  FreeDrawMode,
   NonDeletedExcalidrawElement,
   NonDeleted,
   TextAlign,
@@ -365,7 +366,7 @@ export interface AppState {
   currentItemStrokeWidth: number;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
-  currentItemVariableStrokeWidth: boolean;
+  currentItemFreedrawMode: FreeDrawMode;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;

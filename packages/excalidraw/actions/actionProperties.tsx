@@ -74,6 +74,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  FreeDrawMode,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -105,8 +106,8 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  FreedrawPressureConstantIcon,
-  FreedrawPressureSensitiveIcon,
+  FreedrawConstantModeIcon,
+  FreedrawVariableModeIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -659,9 +660,9 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   ),
 });
 
-export const actionChangeSimulatePressure = register<boolean>({
-  name: "changeSimulatePressure",
-  label: "labels.simulatePressure",
+export const actionChangeFreedrawMode = register<FreeDrawMode>({
+  name: "changeFreedrawMode",
+  label: "labels.pressure",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -670,43 +671,43 @@ export const actionChangeSimulatePressure = register<boolean>({
           return el;
         }
         return newElementWith(el, {
-          constantStrokeWidth: value,
+          freedrawMode: value,
         }) as ExcalidrawElement;
       }),
-      appState: { ...appState, currentItemVariableStrokeWidth: !value },
+      appState: { ...appState, currentItemFreedrawMode: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
-    const constantStrokeWidth =
+    const freedrawMode =
       getFormValue(
         elements,
         app,
-        (element) => (element as ExcalidrawFreeDrawElement).constantStrokeWidth,
+        (element) => (element as ExcalidrawFreeDrawElement).freedrawMode,
         (element) => element.type === "freedraw",
         (hasSelection) =>
-          hasSelection ? null : !appState.currentItemVariableStrokeWidth,
-      ) ?? !appState.currentItemVariableStrokeWidth;
+          hasSelection ? null : appState.currentItemFreedrawMode,
+      ) ?? appState.currentItemFreedrawMode;
 
     return (
       <fieldset>
-        <legend>{t("labels.simulatePressure")}</legend>
+        <legend>{t("labels.pressure")}</legend>
         <div className="buttonList">
-          <RadioSelection
-            group="simulatePressure"
+          <RadioSelection<FreeDrawMode>
+            group="freedrawMode"
             options={[
               {
-                value: true,
-                text: t("labels.pressureConstant"),
-                icon: FreedrawPressureConstantIcon,
+                value: "constant",
+                text: t("labels.pressure_constant"),
+                icon: FreedrawConstantModeIcon,
               },
               {
-                value: false,
-                text: t("labels.pressureSensitive"),
-                icon: FreedrawPressureSensitiveIcon,
+                value: "variable",
+                text: t("labels.pressure_variable"),
+                icon: FreedrawVariableModeIcon,
               },
             ]}
-            value={constantStrokeWidth}
+            value={freedrawMode}
             onChange={(value) => updateData(value)}
           />
         </div>

@@ -68,7 +68,7 @@ export type ActionName =
   | "changeStrokeWidth"
   | "changeStrokeShape"
   | "changeSloppiness"
-  | "changeSimulatePressure"
+  | "changeFreedrawMode"
   | "changeStrokeStyle"
   | "changeArrowhead"
   | "changeArrowType"

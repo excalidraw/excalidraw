@@ -41,6 +41,7 @@ import {
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
+  hasFreedrawMode,
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
@@ -201,9 +202,9 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeSimulatePressure")}
+      {(hasFreedrawMode(appState.activeTool.type) ||
+        targetElements.some((element) => hasFreedrawMode(element.type))) &&
+        renderAction("changeFreedrawMode")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
@@ -394,11 +395,11 @@ const CombinedShapeProperties = ({
                   hasStrokeWidth(element.type),
                 )) &&
                 renderAction("changeStrokeWidth")}
-              {(appState.activeTool.type === "freedraw" ||
-                targetElements.some(
-                  (element) => element.type === "freedraw",
+              {(hasFreedrawMode(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  hasFreedrawMode(element.type),
                 )) &&
-                renderAction("changeSimulatePressure")}
+                renderAction("changeFreedrawMode")}
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),

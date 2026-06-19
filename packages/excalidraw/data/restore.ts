@@ -68,6 +68,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  FreeDrawMode,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   StrokeRoundness,
@@ -187,6 +188,16 @@ export type RestoredDataState = {
   appState: RestoredAppState;
   files: BinaryFiles;
 };
+
+const ALLOWED_FREEDRAW_MODES: Record<FreeDrawMode, true> = {
+  variable: true,
+  constant: true,
+};
+
+const restoreFreedrawMode = (mode: unknown): FreeDrawMode =>
+  typeof mode === "string" && mode in ALLOWED_FREEDRAW_MODES
+    ? (mode as FreeDrawMode)
+    : "variable";
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
@@ -483,7 +494,7 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         points,
         simulatePressure: element.simulatePressure,
-        constantStrokeWidth: element.constantStrokeWidth ?? false,
+        freedrawMode: restoreFreedrawMode(element.freedrawMode),
         pressures,
       });
     }

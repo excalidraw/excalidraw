@@ -34,7 +34,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
-    currentItemVariableStrokeWidth: false,
+    currentItemFreedrawMode: "constant",
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
@@ -168,7 +168,7 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemOpacity: { browser: true, export: false, server: false },
   currentItemRoughness: { browser: true, export: false, server: false },
-  currentItemVariableStrokeWidth: {
+  currentItemFreedrawMode: {
     browser: true,
     export: false,
     server: false,

@@ -384,13 +384,25 @@ export type ExcalidrawElbowArrowElement = Merge<
   }
 >;
 
+/**
+ * Stroke rendering mode for freedraw elements.
+ */
+export type FreeDrawMode = "variable" | "constant";
+
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    constantStrokeWidth?: boolean;
+    /**
+     * Rendering mode for the stroke. Absent defaults to `"variable"` for
+     * backwards compatibility.
+     *
+     * - `"variable"`: width varies with pen pressure (perfect-freehand).
+     * - `"constant"`: uniform width (laser-pointer geometry).
+     */
+    freedrawMode?: FreeDrawMode;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
