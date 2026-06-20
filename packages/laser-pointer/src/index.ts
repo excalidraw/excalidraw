@@ -1,2 +1,2 @@
-export * from './state'
-export type { Point } from './math'
+export * from "./state";
+export type { Point } from "./math";
