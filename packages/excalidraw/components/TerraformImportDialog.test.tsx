@@ -452,6 +452,63 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("RCLL view: primary Layout · Compact expands the whole compact bundle", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The PRIMARY "Layout" profile control fans one click out into the seven flags.
+    const profile = screen.getByRole("group", {
+      name: /pipeline layout profile/i,
+    });
+    fireEvent.click(within(profile).getByRole("button", { name: /^compact$/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineSwimlaneLaneRise: true,
+        pipelineRankSeparate: true,
+        pipelineSubnetDeBand: true,
+        pipelineReorder: true,
+        pipelineStraighten: true,
+        pipelineColumnPacking: "compact",
+      }),
+    );
+  });
+
+  it("RCLL view: touching an advanced lever flips the primary Layout to Custom", async () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const profile = screen.getByRole("group", {
+      name: /pipeline layout profile/i,
+    });
+    // Starts on the default profile; no Custom badge yet.
+    expect(
+      within(profile).getByRole("button", { name: /^balanced$/i }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      within(profile).queryByRole("button", { name: /^custom$/i }),
+    ).not.toBeInTheDocument();
+
+    // Touch any advanced pass (Ordering) → the primary control must show Custom.
+    const ordering = screen.getByRole("group", { name: /pipeline ordering/i });
+    fireEvent.click(within(ordering).getByRole("button", { name: /^on$/i }));
+
+    const custom = within(profile).getByRole("button", { name: /^custom$/i });
+    expect(custom).toHaveAttribute("aria-pressed", "true");
+    expect(
+      within(profile).getByRole("button", { name: /^balanced$/i }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("RCLL view: Cycle height defaults to Risen (true) and threads false when set to Stacked", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],

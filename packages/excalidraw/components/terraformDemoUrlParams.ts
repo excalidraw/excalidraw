@@ -1,3 +1,8 @@
+import {
+  isRcllLayoutProfile,
+  type RcllLayoutProfile,
+} from "./terraformPipelineLayoutProfiles";
+
 import type {
   PipelineLayoutVariant,
   TerraformView,
@@ -14,15 +19,20 @@ export type TerraformDemoUrlParams = {
   packedPullLeft?: boolean;
   ancillary?: boolean;
   semanticPlace?: boolean;
+  /** Accepts the clear alias `laneRise` as well as the milestone name `swimlaneRise`. */
   swimlaneRise?: boolean;
   reorder?: boolean;
   subnetDeBand?: boolean;
+  /** Accepts the clear alias `laneSplit` as well as the milestone name `rankSeparate`. */
   rankSeparate?: boolean;
   straighten?: boolean;
   deDensify?: boolean;
   /** RCLL "Column packing" tri-state: `spread` (M5b) / `none` / `compact` (M5c). */
   columnPacking?: "spread" | "none" | "compact";
-  /** RCLL DEC-1 cycle-band rise; default on — only `=0` (false) is meaningful. */
+  /** RCLL "Layout" profile — `readable | balanced | compact` (outcome-first preset). */
+  profile?: RcllLayoutProfile;
+  /** RCLL DEC-1 cycle-band rise; default on — only `=0` (false) is meaningful.
+   * Accepts the clear alias `cycleRise` as well as the milestone name. */
   staircaseBandOverlap?: boolean;
 };
 
@@ -125,6 +135,23 @@ export const parseTerraformDemoUrlParams = (
     return null;
   };
 
+  // Milestone params accept a clearer alias (matching the menu vocabulary) as well as
+  // the legacy name. The first param that is present wins; an invalid value hard-fails.
+  const parseBooleanAlias = (
+    ...names: string[]
+  ): boolean | undefined | null => {
+    for (const name of names) {
+      const value = parseBooleanParam(name);
+      if (value === null) {
+        return null;
+      }
+      if (value !== undefined) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+
   let packed = parseBooleanParam("packed");
   if (packed === null) {
     return null;
@@ -149,7 +176,7 @@ export const parseTerraformDemoUrlParams = (
   if (semanticPlace === null) {
     return null;
   }
-  const swimlaneRise = parseBooleanParam("swimlaneRise");
+  const swimlaneRise = parseBooleanAlias("laneRise", "swimlaneRise");
   if (swimlaneRise === null) {
     return null;
   }
@@ -161,7 +188,7 @@ export const parseTerraformDemoUrlParams = (
   if (subnetDeBand === null) {
     return null;
   }
-  const rankSeparate = parseBooleanParam("rankSeparate");
+  const rankSeparate = parseBooleanAlias("laneSplit", "rankSeparate");
   if (rankSeparate === null) {
     return null;
   }
@@ -189,9 +216,23 @@ export const parseTerraformDemoUrlParams = (
   } else if (deDensify === true) {
     columnPacking = "spread";
   }
-  const staircaseBandOverlap = parseBooleanParam("staircaseBandOverlap");
+  const staircaseBandOverlap = parseBooleanAlias(
+    "cycleRise",
+    "staircaseBandOverlap",
+  );
   if (staircaseBandOverlap === null) {
     return null;
+  }
+
+  // "Layout" profile enum. Hard-fail on an invalid value (same contract as columnPacking).
+  const profileRaw = params.get("profile");
+  let profile: RcllLayoutProfile | undefined;
+  if (profileRaw != null && profileRaw.trim() !== "") {
+    const normalized = profileRaw.trim().toLowerCase();
+    if (!isRcllLayoutProfile(normalized)) {
+      return null;
+    }
+    profile = normalized;
   }
 
   return {
@@ -211,6 +252,7 @@ export const parseTerraformDemoUrlParams = (
     ...(straighten != null ? { straighten } : {}),
     ...(deDensify != null ? { deDensify } : {}),
     ...(columnPacking != null ? { columnPacking } : {}),
+    ...(profile != null ? { profile } : {}),
     ...(staircaseBandOverlap != null ? { staircaseBandOverlap } : {}),
   };
 };

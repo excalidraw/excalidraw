@@ -35,15 +35,21 @@ const LAYOUT_CORE_MODULE = path.resolve(
 
 // RCLL pipeline toggles → `TerraformLayoutOptions` keys. Param names mirror the
 // `/demo` URL API (terraformDemoUrlParams.ts); `compact` is endpoint-only.
+// Each entry is [paramName, optionKey]. Several params carry a clearer alias that
+// matches the menu vocabulary (laneRise/laneSplit/cycleRise) alongside the legacy
+// milestone name; both map to the same option key (last one present wins, like the URL).
 const LAYOUT_BOOLEAN_PARAMS = [
   ["compact", "pipelineCompact"],
+  ["laneRise", "pipelineSwimlaneLaneRise"],
   ["swimlaneRise", "pipelineSwimlaneLaneRise"],
+  ["laneSplit", "pipelineRankSeparate"],
   ["rankSeparate", "pipelineRankSeparate"],
   ["subnetDeBand", "pipelineSubnetDeBand"],
   ["straighten", "pipelineStraighten"],
   // Legacy alias: `deDensify=1` ⇒ the core derives `columnPacking:"spread"`.
   ["deDensify", "pipelineDeDensify"],
   ["reorder", "pipelineReorder"],
+  ["cycleRise", "pipelineStaircaseBandOverlap"],
   ["staircaseBandOverlap", "pipelineStaircaseBandOverlap"],
   ["ancillary", "pipelineIncludeAncillary"],
 ];
@@ -51,7 +57,36 @@ const LAYOUT_BOOLEAN_PARAMS = [
 // Enum (non-boolean) layout params: [paramName, optionKey, allowedValues].
 const LAYOUT_ENUM_PARAMS = [
   ["columnPacking", "pipelineColumnPacking", ["spread", "none", "compact"]],
+  // Outcome-first "Layout" profile — expands into the seven RCLL flags in the core.
+  ["profile", "pipelineLayoutProfile", ["readable", "balanced", "compact"]],
 ];
+
+// Self-describing catalog returned by `?describe=1` so a caller can discover the
+// vocabulary without reading source. Kept beside the param tables it documents.
+const LAYOUT_PARAM_CATALOG = {
+  route: TERRAFORM_LAYOUT_API_ROUTE,
+  method: "GET",
+  required: { preset: "preset id (slug)" },
+  profiles: {
+    param: "profile",
+    values: ["readable", "balanced", "compact"],
+    note: "Outcome-first preset that expands into the flags below. `balanced` = today's defaults (byte-identical). An explicit flag overrides the profile.",
+  },
+  enums: {
+    columnPacking: ["spread", "none", "compact"],
+  },
+  booleans: {
+    compact: "detail: collapse clusters to a representative",
+    laneRise: "alias of swimlaneRise (M4) — X-disjoint lanes share Y rows",
+    laneSplit: "alias of rankSeparate (M8r) — split dependent lanes (needs laneRise)",
+    cycleRise: "alias of staircaseBandOverlap (DEC-1) — cycle groups share Y (default on)",
+    subnetDeBand: "collapse subnet lanes into one VPC stack",
+    straighten: "Brandes–Köpf leaf straightening",
+    reorder: "barycenter crossing-min reorder",
+    deDensify: "legacy alias ⇒ columnPacking=spread",
+  },
+  responseShape: ["requested", "resolved", "applied", "suppressions", "bounds", "rcll", "regions"],
+};
 
 // The layout engine's import graph (appState, element rendering) reads browser
 // globals at module-eval time. ssrLoadModule runs in Node, so bootstrap a jsdom
@@ -244,16 +279,71 @@ const collectRegionFrames = (elements) => {
   return regions;
 };
 
-/** Shape the proof payload: applied/suppressed flags + bounds + per-region geometry. */
+/**
+ * Self-describing proof payload — the "what happened and why" answer in API form:
+ *  - `requested`: the raw caller params (echoes the URL the caller sent).
+ *  - `resolved`: the effective profile + the seven RCLL flags the engine actually ran,
+ *     after profile expansion AND the toggle guards (so a profile or an alias is visible
+ *     as its concrete flags, not just the param name).
+ *  - `applied`: what the engine did + the rcll.* metrics (legacy shape, kept).
+ *  - `suppressions`: an array of `{ option, reason, detail }` — the guard drops
+ *     (rankSeparate-needs-rise, column-packing-conflict) AND measured no-ops (a compaction
+ *     that moved zero columns on this preset). The honest "why it didn't change" list.
+ */
 const buildLayoutProofPayload = (presetId, requested, scene) => {
   const elements = (scene.elements ?? []).filter((el) => !el.isDeleted);
   const meta = scene.meta ?? {};
   const placement = meta.rcllStageMeta?.placement ?? {};
   const gates = meta.gates ?? {};
+
+  // The effective flags the engine ran (meta omits defaults, so coalesce to them).
+  const resolvedFlags = {
+    swimlaneLaneRise: meta.pipelineSwimlaneLaneRise ?? false,
+    rankSeparate: meta.pipelineRankSeparate ?? false,
+    subnetDeBand: meta.pipelineSubnetDeBand ?? false,
+    staircaseBandOverlap: meta.pipelineStaircaseBandOverlap ?? true,
+    reorder: meta.pipelineReorder ?? false,
+    straighten: meta.pipelineStraighten ?? false,
+    columnPacking: meta.pipelineColumnPacking ?? "none",
+  };
+
+  // Honest "why it didn't fully apply" list, derived from the observable meta backstops
+  // + measured no-ops. Each entry names the option, the reason, and a human detail.
+  const suppressions = [];
+  if (meta.pipelineRankSeparateSuppressed) {
+    suppressions.push({
+      option: "rankSeparate",
+      reason: "needs-lane-rise",
+      detail:
+        "Lane split was dropped because Lane height = Risen was off (solo split is taller + wider).",
+    });
+  }
+  if (meta.pipelineColumnPackingConflict) {
+    suppressions.push({
+      option: "columnPacking",
+      reason: "conflict-compact-wins",
+      detail: "Both spread and compact were set; compact (measure-verified) won.",
+    });
+  }
+  if (
+    resolvedFlags.columnPacking === "compact" &&
+    placement.columnCompactMovedCount === 0
+  ) {
+    suppressions.push({
+      option: "columnPacking",
+      reason: "no-op",
+      detail: "Compaction moved 0 columns on this preset (dataflow already dense).",
+    });
+  }
+
   return {
     preset: presetId,
     view: "rcll",
     requested,
+    resolved: {
+      profile: meta.pipelineLayoutProfile ?? requested.profile ?? "balanced",
+      flags: resolvedFlags,
+    },
     applied: {
       pipelineRankSeparate: meta.pipelineRankSeparate ?? false,
       pipelineRankSeparateSuppressed: meta.pipelineRankSeparateSuppressed ?? false,
@@ -263,8 +353,10 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
       pipelineColumnPacking: meta.pipelineColumnPacking ?? "none",
       pipelineColumnPackingConflict: meta.pipelineColumnPackingConflict ?? false,
       pipelineReorder: meta.pipelineReorder ?? false,
+      pipelineLayoutProfile: meta.pipelineLayoutProfile ?? null,
       rcllMilestone: meta.rcllMilestone ?? null,
     },
+    suppressions,
     bounds: computeSceneBounds(elements),
     elementCount: elements.length,
     rcll: {
@@ -352,6 +444,14 @@ export const terraformImportPresetDevPlugin = () => ({
           ? url.slice(url.indexOf("?") + 1)
           : "";
         const params = new URLSearchParams(queryString);
+
+        // Self-documenting: `?describe=1` returns the param/profile catalog so a caller
+        // can discover the vocabulary without a preset (or reading source).
+        if (parseLayoutBooleanParam(params.get("describe")) === true) {
+          sendJson(res, 200, LAYOUT_PARAM_CATALOG);
+          return;
+        }
+
         const presetId = (params.get("preset") ?? "").trim().toLowerCase();
         if (!presetId) {
           sendJson(res, 400, { error: "Missing required ?preset=<id>." });

@@ -224,4 +224,59 @@ describe("layoutTerraformFromSources — RCLL toggle threading (regression)", ()
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 8,
   );
+
+  // --- "Layout" profile (terraformPipelineLayoutProfiles) ---------------------
+
+  it(
+    "pipelineLayoutProfile=balanced is the identity — OFF byte-identical, no meta",
+    async () => {
+      const off = await build({});
+      const balanced = await build({ pipelineLayoutProfile: "balanced" });
+      // balanced expands to today's exact defaults ⇒ canonicalized geometry equal
+      // AND the profile is omitted from meta (like columnPacking:"none").
+      expect(canonicalize(balanced.elements)).toEqual(
+        canonicalize(off.elements),
+      );
+      expect(balanced.meta.pipelineLayoutProfile).toBeUndefined();
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 8,
+  );
+
+  it(
+    "pipelineLayoutProfile=compact reaches the engine and expands into the flags",
+    async () => {
+      const compact = await build({ pipelineLayoutProfile: "compact" });
+      // The profile is echoed (non-balanced) and its bundle is expanded: lane-rise
+      // + lane-split + subnet de-band + column compaction all show up in meta.
+      expect(compact.meta.pipelineLayoutProfile).toBe("compact");
+      expect(compact.meta.pipelineSwimlaneLaneRise).toBe(true);
+      expect(compact.meta.pipelineRankSeparate).toBe(true);
+      expect(compact.meta.pipelineSubnetDeBand).toBe(true);
+      expect(compact.meta.pipelineColumnPacking).toBe("compact");
+      // compact is shorter than the balanced default (height-shrinking composition).
+      const balanced = await build({});
+      expect(sceneHeight(compact.elements)).toBeLessThanOrEqual(
+        sceneHeight(balanced.elements),
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 10,
+  );
+
+  it(
+    "an explicit individual flag overrides the profile",
+    async () => {
+      // compact would set rankSeparate=true; explicitly forcing the lane-split off
+      // (and the rise off) must win over the profile.
+      const overridden = await build({
+        pipelineLayoutProfile: "compact",
+        pipelineSwimlaneLaneRise: false,
+        pipelineRankSeparate: false,
+      });
+      expect(overridden.meta.pipelineRankSeparate ?? false).toBe(false);
+      expect(overridden.meta.pipelineSwimlaneLaneRise ?? false).toBe(false);
+      // The profile is still echoed (the caller asked for it); only the one flag changed.
+      expect(overridden.meta.pipelineLayoutProfile).toBe("compact");
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 8,
+  );
 });

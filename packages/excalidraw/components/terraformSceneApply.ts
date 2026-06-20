@@ -171,6 +171,9 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineDeDensify?: boolean;
   /** RCLL "Column packing" tri-state: `spread` (M5b) / `none` / `compact` (M5c). */
   pipelineColumnPacking?: "spread" | "none" | "compact";
+  /** RCLL "Layout" profile — `readable | balanced | compact` (expands into the RCLL flags;
+   * `balanced` = today's defaults). An explicit individual flag overrides it. */
+  pipelineLayoutProfile?: import("./terraformPipelineLayoutProfiles").RcllLayoutProfile;
   /** RCLL M3b / DEC-1 — X-disjoint cycle groups rise to share Y. Default on (undefined). */
   pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
@@ -243,6 +246,7 @@ async function layoutTerraformSceneFromSources(
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,
             pipelineColumnPacking: options.pipelineColumnPacking,
+            pipelineLayoutProfile: options.pipelineLayoutProfile,
             // Default-on: undefined ⇒ engine default (true). Only an explicit
             // false (Stacked) flows through.
             pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
@@ -325,6 +329,7 @@ export const runTerraformImportFromSources = async (
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,
             pipelineColumnPacking: options.pipelineColumnPacking,
+            pipelineLayoutProfile: options.pipelineLayoutProfile,
             // Default-on: undefined ⇒ engine default (true). Only an explicit
             // false (Stacked) flows through.
             pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,

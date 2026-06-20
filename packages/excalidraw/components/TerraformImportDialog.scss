@@ -394,6 +394,37 @@
       }
     }
 
+    // Progressive disclosure: the RCLL "Fine-tune layout (advanced)" section. The
+    // <details> is one flex item in the settings column; its own children (summary +
+    // each pass control) re-stack as a flex column with the same gap as the grid.
+    &__advancedDisclosure {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      margin-top: 0.4rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--color-gray-20);
+    }
+
+    &__advancedSummary {
+      cursor: pointer;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--color-on-surface);
+      user-select: none;
+
+      &:hover {
+        color: var(--color-brand-hover, var(--color-on-surface));
+      }
+    }
+
+    // Nested sub-choice (Lane split under Lane height): indent + a faint rail so the
+    // dependency reads as "this belongs to the control above it", not a peer toggle.
+    &__nestedControl {
+      padding-inline-start: 0.7rem;
+      border-inline-start: 2px solid var(--color-gray-20);
+    }
+
     &__filePair,
     &__optionalGrid {
       display: grid;

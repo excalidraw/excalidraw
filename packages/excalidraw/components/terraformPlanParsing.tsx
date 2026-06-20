@@ -156,6 +156,10 @@ export type TerraformPlanParsingOptions = {
    * = M5c column compaction (pull-left), `none` = neither. The single front-door enum;
    * supersedes `pipelineDeDensify` (kept as a legacy alias ⇒ `spread`). Default `none`. */
   pipelineColumnPacking?: "spread" | "none" | "compact";
+  /** RCLL "Layout" profile — outcome-first preset (`readable | balanced | compact`) that
+   * expands into the RCLL flags above. `balanced` = today's defaults (byte-identical). An
+   * explicitly-set individual flag overrides the profile. See terraformPipelineLayoutProfiles. */
+  pipelineLayoutProfile?: import("./terraformPipelineLayoutProfiles").RcllLayoutProfile;
   /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default on; only `=false` is meaningful. */
   pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */

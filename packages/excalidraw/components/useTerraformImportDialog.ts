@@ -39,8 +39,14 @@ import {
   toPresetId,
   type PlanDotBundleRow,
   type PipelineLayoutVariant,
+  type RcllLayoutProfileSelection,
   type TerraformView,
 } from "./terraformImportDialogUtils";
+import {
+  DEFAULT_RCLL_LAYOUT_PROFILE,
+  resolveRcllLayoutProfile,
+  type RcllLayoutProfile,
+} from "./terraformPipelineLayoutProfiles";
 
 import type {
   TerraformImportArtifact,
@@ -100,6 +106,83 @@ export const useTerraformImportDialog = ({
     useState(true);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+  );
+
+  // RCLL "Layout" — the outcome-first PRIMARY control. A named profile fans out into the
+  // seven RCLL flags above (the values actually threaded to import); touching any of those
+  // levers directly (from the Advanced disclosure) flips this to "custom" so the primary
+  // control never lies about what is active. Default `balanced` = today's flag defaults.
+  const [pipelineLayoutProfile, setPipelineLayoutProfileState] =
+    useState<RcllLayoutProfileSelection>(DEFAULT_RCLL_LAYOUT_PROFILE);
+
+  // Apply a named profile: expand its bundle into the seven RCLL flag setters (raw, so the
+  // fan-out itself does not mark "custom"), then record the profile as the primary choice.
+  const applyPipelineLayoutProfile = useCallback((profile: RcllLayoutProfile) => {
+    const flags = resolveRcllLayoutProfile(profile);
+    setPipelineSwimlaneLaneRise(flags.swimlaneLaneRise);
+    setPipelineRankSeparate(flags.rankSeparate);
+    setPipelineSubnetDeBand(flags.subnetDeBand);
+    setPipelineStaircaseBandOverlap(flags.staircaseBandOverlap);
+    setPipelineReorder(flags.reorder);
+    setPipelineStraighten(flags.straighten);
+    setPipelineColumnPacking(flags.columnPacking);
+    setPipelineLayoutProfileState(profile);
+  }, []);
+
+  // Wrap each individual RCLL-flag setter so an Advanced edit flips the primary control to
+  // "custom". `markCustom` only downgrades a named profile — re-applying a profile resets it.
+  const markLayoutCustom = useCallback(
+    () => setPipelineLayoutProfileState("custom"),
+    [],
+  );
+  const setPipelineSwimlaneLaneRiseCustom = useCallback(
+    (v: boolean) => {
+      setPipelineSwimlaneLaneRise(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineReorderCustom = useCallback(
+    (v: boolean) => {
+      setPipelineReorder(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineSubnetDeBandCustom = useCallback(
+    (v: boolean) => {
+      setPipelineSubnetDeBand(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineRankSeparateCustom = useCallback(
+    (v: boolean) => {
+      setPipelineRankSeparate(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineStraightenCustom = useCallback(
+    (v: boolean) => {
+      setPipelineStraighten(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineColumnPackingCustom = useCallback(
+    (v: "spread" | "none" | "compact") => {
+      setPipelineColumnPacking(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineStaircaseBandOverlapCustom = useCallback(
+    (v: boolean) => {
+      setPipelineStaircaseBandOverlap(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
   );
 
   // RCLL view delegates to the compound builder at M0 (its own algorithm lands
@@ -714,6 +797,7 @@ export const useTerraformImportDialog = ({
     pipelineRankSeparate,
     pipelineStraighten,
     pipelineColumnPacking,
+    pipelineLayoutProfile,
     pipelineStaircaseBandOverlap,
     moduleLayoutOptions,
     loading,
@@ -747,13 +831,16 @@ export const useTerraformImportDialog = ({
     setPipelinePackedPullLeft,
     setPipelineIncludeAncillary,
     setPipelineSemanticPlacement,
-    setPipelineSwimlaneLaneRise,
-    setPipelineReorder,
-    setPipelineSubnetDeBand,
-    setPipelineRankSeparate,
-    setPipelineStraighten,
-    setPipelineColumnPacking,
-    setPipelineStaircaseBandOverlap,
+    // The seven RCLL-flag setters are the "custom"-marking wrappers, so any Advanced edit
+    // flips the primary Layout control to "Custom" (the raw setters stay internal).
+    setPipelineSwimlaneLaneRise: setPipelineSwimlaneLaneRiseCustom,
+    setPipelineReorder: setPipelineReorderCustom,
+    setPipelineSubnetDeBand: setPipelineSubnetDeBandCustom,
+    setPipelineRankSeparate: setPipelineRankSeparateCustom,
+    setPipelineStraighten: setPipelineStraightenCustom,
+    setPipelineColumnPacking: setPipelineColumnPackingCustom,
+    setPipelineStaircaseBandOverlap: setPipelineStaircaseBandOverlapCustom,
+    setPipelineLayoutProfile: applyPipelineLayoutProfile,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

@@ -2,7 +2,11 @@ import React from "react";
 
 import { renderOptionFigure } from "./terraformPipelineSettingsFigures";
 
-import type { PipelineLayoutVariant } from "./terraformImportDialogUtils";
+import type {
+  PipelineLayoutVariant,
+  RcllLayoutProfile,
+  RcllLayoutProfileSelection,
+} from "./terraformImportDialogUtils";
 
 /** Per-option explanation shown in the side panel — the detail a user needs to
  * understand what each choice actually does to the diagram. `dev` names the
@@ -232,6 +236,42 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       ],
     },
   },
+  "profile.readable": {
+    title: "Layout · Readable",
+    body: "The clearest, most spread-out arrangement. Mutually-dependent groups stack on their own rows, arrows are ordered to cross less, and fan-out spines are aligned. Tallest of the three — best when you want to follow the dataflow without anything sharing space.",
+    dev: {
+      implements:
+        "Profile bundle: staircaseBandOverlap=false (cycles stack), reorder=on, straighten=on; no width-shrinking passes (laneRise/laneSplit/subnetDeBand off, columnPacking=none).",
+    },
+  },
+  "profile.balanced": {
+    title: "Layout · Balanced (default)",
+    body: "Today's default arrangement — a middle ground that keeps cycles compact (sharing rows where columns don't overlap) but applies no other reflow. Selecting it is identical to importing with no layout tuning at all.",
+    dev: {
+      implements:
+        "Profile bundle = the shipped defaults: staircaseBandOverlap=on, everything else off (columnPacking=none). Byte-identical to no profile.",
+    },
+  },
+  "profile.compact": {
+    title: "Layout · Compact",
+    body: "The smallest overall footprint. Turns on every space-saving pass at once: dependent lanes rise to share rows and split into separate columns, subnet boxes collapse into colored rails, and independent cards are pulled left. It is much shorter — and a bit wider, since splitting lanes trades some width for a lot of height (measured on the staging v2: roughly a third the area, but ~65% shorter and ~30% wider). Densest to read, best when vertical space is tight.",
+    dev: {
+      implements:
+        "Profile bundle: laneRise + laneSplit (the −42% height / +28% width composition) + subnetDeBand (≈ −28% height) + cycle-rise + columnPacking=compact (pull-left), plus reorder + straighten for legibility under the denser packing. Net area on v2 ≈ −55%.",
+      refs: [
+        "Sander 1996 (compound layout)",
+        "Rüegg et al. 2016 (1D compaction)",
+      ],
+    },
+  },
+  "profile.custom": {
+    title: "Layout · Custom",
+    body: "You've adjusted one or more individual passes in Fine-tune below, so the layout no longer matches a named profile. Pick Readable, Balanced, or Compact above to snap back to a preset bundle.",
+    dev: {
+      implements:
+        "Sentinel state: the seven RCLL flags no longer equal any profile's expansion. Re-selecting a profile re-applies its bundle.",
+    },
+  },
   "cycleheight.risen": {
     title: "Cycle height · Risen (default)",
     body: "Inside a mutually-dependent group, sub-groups whose columns don't overlap share a row instead of stacking — shorter. This is the default.",
@@ -285,6 +325,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineRankSeparate,
   pipelineStraighten,
   pipelineColumnPacking,
+  pipelineLayoutProfile,
   pipelineStaircaseBandOverlap,
   setPipelineCompact,
   setPipelineLayoutVariant,
@@ -298,6 +339,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineRankSeparate,
   setPipelineStraighten,
   setPipelineColumnPacking,
+  setPipelineLayoutProfile,
   setPipelineStaircaseBandOverlap,
   showPlacement = true,
   showVariant = true,
@@ -314,6 +356,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineRankSeparate: boolean;
   pipelineStraighten: boolean;
   pipelineColumnPacking: "spread" | "none" | "compact";
+  pipelineLayoutProfile: RcllLayoutProfileSelection;
   pipelineStaircaseBandOverlap: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
@@ -329,6 +372,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineColumnPacking: (
     columnPacking: "spread" | "none" | "compact",
   ) => void;
+  setPipelineLayoutProfile: (profile: RcllLayoutProfile) => void;
   setPipelineStaircaseBandOverlap: (staircaseBandOverlap: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
@@ -463,153 +507,209 @@ export const TerraformImportPipelineSettings = ({
       <div className="TerraformImportModal__layoutSettingsBody">
         <div className="TerraformImportModal__layoutSettingsGrid">
           {isRcll ? (
-            // RCLL owns placement: the controls are grouped + ordered to match
-            // the engine's Sugiyama pipeline (the order they actually apply).
+            // RCLL owns placement. PRIMARY: pick a plain-outcome "Layout" profile.
+            // ADVANCED (collapsed): the individual Sugiyama passes for A/B work —
+            // touching any of them flips the profile control to "Custom".
             <>
-              <div className="TerraformImportModal__controlNote">
-                RCLL arranges layout automatically. The controls below are
-                grouped by the order they are applied.
-              </div>
-              {phaseHeader("Content", "how much / which resources")}
+              {phaseHeader("Content", "how much to draw")}
               {detailGroup}
-              {resourcesGroup}
-              {phaseHeader("Structure", "the model")}
-              <div role="group" aria-label="Pipeline subnets">
+              {phaseHeader("Layout", "height ↔ width ↔ readability")}
+              <div role="group" aria-label="Pipeline layout profile">
                 <span className="TerraformImportModal__controlLabel">
-                  Subnets <span>boxed lanes vs de-banded with color rails</span>
-                </span>
-                <div className="TerraformImportModal__segmentedControl">
-                  {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
-                    setPipelineSubnetDeBand(false),
-                  )}
-                  {option(
-                    "De-banded",
-                    pipelineSubnetDeBand,
-                    "subnet.debanded",
-                    () => setPipelineSubnetDeBand(true),
-                  )}
-                </div>
-              </div>
-              {phaseHeader("Columns", "left → right placement (X)")}
-              <div role="group" aria-label="Pipeline lane split">
-                <span className="TerraformImportModal__controlLabel">
-                  Lane split{" "}
-                  <span>split dependent lanes (needs Lane height = Risen)</span>
-                </span>
-                <div className="TerraformImportModal__segmentedControl">
-                  {option("Off", !pipelineRankSeparate, "lanesplit.off", () =>
-                    setPipelineRankSeparate(false),
-                  )}
-                  {option(
-                    "On",
-                    pipelineRankSeparate,
-                    "lanesplit.on",
-                    () => setPipelineRankSeparate(true),
-                    // Footgun guard: lane split alone is taller + wider; the win
-                    // exists only composed with the risen lane height (M4).
-                    !pipelineSwimlaneLaneRise,
-                  )}
-                </div>
-              </div>
-              <div role="group" aria-label="Pipeline column packing">
-                <span className="TerraformImportModal__controlLabel">
-                  Column packing <span>spread or compact columns</span>
+                  Layout <span>pick the trade — adjust passes below to tune</span>
                 </span>
                 <div className="TerraformImportModal__segmentedControl">
                   {option(
-                    "Spread",
-                    pipelineColumnPacking === "spread",
-                    "columnpacking.spread",
-                    () => setPipelineColumnPacking("spread"),
+                    "Readable",
+                    pipelineLayoutProfile === "readable",
+                    "profile.readable",
+                    () => setPipelineLayoutProfile("readable"),
                   )}
                   {option(
-                    "None",
-                    pipelineColumnPacking === "none",
-                    "columnpacking.none",
-                    () => setPipelineColumnPacking("none"),
+                    "Balanced",
+                    pipelineLayoutProfile === "balanced",
+                    "profile.balanced",
+                    () => setPipelineLayoutProfile("balanced"),
                   )}
                   {option(
                     "Compact",
-                    pipelineColumnPacking === "compact",
-                    "columnpacking.compact",
-                    () => setPipelineColumnPacking("compact"),
+                    pipelineLayoutProfile === "compact",
+                    "profile.compact",
+                    () => setPipelineLayoutProfile("compact"),
                   )}
+                  {pipelineLayoutProfile === "custom" &&
+                    // Non-clickable badge: surfaces the active "Custom" state once an
+                    // advanced lever is touched. Click a profile above to leave it.
+                    option(
+                      "Custom",
+                      true,
+                      "profile.custom",
+                      () => {},
+                      true,
+                    )}
                 </div>
               </div>
-              {phaseHeader("Ordering", "reduce crossing arrows")}
-              <div role="group" aria-label="Pipeline ordering">
-                <span className="TerraformImportModal__controlLabel">
-                  Ordering <span>reduce crossing arrows within groups</span>
-                </span>
-                <div className="TerraformImportModal__segmentedControl">
-                  {option("Off", !pipelineReorder, "ordering.off", () =>
-                    setPipelineReorder(false),
-                  )}
-                  {option("On", pipelineReorder, "ordering.on", () =>
-                    setPipelineReorder(true),
-                  )}
+              <details className="TerraformImportModal__advancedDisclosure">
+                <summary className="TerraformImportModal__advancedSummary">
+                  Fine-tune layout (advanced) — individual passes
+                </summary>
+                <div className="TerraformImportModal__controlNote">
+                  Each control is one pass of the layout engine, in the order it
+                  applies. Changing any of them switches Layout to “Custom”.
                 </div>
-              </div>
-              {phaseHeader("Vertical", "top → down placement (Y)")}
-              <div role="group" aria-label="Pipeline lane height">
-                <span className="TerraformImportModal__controlLabel">
-                  Lane height <span>height of mutually-dependent groups</span>
-                </span>
-                <div className="TerraformImportModal__segmentedControl">
-                  {option(
-                    "Stacked",
-                    !pipelineSwimlaneLaneRise,
-                    "laneheight.stacked",
-                    () => {
-                      // Footgun guard: Lane split is only valid with risen lane
-                      // height, so turning the rise off also clears it (it would
-                      // otherwise be a stale, suppressed On).
-                      setPipelineSwimlaneLaneRise(false);
-                      setPipelineRankSeparate(false);
-                    },
-                  )}
-                  {option(
-                    "Risen",
-                    pipelineSwimlaneLaneRise,
-                    "laneheight.risen",
-                    () => setPipelineSwimlaneLaneRise(true),
-                  )}
+                {phaseHeader("Content", "which resources appear")}
+                {resourcesGroup}
+                {phaseHeader("Structure", "the model")}
+                <div role="group" aria-label="Pipeline subnets">
+                  <span className="TerraformImportModal__controlLabel">
+                    Subnets{" "}
+                    <span>boxed lanes vs de-banded with color rails</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
+                      setPipelineSubnetDeBand(false),
+                    )}
+                    {option(
+                      "De-banded",
+                      pipelineSubnetDeBand,
+                      "subnet.debanded",
+                      () => setPipelineSubnetDeBand(true),
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div role="group" aria-label="Pipeline cycle height">
-                <span className="TerraformImportModal__controlLabel">
-                  Cycle height <span>height of mutually-dependent cycles</span>
-                </span>
-                {/* Button order matches Lane height (Stacked, Risen) so the two
-                    height levers read as the same control at different scopes. */}
-                <div className="TerraformImportModal__segmentedControl">
-                  {option(
-                    "Stacked",
-                    !pipelineStaircaseBandOverlap,
-                    "cycleheight.stacked",
-                    () => setPipelineStaircaseBandOverlap(false),
-                  )}
-                  {option(
-                    "Risen",
-                    pipelineStaircaseBandOverlap,
-                    "cycleheight.risen",
-                    () => setPipelineStaircaseBandOverlap(true),
-                  )}
+                {phaseHeader("Columns", "left → right placement (X)")}
+                <div role="group" aria-label="Pipeline column packing">
+                  <span className="TerraformImportModal__controlLabel">
+                    Column packing <span>spread or compact columns</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Spread",
+                      pipelineColumnPacking === "spread",
+                      "columnpacking.spread",
+                      () => setPipelineColumnPacking("spread"),
+                    )}
+                    {option(
+                      "None",
+                      pipelineColumnPacking === "none",
+                      "columnpacking.none",
+                      () => setPipelineColumnPacking("none"),
+                    )}
+                    {option(
+                      "Compact",
+                      pipelineColumnPacking === "compact",
+                      "columnpacking.compact",
+                      () => setPipelineColumnPacking("compact"),
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div role="group" aria-label="Pipeline straighten">
-                <span className="TerraformImportModal__controlLabel">
-                  Straighten <span>align fan-out spines across columns</span>
-                </span>
-                <div className="TerraformImportModal__segmentedControl">
-                  {option("Off", !pipelineStraighten, "straighten.off", () =>
-                    setPipelineStraighten(false),
-                  )}
-                  {option("On", pipelineStraighten, "straighten.on", () =>
-                    setPipelineStraighten(true),
-                  )}
+                {phaseHeader("Ordering", "reduce crossing arrows")}
+                <div role="group" aria-label="Pipeline ordering">
+                  <span className="TerraformImportModal__controlLabel">
+                    Ordering <span>reduce crossing arrows within groups</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option("Off", !pipelineReorder, "ordering.off", () =>
+                      setPipelineReorder(false),
+                    )}
+                    {option("On", pipelineReorder, "ordering.on", () =>
+                      setPipelineReorder(true),
+                    )}
+                  </div>
                 </div>
-              </div>
+                {phaseHeader("Vertical", "top → down placement (Y)")}
+                <div role="group" aria-label="Pipeline lane height">
+                  <span className="TerraformImportModal__controlLabel">
+                    Lane height <span>height of mutually-dependent groups</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Stacked",
+                      !pipelineSwimlaneLaneRise,
+                      "laneheight.stacked",
+                      () => {
+                        // Footgun guard: Lane split is only valid with risen lane
+                        // height, so turning the rise off also clears it (it would
+                        // otherwise be a stale, suppressed On).
+                        setPipelineSwimlaneLaneRise(false);
+                        setPipelineRankSeparate(false);
+                      },
+                    )}
+                    {option(
+                      "Risen",
+                      pipelineSwimlaneLaneRise,
+                      "laneheight.risen",
+                      () => setPipelineSwimlaneLaneRise(true),
+                    )}
+                  </div>
+                </div>
+                {/* Lane split is NESTED under Lane height: it is a sub-choice that
+                    only does something once Lane height = Risen. Indented + an
+                    always-visible prerequisite line make the dependency structural
+                    (not a silent grey-out the user has to discover). */}
+                <div
+                  role="group"
+                  aria-label="Pipeline lane split"
+                  className="TerraformImportModal__nestedControl"
+                >
+                  <span className="TerraformImportModal__controlLabel">
+                    Lane split{" "}
+                    <span>
+                      {pipelineSwimlaneLaneRise
+                        ? "split dependent lanes into separate columns"
+                        : "needs Lane height = Risen (above) — off until then"}
+                    </span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option("Off", !pipelineRankSeparate, "lanesplit.off", () =>
+                      setPipelineRankSeparate(false),
+                    )}
+                    {option(
+                      "On",
+                      pipelineRankSeparate,
+                      "lanesplit.on",
+                      () => setPipelineRankSeparate(true),
+                      // Footgun guard: lane split alone is taller + wider; the win
+                      // exists only composed with the risen lane height (M4).
+                      !pipelineSwimlaneLaneRise,
+                    )}
+                  </div>
+                </div>
+                <div role="group" aria-label="Pipeline cycle height">
+                  <span className="TerraformImportModal__controlLabel">
+                    Cycle height <span>height of mutually-dependent cycles</span>
+                  </span>
+                  {/* Button order matches Lane height (Stacked, Risen) so the two
+                      height levers read as the same control at different scopes. */}
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Stacked",
+                      !pipelineStaircaseBandOverlap,
+                      "cycleheight.stacked",
+                      () => setPipelineStaircaseBandOverlap(false),
+                    )}
+                    {option(
+                      "Risen",
+                      pipelineStaircaseBandOverlap,
+                      "cycleheight.risen",
+                      () => setPipelineStaircaseBandOverlap(true),
+                    )}
+                  </div>
+                </div>
+                <div role="group" aria-label="Pipeline straighten">
+                  <span className="TerraformImportModal__controlLabel">
+                    Straighten <span>align fan-out spines across columns</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option("Off", !pipelineStraighten, "straighten.off", () =>
+                      setPipelineStraighten(false),
+                    )}
+                    {option("On", pipelineStraighten, "straighten.on", () =>
+                      setPipelineStraighten(true),
+                    )}
+                  </div>
+                </div>
+              </details>
             </>
           ) : (
             // Classic / Compound / V2: the original flat order (no phases — these

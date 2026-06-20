@@ -10,6 +10,16 @@ export type TerraformLayoutMode = TerraformView;
 
 export type PipelineLayoutVariant = "classic" | "compound" | "v2" | "rcll";
 
+/** RCLL "Layout" profile (outcome-first preset), re-exported here so the dialog prop
+ * surface has one import home. The expansion lives in terraformPipelineLayoutProfiles. */
+export type { RcllLayoutProfile } from "./terraformPipelineLayoutProfiles";
+
+/** The dialog's primary "Layout" control state: a named profile, or `custom` once the
+ * user has touched any individual advanced lever (so the control never misrepresents). */
+export type RcllLayoutProfileSelection =
+  | import("./terraformPipelineLayoutProfiles").RcllLayoutProfile
+  | "custom";
+
 export const MAX_PLAN_BUNDLES = 10;
 
 export type PlanDotBundleRow = {

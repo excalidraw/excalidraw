@@ -230,6 +230,47 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses profile (RCLL Layout profile) and rejects invalid", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&profile=compact"),
+      ).toEqual({ presetId: "demo", view: "rcll", profile: "compact" });
+      expect(parseTerraformDemoUrlParams("?preset=demo&profile=readable")).toEqual(
+        { presetId: "demo", profile: "readable" },
+      );
+      expect(parseTerraformDemoUrlParams("?preset=demo&profile=balanced")).toEqual(
+        { presetId: "demo", profile: "balanced" },
+      );
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&profile=sideways"),
+      ).toBeNull();
+    });
+
+    it("accepts clear aliases (laneRise/laneSplit/cycleRise) for the milestone params", () => {
+      // laneRise ⇒ swimlaneRise
+      expect(parseTerraformDemoUrlParams("?preset=demo&laneRise=1")).toEqual({
+        presetId: "demo",
+        swimlaneRise: true,
+      });
+      // laneSplit ⇒ rankSeparate
+      expect(parseTerraformDemoUrlParams("?preset=demo&laneSplit=1")).toEqual({
+        presetId: "demo",
+        rankSeparate: true,
+      });
+      // cycleRise ⇒ staircaseBandOverlap
+      expect(parseTerraformDemoUrlParams("?preset=demo&cycleRise=0")).toEqual({
+        presetId: "demo",
+        staircaseBandOverlap: false,
+      });
+      // the legacy milestone name still works
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&swimlaneRise=1"),
+      ).toEqual({ presetId: "demo", swimlaneRise: true });
+      // an invalid alias value hard-fails
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&laneSplit=maybe"),
+      ).toBeNull();
+    });
+
     it("parses staircaseBandOverlap (RCLL DEC-1, default on — only =0 is meaningful)", () => {
       // Default on: absent ⇒ omitted (engine default true downstream).
       expect(parseTerraformDemoUrlParams("?preset=demo&view=rcll")).toEqual({

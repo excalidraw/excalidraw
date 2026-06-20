@@ -62,6 +62,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineStraighten?: boolean;
   pipelineDeDensify?: boolean;
   pipelineColumnPacking?: "spread" | "none" | "compact";
+  pipelineLayoutProfile?: import("./terraformPipelineLayoutProfiles").RcllLayoutProfile;
   pipelineStaircaseBandOverlap?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
@@ -88,6 +89,7 @@ export const runTerraformImportWithView = async ({
   pipelineStraighten,
   pipelineDeDensify,
   pipelineColumnPacking,
+  pipelineLayoutProfile,
   pipelineStaircaseBandOverlap,
   importedTfdTexts,
   preset = null,
@@ -117,6 +119,7 @@ export const runTerraformImportWithView = async ({
           pipelineStraighten,
           pipelineDeDensify,
           pipelineColumnPacking,
+          pipelineLayoutProfile,
           pipelineStaircaseBandOverlap,
         }
       : {}),
@@ -143,6 +146,7 @@ export type RunTerraformPresetImportOptions = {
   pipelineStraighten?: boolean;
   pipelineDeDensify?: boolean;
   pipelineColumnPacking?: "spread" | "none" | "compact";
+  pipelineLayoutProfile?: import("./terraformPipelineLayoutProfiles").RcllLayoutProfile;
   pipelineStaircaseBandOverlap?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
@@ -194,6 +198,7 @@ export const runTerraformPresetImport = async (
     pipelineStraighten: options.pipelineStraighten,
     pipelineDeDensify: options.pipelineDeDensify,
     pipelineColumnPacking: options.pipelineColumnPacking,
+    pipelineLayoutProfile: options.pipelineLayoutProfile,
     pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
     importedTfdTexts: presetSources.tfdTexts,
     preset,

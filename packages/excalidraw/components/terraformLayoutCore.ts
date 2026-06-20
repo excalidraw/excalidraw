@@ -39,6 +39,10 @@ import {
 import { buildTerraformPipelineV2ExcalidrawScene } from "./terraformPipelineLayoutV2";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
 import { applyRcllToggleGuards } from "./terraformPipelineToggleGuards";
+import {
+  resolveRcllLayoutProfile,
+  type RcllLayoutProfile,
+} from "./terraformPipelineLayoutProfiles";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -437,6 +441,9 @@ type LayoutSceneContext = {
   /** RCLL "Column packing" tri-state: `spread` = M5b pull-right, `compact` = M5c pull-left,
    * `none` = neither. Front-door enum; supersedes `pipelineDeDensify` (legacy ⇒ `spread`). */
   pipelineColumnPacking?: "spread" | "none" | "compact";
+  /** RCLL "Layout" profile, echoed into meta (when not `balanced`). The flag expansion is
+   * done at the `sceneContext` literal; this field is only carried for the meta echo. */
+  pipelineLayoutProfile?: RcllLayoutProfile;
   /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default true (undefined ⇒ on). */
   pipelineStaircaseBandOverlap?: boolean;
   colorMode?: TerraformColorMode;
@@ -554,6 +561,12 @@ async function buildPipelineLayoutSceneBody(
               : {}),
             ...(ctx.pipelineStaircaseBandOverlap === false
               ? { pipelineStaircaseBandOverlap: false }
+              : {}),
+            // "Layout" profile echo — omit `balanced` (the identity ⇒ OFF byte-identical,
+            // like `columnPacking:"none"` / `staircaseBandOverlap:true` are omitted).
+            ...(ctx.pipelineLayoutProfile &&
+            ctx.pipelineLayoutProfile !== "balanced"
+              ? { pipelineLayoutProfile: ctx.pipelineLayoutProfile }
               : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",
@@ -914,6 +927,15 @@ export async function layoutTerraformFromSources(
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
+  // "Layout" profile expansion — one place the outcome-first profile becomes the seven RCLL
+  // flags. An explicitly-set individual option (`options.pipelineX`) overrides the profile;
+  // absent ⇒ the profile's value; no profile ⇒ today's defaults (false / undefined). The
+  // dialog fans the profile into the flags itself, so on that path `pf` is absent and the
+  // explicit flags carry the choice (byte-identical to pre-profile behavior).
+  const pf = options?.pipelineLayoutProfile
+    ? resolveRcllLayoutProfile(options.pipelineLayoutProfile)
+    : undefined;
+
   const sceneContext: LayoutSceneContext = {
     sources,
     plan,
@@ -934,20 +956,25 @@ export async function layoutTerraformFromSources(
     pipelinePackedPullLeft: options?.pipelinePackedPullLeft === true,
     pipelineIncludeAncillary: options?.pipelineIncludeAncillary === true,
     pipelineSemanticPlacement: options?.pipelineSemanticPlacement === true,
-    pipelineSwimlaneLaneRise: options?.pipelineSwimlaneLaneRise === true,
-    pipelineReorder: options?.pipelineReorder === true,
-    pipelineSubnetDeBand: options?.pipelineSubnetDeBand === true,
+    pipelineSwimlaneLaneRise:
+      options?.pipelineSwimlaneLaneRise ?? pf?.swimlaneLaneRise ?? false,
+    pipelineReorder: options?.pipelineReorder ?? pf?.reorder ?? false,
+    pipelineSubnetDeBand:
+      options?.pipelineSubnetDeBand ?? pf?.subnetDeBand ?? false,
     // These four were declared on the context + consumed by the pipeline body but
     // never forwarded here, so they were silently dropped on the worker/headless
     // path (`layoutTerraformFromSources`) — rankSeparate/straighten/deDensify/
     // staircaseBandOverlap did nothing from the dialog/URL. Forward them.
-    pipelineRankSeparate: options?.pipelineRankSeparate === true,
-    pipelineStraighten: options?.pipelineStraighten === true,
+    pipelineRankSeparate:
+      options?.pipelineRankSeparate ?? pf?.rankSeparate ?? false,
+    pipelineStraighten: options?.pipelineStraighten ?? pf?.straighten ?? false,
     pipelineDeDensify: options?.pipelineDeDensify === true,
     // "Column packing" tri-state (M5b spread / M5c compact) — same silent-drop hazard:
     // forward it or the dialog/URL toggle does nothing on the worker/headless path.
-    pipelineColumnPacking: options?.pipelineColumnPacking,
-    pipelineStaircaseBandOverlap: options?.pipelineStaircaseBandOverlap,
+    pipelineColumnPacking: options?.pipelineColumnPacking ?? pf?.columnPacking,
+    pipelineLayoutProfile: options?.pipelineLayoutProfile,
+    pipelineStaircaseBandOverlap:
+      options?.pipelineStaircaseBandOverlap ?? pf?.staircaseBandOverlap,
     colorMode: options?.colorMode,
   };
 
