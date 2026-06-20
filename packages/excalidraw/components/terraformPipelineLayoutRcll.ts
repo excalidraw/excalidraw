@@ -72,6 +72,9 @@ type RcllBuildOptions = {
   /** Subnet de-band (PROBE, default false): collapse subnet lanes so a VPC's resources
    * share one column stack. Suppresses the subnet frame. Internal/measurement-only. */
   subnetDeBand?: boolean;
+  /** `rankSeparate` (default false): sibling-separation ranking — one-way sibling lanes
+   * get disjoint column ranges on the swimlane axis. Internal/measurement-only. */
+  rankSeparate?: boolean;
 };
 
 export type RcllPipelineStage = { name: string; stage: Stage };
@@ -383,6 +386,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     deDensify: options?.deDensify === true,
     deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
     subnetDeBand: options?.subnetDeBand === true,
+    rankSeparate: options?.rankSeparate === true,
   };
 
   // import: build the compound tree + lattice from the shared prep, ONCE.
@@ -470,7 +474,9 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       layoutEngine: "pipeline",
       pipelineVariant: "rcll",
       rcllMilestone: placed
-        ? rcllOptions.subnetDeBand
+        ? rcllOptions.rankSeparate
+          ? "M8r"
+          : rcllOptions.subnetDeBand
           ? "M7s"
           : rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
           ? "M5b"
@@ -484,6 +490,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
+      // M8r (RFC §9.6 / DEC-13): whole-model-global sibling-separation ranking.
+      rcllRankSeparate: rcllOptions.rankSeparate === true,
       // M6: whether the barycenter crossing-min reorder is active.
       rcllReorder: rcllOptions.reorder === true,
       // M5: whether Brandes–Köpf leaf straightening is active.

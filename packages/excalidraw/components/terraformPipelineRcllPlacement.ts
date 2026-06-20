@@ -53,6 +53,8 @@ import {
 } from "./terraformPipelineOrdering";
 import { hubCenteringOverBoxes } from "./terraformPipelineCoordinateAssignment";
 import { deDensifyColumns } from "./terraformPipelineDeDensify";
+import type { RankSeparateMeta } from "./terraformPipelineRcllRankSeparate";
+import { computeGlobalSeparatedFloor } from "./terraformPipelineRcllRankSeparate";
 import {
   straightenColumns,
   type StraightenLeaf,
@@ -497,6 +499,10 @@ function buildLaneContext(
   for (const n of nodes) {
     collectClusterLeaves(n, leaves);
   }
+  // `rankSeparate` (RFC §9.6 / DEC-13) no longer hooks here: the separated floor is
+  // computed once globally at `placementStage` and threaded in as `floor`. This lane
+  // path just consumes whatever floor it was given (base or separated).
+  const effectiveFloor = floor;
   // M5b (Axis-2 B): the dense-rank axis piles independent same-floor clusters into one
   // column. De-density rewrites it, promoting SAFE leaves one column right to make
   // Y-room for the straightener. CON-12-safe by construction (see terraformPipelineDeDensify).
@@ -507,12 +513,12 @@ function buildLaneContext(
             clusterId: l.cluster!.id,
             firstSequence: l.cluster!.firstSequence,
           })),
-          denseClusterColumns(leaves, floor),
+          denseClusterColumns(leaves, effectiveFloor),
           fanout,
           fanin,
           { maxExtraCols: deDensifyMaxCols },
         )
-      : denseClusterColumns(leaves, floor);
+      : denseClusterColumns(leaves, effectiveFloor);
   const maxCol = leaves.reduce(
     (m, l) => Math.max(m, colByCluster.get(l.cluster!.id) ?? 0),
     0,
@@ -1283,6 +1289,35 @@ export function placementStage(
   lattice: Lattice,
   opts: RcllOptions,
 ): StageResult {
-  const placed = layoutPlacement(tree, lattice, opts);
-  return { tree: placed, meta: placementMeta(placed, lattice) };
+  // `rankSeparate` (RFC §9.6 / DEC-13): whole-model-global Sander layering. Compute the
+  // separated floor ONCE over ALL leaves + ALL leaf edges (Codex: lane-local is not
+  // truly global), then place with that floor in place of the base `floor`. Observable
+  // fallback: `pairCount===0` / `augmented-cycle` keep the base floor (OFF byte-identical).
+  let effLattice = lattice;
+  let rankSeparate: RankSeparateMeta | undefined;
+  if (opts?.rankSeparate === true) {
+    rankSeparate = computeGlobalSeparatedFloor(
+      tree,
+      lattice.floor ?? new Map<string, number>(),
+      lattice.fanout ?? new Map<string, readonly string[]>(),
+      lattice.hullEdges ?? new Map<string, readonly HullEdge[]>(),
+    );
+    effLattice = { ...lattice, floor: rankSeparate.floor };
+  }
+  const placed = layoutPlacement(tree, effLattice, opts);
+  const meta: Record<string, number> = placementMeta(placed, effLattice);
+  if (rankSeparate) {
+    // Surface the observability meta for the probe/gate (read as
+    // `rcllStageMeta.placement.rankSeparate*`). Scalars only (CON-8 determinism).
+    meta.rankSeparateApplied = rankSeparate.applied ? 1 : 0;
+    meta.rankSeparatePairCount = rankSeparate.pairCount;
+    meta.rankSeparateChangedRankCount = rankSeparate.changedRankCount;
+    meta.rankSeparateFallback =
+      rankSeparate.fallbackReason === "none"
+        ? 0
+        : rankSeparate.fallbackReason === "no-pairs"
+          ? 1
+          : 2; // augmented-cycle
+  }
+  return { tree: placed, meta };
 }
