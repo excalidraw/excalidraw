@@ -906,6 +906,14 @@ export async function layoutTerraformFromSources(
     pipelineSwimlaneLaneRise: options?.pipelineSwimlaneLaneRise === true,
     pipelineReorder: options?.pipelineReorder === true,
     pipelineSubnetDeBand: options?.pipelineSubnetDeBand === true,
+    // These four were declared on the context + consumed by the pipeline body but
+    // never forwarded here, so they were silently dropped on the worker/headless
+    // path (`layoutTerraformFromSources`) — rankSeparate/straighten/deDensify/
+    // staircaseBandOverlap did nothing from the dialog/URL. Forward them.
+    pipelineRankSeparate: options?.pipelineRankSeparate === true,
+    pipelineStraighten: options?.pipelineStraighten === true,
+    pipelineDeDensify: options?.pipelineDeDensify === true,
+    pipelineStaircaseBandOverlap: options?.pipelineStaircaseBandOverlap,
     colorMode: options?.colorMode,
   };
 

@@ -146,6 +146,14 @@ export type TerraformPlanParsingOptions = {
   pipelineReorder?: boolean;
   /** RCLL subnet de-band: collapse subnet lanes into one VPC stack (frames → rails). */
   pipelineSubnetDeBand?: boolean;
+  /** RCLL M8r: whole-model-global sibling-separation ranking (needs lane-rise). */
+  pipelineRankSeparate?: boolean;
+  /** RCLL M5: Brandes–Köpf leaf straightening (Y-only spine alignment). */
+  pipelineStraighten?: boolean;
+  /** RCLL M5b: de-density — spread crowded columns one column right. */
+  pipelineDeDensify?: boolean;
+  /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default on; only `=false` is meaningful. */
+  pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: import("./terraformPrimaryVisibility").TerraformColorMode;
 };

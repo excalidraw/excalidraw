@@ -24,6 +24,18 @@ export default defineConfig(({ mode }) => {
       // open the browser
       open: true,
     },
+    // The dev-only headless layout endpoint (terraformImportPresetDevPlugin)
+    // runs the TS layout engine via ssrLoadModule. roughjs (+ its geometry deps)
+    // use extensionless ESM imports that Node's loader rejects when externalized,
+    // so have Vite transform them for SSR. No effect on the client/prod build.
+    ssr: {
+      noExternal: [
+        "roughjs",
+        "points-on-curve",
+        "points-on-path",
+        "path-data-parser",
+      ],
+    },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
     envDir: "../",
