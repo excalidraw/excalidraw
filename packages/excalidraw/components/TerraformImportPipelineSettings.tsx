@@ -1,5 +1,7 @@
 import React from "react";
 
+import { renderOptionFigure } from "./terraformPipelineSettingsFigures";
+
 import type { PipelineLayoutVariant } from "./terraformImportDialogUtils";
 
 /** Per-option explanation shown in the side panel — the detail a user needs to
@@ -110,18 +112,18 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
     body: "Plain packing with no extra adjustment. Boxes in the same account/region may share vertical bands.",
     dev: { implements: "No post-pass on top of the chosen Height packing." },
   },
-  "swimlane.stacked": {
-    title: "Swimlanes · Stacked",
-    body: "Inside a swimlane (mutually-dependent accounts that share a left-to-right axis), nested groups stack straight down. Clearest vertically, but taller.",
+  "laneheight.stacked": {
+    title: "Lane height · Stacked",
+    body: "Inside a dependency lane (mutually-dependent accounts that share a left-to-right axis), nested groups stack straight down. Clearest vertically, but taller.",
     dev: {
       implements:
         "Swimlane interiors laid as pure Y-stacked lanes on the shared denseRank(LB) column axis (M3b arrangeSubtreeOnAxis).",
       refs: ["Sander 1996 — compound layout"],
     },
   },
-  "swimlane.compact": {
-    title: "Swimlanes · Risen",
-    body: "Inside a swimlane, groups whose columns don't overlap slide up to share a row instead of stacking, reclaiming vertical space. The shared left-to-right axis is kept, so the dataflow still reads forward. On its own the gain is small on dependency-dense presets — its big win is paired with Separation, which makes more lanes column-disjoint.",
+  "laneheight.risen": {
+    title: "Lane height · Risen",
+    body: "Inside a dependency lane, groups whose columns don't overlap slide up to share a row instead of stacking, reclaiming vertical space. The shared left-to-right axis is kept, so the dataflow still reads forward. On its own the gain is small on dependency-dense presets — its big win is paired with Lane split, which makes more lanes column-disjoint.",
     dev: {
       implements:
         "DEC-1 Y-rise extended to swimlane lanes (M4): each lane's frame is tightened to its content shared-column range while leaf X is preserved (CON-12-safe); X-disjoint lanes share rows via riseStackY.",
@@ -169,17 +171,17 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       ],
     },
   },
-  "separation.off": {
-    title: "Separation · Off",
-    body: "Dependent sibling lanes keep their natural columns. Combined with risen swimlanes they may still overlap and stack. Leave off unless you also want the lane-separation win.",
+  "lanesplit.off": {
+    title: "Lane split · Off",
+    body: "Dependent sibling lanes keep their natural columns. Combined with risen lane height they may still overlap and stack. Leave off unless you also want the lane-separation win.",
     dev: {
       implements:
         "rankSeparate=false: denseClusterColumns uses the base longest-path floor; sibling lanes are not pushed into disjoint column ranges.",
     },
   },
-  "separation.on": {
-    title: "Separation · On (needs risen swimlanes)",
-    body: "One-way-dependent lanes (regions in an account, VPCs in a region) are pushed into separate columns so risen swimlanes can pack their height — much shorter (≈ −42% on the staging preset) at the cost of more width and a few more crossings. Only has an effect with Swimlanes = Risen, so it is disabled until you turn that on.",
+  "lanesplit.on": {
+    title: "Lane split · On (needs Lane height = Risen)",
+    body: "One-way-dependent lanes (regions in an account, VPCs in a region) are pushed into separate columns so risen lanes can pack their height — much shorter (≈ −42% on the staging preset) at the cost of more width and a few more crossings. Only has an effect with Lane height = Risen, so it is disabled until you turn that on.",
     dev: {
       implements:
         "rankSeparate (M8r / DEC-13 / RFC §9.6): whole-model-global Sander base-node layering — one longestPath over the whole-model leaf DAG ∪ all-to-all separation edges per one-way quotient pair (mutual cycles stay co-axial). CON-12 forward by construction. Gated to swimlaneLaneRise (terraformPipelineToggleGuards.ts): alone it is taller + ~+28% width + ~+45% crossings; the height win is only realized once the M4 lane-rise shares the now-disjoint lanes' Y rows.",
@@ -190,8 +192,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
     title: "Straighten · Off",
     body: "Each group's nodes keep a plain top-down stack.",
     dev: {
-      implements:
-        "straighten=false: leaf Y is the naive within-column stack.",
+      implements: "straighten=false: leaf Y is the naive within-column stack.",
     },
   },
   "straighten.on": {
@@ -203,29 +204,29 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
     },
   },
-  "dedensify.off": {
-    title: "De-densify · Off",
+  "columnspread.off": {
+    title: "Column spread · Off",
     body: "Crowded columns keep every independent card in place.",
     dev: { implements: "deDensify=false: the dense-rank axis is untouched." },
   },
-  "dedensify.on": {
-    title: "De-densify · On",
+  "columnspread.on": {
+    title: "Column spread · On",
     body: "Spreads a crowded column by moving independent cards (no dependency edges) one column to the right, making vertical room. Has no effect where every crowded card has a dependency edge — e.g. the staging v2 — because the rule conservatively leaves connected cards alone.",
     dev: {
       implements:
         "deDensify (M5b, Axis-2 B): promotes a SAFE subset of same-floor independent leaves one column right (forward-only, column-preserving ⇒ CON-12-safe). The width dial deDensifyMaxCols defaults to 2 when enabled (terraformPipelineToggleGuards.ts). Measured no-op on v2 (dataflow too dense).",
     },
   },
-  "cyclebands.risen": {
-    title: "Cycle bands · Risen (default)",
+  "cycleheight.risen": {
+    title: "Cycle height · Risen (default)",
     body: "Inside a mutually-dependent group, sub-groups whose columns don't overlap share a row instead of stacking — shorter. This is the default.",
     dev: {
       implements:
         "staircaseBandOverlap=true (M3b / DEC-1): X-disjoint cyclic SCC groups rise to share Y via riseStackY on the condensation staircase.",
     },
   },
-  "cyclebands.stacked": {
-    title: "Cycle bands · Stacked",
+  "cycleheight.stacked": {
+    title: "Cycle height · Stacked",
     body: "Mutually-dependent sub-groups stack vertically in sequence instead of sharing rows — taller, but each group sits on its own row. Turns off a height-saving default.",
     dev: {
       implements:
@@ -254,7 +255,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
   },
 };
 
-type OptionHelpKey = keyof typeof OPTION_HELP;
+export type OptionHelpKey = keyof typeof OPTION_HELP;
 
 export const TerraformImportPipelineSettings = ({
   pipelineCompact,
@@ -340,8 +341,11 @@ export const TerraformImportPipelineSettings = ({
   const [hoverKey, setHoverKey] = React.useState<OptionHelpKey | null>(null);
   const [stickyKey, setStickyKey] =
     React.useState<OptionHelpKey>(layoutHelpKey);
-  const activeHelp =
-    OPTION_HELP[hoverKey ?? stickyKey] ?? OPTION_HELP[layoutHelpKey];
+  const activeKey = hoverKey ?? stickyKey;
+  const activeHelp = OPTION_HELP[activeKey] ?? OPTION_HELP[layoutHelpKey];
+  // Decorative before/after schematic for the active option (null for content
+  // filters / layout-variant keys that have no geometry to show).
+  const activeFigure = renderOptionFigure(activeKey);
 
   const option = (
     label: string,
@@ -356,10 +360,12 @@ export const TerraformImportPipelineSettings = ({
         pressed ? " TerraformImportModal__segmentedButton--active" : ""
       }`}
       aria-pressed={pressed}
-      disabled={disabled}
+      // `aria-disabled` (not native `disabled`) keeps the button focusable, so
+      // the "why is this off?" explanation is reachable by keyboard (Tab) and by
+      // hover; only the click action is suppressed (below). Native `disabled`
+      // buttons are not focusable, which hides the explanation from keyboard users.
+      aria-disabled={disabled || undefined}
       title={OPTION_HELP[helpKey].body}
-      // Hover/focus still preview the help even when disabled (so the "why is
-      // this off?" note is reachable); only the click action is suppressed.
       onMouseEnter={() => setHoverKey(helpKey)}
       onMouseLeave={() => setHoverKey(null)}
       onFocus={() => setHoverKey(helpKey)}
@@ -375,6 +381,62 @@ export const TerraformImportPipelineSettings = ({
     </button>
   );
 
+  // A small uppercase section label that announces the next pipeline phase, so
+  // the RCLL controls read top-to-bottom as the order the engine applies them
+  // (Sugiyama: content → structure → layer/columns → ordering → coordinate/Y).
+  const phaseHeader = (label: string, hint: string) => (
+    <div
+      className="TerraformImportModal__layoutSettingsGroupHeader"
+      aria-hidden="true"
+    >
+      {label}
+      <span>{hint}</span>
+    </div>
+  );
+
+  // Detail + Resources are the two content filters shared by every layout (RCLL
+  // and Classic/Compound/V2), so they are extracted once and placed by branch.
+  const detailGroup = (
+    <div role="group" aria-label="Pipeline detail level">
+      <span className="TerraformImportModal__controlLabel">
+        Detail <span>how much of each cluster to draw</span>
+      </span>
+      <div className="TerraformImportModal__segmentedControl">
+        {option("Compact", pipelineCompact, "detail.compact", () =>
+          setPipelineCompact(true),
+        )}
+        {option("Full", !pipelineCompact, "detail.full", () =>
+          setPipelineCompact(false),
+        )}
+      </div>
+    </div>
+  );
+
+  const resourcesGroup = (
+    <div role="group" aria-label="Pipeline resource scope">
+      <span className="TerraformImportModal__controlLabel">
+        Resources <span>which resources appear in the diagram</span>
+      </span>
+      <div className="TerraformImportModal__segmentedControl">
+        {option(
+          "Dataflow only",
+          // Under RCLL, ancillary is inert ⇒ the view always behaves as
+          // "Dataflow only", so show it active regardless of stored state.
+          isRcll || !pipelineIncludeAncillary,
+          "resources.dataflow",
+          () => setPipelineIncludeAncillary(false),
+        )}
+        {option(
+          "All resources",
+          !isRcll && pipelineIncludeAncillary,
+          isRcll ? "resources.allRcll" : "resources.all",
+          () => setPipelineIncludeAncillary(true),
+          isRcll,
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="TerraformImportModal__layoutSettings">
       <div className="TerraformImportModal__layoutSettingsHeader">
@@ -383,261 +445,239 @@ export const TerraformImportPipelineSettings = ({
       </div>
       <div className="TerraformImportModal__layoutSettingsBody">
         <div className="TerraformImportModal__layoutSettingsGrid">
-          <div role="group" aria-label="Pipeline detail level">
-            <span className="TerraformImportModal__controlLabel">
-              Detail <span>how much of each cluster to draw</span>
-            </span>
-            <div className="TerraformImportModal__segmentedControl">
-              {option("Compact", pipelineCompact, "detail.compact", () =>
-                setPipelineCompact(true),
+          {isRcll ? (
+            // RCLL owns placement: the controls are grouped + ordered to match
+            // the engine's Sugiyama pipeline (the order they actually apply).
+            <>
+              <div className="TerraformImportModal__controlNote">
+                RCLL arranges layout automatically. The controls below are
+                grouped by the order they are applied.
+              </div>
+              {phaseHeader("Content", "how much / which resources")}
+              {detailGroup}
+              {resourcesGroup}
+              {phaseHeader("Structure", "the model")}
+              <div role="group" aria-label="Pipeline subnets">
+                <span className="TerraformImportModal__controlLabel">
+                  Subnets <span>boxed lanes vs de-banded with color rails</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
+                    setPipelineSubnetDeBand(false),
+                  )}
+                  {option(
+                    "De-banded",
+                    pipelineSubnetDeBand,
+                    "subnet.debanded",
+                    () => setPipelineSubnetDeBand(true),
+                  )}
+                </div>
+              </div>
+              {phaseHeader("Columns", "left → right placement (X)")}
+              <div role="group" aria-label="Pipeline lane split">
+                <span className="TerraformImportModal__controlLabel">
+                  Lane split{" "}
+                  <span>split dependent lanes (needs Lane height = Risen)</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option("Off", !pipelineRankSeparate, "lanesplit.off", () =>
+                    setPipelineRankSeparate(false),
+                  )}
+                  {option(
+                    "On",
+                    pipelineRankSeparate,
+                    "lanesplit.on",
+                    () => setPipelineRankSeparate(true),
+                    // Footgun guard: lane split alone is taller + wider; the win
+                    // exists only composed with the risen lane height (M4).
+                    !pipelineSwimlaneLaneRise,
+                  )}
+                </div>
+              </div>
+              <div role="group" aria-label="Pipeline column spread">
+                <span className="TerraformImportModal__controlLabel">
+                  Column spread <span>spread crowded columns</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option("Off", !pipelineDeDensify, "columnspread.off", () =>
+                    setPipelineDeDensify(false),
+                  )}
+                  {option("On", pipelineDeDensify, "columnspread.on", () =>
+                    setPipelineDeDensify(true),
+                  )}
+                </div>
+              </div>
+              {phaseHeader("Ordering", "reduce crossing arrows")}
+              <div role="group" aria-label="Pipeline ordering">
+                <span className="TerraformImportModal__controlLabel">
+                  Ordering <span>reduce crossing arrows within groups</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option("Off", !pipelineReorder, "ordering.off", () =>
+                    setPipelineReorder(false),
+                  )}
+                  {option("On", pipelineReorder, "ordering.on", () =>
+                    setPipelineReorder(true),
+                  )}
+                </div>
+              </div>
+              {phaseHeader("Vertical", "top → down placement (Y)")}
+              <div role="group" aria-label="Pipeline lane height">
+                <span className="TerraformImportModal__controlLabel">
+                  Lane height <span>height of mutually-dependent groups</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option(
+                    "Stacked",
+                    !pipelineSwimlaneLaneRise,
+                    "laneheight.stacked",
+                    () => {
+                      // Footgun guard: Lane split is only valid with risen lane
+                      // height, so turning the rise off also clears it (it would
+                      // otherwise be a stale, suppressed On).
+                      setPipelineSwimlaneLaneRise(false);
+                      setPipelineRankSeparate(false);
+                    },
+                  )}
+                  {option(
+                    "Risen",
+                    pipelineSwimlaneLaneRise,
+                    "laneheight.risen",
+                    () => setPipelineSwimlaneLaneRise(true),
+                  )}
+                </div>
+              </div>
+              <div role="group" aria-label="Pipeline cycle height">
+                <span className="TerraformImportModal__controlLabel">
+                  Cycle height <span>height of mutually-dependent cycles</span>
+                </span>
+                {/* Button order matches Lane height (Stacked, Risen) so the two
+                    height levers read as the same control at different scopes. */}
+                <div className="TerraformImportModal__segmentedControl">
+                  {option(
+                    "Stacked",
+                    !pipelineStaircaseBandOverlap,
+                    "cycleheight.stacked",
+                    () => setPipelineStaircaseBandOverlap(false),
+                  )}
+                  {option(
+                    "Risen",
+                    pipelineStaircaseBandOverlap,
+                    "cycleheight.risen",
+                    () => setPipelineStaircaseBandOverlap(true),
+                  )}
+                </div>
+              </div>
+              <div role="group" aria-label="Pipeline straighten">
+                <span className="TerraformImportModal__controlLabel">
+                  Straighten <span>align fan-out spines across columns</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option("Off", !pipelineStraighten, "straighten.off", () =>
+                    setPipelineStraighten(false),
+                  )}
+                  {option("On", pipelineStraighten, "straighten.on", () =>
+                    setPipelineStraighten(true),
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            // Classic / Compound / V2: the original flat order (no phases — these
+            // engines expose Layout / Height / Placement, not the RCLL passes).
+            <>
+              {detailGroup}
+              <div role="group" aria-label="Pipeline layout variant">
+                <span className="TerraformImportModal__controlLabel">
+                  Layout{" "}
+                  <span>which placement engine arranges the diagram</span>
+                </span>
+                <div className="TerraformImportModal__segmentedControl">
+                  {option(
+                    "Classic",
+                    pipelineLayoutVariant === "classic",
+                    "layout.classic",
+                    () => setPipelineLayoutVariant("classic"),
+                  )}
+                  {option(
+                    "Compound",
+                    pipelineLayoutVariant === "compound",
+                    "layout.compound",
+                    () => setPipelineLayoutVariant("compound"),
+                  )}
+                  {option(
+                    "V2",
+                    pipelineLayoutVariant === "v2",
+                    "layout.v2",
+                    () => setPipelineLayoutVariant("v2"),
+                  )}
+                </div>
+              </div>
+              {isV2 && (
+                <div className="TerraformImportModal__controlNote">
+                  V2 arranges height, packing, and placement automatically. Only
+                  the Detail and Resources toggles apply.
+                </div>
               )}
-              {option("Full", !pipelineCompact, "detail.full", () =>
-                setPipelineCompact(false),
+              {!isV2 && (
+                <div role="group" aria-label="Pipeline height packing">
+                  <span className="TerraformImportModal__controlLabel">
+                    Height <span>trade vertical height for width</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Stacked",
+                      !pipelinePacked,
+                      "height.stacked",
+                      () => {
+                        setPipelinePacked(false);
+                        setPipelinePackedPullLeft(false);
+                      },
+                    )}
+                    {option(
+                      "Packed",
+                      pipelinePacked && !pipelinePackedPullLeft,
+                      "height.packed",
+                      () => {
+                        setPipelinePacked(true);
+                        setPipelinePackedPullLeft(false);
+                      },
+                    )}
+                    {option(
+                      "Packed + pull-left",
+                      pipelinePacked && pipelinePackedPullLeft,
+                      "height.pullLeft",
+                      () => {
+                        setPipelinePacked(true);
+                        setPipelinePackedPullLeft(true);
+                      },
+                    )}
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
-          {showVariant && (
-            <div role="group" aria-label="Pipeline layout variant">
-              <span className="TerraformImportModal__controlLabel">
-                Layout <span>which placement engine arranges the diagram</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option(
-                  "Classic",
-                  pipelineLayoutVariant === "classic",
-                  "layout.classic",
-                  () => setPipelineLayoutVariant("classic"),
-                )}
-                {option(
-                  "Compound",
-                  pipelineLayoutVariant === "compound",
-                  "layout.compound",
-                  () => setPipelineLayoutVariant("compound"),
-                )}
-                {option("V2", pipelineLayoutVariant === "v2", "layout.v2", () =>
-                  setPipelineLayoutVariant("v2"),
-                )}
-              </div>
-            </div>
-          )}
-          {isV2 && (
-            <div className="TerraformImportModal__controlNote">
-              V2 arranges height, packing, and placement automatically. Only the
-              Detail and Resources toggles apply.
-            </div>
-          )}
-          {!showVariant && (
-            <div className="TerraformImportModal__controlNote">
-              RCLL arranges layout automatically. Only the Detail, Resources,
-              Swimlanes, Ordering, Subnets, Separation, Straighten, De-densify,
-              and Cycle bands toggles apply.
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline swimlane height">
-              <span className="TerraformImportModal__controlLabel">
-                Swimlanes <span>height of mutually-dependent groups</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option(
-                  "Stacked",
-                  !pipelineSwimlaneLaneRise,
-                  "swimlane.stacked",
-                  () => {
-                    // Footgun guard: Separation is only valid with risen
-                    // swimlanes, so turning the rise off also clears it (it
-                    // would otherwise be a stale, suppressed On).
-                    setPipelineSwimlaneLaneRise(false);
-                    setPipelineRankSeparate(false);
-                  },
-                )}
-                {option(
-                  "Risen",
-                  pipelineSwimlaneLaneRise,
-                  "swimlane.compact",
-                  () => setPipelineSwimlaneLaneRise(true),
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline ordering">
-              <span className="TerraformImportModal__controlLabel">
-                Ordering <span>reduce crossing arrows within groups</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Off", !pipelineReorder, "ordering.off", () =>
-                  setPipelineReorder(false),
-                )}
-                {option("On", pipelineReorder, "ordering.on", () =>
-                  setPipelineReorder(true),
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline subnets">
-              <span className="TerraformImportModal__controlLabel">
-                Subnets <span>boxed lanes vs de-banded with color rails</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
-                  setPipelineSubnetDeBand(false),
-                )}
-                {option(
-                  "De-banded",
-                  pipelineSubnetDeBand,
-                  "subnet.debanded",
-                  () => setPipelineSubnetDeBand(true),
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline lane separation">
-              <span className="TerraformImportModal__controlLabel">
-                Separation <span>split dependent lanes (needs risen swimlanes)</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Off", !pipelineRankSeparate, "separation.off", () =>
-                  setPipelineRankSeparate(false),
-                )}
-                {option(
-                  "On",
-                  pipelineRankSeparate,
-                  "separation.on",
-                  () => setPipelineRankSeparate(true),
-                  // Footgun guard: separation alone is taller + wider; the win
-                  // exists only composed with the risen swimlane lane-rise.
-                  !pipelineSwimlaneLaneRise,
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline straighten">
-              <span className="TerraformImportModal__controlLabel">
-                Straighten <span>align fan-out spines across columns</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Off", !pipelineStraighten, "straighten.off", () =>
-                  setPipelineStraighten(false),
-                )}
-                {option("On", pipelineStraighten, "straighten.on", () =>
-                  setPipelineStraighten(true),
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline de-densify">
-              <span className="TerraformImportModal__controlLabel">
-                De-densify <span>spread crowded columns</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Off", !pipelineDeDensify, "dedensify.off", () =>
-                  setPipelineDeDensify(false),
-                )}
-                {option("On", pipelineDeDensify, "dedensify.on", () =>
-                  setPipelineDeDensify(true),
-                )}
-              </div>
-            </div>
-          )}
-          {!showVariant && (
-            <div role="group" aria-label="Pipeline cycle bands">
-              <span className="TerraformImportModal__controlLabel">
-                Cycle bands <span>height of mutually-dependent cycles</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option(
-                  "Risen",
-                  pipelineStaircaseBandOverlap,
-                  "cyclebands.risen",
-                  () => setPipelineStaircaseBandOverlap(true),
-                )}
-                {option(
-                  "Stacked",
-                  !pipelineStaircaseBandOverlap,
-                  "cyclebands.stacked",
-                  () => setPipelineStaircaseBandOverlap(false),
-                )}
-              </div>
-            </div>
-          )}
-          {!isV2 && showVariant && (
-            <div role="group" aria-label="Pipeline height packing">
-              <span className="TerraformImportModal__controlLabel">
-                Height <span>trade vertical height for width</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option("Stacked", !pipelinePacked, "height.stacked", () => {
-                  setPipelinePacked(false);
-                  setPipelinePackedPullLeft(false);
-                })}
-                {option(
-                  "Packed",
-                  pipelinePacked && !pipelinePackedPullLeft,
-                  "height.packed",
-                  () => {
-                    setPipelinePacked(true);
-                    setPipelinePackedPullLeft(false);
-                  },
-                )}
-                {option(
-                  "Packed + pull-left",
-                  pipelinePacked && pipelinePackedPullLeft,
-                  "height.pullLeft",
-                  () => {
-                    setPipelinePacked(true);
-                    setPipelinePackedPullLeft(true);
-                  },
-                )}
-              </div>
-            </div>
-          )}
-          <div role="group" aria-label="Pipeline resource scope">
-            <span className="TerraformImportModal__controlLabel">
-              Resources <span>which resources appear in the diagram</span>
-            </span>
-            <div className="TerraformImportModal__segmentedControl">
-              {option(
-                "Dataflow only",
-                // Under RCLL, ancillary is inert ⇒ the view always behaves as
-                // "Dataflow only", so show it active regardless of stored state.
-                isRcll || !pipelineIncludeAncillary,
-                "resources.dataflow",
-                () => setPipelineIncludeAncillary(false),
+              {resourcesGroup}
+              {!isV2 && showPlacement && (
+                <div role="group" aria-label="Pipeline semantic placement">
+                  <span className="TerraformImportModal__controlLabel">
+                    Placement <span>nesting-aware band &amp; arrow tuning</span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Default",
+                      !pipelineSemanticPlacement,
+                      "placement.default",
+                      () => setPipelineSemanticPlacement(false),
+                    )}
+                    {option(
+                      "Semantic",
+                      pipelineSemanticPlacement,
+                      "placement.semantic",
+                      () => setPipelineSemanticPlacement(true),
+                    )}
+                  </div>
+                </div>
               )}
-              {option(
-                "All resources",
-                !isRcll && pipelineIncludeAncillary,
-                isRcll ? "resources.allRcll" : "resources.all",
-                () => setPipelineIncludeAncillary(true),
-                isRcll,
-              )}
-            </div>
-          </div>
-          {!isV2 && showPlacement && (
-            <div role="group" aria-label="Pipeline semantic placement">
-              <span className="TerraformImportModal__controlLabel">
-                Placement <span>nesting-aware band &amp; arrow tuning</span>
-              </span>
-              <div className="TerraformImportModal__segmentedControl">
-                {option(
-                  "Default",
-                  !pipelineSemanticPlacement,
-                  "placement.default",
-                  () => setPipelineSemanticPlacement(false),
-                )}
-                {option(
-                  "Semantic",
-                  pipelineSemanticPlacement,
-                  "placement.semantic",
-                  () => setPipelineSemanticPlacement(true),
-                )}
-              </div>
-            </div>
+            </>
           )}
         </div>
         <aside
@@ -648,6 +688,11 @@ export const TerraformImportPipelineSettings = ({
           <strong className="TerraformImportModal__layoutHelpTitle">
             {activeHelp.title}
           </strong>
+          {activeFigure && (
+            <div className="TerraformImportModal__layoutHelpFigure">
+              {activeFigure}
+            </div>
+          )}
           <p className="TerraformImportModal__layoutHelpBody">
             {activeHelp.body}
           </p>

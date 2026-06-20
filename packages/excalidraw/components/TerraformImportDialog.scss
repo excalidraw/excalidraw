@@ -363,6 +363,37 @@
       line-height: 1.35;
     }
 
+    // Phase section label inside the RCLL settings grid (Content / Structure /
+    // Columns / Ordering / Vertical) — small, uppercase, with a faint rule above
+    // so the controls read as ordered pipeline stages.
+    &__layoutSettingsGroupHeader {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid var(--color-gray-20);
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--color-on-surface);
+
+      &:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+
+      span {
+        font-size: 0.5625rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        color: var(--tf-muted);
+      }
+    }
+
     &__filePair,
     &__optionalGrid {
       display: grid;
@@ -702,6 +733,21 @@
       color: var(--color-on-surface);
     }
 
+    &__layoutHelpFigure {
+      display: flex;
+      justify-content: center;
+      padding: 0.4rem 0.3rem;
+      border: 1px solid var(--color-gray-20);
+      border-radius: var(--tf-radius);
+      background: var(--color-surface-lowest);
+    }
+
+    &__layoutHelpFigureSvg {
+      display: block;
+      max-width: 100%;
+      color: var(--tf-muted);
+    }
+
     &__layoutHelpBody {
       margin: 0;
       font-size: 0.6875rem;
@@ -766,7 +812,10 @@
         box-shadow: 0 0 0 1px var(--color-primary) inset;
       }
 
-      &:disabled {
+      // `aria-disabled` (not native `disabled`) so the gated option stays
+      // focusable and its "why is this off?" help is keyboard-reachable.
+      &:disabled,
+      &[aria-disabled="true"] {
         cursor: not-allowed;
         opacity: 0.45;
 

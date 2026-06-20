@@ -232,10 +232,10 @@ describe("TerraformImportModal", () => {
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
-    // The RCLL-only Swimlanes control is present; flip it to Risen (rise on).
-    // Scoped to the Swimlanes group — "Risen" also appears under Cycle bands.
+    // The RCLL-only Lane height control is present; flip it to Risen (rise on).
+    // Scoped to the Lane height group — "Risen" also appears under Cycle height.
     const swimlanes = screen.getByRole("group", {
-      name: /pipeline swimlane height/i,
+      name: /pipeline lane height/i,
     });
     const risenBtn = within(swimlanes).getByRole("button", {
       name: /^risen$/i,
@@ -303,7 +303,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: Separation 'On' is disabled until Swimlanes = Risen, then threads pipelineRankSeparate true", async () => {
+  it("RCLL view: Lane split 'On' is disabled until Lane height = Risen, then threads pipelineRankSeparate true", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -312,22 +312,27 @@ describe("TerraformImportModal", () => {
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
-    // Footgun guard: Separation alone is a regression (taller/wider). Its "On"
-    // is disabled until the swimlane lane-rise is on.
+    // Footgun guard: Lane split alone is a regression (taller/wider). Its "On"
+    // is aria-disabled (focusable, so its help stays keyboard-reachable) until
+    // the lane-rise is on.
     const separation = screen.getByRole("group", {
-      name: /pipeline lane separation/i,
+      name: /pipeline lane split/i,
     });
     const sepOn = within(separation).getByRole("button", { name: /^on$/i });
-    expect(sepOn).toBeDisabled();
+    expect(sepOn).toHaveAttribute("aria-disabled", "true");
 
-    // Enable the lane-rise → Separation "On" becomes available.
+    // Clicking it while gated does NOT flip rankSeparate (onClick suppressed).
+    fireEvent.click(sepOn);
+    expect(sepOn).toHaveAttribute("aria-pressed", "false");
+
+    // Enable the lane-rise → Lane split "On" becomes available.
     const swimlanes = screen.getByRole("group", {
-      name: /pipeline swimlane height/i,
+      name: /pipeline lane height/i,
     });
     fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
     expect(
       within(separation).getByRole("button", { name: /^on$/i }),
-    ).toBeEnabled();
+    ).not.toHaveAttribute("aria-disabled", "true");
     fireEvent.click(within(separation).getByRole("button", { name: /^on$/i }));
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
@@ -341,7 +346,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: turning Swimlanes back to Stacked clears a set Separation", async () => {
+  it("RCLL view: turning Lane height back to Stacked clears a set Lane split", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -351,12 +356,12 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
     const swimlanes = screen.getByRole("group", {
-      name: /pipeline swimlane height/i,
+      name: /pipeline lane height/i,
     });
     const separation = screen.getByRole("group", {
-      name: /pipeline lane separation/i,
+      name: /pipeline lane split/i,
     });
-    // Risen → Separation On → then back to Stacked (should clear Separation).
+    // Risen → Lane split On → then back to Stacked (should clear Lane split).
     fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
     fireEvent.click(within(separation).getByRole("button", { name: /^on$/i }));
     fireEvent.click(
@@ -397,7 +402,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: De-densify · On threads pipelineDeDensify true", async () => {
+  it("RCLL view: Column spread · On threads pipelineDeDensify true", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -407,7 +412,7 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
     const deDensify = screen.getByRole("group", {
-      name: /pipeline de-densify/i,
+      name: /pipeline column spread/i,
     });
     fireEvent.click(within(deDensify).getByRole("button", { name: /^on$/i }));
 
@@ -421,7 +426,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: Cycle bands defaults to Risen (true) and threads false when set to Stacked", async () => {
+  it("RCLL view: Cycle height defaults to Risen (true) and threads false when set to Stacked", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -431,7 +436,7 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
     const cycleBands = screen.getByRole("group", {
-      name: /pipeline cycle bands/i,
+      name: /pipeline cycle height/i,
     });
     // Default is Risen (on) — flip it to Stacked.
     fireEvent.click(
@@ -448,6 +453,23 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("RCLL view: hovering a geometry option shows a schematic figure in the help panel", () => {
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The side help panel renders a decorative before/after <svg> for geometry
+    // toggles. Hover the Lane height "Risen" arm → its schematic appears.
+    const laneHeight = screen.getByRole("group", {
+      name: /pipeline lane height/i,
+    });
+    fireEvent.mouseEnter(
+      within(laneHeight).getByRole("button", { name: /^risen$/i }),
+    );
+    const help = screen.getByLabelText("Option explanation");
+    expect(help.querySelector("svg")).toBeInTheDocument();
+  });
+
   it("RCLL view: 'All resources' is disabled (ancillary not yet drawn in RCLL)", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
@@ -461,7 +483,7 @@ describe("TerraformImportModal", () => {
     // "Dataflow only" reads active regardless of stored state — the toggle can't
     // mislead. (The full reserved-band feature is a deferred RFC milestone.)
     const allResources = screen.getByRole("button", { name: /^all resources$/i });
-    expect(allResources).toBeDisabled();
+    expect(allResources).toHaveAttribute("aria-disabled", "true");
     const dataflowOnly = screen.getByRole("button", { name: /^dataflow only$/i });
     expect(dataflowOnly).toHaveAttribute("aria-pressed", "true");
 
