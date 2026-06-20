@@ -127,6 +127,10 @@ def main(argv: list[str] | None = None) -> int:
     out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, indent=2))
     print(f"\nWrote {out}", file=sys.stderr)
+    successes = [arm for arm in arms if arm.get("texts_per_s", 0) > 0]
+    if not successes:
+        print("No benchmark arms completed successfully.", file=sys.stderr)
+        return 2
     return 0
 
 

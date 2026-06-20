@@ -17,7 +17,7 @@ import logging
 import os
 from pathlib import Path
 
-from graph_layout_rag.ingest.chunk import TextChunk
+from graph_layout_rag.ingest.chunk import TextChunk, chunking_fingerprint
 from graph_layout_rag.paths import PKG_ROOT
 
 log = logging.getLogger(__name__)
@@ -25,13 +25,13 @@ log = logging.getLogger(__name__)
 _CACHE_VERSION = 1
 _CACHE_DIR = PKG_ROOT / "data" / "extract_cache"
 
-# Chunking strategy descriptor — bump this string any time chunk.py logic
-# changes so stale cached chunks are automatically invalidated.
-CHUNKING_FINGERPRINT = "markdown-structure-v1:target800:overlap120:dedup-sha256-v1"
-
-
-def _cache_key(sha256: str, backend: str) -> str:
-    raw = f"v{_CACHE_VERSION}:{backend}:{CHUNKING_FINGERPRINT}:{sha256}"
+def _cache_key(sha256: str, backend: str, chunk_profile: str | None = None) -> str:
+    fingerprint = json.dumps(
+        chunking_fingerprint(chunk_profile),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    raw = f"v{_CACHE_VERSION}:{backend}:{fingerprint}:{sha256}"
     return hashlib.sha256(raw.encode()).hexdigest()
 
 
@@ -40,11 +40,11 @@ def _cache_path(key: str) -> Path:
     return _CACHE_DIR / key[:2] / f"{key}.json"
 
 
-def get(sha256: str, backend: str) -> list[TextChunk] | None:
+def get(sha256: str, backend: str, chunk_profile: str | None = None) -> list[TextChunk] | None:
     """Return cached chunks or None on miss."""
     if not sha256:
         return None
-    path = _cache_path(_cache_key(sha256, backend))
+    path = _cache_path(_cache_key(sha256, backend, chunk_profile))
     if not path.exists():
         return None
     try:
@@ -59,14 +59,25 @@ def get(sha256: str, backend: str) -> list[TextChunk] | None:
         return None
 
 
-def put(sha256: str, backend: str, chunks: list[TextChunk]) -> None:
+def put(
+    sha256: str,
+    backend: str,
+    chunks: list[TextChunk],
+    chunk_profile: str | None = None,
+) -> None:
     """Write chunks to cache. No-op if sha256 is empty."""
     if not sha256:
         return
-    path = _cache_path(_cache_key(sha256, backend))
+    path = _cache_path(_cache_key(sha256, backend, chunk_profile))
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(
-        {"v": _CACHE_VERSION, "sha256": sha256, "backend": backend, "chunks": [dataclasses.asdict(c) for c in chunks]},
+        {
+            "v": _CACHE_VERSION,
+            "sha256": sha256,
+            "backend": backend,
+            "chunking_fingerprint": chunking_fingerprint(chunk_profile),
+            "chunks": [dataclasses.asdict(c) for c in chunks],
+        },
         ensure_ascii=False,
     )
     tmp = path.with_suffix(".tmp")

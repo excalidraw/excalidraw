@@ -31,7 +31,6 @@ RSYNC_EXCLUDES=(
   --exclude '.pytest_cache'
   --exclude 'data/raw'
   --exclude 'data/bibliography-scan-cache'
-  --exclude 'data/extract_cache'
   --exclude 'data/*.log'
   --exclude 'data/harvest*.log'
   --exclude 'data/ingest*.log'

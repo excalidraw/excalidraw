@@ -183,11 +183,7 @@ run_cloud_hyde() {
   done
 }
 
-MODELS=(
-  "gemma4:e2b"      # smoke: smallest Gemma 4 edge tier; validates Ollama+cuda co-load
-  "gemma4:e4b"      # balanced: ~3GB VRAM — co-loads with cuda embed
-  "qwen3.5:9b"      # max quality; tight on 8GB — run last
-)
+read -r -a MODELS <<< "${RAG_LOCAL_LLM_MODELS:-gemma4:e2b gemma4:e4b qwen3.5:9b}"
 
 log "=== Local LLM benchmark start (profile=${PROFILE}) ==="
 check_index

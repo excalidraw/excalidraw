@@ -28,6 +28,10 @@ log = logging.getLogger("rag_literature_rag.ingest.reembed")
 REEMBED_OFFSET_KEY = "reembed_offset"
 
 
+def _indexed_text_changes(profile: str) -> bool:
+    return "section-v1" in profile or "contextual" in profile
+
+
 def _split_csv(value: Any) -> list[str]:
     if not value:
         return []
@@ -108,8 +112,11 @@ def run_reembed(
     if offset >= len(rows):
         offset = 0
 
+    text_changes = _indexed_text_changes(target_profile)
+
     if offset == 0:
-        _copy_bm25_index(source_profile, target_profile)
+        if not text_changes:
+            _copy_bm25_index(source_profile, target_profile)
         state = {
             "embed_backend": config.backend,
             "embed_model": config.model,
@@ -146,7 +153,7 @@ def run_reembed(
             stats=stats,
             profile=target_paths,
             phase_stats=phase_stats,
-            skip_bm25=True,
+            skip_bm25=not text_changes,
             delete_scope="chunk_id",
         )
         offset += len(batch_rows)

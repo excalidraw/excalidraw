@@ -40,6 +40,7 @@ def _build_schema() -> tantivy.Schema:
     sb.add_text_field("source_url", stored=True)
     sb.add_integer_field("year", stored=True)
     sb.add_integer_field("page", stored=True)
+    sb.add_integer_field("page_end", stored=True)
     return sb.build()
 
 
@@ -98,6 +99,7 @@ def upsert_chunks(
                 source_url=chunk.source_url or "",
                 year=chunk.year if chunk.year is not None else _NO_YEAR,
                 page=chunk.page if chunk.page is not None else _NO_PAGE,
+                page_end=chunk.page_end if chunk.page_end is not None else _NO_PAGE,
             )
         )
     writer.commit()
@@ -132,6 +134,7 @@ def search_bm25(query: str, *, index_dir: Path, limit: int = 40) -> list[dict[st
         doc = searcher.doc(addr)
         year = doc.get_first("year")
         page = doc.get_first("page")
+        page_end = doc.get_first("page_end")
         results.append(
             {
                 "score": float(score),
@@ -149,6 +152,7 @@ def search_bm25(query: str, *, index_dir: Path, limit: int = 40) -> list[dict[st
                 "source_url": doc.get_first("source_url") or "",
                 "year": None if year in (None, _NO_YEAR) else int(year),
                 "page": None if page in (None, _NO_PAGE) else int(page),
+                "page_end": None if page_end in (None, _NO_PAGE) else int(page_end),
             }
         )
     return results

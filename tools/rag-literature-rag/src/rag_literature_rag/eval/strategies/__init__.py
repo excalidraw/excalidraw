@@ -84,6 +84,81 @@ class BM25Strategy:
 
 
 @dataclass
+class SmallToBigDenseStrategy:
+    name: str = "small2big_dense"
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            small_to_big=True,
+            small_to_big_mode="dense",
+        )
+
+
+@dataclass
+class SmallToBigParentBM25Strategy:
+    name: str = "small2big_parent_bm25"
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            small_to_big=True,
+            small_to_big_mode="parent_bm25",
+        )
+
+
+@dataclass
+class SmallToBigHybridStrategy:
+    name: str = "small2big_hybrid"
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            small_to_big=True,
+            small_to_big_mode="hybrid",
+            rrf_k=20,
+        )
+
+
+@dataclass
+class DocSummaryStrategy:
+    name: str
+    mode: str
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            docsummary=True,
+            docsummary_mode=self.mode,
+            rrf_k=20,
+        )
+
+
+@dataclass
 class HybridTunedStrategy:
     name: str
     pool: int
@@ -576,6 +651,9 @@ OFFLINE_STRATEGIES: tuple[str, ...] = (
     "hybrid_category_rerank",
     "hybrid_citation",
     "hybrid_local_rerank",
+    "small2big_dense",
+    "small2big_parent_bm25",
+    "small2big_hybrid",
 )
 
 LLM_STRATEGIES: tuple[str, ...] = (
@@ -605,12 +683,21 @@ AGGREGATION_STRATEGIES: tuple[str, ...] = (
     "hybrid_agg_count",
 )
 
+DOCSUMMARY_STRATEGIES: tuple[str, ...] = (
+    "docsummary_dense",
+    "docsummary_bm25",
+    "docsummary_hybrid",
+    "docsummary_then_chunks",
+    "docsummary_fused_hybrid",
+)
+
 ALL_STRATEGIES: tuple[str, ...] = (
     OFFLINE_STRATEGIES
     + LLM_STRATEGIES
     + CLOUD_STRATEGIES
     + EXPERIMENTAL_STRATEGIES
     + AGGREGATION_STRATEGIES
+    + DOCSUMMARY_STRATEGIES
 )
 
 
@@ -618,6 +705,14 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
     strategies: list[RetrievalStrategy] = [
         DenseStrategy(),
         BM25Strategy(),
+        SmallToBigDenseStrategy(),
+        SmallToBigParentBM25Strategy(),
+        SmallToBigHybridStrategy(),
+        DocSummaryStrategy("docsummary_dense", mode="dense"),
+        DocSummaryStrategy("docsummary_bm25", mode="bm25"),
+        DocSummaryStrategy("docsummary_hybrid", mode="hybrid"),
+        DocSummaryStrategy("docsummary_then_chunks", mode="then_chunks"),
+        DocSummaryStrategy("docsummary_fused_hybrid", mode="fused_hybrid"),
         HybridStrategy(),
         HybridTunedStrategy("hybrid_pool80", pool=80),
         HybridTunedStrategy("hybrid_pool160", pool=160),

@@ -7,31 +7,41 @@ from pathlib import Path
 from typing import Any
 
 from rag_literature_rag.paths import DATA_DIR
+from rag_common.local_llm import generate_text
 
 log = logging.getLogger("rag_literature_rag.query.transforms")
 
 DEFAULT_EVAL_LLM_MODEL = "gemini-2.5-flash"
-CACHE_PATH = DATA_DIR / "eval" / "transform_cache.json"
+
+
+def cache_path() -> Path:
+    from rag_common.local_llm import transform_cache_filename
+
+    return DATA_DIR / "eval" / transform_cache_filename()
 
 
 def eval_llm_model() -> str:
-    return os.getenv("RAG_LIT_EVAL_LLM_MODEL", DEFAULT_EVAL_LLM_MODEL).strip() or DEFAULT_EVAL_LLM_MODEL
+    from rag_common.local_llm import active_model
+
+    return active_model()
 
 
 def _load_cache() -> dict[str, str]:
-    if not CACHE_PATH.is_file():
+    path = cache_path()
+    if not path.is_file():
         return {}
     try:
-        return json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return {}
 
 
 def _save_cache(cache: dict[str, str]) -> None:
-    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    tmp = CACHE_PATH.with_suffix(".tmp")
+    path = cache_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(cache, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    os.replace(tmp, CACHE_PATH)
+    os.replace(tmp, path)
 
 
 def _cache_key(strategy: str, query: str) -> str:
@@ -51,28 +61,16 @@ def _cached_or_generate(strategy: str, query: str, prompt: str) -> str:
 
 
 def _generate_text(prompt: str) -> str:
-    try:
-        from rag_common.gemini_embed import _client
-    except ImportError as exc:
-        raise RuntimeError("Gemini client unavailable for query transforms") from exc
-
-    from rag_common.gemini_embed import llm_location
-
-    client = _client(location=llm_location())
-    model = eval_llm_model()
-    response = client.models.generate_content(model=model, contents=prompt)
-    text = (getattr(response, "text", None) or "").strip()
-    if not text:
-        raise RuntimeError(f"Empty LLM response from {model}")
-    return text
+    return generate_text(prompt)
 
 
 def multi_query_rewrites(query: str, *, n: int = 3) -> list[str]:
     prompt = (
-        "You rewrite search queries for a graph drawing / layout theory paper corpus.\n"
+        "You rewrite search queries for a retrieval-augmented generation (RAG) and "
+        "neural information retrieval paper corpus.\n"
         f"Original query: {query}\n\n"
         f"Return exactly {n} alternative search queries, one per line, with no numbering or bullets. "
-        "Use technical graph layout terminology where appropriate."
+        "Use precise RAG, dense retrieval, hybrid retrieval, reranking, evaluation, or agentic retrieval terminology where appropriate."
     )
     raw = _cached_or_generate("multi_query", query, prompt)
     lines = [line.strip(" -\t") for line in raw.splitlines() if line.strip()]
@@ -81,8 +79,8 @@ def multi_query_rewrites(query: str, *, n: int = 3) -> list[str]:
 
 def hyde_passage(query: str) -> str:
     prompt = (
-        "Write a short technical passage (120-180 words) that would appear in a graph drawing "
-        "research paper and directly answer this question. Use precise algorithm names and "
+        "Write a short technical passage (120-180 words) that would appear in a RAG or "
+        "neural information retrieval research paper and directly answer this question. Use precise method names and "
         "terminology. Output only the passage.\n\n"
         f"Question: {query}"
     )
@@ -91,7 +89,7 @@ def hyde_passage(query: str) -> str:
 
 def step_back_query(query: str) -> str:
     prompt = (
-        "Rewrite this graph layout research question into a more abstract, broader search query "
+        "Rewrite this RAG or neural information retrieval research question into a more abstract, broader search query "
         "that retrieves background papers on the general technique family. Output only the "
         f"rewritten query.\n\nQuestion: {query}"
     )
@@ -99,5 +97,6 @@ def step_back_query(query: str) -> str:
 
 
 def clear_transform_cache() -> None:
-    if CACHE_PATH.is_file():
-        CACHE_PATH.unlink()
+    path = cache_path()
+    if path.is_file():
+        path.unlink()

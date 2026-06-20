@@ -62,6 +62,12 @@ def _row_to_chunk(r: dict) -> TextChunk:
     )
 
 
+def _read_source_rows(tbl) -> list[dict]:
+    cols = [n for n in tbl.schema.names if n != "vector"]
+    row_count = tbl.count_rows()
+    return tbl.search().select(cols).limit(row_count).to_arrow().to_pylist()
+
+
 def main() -> int:
     from rag_literature_rag.env import load_env_file
 
@@ -70,8 +76,7 @@ def main() -> int:
     db = lancedb.connect(str(src.lance_dir))
     # Arrow (not to_pandas, which needs pylance); drop the heavy vector column.
     tbl = db.open_table(CHUNKS_TABLE)
-    cols = [n for n in tbl.schema.names if n != "vector"]
-    rows = tbl.search().select(cols).limit(0).to_arrow().to_pylist()
+    rows = _read_source_rows(tbl)
     print(f"read {len(rows)} chunks from {SRC_PROFILE}", flush=True)
 
     chunks = [_row_to_chunk(r) for r in rows]

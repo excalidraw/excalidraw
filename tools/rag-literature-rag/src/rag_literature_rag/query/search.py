@@ -9,7 +9,9 @@ from rag_literature_rag.query.retrieve import (
     catalog_maps,
     diversify_candidates,
     retrieve_candidates,
+    retrieve_docsummary_candidates,
     retrieve_multi_query,
+    retrieve_small_to_big_candidates,
 )
 from rag_literature_rag.query.identity import canonical_identity_map, split_values
 from rag_common.rerank import rerank as rerank_candidates
@@ -25,7 +27,7 @@ def _score(row: dict[str, Any]) -> float:
 
 def _evidence(row: dict[str, Any]) -> dict[str, Any]:
     text = row.get("text") or ""
-    return {
+    evidence = {
         "excerpt": text[:400] + ("..." if len(text) > 400 else ""),
         "page": row.get("page"),
         "page_end": row.get("page_end"),
@@ -33,6 +35,14 @@ def _evidence(row: dict[str, Any]) -> dict[str, Any]:
         "chunk_id": row.get("id"),
         "score": _score(row),
     }
+    if row.get("child_hits"):
+        evidence["child_hits"] = row["child_hits"]
+    if row.get("summary_level"):
+        evidence["summary_level"] = row["summary_level"]
+        evidence["source_chunk_ids"] = split_values(row.get("source_chunk_ids"))
+        evidence["summary_model"] = row.get("summary_model")
+        evidence["prompt_version"] = row.get("prompt_version")
+    return evidence
 
 
 def format_results(
@@ -163,6 +173,7 @@ def search(
     hybrid: bool = DEFAULT_HYBRID,
     max_per_doc: int = 2,
     expand: str = "off",
+    small_to_big: bool = False,
 ) -> list[dict[str, Any]]:
     if category and category not in PIPELINE_CATEGORIES:
         raise ValueError(
@@ -178,14 +189,23 @@ def search(
         category=category,
         pdf_only=pdf_only,
     )
-    candidates = retrieve_candidates(
-        query,
-        top=top,
-        embed_profile=embed_profile,
-        hybrid=hybrid,
-        filters=filters,
-    )
-    if expand == "force" or (expand == "auto" and _should_expand(query, candidates)):
+    if small_to_big:
+        candidates = retrieve_small_to_big_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=filters,
+            mode="hybrid",
+        )
+    else:
+        candidates = retrieve_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=hybrid,
+            filters=filters,
+        )
+    if not small_to_big and (expand == "force" or (expand == "auto" and _should_expand(query, candidates))):
         expanded = _expand_candidates(
             query,
             top=top,
@@ -225,20 +245,45 @@ def search_raw(
     dense_weight: float = 1.0,
     sparse_weight: float = 1.0,
     rerank_model: str | None = None,
+    small_to_big: bool = False,
+    small_to_big_mode: str = "hybrid",
+    docsummary: bool = False,
+    docsummary_mode: str = "hybrid",
 ) -> list[dict[str, Any]]:
     """Return formatted results for eval strategies (doc_id + score fields)."""
-    candidates = retrieve_candidates(
-        query,
-        top=top,
-        embed_profile=embed_profile,
-        hybrid=hybrid,
-        sparse_only=sparse_only,
-        filters=filters,
-        pool=pool,
-        rrf_k=rrf_k,
-        dense_weight=dense_weight,
-        sparse_weight=sparse_weight,
-    )
+    if docsummary:
+        candidates = retrieve_docsummary_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=filters,
+            pool=pool,
+            mode=docsummary_mode,
+            rrf_k=rrf_k,
+        )
+    elif small_to_big:
+        candidates = retrieve_small_to_big_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=filters,
+            pool=pool,
+            mode=small_to_big_mode,
+            rrf_k=rrf_k,
+        )
+    else:
+        candidates = retrieve_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            hybrid=hybrid,
+            sparse_only=sparse_only,
+            filters=filters,
+            pool=pool,
+            rrf_k=rrf_k,
+            dense_weight=dense_weight,
+            sparse_weight=sparse_weight,
+        )
     diverse = diversify_candidates(
         candidates,
         max_per_doc=5,

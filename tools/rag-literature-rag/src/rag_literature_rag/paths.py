@@ -26,6 +26,8 @@ BIBLIOGRAPHY_SCAN_CACHE_DIR = DATA_DIR / "bibliography-scan-cache"
 HARVEST_LOG_PATH = DATA_DIR / "harvest.log"
 INGEST_LOG_PATH = DATA_DIR / "ingest.log"
 CHUNKS_TABLE = "chunks"
+PARENTS_TABLE = "parents"
+SUMMARIES_TABLE = "summaries"
 
 # Citation-relatedness doc vectors (SciNCL/SPECTER2) — one small LanceDB per model,
 # keyed by doc_id, independent of the chunk indexes.
@@ -46,6 +48,8 @@ class ProfileIndexPaths:
     lance_dir: Path
     ingest_state: Path
     bm25_dir: Path
+    bm25_parent_dir: Path | None = None
+    bm25_summary_dir: Path | None = None
     ingest_status: Path | None = None
 
 
@@ -86,6 +90,8 @@ def profile_index_paths(profile: str | None = None) -> ProfileIndexPaths:
         ingest_state=root / "ingest_state.json",
         ingest_status=root / "ingest_status.json",
         bm25_dir=root / "bm25",
+        bm25_parent_dir=root / "bm25_parent",
+        bm25_summary_dir=root / "bm25_summary",
     )
 
 
@@ -104,6 +110,8 @@ def list_profile_indexes() -> list[ProfileIndexPaths]:
             ingest_state=child / "ingest_state.json",
             ingest_status=child / "ingest_status.json",
             bm25_dir=child / "bm25",
+            bm25_parent_dir=child / "bm25_parent",
+            bm25_summary_dir=child / "bm25_summary",
         )
         if paths.lance_dir.is_dir() or paths.ingest_state.is_file():
             out.append(paths)

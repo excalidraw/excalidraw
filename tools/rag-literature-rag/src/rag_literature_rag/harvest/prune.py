@@ -1,7 +1,7 @@
 """Precision-first corpus prune.
 
-Drops manifest items (and deletes their PDFs) that fail the strict
-layout-relevance gate, while always keeping hand-curated high-signal sources
+Drops manifest items (and deletes their PDFs) that fail the strict RAG-relevance
+gate, while always keeping hand-curated high-signal sources
 (see ``CURATED_SOURCES``). Survivors from discovered sources are re-tagged from
 their own title/abstract so leaked OpenAlex topic tags are removed.
 
@@ -30,7 +30,6 @@ PROVENANCE_TAGS = frozenset(
         "dblp",
         "semantic-scholar",
         "bibliography",
-        "graph-drawing",
         "research-thread",
     }
 )

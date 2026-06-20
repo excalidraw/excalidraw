@@ -7,6 +7,7 @@ data/raw/
 data/indexes/
 data/retrieval-indexes/
 data/eval/
+data/eval/runs/
 data/lancedb/
 data/related/
 data/citations.sqlite
@@ -17,8 +18,11 @@ data/manifest.bak.json
 !data/manifest.example.json
 data/ingest_state.json
 data/*.log
+data/*.sqlite
+data/*.sqlite-*
 data/harvest.db
 data/harvest_checkpoint.json
+data/trusted_venue_checkpoint.json
 data/bibliography-scan-cache/
 data/extract_cache/
 data/embed_cache/

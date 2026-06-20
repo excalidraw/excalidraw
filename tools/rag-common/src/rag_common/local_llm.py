@@ -41,6 +41,10 @@ def gemini_model() -> str:
     for key in (
         "GRAPH_RAG_AGENT_LLM_MODEL",
         "GRAPH_RAG_EVAL_LLM_MODEL",
+        "GRAPH_RAG_CONTEXT_LLM_MODEL",
+        "RAG_LIT_AGENT_LLM_MODEL",
+        "RAG_LIT_EVAL_LLM_MODEL",
+        "RAG_LIT_CONTEXT_LLM_MODEL",
         "RAG_LLM_MODEL",
     ):
         value = os.getenv(key, "").strip()

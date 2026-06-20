@@ -288,6 +288,25 @@ def corpus_health_cmd(embed_profile: str, track: str, as_json: bool) -> None:
     )
     for f in report["findings"]:
         click.echo(f"  {icon.get(f['severity'], '?')} [{f['severity']}] {f['code']}: {f['message']}")
+        detail = f.get("detail") or {}
+        if f["code"] == "extraction_fallback_rate":
+            fallback_by_reason = detail.get("fallback_by_reason") or {}
+            if fallback_by_reason:
+                top_reasons = ", ".join(
+                    f"{reason}={count}" for reason, count in list(fallback_by_reason.items())[:5]
+                )
+                click.echo(f"      fallback causes: {top_reasons}")
+            qrel_docs = detail.get("qrel_fallback_docs", 0)
+            qrel_judgments = detail.get("qrel_fallback_judgments", 0)
+            if qrel_docs:
+                top_docs = ", ".join(
+                    f"{row['doc_id']}({row['judged_cases']})"
+                    for row in detail.get("top_qrel_fallback_docs", [])[:5]
+                )
+                click.echo(
+                    f"      qrel overlap: {qrel_docs} fallback docs across "
+                    f"{qrel_judgments} judged placements; top: {top_docs}"
+                )
         if f["remedy"]:
             click.echo(f"      → {f['remedy']}")
     raise SystemExit(1 if report["n_critical"] else 0)

@@ -1,6 +1,8 @@
 from rag_literature_rag.eval.strategies import resolve_strategies
 from rag_literature_rag.query.hybrid import merge_rankings, reciprocal_rank_fusion
+from rag_literature_rag.query import retrieve
 from rag_literature_rag.query.retrieve import DEFAULT_HYBRID
+from rag_common.config import EmbedConfig
 
 
 def test_production_query_default_is_hybrid():
@@ -11,7 +13,25 @@ def test_resolve_offline_strategies_default():
     strategies = resolve_strategies(None, llm_transforms=False)
     names = [strategy.name for strategy in strategies]
     assert "hybrid_category_rerank" in names
+    assert "small2big_dense" in names
+    assert "small2big_parent_bm25" in names
+    assert "small2big_hybrid" in names
+    assert "docsummary_hybrid" not in names
     assert "multi_query" not in names
+
+
+def test_docsummary_strategies_registered_for_explicit_eval():
+    strategies = resolve_strategies(
+        ["docsummary_dense", "docsummary_bm25", "docsummary_hybrid", "docsummary_then_chunks", "docsummary_fused_hybrid"],
+        llm_transforms=False,
+    )
+    assert [strategy.name for strategy in strategies] == [
+        "docsummary_dense",
+        "docsummary_bm25",
+        "docsummary_hybrid",
+        "docsummary_then_chunks",
+        "docsummary_fused_hybrid",
+    ]
 
 
 def test_resolve_llm_strategies_when_enabled():
@@ -56,3 +76,55 @@ def test_weighted_rrf_can_prefer_dense_or_sparse():
     )
     assert dense_first[0]["id"] == "dense:0"
     assert sparse_first[0]["id"] == "sparse:0"
+
+
+def test_small_to_big_requires_parent_indexes(tmp_path):
+    ctx = retrieve.RetrieveContext(
+        table=None,
+        parent_table=None,
+        paths=type(
+            "Paths",
+            (),
+            {
+                "profile": "old-profile",
+                "root": tmp_path,
+                "bm25_parent_dir": tmp_path / "bm25_parent",
+                "bm25_summary_dir": tmp_path / "bm25_summary",
+            },
+        )(),
+        config=EmbedConfig("local", "model", 3),
+        summary_table=None,
+    )
+    try:
+        retrieve._require_parent_indexes(ctx)
+    except ValueError as exc:
+        assert "does not have parent indexes" in str(exc)
+        assert "rag-literature-rag ingest --embed-profile cuda-qwen0.6b-small2big-dual-v1 --force --rebuild" in str(exc)
+    else:
+        raise AssertionError("expected missing parent index error")
+
+
+def test_docsummary_requires_summary_indexes(tmp_path):
+    ctx = retrieve.RetrieveContext(
+        table=None,
+        parent_table=None,
+        summary_table=None,
+        paths=type(
+            "Paths",
+            (),
+            {
+                "profile": "old-profile",
+                "root": tmp_path,
+                "bm25_parent_dir": tmp_path / "bm25_parent",
+                "bm25_summary_dir": tmp_path / "bm25_summary",
+            },
+        )(),
+        config=EmbedConfig("local", "model", 3),
+    )
+    try:
+        retrieve._require_summary_indexes(ctx)
+    except ValueError as exc:
+        assert "does not have document summary indexes" in str(exc)
+        assert "cuda-qwen0.6b-docsummary-gemma4-v1" in str(exc)
+    else:
+        raise AssertionError("expected missing summary index error")

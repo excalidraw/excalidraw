@@ -26,6 +26,11 @@ uv run graph-layout-rag embed profiles   # list built-in profiles
 | `gemini-2` | gemini | `gemini-embedding-2-preview` | 3072 | Preserved fixed-window baseline |
 | `gemini-2-structure-v1` | gemini | `gemini-embedding-2-preview` | 3072 | Secondary cloud build; source for GPU reembed |
 | `cuda-qwen0.6b-1024` | local | `Qwen/Qwen3-Embedding-0.6B` (CUDA FP16) | 1024 | **Production query profile** (GPU reembed from gemini secondary) |
+| `cuda-qwen0.6b-section-v1` | local | `Qwen/Qwen3-Embedding-0.6B` (CUDA 4-bit) | 1024 | Chunking campaign: enrich indexed text with document/section metadata |
+| `cuda-qwen0.6b-small2big-v1` | local | `Qwen/Qwen3-Embedding-0.6B` (CUDA 4-bit) | 1024 | Chunking campaign: smaller child chunks (~350 target / 550 max) |
+| `cuda-qwen0.6b-contextual-v1` | local | `Qwen/Qwen3-Embedding-0.6B` (CUDA 4-bit) | 1024 | Contextual Retrieval build with local LLM-generated context |
+| `cuda-qwen4b-1024` | local | `Qwen/Qwen3-Embedding-4B` (CUDA 4-bit) | 1024 | Quality campaign probe; skipped on RTX 3060 Ti 8 GB after OOM |
+| `cuda-qwen4b-2560` | local | `Qwen/Qwen3-Embedding-4B` (CUDA 4-bit) | 2560 | Quality campaign high-dimensional probe; skipped on current GPU |
 | `mlx-qwen4b` | local | `Qwen/Qwen3-Embedding-4B` (MLX 4-bit) | 1024 | Free Apple Silicon ingest |
 | `mlx-qwen0.6b` | local | `Qwen/Qwen3-Embedding-0.6B` (MLX 4-bit) | 1024 | Faster local |
 | `local-fp16-qwen4b` | local | Qwen3-4B FP16 (ST/MPS) | 1024 | Heavier RAM |
@@ -116,6 +121,26 @@ Extracts Markdown-aware structural blocks, targets ~800-token chunks (1200 hard 
 uv run graph-layout-rag ingest status --embed-profile gemini-2-structure-v1 --json
 uv run graph-layout-rag eval retrieval --embed-profile gemini-2-structure-v1 --json
 ```
+
+### Chunking campaign profiles
+
+The 2026-06-18 quality campaign keeps the production default unchanged and adds local-first A/B profiles:
+
+- `cuda-qwen0.6b-section-v1`: default chunk boundaries, but indexed dense/BM25 text is prefixed with document title, year, authors, source URL, section path, categories, tags, and aliases.
+- `cuda-qwen0.6b-small2big-v1`: smaller child chunks (`target=350`, `max=550`, `overlap=80`) with a distinct chunking fingerprint and extraction-cache key.
+- `cuda-qwen0.6b-contextual-v1`: default chunking plus local-LLM contextual prefixes through `rag_common.local_llm` (`RAG_LLM_BACKEND=ollama` on `desktop`).
+
+Build each as its own index and benchmark against neutral qrels:
+
+```bash
+RAG_EMBED_PROFILE=cuda-qwen0.6b-small2big-v1 uv run graph-layout-rag ingest --force --rebuild -v
+uv run graph-layout-rag eval benchmark --embed-profile cuda-qwen0.6b-small2big-v1 \
+  --qrels data/eval/qrels/catalog/qrels.json --strategy dense --strategy bm25 --strategy hybrid --report -v
+```
+
+Campaign report: [docs/rag/graph-layout-rag-quality-campaign-2026-06-18.md](../../docs/rag/graph-layout-rag-quality-campaign-2026-06-18.md).
+
+Current result: `cuda-qwen0.6b-section-v1` is built and synced, but is not promoted as the default because its PDF nDCG gain is offset by a catalog regression. Continue with `cuda-qwen0.6b-small2big-v1` before contextual builds.
 
 ## Retrieval benchmark
 

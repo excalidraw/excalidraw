@@ -19,6 +19,24 @@ def test_load_builtin_profiles():
     assert spec.backend == "local"
     assert spec.quant == "4bit"
     assert spec.dimensions == 1024
+    assert profiles["cuda-qwen4b-1024"].model == "Qwen/Qwen3-Embedding-4B"
+    assert profiles["cuda-qwen4b-1024"].dimensions == 1024
+    assert profiles["cuda-qwen4b-1024"].quant == "4bit"
+    assert profiles["cuda-qwen4b-2560"].dimensions == 2560
+    for name in [
+        "cuda-qwen0.6b-section-v1",
+        "cuda-qwen0.6b-contextual-v1",
+        "cuda-qwen0.6b-small2big-v1",
+    ]:
+        assert profiles[name].model == "Qwen/Qwen3-Embedding-0.6B"
+        assert profiles[name].dimensions == 1024
+        assert profiles[name].quant == "4bit"
+    assert profiles["cuda-qwen0.6b-512-v1"].model == "Qwen/Qwen3-Embedding-0.6B"
+    assert profiles["cuda-qwen0.6b-512-v1"].dimensions == 512
+    assert profiles["cuda-qwen0.6b-512-v1"].quant == "4bit"
+    assert profiles["cuda-qwen0.6b-768-v1"].model == "Qwen/Qwen3-Embedding-0.6B"
+    assert profiles["cuda-qwen0.6b-768-v1"].dimensions == 768
+    assert profiles["cuda-qwen0.6b-768-v1"].quant == "4bit"
 
 
 def test_merge_extra_profiles(tmp_path: Path):

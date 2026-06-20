@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo RAG"
+  short_description: "Search excalidraw-tf source, handoffs, symbols, imports, and call graph"
+  default_prompt: "Use $repo-rag to locate implementation details, symbols, handoff docs, and related source files in this repository before making code changes."

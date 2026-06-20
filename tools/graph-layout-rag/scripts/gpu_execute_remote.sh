@@ -67,16 +67,42 @@ ssh "${SSH_HOST}" bash -lc "
   export GRAPH_RAG_ENCODE_DEVICE=cuda
   tmux kill-session -t graphrag-encode 2>/dev/null || true
   tmux new-session -d -s graphrag-encode \
-    'export PATH=\"\${HOME}/.local/bin:\${PATH}\"; cd ~/${REMOTE_ROOT}/tools/graph-layout-rag; \
-     ulimit -n 65536; source scripts/gpu_env.sh; \
-     export GRAPH_RAG_QDRANT_URL=http://127.0.0.1:6333 GRAPH_RAG_ENCODE_DEVICE=cuda; \
-     ./scripts/gpu_build_ab_indexes.sh && ./scripts/gpu_run_benchmark.sh; \
-     echo PIPELINE_DONE >> data/eval/gpu_pipeline.log'
+    \"bash -lc 'set -euo pipefail
+     export PATH=\${HOME}/.local/bin:\${PATH}
+     cd ~/${REMOTE_ROOT}/tools/graph-layout-rag
+     ulimit -n 65536
+     source scripts/gpu_env.sh
+     export GRAPH_RAG_QDRANT_URL=http://127.0.0.1:6333 GRAPH_RAG_ENCODE_DEVICE=cuda
+     mkdir -p data/eval/runs
+     : > data/eval/gpu_pipeline.log
+     gpu_log=data/eval/runs/\$(date -u +%Y%m%dT%H%M%SZ)-gpu-pipeline-nvidia-smi.csv
+     ( while true; do
+         nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total,power.draw \
+           --format=csv,noheader,nounits >> \${gpu_log} 2>/dev/null || true
+         sleep 30
+       done ) &
+     smi_pid=\$!
+     cleanup() { kill \${smi_pid} 2>/dev/null || true; wait \${smi_pid} 2>/dev/null || true; }
+     trap cleanup EXIT
+     status=0
+     { ./scripts/gpu_build_ab_indexes.sh && ./scripts/gpu_run_benchmark.sh; } \
+       2>&1 | tee -a data/eval/gpu_pipeline.log || status=\$?
+     echo \${status} > data/eval/gpu_pipeline.exitcode
+     if [[ \${status} -eq 0 ]]; then
+       echo DONE > data/eval/gpu_pipeline.sentinel
+       echo PIPELINE_DONE >> data/eval/gpu_pipeline.log
+     else
+       echo FAILED > data/eval/gpu_pipeline.sentinel
+       echo PIPELINE_FAILED >> data/eval/gpu_pipeline.log
+     fi
+     grep -Ei \"CUDA out of memory|Killed|Traceback|segmentation|worker exited|memory_aborted\" \
+       data/eval/gpu_pipeline.log > data/eval/gpu_pipeline.crashes 2>/dev/null || true
+     exit \${status}'\"
   echo \"Started tmux session graphrag-encode. Tail: ssh ${SSH_HOST} tmux attach -t graphrag-encode\"
 "
 
 echo "=== Pull results back (skip if pipeline still running in tmux) ==="
-if ssh "${SSH_HOST}" "grep -q PIPELINE_DONE ~/${REMOTE_ROOT}/tools/graph-layout-rag/data/eval/gpu_pipeline.log 2>/dev/null"; then
+if ssh "${SSH_HOST}" "grep -q DONE ~/${REMOTE_ROOT}/tools/graph-layout-rag/data/eval/gpu_pipeline.sentinel 2>/dev/null"; then
   "${ROOT}/scripts/gpu_sync_from_remote.sh"
   echo "Done. Check data/eval/runs/ on Mac."
 else

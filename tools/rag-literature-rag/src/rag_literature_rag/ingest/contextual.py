@@ -15,10 +15,10 @@ from __future__ import annotations
 import json
 import logging
 import os
-from pathlib import Path
 
 from rag_literature_rag.ingest.chunk import TextChunk
 from rag_literature_rag.paths import DATA_DIR
+from rag_common.local_llm import active_model, generate_text, llm_backend
 
 log = logging.getLogger("rag_literature_rag.ingest.contextual")
 
@@ -34,6 +34,8 @@ def is_contextual_profile(profile: str | None) -> bool:
 
 
 def _context_model() -> str:
+    if llm_backend() == "ollama":
+        return active_model()
     return os.getenv(CONTEXT_MODEL_ENV, DEFAULT_CONTEXT_MODEL).strip() or DEFAULT_CONTEXT_MODEL
 
 
@@ -58,14 +60,13 @@ def _save_cache(cache: dict[str, str]) -> None:
 _CONTEXT_VERSION = "rag-v2"
 
 
-def _cache_key(chunk: TextChunk) -> str:
+def _cache_key(chunk: TextChunk, *, backend: str, model: str) -> str:
     fp = chunk.canonical_sha256 or chunk.doc_id
-    return f"{_CONTEXT_VERSION}:{fp}:{chunk.chunk_index}"
+    model_key = f"{backend}:{model}".replace("/", "_")
+    return f"{_CONTEXT_VERSION}:{model_key}:{fp}:{chunk.chunk_index}"
 
 
 def _generate_context(title: str, section_path: str, body: str, model: str) -> str:
-    from rag_common.gemini_embed import _client, llm_location
-
     prompt = (
         "You add retrieval context to a chunk from a retrieval-augmented "
         "generation (RAG) / neural information retrieval research paper.\n"
@@ -77,9 +78,10 @@ def _generate_context(title: str, section_path: str, body: str, model: str) -> s
         "is retrievable on its own: name the algorithm/technique and what the chunk covers. "
         "Output only the sentence."
     )
-    client = _client(location=llm_location())
-    response = client.models.generate_content(model=model, contents=prompt)
-    return (getattr(response, "text", None) or "").strip().replace("\n", " ")
+    # Only pass the Gemini model override to Gemini. For Ollama, let
+    # rag_common.local_llm resolve RAG_OLLAMA_MODEL.
+    resolved_model = model if llm_backend() == "gemini" else None
+    return generate_text(prompt, model=resolved_model, max_tokens=512).strip().replace("\n", " ")
 
 
 def _context_workers() -> int:
@@ -101,7 +103,8 @@ def augment_texts_for_context(chunks: list[TextChunk], texts: list[str]) -> list
 
     cache = _load_cache()
     model = _context_model()
-    keys = [_cache_key(c) for c in chunks]
+    backend = llm_backend()
+    keys = [_cache_key(c, backend=backend, model=model) for c in chunks]
     misses = [i for i, k in enumerate(keys) if k not in cache]
 
     def _gen(i: int) -> tuple[int, str]:

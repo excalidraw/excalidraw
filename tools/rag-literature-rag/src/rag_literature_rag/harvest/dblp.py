@@ -90,7 +90,7 @@ def _hit_to_item(hit: dict) -> ManifestItem:
         localPath=f"data/raw/pdf/{doc_id}.pdf",
         contentType="application/pdf",
         status="failed",
-        tags=["dblp", "graph-drawing"],
+        tags=["dblp", "rag-literature"],
         doi=doi,
     )
 

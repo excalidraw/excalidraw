@@ -35,7 +35,31 @@ rsync -avz --progress \
   data/eval/runs/ 2>/dev/null || true
 
 rsync -avz --progress \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/*.log" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/*.sentinel" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/*.exitcode" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/*.crashes" \
+  data/ 2>/dev/null || true
+
+rsync -avz --progress \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/eval/*.log" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/eval/*.sentinel" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/eval/*.exitcode" \
+  "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/eval/*.crashes" \
+  data/eval/ 2>/dev/null || true
+
+rsync -avz --progress \
   "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/eval/retrieval_indexes/" \
   data/eval/retrieval_indexes/ 2>/dev/null || true
+
+if [[ "${RAG_GPU_SYNC_CACHES_BACK:-0}" == "1" ]]; then
+  mkdir -p data/extract_cache data/embed_cache
+  rsync -avz --progress \
+    "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/extract_cache/" \
+    data/extract_cache/ 2>/dev/null || true
+  rsync -avz --progress \
+    "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/embed_cache/" \
+    data/embed_cache/ 2>/dev/null || true
+fi
 
 echo "Done."

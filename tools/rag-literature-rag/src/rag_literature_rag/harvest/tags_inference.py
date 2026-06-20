@@ -11,7 +11,8 @@ def infer_harvest_tags(
     *,
     existing: list[str] | None = None,
 ) -> list[str]:
-    tags = set(existing or []) | {"bibliography", "graph-drawing"}
+    tags = set(existing or []) | {"bibliography", "rag-literature"}
+    tags.discard("graph-drawing")
     hay = f"{title} {abstract or ''}"
     tags.update(categories_from_keywords(hay))
     if existing:

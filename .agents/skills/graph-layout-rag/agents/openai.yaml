@@ -1,0 +1,4 @@
+interface:
+  display_name: "Graph Layout RAG"
+  short_description: "Search graph drawing and layout literature with evidence passages"
+  default_prompt: "Use $graph-layout-rag to find primary sources for Sugiyama, dot, ELK, compound graphs, routing, packing, and graph layout design decisions."

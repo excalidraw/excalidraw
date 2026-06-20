@@ -12,7 +12,8 @@ dependencies = [
   "openai>=1.40.0",
   "pydantic>=2.7.0",
   "pymupdf>=1.24.0",
-  "rag-common[gemini,mlx]",
+  "rag-common[gemini]",
+  "rag-common[mlx]; sys_platform == 'darwin'",
   "tantivy>=0.22.0",
   "tiktoken>=0.7.0",
 ]
@@ -22,7 +23,7 @@ rag-common = { path = "../rag-common", editable = true }
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
-mlx = ["rag-common[mlx]"]
+mlx = ["rag-common[mlx]; sys_platform == 'darwin'"]
 docling = ["docling>=2.0.0"]
 retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
 retrieval-experiments-gpu = [
@@ -38,6 +39,7 @@ retrieval-experiments-gpu = [
   "nvidia-curand-cu12",
   "nvidia-cusolver-cu12",
   "nvidia-cusparse-cu12",
+  "pylance>=7.0.0",
 ]
 
 [tool.uv]

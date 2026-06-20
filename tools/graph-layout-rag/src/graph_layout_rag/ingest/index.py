@@ -12,7 +12,13 @@ import lancedb
 from rag_common.gemini_embed import is_gemini_embedding_2
 
 from graph_layout_rag.ingest import bm25, embed_cache
-from graph_layout_rag.ingest.chunk import TextChunk, embed_body_text, embed_input_text
+from graph_layout_rag.ingest.chunk import (
+    TextChunk,
+    embed_body_text,
+    embed_input_text,
+    enrich_texts_for_section,
+    is_section_enriched_profile,
+)
 from graph_layout_rag.ingest.log import get_logger
 from graph_layout_rag.ingest.embed import (
     ENV_PREFIX,
@@ -227,6 +233,8 @@ def upsert_chunks(
     else:
         texts = [embed_input_text(c) for c in chunks]
         titles = None
+    if is_section_enriched_profile(cfg.profile):
+        texts = enrich_texts_for_section(chunks, texts)
     # Contextual Retrieval (opt-in via a *contextual* embed profile): prepend an
     # LLM context line to the embed/BM25 text. Production profiles are untouched.
     from graph_layout_rag.ingest.contextual import augment_texts_for_context, is_contextual_profile

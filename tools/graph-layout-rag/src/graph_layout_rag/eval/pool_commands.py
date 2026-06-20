@@ -148,3 +148,28 @@ def diagnostics_cmd(
         Path(output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         Path(output).with_suffix(".md").write_text(format_diagnostics_table(payload), encoding="utf-8")
     click.echo(format_diagnostics_table(payload))
+
+
+@click.command("corpus-health")
+@click.option("--embed-profile", required=True)
+@click.option("--track", type=click.Choice(EVAL_TRACKS), default="catalog", show_default=True)
+@click.option("--json", "as_json", is_flag=True, help="Emit the raw audit JSON.")
+def corpus_health_cmd(embed_profile: str, track: str, as_json: bool) -> None:
+    """Audit corpus/infra health (chunk density, extraction fallback, creds, pool holes)."""
+    from graph_layout_rag.eval.corpus_health import run_audit
+
+    report = run_audit(embed_profile, track=track)
+    if as_json:
+        click.echo(json.dumps(report, indent=2))
+        return
+    icon = {"critical": "x", "warning": "!", "info": ".", "ok": "ok"}
+    click.echo(
+        f"Corpus health - profile={report['profile']} track={report['track']} "
+        f"worst={report['worst_severity']} "
+        f"(critical={report['n_critical']} warning={report['n_warning']})\n"
+    )
+    for f in report["findings"]:
+        click.echo(f"  {icon.get(f['severity'], '?')} [{f['severity']}] {f['code']}: {f['message']}")
+        if f["remedy"]:
+            click.echo(f"      -> {f['remedy']}")
+    raise SystemExit(1 if report["n_critical"] else 0)

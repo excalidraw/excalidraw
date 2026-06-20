@@ -4,8 +4,8 @@ from rag_literature_rag.query import transforms
 
 
 def test_transform_cache_roundtrip(tmp_path, monkeypatch):
-    cache_path = tmp_path / "transform_cache.json"
-    monkeypatch.setattr(transforms, "CACHE_PATH", cache_path)
+    cache_path = tmp_path / "transform_cache_ollama_test.json"
+    monkeypatch.setattr(transforms, "cache_path", lambda: cache_path)
     monkeypatch.setattr(transforms, "_generate_text", lambda prompt: "rewritten query one")
 
     first = transforms.step_back_query("network simplex rank assignment")
@@ -17,8 +17,8 @@ def test_transform_cache_roundtrip(tmp_path, monkeypatch):
 
 
 def test_multi_query_rewrites_parses_lines(tmp_path, monkeypatch):
-    cache_path = tmp_path / "transform_cache.json"
-    monkeypatch.setattr(transforms, "CACHE_PATH", cache_path)
+    cache_path = tmp_path / "transform_cache_ollama_test.json"
+    monkeypatch.setattr(transforms, "cache_path", lambda: cache_path)
     monkeypatch.setattr(
         transforms,
         "_generate_text",
@@ -26,3 +26,19 @@ def test_multi_query_rewrites_parses_lines(tmp_path, monkeypatch):
     )
     rewrites = transforms.multi_query_rewrites("network simplex", n=2)
     assert rewrites == ["rank assignment heuristic", "layered drawing optimization"]
+
+
+def test_transform_prompts_are_rag_specific(tmp_path, monkeypatch):
+    cache_path = tmp_path / "transform_cache_ollama_test.json"
+    prompts: list[str] = []
+
+    monkeypatch.setattr(transforms, "cache_path", lambda: cache_path)
+
+    def fake_generate(prompt: str) -> str:
+        prompts.append(prompt)
+        return "dense retrieval query"
+
+    monkeypatch.setattr(transforms, "_generate_text", fake_generate)
+    assert transforms.multi_query_rewrites("HyDE", n=1) == ["dense retrieval query"]
+    assert "retrieval-augmented generation" in prompts[0]
+    assert "graph drawing" not in prompts[0].lower()

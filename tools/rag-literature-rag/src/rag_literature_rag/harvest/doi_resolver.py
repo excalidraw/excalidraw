@@ -296,7 +296,7 @@ def resolve_doi_with_fallbacks(
             localPath=f"data/raw/pdf/{doc_id}.pdf",
             contentType="application/pdf",
             status="metadata_only",
-            tags=[*(tags or []), "graph-drawing"],
+            tags=[*(tags or []), "rag-literature"],
             doi=doi,
         )
 
@@ -327,7 +327,7 @@ def resolve_doi_with_fallbacks(
         localPath=f"data/raw/pdf/{doc_id}.pdf",
         contentType="application/pdf",
         status="metadata_only",
-        tags=[*(tags or []), "graph-drawing"],
+        tags=[*(tags or []), "rag-literature"],
         doi=doi,
         abstract=abstract,
     )
@@ -441,7 +441,7 @@ def resolve_dois(
                 localPath=f"data/raw/pdf/{doc_id}.pdf",
                 contentType="application/pdf",
                 status="metadata_only",
-                tags=[*(tags or []), "graph-drawing"],
+                tags=[*(tags or []), "rag-literature"],
                 doi=doi,
             )
 

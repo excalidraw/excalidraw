@@ -143,6 +143,7 @@ tools/graph-layout-rag/data/raw/
 tools/graph-layout-rag/data/indexes/
 tools/graph-layout-rag/data/retrieval-indexes/
 tools/graph-layout-rag/data/eval/
+tools/graph-layout-rag/data/eval/runs/
 tools/graph-layout-rag/data/lancedb/
 tools/graph-layout-rag/data/manifest.json
 tools/graph-layout-rag/data/manifest.*.json
@@ -150,8 +151,11 @@ tools/graph-layout-rag/data/manifest.bak.json
 !tools/graph-layout-rag/data/manifest.example.json
 tools/graph-layout-rag/data/ingest_state.json
 tools/graph-layout-rag/data/*.log
+tools/graph-layout-rag/data/*.sqlite
+tools/graph-layout-rag/data/*.sqlite-*
 tools/graph-layout-rag/data/harvest.db
 tools/graph-layout-rag/data/harvest_checkpoint.json
+tools/graph-layout-rag/data/trusted_venue_checkpoint.json
 tools/graph-layout-rag/data/bibliography-scan-cache/
 tools/graph-layout-rag/data/extract_cache/
 tools/graph-layout-rag/data/embed_cache/
@@ -169,9 +173,14 @@ tools/repo-rag/.env
 tools/repo-rag/.venv/
 tools/repo-rag/data/lancedb/
 tools/repo-rag/data/bm25/
+tools/repo-rag/data/indexes/
+tools/repo-rag/data/eval/runs/
 tools/repo-rag/data/manifest.json
 tools/repo-rag/data/ingest_state.json
 tools/repo-rag/data/repo-rag.log
+tools/repo-rag/data/*.log
+tools/repo-rag/data/*.sqlite
+tools/repo-rag/data/*.sqlite-*
 tools/repo-rag/**/__pycache__/
 tools/repo-rag/.pytest_cache/
 
@@ -182,6 +191,7 @@ tools/rag-literature-rag/data/raw/
 tools/rag-literature-rag/data/indexes/
 tools/rag-literature-rag/data/retrieval-indexes/
 tools/rag-literature-rag/data/eval/
+tools/rag-literature-rag/data/eval/runs/
 tools/rag-literature-rag/data/lancedb/
 tools/rag-literature-rag/data/manifest.json
 tools/rag-literature-rag/data/manifest.*.json
@@ -189,8 +199,11 @@ tools/rag-literature-rag/data/manifest.bak.json
 !tools/rag-literature-rag/data/manifest.example.json
 tools/rag-literature-rag/data/ingest_state.json
 tools/rag-literature-rag/data/*.log
+tools/rag-literature-rag/data/*.sqlite
+tools/rag-literature-rag/data/*.sqlite-*
 tools/rag-literature-rag/data/harvest.db
 tools/rag-literature-rag/data/harvest_checkpoint.json
+tools/rag-literature-rag/data/trusted_venue_checkpoint.json
 tools/rag-literature-rag/data/bibliography-scan-cache/
 tools/rag-literature-rag/data/extract_cache/
 tools/rag-literature-rag/data/embed_cache/

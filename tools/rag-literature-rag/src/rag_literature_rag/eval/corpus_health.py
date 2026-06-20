@@ -18,6 +18,7 @@ from __future__ import annotations
 import collections
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -30,6 +31,10 @@ from rag_literature_rag.paths import (
 
 # Severity ranks for sorting findings (higher = more urgent).
 SEVERITY = {"critical": 3, "warning": 2, "info": 1, "ok": 0}
+EXTRACTION_RE = re.compile(
+    r"extracted document=(?P<doc_id>\S+) status=(?P<status>\S+) "
+    r"chunks=(?P<chunks>\d+) reason=(?P<reason>\S+)"
+)
 
 
 @dataclass
@@ -62,7 +67,8 @@ def _load_chunks(profile: str) -> list[dict[str, Any]]:
     if CHUNKS_TABLE not in names:
         return []
     cols = ["doc_id", "text", "canonical_sha256"]
-    return db.open_table(CHUNKS_TABLE).search().select(cols).limit(0).to_arrow().to_pylist()
+    tbl = db.open_table(CHUNKS_TABLE)
+    return tbl.search().select(cols).limit(tbl.count_rows()).to_arrow().to_pylist()
 
 
 def _pdfs_on_disk() -> set[str]:
@@ -70,6 +76,72 @@ def _pdfs_on_disk() -> set[str]:
     if not pdf_dir.is_dir():
         return set()
     return {p.stem for p in pdf_dir.glob("*.pdf")}
+
+
+def _load_qrel_doc_weights(track: str) -> dict[str, int]:
+    """Return judged-doc frequency for a track.
+
+    This is not a relevance claim. It is a cheap "blast radius" signal: if
+    extraction fallbacks overlap many judged docs, benchmark failures can be
+    data-quality artifacts rather than retrieval-method evidence.
+    """
+    from rag_literature_rag.paths import DATA_DIR
+
+    qrels_path = DATA_DIR / "eval" / "qrels" / track / "qrels.json"
+    if not qrels_path.is_file():
+        return {}
+    data = json.loads(qrels_path.read_text())
+    cases = data.get("cases", data)
+    weights: collections.Counter[str] = collections.Counter()
+    if not isinstance(cases, dict):
+        return {}
+    for docs in cases.values():
+        if not isinstance(docs, dict):
+            continue
+        for doc_id in docs:
+            weights[doc_id] += 1
+    return dict(weights)
+
+
+def _scan_extraction_log(log_path: Path) -> dict[str, Any]:
+    ok = fallback = 0
+    by_reason: collections.Counter[str] = collections.Counter()
+    fallback_by_reason: collections.Counter[str] = collections.Counter()
+    fallback_docs: dict[str, str] = {}
+    for line in log_path.read_text(errors="ignore").splitlines():
+        match = EXTRACTION_RE.search(line)
+        if not match:
+            continue
+        reason = match.group("reason")
+        by_reason[reason] += 1
+        if "fallback" in reason:
+            fallback += 1
+            fallback_by_reason[reason] += 1
+            fallback_docs.setdefault(match.group("doc_id"), reason)
+        else:
+            ok += 1
+    return {
+        "ok": ok,
+        "fallback": fallback,
+        "total": ok + fallback,
+        "by_reason": dict(by_reason.most_common()),
+        "fallback_by_reason": dict(fallback_by_reason.most_common()),
+        "fallback_docs": fallback_docs,
+    }
+
+
+def _qrel_overlap_detail(fallback_docs: dict[str, str], qrel_doc_weights: dict[str, int]) -> dict[str, Any]:
+    overlap = [
+        {"doc_id": doc_id, "judged_cases": qrel_doc_weights[doc_id], "reason": reason}
+        for doc_id, reason in fallback_docs.items()
+        if doc_id in qrel_doc_weights
+    ]
+    overlap.sort(key=lambda row: (-row["judged_cases"], row["doc_id"]))
+    return {
+        "qrel_fallback_docs": len(overlap),
+        "qrel_fallback_judgments": sum(row["judged_cases"] for row in overlap),
+        "top_qrel_fallback_docs": overlap[:10],
+    }
 
 
 def audit_chunk_distribution(profile: str, *, min_mean: float = 4.0) -> list[Finding]:
@@ -140,30 +212,39 @@ def audit_chunk_distribution(profile: str, *, min_mean: float = 4.0) -> list[Fin
     return findings
 
 
-def audit_extraction_fallback(*, log_path: Path | None = None) -> list[Finding]:
-    """Scan the most recent ingest log for empty_pdf_metadata_fallback rate."""
+def audit_extraction_fallback(*, track: str = "catalog", log_path: Path | None = None) -> list[Finding]:
+    """Scan the most recent ingest log for fallback rate, causes, and qrel overlap."""
     from rag_literature_rag.paths import INGEST_LOG_PATH
 
     log_path = log_path or INGEST_LOG_PATH
     if not log_path or not log_path.is_file():
         return [Finding("info", "no_ingest_log", "No ingest log to scan for fallbacks.")]
-    ok = fallback = 0
-    for line in log_path.read_text(errors="ignore").splitlines():
-        if "reason=empty_pdf_metadata_fallback" in line:
-            fallback += 1
-        elif "extracted document=" in line and "status=ok" in line:
-            ok += 1
-    total = ok + fallback
+    stats = _scan_extraction_log(log_path)
+    ok = stats["ok"]
+    fallback = stats["fallback"]
+    total = stats["total"]
     if total == 0:
         return [Finding("info", "no_extraction_records", "Ingest log has no per-doc extraction lines.")]
     rate = fallback / total
     sev = "critical" if rate >= 0.5 else "warning" if rate >= 0.15 else "ok"
+    qrel_overlap = _qrel_overlap_detail(stats["fallback_docs"], _load_qrel_doc_weights(track))
     return [
         Finding(
             sev,
             "extraction_fallback_rate",
             f"{fallback}/{total} extractions fell back to abstract ({rate:.0%}).",
-            detail={"fallback": fallback, "total": total, "rate": round(rate, 3)},
+            detail={
+                "fallback": fallback,
+                "total": total,
+                "rate": round(rate, 3),
+                "by_reason": stats["by_reason"],
+                "fallback_by_reason": stats["fallback_by_reason"],
+                "sample_fallback_docs": [
+                    {"doc_id": doc_id, "reason": reason}
+                    for doc_id, reason in list(stats["fallback_docs"].items())[:10]
+                ],
+                **qrel_overlap,
+            },
             remedy=("Many fall-backs at ~0.2s mean the PDF wasn't present/parseable when ingested; "
                     "verify PDFs on disk then --force --rebuild." if sev != "ok" else ""),
         )
@@ -223,7 +304,7 @@ def audit_pool_holes(track: str = "catalog") -> list[Finding]:
 def run_audit(profile: str, *, track: str = "catalog") -> dict[str, Any]:
     findings: list[Finding] = []
     findings += audit_chunk_distribution(profile)
-    findings += audit_extraction_fallback()
+    findings += audit_extraction_fallback(track=track)
     findings += audit_credentials()
     findings += audit_pool_holes(track)
     findings.sort(key=lambda f: SEVERITY.get(f.severity, 0), reverse=True)

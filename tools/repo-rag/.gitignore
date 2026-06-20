@@ -5,8 +5,12 @@ __pycache__/
 .pytest_cache/
 data/lancedb/
 data/bm25/
+data/indexes/
+data/eval/runs/
 data/manifest.json
 data/ingest_state.json
 data/repo-rag.log
+data/*.log
 data/graph.sqlite
+data/graph.sqlite-*
 data/graph.tmp

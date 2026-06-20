@@ -2,8 +2,8 @@
 
 `bibliography.py` walks *backward* (papers our seeds cite). This walks *forward*:
 papers that **cite** our high-signal seeds — capturing newer work that builds on
-the canonical layout algorithms. Citing a graph-drawing paper is itself a strong
-relevance signal, so yield is high-precision.
+canonical RAG / retrieval methods. Citing a RAG literature paper is itself a
+strong relevance signal, so yield is high-precision.
 """
 
 from __future__ import annotations
@@ -121,7 +121,7 @@ def harvest_forward_citations(
         item = resolve_doi_with_fallbacks(
             spec["doi"],
             source="forward-citation",
-            tags=["forward-citation", "graph-drawing"],
+            tags=["forward-citation", "rag-literature"],
             dry_run=dry_run,
             include_archive=False,
             include_paywall_guesses=False,

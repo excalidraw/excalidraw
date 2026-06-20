@@ -15,10 +15,10 @@ from __future__ import annotations
 import json
 import logging
 import os
-from pathlib import Path
 
 from graph_layout_rag.ingest.chunk import TextChunk
 from graph_layout_rag.paths import DATA_DIR
+from rag_common.local_llm import generate_text, llm_backend
 
 log = logging.getLogger("graph_layout_rag.ingest.contextual")
 
@@ -59,8 +59,6 @@ def _cache_key(chunk: TextChunk) -> str:
 
 
 def _generate_context(title: str, section_path: str, body: str, model: str) -> str:
-    from rag_common.gemini_embed import _client, llm_location
-
     prompt = (
         "You add retrieval context to a chunk from a graph drawing / layout theory paper.\n"
         f"Document title: {title}\n"
@@ -71,9 +69,10 @@ def _generate_context(title: str, section_path: str, body: str, model: str) -> s
         "is retrievable on its own: name the algorithm/technique and what the chunk covers. "
         "Output only the sentence."
     )
-    client = _client(location=llm_location())
-    response = client.models.generate_content(model=model, contents=prompt)
-    return (getattr(response, "text", None) or "").strip().replace("\n", " ")
+    # Only pass the Gemini model override to Gemini. For Ollama, let
+    # rag_common.local_llm resolve RAG_OLLAMA_MODEL.
+    resolved_model = model if llm_backend() == "gemini" else None
+    return generate_text(prompt, model=resolved_model, max_tokens=96).strip().replace("\n", " ")
 
 
 def _context_workers() -> int:
@@ -107,16 +106,23 @@ def augment_texts_for_context(chunks: list[TextChunk], texts: list[str]) -> list
             return i, ""
 
     if misses:
-        done = 0
+        done = failed = 0
         with ThreadPoolExecutor(max_workers=_context_workers()) as pool:
             for i, ctx in pool.map(_gen, misses):
-                cache[keys[i]] = ctx
+                if ctx:
+                    cache[keys[i]] = ctx
+                else:
+                    failed += 1
                 done += 1
                 if done % 500 == 0:  # periodic checkpoint for long unattended runs
                     _save_cache(cache)
                     log.info("contextual augmentation: %d/%d context lines", done, len(misses))
         _save_cache(cache)
-        log.info("contextual augmentation: generated %d new context line(s)", len(misses))
+        log.info(
+            "contextual augmentation: generated %d new context line(s), %d failed (will retry)",
+            len(misses) - failed,
+            failed,
+        )
 
     return [
         (f"Context: {cache[k]}\n{t}" if cache.get(k) else t)

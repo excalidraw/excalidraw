@@ -165,11 +165,12 @@ def _fulltext_chunks(profile: str) -> dict[str, str]:
     names = names if isinstance(names, list) else list(getattr(names, "tables", names))
     if CHUNKS_TABLE not in names:
         return {}
+    tbl = db.open_table(CHUNKS_TABLE)
     rows = (
-        db.open_table(CHUNKS_TABLE)
+        tbl
         .search()
         .select(["doc_id", "text"])
-        .limit(0)
+        .limit(tbl.count_rows())
         .to_arrow()
         .to_pylist()
     )

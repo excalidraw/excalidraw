@@ -1,0 +1,4 @@
+interface:
+  display_name: "RAG Literature RAG"
+  short_description: "Search RAG methodology papers and evaluation reports"
+  default_prompt: "Use $rag-literature-rag to research RAG chunking, retrieval, query expansion, GraphRAG, Self-RAG, agentic RAG, and evaluation methodology."

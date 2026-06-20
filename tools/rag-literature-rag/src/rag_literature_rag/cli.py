@@ -34,6 +34,8 @@ from rag_literature_rag.eval.retrieval import retrieval_eval_cmd  # noqa: E402
 from rag_literature_rag.eval.benchmark import benchmark_cmd  # noqa: E402
 from rag_literature_rag.eval.commands import validate_gold_cmd  # noqa: E402
 from rag_literature_rag.eval.experimental_index import build_retrieval_index_cmd  # noqa: E402
+from rag_literature_rag.eval.fallback_repair import fallback_audit_cmd  # noqa: E402
+from rag_literature_rag.eval.performance_campaign import performance_campaign_cmd  # noqa: E402
 from rag_literature_rag.eval.pool_commands import (  # noqa: E402
     corpus_health_cmd,
     diagnostics_cmd,
@@ -50,6 +52,8 @@ eval_group.add_command(pool_cmd, name="pool")
 eval_group.add_command(judge_cmd, name="judge")
 eval_group.add_command(diagnostics_cmd, name="diagnostics")
 eval_group.add_command(corpus_health_cmd, name="corpus-health")
+eval_group.add_command(fallback_audit_cmd, name="fallback-audit")
+eval_group.add_command(performance_campaign_cmd, name="performance-campaign")
 eval_group.add_command(gen_gold_cmd, name="gen-gold")
 
 
@@ -332,14 +336,16 @@ def embed_indexes_cmd(as_json: bool) -> None:
         click.echo("No profile indexes built yet. Run: rag-literature-rag ingest --force --rebuild")
         return
 
-    click.echo(f"{'Profile':<22} {'Chunks':>8}  {'Dims':>5}  Model / path")
+    click.echo(f"{'Profile':<22} {'Chunks':>8} {'Parents':>8} {'Summaries':>9}  {'Dims':>5}  Model / path")
     for row in rows:
         model = row.get("embed_model") or "-"
         dims = row.get("embed_dims") or "-"
         chunks = row.get("chunks", 0)
+        parents = row.get("parents", 0)
+        summaries = row.get("summaries", 0)
         click.echo(
-            f"{row['profile']:<22} {chunks:>8}  {dims:>5}  {model}\n"
-            f"{'':22} {'':>8}        {row['path']}"
+            f"{row['profile']:<22} {chunks:>8} {parents:>8} {summaries:>9}  {dims:>5}  {model}\n"
+            f"{'':22} {'':>8} {'':>8} {'':>9}        {row['path']}"
         )
 
 
@@ -377,6 +383,11 @@ def embed_indexes_cmd(as_json: bool) -> None:
     help="Fuse BM25 lexical search with dense vectors.",
 )
 @click.option(
+    "--small-to-big",
+    is_flag=True,
+    help="Retrieve child chunks, aggregate to parent passages, and rank parent evidence.",
+)
+@click.option(
     "--expand",
     type=click.Choice(["off", "auto", "force"]),
     default="off",
@@ -397,6 +408,7 @@ def query_cmd(
     embed_profile: str | None,
     rerank: bool | None,
     hybrid: bool,
+    small_to_big: bool,
     expand: str,
     as_json: bool,
 ) -> None:
@@ -419,6 +431,7 @@ def query_cmd(
             embed_profile=embed_profile,
             rerank=rerank,
             hybrid=hybrid,
+            small_to_big=small_to_big,
             max_per_doc=max_per_doc,
             expand=expand,
         )

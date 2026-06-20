@@ -13,12 +13,27 @@ source "$(dirname "$0")/gpu_env.sh"
 echo "=== nvidia-smi ==="
 nvidia-smi
 
-echo "=== uv sync (retrieval-experiments-gpu) ==="
+extras=()
 if grep -q 'retrieval-experiments-gpu' pyproject.toml 2>/dev/null; then
-  uv sync --extra retrieval-experiments-gpu
+  extras+=(--extra retrieval-experiments-gpu)
+fi
+if grep -q 'docling' pyproject.toml 2>/dev/null \
+  && { [[ "${RAG_GPU_INSTALL_DOCLING:-0}" == "1" ]] || grep -Eq 'PDF_BACKEND=.*docling' .env 2>/dev/null; }; then
+  extras+=(--extra docling)
+fi
+
+echo "=== uv sync ${extras[*]:-(default)} ==="
+if [[ "${#extras[@]}" -gt 0 ]]; then
+  uv sync "${extras[@]}"
 else
   uv sync
   uv pip install accelerate bitsandbytes 2>/dev/null || true
+fi
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  # MLX is Apple-only. If installed in the Linux GPU venv, Transformers may
+  # detect it and fail later with libmlx.so import errors during Docling runs.
+  uv pip uninstall -y mlx mlx-audio mlx-embeddings mlx-lm mlx-vlm 2>/dev/null || true
 fi
 
 echo "=== PyTorch CUDA ==="

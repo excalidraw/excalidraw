@@ -112,6 +112,7 @@ class ExtractionTask:
     pdf_backend: str
     pipeline_categories: list[str]
     aliases: list[ManifestItem] | None = None
+    chunk_profile: str | None = None
 
 
 @dataclass
@@ -200,7 +201,7 @@ def _extract_pdf_task(task: ExtractionTask) -> ExtractionOutcome:
     sha256 = task.item.sha256 or ""
 
     # Cache hit: skip Docling/MuPDF entirely
-    cached = cache_get(sha256, task.pdf_backend) if sha256 else None
+    cached = cache_get(sha256, task.pdf_backend, task.chunk_profile) if sha256 else None
     if cached is not None:
         return ExtractionOutcome(
             task.item,
@@ -220,9 +221,10 @@ def _extract_pdf_task(task: ExtractionTask) -> ExtractionOutcome:
             alias_source_urls=sorted({item.url for item in aliases if item.url}),
             alias_dois=sorted({item.doi for item in aliases if item.doi}),
             canonical_sha256=sha256,
+            chunk_profile=task.chunk_profile,
         )
         if sha256:
-            cache_put(sha256, task.pdf_backend, chunks)
+            cache_put(sha256, task.pdf_backend, chunks, task.chunk_profile)
         return ExtractionOutcome(
             task.item,
             chunks,
@@ -272,6 +274,7 @@ def _iter_extraction_outcomes(
     state: dict,
     pdf_backend: str,
     extract_workers: int,
+    chunk_profile: str | None = None,
     stop_event: threading.Event | None = None,
 ) -> Iterator[ExtractionOutcome]:
     """Yield inline metadata and bounded, out-of-order PDF extraction outcomes."""
@@ -290,7 +293,13 @@ def _iter_extraction_outcomes(
             elif decision.kind == "metadata":
                 yield _metadata_outcome(item, decision.pipeline_categories)
             else:
-                task = ExtractionTask(item, pdf_backend, decision.pipeline_categories, document.aliases)
+                task = ExtractionTask(
+                    item,
+                    pdf_backend,
+                    decision.pipeline_categories,
+                    document.aliases,
+                    chunk_profile,
+                )
                 try:
                     yield _extract_pdf_task(task)
                 except Exception as exc:  # noqa: BLE001
@@ -317,7 +326,13 @@ def _iter_extraction_outcomes(
             elif decision.kind == "metadata":
                 yield _metadata_outcome(item, decision.pipeline_categories)
             else:
-                task = ExtractionTask(item, pdf_backend, decision.pipeline_categories, document.aliases)
+                task = ExtractionTask(
+                    item,
+                    pdf_backend,
+                    decision.pipeline_categories,
+                    document.aliases,
+                    chunk_profile,
+                )
                 pending[executor.submit(_extract_pdf_task, task)] = task
                 if len(pending) >= max_pending:
                     yield from _drain_one(pending, stop_event)
@@ -341,6 +356,7 @@ def _iter_queued_extraction_outcomes(
     queue_capacity: int,
     telemetry: ExtractionPipelineTelemetry,
     log: logging.Logger,
+    chunk_profile: str | None = None,
 ) -> Iterator[ExtractionOutcome]:
     """Run extraction in a producer thread and yield its bounded queued outcomes."""
     outcome_queue: queue.Queue[ExtractionOutcome | ProducerFailure | object] = queue.Queue(
@@ -385,6 +401,7 @@ def _iter_queued_extraction_outcomes(
                 force=force,
                 state=state,
                 pdf_backend=pdf_backend,
+                chunk_profile=chunk_profile,
                 extract_workers=extract_workers,
                 stop_event=stop_event,
             ):
@@ -456,7 +473,7 @@ def _execute_ingest(
     index_paths = profile_index_paths(index_slug)
     state = load_ingest_state(index_paths)
     stats = EmbedStats()
-    fingerprint = chunking_fingerprint()
+    fingerprint = chunking_fingerprint(cfg.profile)
 
     if rebuild:
         clear_doc_entries(state)
@@ -747,6 +764,7 @@ def _execute_ingest(
         force=force,
         state=state,
         pdf_backend=pdf_backend,
+        chunk_profile=cfg.profile,
         extract_workers=extract_workers,
         queue_capacity=extract_queue_docs,
         telemetry=pipeline_telemetry,

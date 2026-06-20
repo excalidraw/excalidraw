@@ -19,6 +19,21 @@ def default_pdf_backend() -> str:
     return backend if backend in PDF_BACKENDS else "pymupdf"
 
 
+def extraction_cache_options(backend: str) -> dict[str, object]:
+    """Options that affect extracted page text and must partition the page cache."""
+    if backend == "docling":
+        return {
+            "ocr": os.getenv("RAG_LIT_DOCLING_OCR", "false").strip().lower(),
+            "tables": os.getenv("RAG_LIT_DOCLING_TABLES", "true").strip().lower(),
+        }
+    if backend == "gemini":
+        return {
+            "model": os.getenv("RAG_LIT_GEMINI_VISION_MODEL", "gemini-3.1-pro-preview").strip(),
+            "dpi": os.getenv("RAG_LIT_GEMINI_VISION_DPI", "200").strip(),
+        }
+    return {}
+
+
 @dataclass
 class PageText:
     page: int

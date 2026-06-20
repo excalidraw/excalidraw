@@ -1,6 +1,6 @@
-# Graph Layout RAG — Architecture Handoff
+# RAG Literature RAG - Architecture Handoff
 
-Agent-oriented reference for the graph-drawing literature RAG tool at `tools/rag-literature-rag/`. Covers harvest, PDF extraction, ingestion, hybrid query, retrieval evaluation, catalog classification, testing, and operational constraints.
+Agent-oriented reference for the RAG methodology literature tool at `tools/rag-literature-rag/`. Covers harvest, PDF extraction, ingestion, hybrid query, retrieval evaluation, catalog classification, testing, and operational constraints.
 
 **Related docs:**
 
@@ -35,7 +35,7 @@ Agent-oriented reference for the graph-drawing literature RAG tool at `tools/rag
 
 ### What this tool does
 
-Graph-layout-rag builds a **local research corpus** of graph drawing and layout theory papers (Graphviz dot/neato, Sugiyama layering, compound graphs, stress majorization, ELK/Mermaid/dagre, VLSI compaction, etc.) and exposes it via **hybrid vector + lexical search**.
+RAG-literature-rag builds a **local research corpus** of retrieval-augmented generation methodology papers (foundations, dense retrieval, hybrid retrieval, chunking, query expansion, reranking, GraphRAG, agentic RAG, and evaluation) and exposes it via **hybrid vector + lexical search**.
 
 The pipeline has three phases:
 
@@ -283,9 +283,9 @@ class Manifest(BaseModel):
   "url": "https://doi.org/10.5555/304094.304095",
   "localPath": null,
   "status": "metadata_only",
-  "tags": ["handbook", "graph-drawing"],
+  "tags": ["foundations", "survey"],
   "doi": "10.5555/304094.304095",
-  "abstract": "Comprehensive textbook on graph drawing algorithms."
+  "abstract": "Comprehensive survey of retrieval-augmented generation methods."
 }
 ```
 
@@ -308,7 +308,7 @@ class Manifest(BaseModel):
 
 ## 4. Harvest subsystem
 
-**Entry:** `harvest/run.py` (CLI group registered in `cli.py`) **Purpose:** Discover graph-drawing literature, download open-access PDFs, build `manifest.json`.
+**Entry:** `harvest/run.py` (CLI group registered in `cli.py`) **Purpose:** Discover RAG methodology literature, download open-access PDFs, build `manifest.json`.
 
 ### 4.1 CLI surface
 
@@ -449,7 +449,7 @@ Discovery sources run concurrently within each pass (see §4.3). Each module ret
 | --- | --- | --- | --- |
 | `crossref.py` | `harvest_crossref` | `crossref` | Venue queries (JGAA, CGTA, GD, LIPIcs; visualization: TVCG/CGF/InfoVis/PacificVis; VLSI CAD: TCAD/DAC/ICCAD/ISPD) via Crossref API; broad journals strict-gated; DOI resolve + download |
 | `trusted_venues.py` | `harvest_trusted_venues` | `drops`, `jgaa` | Complete GD 2024/2025 DROPS schema.org records, strict relevant SoCG records, and paginated JGAA archive PDFs; incremental per-volume/issue checkpoint |
-| `openalex.py` | `harvest_openalex` | `openalex` | Topic queries + graph-drawing concept filter `C41217795`; cursor pagination; relevance filter |
+| `openalex.py` | `harvest_openalex` | `openalex` | RAG methodology topic queries; cursor pagination; relevance filter |
 | `arxiv.py` | `harvest_arxiv` | `arxiv` | 12 queries in cs.CG/DS/GR; Atom API; 0.5s delay |
 | `arxiv_bulk.py` | `harvest_arxiv_category` | `arxiv` | Deep pagination of entire **cs.CG** category; strict layout gate (complements keyword search) |
 | `dblp.py` | `harvest_dblp` | `dblp` | 14 queries; JSON API with 429 backoff |
@@ -657,7 +657,7 @@ JSON at `data/harvest_checkpoint.json`.
 
 **`tags_inference.py`:**
 
-- `infer_harvest_tags(title, abstract, existing)` — adds `bibliography`, `graph-drawing`, pipeline categories from keywords
+- `infer_harvest_tags(title, abstract, existing)` — removes stale graph-layout tags, adds `bibliography`, and infers RAG categories from keywords
 
 ### 4.14 Verify step (`verify.py`)
 

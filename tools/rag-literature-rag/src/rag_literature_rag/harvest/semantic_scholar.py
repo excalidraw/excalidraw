@@ -1,4 +1,4 @@
-"""Harvest graph layout papers from Semantic Scholar search API."""
+"""Harvest RAG / retrieval papers from Semantic Scholar search API."""
 
 from __future__ import annotations
 
@@ -14,21 +14,21 @@ S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"
 USER_AGENT = "excalidraw-tf-rag-literature-rag/0.1"
 
 SEARCH_QUERIES = [
-    "layered graph drawing Sugiyama",
-    "hierarchical graph layout crossing minimization",
-    "force directed graph drawing stress majorization",
-    "compound graph layout clustering",
-    "orthogonal graph drawing planar",
-    "graph layout port constraints",
-    "dag layout rank assignment",
-    "node link diagram layout algorithm",
-    "ELK eclipse layout layered",
-    "graph drawing visualization layout",
-    "network simplex graph layering",
-    "Brandes Köpf coordinate assignment",
-    "Purchase aesthetic graph drawing",
-    "minimum width graph layering",
-    "edge bundling graph visualization",
+    "retrieval augmented generation",
+    "dense passage retrieval open domain question answering",
+    "hybrid dense sparse retrieval reciprocal rank fusion",
+    "HyDE hypothetical document embeddings",
+    "multi query retrieval augmented generation",
+    "Self-RAG reflection tokens",
+    "corrective retrieval augmented generation CRAG",
+    "GraphRAG knowledge graph retrieval augmented generation",
+    "RAG evaluation benchmark faithfulness context relevance",
+    "RAGAS retrieval augmented generation evaluation",
+    "ColBERT late interaction retrieval",
+    "RAPTOR hierarchical retrieval augmented generation",
+    "agentic retrieval augmented generation",
+    "query rewriting retrieve read retrieval augmented",
+    "contextual retrieval chunk embeddings",
 ]
 
 
@@ -65,7 +65,7 @@ def _paper_to_item(paper: dict) -> ManifestItem:
         localPath=f"data/raw/pdf/{doc_id}.pdf" if pdf_url else None,
         contentType="application/pdf" if pdf_url else "text/metadata",
         status="metadata_only" if not pdf_url else "failed",
-        tags=["semantic-scholar", "graph-drawing"],
+        tags=["semantic-scholar", "rag-literature"],
         doi=doi,
         abstract=(paper.get("abstract") or "")[:4000] or None,
     )

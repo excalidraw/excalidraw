@@ -26,7 +26,7 @@ GRAPHVIZ_KNOWN_PDFS = [
         "authors": ["Matuszewski", "Schönfeld", "Molitor"],
         "year": 1999,
         "url": "https://link.springer.com/content/pdf/10.1007/3-540-46648-7_22.pdf",
-        "tags": ["layered", "hierarchical", "crossing", "sugiyama", "graph-drawing"],
+        "tags": ["layered", "hierarchical", "crossing", "sugiyama"],
         "source": "springer",
         "doi": "10.1007/3-540-46648-7_22",
     },

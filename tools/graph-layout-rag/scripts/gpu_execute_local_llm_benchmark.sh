@@ -17,6 +17,7 @@ SSH_HOST="${GRAPH_RAG_GPU_SSH:-desktop}"
 REMOTE_ROOT="${GRAPH_RAG_GPU_REMOTE_ROOT:-excalidraw-tf}"
 REMOTE="${SSH_HOST}:~/${REMOTE_ROOT}"
 PROFILE="${RAG_EMBED_PROFILE:-cuda-qwen0.6b-1024}"
+LOCAL_LLM_MODELS="${RAG_LOCAL_LLM_MODELS:-gemma4:e4b}"
 RAG_COMMON="$(cd "${ROOT}/../rag-common" && pwd)"
 
 echo "=== Sync repo + cuda index + qrels to ${SSH_HOST} ==="
@@ -58,27 +59,62 @@ rsync -avz --progress \
   "${REMOTE}/tools/graph-layout-rag/data/eval/qrels/" 2>/dev/null || true
 
 echo "=== Remote bootstrap + local LLM benchmark (tmux) ==="
-ssh "${SSH_HOST}" bash -lc "
-  set -euo pipefail
-  export PATH=\"\${HOME}/.local/bin:\${PATH}\"
-  cd ~/${REMOTE_ROOT}/tools/graph-layout-rag
-  chmod +x scripts/gpu_*.sh
-  ./scripts/gpu_remote_bootstrap.sh
-  export RAG_EMBED_PROFILE=${PROFILE}
-  export RAG_LOCAL_EMBED_DEVICE=cuda
-  export GRAPH_RAG_ENCODE_DEVICE=cuda
-  export RAG_OLLAMA_HOST=http://127.0.0.1:11434
-  tmux kill-session -t graphrag-local-llm 2>/dev/null || true
-  tmux new-session -d -s graphrag-local-llm \
-    'export PATH=\"\${HOME}/.local/bin:\${PATH}\"; cd ~/${REMOTE_ROOT}/tools/graph-layout-rag; \
-     ulimit -n 65536; source scripts/gpu_env.sh; \
-     export RAG_EMBED_PROFILE=${PROFILE} RAG_LOCAL_EMBED_DEVICE=cuda GRAPH_RAG_ENCODE_DEVICE=cuda; \
-     export RAG_OLLAMA_HOST=http://127.0.0.1:11434; \
-     ./scripts/gpu_local_llm_benchmark.sh; \
-     echo LOCAL_LLM_PIPELINE_DONE >> data/eval/local_llm_benchmark.log'
-  echo \"Started tmux session graphrag-local-llm. Tail: ssh ${SSH_HOST} tmux attach -t graphrag-local-llm\"
-"
+ssh "${SSH_HOST}" env PROFILE="${PROFILE}" LOCAL_LLM_MODELS="${LOCAL_LLM_MODELS}" REMOTE_ROOT="${REMOTE_ROOT}" bash -s <<'REMOTE'
+set -euo pipefail
+export PATH="${HOME}/.local/bin:${PATH}"
+cd "${HOME}/${REMOTE_ROOT}/tools/graph-layout-rag"
+chmod +x scripts/gpu_*.sh
+./scripts/gpu_remote_bootstrap.sh
+export RAG_EMBED_PROFILE="${PROFILE}"
+export RAG_LOCAL_EMBED_DEVICE=cuda
+export GRAPH_RAG_ENCODE_DEVICE=cuda
+export RAG_OLLAMA_HOST=http://127.0.0.1:11434
+export RAG_LOCAL_LLM_MODELS="${LOCAL_LLM_MODELS}"
+mkdir -p data/eval
+cat > data/eval/run-local-llm-job.sh <<'JOB'
+#!/usr/bin/env bash
+set -euo pipefail
+export PATH="${HOME}/.local/bin:${PATH}"
+cd "${HOME}/${REMOTE_ROOT}/tools/graph-layout-rag"
+ulimit -n 65536
+source scripts/gpu_env.sh
+export RAG_EMBED_PROFILE="${PROFILE}"
+export RAG_LOCAL_EMBED_DEVICE=cuda
+export GRAPH_RAG_ENCODE_DEVICE=cuda
+export RAG_OLLAMA_HOST=http://127.0.0.1:11434
+export RAG_LOCAL_LLM_MODELS="${LOCAL_LLM_MODELS}"
+mkdir -p data/eval/runs
+gpu_log="data/eval/runs/$(date -u +%Y%m%dT%H%M%SZ)-local-llm-nvidia-smi.csv"
+( while true; do
+    nvidia-smi --query-gpu=timestamp,name,utilization.gpu,memory.used,memory.total,power.draw \
+      --format=csv,noheader,nounits >> "${gpu_log}" 2>/dev/null || true
+    sleep 30
+  done ) &
+smi_pid=$!
+cleanup() { kill "${smi_pid}" 2>/dev/null || true; wait "${smi_pid}" 2>/dev/null || true; }
+trap cleanup EXIT
+status=0
+: > data/eval/local_llm_benchmark.log
+./scripts/gpu_local_llm_benchmark.sh 2>&1 | tee -a data/eval/local_llm_benchmark.log || status=$?
+echo "${status}" > data/eval/local_llm_benchmark.exitcode
+if [[ "${status}" -eq 0 ]]; then
+  echo DONE > data/eval/local_llm_benchmark.sentinel
+  echo LOCAL_LLM_PIPELINE_DONE >> data/eval/local_llm_benchmark.log
+else
+  echo FAILED > data/eval/local_llm_benchmark.sentinel
+  echo LOCAL_LLM_PIPELINE_FAILED >> data/eval/local_llm_benchmark.log
+fi
+grep -Ei 'CUDA out of memory|Killed|Traceback|segmentation|worker exited|memory_aborted' \
+  data/eval/local_llm_benchmark.log > data/eval/local_llm_benchmark.crashes 2>/dev/null || true
+exit "${status}"
+JOB
+chmod +x data/eval/run-local-llm-job.sh
+tmux kill-session -t graphrag-local-llm 2>/dev/null || true
+tmux new-session -d -s graphrag-local-llm \
+  "env REMOTE_ROOT='${REMOTE_ROOT}' PROFILE='${PROFILE}' LOCAL_LLM_MODELS='${LOCAL_LLM_MODELS}' bash data/eval/run-local-llm-job.sh"
+echo "Started tmux session graphrag-local-llm. Tail: tmux attach -t graphrag-local-llm"
+REMOTE
 
 echo "=== Pull results when finished ==="
-echo "  ssh ${SSH_HOST} 'grep LOCAL_LLM_BENCHMARK_DONE ~/${REMOTE_ROOT}/tools/graph-layout-rag/data/eval/local_llm_benchmark.log'"
+echo "  ssh ${SSH_HOST} 'cat ~/${REMOTE_ROOT}/tools/graph-layout-rag/data/eval/local_llm_benchmark.sentinel'"
 echo "  ./scripts/gpu_sync_from_remote.sh"

@@ -63,3 +63,61 @@ backend = "local"
 model = "Qwen/Qwen3-Embedding-0.6B"
 dimensions = 1024
 quant = "4bit"
+
+# Same Qwen3-0.6B CUDA embedding stack as cuda-qwen0.6b-1024, with indexed
+# text enriched by document/section metadata before embedding and BM25.
+[profiles."cuda-qwen0.6b-section-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+# Qwen3-0.6B CUDA dimension sweep profiles. Chunking stays identical to the
+# baseline; only the embedding output dimension changes.
+[profiles."cuda-qwen0.6b-512-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 512
+quant = "4bit"
+
+[profiles."cuda-qwen0.6b-768-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 768
+quant = "4bit"
+
+# Same Qwen3-0.6B CUDA embedding stack, plus local-LLM contextual retrieval.
+[profiles."cuda-qwen0.6b-contextual-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+# Same Qwen3-0.6B CUDA embedding stack, using smaller child chunks for a
+# small-to-big retrieval probe while preserving document/section metadata.
+[profiles."cuda-qwen0.6b-small2big-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+# Same Qwen3-0.6B CUDA embedding stack, using larger section/page-span
+# retrieval units for the LongRAG/larger-context campaign probe.
+[profiles."cuda-qwen0.6b-longrag-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+# CUDA dense embed quality probes on the Ubuntu GPU box: Qwen3-4B in 4-bit.
+[profiles."cuda-qwen4b-1024"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 1024
+quant = "4bit"
+
+[profiles."cuda-qwen4b-2560"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 2560
+quant = "4bit"

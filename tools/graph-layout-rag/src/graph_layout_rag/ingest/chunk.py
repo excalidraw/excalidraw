@@ -25,20 +25,63 @@ _FORMULA_RE = re.compile(r"^\s*\$\$\s*$")
 _SENTENCE_RE = re.compile(r"(?<=[.!?])(?:[\"')\]]*)\s+")
 
 
+@dataclass(frozen=True)
+class ChunkLimits:
+    variant: str
+    target_tokens: int
+    max_tokens: int
+    min_preferred_tokens: int
+    overlap_tokens: int
+
+
+DEFAULT_LIMITS = ChunkLimits(
+    "default",
+    TARGET_TOKENS,
+    MAX_TOKENS,
+    MIN_PREFERRED_TOKENS,
+    OVERLAP_TOKENS,
+)
+SMALL2BIG_LIMITS = ChunkLimits(
+    "small2big-v1",
+    350,
+    550,
+    120,
+    80,
+)
+
+
+def chunk_profile_variant(profile: str | None = None) -> str:
+    if profile and "small2big" in profile:
+        return SMALL2BIG_LIMITS.variant
+    return DEFAULT_LIMITS.variant
+
+
+def _limits_for_profile(profile: str | None = None) -> ChunkLimits:
+    return SMALL2BIG_LIMITS if chunk_profile_variant(profile) == SMALL2BIG_LIMITS.variant else DEFAULT_LIMITS
+
+
+def is_section_enriched_profile(profile: str | None = None) -> bool:
+    return bool(profile and "section-v1" in profile)
+
+
 def estimate_tokens(text: str) -> int:
     """Fast, deterministic estimate suitable for chunk-size enforcement."""
     return max(1, math.ceil(len(text) / 4)) if text else 0
 
 
-def chunking_fingerprint() -> dict[str, object]:
-    return {
+def chunking_fingerprint(profile: str | None = None) -> dict[str, object]:
+    limits = _limits_for_profile(profile)
+    fingerprint: dict[str, object] = {
         "strategy": CHUNK_STRATEGY,
-        "target_tokens": TARGET_TOKENS,
-        "max_tokens": MAX_TOKENS,
-        "min_preferred_tokens": MIN_PREFERRED_TOKENS,
-        "overlap_tokens": OVERLAP_TOKENS,
+        "target_tokens": limits.target_tokens,
+        "max_tokens": limits.max_tokens,
+        "min_preferred_tokens": limits.min_preferred_tokens,
+        "overlap_tokens": limits.overlap_tokens,
         "deduplication_version": DEDUPLICATION_VERSION,
     }
+    if limits.variant != DEFAULT_LIMITS.variant:
+        fingerprint["variant"] = limits.variant
+    return fingerprint
 
 
 @dataclass
@@ -90,6 +133,30 @@ def embed_body_text(chunk: TextChunk) -> str:
     """Embedding-2 body; title is supplied separately by the task formatter."""
     header = _topics_tags_header(chunk)
     return f"{header}---\n{chunk.text}" if header else chunk.text
+
+
+def enrich_texts_for_section(chunks: list[TextChunk], texts: list[str]) -> list[str]:
+    enriched: list[str] = []
+    for chunk, text in zip(chunks, texts):
+        lines = [f"Document: {chunk.title}"]
+        if chunk.year:
+            lines.append(f"Year: {chunk.year}")
+        if chunk.authors:
+            lines.append(f"Authors: {', '.join(chunk.authors[:8])}")
+        if chunk.source_url:
+            lines.append(f"Source URL: {chunk.source_url}")
+        if chunk.section_path:
+            lines.append(f"Section path: {chunk.section_path}")
+        if chunk.pipeline_categories:
+            lines.append(f"Categories: {', '.join(chunk.pipeline_categories)}")
+        if chunk.tags:
+            lines.append(f"Tags: {', '.join(chunk.tags)}")
+        if chunk.alias_doc_ids:
+            lines.append(f"Alias doc IDs: {', '.join(chunk.alias_doc_ids[:8])}")
+        if chunk.alias_dois:
+            lines.append(f"Alias DOIs: {', '.join(chunk.alias_dois[:8])}")
+        enriched.append("\n".join(lines) + "\n---\n" + text)
+    return enriched
 
 
 def _make_chunk(
@@ -213,11 +280,12 @@ def parse_markdown_blocks(pages: list[PageText]) -> list[StructuralBlock]:
 def _pack_units(
     units: list[str],
     *,
+    max_tokens: int,
     prefix: str = "",
     suffix: str = "",
     separator: str = "\n",
 ) -> list[str]:
-    max_chars = MAX_TOKENS * 4
+    max_chars = max_tokens * 4
     out: list[str] = []
     current: list[str] = []
     for unit in units:
@@ -235,23 +303,28 @@ def _pack_units(
     return out
 
 
-def _split_block(block: StructuralBlock) -> list[StructuralBlock]:
-    if estimate_tokens(block.text) <= MAX_TOKENS:
+def _split_block(block: StructuralBlock, *, max_tokens: int) -> list[StructuralBlock]:
+    if estimate_tokens(block.text) <= max_tokens:
         return [block]
     if block.kind == "table":
         lines = block.text.splitlines()
         header = lines[:2]
-        pieces = _pack_units(lines[2:], prefix="\n".join(header) + "\n")
+        pieces = _pack_units(lines[2:], max_tokens=max_tokens, prefix="\n".join(header) + "\n")
     elif block.kind in {"code", "formula"}:
         lines = block.text.splitlines()
         prefix = lines[0] + "\n" if len(lines) > 1 else ""
         suffix = "\n" + lines[-1] if len(lines) > 2 else ""
-        pieces = _pack_units(lines[1:-1] if len(lines) > 2 else lines, prefix=prefix, suffix=suffix)
+        pieces = _pack_units(
+            lines[1:-1] if len(lines) > 2 else lines,
+            max_tokens=max_tokens,
+            prefix=prefix,
+            suffix=suffix,
+        )
     elif block.kind == "list":
-        pieces = _pack_units(block.text.splitlines())
+        pieces = _pack_units(block.text.splitlines(), max_tokens=max_tokens)
     else:
         sentences = [s.strip() for s in _SENTENCE_RE.split(block.text) if s.strip()]
-        pieces = _pack_units(sentences, separator=" ")
+        pieces = _pack_units(sentences, max_tokens=max_tokens, separator=" ")
     return [
         StructuralBlock(block.kind, piece, block.page, block.page_end, block.section_path)
         for piece in pieces
@@ -259,33 +332,38 @@ def _split_block(block: StructuralBlock) -> list[StructuralBlock]:
     ]
 
 
-def _trailing_paragraph(blocks: list[StructuralBlock]) -> StructuralBlock | None:
+def _trailing_paragraph(blocks: list[StructuralBlock], *, overlap_tokens: int) -> StructuralBlock | None:
     for block in reversed(blocks):
-        if block.kind == "paragraph" and estimate_tokens(block.text) <= OVERLAP_TOKENS:
+        if block.kind == "paragraph" and estimate_tokens(block.text) <= overlap_tokens:
             return block
     return None
 
 
-def _assemble_blocks(blocks: list[StructuralBlock]) -> list[list[StructuralBlock]]:
-    expanded = [part for block in blocks for part in _split_block(block)]
+def _assemble_blocks(
+    blocks: list[StructuralBlock],
+    *,
+    chunk_profile: str | None = None,
+) -> list[list[StructuralBlock]]:
+    limits = _limits_for_profile(chunk_profile)
+    expanded = [part for block in blocks for part in _split_block(block, max_tokens=limits.max_tokens)]
     groups: list[list[StructuralBlock]] = []
     current: list[StructuralBlock] = []
     for block in expanded:
         candidate = "\n\n".join([*(b.text for b in current), block.text])
-        if current and estimate_tokens(candidate) > MAX_TOKENS:
+        if current and estimate_tokens(candidate) > limits.max_tokens:
             groups.append(current)
-            overlap = _trailing_paragraph(current)
+            overlap = _trailing_paragraph(current, overlap_tokens=limits.overlap_tokens)
             current = [overlap, block] if overlap and overlap is not block else [block]
         else:
             current.append(block)
-        if current and estimate_tokens("\n\n".join(b.text for b in current)) >= TARGET_TOKENS:
+        if current and estimate_tokens("\n\n".join(b.text for b in current)) >= limits.target_tokens:
             groups.append(current)
-            overlap = _trailing_paragraph(current)
+            overlap = _trailing_paragraph(current, overlap_tokens=limits.overlap_tokens)
             current = [overlap] if overlap else []
     if current:
-        if groups and estimate_tokens("\n\n".join(b.text for b in current)) < MIN_PREFERRED_TOKENS:
+        if groups and estimate_tokens("\n\n".join(b.text for b in current)) < limits.min_preferred_tokens:
             merged = "\n\n".join(b.text for b in [*groups[-1], *current])
-            if estimate_tokens(merged) <= MAX_TOKENS:
+            if estimate_tokens(merged) <= limits.max_tokens:
                 groups[-1].extend(current)
             else:
                 groups.append(current)
@@ -303,9 +381,10 @@ def chunk_pages(
     alias_source_urls: list[str] | None = None,
     alias_dois: list[str] | None = None,
     canonical_sha256: str | None = None,
+    chunk_profile: str | None = None,
 ) -> list[TextChunk]:
     cats = pipeline_categories or []
-    groups = _assemble_blocks(parse_markdown_blocks(pages))
+    groups = _assemble_blocks(parse_markdown_blocks(pages), chunk_profile=chunk_profile)
     chunks: list[TextChunk] = []
     for idx, group in enumerate(groups):
         text = "\n\n".join(block.text for block in group)

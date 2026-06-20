@@ -5,7 +5,10 @@ export PATH="${HOME}/.local/bin:${PATH}"
 
 if [[ -z "${RAG_GPU_TOOL_ROOT:-}" ]]; then
   _script_dir="$(cd "$(dirname "${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}")" && pwd)"
-  if [[ "${_script_dir}" == */rag-common/scripts ]]; then
+  _cwd="$(pwd)"
+  if [[ -f "${_cwd}/pyproject.toml" && -d "${_cwd}/.venv" ]]; then
+    RAG_GPU_TOOL_ROOT="${_cwd}"
+  elif [[ "${_script_dir}" == */rag-common/scripts ]]; then
     RAG_GPU_TOOL_ROOT="$(cd "${_script_dir}/../../graph-layout-rag" && pwd)"
   else
     RAG_GPU_TOOL_ROOT="$(cd "${_script_dir}/.." && pwd)"
@@ -17,7 +20,7 @@ _site="${RAG_GPU_TOOL_ROOT}/.venv/lib/python${_pyver}/site-packages"
 if [[ -d "${_site}/nvidia" ]]; then
   _cuda_paths=""
   for _libdir in "${_site}"/nvidia/*/lib; do
-    if [[ -d "${_libdir}" && "${_libdir}" != *"/cu13/lib" ]]; then
+    if [[ -d "${_libdir}" ]]; then
       _cuda_paths="${_cuda_paths:+${_cuda_paths}:}${_libdir}"
     fi
   done

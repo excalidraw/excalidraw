@@ -3,121 +3,51 @@ name: rag-literature-rag
 description: Query the local RAG methodology research corpus. Use when designing repo-rag/graph-layout-rag, choosing chunking or hybrid retrieval, researching Self-RAG, GraphRAG, agentic RAG, RAG evaluation, or reading full PDFs from the literature index.
 ---
 
-# RAG literature RAG
+# RAG Literature RAG
 
-Local hybrid search over core retrieval-augmented generation papers. **Production query profile:** `cuda-qwen0.6b-1024`. **Secondary build:** `gemini-2-structure-v1` (Gemini Embedding 2 @ 3072, Docling, structure-aware chunks).
+Local hybrid search over retrieval-augmented generation papers. Use it before changing RAG architecture, chunking, retrieval, query expansion, evaluation, or agentic search behavior.
 
-## When to use
+Use `repo-rag` for project source lookup and `graph-layout-rag` for graph drawing/layout literature.
 
-- Choosing **hybrid vs dense-only** retrieval, chunking strategy, or query expansion (HyDE, multi-query)
-- **Self-RAG / CRAG / agentic RAG** design decisions
-- **GraphRAG** vs vector-only RAG tradeoffs
-- **RAG evaluation** (RAGAS, pooling bias, multi-system qrels)
-- Finding primary sources before changing `tools/repo-rag` or `tools/graph-layout-rag`
-
-## Agent workflow
-
-```
-1. Search     → yarn rag-lit:query "…" --top 8 --json
-2. Shortlist  → canonical papers by score; read evidence passages
-3. Deep read  → full PDF via doc_id from manifest
-4. Cite       → yarn rag-lit:cite related <doc_id> (citation graph)
-```
-
-## Commands (repo root)
+## First Commands
 
 ```bash
-cd tools/rag-literature-rag && uv sync && cp .env.example .env
-
-yarn rag-lit:harvest -- --deep-harvest --target-pdfs 1000 --resume -v
-yarn rag-lit:ingest -- --force --rebuild
 yarn rag-lit:query "Self-RAG reflection tokens" --tag self-correcting --json
+yarn rag-lit:query "reciprocal rank fusion hybrid retrieval" --category hybrid-retrieval --json
 yarn rag-lit:catalog --category graphrag
+cd tools/rag-literature-rag && uv run rag-literature-rag query "HyDE hypothetical document embeddings" --top 8 --json
 ```
 
-Direct CLI:
+Query returns canonical paper results with evidence snippets. Deep-read the PDF before quoting or making architecture decisions.
+
+## Agent Workflow
+
+1. Search with `yarn rag-lit:query "<topic>" --top 8 --json`.
+2. Shortlist canonical papers by title, score, category, tags, and evidence.
+3. Read full PDFs through the manifest entry for the selected `doc_id`.
+4. Use `yarn rag-lit:cite related <doc_id>` when citation-neighborhood expansion matters.
+5. Cite report links or paper metadata when documenting decisions.
+
+## Setup And Profiles
+
+Production query profile is `cuda-qwen0.6b-1024`, with `gemini-2-structure-v1` as the secondary cloud build. Indexes live under `tools/rag-literature-rag/data/indexes/{profile}/`.
 
 ```bash
 cd tools/rag-literature-rag
-uv run rag-literature-rag query "HyDE hypothetical document embeddings" --top 8 --json
-uv run rag-literature-rag ingest -v            # resume incremental ingest
+uv sync
+cp .env.example .env
 uv run rag-literature-rag embed profiles
 ```
 
-## Ingest
+Detailed ingest, harvest, eval, synthetic gold, quality campaign, and troubleshooting notes live in:
 
-Checkpointing: resume with `ingest -v` (no `--force`). Use `--force --rebuild` only for first build or embed model change.
+- [references/operations.md](references/operations.md)
+- [references/evaluation.md](references/evaluation.md)
+- [references/campaigns.md](references/campaigns.md)
 
-| Profile | Use when |
-|---------|----------|
-| `cuda-qwen0.6b-1024` | **Production query** — GPU reembed from gemini secondary |
-| `gemini-2-structure-v1` | Secondary cloud build @ 3072 |
-| `openai-large` | Fast cloud one-time ingest |
-| `mlx-qwen4b` | Free local Apple Silicon ingest |
-
-Set `RAG_EMBED_PROFILE=cuda-qwen0.6b-1024` in `.env`. Query and ingest profiles must match the index you built.
-
-GPU reembed: `RAG_GPU_TOOL=tools/rag-literature-rag tools/rag-literature-rag/scripts/gpu_dense_reembed.sh`
-
-**Do not query or benchmark during ingest** on a 24 GB Mac.
-
-## Harvest
+## Validation
 
 ```bash
-uv run rag-literature-rag harvest --deep-harvest --target-pdfs 1000 --workers 32 --resume -v
-uv run rag-literature-rag harvest verify
-uv run rag-literature-rag harvest enrich
+cd tools/rag-literature-rag && uv run pytest tests/test_chunk_profiles.py tests/test_contextual.py tests/test_corpus_health.py tests/test_ingest_run.py tests/test_query_transforms.py
+cd tools/rag-literature-rag && uv run rag-literature-rag --help
 ```
-
-| Flag | Purpose |
-|------|---------|
-| `--deep-harvest` | Caps tuned for ~1k PDF core corpus |
-| `--target-pdfs 1000` | Stop when ok PDF count reaches N |
-| `--resume` | Skip early seed stages |
-| `--pipeline-harvest` | OpenAlex core topics only (skip broad discovery) |
-
-## Query
-
-Default: **hybrid** (dense + BM25 + RRF k=20). Do not add `--rerank` by default.
-
-```bash
-uv run rag-literature-rag query "reciprocal rank fusion hybrid retrieval" --category hybrid-retrieval --json
-```
-
-Categories: `foundations`, `dense-retrieval`, `graphrag`, `agentic`, `evaluation`, `engineering`, `survey`, … (see README).
-
-## Eval
-
-```bash
-uv run rag-literature-rag eval corpus-health --embed-profile gemini-2-structure-v1  # read-only, no LLM
-uv run rag-literature-rag eval validate-gold --json
-uv run rag-literature-rag eval pool --track catalog --system bm25 --system dense --system hybrid
-uv run rag-literature-rag eval judge --track catalog
-uv run rag-literature-rag eval benchmark --embed-profile gemini-2-structure-v1 --qrels data/eval/qrels/catalog/qrels.json --report
-uv run rag-literature-rag eval diagnostics --track catalog --embed-profile gemini-2-structure-v1 --qrels data/eval/qrels/catalog/qrels.json
-```
-
-Never expand gold labels from a single retriever (pooling bias). Use multi-system pool + LLM judge, and judge wins on `eval diagnostics` (hole_rate@k / bpref), not raw nDCG.
-
-### Synthetic gold expansion (`eval gen-gold`)
-
-The 42-case curated set **cannot distinguish retrieval methods** (they cluster in a ~0.11 nDCG band). To make the eval discriminate, generate a large stratified synthetic gold set: system-blind Flash queries grounded in corpus docs, anti-leakage + de-dup filtered, then the existing pool→judge pipeline. Opt-in via `RAG_LIT_SYNTH_GOLD=1`; curated-42 stays the default.
-
-```bash
-uv run rag-literature-rag eval gen-gold --embed-profile gemini-2-structure-v1 \
-  --n-catalog 300 --n-pdf 200 --hard-frac 0.2 --budget-usd 12 -v   # ~$10 flash, budget-gated
-uv run python scripts/synth_separation_report.py                    # curated-vs-synthetic spread + Spearman
-```
-
-### Established results (do not re-litigate — see `docs/eval-findings.md`)
-
-- **Quality is data/measurement-bound, not algorithm-bound.** Biggest win was the full-text extraction fix (+0.23 nDCG, ~10× chunks), not any retriever.
-- **Method ranking is stable:** dense ≈ hybrid_dense2 lead, hybrid close, **bm25 trails**. Reranking, citation fusion, multi_query, ColBERT/SPLADE-v3 all **lose**; HyDE only +0.02. Default stays **hybrid**.
-- On 531 synthetic cases the method spread widens **3.5–4×**, agrees with the human anchor (Spearman 0.83–0.94), pooling-unbiased (hole@10 = 0). `hybrid_category` overfits the 42 (0.35 vs 0.63) — a strategy the small set hid.
-- **Quota:** `gemini-3.5-flash` is global-endpoint-only under Dynamic Shared Quota — no per-project limit to raise, regional round-robin can't work; ~24 judge workers is the clean ceiling.
-
-## Paths
-
-- Manifest: `tools/rag-literature-rag/data/manifest.json`
-- Indexes: `tools/rag-literature-rag/data/indexes/{profile}/`
-- Skill sibling: [graph-layout-rag](../graph-layout-rag/SKILL.md) for graph-drawing corpus

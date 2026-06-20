@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from rag_literature_rag.ingest import run
+from rag_literature_rag.ingest import extract_cache
 from rag_literature_rag.ingest.extract import PageText
 from rag_literature_rag.ingest.status import load_status
 from rag_literature_rag.manifest import Manifest, ManifestItem
@@ -77,6 +78,43 @@ def test_extract_pdf_task_chunks_and_falls_back(tmp_path, monkeypatch):
     assert fallback.reason == "empty_pdf_metadata_fallback"
     assert fallback.chunks[0].text.startswith("Title pdf")
     assert fallback.elapsed_seconds is not None
+
+
+def test_extract_pdf_task_reuses_page_cache_across_chunk_profiles(tmp_path, monkeypatch):
+    monkeypatch.setattr(extract_cache, "_CACHE_DIR", tmp_path / "extract_cache")
+    monkeypatch.setattr(extract_cache, "_PAGE_CACHE_DIR", tmp_path / "extract_cache" / "pages")
+    monkeypatch.setattr(run, "extraction_cache_options", lambda backend: {})
+
+    pdf = tmp_path / "doc.pdf"
+    pdf.write_bytes(b"%PDF")
+    item = _item("pdf", path=pdf, sha256="sha-1")
+    calls = {"extract": 0}
+
+    def extract_once(item, backend):
+        calls["extract"] += 1
+        return [PageText(page=1, text="# Heading\n\n" + "Sentence. " * 300)]
+
+    monkeypatch.setattr(run, "extract_pdf_pages", extract_once)
+    first = run._extract_pdf_task(run.ExtractionTask(item, "docling", ["rag"]))
+    assert calls["extract"] == 1
+    assert first.reason is None
+
+    def fail_extract(item, backend):
+        raise AssertionError("page cache should avoid PDF extraction")
+
+    monkeypatch.setattr(run, "extract_pdf_pages", fail_extract)
+    second = run._extract_pdf_task(
+        run.ExtractionTask(
+            item,
+            "docling",
+            ["rag"],
+            chunk_profile="cuda-qwen0.6b-small2big-v1",
+        )
+    )
+
+    assert second.reason == "page_cache_hit"
+    assert calls["extract"] == 1
+    assert len(second.chunks) > len(first.chunks)
 
 
 def test_worker_function_and_task_are_picklable(tmp_path):
@@ -307,6 +345,47 @@ def test_closing_queued_extraction_stops_blocked_producer(monkeypatch):
     assert not any(t.name == "graph-rag-extract" for t in threading.enumerate())
 
 
+def test_queued_extraction_stop_event_exits_promptly(monkeypatch):
+    ready = threading.Event()
+    release = threading.Event()
+
+    def slow(*args, **kwargs):
+        ready.set()
+        release.wait(timeout=5)
+        yield run._metadata_outcome(_item("late", status="metadata_only"), [])
+
+    monkeypatch.setattr(run, "_iter_extraction_outcomes", slow)
+    telemetry = run.ExtractionPipelineTelemetry(queue_capacity=1)
+    stop_event = threading.Event()
+    iterator = run._iter_queued_extraction_outcomes(
+        [],
+        force=True,
+        state={},
+        pdf_backend="pymupdf",
+        extract_workers=1,
+        queue_capacity=1,
+        telemetry=telemetry,
+        log=logging.getLogger("test"),
+        stop_event=stop_event,
+    )
+    results = []
+
+    def consume():
+        try:
+            results.append(next(iterator))
+        except StopIteration:
+            results.append("stopped")
+
+    consumer = threading.Thread(target=consume)
+    consumer.start()
+    assert ready.wait(timeout=1)
+    stop_event.set()
+    release.set()
+    consumer.join(timeout=1)
+    assert results == ["stopped"]
+    assert not any(t.name == "graph-rag-extract" for t in threading.enumerate())
+
+
 def test_execute_ingest_flushes_batches_and_checkpoints(tmp_path, monkeypatch):
     items = [_item(str(n), status="metadata_only") for n in range(3)]
     outcomes = [run._metadata_outcome(item, []) for item in items]
@@ -369,6 +448,132 @@ def test_execute_ingest_flushes_batches_and_checkpoints(tmp_path, monkeypatch):
     assert status["documents_completed"] == 3
     assert status["documents_indexed"] == 3
     assert status["progress_percent"] == 100.0
+
+
+def test_execute_ingest_pause_flushes_partial_batch(tmp_path, monkeypatch):
+    items = [_item(str(n), status="metadata_only") for n in range(3)]
+    outcomes = [run._metadata_outcome(item, []) for item in items]
+    root = tmp_path / "index"
+    paths = ProfileIndexPaths(
+        profile="test",
+        root=root,
+        lance_dir=root / "lancedb",
+        ingest_state=root / "ingest_state.json",
+        bm25_dir=root / "bm25",
+    )
+    upserts = []
+    checkpoints = []
+    captured_stop_event = None
+
+    def interrupting_outcomes(*args, **kwargs):
+        nonlocal captured_stop_event
+        captured_stop_event = kwargs.get("stop_event")
+        yield outcomes[0]
+        assert captured_stop_event is not None
+        captured_stop_event.set()
+
+    monkeypatch.setenv("RAG_LIT_INGEST_DOC_BATCH", "25")
+    monkeypatch.setattr(run, "setup_ingest_logging", lambda **kwargs: logging.getLogger("test"))
+    monkeypatch.setattr(run, "load_manifest", lambda: Manifest(items=items))
+    monkeypatch.setattr(
+        run,
+        "prepare_embed_config",
+        lambda profile: EmbedConfig("local", "all-MiniLM-L6-v2", 384, profile="test"),
+    )
+    monkeypatch.setattr(run, "profile_index_paths", lambda profile=None: paths)
+    monkeypatch.setattr(run, "load_ingest_state", lambda profile: {})
+    monkeypatch.setattr(run, "_iter_queued_extraction_outcomes", interrupting_outcomes)
+    monkeypatch.setattr(
+        run,
+        "upsert_chunks",
+        lambda chunks, **kwargs: upserts.append((len(chunks), kwargs["rebuild"]))
+        or len(chunks),
+    )
+    monkeypatch.setattr(
+        run,
+        "save_ingest_state",
+        lambda state, profile: checkpoints.append(dict(state)),
+    )
+    monkeypatch.setattr(run, "chunk_count", lambda profile: 2)
+    monkeypatch.setattr(run, "resolve_workers", lambda workers, prefix: 1)
+
+    run._execute_ingest(
+        force=False,
+        rebuild=True,
+        verbose=False,
+        log_file=None,
+        embed_profile="test",
+        pdf_backend="pymupdf",
+    )
+
+    assert upserts == [(1, True)]
+    assert set(checkpoints[0]) >= {"0", "pdf_backend"}
+    assert all("1" not in checkpoint for checkpoint in checkpoints)
+    status = load_status(paths)
+    assert status["status"] == "paused"
+    assert status["phase"] == "paused"
+    assert status["documents_indexed"] == 1
+
+
+def test_execute_ingest_pause_flushes_when_producer_interrupts(tmp_path, monkeypatch):
+    item = _item("0", status="metadata_only")
+    outcome = run._metadata_outcome(item, [])
+    root = tmp_path / "index"
+    paths = ProfileIndexPaths(
+        profile="test",
+        root=root,
+        lance_dir=root / "lancedb",
+        ingest_state=root / "ingest_state.json",
+        bm25_dir=root / "bm25",
+    )
+    upserts = []
+    checkpoints = []
+
+    def interrupting_outcomes(*args, **kwargs):
+        stop_event = kwargs["stop_event"]
+        yield outcome
+        stop_event.set()
+        raise KeyboardInterrupt
+
+    monkeypatch.setenv("RAG_LIT_INGEST_DOC_BATCH", "25")
+    monkeypatch.setattr(run, "setup_ingest_logging", lambda **kwargs: logging.getLogger("test"))
+    monkeypatch.setattr(run, "load_manifest", lambda: Manifest(items=[item]))
+    monkeypatch.setattr(
+        run,
+        "prepare_embed_config",
+        lambda profile: EmbedConfig("local", "all-MiniLM-L6-v2", 384, profile="test"),
+    )
+    monkeypatch.setattr(run, "profile_index_paths", lambda profile=None: paths)
+    monkeypatch.setattr(run, "load_ingest_state", lambda profile: {})
+    monkeypatch.setattr(run, "_iter_queued_extraction_outcomes", interrupting_outcomes)
+    monkeypatch.setattr(
+        run,
+        "upsert_chunks",
+        lambda chunks, **kwargs: upserts.append((len(chunks), kwargs["rebuild"]))
+        or len(chunks),
+    )
+    monkeypatch.setattr(
+        run,
+        "save_ingest_state",
+        lambda state, profile: checkpoints.append(dict(state)),
+    )
+    monkeypatch.setattr(run, "chunk_count", lambda profile: 1)
+    monkeypatch.setattr(run, "resolve_workers", lambda workers, prefix: 1)
+
+    run._execute_ingest(
+        force=False,
+        rebuild=True,
+        verbose=False,
+        log_file=None,
+        embed_profile="test",
+        pdf_backend="pymupdf",
+    )
+
+    assert upserts == [(1, True)]
+    assert set(checkpoints[0]) >= {"0", "pdf_backend"}
+    status = load_status(paths)
+    assert status["status"] == "paused"
+    assert status["documents_indexed"] == 1
 
 
 def test_checkpoint_does_not_advance_when_index_write_fails(tmp_path, monkeypatch):
