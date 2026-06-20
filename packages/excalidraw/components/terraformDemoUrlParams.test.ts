@@ -82,6 +82,23 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses compact", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&compact=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        compact: true,
+      });
+      expect(parseTerraformDemoUrlParams("?preset=demo&compact=0")).toEqual({
+        presetId: "demo",
+        compact: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&compact=maybe"),
+      ).toBeNull();
+    });
+
     it("parses ancillary", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=pipeline&ancillary=1"),

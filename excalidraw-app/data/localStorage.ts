@@ -2,6 +2,8 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
+import { isTerraformImportedScene } from "@excalidraw/excalidraw/components/terraformVisibility";
+import { isDevEnv } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -54,6 +56,16 @@ export const importFromLocalStorage = () => {
       console.error(error);
       // Do nothing because elements array is already empty
     }
+  }
+
+  if (isDevEnv() && isTerraformImportedScene(elements)) {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+      localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+    } catch (error: any) {
+      console.error(error);
+    }
+    return { elements: [], appState: null };
   }
 
   let appState = null;

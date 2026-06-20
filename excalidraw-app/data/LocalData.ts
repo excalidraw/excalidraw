@@ -20,6 +20,7 @@ import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
   debounce,
+  isDevEnv,
 } from "@excalidraw/common";
 import {
   createStore,
@@ -55,6 +56,12 @@ const filesStore = createStore("files-db", "files-store");
 
 export const localStorageQuotaExceededAtom = atom(false);
 
+const clearLocalSceneStorage = () => {
+  localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+  localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+  updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+};
+
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
     await entries(filesStore).then((entries) => {
@@ -83,6 +90,11 @@ const saveDataStateToLocalStorage = (
     localStorageQuotaExceededAtom,
   );
   try {
+    if (isDevEnv() && isTerraformImportedScene(elements)) {
+      clearLocalSceneStorage();
+      return;
+    }
+
     const _appState = clearAppStateForLocalStorage(appState);
 
     if (

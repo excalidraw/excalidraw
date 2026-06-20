@@ -8,6 +8,7 @@ export type TerraformDemoUrlParams = {
   presetId: string;
   view?: TerraformView;
   pack?: ModulePackingMode;
+  compact?: boolean;
   pipelineVariant?: PipelineLayoutVariant;
   packed?: boolean;
   packedPullLeft?: boolean;
@@ -128,6 +129,10 @@ export const parseTerraformDemoUrlParams = (
   if (packedPullLeft === true && packed !== false) {
     packed = true;
   }
+  const compact = parseBooleanParam("compact");
+  if (compact === null) {
+    return null;
+  }
   const ancillary = parseBooleanParam("ancillary");
   if (ancillary === null) {
     return null;
@@ -169,6 +174,7 @@ export const parseTerraformDemoUrlParams = (
     presetId,
     ...(view ? { view } : {}),
     ...(pack ? { pack } : {}),
+    ...(compact != null ? { compact } : {}),
     ...(pipelineVariant ? { pipelineVariant } : {}),
     ...(packed != null ? { packed } : {}),
     ...(packedPullLeft != null ? { packedPullLeft } : {}),

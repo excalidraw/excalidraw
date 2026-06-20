@@ -83,6 +83,7 @@ export const TerraformDemoAutoImport = ({
         await runTerraformPresetImport(app, setAppState, preset, {
           view,
           moduleLayoutOptions,
+          pipelineCompact: params.compact,
           pipelineLayoutVariant: params.pipelineVariant,
           pipelinePacked: params.packed,
           pipelinePackedPullLeft: params.packedPullLeft,
