@@ -95,6 +95,7 @@ export const TerraformDemoAutoImport = ({
           pipelineRankSeparate: params.rankSeparate,
           pipelineStraighten: params.straighten,
           pipelineDeDensify: params.deDensify,
+          pipelineColumnPacking: params.columnPacking,
           pipelineStaircaseBandOverlap: params.staircaseBandOverlap,
           signal,
           onLayoutProgress: (progress) => {

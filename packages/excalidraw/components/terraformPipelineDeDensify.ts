@@ -172,8 +172,11 @@ export function deDensifyColumns(
 /**
  * Rule 5: would moving `id` split a fan group? True if `id` shares any fan-in source
  * or fan-out target with another leaf currently at column `c` (its column-mates).
+ *
+ * Exported so the mirror pass `terraformPipelineColumnCompact` (M5c pull-left) reuses
+ * the identical fan-group test — one source of truth for "don't split a fan group".
  */
-function sharesFanWithColumnMate(
+export function sharesFanWithColumnMate(
   id: string,
   c: number,
   sourceIds: readonly string[],

@@ -41,10 +41,16 @@ const LAYOUT_BOOLEAN_PARAMS = [
   ["rankSeparate", "pipelineRankSeparate"],
   ["subnetDeBand", "pipelineSubnetDeBand"],
   ["straighten", "pipelineStraighten"],
+  // Legacy alias: `deDensify=1` ⇒ the core derives `columnPacking:"spread"`.
   ["deDensify", "pipelineDeDensify"],
   ["reorder", "pipelineReorder"],
   ["staircaseBandOverlap", "pipelineStaircaseBandOverlap"],
   ["ancillary", "pipelineIncludeAncillary"],
+];
+
+// Enum (non-boolean) layout params: [paramName, optionKey, allowedValues].
+const LAYOUT_ENUM_PARAMS = [
+  ["columnPacking", "pipelineColumnPacking", ["spread", "none", "compact"]],
 ];
 
 // The layout engine's import graph (appState, element rendering) reads browser
@@ -175,6 +181,15 @@ const parseLayoutBooleanParam = (raw) => {
   return null;
 };
 
+/** undefined when absent, null when invalid, else the matched enum value. */
+const parseLayoutEnumParam = (raw, allowed) => {
+  if (raw == null || raw.trim() === "") {
+    return undefined;
+  }
+  const normalized = raw.trim().toLowerCase();
+  return allowed.includes(normalized) ? normalized : null;
+};
+
 /** Overall bounds (min/max) over the non-deleted elements, or null when empty. */
 const computeSceneBounds = (elements) => {
   let minX = Infinity;
@@ -245,7 +260,8 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
       pipelineSwimlaneLaneRise: meta.pipelineSwimlaneLaneRise ?? false,
       pipelineSubnetDeBand: meta.pipelineSubnetDeBand ?? false,
       pipelineStraighten: meta.pipelineStraighten ?? false,
-      pipelineDeDensify: meta.pipelineDeDensify ?? false,
+      pipelineColumnPacking: meta.pipelineColumnPacking ?? "none",
+      pipelineColumnPackingConflict: meta.pipelineColumnPackingConflict ?? false,
       pipelineReorder: meta.pipelineReorder ?? false,
       rcllMilestone: meta.rcllMilestone ?? null,
     },
@@ -257,6 +273,10 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
       rankSeparateChangedRankCount: placement.rankSeparateChangedRankCount ?? null,
       rankSeparateFallback: placement.rankSeparateFallback ?? null,
       maxDepthPx: placement.maxDepthPx ?? null,
+      columnCompactApplied: placement.columnCompactApplied ?? null,
+      columnCompactMovedCount: placement.columnCompactMovedCount ?? null,
+      columnCompactReclaimedCols: placement.columnCompactReclaimedCols ?? null,
+      columnCompactEvalCapReached: placement.columnCompactEvalCapReached ?? null,
       acyclicBackwardEdges: gates.acyclicBackwardEdges ?? null,
       acyclicSameColumnEdges: gates.acyclicSameColumnEdges ?? null,
     },
@@ -345,6 +365,19 @@ export const terraformImportPresetDevPlugin = () => ({
           if (value === null) {
             sendJson(res, 400, {
               error: `Invalid boolean for ?${param} (use 1/0/true/false).`,
+            });
+            return;
+          }
+          if (value !== undefined) {
+            options[optionKey] = value;
+            requested[param] = value;
+          }
+        }
+        for (const [param, optionKey, allowed] of LAYOUT_ENUM_PARAMS) {
+          const value = parseLayoutEnumParam(params.get(param), allowed);
+          if (value === null) {
+            sendJson(res, 400, {
+              error: `Invalid value for ?${param} (use ${allowed.join("/")}).`,
             });
             return;
           }

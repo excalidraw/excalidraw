@@ -434,6 +434,9 @@ type LayoutSceneContext = {
   pipelineStraighten?: boolean;
   /** RCLL M5b: de-density — spread crowded columns (dial defaulted by the guard). */
   pipelineDeDensify?: boolean;
+  /** RCLL "Column packing" tri-state: `spread` = M5b pull-right, `compact` = M5c pull-left,
+   * `none` = neither. Front-door enum; supersedes `pipelineDeDensify` (legacy ⇒ `spread`). */
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default true (undefined ⇒ on). */
   pipelineStaircaseBandOverlap?: boolean;
   colorMode?: TerraformColorMode;
@@ -452,6 +455,11 @@ async function buildPipelineLayoutSceneBody(
       // rankSeparate when the lane-rise is off (solo = taller/wider) and supplies the
       // de-density width dial. `staircaseBandOverlap` is passthrough (undefined ⇒
       // engine default true ⇒ OFF byte-identical).
+      // "Column packing" tri-state is the single front-door; derive the two mutually
+      // exclusive engine flags from it (legacy `pipelineDeDensify` ⇒ `spread`).
+      const columnPacking: "spread" | "none" | "compact" =
+        ctx.pipelineColumnPacking ??
+        (ctx.pipelineDeDensify ? "spread" : "none");
       const { options: pipelineOptions, suppressions: rcllSuppressions } =
         applyRcllToggleGuards({
           compact: ctx.pipelineCompact !== false,
@@ -464,12 +472,23 @@ async function buildPipelineLayoutSceneBody(
           subnetDeBand: ctx.pipelineSubnetDeBand === true,
           rankSeparate: ctx.pipelineRankSeparate === true,
           straighten: ctx.pipelineStraighten === true,
-          deDensify: ctx.pipelineDeDensify === true,
+          deDensify: columnPacking === "spread",
+          columnCompact: columnPacking === "compact",
           staircaseBandOverlap: ctx.pipelineStaircaseBandOverlap,
         });
       const rankSeparateSuppressed = rcllSuppressions.includes(
         "rankSeparate-needs-rise",
       );
+      const columnPackingConflict = rcllSuppressions.includes(
+        "column-packing-conflict-compact-wins",
+      );
+      // The applied packing arm after the guard (a conflict drops `deDensify`).
+      const appliedColumnPacking: "spread" | "none" | "compact" =
+        pipelineOptions.columnCompact
+          ? "compact"
+          : pipelineOptions.deDensify
+          ? "spread"
+          : "none";
       const buildPipeline =
         ctx.pipelineLayoutVariant === "rcll"
           ? buildTerraformPipelineRcllExcalidrawScene
@@ -520,7 +539,19 @@ async function buildPipelineLayoutSceneBody(
               ? { pipelineRankSeparateSuppressed: true }
               : {}),
             ...(ctx.pipelineStraighten ? { pipelineStraighten: true } : {}),
-            ...(ctx.pipelineDeDensify ? { pipelineDeDensify: true } : {}),
+            // "Column packing": echo the applied arm, plus the legacy `pipelineDeDensify`
+            // flag when spread (back-compat for existing M5b assertions / dev plugin).
+            ...(appliedColumnPacking !== "none"
+              ? { pipelineColumnPacking: appliedColumnPacking }
+              : {}),
+            ...(appliedColumnPacking === "spread"
+              ? { pipelineDeDensify: true }
+              : {}),
+            // Observable backstop: both packing arms requested at the engine level; the
+            // guard kept Compact and dropped Spread.
+            ...(columnPackingConflict
+              ? { pipelineColumnPackingConflict: true }
+              : {}),
             ...(ctx.pipelineStaircaseBandOverlap === false
               ? { pipelineStaircaseBandOverlap: false }
               : {}),
@@ -913,6 +944,9 @@ export async function layoutTerraformFromSources(
     pipelineRankSeparate: options?.pipelineRankSeparate === true,
     pipelineStraighten: options?.pipelineStraighten === true,
     pipelineDeDensify: options?.pipelineDeDensify === true,
+    // "Column packing" tri-state (M5b spread / M5c compact) — same silent-drop hazard:
+    // forward it or the dialog/URL toggle does nothing on the worker/headless path.
+    pipelineColumnPacking: options?.pipelineColumnPacking,
     pipelineStaircaseBandOverlap: options?.pipelineStaircaseBandOverlap,
     colorMode: options?.colorMode,
   };

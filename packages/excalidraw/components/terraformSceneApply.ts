@@ -169,6 +169,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineStraighten?: boolean;
   /** RCLL M5b — de-density: spread crowded columns. Default false. */
   pipelineDeDensify?: boolean;
+  /** RCLL "Column packing" tri-state: `spread` (M5b) / `none` / `compact` (M5c). */
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   /** RCLL M3b / DEC-1 — X-disjoint cycle groups rise to share Y. Default on (undefined). */
   pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
@@ -240,6 +242,7 @@ async function layoutTerraformSceneFromSources(
             pipelineRankSeparate: options.pipelineRankSeparate === true,
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,
+            pipelineColumnPacking: options.pipelineColumnPacking,
             // Default-on: undefined ⇒ engine default (true). Only an explicit
             // false (Stacked) flows through.
             pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
@@ -321,6 +324,7 @@ export const runTerraformImportFromSources = async (
             pipelineRankSeparate: options.pipelineRankSeparate === true,
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,
+            pipelineColumnPacking: options.pipelineColumnPacking,
             // Default-on: undefined ⇒ engine default (true). Only an explicit
             // false (Stacked) flows through.
             pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,

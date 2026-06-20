@@ -128,6 +128,18 @@ export type RcllOptions = {
   deDensify?: boolean;
   deDensifyMaxCols?: number;
   /**
+   * M5c (default **false**): column compaction (Axis-2 A, RFC §9.4) — the mirror of
+   * de-density. Pulls SAFE independent leaves LEFT into an earlier column's vertical
+   * whitespace to shrink the swimlane group's width, spending hull height the parent
+   * already reserves. Measure-driven: a move is accepted only if re-placing a clone for
+   * the trial column map grows neither the hull width nor any inner frame height, so the
+   * "free space" is observed, not guessed. Emptied columns are removed + re-dense-ranked.
+   * CON-12-safe by construction and re-verified. Mutually exclusive with `deDensify`
+   * (one is the left mirror of the other). Exposed in the dialog as the `Compact` arm of
+   * the "Column packing" tri-state (RCLL-only).
+   */
+  columnCompact?: boolean;
+  /**
    * Subnet de-band (PROBE, default **false**): on the swimlane path each subnet is a
    * Y-lane stacked into its own disjoint band, so VPC height ≈ Σ(subnet bands). This
    * collapses the subnet level — lifting every subnet's clusters to be direct VPC

@@ -75,4 +75,23 @@ describe("applyRcllToggleGuards", () => {
     applyRcllToggleGuards(input);
     expect(input).toEqual({ rankSeparate: true, swimlaneLaneRise: false });
   });
+
+  it("resolves a column-packing conflict: Compact wins, Spread dropped, observable", () => {
+    const { options, suppressions } = applyRcllToggleGuards({
+      deDensify: true,
+      columnCompact: true,
+    });
+    expect(options.deDensify).toBe(false);
+    expect(options.columnCompact).toBe(true);
+    expect(suppressions).toEqual(["column-packing-conflict-compact-wins"]);
+  });
+
+  it("leaves a lone columnCompact untouched (no spurious conflict)", () => {
+    const { options, suppressions } = applyRcllToggleGuards({
+      columnCompact: true,
+    });
+    expect(options.columnCompact).toBe(true);
+    expect(options.deDensify ?? false).toBe(false);
+    expect(suppressions).toEqual([]);
+  });
 });

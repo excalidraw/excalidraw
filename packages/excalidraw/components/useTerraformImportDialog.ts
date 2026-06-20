@@ -89,8 +89,11 @@ export const useTerraformImportDialog = ({
   const [pipelineRankSeparate, setPipelineRankSeparate] = useState(false);
   // RCLL M5 (rcll-only): Brandes–Köpf leaf straightening.
   const [pipelineStraighten, setPipelineStraighten] = useState(false);
-  // RCLL M5b (rcll-only): de-density (spread crowded columns).
-  const [pipelineDeDensify, setPipelineDeDensify] = useState(false);
+  // RCLL "Column packing" tri-state (rcll-only): `spread` = M5b de-density (pull-right),
+  // `compact` = M5c column compaction (pull-left), `none` = neither. Default `none`.
+  const [pipelineColumnPacking, setPipelineColumnPacking] = useState<
+    "spread" | "none" | "compact"
+  >("none");
   // RCLL M3b / DEC-1 (rcll-only): X-disjoint cycle groups rise to share Y. Default
   // ON (true) — turning it off (Stacked) makes cyclic groups taller.
   const [pipelineStaircaseBandOverlap, setPipelineStaircaseBandOverlap] =
@@ -279,7 +282,7 @@ export const useTerraformImportDialog = ({
       pipelineSubnetDeBand,
       pipelineRankSeparate,
       pipelineStraighten,
-      pipelineDeDensify,
+      pipelineColumnPacking,
       pipelineStaircaseBandOverlap,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
@@ -409,7 +412,7 @@ export const useTerraformImportDialog = ({
             pipelineSubnetDeBand,
             pipelineRankSeparate,
             pipelineStraighten,
-            pipelineDeDensify,
+            pipelineColumnPacking,
             pipelineStaircaseBandOverlap,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
@@ -505,7 +508,7 @@ export const useTerraformImportDialog = ({
           pipelineSubnetDeBand,
           pipelineRankSeparate,
           pipelineStraighten,
-          pipelineDeDensify,
+          pipelineColumnPacking,
           pipelineStaircaseBandOverlap,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
@@ -710,7 +713,7 @@ export const useTerraformImportDialog = ({
     pipelineSubnetDeBand,
     pipelineRankSeparate,
     pipelineStraighten,
-    pipelineDeDensify,
+    pipelineColumnPacking,
     pipelineStaircaseBandOverlap,
     moduleLayoutOptions,
     loading,
@@ -749,7 +752,7 @@ export const useTerraformImportDialog = ({
     setPipelineSubnetDeBand,
     setPipelineRankSeparate,
     setPipelineStraighten,
-    setPipelineDeDensify,
+    setPipelineColumnPacking,
     setPipelineStaircaseBandOverlap,
     setModuleLayoutOptions,
     setSelectedPresetId,

@@ -61,6 +61,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineRankSeparate?: boolean;
   pipelineStraighten?: boolean;
   pipelineDeDensify?: boolean;
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   pipelineStaircaseBandOverlap?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
@@ -86,6 +87,7 @@ export const runTerraformImportWithView = async ({
   pipelineRankSeparate,
   pipelineStraighten,
   pipelineDeDensify,
+  pipelineColumnPacking,
   pipelineStaircaseBandOverlap,
   importedTfdTexts,
   preset = null,
@@ -114,6 +116,7 @@ export const runTerraformImportWithView = async ({
           pipelineRankSeparate,
           pipelineStraighten,
           pipelineDeDensify,
+          pipelineColumnPacking,
           pipelineStaircaseBandOverlap,
         }
       : {}),
@@ -139,6 +142,7 @@ export type RunTerraformPresetImportOptions = {
   pipelineRankSeparate?: boolean;
   pipelineStraighten?: boolean;
   pipelineDeDensify?: boolean;
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   pipelineStaircaseBandOverlap?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
@@ -189,6 +193,7 @@ export const runTerraformPresetImport = async (
     pipelineRankSeparate: options.pipelineRankSeparate,
     pipelineStraighten: options.pipelineStraighten,
     pipelineDeDensify: options.pipelineDeDensify,
+    pipelineColumnPacking: options.pipelineColumnPacking,
     pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
     importedTfdTexts: presetSources.tfdTexts,
     preset,

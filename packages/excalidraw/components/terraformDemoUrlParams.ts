@@ -20,9 +20,17 @@ export type TerraformDemoUrlParams = {
   rankSeparate?: boolean;
   straighten?: boolean;
   deDensify?: boolean;
+  /** RCLL "Column packing" tri-state: `spread` (M5b) / `none` / `compact` (M5c). */
+  columnPacking?: "spread" | "none" | "compact";
   /** RCLL DEC-1 cycle-band rise; default on — only `=0` (false) is meaningful. */
   staircaseBandOverlap?: boolean;
 };
+
+const VALID_COLUMN_PACKING = new Set<"spread" | "none" | "compact">([
+  "spread",
+  "none",
+  "compact",
+]);
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -165,6 +173,22 @@ export const parseTerraformDemoUrlParams = (
   if (deDensify === null) {
     return null;
   }
+  // "Column packing" tri-state. Hard-fail on an invalid value (same contract as the
+  // booleans). Back-compat: a legacy `deDensify=1` (no explicit packing) ⇒ `spread`.
+  const columnPackingRaw = params.get("columnPacking");
+  let columnPacking: "spread" | "none" | "compact" | undefined;
+  if (columnPackingRaw != null && columnPackingRaw.trim() !== "") {
+    const normalized = columnPackingRaw.trim().toLowerCase() as
+      | "spread"
+      | "none"
+      | "compact";
+    if (!VALID_COLUMN_PACKING.has(normalized)) {
+      return null;
+    }
+    columnPacking = normalized;
+  } else if (deDensify === true) {
+    columnPacking = "spread";
+  }
   const staircaseBandOverlap = parseBooleanParam("staircaseBandOverlap");
   if (staircaseBandOverlap === null) {
     return null;
@@ -186,6 +210,7 @@ export const parseTerraformDemoUrlParams = (
     ...(rankSeparate != null ? { rankSeparate } : {}),
     ...(straighten != null ? { straighten } : {}),
     ...(deDensify != null ? { deDensify } : {}),
+    ...(columnPacking != null ? { columnPacking } : {}),
     ...(staircaseBandOverlap != null ? { staircaseBandOverlap } : {}),
   };
 };

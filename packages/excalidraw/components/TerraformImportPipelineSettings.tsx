@@ -204,17 +204,32 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
     },
   },
-  "columnspread.off": {
-    title: "Column spread · Off",
-    body: "Crowded columns keep every independent card in place.",
-    dev: { implements: "deDensify=false: the dense-rank axis is untouched." },
-  },
-  "columnspread.on": {
-    title: "Column spread · On",
+  "columnpacking.spread": {
+    title: "Column packing · Spread",
     body: "Spreads a crowded column by moving independent cards (no dependency edges) one column to the right, making vertical room. Has no effect where every crowded card has a dependency edge — e.g. the staging v2 — because the rule conservatively leaves connected cards alone.",
     dev: {
       implements:
         "deDensify (M5b, Axis-2 B): promotes a SAFE subset of same-floor independent leaves one column right (forward-only, column-preserving ⇒ CON-12-safe). The width dial deDensifyMaxCols defaults to 2 when enabled (terraformPipelineToggleGuards.ts). Measured no-op on v2 (dataflow too dense).",
+    },
+  },
+  "columnpacking.none": {
+    title: "Column packing · None (default)",
+    body: "Columns keep every card where the dense-rank layering placed it — no spread, no compaction.",
+    dev: {
+      implements:
+        "columnPacking=none: neither deDensify nor columnCompact runs; the dense-rank axis is untouched (OFF byte-identical).",
+    },
+  },
+  "columnpacking.compact": {
+    title: "Column packing · Compact",
+    body: "Pulls independent cards LEFT into an earlier column's vertical whitespace to shrink the diagram's width, spending vertical room the group already has. A move is kept only when the re-measured group does not grow wider OR taller. Forward-only — never crosses a dependency edge (CON-12-safe).",
+    dev: {
+      implements:
+        "columnCompact (M5c, Axis-2 A): measure-driven greedy leftward column reassignment in arrangeSwimlaneGroup; accepts a move only if re-placing a clone for the trial column map grows neither the hull width nor any inner frame height; empties + re-dense-ranks columns to realize the width win. CON-12 re-verified. Mutually exclusive with Spread.",
+      refs: [
+        "Rüegg et al. 2016 (1D compaction for smaller graph drawings)",
+        "Liao & Wong 1983 (constraint-graph longest path)",
+      ],
     },
   },
   "cycleheight.risen": {
@@ -269,7 +284,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSubnetDeBand,
   pipelineRankSeparate,
   pipelineStraighten,
-  pipelineDeDensify,
+  pipelineColumnPacking,
   pipelineStaircaseBandOverlap,
   setPipelineCompact,
   setPipelineLayoutVariant,
@@ -282,7 +297,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSubnetDeBand,
   setPipelineRankSeparate,
   setPipelineStraighten,
-  setPipelineDeDensify,
+  setPipelineColumnPacking,
   setPipelineStaircaseBandOverlap,
   showPlacement = true,
   showVariant = true,
@@ -298,7 +313,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSubnetDeBand: boolean;
   pipelineRankSeparate: boolean;
   pipelineStraighten: boolean;
-  pipelineDeDensify: boolean;
+  pipelineColumnPacking: "spread" | "none" | "compact";
   pipelineStaircaseBandOverlap: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
@@ -311,7 +326,9 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSubnetDeBand: (subnetDeBand: boolean) => void;
   setPipelineRankSeparate: (rankSeparate: boolean) => void;
   setPipelineStraighten: (straighten: boolean) => void;
-  setPipelineDeDensify: (deDensify: boolean) => void;
+  setPipelineColumnPacking: (
+    columnPacking: "spread" | "none" | "compact",
+  ) => void;
   setPipelineStaircaseBandOverlap: (staircaseBandOverlap: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
@@ -494,16 +511,28 @@ export const TerraformImportPipelineSettings = ({
                   )}
                 </div>
               </div>
-              <div role="group" aria-label="Pipeline column spread">
+              <div role="group" aria-label="Pipeline column packing">
                 <span className="TerraformImportModal__controlLabel">
-                  Column spread <span>spread crowded columns</span>
+                  Column packing <span>spread or compact columns</span>
                 </span>
                 <div className="TerraformImportModal__segmentedControl">
-                  {option("Off", !pipelineDeDensify, "columnspread.off", () =>
-                    setPipelineDeDensify(false),
+                  {option(
+                    "Spread",
+                    pipelineColumnPacking === "spread",
+                    "columnpacking.spread",
+                    () => setPipelineColumnPacking("spread"),
                   )}
-                  {option("On", pipelineDeDensify, "columnspread.on", () =>
-                    setPipelineDeDensify(true),
+                  {option(
+                    "None",
+                    pipelineColumnPacking === "none",
+                    "columnpacking.none",
+                    () => setPipelineColumnPacking("none"),
+                  )}
+                  {option(
+                    "Compact",
+                    pipelineColumnPacking === "compact",
+                    "columnpacking.compact",
+                    () => setPipelineColumnPacking("compact"),
                   )}
                 </div>
               </div>

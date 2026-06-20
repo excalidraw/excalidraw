@@ -50,6 +50,73 @@ const sceneHeight = (elements: readonly ExcalidrawElement[]) => {
   return maxY - minY;
 };
 
+/**
+ * Element ids/seeds are non-deterministic across builds in the same process: ids
+ * come from a global sequential counter (parallel-but-offset between runs),
+ * `groupIds` are random nanoids, and `seed`/`versionNonce` are random integers.
+ * To assert layout byte-identity we canonicalize: strip the random scalars and
+ * remap every id-reference (id, frameId, groupIds, boundElements, bindings) to a
+ * first-appearance token. Two structurally identical scenes then deep-equal.
+ */
+const canonicalize = (elements: readonly ExcalidrawElement[]) => {
+  const map = new Map<string, string>();
+  let n = 0;
+  const tok = (s: string) => {
+    if (!map.has(s)) {
+      map.set(s, `T${n++}`);
+    }
+    return map.get(s)!;
+  };
+  for (const el of elements) {
+    const e = el as unknown as Record<string, any>;
+    tok(e.id);
+    if (e.frameId) {
+      tok(e.frameId);
+    }
+    for (const g of (e.groupIds as string[]) ?? []) {
+      tok(g);
+    }
+    for (const b of (e.boundElements as { id: string }[]) ?? []) {
+      tok(b.id);
+    }
+    if (e.startBinding?.elementId) {
+      tok(e.startBinding.elementId);
+    }
+    if (e.endBinding?.elementId) {
+      tok(e.endBinding.elementId);
+    }
+  }
+  return elements.map((el) => {
+    const c = JSON.parse(JSON.stringify(el)) as Record<string, any>;
+    delete c.seed;
+    delete c.versionNonce;
+    delete c.version;
+    delete c.updated;
+    c.id = map.get(c.id) ?? c.id;
+    if (c.frameId) {
+      c.frameId = map.get(c.frameId) ?? c.frameId;
+    }
+    if (Array.isArray(c.groupIds)) {
+      c.groupIds = c.groupIds.map((g: string) => map.get(g) ?? g);
+    }
+    if (Array.isArray(c.boundElements)) {
+      c.boundElements = c.boundElements.map((b: { id: string }) => ({
+        ...b,
+        id: map.get(b.id) ?? b.id,
+      }));
+    }
+    if (c.startBinding?.elementId) {
+      c.startBinding.elementId =
+        map.get(c.startBinding.elementId) ?? c.startBinding.elementId;
+    }
+    if (c.endBinding?.elementId) {
+      c.endBinding.elementId =
+        map.get(c.endBinding.elementId) ?? c.endBinding.elementId;
+    }
+    return c;
+  });
+};
+
 describe("layoutTerraformFromSources — RCLL toggle threading (regression)", () => {
   const build = async (opts: Record<string, unknown>) => {
     const result = await layoutTerraformFromSources(v2Sources(), {
@@ -100,5 +167,61 @@ describe("layoutTerraformFromSources — RCLL toggle threading (regression)", ()
       expect(footgun.meta.pipelineRankSeparateSuppressed).toBe(true);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 4,
+  );
+
+  it(
+    "forwards pipelineColumnPacking=compact (M5c) to the engine — observable on v2",
+    async () => {
+      const off = await build({});
+      const none = await build({ pipelineColumnPacking: "none" });
+      const compact = await build({ pipelineColumnPacking: "compact" });
+
+      // 1. `none` is the literal default — OFF byte-identical (canonicalized
+      //    elements deep-equal; raw ids/seeds are non-deterministic per run),
+      //    and it must not advertise the packing meta.
+      expect(canonicalize(none.elements)).toEqual(canonicalize(off.elements));
+      expect(none.meta.pipelineColumnPacking).toBeUndefined();
+      expect(off.meta.rcllColumnCompact ?? false).toBe(false);
+
+      // 2. `compact` reaches the engine: enum echoed, M5c milestone, stats surfaced.
+      expect(compact.meta.pipelineColumnPacking).toBe("compact");
+      expect(compact.meta.rcllColumnCompact).toBe(true);
+      expect(compact.meta.rcllMilestone).toBe("M5c");
+      const placement = (
+        compact.meta.rcllStageMeta as {
+          placement?: Record<string, number>;
+        }
+      ).placement;
+      expect(placement?.columnCompactApplied).toBeDefined();
+
+      // 3. The measure-gated pass never makes the diagram worse: width is
+      //    non-increasing and CON-12 holds (no backward / same-column leaf edge).
+      //    On v2 the swimlanes are already dense ⇒ a measured no-op (moved 0),
+      //    which must be OFF byte-identical (the safe-fallback path).
+      expect(sceneWidth(compact.elements)).toBeLessThanOrEqual(
+        sceneWidth(off.elements),
+      );
+      const gates = compact.meta.gates as
+        | { acyclicBackwardEdges?: number; acyclicSameColumnEdges?: number }
+        | undefined;
+      expect(gates?.acyclicBackwardEdges ?? 0).toBe(0);
+      expect(gates?.acyclicSameColumnEdges ?? 0).toBe(0);
+      if ((placement?.columnCompactMovedCount ?? 0) === 0) {
+        expect(canonicalize(compact.elements)).toEqual(
+          canonicalize(off.elements),
+        );
+      }
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 8,
+  );
+
+  it(
+    "pipelineColumnPacking=compact is deterministic (CON-8)",
+    async () => {
+      const a = await build({ pipelineColumnPacking: "compact" });
+      const b = await build({ pipelineColumnPacking: "compact" });
+      expect(canonicalize(a.elements)).toEqual(canonicalize(b.elements));
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 8,
   );
 });

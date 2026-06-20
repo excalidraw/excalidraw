@@ -152,6 +152,10 @@ export type TerraformPlanParsingOptions = {
   pipelineStraighten?: boolean;
   /** RCLL M5b: de-density — spread crowded columns one column right. */
   pipelineDeDensify?: boolean;
+  /** RCLL "Column packing" tri-state: `spread` = M5b de-density (pull-right), `compact`
+   * = M5c column compaction (pull-left), `none` = neither. The single front-door enum;
+   * supersedes `pipelineDeDensify` (kept as a legacy alias ⇒ `spread`). Default `none`. */
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default on; only `=false` is meaningful. */
   pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */

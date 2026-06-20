@@ -196,16 +196,37 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
-    it("parses deDensify (RCLL M5b A/B)", () => {
+    it("parses deDensify (RCLL M5b A/B) — legacy alias maps to columnPacking=spread", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=rcll&deDensify=1"),
-      ).toEqual({ presetId: "demo", view: "rcll", deDensify: true });
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        deDensify: true,
+        columnPacking: "spread",
+      });
       expect(parseTerraformDemoUrlParams("?preset=demo&deDensify=0")).toEqual({
         presetId: "demo",
         deDensify: false,
       });
       expect(
         parseTerraformDemoUrlParams("?preset=demo&deDensify=maybe"),
+      ).toBeNull();
+    });
+
+    it("parses columnPacking (RCLL M5b/M5c tri-state) and rejects invalid", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&columnPacking=compact"),
+      ).toEqual({ presetId: "demo", view: "rcll", columnPacking: "compact" });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&columnPacking=none"),
+      ).toEqual({ presetId: "demo", columnPacking: "none" });
+      // explicit columnPacking wins over a legacy deDensify=1
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&deDensify=1&columnPacking=compact"),
+      ).toEqual({ presetId: "demo", deDensify: true, columnPacking: "compact" });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&columnPacking=sideways"),
       ).toBeNull();
     });
 

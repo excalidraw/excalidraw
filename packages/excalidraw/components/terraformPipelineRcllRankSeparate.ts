@@ -98,7 +98,7 @@ export function buildSeparationConstraintGraph(
     if (rf === rt) {
       continue; // intra-quotient (mutual cycle) — co-axial, no separation
     }
-    const k = `${rf}${rt}`;
+    const k = `${rf}\u0001${rt}`;
     if (!seen.has(k)) {
       seen.add(k);
       condEdges.push({ from: rf, to: rt });

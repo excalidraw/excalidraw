@@ -50,6 +50,8 @@ export type TerraformImportSession = {
   pipelineStraighten?: boolean;
   /** RCLL M5b — de-density: spread crowded columns. */
   pipelineDeDensify?: boolean;
+  /** RCLL "Column packing" tri-state: `spread` (M5b) / `none` / `compact` (M5c). */
+  pipelineColumnPacking?: "spread" | "none" | "compact";
   /** RCLL M3b / DEC-1 — X-disjoint cycle groups rise to share Y. Default on. */
   pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode: category/hierarchy vs plan-action default frames. */

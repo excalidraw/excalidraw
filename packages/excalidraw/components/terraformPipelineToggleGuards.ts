@@ -21,7 +21,9 @@
 export const DEDENSIFY_DEFAULT_MAX_COLS = 2;
 
 /** Reason codes for a suppressed/adjusted toggle (surfaced in scene meta). */
-export type RcllToggleSuppression = "rankSeparate-needs-rise";
+export type RcllToggleSuppression =
+  | "rankSeparate-needs-rise"
+  | "column-packing-conflict-compact-wins";
 
 /**
  * Whether `rankSeparate` may be enabled. True only when the M4 swimlane lane-rise
@@ -38,6 +40,8 @@ export type GuardablePipelineOptions = {
   rankSeparate?: boolean;
   deDensify?: boolean;
   deDensifyMaxCols?: number;
+  /** M5c column compaction (pull-left). Mutually exclusive with `deDensify` (pull-right). */
+  columnCompact?: boolean;
 };
 
 /**
@@ -64,6 +68,14 @@ export function applyRcllToggleGuards<T extends GuardablePipelineOptions>(
   ) {
     next = { ...next, rankSeparate: false };
     suppressions.push("rankSeparate-needs-rise");
+  }
+
+  // "Column packing" is a tri-state, so the UI/URL can never set both arms. Defensively,
+  // if a direct engine caller sets both, Compact (the narrower, measure-verified op) wins
+  // and Spread is dropped — surfaced observably (never a silent boolean conflict).
+  if (next.deDensify === true && next.columnCompact === true) {
+    next = { ...next, deDensify: false };
+    suppressions.push("column-packing-conflict-compact-wins");
   }
 
   // deDensify is a no-op without a positive width dial — supply a default.

@@ -69,6 +69,9 @@ type RcllBuildOptions = {
    * (the width dial) must be > 0 for the pass to run. */
   deDensify?: boolean;
   deDensifyMaxCols?: number;
+  /** M5c (default false): column compaction — pull SAFE leaves LEFT to shrink swimlane
+   * width (measure-gated). Mirror of `deDensify`; mutually exclusive with it. */
+  columnCompact?: boolean;
   /** Subnet de-band (PROBE, default false): collapse subnet lanes so a VPC's resources
    * share one column stack. Suppresses the subnet frame. Internal/measurement-only. */
   subnetDeBand?: boolean;
@@ -385,6 +388,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     straighten: options?.straighten === true,
     deDensify: options?.deDensify === true,
     deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
+    columnCompact: options?.columnCompact === true,
     subnetDeBand: options?.subnetDeBand === true,
     rankSeparate: options?.rankSeparate === true,
   };
@@ -478,6 +482,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
           ? "M8r"
           : rcllOptions.subnetDeBand
           ? "M7s"
+          : rcllOptions.columnCompact
+          ? "M5c"
           : rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
           ? "M5b"
           : rcllOptions.straighten
@@ -503,6 +509,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllDeDensify:
         rcllOptions.deDensify === true &&
         (rcllOptions.deDensifyMaxCols ?? 0) > 0,
+      // M5c: whether column compaction (Axis-2 A) is active.
+      rcllColumnCompact: rcllOptions.columnCompact === true,
       pipelineCompact: compact,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,

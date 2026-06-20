@@ -151,6 +151,7 @@ describe("TerraformImportModal", () => {
       pipelineRankSeparate: false,
       pipelineStraighten: false,
       pipelineDeDensify: false,
+      pipelineColumnPacking: "none",
       pipelineStaircaseBandOverlap: true,
       moduleLayoutOptions: undefined,
       colorMode: "category",
@@ -183,6 +184,7 @@ describe("TerraformImportModal", () => {
       pipelineRankSeparate: false,
       pipelineStraighten: false,
       pipelineDeDensify: false,
+      pipelineColumnPacking: "none",
       pipelineStaircaseBandOverlap: true,
       moduleLayoutOptions: undefined,
       colorMode: "category",
@@ -402,7 +404,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: Column spread · On threads pipelineDeDensify true", async () => {
+  it("RCLL view: Column packing · Spread threads pipelineColumnPacking spread", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -411,17 +413,41 @@ describe("TerraformImportModal", () => {
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
-    const deDensify = screen.getByRole("group", {
-      name: /pipeline column spread/i,
+    const packing = screen.getByRole("group", {
+      name: /pipeline column packing/i,
     });
-    fireEvent.click(within(deDensify).getByRole("button", { name: /^on$/i }));
+    fireEvent.click(within(packing).getByRole("button", { name: /^spread$/i }));
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       expect.objectContaining({
         layoutMode: "rcll",
-        pipelineDeDensify: true,
+        pipelineColumnPacking: "spread",
+      }),
+    );
+  });
+
+  it("RCLL view: Column packing · Compact threads pipelineColumnPacking compact (M5c)", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const packing = screen.getByRole("group", {
+      name: /pipeline column packing/i,
+    });
+    fireEvent.click(within(packing).getByRole("button", { name: /^compact$/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineColumnPacking: "compact",
       }),
     );
   });

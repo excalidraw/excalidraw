@@ -53,6 +53,10 @@ import {
 } from "./terraformPipelineOrdering";
 import { hubCenteringOverBoxes } from "./terraformPipelineCoordinateAssignment";
 import { deDensifyColumns } from "./terraformPipelineDeDensify";
+import {
+  compactColumns,
+  type ColumnCompactMeasure,
+} from "./terraformPipelineColumnCompact";
 import type { RankSeparateMeta } from "./terraformPipelineRcllRankSeparate";
 import { computeGlobalSeparatedFloor } from "./terraformPipelineRcllRankSeparate";
 import {
@@ -73,6 +77,13 @@ import type {
   RcllTopologyRole,
   StageResult,
 } from "./terraformPipelineRcllTypes";
+
+/** M5c column-compaction stats, summed across all swimlane groups in the tree. */
+export type ColumnCompactStats = {
+  moved: number;
+  reclaimedCols: number;
+  evalCapReached: boolean;
+};
 
 /** Threaded placement context (avoids param sprawl through the recursion). */
 type PlaceCtx = {
@@ -99,6 +110,12 @@ type PlaceCtx = {
   deDensify: boolean;
   /** M5b width dial: max brand-new columns de-density may add (default 0 == off). */
   deDensifyMaxCols: number;
+  /** M5c (default false): column compaction — pull SAFE independent leaves LEFT into an
+   * earlier column's whitespace to shrink swimlane width, measure-gated so the hull never
+   * grows wider or taller (Axis-2 A, RFC §9.4). Mutually exclusive with `deDensify`. */
+  columnCompact: boolean;
+  /** M5c stats accumulator (mutated across swimlane groups; read by `placementStage`). */
+  columnCompactStats?: ColumnCompactStats;
   /** Subnet de-band (PROBE, default false): collapse each VPC's subnet-zone children,
    * lifting their clusters to direct VPC children so the whole VPC shares one column
    * stack (height → merged max-column-occupancy). X (`colByCluster`) untouched ⇒
@@ -519,6 +536,32 @@ function buildLaneContext(
           { maxExtraCols: deDensifyMaxCols },
         )
       : denseClusterColumns(leaves, effectiveFloor);
+  return laneContextFromColMap(leaves, colByCluster, {
+    riseLanes,
+    reorder,
+    straighten,
+    fanout,
+    fanin,
+  });
+}
+
+/**
+ * Build a `LaneContext` from an already-decided `colByCluster` map: per-column max
+ * cluster width → `columnX` offsets, plus the lane flags. Shared by `buildLaneContext`
+ * (base/de-densified map) and the M5c compaction measure oracle (trial maps), so the
+ * trial measure and the real placement derive identical geometry.
+ */
+function laneContextFromColMap(
+  leaves: readonly CompoundNode[],
+  colByCluster: ReadonlyMap<string, number>,
+  flags: {
+    riseLanes: boolean;
+    reorder: boolean;
+    straighten: boolean;
+    fanout: ReadonlyMap<string, readonly string[]>;
+    fanin: ReadonlyMap<string, readonly string[]>;
+  },
+): LaneContext {
   const maxCol = leaves.reduce(
     (m, l) => Math.max(m, colByCluster.get(l.cluster!.id) ?? 0),
     0,
@@ -532,12 +575,20 @@ function buildLaneContext(
   return {
     columnX,
     colByCluster,
-    riseLanes,
-    reorder,
-    straighten,
-    fanout,
-    fanin,
+    riseLanes: flags.riseLanes,
+    reorder: flags.reorder,
+    straighten: flags.straighten,
+    fanout: flags.fanout,
+    fanin: flags.fanin,
   };
+}
+
+/** Collect every node's box height under `node` (key → px) for the M5c measure. */
+function collectHeights(node: CompoundNode, out: Map<string, number>): void {
+  out.set(node.key, node.box?.height ?? 0);
+  for (const child of node.children) {
+    collectHeights(child, out);
+  }
 }
 
 const byModelOrder = (a: CompoundNode, b: CompoundNode): number =>
@@ -762,10 +813,61 @@ function arrangeSwimlaneGroup(
     pctx.deDensify,
     pctx.deDensifyMaxCols,
   );
-  for (const m of members) {
-    arrangeSubtreeOnAxis(m, ctx);
+  // M5c (Axis-2 A): pull SAFE independent leaves LEFT into earlier-column whitespace to
+  // shrink width. Measure-driven — `compactColumns` accepts a move only if re-placing a
+  // CLONE for the trial column map does not grow the hull width or any inner frame height
+  // (the slack is observed, not guessed). Mutually exclusive with de-density (`ctx` here
+  // is the dense-rank axis since `deDensify` is false whenever `columnCompact` is true).
+  let placeCtx = ctx;
+  if (pctx.columnCompact) {
+    const leaves: CompoundNode[] = [];
+    for (const m of members) {
+      collectClusterLeaves(m, leaves);
+    }
+    const laneFlags = {
+      riseLanes: pctx.swimlaneLaneRise,
+      reorder: pctx.reorder,
+      straighten: pctx.straighten,
+      fanout: pctx.fanout,
+      fanin: pctx.fanin,
+    };
+    // `cluster.id` keys are shared between members and their clones (cloneNode keeps
+    // cluster refs), so a trial map drives both the geometry (via original `leaves`,
+    // whose `cluster.build.width` is identical) and the placement of fresh clones.
+    const measure = (trial: ReadonlyMap<string, number>): ColumnCompactMeasure => {
+      const trialCtx = laneContextFromColMap(leaves, trial, laneFlags);
+      const clones = members.map((m) => cloneNode(m));
+      for (const c of clones) {
+        arrangeSubtreeOnAxis(c, trialCtx);
+      }
+      const { right } = layoutLanesOnAxis(clones, trialCtx, 0, 0);
+      const nodeHeights = new Map<string, number>();
+      for (const c of clones) {
+        collectHeights(c, nodeHeights);
+      }
+      return { width: right, nodeHeights };
+    };
+    const compacted = compactColumns(
+      leaves.map((l) => ({
+        clusterId: l.cluster!.id,
+        firstSequence: l.cluster!.firstSequence,
+      })),
+      ctx.colByCluster,
+      pctx.fanout,
+      pctx.fanin,
+      measure,
+    );
+    if (pctx.columnCompactStats) {
+      pctx.columnCompactStats.moved += compacted.movedCount;
+      pctx.columnCompactStats.reclaimedCols += compacted.reclaimedCols;
+      pctx.columnCompactStats.evalCapReached ||= compacted.evalCapReached;
+    }
+    placeCtx = laneContextFromColMap(leaves, compacted.colByCluster, laneFlags);
   }
-  const { right, bottom } = layoutLanesOnAxis(members, ctx, 0, 0);
+  for (const m of members) {
+    arrangeSubtreeOnAxis(m, placeCtx);
+  }
+  const { right, bottom } = layoutLanesOnAxis(members, placeCtx, 0, 0);
   return { width: right, height: bottom };
 }
 
@@ -1048,6 +1150,7 @@ export function layoutPlacement(
   tree: CompoundNode,
   lattice: Lattice,
   opts?: RcllOptions,
+  columnCompactStats?: ColumnCompactStats,
 ): CompoundNode {
   const ctx: PlaceCtx = {
     cyclic: lattice.cyclicContainers ?? new Set<string>(),
@@ -1059,6 +1162,8 @@ export function layoutPlacement(
     straighten: opts?.straighten === true,
     deDensify: opts?.deDensify === true,
     deDensifyMaxCols: opts?.deDensifyMaxCols ?? 0,
+    columnCompact: opts?.columnCompact === true,
+    columnCompactStats,
     subnetDeBand: opts?.subnetDeBand === true,
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
@@ -1304,8 +1409,20 @@ export function placementStage(
     );
     effLattice = { ...lattice, floor: rankSeparate.floor };
   }
-  const placed = layoutPlacement(tree, effLattice, opts);
+  // M5c column compaction: accumulate stats across all swimlane groups, surface as
+  // `rcllStageMeta.placement.columnCompact*` (same convention as `rankSeparate*`).
+  const columnCompactStats: ColumnCompactStats | undefined =
+    opts?.columnCompact === true
+      ? { moved: 0, reclaimedCols: 0, evalCapReached: false }
+      : undefined;
+  const placed = layoutPlacement(tree, effLattice, opts, columnCompactStats);
   const meta: Record<string, number> = placementMeta(placed, effLattice);
+  if (columnCompactStats) {
+    meta.columnCompactApplied = columnCompactStats.moved > 0 ? 1 : 0;
+    meta.columnCompactMovedCount = columnCompactStats.moved;
+    meta.columnCompactReclaimedCols = columnCompactStats.reclaimedCols;
+    meta.columnCompactEvalCapReached = columnCompactStats.evalCapReached ? 1 : 0;
+  }
   if (rankSeparate) {
     // Surface the observability meta for the probe/gate (read as
     // `rcllStageMeta.placement.rankSeparate*`). Scalars only (CON-8 determinism).
