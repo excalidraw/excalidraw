@@ -38,6 +38,7 @@ import {
 } from "./terraformPipelineLayout";
 import { buildTerraformPipelineV2ExcalidrawScene } from "./terraformPipelineLayoutV2";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
+import { applyRcllToggleGuards } from "./terraformPipelineToggleGuards";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { DECLARED_DATAFLOW_ORDERED_KEY } from "./terraformDeclaredDataFlow";
 import {
@@ -427,6 +428,14 @@ type LayoutSceneContext = {
   pipelineReorder?: boolean;
   /** RCLL subnet de-band: collapse subnet lanes into one VPC stack (frames → rails). */
   pipelineSubnetDeBand?: boolean;
+  /** RCLL M8r: whole-model-global sibling-separation ranking (needs lane-rise). */
+  pipelineRankSeparate?: boolean;
+  /** RCLL M5: Brandes–Köpf leaf straightening (Y-only spine alignment). */
+  pipelineStraighten?: boolean;
+  /** RCLL M5b: de-density — spread crowded columns (dial defaulted by the guard). */
+  pipelineDeDensify?: boolean;
+  /** RCLL M3b / DEC-1: X-disjoint cycle groups rise to share Y. Default true (undefined ⇒ on). */
+  pipelineStaircaseBandOverlap?: boolean;
   colorMode?: TerraformColorMode;
 };
 
@@ -438,16 +447,29 @@ async function buildPipelineLayoutSceneBody(
     async () => {
       // Shared as a variable (not a literal) so v2 — which reads only `compact`
       // / `includeAncillary` — tolerates the extra classic/compound keys.
-      const pipelineOptions = {
-        compact: ctx.pipelineCompact !== false,
-        includeAncillary: ctx.pipelineIncludeAncillary === true,
-        packed: ctx.pipelinePacked === true,
-        packedPullLeft: ctx.pipelinePackedPullLeft === true,
-        semanticPlacement: ctx.pipelineSemanticPlacement === true,
-        swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
-        reorder: ctx.pipelineReorder === true,
-        subnetDeBand: ctx.pipelineSubnetDeBand === true,
-      };
+      // RCLL toggle coupling is enforced once here (the dialog gates the UI; this is
+      // the backstop for URL/programmatic imports): `applyRcllToggleGuards` drops
+      // rankSeparate when the lane-rise is off (solo = taller/wider) and supplies the
+      // de-density width dial. `staircaseBandOverlap` is passthrough (undefined ⇒
+      // engine default true ⇒ OFF byte-identical).
+      const { options: pipelineOptions, suppressions: rcllSuppressions } =
+        applyRcllToggleGuards({
+          compact: ctx.pipelineCompact !== false,
+          includeAncillary: ctx.pipelineIncludeAncillary === true,
+          packed: ctx.pipelinePacked === true,
+          packedPullLeft: ctx.pipelinePackedPullLeft === true,
+          semanticPlacement: ctx.pipelineSemanticPlacement === true,
+          swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
+          reorder: ctx.pipelineReorder === true,
+          subnetDeBand: ctx.pipelineSubnetDeBand === true,
+          rankSeparate: ctx.pipelineRankSeparate === true,
+          straighten: ctx.pipelineStraighten === true,
+          deDensify: ctx.pipelineDeDensify === true,
+          staircaseBandOverlap: ctx.pipelineStaircaseBandOverlap,
+        });
+      const rankSeparateSuppressed = rcllSuppressions.includes(
+        "rankSeparate-needs-rise",
+      );
       const buildPipeline =
         ctx.pipelineLayoutVariant === "rcll"
           ? buildTerraformPipelineRcllExcalidrawScene
@@ -488,6 +510,19 @@ async function buildPipelineLayoutSceneBody(
             ...(ctx.pipelineReorder ? { pipelineReorder: true } : {}),
             ...(ctx.pipelineSubnetDeBand
               ? { pipelineSubnetDeBand: true }
+              : {}),
+            ...(pipelineOptions.rankSeparate
+              ? { pipelineRankSeparate: true }
+              : {}),
+            // Observable footgun backstop: the user asked for rankSeparate but it
+            // was dropped because the lane-rise was off (URL/programmatic path).
+            ...(rankSeparateSuppressed
+              ? { pipelineRankSeparateSuppressed: true }
+              : {}),
+            ...(ctx.pipelineStraighten ? { pipelineStraighten: true } : {}),
+            ...(ctx.pipelineDeDensify ? { pipelineDeDensify: true } : {}),
+            ...(ctx.pipelineStaircaseBandOverlap === false
+              ? { pipelineStaircaseBandOverlap: false }
               : {}),
             importSource: ctx.importSource,
             plannedChanges: ctx.importSource !== "state-only",

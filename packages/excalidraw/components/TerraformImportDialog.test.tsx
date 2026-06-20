@@ -1,6 +1,12 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 import { BUILTIN_TERRAFORM_IMPORT_PRESETS } from "./terraformImportPresetsTypes";
 import { TerraformImportModal } from "./TerraformImportDialog";
@@ -142,6 +148,10 @@ describe("TerraformImportModal", () => {
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
       pipelineSubnetDeBand: false,
+      pipelineRankSeparate: false,
+      pipelineStraighten: false,
+      pipelineDeDensify: false,
+      pipelineStaircaseBandOverlap: true,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -170,6 +180,10 @@ describe("TerraformImportModal", () => {
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
       pipelineSubnetDeBand: false,
+      pipelineRankSeparate: false,
+      pipelineStraighten: false,
+      pipelineDeDensify: false,
+      pipelineStaircaseBandOverlap: true,
       moduleLayoutOptions: undefined,
       colorMode: "category",
     });
@@ -219,7 +233,13 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
     // The RCLL-only Swimlanes control is present; flip it to Risen (rise on).
-    const risenBtn = screen.getByRole("button", { name: /^risen$/i });
+    // Scoped to the Swimlanes group — "Risen" also appears under Cycle bands.
+    const swimlanes = screen.getByRole("group", {
+      name: /pipeline swimlane height/i,
+    });
+    const risenBtn = within(swimlanes).getByRole("button", {
+      name: /^risen$/i,
+    });
     expect(risenBtn).toBeInTheDocument();
     fireEvent.click(risenBtn);
 
@@ -243,7 +263,9 @@ describe("TerraformImportModal", () => {
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
     // The RCLL-only Ordering control is present; flip it On (M6 reorder).
-    const onBtn = screen.getByRole("button", { name: /^on$/i });
+    // Scoped to the Ordering group — "On" also appears under the new toggles.
+    const ordering = screen.getByRole("group", { name: /pipeline ordering/i });
+    const onBtn = within(ordering).getByRole("button", { name: /^on$/i });
     expect(onBtn).toBeInTheDocument();
     fireEvent.click(onBtn);
 
@@ -277,6 +299,151 @@ describe("TerraformImportModal", () => {
       expect.objectContaining({
         layoutMode: "rcll",
         pipelineSubnetDeBand: true,
+      }),
+    );
+  });
+
+  it("RCLL view: Separation 'On' is disabled until Swimlanes = Risen, then threads pipelineRankSeparate true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // Footgun guard: Separation alone is a regression (taller/wider). Its "On"
+    // is disabled until the swimlane lane-rise is on.
+    const separation = screen.getByRole("group", {
+      name: /pipeline lane separation/i,
+    });
+    const sepOn = within(separation).getByRole("button", { name: /^on$/i });
+    expect(sepOn).toBeDisabled();
+
+    // Enable the lane-rise → Separation "On" becomes available.
+    const swimlanes = screen.getByRole("group", {
+      name: /pipeline swimlane height/i,
+    });
+    fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
+    expect(
+      within(separation).getByRole("button", { name: /^on$/i }),
+    ).toBeEnabled();
+    fireEvent.click(within(separation).getByRole("button", { name: /^on$/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineSwimlaneLaneRise: true,
+        pipelineRankSeparate: true,
+      }),
+    );
+  });
+
+  it("RCLL view: turning Swimlanes back to Stacked clears a set Separation", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const swimlanes = screen.getByRole("group", {
+      name: /pipeline swimlane height/i,
+    });
+    const separation = screen.getByRole("group", {
+      name: /pipeline lane separation/i,
+    });
+    // Risen → Separation On → then back to Stacked (should clear Separation).
+    fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
+    fireEvent.click(within(separation).getByRole("button", { name: /^on$/i }));
+    fireEvent.click(
+      within(swimlanes).getByRole("button", { name: /^stacked$/i }),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    const opts = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1] as Record<
+      string,
+      unknown
+    >;
+    expect(opts.pipelineSwimlaneLaneRise).toBe(false);
+    expect(opts.pipelineRankSeparate).toBe(false);
+  });
+
+  it("RCLL view: Straighten · On threads pipelineStraighten true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const straighten = screen.getByRole("group", {
+      name: /pipeline straighten/i,
+    });
+    fireEvent.click(within(straighten).getByRole("button", { name: /^on$/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineStraighten: true,
+      }),
+    );
+  });
+
+  it("RCLL view: De-densify · On threads pipelineDeDensify true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const deDensify = screen.getByRole("group", {
+      name: /pipeline de-densify/i,
+    });
+    fireEvent.click(within(deDensify).getByRole("button", { name: /^on$/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineDeDensify: true,
+      }),
+    );
+  });
+
+  it("RCLL view: Cycle bands defaults to Risen (true) and threads false when set to Stacked", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    const cycleBands = screen.getByRole("group", {
+      name: /pipeline cycle bands/i,
+    });
+    // Default is Risen (on) — flip it to Stacked.
+    fireEvent.click(
+      within(cycleBands).getByRole("button", { name: /^stacked$/i }),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineStaircaseBandOverlap: false,
       }),
     );
   });

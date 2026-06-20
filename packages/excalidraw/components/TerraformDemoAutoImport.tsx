@@ -91,6 +91,10 @@ export const TerraformDemoAutoImport = ({
           pipelineSwimlaneLaneRise: params.swimlaneRise,
           pipelineReorder: params.reorder,
           pipelineSubnetDeBand: params.subnetDeBand,
+          pipelineRankSeparate: params.rankSeparate,
+          pipelineStraighten: params.straighten,
+          pipelineDeDensify: params.deDensify,
+          pipelineStaircaseBandOverlap: params.staircaseBandOverlap,
           signal,
           onLayoutProgress: (progress) => {
             const label =

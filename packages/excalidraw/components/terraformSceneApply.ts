@@ -163,6 +163,14 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineReorder?: boolean;
   /** RCLL subnet de-band — collapse subnet lanes into one VPC stack. Default false. */
   pipelineSubnetDeBand?: boolean;
+  /** RCLL M8r — whole-model-global sibling-separation ranking (needs lane-rise). Default false. */
+  pipelineRankSeparate?: boolean;
+  /** RCLL M5 — Brandes–Köpf leaf straightening. Default false. */
+  pipelineStraighten?: boolean;
+  /** RCLL M5b — de-density: spread crowded columns. Default false. */
+  pipelineDeDensify?: boolean;
+  /** RCLL M3b / DEC-1 — X-disjoint cycle groups rise to share Y. Default on (undefined). */
+  pipelineStaircaseBandOverlap?: boolean;
   /** Frame tint mode for pipeline/semantic topology views. */
   colorMode?: TerraformColorMode;
   importedTfdTexts?: string[];
@@ -229,6 +237,12 @@ async function layoutTerraformSceneFromSources(
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
             pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
+            pipelineRankSeparate: options.pipelineRankSeparate === true,
+            pipelineStraighten: options.pipelineStraighten === true,
+            pipelineDeDensify: options.pipelineDeDensify === true,
+            // Default-on: undefined ⇒ engine default (true). Only an explicit
+            // false (Stacked) flows through.
+            pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
@@ -304,6 +318,12 @@ export const runTerraformImportFromSources = async (
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
             pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
+            pipelineRankSeparate: options.pipelineRankSeparate === true,
+            pipelineStraighten: options.pipelineStraighten === true,
+            pipelineDeDensify: options.pipelineDeDensify === true,
+            // Default-on: undefined ⇒ engine default (true). Only an explicit
+            // false (Stacked) flows through.
+            pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
           }
         : {}),
       colorMode: options.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,

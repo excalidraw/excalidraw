@@ -16,6 +16,11 @@ export type TerraformDemoUrlParams = {
   swimlaneRise?: boolean;
   reorder?: boolean;
   subnetDeBand?: boolean;
+  rankSeparate?: boolean;
+  straighten?: boolean;
+  deDensify?: boolean;
+  /** RCLL DEC-1 cycle-band rise; default on — only `=0` (false) is meaningful. */
+  staircaseBandOverlap?: boolean;
 };
 
 const PRESET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -143,6 +148,22 @@ export const parseTerraformDemoUrlParams = (
   if (subnetDeBand === null) {
     return null;
   }
+  const rankSeparate = parseBooleanParam("rankSeparate");
+  if (rankSeparate === null) {
+    return null;
+  }
+  const straighten = parseBooleanParam("straighten");
+  if (straighten === null) {
+    return null;
+  }
+  const deDensify = parseBooleanParam("deDensify");
+  if (deDensify === null) {
+    return null;
+  }
+  const staircaseBandOverlap = parseBooleanParam("staircaseBandOverlap");
+  if (staircaseBandOverlap === null) {
+    return null;
+  }
 
   return {
     presetId,
@@ -156,6 +177,10 @@ export const parseTerraformDemoUrlParams = (
     ...(swimlaneRise != null ? { swimlaneRise } : {}),
     ...(reorder != null ? { reorder } : {}),
     ...(subnetDeBand != null ? { subnetDeBand } : {}),
+    ...(rankSeparate != null ? { rankSeparate } : {}),
+    ...(straighten != null ? { straighten } : {}),
+    ...(deDensify != null ? { deDensify } : {}),
+    ...(staircaseBandOverlap != null ? { staircaseBandOverlap } : {}),
   };
 };
 

@@ -84,6 +84,17 @@ export const useTerraformImportDialog = ({
   // swimlane dial, not reset on view switch — the RCLL view owns it.
   const [pipelineReorder, setPipelineReorder] = useState(false);
   const [pipelineSubnetDeBand, setPipelineSubnetDeBand] = useState(false);
+  // RCLL M8r (rcll-only): whole-model-global sibling-separation ranking. Gated in
+  // the UI to require the lane-rise (solo = taller/wider — see toggle guards).
+  const [pipelineRankSeparate, setPipelineRankSeparate] = useState(false);
+  // RCLL M5 (rcll-only): Brandes–Köpf leaf straightening.
+  const [pipelineStraighten, setPipelineStraighten] = useState(false);
+  // RCLL M5b (rcll-only): de-density (spread crowded columns).
+  const [pipelineDeDensify, setPipelineDeDensify] = useState(false);
+  // RCLL M3b / DEC-1 (rcll-only): X-disjoint cycle groups rise to share Y. Default
+  // ON (true) — turning it off (Stacked) makes cyclic groups taller.
+  const [pipelineStaircaseBandOverlap, setPipelineStaircaseBandOverlap] =
+    useState(true);
   const [moduleLayoutOptions, setModuleLayoutOptions] = useState(
     DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
   );
@@ -266,6 +277,10 @@ export const useTerraformImportDialog = ({
       pipelineSwimlaneLaneRise,
       pipelineReorder,
       pipelineSubnetDeBand,
+      pipelineRankSeparate,
+      pipelineStraighten,
+      pipelineDeDensify,
+      pipelineStaircaseBandOverlap,
       importedTfdTexts: opts.importedTfdTexts,
       preset: opts.preset ?? null,
       signal: layoutAbortRef.current?.signal,
@@ -392,6 +407,10 @@ export const useTerraformImportDialog = ({
             pipelineSwimlaneLaneRise,
             pipelineReorder,
             pipelineSubnetDeBand,
+            pipelineRankSeparate,
+            pipelineStraighten,
+            pipelineDeDensify,
+            pipelineStaircaseBandOverlap,
             signal: layoutAbortRef.current?.signal,
             onLayoutProgress: (p) => {
               const label =
@@ -484,6 +503,10 @@ export const useTerraformImportDialog = ({
           pipelineSwimlaneLaneRise,
           pipelineReorder,
           pipelineSubnetDeBand,
+          pipelineRankSeparate,
+          pipelineStraighten,
+          pipelineDeDensify,
+          pipelineStaircaseBandOverlap,
           signal: layoutAbortRef.current?.signal,
           onLayoutProgress: (p) => {
             const label =
@@ -685,6 +708,10 @@ export const useTerraformImportDialog = ({
     pipelineSwimlaneLaneRise,
     pipelineReorder,
     pipelineSubnetDeBand,
+    pipelineRankSeparate,
+    pipelineStraighten,
+    pipelineDeDensify,
+    pipelineStaircaseBandOverlap,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -720,6 +747,10 @@ export const useTerraformImportDialog = ({
     setPipelineSwimlaneLaneRise,
     setPipelineReorder,
     setPipelineSubnetDeBand,
+    setPipelineRankSeparate,
+    setPipelineStraighten,
+    setPipelineDeDensify,
+    setPipelineStaircaseBandOverlap,
     setModuleLayoutOptions,
     setSelectedPresetId,
     setArtifactRepoName,

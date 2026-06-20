@@ -121,8 +121,9 @@ export type RcllOptions = {
    * dense-rank axis piles independent same-floor clusters into one column; de-density
    * promotes a SAFE subset one column right to make Y-room for the straightener.
    * Column-preserving, single-column, forward-only ⇒ CON-12-safe by construction.
-   * **Internal / measurement-only** (not wired to the UI). `deDensifyMaxCols` is the
-   * width dial; 0 (default) disables the pass even when `deDensify` is true.
+   * Exposed in the import dialog as "De-densify" (RCLL-only); the UI supplies a
+   * default `deDensifyMaxCols` of 2 (terraformPipelineToggleGuards.ts).
+   * `deDensifyMaxCols` is the width dial; 0 (default) disables the pass.
    */
   deDensify?: boolean;
   deDensifyMaxCols?: number;
@@ -135,6 +136,17 @@ export type RcllOptions = {
    * Phase-0 measurement wiring; suppresses the subnet frame (no annotation visual yet).
    */
   subnetDeBand?: boolean;
+  /**
+   * `rankSeparate` (default **false**): sibling-separation ranking (RFC §9.6 / DEC-13).
+   * On the swimlane path, one-way-dependent sibling lanes (regions in an account, VPCs
+   * in a region, …) are re-ranked into **disjoint column ranges** so the M4 lane rise
+   * can lift them off the Y-stack (trade width for height). Independent lanes are
+   * untouched (shift 0 ⇒ they still Y-stack); mutual cycles stay co-axial. Replaces the
+   * `floor` fed to `denseClusterColumns`; falls back to base floor if the constraint
+   * graph is infeasible. Exposed in the import dialog as "Separation" (RCLL-only),
+   * gated to require `swimlaneLaneRise` (terraformPipelineToggleGuards.ts).
+   */
+  rankSeparate?: boolean;
 };
 
 /** A stage's output: the updated tree plus stage-scoped meta (§28). */

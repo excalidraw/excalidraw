@@ -121,7 +121,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
   },
   "swimlane.compact": {
     title: "Swimlanes · Risen",
-    body: "Inside a swimlane, groups whose columns don't overlap slide up to share a row instead of stacking, reclaiming vertical space. The shared left-to-right axis is kept, so the dataflow still reads forward.",
+    body: "Inside a swimlane, groups whose columns don't overlap slide up to share a row instead of stacking, reclaiming vertical space. The shared left-to-right axis is kept, so the dataflow still reads forward. On its own the gain is small on dependency-dense presets — its big win is paired with Separation, which makes more lanes column-disjoint.",
     dev: {
       implements:
         "DEC-1 Y-rise extended to swimlane lanes (M4): each lane's frame is tightened to its content shared-column range while leaf X is preserved (CON-12-safe); X-disjoint lanes share rows via riseStackY.",
@@ -139,7 +139,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
   },
   "ordering.on": {
     title: "Ordering · On",
-    body: "Inside each group, nodes are reordered to reduce crossing arrows — a node moves next to the ones it connects to. Only applied when it actually cuts crossings, so it never makes a group worse.",
+    body: "Inside each group, nodes are reordered to reduce crossing arrows — a node moves next to the ones it connects to. Only applied when it actually cuts crossings, so it never makes a group worse. On presets whose order is already crossing-optimal (e.g. the staging v2) it finds nothing to change.",
     dev: {
       implements:
         "M6 per-container barycenter reorder with a strict-improve gate (terraformPipelineOrdering.ts): leaves are permuted within their column to minimize a geometric crossing count; accepted only if strictly fewer crossings, else model order. X (columns) untouched — iron rule unaffected.",
@@ -167,6 +167,69 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       refs: [
         "MapSets / BubbleSets (set-membership without overlapping regions)",
       ],
+    },
+  },
+  "separation.off": {
+    title: "Separation · Off",
+    body: "Dependent sibling lanes keep their natural columns. Combined with risen swimlanes they may still overlap and stack. Leave off unless you also want the lane-separation win.",
+    dev: {
+      implements:
+        "rankSeparate=false: denseClusterColumns uses the base longest-path floor; sibling lanes are not pushed into disjoint column ranges.",
+    },
+  },
+  "separation.on": {
+    title: "Separation · On (needs risen swimlanes)",
+    body: "One-way-dependent lanes (regions in an account, VPCs in a region) are pushed into separate columns so risen swimlanes can pack their height — much shorter (≈ −42% on the staging preset) at the cost of more width and a few more crossings. Only has an effect with Swimlanes = Risen, so it is disabled until you turn that on.",
+    dev: {
+      implements:
+        "rankSeparate (M8r / DEC-13 / RFC §9.6): whole-model-global Sander base-node layering — one longestPath over the whole-model leaf DAG ∪ all-to-all separation edges per one-way quotient pair (mutual cycles stay co-axial). CON-12 forward by construction. Gated to swimlaneLaneRise (terraformPipelineToggleGuards.ts): alone it is taller + ~+28% width + ~+45% crossings; the height win is only realized once the M4 lane-rise shares the now-disjoint lanes' Y rows.",
+      refs: ["Sander 1996 — Layout of Compound Directed Graphs"],
+    },
+  },
+  "straighten.off": {
+    title: "Straighten · Off",
+    body: "Each group's nodes keep a plain top-down stack.",
+    dev: {
+      implements:
+        "straighten=false: leaf Y is the naive within-column stack.",
+    },
+  },
+  "straighten.on": {
+    title: "Straighten · On",
+    body: "Aligns fan-out spines so connected cards line up across columns — easier to follow where there's vertical slack. No visible change on dependency-dense presets like the staging v2, where columns are already packed (the straightener has no room to move).",
+    dev: {
+      implements:
+        "straighten (M5): two-sided size-aware Brandes–Köpf coordinate assignment rewrites leaf box.y to align with adjacent-column dataflow neighbours; Y-only, columns + within-column order untouched (CON-12-safe). Measured no-op on v2 (85% of edges are adjacent-column, room-starved).",
+      refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
+    },
+  },
+  "dedensify.off": {
+    title: "De-densify · Off",
+    body: "Crowded columns keep every independent card in place.",
+    dev: { implements: "deDensify=false: the dense-rank axis is untouched." },
+  },
+  "dedensify.on": {
+    title: "De-densify · On",
+    body: "Spreads a crowded column by moving independent cards (no dependency edges) one column to the right, making vertical room. Has no effect where every crowded card has a dependency edge — e.g. the staging v2 — because the rule conservatively leaves connected cards alone.",
+    dev: {
+      implements:
+        "deDensify (M5b, Axis-2 B): promotes a SAFE subset of same-floor independent leaves one column right (forward-only, column-preserving ⇒ CON-12-safe). The width dial deDensifyMaxCols defaults to 2 when enabled (terraformPipelineToggleGuards.ts). Measured no-op on v2 (dataflow too dense).",
+    },
+  },
+  "cyclebands.risen": {
+    title: "Cycle bands · Risen (default)",
+    body: "Inside a mutually-dependent group, sub-groups whose columns don't overlap share a row instead of stacking — shorter. This is the default.",
+    dev: {
+      implements:
+        "staircaseBandOverlap=true (M3b / DEC-1): X-disjoint cyclic SCC groups rise to share Y via riseStackY on the condensation staircase.",
+    },
+  },
+  "cyclebands.stacked": {
+    title: "Cycle bands · Stacked",
+    body: "Mutually-dependent sub-groups stack vertically in sequence instead of sharing rows — taller, but each group sits on its own row. Turns off a height-saving default.",
+    dev: {
+      implements:
+        "staircaseBandOverlap=false: cyclic SCC groups are placed in sequential disjoint Y bands (no rise). Taller than the default.",
     },
   },
   "resources.allRcll": {
@@ -203,6 +266,10 @@ export const TerraformImportPipelineSettings = ({
   pipelineSwimlaneLaneRise,
   pipelineReorder,
   pipelineSubnetDeBand,
+  pipelineRankSeparate,
+  pipelineStraighten,
+  pipelineDeDensify,
+  pipelineStaircaseBandOverlap,
   setPipelineCompact,
   setPipelineLayoutVariant,
   setPipelinePacked,
@@ -212,6 +279,10 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSwimlaneLaneRise,
   setPipelineReorder,
   setPipelineSubnetDeBand,
+  setPipelineRankSeparate,
+  setPipelineStraighten,
+  setPipelineDeDensify,
+  setPipelineStaircaseBandOverlap,
   showPlacement = true,
   showVariant = true,
 }: {
@@ -224,6 +295,10 @@ export const TerraformImportPipelineSettings = ({
   pipelineSwimlaneLaneRise: boolean;
   pipelineReorder: boolean;
   pipelineSubnetDeBand: boolean;
+  pipelineRankSeparate: boolean;
+  pipelineStraighten: boolean;
+  pipelineDeDensify: boolean;
+  pipelineStaircaseBandOverlap: boolean;
   setPipelineCompact: (compact: boolean) => void;
   setPipelineLayoutVariant: (variant: PipelineLayoutVariant) => void;
   setPipelinePacked: (packed: boolean) => void;
@@ -233,6 +308,10 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
   setPipelineReorder: (reorder: boolean) => void;
   setPipelineSubnetDeBand: (subnetDeBand: boolean) => void;
+  setPipelineRankSeparate: (rankSeparate: boolean) => void;
+  setPipelineStraighten: (straighten: boolean) => void;
+  setPipelineDeDensify: (deDensify: boolean) => void;
+  setPipelineStaircaseBandOverlap: (staircaseBandOverlap: boolean) => void;
   /** Experimental view hides Placement — Semantic forced-bands competes with its engine. */
   showPlacement?: boolean;
   /** RCLL view hides the Layout variant + Height — it owns placement (M0 delegates to Compound). */
@@ -350,7 +429,8 @@ export const TerraformImportPipelineSettings = ({
           {!showVariant && (
             <div className="TerraformImportModal__controlNote">
               RCLL arranges layout automatically. Only the Detail, Resources,
-              Swimlanes, Ordering, and Subnets toggles apply.
+              Swimlanes, Ordering, Subnets, Separation, Straighten, De-densify,
+              and Cycle bands toggles apply.
             </div>
           )}
           {!showVariant && (
@@ -363,7 +443,13 @@ export const TerraformImportPipelineSettings = ({
                   "Stacked",
                   !pipelineSwimlaneLaneRise,
                   "swimlane.stacked",
-                  () => setPipelineSwimlaneLaneRise(false),
+                  () => {
+                    // Footgun guard: Separation is only valid with risen
+                    // swimlanes, so turning the rise off also clears it (it
+                    // would otherwise be a stale, suppressed On).
+                    setPipelineSwimlaneLaneRise(false);
+                    setPipelineRankSeparate(false);
+                  },
                 )}
                 {option(
                   "Risen",
@@ -403,6 +489,78 @@ export const TerraformImportPipelineSettings = ({
                   pipelineSubnetDeBand,
                   "subnet.debanded",
                   () => setPipelineSubnetDeBand(true),
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline lane separation">
+              <span className="TerraformImportModal__controlLabel">
+                Separation <span>split dependent lanes (needs risen swimlanes)</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option("Off", !pipelineRankSeparate, "separation.off", () =>
+                  setPipelineRankSeparate(false),
+                )}
+                {option(
+                  "On",
+                  pipelineRankSeparate,
+                  "separation.on",
+                  () => setPipelineRankSeparate(true),
+                  // Footgun guard: separation alone is taller + wider; the win
+                  // exists only composed with the risen swimlane lane-rise.
+                  !pipelineSwimlaneLaneRise,
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline straighten">
+              <span className="TerraformImportModal__controlLabel">
+                Straighten <span>align fan-out spines across columns</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option("Off", !pipelineStraighten, "straighten.off", () =>
+                  setPipelineStraighten(false),
+                )}
+                {option("On", pipelineStraighten, "straighten.on", () =>
+                  setPipelineStraighten(true),
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline de-densify">
+              <span className="TerraformImportModal__controlLabel">
+                De-densify <span>spread crowded columns</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option("Off", !pipelineDeDensify, "dedensify.off", () =>
+                  setPipelineDeDensify(false),
+                )}
+                {option("On", pipelineDeDensify, "dedensify.on", () =>
+                  setPipelineDeDensify(true),
+                )}
+              </div>
+            </div>
+          )}
+          {!showVariant && (
+            <div role="group" aria-label="Pipeline cycle bands">
+              <span className="TerraformImportModal__controlLabel">
+                Cycle bands <span>height of mutually-dependent cycles</span>
+              </span>
+              <div className="TerraformImportModal__segmentedControl">
+                {option(
+                  "Risen",
+                  pipelineStaircaseBandOverlap,
+                  "cyclebands.risen",
+                  () => setPipelineStaircaseBandOverlap(true),
+                )}
+                {option(
+                  "Stacked",
+                  !pipelineStaircaseBandOverlap,
+                  "cyclebands.stacked",
+                  () => setPipelineStaircaseBandOverlap(false),
                 )}
               </div>
             </div>

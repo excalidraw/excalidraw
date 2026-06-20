@@ -60,6 +60,10 @@ export const TerraformImportModal = ({
     pipelineSwimlaneLaneRise,
     pipelineReorder,
     pipelineSubnetDeBand,
+    pipelineRankSeparate,
+    pipelineStraighten,
+    pipelineDeDensify,
+    pipelineStaircaseBandOverlap,
     moduleLayoutOptions,
     loading,
     layoutProgress,
@@ -557,6 +561,10 @@ terraform show -json tfplan > plan.json`}</code>
                 pipelineSwimlaneLaneRise={pipelineSwimlaneLaneRise}
                 pipelineReorder={pipelineReorder}
                 pipelineSubnetDeBand={pipelineSubnetDeBand}
+                pipelineRankSeparate={pipelineRankSeparate}
+                pipelineStraighten={pipelineStraighten}
+                pipelineDeDensify={pipelineDeDensify}
+                pipelineStaircaseBandOverlap={pipelineStaircaseBandOverlap}
                 setPipelineCompact={dialog.setPipelineCompact}
                 setPipelineLayoutVariant={dialog.setPipelineLayoutVariant}
                 setPipelinePacked={dialog.setPipelinePacked}
@@ -570,6 +578,12 @@ terraform show -json tfplan > plan.json`}</code>
                 }
                 setPipelineReorder={dialog.setPipelineReorder}
                 setPipelineSubnetDeBand={dialog.setPipelineSubnetDeBand}
+                setPipelineRankSeparate={dialog.setPipelineRankSeparate}
+                setPipelineStraighten={dialog.setPipelineStraighten}
+                setPipelineDeDensify={dialog.setPipelineDeDensify}
+                setPipelineStaircaseBandOverlap={
+                  dialog.setPipelineStaircaseBandOverlap
+                }
                 showPlacement={view !== "rcll"}
                 showVariant={view !== "rcll"}
               />

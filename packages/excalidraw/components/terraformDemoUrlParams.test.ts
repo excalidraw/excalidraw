@@ -154,6 +154,58 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses rankSeparate (RCLL M8r A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&rankSeparate=1"),
+      ).toEqual({ presetId: "demo", view: "rcll", rankSeparate: true });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&rankSeparate=0"),
+      ).toEqual({ presetId: "demo", rankSeparate: false });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&rankSeparate=maybe"),
+      ).toBeNull();
+    });
+
+    it("parses straighten (RCLL M5 A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&straighten=1"),
+      ).toEqual({ presetId: "demo", view: "rcll", straighten: true });
+      expect(parseTerraformDemoUrlParams("?preset=demo&straighten=0")).toEqual({
+        presetId: "demo",
+        straighten: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&straighten=maybe"),
+      ).toBeNull();
+    });
+
+    it("parses deDensify (RCLL M5b A/B)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&deDensify=1"),
+      ).toEqual({ presetId: "demo", view: "rcll", deDensify: true });
+      expect(parseTerraformDemoUrlParams("?preset=demo&deDensify=0")).toEqual({
+        presetId: "demo",
+        deDensify: false,
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&deDensify=maybe"),
+      ).toBeNull();
+    });
+
+    it("parses staircaseBandOverlap (RCLL DEC-1, default on — only =0 is meaningful)", () => {
+      // Default on: absent ⇒ omitted (engine default true downstream).
+      expect(parseTerraformDemoUrlParams("?preset=demo&view=rcll")).toEqual({
+        presetId: "demo",
+        view: "rcll",
+      });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&staircaseBandOverlap=0"),
+      ).toEqual({ presetId: "demo", staircaseBandOverlap: false });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&staircaseBandOverlap=maybe"),
+      ).toBeNull();
+    });
+
     it("rejects invalid view or pack", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=invalid"),

@@ -58,6 +58,10 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
   pipelineSubnetDeBand?: boolean;
+  pipelineRankSeparate?: boolean;
+  pipelineStraighten?: boolean;
+  pipelineDeDensify?: boolean;
+  pipelineStaircaseBandOverlap?: boolean;
   importedTfdTexts?: string[];
   preset?: TerraformImportPreset | null;
   signal?: AbortSignal;
@@ -79,6 +83,10 @@ export const runTerraformImportWithView = async ({
   pipelineSwimlaneLaneRise,
   pipelineReorder,
   pipelineSubnetDeBand,
+  pipelineRankSeparate,
+  pipelineStraighten,
+  pipelineDeDensify,
+  pipelineStaircaseBandOverlap,
   importedTfdTexts,
   preset = null,
   signal,
@@ -103,6 +111,10 @@ export const runTerraformImportWithView = async ({
           pipelineSwimlaneLaneRise,
           pipelineReorder,
           pipelineSubnetDeBand,
+          pipelineRankSeparate,
+          pipelineStraighten,
+          pipelineDeDensify,
+          pipelineStaircaseBandOverlap,
         }
       : {}),
     importedTfdTexts,
@@ -124,6 +136,10 @@ export type RunTerraformPresetImportOptions = {
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
   pipelineSubnetDeBand?: boolean;
+  pipelineRankSeparate?: boolean;
+  pipelineStraighten?: boolean;
+  pipelineDeDensify?: boolean;
+  pipelineStaircaseBandOverlap?: boolean;
   signal?: AbortSignal;
   onLayoutProgress?: (progress: TerraformLayoutProgress) => void;
 };
@@ -170,6 +186,10 @@ export const runTerraformPresetImport = async (
     pipelineSwimlaneLaneRise: options.pipelineSwimlaneLaneRise,
     pipelineReorder: options.pipelineReorder,
     pipelineSubnetDeBand: options.pipelineSubnetDeBand,
+    pipelineRankSeparate: options.pipelineRankSeparate,
+    pipelineStraighten: options.pipelineStraighten,
+    pipelineDeDensify: options.pipelineDeDensify,
+    pipelineStaircaseBandOverlap: options.pipelineStaircaseBandOverlap,
     importedTfdTexts: presetSources.tfdTexts,
     preset,
     signal: options.signal,
