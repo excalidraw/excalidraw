@@ -20,6 +20,8 @@ import type { PointerDownState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
+import { CODE_BLOCK_PADDING, isCodeBlockTextElement } from "./codeBlock";
+
 import {
   getArrowLocalFixedPoints,
   unbindBindingElement,
@@ -1303,14 +1305,26 @@ export const resizeMultipleElements = (
       ? [midX, midY]
       : anchorsMap[handleDirection];
 
+    // a code block (rectangle container + grouped code text) should resize
+    // freely like a plain rectangle, with the code text scaling uniformly so it
+    // never distorts — so it's exempt from the text/group aspect-ratio lock
+    const codeBlockContainer = targetElements.find(
+      ({ latest }) =>
+        latest.type === "rectangle" && !!latest.customData?.codeBlock,
+    )?.orig;
+    const isCodeBlock =
+      !!codeBlockContainer &&
+      targetElements.some(({ latest }) => isCodeBlockTextElement(latest));
+
     const keepAspectRatio =
       shouldMaintainAspectRatio ||
-      targetElements.some(
-        (item) =>
-          item.latest.angle !== 0 ||
-          isTextElement(item.latest) ||
-          isInGroup(item.latest),
-      );
+      (!isCodeBlock &&
+        targetElements.some(
+          (item) =>
+            item.latest.angle !== 0 ||
+            isTextElement(item.latest) ||
+            isInGroup(item.latest),
+        ));
 
     if (keepAspectRatio) {
       scaleX = scale;
@@ -1424,7 +1438,29 @@ export const resizeMultipleElements = (
         ];
       }
 
-      if (isTextElement(orig)) {
+      if (isCodeBlockTextElement(orig) && codeBlockContainer) {
+        // scale the code text uniformly by the smaller axis (so it stays
+        // undistorted and within the box) and anchor it to the container's
+        // new top-left + padding, letting the container resize freely
+        const textScale = Math.min(Math.abs(scaleX), Math.abs(scaleY)) || 1;
+        const newFontSize = Math.max(orig.fontSize * textScale, MIN_FONT_SIZE);
+        const effScale = newFontSize / orig.fontSize;
+
+        const cOffsetX = codeBlockContainer.x - anchorX;
+        const cOffsetY = codeBlockContainer.y - anchorY;
+        const cWidth = codeBlockContainer.width * scaleX;
+        const cHeight = codeBlockContainer.height * scaleY;
+        const cNewX =
+          anchorX + flipFactorX * (cOffsetX * scaleX + (flipByX ? cWidth : 0));
+        const cNewY =
+          anchorY + flipFactorY * (cOffsetY * scaleY + (flipByY ? cHeight : 0));
+
+        update.width = orig.width * effScale;
+        update.height = orig.height * effScale;
+        update.fontSize = newFontSize;
+        update.x = cNewX + CODE_BLOCK_PADDING * effScale;
+        update.y = cNewY + CODE_BLOCK_PADDING * effScale;
+      } else if (isTextElement(orig)) {
         const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
         if (!metrics) {
           return;
