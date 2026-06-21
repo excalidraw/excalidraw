@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
@@ -54,12 +54,8 @@ export const ColorInput = ({
     [onChange],
   );
 
-  const invalidColorTitle = useMemo(() => {
-    if (!isInvalid) {
-      return undefined;
-    }
-    return t("errors.invalidColor");
-  }, [isInvalid]);
+  const errorId = useId();
+  const invalidColorTitle = isInvalid ? t("errors.invalidColor") : undefined;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
@@ -91,6 +87,7 @@ export const ColorInput = ({
         aria-label={label}
         title={invalidColorTitle}
         aria-invalid={isInvalid}
+        aria-describedby={isInvalid ? errorId : undefined}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
@@ -111,6 +108,15 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {isInvalid && (
+        <span
+          id={errorId}
+          className="color-picker-input__error-message"
+          aria-live="polite"
+        >
+          {invalidColorTitle}
+        </span>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
