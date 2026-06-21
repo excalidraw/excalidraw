@@ -109,7 +109,7 @@ describe("element locking", () => {
       expect(crossHatchButton).toBe(null);
     });
 
-    it("should highlight common stroke width of selected elements", () => {
+    it("should show common stroke width of selected elements", () => {
       const rect1 = API.createElement({
         type: "rectangle",
         strokeWidth: STROKE_WIDTH.thin,
@@ -121,14 +121,17 @@ describe("element locking", () => {
       API.setElements([rect1, rect2]);
       API.setSelectedElements([rect1, rect2]);
 
-      const thinStrokeWidthButton = queryByTestId(
+      const strokeWidthSlider = queryByTestId(
         document.body,
-        `strokeWidth-thin`,
-      );
-      expect(thinStrokeWidthButton).toBeChecked();
+        `strokeWidth`,
+      ) as HTMLInputElement;
+      expect(strokeWidthSlider.value).toBe(`${STROKE_WIDTH.thin}`);
+      expect(strokeWidthSlider.min).toBe("1");
+      expect(strokeWidthSlider.max).toBe("12");
+      expect(strokeWidthSlider.step).toBe("1");
     });
 
-    it("should not highlight any stroke width button if no common style", () => {
+    it("should show stroke width slider if no common style", () => {
       const rect1 = API.createElement({
         type: "rectangle",
         strokeWidth: STROKE_WIDTH.thin,
@@ -140,16 +143,12 @@ describe("element locking", () => {
       API.setElements([rect1, rect2]);
       API.setSelectedElements([rect1, rect2]);
 
-      expect(queryByTestId(document.body, `strokeWidth-thin`)).not.toBe(null);
-      expect(
-        queryByTestId(document.body, `strokeWidth-thin`),
-      ).not.toBeChecked();
-      expect(
-        queryByTestId(document.body, `strokeWidth-bold`),
-      ).not.toBeChecked();
-      expect(
-        queryByTestId(document.body, `strokeWidth-extraBold`),
-      ).not.toBeChecked();
+      const strokeWidthSlider = queryByTestId(
+        document.body,
+        `strokeWidth`,
+      ) as HTMLInputElement;
+      expect(strokeWidthSlider).not.toBe(null);
+      expect(strokeWidthSlider.value).toBe(`${STROKE_WIDTH.bold}`);
     });
 
     it("should show properties of different element types when selected", () => {
@@ -164,7 +163,9 @@ describe("element locking", () => {
       API.setElements([rect, text]);
       API.setSelectedElements([rect, text]);
 
-      expect(queryByTestId(document.body, `strokeWidth-bold`)).toBeChecked();
+      expect(
+        (queryByTestId(document.body, `strokeWidth`) as HTMLInputElement).value,
+      ).toBe(`${STROKE_WIDTH.bold}`);
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );
