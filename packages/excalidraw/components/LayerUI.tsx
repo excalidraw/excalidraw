@@ -49,6 +49,7 @@ import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { sidebarRightIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
+import { CodeBlockDialog } from "./CodeBlockDialog";
 import { Stats } from "./Stats";
 import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
@@ -503,6 +504,9 @@ const LayerUI = ({
           MainMenu.DefaultItems. */}
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
+      {appState.openDialog?.name === "codeBlock" && (
+        <CodeBlockDialog key={appState.openDialog.editingElementId ?? "new"} />
+      )}
       {/* ------------------------------------------------------------------ */}
 
       {defaultUIEnabled && appState.isLoading && <LoadingMessage delay={250} />}
