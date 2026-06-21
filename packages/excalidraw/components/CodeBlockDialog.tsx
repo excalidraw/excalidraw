@@ -3,11 +3,8 @@ import { useMemo, useState } from "react";
 import {
   CODE_BLOCK_LANGUAGES,
   CODE_BLOCK_PADDING,
-  CODE_BLOCK_THEMES,
   DEFAULT_CODE_BLOCK_LANGUAGE,
-  DEFAULT_CODE_BLOCK_THEME,
   ShapeCache,
-  getCodeBlockBorderColor,
   getCodeBlockMeta,
   isCodeBlockTextElement,
   measureCodeBlockText,
@@ -16,7 +13,6 @@ import {
   normalizeCodeText,
 } from "@excalidraw/element";
 
-import type { CodeBlockTheme } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -79,9 +75,6 @@ export const CodeBlockDialog = () => {
   const [language, setLanguage] = useState<string>(
     () => existingMeta?.language ?? DEFAULT_CODE_BLOCK_LANGUAGE,
   );
-  const [theme, setTheme] = useState<CodeBlockTheme>(
-    () => existingMeta?.theme ?? DEFAULT_CODE_BLOCK_THEME,
-  );
 
   const close = () => setAppState({ openDialog: null });
 
@@ -93,24 +86,22 @@ export const CodeBlockDialog = () => {
     }
 
     if (editing) {
+      // the block's colors follow the app theme at render time, so editing only
+      // needs to update the text, language and the container's size
       const elementsMap = app.scene.getNonDeletedElementsMap();
-      const palette = CODE_BLOCK_THEMES[theme];
       const metrics = measureCodeBlockText(normalized);
 
       mutateElement(editing.text as ExcalidrawTextElement, elementsMap, {
         text: normalized,
         originalText: normalized,
-        strokeColor: palette.foreground,
         width: metrics.width,
         height: metrics.height,
-        customData: { codeBlock: { language, theme } },
+        customData: { codeBlock: { language } },
       });
       mutateElement(editing.container, elementsMap, {
         width: metrics.width + CODE_BLOCK_PADDING * 2,
         height: metrics.height + CODE_BLOCK_PADDING * 2,
-        backgroundColor: palette.background,
-        strokeColor: getCodeBlockBorderColor(theme),
-        customData: { codeBlock: { language, theme } },
+        customData: { codeBlock: { language } },
       });
       ShapeCache.delete(editing.text);
       ShapeCache.delete(editing.container);
@@ -119,7 +110,6 @@ export const CodeBlockDialog = () => {
       const { container, text } = newCodeBlockElements({
         code: normalized,
         language,
-        theme,
         x: 0,
         y: 0,
       });
@@ -152,18 +142,6 @@ export const CodeBlockDialog = () => {
                   {lang.label}
                 </option>
               ))}
-            </select>
-          </label>
-          <label>
-            {t("codeBlock.theme")}
-            <select
-              value={theme}
-              onChange={(event) =>
-                setTheme(event.target.value as CodeBlockTheme)
-              }
-            >
-              <option value="dark">{t("codeBlock.themeDark")}</option>
-              <option value="light">{t("codeBlock.themeLight")}</option>
             </select>
           </label>
         </div>

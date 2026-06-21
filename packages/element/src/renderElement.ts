@@ -442,6 +442,7 @@ const strokeStickyNoteEdge = (
 const drawCodeBlockText = (
   element: NonDeletedExcalidrawElement & { type: "text" },
   context: CanvasRenderingContext2D,
+  isDarkMode: boolean,
 ) => {
   const meta = getCodeBlockMeta(element);
   if (!meta) {
@@ -461,7 +462,11 @@ const drawCodeBlockText = (
     lineHeightPx,
   );
 
-  const lines = tokenizeCode(element.text, meta.language, meta.theme);
+  const lines = tokenizeCode(
+    element.text,
+    meta.language,
+    isDarkMode ? "dark" : "light",
+  );
 
   for (let index = 0; index < lines.length; index++) {
     const y = index * lineHeightPx + verticalOffset;
@@ -671,7 +676,7 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isCodeBlockTextElement(element)) {
-        drawCodeBlockText(element, context);
+        drawCodeBlockText(element, context, renderConfig.theme === THEME.DARK);
       } else if (isTextElement(element)) {
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
