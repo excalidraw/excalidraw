@@ -431,6 +431,8 @@ type LayoutSceneContext = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6: per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
+  /** RCLL M6c: container-aware crossing minimization (supersedes the leaf reorder). */
+  pipelineCrossingMin?: boolean;
   /** RCLL de-band depth: dissolve the chosen container level + all deeper levels into one
    * shared column stack (frames → rails). `none` = today's boxed layout. */
   pipelineDeBandLevel?: DeBandLevel;
@@ -480,6 +482,7 @@ async function buildPipelineLayoutSceneBody(
           semanticPlacement: ctx.pipelineSemanticPlacement === true,
           swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
           reorder: ctx.pipelineReorder === true,
+          crossingMin: ctx.pipelineCrossingMin === true,
           deBandLevel: ctx.pipelineDeBandLevel ?? "none",
           rankSeparate: ctx.pipelineRankSeparate === true,
           straighten: ctx.pipelineStraighten === true,
@@ -492,6 +495,9 @@ async function buildPipelineLayoutSceneBody(
       );
       const columnPackingConflict = rcllSuppressions.includes(
         "column-packing-conflict-compact-wins",
+      );
+      const orderingConflict = rcllSuppressions.includes(
+        "ordering-conflict-crossing-min-wins",
       );
       // The applied packing arm after the guard (a conflict drops `deDensify`).
       const appliedColumnPacking: "spread" | "none" | "compact" =
@@ -537,7 +543,15 @@ async function buildPipelineLayoutSceneBody(
             ...(ctx.pipelineSwimlaneLaneRise
               ? { pipelineSwimlaneLaneRise: true }
               : {}),
-            ...(ctx.pipelineReorder ? { pipelineReorder: true } : {}),
+            // Echo the POST-guard reorder arm (the guard drops it when crossingMin
+            // wins) so the meta never claims an ordering pass the engine didn't run.
+            ...(pipelineOptions.reorder ? { pipelineReorder: true } : {}),
+            ...(pipelineOptions.crossingMin
+              ? { pipelineCrossingMin: true }
+              : {}),
+            // Observable backstop: both ordering passes were requested; the guard kept
+            // the hierarchical crossing-min and dropped the leaf reorder (superset wins).
+            ...(orderingConflict ? { pipelineOrderingConflict: true } : {}),
             // De-band depth echo — omit "none" (the identity ⇒ OFF byte-identical). Echo the
             // legacy `pipelineSubnetDeBand` boolean too when the level is "subnet" (back-compat
             // for existing assertions / the dev plugin's boolean-flag view).
@@ -969,6 +983,8 @@ export async function layoutTerraformFromSources(
     pipelineSwimlaneLaneRise:
       options?.pipelineSwimlaneLaneRise ?? pf?.swimlaneLaneRise ?? false,
     pipelineReorder: options?.pipelineReorder ?? pf?.reorder ?? false,
+    pipelineCrossingMin:
+      options?.pipelineCrossingMin ?? pf?.crossingMin ?? false,
     // De-band depth: explicit enum wins, then the legacy `subnetDeBand` boolean alias,
     // then the profile's level, defaulting to "none" (today's boxed layout).
     pipelineDeBandLevel:

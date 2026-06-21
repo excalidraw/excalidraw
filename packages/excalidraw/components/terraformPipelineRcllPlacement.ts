@@ -60,6 +60,11 @@ import {
 import type { RankSeparateMeta } from "./terraformPipelineRcllRankSeparate";
 import { computeGlobalSeparatedFloor } from "./terraformPipelineRcllRankSeparate";
 import {
+  collapsedEdgesFromFanout,
+  minimizeCrossings,
+  type CrossingMinResult,
+} from "./terraformPipelineRcllCrossingMin";
+import {
   straightenColumns,
   type StraightenLeaf,
 } from "./terraformPipelineStraighten";
@@ -127,7 +132,31 @@ type PlaceCtx = {
   fanout: ReadonlyMap<string, readonly string[]>;
   /** in(w): fan-in source cluster ids by target id (M5 straighten). */
   fanin: ReadonlyMap<string, readonly string[]>;
+  /** M6c (default empty): a global pre-order rank per node key proposed by the
+   * container-aware crossing-min search. When non-empty it determines every container's
+   * SIBLING order (lanes/sub-hulls + within-column leaves); model order is the tiebreak.
+   * Empty ⇒ model/M6 order ⇒ byte-identical. X is never a function of order, so this
+   * moves only Y (CON-12 untouched). See terraformPipelineRcllCrossingMin.ts. */
+  orderOverride: ReadonlyMap<string, number>;
 };
+
+/**
+ * Sibling comparator honoring the M6c order override: when BOTH siblings carry an
+ * override rank they sort by it, else fall back to model order `(mds, key)`. An empty
+ * override ⇒ pure model order (OFF byte-identical).
+ */
+function preferredOrder(
+  override: ReadonlyMap<string, number>,
+): (a: CompoundNode, b: CompoundNode) => number {
+  return (a, b) => {
+    const ra = override.get(a.key);
+    const rb = override.get(b.key);
+    if (ra != null && rb != null && ra !== rb) {
+      return ra - rb;
+    }
+    return byModelOrder(a, b);
+  };
+}
 
 /**
  * M6 within-column reorder. Returns a **stable global sort rank** per child key.
@@ -150,6 +179,12 @@ function reorderRankByKey(
       a.key.localeCompare(b.key),
   );
   const modelRank = new Map<string, number>(model.map((c, i) => [c.key, i]));
+  // M6c: a non-empty crossing-min override decides sibling order outright (it is the
+  // hierarchical superset of M6; the toggle guard makes crossingMin win over reorder).
+  if (ctx.orderOverride.size > 0) {
+    const ordered = [...children].sort(preferredOrder(ctx.orderOverride));
+    return new Map<string, number>(ordered.map((c, i) => [c.key, i]));
+  }
   if (!ctx.reorder) {
     return modelRank;
   }
@@ -352,12 +387,13 @@ function placeForcedBands(
   columnX: readonly number[],
   areaX: number,
   startY: number,
+  orderOverride: ReadonlyMap<string, number>,
 ): number {
+  // Within a column the band order is model order — or, under M6c, the crossing-min
+  // sibling order (Y only; the column X is untouched, so CON-12 holds).
+  const pref = preferredOrder(orderOverride);
   const ordered = [...children].sort(
-    (a, b) =>
-      (a.localColumn ?? 0) - (b.localColumn ?? 0) ||
-      a.minDescendantSequence - b.minDescendantSequence ||
-      a.key.localeCompare(b.key),
+    (a, b) => (a.localColumn ?? 0) - (b.localColumn ?? 0) || pref(a, b),
   );
   let cursorY = startY;
   for (const child of ordered) {
@@ -479,6 +515,8 @@ type LaneContext = {
   fanout: ReadonlyMap<string, readonly string[]>;
   /** M5 straighten: in(w) cluster-id fan-in sources by target id. */
   fanin: ReadonlyMap<string, readonly string[]>;
+  /** M6c: the crossing-min global sibling-order override (empty ⇒ model/M6 order). */
+  orderOverride: ReadonlyMap<string, number>;
 };
 
 /** Collect every descendant **leaf cluster** node under `node`. */
@@ -532,6 +570,7 @@ function buildLaneContext(
   fanin: ReadonlyMap<string, readonly string[]>,
   deDensify: boolean,
   deDensifyMaxCols: number,
+  orderOverride: ReadonlyMap<string, number>,
 ): LaneContext {
   const leaves: CompoundNode[] = [];
   for (const n of nodes) {
@@ -563,6 +602,7 @@ function buildLaneContext(
     straighten,
     fanout,
     fanin,
+    orderOverride,
   });
 }
 
@@ -581,6 +621,7 @@ function laneContextFromColMap(
     straighten: boolean;
     fanout: ReadonlyMap<string, readonly string[]>;
     fanin: ReadonlyMap<string, readonly string[]>;
+    orderOverride: ReadonlyMap<string, number>;
   },
 ): LaneContext {
   const maxCol = leaves.reduce(
@@ -601,6 +642,7 @@ function laneContextFromColMap(
     straighten: flags.straighten,
     fanout: flags.fanout,
     fanin: flags.fanin,
+    orderOverride: flags.orderOverride,
   };
 }
 
@@ -628,6 +670,17 @@ function laneLeafOrder(
   ctx: LaneContext,
 ): CompoundNode[] {
   const model = [...leafNodes].sort(byModelOrder);
+  // M6c: under a crossing-min override, leaves order by (shared column, override rank)
+  // — column membership (X) is fixed by colByCluster, so only the within-column Y stack
+  // order changes. Takes precedence over M6 (guard makes crossingMin win over reorder).
+  if (ctx.orderOverride.size > 0) {
+    const pref = preferredOrder(ctx.orderOverride);
+    return [...leafNodes].sort(
+      (a, b) =>
+        (ctx.colByCluster.get(a.cluster!.id) ?? 0) -
+          (ctx.colByCluster.get(b.cluster!.id) ?? 0) || pref(a, b),
+    );
+  }
   if (!ctx.reorder || model.length < 2) {
     return model;
   }
@@ -702,7 +755,11 @@ function layoutLanesOnAxis(
   originX: number,
   originY: number,
 ): { right: number; bottom: number } {
-  const lanes = nodes.filter((c) => c.children.length > 0).sort(byModelOrder);
+  // M6c: lanes (sub-hulls) order by the crossing-min override (Y only; each lane keeps
+  // its content shared-column X). Empty override ⇒ model order (byte-identical).
+  const lanes = nodes
+    .filter((c) => c.children.length > 0)
+    .sort(preferredOrder(ctx.orderOverride));
   let cursorY = originY;
   // M4 (CON-12-safe swimlane lane rise): tighten each lane's frame to its content
   // shared-column range (leaves keep absolute X — forwardness intact) so X-disjoint
@@ -833,6 +890,7 @@ function arrangeSwimlaneGroup(
     pctx.fanin,
     pctx.deDensify,
     pctx.deDensifyMaxCols,
+    pctx.orderOverride,
   );
   // M5c (Axis-2 A): pull SAFE independent leaves LEFT into earlier-column whitespace to
   // shrink width. Measure-driven — `compactColumns` accepts a move only if re-placing a
@@ -851,6 +909,7 @@ function arrangeSwimlaneGroup(
       straighten: pctx.straighten,
       fanout: pctx.fanout,
       fanin: pctx.fanin,
+      orderOverride: pctx.orderOverride,
     };
     // `cluster.id` keys are shared between members and their clones (cloneNode keeps
     // cluster refs), so a trial map drives both the geometry (via original `leaves`,
@@ -900,6 +959,9 @@ type SccGroup = {
   height: number;
   col: number;
   minSeq: number;
+  /** M6c within-column placement order key = min override rank over members (else
+   * minSeq). Reorders same-staircase-column groups in Y; X (`col`) is untouched. */
+  ord: number;
 };
 
 /**
@@ -988,7 +1050,15 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
       (m, c) => Math.min(m, c.minDescendantSequence),
       Number.POSITIVE_INFINITY,
     );
-    groups.push({ rep: r, members, width, height, col: 0, minSeq });
+    const ord =
+      ctx.orderOverride.size > 0
+        ? members.reduce(
+            (m, c) =>
+              Math.min(m, ctx.orderOverride.get(c.key) ?? Number.POSITIVE_INFINITY),
+            Number.POSITIVE_INFINITY,
+          )
+        : minSeq;
+    groups.push({ rep: r, members, width, height, col: 0, minSeq, ord });
   }
 
   // Condensation DAG → group columns (longest-path; rank = group minSeq).
@@ -1024,10 +1094,15 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
   }
   const columnX = columnOffsetsFromWidths(colWidth, 0, PIPELINE_COLUMN_GAP);
 
-  // Canonical placement order: (col, minSeq, rep) — deterministic (CON-8).
+  // Canonical placement order: (col, M6c ord, minSeq, rep) — deterministic (CON-8).
+  // `ord` == minSeq when no override, so this is byte-identical OFF; under M6c it
+  // reorders same-column groups in Y (X by `col` is untouched, so CON-12 holds).
   groups.sort(
     (a, b) =>
-      a.col - b.col || a.minSeq - b.minSeq || a.rep.localeCompare(b.rep),
+      a.col - b.col ||
+      a.ord - b.ord ||
+      a.minSeq - b.minSeq ||
+      a.rep.localeCompare(b.rep),
   );
 
   const titleReserve = rendersTitledFrame(node.role)
@@ -1117,7 +1192,7 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
       };
     }
   } else if (policy === "forced") {
-    placeForcedBands(node.children, columnX, areaX, areaY);
+    placeForcedBands(node.children, columnX, areaX, areaY, ctx.orderOverride);
   } else if (policy === "mixed") {
     // vpc: subnet-zone sub-hulls forced into bands, then vpc-direct leaves packed
     // in a block below — disjoint Y regions so the two groups never overlap.
@@ -1127,7 +1202,13 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
       (c) => c.role !== "primaryCluster",
     );
     const leafKids = node.children.filter((c) => c.role === "primaryCluster");
-    const afterBands = placeForcedBands(containerKids, columnX, areaX, areaY);
+    const afterBands = placeForcedBands(
+      containerKids,
+      columnX,
+      areaX,
+      areaY,
+      ctx.orderOverride,
+    );
     placePackedColumns(leafKids, columnX, areaX, afterBands, ctx);
   } else {
     placePackedColumns(node.children, columnX, areaX, areaY, ctx);
@@ -1172,6 +1253,7 @@ export function layoutPlacement(
   lattice: Lattice,
   opts?: RcllOptions,
   columnCompactStats?: ColumnCompactStats,
+  orderOverride?: ReadonlyMap<string, number>,
 ): CompoundNode {
   const ctx: PlaceCtx = {
     cyclic: lattice.cyclicContainers ?? new Set<string>(),
@@ -1188,6 +1270,7 @@ export function layoutPlacement(
     deBandLevel: opts?.deBandLevel ?? "none",
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
+    orderOverride: orderOverride ?? new Map<string, number>(),
   };
   const root = cloneNode(tree);
   if (ctx.deBandLevel !== "none") {
@@ -1436,8 +1519,55 @@ export function placementStage(
     opts?.columnCompact === true
       ? { moved: 0, reclaimedCols: 0, evalCapReached: false }
       : undefined;
-  const placed = layoutPlacement(tree, effLattice, opts, columnCompactStats);
+
+  // M6c container-aware crossing minimization (RFC §7.2c / §9.5). Measure-driven: the
+  // search re-places clones for candidate sibling orders and accepts on the RENDERED
+  // crossing count (`countPlacedCrossings`, the box-coordinate analogue of
+  // `diagnosePipelineScene`). X is order-independent, so only Y moves (CON-12 untouched).
+  // OFF (or no improvement) ⇒ the empty override ⇒ byte-identical to today's placement.
+  let placed: CompoundNode;
+  let crossingMin: CrossingMinResult | undefined;
+  const placeWith = (
+    override: ReadonlyMap<string, number>,
+    stats?: ColumnCompactStats,
+  ): CompoundNode => layoutPlacement(tree, effLattice, opts, stats, override);
+
+  if (opts?.crossingMin === true) {
+    const edges = collapsedEdgesFromFanout(
+      effLattice.fanout ?? new Map<string, readonly string[]>(),
+    );
+    const search = minimizeCrossings(
+      edges,
+      (override) => placeWith(override),
+      (t) => {
+        const m = placementMeta(t, effLattice);
+        return {
+          containment: m.containmentViolations,
+          overlap: m.siblingOverlapViolations,
+          width: m.maxWidthPx,
+          height: m.maxDepthPx,
+        };
+      },
+    );
+    crossingMin = search.result;
+    // Re-place the accepted order WITH the real columnCompact accumulator so its stats
+    // reflect the chosen geometry (the search trials run without accumulating). The
+    // override is deterministic ⇒ identical geometry to `search.tree`.
+    placed = placeWith(search.override, columnCompactStats);
+  } else {
+    placed = placeWith(new Map<string, number>(), columnCompactStats);
+  }
+
   const meta: Record<string, number> = placementMeta(placed, effLattice);
+  if (crossingMin) {
+    meta.crossingMinApplied = crossingMin.applied ? 1 : 0;
+    meta.crossingMinBefore = crossingMin.before;
+    meta.crossingMinAfter = crossingMin.after;
+    meta.crossingMinMoves = crossingMin.moves;
+    meta.crossingMinHeightDeltaPx = crossingMin.heightDeltaPx;
+    meta.crossingMinWidthDeltaPx = crossingMin.widthDeltaPx;
+    meta.crossingMinEvalCapReached = crossingMin.evalCapReached ? 1 : 0;
+  }
   if (columnCompactStats) {
     meta.columnCompactApplied = columnCompactStats.moved > 0 ? 1 : 0;
     meta.columnCompactMovedCount = columnCompactStats.moved;

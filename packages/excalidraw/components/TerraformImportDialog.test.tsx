@@ -147,6 +147,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
+      pipelineCrossingMin: false,
       pipelineDeBandLevel: "none",
       pipelineRankSeparate: false,
       pipelineStraighten: false,
@@ -180,6 +181,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
+      pipelineCrossingMin: false,
       pipelineDeBandLevel: "none",
       pipelineRankSeparate: false,
       pipelineStraighten: false,
@@ -281,6 +283,34 @@ describe("TerraformImportModal", () => {
     );
   });
 
+  it("RCLL view: Cross-container · On threads pipelineCrossingMin true", async () => {
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
+      elements: [],
+      files: {},
+    });
+    render(<TerraformImportModal onCloseRequest={vi.fn()} />);
+    fillFirstBundle();
+    fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
+
+    // The RCLL-only nested Cross-container control (M6c). Scope to its group so
+    // the shared "On" label of the sibling toggles doesn't collide.
+    const group = screen.getByRole("group", {
+      name: /pipeline cross-container crossing-min/i,
+    });
+    const onBtn = within(group).getByRole("button", { name: /^on$/i });
+    expect(onBtn).toBeInTheDocument();
+    fireEvent.click(onBtn);
+
+    fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
+    await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
+    expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineCrossingMin: true,
+      }),
+    );
+  });
+
   it("RCLL view: De-band depth select threads pipelineDeBandLevel", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
@@ -341,7 +371,9 @@ describe("TerraformImportModal", () => {
     const swimlanes = screen.getByRole("group", {
       name: /pipeline lane height/i,
     });
-    fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
+    fireEvent.click(
+      within(swimlanes).getByRole("button", { name: /^risen$/i }),
+    );
     expect(
       within(separation).getByRole("button", { name: /^on$/i }),
     ).not.toHaveAttribute("aria-disabled", "true");
@@ -374,7 +406,9 @@ describe("TerraformImportModal", () => {
       name: /pipeline lane split/i,
     });
     // Risen → Lane split On → then back to Stacked (should clear Lane split).
-    fireEvent.click(within(swimlanes).getByRole("button", { name: /^risen$/i }));
+    fireEvent.click(
+      within(swimlanes).getByRole("button", { name: /^risen$/i }),
+    );
     fireEvent.click(within(separation).getByRole("button", { name: /^on$/i }));
     fireEvent.click(
       within(swimlanes).getByRole("button", { name: /^stacked$/i }),
@@ -382,10 +416,8 @@ describe("TerraformImportModal", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
-    const opts = vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1] as Record<
-      string,
-      unknown
-    >;
+    const opts = vi.mocked(layoutTerraformViaWorkers).mock
+      .calls[0][1] as Record<string, unknown>;
     expect(opts.pipelineSwimlaneLaneRise).toBe(false);
     expect(opts.pipelineRankSeparate).toBe(false);
   });
@@ -450,7 +482,9 @@ describe("TerraformImportModal", () => {
     const packing = screen.getByRole("group", {
       name: /pipeline column packing/i,
     });
-    fireEvent.click(within(packing).getByRole("button", { name: /^compact$/i }));
+    fireEvent.click(
+      within(packing).getByRole("button", { name: /^compact$/i }),
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
@@ -475,7 +509,9 @@ describe("TerraformImportModal", () => {
     const profile = screen.getByRole("group", {
       name: /pipeline layout profile/i,
     });
-    fireEvent.click(within(profile).getByRole("button", { name: /^compact$/i }));
+    fireEvent.click(
+      within(profile).getByRole("button", { name: /^compact$/i }),
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
@@ -575,9 +611,13 @@ describe("TerraformImportModal", () => {
     // RCLL is dataflow-only: "All resources" is inert, so it renders disabled and
     // "Dataflow only" reads active regardless of stored state — the toggle can't
     // mislead. (The full reserved-band feature is a deferred RFC milestone.)
-    const allResources = screen.getByRole("button", { name: /^all resources$/i });
+    const allResources = screen.getByRole("button", {
+      name: /^all resources$/i,
+    });
     expect(allResources).toHaveAttribute("aria-disabled", "true");
-    const dataflowOnly = screen.getByRole("button", { name: /^dataflow only$/i });
+    const dataflowOnly = screen.getByRole("button", {
+      name: /^dataflow only$/i,
+    });
     expect(dataflowOnly).toHaveAttribute("aria-pressed", "true");
 
     // Clicking the disabled option does NOT flip includeAncillary on the import.

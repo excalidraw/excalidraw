@@ -94,4 +94,23 @@ describe("applyRcllToggleGuards", () => {
     expect(options.deDensify ?? false).toBe(false);
     expect(suppressions).toEqual([]);
   });
+
+  it("resolves an ordering conflict: crossingMin wins, leaf reorder dropped, observable", () => {
+    const { options, suppressions } = applyRcllToggleGuards({
+      reorder: true,
+      crossingMin: true,
+    });
+    expect(options.crossingMin).toBe(true);
+    expect(options.reorder).toBe(false);
+    expect(suppressions).toEqual(["ordering-conflict-crossing-min-wins"]);
+  });
+
+  it("leaves a lone crossingMin (or lone reorder) untouched", () => {
+    expect(applyRcllToggleGuards({ crossingMin: true }).options.crossingMin).toBe(
+      true,
+    );
+    expect(applyRcllToggleGuards({ crossingMin: true }).suppressions).toEqual([]);
+    expect(applyRcllToggleGuards({ reorder: true }).options.reorder).toBe(true);
+    expect(applyRcllToggleGuards({ reorder: true }).suppressions).toEqual([]);
+  });
 });

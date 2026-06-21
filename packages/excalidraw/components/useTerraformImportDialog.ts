@@ -90,6 +90,9 @@ export const useTerraformImportDialog = ({
   // RCLL M6 (rcll-only): per-container barycenter crossing-min reorder. Like the
   // swimlane dial, not reset on view switch — the RCLL view owns it.
   const [pipelineReorder, setPipelineReorder] = useState(false);
+  // RCLL M6c (rcll-only): container-aware crossing minimization — the hierarchical
+  // superset of the leaf reorder (the guard makes it win when both are on). RCLL-owned.
+  const [pipelineCrossingMin, setPipelineCrossingMin] = useState(false);
   const [pipelineDeBandLevel, setPipelineDeBandLevel] =
     useState<DeBandLevel>("none");
   // RCLL M8r (rcll-only): whole-model-global sibling-separation ranking. Gated in
@@ -111,25 +114,29 @@ export const useTerraformImportDialog = ({
   );
 
   // RCLL "Layout" — the outcome-first PRIMARY control. A named profile fans out into the
-  // seven RCLL flags above (the values actually threaded to import); touching any of those
+  // RCLL flags above (the values actually threaded to import); touching any of those
   // levers directly (from the Advanced disclosure) flips this to "custom" so the primary
   // control never lies about what is active. Default `balanced` = today's flag defaults.
   const [pipelineLayoutProfile, setPipelineLayoutProfileState] =
     useState<RcllLayoutProfileSelection>(DEFAULT_RCLL_LAYOUT_PROFILE);
 
-  // Apply a named profile: expand its bundle into the seven RCLL flag setters (raw, so the
+  // Apply a named profile: expand its bundle into the RCLL flag setters (raw, so the
   // fan-out itself does not mark "custom"), then record the profile as the primary choice.
-  const applyPipelineLayoutProfile = useCallback((profile: RcllLayoutProfile) => {
-    const flags = resolveRcllLayoutProfile(profile);
-    setPipelineSwimlaneLaneRise(flags.swimlaneLaneRise);
-    setPipelineRankSeparate(flags.rankSeparate);
-    setPipelineDeBandLevel(flags.deBandLevel);
-    setPipelineStaircaseBandOverlap(flags.staircaseBandOverlap);
-    setPipelineReorder(flags.reorder);
-    setPipelineStraighten(flags.straighten);
-    setPipelineColumnPacking(flags.columnPacking);
-    setPipelineLayoutProfileState(profile);
-  }, []);
+  const applyPipelineLayoutProfile = useCallback(
+    (profile: RcllLayoutProfile) => {
+      const flags = resolveRcllLayoutProfile(profile);
+      setPipelineSwimlaneLaneRise(flags.swimlaneLaneRise);
+      setPipelineRankSeparate(flags.rankSeparate);
+      setPipelineDeBandLevel(flags.deBandLevel);
+      setPipelineStaircaseBandOverlap(flags.staircaseBandOverlap);
+      setPipelineReorder(flags.reorder);
+      setPipelineCrossingMin(flags.crossingMin);
+      setPipelineStraighten(flags.straighten);
+      setPipelineColumnPacking(flags.columnPacking);
+      setPipelineLayoutProfileState(profile);
+    },
+    [],
+  );
 
   // Wrap each individual RCLL-flag setter so an Advanced edit flips the primary control to
   // "custom". `markCustom` only downgrades a named profile — re-applying a profile resets it.
@@ -147,6 +154,13 @@ export const useTerraformImportDialog = ({
   const setPipelineReorderCustom = useCallback(
     (v: boolean) => {
       setPipelineReorder(v);
+      markLayoutCustom();
+    },
+    [markLayoutCustom],
+  );
+  const setPipelineCrossingMinCustom = useCallback(
+    (v: boolean) => {
+      setPipelineCrossingMin(v);
       markLayoutCustom();
     },
     [markLayoutCustom],
@@ -364,6 +378,7 @@ export const useTerraformImportDialog = ({
       pipelineSemanticPlacement,
       pipelineSwimlaneLaneRise,
       pipelineReorder,
+      pipelineCrossingMin,
       pipelineDeBandLevel,
       pipelineRankSeparate,
       pipelineStraighten,
@@ -494,6 +509,7 @@ export const useTerraformImportDialog = ({
             pipelineSemanticPlacement,
             pipelineSwimlaneLaneRise,
             pipelineReorder,
+            pipelineCrossingMin,
             pipelineDeBandLevel,
             pipelineRankSeparate,
             pipelineStraighten,
@@ -590,6 +606,7 @@ export const useTerraformImportDialog = ({
           pipelineSemanticPlacement,
           pipelineSwimlaneLaneRise,
           pipelineReorder,
+          pipelineCrossingMin,
           pipelineDeBandLevel,
           pipelineRankSeparate,
           pipelineStraighten,
@@ -795,6 +812,7 @@ export const useTerraformImportDialog = ({
     pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise,
     pipelineReorder,
+    pipelineCrossingMin,
     pipelineDeBandLevel,
     pipelineRankSeparate,
     pipelineStraighten,
@@ -833,10 +851,11 @@ export const useTerraformImportDialog = ({
     setPipelinePackedPullLeft,
     setPipelineIncludeAncillary,
     setPipelineSemanticPlacement,
-    // The seven RCLL-flag setters are the "custom"-marking wrappers, so any Advanced edit
+    // The RCLL-flag setters are the "custom"-marking wrappers, so any Advanced edit
     // flips the primary Layout control to "Custom" (the raw setters stay internal).
     setPipelineSwimlaneLaneRise: setPipelineSwimlaneLaneRiseCustom,
     setPipelineReorder: setPipelineReorderCustom,
+    setPipelineCrossingMin: setPipelineCrossingMinCustom,
     setPipelineDeBandLevel: setPipelineDeBandLevelCustom,
     setPipelineRankSeparate: setPipelineRankSeparateCustom,
     setPipelineStraighten: setPipelineStraightenCustom,

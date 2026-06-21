@@ -59,6 +59,7 @@ export const TerraformImportModal = ({
     pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise,
     pipelineReorder,
+    pipelineCrossingMin,
     pipelineDeBandLevel,
     pipelineRankSeparate,
     pipelineStraighten,
@@ -561,6 +562,7 @@ terraform show -json tfplan > plan.json`}</code>
                 pipelineSemanticPlacement={pipelineSemanticPlacement}
                 pipelineSwimlaneLaneRise={pipelineSwimlaneLaneRise}
                 pipelineReorder={pipelineReorder}
+                pipelineCrossingMin={pipelineCrossingMin}
                 pipelineDeBandLevel={pipelineDeBandLevel}
                 pipelineRankSeparate={pipelineRankSeparate}
                 pipelineStraighten={pipelineStraighten}
@@ -575,10 +577,9 @@ terraform show -json tfplan > plan.json`}</code>
                 setPipelineSemanticPlacement={
                   dialog.setPipelineSemanticPlacement
                 }
-                setPipelineSwimlaneLaneRise={
-                  dialog.setPipelineSwimlaneLaneRise
-                }
+                setPipelineSwimlaneLaneRise={dialog.setPipelineSwimlaneLaneRise}
                 setPipelineReorder={dialog.setPipelineReorder}
+                setPipelineCrossingMin={dialog.setPipelineCrossingMin}
                 setPipelineDeBandLevel={dialog.setPipelineDeBandLevel}
                 setPipelineRankSeparate={dialog.setPipelineRankSeparate}
                 setPipelineStraighten={dialog.setPipelineStraighten}

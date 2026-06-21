@@ -103,6 +103,7 @@ export type RcllLayoutProfileFlags = {
   deBandLevel: DeBandLevel;
   staircaseBandOverlap: boolean;
   reorder: boolean;
+  crossingMin: boolean;
   straighten: boolean;
   columnPacking: "spread" | "none" | "compact";
 };
@@ -115,10 +116,10 @@ export const RCLL_LAYOUT_PROFILES: readonly RcllLayoutProfile[] = [
 
 export const DEFAULT_RCLL_LAYOUT_PROFILE: RcllLayoutProfile = "balanced";
 
-export function isRcllLayoutProfile(value: unknown): value is RcllLayoutProfile {
-  return (
-    value === "readable" || value === "balanced" || value === "compact"
-  );
+export function isRcllLayoutProfile(
+  value: unknown,
+): value is RcllLayoutProfile {
+  return value === "readable" || value === "balanced" || value === "compact";
 }
 
 /**
@@ -147,6 +148,7 @@ export function resolveRcllLayoutProfile(
         deBandLevel: "none",
         staircaseBandOverlap: false,
         reorder: true,
+        crossingMin: false,
         straighten: true,
         columnPacking: "none",
       };
@@ -157,6 +159,7 @@ export function resolveRcllLayoutProfile(
         deBandLevel: "subnet",
         staircaseBandOverlap: true,
         reorder: true,
+        crossingMin: false,
         straighten: true,
         columnPacking: "compact",
       };
@@ -168,6 +171,7 @@ export function resolveRcllLayoutProfile(
         deBandLevel: "none",
         staircaseBandOverlap: true,
         reorder: false,
+        crossingMin: false,
         straighten: false,
         columnPacking: "none",
       };

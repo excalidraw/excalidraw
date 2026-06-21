@@ -119,7 +119,12 @@ const relOf = (el: ExcalidrawElement) => {
   return r && typeof r === "object" ? (r as Record<string, unknown>) : null;
 };
 
-type Seg = { x1: number; y1: number; x2: number; y2: number };
+/**
+ * A 2D line segment. Exported so the M6c crossing-min scorer
+ * (`terraformPipelineRcllCrossingMin.ts`) can count crossings on box-derived
+ * segments through the SAME kernel the rendered diagnostic uses (DRY — RFC DEC-6).
+ */
+export type Seg = { x1: number; y1: number; x2: number; y2: number };
 
 // Polyline-aware arrow geometry (RFC DEC-6). The previous counter collapsed
 // every arrow to a single first→last chord, which mis-counts crossings and
@@ -180,7 +185,13 @@ function orient(
   return v > 1e-6 ? 1 : v < -1e-6 ? -1 : 0;
 }
 
-function segmentsCross(a: Seg, b: Seg): boolean {
+/**
+ * Proper-crossing test for two segments. Endpoint-sharing (within 1px) is treated
+ * as NON-crossing — two edges that meet at a shared node do not "cross" in the
+ * layered sense. Exported as the shared rendered-crossing kernel (RFC DEC-6) used
+ * by both this diagnostic and the M6c box-coordinate scorer.
+ */
+export function segmentsCross(a: Seg, b: Seg): boolean {
   const share =
     (Math.abs(a.x1 - b.x1) < 1 && Math.abs(a.y1 - b.y1) < 1) ||
     (Math.abs(a.x1 - b.x2) < 1 && Math.abs(a.y1 - b.y2) < 1) ||

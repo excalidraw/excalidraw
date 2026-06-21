@@ -64,6 +64,10 @@ type RcllBuildOptions = {
   swimlaneLaneRise?: boolean;
   /** M6 (default false): per-container barycenter crossing-min reorder. */
   reorder?: boolean;
+  /** M6c (default false): container-aware crossing minimization — reorders lanes/sub-hulls
+   * AND within-column leaves, gated on the rendered crossing count (measure-driven).
+   * Hierarchical superset of `reorder`; wins over it when both set. */
+  crossingMin?: boolean;
   /** M5 (default false): Brandes–Köpf leaf coordinate-assignment / straightening. */
   straighten?: boolean;
   /** M5b (default false, internal/measurement-only): de-density. `deDensifyMaxCols`
@@ -396,6 +400,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     staircaseBandOverlap: options?.staircaseBandOverlap,
     swimlaneLaneRise: options?.swimlaneLaneRise === true,
     reorder: options?.reorder === true,
+    crossingMin: options?.crossingMin === true,
     straighten: options?.straighten === true,
     deDensify: options?.deDensify === true,
     deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
@@ -502,11 +507,13 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
           ? "M5b"
           : rcllOptions.straighten
             ? "M5"
-            : rcllOptions.reorder
-              ? "M6"
-              : rcllOptions.swimlaneLaneRise
-                ? "M4"
-                : "M3a"
+            : rcllOptions.crossingMin
+              ? "M6c"
+              : rcllOptions.reorder
+                ? "M6"
+                : rcllOptions.swimlaneLaneRise
+                  ? "M4"
+                  : "M3a"
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
@@ -514,6 +521,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllRankSeparate: rcllOptions.rankSeparate === true,
       // M6: whether the barycenter crossing-min reorder is active.
       rcllReorder: rcllOptions.reorder === true,
+      // M6c: whether container-aware crossing minimization is active.
+      rcllCrossingMin: rcllOptions.crossingMin === true,
       // M5: whether Brandes–Köpf leaf straightening is active.
       rcllStraighten: rcllOptions.straighten === true,
       // De-band: the dissolved level + all deeper levels collapsed into one shared column

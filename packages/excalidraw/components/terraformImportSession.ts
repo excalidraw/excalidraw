@@ -42,6 +42,8 @@ export type TerraformImportSession = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
+  /** RCLL M6c — container-aware crossing minimization (supersedes the leaf reorder). */
+  pipelineCrossingMin?: boolean;
   /** RCLL de-band depth — dissolve the chosen container level + all deeper levels into one
    * shared column stack (frames → rails). `none` = today's boxed layout. */
   pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;

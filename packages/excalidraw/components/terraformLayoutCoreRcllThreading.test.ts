@@ -154,7 +154,9 @@ describe("layoutTerraformFromSources — RCLL toggle threading (regression)", ()
       // can differ between two builds even when the geometry is identical.)
       expect(subnetViaAlias.meta.pipelineDeBandLevel).toBe("subnet");
       expect(subnetViaAlias.meta.pipelineSubnetDeBand).toBe(true);
-      expect(subnetViaAlias.elements.length).toBe(subnetViaEnum.elements.length);
+      expect(subnetViaAlias.elements.length).toBe(
+        subnetViaEnum.elements.length,
+      );
       expect(sceneHeight(subnetViaAlias.elements)).toBe(
         sceneHeight(subnetViaEnum.elements),
       );
@@ -207,6 +209,54 @@ describe("layoutTerraformFromSources — RCLL toggle threading (regression)", ()
       expect(footgun.meta.pipelineRankSeparateSuppressed).toBe(true);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 4,
+  );
+
+  it(
+    "forwards pipelineCrossingMin (M6c) to the engine — OFF byte-identical, ON echoed, gates clean",
+    async () => {
+      const off = await build({});
+      const on = await build({
+        pipelineSwimlaneLaneRise: true,
+        pipelineRankSeparate: true,
+        pipelineCrossingMin: true,
+      });
+
+      // 1. OFF: the flag is absent ⇒ not advertised in meta.
+      expect(off.meta.pipelineCrossingMin ?? false).toBe(false);
+
+      // 2. ON reaches the engine: echoed + the M6c placement meta surfaces.
+      expect(on.meta.pipelineCrossingMin).toBe(true);
+      const placement = (
+        on.meta.rcllStageMeta as { placement?: Record<string, number> }
+      ).placement;
+      expect(placement?.crossingMinApplied).toBeDefined();
+      expect(placement?.crossingMinAfter).toBeLessThanOrEqual(
+        placement?.crossingMinBefore ?? Infinity,
+      );
+
+      // 3. Structural gates stay clean (X never moves ⇒ CON-12 holds).
+      const gates = on.meta.gates as
+        | { acyclicBackwardEdges?: number; acyclicSameColumnEdges?: number }
+        | undefined;
+      expect(gates?.acyclicBackwardEdges ?? 0).toBe(0);
+      expect(gates?.acyclicSameColumnEdges ?? 0).toBe(0);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 10,
+  );
+
+  it(
+    "crossingMin supersedes the leaf reorder when both are set (guard, observable)",
+    async () => {
+      const both = await build({
+        pipelineReorder: true,
+        pipelineCrossingMin: true,
+      });
+      // The guard drops the leaf reorder (superset wins) and surfaces the conflict.
+      expect(both.meta.pipelineCrossingMin).toBe(true);
+      expect(both.meta.pipelineReorder ?? false).toBe(false);
+      expect(both.meta.pipelineOrderingConflict).toBe(true);
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
   );
 
   it(

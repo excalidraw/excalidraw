@@ -109,6 +109,19 @@ export type RcllOptions = {
    */
   reorder?: boolean;
   /**
+   * M6c (default **false**): container-aware crossing minimization (RFC §7.2c / §9.5).
+   * The hierarchical superset of M6 `reorder`: it permutes **lanes / sub-hulls within
+   * their parent AND leaves within columns** (sibling slots only ⇒ contiguity by
+   * construction), proposing orders by a Sander/Forster barycenter but accepting them
+   * only when the **rendered** crossing count (`box.x/box.y`, the diagnostic's basis)
+   * strictly drops — a measure-driven re-place loop (the M5c precedent), not a
+   * floor-coordinate pre-pass. Pays back the `rankSeparate` +45 % crossings follow-on.
+   * X (columns) is never a function of order ⇒ only Y moves, CON-12 untouched. Height/
+   * width are reported but UNGATED (user decision). `false` ⇒ model/M6 order. Wins over
+   * `reorder` when both set (terraformPipelineToggleGuards.ts).
+   */
+  crossingMin?: boolean;
+  /**
    * M5 (default **false**): coordinate assignment / **straightening** (RFC §9, Axis-1
    * = Brandes–Köpf). After M6 settles the within-column order, each leaf is assigned a
    * Y that aligns it with its dataflow neighbours in adjacent columns (the spine reads

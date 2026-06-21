@@ -161,6 +161,8 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. Default false. */
   pipelineReorder?: boolean;
+  /** RCLL M6c — container-aware crossing minimization (superset of reorder). Default false. */
+  pipelineCrossingMin?: boolean;
   /** RCLL de-band depth — dissolve the chosen container level + all deeper levels into one
    * shared column stack. Default "none" (today's boxed layout). */
   pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;
@@ -241,9 +243,9 @@ async function layoutTerraformSceneFromSources(
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
             pipelineSemanticPlacement:
               options.pipelineSemanticPlacement === true,
-            pipelineSwimlaneLaneRise:
-              options.pipelineSwimlaneLaneRise === true,
+            pipelineSwimlaneLaneRise: options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
+            pipelineCrossingMin: options.pipelineCrossingMin === true,
             pipelineDeBandLevel:
               options.pipelineDeBandLevel ??
               (options.pipelineSubnetDeBand ? "subnet" : "none"),
@@ -326,9 +328,9 @@ export const runTerraformImportFromSources = async (
             pipelineIncludeAncillary: options.pipelineIncludeAncillary === true,
             pipelineSemanticPlacement:
               options.pipelineSemanticPlacement === true,
-            pipelineSwimlaneLaneRise:
-              options.pipelineSwimlaneLaneRise === true,
+            pipelineSwimlaneLaneRise: options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
+            pipelineCrossingMin: options.pipelineCrossingMin === true,
             pipelineDeBandLevel:
               options.pipelineDeBandLevel ??
               (options.pipelineSubnetDeBand ? "subnet" : "none"),

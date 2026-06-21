@@ -152,6 +152,25 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
+    it("parses crossingMin (RCLL M6c container-aware crossing-min)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&crossingMin=1"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        crossingMin: true,
+      });
+      expect(parseTerraformDemoUrlParams("?preset=demo&crossingMin=0")).toEqual(
+        {
+          presetId: "demo",
+          crossingMin: false,
+        },
+      );
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&crossingMin=maybe"),
+      ).toBeNull();
+    });
+
     it("parses subnetDeBand (legacy alias ⇒ deBandLevel=subnet)", () => {
       // The legacy boolean is preserved AND mapped to the generalized de-band enum.
       expect(
@@ -243,15 +262,23 @@ describe("terraformDemoUrlParams", () => {
 
     it("parses columnPacking (RCLL M5b/M5c tri-state) and rejects invalid", () => {
       expect(
-        parseTerraformDemoUrlParams("?preset=demo&view=rcll&columnPacking=compact"),
+        parseTerraformDemoUrlParams(
+          "?preset=demo&view=rcll&columnPacking=compact",
+        ),
       ).toEqual({ presetId: "demo", view: "rcll", columnPacking: "compact" });
       expect(
         parseTerraformDemoUrlParams("?preset=demo&columnPacking=none"),
       ).toEqual({ presetId: "demo", columnPacking: "none" });
       // explicit columnPacking wins over a legacy deDensify=1
       expect(
-        parseTerraformDemoUrlParams("?preset=demo&deDensify=1&columnPacking=compact"),
-      ).toEqual({ presetId: "demo", deDensify: true, columnPacking: "compact" });
+        parseTerraformDemoUrlParams(
+          "?preset=demo&deDensify=1&columnPacking=compact",
+        ),
+      ).toEqual({
+        presetId: "demo",
+        deDensify: true,
+        columnPacking: "compact",
+      });
       expect(
         parseTerraformDemoUrlParams("?preset=demo&columnPacking=sideways"),
       ).toBeNull();
@@ -261,12 +288,12 @@ describe("terraformDemoUrlParams", () => {
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=rcll&profile=compact"),
       ).toEqual({ presetId: "demo", view: "rcll", profile: "compact" });
-      expect(parseTerraformDemoUrlParams("?preset=demo&profile=readable")).toEqual(
-        { presetId: "demo", profile: "readable" },
-      );
-      expect(parseTerraformDemoUrlParams("?preset=demo&profile=balanced")).toEqual(
-        { presetId: "demo", profile: "balanced" },
-      );
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&profile=readable"),
+      ).toEqual({ presetId: "demo", profile: "readable" });
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&profile=balanced"),
+      ).toEqual({ presetId: "demo", profile: "balanced" });
       expect(
         parseTerraformDemoUrlParams("?preset=demo&profile=sideways"),
       ).toBeNull();

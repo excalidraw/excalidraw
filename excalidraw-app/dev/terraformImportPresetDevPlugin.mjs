@@ -50,6 +50,7 @@ const LAYOUT_BOOLEAN_PARAMS = [
   // Legacy alias: `deDensify=1` ⇒ the core derives `columnPacking:"spread"`.
   ["deDensify", "pipelineDeDensify"],
   ["reorder", "pipelineReorder"],
+  ["crossingMin", "pipelineCrossingMin"],
   ["cycleRise", "pipelineStaircaseBandOverlap"],
   ["staircaseBandOverlap", "pipelineStaircaseBandOverlap"],
   ["ancillary", "pipelineIncludeAncillary"],
@@ -65,7 +66,7 @@ const LAYOUT_ENUM_PARAMS = [
     "pipelineDeBandLevel",
     ["none", "subnet", "vpc", "region", "account", "provider"],
   ],
-  // Outcome-first "Layout" profile — expands into the seven RCLL flags in the core.
+  // Outcome-first "Layout" profile — expands into the RCLL flags in the core.
   ["profile", "pipelineLayoutProfile", ["readable", "balanced", "compact"]],
 ];
 
@@ -91,14 +92,26 @@ const LAYOUT_PARAM_CATALOG = {
   booleans: {
     compact: "detail: collapse clusters to a representative",
     laneRise: "alias of swimlaneRise (M4) — X-disjoint lanes share Y rows",
-    laneSplit: "alias of rankSeparate (M8r) — split dependent lanes (needs laneRise)",
-    cycleRise: "alias of staircaseBandOverlap (DEC-1) — cycle groups share Y (default on)",
+    laneSplit:
+      "alias of rankSeparate (M8r) — split dependent lanes (needs laneRise)",
+    cycleRise:
+      "alias of staircaseBandOverlap (DEC-1) — cycle groups share Y (default on)",
     subnetDeBand: "legacy alias ⇒ deBandLevel=subnet",
     straighten: "Brandes–Köpf leaf straightening",
-    reorder: "barycenter crossing-min reorder",
+    reorder: "barycenter crossing-min reorder (leaf, per-container)",
+    crossingMin:
+      "container-aware crossing minimization (M6c) — reorders whole groups + leaves; supersedes reorder",
     deDensify: "legacy alias ⇒ columnPacking=spread",
   },
-  responseShape: ["requested", "resolved", "applied", "suppressions", "bounds", "rcll", "regions"],
+  responseShape: [
+    "requested",
+    "resolved",
+    "applied",
+    "suppressions",
+    "bounds",
+    "rcll",
+    "regions",
+  ],
 };
 
 // The layout engine's import graph (appState, element rendering) reads browser
@@ -206,7 +219,10 @@ const ensureLayoutDomGlobals = () => {
       assign("localStorage", window.localStorage);
       assign("sessionStorage", window.sessionStorage);
       assign("matchMedia", window.matchMedia?.bind(window));
-      assign("requestAnimationFrame", window.requestAnimationFrame?.bind(window));
+      assign(
+        "requestAnimationFrame",
+        window.requestAnimationFrame?.bind(window),
+      );
       assign("cancelAnimationFrame", window.cancelAnimationFrame?.bind(window));
       assign("devicePixelRatio", 1);
     })();
@@ -285,9 +301,7 @@ const collectRegionFrames = (elements) => {
     });
   }
   regions.sort((a, b) =>
-    a.account === b.account
-      ? a.x - b.x
-      : a.account.localeCompare(b.account),
+    a.account === b.account ? a.x - b.x : a.account.localeCompare(b.account),
   );
   return regions;
 };
@@ -318,6 +332,7 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
     subnetDeBand: meta.pipelineSubnetDeBand ?? false,
     staircaseBandOverlap: meta.pipelineStaircaseBandOverlap ?? true,
     reorder: meta.pipelineReorder ?? false,
+    crossingMin: meta.pipelineCrossingMin ?? false,
     straighten: meta.pipelineStraighten ?? false,
     columnPacking: meta.pipelineColumnPacking ?? "none",
   };
@@ -337,7 +352,24 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
     suppressions.push({
       option: "columnPacking",
       reason: "conflict-compact-wins",
-      detail: "Both spread and compact were set; compact (measure-verified) won.",
+      detail:
+        "Both spread and compact were set; compact (measure-verified) won.",
+    });
+  }
+  if (meta.pipelineOrderingConflict) {
+    suppressions.push({
+      option: "reorder",
+      reason: "conflict-crossing-min-wins",
+      detail:
+        "Both reorder and crossingMin were set; the container-aware crossingMin (superset) won and the leaf reorder was dropped.",
+    });
+  }
+  if (resolvedFlags.crossingMin && placement.crossingMinApplied === 0) {
+    suppressions.push({
+      option: "crossingMin",
+      reason: "no-op",
+      detail:
+        "Crossing-min found no strictly-improving reorder on this preset (order already crossing-minimal).",
     });
   }
   if (
@@ -347,7 +379,8 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
     suppressions.push({
       option: "columnPacking",
       reason: "no-op",
-      detail: "Compaction moved 0 columns on this preset (dataflow already dense).",
+      detail:
+        "Compaction moved 0 columns on this preset (dataflow already dense).",
     });
   }
 
@@ -361,14 +394,18 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
     },
     applied: {
       pipelineRankSeparate: meta.pipelineRankSeparate ?? false,
-      pipelineRankSeparateSuppressed: meta.pipelineRankSeparateSuppressed ?? false,
+      pipelineRankSeparateSuppressed:
+        meta.pipelineRankSeparateSuppressed ?? false,
       pipelineSwimlaneLaneRise: meta.pipelineSwimlaneLaneRise ?? false,
       pipelineDeBandLevel: meta.pipelineDeBandLevel ?? "none",
       pipelineSubnetDeBand: meta.pipelineSubnetDeBand ?? false,
       pipelineStraighten: meta.pipelineStraighten ?? false,
       pipelineColumnPacking: meta.pipelineColumnPacking ?? "none",
-      pipelineColumnPackingConflict: meta.pipelineColumnPackingConflict ?? false,
+      pipelineColumnPackingConflict:
+        meta.pipelineColumnPackingConflict ?? false,
       pipelineReorder: meta.pipelineReorder ?? false,
+      pipelineCrossingMin: meta.pipelineCrossingMin ?? false,
+      pipelineOrderingConflict: meta.pipelineOrderingConflict ?? false,
       pipelineLayoutProfile: meta.pipelineLayoutProfile ?? null,
       rcllMilestone: meta.rcllMilestone ?? null,
     },
@@ -378,13 +415,22 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
     rcll: {
       rankSeparateApplied: placement.rankSeparateApplied ?? null,
       rankSeparatePairCount: placement.rankSeparatePairCount ?? null,
-      rankSeparateChangedRankCount: placement.rankSeparateChangedRankCount ?? null,
+      rankSeparateChangedRankCount:
+        placement.rankSeparateChangedRankCount ?? null,
       rankSeparateFallback: placement.rankSeparateFallback ?? null,
       maxDepthPx: placement.maxDepthPx ?? null,
       columnCompactApplied: placement.columnCompactApplied ?? null,
       columnCompactMovedCount: placement.columnCompactMovedCount ?? null,
       columnCompactReclaimedCols: placement.columnCompactReclaimedCols ?? null,
-      columnCompactEvalCapReached: placement.columnCompactEvalCapReached ?? null,
+      columnCompactEvalCapReached:
+        placement.columnCompactEvalCapReached ?? null,
+      crossingMinApplied: placement.crossingMinApplied ?? null,
+      crossingMinBefore: placement.crossingMinBefore ?? null,
+      crossingMinAfter: placement.crossingMinAfter ?? null,
+      crossingMinMoves: placement.crossingMinMoves ?? null,
+      crossingMinHeightDeltaPx: placement.crossingMinHeightDeltaPx ?? null,
+      crossingMinWidthDeltaPx: placement.crossingMinWidthDeltaPx ?? null,
+      crossingMinEvalCapReached: placement.crossingMinEvalCapReached ?? null,
       acyclicBackwardEdges: gates.acyclicBackwardEdges ?? null,
       acyclicSameColumnEdges: gates.acyclicSameColumnEdges ?? null,
     },
@@ -511,7 +557,10 @@ export const terraformImportPresetDevPlugin = () => ({
           }
           await ensureLayoutDomGlobals();
           const core = await server.ssrLoadModule(LAYOUT_CORE_MODULE);
-          const result = await core.layoutTerraformFromSources(sources, options);
+          const result = await core.layoutTerraformFromSources(
+            sources,
+            options,
+          );
           if (!result.ok) {
             sendJson(res, result.status ?? 422, { error: result.error });
             return;
@@ -567,17 +616,22 @@ export const terraformImportPresetDevPlugin = () => ({
 
       if (url.startsWith(TERRAFORM_ARTIFACT_API_ROUTE)) {
         if (req.method === "GET" && url === TERRAFORM_ARTIFACT_API_ROUTE) {
-          sendJson(res, 200, { artifacts: listTerraformImportArtifactsFromDb() });
+          sendJson(res, 200, {
+            artifacts: listTerraformImportArtifactsFromDb(),
+          });
           return;
         }
         if (req.method === "POST" && url === TERRAFORM_ARTIFACT_API_ROUTE) {
           try {
             const body = await readJsonBody(req);
-            const artifact = saveTerraformImportArtifactToDb(body.artifact ?? body);
+            const artifact = saveTerraformImportArtifactToDb(
+              body.artifact ?? body,
+            );
             sendJson(res, 201, { artifact });
           } catch (error) {
             sendJson(res, 400, {
-              error: error instanceof Error ? error.message : "Invalid artifact.",
+              error:
+                error instanceof Error ? error.message : "Invalid artifact.",
             });
           }
           return;
@@ -591,7 +645,8 @@ export const terraformImportPresetDevPlugin = () => ({
         const { compositionId, suffix } = compositionRoute;
         if (req.method === "GET" && suffix === "/sources") {
           try {
-            const composition = getTerraformImportCompositionFromDb(compositionId);
+            const composition =
+              getTerraformImportCompositionFromDb(compositionId);
             if (!composition) {
               sendJson(res, 404, { error: "Composition not found." });
               return;
@@ -631,7 +686,8 @@ export const terraformImportPresetDevPlugin = () => ({
           return;
         }
         if (req.method === "GET" && compositionId && !suffix) {
-          const composition = getTerraformImportCompositionFromDb(compositionId);
+          const composition =
+            getTerraformImportCompositionFromDb(compositionId);
           if (!composition) {
             sendJson(res, 404, { error: "Composition not found." });
             return;

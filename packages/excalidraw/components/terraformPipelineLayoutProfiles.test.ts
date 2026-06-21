@@ -16,6 +16,7 @@ const TODAY_DEFAULT_FLAGS: RcllLayoutProfileFlags = {
   deBandLevel: "none",
   staircaseBandOverlap: true,
   reorder: false,
+  crossingMin: false,
   straighten: false,
   columnPacking: "none",
 };
@@ -39,6 +40,7 @@ describe("resolveRcllLayoutProfile", () => {
       deBandLevel: "none",
       staircaseBandOverlap: false,
       reorder: true,
+      crossingMin: false,
       straighten: true,
       columnPacking: "none",
     });
@@ -51,6 +53,7 @@ describe("resolveRcllLayoutProfile", () => {
       deBandLevel: "subnet",
       staircaseBandOverlap: true,
       reorder: true,
+      crossingMin: false,
       straighten: true,
       columnPacking: "compact",
     });

@@ -23,7 +23,8 @@ export const DEDENSIFY_DEFAULT_MAX_COLS = 2;
 /** Reason codes for a suppressed/adjusted toggle (surfaced in scene meta). */
 export type RcllToggleSuppression =
   | "rankSeparate-needs-rise"
-  | "column-packing-conflict-compact-wins";
+  | "column-packing-conflict-compact-wins"
+  | "ordering-conflict-crossing-min-wins";
 
 /**
  * Whether `rankSeparate` may be enabled. True only when the M4 swimlane lane-rise
@@ -42,6 +43,10 @@ export type GuardablePipelineOptions = {
   deDensifyMaxCols?: number;
   /** M5c column compaction (pull-left). Mutually exclusive with `deDensify` (pull-right). */
   columnCompact?: boolean;
+  /** M6 leaf-only within-column reorder. Subsumed by `crossingMin` when both set. */
+  reorder?: boolean;
+  /** M6c container-aware crossing minimization (hierarchical superset of `reorder`). */
+  crossingMin?: boolean;
 };
 
 /**
@@ -76,6 +81,15 @@ export function applyRcllToggleGuards<T extends GuardablePipelineOptions>(
   if (next.deDensify === true && next.columnCompact === true) {
     next = { ...next, deDensify: false };
     suppressions.push("column-packing-conflict-compact-wins");
+  }
+
+  // `crossingMin` is the hierarchical superset of the leaf-only `reorder` (M6): it
+  // permutes lanes/sub-hulls AND within-column leaves, gated on the rendered count. If a
+  // caller sets both, crossingMin wins and the redundant leaf reorder is dropped (so the
+  // two ordering passes never compose) — surfaced observably (RFC §7.2c / DEC-6).
+  if (next.crossingMin === true && next.reorder === true) {
+    next = { ...next, reorder: false };
+    suppressions.push("ordering-conflict-crossing-min-wins");
   }
 
   // deDensify is a no-op without a positive width dial — supply a default.

@@ -157,6 +157,27 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       ],
     },
   },
+  "crossingmin.off": {
+    title: "Cross-container · Off",
+    body: "Crossing reduction stays within each group (see Ordering above). Arrows that run between groups keep whatever order the layering produced.",
+    dev: {
+      implements:
+        "crossingMin=false: no global pass. Sibling order = the leaf reorder (if on) or model order. Cross-container long edges are unaddressed (DI-M6-3).",
+    },
+  },
+  "crossingmin.on": {
+    title: "Cross-container · On (supersedes Ordering)",
+    body: "Reorders whole groups within their parent AND leaves within columns to cut arrows that cross BETWEEN groups — the thing the per-group Ordering pass can't reach. Each candidate order is re-placed and kept only if the actual drawn crossings strictly drop, so it never makes a diagram worse. Pays back the extra crossings that Lane split trades for height (measured −28% on the compact staging preset). Supersedes Ordering when both are on.",
+    dev: {
+      implements:
+        "crossingMin (M6c): container-aware crossing minimization (terraformPipelineRcllCrossingMin.ts). A Sander/Forster hierarchical barycenter PROPOSES a sibling order (lanes within parents + leaves within columns); the candidate is re-placed on a clone and ACCEPTED only if the RENDERED crossing count (box.x/box.y, same kernel as diagnosePipelineScene) strictly drops AND containment/overlap gates don't regress. X never moves ⇒ CON-12 holds by construction; height/width unbounded but reported. Bounded sweeps + eval budget. Supersedes the leaf reorder (terraformPipelineToggleGuards.ts: ordering-conflict-crossing-min-wins).",
+      refs: [
+        "Sander 1996 (compound crossing reduction)",
+        "Forster 2005 (crossing reduction)",
+        "Brandes & Köpf 2001 (coordinate assignment)",
+      ],
+    },
+  },
   "deband.depth": {
     title: "De-band depth",
     body: "How deep to dissolve the topology boxes. None keeps every level boxed (tallest, clearest ownership). Pick a level — subnet, VPC, region, account, or provider — and that level AND everything inside it collapse into one shared column stack. De-banding cascades downward: de-banding VPC also de-bands its subnets; provider merges everything. Dissolved membership reads from per-card colored rails + a legend instead of boxes. Subnet and VPC are the clean wins (much shorter, columns intact). Going deeper (region+) merges resources across containers that never shared a column axis, so it reshapes — and usually widens — the diagram; provider on a dense graph overflows into one giant stack. Use the deep levels deliberately.",
@@ -324,6 +345,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
   pipelineReorder,
+  pipelineCrossingMin,
   pipelineDeBandLevel,
   pipelineRankSeparate,
   pipelineStraighten,
@@ -338,6 +360,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement,
   setPipelineSwimlaneLaneRise,
   setPipelineReorder,
+  setPipelineCrossingMin,
   setPipelineDeBandLevel,
   setPipelineRankSeparate,
   setPipelineStraighten,
@@ -355,6 +378,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement: boolean;
   pipelineSwimlaneLaneRise: boolean;
   pipelineReorder: boolean;
+  pipelineCrossingMin: boolean;
   pipelineDeBandLevel: DeBandLevel;
   pipelineRankSeparate: boolean;
   pipelineStraighten: boolean;
@@ -369,6 +393,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
   setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
   setPipelineReorder: (reorder: boolean) => void;
+  setPipelineCrossingMin: (crossingMin: boolean) => void;
   setPipelineDeBandLevel: (deBandLevel: DeBandLevel) => void;
   setPipelineRankSeparate: (rankSeparate: boolean) => void;
   setPipelineStraighten: (straighten: boolean) => void;
@@ -519,7 +544,8 @@ export const TerraformImportPipelineSettings = ({
               {phaseHeader("Layout", "height ↔ width ↔ readability")}
               <div role="group" aria-label="Pipeline layout profile">
                 <span className="TerraformImportModal__controlLabel">
-                  Layout <span>pick the trade — adjust passes below to tune</span>
+                  Layout{" "}
+                  <span>pick the trade — adjust passes below to tune</span>
                 </span>
                 <div className="TerraformImportModal__segmentedControl">
                   {option(
@@ -543,13 +569,7 @@ export const TerraformImportPipelineSettings = ({
                   {pipelineLayoutProfile === "custom" &&
                     // Non-clickable badge: surfaces the active "Custom" state once an
                     // advanced lever is touched. Click a profile above to leave it.
-                    option(
-                      "Custom",
-                      true,
-                      "profile.custom",
-                      () => {},
-                      true,
-                    )}
+                    option("Custom", true, "profile.custom", () => {}, true)}
                 </div>
               </div>
               <details className="TerraformImportModal__advancedDisclosure">
@@ -566,7 +586,9 @@ export const TerraformImportPipelineSettings = ({
                 <div role="group" aria-label="Pipeline de-band depth">
                   <span className="TerraformImportModal__controlLabel">
                     De-band depth{" "}
-                    <span>dissolve a level + everything inside it into one stack</span>
+                    <span>
+                      dissolve a level + everything inside it into one stack
+                    </span>
                   </span>
                   <select
                     className="TerraformImportModal__select"
@@ -631,6 +653,34 @@ export const TerraformImportPipelineSettings = ({
                     )}
                   </div>
                 </div>
+                {/* Cross-container is NESTED under Ordering: it is the hierarchical
+                    superset of the per-group reorder (reorders whole groups within
+                    their parent, not just leaves within a column), so it reads as
+                    "extend the crossing-min across group boundaries". When On it
+                    supersedes the leaf reorder (the toggle guard makes it win). */}
+                <div
+                  role="group"
+                  aria-label="Pipeline cross-container crossing-min"
+                  className="TerraformImportModal__nestedControl"
+                >
+                  <span className="TerraformImportModal__controlLabel">
+                    Cross-container{" "}
+                    <span>
+                      cut crossings between groups (supersedes Ordering)
+                    </span>
+                  </span>
+                  <div className="TerraformImportModal__segmentedControl">
+                    {option(
+                      "Off",
+                      !pipelineCrossingMin,
+                      "crossingmin.off",
+                      () => setPipelineCrossingMin(false),
+                    )}
+                    {option("On", pipelineCrossingMin, "crossingmin.on", () =>
+                      setPipelineCrossingMin(true),
+                    )}
+                  </div>
+                </div>
                 {phaseHeader("Vertical", "top → down placement (Y)")}
                 <div role="group" aria-label="Pipeline lane height">
                   <span className="TerraformImportModal__controlLabel">
@@ -691,7 +741,8 @@ export const TerraformImportPipelineSettings = ({
                 </div>
                 <div role="group" aria-label="Pipeline cycle height">
                   <span className="TerraformImportModal__controlLabel">
-                    Cycle height <span>height of mutually-dependent cycles</span>
+                    Cycle height{" "}
+                    <span>height of mutually-dependent cycles</span>
                   </span>
                   {/* Button order matches Lane height (Stacked, Risen) so the two
                       height levers read as the same control at different scopes. */}

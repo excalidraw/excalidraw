@@ -24,6 +24,8 @@ export type TerraformDemoUrlParams = {
   /** Accepts the clear alias `laneRise` as well as the milestone name `swimlaneRise`. */
   swimlaneRise?: boolean;
   reorder?: boolean;
+  /** RCLL M6c: container-aware crossing minimization (hierarchical superset of reorder). */
+  crossingMin?: boolean;
   /** RCLL de-band depth: `none | subnet | vpc | region | account | provider`. */
   deBandLevel?: DeBandLevel;
   /** Back-compat alias for `deBandLevel=subnet` (the original subnet-only probe). */
@@ -189,6 +191,10 @@ export const parseTerraformDemoUrlParams = (
   if (reorder === null) {
     return null;
   }
+  const crossingMin = parseBooleanParam("crossingMin");
+  if (crossingMin === null) {
+    return null;
+  }
   const subnetDeBand = parseBooleanParam("subnetDeBand");
   if (subnetDeBand === null) {
     return null;
@@ -265,6 +271,7 @@ export const parseTerraformDemoUrlParams = (
     ...(semanticPlace != null ? { semanticPlace } : {}),
     ...(swimlaneRise != null ? { swimlaneRise } : {}),
     ...(reorder != null ? { reorder } : {}),
+    ...(crossingMin != null ? { crossingMin } : {}),
     ...(subnetDeBand != null ? { subnetDeBand } : {}),
     ...(deBandLevel != null ? { deBandLevel } : {}),
     ...(rankSeparate != null ? { rankSeparate } : {}),

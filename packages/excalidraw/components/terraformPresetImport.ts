@@ -57,6 +57,7 @@ export type RunTerraformImportFromSourcesArgs = {
   pipelineSemanticPlacement?: boolean;
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
+  pipelineCrossingMin?: boolean;
   pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;
   pipelineSubnetDeBand?: boolean;
   pipelineRankSeparate?: boolean;
@@ -85,6 +86,7 @@ export const runTerraformImportWithView = async ({
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
   pipelineReorder,
+  pipelineCrossingMin,
   pipelineDeBandLevel,
   pipelineSubnetDeBand,
   pipelineRankSeparate,
@@ -116,6 +118,7 @@ export const runTerraformImportWithView = async ({
           pipelineSemanticPlacement,
           pipelineSwimlaneLaneRise,
           pipelineReorder,
+          pipelineCrossingMin,
           pipelineDeBandLevel,
           pipelineSubnetDeBand,
           pipelineRankSeparate,
@@ -144,6 +147,7 @@ export type RunTerraformPresetImportOptions = {
   pipelineSemanticPlacement?: boolean;
   pipelineSwimlaneLaneRise?: boolean;
   pipelineReorder?: boolean;
+  pipelineCrossingMin?: boolean;
   pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;
   pipelineSubnetDeBand?: boolean;
   pipelineRankSeparate?: boolean;
@@ -197,6 +201,7 @@ export const runTerraformPresetImport = async (
     pipelineSemanticPlacement: options.pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise: options.pipelineSwimlaneLaneRise,
     pipelineReorder: options.pipelineReorder,
+    pipelineCrossingMin: options.pipelineCrossingMin,
     pipelineDeBandLevel: options.pipelineDeBandLevel,
     pipelineSubnetDeBand: options.pipelineSubnetDeBand,
     pipelineRankSeparate: options.pipelineRankSeparate,
