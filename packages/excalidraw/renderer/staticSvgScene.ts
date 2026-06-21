@@ -689,7 +689,11 @@ const renderElementToSvg = (
           ? getCodeBlockMeta(element)
           : undefined;
         const codeLines = codeMeta
-          ? tokenizeCode(element.text, codeMeta.language, codeMeta.theme)
+          ? tokenizeCode(
+              element.text,
+              codeMeta.language,
+              renderConfig.theme === THEME.DARK ? "dark" : "light",
+            )
           : null;
 
         for (let i = 0; i < lines.length; i++) {

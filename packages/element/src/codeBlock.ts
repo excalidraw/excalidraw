@@ -33,7 +33,11 @@ export type CodeBlockTheme = "light" | "dark";
 
 export type CodeBlockMeta = {
   language: string;
-  theme: CodeBlockTheme;
+  /**
+   * @deprecated colors now follow the live app theme at render time; retained
+   * for backwards compatibility with previously-created blocks.
+   */
+  theme?: CodeBlockTheme;
   showLineNumbers?: boolean;
 };
 
