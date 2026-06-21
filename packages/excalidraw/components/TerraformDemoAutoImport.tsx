@@ -91,6 +91,7 @@ export const TerraformDemoAutoImport = ({
           pipelineSemanticPlacement: params.semanticPlace,
           pipelineSwimlaneLaneRise: params.swimlaneRise,
           pipelineReorder: params.reorder,
+          pipelineDeBandLevel: params.deBandLevel,
           pipelineSubnetDeBand: params.subnetDeBand,
           pipelineRankSeparate: params.rankSeparate,
           pipelineStraighten: params.straighten,

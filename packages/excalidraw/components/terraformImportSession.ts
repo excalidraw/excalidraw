@@ -42,7 +42,10 @@ export type TerraformImportSession = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
-  /** RCLL subnet de-band — collapse subnet lanes into one VPC stack (frames → rails). */
+  /** RCLL de-band depth — dissolve the chosen container level + all deeper levels into one
+   * shared column stack (frames → rails). `none` = today's boxed layout. */
+  pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;
+  /** Back-compat alias for `pipelineDeBandLevel: "subnet"` (older persisted sessions). */
   pipelineSubnetDeBand?: boolean;
   /** RCLL M8r — whole-model-global sibling-separation ranking (needs lane-rise). */
   pipelineRankSeparate?: boolean;

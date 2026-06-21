@@ -11,6 +11,7 @@
  * land; M0 needs only the content/detail flags it passes to the fallback.
  */
 import type { PipelineCluster } from "./terraformPipelineLayoutShared";
+import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
 /** Topology nesting role (§6.2). */
 export type RcllTopologyRole =
@@ -140,14 +141,16 @@ export type RcllOptions = {
    */
   columnCompact?: boolean;
   /**
-   * Subnet de-band (PROBE, default **false**): on the swimlane path each subnet is a
-   * Y-lane stacked into its own disjoint band, so VPC height ≈ Σ(subnet bands). This
-   * collapses the subnet level — lifting every subnet's clusters to be direct VPC
-   * children — so all of a VPC's resources share ONE column stack (height → the merged
-   * max-column-occupancy). X (`colByCluster`) is untouched ⇒ CON-12-safe. Throwaway
-   * Phase-0 measurement wiring; suppresses the subnet frame (no annotation visual yet).
+   * De-band **depth** (default **`"none"`**): dissolve the chosen container level AND
+   * every deeper level, lifting their leaf clusters to be direct children of the surviving
+   * parent so that subtree's resources share ONE column stack (height → the merged
+   * max-column-occupancy) instead of `Σ(bands)`. The ladder cascades downward:
+   * `subnet` (subnet→VPC, the original probe) → `vpc` (vpc+subnet→region) → `region` →
+   * `account` → `provider` (everything → one stack). X (`colByCluster`) is untouched ⇒
+   * CON-12-safe at any level. Suppresses the dissolved frames; membership is restored as
+   * per-card rails (terraformPipelineSubnetAnnotation.ts).
    */
-  subnetDeBand?: boolean;
+  deBandLevel?: DeBandLevel;
   /**
    * `rankSeparate` (default **false**): sibling-separation ranking (RFC §9.6 / DEC-13).
    * On the swimlane path, one-way-dependent sibling lanes (regions in an account, VPCs

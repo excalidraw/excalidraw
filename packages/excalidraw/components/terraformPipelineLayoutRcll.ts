@@ -44,6 +44,7 @@ import type {
   Stage,
   StageResult,
 } from "./terraformPipelineRcllTypes";
+import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
 /**
  * Options accepted by the RCLL builder. Mirrors the shared `pipelineOptions`
@@ -72,8 +73,12 @@ type RcllBuildOptions = {
   /** M5c (default false): column compaction — pull SAFE leaves LEFT to shrink swimlane
    * width (measure-gated). Mirror of `deDensify`; mutually exclusive with it. */
   columnCompact?: boolean;
-  /** Subnet de-band (PROBE, default false): collapse subnet lanes so a VPC's resources
-   * share one column stack. Suppresses the subnet frame. Internal/measurement-only. */
+  /** De-band depth (default "none"): dissolve the chosen container level + all deeper
+   * levels so that subtree's resources share one column stack. Suppresses the dissolved
+   * frames; membership restored as per-card rails. */
+  deBandLevel?: DeBandLevel;
+  /** Back-compat alias for `deBandLevel: "subnet"` — the original subnet-only probe.
+   * `deBandLevel` wins when both are set. */
   subnetDeBand?: boolean;
   /** `rankSeparate` (default false): sibling-separation ranking — one-way sibling lanes
    * get disjoint column ranges on the swimlane axis. Internal/measurement-only. */
@@ -199,7 +204,7 @@ async function buildSceneFromBoxedTree(
   tree: CompoundNode,
   prep: PipelineLayoutPrep,
   nodes: TerraformPlanNodesMap,
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): Promise<{
   elements: ExcalidrawElement[];
   frameEdgeCount: number;
@@ -255,12 +260,18 @@ async function buildSceneFromBoxedTree(
     skeleton,
     prep.clusters,
     layoutBoxes,
-    subnetDeBand,
+    deBandLevel,
   );
-  // Phase 1b: with the subnet frame suppressed, restore subnet membership as a per-card
-  // colored rail + a tier legend (annotation, not containment — gate/diagnostic-invisible).
-  if (subnetDeBand) {
-    appendSubnetMembershipAnnotations(skeleton, prep.clusters, layoutBoxes);
+  // Phase 1b: with the dissolved frames suppressed, restore membership as per-card colored
+  // rails + a legend (one rail per dissolved level; annotation, not containment — so the
+  // gates / collision diagnostics ignore them).
+  if (deBandLevel !== "none") {
+    appendSubnetMembershipAnnotations(
+      skeleton,
+      prep.clusters,
+      layoutBoxes,
+      deBandLevel,
+    );
   }
   applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
   appendPipelineEdgeSkeletons(
@@ -283,9 +294,9 @@ async function buildSceneFromBoxedTree(
     prep.clusters,
     skeleton,
     layoutBoxes,
-    subnetDeBand,
+    deBandLevel,
   );
-  assignCompoundEdgeFrameParents(skeleton, prep.clusters, subnetDeBand);
+  assignCompoundEdgeFrameParents(skeleton, prep.clusters, deBandLevel);
   const elements = await convertPipelineSkeletonToElements(skeleton);
   return { elements, frameEdgeCount, backEdgesStyled };
 }
@@ -389,7 +400,10 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     deDensify: options?.deDensify === true,
     deDensifyMaxCols: options?.deDensifyMaxCols ?? 0,
     columnCompact: options?.columnCompact === true,
-    subnetDeBand: options?.subnetDeBand === true,
+    // Back-compat: the legacy `subnetDeBand` boolean is an alias for `deBandLevel: "subnet"`.
+    // The explicit enum wins when both are set.
+    deBandLevel:
+      options?.deBandLevel ?? (options?.subnetDeBand === true ? "subnet" : "none"),
     rankSeparate: options?.rankSeparate === true,
   };
 
@@ -425,7 +439,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       laidOutTree,
       prep,
       nodes,
-      rcllOptions.subnetDeBand === true,
+      rcllOptions.deBandLevel ?? "none",
     );
     elements = built.elements;
     backEdgesStyled = built.backEdgesStyled;
@@ -480,7 +494,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllMilestone: placed
         ? rcllOptions.rankSeparate
           ? "M8r"
-          : rcllOptions.subnetDeBand
+          : (rcllOptions.deBandLevel ?? "none") !== "none"
           ? "M7s"
           : rcllOptions.columnCompact
           ? "M5c"
@@ -502,9 +516,14 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       rcllReorder: rcllOptions.reorder === true,
       // M5: whether Brandes–Köpf leaf straightening is active.
       rcllStraighten: rcllOptions.straighten === true,
-      // Subnet de-band: subnet lanes collapsed into one VPC column stack (frames
-      // suppressed; resources parent to the VPC).
-      rcllSubnetDeBand: rcllOptions.subnetDeBand === true,
+      // De-band: the dissolved level + all deeper levels collapsed into one shared column
+      // stack (frames suppressed; resources parent to the surviving container). The legacy
+      // `rcllSubnetDeBand` boolean is kept (true iff level === "subnet") for back-compat;
+      // `rcllDeBandLevel` is the generalized echo (omitted when "none").
+      rcllSubnetDeBand: (rcllOptions.deBandLevel ?? "none") === "subnet",
+      ...((rcllOptions.deBandLevel ?? "none") !== "none"
+        ? { rcllDeBandLevel: rcllOptions.deBandLevel }
+        : {}),
       // M5b: whether de-density (Axis-2 B) is active (toggle AND a positive dial).
       rcllDeDensify:
         rcllOptions.deDensify === true &&

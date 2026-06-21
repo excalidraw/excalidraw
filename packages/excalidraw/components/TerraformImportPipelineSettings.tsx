@@ -2,10 +2,12 @@ import React from "react";
 
 import { renderOptionFigure } from "./terraformPipelineSettingsFigures";
 
-import type {
-  PipelineLayoutVariant,
-  RcllLayoutProfile,
-  RcllLayoutProfileSelection,
+import {
+  DEBAND_LEVELS,
+  type DeBandLevel,
+  type PipelineLayoutVariant,
+  type RcllLayoutProfile,
+  type RcllLayoutProfileSelection,
 } from "./terraformImportDialogUtils";
 
 /** Per-option explanation shown in the side panel — the detail a user needs to
@@ -155,21 +157,12 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
       ],
     },
   },
-  "subnet.boxed": {
-    title: "Subnets · Boxed",
-    body: "Each subnet is drawn as its own boxed lane, stacked vertically inside the VPC. Clearest subnet ownership, but a VPC is as tall as the sum of its subnet lanes.",
+  "deband.depth": {
+    title: "De-band depth",
+    body: "How deep to dissolve the topology boxes. None keeps every level boxed (tallest, clearest ownership). Pick a level — subnet, VPC, region, account, or provider — and that level AND everything inside it collapse into one shared column stack. De-banding cascades downward: de-banding VPC also de-bands its subnets; provider merges everything. Dissolved membership reads from per-card colored rails + a legend instead of boxes. Subnet and VPC are the clean wins (much shorter, columns intact). Going deeper (region+) merges resources across containers that never shared a column axis, so it reshapes — and usually widens — the diagram; provider on a dense graph overflows into one giant stack. Use the deep levels deliberately.",
     dev: {
       implements:
-        "Default RCLL: subnetZone containers are Y-lanes stacked into disjoint bands (layoutLanesOnAxis); VPC height ≈ Σ(subnet bands). Subnet drawn as a real topology frame.",
-      refs: ["Sander 1996 — compound layout"],
-    },
-  },
-  "subnet.debanded": {
-    title: "Subnets · De-banded",
-    body: "Subnet lanes are merged so a VPC's resources share one column stack, then each card carries a colored rail (public / private / intra) with a legend instead of a subnet box. Much shorter (≈ −28% on the staging preset); subnet membership reads from the rail color.",
-    dev: {
-      implements:
-        "Subnet de-band: collapseSubnetsForDeBand lifts each subnet's clusters to direct VPC children (one shared colCursor stack; X / colByCluster untouched → CON-12-safe). Subnet frame suppressed; topology paths truncated to VPC so edges/connectors reparent cleanly. Membership re-encoded as per-card tier rails + a legend (terraformPipelineSubnetAnnotation.ts), gate/diagnostic-invisible.",
+        "De-band depth: collapseTreeForDeBand collapses at the absorbing parent (subnet→vpc, vpc→region, …, provider→root), lifting ALL descendant leaf clusters to direct children (one shared colCursor stack; X / colByCluster untouched → CON-12-safe at any level). collectClusterLeaves already recurses, so the cascade is automatic. Dissolved frames suppressed (emitTopologyContextFrames skips roles with rank ≥ target); topology paths truncated to the surviving level so edges/connectors reparent cleanly. Membership re-encoded as per-card rails (one per dissolved level) + a legend (terraformPipelineSubnetAnnotation.ts), gate/diagnostic-invisible.",
       refs: [
         "MapSets / BubbleSets (set-membership without overlapping regions)",
       ],
@@ -241,7 +234,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
     body: "The clearest, most spread-out arrangement. Mutually-dependent groups stack on their own rows, arrows are ordered to cross less, and fan-out spines are aligned. Tallest of the three — best when you want to follow the dataflow without anything sharing space.",
     dev: {
       implements:
-        "Profile bundle: staircaseBandOverlap=false (cycles stack), reorder=on, straighten=on; no width-shrinking passes (laneRise/laneSplit/subnetDeBand off, columnPacking=none).",
+        "Profile bundle: staircaseBandOverlap=false (cycles stack), reorder=on, straighten=on; no width-shrinking passes (laneRise/laneSplit off, deBandLevel=none, columnPacking=none).",
     },
   },
   "profile.balanced": {
@@ -257,7 +250,7 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
     body: "The smallest overall footprint. Turns on every space-saving pass at once: dependent lanes rise to share rows and split into separate columns, subnet boxes collapse into colored rails, and independent cards are pulled left. It is much shorter — and a bit wider, since splitting lanes trades some width for a lot of height (measured on the staging v2: roughly a third the area, but ~65% shorter and ~30% wider). Densest to read, best when vertical space is tight.",
     dev: {
       implements:
-        "Profile bundle: laneRise + laneSplit (the −42% height / +28% width composition) + subnetDeBand (≈ −28% height) + cycle-rise + columnPacking=compact (pull-left), plus reorder + straighten for legibility under the denser packing. Net area on v2 ≈ −55%.",
+        "Profile bundle: laneRise + laneSplit (the −42% height / +28% width composition) + deBandLevel=subnet (≈ −28% height) + cycle-rise + columnPacking=compact (pull-left), plus reorder + straighten for legibility under the denser packing. Net area on v2 ≈ −55%.",
       refs: [
         "Sander 1996 (compound layout)",
         "Rüegg et al. 2016 (1D compaction)",
@@ -312,6 +305,16 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
 
 export type OptionHelpKey = keyof typeof OPTION_HELP;
 
+/** Human labels for the de-band depth `<select>` options. */
+const DEBAND_LEVEL_LABELS: Record<DeBandLevel, string> = {
+  none: "None — keep every level boxed",
+  subnet: "Subnet",
+  vpc: "VPC (+ subnets)",
+  region: "Region (+ VPCs, subnets)",
+  account: "Account (+ regions …)",
+  provider: "Provider (everything)",
+};
+
 export const TerraformImportPipelineSettings = ({
   pipelineCompact,
   pipelineLayoutVariant,
@@ -321,7 +324,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement,
   pipelineSwimlaneLaneRise,
   pipelineReorder,
-  pipelineSubnetDeBand,
+  pipelineDeBandLevel,
   pipelineRankSeparate,
   pipelineStraighten,
   pipelineColumnPacking,
@@ -335,7 +338,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement,
   setPipelineSwimlaneLaneRise,
   setPipelineReorder,
-  setPipelineSubnetDeBand,
+  setPipelineDeBandLevel,
   setPipelineRankSeparate,
   setPipelineStraighten,
   setPipelineColumnPacking,
@@ -352,7 +355,7 @@ export const TerraformImportPipelineSettings = ({
   pipelineSemanticPlacement: boolean;
   pipelineSwimlaneLaneRise: boolean;
   pipelineReorder: boolean;
-  pipelineSubnetDeBand: boolean;
+  pipelineDeBandLevel: DeBandLevel;
   pipelineRankSeparate: boolean;
   pipelineStraighten: boolean;
   pipelineColumnPacking: "spread" | "none" | "compact";
@@ -366,7 +369,7 @@ export const TerraformImportPipelineSettings = ({
   setPipelineSemanticPlacement: (semanticPlacement: boolean) => void;
   setPipelineSwimlaneLaneRise: (swimlaneLaneRise: boolean) => void;
   setPipelineReorder: (reorder: boolean) => void;
-  setPipelineSubnetDeBand: (subnetDeBand: boolean) => void;
+  setPipelineDeBandLevel: (deBandLevel: DeBandLevel) => void;
   setPipelineRankSeparate: (rankSeparate: boolean) => void;
   setPipelineStraighten: (straighten: boolean) => void;
   setPipelineColumnPacking: (
@@ -560,22 +563,33 @@ export const TerraformImportPipelineSettings = ({
                 {phaseHeader("Content", "which resources appear")}
                 {resourcesGroup}
                 {phaseHeader("Structure", "the model")}
-                <div role="group" aria-label="Pipeline subnets">
+                <div role="group" aria-label="Pipeline de-band depth">
                   <span className="TerraformImportModal__controlLabel">
-                    Subnets{" "}
-                    <span>boxed lanes vs de-banded with color rails</span>
+                    De-band depth{" "}
+                    <span>dissolve a level + everything inside it into one stack</span>
                   </span>
-                  <div className="TerraformImportModal__segmentedControl">
-                    {option("Boxed", !pipelineSubnetDeBand, "subnet.boxed", () =>
-                      setPipelineSubnetDeBand(false),
-                    )}
-                    {option(
-                      "De-banded",
-                      pipelineSubnetDeBand,
-                      "subnet.debanded",
-                      () => setPipelineSubnetDeBand(true),
-                    )}
-                  </div>
+                  <select
+                    className="TerraformImportModal__select"
+                    aria-label="De-band depth"
+                    value={pipelineDeBandLevel}
+                    title={OPTION_HELP["deband.depth"].body}
+                    onMouseEnter={() => setHoverKey("deband.depth")}
+                    onMouseLeave={() => setHoverKey(null)}
+                    onFocus={() => {
+                      setHoverKey("deband.depth");
+                      setStickyKey("deband.depth");
+                    }}
+                    onBlur={() => setHoverKey(null)}
+                    onChange={(e) =>
+                      setPipelineDeBandLevel(e.target.value as DeBandLevel)
+                    }
+                  >
+                    {DEBAND_LEVELS.map((level) => (
+                      <option key={level} value={level}>
+                        {DEBAND_LEVEL_LABELS[level]}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 {phaseHeader("Columns", "left → right placement (X)")}
                 <div role="group" aria-label="Pipeline column packing">

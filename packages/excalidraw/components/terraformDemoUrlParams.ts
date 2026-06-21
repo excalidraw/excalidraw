@@ -1,5 +1,7 @@
 import {
+  isDeBandLevel,
   isRcllLayoutProfile,
+  type DeBandLevel,
   type RcllLayoutProfile,
 } from "./terraformPipelineLayoutProfiles";
 
@@ -22,6 +24,9 @@ export type TerraformDemoUrlParams = {
   /** Accepts the clear alias `laneRise` as well as the milestone name `swimlaneRise`. */
   swimlaneRise?: boolean;
   reorder?: boolean;
+  /** RCLL de-band depth: `none | subnet | vpc | region | account | provider`. */
+  deBandLevel?: DeBandLevel;
+  /** Back-compat alias for `deBandLevel=subnet` (the original subnet-only probe). */
   subnetDeBand?: boolean;
   /** Accepts the clear alias `laneSplit` as well as the milestone name `rankSeparate`. */
   rankSeparate?: boolean;
@@ -188,6 +193,19 @@ export const parseTerraformDemoUrlParams = (
   if (subnetDeBand === null) {
     return null;
   }
+  // De-band depth enum. Hard-fail on an invalid value (same contract as columnPacking).
+  // Back-compat: a legacy `subnetDeBand=1` (no explicit level) ⇒ `subnet`.
+  const deBandLevelRaw = params.get("deBandLevel");
+  let deBandLevel: DeBandLevel | undefined;
+  if (deBandLevelRaw != null && deBandLevelRaw.trim() !== "") {
+    const normalized = deBandLevelRaw.trim().toLowerCase();
+    if (!isDeBandLevel(normalized)) {
+      return null;
+    }
+    deBandLevel = normalized;
+  } else if (subnetDeBand === true) {
+    deBandLevel = "subnet";
+  }
   const rankSeparate = parseBooleanAlias("laneSplit", "rankSeparate");
   if (rankSeparate === null) {
     return null;
@@ -248,6 +266,7 @@ export const parseTerraformDemoUrlParams = (
     ...(swimlaneRise != null ? { swimlaneRise } : {}),
     ...(reorder != null ? { reorder } : {}),
     ...(subnetDeBand != null ? { subnetDeBand } : {}),
+    ...(deBandLevel != null ? { deBandLevel } : {}),
     ...(rankSeparate != null ? { rankSeparate } : {}),
     ...(straighten != null ? { straighten } : {}),
     ...(deDensify != null ? { deDensify } : {}),

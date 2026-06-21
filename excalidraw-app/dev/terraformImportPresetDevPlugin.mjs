@@ -44,6 +44,7 @@ const LAYOUT_BOOLEAN_PARAMS = [
   ["swimlaneRise", "pipelineSwimlaneLaneRise"],
   ["laneSplit", "pipelineRankSeparate"],
   ["rankSeparate", "pipelineRankSeparate"],
+  // Back-compat alias: the core maps `subnetDeBand=1` ⇒ `deBandLevel="subnet"`.
   ["subnetDeBand", "pipelineSubnetDeBand"],
   ["straighten", "pipelineStraighten"],
   // Legacy alias: `deDensify=1` ⇒ the core derives `columnPacking:"spread"`.
@@ -57,6 +58,13 @@ const LAYOUT_BOOLEAN_PARAMS = [
 // Enum (non-boolean) layout params: [paramName, optionKey, allowedValues].
 const LAYOUT_ENUM_PARAMS = [
   ["columnPacking", "pipelineColumnPacking", ["spread", "none", "compact"]],
+  // De-band depth — dissolve the chosen container level + all deeper levels into one
+  // shared column stack. `none` = today's boxed layout (byte-identical).
+  [
+    "deBandLevel",
+    "pipelineDeBandLevel",
+    ["none", "subnet", "vpc", "region", "account", "provider"],
+  ],
   // Outcome-first "Layout" profile — expands into the seven RCLL flags in the core.
   ["profile", "pipelineLayoutProfile", ["readable", "balanced", "compact"]],
 ];
@@ -74,13 +82,18 @@ const LAYOUT_PARAM_CATALOG = {
   },
   enums: {
     columnPacking: ["spread", "none", "compact"],
+    deBandLevel: ["none", "subnet", "vpc", "region", "account", "provider"],
+  },
+  enumNotes: {
+    deBandLevel:
+      "Dissolve the chosen container level AND every deeper level into one shared column stack (cascades downward). `none` = today's boxed layout (byte-identical).",
   },
   booleans: {
     compact: "detail: collapse clusters to a representative",
     laneRise: "alias of swimlaneRise (M4) — X-disjoint lanes share Y rows",
     laneSplit: "alias of rankSeparate (M8r) — split dependent lanes (needs laneRise)",
     cycleRise: "alias of staircaseBandOverlap (DEC-1) — cycle groups share Y (default on)",
-    subnetDeBand: "collapse subnet lanes into one VPC stack",
+    subnetDeBand: "legacy alias ⇒ deBandLevel=subnet",
     straighten: "Brandes–Köpf leaf straightening",
     reorder: "barycenter crossing-min reorder",
     deDensify: "legacy alias ⇒ columnPacking=spread",
@@ -300,6 +313,8 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
   const resolvedFlags = {
     swimlaneLaneRise: meta.pipelineSwimlaneLaneRise ?? false,
     rankSeparate: meta.pipelineRankSeparate ?? false,
+    deBandLevel: meta.pipelineDeBandLevel ?? "none",
+    // Legacy boolean view (true iff deBandLevel === "subnet"), kept for back-compat.
     subnetDeBand: meta.pipelineSubnetDeBand ?? false,
     staircaseBandOverlap: meta.pipelineStaircaseBandOverlap ?? true,
     reorder: meta.pipelineReorder ?? false,
@@ -348,6 +363,7 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
       pipelineRankSeparate: meta.pipelineRankSeparate ?? false,
       pipelineRankSeparateSuppressed: meta.pipelineRankSeparateSuppressed ?? false,
       pipelineSwimlaneLaneRise: meta.pipelineSwimlaneLaneRise ?? false,
+      pipelineDeBandLevel: meta.pipelineDeBandLevel ?? "none",
       pipelineSubnetDeBand: meta.pipelineSubnetDeBand ?? false,
       pipelineStraighten: meta.pipelineStraighten ?? false,
       pipelineColumnPacking: meta.pipelineColumnPacking ?? "none",

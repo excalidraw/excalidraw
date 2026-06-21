@@ -41,6 +41,7 @@ import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLa
 import { applyRcllToggleGuards } from "./terraformPipelineToggleGuards";
 import {
   resolveRcllLayoutProfile,
+  type DeBandLevel,
   type RcllLayoutProfile,
 } from "./terraformPipelineLayoutProfiles";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -430,7 +431,10 @@ type LayoutSceneContext = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6: per-container barycenter crossing-min reorder. */
   pipelineReorder?: boolean;
-  /** RCLL subnet de-band: collapse subnet lanes into one VPC stack (frames → rails). */
+  /** RCLL de-band depth: dissolve the chosen container level + all deeper levels into one
+   * shared column stack (frames → rails). `none` = today's boxed layout. */
+  pipelineDeBandLevel?: DeBandLevel;
+  /** Back-compat alias for `pipelineDeBandLevel: "subnet"`. `pipelineDeBandLevel` wins. */
   pipelineSubnetDeBand?: boolean;
   /** RCLL M8r: whole-model-global sibling-separation ranking (needs lane-rise). */
   pipelineRankSeparate?: boolean;
@@ -476,7 +480,7 @@ async function buildPipelineLayoutSceneBody(
           semanticPlacement: ctx.pipelineSemanticPlacement === true,
           swimlaneLaneRise: ctx.pipelineSwimlaneLaneRise === true,
           reorder: ctx.pipelineReorder === true,
-          subnetDeBand: ctx.pipelineSubnetDeBand === true,
+          deBandLevel: ctx.pipelineDeBandLevel ?? "none",
           rankSeparate: ctx.pipelineRankSeparate === true,
           straighten: ctx.pipelineStraighten === true,
           deDensify: columnPacking === "spread",
@@ -534,7 +538,13 @@ async function buildPipelineLayoutSceneBody(
               ? { pipelineSwimlaneLaneRise: true }
               : {}),
             ...(ctx.pipelineReorder ? { pipelineReorder: true } : {}),
-            ...(ctx.pipelineSubnetDeBand
+            // De-band depth echo — omit "none" (the identity ⇒ OFF byte-identical). Echo the
+            // legacy `pipelineSubnetDeBand` boolean too when the level is "subnet" (back-compat
+            // for existing assertions / the dev plugin's boolean-flag view).
+            ...((ctx.pipelineDeBandLevel ?? "none") !== "none"
+              ? { pipelineDeBandLevel: ctx.pipelineDeBandLevel }
+              : {}),
+            ...((ctx.pipelineDeBandLevel ?? "none") === "subnet"
               ? { pipelineSubnetDeBand: true }
               : {}),
             ...(pipelineOptions.rankSeparate
@@ -959,8 +969,13 @@ export async function layoutTerraformFromSources(
     pipelineSwimlaneLaneRise:
       options?.pipelineSwimlaneLaneRise ?? pf?.swimlaneLaneRise ?? false,
     pipelineReorder: options?.pipelineReorder ?? pf?.reorder ?? false,
-    pipelineSubnetDeBand:
-      options?.pipelineSubnetDeBand ?? pf?.subnetDeBand ?? false,
+    // De-band depth: explicit enum wins, then the legacy `subnetDeBand` boolean alias,
+    // then the profile's level, defaulting to "none" (today's boxed layout).
+    pipelineDeBandLevel:
+      options?.pipelineDeBandLevel ??
+      (options?.pipelineSubnetDeBand ? "subnet" : undefined) ??
+      pf?.deBandLevel ??
+      "none",
     // These four were declared on the context + consumed by the pipeline body but
     // never forwarded here, so they were silently dropped on the worker/headless
     // path (`layoutTerraformFromSources`) — rankSeparate/straighten/deDensify/

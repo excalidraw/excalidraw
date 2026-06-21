@@ -134,6 +134,46 @@ describe("layoutTerraformFromSources — RCLL toggle threading (regression)", ()
   };
 
   it(
+    "de-band depth threads through (none ≡ off; vpc reaches engine; subnetDeBand alias)",
+    async () => {
+      const off = await build({});
+      const none = await build({ pipelineDeBandLevel: "none" });
+      const subnetViaAlias = await build({ pipelineSubnetDeBand: true });
+      const subnetViaEnum = await build({ pipelineDeBandLevel: "subnet" });
+      const vpc = await build({ pipelineDeBandLevel: "vpc" });
+
+      // "none" is the identity ⇒ byte-identical to no options, and omitted from meta.
+      expect(canonicalize(none.elements)).toEqual(canonicalize(off.elements));
+      expect(none.meta.pipelineDeBandLevel).toBeUndefined();
+      expect(off.meta.pipelineSubnetDeBand ?? false).toBe(false);
+
+      // The legacy boolean alias resolves to deBandLevel="subnet" and is geometrically
+      // equivalent to the explicit enum (same element count + bounds); the legacy boolean
+      // meta echo is preserved (true). (We compare bounds, not canonicalized ids — the
+      // helper doesn't tokenize a text element's `containerId`, and absolute id numbering
+      // can differ between two builds even when the geometry is identical.)
+      expect(subnetViaAlias.meta.pipelineDeBandLevel).toBe("subnet");
+      expect(subnetViaAlias.meta.pipelineSubnetDeBand).toBe(true);
+      expect(subnetViaAlias.elements.length).toBe(subnetViaEnum.elements.length);
+      expect(sceneHeight(subnetViaAlias.elements)).toBe(
+        sceneHeight(subnetViaEnum.elements),
+      );
+      expect(sceneWidth(subnetViaAlias.elements)).toBe(
+        sceneWidth(subnetViaEnum.elements),
+      );
+
+      // A deeper level reaches the engine (echoed) and is NOT the legacy boolean.
+      expect(vpc.meta.pipelineDeBandLevel).toBe("vpc");
+      expect(vpc.meta.pipelineSubnetDeBand ?? false).toBe(false);
+      // De-band shortens the diagram (the merged column stack vs Σ(bands)).
+      expect(sceneHeight(subnetViaEnum.elements)).toBeLessThan(
+        sceneHeight(off.elements),
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 12,
+  );
+
+  it(
     "forwards pipelineRankSeparate (+ rise) to the engine — wider & shorter than OFF",
     async () => {
       const off = await build({});

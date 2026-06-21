@@ -45,6 +45,7 @@ import {
 import {
   DEFAULT_RCLL_LAYOUT_PROFILE,
   resolveRcllLayoutProfile,
+  type DeBandLevel,
   type RcllLayoutProfile,
 } from "./terraformPipelineLayoutProfiles";
 
@@ -89,7 +90,8 @@ export const useTerraformImportDialog = ({
   // RCLL M6 (rcll-only): per-container barycenter crossing-min reorder. Like the
   // swimlane dial, not reset on view switch — the RCLL view owns it.
   const [pipelineReorder, setPipelineReorder] = useState(false);
-  const [pipelineSubnetDeBand, setPipelineSubnetDeBand] = useState(false);
+  const [pipelineDeBandLevel, setPipelineDeBandLevel] =
+    useState<DeBandLevel>("none");
   // RCLL M8r (rcll-only): whole-model-global sibling-separation ranking. Gated in
   // the UI to require the lane-rise (solo = taller/wider — see toggle guards).
   const [pipelineRankSeparate, setPipelineRankSeparate] = useState(false);
@@ -121,7 +123,7 @@ export const useTerraformImportDialog = ({
     const flags = resolveRcllLayoutProfile(profile);
     setPipelineSwimlaneLaneRise(flags.swimlaneLaneRise);
     setPipelineRankSeparate(flags.rankSeparate);
-    setPipelineSubnetDeBand(flags.subnetDeBand);
+    setPipelineDeBandLevel(flags.deBandLevel);
     setPipelineStaircaseBandOverlap(flags.staircaseBandOverlap);
     setPipelineReorder(flags.reorder);
     setPipelineStraighten(flags.straighten);
@@ -149,9 +151,9 @@ export const useTerraformImportDialog = ({
     },
     [markLayoutCustom],
   );
-  const setPipelineSubnetDeBandCustom = useCallback(
-    (v: boolean) => {
-      setPipelineSubnetDeBand(v);
+  const setPipelineDeBandLevelCustom = useCallback(
+    (v: DeBandLevel) => {
+      setPipelineDeBandLevel(v);
       markLayoutCustom();
     },
     [markLayoutCustom],
@@ -362,7 +364,7 @@ export const useTerraformImportDialog = ({
       pipelineSemanticPlacement,
       pipelineSwimlaneLaneRise,
       pipelineReorder,
-      pipelineSubnetDeBand,
+      pipelineDeBandLevel,
       pipelineRankSeparate,
       pipelineStraighten,
       pipelineColumnPacking,
@@ -492,7 +494,7 @@ export const useTerraformImportDialog = ({
             pipelineSemanticPlacement,
             pipelineSwimlaneLaneRise,
             pipelineReorder,
-            pipelineSubnetDeBand,
+            pipelineDeBandLevel,
             pipelineRankSeparate,
             pipelineStraighten,
             pipelineColumnPacking,
@@ -588,7 +590,7 @@ export const useTerraformImportDialog = ({
           pipelineSemanticPlacement,
           pipelineSwimlaneLaneRise,
           pipelineReorder,
-          pipelineSubnetDeBand,
+          pipelineDeBandLevel,
           pipelineRankSeparate,
           pipelineStraighten,
           pipelineColumnPacking,
@@ -793,7 +795,7 @@ export const useTerraformImportDialog = ({
     pipelineSemanticPlacement,
     pipelineSwimlaneLaneRise,
     pipelineReorder,
-    pipelineSubnetDeBand,
+    pipelineDeBandLevel,
     pipelineRankSeparate,
     pipelineStraighten,
     pipelineColumnPacking,
@@ -835,7 +837,7 @@ export const useTerraformImportDialog = ({
     // flips the primary Layout control to "Custom" (the raw setters stay internal).
     setPipelineSwimlaneLaneRise: setPipelineSwimlaneLaneRiseCustom,
     setPipelineReorder: setPipelineReorderCustom,
-    setPipelineSubnetDeBand: setPipelineSubnetDeBandCustom,
+    setPipelineDeBandLevel: setPipelineDeBandLevelCustom,
     setPipelineRankSeparate: setPipelineRankSeparateCustom,
     setPipelineStraighten: setPipelineStraightenCustom,
     setPipelineColumnPacking: setPipelineColumnPackingCustom,

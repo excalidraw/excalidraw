@@ -3,6 +3,12 @@ import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 import { spreadContextFrameColors } from "./terraformPrimaryVisibility";
 
 import {
+  deBandLevelRank,
+  topologyRoleDeBandRank,
+  type DeBandLevel,
+} from "./terraformPipelineLayoutProfiles";
+
+import {
   boundsOf,
   laneKey,
   pipelineFrameCustomData,
@@ -123,20 +129,23 @@ export function emitTopologyContextFrames(
   skeleton: ExcalidrawElementSkeleton[],
   clusters: readonly PipelineCluster[],
   boxes: Map<string, TerraformDependencyLayoutBox>,
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): void {
+  const targetRank = deBandLevelRank(deBandLevel);
   const childIdsByKey = new Map<string, string[]>();
   for (const cluster of clusters) {
     childIdsByKey.set(cluster.id, [cluster.build.clusterFrameId]);
   }
 
   for (const level of PIPELINE_TOPOLOGY_LEVELS) {
-    // Subnet de-band: suppress the subnetZone frame. The subnet level no longer
-    // registers a `childIdsByKey` entry, so the VPC level's lookup falls back to each
-    // cluster's own frame id (the `?? cluster.build.clusterFrameId` below) → the VPC
-    // frame parents the cluster frames DIRECTLY. Subnet membership becomes a Phase-1b
-    // annotation, not a containment frame.
-    if (subnetDeBand && level.role === "subnetZone") {
+    // De-band: suppress every dissolved container frame — any level at or deeper than
+    // the de-band target (subnet de-band suppresses subnetZone; vpc de-band suppresses
+    // vpc + subnetZone; …; provider de-band suppresses all). A dissolved level no longer
+    // registers a `childIdsByKey` entry, so the next surviving (shallower) level's lookup
+    // falls back to each cluster's own frame id (the `?? cluster.build.clusterFrameId`
+    // below) → the surviving parent frame parents the cluster frames DIRECTLY. The
+    // dissolved membership becomes a Phase-1b annotation, not a containment frame.
+    if (targetRank > 0 && topologyRoleDeBandRank(level.role) >= targetRank) {
       continue;
     }
     const groups = new Map<string, PipelineCluster[]>();
@@ -199,24 +208,38 @@ export function topologyFrameSkeletonId(
   return `tf-pipeline:${role}:${encodeURIComponent(key)}`;
 }
 
+/**
+ * The full topology path is `[provider, account, region, vpc, subnet]` (segments
+ * dropped from the right when a cluster lacks a vpc/subnet). Under de-band the path is
+ * truncated to the segments strictly **shallower** than the dissolved target, so a
+ * cross-child edge under one surviving parent resolves its LCA to that parent frame
+ * (not a suppressed child) and siblings merged under one absorbing parent get equal
+ * truncated paths (no dangling aggregate connector). `none` ⇒ the full path.
+ */
+const DEBAND_PATH_KEEP: Record<Exclude<DeBandLevel, "none">, number> = {
+  // keep length = path index of the target role (provider=0 … subnet=4)
+  provider: 0,
+  account: 1,
+  region: 2,
+  vpc: 3,
+  subnet: 4,
+};
+
 export function topologyPathForCluster(
   cluster: PipelineCluster,
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): string[] {
   const p = cluster.placement;
-  if (!subnetDeBand && p.vpcId && p.subnetSignature != null) {
-    return [
-      p.providerFamily,
-      p.accountId,
-      p.region,
-      p.vpcId,
-      p.subnetSignature,
-    ];
+  const full =
+    p.vpcId && p.subnetSignature != null
+      ? [p.providerFamily, p.accountId, p.region, p.vpcId, p.subnetSignature]
+      : p.vpcId
+      ? [p.providerFamily, p.accountId, p.region, p.vpcId]
+      : [p.providerFamily, p.accountId, p.region];
+  if (deBandLevel === "none") {
+    return full;
   }
-  if (p.vpcId) {
-    return [p.providerFamily, p.accountId, p.region, p.vpcId];
-  }
-  return [p.providerFamily, p.accountId, p.region];
+  return full.slice(0, DEBAND_PATH_KEEP[deBandLevel]);
 }
 
 export function topologyRoleAndKeyFromPath(

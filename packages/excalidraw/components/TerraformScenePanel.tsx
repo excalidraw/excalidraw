@@ -303,7 +303,9 @@ export const TerraformScenePanel = ({
         pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
         pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
         pipelineReorder: session.pipelineReorder === true,
-        pipelineSubnetDeBand: session.pipelineSubnetDeBand === true,
+        pipelineDeBandLevel:
+          session.pipelineDeBandLevel ??
+          (session.pipelineSubnetDeBand ? "subnet" : "none"),
         importedTfdTexts: session.importedTfdTexts,
         preset: session.preset,
       });

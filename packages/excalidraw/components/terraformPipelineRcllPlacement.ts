@@ -65,6 +65,7 @@ import {
 } from "./terraformPipelineStraighten";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
+import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 import type {
   CollapsedPipelineEdge,
   PipelineCluster,
@@ -116,11 +117,12 @@ type PlaceCtx = {
   columnCompact: boolean;
   /** M5c stats accumulator (mutated across swimlane groups; read by `placementStage`). */
   columnCompactStats?: ColumnCompactStats;
-  /** Subnet de-band (PROBE, default false): collapse each VPC's subnet-zone children,
-   * lifting their clusters to direct VPC children so the whole VPC shares one column
-   * stack (height → merged max-column-occupancy). X (`colByCluster`) untouched ⇒
-   * CON-12-safe. A pre-pass tree rewrite in `layoutPlacement`; suppresses subnet frames. */
-  subnetDeBand: boolean;
+  /** De-band depth (default "none"): collapse the chosen container level + all deeper
+   * levels, lifting their leaf clusters to direct children of the surviving parent so that
+   * subtree shares one column stack (height → merged max-column-occupancy). X
+   * (`colByCluster`) untouched ⇒ CON-12-safe at any level. A pre-pass tree rewrite in
+   * `layoutPlacement`; suppresses the dissolved frames. */
+  deBandLevel: DeBandLevel;
   /** out(u): fan-out target cluster ids by source id (M6 adjacency / M5 straighten). */
   fanout: ReadonlyMap<string, readonly string[]>;
   /** in(w): fan-in source cluster ids by target id (M5 straighten). */
@@ -277,33 +279,52 @@ function cloneNode(node: CompoundNode): CompoundNode {
 }
 
 /**
- * Subnet de-band (PROBE) pre-pass. Mutates the **cloned** tree (safe — `layoutPlacement`
- * already cloned): for every `vpc` node whose children include `subnetZone` containers,
- * lift each subnet's descendant clusters to be **direct** children of the VPC and drop the
- * subnet container. The VPC then arranges all its resources in ONE shared column stack
- * (the swimlane leaf path / the `mixed`-policy leaf block), instead of stacking each subnet
- * into its own disjoint Y band. Height collapses from `Σ(subnet bands)` toward the merged
+ * De-band the chosen level → its **absorbing parent** (the role one level shallower).
+ * Collapsing at the absorbing parent flattens the WHOLE subtree in one op — because
+ * `collectClusterLeaves` already recurses to every descendant leaf, dissolving at the
+ * parent cascades all deeper container levels automatically (vpc de-band also dissolves
+ * subnets; provider de-band dissolves everything into a single stack under the root).
+ */
+const ABSORBING_PARENT_ROLE: Record<
+  Exclude<DeBandLevel, "none">,
+  RcllTopologyRole
+> = {
+  subnet: "vpc",
+  vpc: "region",
+  region: "account",
+  account: "provider",
+  provider: "root",
+};
+
+/**
+ * De-band pre-pass. Mutates the **cloned** tree (safe — `layoutPlacement` already cloned):
+ * for every node whose role is the de-band level's absorbing parent AND which still has a
+ * deeper container child, replace its children with ALL of its descendant leaf clusters —
+ * dissolving the dissolved level (and everything below it) so the absorbing parent arranges
+ * the merged resources in ONE shared column stack instead of stacking each child container
+ * into its own disjoint Y band. Height collapses from `Σ(bands)` toward the merged
  * `max-column-occupancy`. X is set later from the shared `colByCluster`/`localColumn`, so
- * forwardness (CON-12) is untouched. The subnet frame is suppressed downstream (Phase-0:
- * no membership annotation yet). Determinism: VPC children re-sorted `(mds, key)`. */
-function collapseSubnetsForDeBand(node: CompoundNode): void {
+ * forwardness (CON-12) is untouched. The dissolved frames are suppressed downstream
+ * (membership restored as per-card rails). Determinism: children re-sorted `(mds, key)`. */
+function collapseTreeForDeBand(node: CompoundNode, level: DeBandLevel): void {
   for (const child of node.children) {
-    collapseSubnetsForDeBand(child);
+    collapseTreeForDeBand(child, level);
   }
-  if (node.role !== "vpc") {
+  if (level === "none" || node.role !== ABSORBING_PARENT_ROLE[level]) {
     return;
   }
-  const hasSubnet = node.children.some((c) => c.role === "subnetZone");
-  if (!hasSubnet) {
+  // Only act when there is a deeper container to dissolve — a node whose children are
+  // already all leaves stays byte-identical (matches the original subnet-level guard).
+  const hasContainerChild = node.children.some(
+    (c) => c.children.length > 0,
+  );
+  if (!hasContainerChild) {
     return;
   }
   const lifted: CompoundNode[] = [];
-  for (const child of node.children) {
-    if (child.role === "subnetZone") {
-      collectClusterLeaves(child, lifted);
-    } else {
-      lifted.push(child);
-    }
+  collectClusterLeaves(node, lifted);
+  if (lifted.length === 0) {
+    return;
   }
   lifted.sort(
     (a, b) =>
@@ -1164,13 +1185,13 @@ export function layoutPlacement(
     deDensifyMaxCols: opts?.deDensifyMaxCols ?? 0,
     columnCompact: opts?.columnCompact === true,
     columnCompactStats,
-    subnetDeBand: opts?.subnetDeBand === true,
+    deBandLevel: opts?.deBandLevel ?? "none",
     fanout: lattice.fanout ?? new Map<string, readonly string[]>(),
     fanin: lattice.fanin ?? new Map<string, readonly string[]>(),
   };
   const root = cloneNode(tree);
-  if (ctx.subnetDeBand) {
-    collapseSubnetsForDeBand(root);
+  if (ctx.deBandLevel !== "none") {
+    collapseTreeForDeBand(root, ctx.deBandLevel);
   }
   sizeAndArrange(root, ctx);
   globalize(root, 0, 0);

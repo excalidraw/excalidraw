@@ -152,14 +152,17 @@ describe("terraformDemoUrlParams", () => {
       ).toBeNull();
     });
 
-    it("parses subnetDeBand (RCLL subnet de-band A/B)", () => {
+    it("parses subnetDeBand (legacy alias ⇒ deBandLevel=subnet)", () => {
+      // The legacy boolean is preserved AND mapped to the generalized de-band enum.
       expect(
         parseTerraformDemoUrlParams("?preset=demo&view=rcll&subnetDeBand=1"),
       ).toEqual({
         presetId: "demo",
         view: "rcll",
         subnetDeBand: true,
+        deBandLevel: "subnet",
       });
+      // `subnetDeBand=0` does not synthesize a level (stays "none" downstream).
       expect(
         parseTerraformDemoUrlParams("?preset=demo&subnetDeBand=0"),
       ).toEqual({
@@ -168,6 +171,30 @@ describe("terraformDemoUrlParams", () => {
       });
       expect(
         parseTerraformDemoUrlParams("?preset=demo&subnetDeBand=maybe"),
+      ).toBeNull();
+    });
+
+    it("parses deBandLevel (RCLL hierarchy-level de-band depth)", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&view=rcll&deBandLevel=vpc"),
+      ).toEqual({
+        presetId: "demo",
+        view: "rcll",
+        deBandLevel: "vpc",
+      });
+      // Case-insensitive; explicit level wins over a co-present alias.
+      expect(
+        parseTerraformDemoUrlParams(
+          "?preset=demo&subnetDeBand=1&deBandLevel=Region",
+        ),
+      ).toEqual({
+        presetId: "demo",
+        subnetDeBand: true,
+        deBandLevel: "region",
+      });
+      // Invalid level hard-fails (same contract as columnPacking / profile).
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&deBandLevel=datacenter"),
       ).toBeNull();
     });
 

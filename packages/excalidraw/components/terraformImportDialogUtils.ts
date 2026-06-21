@@ -14,6 +14,13 @@ export type PipelineLayoutVariant = "classic" | "compound" | "v2" | "rcll";
  * surface has one import home. The expansion lives in terraformPipelineLayoutProfiles. */
 export type { RcllLayoutProfile } from "./terraformPipelineLayoutProfiles";
 
+/** RCLL de-band depth (none → subnet → vpc → region → account → provider), re-exported
+ * here for the same single-import-home reason as the Layout profile. */
+export {
+  DEBAND_LEVELS,
+  type DeBandLevel,
+} from "./terraformPipelineLayoutProfiles";
+
 /** The dialog's primary "Layout" control state: a named profile, or `custom` once the
  * user has touched any individual advanced lever (so the control never misrepresents). */
 export type RcllLayoutProfileSelection =

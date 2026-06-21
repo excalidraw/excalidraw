@@ -13,7 +13,7 @@ import {
 const TODAY_DEFAULT_FLAGS: RcllLayoutProfileFlags = {
   swimlaneLaneRise: false,
   rankSeparate: false,
-  subnetDeBand: false,
+  deBandLevel: "none",
   staircaseBandOverlap: true,
   reorder: false,
   straighten: false,
@@ -36,7 +36,7 @@ describe("resolveRcllLayoutProfile", () => {
     expect(resolveRcllLayoutProfile("readable")).toEqual({
       swimlaneLaneRise: false,
       rankSeparate: false,
-      subnetDeBand: false,
+      deBandLevel: "none",
       staircaseBandOverlap: false,
       reorder: true,
       straighten: true,
@@ -48,7 +48,7 @@ describe("resolveRcllLayoutProfile", () => {
     expect(resolveRcllLayoutProfile("compact")).toEqual({
       swimlaneLaneRise: true,
       rankSeparate: true,
-      subnetDeBand: true,
+      deBandLevel: "subnet",
       staircaseBandOverlap: true,
       reorder: true,
       straighten: true,

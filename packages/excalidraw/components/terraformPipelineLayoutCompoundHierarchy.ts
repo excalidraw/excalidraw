@@ -15,6 +15,7 @@ import {
 } from "./terraformPipelineTopologyFrames";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
+import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
 type FrameSkeleton = Extract<
   ExcalidrawElementSkeleton,
@@ -259,27 +260,27 @@ function frameSkeletonForTopologyPath(path: readonly string[]): string | null {
 
 function clusterPathById(
   clusters: readonly PipelineCluster[],
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): Map<string, string[]> {
   const out = new Map<string, string[]>();
   for (const cluster of clusters) {
-    out.set(cluster.id, topologyPathForCluster(cluster, subnetDeBand));
+    out.set(cluster.id, topologyPathForCluster(cluster, deBandLevel));
   }
   return out;
 }
 
 /**
  * Parent TFD arrows into the lowest common topology frame so they move with group drag.
- * Under `subnetDeBand` the topology paths are truncated to VPC, so a same-subnet edge's
- * LCA resolves to the (existing) VPC frame instead of the suppressed subnet frame —
- * without this it would silently lose its frame parent.
+ * Under de-band the topology paths are truncated to the surviving (shallower) level, so a
+ * cross-child edge's LCA resolves to the existing surviving frame instead of a suppressed
+ * dissolved frame — without this it would silently lose its frame parent.
  */
 export function assignCompoundEdgeFrameParents(
   skeleton: ExcalidrawElementSkeleton[],
   clusters: readonly PipelineCluster[],
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): void {
-  const pathsByCluster = clusterPathById(clusters, subnetDeBand);
+  const pathsByCluster = clusterPathById(clusters, deBandLevel);
   const skeletonById = new Map(
     skeleton
       .filter((el) => typeof el.id === "string")

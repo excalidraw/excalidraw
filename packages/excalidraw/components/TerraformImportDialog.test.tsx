@@ -147,7 +147,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
-      pipelineSubnetDeBand: false,
+      pipelineDeBandLevel: "none",
       pipelineRankSeparate: false,
       pipelineStraighten: false,
       pipelineDeDensify: false,
@@ -180,7 +180,7 @@ describe("TerraformImportModal", () => {
       pipelineSemanticPlacement: false,
       pipelineSwimlaneLaneRise: false,
       pipelineReorder: false,
-      pipelineSubnetDeBand: false,
+      pipelineDeBandLevel: "none",
       pipelineRankSeparate: false,
       pipelineStraighten: false,
       pipelineDeDensify: false,
@@ -281,7 +281,7 @@ describe("TerraformImportModal", () => {
     );
   });
 
-  it("RCLL view: Subnets · De-banded threads pipelineSubnetDeBand true", async () => {
+  it("RCLL view: De-band depth select threads pipelineDeBandLevel", async () => {
     vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({
       elements: [],
       files: {},
@@ -290,17 +290,27 @@ describe("TerraformImportModal", () => {
     fillFirstBundle();
     fireEvent.click(screen.getByRole("radio", { name: /rcll view/i }));
 
-    // The RCLL-only Subnets control is present; flip it to De-banded.
-    const debandBtn = screen.getByRole("button", { name: /^de-banded$/i });
-    expect(debandBtn).toBeInTheDocument();
-    fireEvent.click(debandBtn);
+    // The RCLL-only "De-band depth" select is present; pick a hierarchy level (vpc).
+    const debandSelect = screen.getByRole("combobox", {
+      name: /de-band depth/i,
+    });
+    expect(debandSelect).toBeInTheDocument();
+    fireEvent.change(debandSelect, { target: { value: "vpc" } });
+
+    // Touching the de-band depth (an advanced lever) flips the primary Layout to Custom.
+    const profile = screen.getByRole("group", {
+      name: /pipeline layout profile/i,
+    });
+    expect(
+      within(profile).getByRole("button", { name: /^custom$/i }),
+    ).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.click(screen.getByRole("button", { name: /import & open/i }));
     await waitFor(() => expect(layoutTerraformViaWorkers).toHaveBeenCalled());
     expect(vi.mocked(layoutTerraformViaWorkers).mock.calls[0][1]).toEqual(
       expect.objectContaining({
         layoutMode: "rcll",
-        pipelineSubnetDeBand: true,
+        pipelineDeBandLevel: "vpc",
       }),
     );
   });
@@ -474,7 +484,7 @@ describe("TerraformImportModal", () => {
         layoutMode: "rcll",
         pipelineSwimlaneLaneRise: true,
         pipelineRankSeparate: true,
-        pipelineSubnetDeBand: true,
+        pipelineDeBandLevel: "subnet",
         pipelineReorder: true,
         pipelineStraighten: true,
         pipelineColumnPacking: "compact",

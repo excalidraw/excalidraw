@@ -161,7 +161,10 @@ export type RunTerraformImportFromSourcesOptions = {
   pipelineSwimlaneLaneRise?: boolean;
   /** RCLL M6 — per-container barycenter crossing-min reorder. Default false. */
   pipelineReorder?: boolean;
-  /** RCLL subnet de-band — collapse subnet lanes into one VPC stack. Default false. */
+  /** RCLL de-band depth — dissolve the chosen container level + all deeper levels into one
+   * shared column stack. Default "none" (today's boxed layout). */
+  pipelineDeBandLevel?: import("./terraformPipelineLayoutProfiles").DeBandLevel;
+  /** Back-compat alias for `pipelineDeBandLevel: "subnet"`. `pipelineDeBandLevel` wins. */
   pipelineSubnetDeBand?: boolean;
   /** RCLL M8r — whole-model-global sibling-separation ranking (needs lane-rise). Default false. */
   pipelineRankSeparate?: boolean;
@@ -241,7 +244,9 @@ async function layoutTerraformSceneFromSources(
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
-            pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
+            pipelineDeBandLevel:
+              options.pipelineDeBandLevel ??
+              (options.pipelineSubnetDeBand ? "subnet" : "none"),
             pipelineRankSeparate: options.pipelineRankSeparate === true,
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,
@@ -324,7 +329,9 @@ export const runTerraformImportFromSources = async (
             pipelineSwimlaneLaneRise:
               options.pipelineSwimlaneLaneRise === true,
             pipelineReorder: options.pipelineReorder === true,
-            pipelineSubnetDeBand: options.pipelineSubnetDeBand === true,
+            pipelineDeBandLevel:
+              options.pipelineDeBandLevel ??
+              (options.pipelineSubnetDeBand ? "subnet" : "none"),
             pipelineRankSeparate: options.pipelineRankSeparate === true,
             pipelineStraighten: options.pipelineStraighten === true,
             pipelineDeDensify: options.pipelineDeDensify === true,

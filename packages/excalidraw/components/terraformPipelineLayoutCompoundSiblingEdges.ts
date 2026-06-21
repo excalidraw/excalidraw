@@ -21,6 +21,7 @@ import {
 import type { PipelineCluster } from "./terraformPipelineLayoutShared";
 
 import type { CollapsedPipelineEdge } from "./terraformPipelineLayoutShared";
+import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
 export type CompoundTopologyFrameEdge = {
   sourceFrameId: string;
@@ -95,12 +96,12 @@ export function resolveSiblingTopologyFramePair(
 export function collectCompoundTopologyFrameEdges(
   collapsedEdges: readonly CollapsedPipelineEdge[],
   clusters: readonly PipelineCluster[],
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): CompoundTopologyFrameEdge[] {
   const pathsByCluster = new Map(
     clusters.map((cluster) => [
       cluster.id,
-      topologyPathForCluster(cluster, subnetDeBand),
+      topologyPathForCluster(cluster, deBandLevel),
     ]),
   );
   const deduped = new Map<string, CompoundTopologyFrameEdge>();
@@ -140,12 +141,12 @@ export function appendCompoundTopologyFrameEdgeSkeletons(
   clusters: readonly PipelineCluster[],
   skeleton: ExcalidrawElementSkeleton[],
   layoutBoxes: Map<string, LayoutBox>,
-  subnetDeBand = false,
+  deBandLevel: DeBandLevel = "none",
 ): number {
   const frameEdges = collectCompoundTopologyFrameEdges(
     collapsedEdges,
     clusters,
-    subnetDeBand,
+    deBandLevel,
   );
   let edgeIndex = 0;
 
