@@ -27,6 +27,11 @@ import {
   isInitializedImageElement,
   isTextElement,
 } from "@excalidraw/element";
+import {
+  getCodeBlockMeta,
+  isCodeBlockTextElement,
+  tokenizeCode,
+} from "@excalidraw/element";
 
 import { getContainingFrame } from "@excalidraw/element";
 
@@ -678,20 +683,42 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+
+        // code blocks emit per-token colored <tspan>s instead of a single fill
+        const codeMeta = isCodeBlockTextElement(element)
+          ? getCodeBlockMeta(element)
+          : undefined;
+        const codeLines = codeMeta
+          ? tokenizeCode(element.text, codeMeta.language, codeMeta.theme)
+          : null;
+
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
+          if (codeLines) {
+            for (const run of codeLines[i] ?? []) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = run.text;
+              tspan.setAttribute("fill", run.color);
+              tspan.setAttribute("xml:space", "preserve");
+              text.appendChild(tspan);
+            }
+          } else {
+            text.textContent = lines[i];
+            text.setAttribute(
+              "fill",
+              applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              ),
+            );
+          }
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);

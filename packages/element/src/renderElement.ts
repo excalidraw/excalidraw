@@ -43,6 +43,11 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import {
+  getCodeBlockMeta,
+  isCodeBlockTextElement,
+  tokenizeCode,
+} from "./codeBlock";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -384,6 +389,49 @@ const drawImagePlaceholder = (
   );
 };
 
+/**
+ * Renders a code block's bound text element with per-token syntax colors.
+ * Relies on the monospace font having a constant advance width, so each run is
+ * placed at `column * charWidth`. Token colors come from the code block's own
+ * theme, so we deliberately skip the global dark-mode filter here.
+ */
+const drawCodeBlockText = (
+  element: NonDeletedExcalidrawElement & { type: "text" },
+  context: CanvasRenderingContext2D,
+) => {
+  const meta = getCodeBlockMeta(element);
+  if (!meta) {
+    return;
+  }
+
+  context.save();
+  context.font = getFontString(element);
+  context.textAlign = "left";
+  context.textBaseline = "alphabetic";
+
+  const charWidth = context.measureText("M").width || element.fontSize * 0.6;
+  const lineHeightPx = getLineHeightInPx(element.fontSize, element.lineHeight);
+  const verticalOffset = getVerticalOffset(
+    element.fontFamily,
+    element.fontSize,
+    lineHeightPx,
+  );
+
+  const lines = tokenizeCode(element.text, meta.language, meta.theme);
+
+  for (let index = 0; index < lines.length; index++) {
+    const y = index * lineHeightPx + verticalOffset;
+    let column = 0;
+    for (const run of lines[index]) {
+      context.fillStyle = run.color;
+      context.fillText(run.text, column * charWidth, y);
+      column += run.text.length;
+    }
+  }
+
+  context.restore();
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -544,7 +592,9 @@ const drawElementOnCanvas = (
       break;
     }
     default: {
-      if (isTextElement(element)) {
+      if (isCodeBlockTextElement(element)) {
+        drawCodeBlockText(element, context);
+      } else if (isTextElement(element)) {
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {

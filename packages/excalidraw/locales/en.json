@@ -331,7 +331,20 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "codeBlock": "Code block",
     "convertElementType": "Toggle shape type"
+  },
+  "codeBlock": {
+    "title": "Insert code block",
+    "editTitle": "Edit code block",
+    "language": "Language",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "placeholder": "Paste or type your code here…",
+    "insert": "Insert",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "element": {
     "rectangle": "Rectangle",

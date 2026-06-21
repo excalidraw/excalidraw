@@ -67,6 +67,7 @@ import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
+  codeIcon,
   EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
@@ -1240,6 +1241,13 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setOpenDialog({ name: "codeBlock" })}
+            icon={codeIcon}
+            data-testid="toolbar-code-block"
+          >
+            {t("toolBar.codeBlock")}
           </DropdownMenu.Item>
           {isFullStylesPanel && (
             <DropdownMenu.Item

@@ -57,6 +57,7 @@ export const isNonDeletedElement = <T extends ExcalidrawElement>(
 export * from "./align";
 export * from "./binding";
 export * from "./bounds";
+export * from "./codeBlock";
 export * from "./collision";
 export * from "./comparisons";
 export * from "./containerCache";
