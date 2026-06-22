@@ -306,6 +306,62 @@ const collectRegionFrames = (elements) => {
   return regions;
 };
 
+// M-ANC / M-ANC-3 — summarize the reserved "Unconnected" (ancillary) frames so the
+// dev API exposes whether the bands are wide/tall and how many there are. The widen
+// metrics (rcll.bandWiden*) say whether M-ANC-2 actually flattened them.
+const summarizeAncillaryFrames = (elements) => {
+  const widths = [];
+  const heights = [];
+  for (const el of elements) {
+    if (el.type === "frame" && el.name === "Unconnected") {
+      widths.push(Math.round(el.width));
+      heights.push(Math.round(el.height));
+    }
+  }
+  return {
+    count: widths.length,
+    maxWidthPx: widths.length ? Math.max(...widths) : 0,
+    maxHeightPx: heights.length ? Math.max(...heights) : 0,
+  };
+};
+
+// DI-ANC-6 — pass through the allocator's read-only diagnostic from scene.meta
+// (`rcllAncillaryAllocator`). We do NOT recompute anything here; the allocator
+// already evaluated each candidate-final-rectangle and labelled every scope.
+const BLOCKED_BAND_STATUSES = new Set([
+  "gap-exists-current-algo-missed",
+  "all-candidates-fail-validation",
+  "root-capped",
+  "ancestor-capped",
+  "shared-slack-consumed",
+]);
+
+const summarizeAncillaryAllocator = (allocator) => {
+  const diagnostics = Array.isArray(allocator.diagnostics)
+    ? allocator.diagnostics
+    : [];
+  const statusCounts = {};
+  for (const d of diagnostics) {
+    statusCounts[d.bandBlockStatus] =
+      (statusCounts[d.bandBlockStatus] ?? 0) + 1;
+  }
+  return {
+    widenedHullCount: allocator.widenedHullCount ?? 0,
+    allocatedWidthPx: allocator.allocatedWidthPx ?? 0,
+    rowSavings: allocator.rowSavings ?? 0,
+    fallbackDropCount: allocator.fallbackDropCount ?? 0,
+    allocationCount: allocator.allocationCount ?? 0,
+    statusCounts,
+    diagnostics,
+    // The actionable subset: bands still tall because a gap was missed or they
+    // are genuinely boxed in. `gap-exists-current-algo-missed` here proves PR2
+    // is worth building on this preset.
+    blocked: diagnostics.filter((d) =>
+      BLOCKED_BAND_STATUSES.has(d.bandBlockStatus),
+    ),
+  };
+};
+
 /**
  * Self-describing proof payload — the "what happened and why" answer in API form:
  *  - `requested`: the raw caller params (echoes the URL the caller sent).
@@ -433,7 +489,24 @@ const buildLayoutProofPayload = (presetId, requested, scene) => {
       crossingMinEvalCapReached: placement.crossingMinEvalCapReached ?? null,
       acyclicBackwardEdges: gates.acyclicBackwardEdges ?? null,
       acyclicSameColumnEdges: gates.acyclicSameColumnEdges ?? null,
+      // M-ANC-2 widen: candidates>0 with applied=0 ⇒ whitespace exists but the
+      // no-sideways-shift rule de-granted it (bands stay tall — the dormancy case).
+      bandWidenCandidates: placement.bandWidenCandidates ?? null,
+      bandWidenApplied: placement.bandWidenApplied ?? null,
+      bandWidenTotalGrantPx: placement.bandWidenTotalGrantPx ?? null,
+      bandWidenHeightSavedPx: placement.bandWidenHeightSavedPx ?? null,
     },
+    ancillary: summarizeAncillaryFrames(elements),
+    // DI-ANC-6 — surface (do not recompute) the allocator's read-only per-scope
+    // diagnostic. The dev API can't run `recursiveRightSlackCeiling` or measure
+    // the pre-ancillary bbox itself, so the allocator emits it into scene.meta
+    // and we just pass it through. `bandBlockStatus` per scope says WHY a tall
+    // band did/didn't widen — `gap-exists-current-algo-missed` is the bug PR2
+    // targets. `blocked` is the convenience subset where a movement-free gap was
+    // missed or the band is genuinely boxed in.
+    ancillaryAllocator: summarizeAncillaryAllocator(
+      meta.rcllAncillaryAllocator ?? {},
+    ),
     regions: collectRegionFrames(elements),
   };
 };

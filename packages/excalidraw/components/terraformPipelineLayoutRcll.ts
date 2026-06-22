@@ -23,9 +23,12 @@ import { buildAncillaryStrips } from "./terraformPipelineLayoutAncillary";
 import {
   layoutAncillaryStrip,
   ancillaryStripAsPseudoCluster,
-  PIPELINE_FRAME_PAD,
-  PIPELINE_CLUSTER_GAP_Y,
 } from "./terraformPipelineLayoutShared";
+import {
+  buildValidatedAncillaryInsertion,
+  cloneAllocatorMeta,
+  EMPTY_RCLL_ANCILLARY_ALLOCATOR_META,
+} from "./terraformPipelineRcllAncillaryAllocator";
 import { layeringStage } from "./terraformPipelineRcllLayering";
 import {
   backwardEdgeGate,
@@ -40,7 +43,6 @@ import {
 
 import type {
   CollapsedPipelineEdge,
-  AncillaryStrip,
   PipelineCluster,
   PipelineLayoutPrep,
 } from "./terraformPipelineLayoutShared";
@@ -234,14 +236,22 @@ async function buildSceneFromBoxedTree(
         node.ancillaryStrip,
         node.ancillaryWrapWidth ?? node.box.width,
       );
+      const stripSkeleton = laid.skeleton.map((el) =>
+        el.id === node.ancillaryStrip!.stripFrameId
+          ? { ...el, width: node.box!.width }
+          : el,
+      );
       skeleton.push(
-        ...translateSkeleton(laid.skeleton, node.box.x, node.box.y),
+        ...translateSkeleton(stripSkeleton, node.box.x, node.box.y),
       );
       for (const [id, box] of laid.boxes) {
         layoutBoxes.set(id, {
           x: node.box.x + box.x,
           y: node.box.y + box.y,
-          width: box.width,
+          width:
+            id === node.ancillaryStrip.stripFrameId
+              ? node.box.width
+              : box.width,
           height: box.height,
         });
       }
@@ -397,186 +407,6 @@ function styleRcllBackEdges(
   return styled;
 }
 
-function findPathByKey(
-  node: CompoundNode,
-  key: string,
-  path: CompoundNode[] = [],
-): CompoundNode[] | null {
-  const nextPath = [...path, node];
-  if (node.key === key) {
-    return nextPath;
-  }
-  for (const child of node.children) {
-    const found = findPathByKey(child, key, nextPath);
-    if (found) {
-      return found;
-    }
-  }
-  return null;
-}
-
-function cloneTreeForAncillary(node: CompoundNode): CompoundNode {
-  return {
-    key: node.key,
-    role: node.role,
-    level: node.level,
-    minDescendantSequence: node.minDescendantSequence,
-    cluster: node.cluster,
-    ancillaryStrip: node.ancillaryStrip,
-    ancillaryWrapWidth: node.ancillaryWrapWidth,
-    localColumn: node.localColumn,
-    box: node.box ? { ...node.box } : undefined,
-    children: node.children.map(cloneTreeForAncillary),
-  };
-}
-
-function translateSubtreeY(node: CompoundNode, dy: number): void {
-  if (node.box) {
-    node.box = { ...node.box, y: node.box.y + dy };
-  }
-  for (const child of node.children) {
-    translateSubtreeY(child, dy);
-  }
-}
-
-function xOverlaps(
-  a: NonNullable<CompoundNode["box"]>,
-  b: NonNullable<CompoundNode["box"]>,
-): boolean {
-  return a.x < b.x + b.width && b.x < a.x + a.width;
-}
-
-function childrenBBox(
-  node: CompoundNode,
-): NonNullable<CompoundNode["box"]> | null {
-  const boxes = node.children
-    .map((child) => child.box)
-    .filter((box): box is NonNullable<CompoundNode["box"]> => !!box);
-  if (boxes.length === 0) {
-    return null;
-  }
-  const minX = Math.min(...boxes.map((box) => box.x));
-  const minY = Math.min(...boxes.map((box) => box.y));
-  const maxX = Math.max(...boxes.map((box) => box.x + box.width));
-  const maxY = Math.max(...boxes.map((box) => box.y + box.height));
-  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-}
-
-function expandNodeToChildren(node: CompoundNode): void {
-  if (!node.box) {
-    return;
-  }
-  const bb = childrenBBox(node);
-  if (!bb) {
-    return;
-  }
-  const right = Math.max(
-    node.box.x + node.box.width,
-    bb.x + bb.width + PIPELINE_FRAME_PAD,
-  );
-  const bottom = Math.max(
-    node.box.y + node.box.height,
-    bb.y + bb.height + PIPELINE_FRAME_PAD,
-  );
-  node.box = {
-    ...node.box,
-    width: right - node.box.x,
-    height: bottom - node.box.y,
-  };
-}
-
-function boxBottom(box: NonNullable<CompoundNode["box"]>): number {
-  return box.y + box.height;
-}
-
-function propagateInsertedBandGrowth(
-  path: readonly CompoundNode[],
-  insertedHostOldBottom: number,
-): void {
-  let grownChild = path[path.length - 1];
-  let grownChildOldBottom = insertedHostOldBottom;
-
-  for (let i = path.length - 2; i >= 0; i -= 1) {
-    const parent = path[i];
-    if (!parent.box || !grownChild.box) {
-      return;
-    }
-
-    const parentOldBottom = boxBottom(parent.box);
-    const growth = boxBottom(grownChild.box) - grownChildOldBottom;
-    if (growth > 0) {
-      for (const sibling of parent.children) {
-        if (
-          sibling !== grownChild &&
-          sibling.box &&
-          sibling.box.y >= grownChildOldBottom - 0.5 &&
-          xOverlaps(sibling.box, grownChild.box)
-        ) {
-          translateSubtreeY(sibling, growth);
-        }
-      }
-      expandNodeToChildren(parent);
-    }
-
-    grownChild = parent;
-    grownChildOldBottom = parentOldBottom;
-  }
-}
-
-function injectAncillaryBandsIntoPlacedTree(
-  placedTree: CompoundNode,
-  strips: readonly AncillaryStrip[],
-): {
-  tree: CompoundNode;
-  applied: boolean;
-  stripCount: number;
-  cardCount: number;
-} {
-  const root = cloneTreeForAncillary(placedTree);
-  let stripCount = 0;
-  let cardCount = 0;
-  for (const strip of strips) {
-    const path = findPathByKey(root, strip.scopeKey);
-    if (!path) {
-      continue;
-    }
-    const host = path[path.length - 1];
-    const bb = host ? childrenBBox(host) : null;
-    if (!host || !host.box || !bb) {
-      continue;
-    }
-    const hostOldBottom = boxBottom(host.box);
-    const contentWidth = Math.max(0, bb.width);
-    const laid = layoutAncillaryStrip(strip, contentWidth);
-    const bandY = bb.y + bb.height + PIPELINE_CLUSTER_GAP_Y;
-    host.children.push({
-      key: `__ancillaryBand__:${strip.scopeKey}`,
-      role: "ancillaryBand",
-      level: host.level + 1,
-      minDescendantSequence: Number.MAX_SAFE_INTEGER,
-      ancillaryStrip: strip,
-      ancillaryWrapWidth: contentWidth,
-      box: {
-        x: bb.x,
-        y: bandY,
-        width: laid.width,
-        height: laid.height,
-      },
-      children: [],
-    });
-    host.children.sort(
-      (a, b) =>
-        a.minDescendantSequence - b.minDescendantSequence ||
-        a.key.localeCompare(b.key),
-    );
-    expandNodeToChildren(host);
-    propagateInsertedBandGrowth(path, hostOldBottom);
-    stripCount += 1;
-    cardCount += strip.cards.length;
-  }
-  return { tree: root, applied: stripCount > 0, stripCount, cardCount };
-}
-
 /**
  * RCLL pipeline builder (RFC docs/pipeline-rcll-layout-design.md).
  *
@@ -643,18 +473,23 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   let ancillaryApplied = false;
   let ancillaryStripCount = 0;
   let ancillaryCardCount = 0;
+  let ancillaryAllocatorMeta = cloneAllocatorMeta(
+    EMPTY_RCLL_ANCILLARY_ALLOCATOR_META,
+  );
   if (
     includeAncillary &&
     ran.includes("placement") &&
     ancillaryStrips.length > 0
   ) {
-    const injected = injectAncillaryBandsIntoPlacedTree(
+    const injected = buildValidatedAncillaryInsertion(
       baselineRun.tree,
       ancillaryStrips,
+      lattice,
     );
     ancillaryApplied = injected.applied;
     ancillaryStripCount = injected.stripCount;
     ancillaryCardCount = injected.cardCount;
+    ancillaryAllocatorMeta = injected.allocatorMeta;
     if (injected.applied) {
       laidOutTree = injected.tree;
       stageMeta = {
@@ -782,12 +617,7 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       pipelineAncillaryApplied: ancillaryApplied,
       pipelineAncillaryCount: ancillaryCardCount,
       pipelineAncillaryStripCount: ancillaryStripCount,
-      rcllAncillaryAllocator: {
-        widenedHullCount: 0,
-        allocatedWidthPx: 0,
-        rowSavings: 0,
-        fallbackDropCount: 0,
-      },
+      rcllAncillaryAllocator: ancillaryAllocatorMeta,
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
       // §29: import-phase facts (the tree + lattice this build computed),

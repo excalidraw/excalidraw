@@ -120,34 +120,6 @@ const geometry = (els: readonly ExcalidrawElement[]): GeomCell[] =>
     return cell;
   });
 
-const primaryFrameGeometryByAddress = (
-  els: readonly ExcalidrawElement[],
-): Map<string, GeomCell> => {
-  const out = new Map<string, GeomCell>();
-  for (const e of els) {
-    const cd = e.customData as
-      | { terraformTopologyRole?: unknown; terraformPrimaryAddress?: unknown }
-      | undefined;
-    if (
-      e.type !== "frame" ||
-      e.isDeleted ||
-      cd?.terraformTopologyRole !== "primaryCluster" ||
-      typeof cd.terraformPrimaryAddress !== "string"
-    ) {
-      continue;
-    }
-    out.set(cd.terraformPrimaryAddress, {
-      type: e.type,
-      x: e.x,
-      y: e.y,
-      width: e.width,
-      height: e.height,
-      angle: e.angle,
-    });
-  }
-  return out;
-};
-
 describe("pipeline view rcll (M3a)", () => {
   it(
     "staging-extended-localstack-v2 — routes to rcll, draws own geometry, collision-free, deterministic",
@@ -913,67 +885,6 @@ describe("rcll M5b de-density (internal probe, v2)", () => {
       expect(geometry(on2.elements), "ON deterministic").toEqual(
         geometry(on.elements),
       );
-    },
-    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
-  );
-
-  it(
-    "All Resources does not widen compact-ish full-detail v2 when de-band is off",
-    async () => {
-      const baseOptions = {
-        compact: false,
-        swimlaneLaneRise: true,
-        rankSeparate: true,
-        reorder: true,
-        crossingMin: true,
-        straighten: true,
-        columnCompact: true,
-        staircaseBandOverlap: true,
-        deBandLevel: "none",
-      };
-      const dataflow = await buildV2(baseOptions);
-      const allResources = await buildV2({
-        ...baseOptions,
-        includeAncillary: true,
-      });
-
-      const dataflowPlace = placement(dataflow.meta);
-      const allPlace = placement(allResources.meta);
-      expect(allResources.meta.pipelineAncillaryApplied).toBe(true);
-      expect(allResources.meta.pipelineAncillaryCount).toBeGreaterThan(0);
-      expect(
-        allPlace.maxWidthPx,
-        "ancillary bands must reserve height without widening the RCLL placement",
-      ).toBeLessThanOrEqual(dataflowPlace.maxWidthPx);
-      const dataflowPrimary = primaryFrameGeometryByAddress(dataflow.elements);
-      const allPrimary = primaryFrameGeometryByAddress(allResources.elements);
-      for (const [address, box] of dataflowPrimary) {
-        const allBox = allPrimary.get(address);
-        expect(allBox, `${address} primary frame still present`).toBeDefined();
-        expect(allBox!.type, `${address} primary frame type unchanged`).toBe(
-          box.type,
-        );
-        expect(allBox!.x, `${address} primary frame x unchanged`).toBe(box.x);
-        expect(allBox!.width, `${address} primary frame width unchanged`).toBe(
-          box.width,
-        );
-        expect(
-          allBox!.height,
-          `${address} primary frame height unchanged`,
-        ).toBe(box.height);
-        expect(allBox!.angle, `${address} primary frame angle unchanged`).toBe(
-          box.angle,
-        );
-        expect(
-          allBox!.y,
-          `${address} primary frame may only move down for inserted rows`,
-        ).toBeGreaterThanOrEqual(box.y);
-      }
-      expect(
-        allPlace.siblingOverlapViolations,
-        "ancillary bands stay disjoint from normal siblings",
-      ).toBe(0);
-      expect(allResources.diagnostics.collisionCount).toBe(0);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
   );

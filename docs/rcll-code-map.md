@@ -234,9 +234,10 @@ curl 'http://localhost:5173/api/terraform-layout?preset=staging-extended-localst
 
 ## Ancillary Bands
 
-RCLL **All Resources** support is implemented as baseline reserved bands:
+RCLL **All Resources** support is implemented as post-placement reserved bands with a recursive slack allocator:
 
 - `terraformPipelineLayoutAncillary.ts` selects VPC/region/account/provider scopes.
-- `terraformPipelineLayoutRcll.ts` runs Dataflow-only placement, inserts measured `ancillaryBand` leaves into a clone of the placed tree, expands host hulls, pushes only lower overlapping siblings downward, renders strips, and stamps ancillary/allocator meta.
+- `terraformPipelineLayoutRcll.ts` runs Dataflow-only placement, calls the allocator/inserter, renders strips, and stamps ancillary/allocator meta.
+- `terraformPipelineRcllAncillaryAllocator.ts` computes per-strip rightward slack ceilings through the host/ancestor chain, accepts measured row-saving wrap-width breakpoints, rebuilds/gates the final ancillary tree, inserts measured `ancillaryBand` leaves into a clone of the placed tree, expands host hulls, and pushes only lower overlapping siblings downward. `diagnoseRcllAncillaryBands` (DI-ANC-6) is a read-only dry-run that materializes each breakpoint as a candidate FINAL rectangle and reuses the gate to emit a per-scope `bandBlockStatus` into `rcllAncillaryAllocator.diagnostics` — it does NOT influence allocation (the dev probe surfaces it under `ancillaryAllocator`; on v2 the target VPC reports `shared-slack-consumed`).
 - `terraformPipelineRcllPlacement.ts` excludes `ancillaryBand` from normal dataflow child placement and places bands below normal content.
 - `terraformPipelineTopologyFrames.ts` uses `ancillaryScopeRole` so account/provider strips parent to the intended hull rather than synthetic descendants.
