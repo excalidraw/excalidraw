@@ -232,6 +232,19 @@ export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 
+export type TextStyleAttributes = {
+  fontSize?: number;
+  fontFamily?: FontFamilyValues;
+  strokeColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+};
+
+export type TextStyleRange = {
+  start: number;
+  end: number;
+} & TextStyleAttributes;
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
@@ -242,6 +255,8 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /** Inline style ranges applied to portions of `originalText`. */
+    textStyles?: readonly TextStyleRange[];
     /**
      * If `true` the width will fit the text. If `false`, the text will
      * wrap to fit the width.

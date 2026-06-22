@@ -23,6 +23,7 @@ import {
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
+import { measureStyledText } from "./textFormatting";
 import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
@@ -300,11 +301,9 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  let { width: nextWidth, height: nextHeight } = measureText(
-    nextText,
-    getFontString(element),
-    element.lineHeight,
-  );
+  let { width: nextWidth, height: nextHeight } = element.textStyles?.length
+    ? measureStyledText(element, nextText)
+    : measureText(nextText, getFontString(element), element.lineHeight);
 
   // wrapped text
   if (!element.autoResize) {

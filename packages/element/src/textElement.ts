@@ -23,6 +23,12 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 
 import { measureText } from "./textMeasurements";
+import {
+  getMaxFontSizeInText,
+  getStyledFontString,
+  getTextSegments,
+  measureStyledText,
+} from "./textFormatting";
 import { wrapText } from "./textWrapping";
 import {
   isBoundToContainer,
@@ -85,11 +91,17 @@ export const redrawTextBoundingBox = (
     );
   }
 
-  const metrics = measureText(
-    boundTextUpdates.text,
-    getFontString(textElement),
-    textElement.lineHeight,
-  );
+  const metrics = textElement.textStyles?.length
+    ? measureStyledText(
+        textElement,
+        boundTextUpdates.text,
+        maxWidth,
+      )
+    : measureText(
+        boundTextUpdates.text,
+        getFontString(textElement),
+        textElement.lineHeight,
+      );
 
   // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
   if (textElement.autoResize) {

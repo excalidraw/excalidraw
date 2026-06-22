@@ -91,6 +91,7 @@ export * from "./sizeHelpers";
 export * from "./sortElements";
 export * from "./store";
 export * from "./textElement";
+export * from "./textFormatting";
 export * from "./textMeasurements";
 export * from "./textWrapping";
 export * from "./transform";

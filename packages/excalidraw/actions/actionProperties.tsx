@@ -74,6 +74,7 @@ import type {
   ExcalidrawTextElement,
   FontFamilyValues,
   TextAlign,
+  TextStyleAttributes,
   VerticalAlign,
 } from "@excalidraw/element/types";
 
@@ -152,8 +153,50 @@ import { getShortcutKey } from "../shortcut";
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
+import {
+  applyStyleToTextSelection,
+  getResolvedTextStyleAt,
+  getSelectionStyleAttributes,
+} from "@excalidraw/element";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+
+const getTextEditorSelection = () => {
+  const textEditor = document.querySelector(
+    ".excalidraw-wysiwyg",
+  ) as HTMLTextAreaElement | null;
+
+  if (!textEditor) {
+    return null;
+  }
+
+  return {
+    start: textEditor.selectionStart,
+    end: textEditor.selectionEnd,
+  };
+};
+
+const applyTextFormatting = (
+  element: ExcalidrawTextElement,
+  appState: AppState,
+  styleUpdate: TextStyleAttributes,
+): Partial<ExcalidrawTextElement> => {
+  if (appState.editingTextElement?.id !== element.id) {
+    return styleUpdate;
+  }
+
+  const selection = getTextEditorSelection();
+  if (!selection) {
+    return styleUpdate;
+  }
+
+  return applyStyleToTextSelection(
+    element,
+    selection.start,
+    selection.end,
+    styleUpdate,
+  );
+};
 
 const getStylesPanelInfo = (app: AppClassProperties) => {
   const stylesPanelMode = deriveStylesPanelMode(app.editorInterface);
@@ -200,7 +243,21 @@ export const getFormValue = function <T extends Primitive>(
   let ret: T | null = null;
 
   if (editingTextElement) {
-    ret = getAttribute(editingTextElement);
+    const selection = getTextEditorSelection();
+    const selectionStyle =
+      selection && app.state.editingTextElement?.id === editingTextElement.id
+        ? getSelectionStyleAttributes(
+            editingTextElement,
+            selection.start,
+            selection.end,
+          )
+        : null;
+
+    ret = getAttribute(
+      selectionStyle
+        ? { ...editingTextElement, ...selectionStyle }
+        : editingTextElement,
+    );
   }
 
   if (!ret) {
@@ -265,9 +322,12 @@ const changeFontSize = (
         const newFontSize = getNewFontSize(oldElement);
         newFontSizes.add(newFontSize);
 
-        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-          fontSize: newFontSize,
-        });
+        let newElement: ExcalidrawTextElement = newElementWith(
+          oldElement,
+          applyTextFormatting(oldElement, appState, {
+            fontSize: newFontSize,
+          }),
+        );
         redrawTextBoundingBox(
           newElement,
           app.scene.getContainerElement(oldElement),
@@ -326,11 +386,22 @@ export const actionChangeStrokeColor = register<
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            if (isTextElement(el)) {
+              return newElementWith(
+                el,
+                applyTextFormatting(el, appState, {
                   strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+                }),
+              );
+            }
+
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
           },
           true,
         ),
@@ -855,13 +926,17 @@ export const actionDecreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(
-        // get previous value before relative increase (doesn't work fully
-        // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
-      ),
-    );
+    return changeFontSize(elements, appState, app, (element) => {
+      const selection = getTextEditorSelection();
+      const baseFontSize =
+        appState.editingTextElement?.id === element.id && selection
+          ? getResolvedTextStyleAt(element, selection.start).fontSize
+          : element.fontSize;
+
+      return Math.round(
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * baseFontSize,
+      );
+    });
   },
   keyTest: (event) => {
     return (
@@ -879,9 +954,17 @@ export const actionIncreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
-    );
+    return changeFontSize(elements, appState, app, (element) => {
+      const selection = getTextEditorSelection();
+      const baseFontSize =
+        appState.editingTextElement?.id === element.id && selection
+          ? getResolvedTextStyleAt(element, selection.start).fontSize
+          : element.fontSize;
+
+      return Math.round(
+        baseFontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
+      );
+    });
   },
   keyTest: (event) => {
     return (
@@ -1031,11 +1114,16 @@ export const actionChangeFontFamily = register<{
               (oldElement.fontFamily !== nextFontFamily ||
                 currentItemFontFamily) // force update on selection
             ) {
+              const formattingUpdates = applyTextFormatting(oldElement, appState, {
+                fontFamily: nextFontFamily,
+              });
               const newElement: ExcalidrawTextElement = newElementWith(
                 oldElement,
                 {
-                  fontFamily: nextFontFamily,
-                  lineHeight: getLineHeight(nextFontFamily!),
+                  ...formattingUpdates,
+                  ...(formattingUpdates.textStyles === undefined && {
+                    lineHeight: getLineHeight(nextFontFamily!),
+                  }),
                 },
               );
 
