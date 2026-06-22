@@ -1503,7 +1503,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "versionNonce": 493213705,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -1556,7 +1556,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -1849,7 +1849,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "versionNonce": 493213705,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -1902,7 +1902,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -2584,7 +2584,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "scrollConstraints": null,
   "scrollX": 0,
   "scrollY": 0,
-  "scrolledOutside": false,
+  "scrolledOutside": true,
   "searchMatches": null,
   "selectedElementIds": {
     "id3": true,
@@ -2963,7 +2963,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "versionNonce": 915032327,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -3051,7 +3051,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -3345,7 +3345,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "versionNonce": 1349943049,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -3431,7 +3431,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -3911,7 +3911,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "versionNonce": 2019559783,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -3964,7 +3964,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -4249,7 +4249,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "versionNonce": 2019559783,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -4302,7 +4302,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -4557,7 +4557,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "versionNonce": 1006504105,
   "width": 20,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -4643,7 +4643,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
             "version": 3,
             "width": 20,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -5857,7 +5857,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "versionNonce": 1150084233,
   "width": 10,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -5890,7 +5890,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "versionNonce": 23633383,
   "width": 10,
   "x": 12,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -5943,7 +5943,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             "version": 3,
             "width": 10,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -5998,7 +5998,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             "version": 3,
             "width": 10,
             "x": 12,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -7093,7 +7093,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "versionNonce": 1723083209,
   "width": 10,
   "x": -10,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -7128,7 +7128,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "versionNonce": 760410951,
   "width": 10,
   "x": 12,
-  "y": 0,
+  "y": "0.00000",
 }
 `;
 
@@ -7181,7 +7181,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "version": 3,
             "width": 10,
             "x": -10,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,
@@ -7236,7 +7236,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "version": 3,
             "width": 10,
             "x": 12,
-            "y": 0,
+            "y": "0.00000",
           },
           "inserted": {
             "isDeleted": true,

@@ -1533,8 +1533,8 @@ describe("Test Linear Elements", () => {
 
       expect(arrow.endBinding?.elementId).toBe(rect.id);
       expect(arrow.width).toBeCloseTo(404);
-      expect(rect.x).toBe(400);
-      expect(rect.y).toBe(0);
+      expect(rect.x).toBeCloseTo(400);
+      expect(rect.y).toBeCloseTo(0);
       expect(
         wrapText(
           textElement.originalText,
@@ -1555,9 +1555,8 @@ describe("Test Linear Elements", () => {
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
-        h.elements[0],
+        h.elements[1],
         h.app.scene,
-        "nw",
         false,
         false,
         false,

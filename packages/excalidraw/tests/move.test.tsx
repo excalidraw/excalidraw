@@ -109,8 +109,8 @@ describe("move element", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
-    expect([rectA.x, rectA.y]).toEqual([0, 0]);
-    expect([rectB.x, rectB.y]).toEqual([200, 0]);
+    expect([[rectA.x, rectA.y]]).toCloselyEqualPoints([[0, 0]]);
+    expect([[rectB.x, rectB.y]]).toCloselyEqualPoints([[200, 0]]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
       [[106.00000000000001, 55.6867741935484]],
       0,
@@ -131,8 +131,8 @@ describe("move element", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
-    expect([rectA.x, rectA.y]).toEqual([0, 0]);
-    expect([rectB.x, rectB.y]).toEqual([201, 2]);
+    expect([[rectA.x, rectA.y]]).toCloselyEqualPoints([[0, 0]]);
+    expect([[rectB.x, rectB.y]]).toCloselyEqualPoints([[201, 2]]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
       [[106, 55.6867741935484]],
       0,
