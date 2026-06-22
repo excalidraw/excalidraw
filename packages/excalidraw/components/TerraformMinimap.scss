@@ -1,0 +1,55 @@
+.terraform-minimap {
+  position: absolute;
+  // bottom-right, lifted above the bottom toolbar / Terraform scene controls
+  right: 12px;
+  bottom: 64px;
+  z-index: 5;
+  padding: 4px;
+  background: var(--island-bg-color, #ffffff);
+  border: 1px solid var(--default-border-color, rgba(0, 0, 0, 0.1));
+  border-radius: 8px;
+  box-shadow: var(--shadow-island, 0 1px 4px rgba(0, 0, 0, 0.15));
+  pointer-events: auto;
+
+  &__canvas {
+    display: block;
+    border-radius: 4px;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  &__collapse {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 18px;
+    height: 18px;
+    line-height: 16px;
+    padding: 0;
+    font-size: 13px;
+    border-radius: 50%;
+    border: 1px solid var(--default-border-color, rgba(0, 0, 0, 0.1));
+    background: var(--island-bg-color, #ffffff);
+    color: var(--text-primary-color, #1b1b1f);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--button-hover-bg, #f1f0ff);
+    }
+  }
+
+  &--collapsed {
+    width: auto;
+    height: auto;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-primary-color, #1b1b1f);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--button-hover-bg, #f1f0ff);
+    }
+  }
+}

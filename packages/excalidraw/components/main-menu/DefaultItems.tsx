@@ -75,6 +75,7 @@ import {
 import {
   updateTerraformImportSessionLodEnabled,
   updateTerraformImportSessionLodPreset,
+  updateTerraformImportSessionMinimapEnabled,
 } from "../terraformImportSession";
 import {
   TERRAFORM_LOD_DEFAULT_PRESET,
@@ -342,6 +343,7 @@ export const TerraformZoomLod = () => {
   const lodEnabled = app.state.terraformLodEnabled;
   const lodPreset =
     app.state.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET;
+  const minimapEnabled = app.state.terraformMinimapEnabled;
 
   return (
     <DropdownMenuSub>
@@ -412,6 +414,27 @@ export const TerraformZoomLod = () => {
         >
           Hide labels and satellites when zoomed out.
           {!lodEnabled ? " Preset applies when zoom LOD is enabled." : ""}
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItemCheckbox
+          checked={minimapEnabled}
+          data-testid="terraform-minimap-enable"
+          onSelect={(event) => {
+            const next = !minimapEnabled;
+            updateTerraformImportSessionMinimapEnabled(next);
+            setAppState({ terraformMinimapEnabled: next });
+            event.preventDefault();
+          }}
+          aria-label="Show overview minimap"
+        >
+          Show overview minimap
+        </DropdownMenuItemCheckbox>
+        <div
+          className="dropdown-menu-item-hint"
+          id="terraform-minimap-hint"
+          role="note"
+        >
+          Navigate large scenes when zoomed out.
         </div>
       </DropdownMenuSub.Content>
     </DropdownMenuSub>

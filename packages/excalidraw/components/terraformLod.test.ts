@@ -7,8 +7,11 @@ import {
   classifyTerraformLodElement,
   filterTerraformLodVisibleElements,
   getTerraformLodThresholds,
+  resolveCanonicalTerraformElement,
   shouldRenderTerraformElementAtZoom,
   shouldShowTerraformPipelineFrameName,
+  terraformLodFloorForElement,
+  terraformSearchTargetZoom,
   TERRAFORM_LOD_DEFAULT_PRESET,
   TERRAFORM_LOD_LABEL_ZOOM,
   TERRAFORM_LOD_SATELLITE1_ZOOM,
@@ -339,6 +342,82 @@ describe("terraformLod", () => {
     ).toBe(false);
   });
 
+  describe("frame name footprint decluttering (Phase 2b)", () => {
+    const region = {
+      terraformPipelineView: true,
+      terraformTopologyRole: "region",
+    };
+    const subnet = {
+      terraformPipelineView: true,
+      terraformTopologyRole: "subnetZone",
+    };
+
+    it("shows a topology frame name once footprint exceeds the threshold", () => {
+      // footprint = min(w,h) * zoom. 56px is the floor.
+      expect(
+        shouldShowTerraformPipelineFrameName(region, 0.05, "balanced", 55),
+      ).toBe(false);
+      expect(
+        shouldShowTerraformPipelineFrameName(region, 0.05, "balanced", 56),
+      ).toBe(true);
+    });
+
+    it("keeps a large enclosing frame name alive farther out than the legacy 0.13 region floor", () => {
+      // a 4000px-min-dim region at 2% zoom = 80px footprint → still named,
+      // where the legacy zoom floor (0.13 balanced) would have hidden it.
+      const footprint = 4000 * 0.02;
+      expect(
+        shouldShowTerraformPipelineFrameName(
+          region,
+          0.02,
+          "balanced",
+          footprint,
+        ),
+      ).toBe(true);
+      // legacy path (no footprint) hides it at 0.02
+      expect(
+        shouldShowTerraformPipelineFrameName(region, 0.02, "balanced"),
+      ).toBe(false);
+    });
+
+    it("suppresses a small child frame name at the low zoom where stacking would occur", () => {
+      // a 300px-min-dim subnet at 0.2 zoom = 60px → just shows; at 0.15 = 45px → suppressed
+      expect(
+        shouldShowTerraformPipelineFrameName(
+          subnet,
+          0.2,
+          "balanced",
+          300 * 0.2,
+        ),
+      ).toBe(true);
+      expect(
+        shouldShowTerraformPipelineFrameName(
+          subnet,
+          0.15,
+          "balanced",
+          300 * 0.15,
+        ),
+      ).toBe(false);
+    });
+
+    it("provider/account anchors are always named regardless of footprint", () => {
+      expect(
+        shouldShowTerraformPipelineFrameName(
+          { terraformPipelineView: true, terraformTopologyRole: "account" },
+          0.01,
+          "balanced",
+          1,
+        ),
+      ).toBe(true);
+    });
+
+    it("non-pipeline frames are unaffected by the footprint rule", () => {
+      expect(
+        shouldShowTerraformPipelineFrameName({}, 0.01, "balanced", 1),
+      ).toBe(true);
+    });
+  });
+
   it("default preset is balanced", () => {
     expect(TERRAFORM_LOD_DEFAULT_PRESET).toBe("balanced");
     const satellite = rect("s", {
@@ -359,5 +438,224 @@ describe("terraformLod", () => {
   it("documents performance-tier base zoom cutoffs", () => {
     expect(TERRAFORM_LOD_LABEL_ZOOM).toBe(0.35);
     expect(TERRAFORM_LOD_SATELLITE1_ZOOM).toBe(0.5);
+  });
+});
+
+const frame = (
+  id: string,
+  customData: Record<string, unknown>,
+): ExcalidrawElement =>
+  ({
+    id,
+    type: "frame",
+    x: 0,
+    y: 0,
+    width: 400,
+    height: 300,
+    isDeleted: false,
+    customData,
+  } as unknown as ExcalidrawElement);
+
+describe("terraformLodFloorForElement (search-to-fit)", () => {
+  it("returns the class threshold for culled content classes", () => {
+    const thresholds = getTerraformLodThresholds("performance");
+    const label = text("l", {
+      terraform: true,
+      terraformVisibilityRole: "resource",
+    });
+    const icon = rect("i", { terraform: true, terraformAwsIconGlyph: true });
+    expect(terraformLodFloorForElement(label, "performance")).toBe(
+      thresholds.label,
+    );
+    expect(terraformLodFloorForElement(icon, "performance")).toBe(
+      thresholds.icon,
+    );
+  });
+
+  it("returns the frame-name threshold for topology frames (the name is the navigational unit)", () => {
+    const thresholds = getTerraformLodThresholds("balanced");
+    const region = frame("r", {
+      terraform: true,
+      terraformTopologyRole: "region",
+    });
+    const vpc = frame("v", { terraform: true, terraformTopologyRole: "vpc" });
+    expect(terraformLodFloorForElement(region, "balanced")).toBe(
+      thresholds.frameName.region,
+    );
+    expect(terraformLodFloorForElement(vpc, "balanced")).toBe(
+      thresholds.frameName.vpc,
+    );
+  });
+
+  it("returns null for always-rendered content (primary box, provider/account frame, non-Terraform)", () => {
+    const primary = rect("p", {
+      terraform: true,
+      terraformVisibilityRole: "resource",
+      terraformInitiallyVisible: true,
+      terraformSatelliteTier: 0,
+    });
+    const account = frame("a", {
+      terraform: true,
+      terraformTopologyRole: "account",
+    });
+    const plain = rect("x", {});
+    expect(terraformLodFloorForElement(primary)).toBeNull();
+    expect(terraformLodFloorForElement(account)).toBeNull();
+    expect(terraformLodFloorForElement(plain)).toBeNull();
+  });
+
+  it("scales the floor with the preset (detailed shows content from farther out)", () => {
+    const label = text("l", {
+      terraform: true,
+      terraformVisibilityRole: "resource",
+    });
+    const detailed = terraformLodFloorForElement(label, "detailed")!;
+    const performance = terraformLodFloorForElement(label, "performance")!;
+    expect(detailed).toBeLessThan(performance);
+  });
+});
+
+describe("terraformSearchTargetZoom (LOD floor wins the clamp)", () => {
+  it("uses the larger of fit-zoom and LOD floor so the match renders", () => {
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: 0.1,
+        lodFloor: 0.35,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(0.35);
+  });
+
+  it("keeps fit-zoom when it already clears the floor", () => {
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: 0.8,
+        lodFloor: 0.35,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(0.8);
+  });
+
+  it("regression: floor wins over maxZoom (no min>max inversion to blank space)", () => {
+    // Pathological maxZoom below the floor must NOT pull the target under the
+    // floor — that was the blank-space bug.
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: 0.1,
+        lodFloor: 0.5,
+        minZoom: 0.05,
+        maxZoom: 0.3,
+      }),
+    ).toBe(0.5);
+  });
+
+  it("clamps normally when there is no LOD floor", () => {
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: 50,
+        lodFloor: null,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(30);
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: 0.001,
+        lodFloor: null,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(0.05);
+  });
+
+  it("guards degenerate fit-zoom (Infinity from getCommonBounds([]))", () => {
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: Infinity,
+        lodFloor: null,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(0.05);
+    // with a floor, the floor still applies
+    expect(
+      terraformSearchTargetZoom({
+        fitZoom: Infinity,
+        lodFloor: 0.4,
+        minZoom: 0.05,
+        maxZoom: 30,
+      }),
+    ).toBe(0.4);
+  });
+});
+
+describe("resolveCanonicalTerraformElement", () => {
+  const KEY = "aws_s3_bucket.data";
+  const primary = rect("primary", {
+    terraform: true,
+    terraformVisibilityRole: "resource",
+    terraformInitiallyVisible: true,
+    terraformSatelliteTier: 0,
+    terraformVisibilityKey: KEY,
+  });
+  const label = text("label", {
+    terraform: true,
+    terraformVisibilityRole: "resource",
+    terraformVisibilityKey: KEY,
+  });
+  const icon = rect("icon", {
+    terraform: true,
+    terraformAwsIconGlyph: true,
+    terraformVisibilityKey: KEY,
+  });
+
+  it("resolves a matched label to its primary box (shared visibility key)", () => {
+    expect(
+      resolveCanonicalTerraformElement(label, [primary, label, icon]).id,
+    ).toBe("primary");
+  });
+
+  it("resolves a matched icon glyph to its primary box", () => {
+    expect(
+      resolveCanonicalTerraformElement(icon, [primary, label, icon]).id,
+    ).toBe("primary");
+  });
+
+  it("returns a primary unchanged", () => {
+    expect(
+      resolveCanonicalTerraformElement(primary, [primary, label, icon]).id,
+    ).toBe("primary");
+  });
+
+  it("returns a frame match unchanged (frames are fit directly)", () => {
+    const region = frame("region", {
+      terraform: true,
+      terraformTopologyRole: "region",
+    });
+    expect(resolveCanonicalTerraformElement(region, [region, primary]).id).toBe(
+      "region",
+    );
+  });
+
+  it("returns a satellite unchanged when it has no separate primary (it is its own box)", () => {
+    const satellite = rect("sat", {
+      terraform: true,
+      terraformVisibilityRole: "resource",
+      terraformInitiallyVisible: false,
+      terraformSatelliteTier: 1,
+      terraformVisibilityKey: "aws_iam_role.x",
+    });
+    expect(
+      resolveCanonicalTerraformElement(satellite, [primary, satellite]).id,
+    ).toBe("sat");
+  });
+
+  it("returns the match unchanged for a non-Terraform element", () => {
+    const plain = rect("plain", {});
+    expect(resolveCanonicalTerraformElement(plain, [plain, primary]).id).toBe(
+      "plain",
+    );
   });
 });

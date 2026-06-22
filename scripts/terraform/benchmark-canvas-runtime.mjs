@@ -14,6 +14,11 @@ const getArg = (name, fallback) => {
 const baseUrl = getArg("--url", "http://localhost:3000").replace(/\/$/, "");
 const runs = Number(getArg("--runs", "5"));
 const out = getArg("--out", "/tmp/terraform-canvas-runtime-results.json");
+// "runtime" = existing runtime-perf toggle A/B (LOD forced off).
+// "lod"     = Phase-1 LOD A/B: off vs balanced vs performance, with the
+//             deterministic per-element canvas-regeneration count as the
+//             primary metric (see docs/terraform-canvas-runtime-performance.md).
+const suite = getArg("--suite", "runtime");
 const targetUrl = `${baseUrl}/demo?preset=staging-extended-localstack-v2&view=pipeline&pipelineVariant=compound&packedPullLeft=1&ancillary=1`;
 
 const profiles = {
@@ -26,6 +31,19 @@ const profiles = {
   clipping: ["terraform-runtime-suppress-clipping"],
   "skip-repair": ["terraform-runtime-skip-binding-repair"],
   all: ["terraform-runtime-enable-all"],
+};
+
+// Phase-1 LOD A/B profiles. Driven via setState (not the menu) so the matrix
+// is robust to UI churn; `terraformLodEnabled`/`terraformLodPreset` are part of
+// the Renderer.getRenderableElements memo key, so a setState flip recomputes the
+// visible-element set exactly as the product feature does.
+const lodProfiles = {
+  "lod-off": { terraformLodEnabled: false },
+  "lod-balanced": { terraformLodEnabled: true, terraformLodPreset: "balanced" },
+  "lod-performance": {
+    terraformLodEnabled: true,
+    terraformLodPreset: "performance",
+  },
 };
 
 const percentile = (values, quantile) => {
@@ -117,7 +135,42 @@ const stopMeasurement = async (page) =>
     };
   });
 
-const runWorkload = async (page, workload) => {
+const setLodProfile = async (page, state) => {
+  await page.evaluate((nextState) => {
+    window.h.setState({
+      terraformLodEnabled: nextState.terraformLodEnabled,
+      ...(nextState.terraformLodPreset
+        ? { terraformLodPreset: nextState.terraformLodPreset }
+        : {}),
+    });
+  }, state);
+  await page.waitForTimeout(250);
+};
+
+const enableRegenStats = async (page) => {
+  await page.evaluate(() => {
+    if (window.__elementCanvasRegenStats) {
+      window.__elementCanvasRegenStats.enabled = true;
+    }
+  });
+};
+
+const resetRegenStats = async (page) => {
+  await page.evaluate(() => {
+    window.__resetElementCanvasRegenStats?.();
+  });
+};
+
+const readRegenStats = async (page) =>
+  page.evaluate(() => ({
+    total: window.__elementCanvasRegenStats?.total ?? null,
+    zoom: window.__elementCanvasRegenStats?.zoom ?? null,
+  }));
+
+const runWorkload = async (page, workload, { captureRegen = false } = {}) => {
+  if (captureRegen) {
+    await resetRegenStats(page);
+  }
   const canvas = page.locator(".excalidraw__canvas.interactive");
   const box = await canvas.boundingBox();
   if (!box) {
@@ -152,6 +205,7 @@ const runWorkload = async (page, workload) => {
   }
   await page.waitForTimeout(500);
   const raw = await stopMeasurement(page);
+  const regen = captureRegen ? await readRegenStats(page) : null;
   return {
     frameIntervals: summarizeIntervals(raw.intervals),
     longTasks: {
@@ -160,6 +214,7 @@ const runWorkload = async (page, workload) => {
       worst: Math.max(...raw.longTasks, 0),
     },
     replaceAllElements: raw.replaceAllElements,
+    ...(regen ? { regen } : {}),
   };
 };
 
@@ -180,12 +235,18 @@ const main = async () => {
     { timeout: 180_000 },
   );
 
-  await openSubmenu(page, "terraform-zoom-lod-submenu");
-  const lodToggle = page.getByTestId("terraform-zoom-lod-enable");
-  if ((await lodToggle.getAttribute("aria-checked")) === "true") {
-    await lodToggle.click();
+  if (suite === "runtime") {
+    // Runtime-perf A/B isolates the runtime toggles, so hold LOD off.
+    await openSubmenu(page, "terraform-zoom-lod-submenu");
+    const lodToggle = page.getByTestId("terraform-zoom-lod-enable");
+    if ((await lodToggle.getAttribute("aria-checked")) === "true") {
+      await lodToggle.click();
+    }
+    await page.keyboard.press("Escape");
+  } else if (suite === "lod") {
+    // LOD A/B: arm the deterministic regen counter; LOD state is set per profile.
+    await enableRegenStats(page);
   }
-  await page.keyboard.press("Escape");
 
   await page.evaluate(() => {
     const scene = window.h.app.scene;
@@ -237,19 +298,44 @@ const main = async () => {
   });
 
   const results = {};
-  for (const [profile, controls] of Object.entries(profiles)) {
-    await configureProfile(page, controls);
-    results[profile] = [];
-    await restoreViewport(page, referenceViewport);
-    for (const workload of ["pan", "zoom", "hover", "combined"]) {
-      await runWorkload(page, workload);
-      for (let run = 0; run < runs; run++) {
-        await restoreViewport(page, referenceViewport);
-        results[profile].push({
-          run: run + 1,
-          workload,
-          ...(await runWorkload(page, workload)),
-        });
+  const lodVisible = {};
+  if (suite === "lod") {
+    // Capture deep-zoom visible-element count (how much each preset culls) and
+    // regen count/p95 for pan (control: no zoom change) + zoom + combined.
+    for (const [profile, lodState] of Object.entries(lodProfiles)) {
+      await setLodProfile(page, lodState);
+      results[profile] = [];
+      await restoreViewport(page, referenceViewport);
+      lodVisible[profile] = await page.evaluate(
+        () => window.h.app.visibleElements?.length ?? null,
+      );
+      for (const workload of ["pan", "zoom", "combined"]) {
+        await runWorkload(page, workload, { captureRegen: true });
+        for (let run = 0; run < runs; run++) {
+          await restoreViewport(page, referenceViewport);
+          results[profile].push({
+            run: run + 1,
+            workload,
+            ...(await runWorkload(page, workload, { captureRegen: true })),
+          });
+        }
+      }
+    }
+  } else {
+    for (const [profile, controls] of Object.entries(profiles)) {
+      await configureProfile(page, controls);
+      results[profile] = [];
+      await restoreViewport(page, referenceViewport);
+      for (const workload of ["pan", "zoom", "hover", "combined"]) {
+        await runWorkload(page, workload);
+        for (let run = 0; run < runs; run++) {
+          await restoreViewport(page, referenceViewport);
+          results[profile].push({
+            run: run + 1,
+            workload,
+            ...(await runWorkload(page, workload)),
+          });
+        }
       }
     }
   }
@@ -264,30 +350,66 @@ const main = async () => {
     browserVersion: browser.version(),
     url: targetUrl,
     runs,
+    suite,
     scene,
+    ...(suite === "lod" ? { lodVisible } : {}),
     profiles: results,
   };
   await writeFile(out, `${JSON.stringify(report, null, 2)}\n`);
 
-  console.log("| Profile | Combined p95 (mean) | vs baseline |");
-  console.log("| --- | ---: | ---: |");
-  const combinedP95 = Object.fromEntries(
-    Object.entries(results).map(([profile, entries]) => {
+  if (suite === "lod") {
+    const meanBy = (entries, workload, pick) => {
       const values = entries
-        .filter((entry) => entry.workload === "combined")
-        .map((entry) => entry.frameIntervals.p95);
-      return [
-        profile,
-        values.reduce((sum, value) => sum + value, 0) / values.length,
-      ];
-    }),
-  );
-  for (const [profile, p95] of Object.entries(combinedP95)) {
-    const improvement =
-      ((combinedP95.baseline - p95) / combinedP95.baseline) * 100;
+        .filter((entry) => entry.workload === workload)
+        .map(pick)
+        .filter((value) => value != null);
+      return values.length
+        ? values.reduce((sum, value) => sum + value, 0) / values.length
+        : null;
+    };
+    // PRIMARY metric: zoom-attributable regen count (deterministic). p95 is
+    // directional only (RAF coalescing + throttling make timing noisy).
     console.log(
-      `| ${profile} | ${p95.toFixed(2)} ms | ${improvement.toFixed(1)}% |`,
+      "| LOD profile | Visible @0.1 | Zoom regen (count) | Zoom p95 (ms) | Combined p95 (ms) |",
     );
+    console.log("| --- | ---: | ---: | ---: | ---: |");
+    for (const [profile, entries] of Object.entries(results)) {
+      const zoomRegen = meanBy(entries, "zoom", (e) => e.regen?.zoom);
+      const zoomP95 = meanBy(entries, "zoom", (e) => e.frameIntervals.p95);
+      const combinedP95 = meanBy(
+        entries,
+        "combined",
+        (e) => e.frameIntervals.p95,
+      );
+      console.log(
+        `| ${profile} | ${lodVisible[profile] ?? "?"} | ${
+          zoomRegen == null ? "?" : zoomRegen.toFixed(0)
+        } | ${zoomP95 == null ? "?" : zoomP95.toFixed(2)} | ${
+          combinedP95 == null ? "?" : combinedP95.toFixed(2)
+        } |`,
+      );
+    }
+  } else {
+    console.log("| Profile | Combined p95 (mean) | vs baseline |");
+    console.log("| --- | ---: | ---: |");
+    const combinedP95 = Object.fromEntries(
+      Object.entries(results).map(([profile, entries]) => {
+        const values = entries
+          .filter((entry) => entry.workload === "combined")
+          .map((entry) => entry.frameIntervals.p95);
+        return [
+          profile,
+          values.reduce((sum, value) => sum + value, 0) / values.length,
+        ];
+      }),
+    );
+    for (const [profile, p95] of Object.entries(combinedP95)) {
+      const improvement =
+        ((combinedP95.baseline - p95) / combinedP95.baseline) * 100;
+      console.log(
+        `| ${profile} | ${p95.toFixed(2)} ms | ${improvement.toFixed(1)}% |`,
+      );
+    }
   }
   console.log(`\nWrote ${out}`);
   await browser.close();

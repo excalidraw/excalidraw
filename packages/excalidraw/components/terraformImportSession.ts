@@ -28,6 +28,8 @@ export type TerraformImportSession = {
   terraformLodEnabled?: boolean;
   /** LOD preset — performance / balanced / detailed. Default balanced. */
   terraformLodPreset?: import("./terraformLod").TerraformLodPreset;
+  /** Overview minimap for large scenes. Default false (feature flag). */
+  terraformMinimapEnabled?: boolean;
   /** Pipeline layout variant — classic global grid or compound hierarchy. */
   pipelineLayoutVariant?: import("./terraformImportDialogUtils").PipelineLayoutVariant;
   /** Pipeline packed mode — push sink-only groups right, re-pack lanes in Y. */
@@ -115,5 +117,13 @@ export const updateTerraformImportSessionLodPreset = (
 ) => {
   if (activeSession) {
     activeSession = { ...activeSession, terraformLodPreset };
+  }
+};
+
+export const updateTerraformImportSessionMinimapEnabled = (
+  terraformMinimapEnabled: boolean,
+) => {
+  if (activeSession) {
+    activeSession = { ...activeSession, terraformMinimapEnabled };
   }
 };

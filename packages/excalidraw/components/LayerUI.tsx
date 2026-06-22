@@ -64,6 +64,7 @@ import {
   isTerraformSceneElements,
 } from "./TerraformScenePanel";
 import "./TerraformOverlays.scss";
+import { TerraformMinimap } from "./TerraformMinimap";
 import { TerraformElementActions } from "./TerraformSelectedShapeActions";
 import {
   findTerraformElementByNodePath,
@@ -704,6 +705,13 @@ const LayerUI = ({
                   renderWelcomeScreen={renderWelcomeScreen}
                 />
               </div>
+            )}
+            {!appState.viewModeEnabled && (
+              <TerraformMinimap
+                app={app}
+                appState={appState}
+                elements={elements}
+              />
             )}
             {(appState.toast || appState.scrolledOutside) && (
               <div className="floating-status-stack">

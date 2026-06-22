@@ -502,6 +502,8 @@ export interface AppState {
   terraformLodEnabled: boolean;
   /** LOD preset — scales zoom thresholds (detailed = visible farther out). */
   terraformLodPreset: import("./components/terraformLod").TerraformLodPreset;
+  /** Overview minimap for large Terraform scenes (navigation when zoomed out). */
+  terraformMinimapEnabled: boolean;
 }
 
 export type SearchMatch = {
@@ -855,6 +857,7 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+  onScrollChangeEmitter: App["onScrollChangeEmitter"];
   onEvent: App["onEvent"];
   onStateChange: App["onStateChange"];
 

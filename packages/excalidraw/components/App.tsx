@@ -259,6 +259,8 @@ import {
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
   getActiveTextElement,
+  elementCanvasRegenStats,
+  resetElementCanvasRegenStats,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -2038,6 +2040,7 @@ class App extends React.Component<AppProps, AppState> {
           f.customData as Record<string, unknown> | undefined,
           this.state.zoom.value,
           this.state.terraformLodPreset,
+          Math.min(f.width, f.height) * this.state.zoom.value,
         )
       ) {
         return null;
@@ -3233,6 +3236,11 @@ class App extends React.Component<AppProps, AppState> {
           value: this.fonts,
         },
       });
+
+      // Benchmark/diagnostic hook for the per-element canvas-regeneration A/B
+      // (LOD on vs off). See docs/terraform-canvas-runtime-performance.md.
+      window.__elementCanvasRegenStats = elementCanvasRegenStats;
+      window.__resetElementCanvasRegenStats = resetElementCanvasRegenStats;
     }
 
     this.store.onDurableIncrementEmitter.on((increment) => {
@@ -4816,8 +4824,17 @@ class App extends React.Component<AppProps, AppState> {
     const propertiesPanelRect = this.excalidrawContainerRef?.current
       ?.querySelector(".App-menu__left")
       ?.getBoundingClientRect();
+    const minimapRect = this.excalidrawContainerRef?.current
+      ?.querySelector(".terraform-minimap")
+      ?.getBoundingClientRect();
 
     const PADDING = 16;
+
+    // Reserve the bottom band occupied by the Terraform overview minimap so
+    // search-to-fit does not center a match behind it.
+    const minimapBottomReserve = minimapRect
+      ? Math.max(this.state.height - minimapRect.top, 0) + PADDING
+      : 0;
 
     return getLanguage().rtl
       ? {
@@ -4828,7 +4845,7 @@ class App extends React.Component<AppProps, AppState> {
                 (propertiesPanelRect?.left ?? this.state.width),
               0,
             ) + PADDING,
-          bottom: PADDING,
+          bottom: Math.max(PADDING, minimapBottomReserve),
           left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
         }
       : {
@@ -4839,7 +4856,7 @@ class App extends React.Component<AppProps, AppState> {
               PADDING,
             0,
           ),
-          bottom: PADDING,
+          bottom: Math.max(PADDING, minimapBottomReserve),
           left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
         };
   };

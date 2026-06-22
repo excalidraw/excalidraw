@@ -30,6 +30,26 @@ export const TERRAFORM_LOD_PIPELINE_FRAME_NAME_ZOOM = {
   primaryCluster: 0.65,
 } as const;
 
+/**
+ * Minimum on-screen footprint (px, smaller frame dimension × zoom) for a
+ * topology frame to render its name.
+ *
+ * This is the navigational decluttering rule (Phase 2b / Design hierarchy): a
+ * frame name only appears once the frame itself is at least this big on screen.
+ * It supersedes the per-role zoom thresholds for topology frames when the
+ * footprint is known, and does the job of both Phase-2b goals at once:
+ * - a large enclosing frame (region/vpc) shows its name *farther out* than the
+ *   old fixed zoom floors ("keep names alive longer"), because its footprint is
+ *   large even at low zoom;
+ * - a small child frame stays suppressed until you've zoomed in enough that it
+ *   no longer collides with its parent's name (kills the region+vpc+subnet
+ *   name-stacking that naive threshold-lowering reintroduces at ~0.2 zoom).
+ *
+ * Tunable; ~56px is roughly the smallest box that can host a legible Assistant
+ * name label without overlapping an enclosing frame's title band.
+ */
+export const TERRAFORM_FRAME_NAME_MIN_FOOTPRINT_PX = 56;
+
 export type TerraformLodPreset = "performance" | "balanced" | "detailed";
 
 export const TERRAFORM_LOD_DEFAULT_PRESET: TerraformLodPreset = "balanced";
@@ -410,6 +430,115 @@ export function shouldRenderTerraformElementAtZoom(
   return ctx.zoom >= minZoom;
 }
 
+/**
+ * The minimum zoom at which a matched element's salient content actually
+ * renders under `preset`. This is the "zoom in far enough to render it" floor
+ * for search-to-fit: jumping to a matched element that is still LOD-culled
+ * lands the user on blank space (Design review, ★critical). Returns `null` for
+ * elements that always render their key content (primary boxes, group frames,
+ * provider/account frame names, edges, non-Terraform elements).
+ *
+ * For a topology frame the navigational unit is its *name*, so we return the
+ * frame-name threshold (not `null`) — otherwise a region/VPC match would frame
+ * a box whose label is still hidden.
+ */
+export function terraformLodFloorForElement(
+  element: ExcalidrawElement,
+  preset: TerraformLodPreset = TERRAFORM_LOD_DEFAULT_PRESET,
+): number | null {
+  const lodClass = classifyTerraformLodElement(element);
+  if (!lodClass) {
+    return null;
+  }
+  const thresholds = getTerraformLodThresholds(preset);
+  if (lodClass === "topologyFrame") {
+    const role = getCustomData(element).terraformTopologyRole;
+    switch (role) {
+      case "region":
+        return thresholds.frameName.region;
+      case "vpc":
+        return thresholds.frameName.vpc;
+      case "subnetZone":
+        return thresholds.frameName.subnetZone;
+      case "primaryCluster":
+        return thresholds.frameName.primaryCluster;
+      default:
+        return null;
+    }
+  }
+  return minZoomForLodClass(lodClass, thresholds);
+}
+
+/**
+ * Target zoom for search-to-fit, with the LOD floor winning the clamp.
+ *
+ * A naive `min(fitZoom, maxZoom)` inverts when `lodFloor > maxZoom`: the result
+ * drops below the floor and the jump lands on a culled (blank) element. So we
+ * floor first (`max(fitZoom, lodFloor)`), then clamp to `[minZoom, maxZoom]`
+ * but raise the ceiling to the floor when they conflict — the floor always
+ * wins (Eng review #12). With `lodFloor == null` this reduces to a normal
+ * `clamp(fitZoom, minZoom, maxZoom)`.
+ */
+export function terraformSearchTargetZoom({
+  fitZoom,
+  lodFloor,
+  minZoom,
+  maxZoom,
+}: {
+  fitZoom: number;
+  lodFloor: number | null;
+  minZoom: number;
+  maxZoom: number;
+}): number {
+  // Guard degenerate fit inputs (e.g. getCommonBounds([]) → Infinity).
+  const safeFit = Number.isFinite(fitZoom) ? fitZoom : minZoom;
+  if (lodFloor == null || !Number.isFinite(lodFloor)) {
+    return Math.min(Math.max(safeFit, minZoom), maxZoom);
+  }
+  const floored = Math.max(safeFit, lodFloor);
+  const ceiling = Math.max(maxZoom, lodFloor); // floor wins over maxZoom
+  return Math.min(Math.max(floored, minZoom), ceiling);
+}
+
+/**
+ * Resolve a search/nav match to the canonical element worth fitting + selecting.
+ *
+ * A Terraform resource is many elements (detached label, AWS icon glyph, primary
+ * rectangle, satellites) that share a visibility key. Search matches the label or
+ * frame name, but to un-cull and center the resource we want its **primary box**;
+ * selecting that box is what bypasses LOD (`isLodBypassed` → `selectedElementIds`).
+ *
+ * Frames (topology/group/satellite) and primaries are fit directly. A label/icon
+ * resolves to the primary sharing its key. A satellite *is* its own resource's
+ * box (no separate primary), and an edge has no key — both return themselves, so
+ * the caller still selects a real, LOD-bypassing element.
+ */
+export function resolveCanonicalTerraformElement(
+  matched: ExcalidrawElement,
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement {
+  const lodClass = classifyTerraformLodElement(matched);
+  if (
+    lodClass === null ||
+    lodClass === "primary" ||
+    lodClass === "topologyFrame" ||
+    lodClass === "groupFrame" ||
+    lodClass === "satelliteFrame"
+  ) {
+    return matched;
+  }
+  const key = getElementGraphKey(matched);
+  if (!key) {
+    return matched;
+  }
+  const primary = elements.find(
+    (element) =>
+      getElementGraphKey(element) === key &&
+      classifyTerraformLodElement(element) === "primary",
+  );
+  return primary ?? matched;
+}
+
 const getEdgeEndpointKeys = (
   element: ExcalidrawElement,
 ): [string, string] | null => {
@@ -507,24 +636,34 @@ export function shouldShowTerraformPipelineFrameName(
   customData: Record<string, unknown> | undefined,
   zoom: number,
   preset: TerraformLodPreset = TERRAFORM_LOD_DEFAULT_PRESET,
+  /**
+   * The frame's on-screen footprint in px (smaller scene dimension × zoom).
+   * When supplied, topology-frame names use the footprint decluttering rule
+   * ({@link TERRAFORM_FRAME_NAME_MIN_FOOTPRINT_PX}) instead of the per-role zoom
+   * floors. Omit it to fall back to the legacy fixed zoom thresholds.
+   */
+  footprintPx?: number,
 ): boolean {
   if (customData?.terraformPipelineView !== true) {
     return true;
   }
-  const frameName = getTerraformLodThresholds(preset).frameName;
-  switch (customData.terraformTopologyRole) {
-    case "provider":
-    case "account":
-      return true;
-    case "region":
-      return zoom >= frameName.region;
-    case "vpc":
-      return zoom >= frameName.vpc;
-    case "subnetZone":
-      return zoom >= frameName.subnetZone;
-    case "primaryCluster":
-      return zoom >= frameName.primaryCluster;
-    default:
-      return true;
+  const role = customData.terraformTopologyRole;
+  // provider/account are the top-level anchors — always named.
+  if (role === "provider" || role === "account") {
+    return true;
   }
+  if (
+    role === "region" ||
+    role === "vpc" ||
+    role === "subnetZone" ||
+    role === "primaryCluster"
+  ) {
+    if (footprintPx != null) {
+      return footprintPx >= TERRAFORM_FRAME_NAME_MIN_FOOTPRINT_PX;
+    }
+    // Legacy fixed-zoom fallback (no footprint available).
+    const frameName = getTerraformLodThresholds(preset).frameName;
+    return zoom >= frameName[role];
+  }
+  return true;
 }

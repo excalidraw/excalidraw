@@ -605,6 +605,32 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+/**
+ * Deterministic instrumentation for the per-element canvas-regeneration path.
+ *
+ * The dominant cost of zooming a large Terraform scene is not draw count but
+ * `generateElementCanvas` re-rasterizing every cached element when the zoom
+ * value changes (`shouldRegenerateBecauseZoom`). Wall-clock timing through the
+ * benchmark is non-deterministic (RAF coalescing, throttling, WeakMap GC), so
+ * the regeneration *count* is the primary, reproducible A/B metric for the
+ * LOD-vs-no-LOD comparison (see docs/terraform-canvas-runtime-performance.md).
+ *
+ * Production builds leave this disabled (a single branch on a boolean flag);
+ * the benchmark / tests flip it on, reset, exercise the canvas, then read.
+ */
+export const elementCanvasRegenStats = {
+  enabled: false,
+  /** total `generateElementCanvas` calls while enabled */
+  total: 0,
+  /** subset attributable to a zoom-value change (the LOD-relevant cost) */
+  zoom: 0,
+};
+
+export const resetElementCanvasRegenStats = () => {
+  elementCanvasRegenStats.total = 0;
+  elementCanvasRegenStats.zoom = 0;
+};
+
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -643,6 +669,13 @@ const generateElementWithCanvas = (
       boundTextElement &&
       element.angle !== prevElementWithCanvas.angle)
   ) {
+    if (elementCanvasRegenStats.enabled) {
+      elementCanvasRegenStats.total += 1;
+      if (shouldRegenerateBecauseZoom) {
+        elementCanvasRegenStats.zoom += 1;
+      }
+    }
+
     const elementWithCanvas = generateElementCanvas(
       element,
       elementsMap,

@@ -132,6 +132,7 @@ export const getDefaultAppState = (): Omit<
     terraformEdgeHoverPeekKey: null,
     terraformLodEnabled: true,
     terraformLodPreset: "balanced",
+    terraformMinimapEnabled: false,
   };
 };
 
@@ -262,6 +263,7 @@ const APP_STATE_STORAGE_CONF = (<
   terraformEdgeHoverPeekKey: { browser: false, export: false, server: false },
   terraformLodEnabled: { browser: true, export: false, server: false },
   terraformLodPreset: { browser: true, export: false, server: false },
+  terraformMinimapEnabled: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

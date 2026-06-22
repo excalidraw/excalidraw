@@ -8,6 +8,14 @@ interface Window {
   gtag: Function;
   sa_event: Function;
   fathom: { trackEvent: Function };
+  // Benchmark/diagnostic hook for the per-element canvas-regeneration A/B
+  // (Terraform LOD on vs off). Only assigned in dev/test builds.
+  __elementCanvasRegenStats?: {
+    enabled: boolean;
+    total: number;
+    zoom: number;
+  };
+  __resetElementCanvasRegenStats?: () => void;
 }
 
 interface CanvasRenderingContext2D {

@@ -38,6 +38,11 @@ import { useStable } from "../hooks/useStable";
 import { t } from "../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
+import {
+  resolveCanonicalTerraformElement,
+  terraformLodFloorForElement,
+  TERRAFORM_LOD_DEFAULT_PRESET,
+} from "./terraformLod";
 import { Button } from "./Button";
 import { TextField } from "./TextField";
 import {
@@ -249,10 +254,36 @@ export const SearchMenu = () => {
             zoomOptions = { fitToContent: true };
           }
 
+          // Terraform LOD: the matched element can sit below its LOD threshold,
+          // so a plain fit lands on a culled (blank) box — or, for a frame, on a
+          // box whose name is still hidden. Resolve to the canonical resource
+          // element and floor the jump zoom at the level where its content
+          // actually renders. `minZoom` is applied as a clamp on the fit zoom in
+          // `zoomToFit`, and we raise any tiny-font `maxZoom` cap so the floor
+          // wins the clamp rather than inverting to blank space. Non-Terraform
+          // and LOD-off searches are untouched (`lodFloor` stays null).
+          const lodFloor = app.state.terraformLodEnabled
+            ? terraformLodFloorForElement(
+                resolveCanonicalTerraformElement(
+                  match.element,
+                  app.scene.getNonDeletedElements(),
+                ),
+                app.state.terraformLodPreset ?? TERRAFORM_LOD_DEFAULT_PRESET,
+              )
+            : null;
+
           app.scrollToContent(matchAsElement, {
             animate: true,
             duration: 300,
             ...zoomOptions,
+            ...(lodFloor != null
+              ? {
+                  minZoom: lodFloor,
+                  ...(zoomOptions.maxZoom != null
+                    ? { maxZoom: Math.max(zoomOptions.maxZoom, lodFloor) }
+                    : {}),
+                }
+              : {}),
             canvasOffsets: app.getEditorUIOffsets(),
           });
         }
