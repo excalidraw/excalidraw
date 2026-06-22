@@ -215,10 +215,10 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
   },
   "straighten.on": {
     title: "Straighten · On",
-    body: "Aligns fan-out spines so connected cards line up across columns — easier to follow where there's vertical slack. No visible change on dependency-dense presets like the staging v2, where columns are already packed (the straightener has no room to move).",
+    body: "Aligns fan-out spines and lifts direct resources into open Y space beside topology lanes where their columns do not overlap, keeping boxes collision-free.",
     dev: {
       implements:
-        "straighten (M5): two-sided size-aware Brandes–Köpf coordinate assignment rewrites leaf box.y to align with adjacent-column dataflow neighbours; Y-only, columns + within-column order untouched (CON-12-safe). Measured no-op on v2 (85% of edges are adjacent-column, room-starved).",
+        "straighten (M5): mixed lane/leaf occupancy plus two-sided size-aware Brandes–Köpf coordinate assignment rewrites leaf box.y to align with adjacent-column dataflow neighbours; Y-only, columns + within-column order untouched (CON-12-safe).",
       refs: ["Brandes & Köpf 2001 (coordinate assignment)"],
     },
   },
@@ -763,7 +763,7 @@ export const TerraformImportPipelineSettings = ({
                 </div>
                 <div role="group" aria-label="Pipeline straighten">
                   <span className="TerraformImportModal__controlLabel">
-                    Straighten <span>align fan-out spines across columns</span>
+                    Straighten <span>align and lift direct resources</span>
                   </span>
                   <div className="TerraformImportModal__segmentedControl">
                     {option("Off", !pipelineStraighten, "straighten.off", () =>

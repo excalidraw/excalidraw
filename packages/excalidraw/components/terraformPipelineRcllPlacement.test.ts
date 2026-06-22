@@ -82,6 +82,10 @@ const lattice = (
   cyclic: string[] = [],
   floor?: Record<string, number>,
   hullEdges?: Record<string, { from: string; to: string }[]>,
+  adjacency?: {
+    fanout?: Record<string, string[]>;
+    fanin?: Record<string, string[]>;
+  },
 ): Lattice => ({
   cyclicContainers: new Set(cyclic),
   // Swimlane placement of a cyclic container derives its shared cluster column
@@ -97,6 +101,10 @@ const lattice = (
         ]),
       )
     : undefined,
+  fanout: adjacency?.fanout
+    ? new Map(Object.entries(adjacency.fanout))
+    : undefined,
+  fanin: adjacency?.fanin ? new Map(Object.entries(adjacency.fanin)) : undefined,
 });
 
 const overlapXY = (
@@ -459,6 +467,58 @@ describe("layoutPlacement — swimlane lane-rise (M4)", () => {
         `${b.get(id)!.x},${b.get(id)!.y}`,
       );
     }
+  });
+});
+
+// ── straighten leaf-rise beside swimlane lanes ───────────────────────────────
+
+describe("layoutPlacement — straighten lifts direct swimlane leaves", () => {
+  const tree = (directFloor: number): CompoundNode =>
+    container(
+      "vpc",
+      [
+        container("subnet", [leaf("A", 0, 0)], "subnetZone"),
+        leaf("B", 0, 1),
+      ],
+      "vpc",
+    );
+  const lat = (directFloor: number): Lattice =>
+    lattice(
+      ["vpc"],
+      { A: 0, B: directFloor },
+      {
+        vpc: [
+          { from: "subnet", to: "B" },
+          { from: "B", to: "subnet" },
+        ],
+      },
+      { fanout: { A: ["B"] }, fanin: { B: ["A"] } },
+    );
+
+  it("raises a direct non-overlapping leaf into free Y beside a lane", () => {
+    const by = boxByKey(
+      layoutPlacement(tree(1), lat(1), { straighten: true }),
+    );
+    const lane = by.get("subnet")!;
+    const direct = by.get("B")!;
+    const a = by.get("A")!;
+
+    expect(direct.x).toBeGreaterThanOrEqual(lane.x + lane.width);
+    expect(direct.y).toBe(lane.y);
+    expect(overlapXY(lane, direct)).toBe(false);
+    expect(a.x).toBeLessThan(direct.x);
+  });
+
+  it("keeps an overlapping direct leaf below the lane", () => {
+    const by = boxByKey(
+      layoutPlacement(tree(0), lat(0), { straighten: true }),
+    );
+    const lane = by.get("subnet")!;
+    const direct = by.get("B")!;
+
+    expect(direct.x).toBeLessThan(lane.x + lane.width);
+    expect(direct.y).toBeGreaterThanOrEqual(lane.y + lane.height);
+    expect(overlapXY(lane, direct)).toBe(false);
   });
 });
 

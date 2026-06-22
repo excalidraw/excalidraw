@@ -833,6 +833,51 @@ describe("rcll M5b de-density (internal probe, v2)", () => {
   const gatesOf = (m: Record<string, unknown>) =>
     m.gates as Record<string, number>;
 
+  it(
+    "straighten ON with compact-ish full-detail v2 keeps gates 0, is deterministic, and does not grow depth",
+    async () => {
+      const baseOptions = {
+        compact: false,
+        swimlaneLaneRise: true,
+        rankSeparate: true,
+        columnCompact: true,
+        deBandLevel: "none",
+      };
+      const off = await buildV2(baseOptions);
+      const on = await buildV2({ ...baseOptions, straighten: true });
+      const on2 = await buildV2({ ...baseOptions, straighten: true });
+
+      expect(on.meta.rcllStraighten, "straighten meta flag").toBe(true);
+      expect(on.meta.rcllSubnetDeBand, "no de-band").toBe(false);
+
+      const onPlace = placement(on.meta);
+      const offPlace = placement(off.meta);
+      const onGates = gatesOf(on.meta);
+      expect(onPlace.containmentViolations, "ON containment (CON-3)").toBe(0);
+      expect(
+        onPlace.siblingOverlapViolations,
+        "ON sibling overlap (CON-4/5)",
+      ).toBe(0);
+      expect(
+        onGates.acyclicBackwardEdges,
+        "ON iron rule: no backward edge (CON-12)",
+      ).toBe(0);
+      expect(
+        onGates.acyclicSameColumnEdges,
+        "ON iron rule: no same-column edge (CON-12)",
+      ).toBe(0);
+      expect(on.diagnostics.collisionCount, "ON collision-free").toBe(0);
+      expect(
+        onPlace.maxDepthPx,
+        "straighten does not increase full-detail compact-ish depth",
+      ).toBeLessThanOrEqual(offPlace.maxDepthPx);
+      expect(geometry(on2.elements), "ON deterministic").toEqual(
+        geometry(on.elements),
+      );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
+  );
+
   // MEASURED no-op on v2 (2026-06-19, maxCols=4, Compact AND Full): ON == OFF on
   // every metric — height 27763 / width 13354 / nearStraight 0.10 / fanoutColRate
   // 0.27 / crossings 274 (compact 249); deDensify+straighten == straighten-alone

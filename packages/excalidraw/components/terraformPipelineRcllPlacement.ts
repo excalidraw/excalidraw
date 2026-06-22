@@ -749,6 +749,70 @@ function translateChildrenX(node: CompoundNode, dx: number): void {
   }
 }
 
+type PlacedInterval = { x: number; y: number; w: number; h: number };
+
+function placeLeafAtSharedColumn(
+  leaf: CompoundNode,
+  ctx: LaneContext,
+  originX: number,
+  placed: readonly PlacedInterval[],
+  startY: number,
+): void {
+  const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
+  const x = originX + (ctx.columnX[col] ?? 0);
+  const width = leaf.box?.width ?? 0;
+  const height = leaf.box?.height ?? 0;
+  const y = riseStackY(x, width, placed, startY, true);
+  leaf.box = { x, y, width, height };
+}
+
+function applyStraighteningWithOccupancy(
+  leaves: readonly CompoundNode[],
+  ctx: LaneContext,
+  segmentTop: number,
+  occupied: readonly PlacedInterval[],
+): void {
+  if (!ctx.straighten || leaves.length === 0) {
+    return;
+  }
+  const ordered = leaves.filter((leaf) => leaf.cluster && leaf.box);
+  const items: StraightenLeaf[] = ordered.map((leaf, i) => ({
+    key: leaf.key,
+    clusterId: leaf.cluster!.id,
+    col: ctx.colByCluster.get(leaf.cluster!.id) ?? 0,
+    height: leaf.box!.height ?? 0,
+    order: i,
+  }));
+  const y = straightenColumns(
+    items,
+    ctx.fanout,
+    ctx.fanin,
+    segmentTop,
+    PIPELINE_CLUSTER_GAP_Y,
+  );
+  const placed: PlacedInterval[] = [...occupied];
+  for (const leaf of ordered) {
+    const proposed = y.get(leaf.key);
+    if (proposed == null || !leaf.box) {
+      continue;
+    }
+    const targetY = riseStackY(
+      leaf.box.x,
+      leaf.box.width,
+      placed,
+      Math.max(segmentTop, proposed),
+      true,
+    );
+    leaf.box = { ...leaf.box, y: targetY };
+    placed.push({
+      x: leaf.box.x,
+      y: leaf.box.y,
+      w: leaf.box.width,
+      h: leaf.box.height,
+    });
+  }
+}
+
 function layoutLanesOnAxis(
   nodes: readonly CompoundNode[],
   ctx: LaneContext,
@@ -761,11 +825,11 @@ function layoutLanesOnAxis(
     .filter((c) => c.children.length > 0)
     .sort(preferredOrder(ctx.orderOverride));
   let cursorY = originY;
+  const placed: PlacedInterval[] = [];
   // M4 (CON-12-safe swimlane lane rise): tighten each lane's frame to its content
   // shared-column range (leaves keep absolute X — forwardness intact) so X-disjoint
   // lanes can RISE to share Y rows instead of pure Y-stacking.
   if (ctx.riseLanes) {
-    const placed: { x: number; y: number; w: number; h: number }[] = [];
     for (const lane of lanes) {
       const minCol = laneMinColumn(lane, ctx);
       const shift = ctx.columnX[minCol] ?? 0;
@@ -775,7 +839,12 @@ function layoutLanesOnAxis(
       const gy = riseStackY(gx, gw, placed, originY, true);
       translateChildrenX(lane, -shift);
       lane.box = { x: gx, y: gy, width: gw, height: lane.box?.height ?? 0 };
-      placed.push({ x: gx, y: gy, w: gw, h: lane.box.height ?? 0 });
+      placed.push({
+        x: gx,
+        y: gy,
+        w: gw,
+        h: lane.box.height ?? 0,
+      });
     }
     cursorY = placed.reduce((m, p) => Math.max(m, p.y + p.h), originY);
     if (placed.length > 0) {
@@ -789,6 +858,12 @@ function layoutLanesOnAxis(
         width: lane.box?.width ?? 0,
         height: lane.box?.height ?? 0,
       };
+      placed.push({
+        x: lane.box.x,
+        y: lane.box.y,
+        w: lane.box.width,
+        h: lane.box.height,
+      });
       cursorY += (lane.box.height ?? 0) + PIPELINE_CLUSTER_GAP_Y;
     }
   }
@@ -796,6 +871,28 @@ function layoutLanesOnAxis(
   // ctx.reorder, else model order. The shared `colByCluster` axis is the column.
   const leafNodes = nodes.filter((c) => c.children.length === 0);
   const leaves = laneLeafOrder(leafNodes, ctx);
+  if (ctx.straighten) {
+    const leafOccupancy: PlacedInterval[] = [...placed];
+    for (const leaf of leaves) {
+      placeLeafAtSharedColumn(leaf, ctx, originX, leafOccupancy, originY);
+      leafOccupancy.push({
+        x: leaf.box!.x,
+        y: leaf.box!.y,
+        w: leaf.box!.width,
+        h: leaf.box!.height,
+      });
+    }
+    applyStraighteningWithOccupancy(leaves, ctx, originY, placed);
+    const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
+    for (const n of nodes) {
+      childBoxes.set(n.key, n.box!);
+    }
+    const bb = boundsOf(
+      nodes.map((c) => c.key),
+      childBoxes,
+    );
+    return { right: bb ? bb.x + bb.width : 0, bottom: bb ? bb.y + bb.height : 0 };
+  }
   const colCursor = new Map<number, number>();
   for (const leaf of leaves) {
     const col = ctx.colByCluster.get(leaf.cluster!.id) ?? 0;
