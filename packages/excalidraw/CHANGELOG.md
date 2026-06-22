@@ -101,6 +101,10 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
+### Features
+
+- Arabic font support. Added 5 Arabic fonts (Noto Naskh Arabic, Lemonada, Baloo Bhaijaan 2, Cairo Play, Changa) with auto-switch between Arabic and English fonts based on text input script. Font picker now groups fonts into Arabic and English sections. Lemonada is the default Arabic font.
+
 ## 0.18.0 (2025-03-11)
 
 ### Highlights

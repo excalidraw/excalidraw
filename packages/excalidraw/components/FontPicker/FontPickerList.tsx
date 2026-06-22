@@ -14,6 +14,7 @@ import {
   debounce,
   FONT_FAMILY,
   getFontFamilyString,
+  isArabicFont,
 } from "@excalidraw/common";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -53,6 +54,7 @@ export interface FontDescriptor {
   icon: JSX.Element;
   text: string;
   deprecated?: true;
+  script?: "arabic";
   badge?: {
     type: ValueOf<typeof DropDownMenuItemBadgeType>;
     placeholder: string;
@@ -121,23 +123,22 @@ export const FontPickerList = React.memo(
             ([_, { metadata }]) => !metadata.private && !metadata.fallback,
           )
           .map(([familyId, { metadata, fontFaces }]) => {
-            const fontDescriptor = {
+            const fontDescriptor: FontDescriptor = {
               value: familyId,
               icon: getFontFamilyIcon(familyId),
               text: getFontFamilyLabel(familyId, fontFaces),
+              script: metadata.script,
             };
 
             if (metadata.deprecated) {
-              Object.assign(fontDescriptor, {
-                deprecated: metadata.deprecated,
-                badge: {
-                  type: DropDownMenuItemBadgeType.RED,
-                  placeholder: t("fontList.badge.old"),
-                },
-              });
+              fontDescriptor.deprecated = metadata.deprecated;
+              fontDescriptor.badge = {
+                type: DropDownMenuItemBadgeType.RED,
+                placeholder: t("fontList.badge.old"),
+              };
             }
 
-            return fontDescriptor as FontDescriptor;
+            return fontDescriptor;
           })
           .sort((a, b) =>
             a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
@@ -281,6 +282,22 @@ export const FontPickerList = React.memo(
       [filteredFonts, sceneFamilies],
     );
 
+    const arabicFonts = useMemo(
+      () =>
+        availableFilteredFonts.filter(
+          (font) => font.script === "arabic" && !font.deprecated,
+        ),
+      [availableFilteredFonts],
+    );
+
+    const latinFonts = useMemo(
+      () =>
+        availableFilteredFonts.filter(
+          (font) => font.script !== "arabic" && !font.deprecated,
+        ),
+      [availableFilteredFonts],
+    );
+
     const FontPickerListItem = ({
       font,
       order,
@@ -353,18 +370,60 @@ export const FontPickerList = React.memo(
       );
     }
 
-    if (availableFilteredFonts.length) {
-      groups.push(
-        <DropdownMenuGroup title={t("fontList.availableFonts")} key="group_2">
-          {availableFilteredFonts.map((font, index) => (
-            <FontPickerListItem
-              key={font.value}
-              font={font}
-              order={index + sceneFilteredFonts.length}
-            />
-          ))}
-        </DropdownMenuGroup>,
-      );
+    if (searchTerm) {
+      if (availableFilteredFonts.length) {
+        groups.push(
+          <DropdownMenuGroup
+            title={t("fontList.availableFonts")}
+            key="group_2"
+          >
+            {availableFilteredFonts.map((font, index) => (
+              <FontPickerListItem
+                key={font.value}
+                font={font}
+                order={index + sceneFilteredFonts.length}
+              />
+            ))}
+          </DropdownMenuGroup>,
+        );
+      }
+    } else {
+      if (latinFonts.length) {
+        groups.push(
+          <DropdownMenuGroup
+            title={t("fontList.latinFonts")}
+            key="group_latin"
+          >
+            {latinFonts.map((font, index) => (
+              <FontPickerListItem
+                key={font.value}
+                font={font}
+                order={index + sceneFilteredFonts.length}
+              />
+            ))}
+          </DropdownMenuGroup>,
+        );
+      }
+      if (arabicFonts.length) {
+        groups.push(
+          <DropdownMenuGroup
+            title={t("fontList.arabicFonts")}
+            key="group_arabic"
+          >
+            {arabicFonts.map((font, index) => (
+              <FontPickerListItem
+                key={font.value}
+                font={font}
+                order={
+                  index +
+                  sceneFilteredFonts.length +
+                  latinFonts.length
+                }
+              />
+            ))}
+          </DropdownMenuGroup>,
+        );
+      }
     }
 
     return (

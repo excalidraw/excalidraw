@@ -695,6 +695,8 @@
       "old": "old"
     },
     "sceneFonts": "In this scene",
+    "arabicFonts": "Arabic fonts",
+    "latinFonts": "English fonts",
     "availableFonts": "Available fonts",
     "empty": "No fonts found"
   },
