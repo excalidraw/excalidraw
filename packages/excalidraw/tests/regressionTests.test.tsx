@@ -288,6 +288,18 @@ describe("regression tests", () => {
     expect(h.state.zoom.value).toBeLessThan(zoomed);
   });
 
+  it("two-finger pinch-to-zoom works in pen mode while freedraw is active", () => {
+    API.setAppState({ penMode: true, penDetected: true });
+    UI.clickTool("freedraw");
+    expect(h.state.zoom.value).toBe(1);
+    finger1.down(50, 50);
+    finger2.down(60, 50);
+    finger1.move(-10, 0);
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+    finger1.up();
+    finger2.up();
+  });
+
   it("two-finger scroll works", () => {
     // scroll horizontally vertically
 

@@ -618,6 +618,11 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+// tracks the pointerType for each active gesture pointer, kept in sync with
+// `gesture.pointers`. Lets us tell a deliberate two-finger pinch (both touch)
+// apart from drawing with a pen while a palm/finger rests on the screen.
+const gesturePointerTypes = new Map<number, string>();
+
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -3690,6 +3695,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       gesture.pointers.clear();
+      gesturePointerTypes.clear();
     }
   };
 
@@ -4251,6 +4257,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     gesture.pointers.delete(event.pointerId);
+    gesturePointerTypes.delete(event.pointerId);
   };
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
@@ -6917,8 +6924,16 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
+      // in pen mode while drawing, a pen contact plus a resting palm/finger
+      // would otherwise zoom; suppress that. A deliberate two-finger pinch
+      // (no pen among the pointers) should still zoom.
+      const hasPenPointer = Array.from(gesturePointerTypes.values()).includes(
+        "pen",
+      );
       const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
+        this.state.activeTool.type === "freedraw" &&
+        this.state.penMode &&
+        hasPenPointer
           ? 1
           : distance / gesture.initialDistance;
 
@@ -8336,6 +8351,7 @@ class App extends React.Component<AppProps, AppState> {
       x: event.clientX,
       y: event.clientY,
     });
+    gesturePointerTypes.set(event.pointerId, event.pointerType);
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
