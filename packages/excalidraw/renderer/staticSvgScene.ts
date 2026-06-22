@@ -6,6 +6,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -34,8 +35,10 @@ import {
 } from "@excalidraw/element";
 import {
   getCodeBlockMeta,
+  getLineWidth,
   isCodeBlockTextElement,
   tokenizeCode,
+  wrapCodeLines,
 } from "@excalidraw/element";
 
 import { getContainingFrame } from "@excalidraw/element";
@@ -819,15 +822,22 @@ const renderElementToSvg = (
         const codeMeta = isCodeBlockTextElement(element)
           ? getCodeBlockMeta(element)
           : undefined;
-        const codeLines = codeMeta
+        let codeLines = codeMeta
           ? tokenizeCode(
               element.text,
               codeMeta.language,
               renderConfig.theme === THEME.DARK ? "dark" : "light",
             )
           : null;
+        if (codeLines && codeMeta?.wrap) {
+          const font = getFontString(element);
+          const charWidth = getLineWidth("M", font) || element.fontSize * 0.6;
+          const maxChars = Math.max(1, Math.floor(element.width / charWidth));
+          codeLines = wrapCodeLines(codeLines, maxChars);
+        }
+        const lineCount = codeLines ? codeLines.length : lines.length;
 
-        for (let i = 0; i < lines.length; i++) {
+        for (let i = 0; i < lineCount; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);

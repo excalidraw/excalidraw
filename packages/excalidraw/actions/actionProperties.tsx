@@ -24,6 +24,7 @@ import {
   invariant,
   FONT_SIZES,
   type StrokeWidthKey,
+  MIN_FONT_SIZE,
 } from "@excalidraw/common";
 
 import {
@@ -32,6 +33,13 @@ import {
   getNonDeletedElements,
   isNonDeletedElement,
   syncStickyNoteInk,
+} from "@excalidraw/element";
+
+import {
+  CODE_BLOCK_PADDING,
+  findCodeBlockContainer,
+  getCodeBlockMeta,
+  measureCodeBlockText,
 } from "@excalidraw/element";
 
 import {
@@ -55,6 +63,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isCodeBlockTextElement,
   isElbowArrow,
   isLinearElement,
   isLineElement,
@@ -291,6 +300,41 @@ const offsetElementAfterFontResize = (
   });
 };
 
+/**
+ * Resizes a code block's text + container to fit a new font size. Unlike
+ * regular text, the container must grow/shrink along with it — otherwise the
+ * code either gets clipped (box too small) or floats in empty space (box too
+ * big). When wrapping is on, width is kept fixed and only height changes.
+ */
+const resizeCodeBlockFont = (
+  elements: readonly ExcalidrawElement[],
+  text: ExcalidrawTextElement,
+  newFontSize: number,
+): { text: ExcalidrawTextElement; container: ExcalidrawElement } | null => {
+  const container = findCodeBlockContainer(elements, text);
+  if (!container) {
+    return null;
+  }
+  const meta = getCodeBlockMeta(text);
+  const metrics = measureCodeBlockText(text.text, {
+    fontSize: newFontSize,
+    wrap: meta?.wrap,
+    maxWidth: meta?.wrap ? text.width : undefined,
+  });
+
+  return {
+    text: newElementWith(text, {
+      fontSize: newFontSize,
+      width: metrics.width,
+      height: metrics.height,
+    }),
+    container: newElementWith(container, {
+      width: metrics.width + CODE_BLOCK_PADDING * 2,
+      height: metrics.height + CODE_BLOCK_PADDING * 2,
+    }),
+  };
+};
+
 const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -301,11 +345,13 @@ const changeFontSize = (
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
-  const updatedElements = changeProperty(
+  let updatedElements = changeProperty(
     elements,
     appState,
     (oldElement) => {
-      if (isTextElement(oldElement)) {
+      // code block text/container are resized together below, since the
+      // container must grow/shrink along with the font size
+      if (isTextElement(oldElement) && !isCodeBlockTextElement(oldElement)) {
         const newFontSize = getNewFontSize(oldElement);
         newFontSizes.add(newFontSize);
         const container = app.scene.getContainerElement(oldElement);
@@ -328,6 +374,32 @@ const changeFontSize = (
     },
     true,
   );
+
+  const selectedIds = arrayToMap(
+    getSelectedElements(elements, appState, { includeBoundTextElement: true }),
+  );
+  const codeBlockReplacements = new Map<string, ExcalidrawElement>();
+  for (const element of updatedElements) {
+    if (
+      !isCodeBlockTextElement(element) ||
+      (!selectedIds.get(element.id) &&
+        element.id !== appState.editingTextElement?.id)
+    ) {
+      continue;
+    }
+    const newFontSize = Math.max(getNewFontSize(element), MIN_FONT_SIZE);
+    newFontSizes.add(newFontSize);
+    const resized = resizeCodeBlockFont(updatedElements, element, newFontSize);
+    if (resized) {
+      codeBlockReplacements.set(resized.text.id, resized.text);
+      codeBlockReplacements.set(resized.container.id, resized.container);
+    }
+  }
+  if (codeBlockReplacements.size > 0) {
+    updatedElements = updatedElements.map(
+      (element) => codeBlockReplacements.get(element.id) ?? element,
+    );
+  }
 
   // Update arrow elements after text elements have been updated
   getSelectedElements(elements, appState, {

@@ -5,6 +5,7 @@ import {
   suppportsHorizontalAlign,
   getColorTargetElement,
   hasBoundTextElement,
+  isCodeBlockTextElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
@@ -113,6 +114,12 @@ export const getShapeActionPredicates = (
     appState.editingTextElement || appState.newElement,
   );
   const hasSelection = targetElements.length > 0;
+  const hasEditableText =
+    activeToolType === "text" ||
+    targetElements.some(
+      (element) => isTextElement(element) && !isCodeBlockTextElement(element),
+    );
+  const hasCodeBlockText = targetElements.some(isCodeBlockTextElement);
 
   return {
     /** some element(s) selected */
@@ -148,11 +155,15 @@ export const getShapeActionPredicates = (
     arrowheads: forToolOrSelection(canHaveArrowheads),
 
     // text
-    text: activeToolType === "text" || targetElements.some(isTextElement),
+    text: hasEditableText || hasCodeBlockText,
+    editableText: hasEditableText,
+    codeBlockText: hasCodeBlockText,
     textAlign:
-      activeToolType === "text" ||
-      suppportsHorizontalAlign(targetElements, elementsMap),
-    verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
+      hasEditableText &&
+      (activeToolType === "text" ||
+        suppportsHorizontalAlign(targetElements, elementsMap)),
+    verticalAlign:
+      hasEditableText && shouldAllowVerticalAlign(targetElements, elementsMap),
 
     opacity: activeToolType !== "autoshape" || hasSelection,
 

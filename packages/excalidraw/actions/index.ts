@@ -33,7 +33,10 @@ export {
   actionToggleTheme,
 } from "./actionCanvas";
 
-export { actionInsertCodeBlock } from "./actionCodeBlock";
+export {
+  actionInsertCodeBlock,
+  actionToggleCodeBlockWrap,
+} from "./actionCodeBlock";
 export { actionFinalize } from "./actionFinalize";
 export { actionDeselect } from "./actionDeselect";
 

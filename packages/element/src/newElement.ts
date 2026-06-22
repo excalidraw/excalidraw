@@ -340,6 +340,7 @@ export const newCodeBlockElements = (opts: {
   language?: string | null;
   theme?: CodeBlockTheme;
   showLineNumbers?: boolean;
+  fontSize?: number;
   x: number;
   y: number;
 }): {
@@ -362,7 +363,7 @@ export const newCodeBlockElements = (opts: {
     y: opts.y + CODE_BLOCK_PADDING,
     text: code,
     fontFamily: FONT_FAMILY.Cascadia,
-    fontSize: CODE_BLOCK_FONT_SIZE,
+    fontSize: opts.fontSize ?? CODE_BLOCK_FONT_SIZE,
     textAlign: "left",
     verticalAlign: VERTICAL_ALIGN.TOP,
     autoResize: true,

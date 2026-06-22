@@ -51,6 +51,7 @@ import {
   getCodeBlockMeta,
   isCodeBlockTextElement,
   tokenizeCode,
+  wrapCodeLines,
 } from "./codeBlock";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -462,11 +463,16 @@ const drawCodeBlockText = (
     lineHeightPx,
   );
 
-  const lines = tokenizeCode(
+  let lines = tokenizeCode(
     element.text,
     meta.language,
     isDarkMode ? "dark" : "light",
   );
+
+  if (meta.wrap) {
+    const maxChars = Math.max(1, Math.floor(element.width / charWidth));
+    lines = wrapCodeLines(lines, maxChars);
+  }
 
   for (let index = 0; index < lines.length; index++) {
     const y = index * lineHeightPx + verticalOffset;
