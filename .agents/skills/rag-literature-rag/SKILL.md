@@ -30,7 +30,7 @@ Query returns canonical paper results with evidence snippets. Deep-read the PDF 
 
 ## Setup And Profiles
 
-Production query profile is `cuda-qwen0.6b-1024`, with `gemini-2-structure-v1` as the secondary cloud build. Indexes live under `tools/rag-literature-rag/data/indexes/{profile}/`.
+Production query profile is `cuda-qwen0.6b-contextual-v1` (promoted 2026-06-22; held-out nDCG@10=0.942 vs 0.630/0.667 dense baseline — see `docs/quality-campaign-2026-06-22.md`). `cuda-qwen0.6b-longrag-v1` is a viable backup; `cuda-qwen0.6b-1024` and `gemini-2-structure-v1` remain available for comparison. Indexes live under `tools/rag-literature-rag/data/indexes/{profile}/`.
 
 ```bash
 cd tools/rag-literature-rag
