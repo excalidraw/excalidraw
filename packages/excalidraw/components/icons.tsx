@@ -1673,6 +1673,17 @@ export const codeIcon = createIcon(
 
 export const FontFamilyCodeIcon = codeIcon;
 
+export const textWrapIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 6h16" />
+    <path d="M4 12h13a3 3 0 0 1 0 6h-4" />
+    <path d="M15 16l2 2l-2 2" />
+    <path d="M4 18h4" />
+  </g>,
+  tablerIconProps,
+);
+
 export const TextAlignLeftIcon = createIcon(
   <g
     stroke="currentColor"

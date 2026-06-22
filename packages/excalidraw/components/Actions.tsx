@@ -13,6 +13,7 @@ import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
   hasBoundTextElement,
+  isCodeBlockTextElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
@@ -101,6 +102,21 @@ const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
+
+/**
+ * Whether the selection contains a text element whose font family/alignment
+ * can be edited via the styles panel. Code block text is excluded — it's
+ * always monospace and left/top aligned; it gets its own font size + wrap
+ * controls instead (see `hasCodeBlockTextElement`).
+ */
+const hasEditableTextElement = (targetElements: readonly ExcalidrawElement[]) =>
+  targetElements.some(
+    (element) => isTextElement(element) && !isCodeBlockTextElement(element),
+  );
+
+const hasCodeBlockTextElement = (
+  targetElements: readonly ExcalidrawElement[],
+) => targetElements.some(isCodeBlockTextElement);
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -225,7 +241,7 @@ export const SelectedShapeActions = ({
       )}
 
       {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
+        hasEditableTextElement(targetElements)) && (
         <>
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
@@ -235,7 +251,15 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {hasCodeBlockTextElement(targetElements) && (
+        <>
+          {renderAction("changeFontSize")}
+          {renderAction("toggleCodeBlockWrap")}
+        </>
+      )}
+
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+        hasEditableTextElement(targetElements) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
@@ -591,12 +615,17 @@ const CombinedTextProperties = ({
           >
             <div className="selected-shape-actions">
               {(appState.activeTool.type === "text" ||
-                targetElements.some(isTextElement)) &&
+                hasEditableTextElement(targetElements) ||
+                hasCodeBlockTextElement(targetElements)) &&
                 renderAction("changeFontSize")}
+              {hasCodeBlockTextElement(targetElements) &&
+                renderAction("toggleCodeBlockWrap")}
               {(appState.activeTool.type === "text" ||
-                suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                (suppportsHorizontalAlign(targetElements, elementsMap) &&
+                  hasEditableTextElement(targetElements))) &&
                 renderAction("changeTextAlign")}
               {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+                hasEditableTextElement(targetElements) &&
                 renderAction("changeVerticalAlign")}
             </div>
           </PropertiesPopover>
@@ -852,11 +881,15 @@ export const CompactShapeActions = ({
 
       {/* Text Properties */}
       {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
+        hasEditableTextElement(targetElements) ||
+        hasCodeBlockTextElement(targetElements)) && (
         <>
-          <div className="compact-action-item">
-            {renderAction("changeFontFamily")}
-          </div>
+          {(appState.activeTool.type === "text" ||
+            hasEditableTextElement(targetElements)) && (
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
+          )}
           <CombinedTextProperties
             appState={appState}
             renderAction={renderAction}
@@ -987,11 +1020,15 @@ export const MobileShapeActions = ({
         />
         {/* Text Properties */}
         {(appState.activeTool.type === "text" ||
-          targetElements.some(isTextElement)) && (
+          hasEditableTextElement(targetElements) ||
+          hasCodeBlockTextElement(targetElements)) && (
           <>
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily")}
-            </div>
+            {(appState.activeTool.type === "text" ||
+              hasEditableTextElement(targetElements)) && (
+              <div className="compact-action-item">
+                {renderAction("changeFontFamily")}
+              </div>
+            )}
             <CombinedTextProperties
               appState={appState}
               renderAction={renderAction}

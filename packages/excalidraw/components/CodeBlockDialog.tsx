@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 
+import { FONT_SIZES } from "@excalidraw/common";
+
 import {
+  CODE_BLOCK_FONT_SIZE,
   CODE_BLOCK_LANGUAGES,
   CODE_BLOCK_PADDING,
   DEFAULT_CODE_BLOCK_LANGUAGE,
@@ -75,6 +78,10 @@ export const CodeBlockDialog = () => {
   const [language, setLanguage] = useState<string>(
     () => existingMeta?.language ?? DEFAULT_CODE_BLOCK_LANGUAGE,
   );
+  const [fontSize, setFontSize] = useState<number>(
+    () => editing?.text.fontSize ?? CODE_BLOCK_FONT_SIZE,
+  );
+  const [wrap, setWrap] = useState<boolean>(() => existingMeta?.wrap ?? false);
 
   const close = () => setAppState({ openDialog: null });
 
@@ -87,21 +94,27 @@ export const CodeBlockDialog = () => {
 
     if (editing) {
       // the block's colors follow the app theme at render time, so editing only
-      // needs to update the text, language and the container's size
+      // needs to update the text, language, font size, wrap and the
+      // container's size to fit
       const elementsMap = app.scene.getNonDeletedElementsMap();
-      const metrics = measureCodeBlockText(normalized);
+      const metrics = measureCodeBlockText(normalized, {
+        fontSize,
+        wrap,
+        maxWidth: wrap ? editing.text.width : undefined,
+      });
 
       mutateElement(editing.text as ExcalidrawTextElement, elementsMap, {
         text: normalized,
         originalText: normalized,
+        fontSize,
         width: metrics.width,
         height: metrics.height,
-        customData: { codeBlock: { language } },
+        customData: { codeBlock: { ...existingMeta, language, wrap } },
       });
       mutateElement(editing.container, elementsMap, {
         width: metrics.width + CODE_BLOCK_PADDING * 2,
         height: metrics.height + CODE_BLOCK_PADDING * 2,
-        customData: { codeBlock: { language } },
+        customData: { codeBlock: { ...existingMeta, language, wrap } },
       });
       ShapeCache.delete(editing.text);
       ShapeCache.delete(editing.container);
@@ -110,11 +123,35 @@ export const CodeBlockDialog = () => {
       const { container, text } = newCodeBlockElements({
         code: normalized,
         language,
+        fontSize,
         x: 0,
         y: 0,
       });
+
+      let finalText: typeof text = text;
+      let finalContainer: typeof container = container;
+      if (wrap) {
+        // wrap to the natural (unwrapped) width so short blocks don't shrink
+        const metrics = measureCodeBlockText(normalized, {
+          fontSize,
+          wrap: true,
+          maxWidth: text.width,
+        });
+        finalText = {
+          ...text,
+          width: metrics.width,
+          height: metrics.height,
+          customData: { codeBlock: { ...getCodeBlockMeta(text), wrap: true } },
+        };
+        finalContainer = {
+          ...container,
+          width: metrics.width + CODE_BLOCK_PADDING * 2,
+          height: metrics.height + CODE_BLOCK_PADDING * 2,
+        };
+      }
+
       app.addElementsFromPasteOrLibrary({
-        elements: [container, text],
+        elements: [finalContainer, finalText],
         files: null,
         position: "center",
       });
@@ -143,6 +180,26 @@ export const CodeBlockDialog = () => {
                 </option>
               ))}
             </select>
+          </label>
+          <label>
+            {t("codeBlock.fontSize")}
+            <select
+              value={fontSize}
+              onChange={(event) => setFontSize(Number(event.target.value))}
+            >
+              <option value={FONT_SIZES.sm}>S</option>
+              <option value={FONT_SIZES.md}>M</option>
+              <option value={FONT_SIZES.lg}>L</option>
+              <option value={FONT_SIZES.xl}>XL</option>
+            </select>
+          </label>
+          <label className="CodeBlockDialog__checkbox">
+            <input
+              type="checkbox"
+              checked={wrap}
+              onChange={(event) => setWrap(event.target.checked)}
+            />
+            {t("codeBlock.wrap")}
           </label>
         </div>
         <textarea

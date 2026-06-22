@@ -134,6 +134,7 @@ export type ActionName =
   | "setFrameAsActiveTool"
   | "setEmbeddableAsActiveTool"
   | "insertCodeBlock"
+  | "toggleCodeBlockWrap"
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"

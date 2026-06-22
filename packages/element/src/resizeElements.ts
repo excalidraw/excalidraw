@@ -20,7 +20,13 @@ import type { PointerDownState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { CODE_BLOCK_PADDING, isCodeBlockTextElement } from "./codeBlock";
+import {
+  CODE_BLOCK_PADDING,
+  fitCodeBlockFontSize,
+  getCodeBlockMeta,
+  isCodeBlockTextElement,
+  measureCodeBlockText,
+} from "./codeBlock";
 
 import {
   getArrowLocalFixedPoints,
@@ -1305,19 +1311,26 @@ export const resizeMultipleElements = (
       ? [midX, midY]
       : anchorsMap[handleDirection];
 
-    // a code block (rectangle container + grouped code text) should resize
-    // freely like a plain rectangle, with the code text scaling uniformly so it
-    // never distorts — so it's exempt from the text/group aspect-ratio lock
+    // a code block is a rectangle container + grouped code text. With wrap
+    // off, dragging an edge should scale the whole block (font included)
+    // proportionally, like a plain image — so it's kept on the aspect-ratio
+    // lock. With wrap on, width follows the drag directly; vertical drags
+    // can snap the font to a discrete size while height tracks the cursor
+    // until it reaches the content minimum.
     const codeBlockContainer = targetElements.find(
       ({ latest }) =>
         latest.type === "rectangle" && !!latest.customData?.codeBlock,
     )?.orig;
-    const isCodeBlock =
-      !!codeBlockContainer &&
-      targetElements.some(({ latest }) => isCodeBlockTextElement(latest));
+    const codeBlockText = targetElements.find(({ orig }) =>
+      isCodeBlockTextElement(orig),
+    )?.orig as ExcalidrawTextElement | undefined;
+    const isCodeBlock = !!codeBlockContainer && !!codeBlockText;
+    const codeBlockWrap =
+      isCodeBlock && !!getCodeBlockMeta(codeBlockText!)?.wrap;
 
     const keepAspectRatio =
       shouldMaintainAspectRatio ||
+      (isCodeBlock && !codeBlockWrap) ||
       (!isCodeBlock &&
         targetElements.some(
           (item) =>
@@ -1340,6 +1353,85 @@ export const resizeMultipleElements = (
      * 3. adjust element angle
      */
     const [flipFactorX, flipFactorY] = [flipByX ? -1 : 1, flipByY ? -1 : 1];
+
+    // precomputed once (not per-element) since both the text and its
+    // container need the same wrapped width/height to stay in sync
+    let codeBlockWrapResult: {
+      text: {
+        width: number;
+        height: number;
+        fontSize: number;
+        x: number;
+        y: number;
+      };
+      container: { height: number; y: number };
+    } | null = null;
+    if (codeBlockWrap && codeBlockContainer && codeBlockText) {
+      const cOffsetX = codeBlockContainer.x - anchorX;
+      const cOffsetY = codeBlockContainer.y - anchorY;
+      const cWidth = codeBlockContainer.width * scaleX;
+      const cNewX =
+        anchorX + flipFactorX * (cOffsetX * scaleX + (flipByX ? cWidth : 0));
+
+      const availableWidth = Math.max(cWidth - CODE_BLOCK_PADDING * 2, 1);
+      // a vertical drag (n/s or any corner) also lets the font size snap to
+      // a smaller/larger discrete step so the box actually tracks the
+      // cursor vertically, instead of just being clamped to a fixed-font
+      // minimum — a pure horizontal drag keeps the font untouched
+      const draggedVertically =
+        handleDirection.includes("n") || handleDirection.includes("s");
+
+      let textMetrics: { width: number; height: number };
+      let newFontSize = codeBlockText.fontSize;
+      let newContainerHeight: number;
+
+      if (draggedVertically) {
+        const cHeight = codeBlockContainer.height * scaleY;
+        const availableHeight = Math.max(cHeight - CODE_BLOCK_PADDING * 2, 1);
+        const fit = fitCodeBlockFontSize(
+          codeBlockText.text,
+          availableWidth,
+          availableHeight,
+        );
+        newFontSize = fit.fontSize;
+        textMetrics = { width: fit.width, height: fit.height };
+        // never go smaller than what the chosen (smallest-fitting) font
+        // needs, so the code never clips; otherwise track the cursor
+        newContainerHeight = Math.max(
+          fit.height + CODE_BLOCK_PADDING * 2,
+          cHeight,
+        );
+      } else {
+        textMetrics = measureCodeBlockText(codeBlockText.text, {
+          fontSize: codeBlockText.fontSize,
+          wrap: true,
+          maxWidth: availableWidth,
+        });
+        newContainerHeight = textMetrics.height + CODE_BLOCK_PADDING * 2;
+      }
+
+      // effective Y scale that produces the chosen height, so the anchor
+      // math below stays correct regardless of handle direction
+      const effScaleY = newContainerHeight / codeBlockContainer.height;
+      const cNewY =
+        anchorY +
+        flipFactorY *
+          (cOffsetY * effScaleY + (flipByY ? newContainerHeight : 0));
+
+      codeBlockWrapResult = {
+        text: {
+          width: textMetrics.width,
+          height: textMetrics.height,
+          fontSize: newFontSize,
+          x: cNewX + CODE_BLOCK_PADDING,
+          y: cNewY + CODE_BLOCK_PADDING,
+        },
+        container: {
+          height: newContainerHeight,
+          y: cNewY,
+        },
+      };
+    }
 
     const elementsAndUpdates: {
       element: NonDeletedExcalidrawElement;
@@ -1439,27 +1531,52 @@ export const resizeMultipleElements = (
       }
 
       if (isCodeBlockTextElement(orig) && codeBlockContainer) {
-        // scale the code text uniformly by the smaller axis (so it stays
-        // undistorted and within the box) and anchor it to the container's
-        // new top-left + padding, letting the container resize freely
-        const textScale = Math.min(Math.abs(scaleX), Math.abs(scaleY)) || 1;
-        const newFontSize = Math.max(orig.fontSize * textScale, MIN_FONT_SIZE);
-        const effScale = newFontSize / orig.fontSize;
+        if (codeBlockWrapResult) {
+          // wrap on: horizontal-only drags keep the font fixed and reflow
+          // at the new width; vertical/diagonal drags also snap the font to
+          // a discrete step that fits the dragged height
+          update.width = codeBlockWrapResult.text.width;
+          update.height = codeBlockWrapResult.text.height;
+          update.fontSize = codeBlockWrapResult.text.fontSize;
+          update.x = codeBlockWrapResult.text.x;
+          update.y = codeBlockWrapResult.text.y;
+        } else {
+          // wrap off: scale the code text uniformly (so it stays
+          // undistorted) and anchor it to the container's new top-left +
+          // padding — keepAspectRatio above already forces scaleX === scaleY
+          const textScale = Math.min(Math.abs(scaleX), Math.abs(scaleY)) || 1;
+          const newFontSize = Math.max(
+            orig.fontSize * textScale,
+            MIN_FONT_SIZE,
+          );
+          const effScale = newFontSize / orig.fontSize;
 
-        const cOffsetX = codeBlockContainer.x - anchorX;
-        const cOffsetY = codeBlockContainer.y - anchorY;
-        const cWidth = codeBlockContainer.width * scaleX;
-        const cHeight = codeBlockContainer.height * scaleY;
-        const cNewX =
-          anchorX + flipFactorX * (cOffsetX * scaleX + (flipByX ? cWidth : 0));
-        const cNewY =
-          anchorY + flipFactorY * (cOffsetY * scaleY + (flipByY ? cHeight : 0));
+          const cOffsetX = codeBlockContainer.x - anchorX;
+          const cOffsetY = codeBlockContainer.y - anchorY;
+          const cWidth = codeBlockContainer.width * scaleX;
+          const cHeight = codeBlockContainer.height * scaleY;
+          const cNewX =
+            anchorX +
+            flipFactorX * (cOffsetX * scaleX + (flipByX ? cWidth : 0));
+          const cNewY =
+            anchorY +
+            flipFactorY * (cOffsetY * scaleY + (flipByY ? cHeight : 0));
 
-        update.width = orig.width * effScale;
-        update.height = orig.height * effScale;
-        update.fontSize = newFontSize;
-        update.x = cNewX + CODE_BLOCK_PADDING * effScale;
-        update.y = cNewY + CODE_BLOCK_PADDING * effScale;
+          update.width = orig.width * effScale;
+          update.height = orig.height * effScale;
+          update.fontSize = newFontSize;
+          update.x = cNewX + CODE_BLOCK_PADDING * effScale;
+          update.y = cNewY + CODE_BLOCK_PADDING * effScale;
+        }
+      } else if (
+        codeBlockWrapResult &&
+        codeBlockContainer &&
+        orig.id === codeBlockContainer.id
+      ) {
+        // keep the container's height/y in sync with the wrapped text above,
+        // ignoring whatever the raw vertical drag would have produced
+        update.height = codeBlockWrapResult.container.height;
+        update.y = codeBlockWrapResult.container.y;
       } else if (isTextElement(orig)) {
         const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
         if (!metrics) {

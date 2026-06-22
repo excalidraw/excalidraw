@@ -341,7 +341,9 @@
     "placeholder": "Paste or type your code here…",
     "insert": "Insert",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "wrap": "Wrap text",
+    "fontSize": "Font size"
   },
   "element": {
     "rectangle": "Rectangle",

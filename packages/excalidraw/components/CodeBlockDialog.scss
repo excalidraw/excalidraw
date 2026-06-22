@@ -29,6 +29,16 @@
       }
     }
 
+    &__checkbox {
+      flex-direction: row !important;
+      align-items: center;
+      align-self: flex-end;
+
+      input {
+        margin: 0;
+      }
+    }
+
     &__textarea {
       width: 100%;
       min-height: 320px;
