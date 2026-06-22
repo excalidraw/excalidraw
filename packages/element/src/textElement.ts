@@ -144,6 +144,7 @@ export const handleBindTextResize = (
   scene: Scene,
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
+  shouldResizeFromCenter = false,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
@@ -190,14 +191,20 @@ export const handleBindTextResize = (
       );
 
       const diff = containerHeight - container.height;
-      // fix the y coord when resizing from ne/nw/n
-      const updatedY =
-        !isArrowElement(container) &&
-        (transformHandleType === "ne" ||
+      // fix the y coord when resizing from ne/nw/n, or keep the vertical center
+      // anchored when resizing from the center (alt/option held)
+      let updatedY = container.y;
+      if (!isArrowElement(container)) {
+        if (shouldResizeFromCenter) {
+          updatedY = container.y - diff / 2;
+        } else if (
+          transformHandleType === "ne" ||
           transformHandleType === "nw" ||
-          transformHandleType === "n")
-          ? container.y - diff
-          : container.y;
+          transformHandleType === "n"
+        ) {
+          updatedY = container.y - diff;
+        }
+      }
       scene.mutateElement(container, {
         height: containerHeight,
         y: updatedY,

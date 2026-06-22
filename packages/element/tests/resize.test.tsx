@@ -198,6 +198,30 @@ describe("generic element", () => {
   //   expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
   // });
 
+  it.each(["n", "s"] as const)(
+    "keeps the vertical center anchored when alt-resizing from %s past the bound text min height",
+    async (handle) => {
+      const rectangle = UI.createElement("rectangle", {
+        width: 200,
+        height: 200,
+      });
+      const label = await UI.editText(
+        rectangle,
+        "line one\nline two\nline three",
+      );
+
+      const prevCenterY = rectangle.y + rectangle.height / 2;
+
+      // Try to shrink past the bound text's minimum height. With alt held, the
+      // container should clamp at min height while keeping its vertical center fixed.
+      const shrinkBy = handle === "n" ? 300 : -300;
+      UI.resize(rectangle, handle, [0, shrinkBy], { alt: true });
+
+      expect(rectangle.y + rectangle.height / 2).toBeCloseTo(prevCenterY);
+      expect(label.y + label.height / 2).toBeCloseTo(prevCenterY);
+    },
+  );
+
   it("resizes with a label", async () => {
     const rectangle = UI.createElement("rectangle", {
       width: 200,

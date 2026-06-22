@@ -919,6 +919,7 @@ export const resizeSingleElement = (
       scene,
       handleDirection,
       shouldMaintainAspectRatio,
+      shouldResizeFromCenter,
     );
 
     updateBoundElements(latestElement, scene);
@@ -1491,7 +1492,13 @@ export const resizeMultipleElements = (
           fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
         });
-        handleBindTextResize(element, scene, handleDirection, true);
+        handleBindTextResize(
+          element,
+          scene,
+          handleDirection,
+          true,
+          shouldResizeFromCenter,
+        );
       }
     }
 
