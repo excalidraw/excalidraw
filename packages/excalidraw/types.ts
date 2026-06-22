@@ -482,6 +482,7 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  isPropertiesPanelCollapsed: boolean;
 }
 
 export type SearchMatch = {

@@ -52,6 +52,7 @@ export type ShortcutName =
       | "toggleShortcuts"
       | "wrapSelectionInFrame"
     >
+  | "togglePropertiesPanel"
   | "saveScene"
   | "imageExport"
   | "commandPalette"
@@ -119,6 +120,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
   wrapSelectionInFrame: [],
   toolLock: [getShortcutKey("Q")],
+  togglePropertiesPanel: [getShortcutKey("CtrlOrCmd+H")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {
