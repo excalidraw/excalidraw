@@ -30,7 +30,13 @@ from rag_literature_rag.ingest.doc_summary import (
     is_docsummary_profile,
     unload_ollama_model,
 )
-from rag_literature_rag.ingest.embed import EmbedStats, prepare_embed_config, resolve_workers
+from rag_literature_rag.ingest.raptor import (
+    build_raptor_tree,
+    cache_stats as raptor_cache_stats,
+    is_raptor_profile,
+    unload_ollama_model_for_raptor,
+)
+from rag_literature_rag.ingest.embed import ENV_PREFIX, EmbedStats, embed_texts, prepare_embed_config, resolve_workers
 from rag_literature_rag.ingest import embed_cache, extract_cache
 from rag_common.config import local_embed_quant, mlx_q4_model_id, use_mlx_q4_embed
 from rag_literature_rag.ingest.extract import (
@@ -664,6 +670,7 @@ def _execute_ingest(
     pipeline_telemetry = ExtractionPipelineTelemetry(extract_queue_docs)
     index_phase_stats = IndexPhaseStats()
     summary_cache_stats = SummaryCacheStats()
+    raptor_stats = SummaryCacheStats()
     run_status = new_run_status(
         paths=index_paths,
         backend=cfg.backend,
@@ -803,6 +810,13 @@ def _execute_ingest(
             "generated": summary_cache_stats.generated,
             "failures": summary_cache_stats.failures,
         }
+        run_status["raptor_cache"] = {
+            **raptor_cache_stats(),
+            "hits": raptor_stats.hits,
+            "misses": raptor_stats.misses,
+            "generated": raptor_stats.generated,
+            "failures": raptor_stats.failures,
+        }
         if cfg.backend == "gemini":
             from rag_common.gemini_rate_limit import get_rate_limiter
 
@@ -890,6 +904,44 @@ def _execute_ingest(
                 summary_cache_stats.generated,
             )
             unload_ollama_model()
+        elif is_raptor_profile(cfg.profile):
+            from rag_literature_rag.ingest.chunk import embed_input_text
+
+            summary_started = time.monotonic()
+
+            def _embed_for_raptor(texts: list[str]) -> list[list[float]]:
+                return embed_texts(
+                    texts,
+                    config=cfg,
+                    stats=stats,
+                    workers=1,
+                    prefix=ENV_PREFIX,
+                )
+
+            for outcome in batch_outcomes:
+                if not outcome.chunks:
+                    continue
+                leaf_vectors = _embed_for_raptor(
+                    [embed_input_text(chunk) for chunk in outcome.chunks]
+                )
+                tree_nodes = build_raptor_tree(
+                    outcome.item,
+                    outcome.chunks,
+                    leaf_vectors,
+                    embed_texts=_embed_for_raptor,
+                    stats=raptor_stats,
+                )
+                batch_summaries.extend(tree_nodes)
+            log.info(
+                "raptor tree nodes ready summaries=%d elapsed_s=%.1f cache_hits=%d cache_misses=%d generated=%d failures=%d",
+                len(batch_summaries),
+                time.monotonic() - summary_started,
+                raptor_stats.hits,
+                raptor_stats.misses,
+                raptor_stats.generated,
+                raptor_stats.failures,
+            )
+            unload_ollama_model_for_raptor()
         written += upsert_chunks(
             batch_chunks,
             rebuild=rebuild_table,
@@ -1102,6 +1154,13 @@ def _execute_ingest(
             "generated": summary_cache_stats.generated,
             "failures": summary_cache_stats.failures,
         }
+        run_status["raptor_cache"] = {
+            **raptor_cache_stats(),
+            "hits": raptor_stats.hits,
+            "misses": raptor_stats.misses,
+            "generated": raptor_stats.generated,
+            "failures": raptor_stats.failures,
+        }
         report_progress(phase="paused", force_log=True)
         write_status(run_status, index_paths)
         click.echo(
@@ -1124,6 +1183,13 @@ def _execute_ingest(
         "misses": summary_cache_stats.misses,
         "generated": summary_cache_stats.generated,
         "failures": summary_cache_stats.failures,
+    }
+    run_status["raptor_cache"] = {
+        **raptor_cache_stats(),
+        "hits": raptor_stats.hits,
+        "misses": raptor_stats.misses,
+        "generated": raptor_stats.generated,
+        "failures": raptor_stats.failures,
     }
     refresh_progress_estimate(
         run_status,

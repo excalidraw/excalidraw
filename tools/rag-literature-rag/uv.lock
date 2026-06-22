@@ -3213,6 +3213,11 @@ docling = [
 mlx = [
     { name = "rag-common", extra = ["mlx"], marker = "sys_platform == 'darwin'" },
 ]
+raptor = [
+    { name = "numpy" },
+    { name = "pylance" },
+    { name = "scikit-learn" },
+]
 retrieval-experiments = [
     { name = "qdrant-client", extra = ["fastembed"] },
 ]
@@ -3241,6 +3246,7 @@ requires-dist = [
     { name = "docling", marker = "extra == 'docling'", specifier = ">=2.0.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "lancedb", specifier = ">=0.15.0" },
+    { name = "numpy", marker = "extra == 'raptor'", specifier = ">=1.26.0" },
     { name = "nvidia-cublas-cu12", marker = "extra == 'retrieval-experiments-gpu'" },
     { name = "nvidia-cuda-nvrtc-cu12", marker = "extra == 'retrieval-experiments-gpu'" },
     { name = "nvidia-cuda-runtime-cu12", marker = "extra == 'retrieval-experiments-gpu'" },
@@ -3252,6 +3258,7 @@ requires-dist = [
     { name = "onnxruntime-gpu", marker = "extra == 'retrieval-experiments-gpu'", specifier = ">=1.19.2,<1.27.0" },
     { name = "openai", specifier = ">=1.40.0" },
     { name = "pydantic", specifier = ">=2.7.0" },
+    { name = "pylance", marker = "extra == 'raptor'", specifier = ">=7.0.0" },
     { name = "pylance", marker = "extra == 'retrieval-experiments-gpu'", specifier = ">=7.0.0" },
     { name = "pymupdf", specifier = ">=1.24.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
@@ -3260,10 +3267,11 @@ requires-dist = [
     { name = "rag-common", extras = ["gemini"], editable = "../rag-common" },
     { name = "rag-common", extras = ["mlx"], marker = "sys_platform == 'darwin'", editable = "../rag-common" },
     { name = "rag-common", extras = ["mlx"], marker = "sys_platform == 'darwin' and extra == 'mlx'", editable = "../rag-common" },
+    { name = "scikit-learn", marker = "extra == 'raptor'", specifier = ">=1.4.0" },
     { name = "tantivy", specifier = ">=0.22.0" },
     { name = "tiktoken", specifier = ">=0.7.0" },
 ]
-provides-extras = ["dev", "mlx", "docling", "retrieval-experiments", "retrieval-experiments-gpu"]
+provides-extras = ["dev", "mlx", "docling", "retrieval-experiments", "raptor", "retrieval-experiments-gpu"]
 
 [[package]]
 name = "rapidocr"

@@ -19,7 +19,7 @@ from rag_literature_rag.ingest.index import (
 from rag_literature_rag.manifest import load_manifest
 from rag_literature_rag.paths import CHUNKS_TABLE, PARENTS_TABLE, SUMMARIES_TABLE, profile_index_paths
 from rag_literature_rag.query.hybrid import merge_rankings, reciprocal_rank_fusion
-from rag_literature_rag.query.identity import canonical_identity_map, clear_identity_cache
+from rag_literature_rag.query.identity import canonical_identity_map, clear_identity_cache, split_values
 
 DEFAULT_HYBRID = True
 
@@ -197,10 +197,20 @@ def _require_parent_indexes(ctx: RetrieveContext) -> None:
 def _require_summary_indexes(ctx: RetrieveContext) -> None:
     summary_bm25 = ctx.paths.bm25_summary_dir or (ctx.paths.root / "bm25_summary")
     if ctx.summary_table is None or not summary_bm25.exists() or not (summary_bm25 / "meta.json").exists():
+        profile_hint = ctx.paths.profile
+        if "raptor" in profile_hint:
+            build_hint = (
+                f"rag-literature-rag ingest --embed-profile {profile_hint} --force --rebuild"
+            )
+            label = "RAPTOR tree"
+        else:
+            build_hint = (
+                "rag-literature-rag ingest --embed-profile cuda-qwen0.6b-docsummary-gemma4-v1 --force --rebuild"
+            )
+            label = "document summary"
         raise ValueError(
-            f"Profile {ctx.paths.profile!r} does not have document summary indexes. "
-            "Build the doc-summary profile first: "
-            "rag-literature-rag ingest --embed-profile cuda-qwen0.6b-docsummary-gemma4-v1 --force --rebuild"
+            f"Profile {ctx.paths.profile!r} does not have {label} indexes. "
+            f"Build the profile first: {build_hint}"
         )
 
 
@@ -524,6 +534,130 @@ def retrieve_docsummary_candidates(
     if selected:
         return selected
     return summary_results
+
+
+def _leaf_chunk_ids_from_summaries(
+    summary_hits: list[dict[str, Any]],
+    *,
+    ctx: RetrieveContext,
+) -> set[str]:
+    rows = _summary_rows(ctx)
+    pending = [str(hit.get("id")) for hit in summary_hits if hit.get("id")]
+    leaves: set[str] = set()
+    seen: set[str] = set()
+    while pending:
+        summary_id = pending.pop()
+        if summary_id in seen:
+            continue
+        seen.add(summary_id)
+        row = rows.get(summary_id)
+        if not row:
+            continue
+        for child_id in split_values(row.get("source_chunk_ids")):
+            if ":raptor:" in child_id:
+                pending.append(child_id)
+            else:
+                leaves.add(child_id)
+    return leaves
+
+
+def _summary_hybrid_results(
+    query: str,
+    *,
+    ctx: RetrieveContext,
+    filters: RetrieveFilters,
+    pool: int,
+    rrf_k: int,
+) -> list[dict[str, Any]]:
+    summary_bm25_dir = ctx.paths.bm25_summary_dir or (ctx.paths.root / "bm25_summary")
+    query_vector = _embed_vector(query, config=ctx.config)
+    dense_summary_results = _dense_search(
+        ctx.summary_table,
+        query_vector,
+        pool=pool,
+        year_min=filters.year_min,
+    )
+    dense_summary_results = _apply_filters(dense_summary_results, filters)
+    sparse_hits = bm25.search_bm25(query, index_dir=summary_bm25_dir, limit=pool)
+    sparse_summary_results = _apply_filters(_hydrate_summary_bm25(ctx, sparse_hits), filters)
+    return reciprocal_rank_fusion(
+        dense_summary_results,
+        sparse_summary_results,
+        top=pool,
+        rrf_k=rrf_k,
+    )
+
+
+def retrieve_raptor_candidates(
+    query: str,
+    *,
+    top: int = 20,
+    embed_profile: str | None = None,
+    filters: RetrieveFilters | None = None,
+    pool: int | None = None,
+    mode: str = "hybrid",
+    rrf_k: int = 20,
+) -> list[dict[str, Any]]:
+    filters = filters or RetrieveFilters()
+    ctx = resolve_retrieve_context(embed_profile=embed_profile)
+    _require_summary_indexes(ctx)
+    pool = pool or _pool_size(top=top, filters=filters)
+
+    summary_results = _summary_hybrid_results(
+        query,
+        ctx=ctx,
+        filters=filters,
+        pool=pool,
+        rrf_k=rrf_k,
+    )
+
+    if mode == "tree_only_hybrid":
+        return summary_results
+
+    chunk_results = retrieve_candidates(
+        query,
+        top=top,
+        embed_profile=embed_profile,
+        hybrid=True,
+        filters=filters,
+        pool=max(pool, top * 8),
+        rrf_k=rrf_k,
+        context=ctx,
+    )
+
+    if mode == "hybrid":
+        return reciprocal_rank_fusion(
+            chunk_results,
+            summary_results,
+            top=pool,
+            rrf_k=rrf_k,
+        )
+
+    if mode == "fused_hybrid":
+        return reciprocal_rank_fusion(
+            chunk_results,
+            summary_results,
+            top=pool,
+            rrf_k=rrf_k,
+        )
+
+    if mode == "then_chunks":
+        summary_doc_ids = [row.get("doc_id") for row in summary_results if row.get("doc_id")]
+        allowed = set(summary_doc_ids[: max(top * 3, top)])
+        selected = [row for row in chunk_results if row.get("doc_id") in allowed]
+        if selected:
+            return selected
+        return summary_results
+
+    if mode == "collapsed":
+        leaf_ids = _leaf_chunk_ids_from_summaries(summary_results[: max(top * 2, top)], ctx=ctx)
+        if leaf_ids:
+            selected = [row for row in chunk_results if row.get("id") in leaf_ids]
+            if selected:
+                return selected
+        return summary_results
+
+    raise ValueError(f"unknown raptor mode {mode!r}")
 
 
 def retrieve_multi_query(

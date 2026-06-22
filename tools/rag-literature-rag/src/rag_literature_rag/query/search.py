@@ -11,6 +11,7 @@ from rag_literature_rag.query.retrieve import (
     retrieve_candidates,
     retrieve_docsummary_candidates,
     retrieve_multi_query,
+    retrieve_raptor_candidates,
     retrieve_small_to_big_candidates,
 )
 from rag_literature_rag.query.identity import canonical_identity_map, split_values
@@ -174,6 +175,8 @@ def search(
     max_per_doc: int = 2,
     expand: str = "off",
     small_to_big: bool = False,
+    raptor: bool = False,
+    raptor_mode: str = "hybrid",
 ) -> list[dict[str, Any]]:
     if category and category not in PIPELINE_CATEGORIES:
         raise ValueError(
@@ -197,6 +200,14 @@ def search(
             filters=filters,
             mode="hybrid",
         )
+    elif raptor:
+        candidates = retrieve_raptor_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=filters,
+            mode=raptor_mode,
+        )
     else:
         candidates = retrieve_candidates(
             query,
@@ -205,7 +216,7 @@ def search(
             hybrid=hybrid,
             filters=filters,
         )
-    if not small_to_big and (expand == "force" or (expand == "auto" and _should_expand(query, candidates))):
+    if not small_to_big and not raptor and (expand == "force" or (expand == "auto" and _should_expand(query, candidates))):
         expanded = _expand_candidates(
             query,
             top=top,
@@ -249,9 +260,21 @@ def search_raw(
     small_to_big_mode: str = "hybrid",
     docsummary: bool = False,
     docsummary_mode: str = "hybrid",
+    raptor: bool = False,
+    raptor_mode: str = "hybrid",
 ) -> list[dict[str, Any]]:
     """Return formatted results for eval strategies (doc_id + score fields)."""
-    if docsummary:
+    if raptor:
+        candidates = retrieve_raptor_candidates(
+            query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=filters,
+            pool=pool,
+            mode=raptor_mode,
+            rrf_k=rrf_k,
+        )
+    elif docsummary:
         candidates = retrieve_docsummary_candidates(
             query,
             top=top,

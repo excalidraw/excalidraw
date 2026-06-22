@@ -34,6 +34,26 @@ def test_docsummary_strategies_registered_for_explicit_eval():
     ]
 
 
+def test_raptor_strategies_registered_for_explicit_eval():
+    strategies = resolve_strategies(
+        [
+            "raptor_hybrid",
+            "raptor_tree_only_hybrid",
+            "raptor_collapsed",
+            "raptor_then_chunks",
+            "raptor_fused_hybrid",
+        ],
+        llm_transforms=False,
+    )
+    assert [strategy.name for strategy in strategies] == [
+        "raptor_hybrid",
+        "raptor_tree_only_hybrid",
+        "raptor_collapsed",
+        "raptor_then_chunks",
+        "raptor_fused_hybrid",
+    ]
+
+
 def test_resolve_llm_strategies_when_enabled():
     strategies = resolve_strategies(["multi_query", "hyde"], llm_transforms=True)
     names = [strategy.name for strategy in strategies]
@@ -128,3 +148,29 @@ def test_docsummary_requires_summary_indexes(tmp_path):
         assert "cuda-qwen0.6b-docsummary-gemma4-v1" in str(exc)
     else:
         raise AssertionError("expected missing summary index error")
+
+
+def test_raptor_requires_summary_indexes(tmp_path):
+    ctx = retrieve.RetrieveContext(
+        table=None,
+        parent_table=None,
+        summary_table=None,
+        paths=type(
+            "Paths",
+            (),
+            {
+                "profile": "mlx-qwen4b-raptor-gemma4-v1",
+                "root": tmp_path,
+                "bm25_parent_dir": tmp_path / "bm25_parent",
+                "bm25_summary_dir": tmp_path / "bm25_summary",
+            },
+        )(),
+        config=EmbedConfig("local", "model", 3),
+    )
+    try:
+        retrieve._require_summary_indexes(ctx)
+    except ValueError as exc:
+        assert "does not have RAPTOR tree indexes" in str(exc)
+        assert "mlx-qwen4b-raptor-gemma4-v1" in str(exc)
+    else:
+        raise AssertionError("expected missing raptor index error")

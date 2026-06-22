@@ -25,11 +25,11 @@ Tool-local scripts should stay as thin compatibility wrappers when existing comm
 
 ## Production Profiles
 
-| Tool | Production query profile | Secondary or build profile |
-| --- | --- | --- |
-| `repo-rag` | `cuda-qwen0.6b-1024` | `gemini-2` |
-| `graph-layout-rag` | `cuda-qwen0.6b-1024` | `gemini-2-structure-v1` |
-| `rag-literature-rag` | `cuda-qwen0.6b-1024` | `gemini-2-structure-v1` |
+| Tool                 | Production query profile | Secondary or build profile |
+| -------------------- | ------------------------ | -------------------------- |
+| `repo-rag`           | `cuda-qwen0.6b-1024`     | `gemini-2`                 |
+| `graph-layout-rag`   | `cuda-qwen0.6b-1024`     | `gemini-2-structure-v1`    |
+| `rag-literature-rag` | `cuda-qwen0.6b-1024`     | `gemini-2-structure-v1`    |
 
 All tools store generated indexes under `tools/<tool>/data/indexes/{profile}/`. These indexes, manifests, caches, raw PDFs, logs, SQLite graph files, and eval runs are local-only and ignored by git.
 

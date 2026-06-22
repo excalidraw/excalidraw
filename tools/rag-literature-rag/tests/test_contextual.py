@@ -1,5 +1,6 @@
 import json
 
+from rag_common.local_llm import llm_backend
 from rag_literature_rag.ingest import contextual
 from rag_literature_rag.ingest.chunk import TextChunk
 
@@ -42,7 +43,10 @@ def test_contextual_cache_persists_success(tmp_path, monkeypatch):
 
     assert texts == ["Context: Covers HyDE query expansion.\nplain text"]
     data = json.loads(cache_path.read_text(encoding="utf-8"))
-    assert data == {"rag-v2:gemini:gemini-2.5-flash:abc:0": "Covers HyDE query expansion."}
+    model = contextual._context_model()
+    backend = llm_backend()
+    expected_key = f"rag-v2:{backend}:{model}:abc:0"
+    assert data == {expected_key: "Covers HyDE query expansion."}
 
 
 def test_contextual_cache_key_scopes_backend_and_model():

@@ -10,6 +10,7 @@ sparse hits merge and render through the same code path.
 from __future__ import annotations
 
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,27 @@ def _open_or_create_index(index_dir: Path) -> tantivy.Index:
     return tantivy.Index(_build_schema(), path=str(index_dir))
 
 
+def _archive_incompatible_index(index_dir: Path) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    archive_dir = index_dir.with_name(f"{index_dir.name}.schema-mismatch-{stamp}")
+    suffix = 1
+    while archive_dir.exists():
+        archive_dir = index_dir.with_name(f"{index_dir.name}.schema-mismatch-{stamp}-{suffix}")
+        suffix += 1
+    shutil.move(str(index_dir), str(archive_dir))
+    return archive_dir
+
+
+def _open_or_recreate_index(index_dir: Path) -> tantivy.Index:
+    try:
+        return _open_or_create_index(index_dir)
+    except ValueError as exc:
+        if "schema does not match" not in str(exc) or not index_dir.exists():
+            raise
+        _archive_incompatible_index(index_dir)
+        return _open_or_create_index(index_dir)
+
+
 def delete_doc_ids(index: tantivy.Index, doc_ids: set[str]) -> None:
     """Delete complete document rows so shorter replacements cannot leave stale tails."""
     if not doc_ids:
@@ -76,7 +98,7 @@ def upsert_chunks(
     if len(index_texts) != len(chunks):
         raise ValueError(f"index_texts {len(index_texts)} != chunks {len(chunks)}")
 
-    index = _open_or_create_index(index_dir)
+    index = _open_or_recreate_index(index_dir)
     delete_doc_ids(index, {chunk.doc_id for chunk in chunks})
     writer = index.writer()
     for chunk, body in zip(chunks, index_texts):

@@ -424,6 +424,13 @@ def _default_run_dir(embed_profile: str) -> Path:
     help="Judged qrels file to overlay onto the gold set (de-biased relevance labels).",
 )
 @click.option("--report", is_flag=True, help="Also write markdown report next to JSON output.")
+@click.option(
+    "--split",
+    type=click.Choice(["tune", "test"]),
+    default=None,
+    help="Restrict to the frozen tune/test split (data/eval/tune_test_split.json); "
+    "omit for the full gold set. Tuning sweeps use tune; final deltas report test.",
+)
 @click.option("-v", "--verbose", is_flag=True, help="Log per-strategy progress to stderr.")
 @click.option("--json", "as_json", is_flag=True, help="Print JSON to stdout.")
 def benchmark_cmd(
@@ -446,12 +453,17 @@ def benchmark_cmd(
     qrels_path: Path | None,
     output_path: Path | None,
     report: bool,
+    split: str | None,
     verbose: bool,
     as_json: bool,
 ) -> None:
     """Benchmark retrieval strategies against the gold evaluation set."""
     if cloud_rerank and not allow_cloud_cost:
         raise click.ClickException("--cloud-rerank requires --allow-cloud-cost")
+    # Propagates to isolated strategy worker subprocesses via env inheritance,
+    # same mechanism as RAG_LIT_QRELS_PATH below.
+    if split:
+        os.environ["RAG_LIT_GOLD_SPLIT"] = split
     if allow_cloud_cost:
         os.environ["RAG_LIT_ALLOW_CLOUD_COST"] = "true"
         os.environ["RAG_LIT_MAX_CLOUD_RANKING_UNITS"] = str(max_cloud_ranking_units)
@@ -484,6 +496,7 @@ def benchmark_cmd(
         max_swap_growth_gb=max_swap_growth_gb,
     )
     payload["qrels"] = str(qrels_path) if qrels_path else None
+    payload["split"] = split
 
     if output_path is None:
         output_path = run_dir / "benchmark.json"

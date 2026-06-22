@@ -57,23 +57,23 @@ Profile: `cuda-qwen0.6b-1024`. LLM transforms disabled.
 
 ### Catalog
 
-| Strategy | nDCG@10 | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.567 | 0.937 | 0.396 | 34 | 0 |
-| bm25 | 0.621 | 0.988 | 0.424 | 60 | 0 |
-| hybrid | 0.617 | 1.000 | 0.426 | 101 | 0 |
-| hybrid_rrf100 | 0.625 | 1.000 | 0.427 | 99 | 0 |
-| hybrid_dense2 | 0.610 | 1.000 | 0.412 | 101 | 0 |
+| Strategy      | nDCG@10 |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ----: | ----: | -----: | -------: |
+| dense         |   0.567 | 0.937 | 0.396 |     34 |        0 |
+| bm25          |   0.621 | 0.988 | 0.424 |     60 |        0 |
+| hybrid        |   0.617 | 1.000 | 0.426 |    101 |        0 |
+| hybrid_rrf100 |   0.625 | 1.000 | 0.427 |     99 |        0 |
+| hybrid_dense2 |   0.610 | 1.000 | 0.412 |    101 |        0 |
 
 ### PDF Deep Read
 
-| Strategy | nDCG@10 | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.615 | 0.935 | 0.485 | 59 | 0 |
-| bm25 | 0.679 | 0.988 | 0.515 | 59 | 0 |
-| hybrid | 0.679 | 1.000 | 0.520 | 137 | 0 |
-| hybrid_rrf100 | 0.678 | 1.000 | 0.510 | 104 | 0 |
-| hybrid_dense2 | 0.665 | 1.000 | 0.501 | 90 | 0 |
+| Strategy      | nDCG@10 |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ----: | ----: | -----: | -------: |
+| dense         |   0.615 | 0.935 | 0.485 |     59 |        0 |
+| bm25          |   0.679 | 0.988 | 0.515 |     59 |        0 |
+| hybrid        |   0.679 | 1.000 | 0.520 |    137 |        0 |
+| hybrid_rrf100 |   0.678 | 1.000 | 0.510 |    104 |        0 |
+| hybrid_dense2 |   0.665 | 1.000 | 0.501 |     90 |        0 |
 
 ## Interpretation
 
@@ -87,41 +87,41 @@ Profile: `cuda-qwen0.6b-section-v1`. Built on `desktop` as a separate profile in
 
 ### Catalog
 
-| Strategy | nDCG@10 | Δ vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.563 | -0.004 | 0.952 | 0.389 | 59 | 0 |
-| bm25 | 0.605 | -0.016 | 0.970 | 0.429 | 101 | 0 |
-| hybrid | 0.627 | +0.010 | 1.000 | 0.441 | 142 | 0 |
-| hybrid_rrf100 | 0.633 | +0.008 | 1.000 | 0.443 | 142 | 0 |
-| hybrid_dense2 | 0.622 | +0.012 | 1.000 | 0.424 | 142 | 0 |
+| Strategy      | nDCG@10 | Δ vs baseline |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ------------: | ----: | ----: | -----: | -------: |
+| dense         |   0.563 |        -0.004 | 0.952 | 0.389 |     59 |        0 |
+| bm25          |   0.605 |        -0.016 | 0.970 | 0.429 |    101 |        0 |
+| hybrid        |   0.627 |        +0.010 | 1.000 | 0.441 |    142 |        0 |
+| hybrid_rrf100 |   0.633 |        +0.008 | 1.000 | 0.443 |    142 |        0 |
+| hybrid_dense2 |   0.622 |        +0.012 | 1.000 | 0.424 |    142 |        0 |
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref | Baseline bpref |
-| --- | ---: | ---: | ---: |
-| bm25 | 0.00 | 0.379 | 0.398 |
-| hybrid | 0.29 | 0.426 | 0.433 |
-| hybrid_rrf100 | 0.28 | 0.427 | 0.434 |
-| hybrid_dense2 | 0.40 | 0.411 | 0.427 |
+| Strategy      | hole@10 | bpref | Baseline bpref |
+| ------------- | ------: | ----: | -------------: |
+| bm25          |    0.00 | 0.379 |          0.398 |
+| hybrid        |    0.29 | 0.426 |          0.433 |
+| hybrid_rrf100 |    0.28 | 0.427 |          0.434 |
+| hybrid_dense2 |    0.40 | 0.411 |          0.427 |
 
 ### PDF Deep Read
 
-| Strategy | nDCG@10 | Δ vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.636 | +0.021 | 0.951 | 0.499 | 85 | 0 |
-| bm25 | 0.665 | -0.014 | 0.970 | 0.525 | 105 | 0 |
-| hybrid | 0.686 | +0.007 | 1.000 | 0.532 | 237 | 0 |
-| hybrid_rrf100 | 0.691 | +0.013 | 1.000 | 0.535 | 150 | 0 |
-| hybrid_dense2 | 0.684 | +0.019 | 1.000 | 0.532 | 154 | 0 |
+| Strategy      | nDCG@10 | Δ vs baseline |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ------------: | ----: | ----: | -----: | -------: |
+| dense         |   0.636 |        +0.021 | 0.951 | 0.499 |     85 |        0 |
+| bm25          |   0.665 |        -0.014 | 0.970 | 0.525 |    105 |        0 |
+| hybrid        |   0.686 |        +0.007 | 1.000 | 0.532 |    237 |        0 |
+| hybrid_rrf100 |   0.691 |        +0.013 | 1.000 | 0.535 |    150 |        0 |
+| hybrid_dense2 |   0.684 |        +0.019 | 1.000 | 0.532 |    154 |        0 |
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref | Baseline bpref |
-| --- | ---: | ---: | ---: |
-| bm25 | 0.00 | 0.453 | 0.479 |
-| hybrid | 0.21 | 0.514 | 0.523 |
-| hybrid_rrf100 | 0.22 | 0.508 | 0.515 |
-| hybrid_dense2 | 0.32 | 0.493 | 0.508 |
+| Strategy      | hole@10 | bpref | Baseline bpref |
+| ------------- | ------: | ----: | -------------: |
+| bm25          |    0.00 | 0.453 |          0.479 |
+| hybrid        |    0.21 | 0.514 |          0.523 |
+| hybrid_rrf100 |    0.22 | 0.508 |          0.515 |
+| hybrid_dense2 |    0.32 | 0.493 |          0.508 |
 
 Decision: do not promote yet. Section enrichment improves nDCG for hybrid/fusion on both tracks, including +0.013 PDF nDCG for `hybrid_rrf100`, but it fails the rag-lit promotion gate because bpref falls slightly and `hole@10` remains nonzero for dense-heavy arms.
 
@@ -146,43 +146,43 @@ The run used CPU Docling with `RAG_LIT_EXTRACT_WORKERS=1`, `RAG_LIT_DOCLING_THRE
 
 ### Catalog
 
-| Strategy | nDCG@10 | Δ vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.566 | -0.001 | 0.940 | 0.326 | 79 | 0 |
-| bm25 | 0.549 | -0.072 | 1.000 | 0.325 | 78 | 0 |
-| hybrid | 0.578 | -0.039 | 1.000 | 0.329 | 120 | 0 |
-| hybrid_rrf100 | 0.583 | -0.042 | 1.000 | 0.331 | 122 | 0 |
-| hybrid_dense2 | 0.598 | -0.012 | 1.000 | 0.339 | 128 | 0 |
+| Strategy      | nDCG@10 | Δ vs baseline |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ------------: | ----: | ----: | -----: | -------: |
+| dense         |   0.566 |        -0.001 | 0.940 | 0.326 |     79 |        0 |
+| bm25          |   0.549 |        -0.072 | 1.000 | 0.325 |     78 |        0 |
+| hybrid        |   0.578 |        -0.039 | 1.000 | 0.329 |    120 |        0 |
+| hybrid_rrf100 |   0.583 |        -0.042 | 1.000 | 0.331 |    122 |        0 |
+| hybrid_dense2 |   0.598 |        -0.012 | 1.000 | 0.339 |    128 |        0 |
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref | Baseline bpref |
-| --- | ---: | ---: | ---: |
-| bm25 | 0.02 | 0.341 | 0.398 |
-| dense | 0.40 | 0.397 | 0.390 |
-| hybrid | 0.34 | 0.376 | 0.433 |
-| hybrid_rrf100 | 0.33 | 0.377 | 0.434 |
-| hybrid_dense2 | 0.38 | 0.392 | 0.427 |
+| Strategy      | hole@10 | bpref | Baseline bpref |
+| ------------- | ------: | ----: | -------------: |
+| bm25          |    0.02 | 0.341 |          0.398 |
+| dense         |    0.40 | 0.397 |          0.390 |
+| hybrid        |    0.34 | 0.376 |          0.433 |
+| hybrid_rrf100 |    0.33 | 0.377 |          0.434 |
+| hybrid_dense2 |    0.38 | 0.392 |          0.427 |
 
 ### PDF Deep Read
 
-| Strategy | nDCG@10 | Δ vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.639 | +0.024 | 0.939 | 0.410 | 87 | 0 |
-| bm25 | 0.679 | +0.000 | 1.000 | 0.425 | 80 | 0 |
-| hybrid | 0.676 | -0.003 | 1.000 | 0.432 | 157 | 0 |
-| hybrid_rrf100 | 0.642 | -0.036 | 1.000 | 0.402 | 118 | 0 |
-| hybrid_dense2 | 0.657 | -0.008 | 1.000 | 0.420 | 122 | 0 |
+| Strategy      | nDCG@10 | Δ vs baseline |   MRR |  R@10 | p95 ms | Failures |
+| ------------- | ------: | ------------: | ----: | ----: | -----: | -------: |
+| dense         |   0.639 |        +0.024 | 0.939 | 0.410 |     87 |        0 |
+| bm25          |   0.679 |        +0.000 | 1.000 | 0.425 |     80 |        0 |
+| hybrid        |   0.676 |        -0.003 | 1.000 | 0.432 |    157 |        0 |
+| hybrid_rrf100 |   0.642 |        -0.036 | 1.000 | 0.402 |    118 |        0 |
+| hybrid_dense2 |   0.657 |        -0.008 | 1.000 | 0.420 |    122 |        0 |
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref | Baseline bpref |
-| --- | ---: | ---: | ---: |
-| bm25 | 0.03 | 0.477 | 0.479 |
-| dense | 0.34 | 0.502 | 0.489 |
-| hybrid | 0.28 | 0.519 | 0.523 |
-| hybrid_rrf100 | 0.27 | 0.457 | 0.515 |
-| hybrid_dense2 | 0.30 | 0.468 | 0.508 |
+| Strategy      | hole@10 | bpref | Baseline bpref |
+| ------------- | ------: | ----: | -------------: |
+| bm25          |    0.03 | 0.477 |          0.479 |
+| dense         |    0.34 | 0.502 |          0.489 |
+| hybrid        |    0.28 | 0.519 |          0.523 |
+| hybrid_rrf100 |    0.27 | 0.457 |          0.515 |
+| hybrid_dense2 |    0.30 | 0.468 |          0.508 |
 
 Decision: do not promote. Small2big increases chunk count by 2.23x and improves a few dense/PDF signals, but it regresses catalog nDCG, BM25, and hybrid fusion relative to the baseline. It also does not meet the rag-lit promotion gate because bpref does not improve for the strongest hybrid arms and `hole@10` remains nonzero.
 
@@ -206,19 +206,19 @@ Build/smoke status:
 
 Benchmark summary:
 
-| Track | Best dual arm | nDCG@10 | Comparable baseline | Failures |
-| --- | --- | ---: | ---: | ---: |
-| catalog | small2big_hybrid | 0.565 | hybrid 0.556 | 25 |
-| pdf-deep-read | small2big_hybrid | 0.646 | hybrid 0.632 | 12 |
+| Track         | Best dual arm    | nDCG@10 | Comparable baseline | Failures |
+| ------------- | ---------------- | ------: | ------------------: | -------: |
+| catalog       | small2big_hybrid |   0.565 |        hybrid 0.556 |       25 |
+| pdf-deep-read | small2big_hybrid |   0.646 |        hybrid 0.632 |       12 |
 
 Diagnostics:
 
-| Track | Arm | corrected nDCG@10 | hole@10 | bpref |
-| --- | --- | ---: | ---: | ---: |
-| catalog | small2big_hybrid | 0.558 | 0.315 | 0.383 |
-| catalog | small2big_parent_bm25 | 0.541 | 0.002 | 0.328 |
-| pdf-deep-read | small2big_hybrid | 0.639 | 0.239 | 0.471 |
-| pdf-deep-read | small2big_parent_bm25 | 0.599 | 0.002 | 0.398 |
+| Track         | Arm                   | corrected nDCG@10 | hole@10 | bpref |
+| ------------- | --------------------- | ----------------: | ------: | ----: |
+| catalog       | small2big_hybrid      |             0.558 |   0.315 | 0.383 |
+| catalog       | small2big_parent_bm25 |             0.541 |   0.002 | 0.328 |
+| pdf-deep-read | small2big_hybrid      |             0.639 |   0.239 | 0.471 |
+| pdf-deep-read | small2big_parent_bm25 |             0.599 |   0.002 | 0.398 |
 
 Decision: do not promote. The best hybrid arm improved raw nDCG@10, but all benchmark arms had nonzero failures, the best hybrid arm retained nonzero diagnostic holes, and bpref did not improve over the comparable baseline on both tracks. Parent BM25 shows that lexical parent context can close holes, but it is not the current `--small-to-big` user path and does not pass the quality gate.
 
@@ -236,14 +236,14 @@ Implementation status:
 
 50-document smoke:
 
-| Metric | Value |
-| --- | ---: |
-| documents | 50 |
-| normal chunks | 1,114 |
-| summaries | 50 |
-| runtime | 658.2s |
-| throughput | 4.57 docs/min |
-| skipped/missing/fallback/errors | 0 |
+| Metric                          |         Value |
+| ------------------------------- | ------------: |
+| documents                       |            50 |
+| normal chunks                   |         1,114 |
+| summaries                       |            50 |
+| runtime                         |        658.2s |
+| throughput                      | 4.57 docs/min |
+| skipped/missing/fallback/errors |             0 |
 
 The first prompt/cache version produced unusable one-word summaries and was discarded. The corrected v2 prompt/cache version increased the generation budget, capped source text at 6,000 characters, rejects summaries under 40 words, and produced 150-168 word summaries in inspected samples.
 
@@ -261,14 +261,14 @@ Implementation fix: contextual cache keys now include LLM backend and active mod
 
 Smoke summary:
 
-| Metric | Value |
-| --- | ---: |
-| accepted smoke documents | 1 |
-| chunks | 21 |
-| generated context lines | 19 |
-| failed context generations | 2 |
-| failure rate | 9.5% |
-| runtime | 128.3s |
+| Metric                     |  Value |
+| -------------------------- | -----: |
+| accepted smoke documents   |      1 |
+| chunks                     |     21 |
+| generated context lines    |     19 |
+| failed context generations |      2 |
+| failure rate               |   9.5% |
+| runtime                    | 128.3s |
 
 Decision: do not promote and do not run full corpus. The run exceeded the 2% contextual generation failure threshold. The earlier 10-document cached smoke is retained as an artifact but rejected as evidence because it predated the model-scoped cache-key fix.
 
@@ -284,13 +284,13 @@ Implementation status:
 
 50-document smoke:
 
-| Metric | Value |
-| --- | ---: |
-| documents | 50 |
-| larger chunks | 522 |
-| runtime | 78.5s |
-| skipped/missing | 0 |
-| crash grep | 0 |
+| Metric          | Value |
+| --------------- | ----: |
+| documents       |    50 |
+| larger chunks   |   522 |
+| runtime         | 78.5s |
+| skipped/missing |     0 |
+| crash grep      |     0 |
 
 Query smoke returned `RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval` at rank 1 for a RAPTOR query. The partial catalog benchmark is route-only; `hybrid` reached nDCG@10 `0.082` with 364 failures because most qrel targets were absent from the 50-document index.
 
@@ -301,7 +301,7 @@ Decision: no promotion decision from the smoke. The implementation is viable and
 Profiles: `cuda-qwen0.6b-512-v1` and `cuda-qwen0.6b-768-v1`. Full corpus was not run.
 
 | Profile | Documents | Chunks | Runtime | Exit | Crash grep | Query smoke |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| --- | --: | --: | --: | --: | --: | --- |
 | `cuda-qwen0.6b-512-v1` | 50 | 1,114 | 121.9s | 0 | 0 | RAPTOR paper rank 1 |
 | `cuda-qwen0.6b-768-v1` | 50 | 1,114 | 122.7s | 0 | 0 | RAPTOR paper rank 1 |
 
@@ -352,7 +352,7 @@ Run one GPU-heavy job at a time on `desktop`:
    Current local audit rerun:
 
    | Track | Worst | Fallbacks | Top cause | Qrel fallback docs | Qrel fallback placements |
-   | --- | --- | ---: | --- | ---: | ---: |
+   | --- | --- | --: | --- | --: | --: |
    | catalog | info | 50/2,897 (2%) | `empty_pdf_metadata_fallback` | 25 | 301 |
    | pdf-deep-read | info | 50/2,897 (2%) | `empty_pdf_metadata_fallback` | 26 | 500 |
 

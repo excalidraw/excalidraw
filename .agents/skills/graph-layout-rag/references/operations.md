@@ -31,15 +31,15 @@ uv run graph-layout-rag ingest --force
 
 Useful flags:
 
-| Flag | Purpose |
-| --- | --- |
-| `--deep-harvest` | OpenAlex, arXiv, bibliography, retry, and DOI passes |
-| `--target-pdfs 2000` | Stop once enough OK PDFs are present |
-| `--target 2800` | Catalog entry ceiling |
-| `--workers 48` | Global PDF download budget |
-| `--resume` | Skip seed stages and continue discovery |
-| `harvest verify` | Validate OK PDFs on disk |
-| `--log-file PATH` | Defaults to `data/harvest.log` |
+| Flag                 | Purpose                                              |
+| -------------------- | ---------------------------------------------------- |
+| `--deep-harvest`     | OpenAlex, arXiv, bibliography, retry, and DOI passes |
+| `--target-pdfs 2000` | Stop once enough OK PDFs are present                 |
+| `--target 2800`      | Catalog entry ceiling                                |
+| `--workers 48`       | Global PDF download budget                           |
+| `--resume`           | Skip seed stages and continue discovery              |
+| `harvest verify`     | Validate OK PDFs on disk                             |
+| `--log-file PATH`    | Defaults to `data/harvest.log`                       |
 
 ## Embedding Profiles
 

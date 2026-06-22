@@ -26,6 +26,7 @@ from rag_literature_rag.ingest.doc_summary import (
     summary_row,
     summary_to_chunk,
 )
+from rag_literature_rag.ingest.raptor import cache_stats as raptor_cache_stats
 from rag_literature_rag.ingest.log import get_logger
 from rag_literature_rag.ingest.embed import (
     ENV_PREFIX,
@@ -541,6 +542,7 @@ def describe_profile_index(profile: str | ProfileIndexPaths) -> dict[str, Any]:
         "extract_cache": extract_cache_stats(),
         "embed_cache": embed_cache.cache_stats(),
         "docsummary_cache": docsummary_cache_stats(),
+        "raptor_cache": raptor_cache_stats(),
     }
 
 

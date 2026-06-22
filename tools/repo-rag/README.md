@@ -1,6 +1,6 @@
 # Repo RAG
 
-Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, hybrid BM25 + vector search. **Local-first** production profile: `cuda-qwen0.6b-1024` (GPU reembed from `gemini-2` secondary). Per-profile indexes live under `data/indexes/{profile}/` (legacy flat `data/lancedb/` still works when `data/indexes/` is empty).
+Full-repo retrieval for **excalidraw-tf** — AST-aware TypeScript chunking, hybrid BM25 + vector search. **M4 Pro / Apple Silicon local default:** `mlx-qwen4b` (Qwen3-Embedding-4B, 4-bit MLX, 1024 dims, local-only). Per-profile indexes live under `data/indexes/{profile}/` (legacy flat `data/lancedb/` still works when `data/indexes/` is empty).
 
 Separate from [`tools/graph-layout-rag`](../graph-layout-rag) (external graph-drawing papers).
 
@@ -14,16 +14,38 @@ Requires Python 3.11+ and [uv](https://github.com/astral-sh/uv).
 cd tools/repo-rag
 uv sync
 cp .env.example .env
-# Edit .env — set RAG_EMBED_PROFILE=cuda-qwen0.6b-1024 (default) or gemini-2 for secondary build
+# .env defaults to RAG_EMBED_PROFILE=mlx-qwen4b and needs no API key.
 ```
 
-## Local-first embedding
+## M4 Pro local embedding
 
-1. **Mac:** build secondary `gemini-2` index (~$0.42, ~10k chunks): `RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild`
+Build and query the local Qwen3 4B index directly on Apple Silicon:
+
+```bash
+cd tools/repo-rag
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag index --force --rebuild
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag query "terraform pipeline compound layout" --top 8 --json
+uv run repo-rag status
+```
+
+`mlx-qwen4b` is local-only and does not require `OPENAI_API_KEY`, `RAG_GPU_SSH`, `RAG_GPU_REMOTE_ROOT`, or CUDA batch settings. Use `uv run repo-rag embed profiles` to inspect the resolved backend/model/dimensions.
+
+For higher-fidelity benchmark runs before changing defaults, build the native-dimension Qwen3 4B profile:
+
+```bash
+RAG_EMBED_PROFILE=qwen3-code uv run repo-rag index --force --rebuild
+RAG_EMBED_PROFILE=qwen3-code uv run repo-rag eval benchmark --compare
+```
+
+## Optional CUDA workflow
+
+The older desktop GPU path remains available when you want the Qwen3-0.6B CUDA index:
+
+1. **Mac/Vertex secondary build:** `RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild`
 2. **GPU reembed:** `RAG_GPU_TOOL=tools/repo-rag tools/repo-rag/scripts/gpu_dense_reembed.sh`
-3. **Query:** `yarn repo-rag:query "…" --embed-profile cuda-qwen0.6b-1024 --json`
+3. **Query:** `yarn repo-rag:query "..." --embed-profile cuda-qwen0.6b-1024 --json`
 
-The key is read from `tools/repo-rag/.env` on every CLI run (gitignored). If `.env` is missing, **`.env.example` is used as fallback**. Shell `export OPENAI_API_KEY=...` overrides both.
+API keys are read from `tools/repo-rag/.env` on every CLI run (gitignored). If `.env` is missing, **`.env.example` is used as fallback**. Shell exports override both.
 
 For secrets, prefer copying the template: `cp .env.example .env` and edit `.env` only.
 
@@ -73,8 +95,9 @@ Querying while the watcher runs is safe (LanceDB is versioned; the per-save writ
 
 | Env var | Default | Purpose |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | — | Required for OpenAI backend; optional when `RAG_EMBED_BACKEND=auto` (falls back to local) |
-| `RAG_EMBED_BACKEND` | `auto` | `auto` \| `openai` \| `local` |
+| `RAG_EMBED_PROFILE` | `mlx-qwen4b` | Named embed profile; use the same value for index and query |
+| `OPENAI_API_KEY` | — | Only required for OpenAI profiles |
+| `RAG_EMBED_BACKEND` | `auto` | `auto` \| `openai` \| `local` \| `gemini` |
 | `REPO_RAG_EMBED_BACKEND` | — | Override backend for repo-rag only |
 | `REPO_RAG_EMBED_MODEL` | `text-embedding-3-large` | OpenAI embedding model |
 | `REPO_RAG_EMBED_DIMS` | `3072` | Vector dimensions (1024 optional) |

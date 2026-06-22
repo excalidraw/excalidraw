@@ -83,6 +83,7 @@ def run_diagnostics(
     depth: int = 20,
     threshold: int = DEFAULT_RELEVANCE_THRESHOLD,
     experimental_indexes: dict[str, str] | None = None,
+    split: str | None = None,
 ) -> dict[str, Any]:
     """Re-run each strategy and compute bias diagnostics on old vs new qrels."""
     import os
@@ -98,7 +99,7 @@ def run_diagnostics(
         return identities.canonicalize_doc_id(doc_id)
 
     judged = graded_labels(qrels_payload)  # case_id -> {doc_id: grade}
-    cases = cases_for_track(track)
+    cases = cases_for_track(track, split=split)  # type: ignore[arg-type]
 
     results: list[dict[str, Any]] = []
     for name in strategies:
@@ -153,6 +154,8 @@ def run_diagnostics(
         "depth": depth,
         "relevance_threshold": threshold,
         "judge_model": qrels_payload.get("judge_model"),
+        "split": split,
+        "case_count": len(cases),
         "strategies": results,
     }
 

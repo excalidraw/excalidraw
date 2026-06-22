@@ -39,7 +39,7 @@ Do not rerun broad ColBERT, SPLADE, or reranker sweeps for this campaign unless 
 Measured 2026-06-17 on desktop RTX 3060 Ti: local Ollama HyDE did not beat cuda hybrid. Keep production query default as hybrid without LLM expansion.
 
 | Arm | Catalog nDCG@10 | PDF nDCG@10 | hybrid_auto_hyde p95 |
-| --- | ---: | ---: | ---: |
+| --- | --: | --: | --: |
 | baseline hybrid (cuda) | 0.715 | 0.684 | n/a |
 | `gemma4:e4b` router | 0.710 | 0.678 | 328 / 429 ms |
 | `gemma4:e2b` router | 0.705 | 0.659 | 328 / 428 ms |

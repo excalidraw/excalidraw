@@ -15,6 +15,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import random
+import time
 
 from rag_literature_rag.ingest.chunk import TextChunk
 from rag_literature_rag.paths import DATA_DIR
@@ -27,6 +29,36 @@ CONTEXT_MODEL_ENV = "RAG_LIT_CONTEXT_LLM_MODEL"
 DEFAULT_CONTEXT_MODEL = "gemini-2.5-flash"
 # Keep the LLM input bounded — context only needs the chunk gist, not the tail.
 MAX_CHUNK_CHARS_FOR_CONTEXT = 1500
+
+# Retry/backoff for transient context-gen errors (rate limits, timeouts).
+# Root cause of the original 9.5% failure rate (2026-06-16 runs): 100% of
+# failures were Gemini "429 RESOURCE_EXHAUSTED" — a transient rate-limit, not
+# a model-quality issue. Retrying with backoff resolves almost all of them;
+# anything still failing after retries falls back to the raw (unaugmented)
+# chunk rather than aborting ingest.
+CONTEXT_GEN_MAX_RETRIES = 3
+CONTEXT_GEN_BASE_DELAY_S = 1.5
+CONTEXT_GEN_MAX_DELAY_S = 20.0
+
+# Substrings identifying transient/retryable errors across backends (Gemini
+# 429/503, Ollama timeouts/connection errors). Matched case-insensitively
+# against str(exc).
+_RETRYABLE_ERROR_MARKERS = (
+    "resource_exhausted",
+    "429",
+    "503",
+    "unavailable",
+    "timeout",
+    "timed out",
+    "connection",
+    "rate limit",
+    "too many requests",
+)
+
+
+def _is_retryable(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return any(marker in text for marker in _RETRYABLE_ERROR_MARKERS)
 
 
 def is_contextual_profile(profile: str | None) -> bool:
@@ -107,35 +139,73 @@ def augment_texts_for_context(chunks: list[TextChunk], texts: list[str]) -> list
     keys = [_cache_key(c, backend=backend, model=model) for c in chunks]
     misses = [i for i, k in enumerate(keys) if k not in cache]
 
-    def _gen(i: int) -> tuple[int, str]:
+    def _gen(i: int) -> tuple[int, str, bool]:
+        """Returns (index, context_or_empty, hard_failure).
+
+        hard_failure distinguishes a fallback-to-raw-chunk (retries exhausted
+        or a non-retryable error) from a clean success, so the true
+        post-fix failure rate can be computed from logs/metrics rather than
+        conflated with successful generations.
+        """
         c = chunks[i]
-        try:
-            return i, _generate_context(c.title or "", c.section_path or "", c.text, model)
-        except Exception as exc:  # noqa: BLE001 — degrade, don't abort ingest
-            log.warning("context gen failed for %s (%s)", keys[i], exc)
-            return i, ""
+        last_exc: Exception | None = None
+        for attempt in range(CONTEXT_GEN_MAX_RETRIES + 1):
+            try:
+                ctx = _generate_context(c.title or "", c.section_path or "", c.text, model)
+                if attempt > 0:
+                    log.info(
+                        "context gen succeeded for %s after %d retr%s",
+                        keys[i], attempt, "y" if attempt == 1 else "ies",
+                    )
+                return i, ctx, False
+            except Exception as exc:  # noqa: BLE001 — decide retry vs. fallback below
+                last_exc = exc
+                if attempt >= CONTEXT_GEN_MAX_RETRIES or not _is_retryable(exc):
+                    break
+                delay = min(
+                    CONTEXT_GEN_MAX_DELAY_S,
+                    CONTEXT_GEN_BASE_DELAY_S * (2 ** attempt),
+                )
+                delay += random.uniform(0, delay * 0.25)  # jitter
+                log.warning(
+                    "context gen transient failure for %s (attempt %d/%d, retrying in %.1fs): %s",
+                    keys[i], attempt + 1, CONTEXT_GEN_MAX_RETRIES + 1, delay, exc,
+                )
+                time.sleep(delay)
+        # HARD failure: retries exhausted or a non-retryable error. Fall back
+        # to the raw (unaugmented) chunk rather than aborting ingest. Logged
+        # distinctly (FALLBACK) from transient retries above and from success.
+        log.warning(
+            "context gen FALLBACK (raw chunk, no context line) for %s after %d attempt(s): %s",
+            keys[i], CONTEXT_GEN_MAX_RETRIES + 1, last_exc,
+        )
+        return i, "", True
 
     if misses:
-        done = failed = 0
+        done = fallback = 0
         with ThreadPoolExecutor(max_workers=_context_workers()) as pool:
-            for i, ctx in pool.map(_gen, misses):
-                # Only cache successful (non-empty) generations. Caching an empty
-                # failure (e.g. a 429) would make it a permanent cache hit and
-                # silently embed that chunk WITHOUT context — contaminating any
-                # contextual-vs-plain A/B. Empty results stay misses and retry.
+            for i, ctx, hard_failure in pool.map(_gen, misses):
+                # Only cache successful (non-empty) generations. Caching a
+                # fallback would make it a permanent cache hit and silently
+                # embed that chunk WITHOUT context forever — contaminating
+                # any contextual-vs-plain A/B. Fallback chunks stay cache
+                # misses and are retried (with fresh backoff) on next ingest.
                 if ctx:
                     cache[keys[i]] = ctx
-                else:
-                    failed += 1
+                if hard_failure:
+                    fallback += 1
                 done += 1
                 if done % 500 == 0:  # periodic checkpoint for long unattended runs
                     _save_cache(cache)
                     log.info("contextual augmentation: %d/%d context lines", done, len(misses))
         _save_cache(cache)
+        failure_rate = (fallback / len(misses)) if misses else 0.0
         log.info(
-            "contextual augmentation: generated %d new context line(s), %d failed (will retry)",
-            len(misses) - failed,
-            failed,
+            "contextual augmentation: generated %d new context line(s), %d hard fallback(s) "
+            "(failure_rate=%.4f, will retry fallbacks on next ingest)",
+            len(misses) - fallback,
+            fallback,
+            failure_rate,
         )
 
     return [

@@ -53,13 +53,16 @@ rsync -avz --progress \
   data/eval/retrieval_indexes/ 2>/dev/null || true
 
 if [[ "${RAG_GPU_SYNC_CACHES_BACK:-0}" == "1" ]]; then
-  mkdir -p data/extract_cache data/embed_cache
+  mkdir -p data/extract_cache data/embed_cache data/raptor_cache
   rsync -avz --progress \
     "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/extract_cache/" \
     data/extract_cache/ 2>/dev/null || true
   rsync -avz --progress \
     "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/embed_cache/" \
     data/embed_cache/ 2>/dev/null || true
+  rsync -avz --progress \
+    "${REMOTE}/tools/${TOOL_REMOTE_NAME}/data/raptor_cache/" \
+    data/raptor_cache/ 2>/dev/null || true
 fi
 
 echo "Done."

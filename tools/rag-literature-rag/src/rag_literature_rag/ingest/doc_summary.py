@@ -4,16 +4,22 @@ import dataclasses
 import hashlib
 import json
 import os
-import re
-import urllib.error
-import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from rag_common.local_llm import DEFAULT_OLLAMA_HOST, DEFAULT_OLLAMA_MODEL
+from rag_common.local_llm import DEFAULT_OLLAMA_MODEL
 
 from rag_literature_rag.ingest.chunk import TextChunk
+from rag_literature_rag.ingest.local_summarize import (
+    bounded_source,
+    clean_summary,
+    generate_ollama,
+    resolve_ollama_host,
+    resolve_ollama_model,
+    unload_ollama_model,
+    validate_summary,
+)
 from rag_literature_rag.manifest import ManifestItem
 from rag_literature_rag.paths import DATA_DIR
 
@@ -25,6 +31,7 @@ CACHE_DIR = DATA_DIR / "docsummary_cache"
 MAX_SOURCE_CHARS = int(os.getenv("RAG_LIT_DOCSUMMARY_SOURCE_CHARS", "6000"))
 MAX_GENERATION_TOKENS = int(os.getenv("RAG_LIT_DOCSUMMARY_MAX_TOKENS", "2048"))
 MIN_SUMMARY_WORDS = int(os.getenv("RAG_LIT_DOCSUMMARY_MIN_WORDS", "40"))
+OLLAMA_ENV_PREFIX = "RAG_LIT_DOCSUMMARY_"
 
 
 @dataclass
@@ -59,6 +66,8 @@ class DocumentSummary:
     alias_dois: list[str] = field(default_factory=list)
     source_text_hash: str = ""
     cache_key: str = ""
+    parent_id: str = ""
+    tree_depth: int = 0
 
 
 def is_docsummary_profile(profile: str | None = None) -> bool:
@@ -66,19 +75,11 @@ def is_docsummary_profile(profile: str | None = None) -> bool:
 
 
 def docsummary_model() -> str:
-    return (
-        os.getenv("RAG_LIT_DOCSUMMARY_OLLAMA_MODEL", "").strip()
-        or os.getenv("RAG_OLLAMA_MODEL", "").strip()
-        or DEFAULT_MODEL
-    )
+    return resolve_ollama_model(env_prefix=OLLAMA_ENV_PREFIX, default=DEFAULT_MODEL)
 
 
 def ollama_host() -> str:
-    return (
-        os.getenv("RAG_LIT_DOCSUMMARY_OLLAMA_HOST", "").strip()
-        or os.getenv("RAG_OLLAMA_HOST", "").strip()
-        or DEFAULT_OLLAMA_HOST
-    ).rstrip("/")
+    return resolve_ollama_host(env_prefix=OLLAMA_ENV_PREFIX)
 
 
 def _sha256_text(text: str) -> str:
@@ -163,14 +164,6 @@ def _store_cached(
     os.replace(tmp, path)
 
 
-def _bounded_source(source: str) -> str:
-    if len(source) <= MAX_SOURCE_CHARS:
-        return source
-    head = MAX_SOURCE_CHARS // 2
-    tail = MAX_SOURCE_CHARS - head
-    return source[:head] + "\n\n[...middle omitted for prompt budget...]\n\n" + source[-tail:]
-
-
 def build_prompt(item: ManifestItem, chunks: list[TextChunk], source_text: str) -> str:
     aliases = sorted({alias for chunk in chunks for alias in chunk.alias_doc_ids})
     tags = sorted({tag for chunk in chunks for tag in chunk.tags})
@@ -192,80 +185,25 @@ def build_prompt(item: ManifestItem, chunks: list[TextChunk], source_text: str) 
         "- If a requested detail is absent, omit it instead of guessing.\n"
         "- Output plain text only, 120-220 words.\n\n"
         "Source text:\n"
-        f"{_bounded_source(source_text)}"
+        f"{bounded_source(source_text, max_chars=MAX_SOURCE_CHARS)}"
     )
 
 
 def _generate_ollama(prompt: str, *, model: str) -> str:
-    payload = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
-        "max_tokens": MAX_GENERATION_TOKENS,
-        "stream": False,
-    }
-    request = urllib.request.Request(
-        f"{ollama_host()}/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
+    return generate_ollama(
+        prompt,
+        model=model,
+        host=ollama_host(),
+        max_tokens=MAX_GENERATION_TOKENS,
     )
-    try:
-        with urllib.request.urlopen(request, timeout=180) as response:
-            data = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Ollama HTTP {exc.code}: {detail}") from exc
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"Ollama unavailable at {ollama_host()}: {exc}") from exc
-
-    choices = data.get("choices") or []
-    if choices:
-        message = choices[0].get("message") or {}
-        content = message.get("content")
-        if isinstance(content, str) and content.strip():
-            return content.strip()
-    raise RuntimeError(f"Empty Ollama response from {model}")
 
 
-def unload_ollama_model(model: str | None = None) -> None:
-    """Best-effort release of Ollama GPU memory before CUDA embedding starts."""
-    resolved = model or docsummary_model()
-    payload = {
-        "model": resolved,
-        "prompt": "",
-        "stream": False,
-        "keep_alive": 0,
-    }
-    request = urllib.request.Request(
-        f"{ollama_host()}/api/generate",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=30):
-            return
-    except Exception:
-        return
+def unload_ollama_model_for_docsummary(model: str | None = None) -> None:
+    unload_ollama_model(model or docsummary_model(), host=ollama_host())
 
 
-_THINKING_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
-
-
-def clean_summary(text: str) -> str:
-    text = _THINKING_RE.sub("", text).strip()
-    text = re.sub(r"^```(?:text)?\s*|\s*```$", "", text, flags=re.IGNORECASE).strip()
-    return re.sub(r"\s+\n", "\n", text).strip()
-
-
-def validate_summary(text: str) -> None:
-    words = re.findall(r"\b[\w.-]+\b", text)
-    if len(words) < MIN_SUMMARY_WORDS:
-        raise RuntimeError(
-            f"Doc-summary generation returned only {len(words)} word(s); "
-            "not caching a likely incomplete response"
-        )
+# Backward-compatible alias used by ingest/run.py
+unload_ollama_model = unload_ollama_model_for_docsummary
 
 
 def build_document_summary(
@@ -296,8 +234,13 @@ def build_document_summary(
         if stats:
             stats.misses += 1
         prompt = build_prompt(item, chunks, source_text)
-        summary = clean_summary(_generate_ollama(prompt, model=model))
-        validate_summary(summary)
+        try:
+            summary = clean_summary(_generate_ollama(prompt, model=model))
+            validate_summary(summary, min_words=MIN_SUMMARY_WORDS)
+        except RuntimeError:
+            if stats:
+                stats.failures += 1
+            return None
         if not summary:
             if stats:
                 stats.failures += 1

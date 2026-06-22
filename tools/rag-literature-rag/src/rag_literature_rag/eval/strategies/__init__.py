@@ -159,6 +159,26 @@ class DocSummaryStrategy:
 
 
 @dataclass
+class RaptorStrategy:
+    name: str
+    mode: str
+    requires_llm: bool = False
+    requires_cloud_cost: bool = False
+
+    def run(self, case: EvalCase, *, embed_profile: str, top: int = 20) -> list[dict[str, Any]]:
+        return search_raw(
+            case.query,
+            top=top,
+            embed_profile=embed_profile,
+            filters=_filters(case, use_category=False, use_pdf_only=False),
+            rerank=False,
+            raptor=True,
+            raptor_mode=self.mode,
+            rrf_k=20,
+        )
+
+
+@dataclass
 class HybridTunedStrategy:
     name: str
     pool: int
@@ -676,6 +696,22 @@ EXPERIMENTAL_STRATEGIES: tuple[str, ...] = (
     "colbert",
 )
 
+# Phase 1 (T2) weighted-RRF fusion sweep, tuned on the frozen tune split.
+# dense_weight/sparse_weight ratios + rrf_k grid; not in OFFLINE_STRATEGIES
+# default run — invoke explicitly via `--strategy`.
+FUSION_SWEEP_STRATEGIES: tuple[str, ...] = (
+    "fusion_d10_s03_k20",
+    "fusion_d10_s05_k20",
+    "fusion_d10_s07_k20",
+    "fusion_d20_s10_k20",
+    "fusion_d10_s03_k10",
+    "fusion_d10_s05_k10",
+    "fusion_d10_s03_k40",
+    "fusion_d10_s05_k40",
+    "fusion_d10_s03_k60",
+    "fusion_d10_s05_k60",
+)
+
 # Experimental paper-level aggregation arms (A/B only; not in the default run).
 AGGREGATION_STRATEGIES: tuple[str, ...] = (
     "hybrid_deep",
@@ -691,13 +727,23 @@ DOCSUMMARY_STRATEGIES: tuple[str, ...] = (
     "docsummary_fused_hybrid",
 )
 
+RAPTOR_STRATEGIES: tuple[str, ...] = (
+    "raptor_hybrid",
+    "raptor_tree_only_hybrid",
+    "raptor_collapsed",
+    "raptor_then_chunks",
+    "raptor_fused_hybrid",
+)
+
 ALL_STRATEGIES: tuple[str, ...] = (
     OFFLINE_STRATEGIES
+    + FUSION_SWEEP_STRATEGIES
     + LLM_STRATEGIES
     + CLOUD_STRATEGIES
     + EXPERIMENTAL_STRATEGIES
     + AGGREGATION_STRATEGIES
     + DOCSUMMARY_STRATEGIES
+    + RAPTOR_STRATEGIES
 )
 
 
@@ -713,6 +759,11 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         DocSummaryStrategy("docsummary_hybrid", mode="hybrid"),
         DocSummaryStrategy("docsummary_then_chunks", mode="then_chunks"),
         DocSummaryStrategy("docsummary_fused_hybrid", mode="fused_hybrid"),
+        RaptorStrategy("raptor_hybrid", mode="hybrid"),
+        RaptorStrategy("raptor_tree_only_hybrid", mode="tree_only_hybrid"),
+        RaptorStrategy("raptor_collapsed", mode="collapsed"),
+        RaptorStrategy("raptor_then_chunks", mode="then_chunks"),
+        RaptorStrategy("raptor_fused_hybrid", mode="fused_hybrid"),
         HybridStrategy(),
         HybridTunedStrategy("hybrid_pool80", pool=80),
         HybridTunedStrategy("hybrid_pool160", pool=160),
@@ -741,6 +792,16 @@ def strategy_registry() -> dict[str, RetrievalStrategy]:
         HybridAggregateStrategy("hybrid_deep", pool=200, aggregate="max"),
         HybridAggregateStrategy("hybrid_agg_sum3", pool=200, aggregate="sum_topk", topk=3),
         HybridAggregateStrategy("hybrid_agg_count", pool=200, aggregate="count_boost"),
+        HybridTunedStrategy("fusion_d10_s03_k20", pool=80, rrf_k=20, dense_weight=1.0, sparse_weight=0.3),
+        HybridTunedStrategy("fusion_d10_s05_k20", pool=80, rrf_k=20, dense_weight=1.0, sparse_weight=0.5),
+        HybridTunedStrategy("fusion_d10_s07_k20", pool=80, rrf_k=20, dense_weight=1.0, sparse_weight=0.7),
+        HybridTunedStrategy("fusion_d20_s10_k20", pool=80, rrf_k=20, dense_weight=2.0, sparse_weight=1.0),
+        HybridTunedStrategy("fusion_d10_s03_k10", pool=80, rrf_k=10, dense_weight=1.0, sparse_weight=0.3),
+        HybridTunedStrategy("fusion_d10_s05_k10", pool=80, rrf_k=10, dense_weight=1.0, sparse_weight=0.5),
+        HybridTunedStrategy("fusion_d10_s03_k40", pool=80, rrf_k=40, dense_weight=1.0, sparse_weight=0.3),
+        HybridTunedStrategy("fusion_d10_s05_k40", pool=80, rrf_k=40, dense_weight=1.0, sparse_weight=0.5),
+        HybridTunedStrategy("fusion_d10_s03_k60", pool=80, rrf_k=60, dense_weight=1.0, sparse_weight=0.3),
+        HybridTunedStrategy("fusion_d10_s05_k60", pool=80, rrf_k=60, dense_weight=1.0, sparse_weight=0.5),
     ]
     return {strategy.name: strategy for strategy in strategies}
 

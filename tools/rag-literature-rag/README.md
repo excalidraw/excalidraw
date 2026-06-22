@@ -25,6 +25,8 @@ Embeddings use shared [`tools/rag-common`](../rag-common) with named profiles (`
 | `gemini-2-structure-v1` | Secondary cloud build (Docling, structure-aware chunks @ 3072) |
 | `openai-large` | Fast cloud ingest |
 | `mlx-qwen4b` | Free local ingest on Apple Silicon |
+| `mlx-qwen4b-raptor-gemma4-v1` | Local RAPTOR experiment: MLX embed + Ollama recursive tree summaries (opt-in) |
+| `cuda-qwen0.6b-raptor-gemma4-v1` | Desktop RAPTOR experiment: CUDA Qwen3-0.6B embed + Ollama Gemma4 tree summaries (opt-in) |
 
 ## Local-first embedding
 

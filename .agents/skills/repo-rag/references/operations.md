@@ -44,18 +44,18 @@ cd tools/repo-rag && uv run repo-rag embed profiles
 Common profiles:
 
 | Profile | Backend | Dims | Use when |
-| --- | --- | ---: | --- |
-| `cuda-qwen0.6b-1024` | local | 1024 | Production query profile after GPU reembed |
+| --- | --- | --: | --- |
+| `mlx-qwen4b` | local | 1024 | Default local Apple Silicon ingest/query |
+| `qwen3-code` | local | 2560 | Code-specialized Qwen3-4B native dims for benchmarks |
+| `cuda-qwen0.6b-1024` | local | 1024 | Optional desktop CUDA profile after GPU reembed |
 | `gemini-2` | gemini | 3072 | Secondary cloud build |
 | `openai-large` | openai | 1024 | Smaller OpenAI vectors |
-| `mlx-qwen4b` | local | 1024 | Free Apple Silicon ingest |
-| `qwen3-code` | local | 2560 | Code-specialized Qwen3-4B native dims |
 
 Set the same profile on index and query:
 
 ```bash
-RAG_EMBED_PROFILE=gemini-2 uv run repo-rag index --force --rebuild
-RAG_EMBED_PROFILE=cuda-qwen0.6b-1024 uv run repo-rag query "compound pipeline" --top 8 --json
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag index --force --rebuild
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag query "compound pipeline" --top 8 --json
 ```
 
 Per-profile indexes live under `data/indexes/{profile}/`. Legacy flat `data/lancedb/` still works only when `data/indexes/` is empty.

@@ -119,6 +119,12 @@ def judge_cmd(
 @click.option("--depth", default=20, show_default=True, type=click.IntRange(min=1))
 @click.option("--splade-index", type=click.Path(path_type=Path, exists=True, file_okay=False), default=None)
 @click.option("--colbert-index", type=click.Path(path_type=Path, exists=True, file_okay=False), default=None)
+@click.option(
+    "--split",
+    type=click.Choice(["tune", "test"]),
+    default=None,
+    help="Restrict to the frozen tune/test split; omit for the full gold set.",
+)
 @click.option("-o", "--output", "output", type=click.Path(path_type=Path), default=None)
 def diagnostics_cmd(
     track: str,
@@ -128,6 +134,7 @@ def diagnostics_cmd(
     depth: int,
     splade_index: Path | None,
     colbert_index: Path | None,
+    split: str | None,
     output: Path | None,
 ) -> None:
     """Hole rate / judged@k / condensed nDCG / bpref on old vs new qrels."""
@@ -142,12 +149,95 @@ def diagnostics_cmd(
         strategies=selected,
         depth=depth,
         experimental_indexes=_experimental_indexes(splade_index, colbert_index),
+        split=split,
     )
     if output:
         Path(output).parent.mkdir(parents=True, exist_ok=True)
         Path(output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         Path(output).with_suffix(".md").write_text(format_diagnostics_table(payload), encoding="utf-8")
     click.echo(format_diagnostics_table(payload))
+
+
+@click.command("qrels-backfill")
+@click.option("--track", type=click.Choice(EVAL_TRACKS), required=True)
+@click.option("--embed-profile", required=True)
+@click.option("--strategy", "strategies", multiple=True, help="Strategy (repeatable); default dense,hybrid,bm25.")
+@click.option("--depth", default=10, show_default=True, type=click.IntRange(min=1))
+@click.option("--budget-usd", default=10.0, show_default=True, type=float)
+@click.option("--qrels", "qrels_path", type=click.Path(path_type=Path, exists=True), default=None)
+@click.option("--model", default=None, help="Judge LLM model (default RAG_LIT_JUDGE_LLM_MODEL).")
+@click.option("--splade-index", type=click.Path(path_type=Path, exists=True, file_okay=False), default=None)
+@click.option("--colbert-index", type=click.Path(path_type=Path, exists=True, file_okay=False), default=None)
+@click.option("--in-place", is_flag=True, help="Merge new labels into the qrels file after writing a backup.")
+@click.option("-v", "--verbose", is_flag=True)
+def qrels_backfill_cmd(
+    track: str,
+    embed_profile: str,
+    strategies: tuple[str, ...],
+    depth: int,
+    budget_usd: float,
+    qrels_path: Path | None,
+    model: str | None,
+    splade_index: Path | None,
+    colbert_index: Path | None,
+    in_place: bool,
+    verbose: bool,
+) -> None:
+    """Judge only currently unjudged top-k retrieval holes and merge into qrels."""
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
+    from rag_literature_rag.eval.qrels_backfill import format_backfill_report, run_qrels_backfill
+
+    try:
+        report = run_qrels_backfill(
+            track=track,  # type: ignore[arg-type]
+            embed_profile=embed_profile,
+            strategies=list(strategies) or None,
+            depth=depth,
+            budget_usd=budget_usd,
+            in_place=in_place,
+            qrels_file=qrels_path,
+            model=model,
+            experimental_indexes=_experimental_indexes(splade_index, colbert_index),
+        )
+    except RuntimeError as exc:
+        raise click.ClickException(str(exc)) from exc
+    click.echo(format_backfill_report(report))
+    click.echo(f"Report: {report['run_dir']}")
+
+
+@click.command("gen-gold-split")
+@click.option("--test-fraction", default=0.3, show_default=True, type=click.FloatRange(0.0, 1.0))
+@click.option("--seed", default="rag-lit-gold-split-v1", show_default=True)
+@click.option("-o", "--output", type=click.Path(path_type=Path), default=None)
+@click.option("--force", is_flag=True, help="Overwrite an existing split file.")
+def gen_gold_split_cmd(test_fraction: float, seed: str, output: Path | None, force: bool) -> None:
+    """Freeze a stratified tune/test split of the gold case set (category x track).
+
+    Phase-1+ tuning sweeps must use --split tune on `eval benchmark`/`eval diagnostics`;
+    final deltas are reported on --split test only. Run once; re-running requires
+    --force and invalidates prior tune/test comparisons.
+    """
+    from rag_literature_rag.eval.gold_validation import DEFAULT_SPLIT_PATH
+    from rag_literature_rag.eval.gold_split import (
+        build_tune_test_split,
+        format_split_report,
+        validate_split_coverage,
+        write_tune_test_split,
+    )
+
+    out_path = output or DEFAULT_SPLIT_PATH
+    if out_path.exists() and not force:
+        raise click.ClickException(f"{out_path} already exists; pass --force to overwrite.")
+
+    payload = build_tune_test_split(test_fraction=test_fraction, seed=seed)
+    coverage = validate_split_coverage(payload)
+    if not coverage["valid"]:
+        raise click.ClickException(f"Split failed coverage validation: {coverage}")
+
+    written = write_tune_test_split(payload, path=out_path)
+    click.echo(f"Wrote {written}")
+    click.echo(format_split_report(payload, coverage))
 
 
 # Rough Gemini-Flash judge cost: ~500 input + ~30 output tokens per (query,doc)

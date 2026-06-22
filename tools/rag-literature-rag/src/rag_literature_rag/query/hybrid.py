@@ -7,6 +7,13 @@ from typing import Any
 # over k=60 on both tracks (catalog 0.768 vs 0.765, pdf 0.715 vs 0.696).
 RRF_K = 20
 
+# Default fusion weights. Tuned on the frozen tune split (2026-06-21, T2 campaign):
+# dense_weight=1.0, sparse_weight=0.3 at rrf_k=20 beats equal-weight hybrid
+# by +0.274 nDCG@10 on catalog and +0.273 on pdf-deep-read, closing 94% of the
+# gap to dense-alone. Promotion gate: nDCG@10 AND bpref > old hybrid baseline.
+DENSE_WEIGHT = 1.0
+SPARSE_WEIGHT = 0.3
+
 
 def merge_rankings(
     *result_lists: list[dict[str, Any]],
@@ -41,8 +48,8 @@ def reciprocal_rank_fusion(
     *,
     top: int = 30,
     rrf_k: int = RRF_K,
-    dense_weight: float = 1.0,
-    sparse_weight: float = 1.0,
+    dense_weight: float = DENSE_WEIGHT,
+    sparse_weight: float = SPARSE_WEIGHT,
 ) -> list[dict[str, Any]]:
     """Merge dense (vector) and sparse (BM25) rankings with reciprocal rank fusion.
 

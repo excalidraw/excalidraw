@@ -58,27 +58,29 @@ See [docs/code-quality.md](docs/code-quality.md) for SonarJS, type-checked ESLin
 - **Canvas runtime (pan/zoom/hover/expand after import):** [docs/excalidraw-canvas-architecture.md](docs/excalidraw-canvas-architecture.md)
 - **Pipeline import toggles (compact/compound/packed/ancillary):** [docs/terraform-pipeline-import-agent-guide.md](docs/terraform-pipeline-import-agent-guide.md)
 
-### Local-first RAG (all three corpora)
+### Local-first RAG
 
-All three tools share [`tools/rag-common`](../tools/rag-common) embed profiles and GPU scripts (`tools/rag-common/scripts/gpu_*.sh`). **Query default:** `cuda-qwen0.6b-1024` (Qwen3-0.6B @ 1024, GPU reembed, $0 API). **Secondary cloud build** (once on Mac/Vertex, then `ingest reembed` on RTX 3060 Ti): `gemini-2-structure-v1` for PDF corpora (graph-layout-rag, rag-literature-rag) or `gemini-2` for repo-rag code AST chunks.
+All three tools share [`tools/rag-common`](../tools/rag-common) embed profiles. **Repo-rag on this M4 Pro defaults to:** `mlx-qwen4b` (Qwen3-Embedding-4B, 4-bit MLX, 1024 dims, local-only, $0 API). The older `cuda-qwen0.6b-1024` desktop GPU workflow remains available for graph/PDF corpora and comparison runs.
 
 ```bash
-# Example: rag-literature-rag
+# Optional desktop GPU example: rag-literature-rag
 RAG_EMBED_PROFILE=gemini-2-structure-v1 uv run rag-literature-rag ingest --force --rebuild
 RAG_GPU_TOOL=tools/rag-literature-rag tools/rag-literature-rag/scripts/gpu_dense_reembed.sh
-yarn rag-lit:query "Self-RAG" --top 8 --json   # uses cuda-qwen0.6b-1024 from .env
+yarn rag-lit:query "Self-RAG" --top 8 --json
 ```
 
 ### Repo RAG (code + docs search)
 
-Local hybrid search over this monorepo (AST chunking, BM25 + vector). Per-profile indexes under `data/indexes/{profile}/`.
+Local hybrid search over this monorepo (AST chunking, BM25 + vector). Per-profile indexes under `data/indexes/{profile}/`. The default local path uses Qwen3 4B on Apple Silicon and needs no `OPENAI_API_KEY`, `RAG_GPU_SSH`, or CUDA settings.
 
 ```bash
 cd tools/repo-rag && uv sync && cp .env.example .env
-yarn repo-rag:index --embed-profile gemini-2   # secondary build (once)
-# GPU reembed → cuda-qwen0.6b-1024, then query with default profile
-yarn repo-rag:query "terraform pipeline compound layout" --top 8 --json
-yarn repo-rag:status
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag index --force --rebuild
+RAG_EMBED_PROFILE=mlx-qwen4b uv run repo-rag query "terraform pipeline compound layout" --top 8 --json
+uv run repo-rag status
+
+# Optional higher-fidelity local benchmark profile: Qwen3-Embedding-4B native 2560 dims
+RAG_EMBED_PROFILE=qwen3-code uv run repo-rag eval benchmark --compare
 ```
 
 See [tools/repo-rag/README.md](tools/repo-rag/README.md). Agent skill: [.agents/skills/repo-rag/SKILL.md](.agents/skills/repo-rag/SKILL.md).

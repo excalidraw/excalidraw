@@ -30,7 +30,7 @@ Query results are excerpts only. Always deep-read the returned `file_path` and `
 
 ## Setup And Profiles
 
-Production query profile is `cuda-qwen0.6b-1024`, with per-profile indexes under `tools/repo-rag/data/indexes/{profile}/`.
+Default local query profile is `mlx-qwen4b` on this M4 Pro, with per-profile indexes under `tools/repo-rag/data/indexes/{profile}/`.
 
 ```bash
 cd tools/repo-rag

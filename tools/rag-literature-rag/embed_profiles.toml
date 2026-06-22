@@ -20,3 +20,15 @@ backend = "local"
 model = "Qwen/Qwen3-Embedding-0.6B"
 dimensions = 1024
 quant = "4bit"
+
+[profiles."cuda-qwen0.6b-raptor-gemma4-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-0.6B"
+dimensions = 1024
+quant = "4bit"
+
+[profiles."mlx-qwen4b-raptor-gemma4-v1"]
+backend = "local"
+model = "Qwen/Qwen3-Embedding-4B"
+dimensions = 1024
+quant = "4bit"

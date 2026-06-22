@@ -26,6 +26,7 @@ dev = ["pytest>=8.0.0"]
 mlx = ["rag-common[mlx]; sys_platform == 'darwin'"]
 docling = ["docling>=2.0.0"]
 retrieval-experiments = ["qdrant-client[fastembed]>=1.14.0"]
+raptor = ["scikit-learn>=1.4.0", "numpy>=1.26.0", "pylance>=7.0.0"]
 retrieval-experiments-gpu = [
   "accelerate>=0.33.0",
   "bitsandbytes>=0.43.0",

@@ -99,13 +99,15 @@ def _generate_ollama(
     temperature: float,
     max_tokens: int,
 ) -> str:
-    url = f"{ollama_host()}/v1/chat/completions"
+    # Use native /api/chat with think:false to disable Qwen3 thinking mode.
+    # The OpenAI-compat endpoint doesn't support think:false, leaving content empty.
+    url = f"{ollama_host()}/api/chat"
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": temperature,
-        "max_tokens": max_tokens,
+        "think": False,
         "stream": False,
+        "options": {"temperature": temperature, "num_predict": max_tokens},
     }
     body = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
@@ -123,19 +125,27 @@ def _generate_ollama(
     except urllib.error.URLError as exc:
         raise RuntimeError(f"Ollama unavailable at {ollama_host()}: {exc}") from exc
 
-    text = _extract_chat_text(data)
+    text = (data.get("message") or {}).get("content", "").strip()
     if not text:
         raise RuntimeError(f"Empty Ollama response from {model}")
     return text
 
 
 def _extract_chat_text(data: dict[str, Any]) -> str:
+    import re as _re
     choices = data.get("choices") or []
     if choices:
         message = choices[0].get("message") or {}
-        content = message.get("content")
-        if isinstance(content, str) and content.strip():
-            return content.strip()
+        content = message.get("content") or ""
+        # Qwen3 thinking mode wraps output in <think>…</think>; strip it and
+        # use what follows. Also fall back to reasoning_content if content is empty.
+        stripped = _re.sub(r"<think>.*?</think>", "", content, flags=_re.DOTALL).strip()
+        if stripped:
+            return stripped
+        # Ollama uses "reasoning" (not "reasoning_content") for the thinking field
+        reasoning = message.get("reasoning_content") or message.get("reasoning") or ""
+        if reasoning.strip():
+            return reasoning.strip()
     message = data.get("message") or {}
     content = message.get("content")
     if isinstance(content, str) and content.strip():

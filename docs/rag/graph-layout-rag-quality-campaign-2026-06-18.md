@@ -42,23 +42,23 @@ Profile: `cuda-qwen0.6b-1024`. LLM transforms disabled.
 
 ### Catalog
 
-| Strategy | nDCG@10 | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.634 | 0.838 | 0.344 | 44 | 0 |
-| bm25 | 0.704 | 0.986 | 0.381 | 270 | 0 |
-| hybrid | 0.718 | 0.946 | 0.397 | 304 | 0 |
-| hybrid_dense2 | 0.697 | 0.939 | 0.371 | 305 | 0 |
-| hybrid_sparse2 | 0.713 | 0.944 | 0.388 | 303 | 0 |
+| Strategy       | nDCG@10 |   MRR |  R@10 | p95 ms | Failures |
+| -------------- | ------: | ----: | ----: | -----: | -------: |
+| dense          |   0.634 | 0.838 | 0.344 |     44 |        0 |
+| bm25           |   0.704 | 0.986 | 0.381 |    270 |        0 |
+| hybrid         |   0.718 | 0.946 | 0.397 |    304 |        0 |
+| hybrid_dense2  |   0.697 | 0.939 | 0.371 |    305 |        0 |
+| hybrid_sparse2 |   0.713 | 0.944 | 0.388 |    303 |        0 |
 
 ### PDF Deep Read
 
-| Strategy | nDCG@10 | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| dense | 0.596 | 0.791 | 0.465 | 62 | 2 |
-| bm25 | 0.676 | 0.954 | 0.482 | 252 | 1 |
-| hybrid | 0.681 | 0.908 | 0.523 | 343 | 1 |
-| hybrid_dense2 | 0.653 | 0.890 | 0.490 | 300 | 1 |
-| hybrid_sparse2 | 0.683 | 0.926 | 0.492 | 299 | 1 |
+| Strategy       | nDCG@10 |   MRR |  R@10 | p95 ms | Failures |
+| -------------- | ------: | ----: | ----: | -----: | -------: |
+| dense          |   0.596 | 0.791 | 0.465 |     62 |        2 |
+| bm25           |   0.676 | 0.954 | 0.482 |    252 |        1 |
+| hybrid         |   0.681 | 0.908 | 0.523 |    343 |        1 |
+| hybrid_dense2  |   0.653 | 0.890 | 0.490 |    300 |        1 |
+| hybrid_sparse2 |   0.683 | 0.926 | 0.492 |    299 |        1 |
 
 ## Interpretation
 
@@ -73,7 +73,7 @@ Profile: `cuda-qwen0.6b-section-v1`. Built on `desktop` as a separate profile in
 ### Catalog
 
 | Strategy | nDCG@10 | Delta vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| --- | --: | --: | --: | --: | --: | --: |
 | dense | 0.640 | +0.006 | 0.885 | 0.342 | 48 | 1 |
 | bm25 | 0.704 | +0.000 | 0.990 | 0.379 | 236 | 0 |
 | hybrid | 0.708 | -0.010 | 0.959 | 0.386 | 257 | 0 |
@@ -82,18 +82,18 @@ Profile: `cuda-qwen0.6b-section-v1`. Built on `desktop` as a separate profile in
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref |
-| --- | ---: | ---: |
-| bm25 | 0.00 | 0.353 |
-| hybrid | 0.03 | 0.378 |
-| hybrid_dense2 | 0.03 | 0.363 |
-| hybrid_sparse2 | 0.00 | 0.365 |
-| dense | 0.04 | 0.351 |
+| Strategy       | hole@10 | bpref |
+| -------------- | ------: | ----: |
+| bm25           |    0.00 | 0.353 |
+| hybrid         |    0.03 | 0.378 |
+| hybrid_dense2  |    0.03 | 0.363 |
+| hybrid_sparse2 |    0.00 | 0.365 |
+| dense          |    0.04 | 0.351 |
 
 ### PDF Deep Read
 
 | Strategy | nDCG@10 | Delta vs baseline | MRR | R@10 | p95 ms | Failures |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| --- | --: | --: | --: | --: | --: | --: |
 | dense | 0.614 | +0.018 | 0.816 | 0.476 | 75 | 1 |
 | bm25 | 0.677 | +0.001 | 0.954 | 0.484 | 192 | 1 |
 | hybrid | 0.696 | +0.015 | 0.933 | 0.522 | 259 | 1 |
@@ -102,13 +102,13 @@ Diagnostics:
 
 Diagnostics:
 
-| Strategy | hole@10 | bpref |
-| --- | ---: | ---: |
-| bm25 | 0.00 | 0.349 |
-| hybrid | 0.02 | 0.379 |
-| hybrid_dense2 | 0.04 | 0.364 |
-| hybrid_sparse2 | 0.00 | 0.357 |
-| dense | 0.05 | 0.355 |
+| Strategy       | hole@10 | bpref |
+| -------------- | ------: | ----: |
+| bm25           |    0.00 | 0.349 |
+| hybrid         |    0.02 | 0.379 |
+| hybrid_dense2  |    0.04 | 0.364 |
+| hybrid_sparse2 |    0.00 | 0.357 |
+| dense          |    0.05 | 0.355 |
 
 Decision: do not promote as the graph default. Section enrichment hits the PDF promotion threshold for `hybrid` (+0.015 nDCG@10), but the same default arm regresses catalog by 0.010, exceeding the allowed opposite-track regression of 0.005. Keep the profile for PDF-focused A/B use and use small2big next to see whether recall can improve without the catalog loss.
 

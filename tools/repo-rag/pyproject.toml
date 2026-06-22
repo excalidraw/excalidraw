@@ -9,7 +9,7 @@ dependencies = [
   "lancedb>=0.15.0",
   "openai>=1.40.0",
   "pydantic>=2.7.0",
-  "rag-common[gemini]",
+  "rag-common[gemini,mlx]",
   "tantivy>=0.22.0",
   "tiktoken>=0.7.0",
   "tree-sitter>=0.23.0",
@@ -20,7 +20,7 @@ dependencies = [
 rag-common = { path = "../rag-common", editable = true }
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0.0"]
+dev = ["pytest>=8.0.0", "watchfiles>=0.21"]
 # Contextual Retrieval LLM path (chunk/contextualize.py). Optional: without it,
 # `index --contextual` falls back to the deterministic heuristic.
 contextual = ["anthropic>=0.40.0"]

@@ -63,6 +63,8 @@ def chunk_profile_variant(profile: str | None = None) -> str:
         return "small2big-dual-v1"
     if profile and "longrag" in profile:
         return LONGRAG_LIMITS.variant
+    if profile and "raptor" in profile:
+        return "raptor-v1"
     if profile and "small2big" in profile:
         return SMALL2BIG_LIMITS.variant
     return DEFAULT_LIMITS.variant
@@ -70,7 +72,7 @@ def chunk_profile_variant(profile: str | None = None) -> str:
 
 def _limits_for_profile(profile: str | None = None) -> ChunkLimits:
     variant = chunk_profile_variant(profile)
-    if variant.startswith("small2big"):
+    if variant.startswith("small2big") or variant == "raptor-v1":
         return SMALL2BIG_LIMITS
     if variant == LONGRAG_LIMITS.variant:
         return LONGRAG_LIMITS
@@ -79,6 +81,10 @@ def _limits_for_profile(profile: str | None = None) -> ChunkLimits:
 
 def is_small2big_dual_profile(profile: str | None = None) -> bool:
     return bool(profile and "small2big-dual" in profile)
+
+
+def is_raptor_profile(profile: str | None = None) -> bool:
+    return bool(profile and "raptor-gemma4" in profile)
 
 
 def is_section_enriched_profile(profile: str | None = None) -> bool:

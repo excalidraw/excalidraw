@@ -40,8 +40,10 @@ from rag_literature_rag.eval.pool_commands import (  # noqa: E402
     corpus_health_cmd,
     diagnostics_cmd,
     gen_gold_cmd,
+    gen_gold_split_cmd,
     judge_cmd,
     pool_cmd,
+    qrels_backfill_cmd,
 )
 
 eval_group.add_command(retrieval_eval_cmd, name="retrieval")
@@ -51,10 +53,12 @@ eval_group.add_command(build_retrieval_index_cmd, name="build-retrieval-index")
 eval_group.add_command(pool_cmd, name="pool")
 eval_group.add_command(judge_cmd, name="judge")
 eval_group.add_command(diagnostics_cmd, name="diagnostics")
+eval_group.add_command(qrels_backfill_cmd, name="qrels-backfill")
 eval_group.add_command(corpus_health_cmd, name="corpus-health")
 eval_group.add_command(fallback_audit_cmd, name="fallback-audit")
 eval_group.add_command(performance_campaign_cmd, name="performance-campaign")
 eval_group.add_command(gen_gold_cmd, name="gen-gold")
+eval_group.add_command(gen_gold_split_cmd, name="gen-gold-split")
 
 
 @eval_group.command("related")
@@ -388,6 +392,21 @@ def embed_indexes_cmd(as_json: bool) -> None:
     help="Retrieve child chunks, aggregate to parent passages, and rank parent evidence.",
 )
 @click.option(
+    "--raptor",
+    is_flag=True,
+    help="Use RAPTOR tree summaries plus leaf chunks for retrieval.",
+)
+@click.option(
+    "--raptor-mode",
+    type=click.Choice(
+        ["hybrid", "tree_only_hybrid", "collapsed", "then_chunks", "fused_hybrid"],
+        case_sensitive=False,
+    ),
+    default="hybrid",
+    show_default=True,
+    help="RAPTOR retrieval mode (requires --raptor and a raptor profile index).",
+)
+@click.option(
     "--expand",
     type=click.Choice(["off", "auto", "force"]),
     default="off",
@@ -409,6 +428,8 @@ def query_cmd(
     rerank: bool | None,
     hybrid: bool,
     small_to_big: bool,
+    raptor: bool,
+    raptor_mode: str,
     expand: str,
     as_json: bool,
 ) -> None:
@@ -432,6 +453,8 @@ def query_cmd(
             rerank=rerank,
             hybrid=hybrid,
             small_to_big=small_to_big,
+            raptor=raptor,
+            raptor_mode=raptor_mode,
             max_per_doc=max_per_doc,
             expand=expand,
         )

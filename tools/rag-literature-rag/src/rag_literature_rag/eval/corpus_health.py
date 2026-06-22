@@ -144,6 +144,35 @@ def _qrel_overlap_detail(fallback_docs: dict[str, str], qrel_doc_weights: dict[s
     }
 
 
+def _active_index_fallback_docs(profile: str, fallback_docs: dict[str, str]) -> tuple[dict[str, str], dict[str, Any]]:
+    """Filter historical log fallbacks to docs that still look fallback-like in the current index."""
+    if not fallback_docs:
+        return {}, {"historical_fallback_docs": 0, "resolved_fallback_docs": 0}
+    wanted = set(fallback_docs)
+    grouped: dict[str, list[str]] = {doc_id: [] for doc_id in wanted}
+    for row in _load_chunks(profile):
+        doc_id = row.get("doc_id")
+        if doc_id in wanted:
+            grouped[doc_id].append(str(row.get("text") or ""))
+
+    active: dict[str, str] = {}
+    resolved: list[dict[str, Any]] = []
+    for doc_id, reason in fallback_docs.items():
+        texts = grouped.get(doc_id) or []
+        text_chars = sum(len(text.strip()) for text in texts)
+        metadata_like = len(texts) <= 1 and text_chars < 4000
+        if metadata_like:
+            active[doc_id] = reason
+        else:
+            resolved.append({"doc_id": doc_id, "chunks": len(texts), "text_chars": text_chars})
+    detail = {
+        "historical_fallback_docs": len(fallback_docs),
+        "resolved_fallback_docs": len(resolved),
+        "sample_resolved_fallback_docs": resolved[:10],
+    }
+    return active, detail
+
+
 def audit_chunk_distribution(profile: str, *, min_mean: float = 4.0) -> list[Finding]:
     """Flag the abstract-only-collapse failure mode: many PDF-backed docs at 1 chunk."""
     rows = _load_chunks(profile)
@@ -212,7 +241,12 @@ def audit_chunk_distribution(profile: str, *, min_mean: float = 4.0) -> list[Fin
     return findings
 
 
-def audit_extraction_fallback(*, track: str = "catalog", log_path: Path | None = None) -> list[Finding]:
+def audit_extraction_fallback(
+    *,
+    track: str = "catalog",
+    log_path: Path | None = None,
+    profile: str | None = None,
+) -> list[Finding]:
     """Scan the most recent ingest log for fallback rate, causes, and qrel overlap."""
     from rag_literature_rag.paths import INGEST_LOG_PATH
 
@@ -225,14 +259,19 @@ def audit_extraction_fallback(*, track: str = "catalog", log_path: Path | None =
     total = stats["total"]
     if total == 0:
         return [Finding("info", "no_extraction_records", "Ingest log has no per-doc extraction lines.")]
+    fallback_docs = stats["fallback_docs"]
+    index_detail: dict[str, Any] = {}
+    if profile:
+        fallback_docs, index_detail = _active_index_fallback_docs(profile, fallback_docs)
+        fallback = len(fallback_docs)
     rate = fallback / total
     sev = "critical" if rate >= 0.5 else "warning" if rate >= 0.15 else "ok"
-    qrel_overlap = _qrel_overlap_detail(stats["fallback_docs"], _load_qrel_doc_weights(track))
+    qrel_overlap = _qrel_overlap_detail(fallback_docs, _load_qrel_doc_weights(track))
     return [
         Finding(
             sev,
             "extraction_fallback_rate",
-            f"{fallback}/{total} extractions fell back to abstract ({rate:.0%}).",
+            f"{fallback}/{total} current indexed docs still look like abstract fallbacks ({rate:.0%}).",
             detail={
                 "fallback": fallback,
                 "total": total,
@@ -241,8 +280,9 @@ def audit_extraction_fallback(*, track: str = "catalog", log_path: Path | None =
                 "fallback_by_reason": stats["fallback_by_reason"],
                 "sample_fallback_docs": [
                     {"doc_id": doc_id, "reason": reason}
-                    for doc_id, reason in list(stats["fallback_docs"].items())[:10]
+                    for doc_id, reason in list(fallback_docs.items())[:10]
                 ],
+                **index_detail,
                 **qrel_overlap,
             },
             remedy=("Many fall-backs at ~0.2s mean the PDF wasn't present/parseable when ingested; "
@@ -304,7 +344,7 @@ def audit_pool_holes(track: str = "catalog") -> list[Finding]:
 def run_audit(profile: str, *, track: str = "catalog") -> dict[str, Any]:
     findings: list[Finding] = []
     findings += audit_chunk_distribution(profile)
-    findings += audit_extraction_fallback(track=track)
+    findings += audit_extraction_fallback(track=track, profile=profile)
     findings += audit_credentials()
     findings += audit_pool_holes(track)
     findings.sort(key=lambda f: SEVERITY.get(f.severity, 0), reverse=True)

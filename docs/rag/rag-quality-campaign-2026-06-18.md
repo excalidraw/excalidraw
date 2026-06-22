@@ -32,7 +32,7 @@ Detailed reports:
 Profile: `cuda-qwen0.6b-1024`.
 
 | Corpus | Track | Best nDCG@10 | Best arm | Default-relevant note |
-| --- | --- | ---: | --- | --- |
+| --- | --- | --: | --- | --- |
 | graph-layout | catalog | 0.718 | hybrid | BM25 has higher MRR, hybrid has higher nDCG/R@10 |
 | graph-layout | pdf | 0.683 | hybrid_sparse2 | hybrid is close at 0.681 with best R@10 |
 | rag-lit | catalog | 0.625 | hybrid_rrf100 | BM25 is close at 0.621 and has `hole@10 = 0` |
@@ -45,7 +45,7 @@ Profile: `cuda-qwen0.6b-1024`.
 Profile: `cuda-qwen0.6b-section-v1`. Built as a separate index on `desktop`; `cuda-qwen0.6b-1024` remains untouched.
 
 | Track | Best section arm | nDCG@10 | Delta | Decision |
-| --- | --- | ---: | ---: | --- |
+| --- | --- | --: | --: | --- |
 | catalog | hybrid_rrf100 | 0.633 | +0.008 | Do not promote: bpref fell and `hole@10` remains nonzero |
 | pdf | hybrid_rrf100 | 0.691 | +0.013 | Do not promote yet for same gate failure |
 
@@ -60,7 +60,7 @@ Profile: `cuda-qwen4b-1024`. The 512-chunk probe on the RTX 3060 Ti failed both 
 Profile: `cuda-qwen0.6b-small2big-v1`. Built as a separate index on `desktop`; `cuda-qwen0.6b-1024` remains untouched. The build completed cleanly: 1,270 docs, 47,219 chunks, 4h 41m 14s, exit 0, crash grep 0.
 
 | Track | Best small2big arm | nDCG@10 | Delta | Decision |
-| --- | --- | ---: | ---: | --- |
+| --- | --- | --: | --: | --- |
 | catalog | hybrid_dense2 | 0.598 | -0.027 vs baseline best | Do not promote: catalog and BM25 regress, `hole@10` remains high |
 | pdf | bm25 | 0.679 | +0.000 vs baseline best | Do not promote: hybrid arms regress and bpref gate fails |
 
@@ -78,13 +78,13 @@ Decision: do not promote. `small2big_hybrid` improved raw benchmark nDCG@10 on b
 
 Profile: `cuda-qwen0.6b-docsummary-gemma4-v1`. Implementation and 50-document smoke are complete; full corpus was intentionally not run.
 
-| Smoke | Value |
-| --- | ---: |
-| documents | 50 |
-| normal chunks | 1,114 |
-| summaries | 50 |
-| runtime | 658.2s |
-| skipped/missing/fallback/errors | 0 |
+| Smoke                           |  Value |
+| ------------------------------- | -----: |
+| documents                       |     50 |
+| normal chunks                   |  1,114 |
+| summaries                       |     50 |
+| runtime                         | 658.2s |
+| skipped/missing/fallback/errors |      0 |
 
 The corrected prompt/cache version rejected short bad outputs and produced 150-168 word summaries in inspected samples. A RAPTOR smoke query ranked the RAPTOR paper first for BM25, hybrid, two-stage, and fused summary modes. The 50-doc benchmark is route-only evidence because most qrel targets are absent from the partial index; failures remained high for all summary strategies.
 
@@ -111,7 +111,7 @@ Decision: no promotion decision from the smoke. This is the cheapest remaining c
 Profiles: `cuda-qwen0.6b-512-v1` and `cuda-qwen0.6b-768-v1`. Smokes complete; full corpus not run.
 
 | Profile | Documents | Chunks | Runtime | Exit | Crash grep | Query smoke |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| --- | --: | --: | --: | --: | --: | --- |
 | `cuda-qwen0.6b-512-v1` | 50 | 1,114 | 121.9s | 0 | 0 | RAPTOR paper rank 1 |
 | `cuda-qwen0.6b-768-v1` | 50 | 1,114 | 122.7s | 0 | 0 | RAPTOR paper rank 1 |
 
@@ -126,7 +126,7 @@ Status: blocked. The current local CUDA embedding path uses pooled `SentenceTran
 Profile: `cuda-qwen0.6b-section-v1`. Built as a separate index on `desktop`; `cuda-qwen0.6b-1024` remains untouched.
 
 | Track | Best section arm | nDCG@10 | Delta | Decision |
-| --- | --- | ---: | ---: | --- |
+| --- | --- | --: | --: | --- |
 | catalog | hybrid_sparse2 | 0.711 | -0.007 vs baseline best | Do not promote: default `hybrid` regressed by 0.010 |
 | pdf | hybrid | 0.696 | +0.015 vs baseline `hybrid` | Useful PDF gain, but catalog gate fails |
 
