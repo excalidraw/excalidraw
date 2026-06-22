@@ -211,6 +211,8 @@ function cloneNode(node: CompoundNode): CompoundNode {
     level: node.level,
     minDescendantSequence: node.minDescendantSequence,
     cluster: node.cluster,
+    ancillaryStrip: node.ancillaryStrip,
+    ancillaryWrapWidth: node.ancillaryWrapWidth,
     children: node.children.map(cloneNode),
     box: node.box,
   };

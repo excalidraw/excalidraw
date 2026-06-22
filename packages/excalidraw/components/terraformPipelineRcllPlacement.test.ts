@@ -21,6 +21,8 @@ import { describe, expect, it } from "vitest";
 import {
   PIPELINE_COLUMN_GAP,
   PIPELINE_FRAME_PAD,
+  PIPELINE_CLUSTER_GAP_Y,
+  type AncillaryStrip,
   type CollapsedPipelineEdge,
   type PipelineCluster,
 } from "./terraformPipelineLayoutShared";
@@ -78,6 +80,61 @@ const container = (
   children,
 });
 
+const ancillaryBand = (scopeKey: string, wrapWidth: number): CompoundNode => {
+  const strip: AncillaryStrip = {
+    scopeRole: "region",
+    scopeKey,
+    placement: {
+      providerFamily: "aws",
+      accountId: "acct",
+      region: "us-east-1",
+      vpcId: null,
+    },
+    stripFrameId: `${scopeKey}:ancillary`,
+    cards: [
+      {
+        address: "aws_s3_bucket.extra",
+        placement: {
+          providerFamily: "aws",
+          accountId: "acct",
+          region: "us-east-1",
+          vpcId: null,
+        },
+        build: {
+          skeleton: [],
+          width: 120,
+          height: 60,
+          clusterFrameId: "aws_s3_bucket.extra:frame",
+        },
+      },
+      {
+        address: "aws_sqs_queue.extra",
+        placement: {
+          providerFamily: "aws",
+          accountId: "acct",
+          region: "us-east-1",
+          vpcId: null,
+        },
+        build: {
+          skeleton: [],
+          width: 120,
+          height: 60,
+          clusterFrameId: "aws_sqs_queue.extra:frame",
+        },
+      },
+    ],
+  };
+  return {
+    key: `__ancillaryBand__:${scopeKey}`,
+    role: "ancillaryBand",
+    level: 2,
+    minDescendantSequence: Number.MAX_SAFE_INTEGER,
+    ancillaryStrip: strip,
+    ancillaryWrapWidth: wrapWidth,
+    children: [],
+  };
+};
+
 const lattice = (
   cyclic: string[] = [],
   floor?: Record<string, number>,
@@ -104,7 +161,9 @@ const lattice = (
   fanout: adjacency?.fanout
     ? new Map(Object.entries(adjacency.fanout))
     : undefined,
-  fanin: adjacency?.fanin ? new Map(Object.entries(adjacency.fanin)) : undefined,
+  fanin: adjacency?.fanin
+    ? new Map(Object.entries(adjacency.fanin))
+    : undefined,
 });
 
 const overlapXY = (
@@ -177,6 +236,35 @@ describe("layoutPlacement — packed column-stack", () => {
     const A = by.get("A")!;
     const C = by.get("C")!;
     expect(C.x - (A.x + A.width)).toBeGreaterThanOrEqual(PIPELINE_COLUMN_GAP);
+  });
+});
+
+// ── ancillary bands ──────────────────────────────────────────────────────────
+
+describe("layoutPlacement — ancillary bands", () => {
+  it("places ancillary bands below normal children without polluting primary metrics", () => {
+    const host = container("aws\0acct\0us-east-1", [
+      leaf("A", 0, 0, 200, 96),
+      leaf("B", 1, 1, 200, 96),
+      ancillaryBand("aws\0acct\0us-east-1", 600),
+    ]);
+    const laid = layoutPlacement(host, lattice());
+    const by = boxByKey(laid);
+    const A = by.get("A")!;
+    const B = by.get("B")!;
+    const band = by.get("__ancillaryBand__:aws\0acct\0us-east-1")!;
+    const normalBottom = Math.max(A.y + A.height, B.y + B.height);
+
+    expect(band.y).toBeGreaterThanOrEqual(
+      normalBottom + PIPELINE_CLUSTER_GAP_Y,
+    );
+    expect(band.x).toBe(A.x);
+    expect(laid.box!.width).toBeGreaterThanOrEqual(B.x + B.width - laid.box!.x);
+
+    const meta = placementMeta(laid, lattice());
+    expect(meta.placedLeafCount).toBe(2);
+    expect(meta.siblingOverlapViolations).toBe(0);
+    expect(meta.containmentViolations).toBe(0);
   });
 });
 
@@ -325,6 +413,26 @@ describe("layoutPlacement — cyclic container → swimlane (multi-hull SCC)", (
     expect(g.acyclicSameColumnEdges).toBe(0);
     expect(g.cyclicBackwardEdges).toBe(0);
     expect(g.cyclicSameColumnEdges).toBe(0);
+  });
+
+  it("keeps ancillary bands out of the cyclic hull matrix and below normal lanes", () => {
+    const base = boxByKey(layoutPlacement(tree(), lat()));
+    const withBandTree = tree();
+    withBandTree.children.push(ancillaryBand("vpc", base.get("vpc")!.width));
+    const withBand = boxByKey(layoutPlacement(withBandTree, lat()));
+
+    for (const key of ["public", "private", "p0", "q0", "p1", "q1"]) {
+      expect(withBand.get(key)!.x, `${key} x unchanged`).toBe(base.get(key)!.x);
+    }
+    const band = withBand.get("__ancillaryBand__:vpc")!;
+    const normalBottom = Math.max(
+      withBand.get("public")!.y + withBand.get("public")!.height,
+      withBand.get("private")!.y + withBand.get("private")!.height,
+    );
+    expect(band.y).toBeGreaterThanOrEqual(
+      normalBottom + PIPELINE_CLUSTER_GAP_Y,
+    );
+    expect(withBand.get("vpc")!.width).toBe(base.get("vpc")!.width);
   });
 });
 
@@ -476,10 +584,7 @@ describe("layoutPlacement — straighten lifts direct swimlane leaves", () => {
   const tree = (directFloor: number): CompoundNode =>
     container(
       "vpc",
-      [
-        container("subnet", [leaf("A", 0, 0)], "subnetZone"),
-        leaf("B", 0, 1),
-      ],
+      [container("subnet", [leaf("A", 0, 0)], "subnetZone"), leaf("B", 0, 1)],
       "vpc",
     );
   const lat = (directFloor: number): Lattice =>
@@ -496,9 +601,7 @@ describe("layoutPlacement — straighten lifts direct swimlane leaves", () => {
     );
 
   it("raises a direct non-overlapping leaf into free Y beside a lane", () => {
-    const by = boxByKey(
-      layoutPlacement(tree(1), lat(1), { straighten: true }),
-    );
+    const by = boxByKey(layoutPlacement(tree(1), lat(1), { straighten: true }));
     const lane = by.get("subnet")!;
     const direct = by.get("B")!;
     const a = by.get("A")!;
@@ -510,9 +613,7 @@ describe("layoutPlacement — straighten lifts direct swimlane leaves", () => {
   });
 
   it("keeps an overlapping direct leaf below the lane", () => {
-    const by = boxByKey(
-      layoutPlacement(tree(0), lat(0), { straighten: true }),
-    );
+    const by = boxByKey(layoutPlacement(tree(0), lat(0), { straighten: true }));
     const lane = by.get("subnet")!;
     const direct = by.get("B")!;
 

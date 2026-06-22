@@ -44,6 +44,7 @@ import {
   PIPELINE_CLUSTER_GAP_Y,
   PIPELINE_COLUMN_GAP,
   PIPELINE_FRAME_PAD,
+  measureAncillaryStrip,
   stronglyConnectedComponents,
 } from "./terraformPipelineLayoutShared";
 import { PIPELINE_FRAME_TITLE_HEIGHT } from "./terraformPipelineTopologyGeometry";
@@ -308,6 +309,8 @@ function cloneNode(node: CompoundNode): CompoundNode {
     level: node.level,
     minDescendantSequence: node.minDescendantSequence,
     cluster: node.cluster,
+    ancillaryStrip: node.ancillaryStrip,
+    ancillaryWrapWidth: node.ancillaryWrapWidth,
     children: node.children.map(cloneNode),
     localColumn: node.localColumn,
   };
@@ -350,9 +353,7 @@ function collapseTreeForDeBand(node: CompoundNode, level: DeBandLevel): void {
   }
   // Only act when there is a deeper container to dissolve — a node whose children are
   // already all leaves stays byte-identical (matches the original subnet-level guard).
-  const hasContainerChild = node.children.some(
-    (c) => c.children.length > 0,
-  );
+  const hasContainerChild = node.children.some((c) => c.children.length > 0);
   if (!hasContainerChild) {
     return;
   }
@@ -419,11 +420,7 @@ function placePackedColumns(
   startY: number,
   ctx: PlaceCtx,
 ): void {
-  const rank = reorderRankByKey(
-    children,
-    (c) => c.localColumn ?? 0,
-    ctx,
-  );
+  const rank = reorderRankByKey(children, (c) => c.localColumn ?? 0, ctx);
   const ordered = [...children].sort(
     (a, b) => (rank.get(a.key) ?? 0) - (rank.get(b.key) ?? 0),
   );
@@ -522,7 +519,7 @@ type LaneContext = {
 /** Collect every descendant **leaf cluster** node under `node`. */
 function collectClusterLeaves(node: CompoundNode, out: CompoundNode[]): void {
   if (node.children.length === 0) {
-    if (node.cluster) {
+    if (node.role === "primaryCluster" && node.cluster) {
       out.push(node);
     }
     return;
@@ -891,7 +888,10 @@ function layoutLanesOnAxis(
       nodes.map((c) => c.key),
       childBoxes,
     );
-    return { right: bb ? bb.x + bb.width : 0, bottom: bb ? bb.y + bb.height : 0 };
+    return {
+      right: bb ? bb.x + bb.width : 0,
+      bottom: bb ? bb.y + bb.height : 0,
+    };
   }
   const colCursor = new Map<number, number>();
   for (const leaf of leaves) {
@@ -936,6 +936,14 @@ function layoutLanesOnAxis(
  */
 function arrangeSubtreeOnAxis(node: CompoundNode, ctx: LaneContext): void {
   if (node.children.length === 0) {
+    if (node.role === "ancillaryBand" && node.ancillaryStrip) {
+      const measured = measureAncillaryStrip(
+        node.ancillaryStrip,
+        node.ancillaryWrapWidth ?? 0,
+      );
+      node.box = { x: 0, y: 0, width: measured.width, height: measured.height };
+      return;
+    }
     node.box = {
       x: 0,
       y: 0,
@@ -947,20 +955,41 @@ function arrangeSubtreeOnAxis(node: CompoundNode, ctx: LaneContext): void {
   for (const child of node.children) {
     arrangeSubtreeOnAxis(child, ctx);
   }
+  const normalKids = node.children.filter((c) => c.role !== "ancillaryBand");
+  const bandKids = node.children.filter((c) => c.role === "ancillaryBand");
   const titleReserve = rendersTitledFrame(node.role)
     ? PIPELINE_FRAME_TITLE_HEIGHT
     : 0;
   const { right, bottom } = layoutLanesOnAxis(
-    node.children,
+    normalKids,
     ctx,
+    PIPELINE_FRAME_PAD,
+    titleReserve + PIPELINE_FRAME_PAD,
+  );
+  placeAncillaryBandsBelowNormal(
+    node,
+    normalKids,
+    bandKids,
     PIPELINE_FRAME_PAD,
     titleReserve + PIPELINE_FRAME_PAD,
   );
   node.box = {
     x: 0,
     y: 0,
-    width: right + PIPELINE_FRAME_PAD,
-    height: bottom + PIPELINE_FRAME_PAD,
+    width: Math.max(
+      right + PIPELINE_FRAME_PAD,
+      ...bandKids.map(
+        (band) =>
+          (band.box?.x ?? 0) + (band.box?.width ?? 0) + PIPELINE_FRAME_PAD,
+      ),
+    ),
+    height: Math.max(
+      bottom + PIPELINE_FRAME_PAD,
+      ...bandKids.map(
+        (band) =>
+          (band.box?.y ?? 0) + (band.box?.height ?? 0) + PIPELINE_FRAME_PAD,
+      ),
+    ),
   };
 }
 
@@ -1011,7 +1040,9 @@ function arrangeSwimlaneGroup(
     // `cluster.id` keys are shared between members and their clones (cloneNode keeps
     // cluster refs), so a trial map drives both the geometry (via original `leaves`,
     // whose `cluster.build.width` is identical) and the placement of fresh clones.
-    const measure = (trial: ReadonlyMap<string, number>): ColumnCompactMeasure => {
+    const measure = (
+      trial: ReadonlyMap<string, number>,
+    ): ColumnCompactMeasure => {
       const trialCtx = laneContextFromColMap(leaves, trial, laneFlags);
       const clones = members.map((m) => cloneNode(m));
       for (const c of clones) {
@@ -1151,7 +1182,10 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
       ctx.orderOverride.size > 0
         ? members.reduce(
             (m, c) =>
-              Math.min(m, ctx.orderOverride.get(c.key) ?? Number.POSITIVE_INFINITY),
+              Math.min(
+                m,
+                ctx.orderOverride.get(c.key) ?? Number.POSITIVE_INFINITY,
+              ),
             Number.POSITIVE_INFINITY,
           )
         : minSeq;
@@ -1236,6 +1270,58 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
   };
 }
 
+function placeAncillaryBandsBelowNormal(
+  node: CompoundNode,
+  normalKids: readonly CompoundNode[],
+  bandKids: readonly CompoundNode[],
+  areaX: number,
+  areaY: number,
+): void {
+  if (bandKids.length === 0) {
+    return;
+  }
+  const normalBoxes = new Map<string, TerraformDependencyLayoutBox>();
+  for (const child of normalKids) {
+    normalBoxes.set(child.key, child.box!);
+  }
+  const nb = boundsOf(
+    normalKids.map((c) => c.key),
+    normalBoxes,
+  );
+  let bandY = nb ? nb.y + nb.height + PIPELINE_CLUSTER_GAP_Y : areaY;
+  const bandX = nb ? nb.x : areaX;
+  const contentWidth = Math.max(0, nb ? nb.width : 0);
+  for (const band of [...bandKids].sort(byModelOrder)) {
+    const requestedWrap = band.ancillaryWrapWidth ?? contentWidth;
+    const wrapWidth =
+      contentWidth > 0 ? Math.min(requestedWrap, contentWidth) : requestedWrap;
+    const measured = band.ancillaryStrip
+      ? measureAncillaryStrip(band.ancillaryStrip, wrapWidth)
+      : { width: 0, height: 0 };
+    band.box = {
+      x: bandX,
+      y: bandY,
+      width: measured.width,
+      height: measured.height,
+    };
+    bandY += measured.height + PIPELINE_CLUSTER_GAP_Y;
+  }
+}
+
+function recomputeContainerBox(node: CompoundNode): void {
+  const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
+  for (const child of node.children) {
+    childBoxes.set(child.key, child.box!);
+  }
+  const bb = boundsOf(
+    node.children.map((c) => c.key),
+    childBoxes,
+  );
+  const width = bb ? bb.x + bb.width + PIPELINE_FRAME_PAD : 0;
+  const height = bb ? bb.y + bb.height + PIPELINE_FRAME_PAD : 0;
+  node.box = { x: 0, y: 0, width, height };
+}
+
 /**
  * Size + locally arrange one node (post-order). Sets `node.box` with **local**
  * x/y (relative to the node's own footprint top-left; the parent assigns the real
@@ -1249,14 +1335,17 @@ function arrangeByHullMatrix(node: CompoundNode, ctx: PlaceCtx): void {
  */
 function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
   if (node.children.length === 0) {
+    if (node.role === "ancillaryBand" && node.ancillaryStrip) {
+      const measured = measureAncillaryStrip(
+        node.ancillaryStrip,
+        node.ancillaryWrapWidth ?? 0,
+      );
+      node.box = { x: 0, y: 0, width: measured.width, height: measured.height };
+      return;
+    }
     const w = node.cluster?.build.width ?? 0;
     const h = node.cluster?.build.height ?? 0;
     node.box = { x: 0, y: 0, width: w, height: h };
-    return;
-  }
-
-  if (ctx.cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
-    arrangeByHullMatrix(node, ctx);
     return;
   }
 
@@ -1264,11 +1353,9 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
     sizeAndArrange(child, ctx);
   }
 
-  const columnX = columnOffsetsFromWidths(
-    columnWidths(node.children),
-    0,
-    PIPELINE_COLUMN_GAP,
-  );
+  const normalKids = node.children.filter((c) => c.role !== "ancillaryBand");
+  const bandKids = node.children.filter((c) => c.role === "ancillaryBand");
+
   const titleReserve = rendersTitledFrame(node.role)
     ? PIPELINE_FRAME_TITLE_HEIGHT
     : 0;
@@ -1276,10 +1363,28 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
   const areaX = isRoot ? 0 : PIPELINE_FRAME_PAD;
   const areaY = isRoot ? 0 : titleReserve + PIPELINE_FRAME_PAD;
 
+  if (ctx.cyclic.has(node.key) && node.key !== RCLL_ROOT_KEY) {
+    if (normalKids.length > 0) {
+      const originalChildren = node.children;
+      node.children = normalKids;
+      arrangeByHullMatrix(node, ctx);
+      node.children = originalChildren;
+    }
+    placeAncillaryBandsBelowNormal(node, normalKids, bandKids, areaX, areaY);
+    recomputeContainerBox(node);
+    return;
+  }
+
+  const columnX = columnOffsetsFromWidths(
+    columnWidths(normalKids),
+    0,
+    PIPELINE_COLUMN_GAP,
+  );
+
   const policy = policyForContainer(node.role);
   if (policy === "passthrough") {
     // root: providers at column X, all at Y = areaY; reanchor stacks them (A3).
-    for (const child of node.children) {
+    for (const child of normalKids) {
       const col = child.localColumn ?? 0;
       child.box = {
         x: areaX + (columnX[col] ?? 0),
@@ -1289,16 +1394,14 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
       };
     }
   } else if (policy === "forced") {
-    placeForcedBands(node.children, columnX, areaX, areaY, ctx.orderOverride);
+    placeForcedBands(normalKids, columnX, areaX, areaY, ctx.orderOverride);
   } else if (policy === "mixed") {
     // vpc: subnet-zone sub-hulls forced into bands, then vpc-direct leaves packed
     // in a block below — disjoint Y regions so the two groups never overlap.
     // Classify by ROLE, not child count: an *empty* subnet-zone (a sub-hull with
     // no children) must still be banded, not packed among the vpc-direct leaves.
-    const containerKids = node.children.filter(
-      (c) => c.role !== "primaryCluster",
-    );
-    const leafKids = node.children.filter((c) => c.role === "primaryCluster");
+    const containerKids = normalKids.filter((c) => c.role !== "primaryCluster");
+    const leafKids = normalKids.filter((c) => c.role === "primaryCluster");
     const afterBands = placeForcedBands(
       containerKids,
       columnX,
@@ -1308,21 +1411,13 @@ function sizeAndArrange(node: CompoundNode, ctx: PlaceCtx): void {
     );
     placePackedColumns(leafKids, columnX, areaX, afterBands, ctx);
   } else {
-    placePackedColumns(node.children, columnX, areaX, areaY, ctx);
+    placePackedColumns(normalKids, columnX, areaX, areaY, ctx);
   }
 
+  placeAncillaryBandsBelowNormal(node, normalKids, bandKids, areaX, areaY);
+
   // Footprint = children bbox + right/bottom PAD (left/top already padded via area).
-  const childBoxes = new Map<string, TerraformDependencyLayoutBox>();
-  for (const child of node.children) {
-    childBoxes.set(child.key, child.box!);
-  }
-  const bb = boundsOf(
-    node.children.map((c) => c.key),
-    childBoxes,
-  );
-  const width = bb ? bb.x + bb.width + PIPELINE_FRAME_PAD : 0;
-  const height = bb ? bb.y + bb.height + PIPELINE_FRAME_PAD : 0;
-  node.box = { x: 0, y: 0, width, height };
+  recomputeContainerBox(node);
 }
 
 /** Pre-order: convert each node's local box to a global box (parent origin + local),
@@ -1452,7 +1547,9 @@ export function placementMeta(
       maxDepthPx = Math.max(maxDepthPx, node.box.y + node.box.height);
     }
     if (node.children.length === 0) {
-      placedLeafCount += 1;
+      if (node.role === "primaryCluster") {
+        placedLeafCount += 1;
+      }
       if (node.cluster && node.box) {
         centerYById.set(node.cluster.id, node.box.y + node.box.height / 2);
       }
@@ -1669,7 +1766,9 @@ export function placementStage(
     meta.columnCompactApplied = columnCompactStats.moved > 0 ? 1 : 0;
     meta.columnCompactMovedCount = columnCompactStats.moved;
     meta.columnCompactReclaimedCols = columnCompactStats.reclaimedCols;
-    meta.columnCompactEvalCapReached = columnCompactStats.evalCapReached ? 1 : 0;
+    meta.columnCompactEvalCapReached = columnCompactStats.evalCapReached
+      ? 1
+      : 0;
   }
   if (rankSeparate) {
     // Surface the observability meta for the probe/gate (read as
@@ -1681,8 +1780,8 @@ export function placementStage(
       rankSeparate.fallbackReason === "none"
         ? 0
         : rankSeparate.fallbackReason === "no-pairs"
-          ? 1
-          : 2; // augmented-cycle
+        ? 1
+        : 2; // augmented-cycle
   }
   return { tree: placed, meta };
 }

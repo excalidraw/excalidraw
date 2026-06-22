@@ -39,7 +39,9 @@ export const PIPELINE_TOPOLOGY_LEVELS: Array<{
   {
     role: "vpc",
     keyOf: (c) =>
-      c.placement.vpcId
+      c.ancillaryScopeRole && c.ancillaryScopeRole !== "vpc"
+        ? null
+        : c.placement.vpcId
         ? [
             c.placement.providerFamily,
             c.placement.accountId,
@@ -51,16 +53,21 @@ export const PIPELINE_TOPOLOGY_LEVELS: Array<{
   {
     role: "region",
     keyOf: (c) =>
-      [
-        c.placement.providerFamily,
-        c.placement.accountId,
-        c.placement.region,
-      ].join("\0"),
+      c.ancillaryScopeRole && !["region", "vpc"].includes(c.ancillaryScopeRole)
+        ? null
+        : [
+            c.placement.providerFamily,
+            c.placement.accountId,
+            c.placement.region,
+          ].join("\0"),
   },
   {
     role: "account",
     keyOf: (c) =>
-      [c.placement.providerFamily, c.placement.accountId].join("\0"),
+      c.ancillaryScopeRole &&
+      !["account", "region", "vpc"].includes(c.ancillaryScopeRole)
+        ? null
+        : [c.placement.providerFamily, c.placement.accountId].join("\0"),
   },
   {
     role: "provider",
@@ -72,6 +79,9 @@ function childKeyForLevel(
   role: TopologyFrameRole,
   cluster: PipelineCluster,
 ): string {
+  if (cluster.ancillaryScopeRole === role) {
+    return cluster.id;
+  }
   if (role === "subnetZone") {
     return cluster.id;
   }
@@ -230,6 +240,18 @@ export function topologyPathForCluster(
   deBandLevel: DeBandLevel = "none",
 ): string[] {
   const p = cluster.placement;
+  if (cluster.ancillaryScopeRole === "provider") {
+    return [p.providerFamily];
+  }
+  if (cluster.ancillaryScopeRole === "account") {
+    return [p.providerFamily, p.accountId];
+  }
+  if (cluster.ancillaryScopeRole === "region") {
+    return [p.providerFamily, p.accountId, p.region];
+  }
+  if (cluster.ancillaryScopeRole === "vpc") {
+    return [p.providerFamily, p.accountId, p.region, p.vpcId ?? ""];
+  }
   const full =
     p.vpcId && p.subnetSignature != null
       ? [p.providerFamily, p.accountId, p.region, p.vpcId, p.subnetSignature]

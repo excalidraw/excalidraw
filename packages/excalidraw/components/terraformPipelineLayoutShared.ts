@@ -48,6 +48,7 @@ export type PipelineCluster = {
   depth: number;
   placement: PipelinePlacement;
   build: PipelinePrimaryClusterBuildResult;
+  ancillaryScopeRole?: AncillaryStrip["scopeRole"];
 };
 
 export type CollapsedPipelineEdge = {
@@ -78,10 +79,10 @@ export type AncillaryCard = {
 
 /**
  * One "Unconnected" strip of non-TFD resources, hosted at the bottom of its
- * deepest topology hull (VPC when the resources have a vpcId, else region).
+ * deepest trustworthy topology hull.
  */
 export type AncillaryStrip = {
-  scopeRole: "vpc" | "region";
+  scopeRole: "provider" | "account" | "region" | "vpc";
   scopeKey: string;
   /** Scope-level placement — subnet info dropped so no subnetZone frame forms. */
   placement: PipelinePlacement;
@@ -842,6 +843,7 @@ export function ancillaryStripAsPseudoCluster(
     firstSequence: Number.MAX_SAFE_INTEGER,
     depth: 0,
     placement: strip.placement,
+    ancillaryScopeRole: strip.scopeRole,
     build: {
       skeleton: [],
       width: placedBox.width,

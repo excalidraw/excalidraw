@@ -17,7 +17,9 @@ import {
 } from "./terraformTopologyLayout";
 import {
   ancillaryStripFrameId,
+  accountScopeKey,
   buildFallbackCluster,
+  providerScopeKey,
   regionScopeKey,
   resourceTypeFor,
   vpcScopeKey,
@@ -27,6 +29,62 @@ import {
 } from "./terraformPipelineLayoutShared";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
+
+function ancillaryScopeForPlacement(placement: PipelinePlacement): {
+  scopeRole: AncillaryStrip["scopeRole"];
+  scopeKey: string;
+  placement: PipelinePlacement;
+} {
+  const vKey = vpcScopeKey(placement);
+  if (vKey) {
+    return {
+      scopeRole: "vpc",
+      scopeKey: vKey,
+      placement: {
+        ...placement,
+        subnetSignature: undefined,
+        subnetTier: undefined,
+      },
+    };
+  }
+  if (placement.region && placement.region !== "unknown-region") {
+    return {
+      scopeRole: "region",
+      scopeKey: regionScopeKey(placement),
+      placement: {
+        ...placement,
+        vpcId: null,
+        subnetSignature: undefined,
+        subnetTier: undefined,
+      },
+    };
+  }
+  if (placement.accountId && placement.accountId !== "unknown-account") {
+    return {
+      scopeRole: "account",
+      scopeKey: accountScopeKey(placement),
+      placement: {
+        ...placement,
+        region: "unknown-region",
+        vpcId: null,
+        subnetSignature: undefined,
+        subnetTier: undefined,
+      },
+    };
+  }
+  return {
+    scopeRole: "provider",
+    scopeKey: providerScopeKey(placement),
+    placement: {
+      ...placement,
+      accountId: "unknown-account",
+      region: "unknown-region",
+      vpcId: null,
+      subnetSignature: undefined,
+      subnetTier: undefined,
+    },
+  };
+}
 
 /**
  * Plan addresses that belong on the canvas but are absent from the TFD graph:
@@ -96,20 +154,14 @@ export function buildAncillaryStrips(
       region: "unknown-region",
       vpcId: null,
     };
-    const vKey = vpcScopeKey(placement);
-    const scopeRole = vKey ? ("vpc" as const) : ("region" as const);
-    const scopeKey = vKey ?? regionScopeKey(placement);
+    const scope = ancillaryScopeForPlacement(placement);
+    const { scopeRole, scopeKey } = scope;
     let strip = byScope.get(scopeKey);
     if (!strip) {
       strip = {
         scopeRole,
         scopeKey,
-        placement: {
-          providerFamily: placement.providerFamily,
-          accountId: placement.accountId,
-          region: placement.region,
-          vpcId: scopeRole === "vpc" ? placement.vpcId : null,
-        },
+        placement: scope.placement,
         stripFrameId: ancillaryStripFrameId(scopeKey),
         cards: [],
       };

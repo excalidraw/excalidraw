@@ -19,10 +19,18 @@ import {
 import { appendCompoundTopologyFrameEdgeSkeletons } from "./terraformPipelineLayoutCompoundSiblingEdges";
 import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
 import { appendSubnetMembershipAnnotations } from "./terraformPipelineSubnetAnnotation";
+import { buildAncillaryStrips } from "./terraformPipelineLayoutAncillary";
+import {
+  layoutAncillaryStrip,
+  ancillaryStripAsPseudoCluster,
+  PIPELINE_FRAME_PAD,
+  PIPELINE_CLUSTER_GAP_Y,
+} from "./terraformPipelineLayoutShared";
 import { layeringStage } from "./terraformPipelineRcllLayering";
 import {
   backwardEdgeGate,
   boxByKey,
+  placementMeta,
   placementStage,
 } from "./terraformPipelineRcllPlacement";
 import {
@@ -32,6 +40,8 @@ import {
 
 import type {
   CollapsedPipelineEdge,
+  AncillaryStrip,
+  PipelineCluster,
   PipelineLayoutPrep,
 } from "./terraformPipelineLayoutShared";
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
@@ -217,8 +227,28 @@ async function buildSceneFromBoxedTree(
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const layoutBoxes = new Map<string, TerraformDependencyLayoutBox>();
 
+  const ancillaryClusters: PipelineCluster[] = [];
   const emitLeaves = (node: CompoundNode): void => {
-    if (node.cluster && node.box) {
+    if (node.role === "ancillaryBand" && node.ancillaryStrip && node.box) {
+      const laid = layoutAncillaryStrip(
+        node.ancillaryStrip,
+        node.ancillaryWrapWidth ?? node.box.width,
+      );
+      skeleton.push(
+        ...translateSkeleton(laid.skeleton, node.box.x, node.box.y),
+      );
+      for (const [id, box] of laid.boxes) {
+        layoutBoxes.set(id, {
+          x: node.box.x + box.x,
+          y: node.box.y + box.y,
+          width: box.width,
+          height: box.height,
+        });
+      }
+      ancillaryClusters.push(
+        ancillaryStripAsPseudoCluster(node.ancillaryStrip, node.box),
+      );
+    } else if (node.role === "primaryCluster" && node.cluster && node.box) {
       const built = node.cluster.build;
       // A cluster skeleton is NOT origin-normalized: its frame element sits at a
       // local (frameX, frameY) offset (e.g. a card whose content starts below a
@@ -260,9 +290,10 @@ async function buildSceneFromBoxedTree(
   };
   emitLeaves(tree);
 
+  const frameClusters = [...prep.clusters, ...ancillaryClusters];
   buildCompoundFramesFromLayoutBoxes(
     skeleton,
-    prep.clusters,
+    frameClusters,
     layoutBoxes,
     deBandLevel,
   );
@@ -277,7 +308,7 @@ async function buildSceneFromBoxedTree(
       deBandLevel,
     );
   }
-  applyCompoundHierarchicalLayout(skeleton, layoutBoxes, prep.clusters);
+  applyCompoundHierarchicalLayout(skeleton, layoutBoxes, frameClusters);
   appendPipelineEdgeSkeletons(
     nodes,
     prep.collapsedEdges,
@@ -295,12 +326,12 @@ async function buildSceneFromBoxedTree(
   );
   const frameEdgeCount = appendCompoundTopologyFrameEdgeSkeletons(
     prep.collapsedEdges,
-    prep.clusters,
+    frameClusters,
     skeleton,
     layoutBoxes,
     deBandLevel,
   );
-  assignCompoundEdgeFrameParents(skeleton, prep.clusters, deBandLevel);
+  assignCompoundEdgeFrameParents(skeleton, frameClusters, deBandLevel);
   const elements = await convertPipelineSkeletonToElements(skeleton);
   return { elements, frameEdgeCount, backEdgesStyled };
 }
@@ -366,6 +397,186 @@ function styleRcllBackEdges(
   return styled;
 }
 
+function findPathByKey(
+  node: CompoundNode,
+  key: string,
+  path: CompoundNode[] = [],
+): CompoundNode[] | null {
+  const nextPath = [...path, node];
+  if (node.key === key) {
+    return nextPath;
+  }
+  for (const child of node.children) {
+    const found = findPathByKey(child, key, nextPath);
+    if (found) {
+      return found;
+    }
+  }
+  return null;
+}
+
+function cloneTreeForAncillary(node: CompoundNode): CompoundNode {
+  return {
+    key: node.key,
+    role: node.role,
+    level: node.level,
+    minDescendantSequence: node.minDescendantSequence,
+    cluster: node.cluster,
+    ancillaryStrip: node.ancillaryStrip,
+    ancillaryWrapWidth: node.ancillaryWrapWidth,
+    localColumn: node.localColumn,
+    box: node.box ? { ...node.box } : undefined,
+    children: node.children.map(cloneTreeForAncillary),
+  };
+}
+
+function translateSubtreeY(node: CompoundNode, dy: number): void {
+  if (node.box) {
+    node.box = { ...node.box, y: node.box.y + dy };
+  }
+  for (const child of node.children) {
+    translateSubtreeY(child, dy);
+  }
+}
+
+function xOverlaps(
+  a: NonNullable<CompoundNode["box"]>,
+  b: NonNullable<CompoundNode["box"]>,
+): boolean {
+  return a.x < b.x + b.width && b.x < a.x + a.width;
+}
+
+function childrenBBox(
+  node: CompoundNode,
+): NonNullable<CompoundNode["box"]> | null {
+  const boxes = node.children
+    .map((child) => child.box)
+    .filter((box): box is NonNullable<CompoundNode["box"]> => !!box);
+  if (boxes.length === 0) {
+    return null;
+  }
+  const minX = Math.min(...boxes.map((box) => box.x));
+  const minY = Math.min(...boxes.map((box) => box.y));
+  const maxX = Math.max(...boxes.map((box) => box.x + box.width));
+  const maxY = Math.max(...boxes.map((box) => box.y + box.height));
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
+function expandNodeToChildren(node: CompoundNode): void {
+  if (!node.box) {
+    return;
+  }
+  const bb = childrenBBox(node);
+  if (!bb) {
+    return;
+  }
+  const right = Math.max(
+    node.box.x + node.box.width,
+    bb.x + bb.width + PIPELINE_FRAME_PAD,
+  );
+  const bottom = Math.max(
+    node.box.y + node.box.height,
+    bb.y + bb.height + PIPELINE_FRAME_PAD,
+  );
+  node.box = {
+    ...node.box,
+    width: right - node.box.x,
+    height: bottom - node.box.y,
+  };
+}
+
+function boxBottom(box: NonNullable<CompoundNode["box"]>): number {
+  return box.y + box.height;
+}
+
+function propagateInsertedBandGrowth(
+  path: readonly CompoundNode[],
+  insertedHostOldBottom: number,
+): void {
+  let grownChild = path[path.length - 1];
+  let grownChildOldBottom = insertedHostOldBottom;
+
+  for (let i = path.length - 2; i >= 0; i -= 1) {
+    const parent = path[i];
+    if (!parent.box || !grownChild.box) {
+      return;
+    }
+
+    const parentOldBottom = boxBottom(parent.box);
+    const growth = boxBottom(grownChild.box) - grownChildOldBottom;
+    if (growth > 0) {
+      for (const sibling of parent.children) {
+        if (
+          sibling !== grownChild &&
+          sibling.box &&
+          sibling.box.y >= grownChildOldBottom - 0.5 &&
+          xOverlaps(sibling.box, grownChild.box)
+        ) {
+          translateSubtreeY(sibling, growth);
+        }
+      }
+      expandNodeToChildren(parent);
+    }
+
+    grownChild = parent;
+    grownChildOldBottom = parentOldBottom;
+  }
+}
+
+function injectAncillaryBandsIntoPlacedTree(
+  placedTree: CompoundNode,
+  strips: readonly AncillaryStrip[],
+): {
+  tree: CompoundNode;
+  applied: boolean;
+  stripCount: number;
+  cardCount: number;
+} {
+  const root = cloneTreeForAncillary(placedTree);
+  let stripCount = 0;
+  let cardCount = 0;
+  for (const strip of strips) {
+    const path = findPathByKey(root, strip.scopeKey);
+    if (!path) {
+      continue;
+    }
+    const host = path[path.length - 1];
+    const bb = host ? childrenBBox(host) : null;
+    if (!host || !host.box || !bb) {
+      continue;
+    }
+    const hostOldBottom = boxBottom(host.box);
+    const contentWidth = Math.max(0, bb.width);
+    const laid = layoutAncillaryStrip(strip, contentWidth);
+    const bandY = bb.y + bb.height + PIPELINE_CLUSTER_GAP_Y;
+    host.children.push({
+      key: `__ancillaryBand__:${strip.scopeKey}`,
+      role: "ancillaryBand",
+      level: host.level + 1,
+      minDescendantSequence: Number.MAX_SAFE_INTEGER,
+      ancillaryStrip: strip,
+      ancillaryWrapWidth: contentWidth,
+      box: {
+        x: bb.x,
+        y: bandY,
+        width: laid.width,
+        height: laid.height,
+      },
+      children: [],
+    });
+    host.children.sort(
+      (a, b) =>
+        a.minDescendantSequence - b.minDescendantSequence ||
+        a.key.localeCompare(b.key),
+    );
+    expandNodeToChildren(host);
+    propagateInsertedBandGrowth(path, hostOldBottom);
+    stripCount += 1;
+    cardCount += strip.cards.length;
+  }
+  return { tree: root, applied: stripCount > 0, stripCount, cardCount };
+}
+
 /**
  * RCLL pipeline builder (RFC docs/pipeline-rcll-layout-design.md).
  *
@@ -408,7 +619,8 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     // Back-compat: the legacy `subnetDeBand` boolean is an alias for `deBandLevel: "subnet"`.
     // The explicit enum wins when both are set.
     deBandLevel:
-      options?.deBandLevel ?? (options?.subnetDeBand === true ? "subnet" : "none"),
+      options?.deBandLevel ??
+      (options?.subnetDeBand === true ? "subnet" : "none"),
     rankSeparate: options?.rankSeparate === true,
   };
 
@@ -419,16 +631,42 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   // (a model-build bug should surface loudly, not silently blank the view).
   const prep = preparePipelineLayout(nodes, plan, compact, {});
   const { tree, lattice } = buildRcllModel(prep);
+  const ancillaryStrips = includeAncillary
+    ? buildAncillaryStrips(nodes, plan, prep, { compact })
+    : [];
 
   // pipeline: layering (M2 → `localColumn`) then placement (M3a → global `box`).
   // We READ the stage output tree (`laidOutTree`) — placement mutates geometry
   // through it, and scene meta reflects the laid-out model.
-  const {
-    tree: laidOutTree,
-    ran,
-    degraded,
-    stageMeta,
-  } = runRcllPipeline(stages, tree, lattice, rcllOptions);
+  const baselineRun = runRcllPipeline(stages, tree, lattice, rcllOptions);
+  let { tree: laidOutTree, ran, degraded, stageMeta } = baselineRun;
+  let ancillaryApplied = false;
+  let ancillaryStripCount = 0;
+  let ancillaryCardCount = 0;
+  if (
+    includeAncillary &&
+    ran.includes("placement") &&
+    ancillaryStrips.length > 0
+  ) {
+    const injected = injectAncillaryBandsIntoPlacedTree(
+      baselineRun.tree,
+      ancillaryStrips,
+    );
+    ancillaryApplied = injected.applied;
+    ancillaryStripCount = injected.stripCount;
+    ancillaryCardCount = injected.cardCount;
+    if (injected.applied) {
+      laidOutTree = injected.tree;
+      stageMeta = {
+        ...stageMeta,
+        placement: {
+          ...((stageMeta.placement as Record<string, unknown> | undefined) ??
+            {}),
+          ...placementMeta(laidOutTree, lattice),
+        },
+      };
+    }
+  }
 
   // export — M3a branch (eng-review A2): if placement RAN, draw RCLL's own
   // geometry from the placed boxes; otherwise fall back to the compound builder
@@ -506,14 +744,14 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
           : rcllOptions.deDensify && (rcllOptions.deDensifyMaxCols ?? 0) > 0
           ? "M5b"
           : rcllOptions.straighten
-            ? "M5"
-            : rcllOptions.crossingMin
-              ? "M6c"
-              : rcllOptions.reorder
-                ? "M6"
-                : rcllOptions.swimlaneLaneRise
-                  ? "M4"
-                  : "M3a"
+          ? "M5"
+          : rcllOptions.crossingMin
+          ? "M6c"
+          : rcllOptions.reorder
+          ? "M6"
+          : rcllOptions.swimlaneLaneRise
+          ? "M4"
+          : "M3a"
         : "M2",
       // M4: whether the swimlane lane-rise (DEC-1 in swimlane interiors) is active.
       rcllSwimlaneLaneRise: rcllOptions.swimlaneLaneRise === true,
@@ -540,6 +778,16 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
       // M5c: whether column compaction (Axis-2 A) is active.
       rcllColumnCompact: rcllOptions.columnCompact === true,
       pipelineCompact: compact,
+      pipelineIncludeAncillary: includeAncillary,
+      pipelineAncillaryApplied: ancillaryApplied,
+      pipelineAncillaryCount: ancillaryCardCount,
+      pipelineAncillaryStripCount: ancillaryStripCount,
+      rcllAncillaryAllocator: {
+        widenedHullCount: 0,
+        allocatedWidthPx: 0,
+        rowSavings: 0,
+        fallbackDropCount: 0,
+      },
       rcllModules: { stages: ran, fallback: "compound" },
       rcllDegraded: degraded,
       // §29: import-phase facts (the tree + lattice this build computed),

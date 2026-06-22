@@ -120,6 +120,34 @@ const geometry = (els: readonly ExcalidrawElement[]): GeomCell[] =>
     return cell;
   });
 
+const primaryFrameGeometryByAddress = (
+  els: readonly ExcalidrawElement[],
+): Map<string, GeomCell> => {
+  const out = new Map<string, GeomCell>();
+  for (const e of els) {
+    const cd = e.customData as
+      | { terraformTopologyRole?: unknown; terraformPrimaryAddress?: unknown }
+      | undefined;
+    if (
+      e.type !== "frame" ||
+      e.isDeleted ||
+      cd?.terraformTopologyRole !== "primaryCluster" ||
+      typeof cd.terraformPrimaryAddress !== "string"
+    ) {
+      continue;
+    }
+    out.set(cd.terraformPrimaryAddress, {
+      type: e.type,
+      x: e.x,
+      y: e.y,
+      width: e.width,
+      height: e.height,
+      angle: e.angle,
+    });
+  }
+  return out;
+};
+
 describe("pipeline view rcll (M3a)", () => {
   it(
     "staging-extended-localstack-v2 — routes to rcll, draws own geometry, collision-free, deterministic",
@@ -398,20 +426,25 @@ describe("pipeline view rcll (M4 — swimlane lane-rise)", () => {
         ).toBeLessThan(offPlacement.maxDepthPx);
 
         // CON-12-safe + collision-free: every structural gate holds under rise ON.
-        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(0);
+        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(
+          0,
+        );
         expect(
           onPlacement.siblingOverlapViolations,
           `${mode} sibling overlap`,
         ).toBe(0);
         const gates = on.meta.gates as Record<string, number>;
-        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(0);
+        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(
+          0,
+        );
         expect(
           gates.acyclicSameColumnEdges,
           `${mode} iron rule same-column`,
         ).toBe(0);
-        expect(on.diagnostics.collisionCount, `${mode} rendered collisions`).toBe(
-          0,
-        );
+        expect(
+          on.diagnostics.collisionCount,
+          `${mode} rendered collisions`,
+        ).toBe(0);
 
         // Determinism (CON-8) under rise ON.
         const on2 = await layout("staging-extended-localstack-v2", {
@@ -453,7 +486,8 @@ describe("pipeline view rcll (M6 — crossing-minimization reorder)", () => {
         // strict-improve gate can only reduce; the global rendered count confirms
         // no cross-container regression). The readability meta is build-internal
         // (computed over ALL elements, incl. the isDeleted dataflow arrows).
-        const onCross = (on.meta.readability as Record<string, number>).crossings;
+        const onCross = (on.meta.readability as Record<string, number>)
+          .crossings;
         const offCross = (off.meta.readability as Record<string, number>)
           .crossings;
         expect(onCross, `${mode} crossings ON ≤ OFF`).toBeLessThanOrEqual(
@@ -464,20 +498,25 @@ describe("pipeline view rcll (M6 — crossing-minimization reorder)", () => {
         const onPlacement = (
           on.meta.rcllStageMeta as Record<string, Record<string, number>>
         ).placement;
-        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(0);
+        expect(onPlacement.containmentViolations, `${mode} containment`).toBe(
+          0,
+        );
         expect(
           onPlacement.siblingOverlapViolations,
           `${mode} sibling overlap`,
         ).toBe(0);
         const gates = on.meta.gates as Record<string, number>;
-        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(0);
+        expect(gates.acyclicBackwardEdges, `${mode} iron rule backward`).toBe(
+          0,
+        );
         expect(
           gates.acyclicSameColumnEdges,
           `${mode} iron rule same-column`,
         ).toBe(0);
-        expect(on.diagnostics.collisionCount, `${mode} rendered collisions`).toBe(
-          0,
-        );
+        expect(
+          on.diagnostics.collisionCount,
+          `${mode} rendered collisions`,
+        ).toBe(0);
 
         // Determinism (CON-8) under reorder ON.
         const on2 = await layout("staging-extended-localstack-v2", {
@@ -874,6 +913,67 @@ describe("rcll M5b de-density (internal probe, v2)", () => {
       expect(geometry(on2.elements), "ON deterministic").toEqual(
         geometry(on.elements),
       );
+    },
+    STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
+  );
+
+  it(
+    "All Resources does not widen compact-ish full-detail v2 when de-band is off",
+    async () => {
+      const baseOptions = {
+        compact: false,
+        swimlaneLaneRise: true,
+        rankSeparate: true,
+        reorder: true,
+        crossingMin: true,
+        straighten: true,
+        columnCompact: true,
+        staircaseBandOverlap: true,
+        deBandLevel: "none",
+      };
+      const dataflow = await buildV2(baseOptions);
+      const allResources = await buildV2({
+        ...baseOptions,
+        includeAncillary: true,
+      });
+
+      const dataflowPlace = placement(dataflow.meta);
+      const allPlace = placement(allResources.meta);
+      expect(allResources.meta.pipelineAncillaryApplied).toBe(true);
+      expect(allResources.meta.pipelineAncillaryCount).toBeGreaterThan(0);
+      expect(
+        allPlace.maxWidthPx,
+        "ancillary bands must reserve height without widening the RCLL placement",
+      ).toBeLessThanOrEqual(dataflowPlace.maxWidthPx);
+      const dataflowPrimary = primaryFrameGeometryByAddress(dataflow.elements);
+      const allPrimary = primaryFrameGeometryByAddress(allResources.elements);
+      for (const [address, box] of dataflowPrimary) {
+        const allBox = allPrimary.get(address);
+        expect(allBox, `${address} primary frame still present`).toBeDefined();
+        expect(allBox!.type, `${address} primary frame type unchanged`).toBe(
+          box.type,
+        );
+        expect(allBox!.x, `${address} primary frame x unchanged`).toBe(box.x);
+        expect(allBox!.width, `${address} primary frame width unchanged`).toBe(
+          box.width,
+        );
+        expect(
+          allBox!.height,
+          `${address} primary frame height unchanged`,
+        ).toBe(box.height);
+        expect(allBox!.angle, `${address} primary frame angle unchanged`).toBe(
+          box.angle,
+        );
+        expect(
+          allBox!.y,
+          `${address} primary frame may only move down for inserted rows`,
+        ).toBeGreaterThanOrEqual(box.y);
+      }
+      expect(
+        allPlace.siblingOverlapViolations,
+        "ancillary bands stay disjoint from normal siblings",
+      ).toBe(0);
+      expect(allResources.diagnostics.collisionCount).toBe(0);
     },
     STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS * 6,
   );

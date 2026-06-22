@@ -10,7 +10,10 @@
  * re-cutting the seam. The full `RcllOptions` knob set is filled in as modules
  * land; M0 needs only the content/detail flags it passes to the fallback.
  */
-import type { PipelineCluster } from "./terraformPipelineLayoutShared";
+import type {
+  AncillaryStrip,
+  PipelineCluster,
+} from "./terraformPipelineLayoutShared";
 import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
 /** Topology nesting role (§6.2). */
@@ -21,7 +24,8 @@ export type RcllTopologyRole =
   | "region"
   | "vpc"
   | "subnetZone"
-  | "primaryCluster";
+  | "primaryCluster"
+  | "ancillaryBand";
 
 /** A node in the compound tree T (§6.2); fields filled progressively in layout. */
 export type CompoundNode = {
@@ -32,6 +36,10 @@ export type CompoundNode = {
   minDescendantSequence: number;
   /** set iff `role === "primaryCluster"`. */
   cluster?: PipelineCluster;
+  /** set iff `role === "ancillaryBand"`. */
+  ancillaryStrip?: AncillaryStrip;
+  /** Width reserved for laying out the ancillary strip. */
+  ancillaryWrapWidth?: number;
   children: CompoundNode[];
   /** local then global box, assigned during layout. */
   box?: { x: number; y: number; width: number; height: number };

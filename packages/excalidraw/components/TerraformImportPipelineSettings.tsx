@@ -302,14 +302,6 @@ const OPTION_HELP: Record<string, OptionHelpEntry> = {
         "staircaseBandOverlap=false: cyclic SCC groups are placed in sequential disjoint Y bands (no rise). Taller than the default.",
     },
   },
-  "resources.allRcll": {
-    title: "Resources · All resources (not in this layout)",
-    body: "The RCLL layout draws its own geometry and does not yet render the unconnected 'Unconnected' resources — it lays out the dataflow only. Switch to the Compound or Classic layout to see all resources, or keep RCLL for the dataflow view. Ancillary support for RCLL is a planned milestone.",
-    dev: {
-      implements:
-        "RCLL model is dataflow-only (no ancillary). The reserved-band design that lifts this (a per-container bottom band placed in the placement engine) is recorded in the RFC as a future milestone; export-phase placement was measured to collide (90/86 on v2), so it needs model-phase space reservation.",
-    },
-  },
   "placement.semantic": {
     title: "Placement · Semantic",
     body: "Two clean-up passes on top of packing: (1) force each account and region into its own distinct horizontal band so regions never interleave vertically (clearer, but taller), and (2) straighten single-occupant lanes by nudging them toward the one resource that feeds them. It never reorders or overlaps boxes.",
@@ -414,11 +406,6 @@ export const TerraformImportPipelineSettings = ({
   // options the V2 builder ignores.
   const isV2 = pipelineLayoutVariant === "v2";
 
-  // RCLL draws its own geometry and does NOT yet render ancillary ("Unconnected")
-  // resources — a documented limitation (the RCLL model is dataflow-only; the
-  // reserved-band design that lifts it is a future milestone, see the RFC). So the
-  // "All resources" option is inert under RCLL. Disable it (rather than letting it
-  // silently no-op) so the control reflects reality and reads as "coming soon".
   // RCLL is the view that hides the Layout-variant control (mirrors the swimlane
   // control's gating); the dialog's `pipelineLayoutVariant` state is NOT "rcll".
   const isRcll = !showVariant;
@@ -509,18 +496,15 @@ export const TerraformImportPipelineSettings = ({
       <div className="TerraformImportModal__segmentedControl">
         {option(
           "Dataflow only",
-          // Under RCLL, ancillary is inert ⇒ the view always behaves as
-          // "Dataflow only", so show it active regardless of stored state.
-          isRcll || !pipelineIncludeAncillary,
+          !pipelineIncludeAncillary,
           "resources.dataflow",
           () => setPipelineIncludeAncillary(false),
         )}
         {option(
           "All resources",
-          !isRcll && pipelineIncludeAncillary,
-          isRcll ? "resources.allRcll" : "resources.all",
+          pipelineIncludeAncillary,
+          "resources.all",
           () => setPipelineIncludeAncillary(true),
-          isRcll,
         )}
       </div>
     </div>
