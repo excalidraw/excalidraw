@@ -6,6 +6,10 @@ import {
   PIPELINE_FRAME_PAD,
 } from "./terraformPipelineLayoutShared";
 import { placementMeta } from "./terraformPipelineRcllPlacement";
+import {
+  isTerraformImportProfilerEnabled,
+  terraformImportProfilerMeasure,
+} from "./terraformImportProfiler";
 
 import type { AncillaryStrip } from "./terraformPipelineLayoutShared";
 import type { CompoundNode, Lattice } from "./terraformPipelineRcllTypes";
@@ -572,86 +576,126 @@ export function allocateRcllAncillarySlackForTesting(
   let accepted: RcllAncillaryAllocation[] = [];
   let simulated = injectAncillaryBandsIntoPlacedTree(baselineTree, strips).tree;
 
-  for (;;) {
-    const currentWraps = wrapWidthMapFromAllocations(accepted);
-    let best:
-      | (RcllAncillaryAllocation & {
-          benefit: number;
-        })
-      | null = null;
+  let greedyIterations = 0;
+  let stripReductionCalls = 0;
+  let treeReinjections = 0;
+  let treeRevalidations = 0;
 
-    for (const strip of strips) {
-      const pathKeys = hostPaths.get(strip.scopeKey);
-      if (!pathKeys) {
-        continue;
-      }
-      const path = pathByKeys(simulated, pathKeys);
-      const host = path?.[path.length - 1];
-      const bb = host ? normalChildrenBBox(host) : null;
-      if (!host?.box || !bb) {
-        continue;
-      }
-      const baselineWrapWidth = Math.max(0, bb.width);
-      const currentWrapWidth =
-        currentWraps.get(strip.scopeKey) ?? baselineWrapWidth;
-      const ceilingRight = recursiveRightSlackCeiling(
-        simulated,
-        pathKeys,
-        baselineRootRight,
-      );
-      const ceilingWrapWidth = Math.max(currentWrapWidth, ceilingRight - bb.x);
-      for (const candidate of stripRowReductionBreakpoints(
-        strip,
-        currentWrapWidth,
-        ceilingWrapWidth,
-      )) {
-        const next: RcllAncillaryAllocation & { benefit: number } = {
-          scopeKey: strip.scopeKey,
-          baselineWrapWidth,
-          wrapWidth: candidate.wrapWidth,
-          allocatedWidthPx: candidate.wrapWidth - baselineWrapWidth,
-          rowSavings: candidate.rowSavings,
-          cardCount: strip.cards.length,
-          benefit: candidate.rowSavings,
-        };
-        if (
-          !best ||
-          next.benefit > best.benefit + 0.5 ||
-          (Math.abs(next.benefit - best.benefit) <= 0.5 &&
-            (next.cardCount > best.cardCount ||
-              (next.cardCount === best.cardCount &&
-                next.scopeKey.localeCompare(best.scopeKey) < 0)))
-        ) {
-          best = next;
+  terraformImportProfilerMeasure("pipeline.rcll.ancillaryInsert.greedy", () => {
+    for (;;) {
+      greedyIterations += 1;
+      const currentWraps = wrapWidthMapFromAllocations(accepted);
+      let best:
+        | (RcllAncillaryAllocation & {
+            benefit: number;
+          })
+        | null = null;
+
+      for (const strip of strips) {
+        const pathKeys = hostPaths.get(strip.scopeKey);
+        if (!pathKeys) {
+          continue;
+        }
+        const path = pathByKeys(simulated, pathKeys);
+        const host = path?.[path.length - 1];
+        const bb = host ? normalChildrenBBox(host) : null;
+        if (!host?.box || !bb) {
+          continue;
+        }
+        const baselineWrapWidth = Math.max(0, bb.width);
+        const currentWrapWidth =
+          currentWraps.get(strip.scopeKey) ?? baselineWrapWidth;
+        const ceilingRight = recursiveRightSlackCeiling(
+          simulated,
+          pathKeys,
+          baselineRootRight,
+        );
+        const ceilingWrapWidth = Math.max(
+          currentWrapWidth,
+          ceilingRight - bb.x,
+        );
+        stripReductionCalls += 1;
+        for (const candidate of terraformImportProfilerMeasure(
+          "pipeline.rcll.ancillaryInsert.stripReduction",
+          () =>
+            stripRowReductionBreakpoints(
+              strip,
+              currentWrapWidth,
+              ceilingWrapWidth,
+            ),
+        )) {
+          const next: RcllAncillaryAllocation & { benefit: number } = {
+            scopeKey: strip.scopeKey,
+            baselineWrapWidth,
+            wrapWidth: candidate.wrapWidth,
+            allocatedWidthPx: candidate.wrapWidth - baselineWrapWidth,
+            rowSavings: candidate.rowSavings,
+            cardCount: strip.cards.length,
+            benefit: candidate.rowSavings,
+          };
+          if (
+            !best ||
+            next.benefit > best.benefit + 0.5 ||
+            (Math.abs(next.benefit - best.benefit) <= 0.5 &&
+              (next.cardCount > best.cardCount ||
+                (next.cardCount === best.cardCount &&
+                  next.scopeKey.localeCompare(best.scopeKey) < 0)))
+          ) {
+            best = next;
+          }
         }
       }
-    }
 
-    if (!best) {
-      break;
+      if (!best) {
+        break;
+      }
+      accepted = [
+        ...accepted.filter((a) => a.scopeKey !== best.scopeKey),
+        {
+          scopeKey: best.scopeKey,
+          baselineWrapWidth: best.baselineWrapWidth,
+          wrapWidth: best.wrapWidth,
+          allocatedWidthPx: best.allocatedWidthPx,
+          rowSavings: best.rowSavings,
+          cardCount: best.cardCount,
+        },
+      ].sort((a, b) => a.scopeKey.localeCompare(b.scopeKey));
+      treeReinjections += 1;
+      simulated = terraformImportProfilerMeasure(
+        "pipeline.rcll.ancillaryInsert.inject",
+        () =>
+          injectAncillaryBandsIntoPlacedTree(
+            baselineTree,
+            strips,
+            wrapWidthMapFromAllocations(accepted),
+          ).tree,
+      );
+      treeRevalidations += 1;
+      if (
+        !terraformImportProfilerMeasure(
+          "pipeline.rcll.ancillaryInsert.validate",
+          () =>
+            validateAncillaryTreeAgainstBaseline(
+              simulated,
+              baselineTree,
+              lattice,
+            ),
+        )
+      ) {
+        accepted = accepted.filter((a) => a.scopeKey !== best.scopeKey);
+        break;
+      }
     }
-    accepted = [
-      ...accepted.filter((a) => a.scopeKey !== best.scopeKey),
-      {
-        scopeKey: best.scopeKey,
-        baselineWrapWidth: best.baselineWrapWidth,
-        wrapWidth: best.wrapWidth,
-        allocatedWidthPx: best.allocatedWidthPx,
-        rowSavings: best.rowSavings,
-        cardCount: best.cardCount,
-      },
-    ].sort((a, b) => a.scopeKey.localeCompare(b.scopeKey));
-    simulated = injectAncillaryBandsIntoPlacedTree(
-      baselineTree,
-      strips,
-      wrapWidthMapFromAllocations(accepted),
-    ).tree;
-    if (
-      !validateAncillaryTreeAgainstBaseline(simulated, baselineTree, lattice)
-    ) {
-      accepted = accepted.filter((a) => a.scopeKey !== best.scopeKey);
-      break;
-    }
+  });
+
+  if (isTerraformImportProfilerEnabled()) {
+    // eslint-disable-next-line no-console -- intentional gated profiling output
+    console.log("[terraform:rcll-instr] allocateRcllAncillarySlack", {
+      greedyIterations,
+      stripReductionCalls,
+      treeReinjections,
+      treeRevalidations,
+    });
   }
 
   return {
@@ -871,14 +915,32 @@ export function buildValidatedAncillaryInsertion(
   );
   let allocations = [...planned.allocations];
   let fallbackDropCount = 0;
+  let fallbackIterations = 0;
+  let fallbackInjections = 0;
+  let fallbackValidations = 0;
   for (;;) {
-    const injected = injectAncillaryBandsIntoPlacedTree(
-      baselineTree,
-      strips,
-      wrapWidthMapFromAllocations(allocations),
+    fallbackIterations += 1;
+    fallbackInjections += 1;
+    const injected = terraformImportProfilerMeasure(
+      "pipeline.rcll.ancillaryInsert.inject",
+      () =>
+        injectAncillaryBandsIntoPlacedTree(
+          baselineTree,
+          strips,
+          wrapWidthMapFromAllocations(allocations),
+        ),
     );
+    fallbackValidations += 1;
     if (
-      validateAncillaryTreeAgainstBaseline(injected.tree, baselineTree, lattice)
+      terraformImportProfilerMeasure(
+        "pipeline.rcll.ancillaryInsert.validate",
+        () =>
+          validateAncillaryTreeAgainstBaseline(
+            injected.tree,
+            baselineTree,
+            lattice,
+          ),
+      )
     ) {
       const allocatorMeta = allocatorMetaFromAllocations(
         allocations,
@@ -891,6 +953,15 @@ export function buildValidatedAncillaryInsertion(
         allocations,
         injected.tree,
       );
+      if (isTerraformImportProfilerEnabled()) {
+        // eslint-disable-next-line no-console -- intentional gated profiling output
+        console.log("[terraform:rcll-instr] buildValidatedAncillaryInsertion", {
+          fallbackIterations,
+          fallbackInjections,
+          fallbackValidations,
+          fallbackDropCount,
+        });
+      }
       return {
         ...injected,
         cardCount:
@@ -901,7 +972,11 @@ export function buildValidatedAncillaryInsertion(
       };
     }
     if (allocations.length === 0) {
-      const baseline = injectAncillaryBandsIntoPlacedTree(baselineTree, strips);
+      fallbackInjections += 1;
+      const baseline = terraformImportProfilerMeasure(
+        "pipeline.rcll.ancillaryInsert.inject",
+        () => injectAncillaryBandsIntoPlacedTree(baselineTree, strips),
+      );
       const allocatorMeta = allocatorMetaFromAllocations([], fallbackDropCount);
       allocatorMeta.diagnostics = diagnoseRcllAncillaryBands(
         baselineTree,
@@ -910,6 +985,15 @@ export function buildValidatedAncillaryInsertion(
         [],
         baseline.tree,
       );
+      if (isTerraformImportProfilerEnabled()) {
+        // eslint-disable-next-line no-console -- intentional gated profiling output
+        console.log("[terraform:rcll-instr] buildValidatedAncillaryInsertion", {
+          fallbackIterations,
+          fallbackInjections,
+          fallbackValidations,
+          fallbackDropCount,
+        });
+      }
       return {
         ...baseline,
         allocatorMeta,

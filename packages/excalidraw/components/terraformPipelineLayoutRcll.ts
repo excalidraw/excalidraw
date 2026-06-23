@@ -40,6 +40,10 @@ import {
   buildRcllModel,
   summarizeRcllModel,
 } from "./terraformPipelineRcllModel";
+import {
+  terraformImportProfilerMeasure,
+  terraformImportProfilerMeasureAsync,
+} from "./terraformImportProfiler";
 
 import type {
   CollapsedPipelineEdge,
@@ -182,7 +186,10 @@ export function runRcllPipeline(
   const stageMeta: Record<string, unknown> = {};
   for (const { name, stage } of stages) {
     try {
-      const result: StageResult = stage(current, lattice, opts);
+      const result: StageResult = terraformImportProfilerMeasure(
+        `pipeline.rcll.stage.${name}`,
+        () => stage(current, lattice, opts),
+      );
       if (!result || !result.tree || !treeBoxesFinite(result.tree)) {
         degraded.push(name);
         continue;
@@ -459,16 +466,25 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   // surfaces as the same HTTP-400 the compound path raises. No try/catch: the
   // model is data-only and degenerate inputs are covered by no-throw tests
   // (a model-build bug should surface loudly, not silently blank the view).
-  const prep = preparePipelineLayout(nodes, plan, compact, {});
-  const { tree, lattice } = buildRcllModel(prep);
+  const prep = terraformImportProfilerMeasure("pipeline.prep", () =>
+    preparePipelineLayout(nodes, plan, compact, {}),
+  );
+  const { tree, lattice } = terraformImportProfilerMeasure(
+    "pipeline.rcll.model",
+    () => buildRcllModel(prep),
+  );
   const ancillaryStrips = includeAncillary
-    ? buildAncillaryStrips(nodes, plan, prep, { compact })
+    ? terraformImportProfilerMeasure("pipeline.rcll.ancillaryStrips", () =>
+        buildAncillaryStrips(nodes, plan, prep, { compact }),
+      )
     : [];
 
   // pipeline: layering (M2 → `localColumn`) then placement (M3a → global `box`).
   // We READ the stage output tree (`laidOutTree`) — placement mutates geometry
   // through it, and scene meta reflects the laid-out model.
-  const baselineRun = runRcllPipeline(stages, tree, lattice, rcllOptions);
+  const baselineRun = terraformImportProfilerMeasure("pipeline.rcll.run", () =>
+    runRcllPipeline(stages, tree, lattice, rcllOptions),
+  );
   let { tree: laidOutTree, ran, degraded, stageMeta } = baselineRun;
   let ancillaryApplied = false;
   let ancillaryStripCount = 0;
@@ -481,10 +497,14 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
     ran.includes("placement") &&
     ancillaryStrips.length > 0
   ) {
-    const injected = buildValidatedAncillaryInsertion(
-      baselineRun.tree,
-      ancillaryStrips,
-      lattice,
+    const injected = terraformImportProfilerMeasure(
+      "pipeline.rcll.ancillaryInsert",
+      () =>
+        buildValidatedAncillaryInsertion(
+          baselineRun.tree,
+          ancillaryStrips,
+          lattice,
+        ),
     );
     ancillaryApplied = injected.applied;
     ancillaryStripCount = injected.stripCount;
@@ -513,11 +533,15 @@ export async function buildTerraformPipelineRcllExcalidrawScene(
   let warnings: TerraformImportWarning[];
   let backEdgesStyled = 0;
   if (placed) {
-    const built = await buildSceneFromBoxedTree(
-      laidOutTree,
-      prep,
-      nodes,
-      rcllOptions.deBandLevel ?? "none",
+    const built = await terraformImportProfilerMeasureAsync(
+      "pipeline.rcll.scene",
+      () =>
+        buildSceneFromBoxedTree(
+          laidOutTree,
+          prep,
+          nodes,
+          rcllOptions.deBandLevel ?? "none",
+        ),
     );
     elements = built.elements;
     backEdgesStyled = built.backEdgesStyled;

@@ -33,6 +33,12 @@ import {
 } from "./terraformTopologyLayout";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
 import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
+import {
+  isTerraformImportProfilerEnabled,
+  terraformImportProfilerMeasure,
+} from "./terraformImportProfiler";
+
+import { withTerraformPlanNodeKeyIndex } from "./terraformPlanParsing";
 
 import type {
   TerraformPlanGraphNode,
@@ -989,8 +995,17 @@ export function preparePipelineLayout(
     );
   }
 
-  const satelliteOwners = buildSatelliteOwnerMap(nodes, plan);
-  const placementByAddress = buildPlacementMap(nodes, plan);
+  const { satelliteOwners, placementByAddress } =
+    withTerraformPlanNodeKeyIndex(nodes, () => ({
+      satelliteOwners: terraformImportProfilerMeasure(
+        "pipeline.prep.satelliteBundles",
+        () => buildSatelliteOwnerMap(nodes, plan),
+      ),
+      placementByAddress: terraformImportProfilerMeasure(
+        "pipeline.prep.resourceRects",
+        () => buildPlacementMap(nodes, plan),
+      ),
+    }));
   const firstSequence = new Map<string, number>();
   const collapsedEdges: CollapsedPipelineEdge[] = [];
   for (const edge of [...declared].sort((a, b) => a.sequence - b.sequence)) {
@@ -1021,45 +1036,58 @@ export function preparePipelineLayout(
   );
   const depthResult = computeDepths(collapsedEdges, clusterIds);
 
-  const clusters: PipelineCluster[] = clusterIds.map((address) => {
-    const placement = placementByAddress.get(address) ?? {
-      providerFamily: providerFamilyForType(resourceTypeFor(nodes, address)),
-      accountId: "unknown-account",
-      region: "unknown-region",
-      vpcId: null,
-    };
-    const clusterPlacement = {
-      accountId: placement.accountId,
-      region: placement.region,
-      vpcId: placement.vpcId,
-      subnetTier: placement.subnetTier,
-      subnetSignature: placement.subnetSignature,
-    };
-    let build = compact
-      ? buildCompactPipelinePrimaryCluster(
-          address,
-          nodes,
-          plan,
-          clusterPlacement,
-        )
-      : buildTopologyPrimaryClusterSkeletonForPipeline(
-          address,
-          nodes,
-          plan,
-          clusterPlacement,
-        );
-    if (build.skeleton.length === 0 || build.width <= 0 || build.height <= 0) {
-      build = buildFallbackCluster(address, nodes, plan, placement);
-    }
-    return {
-      id: address,
-      primaryAddress: address,
-      firstSequence: firstSequence.get(address) ?? 0,
-      depth: depthResult.depths.get(address) ?? 0,
-      placement,
-      build,
-    };
-  });
+  let clusterBuilderCalls = 0;
+  const clusters: PipelineCluster[] = terraformImportProfilerMeasure(
+    "pipeline.prep.materialize",
+    () =>
+      clusterIds.map((address) => {
+        const placement = placementByAddress.get(address) ?? {
+          providerFamily: providerFamilyForType(
+            resourceTypeFor(nodes, address),
+          ),
+          accountId: "unknown-account",
+          region: "unknown-region",
+          vpcId: null,
+        };
+        const clusterPlacement = {
+          accountId: placement.accountId,
+          region: placement.region,
+          vpcId: placement.vpcId,
+          subnetTier: placement.subnetTier,
+          subnetSignature: placement.subnetSignature,
+        };
+        clusterBuilderCalls += 1;
+        let build = compact
+          ? buildCompactPipelinePrimaryCluster(
+              address,
+              nodes,
+              plan,
+              clusterPlacement,
+            )
+          : buildTopologyPrimaryClusterSkeletonForPipeline(
+              address,
+              nodes,
+              plan,
+              clusterPlacement,
+            );
+        if (
+          build.skeleton.length === 0 ||
+          build.width <= 0 ||
+          build.height <= 0
+        ) {
+          clusterBuilderCalls += 1;
+          build = buildFallbackCluster(address, nodes, plan, placement);
+        }
+        return {
+          id: address,
+          primaryAddress: address,
+          firstSequence: firstSequence.get(address) ?? 0,
+          depth: depthResult.depths.get(address) ?? 0,
+          placement,
+          build,
+        };
+      }),
+  );
 
   // Phase A (experimental): re-assign columns with a per-column height budget so
   // tall TFD columns spill deeper and the scene reads wider/flatter. Needs the
@@ -1086,6 +1114,15 @@ export function preparePipelineLayout(
 
   const maxDepth = Math.max(0, ...clusters.map((c) => c.depth));
   const columnX = computeGlobalColumnX(clusters, maxDepth);
+
+  if (isTerraformImportProfilerEnabled()) {
+    // eslint-disable-next-line no-console -- intentional gated profiling output
+    console.log("[terraform:rcll-instr] preparePipelineLayout", {
+      clusterCount: clusters.length,
+      satelliteCardCount: satelliteOwners.size,
+      clusterBuilderCalls,
+    });
+  }
 
   return {
     clusters,

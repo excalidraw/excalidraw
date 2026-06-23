@@ -43,6 +43,10 @@ import {
   segmentsCross,
   type Seg,
 } from "./terraformPipelineCollisionDiagnostics";
+import {
+  isTerraformImportProfilerEnabled,
+  terraformImportProfilerMeasure,
+} from "./terraformImportProfiler";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type { CompoundNode } from "./terraformPipelineRcllTypes";
@@ -119,29 +123,31 @@ export function countPlacedCrossings(
   boxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
   edges: readonly CrossingEdge[],
 ): number {
-  const segs: Seg[] = [];
-  for (const [u, v] of edges) {
-    const bu = boxes.get(u);
-    const bv = boxes.get(v);
-    if (!bu || !bv) {
-      continue;
+  return terraformImportProfilerMeasure("pipeline.rcll.crossingMin.count", () => {
+    const segs: Seg[] = [];
+    for (const [u, v] of edges) {
+      const bu = boxes.get(u);
+      const bv = boxes.get(v);
+      if (!bu || !bv) {
+        continue;
+      }
+      segs.push({
+        x1: centerX(bu),
+        y1: centerY(bu),
+        x2: centerX(bv),
+        y2: centerY(bv),
+      });
     }
-    segs.push({
-      x1: centerX(bu),
-      y1: centerY(bu),
-      x2: centerX(bv),
-      y2: centerY(bv),
-    });
-  }
-  let crossings = 0;
-  for (let i = 0; i < segs.length; i++) {
-    for (let j = i + 1; j < segs.length; j++) {
-      if (segmentsCross(segs[i]!, segs[j]!)) {
-        crossings += 1;
+    let crossings = 0;
+    for (let i = 0; i < segs.length; i++) {
+      for (let j = i + 1; j < segs.length; j++) {
+        if (segmentsCross(segs[i]!, segs[j]!)) {
+          crossings += 1;
+        }
       }
     }
-  }
-  return crossings;
+    return crossings;
+  });
 }
 
 /** Collapsed cluster edges from the lattice fan-out adjacency (self-loops dropped). */
@@ -317,12 +323,14 @@ export function minimizeCrossings(
   const baseMetrics = metrics(best);
   let evals = 1;
   let evalCapReached = false;
+  let sweepsRun = 0;
 
   for (let s = 0; s < sweeps; s++) {
     if (evals >= evalBudget) {
       evalCapReached = true;
       break;
     }
+    sweepsRun += 1;
     const override = barycenterOrder(best, edges);
     const trial = place(override);
     evals += 1;
@@ -339,6 +347,16 @@ export function minimizeCrossings(
       // Hill-climb: first non-improving (or unsafe) sweep ends the search.
       break;
     }
+  }
+
+  if (isTerraformImportProfilerEnabled()) {
+    // eslint-disable-next-line no-console -- gated instrumentation counter
+    console.log("[terraform:rcll-instr] crossingMin", {
+      sweepsRun,
+      evalsRun: evals,
+      sweepBudget: sweeps,
+      evalBudget,
+    });
   }
 
   const finalMetrics = metrics(best);
