@@ -30,6 +30,7 @@
     "changeBackground": "Change background color",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
+    "strokeWidthCustom": "Custom stroke width",
     "strokeStyle": "Stroke style",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Dashed",

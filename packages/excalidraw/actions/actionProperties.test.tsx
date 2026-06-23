@@ -1,4 +1,4 @@
-import { queryByTestId } from "@testing-library/react";
+import { fireEvent, queryByTestId } from "@testing-library/react";
 
 import {
   COLOR_PALETTE,
@@ -11,6 +11,8 @@ import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
 import { render } from "../tests/test-utils";
+
+const { h } = window;
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -150,6 +152,67 @@ describe("element locking", () => {
       expect(
         queryByTestId(document.body, `strokeWidth-extraBold`),
       ).not.toBeChecked();
+    });
+
+    it("should commit a custom stroke width through the numeric input", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        strokeWidth: STROKE_WIDTH.thin,
+      });
+      API.setElements([rect]);
+      API.setSelectedElements([rect]);
+
+      const input = queryByTestId(
+        document.body,
+        "strokeWidth-custom",
+      ) as HTMLInputElement;
+      expect(input).not.toBe(null);
+
+      fireEvent.change(input, { target: { value: "3.5" } });
+      fireEvent.blur(input);
+
+      expect(h.elements[0].strokeWidth).toBe(3.5);
+      expect(h.state.currentItemStrokeWidth).toBe(3.5);
+    });
+
+    it("should clamp out-of-range stroke width values", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        strokeWidth: STROKE_WIDTH.thin,
+      });
+      API.setElements([rect]);
+      API.setSelectedElements([rect]);
+
+      const input = queryByTestId(
+        document.body,
+        "strokeWidth-custom",
+      ) as HTMLInputElement;
+
+      fireEvent.change(input, { target: { value: "999" } });
+      fireEvent.blur(input);
+      expect(h.elements[0].strokeWidth).toBe(32);
+
+      fireEvent.change(input, { target: { value: "0" } });
+      fireEvent.blur(input);
+      expect(h.elements[0].strokeWidth).toBe(0.5);
+    });
+
+    it("should ignore non-numeric input and restore prior value", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        strokeWidth: STROKE_WIDTH.bold,
+      });
+      API.setElements([rect]);
+      API.setSelectedElements([rect]);
+
+      const input = queryByTestId(
+        document.body,
+        "strokeWidth-custom",
+      ) as HTMLInputElement;
+
+      fireEvent.change(input, { target: { value: "abc" } });
+      fireEvent.blur(input);
+      expect(h.elements[0].strokeWidth).toBe(STROKE_WIDTH.bold);
     });
 
     it("should show properties of different element types when selected", () => {
