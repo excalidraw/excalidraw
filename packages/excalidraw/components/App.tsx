@@ -209,7 +209,6 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
   ShapeCache,
-  FreedrawLaserPointerCache,
   getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
@@ -3424,14 +3423,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (hasFollowedPersonLeft) {
       this.maybeUnfollowRemoteUser();
-    }
-
-    if (prevState.collaborators.size !== this.state.collaborators.size) {
-      // size the in-progress freedraw cache to the strokes that can be drawn
-      // concurrently (local + collaborators)
-      FreedrawLaserPointerCache.setCapacityForCollaborators(
-        this.state.collaborators.size,
-      );
     }
 
     if (

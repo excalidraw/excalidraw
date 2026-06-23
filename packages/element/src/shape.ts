@@ -1228,44 +1228,6 @@ const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });
 
-type LaserPointerCacheEntry = {
-  strokeWidth: number;
-  fedCount: number;
-  lastFedPoint: LocalPoint | undefined;
-  laserPointer: LaserPointer;
-};
-
-/**
- * Bounded LRU cache of in-progress `LaserPointer` instances, so we
- * don't recreate them during drawing at every frame.
- */
-export class FreedrawLaserPointerCache {
-  private static capacity = 1;
-  private static cache = new Map<string, LaserPointerCacheEntry>();
-
-  static get = (id: string) => FreedrawLaserPointerCache.cache.get(id);
-
-  static set = (id: string, entry: LaserPointerCacheEntry) => {
-    FreedrawLaserPointerCache.cache.delete(id);
-    FreedrawLaserPointerCache.cache.set(id, entry);
-    while (
-      FreedrawLaserPointerCache.cache.size > FreedrawLaserPointerCache.capacity
-    ) {
-      FreedrawLaserPointerCache.cache.delete(
-        FreedrawLaserPointerCache.cache.keys().next().value!,
-      );
-    }
-  };
-
-  static setCapacityForCollaborators = (collaboratorCount: number) => {
-    const capacity = Math.max(1, collaboratorCount + 1);
-    if (capacity !== FreedrawLaserPointerCache.capacity) {
-      FreedrawLaserPointerCache.capacity = capacity;
-      FreedrawLaserPointerCache.cache = new Map();
-    }
-  };
-}
-
 /**
  * Uniform (constant width) freedraw outline, rendered with the laser-pointer
  * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
@@ -1273,42 +1235,10 @@ export class FreedrawLaserPointerCache {
 const getConstantWidthFreedrawOutline = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] => {
-  const { points } = element;
+  const laserPointer = createLaserPointer(element);
+  element.points.map(([x, y]) => laserPointer.addPoint([x, y, 1]));
 
-  if (points.length === 0) {
-    const laserPointer = createLaserPointer(element);
-    laserPointer.addPoint([0, 0, 1]);
-    return laserPointer
-      .getStrokeOutline()
-      .map(([x, y]) => [x, y] as [number, number]);
-  }
-
-  let cached = FreedrawLaserPointerCache.get(element.id);
-
-  const canAppend =
-    cached !== undefined &&
-    cached.strokeWidth === element.strokeWidth &&
-    points.length >= cached.fedCount &&
-    cached.lastFedPoint === points[cached.fedCount - 1];
-
-  if (!cached || !canAppend) {
-    cached = {
-      strokeWidth: element.strokeWidth,
-      fedCount: 0,
-      lastFedPoint: undefined,
-      laserPointer: createLaserPointer(element),
-    };
-  }
-
-  for (let i = cached.fedCount; i < points.length; i++) {
-    cached.laserPointer.addPoint([points[i][0], points[i][1], 1]);
-  }
-  cached.fedCount = points.length;
-  cached.lastFedPoint = points[points.length - 1];
-
-  FreedrawLaserPointerCache.set(element.id, cached);
-
-  return cached.laserPointer
+  return laserPointer
     .getStrokeOutline()
     .map(([x, y]) => [x, y] as [number, number]);
 };
