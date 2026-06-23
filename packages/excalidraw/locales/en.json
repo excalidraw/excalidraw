@@ -352,7 +352,8 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "Shapes",
+    "Properties": "Properties"
   },
   "hints": {
     "dismissSearch": "{{shortcut}} to dismiss search",

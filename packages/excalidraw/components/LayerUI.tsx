@@ -164,23 +164,106 @@ const LayerUI = ({
   const isCompactStylesPanel = stylesPanelMode === "compact";
   const tunnels = useInitializeTunnels();
 
+  const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = React.useState(false);
+  const dragStartRef = React.useRef({ x: 0, y: 0 });
+  const offsetStartRef = React.useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling to the canvas to block unintended panning or drawing!
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    offsetStartRef.current = { ...dragOffset };
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      moveEvent.stopPropagation();
+      const dx = moveEvent.clientX - dragStartRef.current.x;
+      const dy = moveEvent.clientY - dragStartRef.current.y;
+
+      const newX = offsetStartRef.current.x + dx;
+      const newY = offsetStartRef.current.y + dy;
+
+      // Prevent dragging completely off screen (limit to 85% of screen dimensions)
+      const maxLimitX = window.innerWidth * 0.85;
+      const maxLimitY = window.innerHeight * 0.85;
+
+      setDragOffset({
+        x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
+        y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
+      });
+    };
+
+    const handleMouseUp = (moveEvent: MouseEvent) => {
+      moveEvent.stopPropagation();
+      setIsDragging(false);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation(); // Prevent touch event bubbling to canvas
+    const touch = e.touches[0];
+    setIsDragging(true);
+    dragStartRef.current = { x: touch.clientX, y: touch.clientY };
+    offsetStartRef.current = { ...dragOffset };
+
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      moveEvent.stopPropagation();
+      const touchMove = moveEvent.touches[0];
+      const dx = touchMove.clientX - dragStartRef.current.x;
+      const dy = touchMove.clientY - dragStartRef.current.y;
+
+      const newX = offsetStartRef.current.x + dx;
+      const newY = offsetStartRef.current.y + dy;
+
+      // Prevent dragging completely off screen (limit to 85% of screen dimensions)
+      const maxLimitX = window.innerWidth * 0.85;
+      const maxLimitY = window.innerHeight * 0.85;
+
+      setDragOffset({
+        x: Math.max(-maxLimitX, Math.min(maxLimitX, newX)),
+        y: Math.max(-maxLimitY, Math.min(maxLimitY, newY)),
+      });
+    };
+
+    const handleTouchEnd = (moveEvent: TouchEvent) => {
+      moveEvent.stopPropagation();
+      setIsDragging(false);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
+  };
+
+  const handleDoubleClick = () => {
+    setDragOffset({ x: 0, y: 0 });
+  };
+
   const spacing = isCompactStylesPanel
     ? {
-        menuTopGap: 4,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 0.5,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      }
+      menuTopGap: 4,
+      toolbarColGap: 4,
+      toolbarRowGap: 1,
+      toolbarInnerRowGap: 0.5,
+      islandPadding: 1,
+      collabMarginLeft: 8,
+    }
     : {
-        menuTopGap: 6,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 1,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      };
+      menuTopGap: 6,
+      toolbarColGap: 4,
+      toolbarRowGap: 1,
+      toolbarInnerRowGap: 1,
+      islandPadding: 1,
+      collabMarginLeft: 8,
+    };
 
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
@@ -239,7 +322,7 @@ const LayerUI = ({
 
     return (
       <Section
-        heading="selectedShapeActions"
+        heading="Properties"
         className={clsx("selected-shape-actions zen-mode-transition", {
           "transition-left": appState.zenModeEnabled,
         })}
@@ -254,6 +337,58 @@ const LayerUI = ({
               maxHeight: `${appState.height - 166}px`,
             }}
           >
+            <div
+              className="selected-shape-actions-drag-handle-sticky-container"
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 100,
+                backgroundColor: "transparent",
+                padding: "8px 0 4px 0",
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "8px",
+                borderTopLeftRadius: "8px",
+                borderTopRightRadius: "8px",
+              }}
+            >
+              <div
+                className="selected-shape-actions-drag-handle compact"
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouchStart}
+                onDoubleClick={handleDoubleClick}
+                title={`Properties (Drag to move, Double click to reset)`}
+                style={{
+                  width: "80%",
+                  height: "22px",
+                  borderRadius: "11px",
+                  backgroundColor: appState.theme === "dark" ? "#e0dfff" : "#403e6a",
+                  border: "none",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: isDragging ? "grabbing" : "grab",
+                  userSelect: "none",
+                  color: appState.theme === "dark" ? "#ebdfff" : "#0d006a",
+                  opacity: 0.9,
+                }}
+              >
+                <svg
+                  width="14"
+                  height="8"
+                  viewBox="0 0 16 8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ opacity: 0.6 }}
+                >
+                  <line x1="2" y1="2" x2="14" y2="2" />
+                  <line x1="2" y1="6" x2="14" y2="6" />
+                </svg>
+              </div>
+            </div>
             <CompactShapeActions
               appState={appState}
               elementsMap={app.scene.getNonDeletedElementsMap()}
@@ -272,6 +407,98 @@ const LayerUI = ({
               maxHeight: `${appState.height - 166}px`,
             }}
           >
+            <div
+              className="selected-shape-actions-drag-handle-sticky-container"
+              style={{
+                position: "sticky",
+                top: "-12px",
+                zIndex: 100,
+                backgroundColor: "transparent",
+                margin: "-12px -12px 8px -12px",
+                padding: "10px 12px 6px 12px",
+                borderTopLeftRadius: "8px",
+                borderTopRightRadius: "8px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                className="selected-shape-actions-drag-handle"
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouchStart}
+                onDoubleClick={handleDoubleClick}
+                title={`Properties (Drag to move, Double click to reset)`}
+                style={{
+                  width: "90%",
+                  borderRadius: "18px",
+                  backgroundColor: appState.theme === "dark" ? "#403e6a" : "#e0dfff",
+                  border: "none",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "6px 14px",
+                  cursor: isDragging ? "grabbing" : "grab",
+                  userSelect: "none",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  color: appState.theme === "dark" ? "#ebdfff" : "#0d006a",
+                  opacity: 0.95,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ opacity: 0.9 }}
+                  >
+                    <line x1="4" y1="21" x2="4" y2="14" />
+                    <line x1="4" y1="10" x2="4" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12" y2="3" />
+                    <line x1="20" y1="21" x2="20" y2="16" />
+                    <line x1="20" y1="12" x2="20" y2="3" />
+                    <line x1="2" y1="14" x2="6" y2="14" />
+                    <line x1="10" y1="8" x2="14" y2="8" />
+                    <line x1="18" y1="16" x2="22" y2="16" />
+                  </svg>
+                  <span>{t("headings.Properties") || "Properties"}</span>
+                </div>
+
+                {(dragOffset.x !== 0 || dragOffset.y !== 0) && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDoubleClick();
+                    }}
+                    style={{
+                      all: "unset",
+                      cursor: "pointer",
+                      fontSize: "9px",
+                      fontWeight: 700,
+                      opacity: 0.7,
+                      padding: "1px 6px",
+                      borderRadius: "10px",
+                      background: appState.theme === "dark" ? "rgba(255,255,255,0.12)" : "rgba(13, 0, 106, 0.08)",
+                      color: "inherit",
+                      transition: "opacity 0.2s",
+                    }}
+                    title="Reset position"
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
             <SelectedShapeActions
               appState={appState}
               elementsMap={app.scene.getNonDeletedElementsMap()}
@@ -308,7 +535,14 @@ const LayerUI = ({
               className={clsx("selected-shape-actions-container", {
                 "selected-shape-actions-container--compact":
                   isCompactStylesPanel,
+                "selected-shape-actions-container--dragging": isDragging,
               })}
+              style={{
+                transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+                transition: isDragging ? "none" : "transform 0.15s cubic-bezier(0.1, 0.8, 0.25, 1)",
+                zIndex: 100,
+                position: "relative",
+              }}
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </div>
@@ -441,8 +675,7 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${
-              editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+            `(${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
             })`,
           );
         }}
@@ -471,8 +704,7 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${
-                editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+              `button (${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
               })`,
             );
           }
@@ -511,8 +743,8 @@ const LayerUI = ({
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
                 });
                 ShapeCache.delete(element);
               }
@@ -592,8 +824,8 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
-              isSidebarDocked &&
-              editorInterface.canFitSidebar
+                isSidebarDocked &&
+                editorInterface.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
