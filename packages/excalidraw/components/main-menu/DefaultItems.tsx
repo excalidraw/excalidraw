@@ -7,6 +7,7 @@ import type { Theme } from "@excalidraw/element/types";
 import {
   actionClearCanvas,
   actionLoadScene,
+  actionResetWorkspaceLayout,
   actionSaveToActiveFile,
   actionShortcuts,
   actionToggleArrowBinding,
@@ -16,6 +17,7 @@ import {
   actionToggleSearchMenu,
   actionToggleStats,
   actionToggleTheme,
+  actionToggleWorkspaceLayoutEdit,
   actionToggleZenMode,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
@@ -598,6 +600,51 @@ const PreferencesToggleElementPropertiesItem = () => {
   );
 };
 
+export const PreferencesToggleWorkspaceLayoutEditItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+
+  if (!actionManager.isActionEnabled(actionToggleWorkspaceLayoutEdit)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.workspaceLayout.editing}
+      data-testid="toggle-workspace-layout-edit"
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleWorkspaceLayoutEdit);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.workspaceLayoutEdit")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const PreferencesResetWorkspaceLayoutItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionResetWorkspaceLayout)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      icon={emptyIcon}
+      data-testid="reset-workspace-layout"
+      onSelect={() => {
+        actionManager.executeAction(actionResetWorkspaceLayout);
+      }}
+      aria-label={t("labels.workspaceLayoutReset")}
+    >
+      {t("labels.workspaceLayoutReset")}
+    </DropdownMenuItem>
+  );
+};
+
 export const Preferences = ({
   children,
   additionalItems,
@@ -623,6 +670,8 @@ export const Preferences = ({
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
+            <PreferencesToggleWorkspaceLayoutEditItem />
+            <PreferencesResetWorkspaceLayoutItem />
           </>
         )}
         {additionalItems}
@@ -640,5 +689,8 @@ Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
 Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
+Preferences.ToggleWorkspaceLayoutEdit =
+  PreferencesToggleWorkspaceLayoutEditItem;
+Preferences.ResetWorkspaceLayout = PreferencesResetWorkspaceLayoutItem;
 
 Preferences.displayName = "Preferences";

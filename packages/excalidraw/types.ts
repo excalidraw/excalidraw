@@ -56,6 +56,7 @@ import type App from "./components/App";
 import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
+import type { WorkspaceLayout } from "./workspaceLayout";
 import type { ImportedDataState } from "./data/types";
 
 import type { Language } from "./i18n";
@@ -482,6 +483,8 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** customizable workspace layout (position/visibility/lock of UI zones) */
+  workspaceLayout: WorkspaceLayout;
 }
 
 export type SearchMatch = {

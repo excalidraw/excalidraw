@@ -1,0 +1,166 @@
+.excalidraw {
+  .workspace-zone {
+    position: relative;
+    display: flex;
+
+    &--editing {
+      outline: 1px dashed var(--color-primary);
+      outline-offset: 3px;
+      border-radius: var(--border-radius-lg);
+    }
+
+    &--editing.workspace-zone--locked {
+      outline-style: solid;
+      outline-color: var(--default-border-color);
+    }
+
+    // outside edit mode, unlocked zones are dragged by grabbing any
+    // non-interactive area; interactive children keep their own cursor
+    &--quick-draggable {
+      cursor: grab;
+    }
+
+    &--dragging {
+      cursor: grabbing;
+      user-select: none;
+    }
+
+    &--ghost
+      > *:not(.workspace-zone__controls):not(.workspace-zone__resize-handle) {
+      opacity: 0.4;
+      pointer-events: none !important;
+    }
+
+    // let the wrapper hug the (normally absolutely-positioned) properties
+    // panel island so the outline/handles match its bounds in every mode
+    &--zone-propertiesPanel {
+      .App-menu__left,
+      .compact-shape-actions-island {
+        position: static;
+      }
+    }
+
+    &--has-height {
+      .App-menu__left,
+      .compact-shape-actions-island {
+        max-height: var(--workspace-zone-height) !important;
+      }
+    }
+
+    &__controls {
+      position: absolute;
+      display: flex;
+      gap: 2px;
+      padding: 2px;
+      background-color: var(--island-bg-color);
+      border: 1px solid var(--default-border-color);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-island);
+      z-index: 10;
+      pointer-events: var(--ui-pointerEvents);
+
+      &--above {
+        bottom: calc(100% + 6px);
+      }
+
+      &--below {
+        top: calc(100% + 6px);
+      }
+
+      &--align-start {
+        left: 0;
+      }
+
+      &--align-end {
+        right: 0;
+      }
+
+      &--right {
+        top: 0;
+        bottom: auto;
+        left: calc(100% + 6px);
+        right: auto;
+      }
+    }
+
+    &__control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0.25rem;
+      border: none;
+      border-radius: var(--border-radius-md);
+      background-color: transparent;
+      color: var(--text-primary-color);
+      cursor: pointer;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      &:hover:not(:disabled) {
+        background-color: var(--button-hover-bg);
+      }
+
+      &:active:not(:disabled) {
+        background-color: var(--button-hover-bg);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      &--drag {
+        cursor: grab;
+        touch-action: none;
+
+        &:active:not(:disabled) {
+          cursor: grabbing;
+        }
+      }
+    }
+
+    &__resize-handle {
+      position: absolute;
+      left: 15%;
+      right: 15%;
+      bottom: -4px;
+      height: 7px;
+      border-radius: 4px;
+      background-color: var(--color-primary);
+      opacity: 0.5;
+      cursor: ns-resize;
+      touch-action: none;
+      z-index: 10;
+      pointer-events: var(--ui-pointerEvents);
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &--quick {
+        opacity: 0.2;
+        transition: opacity 0.15s ease-in-out;
+
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+    }
+
+    &__placeholder {
+      width: 12.5rem;
+      box-sizing: border-box;
+      color: var(--color-gray-50);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 4rem;
+    }
+  }
+}

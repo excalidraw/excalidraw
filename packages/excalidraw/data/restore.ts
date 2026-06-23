@@ -83,6 +83,11 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
+import {
+  getDefaultWorkspaceLayout,
+  isWorkspaceLayoutValid,
+} from "../workspaceLayout";
+
 import type {
   AppState,
   BinaryFiles,
@@ -1094,6 +1099,13 @@ export const restoreAppState = (
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
     editingFrame: null,
+    workspaceLayout: {
+      ...(isWorkspaceLayoutValid(nextAppState.workspaceLayout)
+        ? nextAppState.workspaceLayout
+        : getDefaultWorkspaceLayout()),
+      // edit mode is transient and shouldn't survive a reload
+      editing: false,
+    },
   };
 };
 

@@ -372,6 +372,8 @@ function CommandPaletteInner({
         actionManager.actions.zenMode,
         actionManager.actions.viewMode,
         actionManager.actions.gridMode,
+        actionManager.actions.toggleWorkspaceLayoutEdit,
+        actionManager.actions.resetWorkspaceLayout,
         actionManager.actions.objectsSnapMode,
         actionManager.actions.toggleShortcuts,
         actionManager.actions.selectAll,

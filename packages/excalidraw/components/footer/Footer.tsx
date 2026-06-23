@@ -6,6 +6,7 @@ import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
+import { WorkspaceZone } from "../WorkspaceZone/WorkspaceZone";
 
 import type { ActionManager } from "../../actions/manager";
 import type { UIAppState } from "../../types";
@@ -36,19 +37,23 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            <ZoomActions
-              renderAction={actionManager.renderAction}
-              zoom={appState.zoom}
-            />
+            <WorkspaceZone zoneId="zoom" controlsPlacement="above">
+              <ZoomActions
+                renderAction={actionManager.renderAction}
+                zoom={appState.zoom}
+              />
+            </WorkspaceZone>
 
             {!appState.viewModeEnabled && (
-              <UndoRedoActions
-                renderAction={actionManager.renderAction}
-                className={clsx("zen-mode-transition", {
-                  "layer-ui__wrapper__footer-left--transition-bottom":
-                    appState.zenModeEnabled,
-                })}
-              />
+              <WorkspaceZone zoneId="undoRedo" controlsPlacement="above">
+                <UndoRedoActions
+                  renderAction={actionManager.renderAction}
+                  className={clsx("zen-mode-transition", {
+                    "layer-ui__wrapper__footer-left--transition-bottom":
+                      appState.zenModeEnabled,
+                  })}
+                />
+              </WorkspaceZone>
             )}
           </Section>
         </Stack.Col>
