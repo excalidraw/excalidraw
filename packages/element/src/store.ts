@@ -365,7 +365,7 @@ export class Store {
         case CaptureUpdateAction.IMMEDIATELY:
           this.emitDurableIncrement(nextSnapshot, change, delta);
           break;
-        // both never and eventually emit an ephemeral increment
+        // never and eventually emit an ephemeral increment
         case CaptureUpdateAction.NEVER:
         case CaptureUpdateAction.EVENTUALLY:
           this.emitEphemeralIncrement(nextSnapshot, change);
@@ -376,7 +376,7 @@ export class Store {
     } finally {
       // update the snapshot no-matter what, as it would mess up with the next action
       switch (action) {
-        // both immediately and never update the snapshot, unlike eventually
+        // immediately, never, and broadcast update the snapshot, unlike eventually
         case CaptureUpdateAction.IMMEDIATELY:
         case CaptureUpdateAction.NEVER:
           this.snapshot = nextSnapshot;

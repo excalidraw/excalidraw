@@ -1016,6 +1016,7 @@ export interface ExcalidrawImperativeAPI {
   ) => UnsubscribeCallback;
   onStateChange: InstanceType<typeof App>["onStateChange"];
   onEvent: InstanceType<typeof App>["onEvent"];
+  transactionManager: InstanceType<typeof App>["transactionManager"];
 }
 
 export type FrameNameBounds = {

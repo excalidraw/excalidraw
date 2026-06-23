@@ -454,6 +454,7 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
+import { TransactionManager } from "../transaction";
 
 import { findShapeByKey } from "./shapes";
 
@@ -640,8 +641,9 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: Store;
-  private history: History;
+  public store: Store;
+  public history: History;
+  public transactionManager: TransactionManager;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
@@ -782,6 +784,7 @@ class App extends React.Component<AppProps, AppState> {
       onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       onStateChange: this.onStateChange,
       onEvent: this.onEvent,
+      transactionManager: this.transactionManager,
     };
     return api;
   }
@@ -833,6 +836,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store = new Store(this);
     this.history = new History(this.store);
+    this.transactionManager = new TransactionManager(this);
 
     this.excalidrawContainerValue = {
       container: this.excalidrawContainerRef.current,
@@ -3134,7 +3138,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.onDurableIncrementEmitter.on((increment) => {
-      this.history.record(increment.delta);
+      // this.history.record(increment.delta);
     });
 
     // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation
@@ -3545,6 +3549,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.commit(elementsMap, this.state);
+    this.transactionManager.default.update({
+      elements: elementsMap,
+      appState: this.state,
+    });
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -7653,6 +7661,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.transactionManager.createDefault();
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
@@ -11518,7 +11527,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedElementIds,
         )
       ) {
-        this.store.scheduleCapture();
+        this.transactionManager.default.commit();
+        // this.store.scheduleCapture();
       }
 
       if (
