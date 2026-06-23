@@ -111,7 +111,8 @@ export const Popover = ({
         container.style.width = `${viewportWidth}px`;
         container.style.left = "0px";
         container.style.overflowX = "scroll";
-      } else if (left + width - offsetLeft > viewportWidth) {
+      } else if (left + width > viewportWidth) {
+        // offsetLeft is already deducted in App.tsx (12290), so we don't need to deduct it again here
         container.style.left = `${viewportWidth - width - 10}px`;
       } else {
         container.style.left = `${left}px`;
@@ -121,8 +122,10 @@ export const Popover = ({
         container.style.height = `${viewportHeight - 20}px`;
         container.style.top = "10px";
         container.style.overflowY = "scroll";
-      } else if (top + height - offsetTop > viewportHeight) {
-        container.style.top = `${viewportHeight - height}px`;
+      } else if (top + height > viewportHeight) {
+        // same for offsetTop, we don't need to deduct it again here
+        container.style.bottom = `${viewportHeight - top}px`;
+        // bottom is used instead because the popover is overflowing the bottom of the viewport
       } else {
         container.style.top = `${top}px`;
       }
