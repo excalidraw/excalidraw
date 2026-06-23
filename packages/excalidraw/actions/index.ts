@@ -74,6 +74,7 @@ export {
   actionCut,
   actionCopyAsPng,
   actionCopyAsSvg,
+  actionCopyAsMermaid,
   copyText,
 } from "./actionClipboard";
 

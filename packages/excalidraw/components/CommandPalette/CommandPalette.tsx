@@ -385,6 +385,7 @@ function CommandPaletteInner({
         actionManager.actions.saveFileToDisk,
         actionManager.actions.copyAsPng,
         actionManager.actions.copyAsSvg,
+        actionManager.actions.copyAsMermaid,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.export));
 
       commandsFromActions = [

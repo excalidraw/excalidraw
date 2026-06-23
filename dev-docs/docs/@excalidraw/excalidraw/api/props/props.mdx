@@ -3,7 +3,7 @@
 All `props` are _optional_.
 
 | Name | Type | Default | Description |
-| --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) | `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
 | [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | \_ | Callback triggered with the excalidraw api once rendered |
 | [`isCollaborating`](#iscollaborating) | `boolean` | \_ | This indicates if the app is in `collaboration` mode |
@@ -31,7 +31,15 @@ All `props` are _optional_.
 | [`generateIdForFile`](#generateidforfile) | `function` | \_ | Allows you to override `id` generation for files added on canvas |
 | [`validateEmbeddable`](#validateembeddable) | `string[]` \| `boolean` \| `RegExp` \| `RegExp[]` \| <code>((link: string) => boolean &#124; undefined)</code> | \_ | use for custom src url validation |
 | [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
-| [`renderScrollbars`] | `boolean`| | `false` | Indicates whether scrollbars will be shown
+| [`renderScrollbars`] | `boolean` |  | `false` | Indicates whether scrollbars will be shown |
+
+## Mermaid export in the UI
+
+Excalidraw currently includes a built-in UI action to copy supported diagrams as Mermaid flowcharts.
+
+- In the app UI, this is exposed through the context menu and the command palette.
+- In custom integrations, you can render the menu item via [`MainMenu.DefaultItems.CopyAsMermaid`](/docs/@excalidraw/excalidraw/api/children-components/main-menu#mainmenudefaultitemscopyasmermaid).
+- There is currently no dedicated prop to configure Mermaid export behaviour and no dedicated `excalidrawAPI` method for it.
 
 ### Storing custom data on Excalidraw elements
 

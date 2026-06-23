@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
+  return <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -47,6 +47,20 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 Additionally `ready` and `readyPromise` from the API have been discontinued. These APIs were found to be superfluous, and as part of the effort to streamline the APIs and maintain simplicity, they were removed in version v0.17.0.
 
 :::
+
+## Mermaid export
+
+There is currently no dedicated `excalidrawAPI` method such as `exportToMermaid()`.
+
+The built-in Mermaid export that ships in the Excalidraw app is currently exposed through UI actions such as the context menu and command palette entry, not as a public programmatic API for embedders.
+
+If you are embedding Excalidraw and need Mermaid output today, the pragmatic approach is:
+
+- Read the current scene using `getSceneElements()`.
+- Restrict export to a supported subset of elements.
+- Serialize that subset to Mermaid in host code.
+
+This keeps the API surface honest while the feature matures.
 
 ## updateScene
 
@@ -362,10 +376,9 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 ```ts
 (
-  tool: (
-    | { type: ToolType }
-    | { type: "custom"; customType: string }
-  ) & { locked?: boolean },
+  tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
+    locked?: boolean;
+  },
 ) => {};
 ```
 
