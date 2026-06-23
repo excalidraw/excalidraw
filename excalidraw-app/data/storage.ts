@@ -60,7 +60,17 @@ const _getBackendApi = () => {
   return backendApi;
 };
 
-const _getToken = () => {
+const _getToken = async (): Promise<string | undefined> => {
+  // A provider, when supplied, returns a fresh (possibly short-lived) token on
+  // every call and takes precedence over the static token.
+  if (meetingDetailsCache?.getStorageToken) {
+    try {
+      return await meetingDetailsCache.getStorageToken();
+    } catch (error) {
+      console.error("Failed to fetch storage token:", error);
+      return meetingDetailsCache?.token;
+    }
+  }
   return meetingDetailsCache?.token;
 };
 
@@ -82,7 +92,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     ...options.headers as Record<string, string>,
   };
   
-  const token = _getToken();
+  const token = await _getToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -135,7 +145,7 @@ const uploadFilesWithMulter = async (prefix: string, files: { id: FileId; buffer
       formData.append('file', blob, id);
 
       const headers: Record<string, string> = {};
-      const token = _getToken();
+      const token = await _getToken();
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -191,7 +201,7 @@ const downloadFilesFromBackend = async (prefix: string, fileIds: readonly FileId
   const erroredFiles: FileId[] = [];
 
   const headers: Record<string, string> = {};
-  const token = _getToken();
+  const token = await _getToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }

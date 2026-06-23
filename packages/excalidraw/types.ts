@@ -611,6 +611,12 @@ export interface IMeetingDetails {
   jwt: string;
   jid: string;
   token?: string;
+  /**
+   * Optional async provider returning a fresh bearer token for each storage
+   * request. Takes precedence over the static `token` and lets the embedder
+   * supply short-lived credentials that are refreshed transparently.
+   */
+  getStorageToken?: () => Promise<string | undefined>;
 }
 
 export type SceneData = {
