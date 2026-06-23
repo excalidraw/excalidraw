@@ -12,7 +12,7 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
-  STROKE_WIDTH,
+  // STROKE_WIDTH,
   VERTICAL_ALIGN,
   KEYS,
   randomInteger,
@@ -105,8 +105,8 @@ import {
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
   StrokeWidthBaseIcon,
-  StrokeWidthBoldIcon,
-  StrokeWidthExtraBoldIcon,
+  // StrokeWidthBoldIcon,
+  // StrokeWidthExtraBoldIcon,
   FontSizeSmallIcon,
   FontSizeMediumIcon,
   FontSizeLargeIcon,
@@ -561,45 +561,28 @@ export const actionChangeStrokeWidth = register<
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <div className="buttonList">
-        <RadioSelection
-          group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => element.strokeWidth,
-            (element) => element.hasOwnProperty("strokeWidth"),
-            (hasSelection) =>
-              hasSelection ? null : appState.currentItemStrokeWidth,
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const strokeWidth = getFormValue(
+      elements,
+      app,
+      (element) => element.strokeWidth,
+      (element) => element.hasOwnProperty("strokeWidth"),
+      (hasSelection) => (hasSelection ? null : appState.currentItemStrokeWidth),
+    );
+
+    return (
+      <Range
+        label={t("labels.strokeWidth")}
+        value={strokeWidth ?? appState.currentItemStrokeWidth}
+        hasCommonValue={strokeWidth !== null}
+        onChange={updateData}
+        min={1}
+        max={15}
+        step={0.5}
+        testId="strokeWidth"
+      />
+    );
+  },
 });
 
 export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
