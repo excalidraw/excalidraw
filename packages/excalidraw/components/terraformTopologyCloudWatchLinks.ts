@@ -15,6 +15,7 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -69,6 +70,27 @@ function isCloudWatchSatelliteType(type: string): boolean {
     type === "aws_cloudwatch_metric_alarm" ||
     type === "aws_cloudwatch_log_group"
   );
+}
+
+const CW_SATELLITE_TYPES = new Set([
+  "aws_cloudwatch_metric_alarm",
+  "aws_cloudwatch_log_group",
+]);
+
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
 }
 
 function buildResourceIdentityIndex(
@@ -395,16 +417,17 @@ function addAttachment(
 
 function buildCloudWatchAttachmentIndex(
   nodes: TerraformPlanNodesMap,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): CloudWatchAttachmentIndex {
   const identityIndex = buildResourceIdentityIndex(nodes);
   const attachmentIndex: CloudWatchAttachmentIndex = new Map();
 
-  for (const [path, candidateNode] of Object.entries(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, CW_SATELLITE_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
     const candidatePrimary = getPrimaryResource(
-      candidateNode as TerraformPlanGraphNode,
+      nodes[path] as TerraformPlanGraphNode,
     );
     if (!candidatePrimary) {
       continue;
@@ -436,12 +459,13 @@ function buildCloudWatchAttachmentIndex(
 
 export function getCloudWatchAttachmentIndex(
   nodes: TerraformPlanNodesMap,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): CloudWatchAttachmentIndex {
   const cached = cloudWatchAttachmentIndexCache.get(nodes);
   if (cached) {
     return cached;
   }
-  const built = buildCloudWatchAttachmentIndex(nodes);
+  const built = buildCloudWatchAttachmentIndex(nodes, nodesByType);
   cloudWatchAttachmentIndexCache.set(nodes, built);
   return built;
 }
@@ -449,6 +473,7 @@ export function getCloudWatchAttachmentIndex(
 export function buildResourceCloudWatchCluster(
   nodes: TerraformPlanNodesMap,
   resourceAddress: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: ResourceCloudWatchCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[resourceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -457,7 +482,7 @@ export function buildResourceCloudWatchCluster(
     return { cluster: null, edges: [] };
   }
 
-  const attachment = getCloudWatchAttachmentIndex(nodes).get(resourceAddress);
+  const attachment = getCloudWatchAttachmentIndex(nodes, nodesByType).get(resourceAddress);
   const sortedAlarms = [...(attachment?.alarms ?? [])].sort();
   const sortedLogGroups = [...(attachment?.logGroups ?? [])].sort();
   if (sortedAlarms.length === 0 && sortedLogGroups.length === 0) {

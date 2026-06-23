@@ -20,12 +20,29 @@ import {
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import { stripStackPrefixForModuleParsing } from "./terraformStackAddress";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
+}
+
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
 }
 
 function getPrimaryResource(
@@ -393,6 +410,7 @@ export function buildTransitGatewayCompanionCluster(
   nodes: TerraformPlanNodesMap,
   tgwAddress: string,
   planChanges?: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): {
   cluster: TransitGatewayCompanionCluster | null;
   edges: TopologyIamEdge[];
@@ -414,7 +432,7 @@ export function buildTransitGatewayCompanionCluster(
     values: Record<string, unknown>;
   }> = [];
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, TGW_TOPOLOGY_SATELLITE_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }

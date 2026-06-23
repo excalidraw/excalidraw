@@ -14,6 +14,7 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import {
   pickResourceValuesForTopologyPlacement,
   type TerraformPlanProviderContext,
@@ -25,6 +26,33 @@ import {
 } from "./terraformStackAddress";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
+
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
+
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -294,6 +322,7 @@ function isVpcLinkConnectionType(value: unknown): boolean {
 function resolveVpcLinkIdToVpcLinkPath(
   nodes: TerraformPlanNodesMap,
   linkRef: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(linkRef, strings);
@@ -312,7 +341,7 @@ function resolveVpcLinkIdToVpcLinkPath(
     }
   }
 
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_api_gateway_vpc_link", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -320,7 +349,7 @@ function resolveVpcLinkIdToVpcLinkPath(
       continue;
     }
     const v = mergeTerraformPlanResourceValues(
-      getPrimaryResource(node as TerraformPlanGraphNode),
+      getPrimaryResource(nodes[path] as TerraformPlanGraphNode),
     );
     const id = typeof v.id === "string" ? v.id : "";
     if (id && strings.some((x) => x === id)) {
@@ -340,11 +369,12 @@ export function resolveVpcLinksForRestApi(
   nodes: TerraformPlanNodesMap,
   restApiAddress: string,
   changes?: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const apiScope = topologyModuleScopeForAddress(restApiAddress);
   const vpcLinks: string[] = [];
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_api_gateway_vpc_link", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -381,7 +411,7 @@ export function resolveVpcLinksForRestApi(
     if (parent !== restApiAddress) {
       continue;
     }
-    const linkPath = resolveVpcLinkIdToVpcLinkPath(nodes, pv.connection_id);
+    const linkPath = resolveVpcLinkIdToVpcLinkPath(nodes, pv.connection_id, nodesByType);
     if (linkPath) {
       linked.add(linkPath);
     }
@@ -500,6 +530,7 @@ function isAwsApiGatewayDeploymentNode(
 function resolveRestApiIdToRestApiPath(
   nodes: TerraformPlanNodesMap,
   restApiIdRef: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(restApiIdRef, strings);
@@ -518,11 +549,11 @@ function resolveRestApiIdToRestApiPath(
     }
   }
 
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_api_gateway_rest_api", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    const primary = getPrimaryResource(node as TerraformPlanGraphNode);
+    const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
     if (!primary || primary.type !== "aws_api_gateway_rest_api") {
       continue;
     }
@@ -539,6 +570,7 @@ function resolveDeploymentRefToDeploymentPath(
   nodes: TerraformPlanNodesMap,
   deploymentRef: unknown,
   restApiAddress: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(deploymentRef, strings);
@@ -555,7 +587,7 @@ function resolveDeploymentRefToDeploymentPath(
         const v = mergeTerraformPlanResourceValues(
           getPrimaryResource(nodes[key] as TerraformPlanGraphNode),
         );
-        const api = resolveRestApiIdToRestApiPath(nodes, v.rest_api_id);
+        const api = resolveRestApiIdToRestApiPath(nodes, v.rest_api_id, nodesByType);
         if (api === restApiAddress) {
           return key;
         }
@@ -563,7 +595,7 @@ function resolveDeploymentRefToDeploymentPath(
     }
   }
 
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_api_gateway_deployment", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -571,10 +603,10 @@ function resolveDeploymentRefToDeploymentPath(
       continue;
     }
     const v = mergeTerraformPlanResourceValues(
-      getPrimaryResource(node as TerraformPlanGraphNode),
+      getPrimaryResource(nodes[path] as TerraformPlanGraphNode),
     );
     if (
-      resolveRestApiIdToRestApiPath(nodes, v.rest_api_id) !== restApiAddress
+      resolveRestApiIdToRestApiPath(nodes, v.rest_api_id, nodesByType) !== restApiAddress
     ) {
       continue;
     }
@@ -590,6 +622,7 @@ function resolveDeploymentRefToDeploymentPath(
 function resolveLogGroupArnToPath(
   nodes: TerraformPlanNodesMap,
   arnRef: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(arnRef, strings);
@@ -610,12 +643,12 @@ function resolveLogGroupArnToPath(
       ? s.split(":log-group:")[1]?.replace(/:\*$/, "") ?? ""
       : "";
     if (logGroupName) {
-      for (const [path, node] of Object.entries(nodes)) {
+      for (const path of candidatesForType(nodesByType, "aws_cloudwatch_log_group", nodes)) {
         if (!isAwsCloudWatchLogGroupNode(nodes, path)) {
           continue;
         }
         const v = mergeTerraformPlanResourceValues(
-          getPrimaryResource(node as TerraformPlanGraphNode),
+          getPrimaryResource(nodes[path] as TerraformPlanGraphNode),
         );
         const names: string[] = [];
         flattenStringish(v.name, names);
@@ -633,12 +666,13 @@ function resolveStageAccessLogGroupPath(
   nodes: TerraformPlanNodesMap,
   stagePath: string,
   stageValues: Record<string, unknown>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   for (const block of accessLogSettingsBlocks(stageValues)) {
     const refs: string[] = [];
     flattenStringish(block.destination_arn, refs);
     for (const ref of refs) {
-      const path = resolveLogGroupArnToPath(nodes, ref);
+      const path = resolveLogGroupArnToPath(nodes, ref, nodesByType);
       if (path) {
         return path;
       }
@@ -691,10 +725,16 @@ export function apiGatewayCompanionSatellitePaths(
   ];
 }
 
+const APIGW_STAGE_METHOD_TYPES = new Set([
+  "aws_api_gateway_stage",
+  "aws_api_gateway_method_settings",
+]);
+
 export function buildApiGatewayCompanionCluster(
   nodes: TerraformPlanNodesMap,
   restApiAddress: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: ApiGatewayCompanionCluster | null; edges: TopologyIamEdge[] } {
   const apiNode = nodes[restApiAddress] as TerraformPlanGraphNode | undefined;
   const apiPrimary = getPrimaryResource(apiNode);
@@ -708,11 +748,11 @@ export function buildApiGatewayCompanionCluster(
     ? (plan as { resource_changes: PlanRc[] }).resource_changes ?? []
     : undefined;
 
-  const vpcLinks = resolveVpcLinksForRestApi(nodes, restApiAddress, changes);
+  const vpcLinks = resolveVpcLinksForRestApi(nodes, restApiAddress, changes, nodesByType);
   const stages: ApiGatewayStageCluster[] = [];
   const methodSettings: string[] = [];
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, APIGW_STAGE_METHOD_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -725,7 +765,7 @@ export function buildApiGatewayCompanionCluster(
     const values = mergeTerraformPlanResourceValues(p);
     if (t === "aws_api_gateway_stage") {
       if (
-        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id) !==
+        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id, nodesByType) !==
         restApiAddress
       ) {
         continue;
@@ -736,14 +776,15 @@ export function buildApiGatewayCompanionCluster(
           nodes,
           values.deployment_id,
           restApiAddress,
+          nodesByType,
         ),
-        logGroup: resolveStageAccessLogGroupPath(nodes, path, values),
+        logGroup: resolveStageAccessLogGroupPath(nodes, path, values, nodesByType),
       });
       continue;
     }
     if (t === "aws_api_gateway_method_settings") {
       if (
-        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id) ===
+        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id, nodesByType) ===
         restApiAddress
       ) {
         methodSettings.push(path);
@@ -928,11 +969,13 @@ export function buildApiGatewayVpcLinkCluster(
   nodes: TerraformPlanNodesMap,
   restApiAddress: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: ApiGatewayVpcLinkCluster | null; edges: TopologyIamEdge[] } {
   const { cluster, edges } = buildApiGatewayCompanionCluster(
     nodes,
     restApiAddress,
     plan,
+    nodesByType,
   );
   if (!cluster?.vpcLinks.length) {
     return { cluster: null, edges: [] };

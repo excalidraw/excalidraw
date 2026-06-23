@@ -4,6 +4,7 @@
 
 import { mergeTerraformPlanResourceValues } from "./terraformTopologyIamLinks";
 import { getTerraformCardResourceType } from "./terraformResourceCardLabel";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 
 import type { TopologyIamEdge } from "./terraformTopologyIamLinks";
 import type {
@@ -44,6 +45,22 @@ function typeOrder(t: string): number {
   return 3;
 }
 
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
+}
+
 function companionResourceType(
   nodes: TerraformPlanNodesMap,
   addr: string,
@@ -59,6 +76,7 @@ export function buildEksCompanionCluster(
   nodes: TerraformPlanNodesMap,
   clusterAddress: string,
   _arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: EksCompanionCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[clusterAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -77,7 +95,7 @@ export function buildEksCompanionCluster(
   }
 
   const stack: string[] = [];
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, EKS_COMPANION_TYPES, nodes)) {
     if (path.startsWith("__")) {
       continue;
     }

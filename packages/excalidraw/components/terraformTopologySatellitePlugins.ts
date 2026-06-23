@@ -42,7 +42,7 @@ export function installSatellitePlugins(): void {
 
   registerSatellitePlugins({
     cloudwatch_resource: (_kind, ctx) =>
-      buildResourceCloudWatchCluster(ctx.nodes, ctx.primaryAddress),
+      buildResourceCloudWatchCluster(ctx.nodes, ctx.primaryAddress, ctx.nodesByType),
 
     iam_execution_role: (_kind, ctx) =>
       buildPrimaryIamCluster(
@@ -71,7 +71,7 @@ export function installSatellitePlugins(): void {
       ),
 
     eks_companions: (_kind, ctx) =>
-      buildEksCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
+      buildEksCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex, ctx.nodesByType),
 
     ecs_companions: (_kind, ctx) =>
       buildEcsServiceCompanionCluster(
@@ -99,10 +99,10 @@ export function installSatellitePlugins(): void {
       ),
 
     api_gateway_companions: (_kind, ctx) =>
-      buildApiGatewayCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
+      buildApiGatewayCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.plan, ctx.nodesByType),
 
     api_gateway_vpc_links: (_kind, ctx) =>
-      buildApiGatewayVpcLinkCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
+      buildApiGatewayVpcLinkCluster(ctx.nodes, ctx.primaryAddress, ctx.plan, ctx.nodesByType),
 
     tgw_companions: (_kind, ctx) =>
       ctx.primaryType === "aws_ec2_transit_gateway"
@@ -110,6 +110,7 @@ export function installSatellitePlugins(): void {
             ctx.nodes,
             ctx.primaryAddress,
             ctx.planChanges,
+            ctx.nodesByType,
           )
         : emptyResult(),
 
