@@ -14,8 +14,42 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
+
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan. A
+ * missing bucket (no nodes of that type) is a correct empty result, not a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
+
+/** Candidate paths for a union of types — used when a scan filters by a Set of types. */
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
+}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -55,6 +89,7 @@ export function resolveS3BucketFieldToBucketPath(
   nodes: TerraformPlanNodesMap,
   bucketRef: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(bucketRef, strings);
@@ -79,11 +114,11 @@ export function resolveS3BucketFieldToBucketPath(
     }
   }
 
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_s3_bucket", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    const primary = getPrimaryResource(node as TerraformPlanGraphNode);
+    const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
     if (!primary || primary.type !== "aws_s3_bucket") {
       continue;
     }
@@ -188,6 +223,7 @@ export function buildS3CompanionCluster(
   nodes: TerraformPlanNodesMap,
   bucketAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: S3CompanionCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[bucketAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -198,7 +234,7 @@ export function buildS3CompanionCluster(
   const companions = new Set<string>();
   const docToPolicy = new Map<string, string>();
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, S3_COMPANION_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -216,6 +252,7 @@ export function buildS3CompanionCluster(
       nodes,
       values.bucket,
       arnIndex,
+      nodesByType,
     );
     if (resolved !== bucketAddress) {
       continue;

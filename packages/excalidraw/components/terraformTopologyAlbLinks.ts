@@ -25,6 +25,7 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
 import { buildLoadBalancerSgCluster } from "./terraformTopologySgLinks";
 
@@ -106,6 +107,39 @@ function flattenStringish(value: unknown, out: string[]): void {
   }
 }
 
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan. A
+ * missing bucket (no nodes of that type) is a correct empty result, not a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
+
+/** Candidate paths for a union of types — used when a scan filters by a Set of types. */
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
+}
+
 function isAwsLbNode(nodes: TerraformPlanNodesMap, path: string): boolean {
   const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
   return primary?.type === "aws_lb";
@@ -123,6 +157,7 @@ export function resolveLoadBalancerArnToLbPath(
   nodes: TerraformPlanNodesMap,
   lbArnField: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(lbArnField, strings);
@@ -147,11 +182,11 @@ export function resolveLoadBalancerArnToLbPath(
     }
   }
 
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_lb", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    const primary = getPrimaryResource(node as TerraformPlanGraphNode);
+    const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
     if (!primary || primary.type !== "aws_lb") {
       continue;
     }
@@ -569,9 +604,10 @@ function collectAttachmentPathsForTargetGroups(
   nodes: TerraformPlanNodesMap,
   tgPaths: ReadonlySet<string>,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const out = new Set<string>();
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, ATTACHMENT_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -613,6 +649,7 @@ export function buildAlbListenerTargetCluster(
   nodes: TerraformPlanNodesMap,
   lbAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: AlbListenerTargetCluster | null; edges: TopologyIamEdge[] } {
   const canonicalLb = canonicalTopologyNodeKey(nodes, lbAddress);
   const lbNode = nodes[canonicalLb] as TerraformPlanGraphNode | undefined;
@@ -623,7 +660,7 @@ export function buildAlbListenerTargetCluster(
 
   const listenerBareSeen = new Set<string>();
   const listenerPaths: string[] = [];
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, LISTENER_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -641,6 +678,7 @@ export function buildAlbListenerTargetCluster(
       nodes,
       values.load_balancer_arn,
       arnIndex,
+      nodesByType,
     );
     if (!listenerLb || !topologyAddressesMatch(listenerLb, canonicalLb)) {
       continue;
@@ -678,7 +716,7 @@ export function buildAlbListenerTargetCluster(
 
   const attachmentPaths = dedupeTopologyAddressesByBareKey(
     nodes,
-    collectAttachmentPathsForTargetGroups(nodes, tgSet, arnIndex),
+    collectAttachmentPathsForTargetGroups(nodes, tgSet, arnIndex, nodesByType),
   );
 
   const stack = dedupeTopologyAddressesByBareKey(nodes, [

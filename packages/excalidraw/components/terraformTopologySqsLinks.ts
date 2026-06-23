@@ -13,8 +13,42 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
+
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan. A
+ * missing bucket (no nodes of that type) is a correct empty result, not a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
+
+/** Candidate paths for a union of types — used when a scan filters by a Set of types. */
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
+}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -72,6 +106,7 @@ export function resolveSqsQueueFieldToQueuePath(
   nodes: TerraformPlanNodesMap,
   queueRef: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(queueRef, strings);
@@ -95,11 +130,17 @@ export function resolveSqsQueueFieldToQueuePath(
       return byArn;
     }
     if (s.includes("amazonaws.com/") && s.includes("sqs.")) {
-      for (const [path, node] of Object.entries(nodes)) {
+      for (const path of candidatesForType(
+        nodesByType,
+        "aws_sqs_queue",
+        nodes,
+      )) {
         if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
           continue;
         }
-        const primary = getPrimaryResource(node as TerraformPlanGraphNode);
+        const primary = getPrimaryResource(
+          nodes[path] as TerraformPlanGraphNode,
+        );
         if (primary?.type !== "aws_sqs_queue") {
           continue;
         }
@@ -178,6 +219,7 @@ export function buildSqsCompanionCluster(
   nodes: TerraformPlanNodesMap,
   queueAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: SqsCompanionCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[queueAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -188,7 +230,11 @@ export function buildSqsCompanionCluster(
   const companions = new Set<string>();
   const docToPolicy = new Map<string, string>();
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    SQS_COMPANION_TYPES,
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -205,7 +251,12 @@ export function buildSqsCompanionCluster(
     const qUrl = values.queue_url ?? values.source_queue_url;
     const redriveSource = values.source_queue_arn ?? values.queue_arn;
     const ref = qUrl ?? redriveSource;
-    const resolved = resolveSqsQueueFieldToQueuePath(nodes, ref, arnIndex);
+    const resolved = resolveSqsQueueFieldToQueuePath(
+      nodes,
+      ref,
+      arnIndex,
+      nodesByType,
+    );
     if (resolved !== queueAddress) {
       continue;
     }

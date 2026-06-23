@@ -22,6 +22,7 @@ import {
   shouldUsePlanReference,
 } from "./terraformTopologyLambdaSgPlanConfig";
 import { collectSgRuleSecurityGroupIdRefsFromPlanConfiguration } from "./terraformTopologySgRulePlanConfig";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import {
   nestedSgGroupsExtraHeightPx,
   terraformSatelliteLayoutElementId,
@@ -29,6 +30,39 @@ import {
 } from "./terraformTopologySatelliteLayout";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
+
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan. A
+ * missing bucket (no nodes of that type) is a correct empty result, not a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
+
+/** Candidate paths for a union of types — used when a scan filters by a Set of types. */
+function candidatesForTypes(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  types: ReadonlySet<string>,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  const out: string[] = [];
+  for (const t of types) {
+    out.push(...(nodesByType.get(t) ?? []));
+  }
+  return out;
+}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -127,9 +161,10 @@ function terraformSecurityGroupAddressLookupCandidates(
 function listAwsSecurityGroupPathsUnderPrefix(
   nodes: TerraformPlanNodesMap,
   prefixWithDot: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const out: string[] = [];
-  for (const key of Object.keys(nodes)) {
+  for (const key of candidatesForType(nodesByType, "aws_security_group", nodes)) {
     if (key === TERRAFORM_MODULE_TREE_KEY || key.startsWith("__")) {
       continue;
     }
@@ -183,6 +218,7 @@ function lambdaVpcConfigHasSubnets(values: Record<string, unknown>): boolean {
 function inferModuleColocatedSecurityGroupRefs(
   nodes: TerraformPlanNodesMap,
   anchorAddress: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const modPref = terraformModulePrefixForAddress(anchorAddress);
   if (!modPref) {
@@ -193,7 +229,11 @@ function inferModuleColocatedSecurityGroupRefs(
     cursor;
     cursor = stripLastTerraformModuleSegment(cursor) || null
   ) {
-    const paths = listAwsSecurityGroupPathsUnderPrefix(nodes, `${cursor}.`);
+    const paths = listAwsSecurityGroupPathsUnderPrefix(
+      nodes,
+      `${cursor}.`,
+      nodesByType,
+    );
     const ranked = rankInferredSecurityGroupPaths(paths);
     if (ranked.length > 0) {
       return ranked;
@@ -205,20 +245,30 @@ function inferModuleColocatedSecurityGroupRefs(
 function inferLambdaVpcSecurityGroupRefs(
   nodes: TerraformPlanNodesMap,
   lambdaAddress: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
-  return inferModuleColocatedSecurityGroupRefs(nodes, lambdaAddress);
+  return inferModuleColocatedSecurityGroupRefs(
+    nodes,
+    lambdaAddress,
+    nodesByType,
+  );
 }
 
 /** When a rule omits `security_group_id` in `change.after`, the lone SG in the same module is the target. */
 function inferSoleSecurityGroupPathForRuleModule(
   nodes: TerraformPlanNodesMap,
   rulePath: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const modPref = terraformModulePrefixForAddress(rulePath);
   if (!modPref) {
     return null;
   }
-  const paths = listAwsSecurityGroupPathsUnderPrefix(nodes, `${modPref}.`);
+  const paths = listAwsSecurityGroupPathsUnderPrefix(
+    nodes,
+    `${modPref}.`,
+    nodesByType,
+  );
   const ranked = rankInferredSecurityGroupPaths(paths);
   return ranked.length === 1 ? ranked[0]! : null;
 }
@@ -268,9 +318,11 @@ function resolveSecurityGroupIdFieldFromPlanConfiguration(
 /** Map `sg-…` (and optional normalized forms) to Terraform `aws_security_group` node path. */
 export function buildSecurityGroupIdToPathIndex(
   nodes: TerraformPlanNodesMap,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): Map<string, string> {
   const map = new Map<string, string>();
-  for (const [path, node] of Object.entries(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_security_group", nodes)) {
+    const node = nodes[path] as TerraformPlanGraphNode | undefined;
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -381,6 +433,7 @@ export function collectLambdaVpcSecurityGroupRefs(
   nodes: TerraformPlanNodesMap,
   lambdaAddress: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const node = nodes[lambdaAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -416,7 +469,7 @@ export function collectLambdaVpcSecurityGroupRefs(
   if (!lambdaVpcConfigHasSubnets(values)) {
     return [];
   }
-  return inferLambdaVpcSecurityGroupRefs(nodes, lambdaAddress);
+  return inferLambdaVpcSecurityGroupRefs(nodes, lambdaAddress, nodesByType);
 }
 
 /** Unique ordered refs from `vpc_security_group_ids` on `aws_rds_cluster` / `aws_db_instance`. */
@@ -486,6 +539,7 @@ export function collectSecurityGroupRulesForSg(
   arnIndex: Map<string, string>,
   idToPath: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const sgNode = nodes[sgPath] as TerraformPlanGraphNode | undefined;
   const sgPrimary = getPrimaryResource(sgNode);
@@ -495,7 +549,7 @@ export function collectSecurityGroupRulesForSg(
   const out: string[] = [];
   const seen = new Set<string>();
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForTypes(nodesByType, SG_RULE_TYPES, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -531,7 +585,11 @@ export function collectSecurityGroupRulesForSg(
       }
     }
     if (resolved !== sgPath && !ruleHasExplicitSecurityGroupIdField(merged)) {
-      const inferred = inferSoleSecurityGroupPathForRuleModule(nodes, path);
+      const inferred = inferSoleSecurityGroupPathForRuleModule(
+        nodes,
+        path,
+        nodesByType,
+      );
       if (inferred === sgPath) {
         resolved = inferred;
       }
@@ -594,13 +652,14 @@ export function buildLoadBalancerSgCluster(
   lbAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   const refs = collectLoadBalancerSecurityGroupRefs(nodes, lbAddress, plan);
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
 
-  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes, nodesByType);
   const groups: LambdaSgGroup[] = [];
   const edges: TopologyIamEdge[] = [];
   const seenSg = new Set<string>();
@@ -624,6 +683,7 @@ export function buildLoadBalancerSgCluster(
       arnIndex,
       idToPath,
       plan,
+      nodesByType,
     );
     groups.push({ sgPath: canonicalSg, rules });
     edges.push({
@@ -764,13 +824,19 @@ export function buildLambdaSgCluster(
   lambdaAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
-  const refs = collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddress, plan);
+  const refs = collectLambdaVpcSecurityGroupRefs(
+    nodes,
+    lambdaAddress,
+    plan,
+    nodesByType,
+  );
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
 
-  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes, nodesByType);
   const groups: LambdaSgGroup[] = [];
   const edges: TopologyIamEdge[] = [];
   const seenSg = new Set<string>();
@@ -793,6 +859,7 @@ export function buildLambdaSgCluster(
       arnIndex,
       idToPath,
       plan,
+      nodesByType,
     );
     groups.push({ sgPath, rules });
     edges.push({
@@ -826,13 +893,14 @@ export function buildEcsServiceSgCluster(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   const refs = collectEcsServiceSecurityGroupRefs(nodes, serviceAddress);
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
 
-  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes, nodesByType);
   const groups: LambdaSgGroup[] = [];
   const edges: TopologyIamEdge[] = [];
   const seenSg = new Set<string>();
@@ -855,6 +923,7 @@ export function buildEcsServiceSgCluster(
       arnIndex,
       idToPath,
       plan,
+      nodesByType,
     );
     groups.push({ sgPath, rules });
     edges.push({
@@ -889,16 +958,21 @@ export function buildDatastorePrimarySgCluster(
   primaryAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   let refs = collectDatastoreVpcSecurityGroupRefs(nodes, primaryAddress);
   if (refs.length === 0) {
-    refs = inferModuleColocatedSecurityGroupRefs(nodes, primaryAddress);
+    refs = inferModuleColocatedSecurityGroupRefs(
+      nodes,
+      primaryAddress,
+      nodesByType,
+    );
   }
   if (refs.length === 0) {
     return { cluster: null, edges: [] };
   }
 
-  const idToPath = buildSecurityGroupIdToPathIndex(nodes);
+  const idToPath = buildSecurityGroupIdToPathIndex(nodes, nodesByType);
   const groups: LambdaSgGroup[] = [];
   const edges: TopologyIamEdge[] = [];
   const seenSg = new Set<string>();
@@ -922,6 +996,7 @@ export function buildDatastorePrimarySgCluster(
       arnIndex,
       idToPath,
       plan,
+      nodesByType,
     );
     groups.push({ sgPath, rules });
     edges.push({
@@ -956,20 +1031,27 @@ export function buildPrimarySgCluster(
   address: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaSgCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[address] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
   const t = typeof primary?.type === "string" ? primary.type : "";
   if (t === "aws_lb") {
-    return buildLoadBalancerSgCluster(nodes, address, arnIndex, plan);
+    return buildLoadBalancerSgCluster(nodes, address, arnIndex, plan, nodesByType);
   }
   if (t === "aws_ecs_service") {
-    return buildEcsServiceSgCluster(nodes, address, arnIndex, plan);
+    return buildEcsServiceSgCluster(nodes, address, arnIndex, plan, nodesByType);
   }
   if (t === "aws_rds_cluster" || t === "aws_db_instance") {
-    return buildDatastorePrimarySgCluster(nodes, address, arnIndex, plan);
+    return buildDatastorePrimarySgCluster(
+      nodes,
+      address,
+      arnIndex,
+      plan,
+      nodesByType,
+    );
   }
-  return buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  return buildLambdaSgCluster(nodes, address, arnIndex, plan, nodesByType);
 }
 
 /** Vertical gap between stacked SG groups under one Lambda (layout must match). */

@@ -59,6 +59,7 @@ export function installSatellitePlugins(): void {
         ctx.primaryAddress,
         ctx.arnIndex,
         ctx.plan,
+        ctx.nodesByType,
       ),
 
     alb_companions: (_kind, ctx) =>
@@ -66,6 +67,7 @@ export function installSatellitePlugins(): void {
         ctx.nodes,
         ctx.primaryAddress,
         ctx.arnIndex,
+        ctx.nodesByType,
       ),
 
     eks_companions: (_kind, ctx) =>
@@ -112,10 +114,20 @@ export function installSatellitePlugins(): void {
         : emptyResult(),
 
     s3_companions: (_kind, ctx) =>
-      buildS3CompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
+      buildS3CompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.arnIndex,
+        ctx.nodesByType,
+      ),
 
     sqs_companions: (_kind, ctx) =>
-      buildSqsCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.arnIndex),
+      buildSqsCompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.arnIndex,
+        ctx.nodesByType,
+      ),
 
     aurora_companions: (_kind, ctx) =>
       buildAuroraCompanionCluster(ctx.nodes, ctx.primaryAddress),
