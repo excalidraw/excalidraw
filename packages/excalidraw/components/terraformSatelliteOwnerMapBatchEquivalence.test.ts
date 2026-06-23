@@ -9,6 +9,11 @@ import {
   withTerraformPlanNodeKeyIndex,
 } from "./terraformPlanParsing";
 import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
+import {
+  buildNodesByTypeIndex,
+  getFallbackScanCount,
+  resetFallbackScanCount,
+} from "./terraformTopologySatelliteEngine";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildAllSatellitePrimaryMappings,
@@ -180,5 +185,37 @@ describe("buildAllSatellitePrimaryMappings equivalence (T2)", () => {
       const expectedWinner = [...claimants].sort()[0]!;
       expect(batchResult.get(sat)).toBe(expectedWinner);
     }
+  }, 60_000);
+
+  it("buildNodesByTypeIndex partitions every real node path into exactly one type bucket", async () => {
+    const { nodes } = await loadFixtureNodesAndPlan();
+    const nodesByType = buildNodesByTypeIndex(nodes);
+    const allBucketed = [...nodesByType.values()].flat();
+    const realPaths = Object.keys(nodes).filter(
+      (k) => k !== "__module_tree__" && !k.startsWith("__"),
+    );
+    expect(new Set(allBucketed)).toEqual(new Set(realPaths));
+    expect(allBucketed.length).toBe(realPaths.length); // non-vacuous: no path duplicated across buckets
+    expect(nodesByType.size).toBeGreaterThan(5);
+  });
+
+  it("every plugin scan site uses the nodesByType index — zero fallback scans", async () => {
+    const { nodes, plan } = await loadFixtureNodesAndPlan();
+
+    const primaryAddresses = Object.keys(nodes)
+      .filter((key) => !key.startsWith("__"))
+      .filter((addr) =>
+        isPrimaryVisibleResourceType(resourceTypeForNode(nodes, addr)),
+      )
+      .sort();
+
+    resetFallbackScanCount();
+    withTerraformPlanNodeKeyIndex(nodes, () => {
+      const arnIndex = buildArnIndexForTopology(nodes);
+      buildAllSatellitePrimaryMappings(nodes, arnIndex, primaryAddresses, plan);
+    });
+    // A nonzero count means some scan site never received nodesByType despite the
+    // index being supplied — i.e. it's still doing the full O(N) scan silently.
+    expect(getFallbackScanCount()).toBe(0);
   }, 60_000);
 });

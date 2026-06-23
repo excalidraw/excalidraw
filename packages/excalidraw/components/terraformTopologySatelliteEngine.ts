@@ -38,7 +38,57 @@ export type SatelliteBuildContext = {
   arnIndex: Map<string, string>;
   plan?: unknown;
   planChanges?: Array<{ address?: string; type?: string }>;
+  /**
+   * Optional pre-index: resource type -> node-path addresses of that type, in the same
+   * order they appear in `Object.keys(nodes)` (NOT sorted — some plugin scan sites do
+   * order-dependent first-match-by-name lookups on ties, so insertion order is preserved
+   * rather than re-sorted). Built once per build (O(N)) by `buildAllSatellitePrimaryMappings`;
+   * absent when `ctx` is built by any other call site, in which case every scan site falls
+   * back to its original `Object.keys(nodes)` scan.
+   */
+  nodesByType?: ReadonlyMap<string, readonly string[]>;
 };
+
+let fallbackScanCount = 0;
+
+/**
+ * Call from a scan site when it falls back to `Object.keys(nodes)` despite `nodesByType`
+ * being supplied to the enclosing call — i.e. the index existed but this specific site
+ * never received it. Proves the *complexity* claim (not just correctness): a
+ * correctness-only equivalence check would still pass even if a site silently kept doing
+ * the full O(N) scan.
+ */
+export function recordNodesByTypeFallbackScan(): void {
+  fallbackScanCount += 1;
+}
+
+export function resetFallbackScanCount(): void {
+  fallbackScanCount = 0;
+}
+
+export function getFallbackScanCount(): number {
+  return fallbackScanCount;
+}
+
+/** One O(N) pass bucketing every real node path by its resolved resource type. */
+export function buildNodesByTypeIndex(
+  nodes: TerraformPlanNodesMap,
+): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const path of iterateTopologyNodePaths(nodes)) {
+    const type = getTopologyResourceType(
+      path,
+      nodes[path] as TerraformPlanGraphNode | undefined,
+    );
+    const bucket = out.get(type);
+    if (bucket) {
+      bucket.push(path);
+    } else {
+      out.set(type, [path]);
+    }
+  }
+  return out;
+}
 
 export type SatelliteClusterBuildResult = {
   cluster: unknown | null;
@@ -315,6 +365,7 @@ export function collectSatelliteAddressesForKind(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const out = new Set<string>();
   const planChanges = Array.isArray(
@@ -335,6 +386,7 @@ export function collectSatelliteAddressesForKind(
       arnIndex,
       plan,
       planChanges,
+      nodesByType,
     };
     const { cluster } = buildSatelliteClusterForKind(kind, ctx);
     if (!cluster) {

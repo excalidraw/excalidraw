@@ -54,6 +54,7 @@ import { getTerraformCardResourceType } from "./terraformResourceCardLabel";
 import { getTopologyPrimaryLayoutJson } from "./terraformTopologyPrimaryLayoutLoader";
 
 import {
+  buildNodesByTypeIndex,
   buildSatelliteClusterForKind,
   collectSatelliteAddressesForKind,
   getAllCatalogPluginIds,
@@ -479,6 +480,7 @@ export function buildAllSatellitePrimaryMappings(
   plan?: unknown,
 ): Map<string, string> {
   installSatellitePlugins();
+  const nodesByType = buildNodesByTypeIndex(nodes);
   const sortedPrimaries = [...primaryAddresses].sort();
   const out = new Map<string, string>();
 
@@ -492,6 +494,7 @@ export function buildAllSatellitePrimaryMappings(
         nodes,
         arnIndex,
         plan,
+        nodesByType,
       )) {
         if (!out.has(sat)) {
           out.set(sat, primaryAddress);
