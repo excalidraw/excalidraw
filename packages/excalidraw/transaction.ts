@@ -14,13 +14,37 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { AppState, ObservedAppState } from "./types";
-import type App from "./components/App";
 
 type TransactionStatus = "active" | "committed" | "rolled-back";
 
 export interface TransactionUpdate {
   elements?: SceneElementsMap;
   appState?: AppState | ObservedAppState;
+}
+
+/**
+ * The narrow set of editor capabilities the transaction system needs.
+ *
+ * Injecting this (instead of the whole `App`) keeps the system decoupled and
+ * testable, and lets the host keep its `store`/`history` private — they are
+ * reached only through these closures.
+ */
+export interface TransactionContext {
+  /** Current scene elements, including deleted. */
+  getElementsMap: () => SceneElementsMap;
+  /** Current app state. */
+  getAppState: () => AppState;
+  /** Current store snapshot. */
+  getSnapshot: () => StoreSnapshot;
+  /** Replace the store snapshot (used to keep it in sync on commit). */
+  setSnapshot: (snapshot: StoreSnapshot) => void;
+  /** Push a durable delta onto the undo stack. */
+  recordHistory: (delta: StoreDelta) => void;
+  /** Apply elements/appState back to the scene (used by rollback). */
+  applyUpdate: (data: {
+    elements: readonly OrderedExcalidrawElement[];
+    appState: AppState;
+  }) => void;
 }
 
 interface RollbackState {
@@ -32,7 +56,7 @@ export class Transaction {
   readonly id: string = randomId();
   private _status: TransactionStatus = "active";
 
-  readonly originalElementStates = new Map<
+  private readonly originalElementStates = new Map<
     string,
     OrderedExcalidrawElement | null
   >();
@@ -41,7 +65,7 @@ export class Transaction {
   private prevSnapshot: StoreSnapshot;
 
   constructor(
-    private readonly app: App,
+    private readonly context: TransactionContext,
     private readonly rollbackState: RollbackState,
     private readonly onDone: () => void,
   ) {
@@ -49,12 +73,13 @@ export class Transaction {
     // place (mutateElement), so without copying, these references would mutate to
     // their final state and commit() would compute an empty delta.
     const baselineElements = new Map() as SceneElementsMap;
-    for (const element of this.app.scene
-      .getElementsMapIncludingDeleted()
-      .values()) {
+    for (const element of this.context.getElementsMap().values()) {
       baselineElements.set(element.id, deepCopyElement(element));
     }
-    this.prevSnapshot = StoreSnapshot.create(baselineElements, this.app.state);
+    this.prevSnapshot = StoreSnapshot.create(
+      baselineElements,
+      this.context.getAppState(),
+    );
   }
 
   get status(): TransactionStatus {
@@ -109,45 +134,51 @@ export class Transaction {
       string,
       OrderedExcalidrawElement
     >() as SceneElementsMap;
-    const currentSnapshot = StoreSnapshot.create(
-      this.app.scene.getElementsMapIncludingDeleted(),
-      this.app.state,
-    );
+    const currentElements = this.context.getElementsMap();
+    const currentAppState = this.context.getAppState();
 
     for (const [elementId, originalState] of this.originalElementStates) {
       if (originalState !== null) {
         prevElements.set(elementId, originalState);
       }
-      const current = currentSnapshot.elements.get(elementId);
+      const current = currentElements.get(elementId);
       if (current) {
         nextElements.set(elementId, deepCopyElement(current));
       }
     }
 
     // ── Build appState pseudo-snapshots (only touched fields) ─────────────
-    const prevAppState = { ...currentSnapshot.appState };
+    const observedAppState = StoreSnapshot.create(
+      currentElements,
+      currentAppState,
+    ).appState;
+    const prevAppState = { ...observedAppState };
     for (const key of this.touchedAppStateKeys) {
       (prevAppState as Record<string, unknown>)[key] =
         this.originalAppState[key];
     }
-    const nextAppState = currentSnapshot.appState;
+    const nextAppState = observedAppState;
 
     const elementsDelta = ElementsDelta.calculate(prevElements, nextElements);
     const appStateDelta = AppStateDelta.calculate(prevAppState, nextAppState);
     const storeDelta = StoreDelta.create(elementsDelta, appStateDelta);
 
     if (!storeDelta.isEmpty()) {
-      this.app.history.record(storeDelta);
+      this.context.recordHistory(storeDelta);
     }
 
     // Keep the store snapshot in sync with the committed scene, mirroring the
     // store's durable-increment flow. Undo/redo re-base their inverse deltas
-    // against `store.snapshot`; if it stayed stale the redo entry would be
-    // computed from the wrong baseline and redo would not restore the change.
-    this.app.store.snapshot = this.app.store.snapshot.maybeClone(
-      CaptureUpdateAction.IMMEDIATELY,
-      this.app.scene.getElementsMapIncludingDeleted(),
-      this.app.state,
+    // against the snapshot; if it stayed stale the redo entry would be computed
+    // from the wrong baseline and redo would not restore the change.
+    this.context.setSnapshot(
+      this.context
+        .getSnapshot()
+        .maybeClone(
+          CaptureUpdateAction.IMMEDIATELY,
+          currentElements,
+          currentAppState,
+        ),
     );
 
     this._status = "committed";
@@ -155,13 +186,12 @@ export class Transaction {
   }
 
   /**
-   * Revert: restore scene to begin()-state and reset store snapshot directly.
-   * No history entry. Synchronous — no render cycle required for snapshot reset.
+   * Revert: restore the scene to the begin()-time state. No history entry.
    */
   rollback(): void {
     this.assertActive();
 
-    this.app.updateScene({
+    this.context.applyUpdate({
       elements: this.rollbackState.elements,
       appState: this.rollbackState.appState,
     });
@@ -181,31 +211,51 @@ export class Transaction {
 
 export class TransactionManager {
   private keyed = new Map<string, Transaction>();
-  private defaultTxn: Transaction;
+  /** The always-active default transaction. Auto-restarts after commit/rollback. */
+  private defaultTxn!: Transaction;
 
-  constructor(private readonly app: App) {
-    this.defaultTxn = this.createDefault();
+  constructor(private readonly context: TransactionContext) {
+    this.begin();
   }
 
-  /** The always-active default transaction. Auto-restarts after commit or rollback. */
-  get default(): Transaction {
-    return this.defaultTxn;
-  }
+  /**
+   * Open a transaction. With no key, (re)starts the always-active default
+   * transaction. With a key, opens a keyed transaction — throws if one with that
+   * key is already active.
+   */
+  begin(key?: string): Transaction {
+    if (key === undefined) {
+      // the default transaction auto-restarts itself once it finishes
+      this.defaultTxn = this.create(() => this.begin());
+      return this.defaultTxn;
+    }
 
-  /** Open a new keyed transaction. Throws if a transaction with that key is already active. */
-  begin(key: string): Transaction {
     if (this.keyed.has(key)) {
       throw new Error(`Transaction "${key}" is already active.`);
     }
-    const txn = new Transaction(this.app, this.captureRollbackState(), () =>
-      this.keyed.delete(key),
-    );
+    const txn = this.create(() => this.keyed.delete(key));
     this.keyed.set(key, txn);
     return txn;
   }
 
-  get(key: string): Transaction | undefined {
-    return this.keyed.get(key);
+  /**
+   * Get a transaction. With no key, returns the default transaction; with a key,
+   * returns the matching keyed transaction (or undefined).
+   */
+  get(): Transaction;
+  get(key: string): Transaction | undefined;
+  get(key?: string): Transaction | undefined {
+    return this.resolve(key);
+  }
+
+  /** Commit the keyed transaction (or the default when no key is given). */
+  commit(key?: string): void {
+    this.resolve(key)?.commit();
+  }
+
+  /** Rollback the keyed transaction (or the default when no key is given). */
+  rollback(key?: string): void {
+    this.resolve(key)?.rollback();
   }
 
   /** Rollback all keyed transactions and the default transaction (default auto-restarts). */
@@ -216,21 +266,18 @@ export class TransactionManager {
     this.defaultTxn.rollback();
   }
 
-  createDefault(): Transaction {
-    this.defaultTxn = new Transaction(
-      this.app,
-      this.captureRollbackState(),
-      () => {
-        this.defaultTxn = this.createDefault();
-      },
-    );
-    return this.defaultTxn;
+  private create(onDone: () => void): Transaction {
+    return new Transaction(this.context, this.captureRollbackState(), onDone);
+  }
+
+  private resolve(key?: string): Transaction | undefined {
+    return key === undefined ? this.defaultTxn : this.keyed.get(key);
   }
 
   private captureRollbackState(): RollbackState {
     return {
-      elements: this.app.scene.getElementsIncludingDeleted(),
-      appState: this.app.state,
+      elements: Array.from(this.context.getElementsMap().values()),
+      appState: this.context.getAppState(),
     };
   }
 }

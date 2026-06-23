@@ -24,12 +24,29 @@ describe("TransactionManager", () => {
 
   describe("default transaction", () => {
     it("is active on mount", () => {
-      expect(h.app.transactionManager.default.status).toBe("active");
+      expect(h.app.transactionManager.get().status).toBe("active");
+    });
+
+    it("get() (no key) returns the current default transaction", () => {
+      const manager = h.app.transactionManager;
+      expect(manager.get()).toBe(manager.get());
+      expect(manager.get().status).toBe("active");
+    });
+
+    it("begin() (no key) restarts the default with a fresh transaction", () => {
+      const manager = h.app.transactionManager;
+      const before = manager.get();
+
+      const restarted = manager.begin();
+
+      expect(restarted).not.toBe(before);
+      expect(restarted).toBe(manager.get());
+      expect(restarted.status).toBe("active");
     });
 
     it("commit() records an undo entry for scene changes and auto-restarts a fresh default", () => {
       const rect = API.createElement({ type: "rectangle" });
-      const before = h.app.transactionManager.default;
+      const before = h.app.transactionManager.get();
 
       // Transparent model: the scene is mutated through the normal flow, then the
       // touched elements are registered with the transaction.
@@ -45,7 +62,7 @@ describe("TransactionManager", () => {
       expect(h.elements.some((el) => el.id === rect.id)).toBe(true);
       expect(h.history.undoStack.length).toBeGreaterThan(historyLengthBefore);
 
-      const after = h.app.transactionManager.default;
+      const after = h.app.transactionManager.get();
       expect(after).not.toBe(before);
       expect(after.status).toBe("active");
     });
@@ -59,7 +76,7 @@ describe("TransactionManager", () => {
       API.setElements([rect, newRect]);
       expect(h.elements.filter((el) => !el.isDeleted).length).toBe(2);
 
-      const before = h.app.transactionManager.default;
+      const before = h.app.transactionManager.get();
 
       act(() => {
         before.rollback();
@@ -69,7 +86,7 @@ describe("TransactionManager", () => {
       expect(before.status).toBe("rolled-back");
       expect(h.elements.filter((el) => !el.isDeleted).length).toBe(0);
 
-      const after = h.app.transactionManager.default;
+      const after = h.app.transactionManager.get();
       expect(after).not.toBe(before);
       expect(after.status).toBe("active");
     });
@@ -78,11 +95,11 @@ describe("TransactionManager", () => {
       const rect = API.createElement({ type: "rectangle" });
       const historyLengthBefore = h.history.undoStack.length;
 
-      h.app.transactionManager.default.update({
+      h.app.transactionManager.get().update({
         elements: arrayToMap([rect]) as SceneElementsMap,
       });
       act(() => {
-        h.app.transactionManager.default.rollback();
+        h.app.transactionManager.get().rollback();
       });
 
       expect(h.history.undoStack.length).toBe(historyLengthBefore);
@@ -343,7 +360,7 @@ describe("TransactionManager", () => {
 
         const txnA = h.app.transactionManager.begin("txA");
         const txnB = h.app.transactionManager.begin("txB");
-        const defaultBefore = h.app.transactionManager.default;
+        const defaultBefore = h.app.transactionManager.get();
 
         txnA.update({ elements: arrayToMap([rectA]) as SceneElementsMap });
         txnB.update({ elements: arrayToMap([rectB]) as SceneElementsMap });
@@ -357,20 +374,20 @@ describe("TransactionManager", () => {
         expect(defaultBefore.status).toBe("rolled-back");
 
         // default auto-restarts
-        expect(h.app.transactionManager.default).not.toBe(defaultBefore);
-        expect(h.app.transactionManager.default.status).toBe("active");
+        expect(h.app.transactionManager.get()).not.toBe(defaultBefore);
+        expect(h.app.transactionManager.get().status).toBe("active");
       });
 
       it("rollbackAll() is a no-op for keyed when none are active", () => {
-        const defaultBefore = h.app.transactionManager.default;
+        const defaultBefore = h.app.transactionManager.get();
         expect(() => {
           act(() => {
             h.app.transactionManager.rollbackAll();
           });
         }).not.toThrow();
         // default still auto-restarts
-        expect(h.app.transactionManager.default).not.toBe(defaultBefore);
-        expect(h.app.transactionManager.default.status).toBe("active");
+        expect(h.app.transactionManager.get()).not.toBe(defaultBefore);
+        expect(h.app.transactionManager.get().status).toBe("active");
       });
     });
   });

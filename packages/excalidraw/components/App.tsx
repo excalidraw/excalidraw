@@ -641,8 +641,8 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  public store: Store;
-  public history: History;
+  private store: Store;
+  private history: History;
   public transactionManager: TransactionManager;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -836,7 +836,17 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store = new Store(this);
     this.history = new History(this.store);
-    this.transactionManager = new TransactionManager(this);
+    this.transactionManager = new TransactionManager({
+      getElementsMap: () => this.scene.getElementsMapIncludingDeleted(),
+      getAppState: () => this.state,
+      getSnapshot: () => this.store.snapshot,
+      setSnapshot: (snapshot) => {
+        this.store.snapshot = snapshot;
+      },
+      recordHistory: (delta) => this.history.record(delta),
+      applyUpdate: ({ elements, appState }) =>
+        this.updateScene({ elements, appState }),
+    });
 
     this.excalidrawContainerValue = {
       container: this.excalidrawContainerRef.current,
@@ -3138,7 +3148,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.onDurableIncrementEmitter.on((increment) => {
-      // this.history.record(increment.delta);
+      this.history.record(increment.delta);
     });
 
     // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation
@@ -3549,7 +3559,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.commit(elementsMap, this.state);
-    this.transactionManager.default.update({
+    this.transactionManager.get().update({
       elements: elementsMap,
       appState: this.state,
     });
@@ -7661,7 +7671,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    this.transactionManager.createDefault();
+    this.transactionManager.begin();
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
@@ -11527,7 +11537,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedElementIds,
         )
       ) {
-        this.transactionManager.default.commit();
+        this.transactionManager.commit();
         // this.store.scheduleCapture();
       }
 
