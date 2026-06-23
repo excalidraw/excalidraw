@@ -10,6 +10,7 @@ import {
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 import {
+  getResourceTypeFromPath,
   mergeTerraformPlanResourceValues,
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
@@ -28,26 +29,6 @@ function getPrimaryResource(
   return first && typeof first === "object"
     ? (first as Record<string, unknown>)
     : undefined;
-}
-
-function getResourceTypeFromPath(
-  nodePath: string,
-  node?: TerraformPlanGraphNode,
-): string {
-  const primary = getPrimaryResource(node);
-  const t = primary?.type;
-  if (typeof t === "string") {
-    return t;
-  }
-  const parts = nodePath.split(".");
-  let i = 0;
-  while (i < parts.length - 1 && parts[i] === "module") {
-    i += 2;
-  }
-  if (i < parts.length && parts[i] === "data") {
-    return typeof parts[i + 1] === "string" ? String(parts[i + 1]) : "";
-  }
-  return typeof parts[i] === "string" ? String(parts[i]) : "";
 }
 
 function collectStringish(value: unknown, out: string[]): void {

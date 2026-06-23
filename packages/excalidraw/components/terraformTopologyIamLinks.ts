@@ -74,7 +74,7 @@ function getPrimaryResource(
     : undefined;
 }
 
-function getResourceTypeFromPath(
+export function getResourceTypeFromPath(
   nodePath: string,
   node?: TerraformPlanGraphNode,
 ): string {
