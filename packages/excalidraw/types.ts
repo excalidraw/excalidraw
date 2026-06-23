@@ -368,6 +368,9 @@ export interface AppState {
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
+  currentItemFontWeight: ExcalidrawTextElement["fontWeight"];
+  currentItemFontStyle: ExcalidrawTextElement["fontStyle"];
+  currentItemTextDecoration: ExcalidrawTextElement["textDecoration"];
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;

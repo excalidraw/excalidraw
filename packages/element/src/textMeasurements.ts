@@ -20,7 +20,9 @@ export const measureText = (
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const fontSize = parseFloat(font);
+  const fontSize = Number(
+    font.match(/(?:^|\s)(\d+(?:\.\d+)?)px(?:\s|$)/)?.[1] ?? DEFAULT_FONT_SIZE,
+  );
   const height = getTextHeight(_text, fontSize, lineHeight);
   const width = getTextWidth(_text, font);
   return { width, height };

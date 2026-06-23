@@ -103,6 +103,40 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should default missing text style fields and preserve supplied values", () => {
+    const legacyTextElement = API.createElement({
+      type: "text",
+      text: "legacy",
+    }) as any;
+    delete legacyTextElement.fontWeight;
+    delete legacyTextElement.fontStyle;
+    delete legacyTextElement.textDecoration;
+
+    const styledTextElement = API.createElement({
+      type: "text",
+      text: "styled",
+      fontWeight: "bold",
+      fontStyle: "italic",
+      textDecoration: "underline",
+    });
+
+    const [restoredLegacyText, restoredStyledText] = restore.restoreElements(
+      [legacyTextElement, styledTextElement],
+      null,
+    ) as ExcalidrawTextElement[];
+
+    expect(restoredLegacyText).toMatchObject({
+      fontWeight: "normal",
+      fontStyle: "normal",
+      textDecoration: "none",
+    });
+    expect(restoredStyledText).toMatchObject({
+      fontWeight: "bold",
+      fontStyle: "italic",
+      textDecoration: "underline",
+    });
+  });
+
   it("should not delete empty text element when opts.deleteInvisibleElements is not defined", () => {
     const textElement = API.createElement({
       type: "text",

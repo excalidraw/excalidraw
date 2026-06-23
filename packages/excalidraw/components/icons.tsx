@@ -1613,6 +1613,57 @@ export const FontSizeExtraLargeIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const FontWeightBoldIcon = createIcon(
+  <text
+    x="7.25"
+    y="15.5"
+    fill="currentColor"
+    fontFamily="Arial, Helvetica, sans-serif"
+    fontSize="17.469375"
+    fontWeight="600"
+  >
+    B
+  </text>,
+  tablerIconProps,
+);
+
+export const FontStyleItalicIcon = createIcon(
+  <text
+    x="9"
+    y="15.5"
+    fill="currentColor"
+    fontFamily="Arial, Helvetica, sans-serif"
+    fontSize="17.303"
+    fontStyle="italic"
+    fontWeight="500"
+  >
+    I
+  </text>,
+  tablerIconProps,
+);
+
+export const TextDecorationUnderlineIcon = createIcon(
+  <>
+    <text
+      x="7"
+      y="14.75"
+      fill="currentColor"
+      fontFamily="Arial, Helvetica, sans-serif"
+      fontSize="15.939"
+      fontWeight="500"
+    >
+      U
+    </text>
+    <path
+      d="M6.35 17.5h9.8398125"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+    />
+  </>,
+  tablerIconProps,
+);
+
 export const fontSizeIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

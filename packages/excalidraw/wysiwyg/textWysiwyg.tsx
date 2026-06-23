@@ -62,6 +62,9 @@ import {
 } from "../clipboard";
 import {
   actionDecreaseFontSize,
+  actionChangeFontStyle,
+  actionChangeFontWeight,
+  actionChangeTextDecoration,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import {
@@ -252,6 +255,15 @@ export const textWysiwyg = ({
     if (`${updatedTextElement.fontSize}px` !== editable.style.fontSize) {
       return true;
     }
+    if (updatedTextElement.fontWeight !== editable.style.fontWeight) {
+      return true;
+    }
+    if (updatedTextElement.fontStyle !== editable.style.fontStyle) {
+      return true;
+    }
+    if (updatedTextElement.textDecoration !== editable.style.textDecoration) {
+      return true;
+    }
     return false;
   };
 
@@ -375,7 +387,8 @@ export const textWysiwyg = ({
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       Object.assign(editable.style, {
-        font,
+        fontFamily: getFontFamilyString(updatedTextElement),
+        fontSize: `${updatedTextElement.fontSize}px`,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
@@ -399,6 +412,9 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+      editable.style.fontWeight = updatedTextElement.fontWeight;
+      editable.style.fontStyle = updatedTextElement.fontStyle;
+      editable.style.textDecoration = updatedTextElement.textDecoration;
       currentTextLayout = {
         angle: angle as Radians,
         font,
@@ -419,7 +435,12 @@ export const textWysiwyg = ({
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
 
-      app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      if (
+        Math.abs(updatedTextElement.x - coordX) > 0.01 ||
+        Math.abs(updatedTextElement.y - coordY) > 0.01
+      ) {
+        app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      }
     }
   };
 
@@ -643,6 +664,39 @@ export const textWysiwyg = ({
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);
+    } else if (
+      actionChangeFontWeight.keyTest?.(
+        event,
+        app.state,
+        app.actionManager.getElementsIncludingDeleted(),
+        app,
+      )
+    ) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionChangeFontWeight);
+      updateWysiwygStyle();
+    } else if (
+      actionChangeFontStyle.keyTest?.(
+        event,
+        app.state,
+        app.actionManager.getElementsIncludingDeleted(),
+        app,
+      )
+    ) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionChangeFontStyle);
+      updateWysiwygStyle();
+    } else if (
+      actionChangeTextDecoration.keyTest?.(
+        event,
+        app.state,
+        app.actionManager.getElementsIncludingDeleted(),
+        app,
+      )
+    ) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionChangeTextDecoration);
+      updateWysiwygStyle();
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;

@@ -43,10 +43,11 @@ vi.mock("@excalidraw/common", async (importOriginal) => {
   };
 });
 
-const sendPasteEvent = (text: string) => {
+const sendPasteEvent = (text: string, html?: string) => {
   const clipboardEvent = createPasteEvent({
     types: {
       "text/plain": text,
+      ...(html ? { "text/html": html } : null),
     },
   });
   document.dispatchEvent(clipboardEvent);
@@ -67,6 +68,15 @@ const pasteWithCtrlCmdV = (text: string) => {
     Keyboard.keyPress(KEYS.V);
     //triggering paste event with faked clipboard
     sendPasteEvent(text);
+  });
+};
+
+const pasteHTMLWithCtrlCmdV = (text: string, html: string) => {
+  Keyboard.withModifierKeys({ ctrl: true }, () => {
+    //triggering keydown with an empty clipboard
+    Keyboard.keyPress(KEYS.V);
+    //triggering paste event with faked clipboard
+    sendPasteEvent(text, html);
   });
 };
 
@@ -191,6 +201,23 @@ describe("paste text as single lines", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
       expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
+    });
+  });
+
+  it("should preserve rich text styles when pasting html", async () => {
+    const text = "styled text";
+
+    pasteHTMLWithCtrlCmdV(text, `<strong><em><u>${text}</u></em></strong>`);
+
+    await waitFor(() => {
+      expect(h.elements).toHaveLength(1);
+      expect(h.elements[0]).toMatchObject({
+        type: "text",
+        text,
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
     });
   });
 });

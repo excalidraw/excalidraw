@@ -685,6 +685,15 @@ const renderElementToSvg = (
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
+          if (element.fontWeight !== "normal") {
+            text.setAttribute("font-weight", element.fontWeight);
+          }
+          if (element.fontStyle !== "normal") {
+            text.setAttribute("font-style", element.fontStyle);
+          }
+          if (element.textDecoration !== "none") {
+            text.setAttribute("text-decoration", element.textDecoration);
+          }
           text.setAttribute(
             "fill",
             applyDarkModeFilter(

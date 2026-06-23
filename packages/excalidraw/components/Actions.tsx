@@ -227,6 +227,14 @@ export const SelectedShapeActions = ({
         targetElements.some(isTextElement)) && (
         <>
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
+          <fieldset>
+            <legend>{t("labels.textStyle")}</legend>
+            <div className="buttonList">
+              {renderAction("changeFontWeight")}
+              {renderAction("changeFontStyle")}
+              {renderAction("changeTextDecoration")}
+            </div>
+          </fieldset>
           {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
@@ -589,6 +597,17 @@ const CombinedTextProperties = ({
             }}
           >
             <div className="selected-shape-actions">
+              {(appState.activeTool.type === "text" ||
+                targetElements.some(isTextElement)) && (
+                <fieldset>
+                  <legend>{t("labels.textStyle")}</legend>
+                  <div className="buttonList">
+                    {renderAction("changeFontWeight")}
+                    {renderAction("changeFontStyle")}
+                    {renderAction("changeTextDecoration")}
+                  </div>
+                </fieldset>
+              )}
               {(appState.activeTool.type === "text" ||
                 targetElements.some(isTextElement)) &&
                 renderAction("changeFontSize")}

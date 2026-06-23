@@ -679,6 +679,35 @@ describe("textWysiwyg", () => {
       expect(textElement.fontSize).toBe(origFontSize);
     });
 
+    it("should toggle whole-text styles via shortcuts while in wysiwyg", () => {
+      textarea.value = "abc def";
+
+      fireEvent.keyDown(textarea, {
+        key: KEYS.B,
+        code: CODES.B,
+        ctrlKey: true,
+      });
+      fireEvent.keyDown(textarea, {
+        key: KEYS.I,
+        code: CODES.I,
+        ctrlKey: true,
+      });
+      fireEvent.keyDown(textarea, {
+        key: KEYS.U,
+        code: CODES.U,
+        ctrlKey: true,
+      });
+
+      expect(h.elements[0]).toMatchObject({
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
+      expect(textarea.style.fontWeight).toBe("bold");
+      expect(textarea.style.fontStyle).toBe("italic");
+      expect(textarea.style.textDecoration).toBe("underline");
+    });
+
     it("zooming via keyboard should zoom canvas", () => {
       expect(h.state.zoom.value).toBe(1);
       fireEvent.keyDown(textarea, {
