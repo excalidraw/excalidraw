@@ -7,6 +7,22 @@ from typing import Any
 # over k=60 on both tracks (catalog 0.768 vs 0.765, pdf 0.715 vs 0.696).
 RRF_K = 20
 
+# Default fusion weights. Weight sweep (2026-06-22 self-improve campaign,
+# sparse_weight in {0.3,0.5,0.7,1.0,1.5,2.0} at dense_weight=1.0, rrf_k=20,
+# pool=80) found nDCG@10 rising monotonically with sparse_weight across the
+# whole grid (no plateau) -- BM25 dominates this corpus much more than the
+# 2026-06 bake-off implied (bm25-only: catalog 0.878, pdf 0.878; dense-only:
+# catalog 0.615, pdf 0.621). sparse_weight=2.0 clears the calibrated
+# promotion gate vs the prior equal-weight default (+0.054 catalog / +0.063
+# pdf, no failure increase) but is still BELOW bm25-only on pdf-deep-read
+# (0.875 vs 0.878) and only marginally above it on catalog (0.880 vs 0.878).
+# Read this as: hybrid fusion adds no real value over BM25 alone on this
+# corpus today; sparse_weight=2.0 mainly claws back the equal-weight
+# baseline's loss to BM25, it does not represent a verified hybrid win.
+# Recorded honestly rather than oversold -- see docs/quality-campaign-2026-06-22.md.
+DENSE_WEIGHT = 1.0
+SPARSE_WEIGHT = 2.0
+
 
 def merge_rankings(
     *result_lists: list[dict[str, Any]],
@@ -41,8 +57,8 @@ def reciprocal_rank_fusion(
     *,
     top: int = 30,
     rrf_k: int = RRF_K,
-    dense_weight: float = 1.0,
-    sparse_weight: float = 1.0,
+    dense_weight: float = DENSE_WEIGHT,
+    sparse_weight: float = SPARSE_WEIGHT,
 ) -> list[dict[str, Any]]:
     """Merge dense (vector) and sparse (BM25) rankings with reciprocal rank fusion.
 

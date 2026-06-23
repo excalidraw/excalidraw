@@ -8,9 +8,12 @@ Requires Python 3.11+ and [uv](https://github.com/astral-sh/uv).
 
 ```bash
 cd tools/graph-layout-rag
-uv sync
+uv sync --extra mlx   # add --extra mlx on Apple Silicon for local MLX embed profiles; omit on Linux/CUDA
 cp .env.example .env   # or reuse tools/repo-rag/.env — set OPENAI_API_KEY
 ```
+
+`mlx` is an opt-in extra, not a base dependency — it's Apple-Silicon-only and breaks the Linux/CUDA
+desktop venv if installed there (see [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md)).
 
 Embeddings use shared [`tools/rag-common`](../rag-common) with **named profiles** (`RAG_EMBED_PROFILE` or `--embed-profile`). Legacy `RAG_EMBED_BACKEND=auto|openai|local|gemini` still works as the implicit `default` profile.
 
@@ -140,7 +143,13 @@ uv run graph-layout-rag eval benchmark --embed-profile cuda-qwen0.6b-small2big-v
 
 Campaign report: [docs/rag/graph-layout-rag-quality-campaign-2026-06-18.md](../../docs/rag/graph-layout-rag-quality-campaign-2026-06-18.md).
 
-Current result: `cuda-qwen0.6b-section-v1` is built and synced, but is not promoted as the default because its PDF nDCG gain is offset by a catalog regression. Continue with `cuda-qwen0.6b-small2big-v1` before contextual builds.
+Current result: `cuda-qwen0.6b-section-v1` is built and synced, but is not promoted as the default because its PDF nDCG gain is offset by a catalog regression.
+
+**2026-06-23 follow-up campaign** (porting rag-literature-rag's wins): weighted-RRF fusion
+(`dense_weight=1.0, sparse_weight=2.0`, promoted as the new default in `query/hybrid.py`) and a
+full `cuda-qwen0.6b-contextual-v1` build/benchmark (4501 docs, 0 errors) — contextual regresses
+both tracks vs. the plain baseline and vs. `section-v1`, so it stays a non-default profile.
+Full writeup: [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md).
 
 ## Retrieval benchmark
 
@@ -334,7 +343,7 @@ RAG_LOCAL_EMBED_DIMS=1024
 RAG_LOCAL_EMBED_QUANT=4bit          # MLX via mlx-embeddings (~2.1 GB weights)
 ```
 
-Requires `rag-common[mlx]` (included in `uv sync` for this package). Progress: `data/ingest.log` and stderr (`embed progress: N/M texts (... texts/s, eta ...)`). Use `-v` for per-doc extraction logs.
+Requires `rag-common[mlx]` — run `uv sync --extra mlx` (opt-in, Apple Silicon only). Progress: `data/ingest.log` and stderr (`embed progress: N/M texts (... texts/s, eta ...)`). Use `-v` for per-doc extraction logs.
 
 **Prevent sleep during long runs:**
 

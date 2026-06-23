@@ -17,7 +17,7 @@ from graph_layout_rag.ingest.index import (
 )
 from graph_layout_rag.manifest import load_manifest
 from graph_layout_rag.paths import CHUNKS_TABLE, profile_index_paths
-from graph_layout_rag.query.hybrid import merge_rankings, reciprocal_rank_fusion
+from graph_layout_rag.query.hybrid import DENSE_WEIGHT, SPARSE_WEIGHT, merge_rankings, reciprocal_rank_fusion
 from graph_layout_rag.query.identity import canonical_identity_map, clear_identity_cache
 
 DEFAULT_HYBRID = True
@@ -222,8 +222,8 @@ def retrieve_candidates(
     vector: Sequence[float] | None = None,
     bm25_query: str | None = None,
     rrf_k: int = 20,
-    dense_weight: float = 1.0,
-    sparse_weight: float = 1.0,
+    dense_weight: float = DENSE_WEIGHT,
+    sparse_weight: float = SPARSE_WEIGHT,
 ) -> list[dict[str, Any]]:
     """Retrieve ranked chunk rows before reranking or JSON formatting."""
     filters = filters or RetrieveFilters()

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from graph_layout_rag.catalog.taxonomy import PIPELINE_CATEGORIES
+from graph_layout_rag.query.hybrid import DENSE_WEIGHT, SPARSE_WEIGHT
 from graph_layout_rag.query.retrieve import (
     RetrieveFilters,
     DEFAULT_HYBRID,
@@ -253,8 +254,8 @@ def search_raw(
     rerank_query: str | None = None,
     pool: int | None = None,
     rrf_k: int = 20,
-    dense_weight: float = 1.0,
-    sparse_weight: float = 1.0,
+    dense_weight: float = DENSE_WEIGHT,
+    sparse_weight: float = SPARSE_WEIGHT,
     rerank_model: str | None = None,
 ) -> list[dict[str, Any]]:
     """Return formatted results for eval strategies (doc_id + score fields)."""

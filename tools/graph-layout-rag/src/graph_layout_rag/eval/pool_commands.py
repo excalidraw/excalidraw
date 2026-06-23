@@ -150,6 +150,71 @@ def diagnostics_cmd(
     click.echo(format_diagnostics_table(payload))
 
 
+@click.command("gate")
+@click.option("--baseline-benchmark", type=click.Path(path_type=Path, exists=True), required=True)
+@click.option("--candidate-benchmark", type=click.Path(path_type=Path, exists=True), required=True)
+@click.option("--baseline-strategy", required=True)
+@click.option("--candidate-strategy", required=True)
+@click.option("--track", "tracks", type=click.Choice(EVAL_TRACKS), multiple=True)
+@click.option(
+    "--baseline-diagnostics",
+    "baseline_diagnostics_paths",
+    type=(click.Choice(EVAL_TRACKS), click.Path(path_type=Path, exists=True)),
+    multiple=True,
+    help="TRACK PATH pair; repeatable. Optional eval-diagnostics JSON for bpref join.",
+)
+@click.option(
+    "--candidate-diagnostics",
+    "candidate_diagnostics_paths",
+    type=(click.Choice(EVAL_TRACKS), click.Path(path_type=Path, exists=True)),
+    multiple=True,
+    help="TRACK PATH pair; repeatable. Optional eval-diagnostics JSON for bpref join.",
+)
+@click.option("--json", "as_json", is_flag=True, help="Print JSON to stdout.")
+def gate_cmd(
+    baseline_benchmark: Path,
+    candidate_benchmark: Path,
+    baseline_strategy: str,
+    candidate_strategy: str,
+    tracks: tuple[str, ...],
+    baseline_diagnostics_paths: tuple[tuple[str, Path], ...],
+    candidate_diagnostics_paths: tuple[tuple[str, Path], ...],
+    as_json: bool,
+) -> None:
+    """Apply graph's calibrated 2026-06-18 promotion gate to a candidate retrieval change."""
+    from graph_layout_rag.eval.gate import evaluate_gate, format_gate_report, load_json
+
+    selected_tracks = list(tracks) or list(EVAL_TRACKS)
+    baseline_payload = load_json(baseline_benchmark)
+    candidate_payload = load_json(candidate_benchmark)
+    baseline_diagnostics = {track: load_json(path) for track, path in baseline_diagnostics_paths}
+    candidate_diagnostics = {track: load_json(path) for track, path in candidate_diagnostics_paths}
+
+    result = evaluate_gate(
+        baseline_benchmark=baseline_payload,
+        candidate_benchmark=candidate_payload,
+        baseline_strategy=baseline_strategy,
+        candidate_strategy=candidate_strategy,
+        tracks=selected_tracks,  # type: ignore[arg-type]
+        baseline_diagnostics=baseline_diagnostics or None,
+        candidate_diagnostics=candidate_diagnostics or None,
+    )
+    if as_json:
+        click.echo(
+            json.dumps(
+                {
+                    "passed": result.passed,
+                    "findings": [f.__dict__ for f in result.findings],
+                },
+                indent=2,
+            )
+        )
+    else:
+        click.echo(format_gate_report(result))
+    if not result.passed:
+        raise SystemExit(1)
+
+
 @click.command("corpus-health")
 @click.option("--embed-profile", required=True)
 @click.option("--track", type=click.Choice(EVAL_TRACKS), default="catalog", show_default=True)

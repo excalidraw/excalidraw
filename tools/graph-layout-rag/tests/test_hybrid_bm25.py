@@ -2,7 +2,7 @@ from pathlib import Path
 
 from graph_layout_rag.ingest import bm25
 from graph_layout_rag.ingest.chunk import TextChunk
-from graph_layout_rag.query.hybrid import reciprocal_rank_fusion
+from graph_layout_rag.query.hybrid import DENSE_WEIGHT, SPARSE_WEIGHT, reciprocal_rank_fusion
 
 
 def _chunk(doc_id: str, idx: int, text: str, **kw) -> TextChunk:
@@ -71,3 +71,29 @@ def test_rrf_merges_and_prefers_overlap():
     b = next(r for r in fused if r["id"] == "b:0")
     assert b["dense_rank"] == 2 and b["sparse_rank"] == 1
     assert "fusion_score" in b
+
+
+def test_default_fusion_weights_are_2026_06_22_sweep_winner():
+    """Pins the promoted defaults so an accidental edit is caught immediately."""
+    assert DENSE_WEIGHT == 1.0
+    assert SPARSE_WEIGHT == 2.0
+
+
+def test_rrf_defaults_favor_sparse_at_new_weights():
+    """With sparse_weight=2.0 > dense_weight=1.0, a sparse-only top hit should
+    outrank a dense-only top hit at the same rank -- pins the promoted
+    defaults' fusion ordering at the reciprocal_rank_fusion level, which both
+    retrieve_candidates and retrieve_multi_query build on.
+    """
+    dense = [{"id": "dense_top:0", "score": 0.99, "title": "D", "text": "d"}]
+    sparse = [{"id": "sparse_top:0", "score": 9.0, "title": "S", "text": "s"}]
+    fused = reciprocal_rank_fusion(dense, sparse, top=10)
+    ids = [r["id"] for r in fused]
+    assert ids[0] == "sparse_top:0"
+
+    # At equal weight (the pre-campaign default) the two should tie and the
+    # ordering is not guaranteed sparse-first -- confirms the assertion above
+    # is actually exercising the new weights, not RRF's tie-break order.
+    equal_weight_fused = reciprocal_rank_fusion(dense, sparse, top=10, dense_weight=1.0, sparse_weight=1.0)
+    equal_scores = {r["id"]: r["fusion_score"] for r in equal_weight_fused}
+    assert equal_scores["dense_top:0"] == equal_scores["sparse_top:0"]
