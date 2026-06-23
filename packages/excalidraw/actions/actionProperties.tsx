@@ -106,8 +106,6 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  FreedrawConstantModeIcon,
-  FreedrawVariableModeIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -135,6 +133,8 @@ import {
   ArrowheadCardinalityOneOrManyIcon,
   ArrowheadCardinalityZeroOrManyIcon,
   ArrowheadCardinalityZeroOrOneIcon,
+  strokeVariabilityConstantIcon,
+  strokeVariabilityVariableIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -705,12 +705,12 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
               {
                 value: "constant",
                 text: t("labels.pressure_constant"),
-                icon: FreedrawConstantModeIcon,
+                icon: strokeVariabilityConstantIcon,
               },
               {
                 value: "variable",
                 text: t("labels.pressure_variable"),
-                icon: FreedrawVariableModeIcon,
+                icon: strokeVariabilityVariableIcon,
               },
             ]}
             value={strokeVariability}

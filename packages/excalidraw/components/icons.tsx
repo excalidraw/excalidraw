@@ -1249,24 +1249,72 @@ export const SloppinessCartoonistIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const FreedrawConstantModeIcon = createIcon(
-  <path
-    d="M4 10h12"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
-  modifiedTablerIconProps,
+export const strokeVariabilityConstantIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>,
+  tablerIconProps,
 );
 
-export const FreedrawVariableModeIcon = createIcon(
-  <path
-    d="M4 10C6 9.5 10 8 16 7L16 13C10 12 6 10.5 4 10Z"
-    fill="currentColor"
-    stroke="none"
-  />,
-  modifiedTablerIconProps,
+export const strokeVariabilityVariableIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      strokeWidth="2.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      strokeWidth="3.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>,
+  tablerIconProps,
 );
 
 export const EdgeSharpIcon = createIcon(
