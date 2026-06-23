@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * Semantic topology: stack `aws_lb_listener`, `aws_lb_target_group`, and
  * `aws_lb_target_group_attachment` under their `aws_lb` (tier-0) like S3 companions.

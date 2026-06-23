@@ -76,10 +76,7 @@ async function buildV2(options: Record<string, unknown>) {
   return { meta: scene.meta, elements };
 }
 
-function writeArtifact(
-  partial: Record<string, unknown>,
-  merge: boolean,
-): void {
+function writeArtifact(partial: Record<string, unknown>, merge: boolean): void {
   mkdirSync(dirname(OUT_PATH), { recursive: true });
   let existing: Record<string, unknown> = {};
   if (merge) {

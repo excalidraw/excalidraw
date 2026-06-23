@@ -26,6 +26,9 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
@@ -33,7 +36,7 @@ import {
   applyTfdOverlayToNodes,
   buildTerraformLocalImportNodesMap,
 } from "./terraformPlanParsing";
-import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 
 type GeomCell = {
@@ -141,9 +144,10 @@ describe("rcll rankSeparate (RFC §9.6 / DEC-13, v2)", () => {
 
         // 4. Structural + readability gates hold on the staggered geometry.
         expect(rsPlace.containmentViolations, `${mode} containment`).toBe(0);
-        expect(rsPlace.siblingOverlapViolations, `${mode} sibling overlap`).toBe(
-          0,
-        );
+        expect(
+          rsPlace.siblingOverlapViolations,
+          `${mode} sibling overlap`,
+        ).toBe(0);
         expect(rs.diagnostics.collisionCount, `${mode} collision-free`).toBe(0);
 
         // 5. Milestone + meta identity (mirrors subnetDeBand).

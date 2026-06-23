@@ -63,9 +63,10 @@ describe("terraform source-encoding hygiene (RFC §30)", () => {
 
     expect(
       offenders,
-      "Raw control bytes make a source file read as binary to grep/diff/file. " +
-        "Replace each with its escape sequence (a NUL/0x01 escape is byte-clean):\n  " +
-        offenders.join("\n  "),
+      `${
+        "Raw control bytes make a source file read as binary to grep/diff/file. " +
+        "Replace each with its escape sequence (a NUL/0x01 escape is byte-clean):\n  "
+      }${offenders.join("\n  ")}`,
     ).toEqual([]);
   });
 });

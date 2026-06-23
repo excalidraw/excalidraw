@@ -164,7 +164,11 @@ function listAwsSecurityGroupPathsUnderPrefix(
   nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const out: string[] = [];
-  for (const key of candidatesForType(nodesByType, "aws_security_group", nodes)) {
+  for (const key of candidatesForType(
+    nodesByType,
+    "aws_security_group",
+    nodes,
+  )) {
     if (key === TERRAFORM_MODULE_TREE_KEY || key.startsWith("__")) {
       continue;
     }
@@ -321,7 +325,11 @@ export function buildSecurityGroupIdToPathIndex(
   nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): Map<string, string> {
   const map = new Map<string, string>();
-  for (const path of candidatesForType(nodesByType, "aws_security_group", nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_security_group",
+    nodes,
+  )) {
     const node = nodes[path] as TerraformPlanGraphNode | undefined;
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
@@ -1037,10 +1045,22 @@ export function buildPrimarySgCluster(
   const primary = getPrimaryResource(node);
   const t = typeof primary?.type === "string" ? primary.type : "";
   if (t === "aws_lb") {
-    return buildLoadBalancerSgCluster(nodes, address, arnIndex, plan, nodesByType);
+    return buildLoadBalancerSgCluster(
+      nodes,
+      address,
+      arnIndex,
+      plan,
+      nodesByType,
+    );
   }
   if (t === "aws_ecs_service") {
-    return buildEcsServiceSgCluster(nodes, address, arnIndex, plan, nodesByType);
+    return buildEcsServiceSgCluster(
+      nodes,
+      address,
+      arnIndex,
+      plan,
+      nodesByType,
+    );
   }
   if (t === "aws_rds_cluster" || t === "aws_db_instance") {
     return buildDatastorePrimarySgCluster(

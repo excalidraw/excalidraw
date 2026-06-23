@@ -12,8 +12,6 @@
  */
 import { describe, expect, it } from "vitest";
 
-import type { PipelineCluster } from "./terraformPipelineLayoutShared";
-import type { CompoundNode } from "./terraformPipelineRcllTypes";
 import {
   barycenterOrder,
   boxByClusterId,
@@ -24,13 +22,11 @@ import {
   type CrossingEdge,
 } from "./terraformPipelineRcllCrossingMin";
 
+import type { PipelineCluster } from "./terraformPipelineLayoutShared";
+import type { CompoundNode } from "./terraformPipelineRcllTypes";
+
 /** A leaf cluster node with a placed box at column `col`, row `row`. */
-function leaf(
-  id: string,
-  seq: number,
-  col: number,
-  row: number,
-): CompoundNode {
+function leaf(id: string, seq: number, col: number, row: number): CompoundNode {
   return {
     key: id,
     role: "primaryCluster",
@@ -47,7 +43,11 @@ function leaf(
 }
 
 /** A container with the given leaf children. */
-function container(key: string, seq: number, children: CompoundNode[]): CompoundNode {
+function container(
+  key: string,
+  seq: number,
+  children: CompoundNode[],
+): CompoundNode {
   return {
     key,
     role: "vpc",
@@ -76,11 +76,26 @@ describe("M6c countPlacedCrossings", () => {
       ["d", { x: 300, y: 120, width: 100, height: 60 }],
     ]);
     // a(top)→d(bottom) and b(bottom)→c(top) cross.
-    expect(countPlacedCrossings(boxes, [["a", "d"], ["b", "c"]])).toBe(1);
+    expect(
+      countPlacedCrossings(boxes, [
+        ["a", "d"],
+        ["b", "c"],
+      ]),
+    ).toBe(1);
     // a→c and a→d share endpoint a ⇒ not a crossing.
-    expect(countPlacedCrossings(boxes, [["a", "c"], ["a", "d"]])).toBe(0);
+    expect(
+      countPlacedCrossings(boxes, [
+        ["a", "c"],
+        ["a", "d"],
+      ]),
+    ).toBe(0);
     // a→c and b→d are parallel ⇒ no crossing.
-    expect(countPlacedCrossings(boxes, [["a", "c"], ["b", "d"]])).toBe(0);
+    expect(
+      countPlacedCrossings(boxes, [
+        ["a", "c"],
+        ["b", "d"],
+      ]),
+    ).toBe(0);
   });
 
   it("skips edges whose endpoints are missing from the box map", () => {
@@ -102,7 +117,9 @@ describe("M6c collapsedEdgesFromFanout / boxByClusterId", () => {
   });
 
   it("collects leaf cluster boxes by cluster id", () => {
-    const tree = root([container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)])]);
+    const tree = root([
+      container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)]),
+    ]);
     const boxes = boxByClusterId(tree);
     expect([...boxes.keys()].sort()).toEqual(["a", "b"]);
   });
@@ -129,7 +146,9 @@ describe("M6c barycenterOrder", () => {
   });
 
   it("keeps a node with no cross-edges in model order (stable)", () => {
-    const tree = root([container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)])]);
+    const tree = root([
+      container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)]),
+    ]);
     const r = barycenterOrder(tree, []);
     expect(r.get("a")!).toBeLessThan(r.get("b")!);
   });
@@ -153,12 +172,16 @@ describe("M6c minimizeCrossings", () => {
         override.size > 0 ? override.get(id) ?? 0 : ids.indexOf(id);
       const byCol = new Map<number, string[]>();
       for (const id of ids) {
-        (byCol.get(colOf[id]!) ?? byCol.set(colOf[id]!, []).get(colOf[id]!)!).push(id);
+        (
+          byCol.get(colOf[id]!) ?? byCol.set(colOf[id]!, []).get(colOf[id]!)!
+        ).push(id);
       }
       const leaves: CompoundNode[] = [];
       for (const [col, members] of byCol) {
         members.sort((a, b) => rankOf(a) - rankOf(b));
-        members.forEach((id, row) => leaves.push(leaf(id, ids.indexOf(id), col, row)));
+        members.forEach((id, row) =>
+          leaves.push(leaf(id, ids.indexOf(id), col, row)),
+        );
       }
       return root([
         container(
@@ -174,7 +197,12 @@ describe("M6c minimizeCrossings", () => {
       ]);
     };
 
-  const metrics = () => ({ containment: 0, overlap: 0, width: 600, height: 240 });
+  const metrics = () => ({
+    containment: 0,
+    overlap: 0,
+    width: 600,
+    height: 240,
+  });
 
   it("is identity when no override can improve (place ignores override)", () => {
     const constantPlace = () =>
@@ -279,7 +307,9 @@ describe("M6c countReordered + contiguity", () => {
   });
 
   it("counts zero moves for the empty override", () => {
-    const tree = root([container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)])]);
+    const tree = root([
+      container("g", 0, [leaf("a", 0, 0, 0), leaf("b", 1, 0, 1)]),
+    ]);
     expect(countReordered(tree, new Map())).toBe(0);
   });
 });

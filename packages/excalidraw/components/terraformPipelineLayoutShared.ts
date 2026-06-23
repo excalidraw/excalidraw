@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
 import {
@@ -990,8 +991,9 @@ export function preparePipelineLayout(
     );
   }
 
-  const { satelliteOwners, placementByAddress } =
-    withTerraformPlanNodeKeyIndex(nodes, () => {
+  const { satelliteOwners, placementByAddress } = withTerraformPlanNodeKeyIndex(
+    nodes,
+    () => {
       const owners = terraformImportProfilerMeasure(
         "pipeline.prep.satelliteBundles",
         () => buildSatelliteOwnerMap(nodes, plan),
@@ -1001,15 +1003,11 @@ export function preparePipelineLayout(
         placementByAddress: terraformImportProfilerMeasure(
           "pipeline.prep.resourceRects",
           () =>
-            buildPlacementMap(
-              nodes,
-              plan,
-              undefined,
-              new Set(owners.keys()),
-            ),
+            buildPlacementMap(nodes, plan, undefined, new Set(owners.keys())),
         ),
       };
-    });
+    },
+  );
   const firstSequence = new Map<string, number>();
   const collapsedEdges: CollapsedPipelineEdge[] = [];
   for (const edge of [...declared].sort((a, b) => a.sequence - b.sequence)) {

@@ -58,10 +58,9 @@ describe("deDensifyColumns — safe-spread rule", () => {
   it("never moves a card with a predecessor one column back (M5 adjacency, rule 3)", () => {
     // A→B; B and C share dense column 1. Moving B would turn A→B (span 1, straightenable)
     // into a span-2 edge the straightener ignores → B must stay.
-    const { leaves, colByCluster, fanout, fanin } = mk(
-      { A: 0, B: 1, C: 1 },
-      [["A", "B"]],
-    );
+    const { leaves, colByCluster, fanout, fanin } = mk({ A: 0, B: 1, C: 1 }, [
+      ["A", "B"],
+    ]);
     const out = deDensifyColumns(leaves, colByCluster, fanout, fanin, {
       maxExtraCols: 2,
     });
@@ -71,10 +70,9 @@ describe("deDensifyColumns — safe-spread rule", () => {
   it("never moves a card with a successor one column forward (CON-12 same-column, rule 4)", () => {
     // B→D, D at col 2; B shares dense column 1 with X. Moving B to col 2 would make
     // B→D a same-column edge (forbidden) → B must stay.
-    const { leaves, colByCluster, fanout, fanin } = mk(
-      { B: 1, X: 1, D: 2 },
-      [["B", "D"]],
-    );
+    const { leaves, colByCluster, fanout, fanin } = mk({ B: 1, X: 1, D: 2 }, [
+      ["B", "D"],
+    ]);
     const out = deDensifyColumns(leaves, colByCluster, fanout, fanin, {
       maxExtraCols: 2,
     });
@@ -103,13 +101,10 @@ describe("deDensifyColumns — safe-spread rule", () => {
   it("does not split a wide fan even when the hub is two columns back (rule 5)", () => {
     // H at col 0 fans to T1,T2 at col 2 (source at c-2, so rule 3 passes). They share
     // source H → rule 5 keeps them together.
-    const { leaves, colByCluster, fanout, fanin } = mk(
-      { H: 0, T1: 2, T2: 2 },
-      [
-        ["H", "T1"],
-        ["H", "T2"],
-      ],
-    );
+    const { leaves, colByCluster, fanout, fanin } = mk({ H: 0, T1: 2, T2: 2 }, [
+      ["H", "T1"],
+      ["H", "T2"],
+    ]);
     const out = deDensifyColumns(leaves, colByCluster, fanout, fanin, {
       maxExtraCols: 2,
     });
@@ -120,13 +115,10 @@ describe("deDensifyColumns — safe-spread rule", () => {
   it("never promotes a card in a cycle (forward-only neighbourhood, rule 2)", () => {
     // A↔B both at column 1 (a same-column mutual cycle). Each sees an in-axis neighbour
     // at col == c (not strictly forward) → rule 2 blocks both.
-    const { leaves, colByCluster, fanout, fanin } = mk(
-      { A: 1, B: 1 },
-      [
-        ["A", "B"],
-        ["B", "A"],
-      ],
-    );
+    const { leaves, colByCluster, fanout, fanin } = mk({ A: 1, B: 1 }, [
+      ["A", "B"],
+      ["B", "A"],
+    ]);
     const out = deDensifyColumns(leaves, colByCluster, fanout, fanin, {
       maxExtraCols: 2,
     });
@@ -137,10 +129,9 @@ describe("deDensifyColumns — safe-spread rule", () => {
   it("never moves a card with a cross-axis neighbour (rule 1)", () => {
     // B's only edge is from EXT, which is NOT in the axis (not in cols). We can't reason
     // about its absolute X here, so B must stay.
-    const { leaves, colByCluster, fanout, fanin } = mk(
-      { B: 1, C: 1 },
-      [["EXT", "B"]],
-    );
+    const { leaves, colByCluster, fanout, fanin } = mk({ B: 1, C: 1 }, [
+      ["EXT", "B"],
+    ]);
     const out = deDensifyColumns(leaves, colByCluster, fanout, fanin, {
       maxExtraCols: 2,
     });
@@ -178,9 +169,11 @@ describe("deDensifyColumns — safe-spread rule", () => {
   });
 
   it("handles empty and single-leaf inputs", () => {
-    expect(deDensifyColumns([], new Map(), new Map(), new Map(), {
-      maxExtraCols: 2,
-    }).size).toBe(0);
+    expect(
+      deDensifyColumns([], new Map(), new Map(), new Map(), {
+        maxExtraCols: 2,
+      }).size,
+    ).toBe(0);
     const single = mk({ A: 0 });
     const out = deDensifyColumns(
       single.leaves,

@@ -19,3 +19,4 @@ packages/backend/terraform/staging-multi-state/**/plan.json
 # Generated local RAG indexes and corpus metadata.
 tools/graph-layout-rag/data/
 tools/repo-rag/data/
+tools/rag-literature-rag/data/

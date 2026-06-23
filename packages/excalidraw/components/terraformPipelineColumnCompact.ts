@@ -181,20 +181,34 @@ export function compactColumns(
         continue;
       }
       // (3) don't split a fan group: no shared source / target with a column-mate at c.
-      if (sharesFanWithColumnMate(id, c, src.ids, tgt.ids, out, fanin, fanout, axisIds)) {
+      if (
+        sharesFanWithColumnMate(
+          id,
+          c,
+          src.ids,
+          tgt.ids,
+          out,
+          fanin,
+          fanout,
+          axisIds,
+        )
+      ) {
         continue;
       }
       // Lower bound = just right of the deepest in-hull predecessor (CON-12); no source
       // ⇒ col 0. Upper exclusive = just left of the nearest in-hull successor (and < c).
-      const lowerBound =
-        src.cols.length === 0 ? 0 : Math.max(...src.cols) + 1;
+      const lowerBound = src.cols.length === 0 ? 0 : Math.max(...src.cols) + 1;
       const upperExclusive =
         tgt.cols.length === 0 ? c : Math.min(c, Math.min(...tgt.cols));
       if (lowerBound >= upperExclusive) {
         continue;
       }
       // Leftmost-first: land as far left as the measure oracle allows (multi-step).
-      for (let candidate = lowerBound; candidate < upperExclusive; candidate++) {
+      for (
+        let candidate = lowerBound;
+        candidate < upperExclusive;
+        candidate++
+      ) {
         if (evals >= evalBudget) {
           evalCapReached = true;
           break;
@@ -221,7 +235,12 @@ export function compactColumns(
   }
 
   if (movedCount === 0) {
-    return { colByCluster: base, movedCount: 0, reclaimedCols: 0, evalCapReached };
+    return {
+      colByCluster: base,
+      movedCount: 0,
+      reclaimedCols: 0,
+      evalCapReached,
+    };
   }
 
   // Empty-column removal + re-dense-rank (the width-monotonicity engine). Order-

@@ -107,6 +107,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "terraformEdgeLayerPins": null,
   "terraformLodEnabled": true,
   "terraformLodPreset": "balanced",
+  "terraformMinimapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,

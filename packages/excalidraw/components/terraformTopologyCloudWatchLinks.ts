@@ -422,7 +422,11 @@ function buildCloudWatchAttachmentIndex(
   const identityIndex = buildResourceIdentityIndex(nodes);
   const attachmentIndex: CloudWatchAttachmentIndex = new Map();
 
-  for (const path of candidatesForTypes(nodesByType, CW_SATELLITE_TYPES, nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    CW_SATELLITE_TYPES,
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -482,7 +486,9 @@ export function buildResourceCloudWatchCluster(
     return { cluster: null, edges: [] };
   }
 
-  const attachment = getCloudWatchAttachmentIndex(nodes, nodesByType).get(resourceAddress);
+  const attachment = getCloudWatchAttachmentIndex(nodes, nodesByType).get(
+    resourceAddress,
+  );
   const sortedAlarms = [...(attachment?.alarms ?? [])].sort();
   const sortedLogGroups = [...(attachment?.logGroups ?? [])].sort();
   if (sortedAlarms.length === 0 && sortedLogGroups.length === 0) {

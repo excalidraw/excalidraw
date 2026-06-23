@@ -143,7 +143,18 @@ export function deDensifyColumns(
       continue;
     }
     // (5) don't split a fan group: no shared source / target with a column-mate at c.
-    if (sharesFanWithColumnMate(id, c, src.ids, tgt.ids, out, fanin, fanout, axisIds)) {
+    if (
+      sharesFanWithColumnMate(
+        id,
+        c,
+        src.ids,
+        tgt.ids,
+        out,
+        fanin,
+        fanout,
+        axisIds,
+      )
+    ) {
       continue;
     }
     // (6b) move toward the sparser side; cap brand-new columns.

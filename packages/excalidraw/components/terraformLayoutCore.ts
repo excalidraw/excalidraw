@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * Worker-safe Terraform layout: merge plans, run semantic / module layout,
  * return a plain scene payload (no Response, no DOM).
@@ -460,6 +461,7 @@ async function buildPipelineLayoutSceneBody(
 ): Promise<Record<string, unknown>> {
   return withTerraformLayoutColorModeAsync(
     ctx.colorMode ?? TERRAFORM_COLOR_MODE_DEFAULT,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     async () => {
       // Shared as a variable (not a literal) so v2 — which reads only `compact`
       // / `includeAncillary` — tolerates the extra classic/compound keys.
@@ -829,6 +831,7 @@ async function buildModuleLayoutSceneBody(
 }
 
 /** Sequential layout (main-thread fallback and single-bundle paths). */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export async function layoutTerraformFromSources(
   sources: TerraformPlanParsingSources,
   options?: TerraformLayoutOptions,

@@ -34,7 +34,9 @@ const edges = (
 
 /** Width = (max column index) + 1; no frame heights ⇒ the height check is vacuous, so
  * any structurally-legal left move is accepted (width never grows on a left move). */
-const freeMeasure = (trial: ReadonlyMap<string, number>): ColumnCompactMeasure => {
+const freeMeasure = (
+  trial: ReadonlyMap<string, number>,
+): ColumnCompactMeasure => {
   let maxCol = 0;
   for (const v of trial.values()) {
     maxCol = Math.max(maxCol, v);
@@ -181,9 +183,7 @@ describe("compactColumns — structural contract", () => {
     ): ColumnCompactMeasure => ({
       width: 4,
       nodeHeights:
-        (trial.get("d") ?? 3) < 3
-          ? new Map([["frame", 200]])
-          : baselineHeights,
+        (trial.get("d") ?? 3) < 3 ? new Map([["frame", 200]]) : baselineHeights,
     });
     const out = compactColumns(
       leaves("a", "d"),

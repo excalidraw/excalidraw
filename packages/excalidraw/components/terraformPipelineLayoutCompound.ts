@@ -19,7 +19,6 @@ import {
   preparePipelineLayout,
 } from "./terraformPipelineLayoutShared";
 
-import type { PipelineLayoutPrep } from "./terraformPipelineLayoutShared";
 import {
   applyPackedDepthShifts,
   computePackedDepthShifts,
@@ -30,6 +29,8 @@ import {
   EMPTY_PACKED_PULL_LEFT_SHIFTS,
 } from "./terraformPipelineLayoutPacked";
 import { buildCompoundFramesFromLayoutBoxes } from "./terraformPipelineTopologyFrames";
+
+import type { PipelineLayoutPrep } from "./terraformPipelineLayoutShared";
 
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import type { TerraformImportWarning } from "./terraformImportMerge";

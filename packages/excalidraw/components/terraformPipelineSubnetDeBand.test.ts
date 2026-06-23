@@ -22,6 +22,9 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
@@ -29,7 +32,7 @@ import {
   applyTfdOverlayToNodes,
   buildTerraformLocalImportNodesMap,
 } from "./terraformPlanParsing";
-import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 
 type GeomCell = {
@@ -115,9 +118,10 @@ describe("rcll subnet de-band (Phase 1a, v2)", () => {
         const onPlace = placement(on.meta);
         const onGates = gatesOf(on.meta);
         expect(onPlace.containmentViolations, `${mode} containment`).toBe(0);
-        expect(onPlace.siblingOverlapViolations, `${mode} sibling overlap`).toBe(
-          0,
-        );
+        expect(
+          onPlace.siblingOverlapViolations,
+          `${mode} sibling overlap`,
+        ).toBe(0);
         expect(
           onGates.acyclicBackwardEdges,
           `${mode} iron rule: no backward edge`,

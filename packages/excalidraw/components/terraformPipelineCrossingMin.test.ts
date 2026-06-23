@@ -16,6 +16,9 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
@@ -23,7 +26,7 @@ import {
   applyTfdOverlayToNodes,
   buildTerraformLocalImportNodesMap,
 } from "./terraformPlanParsing";
-import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 
 /** Geometry projection — element ids/nonces are random per build, so byte-identity and
@@ -161,7 +164,9 @@ describe("rcll container-aware crossing minimization (M6c, v2)", () => {
       // eslint-disable-next-line no-console
       console.log(
         `[M6c deBand vpc] crossings OFF=${readability(off.meta).crossings} ` +
-          `ON=${readability(on.meta).crossings} applied=${onPlace.crossingMinApplied} ` +
+          `ON=${readability(on.meta).crossings} applied=${
+            onPlace.crossingMinApplied
+          } ` +
           `moves=${onPlace.crossingMinMoves} proxy ${onPlace.crossingMinBefore}→${onPlace.crossingMinAfter}`,
       );
     },

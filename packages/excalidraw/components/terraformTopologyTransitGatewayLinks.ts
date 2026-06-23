@@ -432,7 +432,11 @@ export function buildTransitGatewayCompanionCluster(
     values: Record<string, unknown>;
   }> = [];
 
-  for (const path of candidatesForTypes(nodesByType, TGW_TOPOLOGY_SATELLITE_TYPES, nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    TGW_TOPOLOGY_SATELLITE_TYPES,
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }

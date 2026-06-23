@@ -618,7 +618,13 @@ export function buildEcsEc2CapacityChainsForService(
       nodesByType,
     );
     const ltPath = asgPath
-      ? resolveLaunchTemplateFromAsg(nodes, asgPath, scope, changes, nodesByType)
+      ? resolveLaunchTemplateFromAsg(
+          nodes,
+          asgPath,
+          scope,
+          changes,
+          nodesByType,
+        )
       : null;
     const profilePath = ltPath
       ? resolveInstanceProfileFromLaunchTemplate(
@@ -723,7 +729,11 @@ export function resolveEcsClusterPathFromService(
       return fromPlan;
     }
     const bare = stripTerraformAttributeSuffix(ref);
-    for (const path of candidatesForType(nodesByType, "aws_ecs_cluster", nodes)) {
+    for (const path of candidatesForType(
+      nodesByType,
+      "aws_ecs_cluster",
+      nodes,
+    )) {
       if (getResourceType(path, nodes[path]) !== "aws_ecs_cluster") {
         continue;
       }
@@ -743,7 +753,12 @@ export function resolveEcsClusterPathFromService(
     }
   }
 
-  return findSingletonInModuleScope(nodes, scope, "aws_ecs_cluster", nodesByType);
+  return findSingletonInModuleScope(
+    nodes,
+    scope,
+    "aws_ecs_cluster",
+    nodesByType,
+  );
 }
 
 function resolveClusterCapacityProvidersPath(

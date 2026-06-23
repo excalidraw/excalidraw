@@ -22,6 +22,9 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
+
+import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import { diagnosePipelineScene } from "./terraformPipelineCollisionDiagnostics";
 import { resolveSourcesWithTfdComposition } from "./terraformImportCompositionResolve";
 import { buildTerraformPipelineRcllExcalidrawScene } from "./terraformPipelineLayoutRcll";
@@ -29,7 +32,7 @@ import {
   applyTfdOverlayToNodes,
   buildTerraformLocalImportNodesMap,
 } from "./terraformPlanParsing";
-import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
 import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes";
 import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";
 
@@ -134,7 +137,9 @@ describe("rcll hierarchy-level de-band (v2)", () => {
         // column axis, so some TFD edges land in one column — a measured, honestly-reported
         // legibility trade, NOT a crash and never a backward edge. (See RFC §8.2 / DEC-11.)
         if (level === "subnet" || level === "vpc") {
-          expect(onGates.acyclicSameColumnEdges, `${level} no same-col`).toBe(0);
+          expect(onGates.acyclicSameColumnEdges, `${level} no same-col`).toBe(
+            0,
+          );
         } else {
           expect(
             onGates.acyclicSameColumnEdges,
@@ -167,9 +172,10 @@ describe("rcll hierarchy-level de-band (v2)", () => {
             `${level} height ≤ boxed baseline`,
           ).toBeLessThanOrEqual(offPlace.maxDepthPx + 1);
         } else {
-          expect(onPlace.maxDepthPx, `${level} height measured`).toBeGreaterThan(
-            0,
-          );
+          expect(
+            onPlace.maxDepthPx,
+            `${level} height measured`,
+          ).toBeGreaterThan(0);
         }
 
         // Exactly the dissolved frame roles disappear; shallower (surviving) roles remain.

@@ -52,7 +52,8 @@ function candidatesForTypes(
   for (const t of types) {
     out.push(...(nodesByType.get(t) ?? []));
   }
-  return out;}
+  return out;
+}
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return Boolean(v && typeof v === "object" && !Array.isArray(v));
@@ -341,7 +342,11 @@ function resolveVpcLinkIdToVpcLinkPath(
     }
   }
 
-  for (const path of candidatesForType(nodesByType, "aws_api_gateway_vpc_link", nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_api_gateway_vpc_link",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -374,7 +379,11 @@ export function resolveVpcLinksForRestApi(
   const apiScope = topologyModuleScopeForAddress(restApiAddress);
   const vpcLinks: string[] = [];
 
-  for (const path of candidatesForType(nodesByType, "aws_api_gateway_vpc_link", nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_api_gateway_vpc_link",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -411,7 +420,11 @@ export function resolveVpcLinksForRestApi(
     if (parent !== restApiAddress) {
       continue;
     }
-    const linkPath = resolveVpcLinkIdToVpcLinkPath(nodes, pv.connection_id, nodesByType);
+    const linkPath = resolveVpcLinkIdToVpcLinkPath(
+      nodes,
+      pv.connection_id,
+      nodesByType,
+    );
     if (linkPath) {
       linked.add(linkPath);
     }
@@ -549,7 +562,11 @@ function resolveRestApiIdToRestApiPath(
     }
   }
 
-  for (const path of candidatesForType(nodesByType, "aws_api_gateway_rest_api", nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_api_gateway_rest_api",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -587,7 +604,11 @@ function resolveDeploymentRefToDeploymentPath(
         const v = mergeTerraformPlanResourceValues(
           getPrimaryResource(nodes[key] as TerraformPlanGraphNode),
         );
-        const api = resolveRestApiIdToRestApiPath(nodes, v.rest_api_id, nodesByType);
+        const api = resolveRestApiIdToRestApiPath(
+          nodes,
+          v.rest_api_id,
+          nodesByType,
+        );
         if (api === restApiAddress) {
           return key;
         }
@@ -595,7 +616,11 @@ function resolveDeploymentRefToDeploymentPath(
     }
   }
 
-  for (const path of candidatesForType(nodesByType, "aws_api_gateway_deployment", nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_api_gateway_deployment",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -606,7 +631,8 @@ function resolveDeploymentRefToDeploymentPath(
       getPrimaryResource(nodes[path] as TerraformPlanGraphNode),
     );
     if (
-      resolveRestApiIdToRestApiPath(nodes, v.rest_api_id, nodesByType) !== restApiAddress
+      resolveRestApiIdToRestApiPath(nodes, v.rest_api_id, nodesByType) !==
+      restApiAddress
     ) {
       continue;
     }
@@ -643,7 +669,11 @@ function resolveLogGroupArnToPath(
       ? s.split(":log-group:")[1]?.replace(/:\*$/, "") ?? ""
       : "";
     if (logGroupName) {
-      for (const path of candidatesForType(nodesByType, "aws_cloudwatch_log_group", nodes)) {
+      for (const path of candidatesForType(
+        nodesByType,
+        "aws_cloudwatch_log_group",
+        nodes,
+      )) {
         if (!isAwsCloudWatchLogGroupNode(nodes, path)) {
           continue;
         }
@@ -748,11 +778,20 @@ export function buildApiGatewayCompanionCluster(
     ? (plan as { resource_changes: PlanRc[] }).resource_changes ?? []
     : undefined;
 
-  const vpcLinks = resolveVpcLinksForRestApi(nodes, restApiAddress, changes, nodesByType);
+  const vpcLinks = resolveVpcLinksForRestApi(
+    nodes,
+    restApiAddress,
+    changes,
+    nodesByType,
+  );
   const stages: ApiGatewayStageCluster[] = [];
   const methodSettings: string[] = [];
 
-  for (const path of candidatesForTypes(nodesByType, APIGW_STAGE_METHOD_TYPES, nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    APIGW_STAGE_METHOD_TYPES,
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -765,8 +804,11 @@ export function buildApiGatewayCompanionCluster(
     const values = mergeTerraformPlanResourceValues(p);
     if (t === "aws_api_gateway_stage") {
       if (
-        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id, nodesByType) !==
-        restApiAddress
+        resolveRestApiIdToRestApiPath(
+          nodes,
+          values.rest_api_id,
+          nodesByType,
+        ) !== restApiAddress
       ) {
         continue;
       }
@@ -778,14 +820,22 @@ export function buildApiGatewayCompanionCluster(
           restApiAddress,
           nodesByType,
         ),
-        logGroup: resolveStageAccessLogGroupPath(nodes, path, values, nodesByType),
+        logGroup: resolveStageAccessLogGroupPath(
+          nodes,
+          path,
+          values,
+          nodesByType,
+        ),
       });
       continue;
     }
     if (t === "aws_api_gateway_method_settings") {
       if (
-        resolveRestApiIdToRestApiPath(nodes, values.rest_api_id, nodesByType) ===
-        restApiAddress
+        resolveRestApiIdToRestApiPath(
+          nodes,
+          values.rest_api_id,
+          nodesByType,
+        ) === restApiAddress
       ) {
         methodSettings.push(path);
       }

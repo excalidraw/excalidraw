@@ -81,10 +81,7 @@ const root = (members: CompoundNode[]): CompoundNode =>
 
 describe("buildSeparationConstraintGraph", () => {
   it("adds a separation edge iff one-way AND across distinct quotient nodes", () => {
-    const g = buildSeparationConstraintGraph(
-      ["A", "B", "C"],
-      [edge("A", "B")],
-    );
+    const g = buildSeparationConstraintGraph(["A", "B", "C"], [edge("A", "B")]);
     expect(g.infeasible).toBe(false);
     expect(g.condEdges).toEqual([{ from: "A", to: "B" }]);
     // C is independent → its own singleton quotient, no edges.
@@ -203,7 +200,12 @@ describe("computeGlobalSeparatedFloor", () => {
       tree,
       floors({ a0: 0, b0: 0, c0: 0 }),
       fan({}),
-      hulls({ provider: [["A", "B"], ["B", "C"]] }),
+      hulls({
+        provider: [
+          ["A", "B"],
+          ["B", "C"],
+        ],
+      }),
     ).floor;
     expect(m.get("a0")).toBe(0);
     expect(m.get("b0")).toBe(1);
@@ -221,7 +223,14 @@ describe("computeGlobalSeparatedFloor", () => {
       tree,
       floors({ a0: 0, b0: 0, c0: 0, d0: 0 }),
       fan({}),
-      hulls({ provider: [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"]] }),
+      hulls({
+        provider: [
+          ["A", "B"],
+          ["A", "C"],
+          ["B", "D"],
+          ["C", "D"],
+        ],
+      }),
     ).floor;
     expect(m.get("a0")).toBe(0);
     expect(m.get("b0")).toBe(1);
@@ -239,7 +248,12 @@ describe("computeGlobalSeparatedFloor", () => {
       tree,
       base,
       fan({ a0: ["a1"], b0: ["b1"] }),
-      hulls({ provider: [["A", "B"], ["B", "A"]] }),
+      hulls({
+        provider: [
+          ["A", "B"],
+          ["B", "A"],
+        ],
+      }),
     );
     // A⇄B collapses to one quotient ⇒ no one-way pair ⇒ no-op short-circuit.
     expect(r.pairCount).toBe(0);
@@ -269,7 +283,10 @@ describe("computeGlobalSeparatedFloor", () => {
       floors({ p0: 0, p1: 0, q0: 0, q1: 0 }),
       leafAdj,
       hulls({
-        provider: [["acct1", "acct2"], ["acct2", "acct1"]], // 2-way ⇒ co-axial
+        provider: [
+          ["acct1", "acct2"],
+          ["acct2", "acct1"],
+        ], // 2-way ⇒ co-axial
         acct1: [["R1", "R2"]], // one-way ⇒ separation fires
       }),
     );
@@ -355,7 +372,13 @@ describe("computeGlobalSeparatedFloor", () => {
       tree,
       floors({ a0: 0, b0: 0, c0: 0, d0: 0 }),
       fan({}),
-      hulls({ provider: [["A", "D"], ["B", "D"], ["C", "D"]] }),
+      hulls({
+        provider: [
+          ["A", "D"],
+          ["B", "D"],
+          ["C", "D"],
+        ],
+      }),
     ).floor;
     expect(m.get("a0")).toBe(0);
     expect(m.get("b0")).toBe(0);
@@ -403,7 +426,12 @@ describe("computeGlobalSeparatedFloor", () => {
       floors({ a0: 0, b0: 0, c0: 0, d0: 0, e0: 0 }),
       fan({}),
       hulls({
-        provider: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "E"]],
+        provider: [
+          ["A", "B"],
+          ["B", "C"],
+          ["C", "D"],
+          ["D", "E"],
+        ],
       }),
     );
     expect(r.fallbackReason).toBe("none");
@@ -427,7 +455,12 @@ describe("computeGlobalSeparatedFloor", () => {
       ]);
     const base = floors({ a0: 0, a1: 1, b0: 0, c0: 0 });
     const adj = fan({ a0: ["a1"] });
-    const h = hulls({ provider: [["A", "B"], ["B", "C"]] });
+    const h = hulls({
+      provider: [
+        ["A", "B"],
+        ["B", "C"],
+      ],
+    });
     const r1 = computeGlobalSeparatedFloor(build(), base, adj, h);
     const r2 = computeGlobalSeparatedFloor(build(), base, adj, h);
     expect(Object.fromEntries(r1.floor)).toEqual(Object.fromEntries(r2.floor));

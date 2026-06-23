@@ -71,11 +71,7 @@ function naiveResolveTerraformPlanNodeKey(
   nodes: Record<string, TerraformPlanGraphNode>,
   address: string,
 ): string | null {
-  if (
-    !address ||
-    typeof address !== "string" ||
-    address === MODULE_TREE_KEY
-  ) {
+  if (!address || typeof address !== "string" || address === MODULE_TREE_KEY) {
     return null;
   }
 
@@ -195,13 +191,14 @@ describe("resolveTerraformPlanNodeKey indexed path equivalence", () => {
     >[0],
     layoutMode: "module" | "semantic" | "pipeline",
   ) {
-    const res = await terraformPlanParsingModule.terraformPlanParsingFromSources(
-      sources,
-      {
-        semanticLayout: layoutMode === "semantic",
-        layoutMode,
-      },
-    );
+    const res =
+      await terraformPlanParsingModule.terraformPlanParsingFromSources(
+        sources,
+        {
+          semanticLayout: layoutMode === "semantic",
+          layoutMode,
+        },
+      );
     expect(res.ok).toBe(true);
   }
 
@@ -209,7 +206,8 @@ describe("resolveTerraformPlanNodeKey indexed path equivalence", () => {
     "equivalence: indexed path matches the independent naive resolver across every harvested real call-site address",
     async () => {
       const harvestedCalls: HarvestedCall[] = [];
-      const originalResolve = terraformPlanParsingModule.resolveTerraformPlanNodeKey;
+      const originalResolve =
+        terraformPlanParsingModule.resolveTerraformPlanNodeKey;
       const spy = vi
         .spyOn(terraformPlanParsingModule, "resolveTerraformPlanNodeKey")
         .mockImplementation((nodes, address) => {

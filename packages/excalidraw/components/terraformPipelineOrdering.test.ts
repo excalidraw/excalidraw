@@ -8,21 +8,29 @@ import {
 
 /** Build a posByCluster from {clusterId: [col, rank]} for crossing-count tests. */
 const pos = (m: Record<string, [number, number]>) =>
-  new Map(
-    Object.entries(m).map(([id, [col, rank]]) => [id, { col, rank }]),
-  );
+  new Map(Object.entries(m).map(([id, [col, rank]]) => [id, { col, rank }]));
 
 describe("countContainerCrossings", () => {
   it("counts a single crossing between two 2-column edges", () => {
     // a@(0,0)→d@(1,1) and b@(0,1)→c@(1,0): the chords cross.
     const p = pos({ a: [0, 0], b: [0, 1], c: [1, 0], d: [1, 1] });
-    expect(countContainerCrossings(p, [["a", "d"], ["b", "c"]])).toBe(1);
+    expect(
+      countContainerCrossings(p, [
+        ["a", "d"],
+        ["b", "c"],
+      ]),
+    ).toBe(1);
   });
 
   it("counts zero when the same edges are uncrossed", () => {
     // a@(0,0)→c@(1,0) and b@(0,1)→d@(1,1): parallel, no crossing.
     const p = pos({ a: [0, 0], b: [0, 1], c: [1, 0], d: [1, 1] });
-    expect(countContainerCrossings(p, [["a", "c"], ["b", "d"]])).toBe(0);
+    expect(
+      countContainerCrossings(p, [
+        ["a", "c"],
+        ["b", "d"],
+      ]),
+    ).toBe(0);
   });
 
   it("ignores same-column edges (CON-12 forbids them; no L→R span)", () => {
@@ -37,7 +45,12 @@ describe("countContainerCrossings", () => {
     // Simpler: a@(0,0)→e@(2,2) and b@(1,2)→f@(1,0) — different columns.
     const p = pos({ a: [0, 0], e: [2, 2], b: [1, 2], f: [3, 0] });
     // a→e spans 0..2, b→f spans 1..3; they overlap in [1,2] and invert in Y.
-    expect(countContainerCrossings(p, [["a", "e"], ["b", "f"]])).toBe(1);
+    expect(
+      countContainerCrossings(p, [
+        ["a", "e"],
+        ["b", "f"],
+      ]),
+    ).toBe(1);
   });
 });
 
@@ -131,13 +144,18 @@ describe("barycenterReorder", () => {
     ];
     const m = model(["a", "b", "c", "d", "e", "f"]);
     const before = countContainerCrossings(
-      new Map(leaves.map((l) => [l.clusterId, { col: l.col, rank: m(l.key) % 3 }])),
+      new Map(
+        leaves.map((l) => [l.clusterId, { col: l.col, rank: m(l.key) % 3 }]),
+      ),
       edges,
     );
     const rank = barycenterReorder(leaves, m, edges);
     const after = countContainerCrossings(
       new Map(
-        leaves.map((l) => [l.clusterId, { col: l.col, rank: rank.get(l.key)! }]),
+        leaves.map((l) => [
+          l.clusterId,
+          { col: l.col, rank: rank.get(l.key)! },
+        ]),
       ),
       edges,
     );

@@ -26,6 +26,7 @@ import {
   topologyRoleDeBandRank,
   type DeBandLevel,
 } from "./terraformPipelineLayoutProfiles";
+
 import type { PipelineCluster } from "./terraformPipelineLayoutShared";
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 
@@ -131,6 +132,7 @@ export function appendSubnetMembershipAnnotations(
     sceneMinX = Math.min(sceneMinX, box.x);
     sceneMinY = Math.min(sceneMinY, box.y);
 
+    // eslint-disable-next-line no-loop-func
     levels.forEach((level, railIndex) => {
       if (!clusterHasLevel(cluster, level.role)) {
         return;
@@ -178,7 +180,9 @@ export function appendSubnetMembershipAnnotations(
       // Record the legend row for this level (once).
       if (isSubnet) {
         tiersPresent.add(tierKey(tier));
-        const legendId = `tf-subnet-legend:${tierKey(tier) === "default" ? "default" : tier}`;
+        const legendId = `tf-subnet-legend:${
+          tierKey(tier) === "default" ? "default" : tier
+        }`;
         legendRows.set(legendId, {
           colors: getContextFrameColorForTopologyRole("subnetZone", {
             subnetTier: tier,

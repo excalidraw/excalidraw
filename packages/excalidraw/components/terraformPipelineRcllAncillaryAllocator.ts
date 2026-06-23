@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { countAncillaryCards } from "./terraformPipelineLayoutAncillary";
 import {
   layoutAncillaryStrip,
@@ -663,6 +664,7 @@ export function allocateRcllAncillarySlackForTesting(
       treeReinjections += 1;
       simulated = terraformImportProfilerMeasure(
         "pipeline.rcll.ancillaryInsert.inject",
+        // eslint-disable-next-line no-loop-func
         () =>
           injectAncillaryBandsIntoPlacedTree(
             baselineTree,
@@ -674,6 +676,7 @@ export function allocateRcllAncillarySlackForTesting(
       if (
         !terraformImportProfilerMeasure(
           "pipeline.rcll.ancillaryInsert.validate",
+          // eslint-disable-next-line no-loop-func
           () =>
             validateAncillaryTreeAgainstBaseline(
               simulated,
@@ -923,6 +926,7 @@ export function buildValidatedAncillaryInsertion(
     fallbackInjections += 1;
     const injected = terraformImportProfilerMeasure(
       "pipeline.rcll.ancillaryInsert.inject",
+      // eslint-disable-next-line no-loop-func
       () =>
         injectAncillaryBandsIntoPlacedTree(
           baselineTree,

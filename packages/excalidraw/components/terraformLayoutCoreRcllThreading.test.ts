@@ -14,8 +14,10 @@ import { describe, expect, it } from "vitest";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getTerraformImportPresetSourcesFromDb } from "../../../excalidraw-app/dev/terraformImportPresetDb.mjs";
-import { layoutTerraformFromSources } from "./terraformLayoutCore";
+
 import { STAGING_SEMANTIC_LAYOUT_TEST_TIMEOUT_MS } from "../test-fixtures/terraformPresetFixtures";
+
+import { layoutTerraformFromSources } from "./terraformLayoutCore";
 
 import type { TerraformPlanParsingSources } from "./terraformPlanParsing";
 

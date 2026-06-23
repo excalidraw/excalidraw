@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * RCLL (Recursive Compound Layered Layout) — Placement (Stage 1d/2). M3a drew the
  * first geometry; **M3b** added hull-aware cyclic placement (this file's headline).
@@ -58,7 +59,7 @@ import {
   compactColumns,
   type ColumnCompactMeasure,
 } from "./terraformPipelineColumnCompact";
-import type { RankSeparateMeta } from "./terraformPipelineRcllRankSeparate";
+
 import { computeGlobalSeparatedFloor } from "./terraformPipelineRcllRankSeparate";
 import {
   collapsedEdgesFromFanout,
@@ -69,6 +70,8 @@ import {
   straightenColumns,
   type StraightenLeaf,
 } from "./terraformPipelineStraighten";
+
+import type { RankSeparateMeta } from "./terraformPipelineRcllRankSeparate";
 
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 import type { DeBandLevel } from "./terraformPipelineLayoutProfiles";

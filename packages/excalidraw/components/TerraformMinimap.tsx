@@ -9,9 +9,9 @@ import type {
 
 import { useExcalidrawSetAppState } from "./App";
 
-import type { AppClassProperties, UIAppState } from "../types";
-
 import "./TerraformMinimap.scss";
+
+import type { AppClassProperties, UIAppState } from "../types";
 
 /**
  * Overview minimap for large Terraform scenes.

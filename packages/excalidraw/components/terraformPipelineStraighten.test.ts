@@ -28,9 +28,7 @@ const edges = (es: [string, string][]) => {
 
 describe("terraformPipelineStraighten", () => {
   it("empty input → empty map", () => {
-    expect(
-      straightenColumns([], new Map(), new Map(), 0, GAP).size,
-    ).toBe(0);
+    expect(straightenColumns([], new Map(), new Map(), 0, GAP).size).toBe(0);
   });
 
   it("straightens a single chain across columns to one Y", () => {

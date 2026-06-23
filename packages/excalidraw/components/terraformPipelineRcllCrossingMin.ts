@@ -123,31 +123,34 @@ export function countPlacedCrossings(
   boxes: ReadonlyMap<string, TerraformDependencyLayoutBox>,
   edges: readonly CrossingEdge[],
 ): number {
-  return terraformImportProfilerMeasure("pipeline.rcll.crossingMin.count", () => {
-    const segs: Seg[] = [];
-    for (const [u, v] of edges) {
-      const bu = boxes.get(u);
-      const bv = boxes.get(v);
-      if (!bu || !bv) {
-        continue;
+  return terraformImportProfilerMeasure(
+    "pipeline.rcll.crossingMin.count",
+    () => {
+      const segs: Seg[] = [];
+      for (const [u, v] of edges) {
+        const bu = boxes.get(u);
+        const bv = boxes.get(v);
+        if (!bu || !bv) {
+          continue;
+        }
+        segs.push({
+          x1: centerX(bu),
+          y1: centerY(bu),
+          x2: centerX(bv),
+          y2: centerY(bv),
+        });
       }
-      segs.push({
-        x1: centerX(bu),
-        y1: centerY(bu),
-        x2: centerX(bv),
-        y2: centerY(bv),
-      });
-    }
-    let crossings = 0;
-    for (let i = 0; i < segs.length; i++) {
-      for (let j = i + 1; j < segs.length; j++) {
-        if (segmentsCross(segs[i]!, segs[j]!)) {
-          crossings += 1;
+      let crossings = 0;
+      for (let i = 0; i < segs.length; i++) {
+        for (let j = i + 1; j < segs.length; j++) {
+          if (segmentsCross(segs[i]!, segs[j]!)) {
+            crossings += 1;
+          }
         }
       }
-    }
-    return crossings;
-  });
+      return crossings;
+    },
+  );
 }
 
 /** Collapsed cluster edges from the lattice fan-out adjacency (self-loops dropped). */
@@ -314,7 +317,10 @@ export function minimizeCrossings(
   result: CrossingMinResult;
 } {
   const sweeps = Math.max(0, Math.floor(opts.sweeps ?? DEFAULT_SWEEPS));
-  const evalBudget = Math.max(1, Math.floor(opts.evalBudget ?? DEFAULT_EVAL_BUDGET));
+  const evalBudget = Math.max(
+    1,
+    Math.floor(opts.evalBudget ?? DEFAULT_EVAL_BUDGET),
+  );
 
   let best = place(EMPTY_OVERRIDE);
   let bestOverride: ReadonlyMap<string, number> = EMPTY_OVERRIDE;

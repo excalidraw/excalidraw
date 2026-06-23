@@ -188,6 +188,7 @@ export function runRcllPipeline(
     try {
       const result: StageResult = terraformImportProfilerMeasure(
         `pipeline.rcll.stage.${name}`,
+        // eslint-disable-next-line no-loop-func
         () => stage(current, lattice, opts),
       );
       if (!result || !result.tree || !treeBoxesFinite(result.tree)) {

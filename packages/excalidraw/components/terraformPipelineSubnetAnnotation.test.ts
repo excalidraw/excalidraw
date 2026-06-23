@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
 import { appendSubnetMembershipAnnotations } from "./terraformPipelineSubnetAnnotation";
+
 import type { PipelineCluster } from "./terraformPipelineLayoutShared";
 import type { TerraformDependencyLayoutBox } from "./terraformElkLayout";
 
@@ -138,7 +139,9 @@ describe("appendSubnetMembershipAnnotations", () => {
       ).toBeUndefined();
     }
     // The legend now has a subnet tier row AND a VPC level row.
-    expect(skeleton.find((e) => e.id === "tf-subnet-legend:public")).toBeDefined();
+    expect(
+      skeleton.find((e) => e.id === "tf-subnet-legend:public"),
+    ).toBeDefined();
     expect(skeleton.find((e) => e.id === "tf-vpc-legend:vpc")).toBeDefined();
   });
 
@@ -150,7 +153,9 @@ describe("appendSubnetMembershipAnnotations", () => {
     appendSubnetMembershipAnnotations(a, clusters, boxes); // legacy default
     appendSubnetMembershipAnnotations(b, clusters, boxes, "subnet"); // explicit
     expect(a).toEqual(b);
-    expect(a.find((e) => String(e.id).startsWith("tf-vpc-rail:"))).toBeUndefined();
+    expect(
+      a.find((e) => String(e.id).startsWith("tf-vpc-rail:")),
+    ).toBeUndefined();
   });
 
   it("colors rails by tier (public/private/intra distinct)", () => {

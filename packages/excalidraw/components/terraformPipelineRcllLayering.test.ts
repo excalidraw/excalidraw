@@ -53,7 +53,9 @@ const container = (
   key,
   role,
   level: 1,
-  minDescendantSequence: Math.min(...children.map((c) => c.minDescendantSequence)),
+  minDescendantSequence: Math.min(
+    ...children.map((c) => c.minDescendantSequence),
+  ),
   children,
 });
 
@@ -123,7 +125,12 @@ describe("columnsForContainer", () => {
   });
 
   it("CON-6 hull staircase: H1→H2 ⇒ col(H1) < col(H2)", () => {
-    const col = columnsForContainer(["H1", "H2"], [he("H1", "H2")], false, rank0);
+    const col = columnsForContainer(
+      ["H1", "H2"],
+      [he("H1", "H2")],
+      false,
+      rank0,
+    );
     expect(col.get("H1")!).toBeLessThan(col.get("H2")!);
   });
 
@@ -161,7 +168,10 @@ describe("layerTree", () => {
 
   it("condenses a cyclic container's SCC: cycle members share a column", () => {
     const tree = container("r", [leaf("a", 0), leaf("b", 1)]);
-    const laid = layerTree(tree, lattice([["r", [he("a", "b"), he("b", "a")]]], ["r"]));
+    const laid = layerTree(
+      tree,
+      lattice([["r", [he("a", "b"), he("b", "a")]]], ["r"]),
+    );
     const byKey = new Map(laid.children.map((c) => [c.key, c.localColumn]));
     // a↔b is one SCC ⇒ same column (placement stacks them in Y at one X, so the
     // cycle's wrap-edge does not render backward).
@@ -194,8 +204,15 @@ describe("layerTree", () => {
 
 describe("layeringMeta", () => {
   it("aligned fan-out → rate 1.0, zero violations", () => {
-    const tree = container("r", [leaf("A", 0), leaf("B", 1), leaf("C", 2), leaf("D", 3)]);
-    const lat = lattice([["r", [he("A", "B"), he("A", "C"), he("B", "D"), he("C", "D")]]]);
+    const tree = container("r", [
+      leaf("A", 0),
+      leaf("B", 1),
+      leaf("C", 2),
+      leaf("D", 3),
+    ]);
+    const lat = lattice([
+      ["r", [he("A", "B"), he("A", "C"), he("B", "D"), he("C", "D")]],
+    ]);
     const meta = layeringMeta(layerTree(tree, lat), lat);
     expect(meta.fanoutSetCount).toBe(1);
     expect(meta.fanoutColumnRate).toBe(1);

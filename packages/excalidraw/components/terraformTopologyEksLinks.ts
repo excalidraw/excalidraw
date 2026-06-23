@@ -95,7 +95,11 @@ export function buildEksCompanionCluster(
   }
 
   const stack: string[] = [];
-  for (const path of candidatesForTypes(nodesByType, EKS_COMPANION_TYPES, nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    EKS_COMPANION_TYPES,
+    nodes,
+  )) {
     if (path.startsWith("__")) {
       continue;
     }

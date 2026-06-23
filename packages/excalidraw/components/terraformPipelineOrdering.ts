@@ -84,9 +84,7 @@ export function countContainerCrossings(
     for (let j = i + 1; j < segs.length; j++) {
       const a = segs[i]!;
       const b = segs[j]!;
-      if (
-        segmentsCross(a.ax, a.ay, a.bx, a.by, b.ax, b.ay, b.bx, b.by)
-      ) {
+      if (segmentsCross(a.ax, a.ay, a.bx, a.by, b.ax, b.ay, b.bx, b.by)) {
         crossings += 1;
       }
     }
@@ -146,9 +144,7 @@ export function barycenterReorder(
   }
   const cols = [...columns.keys()].sort((a, b) => a - b);
   for (const c of cols) {
-    columns
-      .get(c)!
-      .sort((a, b) => modelRankOf(a.key) - modelRankOf(b.key));
+    columns.get(c)!.sort((a, b) => modelRankOf(a.key) - modelRankOf(b.key));
   }
 
   // Nothing to permute: <2 columns, or every column is a singleton.

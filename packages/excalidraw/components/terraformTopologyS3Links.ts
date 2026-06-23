@@ -234,7 +234,11 @@ export function buildS3CompanionCluster(
   const companions = new Set<string>();
   const docToPolicy = new Map<string, string>();
 
-  for (const path of candidatesForTypes(nodesByType, S3_COMPANION_TYPES, nodes)) {
+  for (const path of candidatesForTypes(
+    nodesByType,
+    S3_COMPANION_TYPES,
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }

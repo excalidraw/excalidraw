@@ -106,10 +106,12 @@ describe("applyRcllToggleGuards", () => {
   });
 
   it("leaves a lone crossingMin (or lone reorder) untouched", () => {
-    expect(applyRcllToggleGuards({ crossingMin: true }).options.crossingMin).toBe(
-      true,
+    expect(
+      applyRcllToggleGuards({ crossingMin: true }).options.crossingMin,
+    ).toBe(true);
+    expect(applyRcllToggleGuards({ crossingMin: true }).suppressions).toEqual(
+      [],
     );
-    expect(applyRcllToggleGuards({ crossingMin: true }).suppressions).toEqual([]);
     expect(applyRcllToggleGuards({ reorder: true }).options.reorder).toBe(true);
     expect(applyRcllToggleGuards({ reorder: true }).suppressions).toEqual([]);
   });

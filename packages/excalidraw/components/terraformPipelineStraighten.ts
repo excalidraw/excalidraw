@@ -84,7 +84,9 @@ function alignAndCompact(
         continue;
       }
       // neighbours sorted by their within-column order (stable).
-      const sorted = [...ns].sort((a, b) => a.order - b.order || (a.key < b.key ? -1 : 1));
+      const sorted = [...ns].sort(
+        (a, b) => a.order - b.order || (a.key < b.key ? -1 : 1),
+      );
       for (const m of medianIndices(sorted.length)) {
         if (align.get(v.key) !== v.key) {
           break; // v already aligned this pass

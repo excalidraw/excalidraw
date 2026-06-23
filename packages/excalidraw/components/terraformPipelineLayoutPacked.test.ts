@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * Packed pipeline layout: rightward depth shifts for sink-only groups plus
  * hierarchical Y re-packing. Note: under `pipelinePacked`, fan-out targets in
