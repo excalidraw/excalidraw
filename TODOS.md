@@ -24,21 +24,9 @@
 
 ---
 
-### TODO-3: True O(K×N) batch for `prep.satelliteBundles` — requires plugin-level type indexing
+### TODO-3: ~~True O(K×N) batch for `prep.satelliteBundles` — requires plugin-level type indexing~~ — RESOLVED (2026-06-23)
 
-**What:** `buildAllSatellitePrimaryMappings` (`terraformTopologySatelliteRegistry.ts`) still runs the original O(P×K×N) per-primary loop — T1/T2 only factored it into a named, reusable function (so T3 could reuse its result), they did not reduce its complexity. `prep.satelliteBundles` is unchanged at ~1,364ms (median). To actually cut this, add a `nodesByType: Map<string, string[]>` pre-index (built once per build, O(N)) to `SatelliteBuildContext`, and thread it through the ~15 plugin helpers in `terraformTopology{Iam,Ecs,Alb,S3,Sqs,Eks,ApiGateway,TransitGateway,Sg,Datastore}Links.ts` so each plugin's internal `Object.keys(nodes)` scan becomes a `nodesByType.get(type) ?? []` lookup, i.e. O(N_type) instead of O(N) per (primary, kind) call.
-
-**Why:** 16 of the 18 `TOPOLOGY_SATELLITE_KINDS` are `plugin`-mode (only `kms_policies` and `lambda_permission` are `reverseRef`/`companions`), and each plugin does its own per-primary `Object.keys(nodes)` scan internally (confirmed by reading `terraformTopologyEcsLinks.ts`, `terraformTopologyIamLinks.ts`). A registry-level batch (scanning once per kind across all primaries, as originally scoped in the eng-reviewed plan) can't reach inside opaque plugin functions without rewriting each one — out of scope for a single pass.
-
-**Pros:** Projected ~10-40x further reduction on `prep.satelliteBundles` (N=3,886 over ~100 resource types → N_type_avg ≈ 39), since the per-primary-per-kind cost is currently dominated by scanning irrelevant-type nodes.
-
-**Cons:** Touches ~15 files instead of 2-3; each plugin helper needs the same mechanical edit (replace `Object.keys(nodes)` with the indexed lookup, with a `?? Object.keys(nodes)` fallback for callers outside the indexed context) and needs its own equivalence check since each plugin has slightly different filtering logic.
-
-**Context:** Confirmed by reading plugin call sites (e.g. `terraformTopologyIamLinks.ts:163`, `terraformTopologyIamLinks.ts:194`, `terraformTopologyIamLinks.ts:402`, `terraformTopologyEcsLinks.ts:270`) — these helper functions iterate `Object.keys(nodes)` and filter by resource type inline.
-
-**Depends on:** None (T1-T4 already shipped and measured per the 2026-06-23 perf log row).
-
-**Status (2026-06-23):** Implementation plan locked via `/plan-eng-review` — see `nodesByType` index design (T-1 consolidation commit + T0 infra + T1 IAM/ECS + T2 ALB/SG/S3/SQS + T3 EKS/APIGW/TGW/CloudWatch/Route + T4 measure). Not yet implemented.
+**Resolution:** nodesByType index shipped and measured (T-1 consolidation + T0 infra + T1 IAM/ECS + T2 ALB/SG/S3/SQS + T3 EKS/APIGW/TGW/CloudWatch/Route). `prep.satelliteBundles` dropped from ~1,364ms to **~174ms** (−87%, median of 3 runs). Commits: T-1 `c7f3c4da7`, T0 `c301cc8f5`, T1 `a89ad68b8`, T2 `a30013f0f`, T3 `70ebb3cc9`. `pipeline.rcll.stage.placement` (~312ms) is now the dominant pipeline prep/RCLL span. See 2026-06-23 perf-log row for full details. Untouched (by design): `terraformTopologyDatastoreLinks.ts` (module-scope filter), `terraformTopologyKmsLinks.ts` (companions mode — see TODO-4), `terraformTopologyLambdaPermissionLinks.ts` (reverseRef mode), `terraformTopologyRouteLinks.ts` (plan-changes-based, no nodes scans).
 
 ---
 
