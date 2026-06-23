@@ -161,3 +161,50 @@ so there was no basis to expect either would fare better here.
 - Consolidate the three tools' eval harnesses (`benchmark`/`metrics`/`pool`/`judge`) into a shared
   `rag-common` eval package — each tool currently carries a divergent copy.
 - Expand graph's gold set beyond 49/47 cases — the small set makes ±0.01 promotion deltas noisy.
+
+## Rerank re-test (2026-06-23)
+
+The original reranking null result (2026-06-15, `data/eval/runs/neutral-catalog-20260615T162159Z/`)
+was measured against an equal-weight `hybrid` baseline that no longer exists — production has since
+moved to the weighted-RRF baseline promoted in Phase A (0.880/0.876 nDCG@10). Re-tested all 5 local
+rerank strategies (`hybrid_rerank`, `hybrid_minilm_rerank`, `hybrid_local_rerank`,
+`hybrid_llm_rerank`, `hybrid_category_rerank`) against the stronger baseline on `cuda-qwen0.6b-1024`,
+full 49/47 gold set, both tracks. `hybrid_llm_rerank` used Ollama (`qwen3:4b-q4_K_M`, local CPU/GPU
+split) via `RAG_LLM_BACKEND=ollama` to avoid the cloud-Gemini 429 path.
+
+| Strategy | Benchmark nDCG@10 (catalog) | Benchmark nDCG@10 (pdf) | Diagnostics nDCG@10-new (catalog) | Diagnostics nDCG@10-new (pdf) | bpref (catalog) | bpref (pdf) | Gate (catalog) | Gate (pdf) | Failures (cat/pdf) |
+|---|---|---|---|---|---|---|---|---|---|
+| `hybrid` (baseline) | 0.880 | 0.876 | 0.641 | 0.580 | 0.387 | 0.378 | — | — | 0/1 |
+| `hybrid_rerank` | 0.627 | 0.628 | 0.620 | 0.562 | 0.363 | 0.383 | BLOCK | BLOCK | 1/3 |
+| `hybrid_minilm_rerank` | 0.661 | 0.605 | 0.617 | 0.531 | 0.377 | 0.372 | BLOCK | BLOCK | 1/3 |
+| `hybrid_local_rerank` | 0.639 | 0.620 | 0.605 | 0.546 | 0.354 | 0.371 | BLOCK | BLOCK | 1/3 |
+| `hybrid_llm_rerank` | 0.261 | 0.239 | 0.432 | 0.400 | 0.247 | 0.251 | BLOCK | BLOCK | 17/19 |
+| `hybrid_category_rerank` | FAILED | FAILED | — | — | — | — | N/A | N/A | crash |
+
+**Interpretation.** Reranking remains a clear, large null result even against the stronger
+weighted-RRF baseline — this isn't a close call that the baseline shift might have flipped. On raw
+benchmark nDCG@10, every rerank strategy regresses 0.2–0.64 absolute vs. baseline, with
+`hybrid_llm_rerank` worst by a wide margin (also the highest failure count: 17/19 cases returned no
+usable ranking, mostly LLM-rerank timeouts/parse failures on the local 4B model). All 8 gate
+comparisons (4 strategies × 2 tracks; `hybrid_category_rerank` excluded, see below) returned
+**BLOCK** on every threshold (nDCG gain, no-failure-increase, opposite-track-regression).
+
+One methodology note: the diagnostics re-judged metric (LLM-judged qrels, condensed nDCG, hole-rate
+— a different measurement than the benchmark's nDCG@10 against the original gold qrels) shows
+smaller regressions for the three cross-encoder rerankers (0.02–0.07 absolute) and, for
+`hybrid_llm_rerank` specifically, a *higher* score under diagnostics (0.43/0.40) than under the raw
+benchmark (0.26/0.24). This is not a contradiction — the two metrics measure different things
+(diagnostics re-judges with an LLM judge and credits partial relevance differently) — it's a
+reminder that the benchmark number, not the diagnostics number, is what the gate enforces, and the
+two should not be expected to agree in absolute terms.
+
+`hybrid_category_rerank` failed outright on both tracks (`strategy worker exited with code 1`) — a
+pre-existing bug unrelated to reranking quality: one gold-set case is tagged with category `'ports'`,
+which isn't in `query/retrieve.py`'s `_apply_filters` category allowlist (`layer-assignment,
+crossing, compound, constraints, coordinate-assignment, routing, compaction, packing, overlap`).
+Worth a follow-up ticket — either add `'ports'` to the allowlist or fix the gold-set tag. Not fixed
+in this pass.
+
+**No promotions made, no defaults changed.** This is a pure record of a null result, consistent with
+this campaign's no-promotion-on-null-result convention (same as the contextual-retrieval rejection
+above). The production profile and default fusion weights are unchanged.
