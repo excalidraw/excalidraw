@@ -32,7 +32,7 @@ import {
   type PipelinePrimaryClusterBuildResult,
 } from "./terraformTopologyLayout";
 import { resolveAlbCompanionParentLbAddressFromPlan } from "./terraformTopologyAlbLinks";
-import { collectTopologySatelliteAddressesFromRegistry } from "./terraformTopologySatelliteRegistry";
+import { buildAllSatellitePrimaryMappings } from "./terraformTopologySatelliteRegistry";
 import {
   isTerraformImportProfilerEnabled,
   terraformImportProfilerMeasure,
@@ -147,20 +147,12 @@ function buildSatelliteOwnerMap(
       isPrimaryVisibleResourceType(resourceTypeFor(nodes, addr)),
     )
     .sort();
-  const out = new Map<string, string>();
-
-  for (const primaryAddress of primaryAddresses) {
-    for (const sat of collectTopologySatelliteAddressesFromRegistry(
-      nodes,
-      arnIndex,
-      [primaryAddress],
-      plan,
-    )) {
-      if (!out.has(sat)) {
-        out.set(sat, primaryAddress);
-      }
-    }
-  }
+  const out = buildAllSatellitePrimaryMappings(
+    nodes,
+    arnIndex,
+    primaryAddresses,
+    plan,
+  );
 
   const changes = planChanges(plan);
   for (const rc of changes) {
@@ -198,12 +190,15 @@ export function buildPlacementMap(
   nodes: TerraformPlanNodesMap,
   plan: unknown,
   enrichedOverride?: EnrichedTopologyPlacements,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): Map<string, PipelinePlacement> {
   const awsPlan = filterPlanByProviderFamily(plan as any, "aws");
   const cache = getTerraformImportPrepCache();
   let enriched = enrichedOverride ?? cache?.enrichedPlacements;
   if (!enriched) {
-    enriched = buildEnrichedTopologyPlacements(awsPlan, nodes);
+    enriched = buildEnrichedTopologyPlacements(awsPlan, nodes, {
+      precomputedSatelliteAddresses,
+    });
     if (cache) {
       cache.enrichedPlacements = enriched;
     }
@@ -996,16 +991,25 @@ export function preparePipelineLayout(
   }
 
   const { satelliteOwners, placementByAddress } =
-    withTerraformPlanNodeKeyIndex(nodes, () => ({
-      satelliteOwners: terraformImportProfilerMeasure(
+    withTerraformPlanNodeKeyIndex(nodes, () => {
+      const owners = terraformImportProfilerMeasure(
         "pipeline.prep.satelliteBundles",
         () => buildSatelliteOwnerMap(nodes, plan),
-      ),
-      placementByAddress: terraformImportProfilerMeasure(
-        "pipeline.prep.resourceRects",
-        () => buildPlacementMap(nodes, plan),
-      ),
-    }));
+      );
+      return {
+        satelliteOwners: owners,
+        placementByAddress: terraformImportProfilerMeasure(
+          "pipeline.prep.resourceRects",
+          () =>
+            buildPlacementMap(
+              nodes,
+              plan,
+              undefined,
+              new Set(owners.keys()),
+            ),
+        ),
+      };
+    });
   const firstSequence = new Map<string, number>();
   const collapsedEdges: CollapsedPipelineEdge[] = [];
   for (const edge of [...declared].sort((a, b) => a.sequence - b.sequence)) {

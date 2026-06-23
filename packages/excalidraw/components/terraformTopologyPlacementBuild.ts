@@ -133,6 +133,7 @@ export function enrichAndReconcileTopologyPlacements(
   plan: AwsPlan,
   nodes: TerraformPlanNodesMap,
   additionalPreplacedAddresses?: Iterable<string>,
+  precomputedSatelliteAddresses?: ReadonlySet<string>,
 ): void {
   const preplaced = baseEnrichPreplaced(state);
   if (additionalPreplacedAddresses) {
@@ -149,6 +150,7 @@ export function enrichAndReconcileTopologyPlacements(
       nodes,
       plan,
       preplacedAddresses: preplaced,
+      precomputedSatelliteAddresses,
     },
   );
   if (state.zones.length !== zoneCountBefore) {
@@ -176,6 +178,7 @@ export function buildEnrichedTopologyPlacements(
   nodes: TerraformPlanNodesMap,
   options?: {
     additionalPreplacedAddresses?: Iterable<string>;
+    precomputedSatelliteAddresses?: ReadonlySet<string>;
   },
 ): EnrichedTopologyPlacements {
   const state = buildTopologyPlacementFoundation(plan);
@@ -184,6 +187,7 @@ export function buildEnrichedTopologyPlacements(
     plan,
     nodes,
     options?.additionalPreplacedAddresses,
+    options?.precomputedSatelliteAddresses,
   );
   return state;
 }

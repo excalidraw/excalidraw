@@ -60,6 +60,12 @@ export type EnrichTopologyPlacementsOptions = {
   plan?: unknown;
   /** Addresses already laid out elsewhere (other buckets, route tables, etc.). */
   preplacedAddresses?: Iterable<string>;
+  /**
+   * Satellite addresses already resolved upstream (e.g. by `buildSatelliteOwnerMap`).
+   * When present, skips the redundant `collectTopologySatelliteAddressesForPrimaries`
+   * scan below — the caller already has the complete satellite set.
+   */
+  precomputedSatelliteAddresses?: ReadonlySet<string>;
 };
 
 function getPrimaryResource(
@@ -382,12 +388,14 @@ export function enrichTopologyPlacementsWithManagedResources(
     regionalBuckets,
     nodes,
   );
-  const satelliteAddresses = collectTopologySatelliteAddressesForPrimaries(
-    nodes,
-    arnIndex,
-    primaryAnchors,
-    layoutPlan,
-  );
+  const satelliteAddresses =
+    options.precomputedSatelliteAddresses ??
+    collectTopologySatelliteAddressesForPrimaries(
+      nodes,
+      arnIndex,
+      primaryAnchors,
+      layoutPlan,
+    );
   for (const sat of satelliteAddresses) {
     placed.add(sat);
   }
