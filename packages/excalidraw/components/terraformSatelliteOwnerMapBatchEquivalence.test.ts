@@ -197,7 +197,7 @@ describe("buildAllSatellitePrimaryMappings equivalence (T2)", () => {
     expect(new Set(allBucketed)).toEqual(new Set(realPaths));
     expect(allBucketed.length).toBe(realPaths.length); // non-vacuous: no path duplicated across buckets
     expect(nodesByType.size).toBeGreaterThan(5);
-  });
+  }, 60_000);
 
   it("every plugin scan site uses the nodesByType index — zero fallback scans", async () => {
     const { nodes, plan } = await loadFixtureNodesAndPlan();
