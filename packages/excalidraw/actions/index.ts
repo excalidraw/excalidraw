@@ -19,6 +19,8 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
+  actionToggleBulletList,
+  actionToggleNumberedList, 
 } from "./actionProperties";
 
 export {

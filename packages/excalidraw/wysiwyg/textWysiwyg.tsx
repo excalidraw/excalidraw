@@ -618,10 +618,47 @@ export const textWysiwyg = ({
         const selectionStart = editable.selectionStart;
         editable.value = normalized;
         // put the cursor at some position close to where it was before
-        // normalization (otherwise it'll end up at the end of the text)
+        // normalization otherwise it'll end up at the end of the text
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
+ 
+      // Auto-convert list shorthand at the start of a line:
+      //   "."  + char  becomes "• char"   (bullet list)
+      //   "-"  + char  becomes "- char"   (dash list)
+      //   "1." + char  becomes "1. char"  (numbered list)
+      // Triggers as soon as the user types the first character after the
+      // shorthand prefix, so the conversion feels instant.
+      const { selectionStart, value } = editable;
+      const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+      const lineUpToCursor = value.slice(lineStart, selectionStart);
+ 
+      if (/^\.\S$/.test(lineUpToCursor)) {
+        const typedChar = lineUpToCursor[1];
+        editable.value =
+          value.slice(0, lineStart) +
+          "• " +
+          typedChar +
+          value.slice(selectionStart);
+        editable.selectionStart = editable.selectionEnd = lineStart + 3;
+      } else if (/^-\S$/.test(lineUpToCursor)) {
+        const typedChar = lineUpToCursor[1];
+        editable.value =
+          value.slice(0, lineStart) +
+          "- " +
+          typedChar +
+          value.slice(selectionStart);
+        editable.selectionStart = editable.selectionEnd = lineStart + 3;
+      } else if (/^1\.\S$/.test(lineUpToCursor)) {
+        const typedChar = lineUpToCursor[2];
+        editable.value =
+          value.slice(0, lineStart) +
+          "1. " +
+          typedChar +
+          value.slice(selectionStart);
+        editable.selectionStart = editable.selectionEnd = lineStart + 4;
+      }
+ 
       onChange(editable.value);
     };
   }
@@ -658,6 +695,68 @@ export const textWysiwyg = ({
       }
       submittedViaKeyboard = true;
       handleSubmit();
+    } else if (
+      // Auto-continue list formatting on plain Enter (no Ctrl/Shift).
+      // Continues the prefix on the new line, or exits list mode if the line is empty.
+      event.key === KEYS.ENTER &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey
+    ) {
+      const { selectionStart, value } = editable;
+      const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+      const currentLine = value.slice(lineStart, selectionStart);
+      const bulletMatch = currentLine.match(/^(\s*)(•\s|-\s)/);
+      const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s/);
+      if (bulletMatch) {
+        event.preventDefault();
+        const bullet = bulletMatch[0];
+        const contentAfterBullet = currentLine.slice(bullet.length);
+
+        if (contentAfterBullet.trim() === "") {
+          // Empty bullet line — exit list mode
+          editable.value =
+            value.slice(0, lineStart) +
+            value.slice(lineStart + bullet.length);
+          editable.selectionStart = editable.selectionEnd = lineStart;
+          editable.dispatchEvent(new Event("input"));
+          return;
+        }
+
+        const insertion = "\n" + bullet;
+        editable.value =
+          value.slice(0, selectionStart) +
+          insertion +
+          value.slice(editable.selectionEnd);
+        const newPos = selectionStart + insertion.length;
+        editable.selectionStart = editable.selectionEnd = newPos;
+        editable.dispatchEvent(new Event("input"));
+      } else if (numberedMatch) {
+        event.preventDefault();
+        const prefix = numberedMatch[0];
+        const currentNumber = parseInt(numberedMatch[2], 10);
+        const indent = numberedMatch[1];
+        const contentAfterPrefix = currentLine.slice(prefix.length);
+
+        if (contentAfterPrefix.trim() === "") {
+          // Empty numbered line — exit list mode
+          editable.value =
+            value.slice(0, lineStart) +
+            value.slice(lineStart + prefix.length);
+          editable.selectionStart = editable.selectionEnd = lineStart;
+          editable.dispatchEvent(new Event("input"));
+          return;
+        }
+
+        const nextPrefix = `${indent}${currentNumber + 1}. `;
+        const insertion = "\n" + nextPrefix;
+        editable.value =
+          value.slice(0, selectionStart) +
+          insertion +
+          value.slice(editable.selectionEnd);
+        const newPos = selectionStart + insertion.length;
+        editable.selectionStart = editable.selectionEnd = newPos;
+        editable.dispatchEvent(new Event("input"));
+      }
     } else if (
       event.key === KEYS.TAB ||
       (event[KEYS.CTRL_OR_CMD] &&
@@ -740,6 +839,101 @@ export const textWysiwyg = ({
         selectionEnd - TAB_SIZE * removedTabs.length,
       );
     }
+  };
+
+  // Toggles "• " prefix on every selected line.
+  // If all lines already have it, removes it. Otherwise adds it.
+  // Strips any existing numbered prefix first to prevent mixing formats.
+  // Exposed on the DOM element so the toolbar button can call it directly.
+  const toggleBulletPoints = () => {
+    const { selectionStart, selectionEnd, value } = editable;
+    const linesStartIndices = getSelectedLinesStartIndices().reverse();
+
+    const allHaveBullets = linesStartIndices.every((startIndex) =>
+      value.slice(startIndex).startsWith("• "),
+    );
+
+    let newValue = value;
+    let offset = 0;
+
+    linesStartIndices.forEach((startIndex) => {
+      const adjustedIndex = startIndex + offset;
+
+      if (allHaveBullets) {
+        // Remove "• " (2 characters)
+        newValue =
+          newValue.slice(0, adjustedIndex) +
+          newValue.slice(adjustedIndex + 2);
+        offset -= 2;
+      } else {
+        // Strip any existing numbered prefix before inserting bullet
+        // so lines can never end up with both formats simultaneously
+        const numberedPrefix = newValue.slice(adjustedIndex).match(/^\d+\.\s/);
+        const stripLength = numberedPrefix ? numberedPrefix[0].length : 0;
+
+        newValue =
+          newValue.slice(0, adjustedIndex) +
+          "• " +
+          newValue.slice(adjustedIndex + stripLength);
+        offset += 2 - stripLength;
+      }
+    });
+
+    editable.value = newValue;
+    editable.selectionStart = selectionStart + (allHaveBullets ? -2 : 2);
+    editable.selectionEnd = selectionEnd + offset;
+    editable.dispatchEvent(new Event("input"));
+  };
+
+  const toggleNumberedList = () => {
+    const { selectionStart, selectionEnd, value } = editable;
+    const linesStartIndices = getSelectedLinesStartIndices().reverse();
+
+    const allHaveNumbers = linesStartIndices.every((startIndex) =>
+      /^\d+\.\s/.test(value.slice(startIndex)),
+    );
+
+    let newValue = value;
+    let offset = 0;
+
+    if (allHaveNumbers) {
+      // Remove numbered prefixes
+      linesStartIndices.forEach((startIndex) => {
+        const adjustedIndex = startIndex + offset;
+        const prefixMatch = newValue.slice(adjustedIndex).match(/^\d+\.\s/);
+        if (prefixMatch) {
+          const prefixLength = prefixMatch[0].length;
+          newValue =
+            newValue.slice(0, adjustedIndex) +
+            newValue.slice(adjustedIndex + prefixLength);
+          offset -= prefixLength;
+        }
+      });
+    } else {
+      // Add numbered prefixes, stripping any existing bullet prefix first
+      // so lines can never end up with both formats simultaneously
+      linesStartIndices.forEach((startIndex, idx) => {
+        const adjustedIndex = startIndex + offset;
+        const bulletPrefix = newValue.slice(adjustedIndex).match(/^(•\s|-\s)/);
+        const stripLength = bulletPrefix ? bulletPrefix[0].length : 0;
+        const number = idx + 1;
+        const prefix = `${number}. `;
+
+        newValue =
+          newValue.slice(0, adjustedIndex) +
+          prefix +
+          newValue.slice(adjustedIndex + stripLength);
+        offset += prefix.length - stripLength;
+      });
+    }
+
+    editable.value = newValue;
+    const firstPrefixLength = allHaveNumbers
+      ? -(value.slice(linesStartIndices[0]).match(/^\d+\.\s/)?.[0].length ?? 0)
+      : `${1}. `.length;
+    editable.selectionStart = selectionStart + firstPrefixLength;
+    editable.selectionEnd = selectionEnd + offset;
+    editable.dispatchEvent(new Event("input"));
   };
 
   /**
@@ -1017,6 +1211,11 @@ export const textWysiwyg = ({
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
+
+  // Expose list toggle functions so the toolbar buttons in
+  // actionProperties.tsx can reach them through the DOM element.
+  (editable as any).__toggleBulletPoints = toggleBulletPoints;
+  (editable as any).__toggleNumberedList = toggleNumberedList;
 
   return handleSubmit;
 };
