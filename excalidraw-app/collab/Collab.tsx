@@ -510,6 +510,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     );
 
     const fallbackInitializationHandler = () => {
+      console.log("fallbackInitializationHandler");
       this.initializeRoom({
         roomLinkData: existingRoomLinkData,
         fetchScene: true,
@@ -582,7 +583,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           case WS_SUBTYPES.INVALID_RESPONSE:
             return;
           case WS_SUBTYPES.INIT: {
+            console.log("INIT (1)");
             if (!this.portal.socketInitialized) {
+              console.log("INIT (2)");
               this.initializeRoom({ fetchScene: false });
               const remoteElements = toBrandedType<
                 readonly RemoteExcalidrawElement[]
@@ -677,6 +680,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     );
 
     this.portal.socket.on("first-in-room", async () => {
+      console.log("first-in-room");
       if (this.portal.socket) {
         this.portal.socket.off("first-in-room");
       }
