@@ -326,18 +326,58 @@ describe("normalizeElementsOrder", () => {
       ]),
       [
         "BA_rect1",
+        "CBA_rect3",
+        "CBA_rect7",
         "BA_rect5",
         "BA_rect6",
         "A_rect2",
         "A_rect5",
-        "CBA_rect3",
-        "CBA_rect7",
         "rect4",
         "X_rect8",
-        "X_rect11",
         "YX_rect10",
+        "X_rect11",
         "rect9",
       ],
+    );
+    assertOrder(
+      normalizeElementOrder([
+        API.createElement({
+          id: "A_rect1",
+          type: "rectangle",
+          groupIds: ["A"],
+        }),
+        API.createElement({
+          id: "CBA_rect2",
+          type: "rectangle",
+          groupIds: ["C", "B", "A"],
+        }),
+        API.createElement({
+          id: "A_rect3",
+          type: "rectangle",
+          groupIds: ["A"],
+        }),
+      ]),
+      ["A_rect1", "CBA_rect2", "A_rect3"],
+    );
+    assertOrder(
+      normalizeElementOrder([
+        API.createElement({
+          id: "abcT_rect1",
+          type: "rectangle",
+          groupIds: ["ab", "c", "T"],
+        }),
+        API.createElement({
+          id: "abcT_rect2",
+          type: "rectangle",
+          groupIds: ["a", "bc", "T"],
+        }),
+        API.createElement({
+          id: "abcT_rect3",
+          type: "rectangle",
+          groupIds: ["ab", "c", "T"],
+        }),
+      ]),
+      ["abcT_rect1", "abcT_rect3", "abcT_rect2"],
     );
   });
 

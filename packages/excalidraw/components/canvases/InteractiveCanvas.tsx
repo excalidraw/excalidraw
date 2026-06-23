@@ -6,7 +6,6 @@ import {
   sceneCoordsToViewportCoords,
   type EditorInterface,
 } from "@excalidraw/common";
-import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -24,6 +23,8 @@ import type {
 import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
+import { AnimationController } from "../../renderer/animation";
+
 import type {
   AppClassProperties,
   AppState,
@@ -38,7 +39,7 @@ type InteractiveCanvasProps = {
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   allElementsMap: NonDeletedSceneElementsMap;
-  sceneNonce: number | undefined;
+  canvasNonce: string;
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
@@ -53,6 +54,7 @@ type InteractiveCanvasProps = {
     DOMAttributes<HTMLCanvasElement | HTMLDivElement>["onContextMenu"],
     undefined
   >;
+  onClick: Exclude<DOMAttributes<HTMLCanvasElement>["onClick"], undefined>;
   onPointerMove: Exclude<
     DOMAttributes<HTMLCanvasElement>["onPointerMove"],
     undefined
@@ -212,6 +214,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
+      onClick={props.onClick}
       onPointerMove={props.onPointerMove}
       onPointerUp={props.onPointerUp}
       onPointerCancel={props.onPointerCancel}
@@ -276,10 +279,10 @@ const areEqual = (
   // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.sceneNonce !== nextProps.sceneNonce ||
+    prevProps.canvasNonce !== nextProps.canvasNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if sceneNonce didn't change (e.g. we filter elements out based
+    // even if canvasNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
