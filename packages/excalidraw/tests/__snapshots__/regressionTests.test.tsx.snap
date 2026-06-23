@@ -6936,6 +6936,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
+              "streamline": "0.50000",
               "variability": "constant",
             },
             "strokeStyle": "solid",
@@ -9233,6 +9234,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
+              "streamline": "0.50000",
               "variability": "constant",
             },
             "strokeStyle": "solid",
@@ -10257,6 +10259,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
+              "streamline": "0.50000",
               "variability": "constant",
             },
             "strokeStyle": "solid",

@@ -27,6 +27,8 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -9028,6 +9030,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
+    const strokeVariability = this.state.currentItemStrokeVariability;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -9042,7 +9046,11 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       simulatePressure,
       strokeOptions: {
-        variability: this.state.currentItemStrokeVariability,
+        variability: strokeVariability,
+        streamline:
+          strokeVariability === "constant" && event.pointerType !== "mouse"
+            ? DEFAULT_STROKE_STREAMLINE_PRECISE
+            : DEFAULT_STROKE_STREAMLINE,
       },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,

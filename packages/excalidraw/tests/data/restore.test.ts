@@ -200,32 +200,44 @@ describe("restoreElements", () => {
       points: [pointFrom(0, 0), pointFrom(10, 10)],
     });
 
-    const [missing, bogusString, bogusNumber, valid] = restore.restoreElements(
-      [
-        { ...freedrawElement, id: "missing", strokeOptions: undefined },
-        {
-          ...freedrawElement,
-          id: "bogusString",
-          strokeOptions: { variability: "scribble" },
-        },
-        {
-          ...freedrawElement,
-          id: "bogusNumber",
-          strokeOptions: { variability: 42 },
-        },
-        {
-          ...freedrawElement,
-          id: "valid",
-          strokeOptions: { variability: "constant" },
-        },
-      ] as any,
-      null,
-    ) as ExcalidrawFreeDrawElement[];
+    const [missing, bogusString, bogusNumber, valid, variable] =
+      restore.restoreElements(
+        [
+          { ...freedrawElement, id: "missing", strokeOptions: undefined },
+          {
+            ...freedrawElement,
+            id: "bogusString",
+            strokeOptions: { variability: "scribble" },
+          },
+          {
+            ...freedrawElement,
+            id: "bogusNumber",
+            strokeOptions: { variability: 42 },
+          },
+          {
+            ...freedrawElement,
+            id: "valid",
+            strokeOptions: { variability: "constant", streamline: 0.8 },
+          },
+          {
+            ...freedrawElement,
+            id: "variable",
+            strokeOptions: { variability: "variable", streamline: 0.8 },
+          },
+        ] as any,
+        null,
+      ) as ExcalidrawFreeDrawElement[];
 
     expect(missing.strokeOptions?.variability).toBe("variable");
     expect(bogusString.strokeOptions?.variability).toBe("variable");
     expect(bogusNumber.strokeOptions?.variability).toBe("variable");
     expect(valid.strokeOptions?.variability).toBe("constant");
+    expect(variable.strokeOptions?.variability).toBe("variable");
+    expect(missing.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusString.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusNumber.strokeOptions?.streamline).toBe(0.5);
+    expect(valid.strokeOptions?.streamline).toBe(0.8);
+    expect(variable.strokeOptions?.streamline).toBe(0.8);
   });
 
   it("should restore line and draw elements correctly", () => {

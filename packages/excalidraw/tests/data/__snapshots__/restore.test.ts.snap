@@ -241,6 +241,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "simulatePressure": true,
   "strokeColor": "#1e1e1e",
   "strokeOptions": {
+    "streamline": "0.50000",
     "variability": "variable",
   },
   "strokeStyle": "solid",

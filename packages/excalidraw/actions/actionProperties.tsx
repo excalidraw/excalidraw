@@ -665,6 +665,8 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
   label: "labels.pressure",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const variability = value || "constant";
+
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (el.type !== "freedraw") {
@@ -673,11 +675,11 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
         return newElementWith(el, {
           strokeOptions: {
             ...el.strokeOptions,
-            variability: value || "constant",
+            variability,
           },
         }) as ExcalidrawElement;
       }),
-      appState: { ...appState, currentItemStrokeVariability: value },
+      appState: { ...appState, currentItemStrokeVariability: variability },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

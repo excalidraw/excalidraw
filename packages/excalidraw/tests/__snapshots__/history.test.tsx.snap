@@ -9112,6 +9112,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "simulatePressure": false,
   "strokeColor": "#1e1e1e",
   "strokeOptions": {
+    "streamline": "0.50000",
     "variability": "constant",
   },
   "strokeStyle": "solid",
@@ -9217,6 +9218,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
+              "streamline": "0.50000",
               "variability": "constant",
             },
             "strokeStyle": "solid",
@@ -12702,6 +12704,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "simulatePressure": false,
   "strokeColor": "#1e1e1e",
   "strokeOptions": {
+    "streamline": "0.50000",
     "variability": "constant",
   },
   "strokeStyle": "solid",
@@ -12755,6 +12758,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "simulatePressure": false,
   "strokeColor": "#e03131",
   "strokeOptions": {
+    "streamline": "0.50000",
     "variability": "constant",
   },
   "strokeStyle": "solid",
@@ -12897,6 +12901,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             "simulatePressure": false,
             "strokeColor": "#e03131",
             "strokeOptions": {
+              "streamline": "0.50000",
               "variability": "constant",
             },
             "strokeStyle": "solid",

@@ -388,6 +388,7 @@ export type StrokeVariability = "variable" | "constant";
 
 export type StrokeOptions = Readonly<{
   variability: StrokeVariability;
+  streamline: number;
 }>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &

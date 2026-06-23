@@ -25,6 +25,8 @@ import {
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   applyDarkModeFilter,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -1184,14 +1186,20 @@ const VARIABLE_WIDTH_FREEDRAW = {
   SIZE_FACTOR: 2.125,
   THINNING: 0.6,
   SMOOTHING: 0.5,
-  STREAMLINE: 0.5,
+  STREAMLINE: DEFAULT_STROKE_STREAMLINE,
 } as const;
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
   SIZE_FACTOR: 0.7,
-  STREAMLINE: 0.3,
+  STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
 } as const;
+
+const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
+  element.strokeOptions?.streamline ??
+  (element.strokeOptions?.variability === "constant"
+    ? CONSTANT_WIDTH_FREEDRAW.STREAMLINE
+    : VARIABLE_WIDTH_FREEDRAW.STREAMLINE);
 
 /**
  * Pressure-sensitive (variable width) freedraw outline, rendered with
@@ -1214,7 +1222,7 @@ const getVariableWidthFreedrawOutline = (
     size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
     thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
     smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
-    streamline: VARIABLE_WIDTH_FREEDRAW.STREAMLINE,
+    streamline: getFreedrawStreamline(element),
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
     last: true,
   }) as [number, number][];
@@ -1223,7 +1231,7 @@ const getVariableWidthFreedrawOutline = (
 const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
   new LaserPointer({
     size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
-    streamline: CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
+    streamline: getFreedrawStreamline(element),
     simplify: 0,
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });

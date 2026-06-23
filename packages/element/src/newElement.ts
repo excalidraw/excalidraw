@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
   randomInteger,
   randomId,
@@ -453,7 +454,10 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
-    strokeOptions: opts.strokeOptions ?? { variability: "variable" },
+    strokeOptions: opts.strokeOptions ?? {
+      variability: "variable",
+      streamline: DEFAULT_STROKE_STREAMLINE,
+    },
   };
 };
 

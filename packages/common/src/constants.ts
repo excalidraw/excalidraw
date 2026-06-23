@@ -514,3 +514,6 @@ export const BIND_MODE_TIMEOUT = 700; // ms
 export const MOBILE_ACTION_BUTTON_BG = {
   background: "var(--mobile-action-button-bg)",
 } as const;
+
+export const DEFAULT_STROKE_STREAMLINE = 0.5;
+export const DEFAULT_STROKE_STREAMLINE_PRECISE = 0.3;

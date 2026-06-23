@@ -27,6 +27,9 @@ describe("freedraw mode action", () => {
     expect(
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
     ).toBe("constant");
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.streamline,
+    ).toBe(0.5);
   });
 
   it("toggling the radio updates both the selected element and the default", () => {
@@ -37,12 +40,18 @@ describe("freedraw mode action", () => {
     expect(
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
     ).toBe("variable");
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.streamline,
+    ).toBe(0.5);
     expect(h.state.currentItemStrokeVariability).toBe("variable");
 
     fireEvent.click(screen.getByTitle("Constant"));
     expect(
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
     ).toBe("constant");
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.streamline,
+    ).toBe(0.5);
     expect(h.state.currentItemStrokeVariability).toBe("constant");
   });
 });

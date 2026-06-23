@@ -3,6 +3,7 @@ import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 import {
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
@@ -206,14 +207,17 @@ const restoreStrokeVariability = (
 
 const restoreFreedrawStrokeOptions = (
   strokeOptions: unknown,
-): { variability: StrokeVariability } => {
-  const variability =
+): { variability: StrokeVariability; streamline: number } => {
+  const options =
     strokeOptions && typeof strokeOptions === "object"
-      ? (strokeOptions as { variability?: unknown }).variability
-      : undefined;
+      ? (strokeOptions as { variability?: unknown; streamline?: unknown })
+      : null;
 
   return {
-    variability: restoreStrokeVariability(variability, "variable"),
+    variability: restoreStrokeVariability(options?.variability, "variable"),
+    streamline: isFiniteNumber(options?.streamline)
+      ? options?.streamline
+      : DEFAULT_STROKE_STREAMLINE,
   };
 };
 
