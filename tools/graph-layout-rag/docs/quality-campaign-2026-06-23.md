@@ -208,3 +208,63 @@ in this pass.
 **No promotions made, no defaults changed.** This is a pure record of a null result, consistent with
 this campaign's no-promotion-on-null-result convention (same as the contextual-retrieval rejection
 above). The production profile and default fusion weights are unchanged.
+
+## Rejected techniques (2026-06-23): fine-tuned reranker + GraphRAG
+
+Before building either, deep research (literature + direct corpus verification) was done to check
+whether the evidence supported the investment. Both were cancelled — no code written, no GPU time
+spent.
+
+### Fine-tuned cross-encoder reranker — cancelled
+
+Literature consensus puts the floor for "measurable gains" from cross-encoder fine-tuning at
+~1K-50K labeled query-document triples. This corpus's entire gold set is 96 cases (49 catalog + 47
+pdf) — 10-20x below even the optimistic floor, and the documented failure mode at this scale is
+overfitting/unstable training, not modest underperformance.
+
+Worse: this isn't a neutral starting point. Every off-the-shelf reranker already tested on this
+corpus this session (`bge-reranker-v2-m3`, MS MARCO MiniLM, LLM listwise rerank via local
+`qwen3:4b`) **actively regresses** retrieval 0.2-0.64 nDCG@10 below the weighted-RRF hybrid baseline
+— all 8 gate comparisons BLOCK (see "Rerank re-test" section above). That's not "miscalibrated,
+fine-tuning might fix it" — the reranking technique family appears to fight this corpus's natural
+retrieval shape (BM25-dominant, exact technical-term matching on short factual queries), which
+fine-tuning on a tiny dataset can't plausibly change.
+
+**Caveat:** the 96-case gold set isn't a permanent ceiling. rag-literature-rag has a `gen-gold`
+synthetic gold-generation capability in the same eval-infra family — if something similar were
+built for graph-layout-rag, "insufficient training signal" becomes a "haven't done it yet," not a
+"can't." The verdict holds given the gold set as it exists today.
+
+### GraphRAG / knowledge-graph retrieval — cancelled
+
+Corpus size is **not** the blocker: 44,672 chunks (~5,947 docs, 1,121 fully indexed) is well above
+GraphRAG's commonly-cited ~500K-token viability threshold.
+
+Query type **is** the blocker. Direct inspection of the actual gold-set queries
+(`layer-assignment-network-simplex`, `constraints-vpsc`, "VPSC separation constraints
+IPSep-CoLa", "left edge algorithm channel routing", etc.) shows ~95%+ are single-hop factual
+lookups ("what does the corpus say about algorithm X"), not multi-hop or relational. Microsoft's
+own GraphRAG research is explicit: flat/vector RAG beats graph-based RAG on single-fact lookup;
+graph-based retrieval only wins on multi-hop and "sensemaking" queries.
+
+Independent corroborating evidence (not the same mechanism as full GraphRAG, but pointing the same
+direction): this corpus already has a citation graph (bibliographic coupling, co-citation,
+personalized PageRank) wired into the `hybrid_citation` retrieval strategy, benchmarked
+2026-06-15. README.md states: *"citation relatedness did not improve query relevance in the
+current evaluation."* Citation-graph proximity and full GraphRAG's LLM-extracted entity/relation
+graphs are different techniques solving different sub-problems — this is supporting evidence that
+graph-shaped signal doesn't help this corpus's query mix, not literal proof that GraphRAG itself
+would fail. The primary basis for cancellation is the query-type finding above.
+
+### Re-evaluation triggers
+
+Check at this tool's next quality-campaign cycle (campaigns already run periodically — 2026-06-15,
+2026-06-18, 2026-06-23) whether either condition has changed:
+- The gold set has grown substantially past its current 96 cases (e.g. via `gen-gold`-style
+  synthetic expansion) — would make reranker fine-tuning worth reconsidering.
+- The query mix has shifted toward multi-hop/relational questions (check: does the gold set still
+  skew ~95% single-hop?) — would make GraphRAG worth reconsidering.
+
+**No promotions, no code changes, no GPU time spent.** Full research findings and memory entries:
+[[graph-rag-rerank-retest-rejected]] (reranking, including this fine-tuning addendum) and
+[[graph-rag-graphrag-rejected]].
