@@ -750,6 +750,21 @@ describe("restoreAppState", () => {
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
+  it("should migrate legacy current item stroke width to stroke width key", () => {
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      currentItemStrokeWidth: 4,
+      currentItemStrokeWidthKey: undefined,
+    } as any;
+
+    const restoredAppState = restore.restoreAppState(
+      stubImportedAppState,
+      null,
+    );
+
+    expect(restoredAppState.currentItemStrokeWidthKey).toBe("bold");
+  });
+
   it("should restore with current app state when imported data state is undefined", () => {
     const stubImportedAppState = {
       ...getDefaultAppState(),

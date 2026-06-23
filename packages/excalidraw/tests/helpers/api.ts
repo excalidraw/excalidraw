@@ -4,7 +4,12 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import {
+  DEFAULT_VERTICAL_ALIGN,
+  ROUNDNESS,
+  assertNever,
+  getStrokeWidthByKey,
+} from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -261,7 +266,9 @@ export class API {
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
-      strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
+      strokeWidth:
+        rest.strokeWidth ??
+        getStrokeWidthByKey(type, appState.currentItemStrokeWidthKey),
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
       roundness: (
         rest.roundness === undefined

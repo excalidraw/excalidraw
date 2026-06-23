@@ -19,6 +19,9 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  STROKE_WIDTH,
+  STROKE_WIDTH_KEYS,
+  type StrokeWidthKey,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -203,6 +206,12 @@ const restoreStrokeVariability = (
     ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
     ? (variability as StrokeVariability)
     : defaultValue;
+};
+
+const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
+  return isFiniteNumber(strokeWidth)
+    ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
+    : null;
 };
 
 const restoreFreedrawStrokeOptions = (
@@ -1088,6 +1097,13 @@ export const restoreAppState = (
     appState.boxSelectionMode ?? localAppState?.boxSelectionMode;
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
+  }
+
+  // legacy
+  if ((appState as any).currentItemStrokeWidth !== undefined) {
+    nextAppState.currentItemStrokeWidthKey =
+      getStrokeWidthKey((appState as any).currentItemStrokeWidth) ??
+      defaultAppState.currentItemStrokeWidthKey;
   }
 
   return {

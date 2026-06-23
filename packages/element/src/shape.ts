@@ -1183,7 +1183,7 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
  */
 const VARIABLE_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for pressure-sensitive strokes. */
-  SIZE_FACTOR: 2.125,
+  SIZE_FACTOR: 4.25,
   THINNING: 0.6,
   SMOOTHING: 0.5,
   STREAMLINE: DEFAULT_STROKE_STREAMLINE,
@@ -1191,7 +1191,7 @@ const VARIABLE_WIDTH_FREEDRAW = {
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
-  SIZE_FACTOR: 0.7,
+  SIZE_FACTOR: 1.4,
   STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
 } as const;
 
