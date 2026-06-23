@@ -119,6 +119,32 @@
         }
       }
     }
+
+    &--library {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.25rem;
+      width: max-content;
+      font-size: 1.0625rem;
+
+      svg {
+        width: 30px;
+        height: 52px;
+        transform: scaleY(-1);
+        margin-left: 0.35rem;
+      }
+
+      .welcome-screen-decor-hint__label {
+        width: 150px;
+        text-align: center;
+        margin: 0;
+      }
+    }
   }
 
   // WelcomeSreen.Center

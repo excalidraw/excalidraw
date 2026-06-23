@@ -589,6 +589,7 @@
       "menuHint": "Export, preferences, and more...",
       "center_heading": "Diagrams. Made. Simple.",
       "toolbarHint": "Pick a tool & Start drawing!",
+      "libraryHint": "Import public libraries!",
       "helpHint": "Shortcuts & help"
     }
   },

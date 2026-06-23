@@ -49,4 +49,19 @@ const HelpHint = ({ children }: { children?: React.ReactNode }) => {
 };
 HelpHint.displayName = "HelpHint";
 
-export { HelpHint, MenuHint, ToolbarHint };
+const LibraryHint = ({ children }: { children?: React.ReactNode }) => {
+  const { DefaultSidebarTriggerTunnel } = useTunnels();
+  return (
+    <DefaultSidebarTriggerTunnel.In>
+      <div className="excalifont welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--library">
+        {WelcomeScreenMenuArrow}
+        <div className="welcome-screen-decor-hint__label">
+          {children || t("welcomeScreen.defaults.libraryHint")}
+        </div>
+      </div>
+    </DefaultSidebarTriggerTunnel.In>
+  );
+};
+LibraryHint.displayName = "LibraryHint";
+
+export { HelpHint, MenuHint, ToolbarHint, LibraryHint };
