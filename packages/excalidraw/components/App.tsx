@@ -4304,7 +4304,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
-        currentItemFreedrawMode: "variable",
+        currentItemStrokeVariability: "variable",
       };
     });
   };
@@ -7809,7 +7809,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
-          currentItemFreedrawMode: "variable",
+          currentItemStrokeVariability: "variable",
         };
       });
     }
@@ -9041,7 +9041,9 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
-      freedrawMode: this.state.currentItemFreedrawMode,
+      strokeOptions: {
+        variability: this.state.currentItemStrokeVariability,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],

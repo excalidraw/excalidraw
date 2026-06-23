@@ -13,7 +13,6 @@ import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   PointerType,
   ExcalidrawLinearElement,
-  FreeDrawMode,
   NonDeletedExcalidrawElement,
   NonDeleted,
   TextAlign,
@@ -34,6 +33,7 @@ import type {
   ExcalidrawNonSelectionElement,
   BindMode,
   ExcalidrawTextElement,
+  StrokeVariability,
 } from "@excalidraw/element/types";
 
 import type {
@@ -366,7 +366,7 @@ export interface AppState {
   currentItemStrokeWidth: number;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
-  currentItemFreedrawMode: FreeDrawMode;
+  currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;

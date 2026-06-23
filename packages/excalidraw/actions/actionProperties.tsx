@@ -74,7 +74,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
-  FreeDrawMode,
+  StrokeVariability,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -660,7 +660,7 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   ),
 });
 
-export const actionChangeFreedrawMode = register<FreeDrawMode>({
+export const actionChangeFreedrawMode = register<StrokeVariability>({
   name: "changeFreedrawMode",
   label: "labels.pressure",
   trackEvent: false,
@@ -671,30 +671,34 @@ export const actionChangeFreedrawMode = register<FreeDrawMode>({
           return el;
         }
         return newElementWith(el, {
-          freedrawMode: value,
+          strokeOptions: {
+            ...el.strokeOptions,
+            variability: value || "constant",
+          },
         }) as ExcalidrawElement;
       }),
-      appState: { ...appState, currentItemFreedrawMode: value },
+      appState: { ...appState, currentItemStrokeVariability: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
-    const freedrawMode =
+    const strokeVariability =
       getFormValue(
         elements,
         app,
-        (element) => (element as ExcalidrawFreeDrawElement).freedrawMode,
+        (element) =>
+          (element as ExcalidrawFreeDrawElement).strokeOptions?.variability,
         (element) => element.type === "freedraw",
         (hasSelection) =>
-          hasSelection ? null : appState.currentItemFreedrawMode,
-      ) ?? appState.currentItemFreedrawMode;
+          hasSelection ? null : appState.currentItemStrokeVariability,
+      ) ?? appState.currentItemStrokeVariability;
 
     return (
       <fieldset>
         <legend>{t("labels.pressure")}</legend>
         <div className="buttonList">
-          <RadioSelection<FreeDrawMode>
-            group="freedrawMode"
+          <RadioSelection<StrokeVariability>
+            group="strokeOptions.variability"
             options={[
               {
                 value: "constant",
@@ -707,7 +711,7 @@ export const actionChangeFreedrawMode = register<FreeDrawMode>({
                 icon: FreedrawVariableModeIcon,
               },
             ]}
-            value={freedrawMode}
+            value={strokeVariability}
             onChange={(value) => updateData(value)}
           />
         </div>

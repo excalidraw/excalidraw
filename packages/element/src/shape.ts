@@ -1246,8 +1246,8 @@ const getConstantWidthFreedrawOutline = (
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] => {
-  // Unknown/absent modes fall back to the original "variable" rendering.
-  return element.freedrawMode === "constant"
+  // Unknown/absent variability falls back to the original variable rendering.
+  return element.strokeOptions?.variability === "constant"
     ? getConstantWidthFreedrawOutline(element)
     : getVariableWidthFreedrawOutline(element);
 };

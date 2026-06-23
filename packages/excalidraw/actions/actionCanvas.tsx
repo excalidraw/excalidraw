@@ -112,7 +112,9 @@ export const actionClearCanvas = register({
         theme: appState.theme,
         penMode: appState.penMode,
         penDetected: appState.penDetected,
-        currentItemFreedrawMode: appState.penDetected ? "variable" : "constant",
+        currentItemStrokeVariability: appState.penDetected
+          ? "variable"
+          : "constant",
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,

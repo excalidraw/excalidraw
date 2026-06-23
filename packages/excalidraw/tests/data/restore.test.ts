@@ -193,7 +193,7 @@ describe("restoreElements", () => {
     expect(restoredFreedraw.pressures).toEqual([0.1, 0.4]);
   });
 
-  it("should coerce missing or malformed freedrawMode back to 'variable'", () => {
+  it("should restore freedraw stroke variability", () => {
     const freedrawElement = API.createElement({
       type: "freedraw",
       id: "id-freedraw-mode",
@@ -202,18 +202,30 @@ describe("restoreElements", () => {
 
     const [missing, bogusString, bogusNumber, valid] = restore.restoreElements(
       [
-        { ...freedrawElement, id: "missing", freedrawMode: undefined },
-        { ...freedrawElement, id: "bogusString", freedrawMode: "scribble" },
-        { ...freedrawElement, id: "bogusNumber", freedrawMode: 42 },
-        { ...freedrawElement, id: "valid", freedrawMode: "constant" },
+        { ...freedrawElement, id: "missing", strokeOptions: undefined },
+        {
+          ...freedrawElement,
+          id: "bogusString",
+          strokeOptions: { variability: "scribble" },
+        },
+        {
+          ...freedrawElement,
+          id: "bogusNumber",
+          strokeOptions: { variability: 42 },
+        },
+        {
+          ...freedrawElement,
+          id: "valid",
+          strokeOptions: { variability: "constant" },
+        },
       ] as any,
       null,
     ) as ExcalidrawFreeDrawElement[];
 
-    expect(missing.freedrawMode).toBe("variable");
-    expect(bogusString.freedrawMode).toBe("variable");
-    expect(bogusNumber.freedrawMode).toBe("variable");
-    expect(valid.freedrawMode).toBe("constant");
+    expect(missing.strokeOptions?.variability).toBe("variable");
+    expect(bogusString.strokeOptions?.variability).toBe("variable");
+    expect(bogusNumber.strokeOptions?.variability).toBe("variable");
+    expect(valid.strokeOptions?.variability).toBe("constant");
   });
 
   it("should restore line and draw elements correctly", () => {
@@ -663,6 +675,21 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("should restore freedraw mode app state values", () => {
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "constant" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("constant");
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "variable" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("variable");
+  });
+
   it("when appState is null it should return the local app state property", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";

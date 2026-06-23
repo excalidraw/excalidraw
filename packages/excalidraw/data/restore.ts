@@ -68,9 +68,9 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
-  FreeDrawMode,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
+  StrokeVariability,
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
@@ -189,15 +189,33 @@ export type RestoredDataState = {
   files: BinaryFiles;
 };
 
-const ALLOWED_FREEDRAW_MODES: Record<FreeDrawMode, true> = {
-  variable: true,
-  constant: true,
+const ALLOWED_STROKE_VARIABILITIES = new Set<StrokeVariability>([
+  "constant",
+  "variable",
+]);
+
+const restoreStrokeVariability = (
+  variability: unknown,
+  defaultValue: StrokeVariability,
+): StrokeVariability => {
+  return typeof variability === "string" &&
+    ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
+    ? (variability as StrokeVariability)
+    : defaultValue;
 };
 
-const restoreFreedrawMode = (mode: unknown): FreeDrawMode =>
-  typeof mode === "string" && mode in ALLOWED_FREEDRAW_MODES
-    ? (mode as FreeDrawMode)
-    : "variable";
+const restoreFreedrawStrokeOptions = (
+  strokeOptions: unknown,
+): { variability: StrokeVariability } => {
+  const variability =
+    strokeOptions && typeof strokeOptions === "object"
+      ? (strokeOptions as { variability?: unknown }).variability
+      : undefined;
+
+  return {
+    variability: restoreStrokeVariability(variability, "variable"),
+  };
+};
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
@@ -494,7 +512,7 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         points,
         simulatePressure: element.simulatePressure,
-        freedrawMode: restoreFreedrawMode(element.freedrawMode),
+        strokeOptions: restoreFreedrawStrokeOptions(element.strokeOptions),
         pressures,
       });
     }

@@ -216,7 +216,6 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
-  "freedrawMode": "variable",
   "groupIds": [],
   "height": 100,
   "id": "id-freedraw01",
@@ -241,6 +240,9 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "seed": Any<Number>,
   "simulatePressure": true,
   "strokeColor": "#1e1e1e",
+  "strokeOptions": {
+    "variability": "variable",
+  },
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "freedraw",

@@ -18,15 +18,15 @@ describe("freedraw mode action", () => {
     await act(async () => {});
   });
 
-  it("applies currentItemFreedrawMode to newly drawn freedraw elements", () => {
+  it("applies currentItemStrokeVariability to newly drawn freedraw elements", () => {
     // default app state draws constant-width strokes
-    expect(h.state.currentItemFreedrawMode).toBe("constant");
+    expect(h.state.currentItemStrokeVariability).toBe("constant");
 
     UI.createElement("freedraw", { x: 0, y: 0 });
 
-    expect((h.elements[0] as ExcalidrawFreeDrawElement).freedrawMode).toBe(
-      "constant",
-    );
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
+    ).toBe("constant");
   });
 
   it("toggling the radio updates both the selected element and the default", () => {
@@ -34,15 +34,15 @@ describe("freedraw mode action", () => {
     API.setSelectedElements([element.get()]);
 
     fireEvent.click(screen.getByTitle("Variable"));
-    expect((h.elements[0] as ExcalidrawFreeDrawElement).freedrawMode).toBe(
-      "variable",
-    );
-    expect(h.state.currentItemFreedrawMode).toBe("variable");
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
+    ).toBe("variable");
+    expect(h.state.currentItemStrokeVariability).toBe("variable");
 
     fireEvent.click(screen.getByTitle("Constant"));
-    expect((h.elements[0] as ExcalidrawFreeDrawElement).freedrawMode).toBe(
-      "constant",
-    );
-    expect(h.state.currentItemFreedrawMode).toBe("constant");
+    expect(
+      (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
+    ).toBe("constant");
+    expect(h.state.currentItemStrokeVariability).toBe("constant");
   });
 });
