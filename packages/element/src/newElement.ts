@@ -1,4 +1,5 @@
 import {
+  BOUND_TEXT_PADDING,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -22,7 +23,11 @@ import {
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
-import { normalizeText, measureText } from "./textMeasurements";
+import {
+  getLineHeightInPx,
+  normalizeText,
+  measureText,
+} from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
@@ -43,6 +48,8 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawTableElement,
+  ExcalidrawTableCell,
   ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
@@ -212,6 +219,202 @@ export const newMagicFrameElement = (
   );
 
   return frameElement;
+};
+
+export const DEFAULT_TABLE_ROWS = 3;
+export const DEFAULT_TABLE_COLS = 3;
+
+/** Builds an empty `rows x cols` grid of table cells. */
+export const createTableCells = (
+  rows: number,
+  cols: number,
+): ExcalidrawTableCell[][] =>
+  Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({
+      text: "",
+      textAlign: "left" as const,
+      verticalAlign: "top" as const,
+    })),
+  );
+
+/**
+ * (Re)computes equal-width columns / equal-height rows summing to the given
+ * width/height. Shared by table creation and drag-create so the grid always
+ * stays in sync with the element bounds.
+ */
+export const computeTableGrid = (
+  rows: number,
+  cols: number,
+  width: number,
+  height: number,
+): { columnWidths: number[]; rowHeights: number[] } => ({
+  columnWidths: Array.from({ length: cols }, () => width / cols),
+  rowHeights: Array.from({ length: rows }, () => height / rows),
+});
+
+const newTableCell = (): ExcalidrawTableCell => ({
+  text: "",
+  textAlign: "left",
+  verticalAlign: "top",
+});
+
+/**
+ * Returns the field updates to append a row at the bottom of a table (grows the
+ * element height by the new row's height). Pair with `newElementWith`.
+ */
+export const getTableWithAddedRow = (table: ExcalidrawTableElement) => {
+  const newRowHeight =
+    table.rowHeights[table.rowHeights.length - 1] ||
+    table.height / Math.max(1, table.rows);
+  return {
+    rows: table.rows + 1,
+    rowHeights: [...table.rowHeights, newRowHeight],
+    cells: [
+      ...table.cells,
+      Array.from({ length: table.cols }, newTableCell),
+    ] as ExcalidrawTableElement["cells"],
+    height: table.height + newRowHeight,
+  };
+};
+
+/** Field updates to append a column on the right (grows element width). */
+export const getTableWithAddedColumn = (table: ExcalidrawTableElement) => {
+  const newColWidth =
+    table.columnWidths[table.columnWidths.length - 1] ||
+    table.width / Math.max(1, table.cols);
+  return {
+    cols: table.cols + 1,
+    columnWidths: [...table.columnWidths, newColWidth],
+    cells: table.cells.map((row) => [
+      ...row,
+      newTableCell(),
+    ]) as ExcalidrawTableElement["cells"],
+    width: table.width + newColWidth,
+  };
+};
+
+/** Field updates to drop the last row (shrinks height). Null if only one row. */
+export const getTableWithRemovedRow = (table: ExcalidrawTableElement) => {
+  if (table.rows <= 1) {
+    return null;
+  }
+  const removedHeight = table.rowHeights[table.rowHeights.length - 1] || 0;
+  return {
+    rows: table.rows - 1,
+    rowHeights: table.rowHeights.slice(0, -1),
+    cells: table.cells.slice(0, -1) as ExcalidrawTableElement["cells"],
+    height: Math.max(0, table.height - removedHeight),
+  };
+};
+
+/** Field updates to drop the last column (shrinks width). Null if only one. */
+export const getTableWithRemovedColumn = (table: ExcalidrawTableElement) => {
+  if (table.cols <= 1) {
+    return null;
+  }
+  const removedWidth = table.columnWidths[table.columnWidths.length - 1] || 0;
+  return {
+    cols: table.cols - 1,
+    columnWidths: table.columnWidths.slice(0, -1),
+    cells: table.cells.map((row) =>
+      row.slice(0, -1),
+    ) as ExcalidrawTableElement["cells"],
+    width: Math.max(0, table.width - removedWidth),
+  };
+};
+
+/**
+ * Recomputes each row's height so it fits the tallest wrapped cell in that row
+ * (with a single-line minimum), and the resulting total element height. Cell
+ * text wraps to `columnWidths[col] - 2 * BOUND_TEXT_PADDING`. Used to auto-grow
+ * rows when cell text is edited so content never has to be clipped.
+ */
+export const getTableFittedToContent = (
+  table: Pick<
+    ExcalidrawTableElement,
+    "rows" | "cols" | "columnWidths" | "rowHeights" | "cells" | "fontSize"
+  > & { fontFamily: FontFamilyValues; lineHeight: number },
+): { rowHeights: number[]; height: number } => {
+  const fontString = getFontString({
+    fontSize: table.fontSize,
+    fontFamily: table.fontFamily,
+  });
+  const lineHeightPx = getLineHeightInPx(
+    table.fontSize,
+    table.lineHeight as ExcalidrawTableElement["lineHeight"],
+  );
+  const minRowHeight = lineHeightPx + BOUND_TEXT_PADDING * 2;
+
+  const rowHeights = table.rowHeights.map((currentHeight, row) => {
+    let maxLines = 1;
+    for (let col = 0; col < table.cols; col++) {
+      const cell = table.cells[row]?.[col];
+      if (cell?.text) {
+        const maxWidth = Math.max(
+          0,
+          (table.columnWidths[col] ?? 0) - BOUND_TEXT_PADDING * 2,
+        );
+        const lines = wrapText(
+          normalizeText(cell.text),
+          fontString,
+          maxWidth,
+        ).split("\n").length;
+        maxLines = Math.max(maxLines, lines);
+      }
+    }
+    // only ever grow a row to fit its content; never shrink existing rows
+    // (so editing one cell doesn't disturb the rest of the layout)
+    return Math.max(
+      currentHeight,
+      minRowHeight,
+      maxLines * lineHeightPx + BOUND_TEXT_PADDING * 2,
+    );
+  });
+
+  return {
+    rowHeights,
+    height: rowHeights.reduce((acc, value) => acc + value, 0),
+  };
+};
+
+export const newTableElement = (
+  opts: {
+    rows?: number;
+    cols?: number;
+    columnWidths?: readonly number[];
+    rowHeights?: readonly number[];
+    cells?: readonly (readonly ExcalidrawTableCell[])[];
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    lineHeight?: ExcalidrawTableElement["lineHeight"];
+    autoResizeRows?: boolean;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTableElement> => {
+  const rows = opts.rows ?? DEFAULT_TABLE_ROWS;
+  const cols = opts.cols ?? DEFAULT_TABLE_COLS;
+  const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
+  const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
+  const grid = computeTableGrid(rows, cols, opts.width ?? 0, opts.height ?? 0);
+
+  const tableElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawTableElement>("table", opts),
+      type: "table",
+      rows,
+      cols,
+      columnWidths: opts.columnWidths ?? grid.columnWidths,
+      rowHeights: opts.rowHeights ?? grid.rowHeights,
+      cells: opts.cells ?? createTableCells(rows, cols),
+      fontSize,
+      fontFamily,
+      lineHeight,
+      autoResizeRows: opts.autoResizeRows ?? true,
+    },
+    {},
+  );
+
+  return tableElement;
 };
 
 /** computes element x/y offset based on textAlign/verticalAlign */

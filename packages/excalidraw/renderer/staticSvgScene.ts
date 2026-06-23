@@ -1,10 +1,12 @@
 import {
+  BOUND_TEXT_PADDING,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -21,6 +23,8 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
+import { normalizeText } from "@excalidraw/element";
+import { wrapText } from "@excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
@@ -639,6 +643,144 @@ const renderElementToSvg = (
 
         addToRoot(rect, element);
       }
+      break;
+    }
+    case "table": {
+      const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      if (opacity !== 1) {
+        group.setAttribute("stroke-opacity", `${opacity}`);
+        group.setAttribute("fill-opacity", `${opacity}`);
+      }
+      group.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      group.setAttribute("stroke-linecap", "round");
+
+      // (1) rough outer box + grid lines
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      shapes.forEach((shape) => {
+        group.appendChild(
+          roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT),
+        );
+      });
+
+      // (2) per-cell wrapped text
+      const fontString = getFontString(element);
+      const lineHeightPx = getLineHeightInPx(
+        element.fontSize,
+        element.lineHeight,
+      );
+      const verticalOffset = getVerticalOffset(
+        element.fontFamily,
+        element.fontSize,
+        lineHeightPx,
+      );
+      const padding = BOUND_TEXT_PADDING;
+      const fill = applyDarkModeFilter(
+        element.strokeColor,
+        renderConfig.theme === THEME.DARK,
+      );
+
+      let cellY = 0;
+      for (let row = 0; row < element.rows; row++) {
+        const rowHeight = element.rowHeights[row] ?? 0;
+        let cellX = 0;
+        for (let col = 0; col < element.cols; col++) {
+          const colWidth = element.columnWidths[col] ?? 0;
+          const cell = element.cells[row]?.[col];
+          if (cell?.text) {
+            const maxWidth = Math.max(0, colWidth - padding * 2);
+            const lines = wrapText(
+              normalizeText(cell.text),
+              fontString,
+              maxWidth,
+            ).split("\n");
+
+            const direction = isRTL(cell.text) ? "rtl" : "ltr";
+            const horizontalOffset =
+              cell.textAlign === "center"
+                ? colWidth / 2
+                : cell.textAlign === "right"
+                ? colWidth - padding
+                : padding;
+            const textAnchor =
+              cell.textAlign === "center"
+                ? "middle"
+                : cell.textAlign === "right" || direction === "rtl"
+                ? "end"
+                : "start";
+
+            const textBlockHeight = lines.length * lineHeightPx;
+            const verticalStart =
+              cell.verticalAlign === "middle"
+                ? (rowHeight - textBlockHeight) / 2
+                : cell.verticalAlign === "bottom"
+                ? rowHeight - textBlockHeight - padding
+                : padding;
+
+            // clip the cell's text to the cell so overflow doesn't bleed into
+            // neighboring cells
+            const clipId = `table-cell-clip-${element.id}-${row}-${col}`;
+            const clipPath = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "clipPath",
+            );
+            clipPath.setAttribute("id", clipId);
+            const clipRect = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "rect",
+            );
+            clipRect.setAttribute("x", `${cellX}`);
+            clipRect.setAttribute("y", `${cellY}`);
+            clipRect.setAttribute("width", `${colWidth}`);
+            clipRect.setAttribute("height", `${rowHeight}`);
+            clipPath.appendChild(clipRect);
+            group.appendChild(clipPath);
+
+            const cellGroup = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "g",
+            );
+            cellGroup.setAttribute("clip-path", `url(#${clipId})`);
+
+            for (let i = 0; i < lines.length; i++) {
+              const text = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "text",
+              );
+              text.textContent = lines[i];
+              text.setAttribute("x", `${cellX + horizontalOffset}`);
+              text.setAttribute(
+                "y",
+                `${cellY + verticalStart + i * lineHeightPx + verticalOffset}`,
+              );
+              text.setAttribute("font-family", getFontFamilyString(element));
+              text.setAttribute("font-size", `${element.fontSize}px`);
+              text.setAttribute("fill", fill);
+              text.setAttribute("text-anchor", textAnchor);
+              text.setAttribute("style", "white-space: pre;");
+              text.setAttribute("direction", direction);
+              text.setAttribute("dominant-baseline", "alphabetic");
+              cellGroup.appendChild(text);
+            }
+            group.appendChild(cellGroup);
+          }
+          cellX += colWidth;
+        }
+        cellY += rowHeight;
+      }
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+      addToRoot(g || group, element);
       break;
     }
     default: {

@@ -20,11 +20,14 @@ import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
 import { getMinTextElementWidth } from "./textMeasurements";
+import { computeTableGrid } from "./newElement";
+
 import {
   isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
+  isTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -337,6 +340,18 @@ export const dragNewElement = ({
       };
     }
 
+    // keep the table grid in sync with the dragged-out bounds so columns/rows
+    // are sized to the drop rectangle (equal distribution)
+    let tableGrid = null;
+    if (isTableElement(newElement)) {
+      tableGrid = computeTableGrid(
+        newElement.rows,
+        newElement.cols,
+        width,
+        height,
+      );
+    }
+
     scene.mutateElement(
       newElement,
       {
@@ -346,6 +361,7 @@ export const dragNewElement = ({
         height,
         ...textAutoResize,
         ...imageInitialDimension,
+        ...tableGrid,
       },
       { informMutation, isDragging: false },
     );

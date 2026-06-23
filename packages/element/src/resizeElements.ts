@@ -57,6 +57,7 @@ import {
   isFreeDrawElement,
   isImageElement,
   isLinearElement,
+  isTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -77,6 +78,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
+  ExcalidrawTableElement,
   ElementsMap,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
@@ -859,6 +861,20 @@ export const resizeSingleElement = (
     });
   }
 
+  if (isTableElement(latestElement) && isTableElement(origElement)) {
+    // rescale the grid proportionally so columns/rows keep their relative sizes
+    const widthRatio = origElement.width
+      ? Math.abs(nextWidth) / origElement.width
+      : 1;
+    const heightRatio = origElement.height
+      ? Math.abs(nextHeight) / origElement.height
+      : 1;
+    scene.mutateElement(latestElement, {
+      columnWidths: origElement.columnWidths.map((w) => w * widthRatio),
+      rowHeights: origElement.rowHeights.map((h) => h * heightRatio),
+    });
+  }
+
   if (
     isArrowElement(latestElement) &&
     boundTextElement &&
@@ -1335,6 +1351,8 @@ export const resizeMultipleElements = (
         points?: ExcalidrawLinearElement["points"];
         fontSize?: ExcalidrawTextElement["fontSize"];
         scale?: ExcalidrawImageElement["scale"];
+        columnWidths?: ExcalidrawTableElement["columnWidths"];
+        rowHeights?: ExcalidrawTableElement["rowHeights"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
         startBinding?: ExcalidrawElbowArrowElement["startBinding"];
         endBinding?: ExcalidrawElbowArrowElement["endBinding"];
@@ -1422,6 +1440,13 @@ export const resizeMultipleElements = (
           orig.scale[0] * flipFactorX,
           orig.scale[1] * flipFactorY,
         ];
+      }
+
+      if (isTableElement(orig)) {
+        update.columnWidths = orig.columnWidths.map(
+          (w) => w * Math.abs(scaleX),
+        );
+        update.rowHeights = orig.rowHeights.map((h) => h * Math.abs(scaleY));
       }
 
       if (isTextElement(orig)) {

@@ -16,6 +16,7 @@ import {
   newImageElement,
   newLinearElement,
   newMagicFrameElement,
+  newTableElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -35,6 +36,7 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawElementType,
   ExcalidrawMagicFrameElement,
+  ExcalidrawTableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
@@ -189,8 +191,22 @@ export class API {
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
-    fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
-    fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
+    fontSize?: T extends "text" | "table"
+      ? ExcalidrawTextElement["fontSize"]
+      : never;
+    fontFamily?: T extends "text" | "table"
+      ? ExcalidrawTextElement["fontFamily"]
+      : never;
+    lineHeight?: T extends "text" | "table"
+      ? ExcalidrawTextElement["lineHeight"]
+      : never;
+    // table props
+    rows?: T extends "table" ? number : never;
+    cols?: T extends "table" ? number : never;
+    columnWidths?: T extends "table" ? readonly number[] : never;
+    rowHeights?: T extends "table" ? readonly number[] : never;
+    cells?: T extends "table" ? ExcalidrawTableElement["cells"] : never;
+    autoResizeRows?: T extends "table" ? boolean : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
@@ -230,6 +246,8 @@ export class API {
     ? ExcalidrawFrameElement
     : T extends "magicframe"
     ? ExcalidrawMagicFrameElement
+    : T extends "table"
+    ? ExcalidrawTableElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -361,6 +379,22 @@ export class API {
         break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
+        break;
+      case "table":
+        element = newTableElement({
+          ...base,
+          width,
+          height,
+          rows: rest.rows,
+          cols: rest.cols,
+          columnWidths: rest.columnWidths,
+          rowHeights: rest.rowHeights,
+          cells: rest.cells,
+          fontSize: rest.fontSize ?? appState.currentItemFontSize,
+          fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
+          lineHeight: rest.lineHeight,
+          autoResizeRows: rest.autoResizeRows,
+        });
         break;
       default:
         assertNever(

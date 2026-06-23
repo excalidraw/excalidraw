@@ -49,6 +49,7 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  isTableElement,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
@@ -281,6 +282,13 @@ const changeFontSize = (
         );
 
         return newElement;
+      }
+      if (isTableElement(oldElement)) {
+        const newFontSize = getNewFontSize(
+          oldElement as unknown as ExcalidrawTextElement,
+        );
+        newFontSizes.add(newFontSize);
+        return newElementWith(oldElement, { fontSize: newFontSize });
       }
       return oldElement;
     },
@@ -810,7 +818,7 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 elements,
                 app,
                 (element) => {
-                  if (isTextElement(element)) {
+                  if (isTextElement(element) || isTableElement(element)) {
                     return element.fontSize;
                   }
                   const boundTextElement = getBoundTextElement(
@@ -824,6 +832,7 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 },
                 (element) =>
                   isTextElement(element) ||
+                  isTableElement(element) ||
                   getBoundTextElement(
                     element,
                     app.scene.getNonDeletedElementsMap(),
@@ -1314,6 +1323,18 @@ export const actionChangeTextAlign = register<TextAlign>({
             return newElement;
           }
 
+          if (isTableElement(oldElement)) {
+            const textAlign =
+              value === "left" || value === "center" || value === "right"
+                ? value
+                : "left";
+            return newElementWith(oldElement, {
+              cells: oldElement.cells.map((row) =>
+                row.map((cell) => ({ ...cell, textAlign })),
+              ),
+            });
+          }
+
           return oldElement;
         },
         true,
@@ -1362,6 +1383,9 @@ export const actionChangeTextAlign = register<TextAlign>({
                 if (isTextElement(element)) {
                   return element.textAlign;
                 }
+                if (isTableElement(element)) {
+                  return element.cells[0]?.[0]?.textAlign ?? null;
+                }
                 const boundTextElement = getBoundTextElement(
                   element,
                   elementsMap,
@@ -1373,6 +1397,7 @@ export const actionChangeTextAlign = register<TextAlign>({
               },
               (element) =>
                 isTextElement(element) ||
+                isTableElement(element) ||
                 getBoundTextElement(element, elementsMap) !== null,
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemTextAlign,
@@ -1414,6 +1439,18 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               app.scene,
             );
             return newElement;
+          }
+
+          if (isTableElement(oldElement)) {
+            const verticalAlign =
+              value === "top" || value === "middle" || value === "bottom"
+                ? value
+                : "top";
+            return newElementWith(oldElement, {
+              cells: oldElement.cells.map((row) =>
+                row.map((cell) => ({ ...cell, verticalAlign })),
+              ),
+            });
           }
 
           return oldElement;
@@ -1460,6 +1497,9 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
                 if (isTextElement(element) && element.containerId) {
                   return element.verticalAlign;
                 }
+                if (isTableElement(element)) {
+                  return element.cells[0]?.[0]?.verticalAlign ?? null;
+                }
                 const boundTextElement = getBoundTextElement(
                   element,
                   app.scene.getNonDeletedElementsMap(),
@@ -1471,6 +1511,7 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               },
               (element) =>
                 isTextElement(element) ||
+                isTableElement(element) ||
                 getBoundTextElement(
                   element,
                   app.scene.getNonDeletedElementsMap(),

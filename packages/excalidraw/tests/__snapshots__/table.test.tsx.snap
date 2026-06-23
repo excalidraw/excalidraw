@@ -1,0 +1,102 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`table element > drag-creates a default 3x3 table sized to the drag rectangle 1`] = `
+{
+  "angle": 0,
+  "autoResizeRows": true,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "cells": [
+    [
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+    ],
+    [
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+    ],
+    [
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+      {
+        "text": "",
+        "textAlign": "left",
+        "verticalAlign": "top",
+      },
+    ],
+  ],
+  "cols": 3,
+  "columnWidths": [
+    10,
+    10,
+    10,
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 5,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "lineHeight": "1.25000",
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "rowHeights": [
+    "16.66667",
+    "16.66667",
+    "16.66667",
+  ],
+  "rows": 3,
+  "seed": 1278240551,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "table",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": 401146281,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;

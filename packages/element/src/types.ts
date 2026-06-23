@@ -175,6 +175,45 @@ export type ExcalidrawFrameLikeElement =
   | ExcalidrawMagicFrameElement;
 
 /**
+ * A single cell of a {@link ExcalidrawTableElement}. Cell text is stored inline
+ * on the table element as a 2D grid (`cells[row][col]`) rather than as child
+ * `ExcalidrawTextElement`s with a `containerId` — the single-container text path
+ * is for shapes with one centered label and would fight the grid layout.
+ */
+export type ExcalidrawTableCell = Readonly<{
+  text: string;
+  textAlign: "left" | "center" | "right";
+  verticalAlign: "top" | "middle" | "bottom";
+}>;
+
+export type ExcalidrawTableElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "table";
+    /** number of rows, >= 1 */
+    rows: number;
+    /** number of columns, >= 1 */
+    cols: number;
+    /** length === cols; sums to element width */
+    columnWidths: readonly number[];
+    /** length === rows; sums to element height */
+    rowHeights: readonly number[];
+    /** indexed as cells[row][col]; cells.length === rows, each row length === cols */
+    cells: readonly (readonly ExcalidrawTableCell[])[];
+    fontSize: number;
+    fontFamily: FontFamilyValues;
+    /**
+     * Unitless line height (aligned to W3C). To get line height in px, multiply
+     * with font size (using `getLineHeightInPx` helper).
+     */
+    lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * When `true`, rows auto-grow on edit to fit their wrapped cell text. When
+     * `false`, rows keep a fixed height and overflowing text is clipped.
+     */
+    autoResizeRows: boolean;
+  }>;
+
+/**
  * These are elements that don't have any additional properties.
  */
 export type ExcalidrawGenericElement =
@@ -195,6 +234,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
+  | ExcalidrawTableElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawSelectionElement;
 
@@ -212,6 +252,7 @@ export type ExcalidrawElement =
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
+  | ExcalidrawTableElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
@@ -265,7 +306,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawTableElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
