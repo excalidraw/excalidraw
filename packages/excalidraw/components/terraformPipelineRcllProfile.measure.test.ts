@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
@@ -39,7 +40,7 @@ import type { TerraformImportPresetSources } from "./terraformImportPresetsTypes
 
 const OUT_PATH =
   process.env.VITEST_TERRAFORM_PROFILE_MEASURE_OUT ??
-  "/private/tmp/claude-501/-Users-tusharsariya-Projects-excalidraw-tf/82aa1772-7ee9-4bb1-a9a9-aaa45fc24181/scratchpad/rca-profile-run.json";
+  join(tmpdir(), "terraform-rcll-profile", "rca-profile-run.json");
 
 const SLOW_BASE_OPTIONS = {
   compact: true,
