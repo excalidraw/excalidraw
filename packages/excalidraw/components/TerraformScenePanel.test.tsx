@@ -14,6 +14,7 @@ import { DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS } from "./terraformModuleLayout
 import {
   resetTerraformLayout,
   refreshTerraformLayout,
+  runTerraformImportFromSources,
 } from "./terraformSceneApply";
 
 const hoisted = vi.hoisted(() => ({
@@ -30,6 +31,27 @@ vi.mock("./terraformSceneApply", () => ({
   resetTerraformLayout: vi.fn(() => true),
   refreshTerraformLayout: vi.fn(async () => ({})),
   runTerraformImportFromSources: vi.fn(async () => ({})),
+  terraformPipelineReplayOptionsFromSession: vi.fn((session) => ({
+    pipelineLayoutVariant:
+      session.pipelineLayoutVariant ??
+      (session.layoutMode === "rcll" ? "rcll" : "classic"),
+    pipelinePacked: session.pipelinePacked === true,
+    pipelinePackedPullLeft: session.pipelinePackedPullLeft === true,
+    pipelineIncludeAncillary: session.pipelineIncludeAncillary === true,
+    pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
+    pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
+    pipelineReorder: session.pipelineReorder === true,
+    pipelineCrossingMin: session.pipelineCrossingMin === true,
+    pipelineDeBandLevel:
+      session.pipelineDeBandLevel ??
+      (session.pipelineSubnetDeBand ? "subnet" : "none"),
+    pipelineRankSeparate: session.pipelineRankSeparate === true,
+    pipelineStraighten: session.pipelineStraighten === true,
+    pipelineDeDensify: session.pipelineDeDensify === true,
+    pipelineColumnPacking: session.pipelineColumnPacking,
+    pipelineLayoutProfile: session.pipelineLayoutProfile,
+    pipelineStaircaseBandOverlap: session.pipelineStaircaseBandOverlap,
+  })),
 }));
 
 vi.mock("./App", async (importOriginal) => {
@@ -53,6 +75,16 @@ const terraformResource = newTextElement({
   y: 0,
   text: "r",
   customData: { terraformVisibilityRole: "resource" },
+});
+
+const terraformPipelineResource = newTextElement({
+  x: 0,
+  y: 0,
+  text: "p",
+  customData: {
+    terraformVisibilityRole: "resource",
+    terraformPipelineView: true,
+  },
 });
 
 const mockApp = {
@@ -88,6 +120,7 @@ describe("TerraformScenePanel", () => {
     hoisted.replaceAllElements.mockReset();
     vi.mocked(resetTerraformLayout).mockClear();
     vi.mocked(refreshTerraformLayout).mockClear();
+    vi.mocked(runTerraformImportFromSources).mockClear();
   });
 
   it("is hidden when scene has no terraform resources", () => {
@@ -175,6 +208,66 @@ describe("TerraformScenePanel", () => {
 
     fireEvent.click(screen.getByTestId("terraform-debug-refresh"));
     expect(refreshTerraformLayout).toHaveBeenCalled();
+  });
+
+  it("compact toggle preserves RCLL session options when relayouting", async () => {
+    setTerraformImportSession({
+      sources: { planDotBundles: [], states: [], tfdTexts: [] },
+      semanticLayout: false,
+      layoutMode: "rcll",
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+      pipelineCompact: false,
+      pipelineIncludeAncillary: true,
+      pipelineSwimlaneLaneRise: true,
+      pipelineReorder: true,
+      pipelineCrossingMin: true,
+      pipelineDeBandLevel: "none",
+      pipelineRankSeparate: true,
+      pipelineStraighten: true,
+      pipelineColumnPacking: "compact",
+      pipelineLayoutProfile: "compact",
+      pipelineStaircaseBandOverlap: true,
+      preset: null,
+      importedTfdTexts: [],
+      snapshot: {
+        elements: [],
+        terraformEdgeLayerPins: null,
+        enableDeclaredDataFlow: false,
+      },
+    });
+
+    render(
+      <TerraformScenePanel
+        app={mockApp}
+        actionManager={mockActionManager}
+        elements={[terraformPipelineResource]}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("terraform-debug-toggle-compact"));
+    await waitFor(() => {
+      expect(runTerraformImportFromSources).toHaveBeenCalled();
+    });
+    expect(runTerraformImportFromSources).toHaveBeenCalledWith(
+      mockApp,
+      hoisted.setAppState,
+      expect.anything(),
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineCompact: true,
+        pipelineLayoutVariant: "rcll",
+        pipelineIncludeAncillary: true,
+        pipelineSwimlaneLaneRise: true,
+        pipelineReorder: true,
+        pipelineCrossingMin: true,
+        pipelineDeBandLevel: "none",
+        pipelineRankSeparate: true,
+        pipelineStraighten: true,
+        pipelineColumnPacking: "compact",
+        pipelineLayoutProfile: "compact",
+        pipelineStaircaseBandOverlap: true,
+      }),
+    );
   });
 
   it("opens legend popover with category sections by default", async () => {

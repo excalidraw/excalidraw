@@ -37,6 +37,7 @@ import {
   refreshTerraformLayout,
   resetTerraformLayout,
   runTerraformImportFromSources,
+  terraformPipelineReplayOptionsFromSession,
 } from "./terraformSceneApply";
 import {
   TERRAFORM_COLOR_MODE_DEFAULT,
@@ -296,17 +297,7 @@ export const TerraformScenePanel = ({
         layoutMode: session.layoutMode,
         moduleLayoutOptions: session.moduleLayoutOptions,
         pipelineCompact: !pipelineCompact,
-        pipelineLayoutVariant: session.pipelineLayoutVariant ?? "classic",
-        pipelinePacked: session.pipelinePacked === true,
-        pipelinePackedPullLeft: session.pipelinePackedPullLeft === true,
-        pipelineIncludeAncillary: session.pipelineIncludeAncillary === true,
-        pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
-        pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
-        pipelineReorder: session.pipelineReorder === true,
-        pipelineCrossingMin: session.pipelineCrossingMin === true,
-        pipelineDeBandLevel:
-          session.pipelineDeBandLevel ??
-          (session.pipelineSubnetDeBand ? "subnet" : "none"),
+        ...terraformPipelineReplayOptionsFromSession(session),
         importedTfdTexts: session.importedTfdTexts,
         preset: session.preset,
       });

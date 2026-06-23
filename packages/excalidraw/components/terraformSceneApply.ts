@@ -38,6 +38,7 @@ import type { TerraformLayoutProgress } from "./terraformLayoutWorkerTypes";
 import type React from "react";
 
 import type { TerraformImportPreset } from "./terraformImportPresetsTypes";
+import type { TerraformImportSession } from "./terraformImportSession";
 import type { TerraformView } from "./terraformImportDialogUtils";
 import type { AppClassProperties, AppState, BinaryFileData } from "../types";
 
@@ -194,6 +195,47 @@ export type RunTerraformImportFromSourcesOptions = {
 export type RunTerraformImportFromSourcesResult = {
   importWarnings?: TerraformImportWarning[];
 };
+
+export const terraformPipelineReplayOptionsFromSession = (
+  session: TerraformImportSession,
+): Pick<
+  RunTerraformImportFromSourcesOptions,
+  | "pipelineLayoutVariant"
+  | "pipelinePacked"
+  | "pipelinePackedPullLeft"
+  | "pipelineIncludeAncillary"
+  | "pipelineSemanticPlacement"
+  | "pipelineSwimlaneLaneRise"
+  | "pipelineReorder"
+  | "pipelineCrossingMin"
+  | "pipelineDeBandLevel"
+  | "pipelineRankSeparate"
+  | "pipelineStraighten"
+  | "pipelineDeDensify"
+  | "pipelineColumnPacking"
+  | "pipelineLayoutProfile"
+  | "pipelineStaircaseBandOverlap"
+> => ({
+  pipelineLayoutVariant:
+    session.pipelineLayoutVariant ??
+    (session.layoutMode === "rcll" ? "rcll" : "classic"),
+  pipelinePacked: session.pipelinePacked === true,
+  pipelinePackedPullLeft: session.pipelinePackedPullLeft === true,
+  pipelineIncludeAncillary: session.pipelineIncludeAncillary === true,
+  pipelineSemanticPlacement: session.pipelineSemanticPlacement === true,
+  pipelineSwimlaneLaneRise: session.pipelineSwimlaneLaneRise === true,
+  pipelineReorder: session.pipelineReorder === true,
+  pipelineCrossingMin: session.pipelineCrossingMin === true,
+  pipelineDeBandLevel:
+    session.pipelineDeBandLevel ??
+    (session.pipelineSubnetDeBand ? "subnet" : "none"),
+  pipelineRankSeparate: session.pipelineRankSeparate === true,
+  pipelineStraighten: session.pipelineStraighten === true,
+  pipelineDeDensify: session.pipelineDeDensify === true,
+  pipelineColumnPacking: session.pipelineColumnPacking,
+  pipelineLayoutProfile: session.pipelineLayoutProfile,
+  pipelineStaircaseBandOverlap: session.pipelineStaircaseBandOverlap,
+});
 
 async function layoutTerraformSceneFromSources(
   sources: TerraformPlanParsingSources,
@@ -420,7 +462,7 @@ export const refreshTerraformLayout = async (
     layoutMode: session.layoutMode,
     moduleLayoutOptions: session.moduleLayoutOptions,
     pipelineCompact: session.pipelineCompact,
-    pipelineLayoutVariant: session.pipelineLayoutVariant ?? "classic",
+    ...terraformPipelineReplayOptionsFromSession(session),
     colorMode: session.colorMode,
     terraformLodEnabled: session.terraformLodEnabled,
     terraformLodPreset:

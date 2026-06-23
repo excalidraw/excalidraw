@@ -243,6 +243,65 @@ describe("terraformSceneApply", () => {
     );
   });
 
+  it("refreshTerraformLayout preserves all RCLL pipeline options from session", async () => {
+    setTerraformImportSession({
+      sources: {
+        planDotBundles: [{ plan: {}, dotText: "digraph {}", label: "s" }],
+        states: [],
+        tfdTexts: [],
+      },
+      semanticLayout: false,
+      layoutMode: "rcll",
+      moduleLayoutOptions: DEFAULT_TERRAFORM_MODULE_LAYOUT_OPTIONS,
+      pipelineCompact: false,
+      pipelinePacked: false,
+      pipelinePackedPullLeft: false,
+      pipelineIncludeAncillary: true,
+      pipelineSemanticPlacement: false,
+      pipelineSwimlaneLaneRise: true,
+      pipelineReorder: true,
+      pipelineCrossingMin: true,
+      pipelineDeBandLevel: "none",
+      pipelineRankSeparate: true,
+      pipelineStraighten: true,
+      pipelineDeDensify: false,
+      pipelineColumnPacking: "compact",
+      pipelineLayoutProfile: "compact",
+      pipelineStaircaseBandOverlap: true,
+      preset: null,
+      importedTfdTexts: [],
+      snapshot: {
+        elements: [],
+        terraformEdgeLayerPins: null,
+        enableDeclaredDataFlow: false,
+      },
+    });
+
+    vi.mocked(layoutTerraformViaWorkers).mockResolvedValue({ elements: [] });
+
+    await refreshTerraformLayout(mockApp(), hoisted.setAppState);
+    expect(layoutTerraformViaWorkers).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        layoutMode: "rcll",
+        pipelineCompact: false,
+        pipelineLayoutVariant: "rcll",
+        pipelineIncludeAncillary: true,
+        pipelineSwimlaneLaneRise: true,
+        pipelineReorder: true,
+        pipelineCrossingMin: true,
+        pipelineDeBandLevel: "none",
+        pipelineRankSeparate: true,
+        pipelineStraighten: true,
+        pipelineDeDensify: false,
+        pipelineColumnPacking: "compact",
+        pipelineLayoutProfile: "compact",
+        pipelineStaircaseBandOverlap: true,
+      }),
+      expect.anything(),
+    );
+  });
+
   it("relayouts when switching layout mode for identical sources", async () => {
     const semanticEl = newTextElement({
       text: "semantic",
