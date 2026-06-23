@@ -20,7 +20,7 @@
 
 ### TODO-2: ~~Zone resolution O(N×Z) tail in `prep.resourceRects`~~ — RESOLVED, no longer applicable (2026-06-23)
 
-**Resolution:** T1-T4 shipped and measured. `prep.resourceRects` dropped from ~1,402ms to ~10ms (median of 3 runs) — the satellite scan removed by T3 was effectively its *entire* cost. The projected zone-resolution O(N×Z) residual this TODO anticipated did not materialize as a meaningful cost on `staging-extended-localstack-v2`. No further action needed here.
+**Resolution:** T1-T4 shipped and measured. `prep.resourceRects` dropped from ~1,402ms to ~10ms (median of 3 runs) — the satellite scan removed by T3 was effectively its _entire_ cost. The projected zone-resolution O(N×Z) residual this TODO anticipated did not materialize as a meaningful cost on `staging-extended-localstack-v2`. No further action needed here.
 
 ---
 
@@ -50,25 +50,14 @@
 
 ### TODO-5: Consolidate rejected-technique memory entries for graph-layout-rag into one index
 
-**What:** `graph-rag-contextual-rejected`, `graph-rag-rerank-retest-rejected` (now also covering
-reranker fine-tuning), and `graph-rag-graphrag-rejected` are three separate memory files that all
-restate a shared root cause — this corpus is BM25-dominant and resists dense/semantic/graph-shaped
-techniques. Consolidate into a single index page with one shared "why" section and per-technique
-specifics, rather than three-plus flat entries.
+**What:** `graph-rag-contextual-rejected`, `graph-rag-rerank-retest-rejected` (now also covering reranker fine-tuning), and `graph-rag-graphrag-rejected` are three separate memory files that all restate a shared root cause — this corpus is BM25-dominant and resists dense/semantic/graph-shaped techniques. Consolidate into a single index page with one shared "why" section and per-technique specifics, rather than three-plus flat entries.
 
-**Why:** Five-plus rejected-technique memory entries with overlapping rationale risk getting harder
-to navigate than one index page would be. Surfaced by an outside-voice review during
-`/plan-eng-review` of the cancellation writeup (2026-06-23).
+**Why:** Five-plus rejected-technique memory entries with overlapping rationale risk getting harder to navigate than one index page would be. Surfaced by an outside-voice review during `/plan-eng-review` of the cancellation writeup (2026-06-23).
 
-**Pros:** One canonical place to read "why doesn't X work on this corpus," instead of needing to
-read three+ files to notice they all say the same thing about retrieval shape.
+**Pros:** One canonical place to read "why doesn't X work on this corpus," instead of needing to read three+ files to notice they all say the same thing about retrieval shape.
 
-**Cons:** Consolidation work itself, and flattening loses some of each entry's independent
-searchability (a memory search for "contextual retrieval" currently surfaces exactly the right
-file; a consolidated index would surface the whole cluster).
+**Cons:** Consolidation work itself, and flattening loses some of each entry's independent searchability (a memory search for "contextual retrieval" currently surfaces exactly the right file; a consolidated index would surface the whole cluster).
 
-**Context:** Three entries exist today: `graph-rag-contextual-rejected.md`,
-`graph-rag-rerank-retest-rejected.md`, `graph-rag-graphrag-rejected.md`. Not urgent at this count —
-worth doing if a 4th-5th technique gets rejected on this corpus in the future.
+**Context:** Three entries exist today: `graph-rag-contextual-rejected.md`, `graph-rag-rerank-retest-rejected.md`, `graph-rag-graphrag-rejected.md`. Not urgent at this count — worth doing if a 4th-5th technique gets rejected on this corpus in the future.
 
 **Depends on:** Nothing blocking — can be done anytime.

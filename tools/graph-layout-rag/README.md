@@ -12,8 +12,7 @@ uv sync --extra mlx   # add --extra mlx on Apple Silicon for local MLX embed pro
 cp .env.example .env   # or reuse tools/repo-rag/.env — set OPENAI_API_KEY
 ```
 
-`mlx` is an opt-in extra, not a base dependency — it's Apple-Silicon-only and breaks the Linux/CUDA
-desktop venv if installed there (see [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md)).
+`mlx` is an opt-in extra, not a base dependency — it's Apple-Silicon-only and breaks the Linux/CUDA desktop venv if installed there (see [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md)).
 
 Embeddings use shared [`tools/rag-common`](../rag-common) with **named profiles** (`RAG_EMBED_PROFILE` or `--embed-profile`). Legacy `RAG_EMBED_BACKEND=auto|openai|local|gemini` still works as the implicit `default` profile.
 
@@ -145,11 +144,7 @@ Campaign report: [docs/rag/graph-layout-rag-quality-campaign-2026-06-18.md](../.
 
 Current result: `cuda-qwen0.6b-section-v1` is built and synced, but is not promoted as the default because its PDF nDCG gain is offset by a catalog regression.
 
-**2026-06-23 follow-up campaign** (porting rag-literature-rag's wins): weighted-RRF fusion
-(`dense_weight=1.0, sparse_weight=2.0`, promoted as the new default in `query/hybrid.py`) and a
-full `cuda-qwen0.6b-contextual-v1` build/benchmark (4501 docs, 0 errors) — contextual regresses
-both tracks vs. the plain baseline and vs. `section-v1`, so it stays a non-default profile.
-Full writeup: [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md).
+**2026-06-23 follow-up campaign** (porting rag-literature-rag's wins): weighted-RRF fusion (`dense_weight=1.0, sparse_weight=2.0`, promoted as the new default in `query/hybrid.py`) and a full `cuda-qwen0.6b-contextual-v1` build/benchmark (4501 docs, 0 errors) — contextual regresses both tracks vs. the plain baseline and vs. `section-v1`, so it stays a non-default profile. Full writeup: [docs/quality-campaign-2026-06-23.md](docs/quality-campaign-2026-06-23.md).
 
 ## Retrieval benchmark
 

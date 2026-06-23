@@ -104,20 +104,9 @@ Append new entries; do not rewrite prior results.
 
 ### 2026-06-22: Zoom-out legibility campaign — is LOD perf-justified? (`--suite lod`)
 
-Context: in the RCLL pipeline view, zooming out makes the diagram illegible because
-the Terraform LOD feature is **pure culling** (`terraformLod.ts` →
-`Renderer.ts` `filterTerraformLodVisibleElements`). Before redesigning the low-zoom
-experience, this measures whether the culling carries its weight on the render hot path.
+Context: in the RCLL pipeline view, zooming out makes the diagram illegible because the Terraform LOD feature is **pure culling** (`terraformLod.ts` → `Renderer.ts` `filterTerraformLodVisibleElements`). Before redesigning the low-zoom experience, this measures whether the culling carries its weight on the render hot path.
 
-Method: new `--suite lod` mode in `scripts/terraform/benchmark-canvas-runtime.mjs`
-drives `terraformLodEnabled`/`terraformLodPreset` via `setState` (part of the
-`Renderer.getRenderableElements` memo key, so this recomputes the visible set exactly
-as the product feature does). The **primary metric is the deterministic per-element
-canvas-regeneration count** (`elementCanvasRegenStats`, armed only in dev/test, reset
-per workload, incremented in the `shouldRegenerateBecauseZoom` branch at
-`renderElement.ts`). Frame-interval p95 is **directional only** — RAF coalescing,
-render throttling, and WeakMap GC make wall-clock timing non-deterministic through the
-benchmark. See [docs/pipeline-rcll-layout-design.md](./pipeline-rcll-layout-design.md).
+Method: new `--suite lod` mode in `scripts/terraform/benchmark-canvas-runtime.mjs` drives `terraformLodEnabled`/`terraformLodPreset` via `setState` (part of the `Renderer.getRenderableElements` memo key, so this recomputes the visible set exactly as the product feature does). The **primary metric is the deterministic per-element canvas-regeneration count** (`elementCanvasRegenStats`, armed only in dev/test, reset per workload, incremented in the `shouldRegenerateBecauseZoom` branch at `renderElement.ts`). Frame-interval p95 is **directional only** — RAF coalescing, render throttling, and WeakMap GC make wall-clock timing non-deterministic through the benchmark. See [docs/pipeline-rcll-layout-design.md](./pipeline-rcll-layout-design.md).
 
 | Field | Value |
 | --- | --- |
@@ -137,17 +126,7 @@ benchmark. See [docs/pipeline-rcll-layout-design.md](./pipeline-rcll-layout-desi
 Findings:
 
 - LOD culls ~71% of in-viewport elements at `0.1` (392 → 113).
-- The primary deterministic metric agrees with p95: LOD eliminates the post-settle
-  zoom regeneration burst (`12 → 0`) and reduces combined p95 ~28% (`23.44 → 16.80ms`,
-  performance preset). `balanced` and `performance` cull identically at this depth.
-- **Legibility-with-LOD-off check** (screenshots in `docs/assets/lod-ab/`, 1440×900 @ 10%):
-  neither state is legible at deep zoom — resource labels truncate to `a…` and boxes are
-  a few px tall in both. `lod-off` is merely *denser* (845 vs 216 visible at this larger
-  viewport); it does not become readable.
+- The primary deterministic metric agrees with p95: LOD eliminates the post-settle zoom regeneration burst (`12 → 0`) and reduces combined p95 ~28% (`23.44 → 16.80ms`, performance preset). `balanced` and `performance` cull identically at this depth.
+- **Legibility-with-LOD-off check** (screenshots in `docs/assets/lod-ab/`, 1440×900 @ 10%): neither state is legible at deep zoom — resource labels truncate to `a…` and boxes are a few px tall in both. `lod-off` is merely _denser_ (845 vs 216 visible at this larger viewport); it does not become readable.
 
-**Decision:** LOD is **modestly perf-justified — keep it on by default; do not drop the
-culling.** Because the scene is illegible at deep zoom *regardless* of LOD, the fix is
-**navigation/comprehension (minimap + search-to-fit), not cosmetic placeholder fills.**
-This confirms the campaign's navigation-first scope: Phase 2a (navigation) is primary;
-Phase 2b (placeholder + frame-name thresholds) is complementary polish for the
-already-navigated-in view, demoted behind 2a.
+**Decision:** LOD is **modestly perf-justified — keep it on by default; do not drop the culling.** Because the scene is illegible at deep zoom _regardless_ of LOD, the fix is **navigation/comprehension (minimap + search-to-fit), not cosmetic placeholder fills.** This confirms the campaign's navigation-first scope: Phase 2a (navigation) is primary; Phase 2b (placeholder + frame-name thresholds) is complementary polish for the already-navigated-in view, demoted behind 2a.

@@ -29,12 +29,12 @@ uv run rag-literature-rag harvest enrich
 
 Useful flags:
 
-| Flag | Purpose |
-| --- | --- |
-| `--deep-harvest` | Caps tuned for about 1k PDF core corpus |
-| `--target-pdfs 1000` | Stop once enough OK PDFs are present |
-| `--resume` | Skip early seed stages |
-| `--pipeline-harvest` | OpenAlex core topics only |
+| Flag                 | Purpose                                 |
+| -------------------- | --------------------------------------- |
+| `--deep-harvest`     | Caps tuned for about 1k PDF core corpus |
+| `--target-pdfs 1000` | Stop once enough OK PDFs are present    |
+| `--resume`           | Skip early seed stages                  |
+| `--pipeline-harvest` | OpenAlex core topics only               |
 
 ## Embedding Profiles
 
