@@ -49,26 +49,16 @@ export type SatelliteBuildContext = {
   nodesByType?: ReadonlyMap<string, readonly string[]>;
 };
 
-let fallbackScanCount = 0;
-
 /**
- * Call from a scan site when it falls back to `Object.keys(nodes)` despite `nodesByType`
- * being supplied to the enclosing call — i.e. the index existed but this specific site
- * never received it. Proves the *complexity* claim (not just correctness): a
- * correctness-only equivalence check would still pass even if a site silently kept doing
- * the full O(N) scan.
+ * Re-exported from `terraformSatelliteFallbackCounter.ts` (not implemented here) so link
+ * files can call `recordNodesByTypeFallbackScan()` without an import cycle — this module
+ * already value-imports from several link files.
  */
-export function recordNodesByTypeFallbackScan(): void {
-  fallbackScanCount += 1;
-}
-
-export function resetFallbackScanCount(): void {
-  fallbackScanCount = 0;
-}
-
-export function getFallbackScanCount(): number {
-  return fallbackScanCount;
-}
+export {
+  getFallbackScanCount,
+  recordNodesByTypeFallbackScan,
+  resetFallbackScanCount,
+} from "./terraformSatelliteFallbackCounter";
 
 /** One O(N) pass bucketing every real node path by its resolved resource type. */
 export function buildNodesByTypeIndex(

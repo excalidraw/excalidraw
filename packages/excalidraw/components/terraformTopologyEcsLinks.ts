@@ -19,6 +19,7 @@ import {
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import { pickResourceValuesForTopologyPlacement } from "./terraformTopologyExtract";
 import { getCloudWatchAttachmentIndex } from "./terraformTopologyCloudWatchLinks";
 import {
@@ -97,6 +98,22 @@ function getResourceType(
     return typeof parts[i + 1] === "string" ? String(parts[i + 1]) : "";
   }
   return typeof parts[i] === "string" ? String(parts[i]) : "";
+}
+
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan. A
+ * missing bucket (no nodes of that type) is a correct empty result, not a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
 }
 
 function moduleScopesMatch(
@@ -265,9 +282,10 @@ function findSingletonInModuleScope(
   nodes: TerraformPlanNodesMap,
   scope: TopologyModuleScope,
   resourceType: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const matches: string[] = [];
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(nodesByType, resourceType, nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -332,12 +350,17 @@ function resolveCapacityProviderByName(
   scope: TopologyModuleScope,
   cpName: string,
   changes: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const name = cpName.trim();
   if (!name) {
     return null;
   }
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_ecs_capacity_provider",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -385,6 +408,7 @@ export function isEc2BackedEcsService(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   serviceValues?: Record<string, unknown>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): boolean {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -403,6 +427,7 @@ export function isEc2BackedEcsService(
     serviceAddress,
     values.task_definition,
     arnIndex,
+    nodesByType,
   );
   if (!taskDefPath) {
     return false;
@@ -424,6 +449,7 @@ function resolveAutoscalingGroupFromCp(
   cpPath: string,
   scope: TopologyModuleScope,
   changes: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const cpPrimary = getPrimaryResource(nodes[cpPath]);
   if (!cpPrimary) {
@@ -456,7 +482,12 @@ function resolveAutoscalingGroupFromCp(
       return fromPlan;
     }
   }
-  return findSingletonInModuleScope(nodes, scope, "aws_autoscaling_group");
+  return findSingletonInModuleScope(
+    nodes,
+    scope,
+    "aws_autoscaling_group",
+    nodesByType,
+  );
 }
 
 function resolveLaunchTemplateFromAsg(
@@ -464,6 +495,7 @@ function resolveLaunchTemplateFromAsg(
   asgPath: string,
   scope: TopologyModuleScope,
   changes: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const asgPrimary = getPrimaryResource(nodes[asgPath]);
   if (!asgPrimary) {
@@ -494,7 +526,12 @@ function resolveLaunchTemplateFromAsg(
       }
     }
   }
-  return findSingletonInModuleScope(nodes, scope, "aws_launch_template");
+  return findSingletonInModuleScope(
+    nodes,
+    scope,
+    "aws_launch_template",
+    nodesByType,
+  );
 }
 
 function resolveInstanceProfileFromLaunchTemplate(
@@ -502,6 +539,7 @@ function resolveInstanceProfileFromLaunchTemplate(
   ltPath: string,
   scope: TopologyModuleScope,
   changes: readonly PlanRc[],
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const ltPrimary = getPrimaryResource(nodes[ltPath]);
   if (!ltPrimary) {
@@ -533,7 +571,12 @@ function resolveInstanceProfileFromLaunchTemplate(
       }
     }
   }
-  return findSingletonInModuleScope(nodes, scope, "aws_iam_instance_profile");
+  return findSingletonInModuleScope(
+    nodes,
+    scope,
+    "aws_iam_instance_profile",
+    nodesByType,
+  );
 }
 
 export function buildEcsEc2CapacityChainsForService(
@@ -541,6 +584,7 @@ export function buildEcsEc2CapacityChainsForService(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): EcsEc2CapacityChain[] {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -548,7 +592,15 @@ export function buildEcsEc2CapacityChainsForService(
     return [];
   }
   const serviceValues = mergeTerraformPlanResourceValues(primary);
-  if (!isEc2BackedEcsService(nodes, serviceAddress, arnIndex, serviceValues)) {
+  if (
+    !isEc2BackedEcsService(
+      nodes,
+      serviceAddress,
+      arnIndex,
+      serviceValues,
+      nodesByType,
+    )
+  ) {
     return [];
   }
 
@@ -563,12 +615,19 @@ export function buildEcsEc2CapacityChainsForService(
       cpPath,
       scope,
       changes,
+      nodesByType,
     );
     const ltPath = asgPath
-      ? resolveLaunchTemplateFromAsg(nodes, asgPath, scope, changes)
+      ? resolveLaunchTemplateFromAsg(nodes, asgPath, scope, changes, nodesByType)
       : null;
     const profilePath = ltPath
-      ? resolveInstanceProfileFromLaunchTemplate(nodes, ltPath, scope, changes)
+      ? resolveInstanceProfileFromLaunchTemplate(
+          nodes,
+          ltPath,
+          scope,
+          changes,
+          nodesByType,
+        )
       : null;
     chains.push({
       capacityProvider: cpPath,
@@ -583,6 +642,7 @@ export function buildEcsEc2CapacityChainsForService(
       nodes,
       scope,
       "aws_ecs_capacity_provider",
+      nodesByType,
     );
     if (singletonCp) {
       buildChainForCp(singletonCp);
@@ -602,7 +662,8 @@ export function buildEcsEc2CapacityChainsForService(
           scope.modulePrefix,
           ref,
           "aws_ecs_capacity_provider",
-        ) ?? resolveCapacityProviderByName(nodes, scope, ref, changes);
+        ) ??
+        resolveCapacityProviderByName(nodes, scope, ref, changes, nodesByType);
       if (cpPath) {
         break;
       }
@@ -612,6 +673,7 @@ export function buildEcsEc2CapacityChainsForService(
         nodes,
         scope,
         "aws_ecs_capacity_provider",
+        nodesByType,
       );
     }
     if (!cpPath || seenCp.has(cpPath)) {
@@ -628,6 +690,7 @@ export function resolveEcsClusterPathFromService(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -660,7 +723,7 @@ export function resolveEcsClusterPathFromService(
       return fromPlan;
     }
     const bare = stripTerraformAttributeSuffix(ref);
-    for (const path of Object.keys(nodes)) {
+    for (const path of candidatesForType(nodesByType, "aws_ecs_cluster", nodes)) {
       if (getResourceType(path, nodes[path]) !== "aws_ecs_cluster") {
         continue;
       }
@@ -680,13 +743,14 @@ export function resolveEcsClusterPathFromService(
     }
   }
 
-  return findSingletonInModuleScope(nodes, scope, "aws_ecs_cluster");
+  return findSingletonInModuleScope(nodes, scope, "aws_ecs_cluster", nodesByType);
 }
 
 function resolveClusterCapacityProvidersPath(
   nodes: TerraformPlanNodesMap,
   clusterPath: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const clusterPrimary = getPrimaryResource(nodes[clusterPath]);
   if (!clusterPrimary) {
@@ -698,7 +762,11 @@ function resolveClusterCapacityProvidersPath(
   const scope = topologyModuleScopeForAddress(clusterPath);
   const changes = planChangesFromPlan(plan);
 
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_ecs_cluster_capacity_providers",
+    nodes,
+  )) {
     if (
       getResourceType(path, nodes[path]) !==
       "aws_ecs_cluster_capacity_providers"
@@ -734,6 +802,7 @@ function resolveClusterCapacityProvidersPath(
     nodes,
     scope,
     "aws_ecs_cluster_capacity_providers",
+    nodesByType,
   );
 }
 
@@ -747,11 +816,13 @@ export function buildEcsClusterCompanionCluster(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: EcsClusterCompanionCluster | null; edges: TopologyIamEdge[] } {
   const clusterPath = resolveEcsClusterPathFromService(
     nodes,
     serviceAddress,
     plan,
+    nodesByType,
   );
   if (!clusterPath) {
     return { cluster: null, edges: [] };
@@ -760,6 +831,7 @@ export function buildEcsClusterCompanionCluster(
     nodes,
     clusterPath,
     plan,
+    nodesByType,
   );
   const edges: TopologyIamEdge[] = [
     {
@@ -797,6 +869,7 @@ export function buildEcsEc2CapacityCompanionCluster(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): {
   cluster: EcsEc2CapacityCompanionCluster | null;
   edges: TopologyIamEdge[];
@@ -806,6 +879,7 @@ export function buildEcsEc2CapacityCompanionCluster(
     serviceAddress,
     arnIndex,
     plan,
+    nodesByType,
   );
   if (chains.length === 0) {
     return { cluster: null, edges: [] };
@@ -957,6 +1031,7 @@ export function ecsServiceCompanionLogGroupPaths(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -969,6 +1044,7 @@ export function ecsServiceCompanionLogGroupPaths(
     serviceAddress,
     serviceValues.task_definition,
     arnIndex,
+    nodesByType,
   );
   const out = new Set<string>();
   for (const path of collectLogGroupPathsForTaskDefinition(
@@ -994,6 +1070,7 @@ export function buildEcsServiceCompanionCluster(
   nodes: TerraformPlanNodesMap,
   serviceAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: EcsServiceCompanionCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -1006,11 +1083,13 @@ export function buildEcsServiceCompanionCluster(
     serviceAddress,
     serviceValues.task_definition,
     arnIndex,
+    nodesByType,
   );
   const logGroups = ecsServiceCompanionLogGroupPaths(
     nodes,
     serviceAddress,
     arnIndex,
+    nodesByType,
   );
   if (!taskDefPath && logGroups.length === 0) {
     return { cluster: null, edges: [] };

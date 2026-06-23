@@ -4,6 +4,7 @@
  */
 
 import { buildEcsEc2CapacityChainsForService } from "./terraformTopologyEcsLinks";
+import { recordNodesByTypeFallbackScan } from "./terraformSatelliteFallbackCounter";
 import {
   groupIamStackIntoRoleStacks,
   nestedIamRoleStacksExtraHeightPx,
@@ -14,6 +15,23 @@ import {
   type TerraformPlanGraphNode,
   type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
+
+/**
+ * Candidate paths for a single type: indexed lookup if available, else the full scan.
+ * A missing bucket (no nodes of that type) is NOT a fallback — it's a correct empty
+ * result from the index. Only the absence of `nodesByType` itself counts as a fallback.
+ */
+function candidatesForType(
+  nodesByType: ReadonlyMap<string, readonly string[]> | undefined,
+  type: string,
+  nodes: TerraformPlanNodesMap,
+): readonly string[] {
+  if (!nodesByType) {
+    recordNodesByTypeFallbackScan();
+    return Object.keys(nodes);
+  }
+  return nodesByType.get(type) ?? [];
+}
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -155,12 +173,13 @@ function findIamRoleInModuleByRoleField(
   nodes: TerraformPlanNodesMap,
   modulePrefix: string,
   roleIdentifier: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   if (!roleIdentifier) {
     return null;
   }
   const wantMod = modulePrefix;
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_iam_role", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -189,9 +208,10 @@ function inferLambdaExecutionRoleFromModuleContext(
   nodes: TerraformPlanNodesMap,
   lambdaAddress: string,
   modulePrefix: string,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const rolePaths: string[] = [];
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(nodesByType, "aws_iam_role", nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -239,6 +259,7 @@ export function resolveLambdaExecutionRolePath(
   lambdaAddress: string,
   roleValue: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(roleValue, strings);
@@ -249,6 +270,7 @@ export function resolveLambdaExecutionRolePath(
       nodes,
       lambdaAddress,
       modulePrefix,
+      nodesByType,
     );
   }
 
@@ -287,7 +309,12 @@ export function resolveLambdaExecutionRolePath(
       }
     }
 
-    const byName = findIamRoleInModuleByRoleField(nodes, modulePrefix, text);
+    const byName = findIamRoleInModuleByRoleField(
+      nodes,
+      modulePrefix,
+      text,
+      nodesByType,
+    );
     if (byName) {
       return byName;
     }
@@ -297,6 +324,7 @@ export function resolveLambdaExecutionRolePath(
     nodes,
     lambdaAddress,
     modulePrefix,
+    nodesByType,
   );
 }
 
@@ -305,6 +333,7 @@ function resolveRoleReferenceOnPolicyNode(
   policyAddress: string,
   roleRef: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(roleRef, strings);
@@ -331,7 +360,12 @@ function resolveRoleReferenceOnPolicyNode(
         return p;
       }
     }
-    const byName = findIamRoleInModuleByRoleField(nodes, modulePrefix, text);
+    const byName = findIamRoleInModuleByRoleField(
+      nodes,
+      modulePrefix,
+      text,
+      nodesByType,
+    );
     if (byName) {
       return byName;
     }
@@ -396,10 +430,22 @@ export function collectPoliciesForIamRole(
   nodes: TerraformPlanNodesMap,
   rolePath: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string[] {
   const out = new Set<string>();
 
-  for (const path of Object.keys(nodes)) {
+  let candidates: readonly string[];
+  if (nodesByType) {
+    candidates = [
+      ...(nodesByType.get("aws_iam_role_policy") ?? []),
+      ...(nodesByType.get("aws_iam_role_policy_attachment") ?? []),
+    ];
+  } else {
+    recordNodesByTypeFallbackScan();
+    candidates = Object.keys(nodes);
+  }
+
+  for (const path of candidates) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -417,6 +463,7 @@ export function collectPoliciesForIamRole(
         path,
         values.role,
         arnIndex,
+        nodesByType,
       );
       if (resolved === rolePath) {
         out.add(path);
@@ -427,6 +474,7 @@ export function collectPoliciesForIamRole(
         path,
         values.role,
         arnIndex,
+        nodesByType,
       );
       if (resolved !== rolePath) {
         continue;
@@ -466,6 +514,7 @@ export function buildLambdaIamCluster(
   nodes: TerraformPlanNodesMap,
   lambdaAddress: string,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[lambdaAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -478,12 +527,18 @@ export function buildLambdaIamCluster(
     lambdaAddress,
     values.role,
     arnIndex,
+    nodesByType,
   );
   if (!rolePath) {
     return { cluster: null, edges: [] };
   }
 
-  const policies = collectPoliciesForIamRole(nodes, rolePath, arnIndex);
+  const policies = collectPoliciesForIamRole(
+    nodes,
+    rolePath,
+    arnIndex,
+    nodesByType,
+  );
   const policyDocs = collectDataIamPolicyDocumentsForRole(nodes, rolePath);
   const stack = [rolePath, ...policies, ...policyDocs];
   const edges: TopologyIamEdge[] = [
@@ -519,6 +574,7 @@ export function resolveEcsTaskDefinitionPath(
   serviceAddress: string,
   taskDefinitionValue: unknown,
   arnIndex: Map<string, string>,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): string | null {
   const strings: string[] = [];
   flattenStringish(taskDefinitionValue, strings);
@@ -575,7 +631,11 @@ export function resolveEcsTaskDefinitionPath(
   }
 
   const taskDefPaths: string[] = [];
-  for (const path of Object.keys(nodes)) {
+  for (const path of candidatesForType(
+    nodesByType,
+    "aws_ecs_task_definition",
+    nodes,
+  )) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
@@ -599,6 +659,7 @@ export function buildEcsServiceIamCluster(
   serviceAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[serviceAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
@@ -611,6 +672,7 @@ export function buildEcsServiceIamCluster(
     serviceAddress,
     serviceValues.task_definition,
     arnIndex,
+    nodesByType,
   );
   if (!taskDefPath) {
     return { cluster: null, edges: [] };
@@ -632,6 +694,7 @@ export function buildEcsServiceIamCluster(
       serviceAddress,
       roleValue,
       arnIndex,
+      nodesByType,
     );
     if (!rolePath || seenRoles.has(rolePath)) {
       return;
@@ -644,7 +707,12 @@ export function buildEcsServiceIamCluster(
       type: edgeType,
       label,
     });
-    const policies = collectPoliciesForIamRole(nodes, rolePath, arnIndex);
+    const policies = collectPoliciesForIamRole(
+      nodes,
+      rolePath,
+      arnIndex,
+      nodesByType,
+    );
     const policyDocs = collectDataIamPolicyDocumentsForRole(nodes, rolePath);
     for (const p of policies) {
       stack.push(p);
@@ -678,6 +746,7 @@ export function buildEcsServiceIamCluster(
     serviceAddress,
     arnIndex,
     plan,
+    nodesByType,
   );
   for (const chain of ec2Chains) {
     if (!chain.instanceProfile) {
@@ -693,6 +762,7 @@ export function buildEcsServiceIamCluster(
       serviceAddress,
       profileValues.role,
       arnIndex,
+      nodesByType,
     );
     if (!hostRolePath) {
       continue;
@@ -708,7 +778,12 @@ export function buildEcsServiceIamCluster(
       type: "ecs_instance_role",
       label: "instance role",
     });
-    const policies = collectPoliciesForIamRole(nodes, hostRolePath, arnIndex);
+    const policies = collectPoliciesForIamRole(
+      nodes,
+      hostRolePath,
+      arnIndex,
+      nodesByType,
+    );
     const policyDocs = collectDataIamPolicyDocumentsForRole(
       nodes,
       hostRolePath,
@@ -746,14 +821,21 @@ export function buildPrimaryIamCluster(
   primaryAddress: string,
   arnIndex: Map<string, string>,
   plan?: unknown,
+  nodesByType?: ReadonlyMap<string, readonly string[]>,
 ): { cluster: LambdaIamCluster | null; edges: TopologyIamEdge[] } {
   const node = nodes[primaryAddress] as TerraformPlanGraphNode | undefined;
   const primary = getPrimaryResource(node);
   const type = typeof primary?.type === "string" ? primary.type : "";
   if (type === "aws_ecs_service") {
-    return buildEcsServiceIamCluster(nodes, primaryAddress, arnIndex, plan);
+    return buildEcsServiceIamCluster(
+      nodes,
+      primaryAddress,
+      arnIndex,
+      plan,
+      nodesByType,
+    );
   }
-  return buildLambdaIamCluster(nodes, primaryAddress, arnIndex);
+  return buildLambdaIamCluster(nodes, primaryAddress, arnIndex, nodesByType);
 }
 
 /**

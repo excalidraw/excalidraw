@@ -50,6 +50,7 @@ export function installSatellitePlugins(): void {
         ctx.primaryAddress,
         ctx.arnIndex,
         ctx.plan,
+        ctx.nodesByType,
       ),
 
     security_groups: (_kind, ctx) =>
@@ -75,10 +76,16 @@ export function installSatellitePlugins(): void {
         ctx.nodes,
         ctx.primaryAddress,
         ctx.arnIndex,
+        ctx.nodesByType,
       ),
 
     ecs_cluster_companions: (_kind, ctx) =>
-      buildEcsClusterCompanionCluster(ctx.nodes, ctx.primaryAddress, ctx.plan),
+      buildEcsClusterCompanionCluster(
+        ctx.nodes,
+        ctx.primaryAddress,
+        ctx.plan,
+        ctx.nodesByType,
+      ),
 
     ecs_ec2_capacity_companions: (_kind, ctx) =>
       buildEcsEc2CapacityCompanionCluster(
@@ -86,6 +93,7 @@ export function installSatellitePlugins(): void {
         ctx.primaryAddress,
         ctx.arnIndex,
         ctx.plan,
+        ctx.nodesByType,
       ),
 
     api_gateway_companions: (_kind, ctx) =>
