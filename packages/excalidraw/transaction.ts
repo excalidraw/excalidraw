@@ -47,11 +47,6 @@ export interface TransactionContext {
   }) => void;
 }
 
-interface RollbackState {
-  elements: readonly OrderedExcalidrawElement[];
-  appState: AppState;
-}
-
 export class Transaction {
   readonly id: string = randomId();
   private _status: TransactionStatus = "active";
@@ -66,7 +61,6 @@ export class Transaction {
 
   constructor(
     private readonly context: TransactionContext,
-    private readonly rollbackState: RollbackState,
     private readonly onDone: () => void,
   ) {
     // Freeze the baseline by deep-copying elements. The scene mutates elements in
@@ -186,14 +180,53 @@ export class Transaction {
   }
 
   /**
-   * Revert: restore the scene to the begin()-time state. No history entry.
+   * Revert the elements / appState keys this transaction registered via update()
+   * back to their begin()-time baseline. No history entry.
+   *
+   * Scoped, not whole-scene: the revert is merged over the *current* scene, so work
+   * committed by other concurrent transactions (added/removed/edited elements this
+   * transaction never touched) is preserved. The baselines are the deep copies frozen
+   * at begin() (`originalElementStates`), so in-place property mutations are reverted too.
+   *
+   * Shared-element conflict: if another transaction committed an element this one also
+   * registered, rollback still reverts it to this transaction's baseline (clobbering the
+   * committed value). That is an inherent write-write conflict — out of scope (the system
+   * is not a CRDT conflict resolver).
    */
   rollback(): void {
     this.assertActive();
 
+    // Start from the current scene so other transactions' committed work survives.
+    const nextElements = new Map(
+      this.context.getElementsMap(),
+    ) as SceneElementsMap;
+
+    for (const [id, originalState] of this.originalElementStates) {
+      if (originalState === null) {
+        // Didn't exist at begin() → this transaction added it → drop it.
+        nextElements.delete(id);
+      } else {
+        // Restore the frozen baseline. Re-copy so the live scene can't alias and
+        // mutate our baseline after rollback.
+        nextElements.set(id, deepCopyElement(originalState));
+      }
+    }
+
+    // Restore only the touched *observed* appState keys over the current appState.
+    // Non-observed keys have no baseline (they are absent from the observed
+    // snapshot) and must not be clobbered with `undefined`. This mirrors commit(),
+    // which likewise operates purely in observed-appState space.
+    const nextAppState = { ...this.context.getAppState() };
+    for (const key of this.touchedAppStateKeys) {
+      if (key in this.prevSnapshot.appState) {
+        (nextAppState as Record<string, unknown>)[key] =
+          this.originalAppState[key];
+      }
+    }
+
     this.context.applyUpdate({
-      elements: this.rollbackState.elements,
-      appState: this.rollbackState.appState,
+      elements: Array.from(nextElements.values()),
+      appState: nextAppState,
     });
 
     this._status = "rolled-back";
@@ -267,17 +300,10 @@ export class TransactionManager {
   }
 
   private create(onDone: () => void): Transaction {
-    return new Transaction(this.context, this.captureRollbackState(), onDone);
+    return new Transaction(this.context, onDone);
   }
 
   private resolve(key?: string): Transaction | undefined {
     return key === undefined ? this.defaultTxn : this.keyed.get(key);
-  }
-
-  private captureRollbackState(): RollbackState {
-    return {
-      elements: Array.from(this.context.getElementsMap().values()),
-      appState: this.context.getAppState(),
-    };
   }
 }

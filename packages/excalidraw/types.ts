@@ -818,6 +818,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   editorInterface: App["editorInterface"];
   scene: App["scene"];
+  transactionManager: App["transactionManager"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
   pasteFromClipboard: App["pasteFromClipboard"];

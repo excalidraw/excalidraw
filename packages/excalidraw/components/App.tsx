@@ -433,6 +433,8 @@ import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
 
+import { TransactionManager } from "../transaction";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -454,7 +456,6 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
-import { TransactionManager } from "../transaction";
 
 import { findShapeByKey } from "./shapes";
 

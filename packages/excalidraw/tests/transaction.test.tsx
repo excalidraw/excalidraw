@@ -4,11 +4,19 @@ import { arrayToMap, reseed } from "@excalidraw/common";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
+import { actionChangeOpacity } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { GlobalTestState, act, render, unmountComponent } from "./test-utils";
+import {
+  GlobalTestState,
+  act,
+  fireEvent,
+  render,
+  screen,
+  unmountComponent,
+} from "./test-utils";
 
 const { h } = window;
 
@@ -67,22 +75,26 @@ describe("TransactionManager", () => {
       expect(after.status).toBe("active");
     });
 
-    it("rollback() restores scene and auto-restarts a fresh default", () => {
+    it("rollback() reverts registered changes and auto-restarts a fresh default", () => {
+      // Default was created at mount (0 elements).
+      const before = h.app.transactionManager.get();
+
+      // Add elements through the normal flow and register them with the default.
       const rect = API.createElement({ type: "rectangle" });
       API.setElements([rect]);
-
-      // Default was created at mount (0 elements). Externally add another element.
+      before.update({ elements: arrayToMap([rect]) as SceneElementsMap });
       const newRect = API.createElement({ type: "rectangle" });
       API.setElements([rect, newRect]);
+      before.update({
+        elements: arrayToMap([rect, newRect]) as SceneElementsMap,
+      });
       expect(h.elements.filter((el) => !el.isDeleted).length).toBe(2);
-
-      const before = h.app.transactionManager.get();
 
       act(() => {
         before.rollback();
       });
 
-      // Rolled back to mount state (0 elements — rollbackState was captured at mount).
+      // Both were added after begin() (mount, 0 elements) → removed on rollback.
       expect(before.status).toBe("rolled-back");
       expect(h.elements.filter((el) => !el.isDeleted).length).toBe(0);
 
@@ -288,13 +300,35 @@ describe("TransactionManager", () => {
     });
 
     describe("rollback()", () => {
-      it("restores elements to the state at begin() time", () => {
+      it("reverts registered changes to the state at begin() time", () => {
         const rect = API.createElement({ type: "rectangle" });
         API.setElements([rect]);
 
         const txn = h.app.transactionManager.begin("txA");
 
-        // Modify scene externally (not via txn.update)
+        // Add a new element through the normal flow and register it with the txn.
+        const newRect = API.createElement({ type: "rectangle" });
+        API.setElements([rect, newRect]);
+        txn.update({ elements: arrayToMap([newRect]) as SceneElementsMap });
+        expect(h.elements.filter((el) => !el.isDeleted).length).toBe(2);
+
+        act(() => {
+          txn.rollback();
+        });
+
+        // newRect was added after begin() → removed; rect (present at begin) stays.
+        expect(txn.status).toBe("rolled-back");
+        expect(h.elements.filter((el) => !el.isDeleted).length).toBe(1);
+        expect(h.elements.some((el) => el.id === rect.id)).toBe(true);
+      });
+
+      it("leaves elements it never registered untouched", () => {
+        const rect = API.createElement({ type: "rectangle" });
+        API.setElements([rect]);
+
+        const txn = h.app.transactionManager.begin("txA");
+
+        // Add an element through the normal flow but do NOT register it.
         const newRect = API.createElement({ type: "rectangle" });
         API.setElements([rect, newRect]);
         expect(h.elements.filter((el) => !el.isDeleted).length).toBe(2);
@@ -303,9 +337,32 @@ describe("TransactionManager", () => {
           txn.rollback();
         });
 
+        // Nothing was registered, so rollback is a no-op on the scene.
         expect(txn.status).toBe("rolled-back");
-        expect(h.elements.filter((el) => !el.isDeleted).length).toBe(1);
-        expect(h.elements.some((el) => el.id === rect.id)).toBe(true);
+        expect(h.elements.filter((el) => !el.isDeleted).length).toBe(2);
+        expect(h.elements.some((el) => el.id === newRect.id)).toBe(true);
+      });
+
+      it("reverts an in-place property mutation it registered", () => {
+        const rect = API.createElement({ type: "rectangle", x: 0 });
+        API.setElements([rect]);
+
+        const txn = h.app.transactionManager.begin("txA");
+
+        // Mutate in place (same object reference the scene holds), then register.
+        act(() => {
+          h.app.scene.mutateElement(rect, { x: 250 });
+        });
+        txn.update({ elements: arrayToMap([rect]) as SceneElementsMap });
+        expect(h.elements.find((el) => el.id === rect.id)?.x).toBe(250);
+
+        act(() => {
+          txn.rollback();
+        });
+
+        // Restored to the deep-copied begin() baseline, not the live (mutated) ref.
+        expect(txn.status).toBe("rolled-back");
+        expect(h.elements.find((el) => el.id === rect.id)?.x).toBe(0);
       });
 
       it("discards registered changes without recording history", () => {
@@ -352,6 +409,48 @@ describe("TransactionManager", () => {
         });
         expect(txnA.status).toBe("committed");
         expect(txnB.status).toBe("committed");
+      });
+
+      it("rollback() of one transaction preserves another's committed work", () => {
+        const rectA = API.createElement({ type: "rectangle", x: 0 });
+        const rectB = API.createElement({ type: "rectangle", x: 0 });
+        API.setElements([rectA, rectB]);
+
+        const txnA = h.app.transactionManager.begin("txA");
+        const txnB = h.app.transactionManager.begin("txB");
+
+        // txnB edits rectB and adds rectC, then commits — all disjoint from txnA.
+        const rectC = API.createElement({ type: "rectangle" });
+        act(() => {
+          h.app.scene.mutateElement(rectB, { x: 200 });
+          API.setElements([rectA, rectB, rectC]);
+        });
+        txnB.update({
+          elements: arrayToMap([rectB, rectC]) as SceneElementsMap,
+        });
+        act(() => {
+          txnB.commit();
+        });
+
+        // txnA edits rectA, then rolls back after txnB already committed.
+        act(() => {
+          h.app.scene.mutateElement(rectA, { x: 300 });
+        });
+        txnA.update({ elements: arrayToMap([rectA]) as SceneElementsMap });
+        act(() => {
+          txnA.rollback();
+        });
+
+        expect(txnB.status).toBe("committed");
+        expect(txnA.status).toBe("rolled-back");
+
+        // txnB's committed work survives txnA's rollback...
+        expect(
+          h.elements.some((el) => el.id === rectC.id && !el.isDeleted),
+        ).toBe(true);
+        expect(h.elements.find((el) => el.id === rectB.id)?.x).toBe(200);
+        // ...while txnA's own edit is reverted.
+        expect(h.elements.find((el) => el.id === rectA.id)?.x).toBe(0);
       });
 
       it("rollbackAll() reverts all keyed transactions and the default", () => {
@@ -441,9 +540,9 @@ describe("TransactionManager", () => {
       });
       expect(h.elements.filter((e) => !e.isDeleted)).toHaveLength(CHUNKS);
       for (const el of streamed) {
-        expect(
-          h.elements.some((e) => e.id === el.id && !e.isDeleted),
-        ).toBe(true);
+        expect(h.elements.some((e) => e.id === el.id && !e.isDeleted)).toBe(
+          true,
+        );
       }
     });
 
@@ -490,6 +589,67 @@ describe("TransactionManager", () => {
         API.executeAction(redoAction);
       });
       expect(h.elements.find((e) => e.id === rect.id)?.width).toBe(250);
+    });
+  });
+
+  // The opacity slider is the first concrete action wired to the transaction
+  // system: dragging it emits one `onChange` per step, which without scoping
+  // would litter the undo stack with one entry per step.
+  describe("actionChangeOpacity integration", () => {
+    it("collapses an opacity slider drag into a single undo entry", () => {
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
+
+      const rect = API.createElement({ type: "rectangle", opacity: 100 });
+      API.setElements([rect]);
+      API.setSelectedElements([rect]);
+
+      const slider = screen.getByTestId("opacity");
+      const undoLengthBefore = h.history.undoStack.length;
+
+      // Each drag step is applied live but deferred (no history yet) because an
+      // "opacity" transaction is open for the duration of the drag.
+      for (const value of [80, 60, 40, 20]) {
+        fireEvent.change(slider, { target: { value: `${value}` } });
+        expect(h.elements[0].opacity).toBe(value);
+        expect(h.history.undoStack.length).toBe(undoLengthBefore);
+      }
+
+      // Releasing the slider commits the transaction → exactly one undo entry.
+      fireEvent.pointerUp(slider);
+      expect(h.app.transactionManager.get("opacity")).toBeUndefined();
+      expect(h.history.undoStack.length).toBe(undoLengthBefore + 1);
+      expect(h.elements[0].opacity).toBe(20);
+
+      // One undo reverts the whole drag back to the starting opacity.
+      act(() => {
+        API.executeAction(undoAction);
+      });
+      expect(h.elements[0].opacity).toBe(100);
+
+      // One redo re-applies the final opacity.
+      act(() => {
+        API.executeAction(redoAction);
+      });
+      expect(h.elements[0].opacity).toBe(20);
+    });
+
+    it("falls back to immediate capture when no slider transaction is open", () => {
+      const rect = API.createElement({ type: "rectangle", opacity: 100 });
+      API.setElements([rect]);
+      API.setSelectedElements([rect]);
+
+      const undoLengthBefore = h.history.undoStack.length;
+
+      // Invoking the action without an open "opacity" transaction (e.g.
+      // programmatically) records immediately, preserving legacy behaviour.
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeOpacity, "api", 50);
+      });
+
+      expect(h.elements[0].opacity).toBe(50);
+      expect(h.app.transactionManager.get("opacity")).toBeUndefined();
+      expect(h.history.undoStack.length).toBe(undoLengthBefore + 1);
     });
   });
 });

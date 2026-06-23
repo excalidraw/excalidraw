@@ -6,6 +6,13 @@ export type RangeProps = {
   label: React.ReactNode;
   value: number;
   onChange: (value: number) => void;
+  /**
+   * Fired when an interaction with the slider finishes (pointer released,
+   * keyboard step released, or focus lost). Useful to close a transaction
+   * opened on the first `onChange` so the whole drag collapses into a single
+   * undo entry.
+   */
+  onChangeEnd?: () => void;
   min?: number;
   max?: number;
   step?: number;
@@ -18,6 +25,7 @@ export const Range = ({
   label,
   value,
   onChange,
+  onChangeEnd,
   min = 0,
   max = 100,
   step = 10,
@@ -65,6 +73,9 @@ export const Range = ({
           onChange={(event) => {
             onChange(+event.target.value);
           }}
+          onPointerUp={onChangeEnd}
+          onKeyUp={onChangeEnd}
+          onBlur={onChangeEnd}
           value={value}
           className="range-input"
           data-testid={testId}

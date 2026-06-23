@@ -73,6 +73,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  SceneElementsMap,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -711,11 +712,36 @@ export const actionChangeStrokeStyle = register<
   ),
 });
 
+/**
+ * Key for the transaction opened while the opacity slider is being dragged.
+ * Dragging emits an `onChange` per step; scoping them to one transaction
+ * collapses the whole drag into a single undo entry (see PanelComponent).
+ */
+const OPACITY_TRANSACTION_KEY = "opacity";
+
 export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
   name: "changeOpacity",
   label: "labels.opacity",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
+    const nextAppState = { ...appState, currentItemOpacity: value };
+
+    // While the slider is being dragged an "opacity" transaction is open.
+    // Register the touched elements/appState so its commit consolidates the
+    // whole drag into one history entry, and defer capture to that commit.
+    // Outside a drag (e.g. programmatic calls) fall back to capturing now.
+    const transaction = app.transactionManager.get(OPACITY_TRANSACTION_KEY);
+    if (transaction) {
+      transaction.update({
+        elements: arrayToMap(
+          getSelectedElements(elements, appState, {
+            includeBoundTextElement: true,
+          }),
+        ) as SceneElementsMap,
+        appState: nextAppState,
+      });
+    }
+
     return {
       elements: changeProperty(
         elements,
@@ -726,8 +752,10 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
           }),
         true,
       ),
-      appState: { ...appState, currentItemOpacity: value },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      appState: nextAppState,
+      captureUpdate: transaction
+        ? CaptureUpdateAction.EVENTUALLY
+        : CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, app, updateData }) => {
@@ -744,7 +772,19 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
         label={t("labels.opacity")}
         value={opacity ?? appState.currentItemOpacity}
         hasCommonValue={opacity !== null}
-        onChange={updateData}
+        onChange={(value) => {
+          // Open a transaction for the duration of the drag (idempotent — the
+          // slider can emit many onChange events before it is released).
+          if (!app.transactionManager.get(OPACITY_TRANSACTION_KEY)) {
+            app.transactionManager.begin(OPACITY_TRANSACTION_KEY);
+          }
+          updateData(value);
+        }}
+        onChangeEnd={() => {
+          // Drag finished → record the single consolidated history entry.
+          // No-op if no transaction is open.
+          app.transactionManager.commit(OPACITY_TRANSACTION_KEY);
+        }}
         min={0}
         max={100}
         step={10}
