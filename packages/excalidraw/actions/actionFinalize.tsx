@@ -30,6 +30,8 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   NonDeleted,
   PointsPositionUpdates,
@@ -197,6 +199,7 @@ export const actionFinalize = register<FormData>({
       element = appState.multiElement;
     } else if (
       appState.newElement?.type === "freedraw" ||
+      appState.newElement?.type === "highlighter" ||
       isBindingElement(appState.newElement)
     ) {
       element = appState.newElement;
@@ -214,7 +217,8 @@ export const actionFinalize = register<FormData>({
       if (
         appState.selectedLinearElement &&
         appState.multiElement &&
-        element.type !== "freedraw" &&
+        isLinearElement(element) &&
+        !isFreeDrawElement(element) &&
         appState.lastPointerDownWith !== "touch"
       ) {
         const { points } = element;
@@ -225,7 +229,7 @@ export const actionFinalize = register<FormData>({
         ) {
           shouldCommit = false;
           scene.mutateElement(element, {
-            points: element.points.slice(0, -1),
+            points: (element as ExcalidrawLinearElement | ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement).points.slice(0, -1),
           });
           if (
             isBindingElement(element) &&
@@ -310,7 +314,8 @@ export const actionFinalize = register<FormData>({
 
     if (
       (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
+        appState.activeTool.type !== "freedraw" &&
+        appState.activeTool.type !== "highlighter") ||
       !element
     ) {
       resetCursor(interactiveCanvas);
@@ -356,7 +361,8 @@ export const actionFinalize = register<FormData>({
         cursorButton: "up",
         activeTool:
           (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
+            appState.activeTool.type === "freedraw" ||
+            appState.activeTool.type === "highlighter") &&
           element
             ? appState.activeTool
             : activeTool,
@@ -370,7 +376,8 @@ export const actionFinalize = register<FormData>({
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+          appState.activeTool.type !== "freedraw" &&
+          appState.activeTool.type !== "highlighter"
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,

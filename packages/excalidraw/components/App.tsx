@@ -124,6 +124,7 @@ import {
   newElementWith,
   newFrameElement,
   newFreeDrawElement,
+  newHighlighterElement,
   newEmbeddableElement,
   newMagicFrameElement,
   newIframeElement,
@@ -268,6 +269,7 @@ import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -5571,7 +5573,7 @@ class App extends React.Component<AppProps, AppState> {
         frameToHighlight: null,
       } as const;
 
-      if (nextActiveTool.type === "freedraw") {
+      if (nextActiveTool.type === "freedraw" || nextActiveTool.type === "highlighter") {
         this.store.scheduleCapture();
       }
 
@@ -6918,7 +6920,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
+        (this.state.activeTool.type === "freedraw" ||
+          this.state.activeTool.type === "highlighter") &&
+        this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -7725,9 +7729,12 @@ class App extends React.Component<AppProps, AppState> {
     if (
       event.pointerType === "touch" &&
       this.state.newElement &&
-      this.state.newElement.type === "freedraw"
+      (this.state.newElement.type === "freedraw" ||
+        this.state.newElement.type === "highlighter")
     ) {
-      const element = this.state.newElement as ExcalidrawFreeDrawElement;
+      const element = this.state.newElement as
+        | ExcalidrawFreeDrawElement
+        | ExcalidrawHighlighterElement;
       this.updateScene({
         ...(element.points.length < 10
           ? {
@@ -8039,10 +8046,15 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool.type === "freedraw") {
+    } else if (
+      this.state.activeTool.type === "freedraw" ||
+      this.state.activeTool.type === "highlighter"
+    ) {
       this.handleFreeDrawElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        this.state.activeTool.type as
+          | "freedraw"
+          | "highlighter",
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
@@ -8975,7 +8987,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
-    elementType: ExcalidrawFreeDrawElement["type"],
+    elementType:
+      | ExcalidrawFreeDrawElement["type"]
+      | ExcalidrawHighlighterElement["type"],
     pointerDownState: PointerDownState,
   ) => {
     // Begin a mark capture. This does not have to update state yet.
@@ -8992,8 +9006,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
-    const element = newFreeDrawElement({
-      type: elementType,
+    const commonProps = {
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -9009,7 +9022,18 @@ class App extends React.Component<AppProps, AppState> {
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
       pressures: simulatePressure ? [] : [event.pressure],
-    });
+    };
+
+    const element =
+      elementType === "highlighter"
+        ? newHighlighterElement({
+            ...commonProps,
+            type: "highlighter",
+          })
+        : newFreeDrawElement({
+            ...commonProps,
+            type: "freedraw",
+          });
 
     this.insertNewElement(element);
 
@@ -10357,7 +10381,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        if (newElement.type === "freedraw") {
+        if (newElement.type === "freedraw" || newElement.type === "highlighter") {
           const points = newElement.points;
           const dx = pointerCoords.x - newElement.x;
           const dy = pointerCoords.y - newElement.y;
@@ -10825,7 +10849,7 @@ class App extends React.Component<AppProps, AppState> {
         childEvent,
       );
 
-      if (newElement?.type === "freedraw") {
+      if (newElement?.type === "freedraw" || newElement?.type === "highlighter") {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -11494,7 +11518,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw" && newElement) {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        activeTool.type !== "highlighter" &&
+        newElement
+      ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -11545,6 +11574,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !activeTool.locked &&
         activeTool.type !== "freedraw" &&
+        activeTool.type !== "highlighter" &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))

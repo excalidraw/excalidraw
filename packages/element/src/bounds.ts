@@ -59,6 +59,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
   ExcalidrawTextElementWithContainer,
@@ -157,7 +158,7 @@ export class ElementBounds {
     );
     if (isFreeDrawElement(element)) {
       const [minX, minY, maxX, maxY] = getBoundsFromPoints(
-        element.points.map(([x, y]) =>
+        (element.points as readonly LocalPoint[]).map(([x, y]) =>
           pointRotateRads(
             pointFrom(x, y),
             pointFrom(cx - element.x, cy - element.y),
@@ -697,7 +698,7 @@ export const getBoundsFromPoints = <P extends GlobalPoint | LocalPoint>(
 };
 
 const getFreeDrawElementAbsoluteCoords = (
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement,
 ): [number, number, number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
   const x1 = minX + element.x;

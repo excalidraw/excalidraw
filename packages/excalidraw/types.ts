@@ -149,6 +149,7 @@ export type ToolType =
   | "arrow"
   | "line"
   | "freedraw"
+  | "highlighter"
   | "text"
   | "image"
   | "eraser"
@@ -765,6 +766,7 @@ export type UIOptions = Partial<{
   canvasActions: CanvasActions;
   tools: {
     image: boolean;
+    highlighter: boolean;
   };
   /**
    * Optionally control the editor form factor and desktop UI mode from the host app.

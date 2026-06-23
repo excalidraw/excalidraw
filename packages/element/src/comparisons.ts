@@ -14,6 +14,7 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
+  type === "highlighter" ||
   type === "arrow" ||
   type === "line" ||
   type === "text" ||
@@ -26,6 +27,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
+  type === "highlighter" ||
   type === "arrow" ||
   type === "line";
 

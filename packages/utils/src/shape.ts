@@ -45,6 +45,7 @@ import type {
   ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
@@ -263,7 +264,7 @@ const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
 };
 
 export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement,
   center: Point,
   isClosed: boolean = false,
 ): GeometricShape<Point> => {

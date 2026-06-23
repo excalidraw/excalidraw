@@ -22,6 +22,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
@@ -48,6 +49,7 @@ export const distanceToElement = (
     case "line":
     case "arrow":
     case "freedraw":
+    case "highlighter":
       return distanceToLinearOrFreeDraElement(element, elementsMap, p);
   }
 };
@@ -132,7 +134,10 @@ const distanceToEllipseElement = (
 };
 
 const distanceToLinearOrFreeDraElement = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawHighlighterElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {

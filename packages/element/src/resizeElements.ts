@@ -71,6 +71,8 @@ import type {
 } from "./transformHandles";
 import type {
   ExcalidrawLinearElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
@@ -1370,7 +1372,7 @@ export const resizeMultipleElements = (
         false,
       );
 
-      const update: typeof elementsAndUpdates[0]["update"] = {
+      const update: any = {
         x,
         y,
         width,

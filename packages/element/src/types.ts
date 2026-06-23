@@ -209,6 +209,7 @@ export type ExcalidrawElement =
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
+  | ExcalidrawHighlighterElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
@@ -387,6 +388,14 @@ export type ExcalidrawElbowArrowElement = Merge<
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
+    points: readonly LocalPoint[];
+    pressures: readonly number[];
+    simulatePressure: boolean;
+  }>;
+
+export type ExcalidrawHighlighterElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "highlighter";
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;

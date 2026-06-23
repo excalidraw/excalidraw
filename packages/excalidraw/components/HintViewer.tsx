@@ -91,7 +91,7 @@ const getHints = ({
     return t("hints.linearElement");
   }
 
-  if (activeTool.type === "freedraw") {
+  if (activeTool.type === "freedraw" || activeTool.type === "highlighter") {
     return t("hints.freeDraw");
   }
 

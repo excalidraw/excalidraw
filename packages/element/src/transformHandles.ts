@@ -17,6 +17,7 @@ import { getElementAbsoluteCoords } from "./bounds";
 import {
   isElbowArrow,
   isFrameLikeElement,
+  isFreeDrawElement,
   isImageElement,
   isLinearElement,
 } from "./typeChecks";
@@ -24,6 +25,9 @@ import {
 import type {
   ElementsMap,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
+  ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
@@ -287,10 +291,11 @@ export const getTransformHandles = (
     return {};
   }
 
-  if (element.type === "freedraw" || isLinearElement(element)) {
-    if (element.points.length === 2) {
+  if (isFreeDrawElement(element) || isLinearElement(element)) {
+    const el = element as ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement | ExcalidrawLinearElement;
+    if (el.points.length === 2) {
       // only check the last point because starting point is always (0,0)
-      const [, p1] = element.points;
+      const [, p1] = el.points;
       if (p1[0] === 0 || p1[1] === 0) {
         omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       } else if (p1[0] > 0 && p1[1] < 0) {

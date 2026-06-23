@@ -55,6 +55,7 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
@@ -123,7 +124,10 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
  * @returns The rotated in components.
  */
 export function deconstructLinearOrFreeDrawElement(
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawHighlighterElement,
   elementsMap: ElementsMap,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const cachedShape = getElementShapesCacheEntry(element, 0);

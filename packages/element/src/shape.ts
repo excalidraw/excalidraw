@@ -70,6 +70,7 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlighterElement,
   ElementsMap,
   ExcalidrawLineElement,
   Arrowhead,
@@ -239,7 +240,8 @@ export const generateRoughOptions = (
       return options;
     }
     case "line":
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -575,7 +577,10 @@ const getArrowheadShapes = (
 };
 
 export const generateLinearCollisionShape = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawHighlighterElement,
   elementsMap: ElementsMap,
 ): {
   op: string;
@@ -673,7 +678,8 @@ export const generateLinearCollisionShape = (
           };
         });
     }
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       if (element.points.length < 2) {
         return [];
       }
@@ -954,9 +960,10 @@ const _generateElementShape = (
       }
       return shape;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       // oredered in terms of z-index [background, stroke]
-      const shapes: ElementShapes[typeof element.type] = [];
+      const shapes: (Drawable | SVGPathString)[] = [];
 
       // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
@@ -1105,7 +1112,8 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "ellipse":
       return getEllipseShape(element);
 
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
       return getFreedrawShape(
         element,
@@ -1165,14 +1173,16 @@ export const toggleLinePolygonState = (
 // -----------------------------------------------------------------------------
 
 // NOTE not cached (-> for SVG export)
-const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
+const getFreeDrawSvgPath = (
+  element: ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement,
+) => {
   return getSvgPathFromStroke(
     getFreedrawOutlinePoints(element),
   ) as SVGPathString;
 };
 
 export const getFreedrawOutlinePoints = (
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawHighlighterElement,
 ) => {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure

@@ -173,6 +173,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  highlighter: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -474,7 +475,8 @@ export const restoreElement = (
       }
 
       return element;
-    case "freedraw": {
+    case "freedraw":
+    case "highlighter": {
       const { points, pressures } = restoreFreedrawPoints(
         element.points,
         element.pressures,

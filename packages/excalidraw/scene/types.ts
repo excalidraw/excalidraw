@@ -166,6 +166,7 @@ export type ElementShapes = {
   iframe: Drawable;
   embeddable: Drawable;
   freedraw: (Drawable | SVGPathString)[];
+  highlighter: (Drawable | SVGPathString)[];
   arrow: Drawable[];
   line: Drawable[];
   text: null;
