@@ -91,6 +91,31 @@
       }
     }
 
+    &--selectionTool {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: baseline;
+      white-space: nowrap;
+
+      .welcome-screen-decor-hint__label {
+        position: relative;
+        top: -0.5rem;
+      }
+
+      svg {
+        width: 38px;
+        height: 78px;
+
+        :root[dir="rtl"] & {
+          transform: scaleX(-1);
+        }
+      }
+    }
+
     &--menu {
       position: absolute;
       width: 320px;

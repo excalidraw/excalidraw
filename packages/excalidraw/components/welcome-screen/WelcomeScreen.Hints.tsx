@@ -36,6 +36,32 @@ const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
 };
 ToolbarHint.displayName = "ToolbarHint";
 
+const renderHintWithKbd = (hint: string) =>
+  hint.split(/(<kbd>[^<]+<\/kbd>)/g).map((part, index) => {
+    if (index % 2 === 1) {
+      const shortcutMatch =
+        part[0] === "<" && part.match(/^<kbd>([^<]+)<\/kbd>$/);
+      return <kbd key={index}>{shortcutMatch ? shortcutMatch[1] : part}</kbd>;
+    }
+    return part;
+  });
+
+const SelectionToolHint = ({ children }: { children?: React.ReactNode }) => {
+  const { WelcomeScreenSelectionToolHintTunnel } = useTunnels();
+  return (
+    <WelcomeScreenSelectionToolHintTunnel.In>
+      <div className="excalifont welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--selectionTool">
+        <div className="welcome-screen-decor-hint__label">
+          {children ||
+            renderHintWithKbd(t("welcomeScreen.defaults.selectionToolHint"))}
+        </div>
+        {WelcomeScreenTopToolbarArrow}
+      </div>
+    </WelcomeScreenSelectionToolHintTunnel.In>
+  );
+};
+SelectionToolHint.displayName = "SelectionToolHint";
+
 const HelpHint = ({ children }: { children?: React.ReactNode }) => {
   const { WelcomeScreenHelpHintTunnel } = useTunnels();
   return (
@@ -49,4 +75,4 @@ const HelpHint = ({ children }: { children?: React.ReactNode }) => {
 };
 HelpHint.displayName = "HelpHint";
 
-export { HelpHint, MenuHint, ToolbarHint };
+export { HelpHint, MenuHint, SelectionToolHint, ToolbarHint };

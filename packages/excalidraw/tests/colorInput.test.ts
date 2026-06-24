@@ -1,4 +1,7 @@
-import { normalizeInputColor } from "@excalidraw/common";
+import {
+  normalizeHexInputColor,
+  normalizeInputColor,
+} from "@excalidraw/common";
 
 describe("normalizeInputColor", () => {
   describe("hex colors", () => {
@@ -109,6 +112,53 @@ describe("normalizeInputColor", () => {
     it("returns null for partial/malformed colors", () => {
       expect(normalizeInputColor("#ff")).toBe(null);
       expect(normalizeInputColor("rgb(")).toBe(null);
+    });
+  });
+});
+
+describe("normalizeHexInputColor", () => {
+  describe("valid hex colors", () => {
+    it("accepts 3, 4, 6, and 8 digit hex with hash", () => {
+      expect(normalizeHexInputColor("#abc")).toBe("#abc");
+      expect(normalizeHexInputColor("#abcd")).toBe("#abcd");
+      expect(normalizeHexInputColor("#ff0000")).toBe("#ff0000");
+      expect(normalizeHexInputColor("#ff000080")).toBe("#ff000080");
+    });
+
+    it("adds hash to hex without hash", () => {
+      expect(normalizeHexInputColor("abc")).toBe("#abc");
+      expect(normalizeHexInputColor("abcd")).toBe("#abcd");
+      expect(normalizeHexInputColor("ff0000")).toBe("#ff0000");
+      expect(normalizeHexInputColor("ff000080")).toBe("#ff000080");
+    });
+
+    it("trims whitespace", () => {
+      expect(normalizeHexInputColor("  ff0000  ")).toBe("#ff0000");
+      expect(normalizeHexInputColor("  #abc  ")).toBe("#abc");
+    });
+  });
+
+  describe("invalid hex colors", () => {
+    it("rejects invalid lengths from SCRUM-2", () => {
+      expect(normalizeHexInputColor("1")).toBe(null);
+      expect(normalizeHexInputColor("12")).toBe(null);
+      expect(normalizeHexInputColor("12345")).toBe(null);
+      expect(normalizeHexInputColor("1234567")).toBe(null);
+      expect(normalizeHexInputColor("123456789")).toBe(null);
+    });
+
+    it("rejects invalid characters and non-hex formats", () => {
+      expect(normalizeHexInputColor("zzzzzz")).toBe(null);
+      expect(normalizeHexInputColor("#gggggg")).toBe(null);
+      expect(normalizeHexInputColor("blue")).toBe(null);
+      expect(normalizeHexInputColor("red")).toBe(null);
+      expect(normalizeHexInputColor("rgb(255, 0, 0)")).toBe(null);
+      expect(normalizeHexInputColor("notacolor")).toBe(null);
+    });
+
+    it("rejects empty and whitespace-only input", () => {
+      expect(normalizeHexInputColor("")).toBe(null);
+      expect(normalizeHexInputColor("   ")).toBe(null);
     });
   });
 });

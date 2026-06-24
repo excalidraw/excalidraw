@@ -8,6 +8,7 @@ type TunnelsContextValue = {
   MainMenuTunnel: Tunnel;
   WelcomeScreenMenuHintTunnel: Tunnel;
   WelcomeScreenToolbarHintTunnel: Tunnel;
+  WelcomeScreenSelectionToolHintTunnel: Tunnel;
   WelcomeScreenHelpHintTunnel: Tunnel;
   WelcomeScreenCenterTunnel: Tunnel;
   FooterCenterTunnel: Tunnel;
@@ -32,6 +33,7 @@ export const useInitializeTunnels = () => {
       MainMenuTunnel: tunnel(),
       WelcomeScreenMenuHintTunnel: tunnel(),
       WelcomeScreenToolbarHintTunnel: tunnel(),
+      WelcomeScreenSelectionToolHintTunnel: tunnel(),
       WelcomeScreenHelpHintTunnel: tunnel(),
       WelcomeScreenCenterTunnel: tunnel(),
       FooterCenterTunnel: tunnel(),

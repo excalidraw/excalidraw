@@ -1049,16 +1049,21 @@ export const ShapesSwitcher = ({
   setAppState,
   app,
   UIOptions,
+  renderWelcomeScreen,
 }: {
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
+  renderWelcomeScreen?: boolean;
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
+
+  const { TTDDialogTriggerTunnel, WelcomeScreenSelectionToolHintTunnel } =
+    useTunnels();
 
   const SELECTION_TOOLS = [
     {
@@ -1082,7 +1087,22 @@ export const ShapesSwitcher = ({
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
-  const { TTDDialogTriggerTunnel } = useTunnels();
+  const showSelectionToolHint =
+    renderWelcomeScreen &&
+    app.state.preferredSelectionTool.type === "selection";
+
+  const wrapSelectionToolHint = (node: React.ReactNode) => {
+    if (!showSelectionToolHint) {
+      return node;
+    }
+
+    return (
+      <div style={{ position: "relative" }}>
+        <WelcomeScreenSelectionToolHintTunnel.Out />
+        {node}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -1115,7 +1135,7 @@ export const ShapesSwitcher = ({
             (value === "selection" || value === "lasso") &&
             isCompactStylesPanel
           ) {
-            return (
+            const popover = (
               <ToolPopover
                 key={"selection-popover"}
                 app={app}
@@ -1142,9 +1162,13 @@ export const ShapesSwitcher = ({
                 fillable={activeTool.type === "selection"}
               />
             );
+
+            return value === "selection"
+              ? wrapSelectionToolHint(popover)
+              : popover;
           }
 
-          return (
+          const toolButton = (
             <ToolButton
               className={clsx("Shape", { fillable })}
               key={value}
@@ -1184,6 +1208,10 @@ export const ShapesSwitcher = ({
               }}
             />
           );
+
+          return value === "selection"
+            ? wrapSelectionToolHint(toolButton)
+            : toolButton;
         },
       )}
       <div className="App-toolbar__divider" />

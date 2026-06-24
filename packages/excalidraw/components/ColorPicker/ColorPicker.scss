@@ -368,6 +368,10 @@
     }
   }
 
+  .color-picker__input-container {
+    margin: 8px;
+  }
+
   .color-picker__input-label {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
@@ -376,13 +380,29 @@
     border: 1px solid var(--default-border-color);
     border-radius: 8px;
     padding: 0 12px;
-    margin: 8px;
+    margin: 0;
     box-sizing: border-box;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--invalid {
+      border-color: var(--color-danger);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger);
+      }
+    }
+  }
+
+  .color-picker__input-error {
+    margin-top: 4px;
+    padding: 0 4px;
+    font-size: 0.75rem;
+    line-height: 1.25;
+    color: var(--color-danger);
   }
 
   .color-picker__input-hash {
