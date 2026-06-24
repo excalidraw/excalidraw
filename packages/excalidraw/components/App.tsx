@@ -415,6 +415,7 @@ import {
   type ScrollToContentOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
   scrollToElements,
+  constrainScrollState,
 } from "../scroll";
 import {
   setEraserCursor,
@@ -498,6 +499,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ScrollConstraints,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -760,6 +762,7 @@ class App extends React.Component<AppProps, AppState> {
         clear: this.resetHistory,
       },
       scrollToContent: this.scrollToContent,
+      setScrollConstraints: this.setScrollConstraints,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -4373,6 +4376,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    this.setScrollConstraints(null);
     scrollToElements(this.state, elements, this.setState.bind(this), opts);
   };
 
@@ -4390,6 +4394,31 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
     this.setState(state);
+    this.constrainViewportToScrollConstraints();
+  };
+
+  /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when
+   * unconstrained). Runs as a queued update, so it sees the preceding change. */
+  private constrainViewportToScrollConstraints = () => {
+    this.setState((prevState) =>
+      prevState.scrollConstraints ? constrainScrollState(prevState) : null,
+    );
+  };
+
+  /**
+   * Constrains pan & zoom to a scene-coordinate box, so the viewport can't be
+   * scrolled or zoomed out past it. Pass `null` to remove the constraint. When
+   * the box is smaller than the viewport, zoom is increased best-effort to fit.
+   */
+  setScrollConstraints = (scrollConstraints: ScrollConstraints | null) => {
+    // apply the constraint and clamp the viewport in a single, synchronously
+    // flushed update so the new scroll/zoom is reflected immediately
+    flushSync(() => {
+      this.setState((prevState) => ({
+        scrollConstraints,
+        ...constrainScrollState({ ...prevState, scrollConstraints }),
+      }));
+    });
   };
 
   setToast = (toast: AppState["toast"]) => {
@@ -5572,7 +5601,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const initialScale = gesture.initialScale;
     if (initialScale) {
-      this.setState((state) => ({
+      this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
             viewportX: this.lastViewportPosition.x,
@@ -12867,6 +12896,8 @@ class App extends React.Component<AppProps, AppState> {
           cb && cb();
         },
       );
+      // a smaller viewport may push the min zoom up / shrink the pan range
+      this.constrainViewportToScrollConstraints();
     }
   };
 

@@ -45,6 +45,7 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
+import { constrainScrollState } from "../scroll";
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
@@ -141,19 +142,20 @@ export const actionZoomIn = register({
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
+    const nextState = {
+      ...appState,
+      ...getStateForZoom(
+        {
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
+          nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+        },
+        appState,
+      ),
+      userToFollow: null,
+    };
     return {
-      appState: {
-        ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
-          },
-          appState,
-        ),
-        userToFollow: null,
-      },
+      appState: { ...nextState, ...constrainScrollState(nextState) },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -182,19 +184,20 @@ export const actionZoomOut = register({
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
+    const nextState = {
+      ...appState,
+      ...getStateForZoom(
+        {
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
+          nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+        },
+        appState,
+      ),
+      userToFollow: null,
+    };
     return {
-      appState: {
-        ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
-          },
-          appState,
-        ),
-        userToFollow: null,
-      },
+      appState: { ...nextState, ...constrainScrollState(nextState) },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -222,6 +225,8 @@ export const actionResetZoom = register({
   icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
+  // resetting to 100% may violate active scroll constraints
+  predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -246,6 +251,8 @@ export const actionResetZoom = register({
         className="reset-zoom-button zoom-button"
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
+        // keep the zoom level visible, but non-resettable while constrained
+        disabled={!!appState.scrollConstraints}
         onClick={() => {
           updateData(null);
         }}
@@ -254,7 +261,8 @@ export const actionResetZoom = register({
       </ToolButton>
     </Tooltip>
   ),
-  keyTest: (event) =>
+  keyTest: (event, appState) =>
+    !appState.scrollConstraints &&
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
@@ -399,6 +407,7 @@ export const actionZoomToFitSelectionInViewport = register({
   label: "labels.zoomToFitViewport",
   icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
@@ -413,7 +422,8 @@ export const actionZoomToFitSelectionInViewport = register({
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
   // TBD on how proceed
-  keyTest: (event) =>
+  keyTest: (event, appState) =>
+    !appState.scrollConstraints &&
     event.code === CODES.TWO &&
     event.shiftKey &&
     !event.altKey &&
@@ -425,6 +435,7 @@ export const actionZoomToFitSelection = register({
   label: "helpDialog.zoomToSelection",
   icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
@@ -438,7 +449,8 @@ export const actionZoomToFitSelection = register({
     });
   },
   // NOTE this action should use shift-2 per figma, alas
-  keyTest: (event) =>
+  keyTest: (event, appState) =>
+    !appState.scrollConstraints &&
     event.code === CODES.THREE &&
     event.shiftKey &&
     !event.altKey &&
@@ -451,6 +463,7 @@ export const actionZoomToFit = register({
   icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) =>
     zoomToFit({
       targetElements: elements,
@@ -461,7 +474,8 @@ export const actionZoomToFit = register({
       fitToViewport: false,
       canvasOffsets: app.getEditorUIOffsets(),
     }),
-  keyTest: (event) =>
+  keyTest: (event, appState) =>
+    !appState.scrollConstraints &&
     event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&

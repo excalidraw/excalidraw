@@ -273,6 +273,14 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+/** A box, in scene coordinates, that pan & zoom are constrained to. */
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -380,6 +388,9 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  /** when set, pan & zoom are constrained so the viewport stays within this
+   * scene-coordinate box (see `setScrollConstraints`) */
+  scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -971,6 +982,7 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  setScrollConstraints: InstanceType<typeof App>["setScrollConstraints"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
