@@ -1,6 +1,9 @@
 /*
   Access-Control-Allow-Origin: *
 
+/sw.js
+  Cache-Control: no-cache
+
 /brand/*
   Cache-Control: public, max-age=31536000, immutable
 
