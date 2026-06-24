@@ -395,11 +395,17 @@ const CombinedShapeProperties = ({
                   hasStrokeWidth(element.type),
                 )) &&
                 renderAction("changeStrokeWidth")}
-              {(hasFreedrawMode(appState.activeTool.type) ||
-                targetElements.some((element) =>
-                  hasFreedrawMode(element.type),
-                )) &&
-                renderAction("changeFreedrawMode")}
+              {
+                /* in compact UI the freedraw pressure setting is rendered as a
+                  standalone cycle button in the compact actions list; we render
+                  it in the combined properties popup as well for clarity
+                */
+                (hasFreedrawMode(appState.activeTool.type) ||
+                  targetElements.some((element) =>
+                    hasFreedrawMode(element.type),
+                  )) &&
+                  renderAction("changeFreedrawMode")
+              }
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
@@ -829,6 +835,14 @@ export const CompactShapeActions = ({
       {canChangeBackgroundColor(appState, targetElements) && (
         <div className="compact-action-item">
           {renderAction("changeBackgroundColor")}
+        </div>
+      )}
+
+      {/* Freedraw pressure: standalone button cycling the variability mode */}
+      {(hasFreedrawMode(appState.activeTool.type) ||
+        targetElements.some((element) => hasFreedrawMode(element.type))) && (
+        <div className="compact-action-item">
+          {renderAction("changeFreedrawMode", { cycle: true })}
         </div>
       )}
 

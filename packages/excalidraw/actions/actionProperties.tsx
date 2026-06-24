@@ -87,6 +87,7 @@ import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
+import { ToolButton } from "../components/ToolButton";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -717,6 +718,25 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
         (hasSelection) =>
           hasSelection ? null : appState.currentItemStrokeVariability,
       ) ?? appState.currentItemStrokeVariability;
+
+    // in the compact UI the pressure setting is rendered as a single button
+    // that cycles between the two variability modes on click
+    if (data?.cycle) {
+      const isVariable = strokeVariability === "variable";
+      return (
+        <ToolButton
+          type="button"
+          icon={
+            isVariable
+              ? strokeVariabilityVariableIcon
+              : strokeVariabilityConstantIcon
+          }
+          title={t("labels.pressure")}
+          aria-label={t("labels.pressure")}
+          onClick={() => updateData(isVariable ? "constant" : "variable")}
+        />
+      );
+    }
 
     return (
       <fieldset>
