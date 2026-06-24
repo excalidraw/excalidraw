@@ -118,7 +118,7 @@ jobs:
         run: |
           set -euo pipefail
           PROJECT="${{ vars.CF_PAGES_PROJECT_NAME }}"
-          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "master" ]; then
+          if [[ "${{ github.event_name }}" =~ ^(push|workflow_dispatch)$ ]] && [ "${{ github.ref_name }}" = "master" ]; then
             echo "command=pages deploy ./excalidraw-app/build --project-name=${PROJECT}" >> "$GITHUB_OUTPUT"
             echo "environment=production" >> "$GITHUB_OUTPUT"
           else
