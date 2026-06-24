@@ -218,3 +218,54 @@ describe("hitElementItself cache", () => {
     ).toBe(true);
   });
 });
+
+describe("freedraw collision matches the rendered stroke width", () => {
+  // A straight, horizontal stroke centered on y === 0.
+  const points = Array.from({ length: 21 }, (_, i) =>
+    pointFrom<LocalPoint>(i * 5, 0),
+  );
+
+  const createFreeDraw = (variability: "variable" | "constant") =>
+    API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      strokeWidth: 10,
+      points,
+      strokeOptions: { variability, streamline: 0.5 },
+    });
+
+  const distanceAt = (
+    element: ReturnType<typeof createFreeDraw>,
+    x: number,
+    y: number,
+  ) =>
+    distance.distanceToElement(
+      element,
+      arrayToMap([element]),
+      pointFrom<GlobalPoint>(x, y),
+    );
+
+  it("treats a point on the centerline as a direct hit for both modes", () => {
+    expect(distanceAt(createFreeDraw("variable"), 50, 0)).toBe(0);
+    expect(distanceAt(createFreeDraw("constant"), 50, 0)).toBe(0);
+  });
+
+  it("hits across the body of a thick stroke, not just near the centerline", () => {
+    expect(distanceAt(createFreeDraw("variable"), 50, 20)).toBe(0);
+  });
+
+  it("uses a wider hit area for variable-width than for constant-width strokes", () => {
+    const offset = 20;
+    const variableDistance = distanceAt(createFreeDraw("variable"), 50, offset);
+    const constantDistance = distanceAt(createFreeDraw("constant"), 50, offset);
+
+    expect(variableDistance).toBe(0);
+    expect(constantDistance).toBeGreaterThan(0);
+    expect(variableDistance).toBeLessThan(constantDistance);
+  });
+
+  it("does not hit points clearly outside even the widest stroke", () => {
+    expect(distanceAt(createFreeDraw("variable"), 50, 45)).toBeGreaterThan(0);
+  });
+});
