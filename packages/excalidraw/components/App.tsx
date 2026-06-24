@@ -57,6 +57,7 @@ import {
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
+  STROKE_STYLE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   isLocalLink,
   normalizeLink,
@@ -372,6 +373,7 @@ import {
   getNormalizedZoom,
   getSelectedElements,
   hasBackground,
+  hasStrokeStyle,
   isSomeElementSelected,
 } from "../scene";
 import { getStateForZoom } from "../scene/zoom";
@@ -5069,6 +5071,26 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
+        // Shift + tool key cycles stroke style
+        if (event.shiftKey) {
+          const shiftShape = findShapeByKey(event.key.toLowerCase(), this);
+          if (shiftShape && hasStrokeStyle(shiftShape)) {
+            this.setState((prevState) => ({
+              currentItemStrokeStyle:
+                prevState.currentItemStrokeStyle === STROKE_STYLE.solid
+                  ? STROKE_STYLE.dashed
+                  : prevState.currentItemStrokeStyle === STROKE_STYLE.dashed
+                  ? STROKE_STYLE.dotted
+                  : STROKE_STYLE.solid,
+            }));
+            if (this.state.activeTool.type !== shiftShape) {
+              this.setActiveTool({ type: shiftShape });
+            }
+            event.stopPropagation();
+            return;
+          }
+        }
+
         const shape = findShapeByKey(event.key, this);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
