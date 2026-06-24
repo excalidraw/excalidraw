@@ -599,7 +599,9 @@ describe("terraformDemoUrlParams", () => {
         networking: false,
         topologyFrameFlow: false,
       });
-      expect(parsed?.runtimePerformance?.hideAwsIconGlyphsBelowZoom).toBe(false);
+      expect(parsed?.runtimePerformance?.hideAwsIconGlyphsBelowZoom).toBe(
+        false,
+      );
     });
 
     it("hard-fails on an unknown layer code or perf threshold", () => {
