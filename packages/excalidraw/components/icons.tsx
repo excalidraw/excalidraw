@@ -1249,6 +1249,74 @@ export const SloppinessCartoonistIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const strokeVariabilityConstantIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const strokeVariabilityVariableIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      strokeWidth="2.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      strokeWidth="3.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>,
+  tablerIconProps,
+);
+
 export const EdgeSharpIcon = createIcon(
   <svg strokeWidth="1.5">
     <path d="M3.33334 9.99998V6.66665C3.33334 6.04326 3.33403 4.9332 3.33539 3.33646C4.95233 3.33436 6.06276 3.33331 6.66668 3.33331H10" />

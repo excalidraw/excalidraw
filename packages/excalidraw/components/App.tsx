@@ -27,6 +27,8 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -109,6 +111,7 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 
 import {
@@ -4134,7 +4137,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roundness: null,
       roughness: this.state.currentItemRoughness,
@@ -4305,6 +4308,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemStrokeVariability: "variable",
       };
     });
   };
@@ -6304,7 +6308,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
@@ -7774,6 +7778,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
+          currentItemStrokeVariability: "variable",
         };
       });
     }
@@ -8992,6 +8997,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
+    const strokeVariability = this.state.currentItemStrokeVariability;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -8999,15 +9006,24 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeOptions: {
+        variability: strokeVariability,
+        streamline:
+          strokeVariability === "constant" && event.pointerType !== "mouse"
+            ? DEFAULT_STROKE_STREAMLINE_PRECISE
+            : DEFAULT_STROKE_STREAMLINE,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
+      // pressures are only consumed when rendering a real-pressure stroke, so
+      // skip persisting them while pressure is being simulated
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
@@ -9058,7 +9074,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("iframe"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("iframe"),
@@ -9111,7 +9127,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("embeddable"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("embeddable"),
@@ -9158,7 +9174,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("image"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: null,
@@ -9336,7 +9352,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9363,7 +9379,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9500,6 +9516,13 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
+  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+    return getStrokeWidthByKey(
+      elementType,
+      this.state.currentItemStrokeWidthKey,
+    );
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
@@ -9523,7 +9546,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
