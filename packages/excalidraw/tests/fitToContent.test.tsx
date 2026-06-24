@@ -1,20 +1,36 @@
 import React from "react";
-import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
+import { AnimationController } from "../renderer/animation";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
 
 const { h } = window;
 
-const waitForNextAnimationFrame = () => {
+/**
+ * The scroll/zoom animation is driven by `AnimationController`. With render
+ * throttling enabled (see the `beforeEach` below) it schedules frames via
+ * `requestAnimationFrame`, advancing the easing based on elapsed wall-clock
+ * time. We use a very long animation `duration` (see `LONG_ANIMATION_DURATION`)
+ * so it can never complete while we sample it, and let a few frames pass
+ * between samples so the easing makes observable (but partial) progress.
+ */
+const LONG_ANIMATION_DURATION = 1_000_000;
+
+const waitForAnimationProgress = (frames = 4) => {
   return act(
     () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
+      new Promise<void>((resolve) => {
+        let remaining = frames;
+        const step = () => {
+          if (--remaining <= 0) {
+            resolve();
+          } else {
+            requestAnimationFrame(step);
+          }
+        };
+        requestAnimationFrame(step);
       }),
   );
 };
@@ -109,11 +125,16 @@ describe("fitToContent", () => {
 
 describe("fitToContent animated", () => {
   beforeEach(() => {
-    vi.spyOn(window, "requestAnimationFrame");
+    // pace the animation via requestAnimationFrame instead of a tight
+    // setTimeout(0) loop, which would otherwise starve the test's own timers
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    // stop any in-flight scroll/zoom animation so it doesn't keep ticking on
+    // the unmounted component and leak into the next test via the singleton
+    AnimationController.reset();
   });
 
   it("should ease scroll the viewport to the selected element", async () => {
@@ -130,17 +151,18 @@ describe("fitToContent animated", () => {
     });
 
     act(() => {
-      h.app.scrollToContent(rectElement, { animate: true });
+      h.app.scrollToContent(rectElement, {
+        animate: true,
+        duration: LONG_ANIMATION_DURATION,
+      });
     });
 
-    expect(window.requestAnimationFrame).toHaveBeenCalled();
-
-    // Since this is an animation, we expect values to change through time.
-    // We'll verify that the scroll values change at 50ms and 100ms
+    // the animation hasn't progressed yet, so we're still at the origin
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    await waitForNextAnimationFrame();
+    // Since this is an animation, we expect values to change through time.
+    await waitForAnimationProgress();
 
     const prevScrollX = h.state.scrollX;
     const prevScrollY = h.state.scrollY;
@@ -148,7 +170,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
 
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     expect(h.state.scrollX).not.toBe(prevScrollX);
     expect(h.state.scrollY).not.toBe(prevScrollY);
@@ -171,12 +193,14 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollToContent(rectElement, { animate: true, fitToContent: true });
+      h.app.scrollToContent(rectElement, {
+        animate: true,
+        fitToContent: true,
+        duration: LONG_ANIMATION_DURATION,
+      });
     });
 
-    expect(window.requestAnimationFrame).toHaveBeenCalled();
-
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     const prevScrollX = h.state.scrollX;
     const prevScrollY = h.state.scrollY;
@@ -184,7 +208,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
 
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     expect(h.state.scrollX).not.toBe(prevScrollX);
     expect(h.state.scrollY).not.toBe(prevScrollY);
