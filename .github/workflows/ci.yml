@@ -8,7 +8,17 @@ on:
   push:
     branches:
       - "**"
+    paths-ignore:
+      - "docs/**"
+      - "tools/**"
+      - "*.md"
+      - ".agents/**"
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "tools/**"
+      - "*.md"
+      - ".agents/**"
   workflow_dispatch:
 
 concurrency:

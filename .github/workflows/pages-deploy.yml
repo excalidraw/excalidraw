@@ -16,10 +16,20 @@ on:
       - opened
       - synchronize
       - reopened
+    paths-ignore:
+      - "docs/**"
+      - "tools/**"
+      - "*.md"
+      - ".agents/**"
   push:
     branches:
       - master
       - terraform-feature
+    paths-ignore:
+      - "docs/**"
+      - "tools/**"
+      - "*.md"
+      - ".agents/**"
   workflow_dispatch:
 
 concurrency:
