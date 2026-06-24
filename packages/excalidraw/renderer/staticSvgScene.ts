@@ -5,6 +5,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -26,6 +27,13 @@ import {
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
+} from "@excalidraw/element";
+import {
+  getCodeBlockMeta,
+  getLineWidth,
+  isCodeBlockTextElement,
+  tokenizeCode,
+  wrapCodeLines,
 } from "@excalidraw/element";
 
 import { getContainingFrame } from "@excalidraw/element";
@@ -678,20 +686,53 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
-        for (let i = 0; i < lines.length; i++) {
+
+        // code blocks emit per-token colored <tspan>s instead of a single fill
+        const codeMeta = isCodeBlockTextElement(element)
+          ? getCodeBlockMeta(element)
+          : undefined;
+        let codeLines = codeMeta
+          ? tokenizeCode(
+              element.text,
+              codeMeta.language,
+              renderConfig.theme === THEME.DARK ? "dark" : "light",
+            )
+          : null;
+        if (codeLines && codeMeta?.wrap) {
+          const font = getFontString(element);
+          const charWidth = getLineWidth("M", font) || element.fontSize * 0.6;
+          const maxChars = Math.max(1, Math.floor(element.width / charWidth));
+          codeLines = wrapCodeLines(codeLines, maxChars);
+        }
+        const lineCount = codeLines ? codeLines.length : lines.length;
+
+        for (let i = 0; i < lineCount; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
+          if (codeLines) {
+            for (const run of codeLines[i] ?? []) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = run.text;
+              tspan.setAttribute("fill", run.color);
+              tspan.setAttribute("xml:space", "preserve");
+              text.appendChild(tspan);
+            }
+          } else {
+            text.textContent = lines[i];
+            text.setAttribute(
+              "fill",
+              applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              ),
+            );
+          }
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);

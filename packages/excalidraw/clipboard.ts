@@ -47,6 +47,7 @@ export interface ClipboardData {
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
+  code?: { value: string; language?: string };
   mixedContent?: PastedMixedContent;
   errorMessage?: string;
   programmaticAPI?: boolean;
@@ -516,6 +517,61 @@ export const parseDataTransferEvent = async (
   });
 };
 
+// a whole-clipboard markdown fenced code block, e.g. ```js\n…\n```
+const RE_CODE_FENCE = /^```([\w+#.-]*)[ \t]*\n([\s\S]*?)\n?```$/;
+const RE_LANGUAGE_CLASS = /lang(?:uage)?-([\w+#.-]+)/;
+const RE_MONOSPACE_FONT = /mono|consolas|courier|menlo|cascadia|monaco|fira/i;
+
+/**
+ * Detects when the pasted content is source code (a markdown fenced block, or
+ * rich text copied from a code editor such as VS Code's "Copy With Syntax
+ * Highlighting") so it can be turned into a code block element.
+ */
+export const maybeParseCodeFromPaste = (
+  dataList: ParsedDataTranferList,
+  isPlainPaste: boolean,
+): { value: string; language?: string } | null => {
+  if (isPlainPaste) {
+    return null;
+  }
+
+  const plain = dataList.getData(MIME_TYPES.text) || "";
+
+  // 1) markdown fenced block — deterministic, preserves indentation
+  const fence = plain.trim().match(RE_CODE_FENCE);
+  if (fence) {
+    return { value: fence[2], language: fence[1] || undefined };
+  }
+
+  // 2) rich text from a code editor (multi-line only, to avoid false positives)
+  const htmlItem = dataList.findByType(MIME_TYPES.html);
+  if (htmlItem?.value && plain.includes("\n")) {
+    try {
+      const doc = new DOMParser().parseFromString(
+        htmlItem.value,
+        MIME_TYPES.html,
+      );
+      const pre = doc.body.querySelector("pre");
+      const codeEl = doc.body.querySelector("code");
+      const monospaceWrapper = Array.from(
+        doc.body.querySelectorAll<HTMLElement>("*"),
+      ).find((el) => RE_MONOSPACE_FONT.test(el.style?.fontFamily || ""));
+
+      if (pre || codeEl || monospaceWrapper) {
+        const language = `${codeEl?.className || ""} ${pre?.className || ""}`
+          .match(RE_LANGUAGE_CLASS)?.[1]
+          ?.toLowerCase();
+        // prefer the plain text payload — it preserves the exact source
+        return { value: plain, language };
+      }
+    } catch {
+      // ignore malformed html
+    }
+  }
+
+  return null;
+};
+
 /**
  * Attempts to parse clipboard event.
  */
@@ -549,6 +605,11 @@ export const parseClipboard = async (
       };
     }
   } catch {}
+
+  const code = maybeParseCodeFromPaste(dataList, isPlainPaste);
+  if (code) {
+    return { code, text: parsedEventData.value };
+  }
 
   return { text: parsedEventData.value };
 };

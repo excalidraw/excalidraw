@@ -32,6 +32,10 @@ export {
 } from "./actionCanvas";
 
 export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
+export {
+  actionInsertCodeBlock,
+  actionToggleCodeBlockWrap,
+} from "./actionCodeBlock";
 
 export { actionFinalize } from "./actionFinalize";
 export { actionDeselect } from "./actionDeselect";

@@ -133,6 +133,8 @@ export type ActionName =
   | "updateFrameRendering"
   | "setFrameAsActiveTool"
   | "setEmbeddableAsActiveTool"
+  | "insertCodeBlock"
+  | "toggleCodeBlockWrap"
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"

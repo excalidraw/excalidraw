@@ -1,0 +1,82 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .CodeBlockDialog {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    &__controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      select {
+        padding: 0.4rem 0.5rem;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--default-border-color);
+        background-color: var(--island-bg-color);
+        color: var(--text-primary-color);
+        font-size: 0.875rem;
+      }
+    }
+
+    &__checkbox {
+      flex-direction: row !important;
+      align-items: center;
+      align-self: flex-end;
+
+      input {
+        margin: 0;
+      }
+    }
+
+    &__textarea {
+      width: 100%;
+      min-height: 320px;
+      resize: vertical;
+      padding: 0.75rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--default-border-color);
+      background-color: var(--island-bg-color);
+      color: var(--text-primary-color);
+      font-family: "Cascadia", "Comic Shanns", monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      tab-size: 2;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+
+      .ExcButton {
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--default-border-color);
+        background-color: var(--island-bg-color);
+        color: var(--text-primary-color);
+        cursor: pointer;
+        font-weight: 600;
+
+        &--primary {
+          background-color: var(--color-primary);
+          border-color: var(--color-primary);
+          color: var(--color-primary-text, #fff);
+        }
+      }
+    }
+  }
+}
