@@ -42,6 +42,7 @@ import {
   getSelectedElements,
   getTargetElements,
   hasBackground,
+  hasFreedrawMode,
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
@@ -220,6 +221,10 @@ export const SelectedShapeActions = ({
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type)) ||
         isDrawShapeActive) && <>{renderAction("changeStrokeStyle")}</>}
+      {(hasFreedrawMode(appState.activeTool.type) ||
+        targetElements.some((element) => hasFreedrawMode(element.type))) &&
+        renderAction("changeFreedrawMode")}
+
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>{renderAction("changeSloppiness")}</>
@@ -411,6 +416,11 @@ const CombinedShapeProperties = ({
                   hasStrokeWidth(element.type),
                 )) &&
                 renderAction("changeStrokeWidth")}
+              {(hasFreedrawMode(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  hasFreedrawMode(element.type),
+                )) &&
+                renderAction("changeFreedrawMode")}
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),

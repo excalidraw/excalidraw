@@ -4,7 +4,11 @@ import {
   newElement,
   newLinearElement,
 } from "@excalidraw/element/newElement";
-import { getElementBoundsFromPoints, ROUNDNESS } from "@excalidraw/common";
+import {
+  getElementBoundsFromPoints,
+  getStrokeWidthByKey,
+  ROUNDNESS,
+} from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -859,7 +863,10 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: appState.currentItemStrokeWidth,
+        strokeWidth: getStrokeWidthByKey(
+          recognizedShape.type,
+          appState.currentItemStrokeWidthKey,
+        ),
       });
     }
     case "arrow": {
@@ -910,7 +917,10 @@ export const convertToShape = (
           fillStyle: appState.currentItemFillStyle,
           opacity: appState.currentItemOpacity,
           strokeStyle: appState.currentItemStrokeStyle,
-          strokeWidth: appState.currentItemStrokeWidth,
+          strokeWidth: getStrokeWidthByKey(
+            recognizedShape.type,
+            appState.currentItemStrokeWidthKey,
+          ),
         });
 
         const normalized =
@@ -945,7 +955,10 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: appState.currentItemStrokeWidth,
+        strokeWidth: getStrokeWidthByKey(
+          recognizedShape.type,
+          appState.currentItemStrokeWidthKey,
+        ),
       });
 
       const normalized =
@@ -982,7 +995,10 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: appState.currentItemStrokeWidth,
+        strokeWidth: getStrokeWidthByKey(
+          recognizedShape.type,
+          appState.currentItemStrokeWidthKey,
+        ),
       });
 
       const normalized =

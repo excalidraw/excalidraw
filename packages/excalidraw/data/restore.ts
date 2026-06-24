@@ -3,6 +3,7 @@ import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 import {
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
@@ -18,6 +19,9 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  STROKE_WIDTH,
+  STROKE_WIDTH_KEYS,
+  type StrokeWidthKey,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -70,6 +74,7 @@ import type {
   FontFamilyValues,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
+  StrokeVariability,
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
@@ -187,6 +192,43 @@ export type RestoredDataState = {
   elements: OrderedExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
+};
+
+const ALLOWED_STROKE_VARIABILITIES = new Set<StrokeVariability>([
+  "constant",
+  "variable",
+]);
+
+const restoreStrokeVariability = (
+  variability: unknown,
+  defaultValue: StrokeVariability,
+): StrokeVariability => {
+  return typeof variability === "string" &&
+    ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
+    ? (variability as StrokeVariability)
+    : defaultValue;
+};
+
+const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
+  return isFiniteNumber(strokeWidth)
+    ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
+    : null;
+};
+
+const restoreFreedrawStrokeOptions = (
+  strokeOptions: unknown,
+): { variability: StrokeVariability; streamline: number } => {
+  const options =
+    strokeOptions && typeof strokeOptions === "object"
+      ? (strokeOptions as { variability?: unknown; streamline?: unknown })
+      : null;
+
+  return {
+    variability: restoreStrokeVariability(options?.variability, "variable"),
+    streamline: isFiniteNumber(options?.streamline)
+      ? options?.streamline
+      : DEFAULT_STROKE_STREAMLINE,
+  };
 };
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
@@ -484,6 +526,7 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         points,
         simulatePressure: element.simulatePressure,
+        strokeOptions: restoreFreedrawStrokeOptions(element.strokeOptions),
         pressures,
       });
     }
@@ -1055,6 +1098,13 @@ export const restoreAppState = (
     appState.boxSelectionMode ?? localAppState?.boxSelectionMode;
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
+  }
+
+  // legacy
+  if ((appState as any).currentItemStrokeWidth !== undefined) {
+    nextAppState.currentItemStrokeWidthKey =
+      getStrokeWidthKey((appState as any).currentItemStrokeWidth) ??
+      defaultAppState.currentItemStrokeWidthKey;
   }
 
   return {

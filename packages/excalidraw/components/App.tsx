@@ -27,6 +27,8 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -111,6 +113,7 @@ import {
   oneOf,
   getElementBoundsFromPoints,
   ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 
 import {
@@ -263,6 +266,7 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   convertToShape,
+  getBindingStrategyForDraggingBindingElementEndpoints,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -4141,7 +4145,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roundness: null,
       roughness: this.state.currentItemRoughness,
@@ -4312,6 +4316,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemStrokeVariability: "variable",
       };
     });
   };
@@ -6311,7 +6316,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
@@ -7119,45 +7124,7 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        const hoveredElement =
-          isArrowElement(this.state.newElement) &&
-          isBindingEnabled(this.state) &&
-          getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
-          );
-        if (hoveredElement) {
-          this.actionManager.executeAction(actionFinalize, "ui", {
-            event: event.nativeEvent,
-            sceneCoords: {
-              x: scenePointerX,
-              y: scenePointerY,
-            },
-          });
-          this.setState({ suggestedBinding: null });
-          if (!this.state.activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
-            this.setState((prevState) => ({
-              newElement: null,
-              activeTool: updateActiveTool(this.state, {
-                type: this.state.preferredSelectionTool.type,
-              }),
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [multiElement.id]: true,
-                },
-                prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                multiElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            }));
-          }
-        } else if (
+        if (
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
@@ -7165,6 +7132,24 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
+          this.store.scheduleCapture();
+          flushSync(() => {
+            invariant(
+              this.state.selectedLinearElement?.initialState,
+              "initialState must be set",
+            );
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                lastCommittedPoint: points[points.length - 1],
+                selectedPointsIndices: [multiElement.points.length],
+                initialState: {
+                  ...this.state.selectedLinearElement.initialState,
+                  lastClickedPoint: multiElement.points.length,
+                },
+              },
+            });
+          });
           this.scene.mutateElement(
             multiElement,
             {
@@ -7175,21 +7160,6 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
-          invariant(
-            this.state.selectedLinearElement?.initialState,
-            "initialState must be set",
-          );
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              lastCommittedPoint: points[points.length - 1],
-              selectedPointsIndices: [multiElement.points.length - 1],
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                lastClickedPoint: multiElement.points.length - 1,
-              },
-            },
-          });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
@@ -7815,6 +7785,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
+          currentItemStrokeVariability: "variable",
         };
       });
     }
@@ -9038,6 +9009,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
+    const strokeVariability = this.state.currentItemStrokeVariability;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -9045,15 +9018,24 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeOptions: {
+        variability: strokeVariability,
+        streamline:
+          strokeVariability === "constant" && event.pointerType !== "mouse"
+            ? DEFAULT_STROKE_STREAMLINE_PRECISE
+            : DEFAULT_STROKE_STREAMLINE,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
+      // pressures are only consumed when rendering a real-pressure stroke, so
+      // skip persisting them while pressure is being simulated
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
@@ -9104,7 +9086,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("iframe"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("iframe"),
@@ -9157,7 +9139,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("embeddable"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("embeddable"),
@@ -9204,7 +9186,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("image"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: null,
@@ -9276,32 +9258,58 @@ class App extends React.Component<AppProps, AppState> {
 
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
+      const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
+      const { start, end } =
+        isBindingElement(multiElement) && isBindingEnabled(this.state)
+          ? getBindingStrategyForDraggingBindingElementEndpoints(
+              multiElement,
+              new Map([
+                [
+                  multiElement.points.length - 1,
+                  {
+                    point: multiElement.points[multiElement.points.length - 1],
+                    isDragging: false,
+                  },
+                ],
+              ]),
+              sceneCoords.x,
+              sceneCoords.y,
+              this.scene.getNonDeletedElementsMap(),
+              this.scene.getNonDeletedElements(),
+              this.state,
+              {
+                newArrow: Boolean(this.state.newElement),
+                zoom: this.state.zoom,
+              },
+            )
+          : { end: { mode: undefined } };
 
-      const hoveredElementForBinding =
-        isBindingEnabled(this.state) &&
-        getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(
-            this.lastPointerMoveCoords?.x ??
-              rx + multiElement.points[multiElement.points.length - 1][0],
-            this.lastPointerMoveCoords?.y ??
-              ry + multiElement.points[multiElement.points.length - 1][1],
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      // Auto-confirm when both ends bind to the SAME element and the end point
+      // lands on the outline rather than inside it
+      const endOutsideSameElement =
+        start?.mode != null &&
+        end.mode != null &&
+        start.element.id === end.element.id &&
+        !isPointInElement(end.focusPoint, end.element, elementsMap);
+      const boundOutsideFromElsewhere =
+        end.mode === "orbit" &&
+        multiElement.startBinding?.elementId !== end.element?.id;
+      const lastCommittedPointIsInsideCommitZone =
+        lastCommittedPoint &&
+        pointDistance(
+          pointFrom(
+            pointerDownState.origin.x - rx,
+            pointerDownState.origin.y - ry,
           ),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-        );
+          lastCommittedPoint,
+        ) < LINE_CONFIRM_THRESHOLD;
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) && hoveredElementForBinding) ||
-        (multiElement.points.length > 1 &&
-          lastCommittedPoint &&
-          pointDistance(
-            pointFrom(
-              pointerDownState.origin.x - rx,
-              pointerDownState.origin.y - ry,
-            ),
-            lastCommittedPoint,
-          ) < LINE_CONFIRM_THRESHOLD)
+        boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
+        endOutsideSameElement || // End outside the start's element: Bind immediately
+        (multiElement.points.length > 1 && lastCommittedPointIsInsideCommitZone)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {
           event: event.nativeEvent,
@@ -9356,7 +9364,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9383,7 +9391,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9520,6 +9528,13 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
+  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+    return getStrokeWidthByKey(
+      elementType,
+      this.state.currentItemStrokeWidthKey,
+    );
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
@@ -9543,7 +9558,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
@@ -10967,23 +10982,15 @@ class App extends React.Component<AppProps, AppState> {
 
             this.actionManager.executeAction(actionFinalize);
           } else {
-            const dx = pointerCoords.x - newElement.x;
-            const dy = pointerCoords.y - newElement.y;
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [newElement.points[0], pointFrom<LocalPoint>(dx, dy)],
-              },
-              { informMutation: false, isDragging: false },
-            );
-
+            // Movement out of commit area will create the point
             this.setState({
               multiElement: newElement,
               newElement,
             });
           }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          this.store.scheduleCapture();
+
           if (isLinearElement(newElement)) {
             this.actionManager.executeAction(actionFinalize, "ui", {
               event: childEvent,

@@ -291,6 +291,14 @@ const renderElementToSvg = (
         );
         offsetX = offsetX || 0;
         offsetY = offsetY || 0;
+        // Pin the mask to user space; the default maskUnits="objectBoundingBox"
+        // collapses to zero area for axis-aligned arrows (zero-size bbox),
+        // hiding the whole line from SVG exports (#11439).
+        maskPath.setAttribute("maskUnits", "userSpaceOnUse");
+        maskPath.setAttribute("x", "0");
+        maskPath.setAttribute("y", "0");
+        maskPath.setAttribute("width", `${element.width + 100 + offsetX}`);
+        maskPath.setAttribute("height", `${element.height + 100 + offsetY}`);
         maskRectVisible.setAttribute("x", "0");
         maskRectVisible.setAttribute("y", "0");
         maskRectVisible.setAttribute("fill", "#fff");

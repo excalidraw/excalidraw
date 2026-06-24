@@ -643,10 +643,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   let start: BindingStrategy = { mode: undefined };
   let end: BindingStrategy = { mode: undefined };
 
-  invariant(
-    arrow.points.length > 1,
-    "Do not attempt to bind linear elements with a single point",
-  );
+  if (arrow.points.length < 2) {
+    console.error(
+      "Attempting to bind a linear element with less than 2 points",
+    );
+    // a single-point can't be bound -> cancel
+    return { start: { mode: undefined }, end: { mode: undefined } };
+  }
 
   // If none of the ends are dragged, we don't change anything
   if (!startDragged && !endDragged) {
@@ -890,10 +893,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   let start: BindingStrategy = { mode: undefined };
   let end: BindingStrategy = { mode: undefined };
 
-  invariant(
-    arrow.points.length > 1,
-    "Do not attempt to bind linear elements with a single point",
-  );
+  if (arrow.points.length < 2) {
+    console.error(
+      "Attempting to bind a linear element with less than 2 points",
+    );
+    // a single-point can't be bound -> cancel
+    return { start: { mode: undefined }, end: { mode: undefined } };
+  }
 
   // If none of the ends are dragged, we don't change anything
   if (!startDragged && !endDragged) {
