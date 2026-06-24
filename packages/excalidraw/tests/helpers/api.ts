@@ -4,7 +4,12 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import {
+  DEFAULT_VERTICAL_ALIGN,
+  ROUNDNESS,
+  assertNever,
+  getStrokeWidthByKey,
+} from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -201,6 +206,9 @@ export class API {
       ? ExcalidrawTextElement["containerId"]
       : never;
     points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
+    strokeOptions?: T extends "freedraw"
+      ? ExcalidrawFreeDrawElement["strokeOptions"]
+      : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -261,7 +269,9 @@ export class API {
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
-      strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
+      strokeWidth:
+        rest.strokeWidth ??
+        getStrokeWidthByKey(type, appState.currentItemStrokeWidthKey),
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
       roundness: (
         rest.roundness === undefined
@@ -320,6 +330,7 @@ export class API {
           type: type as "freedraw",
           simulatePressure: true,
           points: rest.points,
+          strokeOptions: rest.strokeOptions,
           ...base,
         });
         break;

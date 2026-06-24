@@ -193,6 +193,53 @@ describe("restoreElements", () => {
     expect(restoredFreedraw.pressures).toEqual([0.1, 0.4]);
   });
 
+  it("should restore freedraw stroke variability", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      id: "id-freedraw-mode",
+      points: [pointFrom(0, 0), pointFrom(10, 10)],
+    });
+
+    const [missing, bogusString, bogusNumber, valid, variable] =
+      restore.restoreElements(
+        [
+          { ...freedrawElement, id: "missing", strokeOptions: undefined },
+          {
+            ...freedrawElement,
+            id: "bogusString",
+            strokeOptions: { variability: "scribble" },
+          },
+          {
+            ...freedrawElement,
+            id: "bogusNumber",
+            strokeOptions: { variability: 42 },
+          },
+          {
+            ...freedrawElement,
+            id: "valid",
+            strokeOptions: { variability: "constant", streamline: 0.8 },
+          },
+          {
+            ...freedrawElement,
+            id: "variable",
+            strokeOptions: { variability: "variable", streamline: 0.8 },
+          },
+        ] as any,
+        null,
+      ) as ExcalidrawFreeDrawElement[];
+
+    expect(missing.strokeOptions?.variability).toBe("variable");
+    expect(bogusString.strokeOptions?.variability).toBe("variable");
+    expect(bogusNumber.strokeOptions?.variability).toBe("variable");
+    expect(valid.strokeOptions?.variability).toBe("constant");
+    expect(variable.strokeOptions?.variability).toBe("variable");
+    expect(missing.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusString.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusNumber.strokeOptions?.streamline).toBe(0.5);
+    expect(valid.strokeOptions?.streamline).toBe(0.8);
+    expect(variable.strokeOptions?.streamline).toBe(0.8);
+  });
+
   it("should restore line and draw elements correctly", () => {
     const lineElement = API.createElement({ type: "line", id: "id-line01" });
 
@@ -642,6 +689,21 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("should restore freedraw mode app state values", () => {
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "constant" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("constant");
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "variable" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("variable");
+  });
+
   it("when appState is null it should return the local app state property", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
@@ -688,6 +750,21 @@ describe("restoreAppState", () => {
     );
     expect(restoredAppState.cursorButton).toBe("up");
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
+  });
+
+  it("should migrate legacy current item stroke width to stroke width key", () => {
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      currentItemStrokeWidth: 4,
+      currentItemStrokeWidthKey: undefined,
+    } as any;
+
+    const restoredAppState = restore.restoreAppState(
+      stubImportedAppState,
+      null,
+    );
+
+    expect(restoredAppState.currentItemStrokeWidthKey).toBe("bold");
   });
 
   it("should restore with current app state when imported data state is undefined", () => {

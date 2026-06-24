@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
   randomInteger,
   randomId,
@@ -447,6 +448,7 @@ export const newFreeDrawElement = (
     type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
+    strokeOptions?: ExcalidrawFreeDrawElement["strokeOptions"];
     pressures?: ExcalidrawFreeDrawElement["pressures"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
@@ -455,6 +457,10 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    strokeOptions: opts.strokeOptions ?? {
+      variability: "variable",
+      streamline: DEFAULT_STROKE_STREAMLINE,
+    },
   };
 };
 
