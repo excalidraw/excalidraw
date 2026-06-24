@@ -4308,6 +4308,9 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemStrokeVariability: !prevState.penDetected
+          ? "variable"
+          : prevState.currentItemStrokeVariability,
       };
     });
   };
