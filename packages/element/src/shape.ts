@@ -26,7 +26,6 @@ import {
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   applyDarkModeFilter,
   DEFAULT_STROKE_STREAMLINE,
-  DEFAULT_STROKE_STREAMLINE_PRECISE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -1186,20 +1185,15 @@ const VARIABLE_WIDTH_FREEDRAW = {
   SIZE_FACTOR: 4.25,
   THINNING: 0.6,
   SMOOTHING: 0.5,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE,
 } as const;
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
-  SIZE_FACTOR: 1.25,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
+  SIZE_FACTOR: 1.4,
 } as const;
 
 const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
-  element.strokeOptions?.streamline ??
-  (element.strokeOptions?.variability === "constant"
-    ? CONSTANT_WIDTH_FREEDRAW.STREAMLINE
-    : VARIABLE_WIDTH_FREEDRAW.STREAMLINE);
+  element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
 
 /**
  * Pressure-sensitive (variable width) freedraw outline, rendered with
