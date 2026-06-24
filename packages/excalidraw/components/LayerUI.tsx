@@ -235,8 +235,6 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    const isCompactMode = isCompactStylesPanel;
-
     return (
       <Section
         heading="selectedShapeActions"
@@ -244,7 +242,7 @@ const LayerUI = ({
           "transition-left": appState.zenModeEnabled,
         })}
       >
-        {isCompactMode ? (
+        {isCompactStylesPanel ? (
           <Island
             className={clsx("compact-shape-actions-island")}
             padding={0}
@@ -312,6 +310,23 @@ const LayerUI = ({
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </div>
+            {/* in compact UI the pen mode button lives outside the toolbar, as
+                a separate floating button below the compact actions menu
+                (same as we render it on mobile); shown alongside the compact
+                actions island, i.e. when a drawing tool or elements are
+                selected */}
+            {isCompactStylesPanel &&
+              !appState.viewModeEnabled &&
+              shouldRenderSelectedShapeActions && (
+                <PenModeButton
+                  zenModeEnabled={appState.zenModeEnabled}
+                  checked={appState.penMode}
+                  onChange={() => onPenModeToggle(null)}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
+                />
+              )}
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
@@ -343,13 +358,18 @@ const LayerUI = ({
                           />
                           {heading}
                           <Stack.Row gap={spacing.toolbarInnerRowGap}>
-                            <PenModeButton
-                              zenModeEnabled={appState.zenModeEnabled}
-                              checked={appState.penMode}
-                              onChange={() => onPenModeToggle(null)}
-                              title={t("toolBar.penMode")}
-                              penDetected={appState.penDetected}
-                            />
+                            {/* in compact UI the pen mode button is rendered
+                                as a separate floating button below the compact
+                                actions menu */}
+                            {!isCompactStylesPanel && (
+                              <PenModeButton
+                                zenModeEnabled={appState.zenModeEnabled}
+                                checked={appState.penMode}
+                                onChange={() => onPenModeToggle(null)}
+                                title={t("toolBar.penMode")}
+                                penDetected={appState.penDetected}
+                              />
+                            )}
                             <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}

@@ -4308,7 +4308,9 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
-        currentItemStrokeVariability: "variable",
+        currentItemStrokeVariability: !prevState.penDetected
+          ? "variable"
+          : prevState.currentItemStrokeVariability,
       };
     });
   };
@@ -9015,7 +9017,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeOptions: {
         variability: strokeVariability,
         streamline:
-          strokeVariability === "constant" && event.pointerType !== "mouse"
+          event.pointerType !== "mouse"
             ? DEFAULT_STROKE_STREAMLINE_PRECISE
             : DEFAULT_STROKE_STREAMLINE,
       },
