@@ -435,6 +435,26 @@ export const FREEDRAW_STROKE_WIDTH: Readonly<
   extraBold: 4, // legacy (may be used again in the future)
 };
 
+const STROKE_WIDTH_TO_KEY = {
+  generic: Object.fromEntries(
+    Object.entries(STROKE_WIDTH).map(([key, value]) => [value, key]),
+  ) as Record<ExcalidrawElement["strokeWidth"], StrokeWidthKey | undefined>,
+  freedraw: Object.fromEntries(
+    Object.entries(FREEDRAW_STROKE_WIDTH).map(([key, value]) => [value, key]),
+  ) as Record<ExcalidrawElement["strokeWidth"], StrokeWidthKey | undefined>,
+};
+
+export const getStrokeWidthKeyForElement = (
+  element: Pick<ExcalidrawElement, "type" | "strokeWidth">,
+): StrokeWidthKey | null => {
+  const strokeWidthToKey =
+    element.type === "freedraw"
+      ? STROKE_WIDTH_TO_KEY.freedraw
+      : STROKE_WIDTH_TO_KEY.generic;
+
+  return strokeWidthToKey[element.strokeWidth] ?? null;
+};
+
 export const getStrokeWidthByKey = (
   elementType: ExcalidrawElement["type"],
   strokeWidthKey: StrokeWidthKey,
