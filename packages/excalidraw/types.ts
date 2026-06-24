@@ -279,6 +279,7 @@ export type ScrollConstraints = {
   y: number;
   width: number;
   height: number;
+  tolerance?: number;
 };
 
 export interface AppState {

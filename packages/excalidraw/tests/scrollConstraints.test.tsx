@@ -1,4 +1,5 @@
 import React from "react";
+import { vi } from "vitest";
 
 import { KEYS, MAX_ZOOM } from "@excalidraw/common";
 
@@ -9,7 +10,13 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
-import { constrainScrollState, getMinZoomForConstraints } from "../scroll";
+import {
+  animateToConstraints,
+  constrainScrollState,
+  getMinZoomForConstraints,
+  SCROLL_TO_CONTENT_ANIMATION_KEY,
+} from "../scroll";
+import { AnimationController } from "../renderer/animation";
 
 import { Keyboard } from "./helpers/ui";
 import {
@@ -208,5 +215,108 @@ describe("setScrollConstraints (integration)", () => {
     expect(h.app.actionManager.isActionEnabled(actionZoomToFitSelection)).toBe(
       false,
     );
+  });
+});
+
+describe("rubberband tolerance (pure)", () => {
+  const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
+
+  it("allows scroll overscroll up to `tolerance` fraction of the viewport", () => {
+    const tolerance = 0.25;
+    // hard max for scrollX is -box.x = 0; soft adds tolerance * width / zoom
+    const result = constrainScrollState(
+      makeState({ scrollX: 999, scrollConstraints: { ...box, tolerance } }),
+      tolerance,
+    );
+    expect(result.scrollX).toBeCloseTo((tolerance * VIEWPORT.width) / 1); // 50
+  });
+
+  it("relaxes the minimum zoom by the `tolerance` fraction", () => {
+    const tolerance = 0.25;
+    const minZoom = getMinZoomForConstraints(box, VIEWPORT); // 0.2
+    const result = constrainScrollState(
+      makeState({
+        zoom: { value: getNormalizedZoom(0.01) },
+        scrollConstraints: { ...box, tolerance },
+      }),
+      tolerance,
+    );
+    expect(result.zoom.value).toBeCloseTo(minZoom * (1 - tolerance)); // 0.15
+  });
+
+  it("hard-clamps when tolerance is 0 (default)", () => {
+    const result = constrainScrollState(
+      makeState({ scrollX: 999, scrollConstraints: box }),
+    );
+    expect(result.scrollX).toBeCloseTo(0);
+  });
+});
+
+describe("animateToConstraints (rubberband snap-back)", () => {
+  afterEach(() => {
+    AnimationController.reset();
+  });
+
+  const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
+
+  it("starts an animation toward the box when overscrolled", () => {
+    const onFrame = vi.fn();
+    // scrollX 200 is outside the hard range [-800, 0]
+    animateToConstraints(
+      makeState({ scrollX: 200, scrollConstraints: box }),
+      onFrame,
+    );
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+    expect(onFrame).toHaveBeenCalled();
+  });
+
+  it("is a no-op when already within the box", () => {
+    const onFrame = vi.fn();
+    animateToConstraints(
+      makeState({ scrollX: -100, scrollConstraints: box }),
+      onFrame,
+    );
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(onFrame).not.toHaveBeenCalled();
+  });
+});
+
+describe("rubberband tolerance (integration)", () => {
+  beforeEach(() => {
+    mockBoundingClientRect();
+  });
+
+  afterEach(() => {
+    restoreOriginalGetBoundingClientRect();
+    AnimationController.reset();
+  });
+
+  it("lets the user pan past the box edge (bounded by tolerance)", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setScrollConstraints({
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 1000,
+        tolerance: 0.25,
+      });
+    });
+
+    // snapped to the top edge (hard max scrollY = 0)
+    expect(h.state.scrollY).toBe(0);
+
+    // page-up pans up, pushing scrollY past the hard edge into the overscroll
+    Keyboard.keyPress(KEYS.PAGE_UP);
+
+    // overscrolled past 0, but bounded by tolerance * height = 25
+    expect(h.state.scrollY).toBeGreaterThan(0);
+    expect(h.state.scrollY).toBeLessThanOrEqual(0.25 * h.state.height + 0.001);
   });
 });

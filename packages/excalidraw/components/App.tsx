@@ -416,6 +416,7 @@ import {
   SCROLL_TO_CONTENT_ANIMATION_KEY,
   scrollToElements,
   constrainScrollState,
+  animateToConstraints,
 } from "../scroll";
 import {
   setEraserCursor,
@@ -609,6 +610,10 @@ const YOUTUBE_VIDEO_STATES = new Map<
 >();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
+
+/** how long after the last pan/zoom we animate the rubberband back into the
+ * scroll constraints box */
+const SCROLL_CONSTRAINTS_SNAP_BACK_DELAY = 200;
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
@@ -4394,16 +4399,38 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
     this.setState(state);
-    this.constrainViewportToScrollConstraints();
+
+    // with rubberband tolerance, allow a soft overscroll while interacting and
+    // animate back to the box once the interaction settles; otherwise hard-clamp
+    const tolerance = this.state.scrollConstraints?.tolerance ?? 0;
+    this.constrainViewportToScrollConstraints(tolerance);
+    if (tolerance > 0) {
+      this.snapBackToScrollConstraintsDebounced();
+    }
   };
 
   /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when
-   * unconstrained). Runs as a queued update, so it sees the preceding change. */
-  private constrainViewportToScrollConstraints = () => {
+   * unconstrained). Runs as a queued update, so it sees the preceding change.
+   * `tolerance` (0–1) relaxes the bounds for rubberbanding. */
+  private constrainViewportToScrollConstraints = (tolerance = 0) => {
     this.setState((prevState) =>
-      prevState.scrollConstraints ? constrainScrollState(prevState) : null,
+      prevState.scrollConstraints
+        ? constrainScrollState(prevState, tolerance)
+        : null,
     );
   };
+
+  /** animates an overscrolled viewport back inside the constraint box */
+  private snapBackToScrollConstraints = () => {
+    if (!this.unmounted) {
+      animateToConstraints(this.state, (viewport) => this.setState(viewport));
+    }
+  };
+
+  private snapBackToScrollConstraintsDebounced = debounce(
+    this.snapBackToScrollConstraints,
+    SCROLL_CONSTRAINTS_SNAP_BACK_DELAY,
+  );
 
   /**
    * Constrains pan & zoom to a scene-coordinate box, so the viewport can't be

@@ -67,17 +67,19 @@ export const getMinZoomForConstraints = (
 /**
  * Clamps a single scroll axis so the visible scene span stays inside the box.
  * The visible span is `[-scroll, -scroll + visibleSize]`; we keep it within
- * `[boxStart, boxStart + boxSize]`. When the box can't cover the viewport on
- * this axis (only at the MAX_ZOOM cap for a tiny box) we center the box instead.
+ * `[boxStart, boxStart + boxSize]`, expanded by `overscroll` on each side (for
+ * rubberbanding). When the box can't cover the viewport on this axis (only at
+ * the MAX_ZOOM cap for a tiny box) we center the box instead.
  */
 const constrainScrollAxis = (
   scroll: number,
   boxStart: number,
   boxSize: number,
   visibleSize: number,
+  overscroll: number,
 ): number => {
-  const max = -boxStart;
-  const min = visibleSize - (boxStart + boxSize);
+  const max = -boxStart + overscroll;
+  const min = visibleSize - (boxStart + boxSize) - overscroll;
   return min > max ? (min + max) / 2 : clamp(scroll, min, max);
 };
 
@@ -87,12 +89,17 @@ const constrainScrollAxis = (
  * unchanged when there are no constraints. Because the whole viewport is kept
  * inside the box, any zoom anchor (which lives within the viewport) is also
  * guaranteed to stay inside the box.
+ *
+ * `tolerance` (0–1, a fraction of the viewport) relaxes the bounds for
+ * rubberbanding: the viewport may pan past the edges / zoom out below the fit
+ * zoom by that fraction. Pass `0` (default) for a hard clamp.
  */
 export const constrainScrollState = (
   state: Pick<
     AppState,
     "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
   >,
+  tolerance = 0,
 ): Viewport => {
   const { scrollConstraints, width, height } = state;
 
@@ -100,12 +107,15 @@ export const constrainScrollState = (
     return { scrollX: state.scrollX, scrollY: state.scrollY, zoom: state.zoom };
   }
 
+  tolerance = clamp(tolerance, 0, 1);
+
   const minZoom = getMinZoomForConstraints(scrollConstraints, {
     width,
     height,
   });
+  // relax the min zoom so the user can briefly zoom out past the fit zoom
   const zoomValue = getNormalizedZoom(
-    clamp(state.zoom.value, minZoom, MAX_ZOOM),
+    clamp(state.zoom.value, minZoom * (1 - tolerance), MAX_ZOOM),
   );
 
   return {
@@ -114,15 +124,49 @@ export const constrainScrollState = (
       scrollConstraints.x,
       scrollConstraints.width,
       width / zoomValue,
+      (tolerance * width) / zoomValue,
     ),
     scrollY: constrainScrollAxis(
       state.scrollY,
       scrollConstraints.y,
       scrollConstraints.height,
       height / zoomValue,
+      (tolerance * height) / zoomValue,
     ),
     zoom: { value: zoomValue },
   };
+};
+
+/**
+ * Rubberband snap-back: animates the viewport from its current (possibly
+ * overscrolled) position back inside the constraint box via the shared
+ * AnimationController. No-op when already within the hard bounds (or when there
+ * are no constraints).
+ */
+export const animateToConstraints = (
+  state: Pick<
+    AppState,
+    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
+  >,
+  onFrame: (
+    viewport: Pick<
+      AppState,
+      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
+    >,
+  ) => void,
+  duration = DEFAULT_ANIMATION_DURATION,
+) => {
+  const target = constrainScrollState(state); // hard clamp (tolerance 0)
+
+  if (
+    target.scrollX === state.scrollX &&
+    target.scrollY === state.scrollY &&
+    target.zoom.value === state.zoom.value
+  ) {
+    return;
+  }
+
+  animateToViewport(state, target, duration, onFrame);
 };
 
 /**
