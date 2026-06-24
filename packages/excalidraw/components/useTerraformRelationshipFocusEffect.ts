@@ -15,7 +15,6 @@ import {
 } from "./terraformElementActionsSelection";
 import {
   buildTerraformReconcileOptionsForAppState,
-  getTerraformEdgeHoverPeekKeyFromHoveredIds,
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
@@ -23,7 +22,6 @@ import {
   getTerraformRuntimePerformanceSnapshot,
   isBelowTerraformRuntimeThreshold,
   subscribeTerraformRuntimePerformance,
-  TERRAFORM_RUNTIME_HOVER_DEBOUNCE_MS,
   type TerraformRuntimePerformanceSettings,
 } from "./terraformRuntimePerformance";
 
@@ -131,39 +129,6 @@ export function useTerraformRelationshipFocusEffect({
     getTerraformRuntimePerformanceSnapshot,
   );
   const allElements = app.scene.getElementsIncludingDeleted();
-  const hoveredPeek = getTerraformEdgeHoverPeekKeyFromHoveredIds(
-    allElements,
-    appState.hoveredElementIds,
-  );
-  const suppressedHoveredPeek =
-    runtimeSnapshot.value.suppressHoverFocusBelowZoom &&
-    isBelowTerraformRuntimeThreshold(appState.zoom.value, runtimeSnapshot.value)
-      ? null
-      : hoveredPeek;
-  const [debouncedHoveredPeek, setDebouncedHoveredPeek] = React.useState(
-    suppressedHoveredPeek,
-  );
-
-  React.useEffect(() => {
-    if (
-      !runtimeSnapshot.value.debounceHoverFocus ||
-      suppressedHoveredPeek === null
-    ) {
-      setDebouncedHoveredPeek(suppressedHoveredPeek);
-      return;
-    }
-    const timeout = window.setTimeout(
-      () => setDebouncedHoveredPeek(suppressedHoveredPeek),
-      TERRAFORM_RUNTIME_HOVER_DEBOUNCE_MS,
-    );
-    return () => window.clearTimeout(timeout);
-  }, [
-    appState.selectedElementIds,
-    appState.zoom.value,
-    runtimeSnapshot.version,
-    runtimeSnapshot.value.debounceHoverFocus,
-    suppressedHoveredPeek,
-  ]);
 
   React.useEffect(() => {
     const terraformElement = getTerraformElementForSelection(
@@ -175,10 +140,11 @@ export function useTerraformRelationshipFocusEffect({
       terraformElement && isTerraformResourceElement(terraformElement)
         ? getTerraformGraphAddressForElement(terraformElement)
         : null;
-    const effectiveHoveredPeek = runtimeSnapshot.value.debounceHoverFocus
-      ? debouncedHoveredPeek
-      : suppressedHoveredPeek;
-    const activeFocusNodePath = effectiveHoveredPeek || selectedGraphKey;
+    // Relationship focus is driven by selection (click), not hover: hovering
+    // re-washed ~93% of elements on every pointer move, busting render caches
+    // and stalling the canvas during rapid hover + pan. See
+    // docs/terraform-canvas-hover-unrender-investigation.md.
+    const activeFocusNodePath = selectedGraphKey;
     const update = buildTerraformRuntimeFocusUpdate({
       allElements,
       activeFocusNodePath,
@@ -200,14 +166,10 @@ export function useTerraformRelationshipFocusEffect({
     appState.selectedElementIds,
     appState.selectedGroupIds,
     appState.terraformEdgeLayerPins,
-    appState.zoom.value,
     appState.viewBackgroundColor,
-    debouncedHoveredPeek,
     elements,
     runtimeSnapshot.version,
-    runtimeSnapshot.value.debounceHoverFocus,
     runtimeSnapshot.value.skipBindingRepairDuringFocus,
-    suppressedHoveredPeek,
   ]);
 }
 
