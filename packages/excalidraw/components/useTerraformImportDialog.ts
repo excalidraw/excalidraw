@@ -48,6 +48,7 @@ import {
   type DeBandLevel,
   type RcllLayoutProfile,
 } from "./terraformPipelineLayoutProfiles";
+import { buildTerraformDemoUrlFromSettings } from "./terraformDemoUrlParams";
 
 import type {
   TerraformImportArtifact,
@@ -799,6 +800,59 @@ export const useTerraformImportDialog = ({
     }
   };
 
+  // Shareable `/demo?…` URL that round-trips the current preset + layout settings, so a
+  // configured scene can be reproduced (or handed off) from the URL alone. Only preset-backed
+  // imports are encodable — uploaded files have no stable URL — so it is null without a preset.
+  const demoSettingsUrl = useMemo(() => {
+    if (!selectedPresetId) {
+      return null;
+    }
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+    return buildTerraformDemoUrlFromSettings(
+      {
+        presetId: selectedPresetId,
+        view,
+        pipelineCompact,
+        pipelineLayoutVariant,
+        pipelinePacked,
+        pipelinePackedPullLeft,
+        pipelineIncludeAncillary,
+        pipelineSemanticPlacement,
+        pipelineSwimlaneLaneRise,
+        pipelineReorder,
+        pipelineCrossingMin,
+        pipelineDeBandLevel,
+        pipelineRankSeparate,
+        pipelineStraighten,
+        pipelineColumnPacking,
+        pipelineLayoutProfile,
+        pipelineStaircaseBandOverlap,
+        moduleLayoutMode: moduleLayoutOptions.mode,
+      },
+      { origin },
+    );
+  }, [
+    selectedPresetId,
+    view,
+    pipelineCompact,
+    pipelineLayoutVariant,
+    pipelinePacked,
+    pipelinePackedPullLeft,
+    pipelineIncludeAncillary,
+    pipelineSemanticPlacement,
+    pipelineSwimlaneLaneRise,
+    pipelineReorder,
+    pipelineCrossingMin,
+    pipelineDeBandLevel,
+    pipelineRankSeparate,
+    pipelineStraighten,
+    pipelineColumnPacking,
+    pipelineLayoutProfile,
+    pipelineStaircaseBandOverlap,
+    moduleLayoutOptions.mode,
+  ]);
+
   return {
     bundles,
     stateFiles,
@@ -837,6 +891,7 @@ export const useTerraformImportDialog = ({
     artifactKind,
     artifactUploadFile,
     selectedPreset,
+    demoSettingsUrl,
     canImport,
     canUseSemanticView,
     semanticViewDisabled,

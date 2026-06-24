@@ -5,20 +5,90 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import {
   isDemoPathname,
   parseTerraformDemoUrlParams,
+  type TerraformDemoUrlParams,
 } from "./terraformDemoUrlParams";
 import { getTerraformImportPreset } from "./terraformImportPresets";
 import {
   resolveModuleLayoutOptionsForDemo,
   runTerraformPresetImport,
 } from "./terraformPresetImport";
+import { patchTerraformRuntimePerformanceSettings } from "./terraformRuntimePerformance";
+import {
+  reconcileTerraformVisibility,
+  repairTerraformEdgeBindings,
+} from "./terraformVisibility";
+import {
+  updateTerraformImportSessionLodEnabled,
+  updateTerraformImportSessionLodPreset,
+  updateTerraformImportSessionMinimapEnabled,
+} from "./terraformImportSession";
 
 import "./TerraformDemoAutoImport.scss";
 
+import type { AppClassProperties, AppState } from "../types";
 import type { TerraformView } from "./terraformImportDialogUtils";
 
 type TerraformDemoAutoImportProps = {
   onImportSuccess?: () => void;
   onImportFail?: () => void;
+};
+
+/**
+ * Apply the runtime view settings carried by a canvas-share URL once the scene is imported:
+ * LOD/minimap/pins land in AppState (and the import session, so re-sharing stays faithful),
+ * edge-layer pins additionally drive a visibility reconcile, and the dev canvas-performance
+ * experiments patch their (localStorage-backed, dev-only) store.
+ */
+const applyCanvasViewSettings = (
+  app: AppClassProperties,
+  setAppState: ReturnType<typeof useExcalidrawSetAppState>,
+  params: TerraformDemoUrlParams,
+): void => {
+  // Only the keys the URL carried — cast past the setter's non-partial `Pick` signature
+  // (React merges the provided keys, leaving the rest untouched).
+  const appStatePatch = {
+    ...(params.lodEnabled !== undefined
+      ? { terraformLodEnabled: params.lodEnabled }
+      : {}),
+    ...(params.lodPreset !== undefined
+      ? { terraformLodPreset: params.lodPreset }
+      : {}),
+    ...(params.minimap !== undefined
+      ? { terraformMinimapEnabled: params.minimap }
+      : {}),
+    ...(params.edgeLayerPins
+      ? { terraformEdgeLayerPins: params.edgeLayerPins }
+      : {}),
+  };
+  if (Object.keys(appStatePatch).length > 0) {
+    setAppState(appStatePatch as Pick<AppState, keyof typeof appStatePatch>);
+  }
+
+  if (params.lodEnabled !== undefined) {
+    updateTerraformImportSessionLodEnabled(params.lodEnabled);
+  }
+  if (params.lodPreset !== undefined) {
+    updateTerraformImportSessionLodPreset(params.lodPreset);
+  }
+  if (params.minimap !== undefined) {
+    updateTerraformImportSessionMinimapEnabled(params.minimap);
+  }
+
+  // Edge-layer pins only take visual effect once visibility is reconciled against the
+  // freshly-imported elements (same path the "Terraform layers" menu uses).
+  if (params.edgeLayerPins) {
+    const allElements = app.scene.getElementsIncludingDeleted();
+    app.scene.replaceAllElements(
+      reconcileTerraformVisibility(repairTerraformEdgeBindings(allElements), {
+        pins: params.edgeLayerPins,
+        hoverPeekKey: null,
+      }),
+    );
+  }
+
+  if (params.runtimePerformance) {
+    patchTerraformRuntimePerformanceSettings(params.runtimePerformance);
+  }
 };
 
 type DemoImportStatus = "idle" | "loading" | "error";
@@ -109,6 +179,10 @@ export const TerraformDemoAutoImport = ({
             setMessage(label);
           },
         });
+
+        // Reapply the runtime view settings the share URL carried (LOD, minimap, edge
+        // layers, dev canvas-performance) on top of the freshly-imported scene.
+        applyCanvasViewSettings(app, setAppState, params);
 
         setStatus("idle");
         setMessage(null);

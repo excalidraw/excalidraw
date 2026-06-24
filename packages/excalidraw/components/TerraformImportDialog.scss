@@ -1020,6 +1020,32 @@
         font-size: 0.6875rem;
       }
     }
+
+    // Sits next to "Import & Open" (pushed right via auto margin, summary stays left).
+    &__copyUrlButton {
+      margin-left: auto;
+      padding: 0.5rem 0.875rem;
+      border: 1px solid var(--tf-border);
+      border-radius: 0.5rem;
+      background: var(--color-surface-low, transparent);
+      color: var(--tf-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease,
+        background-color 0.15s ease;
+
+      &:hover {
+        color: var(--text-primary-color);
+        border-color: var(--color-primary);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 1px;
+      }
+    }
   }
 
   @media screen and (max-width: 800px) {

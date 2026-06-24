@@ -1,11 +1,39 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildTerraformDemoUrl,
+  buildTerraformDemoUrlFromSettings,
+  collectTerraformDemoParams,
   hasTerraformDemoAutoImportQuery,
   isDemoPathname,
   normalizePresetIdParam,
   parseTerraformDemoUrlParams,
+  type TerraformDemoSettingsSnapshot,
+  type TerraformDemoUrlParams,
 } from "./terraformDemoUrlParams";
+
+const queryOf = (url: string): string => url.slice(url.indexOf("?"));
+
+const baseSnapshot: TerraformDemoSettingsSnapshot = {
+  presetId: "staging-extended-localstack-v2",
+  view: "rcll",
+  pipelineCompact: true,
+  pipelineLayoutVariant: "classic",
+  pipelinePacked: false,
+  pipelinePackedPullLeft: false,
+  pipelineIncludeAncillary: false,
+  pipelineSemanticPlacement: false,
+  pipelineSwimlaneLaneRise: false,
+  pipelineReorder: false,
+  pipelineCrossingMin: false,
+  pipelineDeBandLevel: "none",
+  pipelineRankSeparate: false,
+  pipelineStraighten: false,
+  pipelineColumnPacking: "none",
+  pipelineLayoutProfile: "balanced",
+  pipelineStaircaseBandOverlap: true,
+  moduleLayoutMode: "default",
+};
 
 describe("terraformDemoUrlParams", () => {
   describe("isDemoPathname", () => {
@@ -373,6 +401,245 @@ describe("terraformDemoUrlParams", () => {
     it("detects auto-import queries", () => {
       expect(hasTerraformDemoAutoImportQuery("?preset=demo")).toBe(true);
       expect(hasTerraformDemoAutoImportQuery("?view=semantic")).toBe(false);
+    });
+  });
+
+  describe("buildTerraformDemoUrl", () => {
+    it("emits a /demo path with the preset and origin", () => {
+      const url = buildTerraformDemoUrl(
+        { presetId: "demo", view: "rcll" },
+        { origin: "https://tfdraw.dev" },
+      );
+      expect(url.startsWith("https://tfdraw.dev/demo?")).toBe(true);
+      expect(url).toContain("preset=demo");
+      expect(url).toContain("view=rcll");
+    });
+
+    it("serializes booleans as 1/0 and skips undefined fields", () => {
+      const url = buildTerraformDemoUrl({
+        presetId: "demo",
+        ancillary: true,
+        compact: false,
+      });
+      const params = new URLSearchParams(queryOf(url).slice(1));
+      expect(params.get("ancillary")).toBe("1");
+      expect(params.get("compact")).toBe("0");
+      expect(params.has("reorder")).toBe(false);
+    });
+
+    it("round-trips every demo param through the parser", () => {
+      const full: TerraformDemoUrlParams = {
+        presetId: "staging-extended-localstack-v2",
+        view: "rcll",
+        compact: false,
+        ancillary: true,
+        swimlaneRise: true,
+        reorder: true,
+        crossingMin: true,
+        deBandLevel: "region",
+        rankSeparate: true,
+        straighten: true,
+        columnPacking: "compact",
+        staircaseBandOverlap: false,
+      };
+      expect(
+        parseTerraformDemoUrlParams(queryOf(buildTerraformDemoUrl(full))),
+      ).toEqual(full);
+    });
+  });
+
+  describe("collectTerraformDemoParams", () => {
+    it("semantic view carries only preset + view", () => {
+      expect(
+        collectTerraformDemoParams({ ...baseSnapshot, view: "semantic" }),
+      ).toEqual({ presetId: baseSnapshot.presetId, view: "semantic" });
+    });
+
+    it("module view emits pack only when non-default", () => {
+      expect(
+        collectTerraformDemoParams({
+          ...baseSnapshot,
+          view: "module",
+          moduleLayoutMode: "default",
+        }),
+      ).toEqual({ presetId: baseSnapshot.presetId, view: "module" });
+      expect(
+        collectTerraformDemoParams({
+          ...baseSnapshot,
+          view: "module",
+          moduleLayoutMode: "rectpacking",
+        }).pack,
+      ).toBe("rectpacking");
+    });
+
+    it("pipeline view captures variant, packing, ancillary, placement", () => {
+      const params = collectTerraformDemoParams({
+        ...baseSnapshot,
+        view: "pipeline",
+        pipelineLayoutVariant: "compound",
+        pipelinePacked: true,
+        pipelinePackedPullLeft: true,
+        pipelineIncludeAncillary: true,
+        pipelineSemanticPlacement: true,
+      });
+      expect(params).toMatchObject({
+        view: "pipeline",
+        pipelineVariant: "compound",
+        packed: true,
+        packedPullLeft: true,
+        ancillary: true,
+        semanticPlace: true,
+      });
+    });
+
+    it("rcll view with a named profile emits profile, not raw flags", () => {
+      const params = collectTerraformDemoParams({
+        ...baseSnapshot,
+        view: "rcll",
+        pipelineLayoutProfile: "compact",
+      });
+      expect(params.profile).toBe("compact");
+      expect(params.swimlaneRise).toBeUndefined();
+      expect(params.straighten).toBeUndefined();
+      // Independent toggles are still captured.
+      expect(params.compact).toBe(true);
+      expect(params.ancillary).toBe(false);
+    });
+
+    it("rcll view with a custom profile spells out the eight flags", () => {
+      const params = collectTerraformDemoParams({
+        ...baseSnapshot,
+        view: "rcll",
+        pipelineLayoutProfile: "custom",
+        pipelineSwimlaneLaneRise: true,
+        pipelineRankSeparate: true,
+        pipelineDeBandLevel: "vpc",
+        pipelineStaircaseBandOverlap: false,
+        pipelineReorder: true,
+        pipelineCrossingMin: true,
+        pipelineStraighten: true,
+        pipelineColumnPacking: "spread",
+      });
+      expect(params.profile).toBeUndefined();
+      expect(params).toMatchObject({
+        swimlaneRise: true,
+        rankSeparate: true,
+        deBandLevel: "vpc",
+        staircaseBandOverlap: false,
+        reorder: true,
+        crossingMin: true,
+        straighten: true,
+        columnPacking: "spread",
+      });
+    });
+  });
+
+  describe("buildTerraformDemoUrlFromSettings", () => {
+    it("round-trips a custom rcll snapshot through the parser", () => {
+      const snapshot: TerraformDemoSettingsSnapshot = {
+        ...baseSnapshot,
+        view: "rcll",
+        pipelineCompact: false,
+        pipelineIncludeAncillary: true,
+        pipelineLayoutProfile: "custom",
+        pipelineSwimlaneLaneRise: true,
+        pipelineRankSeparate: true,
+        pipelineDeBandLevel: "account",
+        pipelineStaircaseBandOverlap: false,
+        pipelineReorder: true,
+        pipelineCrossingMin: true,
+        pipelineStraighten: true,
+        pipelineColumnPacking: "compact",
+      };
+      const parsed = parseTerraformDemoUrlParams(
+        queryOf(buildTerraformDemoUrlFromSettings(snapshot)),
+      );
+      expect(parsed).toEqual(collectTerraformDemoParams(snapshot));
+    });
+  });
+
+  describe("runtime canvas view settings", () => {
+    it("parses lod, minimap, layers, and canvasPerf", () => {
+      const parsed = parseTerraformDemoUrlParams(
+        "?preset=demo&view=rcll&lodEnabled=0&lodPreset=detailed&minimap=1" +
+          "&layers=dep,net&canvasPerf=hideicons,noclip&canvasPerfZoom=0.4",
+      );
+      expect(parsed).toMatchObject({
+        presetId: "demo",
+        view: "rcll",
+        lodEnabled: false,
+        lodPreset: "detailed",
+        minimap: true,
+        edgeLayerPins: {
+          dependency: true,
+          networking: true,
+          dataFlow: false,
+          declaredDataFlow: false,
+          topologyFrameFlow: false,
+        },
+        runtimePerformance: {
+          hideAwsIconGlyphsBelowZoom: true,
+          suppressFrameClippingBelowZoom: true,
+          suppressHoverFocusBelowZoom: false,
+          debounceHoverFocus: false,
+          skipBindingRepairDuringFocus: false,
+          lowZoomThreshold: 0.4,
+        },
+      });
+    });
+
+    it("treats layers=none and canvasPerf=none as all-off", () => {
+      const parsed = parseTerraformDemoUrlParams(
+        "?preset=demo&layers=none&canvasPerf=none",
+      );
+      expect(parsed?.edgeLayerPins).toEqual({
+        dependency: false,
+        dataFlow: false,
+        declaredDataFlow: false,
+        networking: false,
+        topologyFrameFlow: false,
+      });
+      expect(parsed?.runtimePerformance?.hideAwsIconGlyphsBelowZoom).toBe(false);
+    });
+
+    it("hard-fails on an unknown layer code or perf threshold", () => {
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&layers=dep,bogus"),
+      ).toBeNull();
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&canvasPerfZoom=0.9"),
+      ).toBeNull();
+      expect(
+        parseTerraformDemoUrlParams("?preset=demo&lodPreset=ultra"),
+      ).toBeNull();
+    });
+
+    it("round-trips a full runtime-settings params object", () => {
+      const full: TerraformDemoUrlParams = {
+        presetId: "demo",
+        view: "rcll",
+        lodEnabled: true,
+        lodPreset: "performance",
+        minimap: false,
+        edgeLayerPins: {
+          dependency: true,
+          dataFlow: false,
+          declaredDataFlow: true,
+          networking: false,
+          topologyFrameFlow: true,
+        },
+        runtimePerformance: {
+          hideAwsIconGlyphsBelowZoom: true,
+          suppressHoverFocusBelowZoom: false,
+          debounceHoverFocus: true,
+          suppressFrameClippingBelowZoom: false,
+          skipBindingRepairDuringFocus: true,
+          lowZoomThreshold: 0.2,
+        },
+      };
+      expect(
+        parseTerraformDemoUrlParams(queryOf(buildTerraformDemoUrl(full))),
+      ).toEqual(full);
     });
   });
 });

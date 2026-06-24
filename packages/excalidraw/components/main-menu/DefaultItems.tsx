@@ -63,6 +63,7 @@ import {
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
+  LinkIcon,
   LoadIcon,
   MoonIcon,
   save,
@@ -73,6 +74,7 @@ import {
   ZoomOutIcon,
 } from "../icons";
 import {
+  getTerraformImportSession,
   updateTerraformImportSessionLodEnabled,
   updateTerraformImportSessionLodPreset,
   updateTerraformImportSessionMinimapEnabled,
@@ -81,6 +83,9 @@ import {
   TERRAFORM_LOD_DEFAULT_PRESET,
   type TerraformLodPreset,
 } from "../terraformLod";
+import { buildTerraformCanvasShareUrl } from "../terraformCanvasShareUrl";
+import { getTerraformRuntimePerformanceSnapshot } from "../terraformRuntimePerformance";
+import { copyTextToSystemClipboard } from "../../clipboard";
 
 import "./DefaultItems.scss";
 
@@ -441,6 +446,66 @@ export const TerraformZoomLod = () => {
   );
 };
 TerraformZoomLod.displayName = "TerraformZoomLod";
+
+/**
+ * Copy a `/demo?…` URL that reconstructs the current Terraform canvas — its preset + layout
+ * (from the import session) plus the live runtime view settings (LOD, minimap, edge layers,
+ * dev canvas-performance). Hidden unless the scene came from a preset (the only source a URL
+ * can reconstruct from). Open the URL cold and {@link TerraformDemoAutoImport} rebuilds it.
+ */
+export const TerraformCopyCanvasUrl = () => {
+  const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
+  const session = getTerraformImportSession();
+
+  // Only preset-backed scenes can be reconstructed from a URL.
+  if (!session?.preset?.id) {
+    return null;
+  }
+
+  const handleSelect = async () => {
+    const url = buildTerraformCanvasShareUrl(
+      session,
+      {
+        terraformLodEnabled: app.state.terraformLodEnabled,
+        terraformLodPreset: app.state.terraformLodPreset,
+        terraformMinimapEnabled: app.state.terraformMinimapEnabled,
+        terraformEdgeLayerPins: app.state.terraformEdgeLayerPins,
+        runtimePerformance: getTerraformRuntimePerformanceSnapshot().value,
+      },
+      // Absolute URL so the copied link is shareable as-is (not a bare `/demo?…` path).
+      {
+        origin:
+          typeof window !== "undefined" ? window.location.origin : undefined,
+      },
+    );
+    if (!url) {
+      return;
+    }
+    try {
+      await copyTextToSystemClipboard(url);
+      setAppState({
+        toast: { message: "Canvas URL copied to clipboard", duration: 3000 },
+      });
+    } catch {
+      // Clipboard can be blocked (permissions / insecure context) — surface it to copy by hand.
+      window.prompt("Copy this canvas URL:", url);
+    }
+  };
+
+  return (
+    <DropdownMenuItem
+      icon={LinkIcon}
+      onSelect={handleSelect}
+      data-testid="terraform-copy-canvas-url"
+      aria-label="Copy canvas URL"
+    >
+      Copy canvas URL
+    </DropdownMenuItem>
+  );
+};
+TerraformCopyCanvasUrl.displayName = "TerraformCopyCanvasUrl";
+
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();
   const { t } = useI18n();

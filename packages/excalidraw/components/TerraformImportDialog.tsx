@@ -83,11 +83,43 @@ export const TerraformImportModal = ({
     artifactRelativePath,
     artifactKind,
     selectedPreset,
+    demoSettingsUrl,
     canImport,
     semanticViewDisabled,
     usingPresetManifest,
     stateOnly,
   } = dialog;
+
+  const [settingsUrlCopied, setSettingsUrlCopied] = React.useState(false);
+  const copyResetRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(
+    () => () => {
+      if (copyResetRef.current) {
+        clearTimeout(copyResetRef.current);
+      }
+    },
+    [],
+  );
+  const handleCopySettingsUrl = React.useCallback(async () => {
+    if (!demoSettingsUrl) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(demoSettingsUrl);
+      setSettingsUrlCopied(true);
+      if (copyResetRef.current) {
+        clearTimeout(copyResetRef.current);
+      }
+      copyResetRef.current = setTimeout(
+        () => setSettingsUrlCopied(false),
+        1800,
+      );
+    } catch {
+      // Clipboard can be blocked (insecure context / permissions) — surface the URL so the
+      // user can copy it manually rather than failing silently.
+      window.prompt("Copy this scene settings URL:", demoSettingsUrl);
+    }
+  }, [demoSettingsUrl]);
 
   const completeBundleCount = bundles.filter(
     (bundle) => bundle.planFile && bundle.dotFile,
@@ -737,6 +769,16 @@ terraform show -json tfplan > plan.json`}</code>
           <strong>{sourceSummary}</strong>
           <span>{selectedView}</span>
         </div>
+        {demoSettingsUrl && (
+          <button
+            type="button"
+            className="TerraformImportModal__copyUrlButton"
+            onClick={handleCopySettingsUrl}
+            title="Copy a /demo URL that reproduces this preset + layout settings"
+          >
+            {settingsUrlCopied ? "Copied!" : "Copy settings URL"}
+          </button>
+        )}
         {importDone ? (
           <FilledButton onClick={onCloseRequest}>Done</FilledButton>
         ) : (
