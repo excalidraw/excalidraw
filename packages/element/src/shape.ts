@@ -1191,7 +1191,7 @@ const VARIABLE_WIDTH_FREEDRAW = {
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
-  SIZE_FACTOR: 1.4,
+  SIZE_FACTOR: 1.25,
   STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
 } as const;
 
