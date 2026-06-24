@@ -310,8 +310,15 @@ export const addNewNodes = (
   scene: Scene,
   numberOfNodes: number,
 ) => {
-  // always start from 0 and distribute evenly
   const newNodes: ExcalidrawElement[] = [];
+
+  // existing siblings in this direction; the batch must clear their bounding
+  // box so it never overlaps previously-committed children (#8518)
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const linkedNodes = [
+    ...getSuccessors(startNode, elementsMap, direction),
+    ...getPredecessors(startNode, elementsMap, direction),
+  ];
 
   for (let i = 0; i < numberOfNodes; i++) {
     let nextX: number;
@@ -321,26 +328,66 @@ export const addNewNodes = (
         VERTICAL_OFFSET * (numberOfNodes - 1) +
         numberOfNodes * startNode.height;
 
-      const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
+      let startY = startNode.y + startNode.height / 2 - totalHeight / 2;
 
       let offsetX = HORIZONTAL_OFFSET + startNode.width;
       if (direction === "left") {
         offsetX *= -1;
       }
       nextX = startNode.x + offsetX;
+
+      if (linkedNodes.length > 0) {
+        // align the column with the existing siblings and push the batch past
+        // their vertical extent, picking the side with more room
+        nextX =
+          direction === "left"
+            ? Math.max(...linkedNodes.map((n) => n.x + n.width)) -
+              startNode.width
+            : Math.min(...linkedNodes.map((n) => n.x));
+
+        const minSiblingY = Math.min(...linkedNodes.map((n) => n.y));
+        const maxSiblingY = Math.max(...linkedNodes.map((n) => n.y + n.height));
+        const centerY = startNode.y + startNode.height / 2;
+        const placeBelow = maxSiblingY - centerY <= centerY - minSiblingY;
+
+        startY = placeBelow
+          ? maxSiblingY + VERTICAL_OFFSET
+          : minSiblingY - VERTICAL_OFFSET - totalHeight;
+      }
+
       const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
       nextY = startY + offsetY;
     } else {
       const totalWidth =
         HORIZONTAL_OFFSET * (numberOfNodes - 1) +
         numberOfNodes * startNode.width;
-      const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
+      let startX = startNode.x + startNode.width / 2 - totalWidth / 2;
       let offsetY = VERTICAL_OFFSET + startNode.height;
 
       if (direction === "up") {
         offsetY *= -1;
       }
       nextY = startNode.y + offsetY;
+
+      if (linkedNodes.length > 0) {
+        // align the row with the existing siblings and push the batch past
+        // their horizontal extent, picking the side with more room
+        nextY =
+          direction === "up"
+            ? Math.max(...linkedNodes.map((n) => n.y + n.height)) -
+              startNode.height
+            : Math.min(...linkedNodes.map((n) => n.y));
+
+        const minSiblingX = Math.min(...linkedNodes.map((n) => n.x));
+        const maxSiblingX = Math.max(...linkedNodes.map((n) => n.x + n.width));
+        const centerX = startNode.x + startNode.width / 2;
+        const placeRight = maxSiblingX - centerX <= centerX - minSiblingX;
+
+        startX = placeRight
+          ? maxSiblingX + HORIZONTAL_OFFSET
+          : minSiblingX - HORIZONTAL_OFFSET - totalWidth;
+      }
+
       const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
       nextX = startX + offsetX;
     }

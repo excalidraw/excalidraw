@@ -191,6 +191,49 @@ describe("flow chart creation", () => {
       );
     }
   });
+
+  // regression for #8518: a second batch of children (added by holding the
+  // modifier and pressing the arrow several times) must clear the first batch
+  it("does not overlap a previous batch of children (down)", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 400,
+      height: 300,
+    });
+    API.setElements([parent]);
+
+    // hold the modifier and press down N times to create a batch at once
+    const addBatch = (count: number) => {
+      API.setSelectedElements([parent]);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        for (let i = 0; i < count; i++) {
+          Keyboard.keyPress(KEYS.ARROW_DOWN);
+        }
+      });
+      Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    };
+
+    addBatch(3);
+    addBatch(2);
+
+    const children = h.elements.filter(
+      (el) => el.type === "rectangle" && el.id !== parent.id,
+    );
+    expect(children.length).toBe(5);
+
+    const overlaps = (a: typeof children[0], b: typeof children[0]) =>
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y;
+
+    for (let i = 0; i < children.length; i++) {
+      for (let j = i + 1; j < children.length; j++) {
+        expect(overlaps(children[i], children[j])).toBe(false);
+      }
+    }
+  });
 });
 
 describe("flow chart navigation", () => {
