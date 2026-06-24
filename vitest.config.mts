@@ -59,6 +59,17 @@ export default defineConfig({
           "./packages/fractional-indexing/src/$1",
         ),
       },
+      {
+        find: /^@excalidraw\/laser-pointer$/,
+        replacement: path.resolve(
+          __dirname,
+          "./packages/laser-pointer/src/index.ts",
+        ),
+      },
+      {
+        find: /^@excalidraw\/laser-pointer\/(.*?)/,
+        replacement: path.resolve(__dirname, "./packages/laser-pointer/src/$1"),
+      },
     ],
   },
   //@ts-ignore
