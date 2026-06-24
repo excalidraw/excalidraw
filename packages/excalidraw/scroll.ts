@@ -1,4 +1,5 @@
 import { easeOut } from "@excalidraw/common";
+import { clamp } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -102,21 +103,22 @@ const animateToViewport = (
   from: Pick<AppState, "scrollX" | "scrollY" | "zoom">,
   target: Viewport,
   duration: number,
-  onFrame: (state: Pick<AppState, "scrollX" | "scrollY" | "zoom">) => void,
+  onFrame: (
+    state: Pick<
+      AppState,
+      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
+    >,
+  ) => void,
 ) => {
   AnimationController.start<{ elapsed: number }>(
     SCROLL_TO_CONTENT_ANIMATION_KEY,
     ({ deltaTime, state }) => {
       const elapsed = (state?.elapsed ?? 0) + deltaTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      if (progress >= 1) {
-        return null;
-      }
-
-      const factor = easeOut(progress);
+      const factor = easeOut(clamp(progress, 0, 1));
 
       onFrame({
+        shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
         scrollX: from.scrollX + (target.scrollX - from.scrollX) * factor,
         scrollY: from.scrollY + (target.scrollY - from.scrollY) * factor,
         // zoom interpolates geometrically so the transition feels natural
