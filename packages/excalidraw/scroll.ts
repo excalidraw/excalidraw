@@ -138,7 +138,10 @@ const animateToViewport = (
         },
       });
 
-      return { elapsed };
+      // returning a falsy value signals the AnimationController to remove the
+      // animation; otherwise it would keep ticking (and calling onFrame) every
+      // frame forever after reaching the target
+      return progress < 1 ? { elapsed } : null;
     },
   );
 };
