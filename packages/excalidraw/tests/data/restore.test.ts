@@ -536,7 +536,6 @@ describe("restoreElements", () => {
       type: "line",
       x: 419048829414166,
       y: 8484,
-      strokeStyle: "dotted",
     });
     hugeLine.points = [
       [0, 0],
