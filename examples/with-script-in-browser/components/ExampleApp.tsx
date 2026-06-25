@@ -288,6 +288,11 @@ export default function ExampleApp({
     const contents = await loadSceneOrLibraryFromBlob(file, null, null);
     if (contents.type === MIME_TYPES.excalidraw) {
       excalidrawAPI?.updateScene(contents.data as any);
+      if (contents.data.files) {
+        excalidrawAPI?.addFiles(
+          Object.values(contents.data.files) as BinaryFileData[],
+        );
+      }
     } else if (contents.type === MIME_TYPES.excalidrawlib) {
       excalidrawAPI?.updateLibrary({
         libraryItems: (contents.data as ImportedLibraryData).libraryItems!,
