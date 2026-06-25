@@ -43,6 +43,7 @@ export {
   actionSaveToActiveFile,
   actionSaveFileToDisk,
   actionLoadScene,
+  actionExportImage,
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
