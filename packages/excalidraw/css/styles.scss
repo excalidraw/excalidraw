@@ -1,7 +1,8 @@
 @use "./variables.module" as *;
 @use "./theme";
 
-:root {
+:root,
+:host {
   --zIndex-canvas: 1;
   --zIndex-interactiveCanvas: 2;
   --zIndex-svgLayer: 3;
