@@ -306,6 +306,7 @@ export const exportToSvg = async (
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    name?: string;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -351,6 +352,17 @@ export const exportToSvg = async (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  // Add title for accessibility and GitHub searchability
+  if (opts?.name) {
+    const titleElement = svgRoot.ownerDocument.createElementNS(
+      SVG_NS,
+      "title",
+    );
+    titleElement.textContent = opts.name;
+    svgRoot.insertBefore(titleElement, svgRoot.firstChild);
+  }
+
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
 
