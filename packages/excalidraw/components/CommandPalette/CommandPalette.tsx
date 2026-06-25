@@ -16,6 +16,7 @@ import { actionToggleShapeSwitch } from "../../actions/actionToggleShapeSwitch";
 import { getShortcutKey } from "../../shortcut";
 
 import {
+  actionAITidySelection,
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
@@ -595,6 +596,16 @@ function CommandPaletteInner({
                 tab: "mermaid",
               },
             }));
+          },
+        },
+        {
+          label: "AI tidy selection",
+          category: DEFAULT_CATEGORIES.tools,
+          icon: brainIconThin,
+          viewMode: false,
+          predicate: () => actionManager.isActionEnabled(actionAITidySelection),
+          perform: () => {
+            actionManager.executeAction(actionAITidySelection, "commandPalette");
           },
         },
         // {

@@ -1,4 +1,5 @@
 import {
+  AITidySelectionPlugin,
   DiagramToCodePlugin,
   exportToBlob,
   getTextFromElements,
@@ -98,6 +99,52 @@ export const AIComponents = ({
           } catch (error: any) {
             throw new Error("Generation failed (invalid response)");
           }
+        }}
+      />
+
+      <AITidySelectionPlugin
+        tidy={async ({ selectedElements, allElements, appState }) => {
+          const response = await fetch(
+            `${import.meta.env.VITE_APP_AI_BACKEND}/v1/ai/tidy-selection`,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                appState: {
+                  theme: appState.theme,
+                  gridModeEnabled: appState.gridModeEnabled,
+                  gridSize: appState.gridSize,
+                },
+                selectedElements,
+                allElements,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            const text = await response.text();
+            const errorJSON = safelyParseJSON(text);
+            throw new Error(errorJSON?.message || text || "AI tidy failed");
+          }
+
+          const parsed = safelyParseJSON(await response.text()) as
+            | {
+                positions?: {
+                  id: string;
+                  x: number;
+                  y: number;
+                }[];
+              }
+            | null;
+
+          if (!parsed?.positions?.length) {
+            throw new Error("AI tidy returned no positions");
+          }
+
+          return { positions: parsed.positions };
         }}
       />
 
