@@ -447,7 +447,7 @@ const matchHostname = (
     const bareDomain = hostname.replace(/^www\./, "");
 
     if (allowedHostnames instanceof Set) {
-      if (ALLOWED_DOMAINS.has(bareDomain)) {
+      if (allowedHostnames.has(bareDomain)) {
         return bareDomain;
       }
 
@@ -455,7 +455,7 @@ const matchHostname = (
         /^([^.]+)/,
         "*",
       );
-      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+      if (allowedHostnames.has(bareDomainWithFirstSubdomainWildcarded)) {
         return bareDomainWithFirstSubdomainWildcarded;
       }
       return null;
