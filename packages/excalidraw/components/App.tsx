@@ -4373,7 +4373,25 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    scrollToElements(this.state, elements, this.setState.bind(this), opts);
+    // Navigating to an element by id or element-link defaults to zooming the
+    // element into view, animated — matching the historical element-link
+    // behavior — unless the caller opts out.
+    const resolvedOpts =
+      typeof target === "string"
+        ? {
+            ...opts,
+            fitToViewport: undefined,
+            fitToContent: opts?.fitToContent ?? true,
+            animate: opts?.animate ?? true,
+          }
+        : opts;
+
+    scrollToElements(
+      this.state,
+      elements,
+      this.setState.bind(this),
+      resolvedOpts,
+    );
   };
 
   private maybeUnfollowRemoteUser = () => {

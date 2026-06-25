@@ -119,6 +119,34 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
 
+  it("should default to fitToContent when scrolling to an element by id", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 10;
+    h.state.height = 10;
+
+    const rectElement = API.createElement({
+      width: 50,
+      height: 100,
+      x: 50,
+      y: 100,
+    });
+
+    API.setElements([rectElement]);
+
+    expect(h.state.zoom.value).toBe(1);
+
+    act(() => {
+      // navigating by element id (a string target) should zoom-to-fit by
+      // default, even though no `fitToContent` option was passed
+      h.app.scrollToContent(rectElement.id, { animate: false });
+    });
+
+    // element is 10x taller than the viewport, so fit-to-content should
+    // drop the zoom to <= 1/10
+    expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
+  });
+
   it("should scroll the viewport to the selected element", async () => {
     await render(<Excalidraw />);
 
