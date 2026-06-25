@@ -145,6 +145,7 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
+import { ExcalidrawNewCanvas } from "./components/ExcalidrawNewCanvas";
 import { AppSidebar } from "./components/AppSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
@@ -959,6 +960,7 @@ const ExcalidrawWrapper = () => {
 
           return (
             <div className="excalidraw-ui-top-right">
+              <ExcalidrawNewCanvas />
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
