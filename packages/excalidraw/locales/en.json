@@ -253,6 +253,8 @@
     "cancel": "Cancel",
     "saveLibNames": "Save name(s) and exit",
     "clear": "Clear",
+    "showRedactedValue": "Show hidden value",
+    "hideRedactedValue": "Hide value",
     "remove": "Remove",
     "embed": "Toggle embedding",
     "publishLibrary": "Rename or publish",
