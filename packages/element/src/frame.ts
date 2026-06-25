@@ -720,8 +720,25 @@ export const updateFrameMembershipOfSelectedElements = <
   const elementsMap = arrayToMap(allElements);
 
   elementsToFilter.forEach((element) => {
+    if (!element.frameId) {
+      return;
+    }
+
+    const maybeFrame = elementsMap.get(element.frameId);
+    const frame =
+      maybeFrame && isFrameLikeElement(maybeFrame) ? maybeFrame : null;
+
     if (
-      element.frameId &&
+      elementsToFilter.size > 1 &&
+      frame &&
+      isElementInFrame(element, elementsMap, appState, {
+        targetFrame: frame,
+      })
+    ) {
+      return;
+    }
+
+    if (
       !isFrameLikeElement(element) &&
       !isElementInFrame(element, elementsMap, appState)
     ) {
