@@ -255,6 +255,8 @@ function Picker<T>({
       aria-label={label}
       side={"bottom"}
       align="start"
+      avoidCollisions
+      collisionPadding={10}
       sideOffset={12}
       alignOffset={12}
       style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
