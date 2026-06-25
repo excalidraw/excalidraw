@@ -500,7 +500,14 @@
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
       "copyPngToClipboard": "நகலகத்திற்கு நகலெடு"
-    }
+    },
+    "exportFrame": "Export frame",
+    "exportFrameButton": "Choose region…",
+    "exportFrameTooltip": "Close this dialog and drag on the canvas to select the rectangular area you want to export.",
+    "exportFrameInstructions": "Drag to draw the export region",
+    "exportFrameConfirm": "Choose how to export the selected region",
+    "exportFrameCancel": "Cancel",
+    "exportFrameTooSmall": "Selection is too small. Drag a larger area."
   },
   "encrypted": {
     "tooltip": "உம் சித்திரங்கள் இருமுனை மறையாக்கம் செய்யப்பட்டவையாதலால் எக்ஸ்கேலிட்ராவின் சேவையகங்கள் அவற்றை ஒருபோதும் பார்க்கா.",

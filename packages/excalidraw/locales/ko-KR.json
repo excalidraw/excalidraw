@@ -500,7 +500,14 @@
       "exportToPng": "",
       "exportToSvg": "",
       "copyPngToClipboard": "클립보드로 복사"
-    }
+    },
+    "exportFrame": "Export frame",
+    "exportFrameButton": "Choose region…",
+    "exportFrameTooltip": "Close this dialog and drag on the canvas to select the rectangular area you want to export.",
+    "exportFrameInstructions": "Drag to draw the export region",
+    "exportFrameConfirm": "Choose how to export the selected region",
+    "exportFrameCancel": "Cancel",
+    "exportFrameTooSmall": "Selection is too small. Drag a larger area."
   },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",

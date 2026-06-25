@@ -1,0 +1,93 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .ExportFrameOverlay__dimming {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .ExportFrameOverlay__interaction {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+    touch-action: none;
+    z-index: 2;
+  }
+
+  .ExportFrameOverlay__blocker {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    cursor: default;
+    background: transparent;
+  }
+
+  .ExportFrameOverlay__frameBorder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    border: 2px dashed var(--color-primary);
+    pointer-events: none;
+    border-radius: 2px;
+    z-index: 3;
+  }
+
+  .ExportFrameOverlay__hintIsland {
+    position: absolute;
+    bottom: calc(140px + 1rem);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background: var(--island-bg-color);
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary-color);
+    font-size: 0.9375rem;
+    font-family: Assistant, system-ui, sans-serif;
+    pointer-events: none;
+    z-index: 4;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    max-width: min(92vw, 480px);
+
+    text-align: center;
+    white-space: normal;
+
+    @include isMobile {
+      bottom: unset;
+      top: calc(4rem + var(--sal, 0px));
+      max-width: 90vw;
+    }
+  }
+
+  .ExportFrameOverlay__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    position: absolute;
+    bottom: calc(1rem + var(--sat, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 96vw;
+    z-index: 5;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+
+    button {
+      margin: 0;
+    }
+
+    @include isMobile {
+      flex-direction: column;
+      gap: 0.35rem;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

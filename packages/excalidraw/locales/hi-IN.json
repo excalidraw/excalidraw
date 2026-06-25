@@ -500,7 +500,14 @@
       "exportToPng": "पी-एन-जी",
       "exportToSvg": "एस-वी-जी",
       "copyPngToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ"
-    }
+    },
+    "exportFrame": "Export frame",
+    "exportFrameButton": "Choose region…",
+    "exportFrameTooltip": "Close this dialog and drag on the canvas to select the rectangular area you want to export.",
+    "exportFrameInstructions": "Drag to draw the export region",
+    "exportFrameConfirm": "Choose how to export the selected region",
+    "exportFrameCancel": "Cancel",
+    "exportFrameTooSmall": "Selection is too small. Drag a larger area."
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",

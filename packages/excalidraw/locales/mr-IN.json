@@ -500,7 +500,14 @@
       "exportToPng": "पीएनजी",
       "exportToSvg": "एसविज़ी",
       "copyPngToClipboard": "फळी वर कॉपी करा"
-    }
+    },
+    "exportFrame": "Export frame",
+    "exportFrameButton": "Choose region…",
+    "exportFrameTooltip": "Close this dialog and drag on the canvas to select the rectangular area you want to export.",
+    "exportFrameInstructions": "Drag to draw the export region",
+    "exportFrameConfirm": "Choose how to export the selected region",
+    "exportFrameCancel": "Cancel",
+    "exportFrameTooSmall": "Selection is too small. Drag a larger area."
   },
   "encrypted": {
     "tooltip": "तुमचे चित्रे या टोकापासून त्या टोकापर्यंत कूटबद्धतित आहेत, त्या कारणांनी ऐक्सकैलिड्रॉ सर्वर्स ह्यानां ते पहाणं कधीच जमणार नाही.",

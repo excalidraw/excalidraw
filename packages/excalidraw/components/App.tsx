@@ -447,6 +447,7 @@ import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import FollowMode from "./FollowMode/FollowMode";
+import { ExportFrameOverlay } from "./ExportFrameOverlay";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
@@ -2412,6 +2413,14 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
+                          {this.state.exportFrameMode !== "idle" && (
+                            <ExportFrameOverlay
+                              appState={this.state}
+                              elements={this.scene.getNonDeletedElements()}
+                              setAppState={this.setAppState}
+                              onExportImage={this.onExportImage}
+                            />
+                          )}
                           {this.state.userToFollow && (
                             <FollowMode
                               width={this.state.width}
@@ -2471,7 +2480,10 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: ExcalidrawFrameLikeElement | null },
+    opts: {
+      exportingFrame: ExcalidrawFrameLikeElement | null;
+      cropBounds?: [number, number, number, number] | null;
+    },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -2483,7 +2495,8 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: this.state.exportBackground,
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
-        exportingFrame: opts.exportingFrame,
+        exportingFrame: opts.cropBounds != null ? null : opts.exportingFrame,
+        cropBounds: opts.cropBounds ?? null,
       },
     )
       .catch(muteFSAbortError)
@@ -4779,6 +4792,18 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
+        if (
+          event.key === KEYS.ESCAPE &&
+          this.state.exportFrameMode !== "idle"
+        ) {
+          event.preventDefault();
+          this.setState({
+            exportFrameMode: "idle",
+            exportCropRegion: null,
+          });
+          return;
+        }
+
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
           this.state.croppingElementId

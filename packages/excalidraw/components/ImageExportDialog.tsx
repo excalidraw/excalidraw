@@ -58,6 +58,7 @@ type ImageExportModalProps = {
   files: BinaryFiles;
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
+  onStartExportCrop: () => void;
   name: string;
   exportWithDarkMode: boolean;
 };
@@ -68,6 +69,7 @@ const ImageExportModal = ({
   files,
   actionManager,
   onExportImage,
+  onStartExportCrop,
   name,
   exportWithDarkMode,
 }: ImageExportModalProps) => {
@@ -300,6 +302,20 @@ const ImageExportModal = ({
           />
         </ExportSetting>
 
+        <ExportSetting
+          label={t("imageExportDialog.exportFrame")}
+          tooltip={t("imageExportDialog.exportFrameTooltip")}
+          name="exportFrameAction"
+        >
+          <FilledButton
+            variant="outlined"
+            size="medium"
+            onClick={() => onStartExportCrop()}
+          >
+            {t("imageExportDialog.exportFrameButton")}
+          </FilledButton>
+        </ExportSetting>
+
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
@@ -391,6 +407,7 @@ export const ImageExportDialog = ({
   actionManager,
   onExportImage,
   onCloseRequest,
+  onStartExportCrop,
   name,
 }: {
   appState: UIAppState;
@@ -399,6 +416,7 @@ export const ImageExportDialog = ({
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
   onCloseRequest: () => void;
+  onStartExportCrop: () => void;
   name: string;
 }) => {
   // we need to take a snapshot so that the exported state can't be modified
@@ -418,6 +436,7 @@ export const ImageExportDialog = ({
         files={files}
         actionManager={actionManager}
         onExportImage={onExportImage}
+        onStartExportCrop={onStartExportCrop}
         name={name}
         exportWithDarkMode={appState.exportWithDarkMode}
       />

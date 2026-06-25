@@ -108,6 +108,7 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    cropBounds = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -116,6 +117,8 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
+    /** scene-space crop rectangle as minX, minY, maxX, maxY */
+    cropBounds?: [number, number, number, number] | null;
   },
 ) => {
   if (elements.length === 0) {
@@ -133,7 +136,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, cropBounds },
     );
 
     if (type === "svg") {
@@ -169,6 +172,7 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    cropBounds: cropBounds ?? undefined,
   });
 
   if (type === "png") {
