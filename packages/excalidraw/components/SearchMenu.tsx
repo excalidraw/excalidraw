@@ -804,9 +804,6 @@ const handleSearch = debounce(
       isFrameLikeElement(el),
     ) as ExcalidrawFrameLikeElement[];
 
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
-
     const textMatches: SearchMatchItem[] = [];
 
     const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
