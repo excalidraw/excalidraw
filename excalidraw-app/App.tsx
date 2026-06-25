@@ -116,10 +116,11 @@ import {
 
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { FileStatusStore } from "./data/fileStatusStore";
-import {
-  importFromLocalStorage,
-  importUsernameFromLocalStorage,
-} from "./data/localStorage";
+import { importUsernameFromLocalStorage } from "./data/localStorage";
+import { DocumentStore } from "./data/DocumentStore";
+import { ensureTabsReady } from "./data/tabsStore";
+import { activeTabIdAtom } from "./tabs-atoms";
+import { TabBar } from "./components/TabBar";
 
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
@@ -228,7 +229,15 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const localDataState = importFromLocalStorage();
+  await ensureTabsReady();
+  const activeTabId = appJotaiStore.get(activeTabIdAtom);
+  const activeDoc = activeTabId
+    ? await DocumentStore.loadDocument(activeTabId)
+    : null;
+  const localDataState = {
+    elements: activeDoc?.elements ?? [],
+    appState: activeDoc?.appState ?? null,
+  };
 
   let scene: Omit<
     RestoredDataState,
@@ -409,6 +418,8 @@ const ExcalidrawWrapper = () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const activeTabId = useAtomValue(activeTabIdAtom);
+  const previousActiveTabIdRef = useRef<string | null>(activeTabId);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -566,13 +577,23 @@ const ExcalidrawWrapper = () => {
       ) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
-          const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
           setLangCode(getPreferredLanguage());
-          excalidrawAPI.updateScene({
-            ...localDataState,
-            captureUpdate: CaptureUpdateAction.NEVER,
-          });
+          const activeTabId = appJotaiStore.get(activeTabIdAtom);
+          if (activeTabId) {
+            DocumentStore.loadDocument(activeTabId).then((doc) => {
+              if (!doc) {
+                return;
+              }
+              excalidrawAPI.updateScene({
+                elements: restoreElements(doc.elements, null, {
+                  repairBindings: true,
+                }),
+                appState: restoreAppState(doc.appState, null),
+                captureUpdate: CaptureUpdateAction.NEVER,
+              });
+            });
+          }
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
               excalidrawAPI.updateLibrary({
@@ -673,6 +694,99 @@ const ExcalidrawWrapper = () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     };
   }, [excalidrawAPI]);
+
+  // Swap the scene when the user switches tabs.
+  // The initial document is loaded by initializeScene; here we only react to
+  // subsequent activeTabId changes (e.g. clicking a tab, Cmd+T, etc).
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    const previousId = previousActiveTabIdRef.current;
+    if (previousId === activeTabId) {
+      return;
+    }
+    previousActiveTabIdRef.current = activeTabId;
+
+    if (collabAPI?.isCollaborating()) {
+      // Tab switching is disabled during collab; don't fight the room state.
+      // `activateTab` already acquired the "tabSwitch" lock — release it,
+      // otherwise saves would stay paused after collab ends because this
+      // effect's deps don't include `isCollaborating` and won't re-run.
+      LocalData.resumeSave("tabSwitch");
+      return;
+    }
+    if (!activeTabId) {
+      return;
+    }
+    // Skip the initial hydration after migration: initializeScene already
+    // resolves the promise with the right document and we'd otherwise double
+    // updateScene before the canvas has even rendered the first frame.
+    if (previousId === null) {
+      return;
+    }
+
+    // Flush any pending debounced save for the previous tab so its latest
+    // changes hit IDB before we load a different document, then pause saves
+    // so that onChange events fired between here and updateScene below
+    // don't accidentally write the old scene's contents into the new tab.
+    LocalData.flushSave();
+    LocalData.pauseSave("tabSwitch");
+
+    let cancelled = false;
+    DocumentStore.loadDocument(activeTabId).then((doc) => {
+      if (cancelled || !excalidrawAPI) {
+        // The cleanup below already released the "tabSwitch" lock for this
+        // effect run; releasing it again here would unlock the *next* run's
+        // pause and let onChange persist the previous tab's elements into
+        // the newly-activated tab.
+        return;
+      }
+      const elements = restoreElements(doc?.elements ?? [], null, {
+        repairBindings: true,
+      });
+      const appState = restoreAppState(doc?.appState ?? null, null);
+      excalidrawAPI.updateScene({
+        elements,
+        appState: { ...appState, isLoading: false },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      excalidrawAPI.history.clear();
+
+      // Load any image files referenced by the new scene from IDB.
+      const fileIds =
+        elements.reduce((acc, element) => {
+          if (isInitializedImageElement(element)) {
+            acc.push(element.fileId);
+          }
+          return acc;
+        }, [] as FileId[]) || [];
+      if (fileIds.length) {
+        LocalData.fileStorage
+          .getFiles(fileIds)
+          .then(({ loadedFiles, erroredFiles }) => {
+            if (cancelled) {
+              return;
+            }
+            if (loadedFiles.length) {
+              excalidrawAPI.addFiles(loadedFiles);
+            }
+            updateStaleImageStatuses({
+              excalidrawAPI,
+              erroredFiles,
+              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+            });
+          });
+      }
+
+      LocalData.resumeSave("tabSwitch");
+    });
+
+    return () => {
+      cancelled = true;
+      LocalData.resumeSave("tabSwitch");
+    };
+  }, [activeTabId, excalidrawAPI, collabAPI]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -900,13 +1014,17 @@ const ExcalidrawWrapper = () => {
     },
   };
 
+  const isTabBarHidden = isCollaborating || isCollabDisabled;
+
   return (
     <div
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
+        "has-tabbar": !isTabBarHidden,
       })}
     >
+      <TabBar hidden={isTabBarHidden} />
       <Excalidraw
         onChange={onChange}
         onExport={onExport}
