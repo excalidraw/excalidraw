@@ -101,7 +101,42 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-const MAX_ARROW_PX = 75_000;
+const MAX_LINEAR_PX = 75_000;
+
+// Last resort fix for extremely large linear elements (lines / arrows), which
+// would otherwise freeze the editor while rendering — e.g. a dotted or dashed
+// stroke spanning a huge distance generates an enormous dash array.
+// https://github.com/excalidraw/excalidraw/issues/11497
+const clampExtremelyLargeLinearElement = <
+  T extends {
+    id: string;
+    type: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  },
+>(
+  element: T,
+): T => {
+  if (element.width <= MAX_LINEAR_PX && element.height <= MAX_LINEAR_PX) {
+    return element;
+  }
+
+  console.error(
+    `Removing extremely large ${element.type} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
+  );
+
+  return {
+    ...element,
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+    isDeleted: true,
+  };
+};
 
 const restoreLinearElementPoints = (
   points: unknown,
@@ -560,7 +595,7 @@ export const restoreElement = (
           } as ExcalidrawLinearElement));
       }
 
-      return restoreElementWithProperties(element, {
+      const restoredLine = restoreElementWithProperties(element, {
         type: "line",
         startBinding: null,
         endBinding: null,
@@ -578,6 +613,8 @@ export const restoreElement = (
           : {}),
         ...getSizeFromPoints(points),
       });
+
+      return clampExtremelyLargeLinearElement(restoredLine);
     case "arrow": {
       const startArrowhead = normalizeArrowhead(element.startArrowhead);
       const endArrowhead =
@@ -644,37 +681,7 @@ export const restoreElement = (
         ),
       };
 
-      // Last resort fix for extremely large arrows
-      if (
-        normalizedRestoredElement.width > MAX_ARROW_PX ||
-        normalizedRestoredElement.height > MAX_ARROW_PX
-      ) {
-        console.error(
-          `Removing extremely large arrow ${
-            normalizedRestoredElement.id
-          } (type: ${
-            isElbowArrow(normalizedRestoredElement) ? "elbow" : "simple"
-          }, width: ${normalizedRestoredElement.width}, height: ${
-            normalizedRestoredElement.height
-          }, x: ${normalizedRestoredElement.x}, y: ${
-            normalizedRestoredElement.y
-          })`,
-        );
-        return {
-          ...normalizedRestoredElement,
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 100,
-          points: [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(100, 100),
-          ],
-          isDeleted: true,
-        };
-      }
-
-      return normalizedRestoredElement;
+      return clampExtremelyLargeLinearElement(normalizedRestoredElement);
     }
 
     // generic elements
