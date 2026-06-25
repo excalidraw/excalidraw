@@ -1,4 +1,4 @@
-import { ORIG_ID } from "@excalidraw/common";
+import { DEFAULT_GRID_SIZE, ORIG_ID } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
@@ -528,4 +528,56 @@ describe("actionDuplicateSelection", () => {
       ]);
     });
   });
+
+  describe("grid-aligned duplication", () => {
+    it("should offset duplicated elements by grid size when grid mode is enabled", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 40,
+        y: 60,
+      });
+
+      API.setElements([rectangle]);
+      API.setSelectedElements([rectangle]);
+      API.setAppState({ gridModeEnabled: true });
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const gridSize = h.state.gridSize;
+      const duplicated = h.elements.find(
+        (el) => el.id !== rectangle.id && el.type === "rectangle",
+      );
+      expect(duplicated).toBeDefined();
+      // When grid mode is enabled, the duplicate should be offset by gridSize
+      // (not DEFAULT_GRID_SIZE / 2), so it remains grid-aligned
+      expect(duplicated!.x).toBe(rectangle.x + gridSize);
+      expect(duplicated!.y).toBe(rectangle.y + gridSize);
+    });
+
+    it("should offset duplicated elements by DEFAULT_GRID_SIZE / 2 when grid mode is disabled", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 40,
+        y: 60,
+      });
+
+      API.setElements([rectangle]);
+      API.setSelectedElements([rectangle]);
+      API.setAppState({ gridModeEnabled: false });
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const duplicated = h.elements.find(
+        (el) => el.id !== rectangle.id && el.type === "rectangle",
+      );
+      expect(duplicated).toBeDefined();
+      expect(duplicated!.x).toBe(rectangle.x + DEFAULT_GRID_SIZE / 2);
+      expect(duplicated!.y).toBe(rectangle.y + DEFAULT_GRID_SIZE / 2);
+    });
+  });
+
 });
