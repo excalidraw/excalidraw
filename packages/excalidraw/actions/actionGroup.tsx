@@ -66,6 +66,28 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   return false;
 };
 
+// Returns true if all selected elements are just bound text containers
+// paired with their bound text (i.e., no independent elements to group).
+const onlyBoundPairsSelected = (
+  selectedElements: readonly ExcalidrawElement[],
+) => {
+  const selectedIds = new Set(selectedElements.map((el) => el.id));
+  let independentCount = 0;
+
+  for (const element of selectedElements) {
+    if (isBoundToContainer(element)) {
+      // Bound text only counts as independent if its container isn't selected
+      if (!selectedIds.has((element as ExcalidrawTextElement).containerId!)) {
+        independentCount++;
+      }
+    } else {
+      independentCount++;
+    }
+  }
+
+  return independentCount < 2;
+};
+
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -79,7 +101,8 @@ const enableActionGroup = (
   return (
     selectedElements.length >= 2 &&
     !allElementsInSameGroup(selectedElements) &&
-    !frameAndChildrenSelectedTogether(selectedElements)
+    !frameAndChildrenSelectedTogether(selectedElements) &&
+    !onlyBoundPairsSelected(selectedElements)
   );
 };
 
