@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Najít na plátně",
+    "resultsRegion": "Výsledky vyhledávání na plátně",
     "noMatch": "Nebyla nalezena žádná shoda...",
     "singleResult": "výsledek",
     "multipleResults": "výsledky",

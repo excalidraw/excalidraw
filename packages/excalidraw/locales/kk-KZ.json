@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Кенбеңдегі іздеу нәтижелері",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

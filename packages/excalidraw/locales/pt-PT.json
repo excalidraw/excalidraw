@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Pesquisar na área de desenho",
+    "resultsRegion": "Resultados da pesquisa na tela",
     "noMatch": "Não foram encontrados resultados...",
     "singleResult": "resultado",
     "multipleResults": "resultados",

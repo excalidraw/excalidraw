@@ -212,6 +212,7 @@
   },
   "search": {
     "title": "Find on canvas",
+    "resultsRegion": "Canvas search results",
     "noMatch": "No matches found...",
     "singleResult": "result",
     "multipleResults": "results",

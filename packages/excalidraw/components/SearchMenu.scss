@@ -2,10 +2,20 @@
 
 .excalidraw {
   .layer-ui__search {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     padding: 8px 0 0 0;
+  }
+
+  .layer-ui__search-results-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .layer-ui__search-header {
@@ -60,8 +70,7 @@
   }
 
   .layer-ui__search-result-container {
-    overflow-y: auto;
-    flex: 1 1 0;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     padding: 0 0.75rem;

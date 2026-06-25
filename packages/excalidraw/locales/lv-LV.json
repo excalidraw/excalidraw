@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Meklēšanas rezultāti audeklī",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

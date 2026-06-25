@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "캔버스에서 찾기",
+    "resultsRegion": "캔버스 검색 결과",
     "noMatch": "결과를 찾을 수 없습니다...",
     "singleResult": "개의 결과",
     "multipleResults": "개의 결과",

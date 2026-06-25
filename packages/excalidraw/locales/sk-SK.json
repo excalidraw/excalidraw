@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Vyhľadať v plátne",
+    "resultsRegion": "Výsledky vyhľadávania v plátne",
     "noMatch": "Neboli nájdené žiadne výsledky...",
     "singleResult": "výsledok",
     "multipleResults": "výsledky",

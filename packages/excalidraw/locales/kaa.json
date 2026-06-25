@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Canvas search results",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

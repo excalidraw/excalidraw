@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "在画布上查找",
+    "resultsRegion": "画布搜索结果",
     "noMatch": "无匹配项…",
     "singleResult": "结果",
     "multipleResults": "结果",

@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Paieškos rezultatai drobėje",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

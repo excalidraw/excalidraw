@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Tuvalde bul",
+    "resultsRegion": "Tuval arama sonuçları",
     "noMatch": "Sonuç bulunamadı...",
     "singleResult": "sonuç",
     "multipleResults": "sonuç",

@@ -99,6 +99,7 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+    min-height: 0;
     padding: 1rem 0;
 
     [role="tabpanel"] {
@@ -106,6 +107,7 @@
       outline: none;
 
       flex: 1 1 auto;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       outline: none;

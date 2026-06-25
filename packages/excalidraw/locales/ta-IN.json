@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "கன்வாஸில் தேடு",
+    "resultsRegion": "கன்வாஸ் தேடல் முடிவுகள்",
     "noMatch": "பொருத்தங்கள் எதுவும் இல்லை...",
     "singleResult": "முடிவு",
     "multipleResults": "முடிவுகள்",
