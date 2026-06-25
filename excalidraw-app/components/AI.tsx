@@ -42,7 +42,7 @@ export const AIComponents = ({
 
           const response = await fetch(
             `${
-              import.meta.env.VITE_APP_AI_BACKEND
+              (window.EXCALIDRAW_ENV?.VITE_APP_AI_BACKEND || import.meta.env.VITE_APP_AI_BACKEND)
             }/v1/ai/diagram-to-code/generate`,
             {
               method: "POST",
@@ -75,7 +75,7 @@ export const AIComponents = ({
                   </br>
                   </br>
                   <div>You can also try <a href="${
-                    import.meta.env.VITE_APP_PLUS_LP
+                    (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
                   }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noopener">Excalidraw+</a> to get more requests.</div>
                 </div>
                 </body>
@@ -107,7 +107,7 @@ export const AIComponents = ({
 
           const result = await TTDStreamFetch({
             url: `${
-              import.meta.env.VITE_APP_AI_BACKEND
+              (window.EXCALIDRAW_ENV?.VITE_APP_AI_BACKEND || import.meta.env.VITE_APP_AI_BACKEND)
             }/v1/ai/text-to-diagram/chat-streaming`,
             messages,
             onChunk,

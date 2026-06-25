@@ -729,7 +729,7 @@ const drawElementFromCanvas = (
     );
 
     if (
-      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+      (window.EXCALIDRAW_ENV?.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX || import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX) ===
         "true" &&
       hasBoundTextElement(element)
     ) {
