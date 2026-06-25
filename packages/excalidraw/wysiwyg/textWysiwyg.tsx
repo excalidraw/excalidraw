@@ -627,6 +627,35 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    if (event.key === KEYS.ENTER && !event.shiftKey && !event[KEYS.CTRL_OR_CMD]) {
+      const { selectionStart, selectionEnd, value } = editable;
+      const line = value.substring(
+        value.lastIndexOf("\n", selectionStart - 1) + 1,
+        selectionStart,
+      );
+      const match = line.match(/^(\s*\*\s)/);
+
+      if (match) {
+        event.preventDefault();
+        if (line.trim() === "*") {
+          const prevLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+          editable.value =
+            value.substring(0, prevLineStart) + value.substring(selectionStart);
+          editable.selectionStart = editable.selectionEnd = prevLineStart;
+          editable.dispatchEvent(new Event("input"));
+          return;
+        }
+
+        const insert = `\n${match[1]}`;
+        editable.value =
+          value.slice(0, selectionStart) + insert + value.slice(selectionEnd);
+        editable.selectionStart = editable.selectionEnd =
+          selectionStart + insert.length;
+        editable.dispatchEvent(new Event("input"));
+        return;
+      }
+    }
+
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
