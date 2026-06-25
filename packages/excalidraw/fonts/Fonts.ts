@@ -8,7 +8,7 @@ import {
 } from "@excalidraw/common";
 import { getContainerElement } from "@excalidraw/element";
 import { charWidth } from "@excalidraw/element";
-import { containsCJK } from "@excalidraw/element";
+import { containsCJK, containsEmoji } from "@excalidraw/element";
 
 import {
   FONT_METADATA,
@@ -195,6 +195,24 @@ export class Fonts {
         // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
         // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
         families.unshift(FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT]);
+      }
+    }
+    // Check for Emoji fallback
+    const familyWithEmoji = families.find((x) =>
+      getFontFamilyFallbacks(x).includes(WINDOWS_EMOJI_FALLBACK_FONT),
+    );
+
+    if (familyWithEmoji) {
+      const characters = Fonts.getCharacters(charsPerFamily, familyWithEmoji);
+
+      if (containsEmoji(characters)) {
+        const family = FONT_FAMILY_FALLBACKS[WINDOWS_EMOJI_FALLBACK_FONT];
+
+        // Adding the characters to the Emoji fallback family
+        charsPerFamily[family] = new Set(characters);
+
+        // Put the Emoji font at the front of the list
+        families.unshift(FONT_FAMILY_FALLBACKS[WINDOWS_EMOJI_FALLBACK_FONT]);
       }
     }
 
