@@ -4361,14 +4361,14 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!elements.length) {
       if (typeof target === "string" && isElementLink(target)) {
+        this.setState({
+          toast: {
+            message: t("elementLink.notFound"),
+            duration: 3000,
+            closable: true,
+          },
+        });
       }
-      this.setState({
-        toast: {
-          message: t("elementLink.notFound"),
-          duration: 3000,
-          closable: true,
-        },
-      });
 
       return;
     }
