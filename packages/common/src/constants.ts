@@ -257,6 +257,8 @@ export const STRING_MIME_TYPES = {
   excalidrawlib: "application/vnd.excalidrawlib+json",
   // list of excalidraw library item ids
   excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
+  // list of excalidraw shape template ids
+  excalidrawTemplateIds: "application/vnd.excalidraw-template.ids+json",
 } as const;
 
 export const MIME_TYPES = {
@@ -286,6 +288,7 @@ export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
   excalidrawClipboard: "excalidraw/clipboard",
   excalidrawLibrary: "excalidrawlib",
+  excalidrawTemplates: "excalidraw-templates",
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
@@ -352,6 +355,7 @@ export const ENCRYPTION_KEY_BITS = 128;
 export const VERSIONS = {
   excalidraw: 2,
   excalidrawLibrary: 2,
+  excalidrawTemplates: 1,
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
@@ -468,6 +472,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
+export const TEMPLATES_SIDEBAR_TAB = "templates";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
@@ -505,6 +510,7 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  SHAPE_TEMPLATES: "excalidraw-shape-templates",
 } as const;
 
 /**

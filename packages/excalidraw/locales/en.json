@@ -199,6 +199,28 @@
     "desc": "Click on a shape on canvas or paste a link.",
     "notFound": "Linked object wasn't found on canvas."
   },
+  "shapeTemplates": {
+    "hint": "Drag a template onto the canvas or click to insert at center.",
+    "empty": "No shape templates available.",
+    "searchPlaceholder": "Search templates",
+    "tabsLabel": "Shape templates sections",
+    "recent": "Recent",
+    "favorites": "Favorites",
+    "emptyFavorites": "Star templates to add favorites.",
+    "emptySearch": "No templates match your search.",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites"
+  },
+  "shapePanel": {
+    "searchPlaceholder": "Search tools",
+    "tabsLabel": "Shape panel sections",
+    "recent": "Recent",
+    "favorites": "Favorites",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "emptyFavorites": "Star tools to add favorites.",
+    "emptySearch": "No tools match your search."
+  },
   "library": {
     "noItems": "No items added yet...",
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
