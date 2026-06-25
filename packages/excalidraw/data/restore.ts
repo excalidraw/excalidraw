@@ -107,24 +107,20 @@ const MAX_LINEAR_PX = 75_000;
 // would otherwise freeze the editor while rendering — e.g. a dotted or dashed
 // stroke spanning a huge distance generates an enormous dash array.
 // https://github.com/excalidraw/excalidraw/issues/11497
-const clampExtremelyLargeLinearElement = <
-  T extends {
-    id: string;
-    type: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  },
->(
+const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
   element: T,
 ): T => {
   if (element.width <= MAX_LINEAR_PX && element.height <= MAX_LINEAR_PX) {
     return element;
   }
 
+  const label =
+    element.type === "arrow"
+      ? `${isElbowArrow(element) ? "elbow" : "simple"} arrow`
+      : element.type;
+
   console.error(
-    `Removing extremely large ${element.type} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
+    `Removing extremely large ${label} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
   );
 
   return {
@@ -614,7 +610,7 @@ export const restoreElement = (
         ...getSizeFromPoints(points),
       });
 
-      return clampExtremelyLargeLinearElement(restoredLine);
+      return handleOversizedLinearElements(restoredLine);
     case "arrow": {
       const startArrowhead = normalizeArrowhead(element.startArrowhead);
       const endArrowhead =
@@ -681,7 +677,7 @@ export const restoreElement = (
         ),
       };
 
-      return clampExtremelyLargeLinearElement(normalizedRestoredElement);
+      return handleOversizedLinearElements(normalizedRestoredElement);
     }
 
     // generic elements
