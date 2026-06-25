@@ -296,6 +296,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     frameRendering?: AppState["frameRendering"];
+    name?: string | null;
   },
   files: BinaryFiles | null,
   opts?: {
@@ -363,6 +364,13 @@ export const exportToSvg = async (
 
   svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
+
+  if (appState.name) {
+    const titleElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "title");
+    titleElement.textContent = appState.name;
+    svgRoot.appendChild(titleElement);
+  }
+
   svgRoot.appendChild(defsElement);
 
   // ---------------------------------------------------------------------------
