@@ -44,10 +44,19 @@ import { register } from "./register";
 
 import type { AppState } from "../types";
 
-type FormData = {
-  event: PointerEvent;
-  sceneCoords: { x: number; y: number };
-};
+type FormData =
+  | {
+      event: PointerEvent;
+      sceneCoords: { x: number; y: number };
+    }
+  | Pick<KeyboardEvent, "key">;
+
+const isKeyboardFormData = (
+  data: FormData | undefined,
+): data is Pick<KeyboardEvent, "key"> => !!data && "key" in data;
+
+const isEscapeKey = (data: FormData | undefined) =>
+  isKeyboardFormData(data) && data.key === KEYS.ESCAPE;
 
 export const actionFinalize = register<FormData>({
   name: "finalize",
@@ -59,7 +68,7 @@ export const actionFinalize = register<FormData>({
     const { interactiveCanvas, focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    if (data && appState.selectedLinearElement) {
+    if (data && !isKeyboardFormData(data) && appState.selectedLinearElement) {
       const { event, sceneCoords } = data;
       const element = LinearElementEditor.getElement(
         appState.selectedLinearElement.elementId,
@@ -210,6 +219,37 @@ export const actionFinalize = register<FormData>({
     }
 
     if (element) {
+      if (
+        isEscapeKey(data) &&
+        appState.newElement &&
+        appState.multiElement?.id === appState.newElement.id
+      ) {
+        return {
+          elements: newElements.map((el) => {
+            if (el.id === appState.newElement?.id) {
+              return newElementWith(el, { isDeleted: true });
+            }
+            return el;
+          }),
+          appState: {
+            ...appState,
+            cursorButton: "up",
+            activeTool: appState.activeTool.locked
+              ? appState.activeTool
+              : updateActiveTool(appState, {
+                  type: app.state.preferredSelectionTool.type,
+                }),
+            selectedElementIds: {},
+            selectedLinearElement: null,
+            newElement: null,
+            multiElement: null,
+            selectionElement: null,
+            suggestedBinding: null,
+          },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+
       // pen and mouse have hover
       if (
         appState.selectedLinearElement &&

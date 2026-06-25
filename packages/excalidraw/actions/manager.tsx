@@ -119,13 +119,13 @@ export class ActionManager {
 
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
-    const value = null;
+    const value = action.name === "finalize" ? event : null;
 
-    trackAction(action, "keyboard", appState, elements, this.app, null);
+    trackAction(action, "keyboard", appState, elements, this.app, value);
 
     event.preventDefault();
     event.stopPropagation();
-    this.updater(data[0].perform(elements, appState, value, this.app));
+    this.updater(action.perform(elements, appState, value, this.app));
     return true;
   }
 
