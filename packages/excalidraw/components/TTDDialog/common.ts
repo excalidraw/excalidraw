@@ -15,9 +15,35 @@ import type {
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element/transform";
+
 import type { MermaidToExcalidrawLibProps } from "./types";
 
 import type { AppClassProperties, BinaryFiles } from "../../types";
+
+const BR_TAG_RE = /<br\s*\/?>/gi;
+
+/**
+ * Replaces `<br>` / `<br/>` / `<br />` tags with newlines in Mermaid
+ * skeleton element text, since Mermaid supports them for multiline
+ * labels but Excalidraw renders them as literal text.
+ */
+export const sanitizeMermaidElementText = (
+  elements: ExcalidrawElementSkeleton[],
+): ExcalidrawElementSkeleton[] =>
+  elements.map((el) => {
+    const result = { ...el } as any;
+    if ("text" in result && typeof result.text === "string") {
+      result.text = result.text.replace(BR_TAG_RE, "\n");
+    }
+    if (result.label?.text) {
+      result.label = {
+        ...result.label,
+        text: result.label.text.replace(BR_TAG_RE, "\n"),
+      };
+    }
+    return result;
+  });
 
 export const resetPreview = ({
   canvasRef,
@@ -98,9 +124,10 @@ export const convertMermaidToExcalidraw = async ({
     setError(null);
 
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
-        regenerateIds: true,
-      }),
+      elements: convertToExcalidrawElements(
+        sanitizeMermaidElementText(elements),
+        { regenerateIds: true },
+      ),
       files,
     };
 
