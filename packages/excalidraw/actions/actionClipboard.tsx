@@ -13,7 +13,13 @@ import {
   probablySupportsClipboardWriteText,
   readSystemClipboard,
 } from "../clipboard";
-import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import {
+  DuplicateIcon,
+  cutIcon,
+  pngIcon,
+  svgIcon,
+  ExportIcon,
+} from "../components/icons";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { t } from "../i18n";
 
@@ -249,6 +255,86 @@ export const actionCopyAsPng = register({
   },
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
   keywords: ["png", "clipboard", "copy"],
+});
+
+export const imageExport = register({
+  name: "imageExport",
+  label: "labels.imageExport",
+  icon: ExportIcon,
+  trackEvent: { category: "element" },
+
+  perform: async (elements, appState, _data, app) => {
+    // If canvas not ready, defer execution
+    if (!app.canvas) {
+      return {
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+
+    // Get selected elements including bound text and frames
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+
+    // If no selection, show toast and exit early
+    if (selectedElements.length === 0) {
+      return {
+        appState: {
+          ...appState,
+          toast: {
+            message: t("toast.exportSelction"),
+          },
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+
+    // Prepare elements for export (only selection)
+    const { exportedElements, exportingFrame } = prepareElementsForExport(
+      elements,
+      appState,
+      true,
+    );
+
+    try {
+      // Export as PNG
+      await exportCanvas("png", exportedElements, appState, app.files, {
+        ...appState,
+        exportingFrame,
+        name: app.getName(),
+      });
+
+      // Show success toast
+      return {
+        appState: {
+          ...appState,
+          toast: {
+            message: t("toast.exportSelction"),
+          },
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    } catch (error: any) {
+      console.error(error);
+
+      // Show error message
+      return {
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+  },
+
+  predicate: (elements) => elements.length > 0,
+
+  keyTest: (event) => event.code === KEYS.E && event.altKey && event.shiftKey,
+
+  keywords: ["export", "selection", "download", "png", "image"],
 });
 
 export const copyText = register({
