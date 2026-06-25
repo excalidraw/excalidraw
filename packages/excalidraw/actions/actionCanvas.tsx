@@ -613,3 +613,20 @@ export const actionToggleHandTool = register({
   keyTest: (event) =>
     !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
+
+export const actionPurgeDeletedElements = register({
+  name: "purgeDeletedElements",
+  label: "buttons.purgeDeletedItems",
+  trackEvent: { category: "canvas" },
+  perform: (elements, appState) => {
+    return {
+      elements: elements.filter((element) => !element.isDeleted),
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+});

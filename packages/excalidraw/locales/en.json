@@ -97,6 +97,7 @@
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "clearCanvas": "Clear canvas",
+    "purgeDeletedItemsTooltip": "Removes elements marked as deleted to reduce file size",
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
@@ -221,6 +222,7 @@
   },
   "buttons": {
     "clearReset": "Reset the canvas",
+    "purgeDeletedItems": "Purge deleted items",
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
@@ -466,6 +468,11 @@
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
+  },
+  "purgeDeletedItemsDialog": {
+    "title": "Purge deleted items",
+    "description": "This will permanently remove all deleted elements from the file. This action cannot be undone: your undo/redo history will be cleared.",
+    "confirm": "Purge"
   },
   "publishDialog": {
     "title": "Publish library",
