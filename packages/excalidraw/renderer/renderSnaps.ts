@@ -19,8 +19,6 @@ export const renderSnaps = (
   }
 
   // in dark mode, we need to adjust the color to account for color inversion.
-  // Don't change if zen mode, because we draw only crosses, we want the
-  // colors to be more visible
   const snapColor =
     appState.theme === THEME.LIGHT || appState.zenModeEnabled
       ? SNAP_COLOR_LIGHT
