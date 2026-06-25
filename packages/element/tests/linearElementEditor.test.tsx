@@ -155,6 +155,24 @@ describe("Test Linear Elements", () => {
     });
   };
 
+  const dragMove = (startPoint: GlobalPoint, endPoint: GlobalPoint) => {
+    fireEvent.pointerDown(interactiveCanvas, {
+      clientX: startPoint[0],
+      clientY: startPoint[1],
+    });
+    fireEvent.pointerMove(interactiveCanvas, {
+      clientX: endPoint[0],
+      clientY: endPoint[1],
+    });
+  };
+
+  const dragEnd = (endPoint: GlobalPoint) => {
+    fireEvent.pointerUp(interactiveCanvas, {
+      clientX: endPoint[0],
+      clientY: endPoint[1],
+    });
+  };
+
   const deletePoint = (point: GlobalPoint) => {
     fireEvent.pointerDown(interactiveCanvas, {
       clientX: point[0],
@@ -256,6 +274,73 @@ describe("Test Linear Elements", () => {
 
     expect(h.state.selectedLinearElement?.isEditing).toBe(true);
     expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("shows snap lines and snaps the endpoint when creating a line", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 40,
+      height: 40,
+    });
+    API.setElements([rect]);
+    API.setAppState({ objectsSnapModeEnabled: true });
+
+    UI.clickTool("line");
+
+    const startPoint = pointFrom<GlobalPoint>(20, 20);
+    const pointerNearCorner = pointFrom<GlobalPoint>(95, 95);
+
+    dragMove(startPoint, pointerNearCorner);
+
+    expect(h.state.snapLines.length).toBeGreaterThan(0);
+
+    dragEnd(pointerNearCorner);
+
+    const line = h.elements.find(
+      (element): element is ExcalidrawLinearElement => element.type === "line",
+    );
+
+    expect(line).toBeDefined();
+
+    const endpoint = LinearElementEditor.getPointGlobalCoordinates(
+      line!,
+      line!.points[line!.points.length - 1],
+      h.app.scene.getNonDeletedElementsMap(),
+    );
+
+    expect(endpoint).toEqual(pointFrom<GlobalPoint>(100, 100));
+  });
+
+  it("prefers binding over external snaps when creating an arrow endpoint", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 40,
+      height: 40,
+    });
+    API.setElements([rect]);
+    API.setAppState({ objectsSnapModeEnabled: true });
+
+    UI.clickTool("arrow");
+
+    const startPoint = pointFrom<GlobalPoint>(20, 20);
+    const pointerNearBindable = pointFrom<GlobalPoint>(96, 118);
+
+    dragMove(startPoint, pointerNearBindable);
+
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.snapLines).toEqual([]);
+
+    dragEnd(pointerNearBindable);
+
+    const arrow = h.elements.find(
+      (element): element is ExcalidrawLinearElement => element.type === "arrow",
+    );
+
+    expect(arrow?.endBinding?.elementId).toBe(rect.id);
   });
 
   it("should enter line editor via enter (line)", () => {
@@ -399,6 +484,77 @@ describe("Test Linear Elements", () => {
           ],
         ]
       `);
+    });
+
+    it("shows snap lines when dragging a point to another line point axis", () => {
+      const line = API.createElement({
+        type: "line",
+        x: 20,
+        y: 20,
+        width: 100,
+        height: 50,
+        roughness: 0,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+        ],
+      });
+
+      API.setElements([line]);
+      API.setAppState({ objectsSnapModeEnabled: true });
+      enterLineEditingMode(line);
+
+      const middlePoint = pointFrom<GlobalPoint>(70, 70);
+      const pointerNearEndPointX = pointFrom<GlobalPoint>(117, 65);
+
+      dragMove(middlePoint, pointerNearEndPointX);
+
+      expect(h.state.snapLines.length).toBeGreaterThan(0);
+
+      dragEnd(pointerNearEndPointX);
+
+      expect(API.getElement(line).points[1]).toEqual(
+        pointFrom<LocalPoint>(100, 45),
+      );
+    });
+
+    it("prefers binding over external snaps when dragging an existing arrow endpoint", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 40,
+        height: 40,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 20,
+        y: 20,
+        width: 40,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(40, 0)],
+      });
+
+      API.setElements([rect, arrow]);
+      API.setAppState({ objectsSnapModeEnabled: true });
+      enterLineEditingMode(arrow);
+
+      const endPoint = LinearElementEditor.getPointGlobalCoordinates(
+        arrow,
+        arrow.points[arrow.points.length - 1],
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+      const pointerNearBindable = pointFrom<GlobalPoint>(96, 118);
+
+      dragMove(endPoint, pointerNearBindable);
+
+      expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+      expect(h.state.snapLines).toEqual([]);
+
+      dragEnd(pointerNearBindable);
+
+      expect(API.getElement(arrow).endBinding?.elementId).toBe(rect.id);
     });
 
     it("should update the midpoints when element roundness changed", async () => {

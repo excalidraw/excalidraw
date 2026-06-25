@@ -3,6 +3,7 @@ import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
 import {
   isFlowchartNodeElement,
   isImageElement,
+  isGridModeEnabled,
   isLinearElement,
   isLineElement,
   isTextBindableContainer,
@@ -16,7 +17,6 @@ import type { EditorInterface } from "@excalidraw/common";
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
-import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
 

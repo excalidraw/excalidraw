@@ -242,6 +242,16 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  isGridModeEnabled,
+  SnapCache,
+  isActiveToolNonLinearSnappable,
+  getSnapLinesAtPointer,
+  isSnappingEnabled,
+  getReferenceSnapPoints,
+  getVisibleGaps,
+  snapDraggedElements,
+  snapNewElement,
+  snapResizingElements,
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
@@ -400,18 +410,6 @@ import {
 import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
-import {
-  getSnapLinesAtPointer,
-  snapDraggedElements,
-  isActiveToolNonLinearSnappable,
-  snapNewElement,
-  snapResizingElements,
-  isSnappingEnabled,
-  getVisibleGaps,
-  getReferenceSnapPoints,
-  SnapCache,
-  isGridModeEnabled,
-} from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
   setEraserCursor,
@@ -787,6 +785,29 @@ class App extends React.Component<AppProps, AppState> {
       onEvent: this.onEvent,
     };
     return api;
+  }
+
+  private withStableSnapLines<T extends { snapLines: AppState["snapLines"] }>(
+    state: T,
+  ): T {
+    const snapLines = updateStable(this.state.snapLines, state.snapLines);
+
+    return snapLines === state.snapLines
+      ? state
+      : {
+          ...state,
+          snapLines,
+        };
+  }
+
+  private shouldUpdateSelectedLinearElementState(
+    selectedLinearElement: AppState["selectedLinearElement"],
+    snapLines: AppState["snapLines"],
+  ) {
+    return (
+      selectedLinearElement !== this.state.selectedLinearElement ||
+      snapLines !== this.state.snapLines
+    );
   }
 
   constructor(props: AppProps) {
@@ -7000,7 +7021,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       !this.state.newElement &&
-      isActiveToolNonLinearSnappable(this.state.activeTool.type)
+      (isActiveToolNonLinearSnappable(this.state.activeTool.type) ||
+        ((this.state.activeTool.type === "line" ||
+          this.state.activeTool.type === "arrow") &&
+          this.state.currentItemArrowType !== ARROW_TYPE.elbow))
     ) {
       const { originOffset, snapLines } = getSnapLinesAtPointer(
         this.scene.getNonDeletedElements(),
@@ -7049,7 +7073,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedLinearElement?.isEditing &&
       !this.state.selectedLinearElement.isDragging
     ) {
-      const editingLinearElement = this.state.newElement
+      const result = this.state.newElement
         ? null
         : LinearElementEditor.handlePointerMoveInEditMode(
             event,
@@ -7058,18 +7082,33 @@ class App extends React.Component<AppProps, AppState> {
             this,
           );
 
-      if (
-        editingLinearElement &&
-        editingLinearElement !== this.state.selectedLinearElement
-      ) {
-        // Since we are reading from previous state which is not possible with
-        // automatic batching in React 18 hence using flush sync to synchronously
-        // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
-        flushSync(() => {
-          this.setState({
-            selectedLinearElement: editingLinearElement,
-          });
+      if (result) {
+        const { editingLinearElement, snapLines } = result;
+        const nextState = this.withStableSnapLines({
+          selectedLinearElement: editingLinearElement,
+          snapLines,
         });
+
+        if (
+          editingLinearElement &&
+          this.shouldUpdateSelectedLinearElementState(
+            nextState.selectedLinearElement,
+            nextState.snapLines,
+          )
+        ) {
+          // Since we are reading from previous state which is not possible with
+          // automatic batching in React 18 hence using flush sync to synchronously
+          // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+          flushSync(() => {
+            this.setState(nextState);
+          });
+        }
+        if (
+          editingLinearElement.lastUncommittedPoint == null &&
+          this.state.suggestedBinding
+        ) {
+          this.setState({ suggestedBinding: null });
+        }
       }
     }
 
@@ -9926,25 +9965,27 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.lastCoords.x = pointerCoords.x;
             pointerDownState.lastCoords.y = pointerCoords.y;
             pointerDownState.drag.hasOccurred = true;
+            const nextState = this.withStableSnapLines(newState);
 
             // NOTE: Optimize setState calls because it
             // affects history and performance
             if (
-              newState.suggestedBinding !== this.state.suggestedBinding ||
+              nextState.suggestedBinding !== this.state.suggestedBinding ||
               !isShallowEqual(
-                newState.selectedLinearElement?.selectedPointsIndices ?? [],
+                nextState.selectedLinearElement?.selectedPointsIndices ?? [],
                 this.state.selectedLinearElement?.selectedPointsIndices ?? [],
               ) ||
-              newState.selectedLinearElement?.hoverPointIndex !==
+              nextState.selectedLinearElement?.hoverPointIndex !==
                 this.state.selectedLinearElement?.hoverPointIndex ||
-              newState.selectedLinearElement?.customLineAngle !==
+              nextState.selectedLinearElement?.customLineAngle !==
                 this.state.selectedLinearElement?.customLineAngle ||
               this.state.selectedLinearElement.isDragging !==
-                newState.selectedLinearElement?.isDragging ||
+                nextState.selectedLinearElement?.isDragging ||
               this.state.selectedLinearElement?.initialState?.altFocusPoint !==
-                newState.selectedLinearElement?.initialState?.altFocusPoint
+                nextState.selectedLinearElement?.initialState?.altFocusPoint ||
+              nextState.snapLines !== this.state.snapLines
             ) {
-              this.setState(newState);
+              this.setState(nextState);
             }
 
             return;
@@ -10650,8 +10691,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lassoTrail.endPath();
       this.previousPointerMoveCoords = null;
 
-      SnapCache.setReferenceSnapPoints(null);
-      SnapCache.setVisibleGaps(null);
+      SnapCache.destroy();
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
