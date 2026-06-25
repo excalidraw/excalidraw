@@ -1,0 +1,57 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.shared-link-deferred-notice {
+  pointer-events: auto;
+  position: absolute;
+  top: 6.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--zIndex-layerUI);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  max-width: min(36rem, calc(100% - 2rem));
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  text-align: center;
+  border-radius: var(--border-radius-md);
+  background-color: var(--island-bg-color);
+  color: var(--color-on-surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%),
+    0 0 0 1px var(--color-surface-lowest);
+}
+
+.shared-link-deferred-notice__text {
+  margin: 0;
+}
+
+.shared-link-deferred-notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.shared-link-deferred-notice__btn {
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  border: 1px solid var(--color-surface-lowest);
+  background: transparent;
+  color: var(--color-on-surface);
+
+  &--primary {
+    border: none;
+    font-weight: 600;
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
