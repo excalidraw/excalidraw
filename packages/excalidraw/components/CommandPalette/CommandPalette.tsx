@@ -16,6 +16,7 @@ import { actionToggleShapeSwitch } from "../../actions/actionToggleShapeSwitch";
 import { getShortcutKey } from "../../shortcut";
 
 import {
+  actionAISmartConnectorLabels,
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
@@ -579,6 +580,20 @@ function CommandPaletteInner({
                 tab: "text-to-diagram",
               },
             }));
+          },
+        },
+        {
+          label: "AI suggest connector labels",
+          category: DEFAULT_CATEGORIES.tools,
+          icon: brainIconThin,
+          viewMode: false,
+          predicate: () =>
+            actionManager.isActionEnabled(actionAISmartConnectorLabels),
+          perform: () => {
+            actionManager.executeAction(
+              actionAISmartConnectorLabels,
+              "commandPalette",
+            );
           },
         },
         {

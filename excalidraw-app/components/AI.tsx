@@ -1,4 +1,5 @@
 import {
+  AISmartConnectorLabelsPlugin,
   DiagramToCodePlugin,
   exportToBlob,
   getTextFromElements,
@@ -98,6 +99,51 @@ export const AIComponents = ({
           } catch (error: any) {
             throw new Error("Generation failed (invalid response)");
           }
+        }}
+      />
+
+      <AISmartConnectorLabelsPlugin
+        suggest={async ({ selectedArrows, allElements, appState }) => {
+          const response = await fetch(
+            `${import.meta.env.VITE_APP_AI_BACKEND}/v1/ai/smart-connector-labels`,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                appState: {
+                  theme: appState.theme,
+                },
+                selectedArrows,
+                allElements,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            const text = await response.text();
+            const errorJSON = safelyParseJSON(text);
+            throw new Error(
+              errorJSON?.message || text || "AI connector labeling failed",
+            );
+          }
+
+          const parsed = safelyParseJSON(await response.text()) as
+            | {
+                labels?: {
+                  arrowId: string;
+                  text: string;
+                }[];
+              }
+            | null;
+
+          if (!parsed?.labels?.length) {
+            throw new Error("AI connector labeling returned no labels");
+          }
+
+          return { labels: parsed.labels };
         }}
       />
 
