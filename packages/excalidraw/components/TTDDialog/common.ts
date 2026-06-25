@@ -4,7 +4,10 @@ import {
   THEME,
 } from "@excalidraw/common";
 
-import { convertToExcalidrawElements } from "@excalidraw/element";
+import {
+  convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
+} from "@excalidraw/element";
 
 import { exportToCanvas } from "@excalidraw/utils";
 
@@ -39,6 +42,60 @@ export const resetPreview = ({
   setError(null);
   canvasNode.replaceChildren();
 };
+
+const BR_TAG_RE = /<br\s*\/?>/gi;
+const HTML_TAG_RE = /<\/?[^>]+(>|$)/g;
+
+const decodeHTMLEntities = (text: string) => {
+  return text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ");
+};
+
+export const sanitizeMermaidElementText = (
+  elements: ExcalidrawElementSkeleton[],
+): ExcalidrawElementSkeleton[] =>
+  elements.map((el) => {
+    const result = { ...el } as any;
+
+    const cleanText = (text?: string) => {
+      if (!text) {
+        return text;
+      }
+      return decodeHTMLEntities(text)
+        .replace(BR_TAG_RE, "\n")
+        .replace(/\\n/g, "\n")
+        .replace(HTML_TAG_RE, "");
+    };
+
+    if ("text" in result && typeof result.text === "string") {
+      result.text = cleanText(result.text);
+    }
+
+    if (result.label?.text) {
+      result.label = {
+        ...result.label,
+        text: cleanText(result.label.text),
+      };
+    }
+
+    if (result.start?.text) {
+      result.start = { ...result.start, text: cleanText(result.start.text) };
+    }
+
+    if (result.end?.text) {
+      result.end = { ...result.end, text: cleanText(result.end.text) };
+    }
+
+    if ("name" in result && typeof result.name === "string") {
+      result.name = cleanText(result.name);
+    }
+
+    return result;
+  });
 
 export const convertMermaidToExcalidraw = async ({
   canvasRef,
@@ -98,9 +155,10 @@ export const convertMermaidToExcalidraw = async ({
     setError(null);
 
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
-        regenerateIds: true,
-      }),
+      elements: convertToExcalidrawElements(
+        sanitizeMermaidElementText(elements),
+        { regenerateIds: true },
+      ),
       files,
     };
 

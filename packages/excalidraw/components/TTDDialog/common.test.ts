@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { convertMermaidToExcalidraw } from "./common";
+import { convertMermaidToExcalidraw, sanitizeMermaidElementText } from "./common";
 
 type ConvertMermaidArgs = Parameters<typeof convertMermaidToExcalidraw>[0];
 type ParseMermaidToExcalidraw = Awaited<
@@ -85,5 +85,93 @@ describe("convertMermaidToExcalidraw", () => {
     if (!result.success) {
       expect(result.error).toBe(originalError);
     }
+  });
+});
+
+describe("sanitizeMermaidElementText", () => {
+  it("converts <br> tags to newlines and strips other HTML", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        id: "1",
+        label: { text: "Hello<br/>World" },
+      },
+      {
+        type: "text",
+        id: "2",
+        text: "Line 1<br>Line 2",
+      },
+      {
+        type: "arrow",
+        id: "3",
+        start: { type: "text", text: "Start<br>Point" },
+        end: { type: "text", text: "End<br>Point" },
+        label: { text: "<b>Bold</b> Label" },
+      },
+    ] as any;
+
+    const sanitized = sanitizeMermaidElementText(elements) as any[];
+
+    expect(sanitized[0].label.text).toBe("Hello\nWorld");
+    expect(sanitized[1].text).toBe("Line 1\nLine 2");
+    expect(sanitized[2].label.text).toBe("Bold Label");
+  });
+
+  it("converts literal \\n to actual newlines", () => {
+    const elements = [
+      {
+        type: "text",
+        id: "1",
+        text: "Line 1\\nLine 2",
+      },
+      {
+        type: "rectangle",
+        id: "2",
+        label: { text: "Label\\nNewline" },
+      },
+    ] as any;
+
+    const sanitized = sanitizeMermaidElementText(elements) as any[];
+
+    expect(sanitized[0].text).toBe("Line 1\nLine 2");
+    expect(sanitized[1].label.text).toBe("Label\nNewline");
+  });
+
+  it("decodes HTML entities and strips resulting tags", () => {
+    const elements = [
+      {
+        type: "text",
+        id: "1",
+        text: "&lt;b&gt;Bold&lt;/b&gt; &amp; &quot;Quotes&quot;",
+      },
+      {
+        type: "rectangle",
+        id: "2",
+        label: { text: "A &gt; B" },
+      },
+    ] as any;
+
+    const sanitized = sanitizeMermaidElementText(elements) as any[];
+
+    expect(sanitized[0].text).toBe("Bold & \"Quotes\"");
+    expect(sanitized[1].label.text).toBe("A > B");
+  });
+
+  it("handles missing text fields gracefully", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        id: "1",
+      },
+      {
+        type: "arrow",
+        id: "2",
+        label: {},
+      },
+    ] as any;
+
+    const sanitized = sanitizeMermaidElementText(elements) as any[];
+    expect(sanitized[0].id).toBe("1");
+    expect(sanitized[1].id).toBe("2");
   });
 });
