@@ -4,13 +4,19 @@ import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
 
+import { useSetAtom } from "../app-jotai";
+
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+
+import { gitHubLoadDialogOpenAtom } from "./GitHubLoadDialog";
+import { GitHubIcon } from "./GitHubSaveDialog";
 
 export const AppWelcomeScreen: React.FC<{
   onCollabDialogOpen: () => any;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
   const { t } = useI18n();
+  const openGitHubLoadDialog = useSetAtom(gitHubLoadDialogOpenAtom);
   let headingContent;
 
   if (isExcalidrawPlusSignedUser) {
@@ -58,6 +64,16 @@ export const AppWelcomeScreen: React.FC<{
         </WelcomeScreen.Center.Heading>
         <WelcomeScreen.Center.Menu>
           <WelcomeScreen.Center.MenuItemLoadScene />
+          <WelcomeScreen.Center.MenuItem
+            onSelect={() => openGitHubLoadDialog(true)}
+            icon={
+              <div style={{ width: "1.2rem", height: "1.2rem" }}>
+                <GitHubIcon />
+              </div>
+            }
+          >
+            Load from GitHub
+          </WelcomeScreen.Center.MenuItem>
           <WelcomeScreen.Center.MenuItemHelp />
           {props.isCollabEnabled && (
             <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
