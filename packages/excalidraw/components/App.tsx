@@ -7787,7 +7787,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       !this.editorInterface.isTouchScreen &&
-      ["pen", "touch"].includes(event.pointerType)
+      ["touch"].includes(event.pointerType)
     ) {
       this.editorInterface = updateObject(this.editorInterface, {
         isTouchScreen: true,
