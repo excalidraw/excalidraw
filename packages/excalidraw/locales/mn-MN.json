@@ -1,0 +1,251 @@
+{
+  "labels": {
+    "paste": "Буулгах",
+    "pasteAsPlaintext": "Энгийн текст болгон буулгах",
+    "pasteCharts": "Диаграммуудыг буулгах",
+    "selectAll": "Бүгдийг сонгох",
+    "multiSelect": "Сонголтод элемент нэмэх",
+    "moveCanvas": "Зурагт хавтас зөөх",
+    "cut": "Тайрах",
+    "copy": "Хуулах",
+    "copyAsPng": "PNG файл болгон хуулах",
+    "copyAsSvg": "SVG файл болгон хуулах",
+    "copyText": "Текст болгон хуулах",
+    "copySource": "Эхийг хуулах",
+    "bringForward": "Нэг давхарга дээш гаргах",
+    "sendToBack": "Арын давхаргад илгээх",
+    "bringToFront": "Хамгийн өмнө нь гаргах",
+    "sendBackward": "Нэг давхарга доош илгээх",
+    "delete": "Устгах",
+    "copyStyles": "Загварыг хуулах",
+    "pasteStyles": "Загварыг буулгах",
+    "stroke": "Зураас",
+    "changeStroke": "Зураасны өнгийг өөрчлөх",
+    "background": "Арын дэвсгэр",
+    "changeBackground": "Арын дэвсгэрийн өнгийг өөрчлөх",
+    "fill": "Дүүргэх",
+    "strokeWidth": "Зураасны өргөн",
+    "strokeStyle": "Зураасны хэлбэр",
+    "strokeStyle_solid": "Суурин",
+    "strokeStyle_dashed": "Таслалтай",
+    "strokeStyle_dotted": "Цэгтэй",
+    "sloppiness": "Хайнгашил",
+    "opacity": "Тунгалаг байдал",
+    "textAlign": "Текст тэгштгэл",
+    "edges": "Ирмэгүүд",
+    "sharp": "Хурц",
+    "round": "Дугуй",
+    "arrowheads": "Сумны толгой",
+    "arrowhead_none": "Байхгүй",
+    "arrowhead_arrow": "Сум",
+    "arrowhead_bar": "Мөр",
+    "arrowhead_circle": "Тойрог",
+    "arrowhead_circle_outline": "Тойрог (контур)",
+    "arrowhead_triangle": "Гурвалжин",
+    "arrowhead_triangle_outline": "Гурвалжин (контур)",
+    "arrowhead_diamond": "Ромб",
+    "arrowhead_diamond_outline": "Ромб (контур)",
+    "more_options": "Дэлгэрэнгүй тохиргоо",
+    "cardinality": "Кардинальчлал",
+    "arrowtypes": "Сумны хэлбэр",
+    "arrowtype_sharp": "Шулуун сум",
+    "arrowtype_round": "Муруй сум",
+    "arrowtype_elbowed": "Тохойлсон сум",
+    "fontSize": "Фонтын хэмжээ",
+    "fontFamily": "Фонтын гэр бүл",
+    "handDrawn": "Гараар зурсан",
+    "normal": "Энгийн",
+    "code": "Код",
+    "small": "Жижиг",
+    "medium": "Дунд",
+    "large": "Том",
+    "veryLarge": "Маш том",
+    "solid": "Суурин",
+    "hachure": "Зураалт",
+    "cross-hatch": "Хэлхэх зураалт",
+    "zigzag": "Зигзаг",
+    "dots": "Цэгүүд",
+    "lock": "Цоожлох",
+    "unlock": "Цоожлохгүй болгох",
+    "noFill": "Дүүргэлтгүй",
+    "left": "Зүүн",
+    "right": "Баруун",
+    "center": "Төв",
+    "top": "Дээд",
+    "bottom": "Доод",
+    "alignTop": "Дээшлүүлэх",
+    "alignRight": "Баруун тэгш",
+    "alignBottom": "Доошлуулах",
+    "alignLeft": "Зүүн тэгш",
+    "centerVertically": "Босоогоор голлуулах",
+    "centerHorizontally": "Хэвтээгээр голлуулах",
+    "close": "Хаах",
+    "reset": "Шинэчлэх",
+    "done": "Болсон",
+    "save": "Хадгалах",
+    "edit": "Засварлах",
+    "export": "Экспортлох",
+    "share": "Хуваалцах",
+    "language": "Хэл",
+    "darkMode": "Харанхуй горим",
+    "helpAndShortcuts": "Тусламж & Товчлол",
+    "about": "Тухай",
+    "addToLibrary": "Сангд нэмэх",
+    "clearCanvas": "Зурагт хавтасыг цэвэрлэх"
+  },
+  "buttons": {
+    "clearReset": "Цэвэрлэх & шинэчлэх",
+    "resetLibrary": "Санг шинэчлэх",
+    "exportLibrary": "Санг экспортлох",
+    "importLibrary": "Санг импортлох",
+    "load": "Ачаалах",
+    "copyToClipboard": "Clipboard-д хуулах",
+    "selectAll": "Бүгдийг сонгох",
+    "close": "Хаах",
+    "done": "Болсон",
+    "cancel": "Цуцлах",
+    "confirm": "Баталгаажуулах"
+  },
+  "alerts": {
+    "couldNotLoadSomeElements": "Зарим элементүүдийг ачаалж чадсангүй",
+    "wrongFileType": "Буруу файлын төрөл"
+  },
+  "errors": {
+    "unsupportedFileType": "Дэмжигдэхгүй файлын төрөл",
+    "importBackendFailed": "Экспортлосон өгөгдлийг ачаалж чадсангүй",
+    "cannotResolveCollabServer": "Хамтарсан сервертэй холбогдож чадсангүй",
+    "fileTooBig": "Файл хэт том байна"
+  },
+  "toolBar": {
+    "selection": "Сонгох",
+    "rectangle": "Тэгш өнцөгт",
+    "diamond": "Ромб",
+    "ellipse": "Зуйван",
+    "arrow": "Сум",
+    "line": "Шугам",
+    "freedraw": "Чөлөөт зураг",
+    "text": "Текст",
+    "image": "Зураг",
+    "eraser": "Арилгагч",
+    "frame": "Хүрээ",
+    "hand": "Гар",
+    "laser": "Лазер",
+    "link": "Холбоос"
+  },
+  "headings": {
+    "canvasActions": "Зурагт хавтасны үйлдлүүд",
+    "selectedShapeActions": "Сонгосон хэлбэрийн үйлдлүүд",
+    "shapes": "Хэлбэрүүд"
+  },
+  "stats": {
+    "angle": "Өнцөг",
+    "shapes": "Хэлбэрүүд",
+    "height": "Өндөр",
+    "scene": "Дүр зураг",
+    "selected": "Сонгогдсон",
+    "storage": "Хадгалалт",
+    "title": "Шинж чанарууд",
+    "total": "Нийт",
+    "version": "Хувилбар",
+    "width": "Өргөн"
+  },
+  "toast": {
+    "addedToLibrary": "Санд нэмэгдлээ",
+    "copyStyles": "Загвар хуулагдлаа",
+    "copyToClipboard": "Clipboard-д хуулагдлаа",
+    "fileSaved": "Файл хадгалагдлаа",
+    "canvas": "зурагт хавтас",
+    "selection": "сонголт",
+    "elementLinkCopied": "Холбоос clipboard-д хуулагдлаа"
+  },
+  "colors": {
+    "transparent": "Тунгалаг",
+    "black": "Хар",
+    "white": "Цагаан",
+    "red": "Улаан",
+    "pink": "Ягаан",
+    "grape": "Усан үзмийн өнгө",
+    "violet": "Нил ягаан",
+    "gray": "Саарал",
+    "blue": "Цэнхэр",
+    "cyan": "Цайвар цэнхэр",
+    "teal": "Хөх ногоон",
+    "green": "Ногоон",
+    "yellow": "Шар",
+    "orange": "Улбар шар",
+    "bronze": "Хүрэл"
+  },
+  "welcomeScreen": {
+    "defaults": {
+      "menuHint": "Экспортлох, тохиргоо, болон бусад...",
+      "center_heading": "Диаграмм. Хийсэн. Энгийнээр.",
+      "toolbarHint": "Хэрэгсэл сонгоод зурж эхлэ!",
+      "helpHint": "Товчлол & тусламж"
+    }
+  },
+  "colorPicker": {
+    "color": "Өнгө",
+    "mostUsedCustomColors": "Хамгийн их хэрэглэсэн өнгөнүүд",
+    "colors": "Өнгөнүүд",
+    "shades": "Сүүдрүүд",
+    "hexCode": "Hex код",
+    "noShades": "Энэ өнгөнд сүүдэр байхгүй"
+  },
+  "encrypted": {
+    "tooltip": "Таны зургийг Excalidraw-ын сервер хэзээ ч харахгүйгээр нэг хэсгээс нөгөөд шифрлэдэг.",
+    "link": "Excalidraw-ын end-to-end шифрлэлтийн тухай блог нийтлэл"
+  },
+  "exportDialog": {
+    "title": {
+      "exportToPng": "PNG-д экспортлох",
+      "exportToSvg": "SVG-д экспортлох",
+      "copyPngToClipboard": "PNG-г clipboard-д хуулах"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Clipboard-д хуулах"
+    }
+  },
+  "clearCanvasDialog": {
+    "title": "Зурагт хавтасыг цэвэрлэх үү?"
+  },
+  "mermaid": {
+    "title": "Mermaid-аас Excalidraw руу",
+    "button": "Оруулах",
+    "syntax": "Mermaid синтакс",
+    "preview": "Урьдчилан харах",
+    "label": "Mermaid"
+  },
+  "ttd": {
+    "error": "Алдаа!"
+  },
+  "quickSearch": {
+    "placeholder": "Хурдан хайлт"
+  },
+  "commandPalette": {
+    "title": "Командын цонх",
+    "shortcuts": {
+      "select": "Сонгох",
+      "confirm": "Баталгаажуулах",
+      "close": "Хаах"
+    },
+    "recents": "Сүүлд ашигласан",
+    "search": {
+      "placeholder": "Цэс, командуудаас хайх",
+      "noMatch": "Тохирох команд олдсонгүй..."
+    }
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Зай",
+    "delete": "Устгах",
+    "mmb": "Гүйлгэн дугуй"
+  }
+}
