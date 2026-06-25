@@ -432,6 +432,10 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
+import { RasterPenManager } from "../rasterPen";
+
+import { RasterPixelEraser } from "../rasterEraser";
+
 import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
@@ -709,6 +713,8 @@ class App extends React.Component<AppProps, AppState> {
   laserTrails = new LaserTrails(this);
   eraserTrail = new EraserTrail(this);
   lassoTrail = new LassoTrail(this);
+  rasterPenManager = new RasterPenManager();
+  rasterPixelEraser = new RasterPixelEraser();
 
   onChangeEmitter = new Emitter<
     [
@@ -2358,7 +2364,9 @@ class App extends React.Component<AppProps, AppState> {
                               theme: this.state.theme,
                             }}
                           />
-                          {newElementCanvasElement && (
+                          {(newElementCanvasElement ||
+                            this.rasterPenManager.isDrawing() ||
+                            this.rasterPixelEraser.isActive()) && (
                             <NewElementCanvas
                               appState={this.state}
                               newElement={newElementCanvasElement}
@@ -2379,6 +2387,33 @@ class App extends React.Component<AppProps, AppState> {
                                 pendingFlowchartNodes: null,
                                 theme: this.state.theme,
                               }}
+                              rasterPenPreview={
+                                this.rasterPenManager.isDrawing()
+                                  ? {
+                                      points: this.rasterPenManager.getPoints(),
+                                      originX:
+                                        this.rasterPenManager.getOrigin().x,
+                                      originY:
+                                        this.rasterPenManager.getOrigin().y,
+                                      strokeWidth:
+                                        this.rasterPenManager.getStrokeWidth(),
+                                      strokeColor:
+                                        this.rasterPenManager.getStrokeColor(),
+                                      opacity:
+                                        this.rasterPenManager.getOpacity(),
+                                    }
+                                  : undefined
+                              }
+                              eraserPreview={
+                                this.rasterPixelEraser.isActive()
+                                  ? {
+                                      points:
+                                        this.rasterPixelEraser.getPreviewPoints(),
+                                      radius:
+                                        this.rasterPixelEraser.getRadius(),
+                                    }
+                                  : undefined
+                              }
                             />
                           )}
                           <InteractiveCanvas
@@ -5548,6 +5583,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const nextActiveTool = updateActiveTool(this.state, tool);
+    if (nextActiveTool.type !== "freedraw") {
+      this.rasterPenManager.cancelStroke();
+    }
+    if (nextActiveTool.type !== "eraser") {
+      this.rasterPixelEraser.cancelErase();
+    }
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -7512,7 +7553,29 @@ class App extends React.Component<AppProps, AppState> {
       event.altKey,
     );
 
-    this.elementsPendingErasure = new Set(elementsToErase);
+    if (this.state.eraserMode === "pixel") {
+      const intersectedImages: ExcalidrawImageElement[] = [];
+      const nonImageIds: string[] = [];
+
+      for (const id of elementsToErase) {
+        const element = this.scene.getElement(id);
+        if (isImageElement(element)) {
+          intersectedImages.push(element);
+        } else {
+          nonImageIds.push(id);
+        }
+      }
+
+      this.rasterPixelEraser.addPoint(
+        scenePointer.x,
+        scenePointer.y,
+        intersectedImages,
+      );
+      this.elementsPendingErasure = new Set(nonImageIds);
+    } else {
+      this.elementsPendingErasure = new Set(elementsToErase);
+    }
+
     this.triggerRender();
   };
 
@@ -8047,11 +8110,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.activeTool.type,
-        pointerDownState,
-      );
+      if (this.state.freedrawMode === "raster") {
+        this.handleRasterPenPointerDown(event, pointerDownState);
+      } else {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.activeTool.type,
+          pointerDownState,
+        );
+      }
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
@@ -8090,6 +8157,11 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+      if (this.state.eraserMode === "pixel") {
+        this.rasterPixelEraser.startErase(
+          this.state.currentItemStrokeWidth * 3,
+        );
+      }
     }
 
     const onPointerMove =
@@ -8978,6 +9050,30 @@ class App extends React.Component<AppProps, AppState> {
         }),
       });
     }
+  };
+
+  private handleRasterPenPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    pointerDownState: PointerDownState,
+  ) => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      null,
+    );
+
+    this.rasterPenManager.startStroke(
+      gridX,
+      gridY,
+      this.state.currentItemStrokeWidth,
+      this.state.currentItemStrokeColor,
+      this.state.currentItemOpacity,
+    );
+
+    this.setState({
+      newElement: null,
+      suggestedBinding: null,
+    });
   };
 
   private handleFreeDrawElementOnPointerDown = (
@@ -10373,6 +10469,10 @@ class App extends React.Component<AppProps, AppState> {
             event.shiftKey,
           );
         }
+      } else if (this.rasterPenManager.isDrawing()) {
+        const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+        this.rasterPenManager.addPoint(pointerCoords.x, pointerCoords.y);
+        this.scene.triggerUpdate();
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -10850,6 +10950,58 @@ class App extends React.Component<AppProps, AppState> {
         childEvent,
       );
 
+      if (this.rasterPenManager.isDrawing()) {
+        const pointerCoords = viewportCoordsToSceneCoords(
+          childEvent,
+          this.state,
+        );
+        this.rasterPenManager.addPoint(pointerCoords.x, pointerCoords.y);
+
+        const result = this.rasterPenManager.endStroke(
+          window.devicePixelRatio,
+        );
+
+        if (!result) {
+          return;
+        }
+
+        const fileId = nanoid() as FileId;
+
+        this.files[fileId] = {
+          id: fileId,
+          dataURL: result.dataURL,
+          mimeType: MIME_TYPES.png,
+          created: Date.now(),
+        };
+
+        const element = newImageElement({
+          type: "image",
+          x: result.x,
+          y: result.y,
+          width: result.width,
+          height: result.height,
+          fileId,
+          status: "saved",
+          scale: [1, 1],
+          crop: null,
+        });
+
+        this.insertNewElement(element);
+        this.addNewImagesToImageCache([
+          element as InitializedExcalidrawImageElement,
+        ]);
+
+        this.store.scheduleCapture();
+
+        this.setState({
+          newElement: null,
+          cursorButton: "up",
+          suggestedBinding: null,
+        });
+
+        return;
+      }
+
       if (newElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -11252,6 +11404,35 @@ class App extends React.Component<AppProps, AppState> {
       if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         this.eraserTrail.endPath();
 
+        if (this.rasterPixelEraser.isActive()) {
+          this.rasterPixelEraser
+            .commitErase(this.files, this.imageCache)
+            .then((results) => {
+              const sceneElementsMap =
+                this.scene.getNonDeletedElementsMap();
+
+              for (const { fileId, dataURL, elementId } of results) {
+                const newFileId = nanoid() as FileId;
+                this.files[newFileId] = {
+                  id: newFileId,
+                  dataURL,
+                  mimeType: MIME_TYPES.png,
+                  created: Date.now(),
+                };
+
+                const element = sceneElementsMap.get(elementId);
+                if (element) {
+                  this.scene.mutateElement(element, {
+                    fileId: newFileId,
+                  } as any);
+                }
+              }
+
+              this.addNewImagesToImageCache();
+              this.scene.triggerUpdate();
+            });
+        }
+
         const draggedDistance = pointDistance(
           pointFrom(pointerStart.clientX, pointerStart.clientY),
           pointFrom(pointerEnd.clientX, pointerEnd.clientY),
@@ -11269,9 +11450,15 @@ class App extends React.Component<AppProps, AppState> {
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach((hitElement) =>
-            this.elementsPendingErasure.add(hitElement.id),
-          );
+          hitElements.forEach((hitElement) => {
+            if (
+              this.state.eraserMode === "pixel" &&
+              isImageElement(hitElement)
+            ) {
+              return;
+            }
+            this.elementsPendingErasure.add(hitElement.id);
+          });
         }
         this.eraseElements();
         return;

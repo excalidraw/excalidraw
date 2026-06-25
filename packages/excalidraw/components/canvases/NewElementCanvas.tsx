@@ -8,18 +8,22 @@ import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
+  RasterPenPreviewData,
+  EraserPreviewData,
 } from "../../scene/types";
 import type { AppState } from "../../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
 interface NewElementCanvasProps {
   appState: AppState;
-  newElement: NonNullable<AppState["newElement"]>;
+  newElement: NonNullable<AppState["newElement"]> | null;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
   rc: RoughCanvas;
   renderConfig: StaticCanvasRenderConfig;
+  rasterPenPreview?: RasterPenPreviewData | null;
+  eraserPreview?: EraserPreviewData | null;
 }
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
@@ -38,6 +42,8 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
         rc: props.rc,
         renderConfig: props.renderConfig,
         appState: props.appState,
+        rasterPenPreview: props.rasterPenPreview,
+        eraserPreview: props.eraserPreview,
       },
       isRenderThrottlingEnabled(),
     );

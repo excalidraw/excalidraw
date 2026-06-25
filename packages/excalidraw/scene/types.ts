@@ -110,6 +110,20 @@ export type InteractiveSceneRenderConfig = {
   deltaTime: number;
 };
 
+export type RasterPenPreviewData = {
+  points: readonly { dx: number; dy: number }[];
+  originX: number;
+  originY: number;
+  strokeWidth: number;
+  strokeColor: string;
+  opacity: number;
+};
+
+export type EraserPreviewData = {
+  points: readonly { x: number; y: number }[];
+  radius: number;
+};
+
 export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
@@ -119,6 +133,8 @@ export type NewElementSceneRenderConfig = {
   scale: number;
   appState: AppState;
   renderConfig: StaticCanvasRenderConfig;
+  rasterPenPreview?: RasterPenPreviewData | null;
+  eraserPreview?: EraserPreviewData | null;
 };
 
 export type SceneScroll = {
