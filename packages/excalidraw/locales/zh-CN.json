@@ -711,5 +711,9 @@
     "spacebar": "空格",
     "delete": "Delete",
     "mmb": "鼠标滚轮"
+  },
+  "progressDialog": {
+    "title": "正在保存",
+    "defaultMessage": "准备保存中…"
   }
 }
