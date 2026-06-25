@@ -6251,6 +6251,9 @@ class App extends React.Component<AppProps, AppState> {
       const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
+      if (newHeight !== container.height || newWidth !== container.width) {
+        this.store.scheduleCapture();
+      }
       this.scene.mutateElement(container, {
         height: newHeight,
         width: newWidth,
