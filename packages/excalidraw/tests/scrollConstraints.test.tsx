@@ -219,6 +219,51 @@ describe("setScrollConstraints (integration)", () => {
   });
 });
 
+describe("explicit minZoom / maxZoom (pure)", () => {
+  const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
+
+  it("lets minZoom override the box-enforced fit zoom (zoom out past the box)", () => {
+    // without minZoom the box forces a fit zoom of 0.2; minZoom 0.1 takes over
+    const { zoom } = constrainScrollState(
+      makeState({
+        zoom: { value: getNormalizedZoom(0.1) },
+        scrollConstraints: { ...box, minZoom: 0.1 },
+      }),
+    );
+    expect(zoom.value).toBeCloseTo(0.1);
+  });
+
+  it("still clamps zoom out at minZoom", () => {
+    const { zoom } = constrainScrollState(
+      makeState({
+        zoom: { value: getNormalizedZoom(0.1) },
+        scrollConstraints: { ...box, minZoom: 0.5 },
+      }),
+    );
+    expect(zoom.value).toBeCloseTo(0.5);
+  });
+
+  it("lets maxZoom cap zoom-in below the global MAX_ZOOM", () => {
+    const { zoom } = constrainScrollState(
+      makeState({
+        zoom: { value: getNormalizedZoom(MAX_ZOOM) },
+        scrollConstraints: { ...box, maxZoom: 3 },
+      }),
+    );
+    expect(zoom.value).toBeCloseTo(3);
+  });
+
+  it("leaves an in-range zoom untouched", () => {
+    const { zoom } = constrainScrollState(
+      makeState({
+        zoom: { value: getNormalizedZoom(1.5) },
+        scrollConstraints: { ...box, minZoom: 0.5, maxZoom: 3 },
+      }),
+    );
+    expect(zoom.value).toBeCloseTo(1.5);
+  });
+});
+
 describe("rubberband tolerance (pure)", () => {
   const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
 

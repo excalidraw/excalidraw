@@ -279,7 +279,21 @@ export type ScrollConstraints = {
   y: number;
   width: number;
   height: number;
+  /**
+   * Pixel amount to allow to overscroll.
+   */
   tolerance?: number;
+  /**
+   * Lower zoom bound. When set, it takes precedence over the zoom the box would
+   * otherwise enforce (the fit zoom that keeps the box covering the viewport),
+   * letting the viewport zoom out past the box.
+   */
+  minZoom?: number;
+  /**
+   * Upper zoom bound. When set, it takes precedence over the global `MAX_ZOOM`,
+   * capping how far the viewport can zoom in.
+   */
+  maxZoom?: number;
 };
 
 export interface AppState {

@@ -94,6 +94,11 @@ const constrainScrollAxis = (
  * viewport may pan past the box edges (and zoom out below the fit zoom) until
  * each edge has crossed the box by up to `tolerance` pixels on screen,
  * independent of the current zoom. Pass `0` (default) for a hard clamp.
+ *
+ * An explicit `minZoom`/`maxZoom` on the constraints takes precedence over the
+ * zoom the box would otherwise enforce: `minZoom` replaces the fit zoom (so the
+ * viewport may zoom out past the box) and `maxZoom` replaces the global
+ * `MAX_ZOOM` cap.
  */
 export const constrainScrollState = (
   state: Pick<
@@ -110,14 +115,20 @@ export const constrainScrollState = (
 
   tolerance = Math.max(tolerance, 0);
 
-  // relax the min zoom so the user can briefly zoom out past the fit zoom,
-  // letting each viewport edge cross the box by up to `tolerance` screen px
-  const relaxedMinZoom = getMinZoomForConstraints(scrollConstraints, {
-    width: width - 2 * tolerance,
-    height: height - 2 * tolerance,
-  });
+  // zoom bounds: an explicit min/maxZoom on the constraints takes precedence
+  // over the box-enforced fit zoom (lower) and the global MAX_ZOOM (upper).
+  // Without a `minZoom`, relax the fit zoom by `tolerance` so the user can
+  // briefly zoom out past it (rubberbanding), letting each viewport edge cross
+  // the box by up to `tolerance` screen px.
+  const minZoom =
+    scrollConstraints.minZoom ??
+    getMinZoomForConstraints(scrollConstraints, {
+      width: width - 2 * tolerance,
+      height: height - 2 * tolerance,
+    });
+  const maxZoom = scrollConstraints.maxZoom ?? MAX_ZOOM;
   const zoomValue = getNormalizedZoom(
-    clamp(state.zoom.value, relaxedMinZoom, MAX_ZOOM),
+    clamp(state.zoom.value, minZoom, maxZoom),
   );
 
   // `tolerance` screen px expressed in scene coords at the current zoom

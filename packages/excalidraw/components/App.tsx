@@ -4458,6 +4458,10 @@ class App extends React.Component<AppProps, AppState> {
    * Constrains pan & zoom to a scene-coordinate box, so the viewport can't be
    * scrolled or zoomed out past it. Pass `null` to remove the constraint. When
    * the box is smaller than the viewport, zoom is increased best-effort to fit.
+   *
+   * Optional `minZoom`/`maxZoom` take precedence over the box: `minZoom` lets
+   * the viewport zoom out past the fit zoom, while `maxZoom` caps zoom-in below
+   * the global limit.
    */
   setScrollConstraints = (scrollConstraints: ScrollConstraints | null) => {
     // apply the constraint and clamp the viewport in a single, synchronously
