@@ -610,6 +610,18 @@ let invalidateContextMenu = false;
 let scrollConstraintsAnimationTimeout: ReturnType<typeof setTimeout> | null =
   null;
 
+const areScrollConstraintsEqual = (
+  left: ScrollConstraints | null | undefined,
+  right: ScrollConstraints | null | undefined,
+) => {
+  return left === right || (!!left && !!right && isShallowEqual(left, right));
+};
+
+const SET_SCROLL_CONSTRAINTS_CONTROLLED_WARNING =
+  "Excalidraw: `setScrollConstraints()` is ignored when the `scrollConstraints` prop is controlled.";
+const SCROLL_TO_CONTENT_SCROLL_LOCK_CONTROLLED_WARNING =
+  "Excalidraw: `scrollToContent()` with `scrollLock` is ignored when the `scrollConstraints` prop is controlled.";
+
 /**
  * Map of youtube embed video states
  */
@@ -3495,6 +3507,15 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
     }
 
+    if (
+      !areScrollConstraintsEqual(
+        prevProps.scrollConstraints,
+        this.props.scrollConstraints,
+      )
+    ) {
+      this.syncScrollConstraints(this.props.scrollConstraints ?? null);
+    }
+
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
       this.deselectElements();
@@ -4378,6 +4399,11 @@ class App extends React.Component<AppProps, AppState> {
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
     opts?: ScrollToContentOptions,
   ) => {
+    if (opts?.scrollLock && this.props.scrollConstraints !== undefined) {
+      console.warn(SCROLL_TO_CONTENT_SCROLL_LOCK_CONTROLLED_WARNING);
+      opts = { ...opts, scrollLock: undefined };
+    }
+
     if (typeof target === "string") {
       let id: string | null;
       if (isElementLink(target)) {
@@ -4434,7 +4460,7 @@ class App extends React.Component<AppProps, AppState> {
       scrollConstraintsAnimationTimeout = null;
     }
 
-    if (opts?.scrollLock && this.state.scrollConstraints) {
+    if (opts?.scrollLock != null && this.state.scrollConstraints) {
       // Clear the previous lock before starting the next locked transition so
       // stale constraint enforcement cannot snap us back mid-flight.
       this.setState({ scrollConstraints: null });
@@ -4492,7 +4518,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         scrollConstraints,
-        viewModeEnabled: true,
       });
     };
 
@@ -4538,7 +4563,6 @@ class App extends React.Component<AppProps, AppState> {
         scrollY,
         zoom,
         scrollConstraints,
-        viewModeEnabled: true,
       });
     } else {
       this.setState({ scrollX, scrollY, zoom });
@@ -13065,11 +13089,31 @@ class App extends React.Component<AppProps, AppState> {
   public setScrollConstraints = (
     scrollConstraints: ScrollConstraints | null,
   ) => {
+    if (this.props.scrollConstraints !== undefined) {
+      console.warn(SET_SCROLL_CONSTRAINTS_CONTROLLED_WARNING);
+      return;
+    }
+
+    this.syncScrollConstraints(scrollConstraints);
+  };
+
+  private syncScrollConstraints = (
+    scrollConstraints: ScrollConstraints | null,
+  ) => {
+    this.debounceConstrainScrollState.cancel();
+
+    if (scrollConstraintsAnimationTimeout) {
+      clearTimeout(scrollConstraintsAnimationTimeout);
+      scrollConstraintsAnimationTimeout = null;
+    }
+
+    this.cancelInProgressAnimation?.();
+
     if (scrollConstraints) {
       this.setState(
         {
           scrollConstraints,
-          viewModeEnabled: true,
+          shouldCacheIgnoreZoom: false,
         },
         () => {
           const newState = constrainScrollState(
@@ -13097,7 +13141,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.setState({
         scrollConstraints: null,
-        viewModeEnabled: false,
+        shouldCacheIgnoreZoom: false,
       });
     }
   };
