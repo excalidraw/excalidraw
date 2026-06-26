@@ -965,4 +965,46 @@ describe("Test Transform", () => {
       });
     });
   });
+
+  it("应该将文本元素和容器标签中的 HTML 换行标签 <br> 替换为换行符 \\n", () => {
+    // 包含各种格式的 <br> 换行标签的骨架元素
+    const elements = [
+      {
+        type: "text",
+        x: 100,
+        y: 100,
+        text: "第一行<br>第二行<br/>第三行<br   />第四行",
+      },
+      {
+        type: "rectangle",
+        x: 200,
+        y: 200,
+        label: {
+          text: "标签一<br>标签二",
+        },
+      },
+    ];
+
+    const excalidrawElements = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    // 总共应该生成 3 个元素：1 个独立 text 元素，1 个 rectangle 容器，1 个绑定到容器的 label text 元素
+    expect(excalidrawElements.length).toBe(3);
+
+    // 验证独立的普通文本元素换行转换正确
+    const textElement = excalidrawElements.find(
+      (e) => e.type === "text" && !e.containerId,
+    ) as any;
+    expect(textElement).toBeDefined();
+    expect(textElement?.text).toBe("第一行\n第二行\n第三行\n第四行");
+
+    // 验证容器绑定标签的换行转换正确
+    const labelElement = excalidrawElements.find(
+      (e) => e.type === "text" && e.containerId,
+    ) as any;
+    expect(labelElement).toBeDefined();
+    expect(labelElement?.text).toBe("标签一\n标签二");
+  });
 });
