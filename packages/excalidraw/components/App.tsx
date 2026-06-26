@@ -4315,7 +4315,9 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
-        currentItemStrokeVariability: "variable",
+        currentItemStrokeVariability: !prevState.penDetected
+          ? "variable"
+          : prevState.currentItemStrokeVariability,
       };
     });
   };
@@ -4369,20 +4371,39 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!elements.length) {
       if (typeof target === "string" && isElementLink(target)) {
+        this.setState({
+          toast: {
+            message: t("elementLink.notFound"),
+            duration: 3000,
+            closable: true,
+          },
+        });
       }
-      this.setState({
-        toast: {
-          message: t("elementLink.notFound"),
-          duration: 3000,
-          closable: true,
-        },
-      });
 
       return;
     }
 
     this.setScrollConstraints(null);
-    scrollToElements(this.state, elements, this.setState.bind(this), opts);
+
+    // Navigating to an element by id or element-link defaults to zooming the
+    // element into view, animated — matching the historical element-link
+    // behavior — unless the caller opts out.
+    const resolvedOpts =
+      typeof target === "string"
+        ? {
+            ...opts,
+            fitToViewport: undefined,
+            fitToContent: opts?.fitToContent ?? true,
+            animate: opts?.animate ?? true,
+          }
+        : opts;
+
+    scrollToElements(
+      this.state,
+      elements,
+      this.setState.bind(this),
+      resolvedOpts,
+    );
   };
 
   private maybeUnfollowRemoteUser = () => {
@@ -8965,7 +8986,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeOptions: {
         variability: strokeVariability,
         streamline:
-          strokeVariability === "constant" && event.pointerType !== "mouse"
+          event.pointerType !== "mouse"
             ? DEFAULT_STROKE_STREAMLINE_PRECISE
             : DEFAULT_STROKE_STREAMLINE,
       },

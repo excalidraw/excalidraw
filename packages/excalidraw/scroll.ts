@@ -176,7 +176,12 @@ export const animateToConstraints = (
 export const scrollToElements = (
   state: AppState,
   target: readonly ExcalidrawElement[],
-  onFrame: (state: Pick<AppState, "scrollX" | "scrollY" | "zoom">) => void,
+  onFrame: (
+    state: Pick<
+      AppState,
+      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
+    >,
+  ) => void,
   opts?: ScrollToContentOptions,
 ) => {
   AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
@@ -191,7 +196,9 @@ export const scrollToElements = (
       onFrame,
     );
   } else {
-    onFrame(viewport);
+    // no animation: jump straight to the target. Re-enable zoom caching in
+    // case we just cancelled an in-flight animation that had suppressed it.
+    onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
   }
 };
 
@@ -265,7 +272,10 @@ const animateToViewport = (
         },
       });
 
-      return { elapsed };
+      // returning a falsy value signals the AnimationController to remove the
+      // animation; otherwise it would keep ticking (and calling onFrame) every
+      // frame forever after reaching the target
+      return progress < 1 ? { elapsed } : null;
     },
   );
 };

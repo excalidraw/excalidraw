@@ -2,6 +2,7 @@ import React from "react";
 
 import { Excalidraw } from "../index";
 import { AnimationController } from "../renderer/animation";
+import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../scroll";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
@@ -31,6 +32,31 @@ const waitForAnimationProgress = (frames = 4) => {
           }
         };
         requestAnimationFrame(step);
+      }),
+  );
+};
+
+/**
+ * Polls until the scroll/zoom animation has removed itself from the
+ * `AnimationController` (i.e. it ran to completion), or until `maxFrames`
+ * elapses as a safety net so a regression can't hang the suite.
+ */
+const waitForAnimationToStop = (maxFrames = 200) => {
+  return act(
+    () =>
+      new Promise<void>((resolve) => {
+        let remaining = maxFrames;
+        const check = () => {
+          if (
+            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+            --remaining <= 0
+          ) {
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
       }),
   );
 };
@@ -90,6 +116,34 @@ describe("fitToContent", () => {
 
     // elements take 100x100, which is 10x bigger than the viewport size,
     // zoom should be at least 1/10
+    expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
+  });
+
+  it("should default to fitToContent when scrolling to an element by id", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 10;
+    h.state.height = 10;
+
+    const rectElement = API.createElement({
+      width: 50,
+      height: 100,
+      x: 50,
+      y: 100,
+    });
+
+    API.setElements([rectElement]);
+
+    expect(h.state.zoom.value).toBe(1);
+
+    act(() => {
+      // navigating by element id (a string target) should zoom-to-fit by
+      // default, even though no `fitToContent` option was passed
+      h.app.scrollToContent(rectElement.id, { animate: false });
+    });
+
+    // element is 10x taller than the viewport, so fit-to-content should
+    // drop the zoom to <= 1/10
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
 
@@ -212,5 +266,44 @@ describe("fitToContent animated", () => {
 
     expect(h.state.scrollX).not.toBe(prevScrollX);
     expect(h.state.scrollY).not.toBe(prevScrollY);
+  });
+
+  it("should stop ticking and settle on the target once complete", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 10;
+    h.state.height = 10;
+
+    const rectElement = API.createElement({
+      width: 100,
+      height: 100,
+      x: -100,
+      y: -100,
+    });
+
+    act(() => {
+      // a short duration so the animation completes within a few frames
+      h.app.scrollToContent(rectElement, { animate: true, duration: 10 });
+    });
+
+    await waitForAnimationToStop();
+
+    // the animation must remove itself from the controller rather than keep
+    // ticking forever after reaching the target
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+
+    // it should have settled on the target viewport (moved off the origin)
+    const settledScrollX = h.state.scrollX;
+    const settledScrollY = h.state.scrollY;
+    expect(settledScrollX).not.toBe(0);
+    expect(settledScrollY).not.toBe(0);
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
+
+    // further frames must not move the viewport (no perpetual re-rendering)
+    await waitForAnimationProgress();
+    expect(h.state.scrollX).toBe(settledScrollX);
+    expect(h.state.scrollY).toBe(settledScrollY);
   });
 });
