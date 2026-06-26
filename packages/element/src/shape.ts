@@ -1,5 +1,6 @@
 import { simplify } from "points-on-curve";
 import { getStroke } from "perfect-freehand";
+import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
   type GeometricShape,
@@ -24,6 +25,7 @@ import {
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   applyDarkModeFilter,
+  DEFAULT_STROKE_STREAMLINE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -1171,25 +1173,85 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
   ) as SVGPathString;
 };
 
-export const getFreedrawOutlinePoints = (
+/**
+ * Freedraw stroke geometry tuning constants.
+ *
+ * These factors are not derived analytically — they were tuned empirically by
+ * visually comparing rendered strokes until they matched the desired feel.
+ * Treat them as magic numbers backed by visual verification.
+ */
+const VARIABLE_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for pressure-sensitive strokes. */
+  SIZE_FACTOR: 4.25,
+  THINNING: 0.6,
+  SMOOTHING: 0.5,
+} as const;
+
+const CONSTANT_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
+  SIZE_FACTOR: 1.4,
+} as const;
+
+const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
+  element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
+
+/**
+ * Pressure-sensitive (variable width) freedraw outline, rendered with
+ * perfect-freehand. This is the original Excalidraw freedraw look.
+ */
+const getVariableWidthFreedrawOutline = (
   element: ExcalidrawFreeDrawElement,
-) => {
+): [number, number][] => {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    ? element.points.map(
+        ([x, y], i) => [x, y, element.pressures[i]] as [number, number, number],
+      )
     : [[0, 0, 0.5]];
 
   return getStroke(inputPoints as number[][], {
     simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
+    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+    thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
+    smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
+    streamline: getFreedrawStreamline(element),
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
     last: true,
   }) as [number, number][];
+};
+
+const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
+  new LaserPointer({
+    size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: getFreedrawStreamline(element),
+    simplify: 0,
+    sizeMapping: (details) => Math.max(0.1, details.pressure),
+  });
+
+/**
+ * Uniform (constant width) freedraw outline, rendered with the laser-pointer
+ * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
+ */
+const getConstantWidthFreedrawOutline = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  const laserPointer = createLaserPointer(element);
+  element.points.map(([x, y]) => laserPointer.addPoint([x, y, 1]));
+
+  return laserPointer
+    .getStrokeOutline()
+    .map(([x, y]) => [x, y] as [number, number]);
+};
+
+export const getFreedrawOutlinePoints = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  // Unknown/absent variability falls back to the original variable rendering.
+  return element.strokeOptions?.variability === "constant"
+    ? getConstantWidthFreedrawOutline(element)
+    : getVariableWidthFreedrawOutline(element);
 };
 
 const med = (A: number[], B: number[]) => {

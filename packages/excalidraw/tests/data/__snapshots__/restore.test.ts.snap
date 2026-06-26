@@ -154,7 +154,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "opacity": 10,
   "roughness": 2,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": Any<Number>,
   "strokeColor": "red",
@@ -192,7 +192,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "opacity": 10,
   "roughness": 2,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": Any<Number>,
   "strokeColor": "red",
@@ -240,8 +240,12 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "seed": Any<Number>,
   "simulatePressure": true,
   "strokeColor": "#1e1e1e",
+  "strokeOptions": {
+    "streamline": "0.50000",
+    "variability": "variable",
+  },
   "strokeStyle": "solid",
-  "strokeWidth": 2,
+  "strokeWidth": 1,
   "type": "freedraw",
   "updated": 1,
   "version": 2,
