@@ -24,6 +24,9 @@ import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
+import { ExportIcon } from "./icons"; 
+import { ToolButton } from "./ToolButton";
+
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 
@@ -227,8 +230,6 @@ const LayerUI = ({
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      {/* wrapping to Fragment stops React from occasionally complaining
-                about identical Keys */}
       <tunnels.MainMenuTunnel.Out />
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
@@ -421,6 +422,19 @@ const LayerUI = ({
               },
             )}
           >
+            {UIOptions.canvasActions.saveAsImage && (
+              <ToolButton
+                className="QuickExport-button"
+                type="button"
+                icon={ExportIcon}
+                title={t("buttons.exportImage")}
+                aria-label={t("buttons.exportImage")}
+                onClick={() => {
+                  setAppState({ openDialog: { name: "imageExport" } });
+                }}
+              />
+            )}
+
             {appState.collaborators.size > 0 && (
               <UserList
                 collaborators={appState.collaborators}
