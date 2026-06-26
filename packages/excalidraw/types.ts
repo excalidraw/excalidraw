@@ -411,7 +411,7 @@ export interface AppState {
   scrollX: number;
   scrollY: number;
   /** when set, pan & zoom are constrained so the viewport stays within this
-   * scene-coordinate box (see `setScrollConstraints`) */
+   * scene-coordinate box (see `scrollToContent`'s `scrollConstraints` option) */
   scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
@@ -1004,7 +1004,6 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
-  setScrollConstraints: InstanceType<typeof App>["setScrollConstraints"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

@@ -501,7 +501,6 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-  ScrollConstraints,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -768,7 +767,6 @@ class App extends React.Component<AppProps, AppState> {
         clear: this.resetHistory,
       },
       scrollToContent: this.scrollToContent,
-      setScrollConstraints: this.setScrollConstraints,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -4370,6 +4368,16 @@ class App extends React.Component<AppProps, AppState> {
       elements = this.scene.getNonDeletedElements();
     }
 
+    const scrollConstraints = opts?.scrollConstraints ?? null;
+    if (scrollConstraints || this.state.scrollConstraints) {
+      flushSync(() => {
+        this.setState((prevState) => ({
+          scrollConstraints,
+          ...constrainScrollState({ ...prevState, scrollConstraints }),
+        }));
+      });
+    }
+
     if (!elements.length) {
       if (typeof target === "string" && isElementLink(target)) {
         this.setState({
@@ -4383,8 +4391,6 @@ class App extends React.Component<AppProps, AppState> {
 
       return;
     }
-
-    this.setScrollConstraints(null);
 
     // Navigating to an element by id or element-link defaults to zooming the
     // element into view, animated — matching the historical element-link
@@ -4453,26 +4459,6 @@ class App extends React.Component<AppProps, AppState> {
     this.snapBackToScrollConstraints,
     SCROLL_CONSTRAINTS_SNAP_BACK_DELAY,
   );
-
-  /**
-   * Constrains pan & zoom to a scene-coordinate box, so the viewport can't be
-   * scrolled or zoomed out past it. Pass `null` to remove the constraint. When
-   * the box is smaller than the viewport, zoom is increased best-effort to fit.
-   *
-   * Optional `minZoom`/`maxZoom` take precedence over the box: `minZoom` lets
-   * the viewport zoom out past the fit zoom, while `maxZoom` caps zoom-in below
-   * the global limit.
-   */
-  setScrollConstraints = (scrollConstraints: ScrollConstraints | null) => {
-    // apply the constraint and clamp the viewport in a single, synchronously
-    // flushed update so the new scroll/zoom is reflected immediately
-    flushSync(() => {
-      this.setState((prevState) => ({
-        scrollConstraints,
-        ...constrainScrollState({ ...prevState, scrollConstraints }),
-      }));
-    });
-  };
 
   setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });

@@ -19,6 +19,7 @@ import {
 } from "../scroll";
 import { AnimationController } from "../renderer/animation";
 
+import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import {
   mockBoundingClientRect,
@@ -151,7 +152,7 @@ describe("constrainScrollState (pure)", () => {
   });
 });
 
-describe("setScrollConstraints (integration)", () => {
+describe("scrollToContent scrollConstraints (integration)", () => {
   beforeEach(() => {
     mockBoundingClientRect();
   });
@@ -166,7 +167,9 @@ describe("setScrollConstraints (integration)", () => {
 
     // start well outside the future box
     React.act(() => {
-      h.app.setScrollConstraints({ x: 0, y: 0, width: 1000, height: 1000 });
+      h.app.scrollToContent([], {
+        scrollConstraints: { x: 0, y: 0, width: 1000, height: 1000 },
+      });
     });
 
     // viewport must now be within [-800, 0] x [-900, 0]
@@ -182,7 +185,9 @@ describe("setScrollConstraints (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setScrollConstraints({ x: 0, y: 0, width: 300, height: 200 });
+      h.app.scrollToContent([], {
+        scrollConstraints: { x: 0, y: 0, width: 300, height: 200 },
+      });
     });
 
     // hammer page-down (pans down) far past the box; scroll must stay clamped
@@ -193,11 +198,38 @@ describe("setScrollConstraints (integration)", () => {
 
     // clearing constraints lets it scroll freely again
     React.act(() => {
-      h.app.setScrollConstraints(null);
+      h.app.scrollToContent([], { scrollConstraints: null });
     });
     const before = h.state.scrollY;
     Keyboard.keyPress(KEYS.PAGE_DOWN);
     expect(h.state.scrollY).toBeLessThan(before);
+  });
+
+  it("clamps the scroll target into the box when scrolling to content", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    // an element well outside the future constraint box
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 2000,
+      y: 2000,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([rect]);
+
+    React.act(() => {
+      h.app.scrollToContent(rect, {
+        scrollConstraints: { x: 0, y: 0, width: 1000, height: 1000 },
+        animate: false,
+      });
+    });
+
+    // recentering on the element would scroll way past the box; it must be
+    // clamped to the far edges instead (scrollX -800, scrollY -900 at zoom 1)
+    expect(h.state.scrollX).toBeCloseTo(-800);
+    expect(h.state.scrollY).toBeCloseTo(-900);
   });
 
   it("disables reset-zoom and zoom-to-fit actions while constrained", async () => {
@@ -208,7 +240,9 @@ describe("setScrollConstraints (integration)", () => {
     expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(true);
 
     React.act(() => {
-      h.app.setScrollConstraints({ x: 0, y: 0, width: 500, height: 500 });
+      h.app.scrollToContent([], {
+        scrollConstraints: { x: 0, y: 0, width: 500, height: 500 },
+      });
     });
 
     expect(h.app.actionManager.isActionEnabled(actionResetZoom)).toBe(false);
@@ -468,12 +502,14 @@ describe("rubberband tolerance (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setScrollConstraints({
-        x: 0,
-        y: 0,
-        width: 1000,
-        height: 1000,
-        tolerance: 25,
+      h.app.scrollToContent([], {
+        scrollConstraints: {
+          x: 0,
+          y: 0,
+          width: 1000,
+          height: 1000,
+          tolerance: 25,
+        },
       });
     });
 

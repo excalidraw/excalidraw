@@ -41,6 +41,7 @@ export type ScrollToContentOptions = (
   minZoom?: number;
   maxZoom?: number;
   canvasOffsets?: Offsets;
+  scrollConstraints?: ScrollConstraints | null;
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
@@ -263,6 +264,8 @@ const getTargetViewport = (
   targetElements: readonly ExcalidrawElement[],
   opts?: ScrollToContentOptions,
 ): Viewport => {
+  let viewport: Viewport;
+
   if (opts?.fitToContent || opts?.fitToViewport) {
     const { appState } = zoomToFit({
       canvasOffsets: opts.canvasOffsets,
@@ -274,16 +277,19 @@ const getTargetViewport = (
       maxZoom: opts.maxZoom,
     });
 
-    return {
+    viewport = {
       scrollX: appState.scrollX,
       scrollY: appState.scrollY,
       zoom: appState.zoom,
     };
+  } else {
+    // keep the current zoom, only recenter the viewport on the target
+    const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
+    viewport = { scrollX, scrollY, zoom: state.zoom };
   }
-  // keep the current zoom, only recenter the viewport on the target
-  const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
 
-  return { scrollX, scrollY, zoom: state.zoom };
+  // keep the target inside any active scroll constraints (no-op otherwise)
+  return constrainScrollState({ ...state, ...viewport });
 };
 
 /**
