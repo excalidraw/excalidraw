@@ -1,0 +1,126 @@
+- generic [ref=e1]:
+  - banner:
+    - heading "Excalidraw" [level=1] [ref=e2]
+  - generic [ref=e5]:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+            - img
+        - generic:
+          - text: Your drawings are saved in your browser's storage.
+          - text: Browser storage can be cleared unexpectedly.
+          - text: Save your work to a file regularly to avoid losing it.
+        - generic:
+          - button "Open Ctrl+O" [ref=e181] [cursor=pointer]:
+            - img [ref=e183]
+            - generic [ref=e185]: Open
+            - generic [ref=e186]: Ctrl+O
+          - button "Help ?" [ref=e187] [cursor=pointer]:
+            - img [ref=e189]
+            - generic [ref=e194]: Help
+            - generic [ref=e195]: "?"
+          - button "Live collaboration..." [ref=e196] [cursor=pointer]:
+            - img [ref=e198]
+            - generic [ref=e205]: Live collaboration...
+          - link "Sign up" [ref=e206] [cursor=pointer]:
+            - /url: https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest
+            - img [ref=e208]
+            - generic [ref=e214]: Sign up
+      - generic:
+        - generic:
+          - button [ref=e9] [cursor=pointer]:
+            - img [ref=e10]
+          - region "Shapes":
+            - generic [ref=e16]:
+              - generic:
+                - generic:
+                  - text: To move canvas, hold
+                  - generic: Scroll wheel
+                  - text: or
+                  - generic: Space
+                  - text: while dragging, or use the hand tool
+              - heading "Shapes" [level=2] [ref=e17]
+              - generic [ref=e18]:
+                - generic "Keep selected tool active after drawing — Q" [ref=e19] [cursor=pointer]:
+                  - checkbox "Keep selected tool active after drawing"
+                  - img [ref=e21]
+                - generic "Hand (panning tool) — H or null" [ref=e29] [cursor=pointer]:
+                  - radio "Hand (panning tool)"
+                  - img [ref=e31]
+                - generic "Selection" [ref=e215] [cursor=pointer]:
+                  - radio "Selection" [checked]
+                  - img [ref=e217]
+                - generic "Rectangle — R or 2" [ref=e46] [cursor=pointer]:
+                  - radio "Rectangle"
+                  - img [ref=e48]
+                - generic "Diamond — D or 3" [ref=e53] [cursor=pointer]:
+                  - radio "Diamond"
+                  - img [ref=e55]
+                - generic "Ellipse — O or 4" [ref=e60] [cursor=pointer]:
+                  - radio "Ellipse"
+                  - img [ref=e62]
+                - generic "Arrow — A or 5" [ref=e67] [cursor=pointer]:
+                  - radio "Arrow"
+                  - img [ref=e69]
+                - generic "Line — L or 6" [ref=e75] [cursor=pointer]:
+                  - radio "Line"
+                  - img [ref=e77]
+                - generic "Draw — P or 7" [ref=e79] [cursor=pointer]:
+                  - radio "Draw"
+                  - img [ref=e81]
+                - generic "Text — T or 8" [ref=e86] [cursor=pointer]:
+                  - radio "Text"
+                  - img [ref=e88]
+                - generic "Insert image — 9" [ref=e94] [cursor=pointer]:
+                  - radio "Insert image"
+                  - img [ref=e96]
+                - generic "Eraser — E or 0" [ref=e102] [cursor=pointer]:
+                  - radio "Eraser"
+                  - img [ref=e104]
+                - button "More tools" [ref=e112] [cursor=pointer]:
+                  - img [ref=e113]
+          - generic:
+            - button "Live collaboration..." [ref=e121] [cursor=pointer]:
+              - img [ref=e122]
+            - generic "Library" [ref=e124]:
+              - checkbox "Library"
+              - img [ref=e127] [cursor=pointer]
+      - contentinfo:
+        - region "Canvas actions" [ref=e132]:
+          - heading "Canvas actions" [level=2] [ref=e133]
+          - generic [ref=e135]:
+            - button "Zoom out" [ref=e136] [cursor=pointer]:
+              - img [ref=e138]
+            - button "Reset zoom" [disabled] [ref=e140]: 100%
+            - button "Zoom in" [ref=e141] [cursor=pointer]:
+              - img [ref=e143]
+          - generic [ref=e145]:
+            - button "Undo" [disabled] [ref=e148]:
+              - img [ref=e150]
+            - button "Redo" [disabled] [ref=e154]:
+              - img [ref=e156]
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - button "disable scroll lock" [active] [ref=e222] [cursor=pointer]
+            - generic [ref=e161]:
+              - text: overscroll
+              - spinbutton "overscroll" [ref=e162]: "0.2"
+            - generic [ref=e163]:
+              - text: zoom factor
+              - spinbutton "zoom factor" [ref=e164]: "0.2"
+            - generic [ref=e165]:
+              - checkbox "lock zoom" [ref=e166]
+              - text: lock zoom
+            - generic [ref=e167]:
+              - checkbox "animate" [ref=e168]
+              - text: animate
+          - link "Blog post on end-to-end encryption in Excalidraw" [ref=e169] [cursor=pointer]:
+            - /url: https://plus.excalidraw.com/blog/end-to-end-encryption
+            - img [ref=e171]
+        - button "Help" [ref=e174] [cursor=pointer]:
+          - img [ref=e175]
+    - generic:
+      - img
+    - generic [ref=e180]: Drawing canvas
