@@ -214,8 +214,6 @@ const getTargetViewport = (
   targetElements: readonly ExcalidrawElement[],
   opts?: ScrollToContentOptions,
 ): Viewport => {
-  let viewport: Viewport;
-
   if (opts?.fitToContent || opts?.fitToViewport) {
     const { appState } = zoomToFit({
       canvasOffsets: opts.canvasOffsets,
@@ -227,19 +225,16 @@ const getTargetViewport = (
       maxZoom: opts.maxZoom,
     });
 
-    viewport = {
+    return {
       scrollX: appState.scrollX,
       scrollY: appState.scrollY,
       zoom: appState.zoom,
     };
-  } else {
-    // keep the current zoom, only recenter the viewport on the target
-    const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
-    viewport = { scrollX, scrollY, zoom: state.zoom };
   }
+  // keep the current zoom, only recenter the viewport on the target
+  const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
 
-  // keep programmatic scrolling within the constraint box, if any
-  return constrainScrollState({ ...state, ...viewport });
+  return { scrollX, scrollY, zoom: state.zoom };
 };
 
 /**
@@ -310,9 +305,6 @@ const animateToViewport = (
         shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
       });
 
-      // returning a falsy value signals the AnimationController to remove the
-      // animation; otherwise it would keep ticking (and calling onFrame) every
-      // frame forever after reaching the target
       return progress < 1 ? { elapsed } : null;
     },
   );
