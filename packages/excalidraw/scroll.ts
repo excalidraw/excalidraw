@@ -67,19 +67,21 @@ export const getMinZoomForConstraints = (
 /**
  * Clamps a single scroll axis so the visible scene span stays inside the box.
  * The visible span is `[-scroll, -scroll + visibleSize]`; we keep it within
- * `[boxStart, boxStart + boxSize]`, expanded by `overscroll` on each side (for
- * rubberbanding). When the box can't cover the viewport on this axis (only at
- * the MAX_ZOOM cap for a tiny box) we center the box instead.
+ * `[boxStart, boxStart + boxSize]`, expanded by `startExpand` at the low edge
+ * and `endExpand` at the high edge (rubberband overscroll plus any padding).
+ * When the box can't cover the viewport on this axis (only at the MAX_ZOOM cap
+ * for a tiny box) we center the box instead.
  */
 const constrainScrollAxis = (
   scroll: number,
   boxStart: number,
   boxSize: number,
   visibleSize: number,
-  overscroll: number,
+  startExpand: number,
+  endExpand: number,
 ): number => {
-  const max = -boxStart + overscroll;
-  const min = visibleSize - (boxStart + boxSize) - overscroll;
+  const max = -boxStart + startExpand;
+  const min = visibleSize - (boxStart + boxSize) - endExpand;
   return min > max ? (min + max) / 2 : clamp(scroll, min, max);
 };
 
@@ -99,6 +101,11 @@ const constrainScrollAxis = (
  * zoom the box would otherwise enforce: `minZoom` replaces the fit zoom (so the
  * viewport may zoom out past the box) and `maxZoom` replaces the global
  * `MAX_ZOOM` cap.
+ *
+ * `padding` ([top, right, bottom, left], screen px) permanently extends the
+ * scrollable area past each box edge by that many on-screen pixels, so the
+ * viewport can reveal that much empty space beyond the box. Unlike `tolerance`
+ * it does not snap back.
  */
 export const constrainScrollState = (
   state: Pick<
@@ -131,8 +138,12 @@ export const constrainScrollState = (
     clamp(state.zoom.value, minZoom, maxZoom),
   );
 
-  // `tolerance` screen px expressed in scene coords at the current zoom
+  // `tolerance`/`padding` are screen px; express them in scene coords at the
+  // current zoom so the on-screen amount stays the same regardless of zoom.
   const overscroll = tolerance / zoomValue;
+  const [padTop, padRight, padBottom, padLeft] = (
+    scrollConstraints.padding ?? [0, 0, 0, 0]
+  ).map((px) => px / zoomValue);
 
   return {
     scrollX: constrainScrollAxis(
@@ -140,14 +151,16 @@ export const constrainScrollState = (
       scrollConstraints.x,
       scrollConstraints.width,
       width / zoomValue,
-      overscroll,
+      overscroll + padLeft,
+      overscroll + padRight,
     ),
     scrollY: constrainScrollAxis(
       state.scrollY,
       scrollConstraints.y,
       scrollConstraints.height,
       height / zoomValue,
-      overscroll,
+      overscroll + padTop,
+      overscroll + padBottom,
     ),
     zoom: { value: zoomValue },
   };

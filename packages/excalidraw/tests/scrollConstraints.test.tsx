@@ -264,6 +264,68 @@ describe("explicit minZoom / maxZoom (pure)", () => {
   });
 });
 
+describe("padding (pure)", () => {
+  const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
+
+  it("extends the scrollable area past each edge by `[top, right, bottom, left]`", () => {
+    const padding: [number, number, number, number] = [10, 20, 30, 40];
+
+    // pan past the top-left corner → clamp to the padded corner
+    const topLeft = constrainScrollState(
+      makeState({
+        scrollX: 999,
+        scrollY: 999,
+        scrollConstraints: { ...box, padding },
+      }),
+    );
+    expect(topLeft.scrollX).toBeCloseTo(40); // left padding
+    expect(topLeft.scrollY).toBeCloseTo(10); // top padding
+
+    // pan past the far edges → clamp to width/height - boxSize - far padding
+    const farEdge = constrainScrollState(
+      makeState({
+        scrollX: -5000,
+        scrollY: -5000,
+        scrollConstraints: { ...box, padding },
+      }),
+    );
+    expect(farEdge.scrollX).toBeCloseTo(VIEWPORT.width - box.width - 20); // -820 (right)
+    expect(farEdge.scrollY).toBeCloseTo(VIEWPORT.height - box.height - 30); // -930 (bottom)
+  });
+
+  it("keeps the padding a fixed screen distance regardless of zoom", () => {
+    // 40 screen px of top padding at zoom 2 → 20 scene px
+    const result = constrainScrollState(
+      makeState({
+        scrollY: 999,
+        zoom: { value: getNormalizedZoom(2) },
+        scrollConstraints: { ...box, padding: [40, 0, 0, 0] },
+      }),
+    );
+    expect(result.scrollY).toBeCloseTo(20);
+  });
+
+  it("defaults to no extra room", () => {
+    const result = constrainScrollState(
+      makeState({ scrollX: 999, scrollConstraints: box }),
+    );
+    expect(result.scrollX).toBeCloseTo(0);
+  });
+
+  it("stacks with the rubberband tolerance", () => {
+    const tolerance = 30; // screen px
+    const result = constrainScrollState(
+      makeState({
+        scrollX: 999,
+        scrollConstraints: { ...box, tolerance, padding: [0, 0, 0, 40] },
+      }),
+      tolerance,
+    );
+    // left padding (40) + tolerance overscroll (30) at zoom 1
+    expect(result.scrollX).toBeCloseTo(70);
+  });
+});
+
 describe("rubberband tolerance (pure)", () => {
   const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
 

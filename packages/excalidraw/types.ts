@@ -294,6 +294,13 @@ export type ScrollConstraints = {
    * capping how far the viewport can zoom in.
    */
   maxZoom?: number;
+  /**
+   * Extra scrollable margin around the box, as `[top, right, bottom, left]`
+   * (cardinal order), letting the viewport scroll past each box edge to reveal
+   * that much empty space beyond it. Values are screen pixels, so the margin
+   * stays the same on-screen regardless of zoom. Defaults to `[0, 0, 0, 0]`.
+   */
+  padding?: [top: number, right: number, bottom: number, left: number];
 };
 
 export interface AppState {
