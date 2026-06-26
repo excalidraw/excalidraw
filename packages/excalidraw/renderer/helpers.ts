@@ -1,4 +1,4 @@
-import { THEME, applyDarkModeFilter } from "@excalidraw/common";
+import { COLOR_WHITE, THEME, applyDarkModeFilter } from "@excalidraw/common";
 
 import type { StaticCanvasRenderConfig } from "../scene/types";
 import type { AppState, StaticCanvasAppState } from "../types";
@@ -53,29 +53,24 @@ export const bootstrapCanvas = ({
 
   // Paint background
   if (typeof viewBackgroundColor === "string") {
-    // 1. Verify if the color is a valid CSS string.
-    // Corrupted values like "0000" (missing #) cause the ghosting bug.
-    const isValidColor =
-      /^(#|rgba\(|hsla\(|rgb\(|hsl\()/.test(viewBackgroundColor) ||
-      viewBackgroundColor === "transparent" ||
-      (!viewBackgroundColor.startsWith("#") && !/\d/.test(viewBackgroundColor));
+    // An opaque fill repaints every pixel, so clearRect would be redundant.
+    // For anything else — transparency, or a value we can't be certain about
+    // (e.g. corrupted persisted state like "0000") — clear first so the
+    // previous frame can't bleed through.
+    //
+    // We skip opaque #RRGGBB and #RGB hex colors as a quick optimization.
+    const isOpaque = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(viewBackgroundColor);
 
-    // 2. Determine if we need to clear the canvas.
-    // If the color is invalid, we force a clear to prevent trails.
-    const hasTransparence =
-      !isValidColor ||
-      viewBackgroundColor === "transparent" ||
-      viewBackgroundColor.length === 5 ||
-      viewBackgroundColor.length === 9 ||
-      /(hsla|rgba)\(/.test(viewBackgroundColor);
-
-    if (hasTransparence) {
+    if (!isOpaque) {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
 
-    // 3. Only attempt to fill if the color is valid and not transparent
-    if (isValidColor && viewBackgroundColor !== "transparent") {
+    if (viewBackgroundColor !== "transparent") {
       context.save();
+      // The canvas silently ignores an invalid fillStyle, which would leave a
+      // stale color from a previous draw. Seed a sane default so corrupted
+      // values fall back to white instead of painting garbage.
+      context.fillStyle = COLOR_WHITE;
       context.fillStyle = applyDarkModeFilter(
         viewBackgroundColor,
         theme === THEME.DARK,
