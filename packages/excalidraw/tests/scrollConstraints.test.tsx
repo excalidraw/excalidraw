@@ -14,6 +14,7 @@ import {
   animateToConstraints,
   constrainScrollState,
   getMinZoomForConstraints,
+  isViewportOverscrolled,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
 } from "../scroll";
 import { AnimationController } from "../renderer/animation";
@@ -268,6 +269,47 @@ describe("rubberband tolerance (pure)", () => {
       makeState({ scrollX: 999, scrollConstraints: box }),
     );
     expect(result.scrollX).toBeCloseTo(0);
+  });
+});
+
+describe("isViewportOverscrolled (pure)", () => {
+  const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
+
+  it("is false when there are no constraints", () => {
+    expect(
+      isViewportOverscrolled(
+        makeState({ scrollX: 9999, scrollConstraints: null }),
+      ),
+    ).toBe(false);
+  });
+
+  it("is false when the viewport is within the hard bounds", () => {
+    expect(
+      isViewportOverscrolled(
+        makeState({ scrollX: -100, scrollY: -100, scrollConstraints: box }),
+      ),
+    ).toBe(false);
+  });
+
+  it("is true when panned past an edge (rubberband overscroll)", () => {
+    // scrollX 30 is past the hard max of 0
+    expect(
+      isViewportOverscrolled(
+        makeState({ scrollX: 30, scrollConstraints: box }),
+      ),
+    ).toBe(true);
+  });
+
+  it("is true when zoomed out below the fit zoom", () => {
+    // fit zoom for this box is 0.2; 0.1 is below it
+    expect(
+      isViewportOverscrolled(
+        makeState({
+          zoom: { value: getNormalizedZoom(0.1) },
+          scrollConstraints: box,
+        }),
+      ),
+    ).toBe(true);
   });
 });
 

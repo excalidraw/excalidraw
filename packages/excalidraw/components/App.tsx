@@ -417,6 +417,7 @@ import {
   scrollToElements,
   constrainScrollState,
   animateToConstraints,
+  isViewportOverscrolled,
 } from "../scroll";
 import {
   setEraserCursor,
@@ -5647,6 +5648,12 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // while rubberband-overscrolled past the scroll constraints, suppress
+    // zooming until the viewport has snapped back inside the box
+    if (isViewportOverscrolled(this.state)) {
+      return;
+    }
+
     const initialScale = gesture.initialScale;
     if (initialScale) {
       this.translateCanvas((state) => ({
@@ -6897,7 +6904,11 @@ class App extends React.Component<AppProps, AppState> {
           ? 1
           : distance / gesture.initialDistance;
 
-      const nextZoom = scaleFactor
+      // while rubberband-overscrolled past the scroll constraints, pin the zoom
+      // (still allowing the pan below) until the viewport has snapped back
+      const nextZoom = isViewportOverscrolled(this.state)
+        ? this.state.zoom.value
+        : scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
         : this.state.zoom.value;
 
@@ -12791,6 +12802,12 @@ class App extends React.Component<AppProps, AppState> {
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
+        // while rubberband-overscrolled past the scroll constraints, suppress
+        // zooming until the viewport has snapped back inside the box
+        if (isViewportOverscrolled(this.state)) {
+          return;
+        }
+
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);

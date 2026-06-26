@@ -143,6 +143,31 @@ export const constrainScrollState = (
 };
 
 /**
+ * Whether the viewport currently sits outside the hard constraint bounds, i.e.
+ * the user is rubberband-overscrolled (panned past an edge or zoomed out below
+ * the fit zoom). Always `false` when there are no constraints. Used to suppress
+ * zooming until the viewport has settled back inside the box.
+ */
+export const isViewportOverscrolled = (
+  state: Pick<
+    AppState,
+    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
+  >,
+): boolean => {
+  if (!state.scrollConstraints) {
+    return false;
+  }
+
+  const target = constrainScrollState(state); // hard clamp (tolerance 0)
+
+  return (
+    target.scrollX !== state.scrollX ||
+    target.scrollY !== state.scrollY ||
+    target.zoom.value !== state.zoom.value
+  );
+};
+
+/**
  * Rubberband snap-back: animates the viewport from its current (possibly
  * overscrolled) position back inside the constraint box via the shared
  * AnimationController. No-op when already within the hard bounds (or when there
