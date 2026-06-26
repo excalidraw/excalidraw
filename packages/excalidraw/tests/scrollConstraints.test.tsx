@@ -221,19 +221,38 @@ describe("setScrollConstraints (integration)", () => {
 describe("rubberband tolerance (pure)", () => {
   const box: ScrollConstraints = { x: 0, y: 0, width: 1000, height: 1000 };
 
-  it("allows scroll overscroll up to `tolerance` fraction of the viewport", () => {
-    const tolerance = 0.25;
-    // hard max for scrollX is -box.x = 0; soft adds tolerance * width / zoom
+  it("allows scroll overscroll up to `tolerance` screen pixels", () => {
+    const tolerance = 30; // screen px
+    // hard max for scrollX is -box.x = 0; soft adds tolerance / zoom scene px
     const result = constrainScrollState(
       makeState({ scrollX: 999, scrollConstraints: { ...box, tolerance } }),
       tolerance,
     );
-    expect(result.scrollX).toBeCloseTo((tolerance * VIEWPORT.width) / 1); // 50
+    expect(result.scrollX).toBeCloseTo(tolerance / 1); // 30 (zoom 1)
   });
 
-  it("relaxes the minimum zoom by the `tolerance` fraction", () => {
-    const tolerance = 0.25;
-    const minZoom = getMinZoomForConstraints(box, VIEWPORT); // 0.2
+  it("keeps the overscroll a fixed screen distance regardless of zoom", () => {
+    const tolerance = 30; // screen px
+    const result = constrainScrollState(
+      makeState({
+        scrollX: 999,
+        zoom: { value: getNormalizedZoom(2) },
+        scrollConstraints: { ...box, tolerance },
+      }),
+      tolerance,
+    );
+    // 30 screen px at zoom 2 -> 15 scene px of overscroll
+    expect(result.scrollX).toBeCloseTo(tolerance / 2); // 15
+  });
+
+  it("relaxes the minimum zoom by the `tolerance` screen pixels", () => {
+    const tolerance = 25; // screen px
+    // relaxed min zoom lets the box shrink within the viewport by `tolerance`
+    // px on each side: max((200-50)/1000, (100-50)/1000) = 0.15
+    const expected = getMinZoomForConstraints(box, {
+      width: VIEWPORT.width - 2 * tolerance,
+      height: VIEWPORT.height - 2 * tolerance,
+    });
     const result = constrainScrollState(
       makeState({
         zoom: { value: getNormalizedZoom(0.01) },
@@ -241,7 +260,7 @@ describe("rubberband tolerance (pure)", () => {
       }),
       tolerance,
     );
-    expect(result.zoom.value).toBeCloseTo(minZoom * (1 - tolerance)); // 0.15
+    expect(result.zoom.value).toBeCloseTo(expected); // 0.15
   });
 
   it("hard-clamps when tolerance is 0 (default)", () => {
@@ -305,7 +324,7 @@ describe("rubberband tolerance (integration)", () => {
         y: 0,
         width: 1000,
         height: 1000,
-        tolerance: 0.25,
+        tolerance: 25,
       });
     });
 
@@ -315,8 +334,10 @@ describe("rubberband tolerance (integration)", () => {
     // page-up pans up, pushing scrollY past the hard edge into the overscroll
     Keyboard.keyPress(KEYS.PAGE_UP);
 
-    // overscrolled past 0, but bounded by tolerance * height = 25
+    // overscrolled past 0, but bounded by tolerance (25 screen px / zoom 1)
     expect(h.state.scrollY).toBeGreaterThan(0);
-    expect(h.state.scrollY).toBeLessThanOrEqual(0.25 * h.state.height + 0.001);
+    expect(h.state.scrollY).toBeLessThanOrEqual(
+      25 / h.state.zoom.value + 0.001,
+    );
   });
 });

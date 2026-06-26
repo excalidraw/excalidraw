@@ -4432,7 +4432,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when
    * unconstrained). Runs as a queued update, so it sees the preceding change.
-   * `tolerance` (0–1) relaxes the bounds for rubberbanding. */
+   * `tolerance` (screen px) relaxes the bounds for rubberbanding. */
   private constrainViewportToScrollConstraints = (tolerance = 0) => {
     this.setState((prevState) =>
       prevState.scrollConstraints

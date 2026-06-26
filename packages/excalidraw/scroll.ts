@@ -90,9 +90,10 @@ const constrainScrollAxis = (
  * inside the box, any zoom anchor (which lives within the viewport) is also
  * guaranteed to stay inside the box.
  *
- * `tolerance` (0–1, a fraction of the viewport) relaxes the bounds for
- * rubberbanding: the viewport may pan past the edges / zoom out below the fit
- * zoom by that fraction. Pass `0` (default) for a hard clamp.
+ * `tolerance` is the rubberband overscroll allowance, in screen pixels: the
+ * viewport may pan past the box edges (and zoom out below the fit zoom) until
+ * each edge has crossed the box by up to `tolerance` pixels on screen,
+ * independent of the current zoom. Pass `0` (default) for a hard clamp.
  */
 export const constrainScrollState = (
   state: Pick<
@@ -107,16 +108,20 @@ export const constrainScrollState = (
     return { scrollX: state.scrollX, scrollY: state.scrollY, zoom: state.zoom };
   }
 
-  tolerance = clamp(tolerance, 0, 1);
+  tolerance = Math.max(tolerance, 0);
 
-  const minZoom = getMinZoomForConstraints(scrollConstraints, {
-    width,
-    height,
+  // relax the min zoom so the user can briefly zoom out past the fit zoom,
+  // letting each viewport edge cross the box by up to `tolerance` screen px
+  const relaxedMinZoom = getMinZoomForConstraints(scrollConstraints, {
+    width: width - 2 * tolerance,
+    height: height - 2 * tolerance,
   });
-  // relax the min zoom so the user can briefly zoom out past the fit zoom
   const zoomValue = getNormalizedZoom(
-    clamp(state.zoom.value, minZoom * (1 - tolerance), MAX_ZOOM),
+    clamp(state.zoom.value, relaxedMinZoom, MAX_ZOOM),
   );
+
+  // `tolerance` screen px expressed in scene coords at the current zoom
+  const overscroll = tolerance / zoomValue;
 
   return {
     scrollX: constrainScrollAxis(
@@ -124,14 +129,14 @@ export const constrainScrollState = (
       scrollConstraints.x,
       scrollConstraints.width,
       width / zoomValue,
-      (tolerance * width) / zoomValue,
+      overscroll,
     ),
     scrollY: constrainScrollAxis(
       state.scrollY,
       scrollConstraints.y,
       scrollConstraints.height,
       height / zoomValue,
-      (tolerance * height) / zoomValue,
+      overscroll,
     ),
     zoom: { value: zoomValue },
   };
