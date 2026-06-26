@@ -242,11 +242,53 @@ const getTargetViewport = (
   return constrainScrollState({ ...state, ...viewport });
 };
 
+/**
+ * Interpolates the viewport from `from` to `target` at the (already-eased)
+ * blend amount `factor` (0 = `from`, 1 = `target`).
+ *
+ * Zoom is interpolated geometrically (so it feels uniform), and rather than
+ * tweening scrollX/scrollY directly we tween the *focal point* — the scene
+ * point under the viewport center — and derive scroll from it. Mixing a linear
+ * scroll with a geometric zoom makes the focal point swoop sideways
+ * mid-animation (most visible when zooming out); gliding the focal point keeps
+ * it steady. `width/2/zoom - scroll` is the inverse of `centerScrollOn` without
+ * offsets, so factor 0/1 land exactly on `from`/`target`.
+ */
+export const interpolateViewport = ({
+  from,
+  target,
+  factor,
+}: {
+  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">;
+  target: Viewport;
+  factor: number;
+}): Viewport => {
+  const zoom = (from.zoom.value *
+    Math.pow(
+      target.zoom.value / from.zoom.value,
+      factor,
+    )) as NormalizedZoomValue;
+
+  const fromCenterX = from.width / 2 / from.zoom.value - from.scrollX;
+  const fromCenterY = from.height / 2 / from.zoom.value - from.scrollY;
+  const toCenterX = from.width / 2 / target.zoom.value - target.scrollX;
+  const toCenterY = from.height / 2 / target.zoom.value - target.scrollY;
+
+  const centerX = fromCenterX + (toCenterX - fromCenterX) * factor;
+  const centerY = fromCenterY + (toCenterY - fromCenterY) * factor;
+
+  return {
+    scrollX: from.width / 2 / zoom - centerX,
+    scrollY: from.height / 2 / zoom - centerY,
+    zoom: { value: zoom },
+  };
+};
+
 /** Eases the viewport from its current position to `target` over `duration`,
  * driving the transition through the shared AnimationController so it doesn't
  * slow down other processes. */
 const animateToViewport = (
-  from: Pick<AppState, "scrollX" | "scrollY" | "zoom">,
+  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">,
   target: Viewport,
   duration: number,
   onFrame: (
@@ -264,17 +306,8 @@ const animateToViewport = (
       const factor = easeOut(clamp(progress, 0, 1));
 
       onFrame({
+        ...interpolateViewport({ from, target, factor }),
         shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
-        scrollX: from.scrollX + (target.scrollX - from.scrollX) * factor,
-        scrollY: from.scrollY + (target.scrollY - from.scrollY) * factor,
-        // zoom interpolates geometrically so the transition feels natural
-        zoom: {
-          value: (from.zoom.value *
-            Math.pow(
-              target.zoom.value / from.zoom.value,
-              factor,
-            )) as NormalizedZoomValue,
-        },
       });
 
       // returning a falsy value signals the AnimationController to remove the
