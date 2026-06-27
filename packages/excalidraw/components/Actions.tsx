@@ -47,6 +47,7 @@ import {
 } from "../scene";
 
 import { getFormValue } from "../actions/actionProperties";
+import { getShortcutKey } from "../shortcut";
 
 import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
@@ -1292,6 +1293,7 @@ export const ShapesSwitcher = ({
             icon={bucketFillIcon}
             data-testid="toolbar-bucketFill"
             selected={bucketFillToolSelected}
+            shortcut={getShortcutKey("Shift+F")}
           >
             {t("toolBar.bucketFill")}
           </DropdownMenu.Item>

@@ -2,6 +2,7 @@ import {
   lineSegment,
   lineSegmentIntersectionPoints,
   pointDistance,
+  pointFrom,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
@@ -13,7 +14,7 @@ import {
   getElementBounds,
   getElementLineSegments,
 } from "./bounds";
-import { isPointInElement } from "./collision";
+import { intersectElementWithLineSegment, isPointInElement } from "./collision";
 import { isLineElement, isValidPolygon } from "./typeChecks";
 import { isPathALoop } from "./utils";
 
@@ -140,6 +141,93 @@ const perpendicularDistance = (
     return pointDistance(p, a);
   }
   return Math.abs((p[0] - a[0]) * dy - (p[1] - a[1]) * dx) / len;
+};
+
+const pointAtParam = (a: GlobalPoint, b: GlobalPoint, t: number): GlobalPoint =>
+  pointFrom<GlobalPoint>(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t);
+
+/** Remove the `cuts` parameter intervals from the `base` parameter intervals. */
+const subtractIntervals = (
+  base: [number, number][],
+  cuts: [number, number][],
+): [number, number][] => {
+  let result = base;
+  for (const [c0, c1] of cuts) {
+    const next: [number, number][] = [];
+    for (const [b0, b1] of result) {
+      if (c1 <= b0 || c0 >= b1) {
+        next.push([b0, b1]);
+        continue;
+      }
+      if (c0 > b0) {
+        next.push([b0, c0]);
+      }
+      if (c1 < b1) {
+        next.push([c1, b1]);
+      }
+    }
+    result = next;
+  }
+  return result;
+};
+
+/**
+ * Clip a segment to only its visible parts: the portions covered by an opaque
+ * (non-transparent background) element above the segment's source are hidden
+ * and removed. Returns the visible sub-segments (possibly empty).
+ */
+const clipSegmentToVisible = (
+  a: GlobalPoint,
+  b: GlobalPoint,
+  coverers: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
+  eps: number,
+): [GlobalPoint, GlobalPoint][] => {
+  let intervals: [number, number][] = [[0, 1]];
+  for (const coverer of coverers) {
+    if (intervals.length === 0) {
+      break;
+    }
+    const hits = intersectElementWithLineSegment(
+      coverer,
+      elementsMap,
+      lineSegment(a, b),
+    );
+    const breaks = [
+      0,
+      ...hits
+        .map((p) => projectParam(a, b, p))
+        .filter((t) => t > 0 && t < 1)
+        .sort((x, y) => x - y),
+      1,
+    ];
+    const covered: [number, number][] = [];
+    for (let k = 0; k < breaks.length - 1; k++) {
+      const t0 = breaks[k];
+      const t1 = breaks[k + 1];
+      if (t1 - t0 < 1e-9) {
+        continue;
+      }
+      if (
+        isPointInElement(
+          pointAtParam(a, b, (t0 + t1) / 2),
+          coverer,
+          elementsMap,
+        )
+      ) {
+        covered.push([t0, t1]);
+      }
+    }
+    if (covered.length) {
+      intervals = subtractIntervals(intervals, covered);
+    }
+  }
+  return intervals
+    .filter(
+      ([t0, t1]) =>
+        pointDistance(pointAtParam(a, b, t0), pointAtParam(a, b, t1)) >= eps,
+    )
+    .map(([t0, t1]) => [pointAtParam(a, b, t0), pointAtParam(a, b, t1)]);
 };
 
 /**
@@ -744,19 +832,53 @@ export const computeBucketFillPolygon = (args: {
   const ownerBounds = getElementBounds(owner, elementsMap);
   const pad = options.gapTolerance + 2 + Math.max(owner.strokeWidth ?? 1, 1);
   const expandedOwner = expandBounds(ownerBounds, pad);
+  const overlapsOwner = (element: ExcalidrawElement) =>
+    doBoundsIntersect(expandedOwner, getElementBounds(element, elementsMap));
   const extraBoundaries = elements.filter(
     (element) =>
       element.id !== owner.id &&
       isEligibleBoundary(element) &&
-      doBoundsIntersect(expandedOwner, getElementBounds(element, elementsMap)),
+      overlapsOwner(element),
   );
 
-  // 3. flatten to segments, tagged with their source element
+  // z-order index + the opaque elements that hide outlines beneath them
+  const indexOf = new Map<string, number>();
+  elements.forEach((element, i) => indexOf.set(element.id, i));
+  const coverers = elements.filter(
+    (element) =>
+      element.opacity > 0 &&
+      element.backgroundColor !== "transparent" &&
+      !isBucketFill(element) &&
+      overlapsOwner(element),
+  );
+
+  // 3. flatten to segments tagged with their source element, clipping each
+  // outline to its visible parts (portions hidden behind an opaque element
+  // above are not boundaries — only what the user actually sees can stop fill)
   const rawSegments: SourceSegment[] = [];
   const collect = (element: ExcalidrawElement) => {
+    const elementIndex = indexOf.get(element.id) ?? 0;
+    const coverersAbove = coverers.filter(
+      (coverer) =>
+        coverer.id !== element.id &&
+        (indexOf.get(coverer.id) ?? 0) > elementIndex,
+    );
     for (const segment of getElementLineSegments(element, elementsMap)) {
-      if (segmentLength(segment) >= options.snapEpsilon) {
+      if (segmentLength(segment) < options.snapEpsilon) {
+        continue;
+      }
+      if (coverersAbove.length === 0) {
         rawSegments.push({ segment, elementId: element.id });
+        continue;
+      }
+      for (const [a, b] of clipSegmentToVisible(
+        segment[0],
+        segment[1],
+        coverersAbove,
+        elementsMap,
+        options.snapEpsilon,
+      )) {
+        rawSegments.push({ segment: lineSegment(a, b), elementId: element.id });
       }
     }
   };

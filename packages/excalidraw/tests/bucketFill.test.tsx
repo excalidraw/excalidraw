@@ -95,6 +95,15 @@ describe("bucket fill tool", () => {
     expect(panel!.querySelector('[aria-label="Stroke"]')).toBeNull();
   });
 
+  it("selects the tool with the shift+f shortcut", () => {
+    expect(h.state.activeTool.type).toBe("selection");
+    // frame owns plain "f"; bucket fill is shift+f (uppercase event.key)
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress("F");
+    });
+    expect(h.state.activeTool.type).toBe("bucketFill");
+  });
+
   it("no-ops with a transparent background color", () => {
     seedRectangle();
     act(() => {
@@ -147,6 +156,49 @@ describe("bucket fill tool", () => {
     expect(fill.customData?.bucketFill?.boundaryElementIds).toContain(below.id);
     expect(h.elements[0].id).toBe(fill.id);
     expect(h.elements[1].id).toBe(below.id);
+    expect(h.elements[2].id).toBe(owner.id);
+  });
+
+  it("inserts the fill above a participant whose opaque background covers it", () => {
+    // lower rectangle is filled red: its background would hide a fill placed
+    // beneath it, so the bucket fill must go above it (but below the
+    // transparent owner, whose outline should stay visible)
+    const below = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "#ff0000",
+    });
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    act(() => {
+      h.app.updateScene({
+        elements: [below, owner],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+    act(() => {
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(75, 75);
+
+    const fill = h.elements.find((el) => el.type === "line" && !el.isDeleted)!;
+    expect(fill).toBeDefined();
+    // order: below (red, covered) -> fill -> owner (transparent outline on top)
+    expect(h.elements[0].id).toBe(below.id);
+    expect(h.elements[1].id).toBe(fill.id);
     expect(h.elements[2].id).toBe(owner.id);
   });
 

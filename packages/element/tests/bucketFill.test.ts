@@ -183,6 +183,82 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(7800);
   });
 
+  it("ignores outline portions hidden behind an opaque element on top", () => {
+    // `hidden` sits below `owner`; the part of its outline inside `owner` is
+    // covered by owner's opaque fill, so it must not act as a boundary
+    const hidden = API.createElement({
+      type: "rectangle",
+      x: 40,
+      y: 40,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "#ffd43b",
+    });
+    // owner drawn last => on top, with an opaque fill
+    const { elements, elementsMap } = setup([hidden, owner]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(20, 20),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBe(owner.id);
+    // the whole visible owner fills (~10000); the hidden outline does NOT carve
+    // out the ~6400 L-shape it would if it were visible
+    expect(polygonArea(result.scenePoints)).toBeGreaterThan(9000);
+  });
+
+  it("respects outlines visible through a transparent element on top", () => {
+    // same geometry, but `owner` is transparent, so the lower rectangle's
+    // outline shows through and splits the region
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 40,
+      y: 40,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([lower, owner]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(20, 20),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // the visible outline carves out the overlap corner => ~6400 L-shape
+    expect(polygonArea(result.scenePoints)).toBeGreaterThan(6000);
+    expect(polygonArea(result.scenePoints)).toBeLessThan(7000);
+  });
+
   it("returns no_owner for open canvas", () => {
     const { elements, elementsMap } = setup([]);
     const result = computeBucketFillPolygon({

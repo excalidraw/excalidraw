@@ -118,7 +118,9 @@ export const SHAPES = [
   {
     icon: bucketFillIcon,
     value: "bucketFill",
-    key: null,
+    // shift+f (frame owns plain "f"); a held shift produces an uppercase
+    // `event.key`, which is what findShapeByKey matches against
+    key: KEYS.F.toUpperCase(),
     numericKey: null,
     fillable: false,
     toolbar: false,

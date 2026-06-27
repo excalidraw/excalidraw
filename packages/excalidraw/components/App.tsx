@@ -7656,17 +7656,37 @@ class App extends React.Component<AppProps, AppState> {
       },
     });
 
-    // insert the fill below the lowest-z element whose outline bounds it (the
-    // owner plus any boundary elements that contributed an edge), so none of
-    // those strokes get covered by the fill
+    // Z-order: the fill should sit above any participating element whose
+    // opaque background would otherwise render over (hide) it, but below
+    // participants that only contribute an outline, so their borders stay
+    // visible. A participant "covers" the fill when it has a non-transparent
+    // background and the filled region lies inside it (the click lands inside).
+    // Indices are computed against the deleted-inclusive array that
+    // `insertElementsAtIndex` operates on.
     const participantIds = new Set<string>([
       result.ownerId,
       ...result.boundaryElementIds,
     ]);
-    let insertIndex = elements.findIndex((el) => participantIds.has(el.id));
-    if (insertIndex < 0) {
-      insertIndex = elements.findIndex((el) => el.id === result.ownerId);
+    const orderedElements = this.scene.getElementsIncludingDeleted();
+    let lowestParticipantIndex = -1;
+    let aboveCoveringIndex = -1;
+    for (let i = 0; i < orderedElements.length; i++) {
+      const el = orderedElements[i];
+      if (!participantIds.has(el.id)) {
+        continue;
+      }
+      if (lowestParticipantIndex < 0) {
+        lowestParticipantIndex = i;
+      }
+      if (
+        el.backgroundColor !== "transparent" &&
+        isPointInElement(point, el, elementsMap)
+      ) {
+        aboveCoveringIndex = i;
+      }
     }
+    const insertIndex =
+      aboveCoveringIndex >= 0 ? aboveCoveringIndex + 1 : lowestParticipantIndex;
     this.scene.insertElementsAtIndex(
       [fill],
       insertIndex < 0 ? null : insertIndex,
