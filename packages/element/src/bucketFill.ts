@@ -341,25 +341,39 @@ type WorkingSegment = {
   pa: GlobalPoint;
   pb: GlobalPoint;
   box: Bounds;
+  elementId: string;
   splits: { node: number; t: number }[];
+};
+
+/** A segment paired with the element it was extracted from. */
+type SourceSegment = {
+  segment: LineSegment<GlobalPoint>;
+  elementId: string;
+};
+
+/** An extracted face ring plus the ids of the elements whose outlines bound it. */
+type Face = {
+  ring: GlobalPoint[];
+  contributors: Set<string>;
 };
 
 /**
  * Build the planar straight-line graph from the input segments (split at
- * intersections and T-junctions) and extract its face rings.
+ * intersections and T-junctions) and extract its face rings. Each face records
+ * which source elements contributed an edge to its boundary.
  *
  * Known gap (see spec): collinear/overlapping segments are not split against
  * each other; transversal intersections and T-junctions are handled.
  */
 const buildFaces = (
-  rawSegments: LineSegment<GlobalPoint>[],
+  rawSegments: SourceSegment[],
   options: BucketFillOptions,
-): GlobalPoint[][] | null => {
+): Face[] | null => {
   const eps = options.snapEpsilon;
   const store = new NodeStore(eps);
   const segments: WorkingSegment[] = [];
 
-  for (const segment of rawSegments) {
+  for (const { segment, elementId } of rawSegments) {
     if (segmentLength(segment) < eps) {
       continue;
     }
@@ -375,6 +389,7 @@ const buildFaces = (
       b,
       pa,
       pb,
+      elementId,
       box: [
         Math.min(pa[0], pb[0]),
         Math.min(pa[1], pb[1]),
@@ -445,6 +460,9 @@ const buildFaces = (
   // emit atomic edges
   const edgeSet = new Set<string>();
   const adjacency = new Map<number, number[]>();
+  // atomic edge -> ids of the elements whose segments produced it
+  const edgeToElements = new Map<string, Set<string>>();
+  const edgeKey = (u: number, v: number) => (u < v ? `${u}-${v}` : `${v}-${u}`);
   const link = (u: number, v: number) => {
     const list = adjacency.get(u);
     if (list) {
@@ -453,14 +471,20 @@ const buildFaces = (
       adjacency.set(u, [v]);
     }
   };
-  const addEdge = (u: number, v: number) => {
+  const addEdge = (u: number, v: number, elementId: string) => {
     if (u === v) {
       return;
     }
     if (pointDistance(store.nodes[u], store.nodes[v]) < eps) {
       return;
     }
-    const key = u < v ? `${u}-${v}` : `${v}-${u}`;
+    const key = edgeKey(u, v);
+    const owners = edgeToElements.get(key);
+    if (owners) {
+      owners.add(elementId);
+    } else {
+      edgeToElements.set(key, new Set([elementId]));
+    }
     if (edgeSet.has(key)) {
       return;
     }
@@ -480,7 +504,7 @@ const buildFaces = (
       .map(([node, t]) => ({ node, t }))
       .sort((a, b) => a.t - b.t);
     for (let k = 0; k < ordered.length - 1; k++) {
-      addEdge(ordered[k].node, ordered[k + 1].node);
+      addEdge(ordered[k].node, ordered[k + 1].node, segment.elementId);
     }
   }
 
@@ -507,7 +531,7 @@ const buildFaces = (
 
   // walk half-edges into face rings
   const visited = new Set<string>();
-  const faces: GlobalPoint[][] = [];
+  const faces: Face[] = [];
   const maxSteps = edgeSet.size * 2 + 4;
   for (const [node, neighbours] of adjacency) {
     for (const first of neighbours) {
@@ -534,7 +558,21 @@ const buildFaces = (
         }
       }
       if (ring.length >= 3) {
-        faces.push(ring.map((index) => store.nodes[index]));
+        const contributors = new Set<string>();
+        for (let k = 0; k < ring.length; k++) {
+          const owners = edgeToElements.get(
+            edgeKey(ring[k], ring[(k + 1) % ring.length]),
+          );
+          if (owners) {
+            for (const id of owners) {
+              contributors.add(id);
+            }
+          }
+        }
+        faces.push({
+          ring: ring.map((index) => store.nodes[index]),
+          contributors,
+        });
       }
     }
   }
@@ -548,10 +586,10 @@ const buildFaces = (
  * are skipped, which leaves only true (bounded) cells.
  */
 const selectFaceFromArrangement = (
-  faces: GlobalPoint[][],
+  faces: Face[],
   point: GlobalPoint,
   options: BucketFillOptions,
-): GlobalPoint[] | null => {
+): Face | null => {
   if (faces.length === 0) {
     return null;
   }
@@ -559,17 +597,17 @@ const selectFaceFromArrangement = (
   let outerSign = 0;
   let maxAbsArea = -1;
   for (const face of faces) {
-    const area = signedArea(face);
+    const area = signedArea(face.ring);
     if (Math.abs(area) > maxAbsArea) {
       maxAbsArea = Math.abs(area);
       outerSign = Math.sign(area);
     }
   }
 
-  let best: GlobalPoint[] | null = null;
+  let best: Face | null = null;
   let bestArea = Infinity;
   for (const face of faces) {
-    const area = signedArea(face);
+    const area = signedArea(face.ring);
     if (Math.sign(area) === outerSign) {
       continue;
     }
@@ -577,7 +615,7 @@ const selectFaceFromArrangement = (
     if (absArea < options.minArea) {
       continue;
     }
-    if (!polygonIncludesPointNonZero(point, face)) {
+    if (!polygonIncludesPointNonZero(point, face.ring)) {
       continue;
     }
     if (absArea < bestArea) {
@@ -713,12 +751,12 @@ export const computeBucketFillPolygon = (args: {
       doBoundsIntersect(expandedOwner, getElementBounds(element, elementsMap)),
   );
 
-  // 3. flatten to segments
-  const rawSegments: LineSegment<GlobalPoint>[] = [];
+  // 3. flatten to segments, tagged with their source element
+  const rawSegments: SourceSegment[] = [];
   const collect = (element: ExcalidrawElement) => {
     for (const segment of getElementLineSegments(element, elementsMap)) {
       if (segmentLength(segment) >= options.snapEpsilon) {
-        rawSegments.push(segment);
+        rawSegments.push({ segment, elementId: element.id });
       }
     }
   };
@@ -730,17 +768,24 @@ export const computeBucketFillPolygon = (args: {
     return { ok: false, reason: "too_complex" };
   }
 
-  // 4. select the ring to fill
+  // 4. select the ring to fill and the elements whose outlines bound it
   let ring: GlobalPoint[] | null;
+  let contributors: Set<string>;
   if (extraBoundaries.length === 0) {
     // owner-only fill: chain the owner outline into a single ring
-    ring = assembleRing(rawSegments, options.snapEpsilon);
+    ring = assembleRing(
+      rawSegments.map((source) => source.segment),
+      options.snapEpsilon,
+    );
+    contributors = new Set([owner.id]);
   } else {
     const faces = buildFaces(rawSegments, options);
     if (!faces) {
       return { ok: false, reason: "too_complex" };
     }
-    ring = selectFaceFromArrangement(faces, point, options);
+    const face = selectFaceFromArrangement(faces, point, options);
+    ring = face ? face.ring : null;
+    contributors = face ? face.contributors : new Set();
   }
   if (!ring) {
     return { ok: false, reason: "open_region" };
@@ -758,7 +803,9 @@ export const computeBucketFillPolygon = (args: {
   return {
     ok: true,
     ownerId: owner.id,
-    boundaryElementIds: extraBoundaries.map((element) => element.id),
+    // elements (other than the owner) whose outlines actually bound the fill;
+    // the app inserts the fill below the lowest of these + the owner
+    boundaryElementIds: [...contributors].filter((id) => id !== owner.id),
     scenePoints,
   };
 };

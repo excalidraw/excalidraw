@@ -64,6 +64,7 @@ export type ActionName =
   | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"
+  | "changeBucketFillBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
   | "changeStrokeShape"

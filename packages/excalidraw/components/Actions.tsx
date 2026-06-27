@@ -188,6 +188,15 @@ export const SelectedShapeActions = ({
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
+  // the bucket fill tool only needs its fill color; show just that picker
+  if (appState.activeTool.type === "bucketFill") {
+    return (
+      <div className="selected-shape-actions">
+        <div>{renderAction("changeBucketFillBackgroundColor")}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="selected-shape-actions">
       <div>

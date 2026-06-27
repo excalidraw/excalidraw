@@ -7573,7 +7573,7 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
-    const backgroundColor = this.state.currentItemBackgroundColor;
+    const backgroundColor = this.state.currentItemBucketFillBackgroundColor;
 
     const finishTool = () => {
       resetCursor(this.interactiveCanvas);
@@ -7615,16 +7615,19 @@ class App extends React.Component<AppProps, AppState> {
     const minY = Math.min(...ys);
     const maxX = Math.max(...xs);
     const maxY = Math.max(...ys);
+    // linear elements are normalized so points[0] must be [0, 0]; use the
+    // first scene point as the element origin
+    const [originX, originY] = result.scenePoints[0];
     const points = result.scenePoints.map((p) =>
-      pointFrom<LocalPoint>(p[0] - minX, p[1] - minY),
+      pointFrom<LocalPoint>(p[0] - originX, p[1] - originY),
     );
 
     const owner = elementsMap.get(result.ownerId);
 
     const fill = newLinearElement({
       type: "line",
-      x: minX,
-      y: minY,
+      x: originX,
+      y: originY,
       width: maxX - minX,
       height: maxY - minY,
       points,
@@ -7653,10 +7656,20 @@ class App extends React.Component<AppProps, AppState> {
       },
     });
 
-    const ownerIndex = elements.findIndex((el) => el.id === result.ownerId);
+    // insert the fill below the lowest-z element whose outline bounds it (the
+    // owner plus any boundary elements that contributed an edge), so none of
+    // those strokes get covered by the fill
+    const participantIds = new Set<string>([
+      result.ownerId,
+      ...result.boundaryElementIds,
+    ]);
+    let insertIndex = elements.findIndex((el) => participantIds.has(el.id));
+    if (insertIndex < 0) {
+      insertIndex = elements.findIndex((el) => el.id === result.ownerId);
+    }
     this.scene.insertElementsAtIndex(
       [fill],
-      ownerIndex < 0 ? null : ownerIndex,
+      insertIndex < 0 ? null : insertIndex,
     );
 
     this.setState((prevState) => ({

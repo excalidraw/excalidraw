@@ -48,7 +48,11 @@ describe("bucket fill tool", () => {
   it("creates a selected line polygon with the current background color", () => {
     const rect = seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+      // the bucket fill color is independent from the generic shape background
+      API.setAppState({
+        currentItemBackgroundColor: "#000000",
+        currentItemBucketFillBackgroundColor: "#ffec99",
+      });
     });
     selectBucketFill();
 
@@ -65,6 +69,11 @@ describe("bucket fill tool", () => {
     expect(fill!.fillStyle).toBe("solid");
     expect(fill!.customData?.bucketFill?.ownerId).toBe(rect.id);
 
+    // linear elements must be normalized: points[0] === [0, 0], and the
+    // polygon is explicitly closed
+    expect(fill!.points[0]).toEqual([0, 0]);
+    expect(fill!.points[fill!.points.length - 1]).toEqual([0, 0]);
+
     // inserted immediately below (before) the owner in z-order
     expect(h.elements[0].id).toBe(fill!.id);
     expect(h.elements[1].id).toBe(rect.id);
@@ -74,10 +83,22 @@ describe("bucket fill tool", () => {
     expect(h.state.activeTool.type).toBe("selection");
   });
 
+  it("shows only the fill color picker in the panel when the tool is active", () => {
+    seedRectangle();
+    selectBucketFill();
+
+    const panel = document.querySelector(".selected-shape-actions");
+    expect(panel).not.toBeNull();
+    // the fill (background) color picker is shown...
+    expect(panel!.querySelector('[aria-label="Background"]')).not.toBeNull();
+    // ...and nothing else from the generic shape panel (e.g. stroke)
+    expect(panel!.querySelector('[aria-label="Stroke"]')).toBeNull();
+  });
+
   it("no-ops with a transparent background color", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBackgroundColor: "transparent" });
+      API.setAppState({ currentItemBucketFillBackgroundColor: "transparent" });
     });
     selectBucketFill();
 
@@ -87,10 +108,52 @@ describe("bucket fill tool", () => {
     expect(h.state.toast?.message).toMatch(/background color/i);
   });
 
+  it("inserts the overlap fill below the lowest participating shape", () => {
+    const below = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    act(() => {
+      h.app.updateScene({
+        elements: [below, owner],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+    act(() => {
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    // click the overlap lens (inside both rectangles)
+    mouse.clickAt(75, 75);
+
+    const fill = h.elements.find((el) => el.type === "line" && !el.isDeleted)!;
+    expect(fill).toBeDefined();
+    // both rectangles bound the lens, so the fill goes below the lower one
+    expect(fill.customData?.bucketFill?.boundaryElementIds).toContain(below.id);
+    expect(h.elements[0].id).toBe(fill.id);
+    expect(h.elements[1].id).toBe(below.id);
+    expect(h.elements[2].id).toBe(owner.id);
+  });
+
   it("does nothing when clicking empty canvas", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -102,7 +165,7 @@ describe("bucket fill tool", () => {
   it("undo removes the generated fill in one step", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 

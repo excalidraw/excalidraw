@@ -473,6 +473,49 @@ export const actionChangeBackgroundColor = register<
   },
 });
 
+export const actionChangeBucketFillBackgroundColor = register<
+  Pick<AppState, "currentItemBucketFillBackgroundColor">
+>({
+  name: "changeBucketFillBackgroundColor",
+  label: "labels.changeBackground",
+  trackEvent: false,
+  // the bucket fill tool has no element to mutate; it only updates the default
+  // fill color used when the user clicks a region
+  perform: (elements, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const { stylesPanelMode } = getStylesPanelInfo(app);
+
+    return (
+      <>
+        {stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.background")}</h3>
+        )}
+        <ColorPicker
+          topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          type="elementBackground"
+          label={t("labels.background")}
+          color={appState.currentItemBucketFillBackgroundColor}
+          onChange={(color) =>
+            updateData({ currentItemBucketFillBackgroundColor: color })
+          }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+      </>
+    );
+  },
+});
+
 export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   name: "changeFillStyle",
   label: "labels.fill",
