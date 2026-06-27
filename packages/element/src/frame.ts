@@ -723,7 +723,9 @@ export const updateFrameMembershipOfSelectedElements = <
     if (
       element.frameId &&
       !isFrameLikeElement(element) &&
-      !isElementInFrame(element, elementsMap, appState)
+      !isElementInFrame(element, elementsMap, appState, {
+        noOptimization: true,
+      })
     ) {
       elementsToRemove.add(element);
     }
@@ -816,6 +818,10 @@ export const isElementInFrame = (
   opts?: {
     targetFrame?: ExcalidrawFrameLikeElement;
     checkedGroups?: Map<string, boolean>;
+    /** When true, skip the non-drag optimization shortcut so that frame
+     *  membership is re-evaluated even for actions (align, flip, distribute)
+     *  that move elements without a pointer drag. */
+    noOptimization?: boolean;
   },
 ) => {
   const frame =
@@ -838,13 +844,16 @@ export const isElementInFrame = (
   };
 
   if (
+    !opts?.noOptimization &&
     // if the element is not selected, or it is selected but not being dragged,
     // frame membership won't update, so return true
-    !appState.selectedElementIds[_element.id] ||
-    !appState.selectedElementsAreBeingDragged ||
-    // if both frame and element are selected, won't update membership, so return true
-    (appState.selectedElementIds[_element.id] &&
-      appState.selectedElementIds[frame.id])
+    (
+      !appState.selectedElementIds[_element.id] ||
+      !appState.selectedElementsAreBeingDragged ||
+      // if both frame and element are selected, won't update membership, so return true
+      (appState.selectedElementIds[_element.id] &&
+        appState.selectedElementIds[frame.id])
+    )
   ) {
     return true;
   }
