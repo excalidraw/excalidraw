@@ -132,6 +132,7 @@ import {
   newElement,
   newImageElement,
   newLinearElement,
+  computeBucketFillPolygon,
   newTextElement,
   refreshTextDimensions,
   deepCopyElement,
@@ -7568,6 +7569,113 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private handleBucketFillOnPointerDown = (scenePointer: {
+    x: number;
+    y: number;
+  }) => {
+    const backgroundColor = this.state.currentItemBackgroundColor;
+
+    const finishTool = () => {
+      resetCursor(this.interactiveCanvas);
+      if (!this.state.activeTool.locked) {
+        this.setActiveTool({ type: this.state.preferredSelectionTool.type });
+      }
+    };
+
+    if (backgroundColor === "transparent") {
+      this.setToast({ message: t("bucketFill.noBackground"), duration: 3000 });
+      finishTool();
+      return;
+    }
+
+    const elements = this.scene.getNonDeletedElements();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
+
+    const result = computeBucketFillPolygon({ point, elements, elementsMap });
+
+    if (!result.ok) {
+      if (result.reason === "too_complex") {
+        this.setToast({ message: t("bucketFill.tooComplex"), duration: 3000 });
+      } else if (
+        result.reason === "open_region" ||
+        result.reason === "too_small" ||
+        result.reason === "invalid_polygon"
+      ) {
+        this.setToast({ message: t("bucketFill.noRegion"), duration: 3000 });
+      }
+      // "no_owner" stays silent — clicking empty canvas shouldn't nag
+      finishTool();
+      return;
+    }
+
+    const xs = result.scenePoints.map((p) => p[0]);
+    const ys = result.scenePoints.map((p) => p[1]);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+    const maxX = Math.max(...xs);
+    const maxY = Math.max(...ys);
+    const points = result.scenePoints.map((p) =>
+      pointFrom<LocalPoint>(p[0] - minX, p[1] - minY),
+    );
+
+    const owner = elementsMap.get(result.ownerId);
+
+    const fill = newLinearElement({
+      type: "line",
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+      points,
+      polygon: true,
+      strokeColor: "transparent",
+      backgroundColor,
+      fillStyle: "solid",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roughness: 0,
+      roundness: null,
+      opacity: this.state.currentItemOpacity,
+      frameId: owner
+        ? isFrameLikeElement(owner)
+          ? owner.id
+          : owner.frameId
+        : null,
+      groupIds: owner ? owner.groupIds : [],
+      customData: {
+        bucketFill: {
+          version: 1,
+          ownerId: result.ownerId,
+          boundaryElementIds: result.boundaryElementIds,
+          seedPoint: [scenePointer.x, scenePointer.y],
+        },
+      },
+    });
+
+    const ownerIndex = elements.findIndex((el) => el.id === result.ownerId);
+    this.scene.insertElementsAtIndex(
+      [fill],
+      ownerIndex < 0 ? null : ownerIndex,
+    );
+
+    this.setState((prevState) => ({
+      newElement: null,
+      selectedLinearElement: null,
+      selectedElementIds: makeNextSelectedElementIds(
+        { [fill.id]: true },
+        prevState,
+      ),
+      activeTool: prevState.activeTool.locked
+        ? prevState.activeTool
+        : updateActiveTool(prevState, {
+            type: prevState.preferredSelectionTool.type,
+          }),
+    }));
+    this.store.scheduleCapture();
+    resetCursor(this.interactiveCanvas);
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
@@ -7716,6 +7824,13 @@ class App extends React.Component<AppProps, AppState> {
     // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
+
+    // bucket fill is a one-shot click tool; resolve it before any drag /
+    // selection gesture machinery and return early.
+    if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
+      this.handleBucketFillOnPointerDown(scenePointer);
       return;
     }
 

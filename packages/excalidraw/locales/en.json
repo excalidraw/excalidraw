@@ -331,10 +331,16 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "bucketFill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
+  },
+  "bucketFill": {
+    "noBackground": "Choose a background color to fill.",
+    "noRegion": "Couldn't find an enclosed region to fill here.",
+    "tooComplex": "This region is too complex to fill."
   },
   "element": {
     "rectangle": "Rectangle",

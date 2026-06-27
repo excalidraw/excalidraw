@@ -31,6 +31,7 @@ import {
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
+  bucketFillIcon,
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
@@ -160,6 +161,7 @@ export const MobileToolBar = ({
     "frame",
     "embeddable",
     "laser",
+    "bucketFill",
     "magicframe",
   ].filter((tool) => {
     if (showTextToolOutside && tool === "text") {
@@ -185,6 +187,8 @@ export const MobileToolBar = ({
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
+      : activeTool.type === "bucketFill"
+      ? bucketFillIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
       : extraToolsIcon

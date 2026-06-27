@@ -73,6 +73,7 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
+  bucketFillIcon,
   MagicIcon,
   LassoIcon,
   sharpArrowIcon,
@@ -1094,6 +1095,7 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const bucketFillToolSelected = activeTool.type === "bucketFill";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -1275,6 +1277,14 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+            icon={bucketFillIcon}
+            data-testid="toolbar-bucketFill"
+            selected={bucketFillToolSelected}
+          >
+            {t("toolBar.bucketFill")}
           </DropdownMenu.Item>
           {isFullStylesPanel && (
             <DropdownMenu.Item
