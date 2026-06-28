@@ -88,6 +88,27 @@ import type {
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
 
+const getStickyNoteCornerResizeHeight = (
+  container: ExcalidrawStickyNoteElement,
+  textElement: ExcalidrawTextElement,
+  width: number,
+  height: number,
+) => {
+  const proposedContainer = {
+    ...container,
+    width: Math.abs(width),
+    height: Math.abs(height),
+    baseHeight: Math.abs(height),
+  };
+  const layout = computeStickyNoteTextLayout(proposedContainer, textElement);
+
+  if (layout.container.height > layout.container.baseHeight + 0.5) {
+    return layout.container.height;
+  }
+
+  return Math.abs(height);
+};
+
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
   originalElements: PointerDownState["originalElements"],
@@ -806,6 +827,19 @@ export const resizeSingleElement = (
     nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
   }
 
+  if (
+    isResizingStickyNote &&
+    boundTextElement &&
+    handleDirection.length === 2
+  ) {
+    nextHeight = getStickyNoteCornerResizeHeight(
+      latestElement,
+      boundTextElement,
+      nextWidth,
+      nextHeight,
+    );
+  }
+
   const rescaledPoints = rescalePointsInElement(
     origElement,
     nextWidth,
@@ -859,28 +893,6 @@ export const resizeSingleElement = (
   }
   if (nextHeight < 0) {
     newOrigin.y = newOrigin.y + nextHeight;
-  }
-
-  if (
-    isResizingStickyNote &&
-    boundTextElement &&
-    handleDirection.length === 2
-  ) {
-    const proposedContainer = {
-      ...latestElement,
-      ...newOrigin,
-      width: Math.abs(nextWidth),
-      height: Math.abs(nextHeight),
-      baseHeight: Math.abs(nextHeight),
-    };
-    const layout = computeStickyNoteTextLayout(
-      proposedContainer,
-      boundTextElement,
-    );
-
-    if (layout.container.height > layout.container.baseHeight + 0.5) {
-      return;
-    }
   }
 
   if ("scale" in latestElement && "scale" in origElement) {

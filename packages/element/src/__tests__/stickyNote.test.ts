@@ -10,6 +10,7 @@ import { Scene } from "../Scene";
 import { newElementWith } from "../mutateElement";
 import { newStickyNoteElement, newTextElement } from "../newElement";
 import { resizeSingleElement } from "../resizeElements";
+import { computeStickyNoteTextLayout } from "../stickyNote";
 import { redrawTextBoundingBox } from "../textElement";
 
 import type {
@@ -135,7 +136,7 @@ describe("sticky note text layout", () => {
     expect(updatedText.fontSize).toBe(updatedText.fontSizeMax);
   });
 
-  it("rejects corner resize when the proposed base height cannot contain the text", () => {
+  it("clamps corner resize height while still resizing width", () => {
     const overflowingText = Array(40)
       .fill("abcdefghijklmnopqrstuvwx")
       .join("\n");
@@ -145,10 +146,21 @@ describe("sticky note text layout", () => {
     const originalSticky = { ...sticky };
     const originalText = { ...text };
     const originalElementsMap = arrayToMap([originalSticky, originalText]);
+    const nextWidth = 120;
+    const nextHeight = DEFAULT_STICKY_NOTE_SIZE;
+    const expectedLayout = computeStickyNoteTextLayout(
+      {
+        ...sticky,
+        width: nextWidth,
+        height: nextHeight,
+        baseHeight: nextHeight,
+      },
+      text,
+    );
 
     resizeSingleElement(
-      120,
-      DEFAULT_STICKY_NOTE_SIZE,
+      nextWidth,
+      nextHeight,
       sticky,
       originalSticky,
       originalElementsMap,
@@ -159,9 +171,12 @@ describe("sticky note text layout", () => {
     const updatedSticky = getSticky(scene, stickyId);
     const updatedText = getBoundText(scene, textId);
 
-    expect(updatedSticky.width).toBe(originalSticky.width);
-    expect(updatedSticky.height).toBe(originalSticky.height);
-    expect(updatedSticky.baseHeight).toBe(originalSticky.baseHeight);
+    expect(updatedSticky.width).toBe(nextWidth);
+    expect(updatedSticky.height).toBeCloseTo(expectedLayout.container.height);
+    expect(updatedSticky.baseHeight).toBeCloseTo(
+      expectedLayout.container.height,
+    );
+    expect(updatedSticky.height).toBeGreaterThan(nextHeight);
     expect(updatedText.fontSize).toBe(originalText.fontSize);
   });
 });
