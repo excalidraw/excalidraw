@@ -1268,9 +1268,20 @@ const getSvgPathFromStroke = (points: number[][]): string => {
     return "";
   }
 
-  const max = points.length - 1;
+  // Filter out points containing NaN/Infinity values which can be produced
+  // by the perfect-freehand library in edge cases (e.g., overlapping input
+  // points or zero-length vectors). NaN in SVG path data produces invalid output.
+  const validPoints = points.filter((point) =>
+    point.every((coord) => Number.isFinite(coord)),
+  );
 
-  return points
+  if (!validPoints.length) {
+    return "";
+  }
+
+  const max = validPoints.length - 1;
+
+  return validPoints
     .reduce(
       (acc, point, i, arr) => {
         if (i === max) {
@@ -1280,7 +1291,7 @@ const getSvgPathFromStroke = (points: number[][]): string => {
         }
         return acc;
       },
-      ["M", points[0], "Q"],
+      ["M", validPoints[0], "Q"],
     )
     .join(" ")
     .replace(TO_FIXED_PRECISION, "$1");

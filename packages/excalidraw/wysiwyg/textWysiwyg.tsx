@@ -32,13 +32,10 @@ import {
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
-  getBoundTextElement,
 } from "@excalidraw/element";
-import { getTextWidth } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import { getLineWidth } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
-import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
 import {
   isArrowElement,
@@ -578,38 +575,20 @@ export const textWysiwyg = ({
         }
       }
 
-      dataList = dataList || (await parseDataTransferEvent(event));
-
-      const textItem = dataList.findByType(MIME_TYPES.text);
-      if (!textItem) {
-        return;
-      }
-      const text = normalizeText(textItem.value);
-      if (!text) {
-        return;
-      }
-      const container = getContainerElement(
-        element,
-        app.scene.getNonDeletedElementsMap(),
-      );
-
-      const font = getFontString({
-        fontSize: app.state.currentItemFontSize,
-        fontFamily: app.state.currentItemFontFamily,
-      });
-      if (container) {
-        const boundTextElement = getBoundTextElement(
-          container,
-          app.scene.getNonDeletedElementsMap(),
-        );
-        const wrappedText = wrapText(
-          `${editable.value}${text}`,
-          font,
-          getBoundTextMaxWidth(container, boundTextElement),
-        );
-        const width = getTextWidth(wrappedText, font);
-        editable.style.width = `${width}px`;
-      }
+      // For regular text paste, let the browser handle the insertion
+      // (we did not call event.preventDefault()). The browser's default
+      // paste will fire `oninput`, which calls `onChange` and triggers
+      // `updateWysiwygStyle()` to correctly resize the container and
+      // reposition the editor.
+      //
+      // We intentionally do NOT manually set the editable width here
+      // because this code runs asynchronously (after `await`) and would
+      // execute after `oninput`/`onChange`/`updateWysiwygStyle` have
+      // already computed the correct dimensions. Overwriting the width
+      // here previously caused text to overflow the container, as it
+      // used stale font properties (currentItem* instead of the actual
+      // element's font) and assumed text was appended at the end rather
+      // than inserted at the cursor position.
     };
 
     editable.oninput = () => {
