@@ -316,6 +316,12 @@ export const SearchMenu = () => {
         event.target instanceof HTMLElement &&
         event.target.closest(".layer-ui__search")
       ) {
+        // ignore the Enter/arrow keys that confirm or move through an IME
+        // composition so they don't also jump between search matches
+        if (event.isComposing || event.keyCode === 229) {
+          return;
+        }
+
         if (stableState.searchMatches.items.length) {
           if (event.key === KEYS.ENTER) {
             event.stopPropagation();
