@@ -159,6 +159,7 @@ describe("scrollToContent scrollConstraints (integration)", () => {
 
   afterEach(() => {
     restoreOriginalGetBoundingClientRect();
+    AnimationController.reset();
   });
 
   it("snaps the current viewport inside the box when constraints are set", async () => {
@@ -205,7 +206,7 @@ describe("scrollToContent scrollConstraints (integration)", () => {
     expect(h.state.scrollY).toBeLessThan(before);
   });
 
-  it("clamps the scroll target into the box when scrolling to content", async () => {
+  it("clamps into the box once the scroll has settled on the content", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
@@ -226,10 +227,40 @@ describe("scrollToContent scrollConstraints (integration)", () => {
       });
     });
 
-    // recentering on the element would scroll way past the box; it must be
-    // clamped to the far edges instead (scrollX -800, scrollY -900 at zoom 1)
+    // recentering on the element settles way past the box; the constraints are
+    // applied on completion and clamp it back to the far edges (scrollX -800,
+    // scrollY -900 at zoom 1)
     expect(h.state.scrollX).toBeCloseTo(-800);
     expect(h.state.scrollY).toBeCloseTo(-900);
+  });
+
+  it("defers applying the constraints until an animated scroll settles", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 2000,
+      y: 2000,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([rect]);
+
+    React.act(() => {
+      h.app.scrollToContent(rect, {
+        scrollConstraints: { x: 0, y: 0, width: 1000, height: 1000 },
+        animate: true,
+        duration: 300,
+      });
+    });
+
+    // the animation is in flight and the constraints have NOT been applied yet
+    // — they're chained to run once it settles
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+    expect(h.state.scrollConstraints).toBe(null);
   });
 
   it("disables reset-zoom and zoom-to-fit actions while constrained", async () => {

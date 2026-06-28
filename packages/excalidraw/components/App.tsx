@@ -4369,16 +4369,21 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scrollConstraints = opts?.scrollConstraints ?? null;
-    if (scrollConstraints || this.state.scrollConstraints) {
-      flushSync(() => {
-        this.setState((prevState) => ({
-          scrollConstraints,
-          ...constrainScrollState({ ...prevState, scrollConstraints }),
-        }));
-      });
-    }
+    const applyScrollConstraints = () => {
+      if (scrollConstraints || this.state.scrollConstraints) {
+        flushSync(() => {
+          this.setState((prevState) => ({
+            scrollConstraints,
+            ...constrainScrollState({ ...prevState, scrollConstraints }),
+          }));
+        });
+      }
+    };
 
     if (!elements.length) {
+      // a string element-link that resolves to nothing is a broken link: show
+      // a toast and bail *without* touching the constraints — we never
+      // navigated, so there's nothing to constrain to
       if (typeof target === "string" && isElementLink(target)) {
         this.setState({
           toast: {
@@ -4387,8 +4392,13 @@ class App extends React.Component<AppProps, AppState> {
             closable: true,
           },
         });
+
+        return;
       }
 
+      // nothing to scroll to (an explicit empty target or an empty scene), but
+      // still apply the requested constraints
+      applyScrollConstraints();
       return;
     }
 
@@ -4410,6 +4420,8 @@ class App extends React.Component<AppProps, AppState> {
       elements,
       this.setState.bind(this),
       resolvedOpts,
+      // chain: enforce the constraints once the scroll/zoom has settled
+      applyScrollConstraints,
     );
   };
 

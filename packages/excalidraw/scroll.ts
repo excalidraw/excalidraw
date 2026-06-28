@@ -226,7 +226,8 @@ export const animateToConstraints = (
 
 /**
  * Scrolls (and optionally zooms) the viewport so that the given target is in
- * view, optionally animating the transition.
+ * view, optionally animating the transition. `onComplete` runs once the
+ * viewport has settled on the target.
  */
 export const scrollToElements = (
   state: AppState,
@@ -238,6 +239,7 @@ export const scrollToElements = (
     >,
   ) => void,
   opts?: ScrollToContentOptions,
+  onComplete?: () => void,
 ) => {
   AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
 
@@ -249,11 +251,13 @@ export const scrollToElements = (
       viewport,
       opts.duration ?? DEFAULT_ANIMATION_DURATION,
       onFrame,
+      onComplete,
     );
   } else {
     // no animation: jump straight to the target. Re-enable zoom caching in
     // case we just cancelled an in-flight animation that had suppressed it.
     onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
+    onComplete?.();
   }
 };
 
@@ -264,8 +268,6 @@ const getTargetViewport = (
   targetElements: readonly ExcalidrawElement[],
   opts?: ScrollToContentOptions,
 ): Viewport => {
-  let viewport: Viewport;
-
   if (opts?.fitToContent || opts?.fitToViewport) {
     const { appState } = zoomToFit({
       canvasOffsets: opts.canvasOffsets,
@@ -277,19 +279,16 @@ const getTargetViewport = (
       maxZoom: opts.maxZoom,
     });
 
-    viewport = {
+    return {
       scrollX: appState.scrollX,
       scrollY: appState.scrollY,
       zoom: appState.zoom,
     };
-  } else {
-    // keep the current zoom, only recenter the viewport on the target
-    const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
-    viewport = { scrollX, scrollY, zoom: state.zoom };
   }
+  // keep the current zoom, only recenter the viewport on the target
+  const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
 
-  // keep the target inside any active scroll constraints (no-op otherwise)
-  return constrainScrollState({ ...state, ...viewport });
+  return { scrollX, scrollY, zoom: state.zoom };
 };
 
 /**
@@ -347,6 +346,7 @@ const animateToViewport = (
       "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
     >,
   ) => void,
+  onComplete?: () => void,
 ) => {
   AnimationController.start<{ elapsed: number }>(
     SCROLL_TO_CONTENT_ANIMATION_KEY,
@@ -360,7 +360,13 @@ const animateToViewport = (
         shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
       });
 
-      return progress < 1 ? { elapsed } : null;
+      if (progress < 1) {
+        return { elapsed };
+      }
+
+      onComplete?.();
+
+      return null;
     },
   );
 };
