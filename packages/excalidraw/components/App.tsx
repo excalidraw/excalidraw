@@ -7697,12 +7697,15 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (
-      !this.editorInterface.isTouchScreen &&
-      ["pen", "touch"].includes(event.pointerType)
-    ) {
+    if (["pen", "touch"].includes(event.pointerType)) {
+      if (!this.editorInterface.isTouchScreen) {
+        this.editorInterface = updateObject(this.editorInterface, {
+          isTouchScreen: true,
+        });
+      }
+    } else if (event.pointerType === "mouse" && this.editorInterface.isTouchScreen) {
       this.editorInterface = updateObject(this.editorInterface, {
-        isTouchScreen: true,
+        isTouchScreen: false,
       });
     }
 

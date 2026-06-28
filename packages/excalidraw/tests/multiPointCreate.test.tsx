@@ -182,4 +182,26 @@ describe("multi point mode in linear elements", () => {
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
+
+  it("arrow should enter multipoint mode after switching from pen to mouse", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const tool = getByToolName("arrow");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // draw an arrow with a pen and sets isTouchScreen to true
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30, pointerType: "pen" });
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30, pointerType: "pen" });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
+
+    // select arrow tool again
+    fireEvent.click(tool);
+
+    // draw with mouse so it enters the multipoint mode
+    fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, pointerType: "mouse" });
+    fireEvent.pointerUp(canvas, { clientX: 100, clientY: 100, pointerType: "mouse" });
+
+    expect(h.state.multiElement).not.toBeNull();
+  });
 });
