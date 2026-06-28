@@ -391,6 +391,19 @@ const drawElementOnCanvas = (
   renderConfig: StaticCanvasRenderConfig,
 ) => {
   switch (element.type) {
+    case "stickynote": {
+      context.save();
+      context.fillStyle = applyDarkModeFilter(
+        element.backgroundColor,
+        renderConfig.theme === THEME.DARK,
+      );
+      context.beginPath();
+      context.rect(0, 0, element.width, element.height);
+      context.fill();
+      context.closePath();
+      context.restore();
+      break;
+    }
     case "rectangle":
     case "iframe":
     case "embeddable":
@@ -879,6 +892,7 @@ export const renderElement = (
       break;
     }
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "ellipse":
     case "line":

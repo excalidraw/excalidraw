@@ -3,6 +3,7 @@ import {
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
+  STICKY_NOTE_PADDING,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   getFontString,
@@ -22,11 +23,13 @@ import {
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
 
+import { computeStickyNoteTextLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
   isBoundToContainer,
   isArrowElement,
+  isStickyNoteElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -98,6 +101,39 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.height = metrics.height;
 
   if (container) {
+    if (isStickyNoteElement(container)) {
+      const layout = computeStickyNoteTextLayout(container, textElement);
+      const updatedContainer = {
+        ...container,
+        ...layout.container,
+      };
+      const updatedTextElement = {
+        ...textElement,
+        ...boundTextUpdates,
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(
+        updatedContainer,
+        updatedTextElement,
+        elementsMap,
+      );
+
+      scene.mutateElement(container, layout.container);
+      scene.mutateElement(textElement, {
+        ...boundTextUpdates,
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+        x,
+        y,
+      });
+      return;
+    }
+
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
@@ -148,12 +184,59 @@ export const handleBindTextResize = (
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
+    if (isStickyNoteElement(container)) {
+      scene.mutateElement(container, {
+        baseHeight: container.height,
+        height: container.height,
+      });
+    }
     return;
   }
   resetOriginalContainerCache(container.id);
   const textElement = getBoundTextElement(container, elementsMap);
   if (textElement && textElement.text) {
     if (!container) {
+      return;
+    }
+
+    if (isStickyNoteElement(container)) {
+      const explicitHeightResize =
+        typeof transformHandleType === "string" &&
+        (transformHandleType.includes("n") ||
+          transformHandleType.includes("s"));
+      const layoutContainer = {
+        ...container,
+        baseHeight: explicitHeightResize
+          ? container.height
+          : container.baseHeight,
+      };
+      const layout = computeStickyNoteTextLayout(layoutContainer, textElement);
+      const updatedContainer = {
+        ...container,
+        ...layout.container,
+      };
+      const updatedTextElement = {
+        ...textElement,
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(
+        updatedContainer,
+        updatedTextElement,
+        elementsMap,
+      );
+
+      scene.mutateElement(container, layout.container);
+      scene.mutateElement(textElement, {
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+        x,
+        y,
+      });
       return;
     }
 
@@ -354,8 +437,11 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
-  let offsetX = BOUND_TEXT_PADDING;
-  let offsetY = BOUND_TEXT_PADDING;
+  const padding = isStickyNoteElement(container)
+    ? STICKY_NOTE_PADDING
+    : BOUND_TEXT_PADDING;
+  let offsetX = padding;
+  let offsetY = padding;
 
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
@@ -435,6 +521,7 @@ export const suppportsHorizontalAlign = (
 
 const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
+  "stickynote",
   "ellipse",
   "diamond",
   "arrow",
@@ -486,7 +573,11 @@ export const getBoundTextMaxWidth = (
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
   }
-  return width - BOUND_TEXT_PADDING * 2;
+  return (
+    width -
+    (isStickyNoteElement(container) ? STICKY_NOTE_PADDING : BOUND_TEXT_PADDING) *
+      2
+  );
 };
 
 export const getBoundTextMaxHeight = (
@@ -512,7 +603,11 @@ export const getBoundTextMaxHeight = (
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
-  return height - BOUND_TEXT_PADDING * 2;
+  return (
+    height -
+    (isStickyNoteElement(container) ? STICKY_NOTE_PADDING : BOUND_TEXT_PADDING) *
+      2
+  );
 };
 
 /** retrieves text from text elements and concatenates to a single string */

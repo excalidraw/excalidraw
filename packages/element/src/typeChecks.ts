@@ -29,6 +29,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -67,6 +68,12 @@ export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
+};
+
+export const isStickyNoteElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawStickyNoteElement => {
+  return element != null && element.type === "stickynote";
 };
 
 export const isFrameElement = (
@@ -182,6 +189,7 @@ export const isBindableElement = (
     element != null &&
     (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
+      element.type === "stickynote" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
@@ -199,6 +207,7 @@ export const isRectanguloidElement = (
   return (
     element != null &&
     (element.type === "rectangle" ||
+      element.type === "stickynote" ||
       element.type === "diamond" ||
       element.type === "image" ||
       element.type === "iframe" ||
@@ -217,6 +226,7 @@ export const isRectangularElement = (
   return (
     element != null &&
     (element.type === "rectangle" ||
+      element.type === "stickynote" ||
       element.type === "image" ||
       element.type === "text" ||
       element.type === "iframe" ||
@@ -235,6 +245,7 @@ export const isTextBindableContainer = (
     element != null &&
     (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
+      element.type === "stickynote" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
       isArrowElement(element))
@@ -252,6 +263,7 @@ export const isExcalidrawElement = (
     case "text":
     case "diamond":
     case "rectangle":
+    case "stickynote":
     case "iframe":
     case "embeddable":
     case "ellipse":
@@ -396,6 +408,7 @@ export const canBecomePolygon = (
 export const isEligibleFrameChildType = (type: ElementOrToolType) => {
   switch (type) {
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "ellipse":
     case "arrow":

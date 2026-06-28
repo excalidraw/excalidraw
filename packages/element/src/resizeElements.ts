@@ -10,6 +10,8 @@ import {
 import {
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
+  STICKY_NOTE_MIN_BASE_HEIGHT,
+  STICKY_NOTE_MIN_BASE_WIDTH,
   rescalePoints,
   getFontString,
 } from "@excalidraw/common";
@@ -57,10 +59,12 @@ import {
   isFreeDrawElement,
   isImageElement,
   isLinearElement,
+  isStickyNoteElement,
   isTextElement,
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
+import { computeStickyNoteTextLayout } from "./stickyNote";
 
 import type { Scene } from "./Scene";
 
@@ -80,6 +84,7 @@ import type {
   ElementsMap,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
 
@@ -752,6 +757,7 @@ export const resizeSingleElement = (
   let boundTextFont: { fontSize?: number } = {};
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
+  const isResizingStickyNote = isStickyNoteElement(latestElement);
 
   if (boundTextElement) {
     const stateOfBoundTextElementAtResize = originalElementsMap.get(
@@ -762,7 +768,10 @@ export const resizeSingleElement = (
         fontSize: stateOfBoundTextElementAtResize.fontSize,
       };
     }
-    if (shouldMaintainAspectRatio) {
+    if (isResizingStickyNote) {
+      nextWidth = Math.max(nextWidth, STICKY_NOTE_MIN_BASE_WIDTH);
+      nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
+    } else if (shouldMaintainAspectRatio) {
       const updatedElement = {
         ...latestElement,
         width: nextWidth,
@@ -792,6 +801,9 @@ export const resizeSingleElement = (
       nextWidth = Math.max(nextWidth, minWidth);
       nextHeight = Math.max(nextHeight, minHeight);
     }
+  } else if (isResizingStickyNote) {
+    nextWidth = Math.max(nextWidth, STICKY_NOTE_MIN_BASE_WIDTH);
+    nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
   }
 
   const rescaledPoints = rescalePointsInElement(
@@ -847,6 +859,28 @@ export const resizeSingleElement = (
   }
   if (nextHeight < 0) {
     newOrigin.y = newOrigin.y + nextHeight;
+  }
+
+  if (
+    isResizingStickyNote &&
+    boundTextElement &&
+    handleDirection.length === 2
+  ) {
+    const proposedContainer = {
+      ...latestElement,
+      ...newOrigin,
+      width: Math.abs(nextWidth),
+      height: Math.abs(nextHeight),
+      baseHeight: Math.abs(nextHeight),
+    };
+    const layout = computeStickyNoteTextLayout(
+      proposedContainer,
+      boundTextElement,
+    );
+
+    if (layout.container.height > layout.container.baseHeight + 0.5) {
+      return;
+    }
   }
 
   if ("scale" in latestElement && "scale" in origElement) {
@@ -909,7 +943,11 @@ export const resizeSingleElement = (
       isDragging: false,
     });
 
-    if (boundTextElement && boundTextFont != null) {
+    if (
+      boundTextElement &&
+      boundTextFont != null &&
+      !isStickyNoteElement(latestElement)
+    ) {
       scene.mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
       });
@@ -1437,7 +1475,9 @@ export const resizeMultipleElements = (
       ) as ExcalidrawTextElementWithContainer | undefined;
 
       if (boundTextElement) {
-        if (keepAspectRatio) {
+        if (isStickyNoteElement(orig)) {
+          update.boundTextFontSize = boundTextElement.fontSize;
+        } else if (keepAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
           if (newFontSize < MIN_FONT_SIZE) {
             return;
@@ -1445,6 +1485,28 @@ export const resizeMultipleElements = (
           update.boundTextFontSize = newFontSize;
         } else {
           update.boundTextFontSize = boundTextElement.fontSize;
+        }
+      }
+
+      if (
+        isStickyNoteElement(orig) &&
+        boundTextElement &&
+        handleDirection.length === 2
+      ) {
+        const proposedContainer = {
+          ...latest,
+          ...update,
+          width: Math.abs(update.width),
+          height: Math.abs(update.height),
+          baseHeight: Math.abs(update.height),
+        } as ExcalidrawStickyNoteElement;
+        const layout = computeStickyNoteTextLayout(
+          proposedContainer,
+          boundTextElement,
+        );
+
+        if (layout.container.height > layout.container.baseHeight + 0.5) {
+          return;
         }
       }
 
@@ -1487,10 +1549,12 @@ export const resizeMultipleElements = (
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && boundTextFontSize) {
-        scene.mutateElement(boundTextElement, {
-          fontSize: boundTextFontSize,
-          angle: isLinearElement(element) ? undefined : angle,
-        });
+        if (!isStickyNoteElement(element)) {
+          scene.mutateElement(boundTextElement, {
+            fontSize: boundTextFontSize,
+            angle: isLinearElement(element) ? undefined : angle,
+          });
+        }
         handleBindTextResize(element, scene, handleDirection, true);
       }
     }

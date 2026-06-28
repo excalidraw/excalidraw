@@ -89,6 +89,12 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "stickynote";
+    baseHeight: number;
+  }>;
+
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
 };
@@ -190,6 +196,7 @@ export type ExcalidrawFlowchartNodeElement =
 
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -205,6 +212,7 @@ export type ExcalidrawRectanguloidElement =
  */
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -237,10 +245,11 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     type: "text";
     fontSize: number;
     fontFamily: FontFamilyValues;
+    fontSizeMax?: number;
     text: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    containerId: ExcalidrawGenericElement["id"] | null;
+    containerId: ExcalidrawTextContainer["id"] | null;
     originalText: string;
     /**
      * If `true` the width will fit the text. If `false`, the text will
@@ -258,6 +267,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
@@ -269,6 +279,7 @@ export type ExcalidrawBindableElement =
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawArrowElement;

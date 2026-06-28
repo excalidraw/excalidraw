@@ -10,13 +10,16 @@ import {
 import { newElementWith } from "@excalidraw/element";
 
 import {
+  clampStickyNoteProps,
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
   isExcalidrawElement,
+  isStickyNoteElement,
   isTextElement,
+  normalizeStickyNoteFontSize,
 } from "@excalidraw/element";
 
 import {
@@ -121,16 +124,6 @@ export const actionPasteStyles = register({
             const fontFamily =
               (elementStylesToCopyFrom as ExcalidrawTextElement).fontFamily ||
               DEFAULT_FONT_FAMILY;
-            newElement = newElementWith(newElement, {
-              fontSize,
-              fontFamily,
-              textAlign:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).textAlign ||
-                DEFAULT_TEXT_ALIGN,
-              lineHeight:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).lineHeight ||
-                getLineHeight(fontFamily),
-            });
             let container = null;
             if (newElement.containerId) {
               container =
@@ -140,6 +133,20 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
+            const isStickyBoundText =
+              container !== null && isStickyNoteElement(container);
+            newElement = newElementWith(newElement, {
+              ...(isStickyBoundText
+                ? { fontSizeMax: normalizeStickyNoteFontSize(fontSize) }
+                : { fontSize }),
+              fontFamily,
+              textAlign:
+                (elementStylesToCopyFrom as ExcalidrawTextElement).textAlign ||
+                DEFAULT_TEXT_ALIGN,
+              lineHeight:
+                (elementStylesToCopyFrom as ExcalidrawTextElement).lineHeight ||
+                getLineHeight(fontFamily),
+            });
 
             redrawTextBoundingBox(newElement, container, app.scene);
           }
@@ -159,6 +166,10 @@ export const actionPasteStyles = register({
               roundness: null,
               backgroundColor: "transparent",
             });
+          }
+
+          if (isStickyNoteElement(newElement)) {
+            newElement = clampStickyNoteProps(newElement);
           }
 
           return newElement;

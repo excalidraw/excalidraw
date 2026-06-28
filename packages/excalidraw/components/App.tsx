@@ -58,6 +58,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
+  DEFAULT_STICKY_NOTE_SIZE,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -127,6 +128,7 @@ import {
   newFreeDrawElement,
   newEmbeddableElement,
   newMagicFrameElement,
+  newStickyNoteElement,
   newIframeElement,
   newArrowElement,
   newElement,
@@ -156,6 +158,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
+  isStickyNoteElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -172,6 +175,8 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  computeBoundTextPosition,
+  computeStickyNoteTextLayout,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -278,6 +283,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeLikeElement,
@@ -5638,20 +5644,71 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+      const latestTextElement = this.scene.getElement<ExcalidrawTextElement>(
+        element.id,
+      );
+
+      if (!latestTextElement || !isTextElement(latestTextElement)) {
+        return;
+      }
+
+      const container = getContainerElement(latestTextElement, elementsMap);
+      const stickyLayout =
+        container && isStickyNoteElement(container)
+          ? computeStickyNoteTextLayout(
+              container,
+              latestTextElement,
+              nextOriginalText,
+            )
+          : null;
+      const stickyTextPosition =
+        stickyLayout && container && isStickyNoteElement(container)
+          ? computeBoundTextPosition(
+              { ...container, ...stickyLayout.container },
+              {
+                ...latestTextElement,
+                text: stickyLayout.text,
+                fontSize: stickyLayout.fontSize,
+                width: stickyLayout.width,
+                height: stickyLayout.height,
+              } as ExcalidrawTextElementWithContainer,
+              elementsMap,
+            )
+          : null;
+
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id && isTextElement(_element)) {
+          if (
+            stickyLayout &&
+            container &&
+            _element.id === container.id &&
+            isStickyNoteElement(_element)
+          ) {
+            return newElementWith(_element, stickyLayout.container);
+          }
+          if (_element.id === latestTextElement.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...(stickyLayout && stickyTextPosition
+                ? {
+                    text: stickyLayout.text,
+                    fontSize: stickyLayout.fontSize,
+                    width: stickyLayout.width,
+                    height: stickyLayout.height,
+                    ...stickyTextPosition,
+                  }
+                : {}),
               // returns (wrapped) text and new dimensions
-              ...refreshTextDimensions(
-                _element,
-                getContainerElement(_element, elementsMap),
-                elementsMap,
-                nextOriginalText,
-              ),
+              ...(stickyLayout
+                ? {}
+                : refreshTextDimensions(
+                    _element,
+                    getContainerElement(_element, elementsMap),
+                    elementsMap,
+                    nextOriginalText,
+                  )),
             });
           }
           return _element;
@@ -6150,7 +6207,8 @@ class App extends React.Component<AppProps, AppState> {
       !existingTextElement &&
       shouldBindToContainer &&
       container &&
-      !isArrowElement(container)
+      !isArrowElement(container) &&
+      !isStickyNoteElement(container)
     ) {
       const fontString = {
         fontSize,
@@ -6228,6 +6286,10 @@ class App extends React.Component<AppProps, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         fontSize,
+        fontSizeMax:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? fontSize
+            : undefined,
         fontFamily,
         textAlign: parentCenterPosition
           ? "center"
@@ -9416,6 +9478,7 @@ class App extends React.Component<AppProps, AppState> {
     elementType:
       | "selection"
       | "rectangle"
+      | "stickynote"
       | "diamond"
       | "ellipse"
       | "iframe"
@@ -9438,7 +9501,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable",
+    elementType:
+      | ExcalidrawGenericElement["type"]
+      | "embeddable"
+      | "stickynote",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -9473,6 +9539,11 @@ class App extends React.Component<AppProps, AppState> {
     if (elementType === "embeddable") {
       element = newEmbeddableElement({
         type: "embeddable",
+        ...baseElementAttributes,
+      });
+    } else if (elementType === "stickynote") {
+      element = newStickyNoteElement({
+        type: "stickynote",
         ...baseElementAttributes,
       });
     } else {
@@ -10896,6 +10967,43 @@ class App extends React.Component<AppProps, AppState> {
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
         });
+      }
+
+      if (newElement && isStickyNoteElement(newElement)) {
+        const shouldUseDefaultSize = !pointerDownState.drag.hasOccurred;
+        const size = DEFAULT_STICKY_NOTE_SIZE;
+        const nextWidth = shouldUseDefaultSize ? size : newElement.width;
+        const nextHeight = shouldUseDefaultSize ? size : newElement.height;
+        const nextX = shouldUseDefaultSize
+          ? pointerDownState.origin.x - size / 2
+          : newElement.x;
+        const nextY = shouldUseDefaultSize
+          ? pointerDownState.origin.y - size / 2
+          : newElement.y;
+
+        this.scene.mutateElement(
+          newElement,
+          {
+            x: nextX,
+            y: nextY,
+            width: nextWidth,
+            height: nextHeight,
+            baseHeight: nextHeight,
+          },
+          {
+            informMutation: false,
+            isDragging: false,
+          },
+        );
+
+        this.store.scheduleCapture();
+        this.scene.triggerUpdate();
+        this.startTextEditing({
+          sceneX: newElement.x + newElement.width / 2,
+          sceneY: newElement.y + newElement.height / 2,
+          container: newElement,
+        });
+        return;
       }
 
       if (

@@ -145,6 +145,40 @@ const renderElementToSvg = (
       // this should not happen
       throw new Error("Selection rendering is not supported for SVG");
     }
+    case "stickynote": {
+      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+
+      rect.setAttribute("width", `${element.width}`);
+      rect.setAttribute("height", `${element.height}`);
+      rect.setAttribute(
+        "fill",
+        applyDarkModeFilter(
+          element.backgroundColor,
+          renderConfig.theme === THEME.DARK,
+        ),
+      );
+      rect.setAttribute("stroke", "none");
+      if (opacity !== 1) {
+        rect.setAttribute("fill-opacity", `${opacity}`);
+      }
+      rect.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [rect],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      addToRoot(g || rect, element);
+      break;
+    }
     case "rectangle":
     case "diamond":
     case "ellipse": {

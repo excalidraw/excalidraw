@@ -1,8 +1,13 @@
 import {
   getBoundTextElement,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
-import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
+import {
+  hasBoundTextElement,
+  isStickyNoteElement,
+  isTextElement,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -65,14 +70,16 @@ const handleFontSizeChange: DragInputCallbackType<
     }
 
     if (nextFontSize) {
+      const container = scene.getContainerElement(latestElement);
+      const isStickyBoundText =
+        container !== null && isStickyNoteElement(container);
+
       scene.mutateElement(latestElement, {
-        fontSize: nextFontSize,
+        ...(isStickyBoundText
+          ? { fontSizeMax: normalizeStickyNoteFontSize(nextFontSize) }
+          : { fontSize: nextFontSize }),
       });
-      redrawTextBoundingBox(
-        latestElement,
-        scene.getContainerElement(latestElement),
-        scene,
-      );
+      redrawTextBoundingBox(latestElement, container, scene);
     }
   }
 };
@@ -91,7 +98,7 @@ const FontSize = ({ element, scene, appState, property }: FontSizeProps) => {
   return (
     <StatsDragInput
       label="F"
-      value={Math.round(_element.fontSize * 10) / 10}
+      value={Math.round((_element.fontSizeMax ?? _element.fontSize) * 10) / 10}
       elements={[_element]}
       dragInputCallback={handleFontSizeChange}
       icon={fontSizeIcon}

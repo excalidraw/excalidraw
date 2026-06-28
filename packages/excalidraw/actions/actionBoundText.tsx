@@ -18,12 +18,14 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
   isArrowElement,
+  isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -86,6 +88,7 @@ export const actionUnbindText = register({
           width,
           height,
           text: boundTextElement.originalText,
+          fontSizeMax: undefined,
           x,
           y,
         });
@@ -160,6 +163,13 @@ export const actionBindText = register({
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
       angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+      ...(isStickyNoteElement(container)
+        ? {
+            fontSizeMax: normalizeStickyNoteFontSize(
+              textElement.fontSizeMax ?? textElement.fontSize,
+            ),
+          }
+        : null),
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({

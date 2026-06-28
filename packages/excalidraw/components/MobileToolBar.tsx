@@ -34,6 +34,7 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  stickyNoteToolIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -122,6 +123,7 @@ export const MobileToolBar = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const stickyNoteToolSelected = activeTool.type === "stickynote";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -157,6 +159,7 @@ export const MobileToolBar = ({
 
   const extraTools = [
     "text",
+    "stickynote",
     "frame",
     "embeddable",
     "laser",
@@ -181,6 +184,8 @@ export const MobileToolBar = ({
       ? ImageIcon
       : activeTool.type === "frame"
       ? frameToolIcon
+      : activeTool.type === "stickynote"
+      ? stickyNoteToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
@@ -427,6 +432,15 @@ export const MobileToolBar = ({
               {t("toolBar.image")}
             </DropdownMenu.Item>
           )}
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "stickynote" })}
+            icon={stickyNoteToolIcon}
+            data-testid="toolbar-stickynote"
+            selected={stickyNoteToolSelected}
+          >
+            {t("toolBar.stickynote")}
+          </DropdownMenu.Item>
+
           {!showFrameToolOutside && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "frame" })}

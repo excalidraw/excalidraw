@@ -2,6 +2,7 @@ import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
 export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "stickynote" ||
   type === "iframe" ||
   type === "embeddable" ||
   type === "ellipse" ||

@@ -329,6 +329,7 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
@@ -348,6 +349,7 @@
     "group": "Group",
     "frame": "Frame",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"

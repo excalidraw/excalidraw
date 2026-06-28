@@ -157,6 +157,7 @@ export type ToolType =
   | "hand"
   | "frame"
   | "magicframe"
+  | "stickynote"
   | "embeddable"
   | "laser";
 

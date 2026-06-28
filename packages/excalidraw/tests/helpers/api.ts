@@ -21,6 +21,7 @@ import {
   newImageElement,
   newLinearElement,
   newMagicFrameElement,
+  newStickyNoteElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -42,6 +43,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
+  ExcalidrawStickyNoteElement,
   FixedSegment,
 } from "@excalidraw/element/types";
 
@@ -201,6 +203,9 @@ export class API {
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
     boundElements?: ExcalidrawGenericElement["boundElements"];
+    baseHeight?: T extends "stickynote"
+      ? ExcalidrawStickyNoteElement["baseHeight"]
+      : never;
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
@@ -238,6 +243,8 @@ export class API {
     ? ExcalidrawFrameElement
     : T extends "magicframe"
     ? ExcalidrawMagicFrameElement
+    : T extends "stickynote"
+    ? ExcalidrawStickyNoteElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -305,6 +312,15 @@ export class API {
         element = newIframeElement({
           type: "iframe",
           ...base,
+        });
+        break;
+      case "stickynote":
+        element = newStickyNoteElement({
+          ...base,
+          width,
+          height,
+          type,
+          baseHeight: rest.baseHeight ?? height,
         });
         break;
       case "text":

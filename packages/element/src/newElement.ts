@@ -2,7 +2,11 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_STICKY_NOTE_BG,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_BASE_HEIGHT,
+  STICKY_NOTE_MIN_BASE_WIDTH,
   DEFAULT_VERTICAL_ALIGN,
   DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
@@ -22,11 +26,16 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
+import { computeStickyNoteTextLayout } from "./stickyNote";
 import { getBoundTextMaxWidth } from "./textElement";
+import { computeBoundTextPosition } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
-import { isLineElement } from "./typeChecks";
+import {
+  isLineElement,
+  isStickyNoteElement,
+} from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -49,6 +58,8 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawStickyNoteElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -163,6 +174,50 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
+  element: T,
+): T => {
+  const width = Math.max(element.width, STICKY_NOTE_MIN_BASE_WIDTH);
+  const baseHeight = Math.max(
+    element.baseHeight || element.height || DEFAULT_STICKY_NOTE_SIZE,
+    STICKY_NOTE_MIN_BASE_HEIGHT,
+  );
+
+  return {
+    ...element,
+    width,
+    height: Math.max(element.height, baseHeight),
+    baseHeight,
+    backgroundColor:
+      !element.backgroundColor || element.backgroundColor === "transparent"
+        ? DEFAULT_STICKY_NOTE_BG
+        : element.backgroundColor,
+    fillStyle: "solid",
+    roughness: 0,
+    roundness: null,
+  };
+};
+
+export const newStickyNoteElement = (
+  opts: {
+    type: "stickynote";
+    baseHeight?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawStickyNoteElement> => {
+  const base = _newElementBase<ExcalidrawStickyNoteElement>(
+    "stickynote",
+    opts,
+  );
+  const baseHeight =
+    opts.baseHeight ?? (base.height || DEFAULT_STICKY_NOTE_SIZE);
+
+  return clampStickyNoteProps({
+    ...base,
+    baseHeight,
+    height: Math.max(base.height || baseHeight, baseHeight),
+  });
+};
+
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
@@ -248,6 +303,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    fontSizeMax?: ExcalidrawTextElement["fontSizeMax"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -270,6 +326,7 @@ export const newTextElement = (
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
+    fontSizeMax: opts.fontSizeMax,
     fontFamily,
     textAlign,
     verticalAlign,
@@ -428,6 +485,39 @@ export const refreshTextDimensions = (
     return;
   }
   if (container || !textElement.autoResize) {
+    if (container && isStickyNoteElement(container)) {
+      const layout = computeStickyNoteTextLayout(
+        container,
+        textElement,
+        text,
+      );
+      const updatedContainer = {
+        ...container,
+        ...layout.container,
+      };
+      const updatedTextElement = {
+        ...textElement,
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(
+        updatedContainer,
+        updatedTextElement,
+        elementsMap,
+      );
+
+      return {
+        text: layout.text,
+        fontSize: layout.fontSize,
+        width: layout.width,
+        height: layout.height,
+        x,
+        y,
+      };
+    }
+
     text = wrapText(
       text,
       getFontString(textElement),

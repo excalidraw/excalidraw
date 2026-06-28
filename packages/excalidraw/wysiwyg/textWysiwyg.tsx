@@ -43,6 +43,7 @@ import { getWrappedTextLines } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
+  isStickyNoteElement,
   isTextElement,
 } from "@excalidraw/element";
 
@@ -296,57 +297,7 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
-        const propertiesUpdated = textPropertiesUpdated(
-          updatedTextElement,
-          editable,
-        );
-
-        let originalContainerData;
-        if (propertiesUpdated) {
-          originalContainerData = updateOriginalContainerCache(
-            container.id,
-            container.height,
-          );
-        } else {
-          originalContainerData = originalContainerCache[container.id];
-          if (!originalContainerData) {
-            originalContainerData = updateOriginalContainerCache(
-              container.id,
-              container.height,
-            );
-          }
-        }
-
-        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-        maxHeight = getBoundTextMaxHeight(
-          container,
-          updatedTextElement as ExcalidrawTextElementWithContainer,
-        );
-
-        // autogrow container height if text exceeds
-        if (!isArrowElement(container) && height > maxHeight) {
-          const targetContainerHeight = computeContainerDimensionForBoundText(
-            height,
-            container.type,
-          );
-
-          app.scene.mutateElement(container, { height: targetContainerHeight });
-          updateBoundElements(container, app.scene);
-          return;
-        } else if (
-          // autoshrink container height until original container height
-          // is reached when text is removed
-          !isArrowElement(container) &&
-          container.height > originalContainerData.height &&
-          height < maxHeight
-        ) {
-          const targetContainerHeight = computeContainerDimensionForBoundText(
-            height,
-            container.type,
-          );
-          app.scene.mutateElement(container, { height: targetContainerHeight });
-          updateBoundElements(container, app.scene);
-        } else {
+        if (isStickyNoteElement(container)) {
           const { x, y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -354,6 +305,75 @@ export const textWysiwyg = ({
           );
           coordX = x;
           coordY = y;
+          maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+          maxHeight = getBoundTextMaxHeight(
+            container,
+            updatedTextElement as ExcalidrawTextElementWithContainer,
+          );
+        } else {
+          const propertiesUpdated = textPropertiesUpdated(
+            updatedTextElement,
+            editable,
+          );
+
+          let originalContainerData;
+          if (propertiesUpdated) {
+            originalContainerData = updateOriginalContainerCache(
+              container.id,
+              container.height,
+            );
+          } else {
+            originalContainerData = originalContainerCache[container.id];
+            if (!originalContainerData) {
+              originalContainerData = updateOriginalContainerCache(
+                container.id,
+                container.height,
+              );
+            }
+          }
+
+          maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+          maxHeight = getBoundTextMaxHeight(
+            container,
+            updatedTextElement as ExcalidrawTextElementWithContainer,
+          );
+
+          // autogrow container height if text exceeds
+          if (!isArrowElement(container) && height > maxHeight) {
+            const targetContainerHeight = computeContainerDimensionForBoundText(
+              height,
+              container.type,
+            );
+
+            app.scene.mutateElement(container, {
+              height: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+            return;
+          } else if (
+            // autoshrink container height until original container height
+            // is reached when text is removed
+            !isArrowElement(container) &&
+            container.height > originalContainerData.height &&
+            height < maxHeight
+          ) {
+            const targetContainerHeight = computeContainerDimensionForBoundText(
+              height,
+              container.type,
+            );
+            app.scene.mutateElement(container, {
+              height: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+          } else {
+            const { x, y } = computeBoundTextPosition(
+              container,
+              updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
+            );
+            coordX = x;
+            coordY = y;
+          }
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
@@ -593,21 +613,27 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      const font = getFontString({
-        fontSize: app.state.currentItemFontSize,
-        fontFamily: app.state.currentItemFontFamily,
-      });
       if (container) {
         const boundTextElement = getBoundTextElement(
           container,
           app.scene.getNonDeletedElementsMap(),
         );
-        const wrappedText = wrapText(
-          `${editable.value}${text}`,
-          font,
-          getBoundTextMaxWidth(container, boundTextElement),
-        );
-        const width = getTextWidth(wrappedText, font);
+        const font = getFontString({
+          fontSize:
+            isStickyNoteElement(container) && boundTextElement
+              ? boundTextElement.fontSize
+              : app.state.currentItemFontSize,
+          fontFamily:
+            isStickyNoteElement(container) && boundTextElement
+              ? boundTextElement.fontFamily
+              : app.state.currentItemFontFamily,
+        });
+        const maxWidth = getBoundTextMaxWidth(container, boundTextElement);
+        const { selectionStart, selectionEnd, value } = editable;
+        const nextText =
+          value.slice(0, selectionStart) + text + value.slice(selectionEnd);
+        const wrappedText = wrapText(nextText, font, maxWidth);
+        const width = Math.min(getTextWidth(wrappedText, font), maxWidth);
         editable.style.width = `${width}px`;
       }
     };

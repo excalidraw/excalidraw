@@ -1,8 +1,13 @@
 import {
   getBoundTextElement,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
-import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
+import {
+  hasBoundTextElement,
+  isStickyNoteElement,
+  isTextElement,
+} from "@excalidraw/element";
 
 import { isInGroup } from "@excalidraw/element";
 
@@ -81,15 +86,17 @@ const handleFontSizeChange: DragInputCallbackType<
     nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
 
     for (const textElement of latestTextElements) {
+      const container = scene.getContainerElement(textElement);
+      const isStickyBoundText =
+        container !== null && isStickyNoteElement(container);
+
       scene.mutateElement(textElement, {
-        fontSize: nextFontSize,
+        ...(isStickyBoundText
+          ? { fontSizeMax: normalizeStickyNoteFontSize(nextFontSize) }
+          : { fontSize: nextFontSize }),
       });
 
-      redrawTextBoundingBox(
-        textElement,
-        scene.getContainerElement(textElement),
-        scene,
-      );
+      redrawTextBoundingBox(textElement, container, scene);
     }
 
     scene.triggerUpdate();
@@ -100,7 +107,9 @@ const handleFontSizeChange: DragInputCallbackType<
       const latestElement = latestTextElements[i];
       const originalElement = originalTextElements[i];
 
-      const originalFontSize = Math.round(originalElement.fontSize);
+      const originalFontSize = Math.round(
+        originalElement.fontSizeMax ?? originalElement.fontSize,
+      );
       const changeInFontSize = Math.round(accumulatedChange);
       let nextFontSize = Math.max(
         originalFontSize + changeInFontSize,
@@ -109,15 +118,17 @@ const handleFontSizeChange: DragInputCallbackType<
       if (shouldChangeByStepSize) {
         nextFontSize = getStepSizedValue(nextFontSize, STEP_SIZE);
       }
+      const container = scene.getContainerElement(latestElement);
+      const isStickyBoundText =
+        container !== null && isStickyNoteElement(container);
+
       scene.mutateElement(latestElement, {
-        fontSize: nextFontSize,
+        ...(isStickyBoundText
+          ? { fontSizeMax: normalizeStickyNoteFontSize(nextFontSize) }
+          : { fontSize: nextFontSize }),
       });
 
-      redrawTextBoundingBox(
-        latestElement,
-        scene.getContainerElement(latestElement),
-        scene,
-      );
+      redrawTextBoundingBox(latestElement, container, scene);
     }
 
     scene.triggerUpdate();
@@ -138,7 +149,7 @@ const MultiFontSize = ({
   }
 
   const fontSizes = latestTextElements.map(
-    (textEl) => Math.round(textEl.fontSize * 10) / 10,
+    (textEl) => Math.round((textEl.fontSizeMax ?? textEl.fontSize) * 10) / 10,
   );
   const value = new Set(fontSizes).size === 1 ? fontSizes[0] : "Mixed";
   const editable = fontSizes.length > 0;

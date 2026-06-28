@@ -1985,6 +1985,17 @@ export const frameToolIcon = createIcon(
   tablerIconProps,
 );
 
+export const stickyNoteToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M6 4h12a2 2 0 0 1 2 2v9l-5 5h-9a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2z"></path>
+    <path d="M14 20v-4a2 2 0 0 1 2 -2h4"></path>
+    <path d="M8 9h8"></path>
+    <path d="M8 13h5"></path>
+  </g>,
+  tablerIconProps,
+);
+
 export const mermaidLogoIcon = createIcon(
   <path
     fill="currentColor"
