@@ -25,7 +25,8 @@ number.
   - If the text still overflows at the minimum font size, the box **grows** vertically to keep
     all text visible — it is never clipped.
   - All resizing happens **in the same render frame** as the edit — no layout-shift flash —
-    on typing, paste, programmatic changes, and restore.
+    on typing, paste, the font/style actions, resize, and the restore pass. (Raw imperative
+    `mutateElement`/`updateScene` are **excluded** — they don't run the fit; see §3.5/§7.)
 - **Font size is user-pickable:** the picker sets a per-element maximum; auto-fit never grows
   the font past it.
 - Reuse existing helpers; consolidate the text-geometry helpers where it produces a cleaner
@@ -159,9 +160,13 @@ exhaustive switches (compiler-flagged) **and** boolean OR-chains / default-retur
 - `distance.distanceToElement` (`distance.ts:29`) — rectangle-arm type switch feeding
   collision/binding distance; a missing `"stickynote"` arm returns `undefined`, breaking
   arrow-binding and body-distance (`collision.ts`/`binding.ts` callers).
-- `resizeElements.ts` — bound-text `fontSize` is scaled **directly** in `resizeSingleElement`
-  (aspect/Shift, `~:914`) and `resizeMultipleElements` (multi-select, `~:1491`), *before*
-  `handleBindTextResize`; for stickies these must scale `fontSizeMax` instead (§6).
+- `resizeElements.ts` — *before* `handleBindTextResize`: (a) bound-text `fontSize` is scaled
+  **directly** in `resizeSingleElement` (aspect/Shift, `~:914`) and `resizeMultipleElements`
+  (multi-select, `~:1491`) — for stickies scale `fontSizeMax` instead; (b) the non-aspect
+  min-dimension clamp (`~:784–793`) floors `nextWidth`/`nextHeight` from the *current* bound-text
+  font and can block sticky shrink — bypass it with the sticky floors. Plus an empty-sticky
+  container-only path (`handleBindTextResize` early-returns with no bound text, `textElement.ts:149`)
+  (§6).
 - `transform.convertToExcalidrawElements` construction switch (`transform.ts:529`) — no
   `"stickynote"` case today; an unhandled type hits `assertNever` and passes through unconstructed
   (§5.5 — add a case or explicitly mark the skeleton API unsupported for v1).
@@ -279,16 +284,25 @@ container half (`height`/`y`) cannot be safely applied from inside the text's `O
      `onChange` still fires on the repaint (it fires every render) but carries no version delta, so
      version-keyed consumers see nothing.
    This matches how `Fonts.onLoaded` already works (`Fonts.ts:128`): it mutates **no** element
-   version — only invalidates `ShapeCache`/`charWidth` and calls `triggerUpdate()`. The sticky hook
-   extends that same loop with a **version-preserving local write** of the fitted
-   `text/fontSize/width/height` (and container `height/y`); since public `mutateElement` cannot skip
-   the version bump, this needs a small version-preserving helper (assign-in-place + cache
-   invalidate) kept local to the `onLoaded` path.
-   **Fallback** if a version-preserving write is undesirable: do **not** mutate geometry on font load
-   at all and re-fit lazily on the next interaction (where `mutateElement` bumps version naturally)
-   — simplest and divergence-free, at the cost of a sticky showing its fallback-measured size until
-   first interaction (more visible than for plain text, since a sticky's *stored* `fontSize`/`height`
-   are what's wrong, not just glyph rasterization).
+   version — only invalidates `ShapeCache`/`charWidth` and calls `triggerUpdate()`. But a geometry
+   write that does *not* bump `version` leaves every **version-keyed cache stale**, so the helper
+   would have to manually invalidate **all** of them for both the text and the container:
+   - `ShapeCache` (`shape.ts`) — has **no** version key; only `ShapeCache.delete(element)` clears it,
+     and only `mutateElement` calls that on a `width/height` change — a version-preserving write
+     bypasses it, so it must delete explicitly;
+   - `ElementShapesCache` (`utils.ts:64`) — keyed on `version`; collision segments go stale → delete;
+   - `ElementBounds.boundsCache` **and** `nonRotatedBoundsCache` (`bounds.ts:87/94`) — keyed on
+     `version`; with the version unchanged they return **stale bounds** and there is **no public
+     manual-clear**, so bounds/selection/hit-test stay wrong unless a clear API is added;
+   - the `hitElementItself` memo (`collision.ts:113`) — keyed on `version`+`versionNonce` (single
+     entry, self-evicts on the next differing query).
+   Because the bounds caches have no clean version-preserving invalidation, the **recommended default
+   is the lazy fallback**: do **not** mutate geometry on font load; re-fit on the next interaction
+   (where `mutateElement` bumps `version`, auto-invalidating every version-keyed cache and deleting
+   `ShapeCache`). The cost is a sticky showing its fallback-measured size until first interaction
+   (more visible than for plain text, since a sticky's *stored* `fontSize`/`height` are what's wrong,
+   not just glyph rasterization). The immediate version-preserving write stays an option **only** if
+   the full invalidation set above (incl. a new bounds-cache clear) is wired.
 
 ---
 
@@ -498,6 +512,19 @@ computeStickyNoteTextLayout(W, maxHeight, originalText, fontFamily, lineHeight, 
   directly. (Vertical-only edge drag still maps to `maxHeight`; horizontal-only to `W`; the
   proportional corner/aspect drag scales `fontSizeMax` — "scale the note".) Both call sites are on
   the §3.3 touch checklist, with Shift/aspect and multi-select tests (§11).
+- **Resize min-dimension clamp also runs *before* `handleBindTextResize`.** The non-aspect path
+  clamps `nextWidth`/`nextHeight` to a floor derived from the bound text's **current** font
+  (`getApproxMinLineWidth`/`getApproxMinLineHeight`, `resizeElements.ts:~784–793`) on *every*
+  direction — so it can **block a sticky from shrinking** on a vertical/free-corner drag that should
+  lower `maxHeight` and then shrink the font. For stickies, bypass/replace this clamp with the
+  sticky floors (`STICKY_NOTE_MIN_HEIGHT`, and a width floor from `MIN` font + `2P`) so shrink
+  proceeds and the fit re-derives the font. On the §3.3 checklist, with a vertical-shrink test.
+- **Empty sticky resize** (no bound text): `handleBindTextResize` early-returns when the container
+  has no bound text (`textElement.ts:149`), so an empty sticky gets only the generic width/height
+  update (`resizeElements.ts:~907`) and **no `maxHeight` reconciliation**. Add a container-only
+  sticky path that still sets `W` (horizontal) and `maxHeight` (vertical/corner) for an empty
+  sticky — the empty-text rule then holds the box at `maxHeight` — so resize behaves the same
+  whether or not the sticky currently has text.
 - **Anchoring:** the anchor is the box's **local top edge** (the note grows/shrinks downward in
   its own frame). For an **unrotated** sticky this just means `y` is unchanged on auto-recompute.
   For a **rotated** sticky, holding raw `x/y` while `height` changes moves the rotated
@@ -548,6 +575,13 @@ coalesce into one paint. Rules:
   Either way, never defer to `requestAnimationFrame`, `setTimeout`, or a React effect. Idempotency
   (§6) is a safety net so a redundant recompute is a no-op (same values → no version bump → no
   further `onUpdate`), not the primary mechanism.
+- **Raw imperative API is out of scope for the fit.** `ExcalidrawImperativeAPI.mutateElement` /
+  `updateScene` (`App.tsx:4643`/`4571`) do **not** run the sticky fit (they are the trusted raw
+  boundary of §3.5), so the same-frame guarantee covers the canonical recompute paths above — *not*
+  a raw programmatic mutation. An integrator that programmatically changes a sticky's text, `W`, or
+  `maxHeight` should route through `restore`, or call an optional exposed
+  `refitStickyNote(container, scene)` helper that runs `computeStickyNoteTextLayout` + applies both
+  halves; otherwise the box reconciles on the next edit/resize.
 - Mutate the bound text's `fontSize` before/with the container so the wysiwyg textarea — restyled
   in the same commit via `scene.onUpdate → updateWysiwygStyle`, which reads
   `getFontString(textElement)` — matches the canvas glyphs.
@@ -737,8 +771,11 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
   sticky path.
 - `resizeElements.ts`: in `resizeSingleElement` (aspect/Shift, `~:914`) and
   `resizeMultipleElements` (multi-select, `~:1491`), bypass the direct bound-text `fontSize` scale
-  for sticky-bound text and scale `fontSizeMax` (clamp+snap) instead, then re-fit (§6). Cover with
-  Shift/aspect and multi-select resize tests.
+  for sticky-bound text and scale `fontSizeMax` (clamp+snap) instead, then re-fit (§6); also bypass
+  the non-aspect min-dimension clamp (`~:784–793`) for stickies so vertical/free-corner **shrink**
+  isn't blocked by the current-font floor. Add an **empty-sticky container-only path** (past
+  `handleBindTextResize`'s no-bound-text early return, `textElement.ts:149`) that still updates
+  `W`/`maxHeight`. Cover with Shift/aspect, multi-select, vertical-shrink, and empty-sticky tests.
 
 **Phase 7 — Tests & visual polish (§11, §12).**
 
@@ -776,7 +813,9 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
 - **Resize (perform-level), full matrix (§6):** horizontal edge → `W` (re-wrap); vertical edge →
   `maxHeight` (rubber-bands at font `MIN`/`MAX`); free corner → both `W` and `maxHeight`;
   **Shift/aspect corner and multi-select** scale `fontSizeMax` (clamp+snap) + re-fit and **never**
-  write the derived `fontSize`.
+  write the derived `fontSize`. **Vertical/free-corner shrink** is not blocked by the current-font
+  min clamp; an **empty sticky** (no bound text) still updates `W`/`maxHeight` via the container-only
+  path.
 - **Render/snapshot & geometry:** sticky renders solid (canvas + SVG parity); body is
   hit-testable/bindable (assert `shouldTestInside` *and* `distanceToElement` returns a finite body
   distance so an arrow binds); roundness resolves to `ADAPTIVE_RADIUS` (not `null`/square corners);
@@ -788,9 +827,9 @@ and the `autoResize:false`-on-manual-resize behavior (`resize.test.tsx`).
 - **Skeleton API:** with v1 deferring support (§5.5), `convertToExcalidrawElements({ type:
   "stickynote", … })` is rejected/guarded (never a malformed unconstructed element); if support is
   later added, the public `ExcalidrawElementSkeleton` type admits it and a `label` becomes bound text.
-- **Imperative API (best-effort, §3.5):** elements injected via `restore`/`updateScene` are clamped
-  (transparent sticky bg → default); a raw `ExcalidrawImperativeAPI.mutateElement` that sets a
-  sticky transparent is *not* auto-fixed but trips the dev-only assertion.
+- **Imperative API (best-effort, §3.5):** elements normalized by `restore` **before** `updateScene`
+  are clamped (transparent sticky bg → default); a **raw** `updateScene`/`mutateElement` that sets a
+  sticky transparent is *not* auto-fixed (trusted boundary) but trips the dev-only assertion.
 - **Tool plumbing:** restored sticky tool survives; click-to-place creates a default square via
   `newStickyNoteElement` (clamped, not deleted as invisibly-small) and enters edit;
   **re-editing** a selected sticky with bound text re-opens the editor (`isValidTextContainer`);
