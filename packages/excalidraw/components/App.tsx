@@ -59,6 +59,8 @@ import {
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_BASE_HEIGHT,
+  STICKY_NOTE_MIN_BASE_WIDTH,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -670,6 +672,7 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+  private shouldSuppressStickyNoteCreationPreview = false;
 
   private _initialized = false;
 
@@ -2118,7 +2121,11 @@ class App extends React.Component<AppProps, AppState> {
       height: this.state.height,
       width: this.state.width,
       editingTextElement: this.state.editingTextElement,
-      newElement: this.state.newElement,
+      newElement:
+        this.shouldSuppressStickyNoteCreationPreview &&
+        isStickyNoteElement(this.state.newElement)
+          ? null
+          : this.state.newElement,
       selectedElements,
       selectedElementsAreBeingDragged:
         this.state.selectedElementsAreBeingDragged,
@@ -9557,6 +9564,12 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         selectionElement: element,
       });
+    } else if (element.type === "stickynote") {
+      this.shouldSuppressStickyNoteCreationPreview = true;
+      this.setState({
+        multiElement: null,
+        newElement: element,
+      });
     } else {
       this.insertNewElement(element);
       this.setState({
@@ -10995,6 +11008,12 @@ class App extends React.Component<AppProps, AppState> {
             isDragging: false,
           },
         );
+
+        this.shouldSuppressStickyNoteCreationPreview = false;
+
+        if (!this.scene.getElement(newElement.id)) {
+          this.insertNewElement(newElement);
+        }
 
         this.store.scheduleCapture();
         this.scene.triggerUpdate();
@@ -12440,6 +12459,30 @@ class App extends React.Component<AppProps, AppState> {
     gridX += snapOffset.x;
     gridY += snapOffset.y;
 
+    const isDraggingStickyNote = isStickyNoteElement(newElement);
+    const hasDraggedStickyNote =
+      isDraggingStickyNote &&
+      (gridX !== pointerDownState.originInGrid.x ||
+        gridY !== pointerDownState.originInGrid.y);
+    const nextWidth =
+      hasDraggedStickyNote
+        ? Math.max(
+            distance(pointerDownState.originInGrid.x, gridX),
+            STICKY_NOTE_MIN_BASE_WIDTH,
+          )
+        : distance(pointerDownState.originInGrid.x, gridX);
+    const nextHeight =
+      hasDraggedStickyNote
+        ? Math.max(
+            distance(pointerDownState.originInGrid.y, gridY),
+            STICKY_NOTE_MIN_BASE_HEIGHT,
+          )
+        : distance(pointerDownState.originInGrid.y, gridY);
+
+    if (hasDraggedStickyNote) {
+      pointerDownState.drag.hasOccurred = true;
+    }
+
     this.setState({
       snapLines,
     });
@@ -12452,8 +12495,8 @@ class App extends React.Component<AppProps, AppState> {
         originY: pointerDownState.originInGrid.y,
         x: gridX,
         y: gridY,
-        width: distance(pointerDownState.originInGrid.x, gridX),
-        height: distance(pointerDownState.originInGrid.y, gridY),
+        width: nextWidth,
+        height: nextHeight,
         shouldMaintainAspectRatio: isImageElement(newElement)
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
@@ -12464,6 +12507,10 @@ class App extends React.Component<AppProps, AppState> {
         originOffset: this.state.originSnapOffset,
         informMutation,
       });
+    }
+
+    if (hasDraggedStickyNote) {
+      this.shouldSuppressStickyNoteCreationPreview = false;
     }
 
     this.setState({
