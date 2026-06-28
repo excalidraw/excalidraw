@@ -10,6 +10,8 @@ import {
   getVerticalOffset,
   applyDarkModeFilter,
   MIME_TYPES,
+  STICKY_NOTE_EDGE_SHADOW_OPACITY,
+  STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_SHADOW_OFFSET,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
@@ -180,8 +182,47 @@ const renderElementToSvg = (
         ),
       );
       rect.setAttribute("stroke", "none");
+
+      const edgeShadowWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH;
+      const verticalEdgeHeight = Math.max(
+        0,
+        element.height - edgeShadowWidth * 2,
+      );
+      const edgeShadows = [
+        { x: 0, y: 0, width: element.width, height: edgeShadowWidth },
+        {
+          x: 0,
+          y: edgeShadowWidth,
+          width: edgeShadowWidth,
+          height: verticalEdgeHeight,
+        },
+        {
+          x: element.width - edgeShadowWidth,
+          y: edgeShadowWidth,
+          width: edgeShadowWidth,
+          height: verticalEdgeHeight,
+        },
+        {
+          x: 0,
+          y: element.height - edgeShadowWidth,
+          width: element.width,
+          height: edgeShadowWidth,
+        },
+      ].map((edgeShadow) => {
+        const edge = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+        edge.setAttribute("x", `${edgeShadow.x}`);
+        edge.setAttribute("y", `${edgeShadow.y}`);
+        edge.setAttribute("width", `${edgeShadow.width}`);
+        edge.setAttribute("height", `${edgeShadow.height}`);
+        edge.setAttribute("fill", "#000");
+        edge.setAttribute("fill-opacity", `${STICKY_NOTE_EDGE_SHADOW_OPACITY}`);
+        edge.setAttribute("stroke", "none");
+        return edge;
+      });
+
       group.appendChild(shadow);
       group.appendChild(rect);
+      edgeShadows.forEach((edgeShadow) => group.appendChild(edgeShadow));
 
       const g = maybeWrapNodesInFrameClipPath(
         element,

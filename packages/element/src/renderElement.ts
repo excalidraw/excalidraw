@@ -24,6 +24,8 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  STICKY_NOTE_EDGE_SHADOW_OPACITY,
+  STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_SHADOW_OFFSET,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
@@ -410,6 +412,26 @@ const drawElementOnCanvas = (
       context.rect(0, 0, element.width, element.height);
       context.fill();
       context.closePath();
+      const edgeShadowWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH;
+      const verticalEdgeHeight = Math.max(
+        0,
+        element.height - edgeShadowWidth * 2,
+      );
+      context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
+      context.fillRect(0, 0, element.width, edgeShadowWidth);
+      context.fillRect(0, edgeShadowWidth, edgeShadowWidth, verticalEdgeHeight);
+      context.fillRect(
+        element.width - edgeShadowWidth,
+        edgeShadowWidth,
+        edgeShadowWidth,
+        verticalEdgeHeight,
+      );
+      context.fillRect(
+        0,
+        element.height - edgeShadowWidth,
+        element.width,
+        edgeShadowWidth,
+      );
       context.restore();
       break;
     }
