@@ -30,7 +30,7 @@ import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
-import { t } from "../../i18n";
+import { t, useI18n } from "../../i18n";
 import {
   useApp,
   useAppProps,
@@ -75,13 +75,13 @@ import {
 import * as defaultItems from "./defaultCommandPaletteItems";
 import "./CommandPalette.scss";
 
-import type { CommandPaletteItem } from "./types";
+import type { CommandPaletteItem, ResolvedCommandPaletteItem } from "./types";
 import type { AppProps, AppState, LibraryItem, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
 
-const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
+const lastUsedPaletteItem = atom<ResolvedCommandPaletteItem | null>(null);
 
 export const DEFAULT_CATEGORIES = {
   app: "App",
@@ -204,10 +204,11 @@ function CommandPaletteInner({
   const setAppState = useExcalidrawSetAppState();
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
+  const { langCode } = useI18n();
 
   const [lastUsed, setLastUsed] = useAtom(lastUsedPaletteItem);
   const [allCommands, setAllCommands] = useState<
-    MarkRequired<CommandPaletteItem, "haystack" | "order">[] | null
+    MarkRequired<ResolvedCommandPaletteItem, "haystack" | "order">[] | null
   >(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -219,7 +220,7 @@ function CommandPaletteInner({
   });
 
   const [libraryItemsData] = useAtom(libraryItemsAtom);
-  const libraryCommands: CommandPaletteItem[] = useMemo(() => {
+  const libraryCommands: ResolvedCommandPaletteItem[] = useMemo(() => {
     return (
       libraryItemsData.libraryItems
         ?.filter(
@@ -614,11 +615,20 @@ function CommandPaletteInner({
         ...additionalCommands,
         ...(customCommandPaletteItems || []),
       ].map((command) => {
+        // resolve lazy labels so the rest of the palette can treat the
+        // label as a plain string (used as React key, haystack, and the
+        // identity key for selection / last-used matching). Resolving here
+        // (inside the `langCode`-dependent effect) keeps custom item labels
+        // in sync with the active language (#11569).
+        const label =
+          typeof command.label === "function" ? command.label() : command.label;
+
         return {
           ...command,
+          label,
           icon: command.icon || boltIcon,
           order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
+          haystack: `${deburr(label.toLocaleLowerCase())} ${
             command.keywords?.join(" ") || ""
           }`,
         };
@@ -640,13 +650,14 @@ function CommandPaletteInner({
     setLastUsed,
     setAppState,
     libraryCommands,
+    langCode,
   ]);
 
   const [commandSearch, setCommandSearch] = useState("");
   const [currentCommand, setCurrentCommand] =
-    useState<CommandPaletteItem | null>(null);
+    useState<ResolvedCommandPaletteItem | null>(null);
   const [commandsByCategory, setCommandsByCategory] = useState<
-    Record<string, CommandPaletteItem[]>
+    Record<string, ResolvedCommandPaletteItem[]>
   >({});
 
   const closeCommandPalette = (cb?: () => void) => {
@@ -660,7 +671,7 @@ function CommandPaletteInner({
   };
 
   const executeCommand = (
-    command: CommandPaletteItem,
+    command: ResolvedCommandPaletteItem,
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => {
     if (uiAppState.openDialog?.name === "commandPalette") {
@@ -679,7 +690,7 @@ function CommandPaletteInner({
   };
 
   const isCommandAvailable = useStableCallback(
-    (command: CommandPaletteItem) => {
+    (command: ResolvedCommandPaletteItem) => {
       if (command.viewMode === false && uiAppState.viewModeEnabled) {
         return false;
       }
@@ -823,8 +834,13 @@ function CommandPaletteInner({
       return;
     }
 
-    const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
-      const nextCommandsByCategory: Record<string, CommandPaletteItem[]> = {};
+    const getNextCommandsByCategory = (
+      commands: ResolvedCommandPaletteItem[],
+    ) => {
+      const nextCommandsByCategory: Record<
+        string,
+        ResolvedCommandPaletteItem[]
+      > = {};
       for (const command of commands) {
         if (nextCommandsByCategory[command.category]) {
           nextCommandsByCategory[command.category].push(command);
@@ -999,7 +1015,7 @@ const CommandItem = ({
   appState,
   size = "small",
 }: {
-  command: CommandPaletteItem;
+  command: ResolvedCommandPaletteItem;
   isSelected: boolean;
   disabled?: boolean;
   onMouseMove: () => void;
