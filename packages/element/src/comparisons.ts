@@ -50,6 +50,7 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "line" ||
   type === "diamond" ||
+  type === "stickynote" ||
   type === "image";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";

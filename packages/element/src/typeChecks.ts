@@ -324,7 +324,10 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "image";
 
 export const isUsingProportionalRadius = (type: string) =>
-  type === "line" || type === "arrow" || type === "diamond";
+  type === "line" ||
+  type === "arrow" ||
+  type === "diamond" ||
+  type === "stickynote";
 
 export const canApplyRoundnessTypeToElement = (
   roundnessType: RoundnessType,

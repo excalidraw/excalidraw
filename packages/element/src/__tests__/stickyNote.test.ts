@@ -1,16 +1,22 @@
 import {
   DEFAULT_STICKY_NOTE_SIZE,
+  ROUNDNESS,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   VERTICAL_ALIGN,
   arrayToMap,
 } from "@excalidraw/common";
+import { lineSegment, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import { Scene } from "../Scene";
+import { intersectElementWithLineSegment } from "../collision";
 import { newElementWith } from "../mutateElement";
 import { newStickyNoteElement, newTextElement } from "../newElement";
 import { resizeSingleElement } from "../resizeElements";
-import { computeStickyNoteTextLayout } from "../stickyNote";
+import {
+  computeStickyNoteTextLayout,
+  getStickyNoteCornerRadius,
+} from "../stickyNote";
 import { redrawTextBoundingBox } from "../textElement";
 
 import type {
@@ -67,17 +73,48 @@ const createStickyWithText = (originalText: string) => {
 };
 
 describe("sticky note text layout", () => {
-  it("normalizes to square corners", () => {
+  it("preserves rounded corners with reduced radius", () => {
     const sticky = newStickyNoteElement({
       type: "stickynote",
       x: 0,
       y: 0,
       width: DEFAULT_STICKY_NOTE_SIZE,
       height: DEFAULT_STICKY_NOTE_SIZE,
-      roundness: { type: 3 },
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     });
 
-    expect(sticky.roundness).toBe(null);
+    expect(sticky.roundness).toEqual({ type: ROUNDNESS.PROPORTIONAL_RADIUS });
+    expect(getStickyNoteCornerRadius(sticky)).toBeLessThan(
+      DEFAULT_STICKY_NOTE_SIZE * 0.25,
+    );
+  });
+
+  it("uses reduced rounded corners for binding intersections", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    });
+    const elementsMap = arrayToMap([sticky]);
+    const intersection = intersectElementWithLineSegment(
+      sticky,
+      elementsMap,
+      lineSegment<GlobalPoint>(
+        pointFrom<GlobalPoint>(
+          sticky.x + sticky.width / 2,
+          sticky.y + sticky.height / 2,
+        ),
+        pointFrom<GlobalPoint>(sticky.x - 10, sticky.y - 10),
+      ),
+      0,
+      true,
+    )[0];
+
+    expect(intersection[0]).toBeLessThan(getStickyNoteCornerRadius(sticky));
+    expect(intersection[1]).toBeLessThan(getStickyNoteCornerRadius(sticky));
   });
 
   it("preserves roughness for render-only shape variation", () => {

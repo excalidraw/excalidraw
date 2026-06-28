@@ -23,6 +23,21 @@ export type StickyNoteRenderPoint = {
   y: number;
 };
 
+export type StickyNotePathCommand =
+  | {
+      type: "move";
+      point: StickyNoteRenderPoint;
+    }
+  | {
+      type: "line";
+      point: StickyNoteRenderPoint;
+    }
+  | {
+      type: "quadratic";
+      control: StickyNoteRenderPoint;
+      point: StickyNoteRenderPoint;
+    };
+
 export type StickyNoteTextLayout = {
   text: string;
   fontSize: number;
@@ -38,6 +53,8 @@ export type StickyNoteTextLayout = {
 };
 
 const STICKY_NOTE_RENDER_ROUGHNESS = [0, 1.5, 8] as const;
+const STICKY_NOTE_CORNER_RADIUS_RATIO = 0.04;
+const STICKY_NOTE_MAX_CORNER_RADIUS = 16;
 
 const seededRandom = (seed: number) => {
   let value = seed >>> 0;
@@ -52,6 +69,39 @@ const seededRandom = (seed: number) => {
 
 const jitter = (random: () => number, amount: number) =>
   (random() * 2 - 1) * amount;
+
+const pointAtDistance = (
+  from: StickyNoteRenderPoint,
+  to: StickyNoteRenderPoint,
+  distance: number,
+) => {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy);
+
+  if (!length) {
+    return from;
+  }
+
+  const ratio = Math.min(distance / length, 1);
+  return {
+    x: from.x + dx * ratio,
+    y: from.y + dy * ratio,
+  };
+};
+
+export const getStickyNoteCornerRadius = (
+  element: ExcalidrawStickyNoteElement,
+) => {
+  if (!element.roundness) {
+    return 0;
+  }
+
+  return Math.min(
+    Math.min(element.width, element.height) * STICKY_NOTE_CORNER_RADIUS_RATIO,
+    STICKY_NOTE_MAX_CORNER_RADIUS,
+  );
+};
 
 export const getStickyNoteRenderPoints = (
   element: ExcalidrawStickyNoteElement,
@@ -102,42 +152,63 @@ export const getStickyNoteRenderPoints = (
   ];
 };
 
-export const getStickyNoteEdgePolygons = (
+export const getStickyNotePathCommands = (
   points: StickyNoteRenderPoint[],
-  edgeWidth: number,
-) => {
-  const center = points.reduce(
-    (acc, point) => ({
-      x: acc.x + point.x / points.length,
-      y: acc.y + point.y / points.length,
-    }),
-    { x: 0, y: 0 },
-  );
-  const innerPoints = points.map((point) => {
-    const dx = center.x - point.x;
-    const dy = center.y - point.y;
-    const distance = Math.hypot(dx, dy);
+  radius: number,
+): StickyNotePathCommand[] => {
+  if (!radius) {
+    return [
+      { type: "move", point: points[0] },
+      ...points.slice(1).map(
+        (point): StickyNotePathCommand => ({
+          type: "line",
+          point,
+        }),
+      ),
+    ];
+  }
 
-    if (!distance) {
-      return point;
-    }
+  const corners = points.map((point, index) => {
+    const prev = points[(index + points.length - 1) % points.length];
+    const next = points[(index + 1) % points.length];
+    const cornerRadius = Math.min(
+      radius,
+      Math.hypot(point.x - prev.x, point.y - prev.y) / 2,
+      Math.hypot(point.x - next.x, point.y - next.y) / 2,
+    );
 
-    const ratio = Math.min(edgeWidth / distance, 1);
     return {
-      x: point.x + dx * ratio,
-      y: point.y + dy * ratio,
+      point,
+      start: pointAtDistance(point, prev, cornerRadius),
+      end: pointAtDistance(point, next, cornerRadius),
     };
   });
 
-  return points.map((point, index) => {
-    const nextIndex = (index + 1) % points.length;
-    return [
-      point,
-      points[nextIndex],
-      innerPoints[nextIndex],
-      innerPoints[index],
-    ];
-  });
+  const commands: StickyNotePathCommand[] = [
+    { type: "move", point: corners[0].end },
+  ];
+
+  for (let index = 1; index < corners.length; index++) {
+    commands.push(
+      { type: "line", point: corners[index].start },
+      {
+        type: "quadratic",
+        control: corners[index].point,
+        point: corners[index].end,
+      },
+    );
+  }
+
+  commands.push(
+    { type: "line", point: corners[0].start },
+    {
+      type: "quadratic",
+      control: corners[0].point,
+      point: corners[0].end,
+    },
+  );
+
+  return commands;
 };
 
 export const normalizeStickyNoteFontSize = (fontSize: number) => {

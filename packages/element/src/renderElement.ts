@@ -72,9 +72,10 @@ import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
 import {
-  getStickyNoteEdgePolygons,
+  getStickyNoteCornerRadius,
+  getStickyNotePathCommands,
   getStickyNoteRenderPoints,
-  type StickyNoteRenderPoint,
+  type StickyNotePathCommand,
 } from "./stickyNote";
 
 import type {
@@ -393,17 +394,48 @@ const drawImagePlaceholder = (
   );
 };
 
-const fillStickyNotePolygon = (
+const drawStickyNotePath = (
   context: CanvasRenderingContext2D,
-  points: StickyNoteRenderPoint[],
+  commands: StickyNotePathCommand[],
 ) => {
   context.beginPath();
-  context.moveTo(points[0].x, points[0].y);
-  for (const point of points.slice(1)) {
-    context.lineTo(point.x, point.y);
+  for (const command of commands) {
+    if (command.type === "move") {
+      context.moveTo(command.point.x, command.point.y);
+    } else if (command.type === "line") {
+      context.lineTo(command.point.x, command.point.y);
+    } else {
+      context.quadraticCurveTo(
+        command.control.x,
+        command.control.y,
+        command.point.x,
+        command.point.y,
+      );
+    }
   }
   context.closePath();
+};
+
+const fillStickyNoteShape = (
+  context: CanvasRenderingContext2D,
+  commands: StickyNotePathCommand[],
+) => {
+  drawStickyNotePath(context, commands);
   context.fill();
+};
+
+const strokeStickyNoteEdge = (
+  context: CanvasRenderingContext2D,
+  commands: StickyNotePathCommand[],
+) => {
+  context.save();
+  drawStickyNotePath(context, commands);
+  context.clip();
+  context.lineWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH * 2;
+  context.strokeStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
+  drawStickyNotePath(context, commands);
+  context.stroke();
+  context.restore();
 };
 
 const drawElementOnCanvas = (
@@ -415,29 +447,28 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "stickynote": {
       context.save();
+      const radius = getStickyNoteCornerRadius(element);
       context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
-      fillStickyNotePolygon(
+      fillStickyNoteShape(
         context,
-        getStickyNoteRenderPoints(element, {
-          offsetX: STICKY_NOTE_SHADOW_OFFSET,
-          offsetY: STICKY_NOTE_SHADOW_OFFSET,
-          seedOffset: 1,
-        }),
+        getStickyNotePathCommands(
+          getStickyNoteRenderPoints(element, {
+            offsetX: STICKY_NOTE_SHADOW_OFFSET,
+            offsetY: STICKY_NOTE_SHADOW_OFFSET,
+            seedOffset: 1,
+          }),
+          radius,
+        ),
       );
 
       const points = getStickyNoteRenderPoints(element);
+      const commands = getStickyNotePathCommands(points, radius);
       context.fillStyle = applyDarkModeFilter(
         element.backgroundColor,
         renderConfig.theme === THEME.DARK,
       );
-      fillStickyNotePolygon(context, points);
-
-      context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
-      getStickyNoteEdgePolygons(points, STICKY_NOTE_EDGE_SHADOW_WIDTH).forEach(
-        (edgePolygon) => {
-          fillStickyNotePolygon(context, edgePolygon);
-        },
-      );
+      fillStickyNoteShape(context, commands);
+      strokeStickyNoteEdge(context, commands);
 
       context.restore();
       break;

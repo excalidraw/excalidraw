@@ -193,7 +193,6 @@ export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
         ? DEFAULT_STICKY_NOTE_BG
         : element.backgroundColor,
     fillStyle: "solid",
-    roundness: null,
   };
 };
 

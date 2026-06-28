@@ -38,9 +38,9 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 import {
-  getStickyNoteEdgePolygons,
+  getStickyNoteCornerRadius,
+  getStickyNotePathCommands,
   getStickyNoteRenderPoints,
-  type StickyNoteRenderPoint,
 } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
@@ -155,25 +155,41 @@ const renderElementToSvg = (
       throw new Error("Selection rendering is not supported for SVG");
     }
     case "stickynote": {
-      const createPolygon = (
-        points: StickyNoteRenderPoint[],
+      const getPathData = (
+        elementPoints: ReturnType<typeof getStickyNoteRenderPoints>,
+      ) =>
+        getStickyNotePathCommands(
+          elementPoints,
+          getStickyNoteCornerRadius(element),
+        )
+          .map((command) => {
+            if (command.type === "move") {
+              return `M ${command.point.x} ${command.point.y}`;
+            }
+            if (command.type === "line") {
+              return `L ${command.point.x} ${command.point.y}`;
+            }
+            return `Q ${command.control.x} ${command.control.y} ${command.point.x} ${command.point.y}`;
+          })
+          .join(" ")
+          .concat(" Z");
+
+      const createPath = (
+        elementPoints: ReturnType<typeof getStickyNoteRenderPoints>,
         fill: string,
         fillOpacity?: number,
       ) => {
-        const polygon = svgRoot.ownerDocument.createElementNS(
+        const path = svgRoot.ownerDocument.createElementNS(
           SVG_NS,
-          "polygon",
+          "path",
         );
-        polygon.setAttribute(
-          "points",
-          points.map((point) => `${point.x},${point.y}`).join(" "),
-        );
-        polygon.setAttribute("fill", fill);
+        path.setAttribute("d", getPathData(elementPoints));
+        path.setAttribute("fill", fill);
         if (typeof fillOpacity !== "undefined") {
-          polygon.setAttribute("fill-opacity", `${fillOpacity}`);
+          path.setAttribute("fill-opacity", `${fillOpacity}`);
         }
-        polygon.setAttribute("stroke", "none");
-        return polygon;
+        path.setAttribute("stroke", "none");
+        return path;
       };
 
       const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
@@ -187,7 +203,7 @@ const renderElementToSvg = (
         group.setAttribute("opacity", `${opacity}`);
       }
 
-      const shadow = createPolygon(
+      const shadow = createPath(
         getStickyNoteRenderPoints(element, {
           offsetX: STICKY_NOTE_SHADOW_OFFSET,
           offsetY: STICKY_NOTE_SHADOW_OFFSET,
@@ -197,23 +213,37 @@ const renderElementToSvg = (
         STICKY_NOTE_SHADOW_OPACITY,
       );
       const points = getStickyNoteRenderPoints(element);
-      const rect = createPolygon(
+      const rect = createPath(
         points,
         applyDarkModeFilter(
           element.backgroundColor,
           renderConfig.theme === THEME.DARK,
         ),
       );
-      const edgeShadows = getStickyNoteEdgePolygons(
-        points,
-        STICKY_NOTE_EDGE_SHADOW_WIDTH,
-      ).map((edgePolygon) =>
-        createPolygon(edgePolygon, "#000", STICKY_NOTE_EDGE_SHADOW_OPACITY),
+      const clipPath = svgRoot.ownerDocument.createElementNS(
+        SVG_NS,
+        "clipPath",
       );
+      clipPath.setAttribute("id", `sticky-note-clipPath-${element.id}`);
+      clipPath.setAttribute("clipPathUnits", "userSpaceOnUse");
+      clipPath.appendChild(createPath(points, "#000"));
+      addToRoot(clipPath, element);
+
+      const edgeShadow = createPath(points, "none");
+      edgeShadow.setAttribute("stroke", "#000");
+      edgeShadow.setAttribute(
+        "stroke-opacity",
+        `${STICKY_NOTE_EDGE_SHADOW_OPACITY}`,
+      );
+      edgeShadow.setAttribute(
+        "stroke-width",
+        `${STICKY_NOTE_EDGE_SHADOW_WIDTH * 2}`,
+      );
+      edgeShadow.setAttribute("clip-path", `url(#${clipPath.id})`);
 
       group.appendChild(shadow);
       group.appendChild(rect);
-      edgeShadows.forEach((edgeShadow) => group.appendChild(edgeShadow));
+      group.appendChild(edgeShadow);
 
       const g = maybeWrapNodesInFrameClipPath(
         element,

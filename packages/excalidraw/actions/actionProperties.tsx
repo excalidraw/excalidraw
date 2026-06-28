@@ -1705,7 +1705,6 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                   : "sharp",
               (element) =>
                 !isArrowElement(element) &&
-                !isStickyNoteElement(element) &&
                 element.hasOwnProperty("roundness"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,

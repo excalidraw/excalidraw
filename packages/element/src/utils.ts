@@ -47,6 +47,7 @@ import {
   getGlobalFixedPointForBindableElement,
   normalizeFixedPoint,
 } from "./binding";
+import { getStickyNoteCornerRadius } from "./stickyNote";
 
 import type {
   ElementsMap,
@@ -217,10 +218,10 @@ export function deconstructRectanguloidElement(
     return cachedShape;
   }
 
-  let radius = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
+  let radius =
+    element.type === "stickynote"
+      ? getStickyNoteCornerRadius(element)
+      : getCornerRadius(Math.min(element.width, element.height), element);
 
   if (radius === 0) {
     radius = 0.01;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CODES, STROKE_WIDTH } from "@excalidraw/common";
+import { CODES, ROUNDNESS, STROKE_WIDTH } from "@excalidraw/common";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
@@ -96,5 +96,21 @@ describe("actionStyles", () => {
     fireEvent.click(screen.getByTitle("Cartoonist"));
 
     expect(API.getSelectedElement().roughness).toBe(2);
+  });
+
+  it("should show and apply roundness for sticky notes", async () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      roundness: null,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    fireEvent.click(screen.getByTitle("Round"));
+
+    expect(API.getSelectedElement().roundness).toEqual({
+      type: ROUNDNESS.PROPORTIONAL_RADIUS,
+    });
   });
 });
