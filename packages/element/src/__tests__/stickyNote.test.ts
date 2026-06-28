@@ -25,7 +25,9 @@ const getSticky = (scene: Scene, id: string) =>
   scene.getNonDeletedElement(id) as NonDeleted<ExcalidrawStickyNoteElement>;
 
 const getBoundText = (scene: Scene, id: string) =>
-  scene.getNonDeletedElement(id) as NonDeleted<ExcalidrawTextElementWithContainer>;
+  scene.getNonDeletedElement(
+    id,
+  ) as NonDeleted<ExcalidrawTextElementWithContainer>;
 
 const createStickyWithText = (originalText: string) => {
   const baseSticky = newStickyNoteElement({
@@ -91,13 +93,28 @@ describe("sticky note text layout", () => {
     expect(sticky.roughness).toBe(2);
   });
 
-  it("downscales font to fit the base size before growing height", () => {
-    const sevenBaseHeightLines = Array(7)
-      .fill("abcdefghij")
-      .join("\n");
-    const { scene, stickyId, textId } = createStickyWithText(
-      sevenBaseHeightLines,
+  it("respects user font size below the sticky note minimum font size", () => {
+    const fontSize = STICKY_NOTE_MIN_FONT_SIZE - 1;
+    const { scene, textId } = createStickyWithText("short");
+    const text = getBoundText(scene, textId);
+
+    scene.mutateElement(text, {
+      fontSize,
+      fontSizeMax: fontSize,
+    });
+
+    const layout = computeStickyNoteTextLayout(
+      getSticky(scene, text.containerId),
+      text,
     );
+
+    expect(layout.fontSize).toBe(fontSize);
+  });
+
+  it("downscales font to fit the base size before growing height", () => {
+    const sevenBaseHeightLines = Array(7).fill("abcdefghij").join("\n");
+    const { scene, stickyId, textId } =
+      createStickyWithText(sevenBaseHeightLines);
     const sticky = getSticky(scene, stickyId);
     const text = getBoundText(scene, textId);
 

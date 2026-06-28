@@ -1,4 +1,5 @@
 import {
+  MIN_FONT_SIZE,
   STICKY_NOTE_FONT_STEP,
   STICKY_NOTE_MIN_BASE_HEIGHT,
   STICKY_NOTE_MIN_BASE_WIDTH,
@@ -140,9 +141,7 @@ export const getStickyNoteEdgePolygons = (
 };
 
 export const normalizeStickyNoteFontSize = (fontSize: number) => {
-  const stepped =
-    Math.round(fontSize / STICKY_NOTE_FONT_STEP) * STICKY_NOTE_FONT_STEP;
-  return Math.max(STICKY_NOTE_MIN_FONT_SIZE, stepped);
+  return Math.max(MIN_FONT_SIZE, fontSize);
 };
 
 const getStickyNoteFontMax = (textElement: ExcalidrawTextElement) => {
