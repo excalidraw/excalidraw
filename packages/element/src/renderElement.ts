@@ -24,6 +24,8 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  STICKY_NOTE_SHADOW_OFFSET,
+  STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
 
 import type {
@@ -393,6 +395,13 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "stickynote": {
       context.save();
+      context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
+      context.fillRect(
+        STICKY_NOTE_SHADOW_OFFSET,
+        STICKY_NOTE_SHADOW_OFFSET,
+        element.width,
+        element.height,
+      );
       context.fillStyle = applyDarkModeFilter(
         element.backgroundColor,
         renderConfig.theme === THEME.DARK,

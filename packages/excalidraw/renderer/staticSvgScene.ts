@@ -10,6 +10,8 @@ import {
   getVerticalOffset,
   applyDarkModeFilter,
   MIME_TYPES,
+  STICKY_NOTE_SHADOW_OFFSET,
+  STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -146,6 +148,26 @@ const renderElementToSvg = (
       throw new Error("Selection rendering is not supported for SVG");
     }
     case "stickynote": {
+      const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      group.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      if (opacity !== 1) {
+        group.setAttribute("opacity", `${opacity}`);
+      }
+
+      const shadow = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      shadow.setAttribute("x", `${STICKY_NOTE_SHADOW_OFFSET}`);
+      shadow.setAttribute("y", `${STICKY_NOTE_SHADOW_OFFSET}`);
+      shadow.setAttribute("width", `${element.width}`);
+      shadow.setAttribute("height", `${element.height}`);
+      shadow.setAttribute("fill", "#000");
+      shadow.setAttribute("fill-opacity", `${STICKY_NOTE_SHADOW_OPACITY}`);
+      shadow.setAttribute("stroke", "none");
+
       const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
 
       rect.setAttribute("width", `${element.width}`);
@@ -158,25 +180,18 @@ const renderElementToSvg = (
         ),
       );
       rect.setAttribute("stroke", "none");
-      if (opacity !== 1) {
-        rect.setAttribute("fill-opacity", `${opacity}`);
-      }
-      rect.setAttribute(
-        "transform",
-        `translate(${offsetX || 0} ${
-          offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
-      );
+      group.appendChild(shadow);
+      group.appendChild(rect);
 
       const g = maybeWrapNodesInFrameClipPath(
         element,
         root,
-        [rect],
+        [group],
         renderConfig.frameRendering,
         elementsMap,
       );
 
-      addToRoot(g || rect, element);
+      addToRoot(g || group, element);
       break;
     }
     case "rectangle":
