@@ -83,4 +83,18 @@ describe("actionStyles", () => {
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
   });
+
+  it("should show and apply roughness for sticky notes", async () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      roughness: 0,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    fireEvent.click(screen.getByTitle("Cartoonist"));
+
+    expect(API.getSelectedElement().roughness).toBe(2);
+  });
 });

@@ -71,6 +71,11 @@ import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
+import {
+  getStickyNoteEdgePolygons,
+  getStickyNoteRenderPoints,
+  type StickyNoteRenderPoint,
+} from "./stickyNote";
 
 import type {
   ExcalidrawElement,
@@ -388,6 +393,19 @@ const drawImagePlaceholder = (
   );
 };
 
+const fillStickyNotePolygon = (
+  context: CanvasRenderingContext2D,
+  points: StickyNoteRenderPoint[],
+) => {
+  context.beginPath();
+  context.moveTo(points[0].x, points[0].y);
+  for (const point of points.slice(1)) {
+    context.lineTo(point.x, point.y);
+  }
+  context.closePath();
+  context.fill();
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -398,40 +416,29 @@ const drawElementOnCanvas = (
     case "stickynote": {
       context.save();
       context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
-      context.fillRect(
-        STICKY_NOTE_SHADOW_OFFSET,
-        STICKY_NOTE_SHADOW_OFFSET,
-        element.width,
-        element.height,
+      fillStickyNotePolygon(
+        context,
+        getStickyNoteRenderPoints(element, {
+          offsetX: STICKY_NOTE_SHADOW_OFFSET,
+          offsetY: STICKY_NOTE_SHADOW_OFFSET,
+          seedOffset: 1,
+        }),
       );
+
+      const points = getStickyNoteRenderPoints(element);
       context.fillStyle = applyDarkModeFilter(
         element.backgroundColor,
         renderConfig.theme === THEME.DARK,
       );
-      context.beginPath();
-      context.rect(0, 0, element.width, element.height);
-      context.fill();
-      context.closePath();
-      const edgeShadowWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH;
-      const verticalEdgeHeight = Math.max(
-        0,
-        element.height - edgeShadowWidth * 2,
-      );
+      fillStickyNotePolygon(context, points);
+
       context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
-      context.fillRect(0, 0, element.width, edgeShadowWidth);
-      context.fillRect(0, edgeShadowWidth, edgeShadowWidth, verticalEdgeHeight);
-      context.fillRect(
-        element.width - edgeShadowWidth,
-        edgeShadowWidth,
-        edgeShadowWidth,
-        verticalEdgeHeight,
+      getStickyNoteEdgePolygons(points, STICKY_NOTE_EDGE_SHADOW_WIDTH).forEach(
+        (edgePolygon) => {
+          fillStickyNotePolygon(context, edgePolygon);
+        },
       );
-      context.fillRect(
-        0,
-        element.height - edgeShadowWidth,
-        element.width,
-        edgeShadowWidth,
-      );
+
       context.restore();
       break;
     }

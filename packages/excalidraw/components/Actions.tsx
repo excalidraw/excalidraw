@@ -42,6 +42,7 @@ import {
   getTargetElements,
   hasBackground,
   hasFreedrawMode,
+  hasRoughness,
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
@@ -207,12 +208,12 @@ export const SelectedShapeActions = ({
         renderAction("changeFreedrawMode")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
+        targetElements.some((element) => hasStrokeStyle(element.type))) &&
+        renderAction("changeStrokeStyle")}
+
+      {(hasRoughness(appState.activeTool.type) ||
+        targetElements.some((element) => hasRoughness(element.type))) &&
+        renderAction("changeSloppiness")}
 
       {(canChangeRoundness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeRoundness(element.type))) && (
@@ -409,12 +410,11 @@ const CombinedShapeProperties = ({
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
-                )) && (
-                <>
-                  {renderAction("changeStrokeStyle")}
-                  {renderAction("changeSloppiness")}
-                </>
-              )}
+                )) &&
+                renderAction("changeStrokeStyle")}
+              {(hasRoughness(appState.activeTool.type) ||
+                targetElements.some((element) => hasRoughness(element.type))) &&
+                renderAction("changeSloppiness")}
               {(canChangeRoundness(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   canChangeRoundness(element.type),

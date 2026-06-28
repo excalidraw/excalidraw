@@ -37,6 +37,11 @@ import { getContainingFrame } from "@excalidraw/element";
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
+import {
+  getStickyNoteEdgePolygons,
+  getStickyNoteRenderPoints,
+  type StickyNoteRenderPoint,
+} from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -150,6 +155,27 @@ const renderElementToSvg = (
       throw new Error("Selection rendering is not supported for SVG");
     }
     case "stickynote": {
+      const createPolygon = (
+        points: StickyNoteRenderPoint[],
+        fill: string,
+        fillOpacity?: number,
+      ) => {
+        const polygon = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "polygon",
+        );
+        polygon.setAttribute(
+          "points",
+          points.map((point) => `${point.x},${point.y}`).join(" "),
+        );
+        polygon.setAttribute("fill", fill);
+        if (typeof fillOpacity !== "undefined") {
+          polygon.setAttribute("fill-opacity", `${fillOpacity}`);
+        }
+        polygon.setAttribute("stroke", "none");
+        return polygon;
+      };
+
       const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
       group.setAttribute(
         "transform",
@@ -161,64 +187,29 @@ const renderElementToSvg = (
         group.setAttribute("opacity", `${opacity}`);
       }
 
-      const shadow = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
-      shadow.setAttribute("x", `${STICKY_NOTE_SHADOW_OFFSET}`);
-      shadow.setAttribute("y", `${STICKY_NOTE_SHADOW_OFFSET}`);
-      shadow.setAttribute("width", `${element.width}`);
-      shadow.setAttribute("height", `${element.height}`);
-      shadow.setAttribute("fill", "#000");
-      shadow.setAttribute("fill-opacity", `${STICKY_NOTE_SHADOW_OPACITY}`);
-      shadow.setAttribute("stroke", "none");
-
-      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
-
-      rect.setAttribute("width", `${element.width}`);
-      rect.setAttribute("height", `${element.height}`);
-      rect.setAttribute(
-        "fill",
+      const shadow = createPolygon(
+        getStickyNoteRenderPoints(element, {
+          offsetX: STICKY_NOTE_SHADOW_OFFSET,
+          offsetY: STICKY_NOTE_SHADOW_OFFSET,
+          seedOffset: 1,
+        }),
+        "#000",
+        STICKY_NOTE_SHADOW_OPACITY,
+      );
+      const points = getStickyNoteRenderPoints(element);
+      const rect = createPolygon(
+        points,
         applyDarkModeFilter(
           element.backgroundColor,
           renderConfig.theme === THEME.DARK,
         ),
       );
-      rect.setAttribute("stroke", "none");
-
-      const edgeShadowWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH;
-      const verticalEdgeHeight = Math.max(
-        0,
-        element.height - edgeShadowWidth * 2,
+      const edgeShadows = getStickyNoteEdgePolygons(
+        points,
+        STICKY_NOTE_EDGE_SHADOW_WIDTH,
+      ).map((edgePolygon) =>
+        createPolygon(edgePolygon, "#000", STICKY_NOTE_EDGE_SHADOW_OPACITY),
       );
-      const edgeShadows = [
-        { x: 0, y: 0, width: element.width, height: edgeShadowWidth },
-        {
-          x: 0,
-          y: edgeShadowWidth,
-          width: edgeShadowWidth,
-          height: verticalEdgeHeight,
-        },
-        {
-          x: element.width - edgeShadowWidth,
-          y: edgeShadowWidth,
-          width: edgeShadowWidth,
-          height: verticalEdgeHeight,
-        },
-        {
-          x: 0,
-          y: element.height - edgeShadowWidth,
-          width: element.width,
-          height: edgeShadowWidth,
-        },
-      ].map((edgeShadow) => {
-        const edge = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
-        edge.setAttribute("x", `${edgeShadow.x}`);
-        edge.setAttribute("y", `${edgeShadow.y}`);
-        edge.setAttribute("width", `${edgeShadow.width}`);
-        edge.setAttribute("height", `${edgeShadow.height}`);
-        edge.setAttribute("fill", "#000");
-        edge.setAttribute("fill-opacity", `${STICKY_NOTE_EDGE_SHADOW_OPACITY}`);
-        edge.setAttribute("stroke", "none");
-        return edge;
-      });
 
       group.appendChild(shadow);
       group.appendChild(rect);

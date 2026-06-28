@@ -77,6 +77,19 @@ describe("sticky note text layout", () => {
     expect(sticky.roundness).toBe(null);
   });
 
+  it("preserves roughness for render-only shape variation", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      roughness: 2,
+    });
+
+    expect(sticky.roughness).toBe(2);
+  });
+
   it("downscales font to fit the base size before growing height", () => {
     const sevenBaseHeightLines = Array(7)
       .fill("abcdefghij")

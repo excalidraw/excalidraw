@@ -17,6 +17,11 @@ import type {
   ExcalidrawTextElement,
 } from "./types";
 
+export type StickyNoteRenderPoint = {
+  x: number;
+  y: number;
+};
+
 export type StickyNoteTextLayout = {
   text: string;
   fontSize: number;
@@ -29,6 +34,109 @@ export type StickyNoteTextLayout = {
     height: number;
     baseHeight: number;
   };
+};
+
+const STICKY_NOTE_RENDER_ROUGHNESS = [0, 1.5, 8] as const;
+
+const seededRandom = (seed: number) => {
+  let value = seed >>> 0;
+  return () => {
+    value += 0x6d2b79f5;
+    let next = value;
+    next = Math.imul(next ^ (next >>> 15), next | 1);
+    next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+    return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const jitter = (random: () => number, amount: number) =>
+  (random() * 2 - 1) * amount;
+
+export const getStickyNoteRenderPoints = (
+  element: ExcalidrawStickyNoteElement,
+  {
+    offsetX = 0,
+    offsetY = 0,
+    seedOffset = 0,
+  }: {
+    offsetX?: number;
+    offsetY?: number;
+    seedOffset?: number;
+  } = {},
+): StickyNoteRenderPoint[] => {
+  const roughness = Math.max(0, Math.min(2, Math.round(element.roughness)));
+  const amount = Math.min(
+    STICKY_NOTE_RENDER_ROUGHNESS[roughness],
+    Math.min(element.width, element.height) * 0.012,
+  );
+
+  if (!amount) {
+    return [
+      { x: offsetX, y: offsetY },
+      { x: offsetX + element.width, y: offsetY },
+      { x: offsetX + element.width, y: offsetY + element.height },
+      { x: offsetX, y: offsetY + element.height },
+    ];
+  }
+
+  const random = seededRandom(element.seed + seedOffset);
+
+  return [
+    {
+      x: offsetX + jitter(random, amount),
+      y: offsetY + jitter(random, amount),
+    },
+    {
+      x: offsetX + element.width + jitter(random, amount),
+      y: offsetY + jitter(random, amount),
+    },
+    {
+      x: offsetX + element.width + jitter(random, amount),
+      y: offsetY + element.height + jitter(random, amount),
+    },
+    {
+      x: offsetX + jitter(random, amount),
+      y: offsetY + element.height + jitter(random, amount),
+    },
+  ];
+};
+
+export const getStickyNoteEdgePolygons = (
+  points: StickyNoteRenderPoint[],
+  edgeWidth: number,
+) => {
+  const center = points.reduce(
+    (acc, point) => ({
+      x: acc.x + point.x / points.length,
+      y: acc.y + point.y / points.length,
+    }),
+    { x: 0, y: 0 },
+  );
+  const innerPoints = points.map((point) => {
+    const dx = center.x - point.x;
+    const dy = center.y - point.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (!distance) {
+      return point;
+    }
+
+    const ratio = Math.min(edgeWidth / distance, 1);
+    return {
+      x: point.x + dx * ratio,
+      y: point.y + dy * ratio,
+    };
+  });
+
+  return points.map((point, index) => {
+    const nextIndex = (index + 1) % points.length;
+    return [
+      point,
+      points[nextIndex],
+      innerPoints[nextIndex],
+      innerPoints[index],
+    ];
+  });
 };
 
 export const normalizeStickyNoteFontSize = (fontSize: number) => {
