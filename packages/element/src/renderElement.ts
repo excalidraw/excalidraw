@@ -769,12 +769,22 @@ const drawElementFromCanvas = (
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
+    let drawX =
+      (x1 + appState.scrollX) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+    let drawY =
+      (y1 + appState.scrollY) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+
+    if (!element.angle && isTextElement(element)) {
+      drawX = Math.round(drawX);
+      drawY = Math.round(drawY);
+    }
+
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      drawX,
+      drawY,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
