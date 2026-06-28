@@ -11017,6 +11017,23 @@ class App extends React.Component<AppProps, AppState> {
 
         this.store.scheduleCapture();
         this.scene.triggerUpdate();
+
+        if (activeTool.locked) {
+          this.setState((prevState) => ({
+            newElement: null,
+            selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          }));
+          setCursorForShape(this.interactiveCanvas, this.state);
+          return;
+        }
+
+        resetCursor(this.interactiveCanvas);
+        this.setState({
+          newElement: null,
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        });
         this.startTextEditing({
           sceneX: newElement.x + newElement.width / 2,
           sceneY: newElement.y + newElement.height / 2,

@@ -12,10 +12,12 @@ import * as StaticScene from "../renderer/staticScene";
 import {
   render,
   fireEvent,
+  waitFor,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "./queries/dom";
 
 unmountComponent();
 
@@ -212,6 +214,62 @@ describe("Test dragCreate", () => {
       expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
 
       h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
+  });
+
+  describe("sticky note creation", () => {
+    const createDefaultStickyNote = (canvas: Element) => {
+      fireEvent.pointerDown(canvas, { clientX: 300, clientY: 300 });
+      fireEvent.pointerUp(canvas, { clientX: 300, clientY: 300 });
+    };
+
+    it("switches back to selection and starts editing when tool is unlocked", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      createDefaultStickyNote(canvas);
+
+      await getTextEditor();
+
+      const stickyNote = h.elements.find(
+        (element) => element.type === "stickynote",
+      );
+      const boundText = h.elements.find((element) => element.type === "text");
+
+      expect(stickyNote).toBeDefined();
+      expect(boundText).toEqual(
+        expect.objectContaining({
+          containerId: stickyNote?.id,
+        }),
+      );
+      expect(h.state.editingTextElement?.id).toBe(boundText?.id);
+      expect(h.state.activeTool.type).toBe("selection");
+      expect(h.state.activeTool.locked).toBe(false);
+    });
+
+    it("keeps sticky note tool active without editing when tool is locked", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+      fireEvent.click(getByToolName("lock"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      createDefaultStickyNote(canvas);
+
+      await waitFor(() => {
+        expect(
+          h.elements.filter((element) => element.type === "stickynote"),
+        ).toHaveLength(1);
+      });
+
+      expect(h.elements.filter((element) => element.type === "text")).toEqual(
+        [],
+      );
+      expect(h.state.editingTextElement).toBeNull();
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBeNull();
+      expect(h.state.activeTool.type).toBe("stickynote");
+      expect(h.state.activeTool.locked).toBe(true);
+      expect(h.state.selectedElementIds).toEqual({});
     });
   });
 
