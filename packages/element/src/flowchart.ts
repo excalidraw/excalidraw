@@ -20,7 +20,7 @@ import {
 } from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
-import { newArrowElement, newElement } from "./newElement";
+import { newArrowElement, newElement, newStickyNoteElement } from "./newElement";
 import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
@@ -45,6 +45,41 @@ type LinkDirection = "up" | "right" | "down" | "left";
 
 const VERTICAL_OFFSET = 100;
 const HORIZONTAL_OFFSET = 100;
+
+const createFlowchartNode = (
+  sourceNode: ExcalidrawFlowchartNodeElement,
+  x: number,
+  y: number,
+): ExcalidrawFlowchartNodeElement => {
+  const commonNodeProps = {
+    x,
+    y,
+    // TODO: extract this to a util
+    width: sourceNode.width,
+    height: sourceNode.height,
+    roundness: sourceNode.roundness,
+    roughness: sourceNode.roughness,
+    backgroundColor: sourceNode.backgroundColor,
+    strokeColor: sourceNode.strokeColor,
+    strokeWidth: sourceNode.strokeWidth,
+    opacity: sourceNode.opacity,
+    fillStyle: sourceNode.fillStyle,
+    strokeStyle: sourceNode.strokeStyle,
+  };
+
+  if (sourceNode.type === "stickynote") {
+    return newStickyNoteElement({
+      type: "stickynote",
+      ...commonNodeProps,
+      baseHeight: sourceNode.baseHeight,
+    });
+  }
+
+  return newElement({
+    type: sourceNode.type,
+    ...commonNodeProps,
+  }) as ExcalidrawFlowchartNodeElement;
+};
 
 export const getLinkDirectionFromKey = (key: string): LinkDirection => {
   switch (key) {
@@ -253,22 +288,11 @@ const addNewNode = (
     direction,
   );
 
-  const nextNode = newElement({
-    type: element.type,
-    x: element.x + offsets.x,
-    y: element.y + offsets.y,
-    // TODO: extract this to a util
-    width: element.width,
-    height: element.height,
-    roundness: element.roundness,
-    roughness: element.roughness,
-    backgroundColor: element.backgroundColor,
-    strokeColor: element.strokeColor,
-    strokeWidth: element.strokeWidth,
-    opacity: element.opacity,
-    fillStyle: element.fillStyle,
-    strokeStyle: element.strokeStyle,
-  });
+  const nextNode = createFlowchartNode(
+    element,
+    element.x + offsets.x,
+    element.y + offsets.y,
+  );
 
   invariant(
     isFlowchartNodeElement(nextNode),
@@ -331,22 +355,7 @@ export const addNewNodes = (
       nextX = startX + offsetX;
     }
 
-    const nextNode = newElement({
-      type: startNode.type,
-      x: nextX,
-      y: nextY,
-      // TODO: extract this to a util
-      width: startNode.width,
-      height: startNode.height,
-      roundness: startNode.roundness,
-      roughness: startNode.roughness,
-      backgroundColor: startNode.backgroundColor,
-      strokeColor: startNode.strokeColor,
-      strokeWidth: startNode.strokeWidth,
-      opacity: startNode.opacity,
-      fillStyle: startNode.fillStyle,
-      strokeStyle: startNode.strokeStyle,
-    });
+    const nextNode = createFlowchartNode(startNode, nextX, nextY);
 
     invariant(
       isFlowchartNodeElement(nextNode),
