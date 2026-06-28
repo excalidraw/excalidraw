@@ -500,6 +500,26 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .floating-status-stack {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+
+    .scroll-back-to-content {
+      position: static;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
   .help-icon {
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;
@@ -794,6 +814,14 @@ body.excalidraw-cursor-resize * {
   .excalidraw__embeddable__outer {
     width: 100%;
     height: 100%;
+  }
+
+  .excalidraw__embeddable__content {
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+
+    &,
     & > * {
       border-radius: var(--embeddable-radius);
     }

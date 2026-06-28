@@ -9,6 +9,7 @@ export {
   hasBackground,
   hasStrokeWidth,
   hasStrokeStyle,
+  hasFreedrawMode,
   canHaveArrowheads,
   canChangeRoundness,
 } from "@excalidraw/element";

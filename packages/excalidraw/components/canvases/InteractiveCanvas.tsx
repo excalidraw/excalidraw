@@ -6,7 +6,6 @@ import {
   sceneCoordsToViewportCoords,
   type EditorInterface,
 } from "@excalidraw/common";
-import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -24,6 +23,8 @@ import type {
 import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
+import { AnimationController } from "../../renderer/animation";
+
 import type {
   AppClassProperties,
   AppState,
@@ -38,7 +39,7 @@ type InteractiveCanvasProps = {
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   allElementsMap: NonDeletedSceneElementsMap;
-  sceneNonce: number | undefined;
+  canvasNonce: string;
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
@@ -53,6 +54,7 @@ type InteractiveCanvasProps = {
     DOMAttributes<HTMLCanvasElement | HTMLDivElement>["onContextMenu"],
     undefined
   >;
+  onClick: Exclude<DOMAttributes<HTMLCanvasElement>["onClick"], undefined>;
   onPointerMove: Exclude<
     DOMAttributes<HTMLCanvasElement>["onPointerMove"],
     undefined
@@ -202,14 +204,17 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor: props.appState.viewModeEnabled
-          ? CURSOR_TYPE.GRAB
-          : CURSOR_TYPE.AUTO,
+        cursor:
+          props.appState.viewModeEnabled &&
+          props.appState.activeTool.type !== "laser"
+            ? CURSOR_TYPE.GRAB
+            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
+      onClick={props.onClick}
       onPointerMove={props.onPointerMove}
       onPointerUp={props.onPointerUp}
       onPointerCancel={props.onPointerCancel}
@@ -233,6 +238,7 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  activeTool: appState.activeTool,
   openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
   selectedElementIds: appState.selectedElementIds,
@@ -246,6 +252,7 @@ const getRelevantAppStateProps = (
   multiElement: appState.multiElement,
   newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
+  isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
   suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
@@ -262,6 +269,7 @@ const getRelevantAppStateProps = (
   frameRendering: appState.frameRendering,
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
   exportScale: appState.exportScale,
+  currentItemArrowType: appState.currentItemArrowType,
 });
 
 const areEqual = (
@@ -271,10 +279,10 @@ const areEqual = (
   // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.sceneNonce !== nextProps.sceneNonce ||
+    prevProps.canvasNonce !== nextProps.canvasNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if sceneNonce didn't change (e.g. we filter elements out based
+    // even if canvasNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||

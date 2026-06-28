@@ -1,7 +1,9 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  bumpVersion,
   getLinearElementSubType,
+  mutateElement,
   updateElbowArrowPoints,
 } from "@excalidraw/element";
 
@@ -37,6 +39,8 @@ import {
   isProdEnv,
   mapFind,
   reduceToCommonValue,
+  ROUNDNESS,
+  sceneCoordsToViewportCoords,
   updateActiveTool,
 } from "@excalidraw/common";
 
@@ -71,12 +75,6 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
-import {
-  bumpVersion,
-  mutateElement,
-  ROUNDNESS,
-  sceneCoordsToViewportCoords,
-} from "..";
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 
@@ -833,14 +831,13 @@ const convertElementType = <
       newElement({
         ...element,
         type: targetType,
-        roundness:
-          targetType === "diamond" && element.roundness
-            ? {
-                type: isUsingAdaptiveRadius(targetType)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : element.roundness,
+        roundness: element.roundness
+          ? {
+              type: isUsingAdaptiveRadius(targetType)
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
+            }
+          : element.roundness,
       }),
     ) as typeof element;
 

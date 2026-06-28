@@ -1,14 +1,33 @@
-import React, { useEffect } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  DEFAULT_IMAGE_OPTIONS,
+  DEFAULT_UI_OPTIONS,
+  getStrokeWidthByKey,
+  isShallowEqual,
+} from "@excalidraw/common";
 
-import App from "./components/App";
+import App, {
+  ExcalidrawAPIContext,
+  ExcalidrawAPISetContext,
+} from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
+import {
+  useAppStateValue as _useAppStateValue,
+  useOnAppStateChange as _useOnAppStateChange,
+} from "./hooks/useAppStateValue";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
@@ -16,16 +35,46 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import type { AppProps, ExcalidrawProps } from "./types";
+import type {
+  AppProps,
+  AppState,
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+} from "./types";
 
 polyfill();
 
+/**
+ * Stateless provider that allows `useExcalidrawAPI()` (and hooks built
+ * on it, such as `useAppStateValue()` and `useOnAppStateChange()`) to work
+ * outside the <Excalidraw> component tree.
+ */
+export const ExcalidrawAPIProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [api, setApi] = useState<ExcalidrawImperativeAPI | null>(null);
+  return (
+    <ExcalidrawAPIContext.Provider value={api}>
+      <ExcalidrawAPISetContext.Provider value={setApi}>
+        {children}
+      </ExcalidrawAPISetContext.Provider>
+    </ExcalidrawAPIContext.Provider>
+  );
+};
+
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
+    onExport,
     onChange,
+    onThemeChange,
     onIncrement,
     initialData,
-    excalidrawAPI,
+    onExcalidrawAPI,
+    onMount,
+    onUnmount,
+    onInitialize,
     isCollaborating = false,
     onPointerUpdate,
     renderTopLeftUI,
@@ -56,6 +105,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
+    imageOptions,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -81,10 +131,30 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   if (
     UIOptions.canvasActions.toggleTheme === null &&
-    typeof theme === "undefined"
+    (theme == null || onThemeChange)
   ) {
     UIOptions.canvasActions.toggleTheme = true;
   }
+
+  const normalizedImageOptions: AppProps["imageOptions"] = {
+    maxFileSizeBytes:
+      imageOptions?.maxFileSizeBytes ?? DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes,
+    maxWidthOrHeight:
+      imageOptions?.maxWidthOrHeight ?? DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight,
+  };
+
+  const setExcalidrawAPI = useContext(ExcalidrawAPISetContext);
+
+  const onExcalidrawAPIRef = useRef(onExcalidrawAPI);
+  onExcalidrawAPIRef.current = onExcalidrawAPI;
+
+  const handleExcalidrawAPI = useCallback(
+    (api: ExcalidrawImperativeAPI | null) => {
+      setExcalidrawAPI?.(api);
+      onExcalidrawAPIRef.current?.(api);
+    },
+    [setExcalidrawAPI],
+  );
 
   useEffect(() => {
     const importPolyfill = async () => {
@@ -115,10 +185,15 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     <EditorJotaiProvider store={editorJotaiStore}>
       <InitializeApp langCode={langCode} theme={theme}>
         <App
+          onExport={onExport}
           onChange={onChange}
+          onThemeChange={onThemeChange}
           onIncrement={onIncrement}
           initialData={initialData}
-          excalidrawAPI={excalidrawAPI}
+          onExcalidrawAPI={handleExcalidrawAPI}
+          onMount={onMount}
+          onUnmount={onUnmount}
+          onInitialize={onInitialize}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopLeftUI={renderTopLeftUI}
@@ -149,6 +224,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
+          imageOptions={normalizedImageOptions}
         >
           {children}
         </App>
@@ -166,11 +242,13 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   const {
     initialData: prevInitialData,
     UIOptions: prevUIOptions = {},
+    imageOptions: prevImageOptions,
     ...prev
   } = prevProps;
   const {
     initialData: nextInitialData,
     UIOptions: nextUIOptions = {},
+    imageOptions: nextImageOptions,
     ...next
   } = nextProps;
 
@@ -214,7 +292,17 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     return prevUIOptions[key] === nextUIOptions[key];
   });
 
-  return isUIOptionsSame && isShallowEqual(prev, next);
+  const isImageOptionsSame =
+    (prevImageOptions?.maxWidthOrHeight ??
+      DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) ===
+      (nextImageOptions?.maxWidthOrHeight ??
+        DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) &&
+    (prevImageOptions?.maxFileSizeBytes ??
+      DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes) ===
+      (nextImageOptions?.maxFileSizeBytes ??
+        DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes);
+
+  return isUIOptionsSame && isImageOptionsSame && isShallowEqual(prev, next);
 };
 
 export const Excalidraw = React.memo(ExcalidrawBase, areEqual);
@@ -267,6 +355,7 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   getFormFactor,
+  throttleRAF,
 } from "@excalidraw/common";
 
 export {
@@ -284,7 +373,13 @@ export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
-export { useEditorInterface, useStylesPanelMode } from "./components/App";
+export {
+  useEditorInterface,
+  useStylesPanelMode,
+  useExcalidrawAPI,
+  ExcalidrawAPIContext,
+} from "./components/App";
+
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
@@ -306,16 +401,54 @@ export {
   convertToExcalidrawElements,
 } from "@excalidraw/element";
 
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "@excalidraw/utils/withinBounds";
+export { elementsOverlappingBBox } from "@excalidraw/element";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
+export { Fonts } from "./fonts/Fonts";
+
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
 
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
+
+export {
+  renderSpreadsheet,
+  tryParseSpreadsheet,
+  isSpreadsheetValidForChartType,
+} from "./charts";
+
+// -----------------------------------------------------------------------------
+// useExcalidrawStateValue() wrapper for host apps for the return type to reflect the
+// the potentially `undefined` value for initial render before the excalidrawAPI
+// is ready.
+//
+/**
+ * hook that subscribes to specific appState prop(s)
+ *
+ * @param prop - appState prop(s) to subscribe to, or a selector function.
+ * NOTE `prop/selector` is memoized and will not change after initial render
+ */
+export function useExcalidrawStateValue<K extends keyof AppState>(
+  prop: K,
+): AppState[K] | undefined;
+export function useExcalidrawStateValue<T extends keyof AppState>(
+  props: T[],
+): AppState | undefined;
+export function useExcalidrawStateValue<T>(
+  selector: (appState: AppState) => T,
+): T | undefined;
+export function useExcalidrawStateValue(
+  selector:
+    | keyof AppState
+    | (keyof AppState)[]
+    | ((appState: AppState) => unknown),
+) {
+  return _useAppStateValue(selector as any, false);
+}
+// -----------------------------------------------------------------------------
+
+export { _useOnAppStateChange as useOnExcalidrawStateChange };
+
+export { applyDarkModeFilter, getStrokeWidthByKey };

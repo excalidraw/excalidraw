@@ -314,7 +314,7 @@ describe("history", () => {
         expect.objectContaining({ id: rect2.id, isDeleted: true }),
       ]);
 
-      mouse.downAt(0, 0);
+      mouse.downAt(-10, -10);
       mouse.moveTo(25, 25);
       mouse.moveTo(50, 50);
       mouse.upAt(50, 50);
@@ -1590,7 +1590,7 @@ describe("history", () => {
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1613,7 +1613,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1636,7 +1636,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1667,7 +1667,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1690,7 +1690,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -2969,6 +2969,82 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(3);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingGroupId).toBeNull();
+    });
+
+    // TODO mark with "noncritical" tag once we migrate to vitest 4
+    it.skip("should support undo and redo when escape unwinds nested group editing", async () => {
+      const rectA = API.createElement({
+        type: "rectangle",
+        groupIds: ["inner", "outer"],
+        x: 0,
+      });
+      const rectB = API.createElement({
+        type: "rectangle",
+        groupIds: ["outer"],
+        x: 100,
+      });
+      const rectC = API.createElement({
+        type: "rectangle",
+        groupIds: ["inner", "outer"],
+        x: 200,
+      });
+
+      API.setElements([rectA, rectB, rectC]);
+      mouse.select(rectA);
+      mouse.doubleClickOn(rectA);
+      mouse.doubleClickOn(rectA);
+
+      assertSelectedElements([rectA]);
+      expect(h.state.editingGroupId).toBe("inner");
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+      expect(API.getUndoStack().length).toBe(5);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({});
+      expect(API.getUndoStack().length).toBe(6);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.undo();
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+
+      Keyboard.undo();
+      assertSelectedElements([rectA]);
+      expect(h.state.editingGroupId).toBe("inner");
+
+      Keyboard.redo();
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+
+      Keyboard.redo();
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+
+      Keyboard.redo();
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({});
     });
 
     it("should iterate through the history when selected or editing linear element was remotely deleted", async () => {
@@ -4510,20 +4586,20 @@ describe("history", () => {
 
         // create start binding
         mouse.downAt(0, 0);
-        mouse.moveTo(0, 10);
-        mouse.moveTo(0, 10);
+        mouse.moveTo(0, 3);
+        mouse.moveTo(0, 3);
         mouse.up();
 
         // create end binding
         mouse.downAt(100, 0);
-        mouse.moveTo(100, 10);
-        mouse.moveTo(100, 10);
+        mouse.moveTo(100, 3);
+        mouse.moveTo(100, 3);
         mouse.up();
 
         expect(
           (h.elements[2] as ExcalidrawElbowArrowElement).startBinding
             ?.fixedPoint,
-        ).not.toEqual([1, 0.5001]);
+        ).toEqual([1, 0.5001]);
         expect(
           (h.elements[2] as ExcalidrawElbowArrowElement).startBinding?.mode,
         ).toBe("orbit");
@@ -4623,12 +4699,12 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.6363636363636364, 0.6363636363636364],
+                  fixedPoint: [1, 0.5001],
                   mode: "orbit",
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.4106696643494564, 0.5893303356505437],
+                  fixedPoint: [0, 0.5001],
                   mode: "orbit",
                 }),
               }),
@@ -4666,13 +4742,13 @@ describe("history", () => {
 
         // create start binding
         mouse.downAt(0, 0);
-        mouse.moveTo(0, 10);
-        mouse.upAt(0, 10);
+        mouse.moveTo(0, 3);
+        mouse.upAt(0, 3);
 
         // create end binding
         mouse.downAt(100, 0);
-        mouse.moveTo(100, 10);
-        mouse.upAt(100, 10);
+        mouse.moveTo(100, 3);
+        mouse.upAt(100, 3);
 
         expect(h.elements).toEqual(
           expect.arrayContaining([
@@ -4766,13 +4842,13 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.6363636363636364, 0.6363636363636364],
+                  fixedPoint: [1, 0.5001],
                   mode: "orbit",
                 }),
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.39746300211416496, 0.6025369978858351],
+                  fixedPoint: [0, 0.5001],
                   mode: "orbit",
                 }),
               }),
@@ -5031,8 +5107,9 @@ describe("history", () => {
         // bind arrow to rect1 and rect2
         UI.clickTool("arrow");
         mouse.down(0, 0);
-        mouse.moveTo(50, 0);
-        mouse.up(50, 0);
+        mouse.moveTo(25, 0);
+        mouse.moveTo(47, 0);
+        mouse.up(47, 0);
 
         const arrowId = h.elements[2].id;
 
@@ -5055,7 +5132,7 @@ describe("history", () => {
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+                fixedPoint: expect.arrayContaining([0, 0.5001]),
               }),
               isDeleted: true,
             }),

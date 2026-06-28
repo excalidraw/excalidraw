@@ -1,5 +1,4 @@
 import { LaserPointer } from "@excalidraw/laser-pointer";
-
 import {
   SVG_NS,
   getSvgPathFromStroke,
@@ -8,7 +7,8 @@ import {
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
-import type { AnimationFrameHandler } from "./animation-frame-handler";
+import { AnimationController } from "./renderer/animation";
+
 import type App from "./components/App";
 import type { AppState } from "./types";
 
@@ -34,15 +34,16 @@ export class AnimatedTrail implements Trail {
   private container?: SVGSVGElement;
   private trailElement: SVGPathElement;
   private trailAnimation?: SVGAnimateElement;
+  private key: string;
+
+  private static counter = 0;
 
   constructor(
-    private animationFrameHandler: AnimationFrameHandler,
     protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
   ) {
-    this.animationFrameHandler.register(this, this.onFrame.bind(this));
-
+    this.key = `animated-trail-${AnimatedTrail.counter++}`;
     this.trailElement = document.createElementNS(SVG_NS, "path");
     if (this.options.animateTrail) {
       this.trailAnimation = document.createElementNS(SVG_NS, "animate");
@@ -73,6 +74,15 @@ export class AnimatedTrail implements Trail {
     return false;
   }
 
+  private cleanup() {
+    this.pastTrails = [];
+    this.currentTrail = undefined;
+
+    if (this.trailElement.parentNode === this.container) {
+      this.container?.removeChild(this.trailElement);
+    }
+  }
+
   start(container?: SVGSVGElement) {
     if (container) {
       this.container = container;
@@ -82,15 +92,23 @@ export class AnimatedTrail implements Trail {
       this.container.appendChild(this.trailElement);
     }
 
-    this.animationFrameHandler.start(this);
+    if (!AnimationController.running(this.key)) {
+      AnimationController.start(this.key, () => {
+        const needsNext = this.onFrame();
+        if (needsNext) {
+          return { keep: true };
+        }
+
+        this.cleanup();
+
+        return null;
+      });
+    }
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
-
-    if (this.trailElement.parentNode === this.container) {
-      this.container?.removeChild(this.trailElement);
-    }
+    AnimationController.cancel(this.key);
+    this.cleanup();
   }
 
   startPath(x: number, y: number) {
@@ -145,21 +163,25 @@ export class AnimatedTrail implements Trail {
 
     if (this.currentTrail) {
       const currentPath = this.drawTrail(this.currentTrail, this.app.state);
-
       paths.push(currentPath);
     }
 
-    this.pastTrails = this.pastTrails.filter((trail) => {
-      return trail.getStrokeOutline().length !== 0;
-    });
+    this.pastTrails = this.pastTrails.filter(
+      (t) =>
+        t.getStrokeOutline(t.options.size / this.app.state.zoom.value)
+          .length !== 0,
+    );
 
     if (paths.length === 0) {
-      this.stop();
+      // Clean up the SVG path if there are no trails to render
+      this.trailElement.setAttribute("d", "");
+
+      return false;
     }
 
     const svgPaths = paths.join(" ").trim();
-
     this.trailElement.setAttribute("d", svgPaths);
+
     if (this.trailAnimation) {
       this.trailElement.setAttribute(
         "fill",
@@ -175,6 +197,8 @@ export class AnimatedTrail implements Trail {
         (this.options.fill ?? (() => "black"))(this),
       );
     }
+
+    return true;
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {

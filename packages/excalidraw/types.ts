@@ -4,6 +4,7 @@ import type {
   throttleRAF,
   MIME_TYPES,
   EditorInterface,
+  StrokeWidthKey,
 } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element";
@@ -20,7 +21,6 @@ import type {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
-  ChartType,
   FontFamilyValues,
   FileId,
   Theme,
@@ -33,6 +33,8 @@ import type {
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
   BindMode,
+  ExcalidrawTextElement,
+  StrokeVariability,
 } from "@excalidraw/element/types";
 
 import type {
@@ -47,13 +49,13 @@ import type {
   DurableIncrement,
   EphemeralIncrement,
 } from "@excalidraw/element";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
 import type Library from "./data/library";
-import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
@@ -214,6 +216,7 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
+    activeTool: AppState["activeTool"];
     // renderInteractiveScene
     activeEmbeddable: AppState["activeEmbeddable"];
     selectionElement: AppState["selectionElement"];
@@ -222,6 +225,7 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
+    isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
@@ -242,6 +246,7 @@ export type InteractiveCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
+    currentItemArrowType: AppState["currentItemArrowType"];
   }
 >;
 
@@ -265,6 +270,8 @@ export type ObservedElementsAppState = {
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
 };
+
+export type BoxSelectionMode = "contain" | "overlap";
 
 export interface AppState {
   contextMenu: {
@@ -299,9 +306,25 @@ export interface AppState {
    * - set on pointer down, updated during pointer move
    */
   selectionElement: NonDeletedExcalidrawElement | null;
+  /**
+   * tracking current arrow binding editor state (takes into account
+   * `bindingPreference` and keyboard modifiers (ctrl/alt)
+   */
   isBindingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
+  /** user box selection preference; defaults to "contain" when unset */
+  boxSelectionMode: BoxSelectionMode;
+  /** user arrow binding preference */
+  bindingPreference: "enabled" | "disabled";
+  /** user preference whether arrow snap to midpoints while binding */
+  isMidpointSnappingEnabled: boolean;
+  /**
+   * The bindable element the UI highlights for the user when an arrow is
+   * dragged or otherwise its endpoint being close to said element.
+   */
+  suggestedBinding: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    midPoint?: GlobalPoint;
+  } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -314,7 +337,7 @@ export interface AppState {
   /**
    * set when a new text is created or when an existing text is being edited
    */
-  editingTextElement: NonDeletedExcalidrawElement | null;
+  editingTextElement: ExcalidrawTextElement | null;
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
@@ -329,8 +352,11 @@ export interface AppState {
     type: "selection" | "lasso";
     initialized: boolean;
   };
+
+  // Pen handling
   penMode: boolean;
   penDetected: boolean;
+
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -338,9 +364,10 @@ export interface AppState {
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
-  currentItemStrokeWidth: number;
+  currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
+  currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
@@ -377,7 +404,8 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "settings" }
-    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
+    | { name: "charts"; data: Spreadsheet; rawText: string };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -393,7 +421,11 @@ export interface AppState {
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
-  toast: { message: string; closable?: boolean; duration?: number } | null;
+  toast: {
+    message: React.ReactNode;
+    closable?: boolean;
+    duration?: number;
+  } | null;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
@@ -412,23 +444,13 @@ export interface AppState {
   offsetTop: number;
   offsetLeft: number;
 
-  fileHandle: FileSystemHandle | null;
+  fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */
     panels: number;
   };
-  currentChartType: ChartType;
-  pasteDialog:
-    | {
-        shown: false;
-        data: null;
-      }
-    | {
-        shown: true;
-        data: Spreadsheet;
-      };
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
@@ -459,6 +481,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  // Stores the current bind mode which is detemined at various points during
+  // a drag operation (like pointer position vs bindable element) but needed
+  // globally for calculating the binding strategy
   bindMode: BindMode;
 }
 
@@ -474,10 +499,7 @@ export type SearchMatch = {
   }[];
 };
 
-export type UIAppState = Omit<
-  AppState,
-  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
->;
+export type UIAppState = Omit<AppState, "cursorButton" | "scrollX" | "scrollY">;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
@@ -541,17 +563,44 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export type OnExportProgress = {
+  type: "progress";
+  message?: React.ReactNode;
+  /** 0-1 range */
+  progress?: number;
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onThemeChange?: (theme: Theme | "system") => void;
+  /**
+   * note: only subscribes if the props.onIncrement is defined on initial render
+   */
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
-  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
+  /**
+   * Invoked as soon as the Excalidraw API is available
+   * NOTE editor is not yet mounted, and state is not yet initialized
+   */
+  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI | null) => void;
+  /**
+   * Invoked once the editor root is mounted.
+   */
+  onMount?: (payload: ExcalidrawMountPayload) => void;
+  /**
+   * Invoked when the editor root is unmounted.
+   */
+  onUnmount?: () => void;
+  /**
+   * Invoked once the initial scene is loaded.
+   */
+  onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -600,6 +649,10 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
+  /**
+   * dimensions and size constraints for inserted images
+   */
+  imageOptions?: ImageOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -636,6 +689,32 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  /**
+   * Called before exporting to a file.
+   *
+   * Allows the host app to intercept and delay saving until async operations
+   * (e.g., images are loaded) complete.
+   *
+   * If Promise/AsyncGenerator is returned, a progress toast will be shown
+   * until the operation completes. Generator can yield progress updates.
+   */
+  onExport?: (
+    /** type of export. Currently we only call for JSON exports or
+     * JSON-embedded PNG (which is also identified as `json` type here)*/
+    type: "json",
+    data: {
+      elements: readonly ExcalidrawElement[];
+      appState: AppState;
+      files: BinaryFiles;
+    },
+    options: {
+      /** signal that gets aborted if user cancels the export (e.g. closes
+       * the native file picker dialog). In that case, you can either
+       * return immediately, or throw AbortError.
+       */
+      signal: AbortSignal;
+    },
+  ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
 }
 
 export type SceneData = {
@@ -660,6 +739,11 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+export type ImageOptions = Partial<{
+  maxWidthOrHeight: number;
+  maxFileSizeBytes: number;
+}>;
+
 // NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
@@ -670,6 +754,11 @@ export type CanvasActions = Partial<{
   export: false | ExportOpts;
   loadScene: boolean;
   saveToActiveFile: boolean;
+  /**
+   * defaults to true if `props.theme` is omitted or `props.onThemeChange`
+   * is supplied (at which point the theme is considered as host-app controlled),
+   * else default to false
+   * */
   toggleTheme: boolean | null;
   saveAsImage: boolean;
 }>;
@@ -701,6 +790,7 @@ export type AppProps = Merge<
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
     >;
+    imageOptions: Required<ImageOptions>;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
@@ -714,6 +804,8 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  api: App["api"];
+  sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
@@ -758,8 +850,13 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+  onEvent: App["onEvent"];
+  onStateChange: App["onStateChange"];
 
+  lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
+
+  setAppState: App["setAppState"];
 };
 
 export type PointerDownState = Readonly<{
@@ -798,8 +895,13 @@ export type PointerDownState = Readonly<{
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // Whether the pointer is hitting the common bounding box of selected
+    // elements, which is useful for discriminating between selecitng
+    // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
+  // This is determined on the initial pointer down event to
+  // set various interaction modalities
   withCmdOrCtrl: boolean;
   drag: {
     // Might change during the pointer interaction
@@ -809,9 +911,8 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
-    // Whether to block drag after lasso selection
-    // this is meant to be used to block dragging after lasso selection on PCs
-    // until the next pointer down
+    // explicit flag for specific scenarios such as:
+    // - after lasso selection until the next pointer down
     blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
@@ -826,13 +927,31 @@ export type PointerDownState = Readonly<{
     onKeyUp: null | ((event: KeyboardEvent) => void);
   };
   boxSelection: {
+    // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
   };
 }>;
 
 export type UnsubscribeCallback = () => void;
 
+export type ExcalidrawMountPayload = {
+  excalidrawAPI: ExcalidrawImperativeAPI;
+  /*
+   *Excalidraw container.
+   * should never be null, but just to be safe
+   */
+  container: HTMLDivElement | null;
+};
+
+export type ExcalidrawImperativeAPIEventMap = {
+  "editor:mount": [payload: ExcalidrawMountPayload];
+  "editor:initialize": [api: ExcalidrawImperativeAPI];
+  "editor:unmount": [];
+};
+
 export interface ExcalidrawImperativeAPI {
+  /** Whether the editor has been unmounted and the API is no longer usable. */
+  isDestroyed: boolean;
   updateScene: InstanceType<typeof App>["updateScene"];
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
@@ -898,6 +1017,8 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
+  onStateChange: InstanceType<typeof App>["onStateChange"];
+  onEvent: InstanceType<typeof App>["onEvent"];
 }
 
 export type FrameNameBounds = {

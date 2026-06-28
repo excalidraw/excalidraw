@@ -118,7 +118,6 @@ export const actionClearCanvas = register({
         gridStep: appState.gridStep,
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
-        pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
             ? {
@@ -478,17 +477,28 @@ export const actionToggleTheme = register<AppState["theme"]>({
     appState.theme === THEME.LIGHT ? MoonIcon : SunIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_, appState, value) => {
+  perform: (_, appState, value, app) => {
+    const nextTheme =
+      value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
+
+    if (app.props.onThemeChange) {
+      app.props.onThemeChange(nextTheme);
+      return false;
+    }
+
     return {
       appState: {
         ...appState,
-        theme:
-          value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+        theme: nextTheme,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.shiftKey &&
+    event.code === CODES.D,
   predicate: (elements, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
   },

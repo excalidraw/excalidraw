@@ -3,6 +3,10 @@
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
+    "chartType_bar": "Bar chart",
+    "chartType_line": "Line chart",
+    "chartType_radar": "Radar chart",
+    "chartType_plaintext": "Plain text",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
@@ -31,6 +35,9 @@
     "strokeStyle_dashed": "Dashed",
     "strokeStyle_dotted": "Dotted",
     "sloppiness": "Sloppiness",
+    "pressure": "Pressure",
+    "pressure_constant": "Constant",
+    "pressure_variable": "Variable",
     "opacity": "Opacity",
     "textAlign": "Text align",
     "edges": "Edges",
@@ -49,7 +56,14 @@
     "arrowhead_crowfoot_many": "Crow's foot (many)",
     "arrowhead_crowfoot_one": "Crow's foot (one)",
     "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "arrowhead_cardinality_one": "Cardinality (one)",
+    "arrowhead_cardinality_many": "Cardinality (many)",
+    "arrowhead_cardinality_one_or_many": "Cardinality (one or many)",
+    "arrowhead_cardinality_exactly_one": "Cardinality (exactly one)",
+    "arrowhead_cardinality_zero_or_one": "Cardinality (zero or one)",
+    "arrowhead_cardinality_zero_or_many": "Cardinality (zero or many)",
     "more_options": "More options",
+    "cardinality": "Cardinality",
     "arrowtypes": "Arrow type",
     "arrowtype_sharp": "Sharp arrow",
     "arrowtype_round": "Curved arrow",
@@ -173,7 +187,12 @@
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
-    "preferences_toolLock": "Tool lock"
+    "preferences_toolLock": "Tool lock",
+    "boxSelectionMode": "Select on",
+    "boxSelectionContain": "Wrap",
+    "boxSelectionOverlap": "Overlap",
+    "arrowBinding": "Arrow binding",
+    "midpointSnapping": "Snap to midpoints"
   },
   "elementLink": {
     "title": "Link to object",
@@ -397,6 +416,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "Saving",
+    "defaultMessage": "Preparing to save..."
+  },
   "exportDialog": {
     "disk_title": "Save to disk",
     "disk_details": "Export the scene data to a file from which you can import later.",
@@ -614,11 +637,12 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
-    "inputPlaceholder": "Write Mermaid diagram defintion here..."
+    "inputPlaceholder": "Write Mermaid diagram defintion here...",
+    "autoFixAvailable": "Auto-fix is available"
   },
   "ttd": {
     "error": "Error!"
@@ -643,7 +667,7 @@
     "placeholder": {
       "title": "Let's design your diagram",
       "description": "Describe the diagram you want to create, and we'll generate it for you.",
-      "hint": "At the moment we know Flowchart, Sequence, and Class diagrams."
+      "hint": "At the moment we know Flowchart, Sequence, Class, State, and Entity Relationship diagrams."
     },
     "preview": "Preview",
     "insert": "Insert",

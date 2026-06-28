@@ -135,7 +135,6 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-
     UI.updateInput(inputX, String("184"));
     expect(linear.startBinding).not.toBe(null);
   });
@@ -362,12 +361,10 @@ describe("stats for a non-generic element", () => {
     mouse.clickAt(20, 30);
     const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
-    act(() => {
-      editor.blur();
-    });
+    Keyboard.exitTextEditor(editor);
 
     const text = h.elements[0] as ExcalidrawTextElement;
-    mouse.clickOn(text);
+    API.setSelectedElements([text]);
 
     elementStats = stats?.querySelector("#elementStats");
 
@@ -753,7 +750,7 @@ describe("frame resizing behavior", () => {
       x: 0,
       y: 0,
       width: 100,
-      height: 100,
+      height: 103,
     });
 
     // Create a rectangle outside the frame

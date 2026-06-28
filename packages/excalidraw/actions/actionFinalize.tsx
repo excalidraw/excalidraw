@@ -54,6 +54,7 @@ export const actionFinalize = register<FormData>({
   label: "",
   trackEvent: false,
   perform: (elements, appState, data, app) => {
+    let shouldCommit = true;
     let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
@@ -108,7 +109,6 @@ export const actionFinalize = register<FormData>({
 
             return map;
           }, new Map()) ?? new Map();
-
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
@@ -223,9 +223,44 @@ export const actionFinalize = register<FormData>({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
+          shouldCommit = false;
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
           });
+          if (
+            isBindingElement(element) &&
+            element.endBinding &&
+            // after slicing the trailing point a <2-point arrow may be left
+            element.points.length > 1
+          ) {
+            const newArrow = !!appState.newElement;
+            const draggedPoints: PointsPositionUpdates = new Map([
+              [
+                element.points.length - 1,
+                {
+                  point: element.points[element.points.length - 1],
+                  isDragging: false,
+                },
+              ],
+            ]);
+            const globalPoint =
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                elementsMap,
+              );
+            bindOrUnbindBindingElement(
+              element,
+              draggedPoints,
+              globalPoint[0],
+              globalPoint[1],
+              scene,
+              appState,
+              {
+                newArrow,
+              },
+            );
+          }
         }
       }
 
@@ -330,8 +365,8 @@ export const actionFinalize = register<FormData>({
         selectionElement: null,
         multiElement: null,
         editingTextElement: null,
-        startBoundElement: null,
         suggestedBinding: null,
+        frameToHighlight: null,
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
@@ -345,13 +380,13 @@ export const actionFinalize = register<FormData>({
         selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      captureUpdate: shouldCommit
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.NEVER,
     };
   },
   keyTest: (event, appState) =>
-    (event.key === KEYS.ESCAPE &&
-      (appState.selectedLinearElement?.isEditing ||
-        (!appState.newElement && appState.multiElement === null))) ||
+    (event.key === KEYS.ESCAPE && appState.selectedLinearElement?.isEditing) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
