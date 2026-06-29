@@ -592,6 +592,7 @@ let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
+let isHoldingH: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
@@ -2859,6 +2860,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
+    isHoldingH = false;
     this.setState({
       isBindingEnabled: this.state.bindingPreference === "enabled",
     });
@@ -4956,6 +4958,24 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // Hold H to temporarily activate the hand/pan tool (like Space bar).
+      // Intercept before actionManager so the toggle action never sees repeats.
+      if (
+        event.key === KEYS.H &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD] &&
+        !this.state.viewModeEnabled
+      ) {
+        if (!isHoldingH) {
+          isHoldingH = true;
+          if (!isHandToolActive(this.state)) {
+            this.actionManager.executeAction(actionToggleHandTool);
+          }
+        }
+        event.preventDefault();
+        return;
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -5272,6 +5292,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
       isHoldingSpace = false;
+    }
+
+    // Restore the previous tool when H key is released
+    if (event.key === KEYS.H && isHoldingH) {
+      isHoldingH = false;
+      if (isHandToolActive(this.state)) {
+        this.actionManager.executeAction(actionToggleHandTool);
+      }
     }
 
     if (event.key === KEYS.ALT) {
