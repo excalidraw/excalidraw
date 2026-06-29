@@ -59,6 +59,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "gridStep": 5,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isConvertToShapeEnabled": false,
   "isCropping": false,
   "isLoading": false,
   "isMidpointSnappingEnabled": true,

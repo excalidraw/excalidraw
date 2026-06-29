@@ -34,6 +34,48 @@ export const setCursor = (
   }
 };
 
+let drawShapeCanvasCache: any;
+let drawShapeDataURL: string;
+export const setDrawShapeCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+  theme: AppState["theme"],
+) => {
+  const cursorImageSizePx = 20;
+
+  const drawCanvas = () => {
+    const isDarkTheme = theme === THEME.DARK;
+    drawShapeCanvasCache = document.createElement("canvas");
+    drawShapeCanvasCache.theme = theme;
+    drawShapeCanvasCache.height = cursorImageSizePx;
+    drawShapeCanvasCache.width = cursorImageSizePx;
+
+    const context = drawShapeCanvasCache.getContext("2d")!;
+
+    context.strokeStyle = isDarkTheme ? "#fff" : "#000";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(4, 10.5);
+    context.lineTo(15, 4.15);
+    context.lineTo(15, 16.85);
+    context.closePath();
+    context.stroke();
+
+    drawShapeDataURL = drawShapeCanvasCache.toDataURL(
+      MIME_TYPES.svg,
+    ) as DataURL;
+  };
+  if (!drawShapeCanvasCache || drawShapeCanvasCache.theme !== theme) {
+    drawCanvas();
+  }
+
+  setCursor(
+    interactiveCanvas,
+    `url(${drawShapeDataURL}) ${cursorImageSizePx / 2} ${
+      cursorImageSizePx / 2
+    }, auto`,
+  );
+};
+
 let eraserCanvasCache: any;
 let previewDataURL: string;
 export const setEraserCursor = (
@@ -89,6 +131,8 @@ export const setCursorForShape = (
     interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
     setEraserCursor(interactiveCanvas, appState.theme);
+  } else if (appState.activeTool.type === "drawShape") {
+    setDrawShapeCursor(interactiveCanvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide

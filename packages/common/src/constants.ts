@@ -371,6 +371,7 @@ export const TEXT_ALIGN = {
 };
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
+export const ELEMENT_PENDING_DRAW_SHAPE_OPACITY = 70;
 
 // Radius represented as 25% of element's largest side (width/height).
 // Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
@@ -498,6 +499,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  drawShape: "drawShape",
 } as const;
 
 export const EDITOR_LS_KEYS = {

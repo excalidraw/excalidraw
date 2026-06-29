@@ -215,6 +215,7 @@ export const AllowedExcalidrawActiveTools: Record<
   embeddable: true,
   hand: true,
   laser: false,
+  drawShape: false,
   magicframe: false,
 };
 

@@ -31,6 +31,7 @@ import {
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
+  drawShapeToolIcon,
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
@@ -120,6 +121,7 @@ export const MobileToolBar = ({
   }, [activeTool.type]);
 
   const frameToolSelected = activeTool.type === "frame";
+  const drawShapeToolSelected = activeTool.type === "drawShape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -159,6 +161,7 @@ export const MobileToolBar = ({
     "text",
     "frame",
     "embeddable",
+    "drawShape",
     "laser",
     "magicframe",
   ].filter((tool) => {
@@ -183,6 +186,8 @@ export const MobileToolBar = ({
       ? frameToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
+      : activeTool.type === "drawShape"
+      ? drawShapeToolIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
@@ -445,6 +450,15 @@ export const MobileToolBar = ({
             selected={embeddableToolSelected}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "drawShape" })}
+            icon={drawShapeToolIcon}
+            shortcut={KEYS.S.toLocaleUpperCase()}
+            data-testid="toolbar-drawShape"
+            selected={drawShapeToolSelected}
+          >
+            {t("toolBar.drawShape")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}

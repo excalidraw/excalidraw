@@ -2022,6 +2022,19 @@ export const ArrowRightIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const drawShapeToolIcon = createIcon(
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 10.5l11-6.35v12.7L4 10.5z" />
+  </g>,
+  20,
+);
+
 export const laserPointerToolIcon = createIcon(
   <g
     fill="none"
