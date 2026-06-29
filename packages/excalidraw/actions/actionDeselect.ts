@@ -6,12 +6,28 @@ import {
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
+import { t } from "../i18n";
 
 import type { GroupId } from "@excalidraw/element/types";
 
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
+
+const isShapeTool = (type: string): boolean => {
+  switch (type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse":
+    case "arrow":
+    case "line":
+    case "freedraw":
+    case "text":
+      return true;
+    default:
+      return false;
+  }
+};
 
 const getNextActiveTool = (
   appState: Readonly<AppState>,
@@ -66,6 +82,10 @@ export const actionDeselect = register({
   perform: (_elements, appState, _, app) => {
     const activeTool = getNextActiveTool(appState, app);
 
+    const shouldShowTooltip =
+      isShapeTool(appState.activeTool.type) &&
+      activeTool.type === app.state.preferredSelectionTool.type;
+
     if (appState.editingGroupId) {
       const nonDeletedElements = app.scene.getNonDeletedElements();
       const selectedElementIds =
@@ -102,6 +122,9 @@ export const actionDeselect = register({
           showHyperlinkPopup: false,
           suggestedBinding: null,
           frameToHighlight: null,
+          toast: shouldShowTooltip
+            ? { message: t("toast.selectShapeTool"), duration: 3000 }
+            : appState.toast,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
@@ -120,6 +143,9 @@ export const actionDeselect = register({
         showHyperlinkPopup: false,
         suggestedBinding: null,
         frameToHighlight: null,
+        toast: shouldShowTooltip
+          ? { message: t("toast.selectShapeTool"), duration: 3000 }
+          : appState.toast,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
