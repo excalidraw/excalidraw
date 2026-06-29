@@ -2524,9 +2524,9 @@ type Side =
   | "bottom-left"
   | "left"
   | "top-left";
-type ShapeType = "rectangle" | "ellipse" | "diamond";
+type ShapeType = "rectangle" | "ellipse" | "diamond" | "cloud";
 const getShapeType = (element: ExcalidrawBindableElement): ShapeType => {
-  if (element.type === "ellipse" || element.type === "diamond") {
+  if (element.type === "ellipse" || element.type === "diamond" || element.type === "cloud") {
     return element.type;
   }
   return "rectangle";
@@ -2568,6 +2568,18 @@ const SHAPE_CONFIGS: Record<ShapeType, SectorConfig[]> = {
 
   // ellipse: 15° cardinal points, 75° diagonals
   ellipse: [
+    { centerAngle: 0, sectorWidth: 15, side: "right" },
+    { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
+    { centerAngle: 90, sectorWidth: 15, side: "bottom" },
+    { centerAngle: 135, sectorWidth: 75, side: "bottom-left" },
+    { centerAngle: 180, sectorWidth: 15, side: "left" },
+    { centerAngle: 225, sectorWidth: 75, side: "top-left" },
+    { centerAngle: 270, sectorWidth: 15, side: "top" },
+    { centerAngle: 315, sectorWidth: 75, side: "top-right" },
+  ],
+
+  // cloud: 15° cardinal points, 75° diagonals (similar to ellipse)
+  cloud: [
     { centerAngle: 0, sectorWidth: 15, side: "right" },
     { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
     { centerAngle: 90, sectorWidth: 15, side: "bottom" },
@@ -2767,7 +2779,7 @@ export const getBindingSideMidPoint = (
     return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
   }
 
-  if (bindableElement.type === "ellipse") {
+  if (bindableElement.type === "ellipse" || bindableElement.type === "cloud") {
     const ellipseCenterX = bindableElement.x + bindableElement.width / 2;
     const ellipseCenterY = bindableElement.y + bindableElement.height / 2;
     const radiusX = bindableElement.width / 2;

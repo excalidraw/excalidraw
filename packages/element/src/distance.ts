@@ -45,6 +45,14 @@ export const distanceToElement = (
       return distanceToDiamondElement(element, elementsMap, p);
     case "ellipse":
       return distanceToEllipseElement(element, elementsMap, p);
+    case "cloud": {
+      // Approximate cloud distance as inscribed ellipse
+      const center = elementCenterPoint(element, elementsMap);
+      return ellipseDistanceFromPoint(
+        pointRotateRads(p, center, -element.angle as Radians),
+        ellipse(center, element.width / 2, element.height / 2),
+      );
+    }
     case "line":
     case "arrow":
     case "freedraw":
