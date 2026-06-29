@@ -796,6 +796,14 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   }
 
   // Handle normal cases
+  //
+  // When the user is shift-dragging the endpoint to lock the line angle, an
+  // orbit binding would project the endpoint onto the bindable element's
+  // diagonal / outline midpoint — silently overriding the shift-locked
+  // position. Inside binding keeps the shift-locked `globalPoint` as the
+  // focus point, so it doesn't fight the modifier; only orbit binding does.
+  // Skip the orbit attempt when angleLocked is on, leaving the shift-locked
+  // position intact. See excalidraw/excalidraw#11313.
   const current: BindingStrategy = hit
     ? pointInElement
       ? {
@@ -803,6 +811,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           element: hit,
           focusPoint: globalPoint,
         }
+      : opts?.angleLocked
+      ? { mode: undefined }
       : {
           mode: "orbit",
           element: hit,

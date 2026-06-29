@@ -16,6 +16,9 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import { getBindingStrategyForDraggingBindingElementEndpoints } from "../src/binding";
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -24,8 +27,13 @@ import {
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawLinearElement,
   FixedPointBinding,
+  NonDeletedSceneElementsMap,
+  Ordered,
+  NonDeletedExcalidrawElement,
+  PointsPositionUpdates,
 } from "../src/types";
 
 const { h } = window;
@@ -752,6 +760,154 @@ describe("binding for simple arrows", () => {
 
       expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
       expect(arrow.endBinding).toBe(null);
+    });
+  });
+
+  describe("when shift-locking the angle while dragging an endpoint", () => {
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+    });
+
+    // Regression for excalidraw/excalidraw#11313 — when the user holds SHIFT
+    // to lock the line angle while dragging an endpoint, the orbit binding
+    // path used to override the shift-locked position by projecting the
+    // endpoint onto a nearby bindable element's diagonal / outline midpoint.
+    // The SHIFT modifier must take precedence over auto-binding.
+    it("does not apply orbit binding when angle is locked (#11313)", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 100,
+      }) as ExcalidrawBindableElement;
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 50,
+        y: 50,
+        width: 200,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      }) as ExcalidrawArrowElement;
+      API.setElements([rect, arrow]);
+
+      // Shift-locked end-point lands ~14px diagonally from rect's top-left
+      // corner — outside the element, but within `maxBindingDistance_simple`,
+      // so the binding hit-test will find the rectangle and the orbit branch
+      // would normally fire.
+      const shiftLockedGlobal = pointFrom<GlobalPoint>(190, 190);
+      const endIdx = arrow.points.length - 1;
+      const draggingPoints: PointsPositionUpdates = new Map([
+        [
+          endIdx,
+          {
+            point: pointFrom<LocalPoint>(
+              shiftLockedGlobal[0] - arrow.x,
+              shiftLockedGlobal[1] - arrow.y,
+            ),
+            isDragging: true,
+          },
+        ],
+      ]);
+
+      const elementsMap = arrayToMap(h.elements) as NonDeletedSceneElementsMap;
+      const elements =
+        h.elements as readonly Ordered<NonDeletedExcalidrawElement>[];
+
+      // Baseline: without the shift modifier, the rectangle is close enough
+      // for orbit binding to fire — this is the existing behaviour we
+      // do *not* want to break.
+      const withoutShiftLock =
+        getBindingStrategyForDraggingBindingElementEndpoints(
+          arrow,
+          draggingPoints,
+          shiftLockedGlobal[0],
+          shiftLockedGlobal[1],
+          elementsMap,
+          elements,
+          h.state,
+          { angleLocked: false },
+        );
+      expect(withoutShiftLock.end.mode).toBe("orbit");
+
+      // With the shift modifier, orbit binding would override the locked
+      // position — so the strategy must skip the bind for this drag entirely
+      // and let `pointDraggingUpdates` fall back to the naive shift-locked
+      // position.
+      const withShiftLock =
+        getBindingStrategyForDraggingBindingElementEndpoints(
+          arrow,
+          draggingPoints,
+          shiftLockedGlobal[0],
+          shiftLockedGlobal[1],
+          elementsMap,
+          elements,
+          h.state,
+          { angleLocked: true },
+        );
+      expect(withShiftLock.end.mode).toBeUndefined();
+    });
+
+    // Sister-check to the above: when the locked endpoint actually lands
+    // *inside* the bindable element, inside-binding keeps the shift-locked
+    // `globalPoint` as its focus point, so the modifier is preserved
+    // without losing the binding itself. We don't want the angleLocked
+    // guard to disable that case too.
+    it("keeps inside binding when angle is locked and endpoint lands inside (#11313)", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 100,
+      }) as ExcalidrawBindableElement;
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 50,
+        y: 50,
+        width: 200,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      }) as ExcalidrawArrowElement;
+      API.setElements([rect, arrow]);
+
+      // Endpoint clearly inside the rectangle.
+      const shiftLockedGlobal = pointFrom<GlobalPoint>(250, 250);
+      const endIdx = arrow.points.length - 1;
+      const draggingPoints: PointsPositionUpdates = new Map([
+        [
+          endIdx,
+          {
+            point: pointFrom<LocalPoint>(
+              shiftLockedGlobal[0] - arrow.x,
+              shiftLockedGlobal[1] - arrow.y,
+            ),
+            isDragging: true,
+          },
+        ],
+      ]);
+
+      const elementsMap = arrayToMap(h.elements) as NonDeletedSceneElementsMap;
+      const elements =
+        h.elements as readonly Ordered<NonDeletedExcalidrawElement>[];
+
+      const result = getBindingStrategyForDraggingBindingElementEndpoints(
+        arrow,
+        draggingPoints,
+        shiftLockedGlobal[0],
+        shiftLockedGlobal[1],
+        elementsMap,
+        elements,
+        h.state,
+        { angleLocked: true },
+      );
+      expect(result.end.mode).toBe("inside");
+      if (result.end.mode === "inside") {
+        expect(result.end.element.id).toBe(rect.id);
+        expect(result.end.focusPoint).toEqual(shiftLockedGlobal);
+      }
     });
   });
 });
