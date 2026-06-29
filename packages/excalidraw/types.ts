@@ -760,6 +760,7 @@ export type CanvasActions = Partial<{
    * else default to false
    * */
   toggleTheme: boolean | null;
+  toggleFullScreen: boolean;
   saveAsImage: boolean;
 }>;
 
