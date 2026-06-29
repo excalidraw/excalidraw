@@ -458,7 +458,12 @@ const buildFaces = (
   options: BucketFillOptions,
 ): Face[] | null => {
   const eps = options.snapEpsilon;
-  const store = new NodeStore(eps);
+  // Node merging / T-junctions use the larger gap tolerance so that tiny gaps
+  // left by clipping (e.g. where a thin coverer crosses a rounded corner) are
+  // bridged instead of leaving the region open. snapEpsilon stays for dropping
+  // genuinely degenerate segments/edges.
+  const gapEps = Math.max(eps, options.gapTolerance);
+  const store = new NodeStore(gapEps);
   const segments: WorkingSegment[] = [];
 
   for (const { segment, elementId } of rawSegments) {
@@ -528,10 +533,10 @@ const buildFaces = (
       }
       const q = store.nodes[n];
       if (
-        q[0] < segment.box[0] - eps ||
-        q[0] > segment.box[2] + eps ||
-        q[1] < segment.box[1] - eps ||
-        q[1] > segment.box[3] + eps
+        q[0] < segment.box[0] - gapEps ||
+        q[0] > segment.box[2] + gapEps ||
+        q[1] < segment.box[1] - gapEps ||
+        q[1] > segment.box[3] + gapEps
       ) {
         continue;
       }
@@ -539,7 +544,7 @@ const buildFaces = (
       if (t <= 0 || t >= 1) {
         continue;
       }
-      if (distanceToSegment(q, segment.pa, segment.pb) <= eps) {
+      if (distanceToSegment(q, segment.pa, segment.pb) <= gapEps) {
         segment.splits.push({ node: n, t });
       }
     }

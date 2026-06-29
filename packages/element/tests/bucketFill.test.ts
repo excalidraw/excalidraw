@@ -1,4 +1,4 @@
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap, ROUNDNESS } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
@@ -257,6 +257,94 @@ describe("computeBucketFillPolygon", () => {
     // the visible outline carves out the overlap corner => ~6400 L-shape
     expect(polygonArea(result.scenePoints)).toBeGreaterThan(6000);
     expect(polygonArea(result.scenePoints)).toBeLessThan(7000);
+  });
+
+  it("fills the whole top element when clicking an opaque overlap", () => {
+    // clicking the overlap of two OPAQUE shapes fills the whole top shape, not
+    // the small overlap: the lower outline is hidden behind the top shape's
+    // opaque fill, so it does not subdivide the visible region
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "#ffd43b",
+    });
+    const top = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "#ffd43b",
+    });
+    const { elements, elementsMap } = setup([lower, top]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(75, 75), // inside the 50x50 overlap
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBe(top.id);
+    // the whole top rectangle (~10000), NOT the 50x50 overlap (~2500)
+    expect(polygonArea(result.scenePoints)).toBeGreaterThan(9000);
+  });
+
+  it("fills a rounded owner partially covered by a thin opaque overlap", () => {
+    // regression: a thin opaque coverer crossing the owner's ROUNDED corners
+    // left sub-pixel gaps in the clipped outline, opening the region. The
+    // gapTolerance-based node merging in the arrangement bridges them.
+    const rounded = { type: ROUNDNESS.ADAPTIVE_RADIUS } as const;
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 180,
+      y: 650,
+      width: 240,
+      height: 195,
+      roundness: rounded,
+      backgroundColor: "#ffd43b",
+    });
+    const sideways = API.createElement({
+      type: "rectangle",
+      x: 5,
+      y: 690,
+      width: 230,
+      height: 160,
+      roundness: rounded,
+      backgroundColor: "#ffd43b",
+    });
+    // thin opaque cover: its bottom edge overlaps the owner's top by ~5px,
+    // crossing the owner's rounded top corners
+    const cover = API.createElement({
+      type: "rectangle",
+      x: 110,
+      y: 510,
+      width: 245,
+      height: 145,
+      roundness: rounded,
+      backgroundColor: "#a5d8ff",
+    });
+    const { elements, elementsMap } = setup([sideways, owner, cover]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(300, 740),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBe(owner.id);
   });
 
   it("returns no_owner for open canvas", () => {
