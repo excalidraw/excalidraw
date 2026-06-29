@@ -1,0 +1,180 @@
+import { easeOut } from "@excalidraw/common";
+import { clamp } from "@excalidraw/math";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { zoomToFit } from "./actions/actionCanvas";
+import { AnimationController } from "./renderer/animation";
+import { calculateScrollCenter } from "./scene/scroll";
+
+import type { AppState, NormalizedZoomValue, Offsets } from "./types";
+
+export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
+
+/** default duration of the scroll/zoom animation, in milliseconds */
+const DEFAULT_ANIMATION_DURATION = 500;
+
+export type ScrollToContentOptions = (
+  | {
+      fitToContent?: boolean;
+      fitToViewport?: never;
+      viewportZoomFactor?: number;
+      animate?: boolean;
+      duration?: number;
+    }
+  | {
+      fitToContent?: never;
+      fitToViewport?: boolean;
+      /** when fitToViewport=true, how much screen should the content cover,
+       * between 0.1 (10%) and 1 (100%) */
+      viewportZoomFactor?: number;
+      animate?: boolean;
+      duration?: number;
+    }
+) & {
+  minZoom?: number;
+  maxZoom?: number;
+  canvasOffsets?: Offsets;
+};
+
+type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
+
+/**
+ * Scrolls (and optionally zooms) the viewport so that the given target is in
+ * view, optionally animating the transition.
+ */
+export const scrollToElements = (
+  state: AppState,
+  target: readonly ExcalidrawElement[],
+  onFrame: (
+    state: Pick<
+      AppState,
+      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
+    >,
+  ) => void,
+  opts?: ScrollToContentOptions,
+) => {
+  AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+
+  const viewport = getTargetViewport(state, target, opts);
+
+  if (opts?.animate) {
+    animateToViewport(
+      state,
+      viewport,
+      opts.duration ?? DEFAULT_ANIMATION_DURATION,
+      onFrame,
+    );
+  } else {
+    // no animation: jump straight to the target. Re-enable zoom caching in
+    // case we just cancelled an in-flight animation that had suppressed it.
+    onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
+  }
+};
+
+/** Computes the viewport (scroll + zoom) that brings the target elements into
+ * view, based on the requested fit behavior. */
+const getTargetViewport = (
+  state: AppState,
+  targetElements: readonly ExcalidrawElement[],
+  opts?: ScrollToContentOptions,
+): Viewport => {
+  if (opts?.fitToContent || opts?.fitToViewport) {
+    const { appState } = zoomToFit({
+      canvasOffsets: opts.canvasOffsets,
+      targetElements,
+      appState: state,
+      fitToViewport: !!opts.fitToViewport,
+      viewportZoomFactor: opts.viewportZoomFactor,
+      minZoom: opts.minZoom,
+      maxZoom: opts.maxZoom,
+    });
+
+    return {
+      scrollX: appState.scrollX,
+      scrollY: appState.scrollY,
+      zoom: appState.zoom,
+    };
+  }
+
+  // keep the current zoom, only recenter the viewport on the target
+  const { scrollX, scrollY } = calculateScrollCenter(targetElements, state);
+
+  return { scrollX, scrollY, zoom: state.zoom };
+};
+
+/**
+ * Interpolates the viewport from `from` to `target` at the (already-eased)
+ * blend amount `factor` (0 = `from`, 1 = `target`).
+ *
+ * Zoom is interpolated geometrically (so it feels uniform), and rather than
+ * tweening scrollX/scrollY directly we tween the *focal point* — the scene
+ * point under the viewport center — and derive scroll from it. Mixing a linear
+ * scroll with a geometric zoom makes the focal point swoop sideways
+ * mid-animation (most visible when zooming out); gliding the focal point keeps
+ * it steady. `width/2/zoom - scroll` is the inverse of `centerScrollOn` without
+ * offsets, so factor 0/1 land exactly on `from`/`target`.
+ */
+export const interpolateViewport = ({
+  from,
+  target,
+  factor,
+}: {
+  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">;
+  target: Viewport;
+  factor: number;
+}): Viewport => {
+  const zoom = (from.zoom.value *
+    Math.pow(
+      target.zoom.value / from.zoom.value,
+      factor,
+    )) as NormalizedZoomValue;
+
+  const fromCenterX = from.width / 2 / from.zoom.value - from.scrollX;
+  const fromCenterY = from.height / 2 / from.zoom.value - from.scrollY;
+  const toCenterX = from.width / 2 / target.zoom.value - target.scrollX;
+  const toCenterY = from.height / 2 / target.zoom.value - target.scrollY;
+
+  const centerX = fromCenterX + (toCenterX - fromCenterX) * factor;
+  const centerY = fromCenterY + (toCenterY - fromCenterY) * factor;
+
+  return {
+    scrollX: from.width / 2 / zoom - centerX,
+    scrollY: from.height / 2 / zoom - centerY,
+    zoom: { value: zoom },
+  };
+};
+
+/** Eases the viewport from its current position to `target` over `duration`,
+ * driving the transition through the shared AnimationController so it doesn't
+ * slow down other processes. */
+const animateToViewport = (
+  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">,
+  target: Viewport,
+  duration: number,
+  onFrame: (
+    state: Pick<
+      AppState,
+      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
+    >,
+  ) => void,
+) => {
+  AnimationController.start<{ elapsed: number }>(
+    SCROLL_TO_CONTENT_ANIMATION_KEY,
+    ({ deltaTime, state }) => {
+      const elapsed = (state?.elapsed ?? 0) + deltaTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const factor = easeOut(clamp(progress, 0, 1));
+
+      onFrame({
+        ...interpolateViewport({ from, target, factor }),
+        shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
+      });
+
+      // returning a falsy value signals the AnimationController to remove the
+      // animation; otherwise it would keep ticking (and calling onFrame) every
+      // frame forever after reaching the target
+      return progress < 1 ? { elapsed } : null;
+    },
+  );
+};
