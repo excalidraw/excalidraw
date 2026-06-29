@@ -762,7 +762,7 @@ export const isPointInElement = (
     (isLinearElement(element) || isFreeDrawElement(element)) &&
     !isPathALoop(element.points)
   ) {
-    // There isn't any "inside" for a non-looping path
+    // There isn't any "fixed" for a non-looping path
     return false;
   }
 

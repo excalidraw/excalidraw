@@ -312,8 +312,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       if (binding.elementId) {
         return {
           elementId: binding.elementId,
-          mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+          mode: (binding.mode as string) === "inside" ? "fixed" : binding.mode,
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
         } as FixedPointBinding | null;
       }
       return null;
@@ -342,7 +342,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         elementsMap,
       );
       const mode = isPointInElement(p, boundElement, elementsMap)
-        ? "inside"
+        ? "fixed"
         : "orbit";
       const safeElement = {
         ...element,
@@ -362,7 +362,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
           : null,
       };
       const focusPoint =
-        mode === "inside"
+        mode === "fixed"
           ? p
           : projectFixedPointOntoDiagonal(
               safeElement,

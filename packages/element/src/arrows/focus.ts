@@ -125,7 +125,7 @@ const focusPointUpdate = (
     if (switchToInsideBinding || boundToSameElement) {
       currentBinding = {
         ...currentBinding,
-        mode: "inside",
+        mode: "fixed",
       };
     } else {
       currentBinding = {
@@ -166,7 +166,7 @@ const focusPointUpdate = (
       if (switchToInsideBinding || boundToSameElementAfterUpdate) {
         adjacentBinding = {
           ...adjacentBinding,
-          mode: "inside",
+          mode: "fixed",
         };
       } else {
         adjacentBinding = {
@@ -256,8 +256,8 @@ export const handleFocusPointDrag = (
     // Handle binding mode switch
     const newMode =
       switchToInsideBinding && arrow[bindingField]?.mode === "orbit"
-        ? "inside"
-        : !switchToInsideBinding && arrow[bindingField]?.mode === "inside"
+        ? "fixed"
+        : !switchToInsideBinding && arrow[bindingField]?.mode === "fixed"
         ? "orbit"
         : null;
 
