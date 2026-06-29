@@ -1,0 +1,168 @@
+/**
+ * Google Drive component styles.
+ */
+
+.google-drive-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+
+  &--loading {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.google-drive-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  min-width: 280px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  &__email {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__signout {
+    appearance: none;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    text-align: center;
+
+    &:hover {
+      color: var(--color-danger);
+      text-decoration: underline;
+    }
+  }
+}
+
+.google-drive-dialog {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 400px;
+    max-width: 600px;
+  }
+
+  &__file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  &__file-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--color-surface-high);
+    }
+
+    &--selected {
+      background-color: var(--color-primary-light);
+    }
+  }
+
+  &__file-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  &__file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__file-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__file-date {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__error {
+    text-align: center;
+    padding: 1rem;
+    color: var(--color-danger);
+    background-color: var(--color-danger-lighter);
+    border-radius: 0.25rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__save-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
