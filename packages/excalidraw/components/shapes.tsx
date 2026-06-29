@@ -96,7 +96,7 @@ export const SHAPES = [
     value: "stickynote",
     key: KEYS.N,
     numericKey: null,
-    fillable: true,
+    fillable: false,
     toolbar: true,
   },
   {
