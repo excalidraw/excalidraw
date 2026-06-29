@@ -21,19 +21,22 @@
   }
 
   .color-picker-container {
-    display: grid;
-    grid-template-columns: 1fr 20px 1.625rem;
+    display: flex;
+    // justify-content: space-between;
     padding: 0.25rem 0px;
     align-items: center;
+    gap: 0.6rem;
 
     @include isMobile {
       max-width: 11rem;
     }
 
+    & > * {
+      flex-shrink: 0;
+    }
+
     &.color-picker-container--no-top-picks {
-      display: flex;
       justify-content: center;
-      grid-template-columns: unset;
     }
   }
 
@@ -41,6 +44,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.063rem;
   }
 
   .color-picker__button {
@@ -63,6 +67,10 @@
     position: relative;
     font-family: inherit;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem; 
 
     &:hover:not(.active):not(.color-picker__button--large) {
       transform: scale(1.075);
@@ -175,6 +183,10 @@
     }
   }
 
+  .color-picker__button + .color-picker__button {
+    margin-left: 0.25rem;
+  }
+  
   .color-picker__button__hotkey-label {
     position: absolute;
     right: 5px;
@@ -492,5 +504,11 @@
     .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
       color: #000;
     }
+  }
+
+  .mixed-color-placeholder {
+    display: inline-block;
+    width: 1em;
+    text-align: center;
   }
 }
