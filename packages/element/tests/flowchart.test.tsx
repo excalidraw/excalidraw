@@ -154,6 +154,86 @@ describe("flow chart creation", () => {
     expect(firstChildNode.x).toBe(secondChildNode.x);
     expect(secondChildNode.x).toBe(thirdChildNode.x);
   });
+
+  // regression for #8518: additional siblings must not overlap existing ones
+  it("does not overlap existing siblings when adding more children (down)", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 400,
+      height: 300,
+    });
+    API.setElements([parent]);
+    API.setSelectedElements([parent]);
+
+    for (let i = 0; i < 4; i++) {
+      API.setSelectedElements([parent]);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ARROW_DOWN);
+      });
+      Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    }
+
+    const children = h.elements.filter(
+      (el) => el.type === "rectangle" && el.id !== parent.id,
+    );
+    expect(children.length).toBe(4);
+
+    // all siblings should sit on the same row (no vertical misalignment)
+    const ys = new Set(children.map((c) => c.y));
+    expect(ys.size).toBe(1);
+
+    // no two siblings should overlap horizontally
+    const sorted = [...children].sort((a, b) => a.x - b.x);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(sorted[i].x).toBeGreaterThanOrEqual(
+        sorted[i - 1].x + sorted[i - 1].width,
+      );
+    }
+  });
+
+  // regression for #8518: a second batch of children (added by holding the
+  // modifier and pressing the arrow several times) must clear the first batch
+  it("does not overlap a previous batch of children (down)", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 400,
+      height: 300,
+    });
+    API.setElements([parent]);
+
+    // hold the modifier and press down N times to create a batch at once
+    const addBatch = (count: number) => {
+      API.setSelectedElements([parent]);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        for (let i = 0; i < count; i++) {
+          Keyboard.keyPress(KEYS.ARROW_DOWN);
+        }
+      });
+      Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    };
+
+    addBatch(3);
+    addBatch(2);
+
+    const children = h.elements.filter(
+      (el) => el.type === "rectangle" && el.id !== parent.id,
+    );
+    expect(children.length).toBe(5);
+
+    const overlaps = (a: typeof children[0], b: typeof children[0]) =>
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y;
+
+    for (let i = 0; i < children.length; i++) {
+      for (let j = i + 1; j < children.length; j++) {
+        expect(overlaps(children[i], children[j])).toBe(false);
+      }
+    }
+  });
 });
 
 describe("flow chart navigation", () => {
