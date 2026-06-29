@@ -7575,16 +7575,8 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const backgroundColor = this.state.currentItemBucketFillBackgroundColor;
 
-    const finishTool = () => {
-      resetCursor(this.interactiveCanvas);
-      if (!this.state.activeTool.locked) {
-        this.setActiveTool({ type: this.state.preferredSelectionTool.type });
-      }
-    };
-
     if (backgroundColor === "transparent") {
       this.setToast({ message: t("bucketFill.noBackground"), duration: 3000 });
-      finishTool();
       return;
     }
 
@@ -7605,7 +7597,6 @@ class App extends React.Component<AppProps, AppState> {
         this.setToast({ message: t("bucketFill.noRegion"), duration: 3000 });
       }
       // "no_owner" stays silent — clicking empty canvas shouldn't nag
-      finishTool();
       return;
     }
 
@@ -7692,21 +7683,10 @@ class App extends React.Component<AppProps, AppState> {
       insertIndex < 0 ? null : insertIndex,
     );
 
-    this.setState((prevState) => ({
-      newElement: null,
-      selectedLinearElement: null,
-      selectedElementIds: makeNextSelectedElementIds(
-        { [fill.id]: true },
-        prevState,
-      ),
-      activeTool: prevState.activeTool.locked
-        ? prevState.activeTool
-        : updateActiveTool(prevState, {
-            type: prevState.preferredSelectionTool.type,
-          }),
-    }));
+    // Keep the bucket fill tool active and do NOT select the new fill, so the
+    // user can keep filling regions back-to-back without re-selecting the tool
+    // (even when the tool isn't locked).
     this.store.scheduleCapture();
-    resetCursor(this.interactiveCanvas);
   };
 
   private handleCanvasPointerDown = (

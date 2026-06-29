@@ -78,9 +78,49 @@ describe("bucket fill tool", () => {
     expect(h.elements[0].id).toBe(fill!.id);
     expect(h.elements[1].id).toBe(rect.id);
 
-    // selected, and tool returns to selection
-    expect(h.state.selectedElementIds[fill!.id]).toBe(true);
-    expect(h.state.activeTool.type).toBe("selection");
+    // the fill is NOT selected and the tool stays active so the user can keep
+    // filling regions back-to-back
+    expect(h.state.selectedElementIds[fill!.id]).not.toBe(true);
+    expect(h.state.activeTool.type).toBe("bucketFill");
+  });
+
+  it("can fill multiple regions in a row without re-selecting the tool", () => {
+    const first = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      width: 100,
+      height: 80,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const second = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 20,
+      width: 100,
+      height: 80,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    act(() => {
+      h.app.updateScene({
+        elements: [first, second],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(70, 60); // inside first
+    expect(h.state.activeTool.type).toBe("bucketFill");
+    mouse.clickAt(250, 60); // inside second, tool still active
+
+    const fills = h.elements.filter(
+      (el) => el.type === "line" && !el.isDeleted,
+    );
+    expect(fills).toHaveLength(2);
+    expect(h.state.activeTool.type).toBe("bucketFill");
   });
 
   it("shows only the fill color picker in the panel when the tool is active", () => {
