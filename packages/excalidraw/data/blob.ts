@@ -234,17 +234,23 @@ export const loadLibraryFromBlob = async (
 };
 
 export const canvasToBlob = async (
-  canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,
+  canvasOrPromise: HTMLCanvasElement | Promise<HTMLCanvasElement>, //
 ): Promise<Blob> => {
-  return new Promise(async (resolve, reject) => {
+  const canvas = isPromiseLike(canvasOrPromise)
+    ? await canvasOrPromise
+    : canvasOrPromise;
+
+  return new Promise((resolve, reject) => {
     try {
-      if (isPromiseLike(canvas)) {
-        canvas = await canvas;
-      }
       canvas.toBlob((blob) => {
         if (!blob) {
+          // Failure to create a blob usually indicates that browser hardware limits
+          // (VRAM/Memory) have been exceeded for the given canvas dimensions.
           return reject(
-            new CanvasError("Error: Canvas too big", "CANVAS_POSSIBLY_TOO_BIG"),
+            new CanvasError(
+              `Error: Canvas too big (${canvas.width}x${canvas.height})`,
+              "CANVAS_POSSIBLY_TOO_BIG",
+            ),
           );
         }
         resolve(blob);
