@@ -2083,11 +2083,15 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private toggleOverscrollBehavior(event: React.PointerEvent) {
-    // when pointer inside editor, disable overscroll behavior to prevent
-    // panning to trigger history back/forward on MacOS Chrome
-    document.documentElement.style.overscrollBehaviorX =
-      event.type === "pointerenter" ? "none" : "auto";
+  // disable the documentElement's horizontal overscroll behavior so that
+  // trackpad panning on Chrome (MacOS) cannot accidentally trigger the
+  // browser's back/forward history navigation. Previously this was toggled
+  // on pointer enter/leave, but the window where it was reset to "auto"
+  // could leave Chrome in a state where the very next pan still triggered
+  // the bf gesture (see #5588). Keep it disabled for the lifetime of the
+  // editor instead, and restore it on unmount.
+  private setDocumentOverscrollBehavior(disable: boolean) {
+    document.documentElement.style.overscrollBehaviorX = disable ? "none" : "";
   }
 
   public render() {
@@ -2161,8 +2165,6 @@ class App extends React.Component<AppProps, AppState> {
         onKeyDown={
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
-        onPointerEnter={this.toggleOverscrollBehavior}
-        onPointerLeave={this.toggleOverscrollBehavior}
       >
         <ExcalidrawAPIContext.Provider value={this.api}>
           <AppContext.Provider value={this}>
@@ -3101,6 +3103,8 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
+    this.setDocumentOverscrollBehavior(true);
+
     if (isTestEnv() || isDevEnv()) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -3237,7 +3241,7 @@ class App extends React.Component<AppProps, AppState> {
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
-    document.documentElement.style.overscrollBehaviorX = "";
+    this.setDocumentOverscrollBehavior(false);
   }
 
   private onResize = withBatchedUpdates(() => {
