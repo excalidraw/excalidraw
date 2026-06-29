@@ -1094,6 +1094,7 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const annotationToolSelected = activeTool.type === "annotation";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -1239,6 +1240,8 @@ export const ShapesSwitcher = ({
             ? frameToolIcon
             : embeddableToolSelected
             ? EmbedIcon
+            : annotationToolSelected
+            ? laserPointerToolIcon
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -1275,6 +1278,15 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "annotation" })}
+            icon={laserPointerToolIcon}
+            data-testid="toolbar-annotation"
+            selected={annotationToolSelected}
+            shortcut={KEYS.L.toLocaleUpperCase()}
+          >
+            {t("toolBar.annotation")}
           </DropdownMenu.Item>
           {isFullStylesPanel && (
             <DropdownMenu.Item

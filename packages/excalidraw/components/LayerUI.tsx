@@ -60,6 +60,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { AnnotationButton } from "./AnnotationButton";
 import { Toast } from "./Toast";
 
 import "./LayerUI.scss";
@@ -401,6 +402,19 @@ const LayerUI = ({
                               }
                               onChange={() =>
                                 app.setActiveTool({ type: TOOL_TYPE.laser })
+                              }
+                              isMobile
+                            />
+                            <AnnotationButton
+                              title={t("toolBar.annotation")}
+                              checked={
+                                appState.activeTool.type ===
+                                TOOL_TYPE.annotation
+                              }
+                              onChange={() =>
+                                app.setActiveTool({
+                                  type: TOOL_TYPE.annotation,
+                                })
                               }
                               isMobile
                             />
