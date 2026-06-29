@@ -483,11 +483,14 @@ const shouldHideLinkPopup = (
     elementsMap,
   );
 
+  const clientXWithOffset = clientX - appState.offsetLeft;
+  const clientYWithOffset = clientY - appState.offsetTop;
   if (
-    clientX >= popoverX - threshold &&
-    clientX <= popoverX + POPUP_WIDTH + POPUP_PADDING * 2 + threshold &&
-    clientY >= popoverY - threshold &&
-    clientY <= popoverY + threshold + POPUP_PADDING * 2 + POPUP_HEIGHT
+    clientXWithOffset >= popoverX - threshold &&
+    clientXWithOffset <=
+      popoverX + POPUP_WIDTH + POPUP_PADDING * 2 + threshold &&
+    clientYWithOffset >= popoverY - threshold &&
+    clientYWithOffset <= popoverY + threshold + POPUP_PADDING * 2 + POPUP_HEIGHT
   ) {
     return false;
   }
