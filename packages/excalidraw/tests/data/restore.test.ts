@@ -1,7 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
+import {
+  COLOR_PALETTE,
+  DEFAULT_SIDEBAR,
+  FONT_FAMILY,
+  ROUNDNESS,
+} from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
@@ -41,6 +46,20 @@ describe("restoreElements", () => {
 
     const restoredElements = restore.restoreElements(elements, null);
     expect(restoredElements.length).toBe(elements.length);
+  });
+
+  it("should restore transparent sticky note stroke as black", () => {
+    const stickyNote = {
+      ...API.createElement({ type: "stickynote" }),
+      strokeColor: COLOR_PALETTE.transparent,
+    };
+
+    const restoredElement = restore.restoreElements(
+      [stickyNote],
+      null,
+    )[0];
+
+    expect(restoredElement.strokeColor).toBe(COLOR_PALETTE.black);
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {
@@ -810,6 +829,19 @@ describe("restoreAppState", () => {
     );
 
     expect(restoredAppState.currentItemStrokeWidthKey).toBe("bold");
+  });
+
+  it("should restore transparent current sticky note stroke as black", () => {
+    const restoredAppState = restore.restoreAppState(
+      {
+        currentItemStickynoteStrokeColor: COLOR_PALETTE.transparent,
+      } as any,
+      null,
+    );
+
+    expect(restoredAppState.currentItemStickynoteStrokeColor).toBe(
+      COLOR_PALETTE.black,
+    );
   });
 
   it("should restore with current app state when imported data state is undefined", () => {

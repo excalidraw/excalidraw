@@ -37,7 +37,11 @@ import {
   validateElbowPoints,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { bumpVersion, clampStickyNoteProps } from "@excalidraw/element";
+import {
+  bumpVersion,
+  clampStickyNoteProps,
+  normalizeStickyNoteStrokeColor,
+} from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
@@ -1156,6 +1160,9 @@ export const restoreAppState = (
     ),
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
+    ),
+    currentItemStickynoteStrokeColor: normalizeStickyNoteStrokeColor(
+      nextAppState.currentItemStickynoteStrokeColor,
     ),
     editingFrame: null,
   };

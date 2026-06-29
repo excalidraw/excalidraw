@@ -12,6 +12,7 @@ export const hasBackground = (type: ElementOrToolType) =>
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "stickynote" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||

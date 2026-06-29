@@ -269,7 +269,11 @@ export class API {
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
       angle: (rest.angle ?? 0) as Radians,
-      strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
+      strokeColor:
+        rest.strokeColor ??
+        (type === "stickynote"
+          ? appState.currentItemStickynoteStrokeColor
+          : appState.currentItemStrokeColor),
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,

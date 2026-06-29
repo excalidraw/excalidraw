@@ -1,6 +1,11 @@
 import React from "react";
 
-import { CODES, ROUNDNESS, STROKE_WIDTH } from "@excalidraw/common";
+import {
+  CODES,
+  COLOR_PALETTE,
+  ROUNDNESS,
+  STROKE_WIDTH,
+} from "@excalidraw/common";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
@@ -112,5 +117,39 @@ describe("actionStyles", () => {
     expect(API.getSelectedElement().roundness).toEqual({
       type: ROUNDNESS.PROPORTIONAL_RADIUS,
     });
+  });
+
+  it("should hide transparent stroke color for sticky notes", async () => {
+    UI.clickTool("stickynote");
+
+    togglePopover("Stroke");
+
+    expect(screen.queryByTestId("color-transparent")).toBeNull();
+    expect(document.querySelector(".color-picker__button--hidden")).not.toBe(
+      null,
+    );
+  });
+
+  it("should track sticky note stroke color separately", async () => {
+    API.setAppState({
+      currentItemStrokeColor: COLOR_PALETTE.red[4],
+      currentItemStickynoteStrokeColor: COLOR_PALETTE.black,
+    });
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      strokeColor: COLOR_PALETTE.black,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    togglePopover("Stroke");
+    UI.clickOnTestId("color-blue");
+
+    expect(API.getSelectedElement().strokeColor).toBe(COLOR_PALETTE.blue[4]);
+    expect(h.state.currentItemStickynoteStrokeColor).toBe(
+      COLOR_PALETTE.blue[4],
+    );
+    expect(h.state.currentItemStrokeColor).toBe(COLOR_PALETTE.red[4]);
   });
 });

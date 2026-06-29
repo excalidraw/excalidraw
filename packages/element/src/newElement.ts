@@ -26,7 +26,10 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
-import { computeStickyNoteTextLayout } from "./stickyNote";
+import {
+  computeStickyNoteTextLayout,
+  normalizeStickyNoteStrokeColor,
+} from "./stickyNote";
 import { getBoundTextMaxWidth } from "./textElement";
 import { computeBoundTextPosition } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
@@ -192,6 +195,7 @@ export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
       !element.backgroundColor || element.backgroundColor === "transparent"
         ? DEFAULT_STICKY_NOTE_BG
         : element.backgroundColor,
+    strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
     fillStyle: "solid",
   };
 };

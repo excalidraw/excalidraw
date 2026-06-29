@@ -179,6 +179,7 @@ import {
   getContainerElement,
   computeBoundTextPosition,
   computeStickyNoteTextLayout,
+  normalizeStickyNoteStrokeColor,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -2744,7 +2745,15 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
-              appState: { ...this.state, currentItemStrokeColor: color },
+              appState: {
+                ...this.state,
+                ...(this.state.activeTool.type === "stickynote"
+                  ? {
+                      currentItemStickynoteStrokeColor:
+                        normalizeStickyNoteStrokeColor(color),
+                    }
+                  : { currentItemStrokeColor: color }),
+              },
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           } else {
@@ -2757,9 +2766,13 @@ class App extends React.Component<AppProps, AppState> {
           this.updateScene({
             elements: this.scene.getElementsIncludingDeleted().map((el) => {
               if (this.state.selectedElementIds[el.id]) {
+                const nextColor =
+                  shouldUpdateStrokeColor && isStickyNoteElement(el)
+                    ? normalizeStickyNoteStrokeColor(color)
+                    : color;
                 return newElementWith(el, {
                   [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
-                    color,
+                    nextColor,
                 });
               }
               return el;
@@ -6284,7 +6297,10 @@ class App extends React.Component<AppProps, AppState> {
       newTextElement({
         x: newTextElementPosition.x,
         y: newTextElementPosition.y,
-        strokeColor: this.state.currentItemStrokeColor,
+        strokeColor:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? this.state.currentItemStickynoteStrokeColor
+            : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.getCurrentItemStrokeWidth("text"),
@@ -9530,7 +9546,10 @@ class App extends React.Component<AppProps, AppState> {
     const baseElementAttributes = {
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
+      strokeColor:
+        elementType === "stickynote"
+          ? this.state.currentItemStickynoteStrokeColor
+          : this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),

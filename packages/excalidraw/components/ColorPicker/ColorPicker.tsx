@@ -51,6 +51,7 @@ interface ColorPickerProps {
   appState: AppState;
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
+  hiddenPaletteColorNames?: string[];
   updateData: (formData?: any) => void;
 }
 
@@ -61,6 +62,7 @@ const ColorPickerPopupContent = ({
   label,
   elements,
   palette = COLOR_PALETTE,
+  hiddenPaletteColorNames,
   updateData,
   getOpenPopup,
   appState,
@@ -72,6 +74,7 @@ const ColorPickerPopupContent = ({
   | "label"
   | "elements"
   | "palette"
+  | "hiddenPaletteColorNames"
   | "updateData"
   | "appState"
 > & {
@@ -151,6 +154,7 @@ const ColorPickerPopupContent = ({
         <Picker
           ref={colorPickerContentRef}
           palette={palette}
+          hiddenPaletteColorNames={hiddenPaletteColorNames}
           color={color}
           onChange={(changedColor) => {
             // Save caret position before color change if editing text
@@ -287,6 +291,7 @@ export const ColorPicker = ({
   elements,
   palette = COLOR_PALETTE,
   topPicks,
+  hiddenPaletteColorNames,
   updateData,
   appState,
 }: ColorPickerProps) => {
@@ -352,6 +357,7 @@ export const ColorPicker = ({
               label={label}
               elements={elements}
               palette={palette}
+              hiddenPaletteColorNames={hiddenPaletteColorNames}
               updateData={updateData}
               getOpenPopup={() => openRef.current}
               appState={appState}

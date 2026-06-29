@@ -10,7 +10,11 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element";
+import {
+  isStickyNoteElement,
+  mutateElement,
+  normalizeStickyNoteStrokeColor,
+} from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
@@ -525,14 +529,20 @@ const LayerUI = ({
 
             if (selectedElements.length) {
               for (const element of selectedElements) {
-                mutateElement(element, arrayToMap(elements), {
-                  [altKey && eyeDropperState.swapPreviewOnAlt
+                const colorProperty =
+                  altKey && eyeDropperState.swapPreviewOnAlt
                     ? colorPickerType === "elementBackground"
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
                     ? "backgroundColor"
-                    : "strokeColor"]: color,
+                    : "strokeColor";
+                const nextColor =
+                  colorProperty === "strokeColor" && isStickyNoteElement(element)
+                    ? normalizeStickyNoteStrokeColor(color)
+                    : color;
+                mutateElement(element, arrayToMap(elements), {
+                  [colorProperty]: nextColor,
                 });
                 ShapeCache.delete(element);
               }
@@ -542,7 +552,19 @@ const LayerUI = ({
                 currentItemBackgroundColor: color,
               });
             } else {
-              setAppState({ currentItemStrokeColor: color });
+              setAppState(
+                appState.activeTool.type === "stickynote"
+                  ? {
+                      currentItemStrokeColor: appState.currentItemStrokeColor,
+                      currentItemStickynoteStrokeColor:
+                        normalizeStickyNoteStrokeColor(color),
+                    }
+                  : {
+                      currentItemStrokeColor: color,
+                      currentItemStickynoteStrokeColor:
+                        appState.currentItemStickynoteStrokeColor,
+                    },
+              );
             }
           }}
           onSelect={(color, event) => {

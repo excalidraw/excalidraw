@@ -46,6 +46,8 @@ import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
+  getContainerElement,
+  normalizeStickyNoteStrokeColor,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
@@ -175,6 +177,22 @@ const getStylesPanelInfo = (app: AppClassProperties) => {
     isCompact: stylesPanelMode !== "full",
     isMobile: stylesPanelMode === "mobile",
   } as const;
+};
+
+const isStickyNoteStrokeColorElement = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  if (isStickyNoteElement(element)) {
+    return true;
+  }
+
+  if (isTextElement(element) && isBoundToContainer(element)) {
+    const container = getContainerElement(element, elementsMap);
+    return isStickyNoteElement(container);
+  }
+
+  return false;
 };
 
 export const changeProperty = (
@@ -336,38 +354,76 @@ const changeFontSize = (
 // -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register<
-  Pick<AppState, "currentItemStrokeColor">
+  Pick<AppState, "currentItemStrokeColor" | "currentItemStickynoteStrokeColor">
 >({
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const nextValue = value
+      ? {
+          ...value,
+          ...(value.currentItemStickynoteStrokeColor
+            ? {
+                currentItemStickynoteStrokeColor:
+                  normalizeStickyNoteStrokeColor(
+                    value.currentItemStickynoteStrokeColor,
+                  ),
+              }
+            : null),
+        }
+      : null;
+    const hasStrokeColorValue =
+      nextValue?.currentItemStrokeColor ||
+      nextValue?.currentItemStickynoteStrokeColor;
+    const elementsMap = arrayToMap(elements);
+
     return {
-      ...(value?.currentItemStrokeColor && {
+      ...(hasStrokeColorValue && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            const strokeColor = isStickyNoteStrokeColorElement(el, elementsMap)
+              ? nextValue?.currentItemStickynoteStrokeColor ??
+                normalizeStickyNoteStrokeColor(nextValue!.currentItemStrokeColor)
+              : nextValue?.currentItemStrokeColor ??
+                nextValue!.currentItemStickynoteStrokeColor;
+
+            return newElementWith(el, { strokeColor });
           },
           true,
         ),
       }),
       appState: {
         ...appState,
-        ...value,
+        ...nextValue,
       },
-      captureUpdate: !!value?.currentItemStrokeColor
+      captureUpdate: !!hasStrokeColorValue
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
+    const elementsMap = arrayToMap(elements);
+    const selectedStrokeElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }).filter((element) => hasStrokeColor(element.type));
+    const hasSelectedStickyNoteStrokeElement = selectedStrokeElements.some(
+      (element) => isStickyNoteStrokeColorElement(element, elementsMap),
+    );
+    const hasSelectedNonStickyStrokeElement = selectedStrokeElements.some(
+      (element) => !isStickyNoteStrokeColorElement(element, elementsMap),
+    );
+    const isStickyNoteStrokePicker =
+      hasSelectedStickyNoteStrokeElement ||
+      (!selectedStrokeElements.length &&
+        appState.activeTool.type === "stickynote");
 
     return (
       <>
@@ -385,12 +441,35 @@ export const actionChangeStrokeColor = register<
             (element) => element.strokeColor,
             true,
             (hasSelection) =>
-              !hasSelection ? appState.currentItemStrokeColor : null,
+              !hasSelection
+                ? appState.activeTool.type === "stickynote"
+                  ? appState.currentItemStickynoteStrokeColor
+                  : appState.currentItemStrokeColor
+                : null,
           )}
-          onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          onChange={(color) =>
+            updateData({
+              ...(selectedStrokeElements.length
+                ? hasSelectedNonStickyStrokeElement
+                  ? { currentItemStrokeColor: color }
+                  : null
+                : appState.activeTool.type !== "stickynote"
+                ? { currentItemStrokeColor: color }
+                : null),
+              ...(isStickyNoteStrokePicker
+                ? {
+                    currentItemStickynoteStrokeColor:
+                      normalizeStickyNoteStrokeColor(color),
+                  }
+                : null),
+            })
+          }
           elements={elements}
           appState={appState}
           updateData={updateData}
+          hiddenPaletteColorNames={
+            isStickyNoteStrokePicker ? ["transparent"] : undefined
+          }
         />
       </>
     );

@@ -363,6 +363,7 @@ export interface AppState {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemStickynoteStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;

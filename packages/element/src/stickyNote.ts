@@ -1,4 +1,5 @@
 import {
+  DEFAULT_ELEMENT_PROPS,
   MIN_FONT_SIZE,
   STICKY_NOTE_FONT_STEP,
   STICKY_NOTE_MIN_BASE_HEIGHT,
@@ -6,6 +7,7 @@ import {
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   getFontString,
+  isTransparent,
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
@@ -55,6 +57,14 @@ export type StickyNoteTextLayout = {
 const STICKY_NOTE_RENDER_ROUGHNESS = [0, 1.5, 8] as const;
 const STICKY_NOTE_CORNER_RADIUS_RATIO = 0.04;
 const STICKY_NOTE_MAX_CORNER_RADIUS = 16;
+
+export const normalizeStickyNoteStrokeColor = (
+  strokeColor: string | null | undefined,
+) => {
+  return !strokeColor || isTransparent(strokeColor)
+    ? DEFAULT_ELEMENT_PROPS.strokeColor
+    : strokeColor;
+};
 
 const seededRandom = (seed: number) => {
   let value = seed >>> 0;
