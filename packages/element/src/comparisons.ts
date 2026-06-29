@@ -51,3 +51,5 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 
 export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";
+
+export const hasTextStroke = (type: ElementOrToolType) => type === "text";

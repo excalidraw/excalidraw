@@ -582,6 +582,27 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        // Draw text stroke (outline) first if configured
+        const hasTextStroke =
+          element.textStrokeWidth > 0 && element.textStrokeColor !== null;
+        if (hasTextStroke) {
+          context.strokeStyle =
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.textStrokeColor!)
+              : element.textStrokeColor!;
+          context.lineWidth = element.textStrokeWidth;
+          context.lineJoin = "round";
+          context.miterLimit = 2;
+          for (let index = 0; index < lines.length; index++) {
+            context.strokeText(
+              lines[index],
+              horizontalOffset,
+              index * lineHeightPx + verticalOffset,
+            );
+          }
+        }
+
+        // Draw text fill on top
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
