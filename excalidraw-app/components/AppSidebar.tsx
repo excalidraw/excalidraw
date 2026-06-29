@@ -1,19 +1,32 @@
 import { DefaultSidebar, Sidebar, THEME } from "@excalidraw/excalidraw";
 import {
+  file,
   messageCircleIcon,
   presentationIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { SessionsSidebar } from "./SessionsSidebar";
+
 import "./AppSidebar.scss";
 
-export const AppSidebar = () => {
+export const AppSidebar: React.FC<{
+  excalidrawAPI: ExcalidrawImperativeAPI | null;
+}> = ({ excalidrawAPI }) => {
   const { theme, openSidebar } = useUIAppState();
 
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
+        <Sidebar.TabTrigger
+          tab="sessions"
+          style={{ opacity: openSidebar?.tab === "sessions" ? 1 : 0.4 }}
+        >
+          {file}
+        </Sidebar.TabTrigger>
         <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
@@ -27,6 +40,9 @@ export const AppSidebar = () => {
           {presentationIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
+      <Sidebar.Tab tab="sessions">
+        <SessionsSidebar excalidrawAPI={excalidrawAPI} />
+      </Sidebar.Tab>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
           <div
