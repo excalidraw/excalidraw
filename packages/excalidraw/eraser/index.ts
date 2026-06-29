@@ -115,17 +115,19 @@ export class EraserTrail extends AnimatedTrail {
         );
 
         if (intersects) {
-          const shallowestGroupId = element.groupIds.at(-1)!;
+          if (element.groupIds.length > 0) {
+            const shallowestGroupId = element.groupIds.at(-1)!;
 
-          if (this.groupsToErase.has(shallowestGroupId)) {
-            const elementsInGroup = getElementsInGroup(
-              this.app.scene.getNonDeletedElementsMap(),
-              shallowestGroupId,
-            );
-            for (const elementInGroup of elementsInGroup) {
-              this.elementsToErase.delete(elementInGroup.id);
+            if (this.groupsToErase.has(shallowestGroupId)) {
+              const elementsInGroup = getElementsInGroup(
+                this.app.scene.getNonDeletedElementsMap(),
+                shallowestGroupId,
+              );
+              for (const elementInGroup of elementsInGroup) {
+                this.elementsToErase.delete(elementInGroup.id);
+              }
+              this.groupsToErase.delete(shallowestGroupId);
             }
-            this.groupsToErase.delete(shallowestGroupId);
           }
 
           if (isBoundToContainer(element)) {
@@ -151,18 +153,20 @@ export class EraserTrail extends AnimatedTrail {
         );
 
         if (intersects) {
-          const shallowestGroupId = element.groupIds.at(-1)!;
+          if (element.groupIds.length > 0) {
+            const shallowestGroupId = element.groupIds.at(-1)!;
 
-          if (!this.groupsToErase.has(shallowestGroupId)) {
-            const elementsInGroup = getElementsInGroup(
-              this.app.scene.getNonDeletedElementsMap(),
-              shallowestGroupId,
-            );
+            if (!this.groupsToErase.has(shallowestGroupId)) {
+              const elementsInGroup = getElementsInGroup(
+                this.app.scene.getNonDeletedElementsMap(),
+                shallowestGroupId,
+              );
 
-            for (const elementInGroup of elementsInGroup) {
-              this.elementsToErase.add(elementInGroup.id);
+              for (const elementInGroup of elementsInGroup) {
+                this.elementsToErase.add(elementInGroup.id);
+              }
+              this.groupsToErase.add(shallowestGroupId);
             }
-            this.groupsToErase.add(shallowestGroupId);
           }
 
           if (hasBoundTextElement(element)) {
