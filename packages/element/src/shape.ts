@@ -9,6 +9,7 @@ import {
   getEllipseShape,
   getFreedrawShape,
   getPolygonShape,
+  getStarShape,
 } from "@excalidraw/utils/shape";
 
 import {
@@ -63,6 +64,7 @@ import {
   getArrowheadPoints,
   getDiamondPoints,
   getElementAbsoluteCoords,
+  getStarPoints,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
 
@@ -230,7 +232,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "star": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -860,6 +863,18 @@ const _generateElementShape = (
       }
       return shape;
     }
+    case "star": {
+      const starPoints = getStarPoints(element);
+      const polygonPoints: RoughPoint[] = [];
+      for (let i = 0; i < starPoints.length; i += 2) {
+        polygonPoints.push([starPoints[i], starPoints[i + 1]]);
+      }
+      const shape: ElementShapes[typeof element.type] = generator.polygon(
+        polygonPoints,
+        generateRoughOptions(element, false, isDarkMode),
+      );
+      return shape;
+    }
     case "ellipse": {
       const shape: ElementShapes[typeof element.type] = generator.ellipse(
         element.width / 2,
@@ -1106,6 +1121,9 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 
     case "ellipse":
       return getEllipseShape(element);
+
+    case "star":
+      return getStarShape(element);
 
     case "freedraw": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);

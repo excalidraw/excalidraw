@@ -138,6 +138,28 @@ describe("hitElementItself cache", () => {
     distanceSpy.mockRestore();
   });
 
+  it("star", () => {
+    const element = API.createElement({
+      type: "star",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      backgroundColor: "#ffffff",
+    });
+    const elementsMap = arrayToMap([element]);
+    const point = pointFrom<GlobalPoint>(50, 50);
+
+    expect(
+      hitElementItself({
+        point,
+        element,
+        threshold: 6,
+        elementsMap,
+      }),
+    ).toBe(true);
+  });
+
   it("invalidates cache when element version changes", () => {
     const element = API.createElement({
       type: "rectangle",

@@ -25,6 +25,7 @@ import {
   extraToolsIcon,
   DiamondIcon,
   EllipseIcon,
+  StarIcon,
   LineIcon,
   TextIcon,
   ImageIcon,
@@ -56,6 +57,11 @@ const SHAPE_TOOLS = [
     type: "ellipse",
     icon: EllipseIcon,
     title: capitalizeString(t("toolBar.ellipse")),
+  },
+  {
+    type: "star",
+    icon: StarIcon,
+    title: capitalizeString(t("toolBar.star")),
   },
 ] as const;
 
