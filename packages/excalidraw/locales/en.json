@@ -601,7 +601,9 @@
     "colors": "Colors",
     "shades": "Shades",
     "hexCode": "Hex code",
-    "noShades": "No shades available for this color"
+    "noShades": "No shades available for this color",
+    "invalidHexCode": "Hex code must be 3, 4, 6, or 8 characters (excluding #)",
+    "invalidColor": "Not a valid color"
   },
   "overwriteConfirm": {
     "action": {
