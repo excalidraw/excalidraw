@@ -12714,7 +12714,7 @@ class App extends React.Component<AppProps, AppState> {
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement ||
           (event.target instanceof HTMLElement &&
-            event.target.classList.contains(CLASSES.FRAME_NAME))
+            event.target.closest(`.${CLASSES.FRAME_NAME}`) != null)
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
