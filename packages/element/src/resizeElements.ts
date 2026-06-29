@@ -79,7 +79,6 @@ import type {
   ExcalidrawImageElement,
   ElementsMap,
   ExcalidrawElbowArrowElement,
-  ExcalidrawArrowElement,
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
 
@@ -234,7 +233,7 @@ const rotateSingleElement = (
   if (isBindingElement(element)) {
     update = {
       ...update,
-    } as ElementUpdate<ExcalidrawArrowElement>;
+    } as ElementUpdate<NonDeletedExcalidrawElement>;
 
     if (element.startBinding) {
       unbindBindingElement(element, "start", scene);
@@ -266,7 +265,7 @@ const rotateSingleElement = (
 };
 
 export const rescalePointsInElement = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   width: number,
   height: number,
   normalizePoints: boolean,
@@ -283,7 +282,7 @@ export const rescalePointsInElement = (
     : {};
 
 export const measureFontSizeFromWidth = (
-  element: NonDeleted<ExcalidrawTextElement>,
+  element: ExcalidrawTextElement,
   elementsMap: ElementsMap,
   nextWidth: number,
 ): { size: number } | null => {
@@ -308,8 +307,8 @@ export const measureFontSizeFromWidth = (
 };
 
 export const resizeSingleTextElement = (
-  origElement: NonDeleted<ExcalidrawTextElement>,
-  element: NonDeleted<ExcalidrawTextElement>,
+  origElement: ExcalidrawTextElement,
+  element: ExcalidrawTextElement,
   scene: Scene,
   transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
@@ -388,7 +387,7 @@ export const resizeSingleTextElement = (
       shouldResizeFromCenter,
     );
 
-    const resizedElement: Partial<ExcalidrawTextElement> = {
+    const resizedElement: Partial<NonDeleted<ExcalidrawTextElement>> = {
       width: Math.abs(newWidth),
       height: Math.abs(metrics.height),
       x: newOrigin.x,
@@ -722,8 +721,8 @@ const getResizedOrigin = (
 export const resizeSingleElement = (
   nextWidth: number,
   nextHeight: number,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
+  latestElement: NonDeletedExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
   handleDirection: TransformHandleDirection,
@@ -889,7 +888,7 @@ export const resizeSingleElement = (
       if (latestElement.startBinding) {
         updates = {
           ...updates,
-        } as ElementUpdate<ExcalidrawArrowElement>;
+        } as ElementUpdate<ExcalidrawElement>;
 
         if (latestElement.startBinding) {
           unbindBindingElement(latestElement, "start", scene);
@@ -900,7 +899,7 @@ export const resizeSingleElement = (
         updates = {
           ...updates,
           endBinding: null,
-        } as ElementUpdate<ExcalidrawArrowElement>;
+        } as ElementUpdate<ExcalidrawElement>;
       }
     }
 
@@ -1200,7 +1199,10 @@ export const resizeMultipleElements = (
       }[],
       element,
     ) => {
-      const origElement = originalElementsMap!.get(element.id);
+      // originalElementsMap holds snapshots of the (non-deleted) selection
+      const origElement = originalElementsMap!.get(element.id) as
+        | NonDeletedExcalidrawElement
+        | undefined;
       if (origElement) {
         acc.push({ orig: origElement, latest: element });
       }
@@ -1239,9 +1241,10 @@ export const resizeMultipleElements = (
       ];
     }, [] as ExcalidrawTextElementWithContainer[]);
 
-    boundingBox = getCommonBoundingBox(
-      targetElements.map(({ orig }) => orig).concat(boundTextElements),
-    );
+    boundingBox = getCommonBoundingBox([
+      ...targetElements.map(({ orig }) => orig),
+      ...boundTextElements,
+    ]);
   }
   const { minX, minY, maxX, maxY, midX, midY } = boundingBox;
   const width = maxX - minX;

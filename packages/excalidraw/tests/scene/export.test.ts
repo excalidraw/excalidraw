@@ -11,6 +11,7 @@ import { pointFrom } from "@excalidraw/math";
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -85,7 +86,7 @@ describe("exportToSvg", () => {
           originalText:
             "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
           index: "a4" as FractionalIndex,
-        } as ExcalidrawTextElement,
+        } as NonDeleted<ExcalidrawTextElement>,
       ],
       DEFAULT_OPTIONS,
       null,
@@ -190,7 +191,7 @@ describe("exportToSvg", () => {
 
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
-      [rectangleWithLinkFixture],
+      [rectangleWithLinkFixture] as NonDeletedExcalidrawElement[],
       DEFAULT_OPTIONS,
       null,
     );

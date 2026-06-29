@@ -30,6 +30,7 @@ import {
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
+  isNonDeletedElement,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
@@ -72,6 +73,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   StrokeVariability,
@@ -344,6 +346,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       const mode = isPointInElement(p, boundElement, elementsMap)
         ? "inside"
         : "orbit";
+
+      if (!isNonDeletedElement(element)) {
+        console.error("[NONDELETED][INVARIANT] Restoring a deleted element");
+      }
+
       const safeElement = {
         ...element,
         startBinding: element.startBinding?.elementId
@@ -373,8 +380,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-        safeElement,
-        boundElement,
+        safeElement as NonDeleted<ExcalidrawArrowElement>,
+        boundElement as NonDeleted<ExcalidrawBindableElement>,
         startOrEnd,
         elementsMap,
         focusPoint,
@@ -1150,10 +1157,9 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
-  const elements = restoreElements(
-    getNonDeletedElements(libraryItem.elements),
-    null,
+const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
+  const elements = getNonDeletedElements(
+    restoreElements(libraryItem.elements, null),
   );
   return elements.length ? { ...libraryItem, elements } : null;
 };

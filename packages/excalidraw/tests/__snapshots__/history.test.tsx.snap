@@ -12767,8 +12767,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 4,
   "width": 50,
-  "x": 130,
-  "y": -30,
+  "x": 40,
+  "y": -20,
 }
 `;
 
@@ -12909,8 +12909,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             "type": "freedraw",
             "version": 4,
             "width": 50,
-            "x": 130,
-            "y": -30,
+            "x": 40,
+            "y": -20,
           },
           "inserted": {
             "isDeleted": true,
