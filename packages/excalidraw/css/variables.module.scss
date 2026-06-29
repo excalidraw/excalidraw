@@ -28,6 +28,11 @@ $color-blue-8: #1971c2;
     @content;
   }
 }
+@mixin isTabletOrMobile() {
+  @media (min-width: 10px) and (max-width: 1400px) {
+    @content;
+  }
+}
 
 @mixin toolbarButtonColorStates {
   &.fillable {
