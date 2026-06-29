@@ -63,7 +63,7 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { hasStrokeColor } from "@excalidraw/element";
+import { hasFillStyle, hasStrokeColor } from "@excalidraw/element";
 
 import {
   updateElbowArrowPoints,
@@ -583,11 +583,7 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
     );
     return {
       elements: changeProperty(elements, appState, (el) =>
-        isStickyNoteElement(el)
-          ? clampStickyNoteProps(newElementWith(el, { fillStyle: value }))
-          : newElementWith(el, {
-              fillStyle: value,
-            }),
+        hasFillStyle(el.type) ? newElementWith(el, { fillStyle: value }) : el,
       ),
       appState: { ...appState, currentItemFillStyle: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -595,9 +591,12 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const selectedElements = getSelectedElements(elements, appState);
+    const selectedFillStyleElements = selectedElements.filter((element) =>
+      hasFillStyle(element.type),
+    );
     const allElementsZigZag =
-      selectedElements.length > 0 &&
-      selectedElements.every((el) => el.fillStyle === "zigzag");
+      selectedFillStyleElements.length > 0 &&
+      selectedFillStyleElements.every((el) => el.fillStyle === "zigzag");
 
     return (
       <fieldset>
@@ -632,7 +631,7 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
               elements,
               app,
               (element) => element.fillStyle,
-              (element) => element.hasOwnProperty("fillStyle"),
+              (element) => hasFillStyle(element.type),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemFillStyle,
             )}
@@ -640,7 +639,9 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
               const nextValue =
                 event.altKey &&
                 value === "hachure" &&
-                selectedElements.every((el) => el.fillStyle === "hachure")
+                selectedFillStyleElements.every(
+                  (el) => el.fillStyle === "hachure",
+                )
                   ? "zigzag"
                   : value;
 

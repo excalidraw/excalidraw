@@ -71,6 +71,18 @@ describe("element locking", () => {
       expect(hachureFillButton).toBe(null);
     });
 
+    it("should not show fill style for sticky note tool", () => {
+      UI.clickTool("stickynote");
+
+      API.setAppState({
+        currentItemBackgroundColor: DEFAULT_ELEMENT_BACKGROUND_PICKS[1],
+        currentItemFillStyle: "hachure",
+      });
+      const hachureFillButton = queryByTestId(document.body, `fill-hachure`);
+
+      expect(hachureFillButton).toBe(null);
+    });
+
     it("should show horizontal text align for text tool", () => {
       UI.clickTool("text");
 
@@ -108,6 +120,19 @@ describe("element locking", () => {
 
       const crossHatchButton = queryByTestId(document.body, `fill-cross-hatch`);
       expect(crossHatchButton).toBe(null);
+    });
+
+    it("should not show fill style for selected sticky note", () => {
+      const stickyNote = API.createElement({
+        type: "stickynote",
+        backgroundColor: DEFAULT_ELEMENT_BACKGROUND_PICKS[1],
+        fillStyle: "hachure",
+      });
+      API.setElements([stickyNote]);
+      API.setSelectedElements([stickyNote]);
+
+      const hachureFillButton = queryByTestId(document.body, `fill-hachure`);
+      expect(hachureFillButton).toBe(null);
     });
 
     it("should highlight common stroke width of selected elements", () => {

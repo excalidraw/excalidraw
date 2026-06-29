@@ -41,6 +41,7 @@ import {
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
+  hasFillStyle,
   hasFreedrawMode,
   hasRoughness,
   hasStrokeStyle,
@@ -136,6 +137,20 @@ export const canChangeBackgroundColor = (
   );
 };
 
+const shouldShowFillIcons = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  return (
+    (hasFillStyle(appState.activeTool.type) &&
+      !isTransparent(appState.currentItemBackgroundColor)) ||
+    targetElements.some(
+      (element) =>
+        hasFillStyle(element.type) && !isTransparent(element.backgroundColor),
+    )
+  );
+};
+
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -163,13 +178,7 @@ export const SelectedShapeActions = ({
   const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
+  const showFillIcons = shouldShowFillIcons(appState, targetElements);
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
@@ -330,13 +339,7 @@ const CombinedShapeProperties = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
 }) => {
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
+  const showFillIcons = shouldShowFillIcons(appState, targetElements);
 
   const shouldShowCombinedProperties =
     targetElements.length > 0 ||

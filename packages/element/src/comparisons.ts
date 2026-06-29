@@ -10,6 +10,9 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "line" ||
   type === "freedraw";
 
+export const hasFillStyle = (type: ElementOrToolType) =>
+  hasBackground(type) && type !== "stickynote";
+
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "stickynote" ||
