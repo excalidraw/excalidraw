@@ -436,6 +436,11 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
+      // anim images are drawn as html <img> in App.renderAnimationElements
+      // when exporting (to png)
+      if (element.is_anim && !renderConfig.isExporting) {
+        return;
+      }
       context.save();
       const cacheEntry =
         element.fileId !== null
