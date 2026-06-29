@@ -262,19 +262,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     window.removeEventListener("offline", this.onOfflineStatusToggle);
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
-    window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    window.removeEventListener(
-      EVENT.VISIBILITY_CHANGE,
-      this.onVisibilityChange,
-    );
-    if (this.activeIntervalId) {
-      window.clearInterval(this.activeIntervalId);
-      this.activeIntervalId = null;
-    }
-    if (this.idleTimeoutId) {
-      window.clearTimeout(this.idleTimeoutId);
-      this.idleTimeoutId = null;
-    }
+    this.removeIdleDetector();
     this.onUmmount?.();
   }
 
@@ -406,6 +394,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
     this.fileManager.reset();
+    // stop idle detection when the collab session ends, otherwise the
+    // `document` pointer/visibility listeners (added in `initializeIdleDetector`)
+    // keep firing after the session is over.
+    this.removeIdleDetector();
     if (!opts?.isUnload) {
       this.setIsCollaborating(false);
       this.setActiveRoomLink(null);
@@ -864,6 +856,22 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   private initializeIdleDetector = () => {
     document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
     document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+  };
+
+  private removeIdleDetector = () => {
+    document.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    document.removeEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      this.onVisibilityChange,
+    );
+    if (this.activeIntervalId) {
+      window.clearInterval(this.activeIntervalId);
+      this.activeIntervalId = null;
+    }
+    if (this.idleTimeoutId) {
+      window.clearTimeout(this.idleTimeoutId);
+      this.idleTimeoutId = null;
+    }
   };
 
   setCollaborators(sockets: SocketId[]) {
