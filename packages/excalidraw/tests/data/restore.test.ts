@@ -881,6 +881,35 @@ describe("restoreAppState", () => {
     );
   });
 
+  it("should coerce a JSON-serialized `collaborators` back to a Map", () => {
+    // `JSON.stringify` turns the `collaborators` Map into `{}`; reimporting
+    // such an appState must not yield a plain object (would crash on
+    // `collaborators.forEach`/`.has`).
+    const serializedAppState = JSON.parse(JSON.stringify(getDefaultAppState()));
+    expect(serializedAppState.collaborators).toEqual({});
+
+    const restoredAppState = restore.restoreAppState(serializedAppState, null);
+    expect(restoredAppState.collaborators).toBeInstanceOf(Map);
+    expect(restoredAppState.collaborators.size).toBe(0);
+  });
+
+  it("should preserve a `collaborators` Map passed through restore", () => {
+    const collaborators = new Map<any, any>([["socket-1", { username: "a" }]]);
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      collaborators,
+    } as any;
+
+    const restoredAppState = restore.restoreAppState(
+      stubImportedAppState,
+      null,
+    );
+    expect(restoredAppState.collaborators).toBeInstanceOf(Map);
+    expect(
+      restoredAppState.collaborators.get("socket-1" as any)?.username,
+    ).toBe("a");
+  });
+
   it("when imported data state has a not allowed Excalidraw Element Types", () => {
     const stubImportedAppState: any = getDefaultAppState();
 
