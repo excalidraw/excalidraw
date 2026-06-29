@@ -38,6 +38,8 @@ export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "arrow" ||
   type === "line";
 
+export const hasFreedrawMode = (type: ElementOrToolType) => type === "freedraw";
+
 export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "iframe" ||

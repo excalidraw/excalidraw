@@ -404,11 +404,47 @@ export const ROUGHNESS = {
   cartoonist: 2,
 } as const;
 
-export const STROKE_WIDTH = {
+export type StrokeWidthKey = "thin" | "medium" | "bold";
+
+export const STROKE_WIDTH_KEYS: readonly StrokeWidthKey[] = [
+  "thin",
+  "medium",
+  "bold",
+];
+
+export const STROKE_WIDTH: Readonly<
+  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+> = {
   thin: 1,
+  medium: 2,
+  bold: 4,
+  extraBold: 8, // unused (may be introduced in the future)
+};
+
+// freedraw schema 2.0 uses thinner stroke, but to maintain backwards and
+// forwards compatibility, instead of changing the shape renderer, we scale
+// the stroke width by 1/2 (previous, thin was 1, medium 2 etc.)
+//
+// note that in the UI, STROKE_WIDTH.thin == FREEDRAW_STROKE_WIDTH.thin still
+export const FREEDRAW_STROKE_WIDTH: Readonly<
+  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+> = {
+  thin: 0.5,
+  medium: 1,
   bold: 2,
-  extraBold: 4,
-} as const;
+  extraBold: 4, // legacy (may be used again in the future)
+};
+
+export const getStrokeWidthByKey = (
+  elementType: ExcalidrawElement["type"],
+  strokeWidthKey: StrokeWidthKey,
+): ExcalidrawElement["strokeWidth"] => {
+  return elementType === "freedraw"
+    ? FREEDRAW_STROKE_WIDTH[strokeWidthKey]
+    : STROKE_WIDTH[strokeWidthKey];
+};
+
+export const DEFAULT_ELEMENT_STROKE_WIDTH_KEY: StrokeWidthKey = "medium";
 
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
@@ -423,7 +459,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "solid",
-  strokeWidth: 2,
+  strokeWidth: STROKE_WIDTH[DEFAULT_ELEMENT_STROKE_WIDTH_KEY],
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
   opacity: 100,
@@ -462,6 +498,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  annotation: "annotation",
 } as const;
 
 export const EDITOR_LS_KEYS = {
@@ -514,3 +551,6 @@ export const BIND_MODE_TIMEOUT = 700; // ms
 export const MOBILE_ACTION_BUTTON_BG = {
   background: "var(--mobile-action-button-bg)",
 } as const;
+
+export const DEFAULT_STROKE_STREAMLINE = 0.5;
+export const DEFAULT_STROKE_STREAMLINE_PRECISE = 0.2;

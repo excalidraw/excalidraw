@@ -27,6 +27,8 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -75,11 +77,9 @@ import {
   updateObject,
   updateActiveTool,
   isTransparent,
-  easeToValuesRAF,
   muteFSAbortError,
   isTestEnv,
   isDevEnv,
-  easeOut,
   updateStable,
   addEventListener,
   normalizeEOL,
@@ -109,6 +109,7 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 
 import {
@@ -200,7 +201,6 @@ import {
   cropElement,
   wrapText,
   isElementLink,
-  parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
@@ -261,6 +261,7 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
+  parseElementLinkFromURL,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -328,7 +329,7 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import { actionToggleHandTool } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -411,6 +412,11 @@ import {
 } from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
+  type ScrollToContentOptions,
+  SCROLL_TO_CONTENT_ANIMATION_KEY,
+  scrollToElements,
+} from "../scroll";
+import {
   setEraserCursor,
   setCursor,
   resetCursor,
@@ -422,16 +428,12 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
-
 import { isMaybeMermaidDefinition } from "../mermaid";
-
 import { LassoTrail } from "../lasso";
-
 import { EraserTrail } from "../eraser";
-
 import { getShortcutKey } from "../shortcut";
-
 import { tryParseSpreadsheet } from "../charts";
+import { AnimationController } from "../renderer/animation";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -1298,6 +1300,7 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "annotation" ||
         this.isIframeLikeElementCenter(
           hitElement,
           moveEvent,
@@ -2129,7 +2132,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.newElement ||
           this.state.selectedElementsAreBeingDragged ||
           this.state.resizingElement ||
-          (this.state.activeTool.type === "laser" &&
+          ((this.state.activeTool.type === "laser" ||
+            this.state.activeTool.type === "annotation") &&
             // technically we can just test on this once we make it more safe
             this.state.cursorButton === "down");
 
@@ -4134,7 +4138,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roundness: null,
       roughness: this.state.currentItemRoughness,
@@ -4305,6 +4309,9 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemStrokeVariability: !prevState.penDetected
+          ? "variable"
+          : prevState.currentItemStrokeVariability,
       };
     });
   };
@@ -4335,148 +4342,60 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private cancelInProgressAnimation: (() => void) | null = null;
-
   scrollToContent = (
-    /**
-     * target to scroll to
-     *
-     * - string - id of element or group, or url containing elementLink
-     * - ExcalidrawElement | ExcalidrawElement[] - element(s) objects
-     */
-    target:
+    target?:
       | string
       | ExcalidrawElement
-      | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: (
-      | {
-          fitToContent?: boolean;
-          fitToViewport?: never;
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-      | {
-          fitToContent?: never;
-          fitToViewport?: boolean;
-          /** when fitToViewport=true, how much screen should the content cover,
-           * between 0.1 (10%) and 1 (100%)
-           */
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-    ) & {
-      minZoom?: number;
-      maxZoom?: number;
-      canvasOffsets?: Offsets;
-    },
+      | readonly NonDeletedExcalidrawElement[],
+    opts?: ScrollToContentOptions,
   ) => {
+    let elements: readonly NonDeleted<ExcalidrawElement>[];
     if (typeof target === "string") {
-      let id: string | null;
-      if (isElementLink(target)) {
-        id = parseElementLinkFromURL(target);
-      } else {
-        id = target;
-      }
-      if (id) {
-        const elements = this.scene.getElementsFromId(id);
+      const id = isElementLink(target)
+        ? parseElementLinkFromURL(target)
+        : target;
+      elements = id ? this.scene.getElementsFromId(id) : [];
+    } else if (Array.isArray(target)) {
+      elements = target;
+    } else if (target) {
+      elements = [target as NonDeleted<ExcalidrawElement>];
+    } else {
+      elements = this.scene.getNonDeletedElements();
+    }
 
-        if (elements?.length) {
-          this.scrollToContent(elements, {
-            fitToContent: opts?.fitToContent ?? true,
-            animate: opts?.animate ?? true,
-          });
-        } else if (isElementLink(target)) {
-          this.setState({
-            toast: {
-              message: t("elementLink.notFound"),
-              duration: 3000,
-              closable: true,
-            },
-          });
-        }
+    if (!elements.length) {
+      if (typeof target === "string" && isElementLink(target)) {
+        this.setState({
+          toast: {
+            message: t("elementLink.notFound"),
+            duration: 3000,
+            closable: true,
+          },
+        });
       }
+
       return;
     }
 
-    this.cancelInProgressAnimation?.();
-
-    // convert provided target into ExcalidrawElement[] if necessary
-    const targetElements = Array.isArray(target) ? target : [target];
-
-    let zoom = this.state.zoom;
-    let scrollX = this.state.scrollX;
-    let scrollY = this.state.scrollY;
-
-    if (opts?.fitToContent || opts?.fitToViewport) {
-      const { appState } = zoomToFit({
-        canvasOffsets: opts.canvasOffsets,
-        targetElements,
-        appState: this.state,
-        fitToViewport: !!opts?.fitToViewport,
-        viewportZoomFactor: opts?.viewportZoomFactor,
-        minZoom: opts?.minZoom,
-        maxZoom: opts?.maxZoom,
-      });
-      zoom = appState.zoom;
-      scrollX = appState.scrollX;
-      scrollY = appState.scrollY;
-    } else {
-      // compute only the viewport location, without any zoom adjustment
-      const scroll = calculateScrollCenter(targetElements, this.state);
-      scrollX = scroll.scrollX;
-      scrollY = scroll.scrollY;
-    }
-
-    // when animating, we use RequestAnimationFrame to prevent the animation
-    // from slowing down other processes
-    if (opts?.animate) {
-      const origScrollX = this.state.scrollX;
-      const origScrollY = this.state.scrollY;
-      const origZoom = this.state.zoom.value;
-
-      const cancel = easeToValuesRAF({
-        fromValues: {
-          scrollX: origScrollX,
-          scrollY: origScrollY,
-          zoom: origZoom,
-        },
-        toValues: { scrollX, scrollY, zoom: zoom.value },
-        interpolateValue: (from, to, progress, key) => {
-          // for zoom, use different easing
-          if (key === "zoom") {
-            return from * Math.pow(to / from, easeOut(progress));
+    // Navigating to an element by id or element-link defaults to zooming the
+    // element into view, animated — matching the historical element-link
+    // behavior — unless the caller opts out.
+    const resolvedOpts =
+      typeof target === "string"
+        ? {
+            ...opts,
+            fitToViewport: undefined,
+            fitToContent: opts?.fitToContent ?? true,
+            animate: opts?.animate ?? true,
           }
-          // handle using default
-          return undefined;
-        },
-        onStep: ({ scrollX, scrollY, zoom }) => {
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoom },
-          });
-        },
-        onStart: () => {
-          this.setState({ shouldCacheIgnoreZoom: true });
-        },
-        onEnd: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        onCancel: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        duration: opts?.duration ?? 500,
-      });
+        : opts;
 
-      this.cancelInProgressAnimation = () => {
-        cancel();
-        this.cancelInProgressAnimation = null;
-      };
-    } else {
-      this.setState({ scrollX, scrollY, zoom });
-    }
+    scrollToElements(
+      this.state,
+      elements,
+      this.setState.bind(this),
+      resolvedOpts,
+    );
   };
 
   private maybeUnfollowRemoteUser = () => {
@@ -4489,7 +4408,8 @@ class App extends React.Component<AppProps, AppState> {
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
   ) => {
-    this.cancelInProgressAnimation?.();
+    AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+    this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
     this.setState(state);
   };
@@ -5092,7 +5012,11 @@ class App extends React.Component<AppProps, AppState> {
             }));
           }
 
-          if (shape === "lasso" && this.state.activeTool.type === "laser") {
+          if (
+            shape === "lasso" &&
+            (this.state.activeTool.type === "laser" ||
+              this.state.activeTool.type === "annotation")
+          ) {
             this.setActiveTool({
               type: this.state.preferredSelectionTool.type,
             });
@@ -5338,7 +5262,8 @@ class App extends React.Component<AppProps, AppState> {
     if (event.key === KEYS.SPACE) {
       if (
         (this.state.viewModeEnabled &&
-          this.state.activeTool.type !== "laser") ||
+          this.state.activeTool.type !== "laser" &&
+          this.state.activeTool.type !== "annotation") ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
@@ -6304,7 +6229,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
@@ -7774,6 +7699,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
+          currentItemStrokeVariability: "variable",
         };
       });
     }
@@ -8055,7 +7981,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
         this.state.activeTool.type,
       );
-    } else if (this.state.activeTool.type === "laser") {
+    } else if (
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "annotation"
+    ) {
       this.laserTrails.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
@@ -8098,7 +8027,11 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+    if (
+      !this.state.viewModeEnabled ||
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "annotation"
+    ) {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -8224,7 +8157,8 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
           (this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"))
+            this.state.activeTool.type !== "laser" &&
+            this.state.activeTool.type !== "annotation"))
       )
     ) {
       return false;
@@ -8304,7 +8238,8 @@ class App extends React.Component<AppProps, AppState> {
         if (!isHoldingSpace) {
           if (
             this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"
+            this.state.activeTool.type !== "laser" &&
+            this.state.activeTool.type !== "annotation"
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
           } else {
@@ -8992,6 +8927,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
+    const strokeVariability = this.state.currentItemStrokeVariability;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -8999,15 +8936,24 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeOptions: {
+        variability: strokeVariability,
+        streamline:
+          event.pointerType !== "mouse"
+            ? DEFAULT_STROKE_STREAMLINE_PRECISE
+            : DEFAULT_STROKE_STREAMLINE,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
+      // pressures are only consumed when rendering a real-pressure stroke, so
+      // skip persisting them while pressure is being simulated
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
@@ -9058,7 +9004,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("iframe"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("iframe"),
@@ -9111,7 +9057,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("embeddable"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("embeddable"),
@@ -9158,7 +9104,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("image"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: null,
@@ -9336,7 +9282,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9363,7 +9309,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9500,6 +9446,13 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
+  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+    return getStrokeWidthByKey(
+      elementType,
+      this.state.currentItemStrokeWidthKey,
+    );
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
@@ -9523,7 +9476,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
@@ -9761,7 +9714,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.state.activeTool.type === "laser") {
+      if (
+        this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "annotation"
+      ) {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
@@ -11537,7 +11493,7 @@ class App extends React.Component<AppProps, AppState> {
         bindOrUnbindBindingElements(linearElements, this.scene, this.state);
       }
 
-      if (activeTool.type === "laser") {
+      if (activeTool.type === "laser" || activeTool.type === "annotation") {
         this.laserTrails.endPath();
         return;
       }
