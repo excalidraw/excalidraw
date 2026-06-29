@@ -1056,7 +1056,10 @@ const ExcalidrawWrapper = () => {
           }}
         />
 
-        <AppSidebar />
+        <AppSidebar
+          excalidrawAPI={excalidrawAPI}
+          isCollaborating={isCollaborating}
+        />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>
