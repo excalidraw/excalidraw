@@ -244,6 +244,18 @@ export const SelectedShapeActions = ({
 
       {renderAction("changeOpacity")}
 
+      {targetElements.some(
+        (el) =>
+          el.type === "rectangle" ||
+          el.type === "diamond" ||
+          el.type === "ellipse",
+      ) && (
+        <>
+          {renderAction("changeBlurStyle")}
+          {renderAction("changeBlurRadius")}
+        </>
+      )}
+
       <fieldset>
         <legend>{t("labels.layers")}</legend>
         <div className="buttonList">
@@ -421,6 +433,17 @@ const CombinedShapeProperties = ({
                 )) &&
                 renderAction("changeRoundness")}
               {renderAction("changeOpacity")}
+              {targetElements.some(
+                (el) =>
+                  el.type === "rectangle" ||
+                  el.type === "diamond" ||
+                  el.type === "ellipse",
+              ) && (
+                <>
+                  {renderAction("changeBlurStyle")}
+                  {renderAction("changeBlurRadius")}
+                </>
+              )}
             </div>
           </PropertiesPopover>
         )}

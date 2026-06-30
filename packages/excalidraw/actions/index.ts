@@ -15,6 +15,8 @@ export {
   actionChangeSloppiness,
   actionChangeFreedrawMode,
   actionChangeOpacity,
+  actionChangeBlurStyle,
+  actionChangeBlurRadius,
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,

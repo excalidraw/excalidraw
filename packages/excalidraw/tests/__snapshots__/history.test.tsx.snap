@@ -20,6 +20,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -122,6 +124,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -152,6 +156,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -182,6 +188,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -237,6 +245,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id4",
@@ -495,6 +505,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -526,6 +538,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -583,6 +597,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -655,6 +671,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -757,6 +775,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -787,6 +807,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -817,6 +839,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -1058,6 +1082,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -1089,6 +1115,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -1146,6 +1174,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -1218,6 +1248,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -1318,6 +1350,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -1378,6 +1412,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id4",
@@ -1413,6 +1449,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id4",
@@ -1466,6 +1504,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -1497,6 +1537,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -1579,6 +1621,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -1679,6 +1723,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -1739,6 +1785,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id5",
@@ -1774,6 +1822,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id5",
@@ -1827,6 +1877,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -1942,6 +1994,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -2042,6 +2096,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -2072,6 +2128,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -2120,6 +2178,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -2151,6 +2211,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -2206,6 +2268,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -2286,6 +2350,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "startBoundElement": {
     "angle": 0,
     "backgroundColor": "transparent",
+    "blurRadius": 0,
+    "blurStyle": "none",
     "boundElements": [
       {
         "id": "id4",
@@ -2339,6 +2405,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id4",
@@ -2374,6 +2442,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id4",
@@ -2409,6 +2479,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -2489,6 +2561,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -2520,6 +2594,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -2577,6 +2653,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -2694,6 +2772,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -2794,6 +2874,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id5",
@@ -2830,6 +2912,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -2869,6 +2953,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -2928,6 +3014,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -2998,6 +3086,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -3098,6 +3188,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id5",
@@ -3134,6 +3226,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -3173,6 +3267,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -3232,6 +3328,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -3318,6 +3416,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -3418,6 +3518,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id5",
@@ -3454,6 +3556,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -3493,6 +3597,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -3613,6 +3719,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -3713,6 +3821,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -3743,6 +3853,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -3779,6 +3891,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id5",
   "customData": undefined,
@@ -3900,6 +4014,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -4000,6 +4116,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -4031,6 +4149,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -4136,6 +4256,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -4236,6 +4358,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -4272,6 +4396,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -4328,6 +4454,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -4394,6 +4522,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -4494,6 +4624,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -4530,6 +4662,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -4587,6 +4721,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": "id0",
             "customData": undefined,
@@ -4666,6 +4802,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -4766,6 +4904,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -4802,6 +4942,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -4896,6 +5038,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -4996,6 +5140,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 90,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -5032,6 +5178,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 90,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -5126,6 +5274,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -5226,6 +5376,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -5257,6 +5409,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -5313,6 +5467,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": [],
             "customData": undefined,
             "fillStyle": "solid",
@@ -5374,6 +5530,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -5474,6 +5632,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -5510,6 +5670,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -5567,6 +5729,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -5631,6 +5795,8 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -5731,6 +5897,8 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -5761,6 +5929,8 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -5810,6 +5980,8 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -5890,6 +6062,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -5989,6 +6163,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6021,6 +6197,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6083,6 +6261,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6116,6 +6296,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6220,6 +6402,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -6319,6 +6503,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6349,6 +6535,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "#ffc9c9",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6379,6 +6567,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "#ffc9c9",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6433,6 +6623,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6488,6 +6680,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6567,6 +6761,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "#ffc9c9",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6648,6 +6844,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -6750,6 +6948,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6780,6 +6980,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6810,6 +7012,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -6864,6 +7068,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6895,6 +7101,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -6926,6 +7134,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -7023,6 +7233,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -7131,6 +7343,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7163,6 +7377,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7195,6 +7411,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7227,6 +7445,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7336,6 +7556,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -7434,6 +7656,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -7511,6 +7735,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -7630,6 +7856,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -7727,6 +7955,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "#ffec99",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7782,6 +8012,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -7861,6 +8093,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -7958,6 +8192,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -7988,6 +8224,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8018,6 +8256,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8098,6 +8338,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8129,6 +8371,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8160,6 +8404,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8214,6 +8460,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -8311,6 +8559,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8341,6 +8591,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8371,6 +8623,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8451,6 +8705,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8482,6 +8738,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8513,6 +8771,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8567,6 +8827,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -8670,6 +8932,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8700,6 +8964,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8730,6 +8996,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -8784,6 +9052,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8838,6 +9108,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -8974,6 +9246,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -9071,6 +9345,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9130,6 +9406,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9178,6 +9456,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -9262,6 +9542,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -9361,6 +9643,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9391,6 +9675,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9445,6 +9731,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -9527,6 +9815,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -9626,6 +9916,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9656,6 +9948,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 {
   "angle": 0,
   "backgroundColor": "#ffc9c9",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9738,6 +10032,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -9793,6 +10089,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -9892,6 +10190,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 {
   "angle": 0,
   "backgroundColor": "#ffc9c9",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -9946,6 +10246,8 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -10026,6 +10328,8 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -10126,6 +10430,8 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -10159,6 +10465,8 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -10192,6 +10500,8 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -10224,6 +10534,8 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -10324,6 +10636,8 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -10424,6 +10738,8 @@ exports[`history > multiplayer undo/redo > should override remotely added points
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -10512,6 +10828,8 @@ exports[`history > multiplayer undo/redo > should override remotely added points
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -10643,6 +10961,8 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -10740,6 +11060,8 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
 {
   "angle": 0,
   "backgroundColor": "#ffec99",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -10794,6 +11116,8 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
           "deleted": {
             "angle": 0,
             "backgroundColor": "#ffec99",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -10880,6 +11204,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -10980,6 +11306,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -11010,6 +11338,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -11040,6 +11370,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": true,
@@ -11125,6 +11457,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": true,
@@ -11238,6 +11572,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -11269,6 +11605,8 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -11806,6 +12144,8 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -11905,6 +12245,8 @@ exports[`history > multiplayer undo/redo > should update history entries after r
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12012,6 +12354,8 @@ exports[`history > multiplayer undo/redo > should update history entries after r
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -12067,6 +12411,8 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -12164,6 +12510,8 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -12194,6 +12542,8 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12249,6 +12599,8 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -12303,6 +12655,8 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -12402,6 +12756,8 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12432,6 +12788,8 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12486,6 +12844,8 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -12541,6 +12901,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -12638,6 +13000,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12668,6 +13032,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12722,6 +13088,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -12800,6 +13168,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -12866,6 +13236,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -12945,6 +13317,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -13047,6 +13421,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -13101,6 +13477,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -13156,6 +13534,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -13255,6 +13635,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -13309,6 +13691,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -13364,6 +13748,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -13467,6 +13853,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "crop": null,
   "customData": undefined,
@@ -13504,6 +13892,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "crop": null,
   "customData": undefined,
@@ -13566,6 +13956,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "crop": null,
             "customData": undefined,
@@ -13604,6 +13996,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "crop": null,
             "customData": undefined,
@@ -13666,6 +14060,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -13766,6 +14162,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "crop": null,
   "customData": undefined,
@@ -13803,6 +14201,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "crop": null,
   "customData": undefined,
@@ -13865,6 +14265,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "crop": null,
             "customData": undefined,
@@ -13903,6 +14305,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "crop": null,
             "customData": undefined,
@@ -13965,6 +14369,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -14065,6 +14471,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -14095,6 +14503,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "fillStyle": "solid",
   "frameId": null,
@@ -14157,6 +14567,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": [],
             "fillStyle": "solid",
             "frameId": null,
@@ -14211,6 +14623,8 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -14310,6 +14724,8 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -14340,6 +14756,8 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -14394,6 +14812,8 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -14449,6 +14869,8 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -14548,6 +14970,8 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -14578,6 +15002,8 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -14632,6 +15058,8 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -14687,6 +15115,8 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -14786,6 +15216,8 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -14881,6 +15313,8 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
           "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -14935,6 +15369,8 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -15034,6 +15470,8 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15064,6 +15502,8 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15118,6 +15558,8 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15212,6 +15654,8 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15267,6 +15711,8 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -15367,6 +15813,8 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15438,6 +15886,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -15540,6 +15990,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15572,6 +16024,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15633,6 +16087,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15666,6 +16122,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15723,6 +16181,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -15823,6 +16283,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15853,6 +16315,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -15901,6 +16365,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15932,6 +16398,8 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -15987,6 +16455,8 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -16087,6 +16557,8 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
@@ -16141,6 +16613,8 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -16242,6 +16716,8 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -16369,6 +16845,8 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -16424,6 +16902,8 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -16587,6 +17067,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -16689,6 +17171,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -16729,6 +17213,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -16767,6 +17253,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -16802,6 +17290,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -16992,6 +17482,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -17024,6 +17516,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -17063,6 +17557,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -17220,6 +17716,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -17337,6 +17835,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -17439,6 +17939,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -17479,6 +17981,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -17517,6 +18021,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -17552,6 +18058,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -17632,6 +18140,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -17664,6 +18174,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -17703,6 +18215,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -17860,6 +18374,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -17985,6 +18501,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -18087,6 +18605,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id1",
@@ -18127,6 +18647,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -18165,6 +18687,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -18200,6 +18724,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -18280,6 +18806,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -18312,6 +18840,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -18351,6 +18881,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -18508,6 +19040,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -18633,6 +19167,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -18733,6 +19269,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -18773,6 +19311,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -18811,6 +19351,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -18846,6 +19388,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -19012,6 +19556,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -19044,6 +19590,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -19083,6 +19631,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -19240,6 +19790,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -19384,6 +19936,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -19487,6 +20041,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -19527,6 +20083,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id0",
   "customData": undefined,
@@ -19565,6 +20123,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id13",
@@ -19600,6 +20160,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -19762,6 +20324,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -19794,6 +20358,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "angle": 0,
             "autoResize": true,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "containerId": null,
             "customData": undefined,
@@ -19833,6 +20399,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -19990,6 +20558,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,
@@ -20154,6 +20724,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -20256,6 +20828,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20286,6 +20860,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20316,6 +20892,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20370,6 +20948,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -20424,6 +21004,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -20478,6 +21060,8 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -20635,6 +21219,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -20739,6 +21325,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20771,6 +21359,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20803,6 +21393,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20835,6 +21427,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20867,6 +21461,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20899,6 +21495,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -20960,6 +21558,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -20993,6 +21593,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21057,6 +21659,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21090,6 +21694,8 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21147,6 +21753,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -21246,6 +21854,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -21276,6 +21886,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -21306,6 +21918,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -21360,6 +21974,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21414,6 +22030,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21468,6 +22086,8 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "fillStyle": "solid",
@@ -21607,6 +22227,8 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
@@ -21709,6 +22331,8 @@ exports[`history > singleplayer undo/redo > should support linear element creati
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -21789,6 +22413,8 @@ exports[`history > singleplayer undo/redo > should support linear element creati
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
+            "blurRadius": 0,
+            "blurStyle": "none",
             "boundElements": null,
             "customData": undefined,
             "elbowed": false,

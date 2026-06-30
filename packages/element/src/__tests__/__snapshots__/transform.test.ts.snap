@@ -4,6 +4,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "#d8f5a2",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id47",
@@ -45,6 +47,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id48",
@@ -82,6 +86,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -143,6 +149,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -204,6 +212,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id47",
@@ -242,6 +252,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id50",
@@ -288,6 +300,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id50",
@@ -333,6 +347,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id51",
@@ -400,6 +416,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id50",
   "customData": undefined,
@@ -440,6 +458,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id40",
@@ -507,6 +527,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id39",
   "customData": undefined,
@@ -547,6 +569,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id39",
@@ -584,6 +608,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id39",
@@ -621,6 +647,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id44",
@@ -688,6 +716,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id43",
   "customData": undefined,
@@ -729,6 +759,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id43",
@@ -775,6 +807,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id43",
@@ -820,6 +854,8 @@ exports[`Test Transform > should not allow duplicate ids 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -852,6 +888,8 @@ exports[`Test Transform > should transform linear elements 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -899,6 +937,8 @@ exports[`Test Transform > should transform linear elements 2`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -946,6 +986,8 @@ exports[`Test Transform > should transform linear elements 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "endArrowhead": null,
@@ -993,6 +1035,8 @@ exports[`Test Transform > should transform linear elements 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "endArrowhead": null,
@@ -1040,6 +1084,8 @@ exports[`Test Transform > should transform regular shapes 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -1072,6 +1118,8 @@ exports[`Test Transform > should transform regular shapes 2`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -1104,6 +1152,8 @@ exports[`Test Transform > should transform regular shapes 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -1136,6 +1186,8 @@ exports[`Test Transform > should transform regular shapes 4`] = `
 {
   "angle": 0,
   "backgroundColor": "#c0eb75",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -1168,6 +1220,8 @@ exports[`Test Transform > should transform regular shapes 5`] = `
 {
   "angle": 0,
   "backgroundColor": "#ffc9c9",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -1200,6 +1254,8 @@ exports[`Test Transform > should transform regular shapes 6`] = `
 {
   "angle": 0,
   "backgroundColor": "#a5d8ff",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "cross-hatch",
@@ -1233,6 +1289,8 @@ exports[`Test Transform > should transform text element 1`] = `
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -1274,6 +1332,8 @@ exports[`Test Transform > should transform text element 2`] = `
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
@@ -1314,6 +1374,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id56",
@@ -1357,6 +1419,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id57",
@@ -1396,6 +1460,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id58",
@@ -1439,6 +1505,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id59",
@@ -1486,6 +1554,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id60",
@@ -1554,6 +1624,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id61",
@@ -1619,6 +1691,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "B",
   "customData": undefined,
@@ -1662,6 +1736,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "A",
   "customData": undefined,
@@ -1705,6 +1781,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "Alice",
   "customData": undefined,
@@ -1748,6 +1826,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "Bob",
   "customData": undefined,
@@ -1791,6 +1871,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "Bob_Alice",
   "customData": undefined,
@@ -1832,6 +1914,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "Bob_B",
   "customData": undefined,
@@ -1872,6 +1956,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id29",
@@ -1924,6 +2010,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id30",
@@ -1976,6 +2064,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id31",
@@ -2028,6 +2118,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id32",
@@ -2081,6 +2173,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id25",
   "customData": undefined,
@@ -2122,6 +2216,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id26",
   "customData": undefined,
@@ -2163,6 +2259,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id27",
   "customData": undefined,
@@ -2205,6 +2303,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id28",
   "customData": undefined,
@@ -2246,6 +2346,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id19",
@@ -2283,6 +2385,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id20",
@@ -2320,6 +2424,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id21",
@@ -2357,6 +2463,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "#fff3bf",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id22",
@@ -2394,6 +2502,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id23",
@@ -2431,6 +2541,8 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "#ffec99",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id24",
@@ -2469,6 +2581,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id13",
   "customData": undefined,
@@ -2510,6 +2624,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id14",
   "customData": undefined,
@@ -2552,6 +2668,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id15",
   "customData": undefined,
@@ -2596,6 +2714,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id16",
   "customData": undefined,
@@ -2638,6 +2758,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id17",
   "customData": undefined,
@@ -2681,6 +2803,8 @@ exports[`Test Transform > should transform to text containers when label provide
   "angle": 0,
   "autoResize": true,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "containerId": "id18",
   "customData": undefined,
