@@ -7591,7 +7591,18 @@ class App extends React.Component<AppProps, AppState> {
     const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
     // this makes other elements non-interactive until pointer up
-    if (target.setPointerCapture) {
+    //
+    // Don't capture for right-clicks (SECONDARY button).
+    // Root cause of https://github.com/excalidraw/excalidraw/issues/11401:
+    // For SECONDARY button we always return early below (not a drag-initiating
+    // event), so the capture serves no purpose. On macOS with "Tap to Click"
+    // enabled, a two-finger touchpad tap that opens the context menu fires
+    // `pointerdown` (button=SECONDARY) + `contextmenu` but NOT `pointerup`
+    // (the OS intercepts it for the native menu). This left the canvas holding
+    // pointer-capture indefinitely, routing all subsequent pointer events
+    // (hover / click) away from the Excalidraw context menu items so they
+    // appeared unresponsive.
+    if (target.setPointerCapture && event.button !== POINTER_BUTTON.SECONDARY) {
       target.setPointerCapture(event.pointerId);
     }
 
