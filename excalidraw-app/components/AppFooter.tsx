@@ -1,6 +1,5 @@
 import { Footer } from "@excalidraw/excalidraw/index";
 import {
-  getCommonBounds,
   getSelectedElements,
   getVisibleSceneBounds,
 } from "@excalidraw/element";
@@ -8,7 +7,7 @@ import React, { useCallback, useState } from "react";
 
 import type {
   ExcalidrawImperativeAPI,
-  ScrollConstraints,
+  Offsets,
 } from "@excalidraw/excalidraw/types";
 
 import { isExcalidrawPlusSignedUser } from "../app_constants";
@@ -16,34 +15,34 @@ import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { DebugFooter, isVisualDebuggerEnabled } from "./DebugCanvas";
 import { EncryptedIcon } from "./EncryptedIcon";
 
-type ScrollConstraintOptions = Pick<
-  ScrollConstraints,
-  "maxZoom" | "minZoom" | "padding" | "tolerance"
+type ScrollToArgs = NonNullable<
+  Parameters<ExcalidrawImperativeAPI["scrollTo"]>[0]
 >;
+type ScrollToBehavior = ScrollToArgs["behavior"];
+type LockOptions = NonNullable<ScrollToArgs["lock"]>;
+
+const OFFSET_SIDES = ["top", "right", "bottom", "left"] as const;
 
 const ScrollConstraintsDebugFooter = ({
   excalidrawAPI,
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI | null;
 }) => {
-  const [activeLock, setActiveLock] = useState<ScrollConstraints | null>(null);
-  const [options, setOptions] = useState<ScrollConstraintOptions>({
+  const [locked, setLocked] = useState(false);
+  const [behavior, setBehavior] = useState<ScrollToBehavior>("zoomToFit");
+  const [lock, setLock] = useState<LockOptions>({
+    scroll: true,
+    zoom: false,
     tolerance: 0,
-    minZoom: undefined,
-    maxZoom: undefined,
-    padding: [0, 0, 0, 0],
+  });
+  const [offset, setOffset] = useState<Offsets>({
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   });
 
-  const setLock = useCallback(
-    (nextLock: ScrollConstraints) => {
-      // pass an empty target so the constraints are applied without scrolling
-      excalidrawAPI?.scrollToContent([], { scrollConstraints: nextLock });
-      setActiveLock(nextLock);
-    },
-    [excalidrawAPI],
-  );
-
-  const getSelectedElementsForScrollLock = useCallback(() => {
+  const getSelectedElementsForLock = useCallback(() => {
     if (!excalidrawAPI) {
       return [];
     }
@@ -58,122 +57,80 @@ const ScrollConstraintsDebugFooter = ({
     );
   }, [excalidrawAPI]);
 
-  const getScrollConstraintsFromBounds = useCallback(
-    ([x1, y1, x2, y2]: readonly [number, number, number, number]) => ({
-      x: x1,
-      y: y1,
-      width: x2 - x1,
-      height: y2 - y1,
-      ...options,
-    }),
-    [options],
+  // (re)lock the current viewport in place (no navigation) with the given lock
+  const lockCurrentView = useCallback(
+    (nextLock: LockOptions, nextOffset: Offsets) => {
+      if (!excalidrawAPI) {
+        return;
+      }
+      excalidrawAPI.scrollTo({
+        target: getVisibleSceneBounds(excalidrawAPI.getAppState()),
+        behavior: "panOnly",
+        animation: false,
+        lock: nextLock,
+        offset: nextOffset,
+      });
+      setLocked(true);
+    },
+    [excalidrawAPI],
   );
 
-  const toggleScrollLock = useCallback(() => {
+  const toggleLock = useCallback(() => {
     if (!excalidrawAPI) {
       return;
     }
-
-    if (activeLock) {
-      excalidrawAPI.scrollToContent([], { scrollConstraints: null });
-      setActiveLock(null);
+    if (locked) {
+      excalidrawAPI.scrollTo(null);
+      setLocked(false);
       return;
     }
-
-    const selectedElements = getSelectedElementsForScrollLock();
-    const [x1, y1, x2, y2] = selectedElements.length
-      ? getCommonBounds(
-          selectedElements,
-          excalidrawAPI.getSceneElementsMapIncludingDeleted(),
-        )
-      : getVisibleSceneBounds(excalidrawAPI.getAppState());
-
-    setLock(getScrollConstraintsFromBounds([x1, y1, x2, y2]));
-  }, [
-    activeLock,
-    excalidrawAPI,
-    getScrollConstraintsFromBounds,
-    getSelectedElementsForScrollLock,
-    setLock,
-  ]);
+    lockCurrentView(lock, offset);
+  }, [excalidrawAPI, locked, lock, offset, lockCurrentView]);
 
   const scrollToSelectionWithLock = useCallback(() => {
-    if (!excalidrawAPI) {
+    const selectedElements = getSelectedElementsForLock();
+    if (!excalidrawAPI || !selectedElements.length) {
       return;
     }
-
-    const selectedElements = getSelectedElementsForScrollLock();
-
-    if (!selectedElements.length) {
-      return;
-    }
-
-    const scrollConstraints = getScrollConstraintsFromBounds(
-      getCommonBounds(
-        selectedElements,
-        excalidrawAPI.getSceneElementsMapIncludingDeleted(),
-      ),
-    );
-
-    excalidrawAPI.scrollToContent(selectedElements, {
-      animate: true,
-      scrollConstraints,
+    excalidrawAPI.scrollTo({
+      target: selectedElements,
+      behavior,
+      animation: true,
+      lock,
+      offset,
     });
-    setActiveLock(scrollConstraints);
-  }, [
-    excalidrawAPI,
-    getScrollConstraintsFromBounds,
-    getSelectedElementsForScrollLock,
-  ]);
+    setLocked(true);
+  }, [excalidrawAPI, behavior, lock, offset, getSelectedElementsForLock]);
 
-  const updateOptions = useCallback(
-    (nextOptions: ScrollConstraintOptions) => {
-      setOptions(nextOptions);
-
-      if (activeLock) {
-        setLock({ ...activeLock, ...nextOptions });
+  const updateLock = useCallback(
+    (nextLock: LockOptions) => {
+      setLock(nextLock);
+      if (locked) {
+        lockCurrentView(nextLock, offset);
       }
     },
-    [activeLock, setLock],
+    [locked, offset, lockCurrentView],
   );
 
-  const updateNumberOption = useCallback(
-    (option: "maxZoom" | "minZoom" | "tolerance", value: string) => {
-      updateOptions({
-        ...options,
-        [option]: value === "" ? undefined : Number(value),
-      });
-    },
-    [options, updateOptions],
-  );
-
-  const updatePadding = useCallback(
-    (side: "bottom" | "left" | "right" | "top", value: string) => {
-      const nextPadding = value === "" ? undefined : Number(value);
-      const [top = 0, right = 0, bottom = 0, left = 0] = options.padding ?? [];
-      const padding = {
-        bottom,
-        left,
-        right,
-        top,
-        [side]: nextPadding,
+  const updateOffset = useCallback(
+    (side: typeof OFFSET_SIDES[number], value: string) => {
+      const nextOffset = {
+        ...offset,
+        [side]: value === "" ? 0 : Number(value),
       };
-
-      updateOptions({
-        ...options,
-        padding: [
-          padding.top ?? 0,
-          padding.right ?? 0,
-          padding.bottom ?? 0,
-          padding.left ?? 0,
-        ],
-      });
+      setOffset(nextOffset);
+      if (locked) {
+        lockCurrentView(lock, nextOffset);
+      }
     },
-    [options, updateOptions],
+    [offset, lock, locked, lockCurrentView],
   );
 
-  const [paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0] =
-    options.padding ?? [];
+  const labelStyle = {
+    display: "flex",
+    gap: ".25rem",
+    alignItems: "center",
+  } as const;
 
   return (
     <div
@@ -185,90 +142,69 @@ const ScrollConstraintsDebugFooter = ({
         fontSize: 12,
       }}
     >
-      <button onClick={toggleScrollLock}>
-        {activeLock ? "disable scroll lock" : "lock scroll"}
+      <button onClick={toggleLock}>
+        {locked ? "disable lock" : "lock view"}
       </button>
       <button onClick={scrollToSelectionWithLock}>scroll + lock</button>
-      <label
-        style={{
-          display: "flex",
-          gap: ".25rem",
-          alignItems: "center",
-        }}
-      >
+      <label style={labelStyle}>
+        behavior
+        <select
+          value={behavior}
+          onChange={(event) =>
+            setBehavior(event.target.value as ScrollToBehavior)
+          }
+        >
+          <option value="panOnly">panOnly</option>
+          <option value="zoomToFit">zoomToFit</option>
+          <option value="zoomToTarget">zoomToTarget</option>
+        </select>
+      </label>
+      <label style={labelStyle}>
+        <input
+          type="checkbox"
+          checked={!!lock.scroll}
+          onChange={(event) =>
+            updateLock({ ...lock, scroll: event.target.checked })
+          }
+        />
+        lock scroll
+      </label>
+      <label style={labelStyle}>
+        <input
+          type="checkbox"
+          checked={!!lock.zoom}
+          onChange={(event) =>
+            updateLock({ ...lock, zoom: event.target.checked })
+          }
+        />
+        lock zoom
+      </label>
+      <label style={labelStyle}>
         tolerance
         <input
           type="number"
           min={0}
           step={1}
-          value={options.tolerance ?? ""}
+          value={lock.tolerance ?? 0}
           onChange={(event) =>
-            updateNumberOption("tolerance", event.target.value)
+            updateLock({
+              ...lock,
+              tolerance:
+                event.target.value === "" ? 0 : Number(event.target.value),
+            })
           }
           style={{ width: 56 }}
         />
       </label>
-      <label
-        style={{
-          display: "flex",
-          gap: ".25rem",
-          alignItems: "center",
-        }}
-      >
-        min zoom
-        <input
-          type="number"
-          min={0}
-          step={0.1}
-          value={options.minZoom ?? ""}
-          onChange={(event) =>
-            updateNumberOption("minZoom", event.target.value)
-          }
-          style={{ width: 56 }}
-        />
-      </label>
-      <label
-        style={{
-          display: "flex",
-          gap: ".25rem",
-          alignItems: "center",
-        }}
-      >
-        max zoom
-        <input
-          type="number"
-          min={0}
-          step={0.1}
-          value={options.maxZoom ?? ""}
-          onChange={(event) =>
-            updateNumberOption("maxZoom", event.target.value)
-          }
-          style={{ width: 56 }}
-        />
-      </label>
-      {(
-        [
-          ["top", paddingTop],
-          ["right", paddingRight],
-          ["bottom", paddingBottom],
-          ["left", paddingLeft],
-        ] as const
-      ).map(([side, value]) => (
-        <label
-          key={side}
-          style={{
-            display: "flex",
-            gap: ".25rem",
-            alignItems: "center",
-          }}
-        >
-          {`pad ${side}`}
+      {OFFSET_SIDES.map((side) => (
+        <label key={side} style={labelStyle}>
+          {`off ${side}`}
           <input
             type="number"
             min={0}
             step={1}
-            value={value}
-            onChange={(event) => updatePadding(side, event.target.value)}
+            value={offset[side] ?? 0}
+            onChange={(event) => updateOffset(side, event.target.value)}
             style={{ width: 48 }}
           />
         </label>

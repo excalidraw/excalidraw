@@ -78,7 +78,11 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollToContent(rectElement, { fitToContent: true });
+      h.app.scrollTo({
+        target: rectElement,
+        behavior: "zoomToFit",
+        animation: false,
+      });
     });
 
     // element is 10x taller than the viewport size,
@@ -109,8 +113,10 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollToContent([topLeft, bottomRight], {
-        fitToContent: true,
+      h.app.scrollTo({
+        target: [topLeft, bottomRight],
+        behavior: "zoomToFit",
+        animation: false,
       });
     });
 
@@ -119,7 +125,7 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
 
-  it("should default to fitToContent when scrolling to an element by id", async () => {
+  it("should zoom to fit when scrolling to an element by id", async () => {
     await render(<Excalidraw />);
 
     h.state.width = 10;
@@ -137,9 +143,12 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      // navigating by element id (a string target) should zoom-to-fit by
-      // default, even though no `fitToContent` option was passed
-      h.app.scrollToContent(rectElement.id, { animate: false });
+      // navigating by element id (a string target) with zoomToFit
+      h.app.scrollTo({
+        target: rectElement.id,
+        behavior: "zoomToFit",
+        animation: false,
+      });
     });
 
     // element is 10x taller than the viewport, so fit-to-content should
@@ -165,7 +174,11 @@ describe("fitToContent", () => {
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollToContent(rectElement);
+      h.app.scrollTo({
+        target: rectElement,
+        behavior: "panOnly",
+        animation: false,
+      });
     });
 
     // zoom level should stay the same
@@ -205,9 +218,10 @@ describe("fitToContent animated", () => {
     });
 
     act(() => {
-      h.app.scrollToContent(rectElement, {
-        animate: true,
-        duration: LONG_ANIMATION_DURATION,
+      h.app.scrollTo({
+        target: rectElement,
+        behavior: "panOnly",
+        animation: { duration: LONG_ANIMATION_DURATION },
       });
     });
 
@@ -247,10 +261,10 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollToContent(rectElement, {
-        animate: true,
-        fitToContent: true,
-        duration: LONG_ANIMATION_DURATION,
+      h.app.scrollTo({
+        target: rectElement,
+        behavior: "zoomToFit",
+        animation: { duration: LONG_ANIMATION_DURATION },
       });
     });
 
@@ -283,7 +297,11 @@ describe("fitToContent animated", () => {
 
     act(() => {
       // a short duration so the animation completes within a few frames
-      h.app.scrollToContent(rectElement, { animate: true, duration: 10 });
+      h.app.scrollTo({
+        target: rectElement,
+        behavior: "panOnly",
+        animation: { duration: 10 },
+      });
     });
 
     await waitForAnimationToStop();

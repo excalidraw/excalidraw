@@ -979,7 +979,11 @@ const ExcalidrawWrapper = () => {
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
-            excalidrawAPI?.scrollToContent(element.link, { animate: true });
+            excalidrawAPI?.scrollTo({
+              target: element.link,
+              behavior: "zoomToFit",
+              animation: true,
+            });
           }
         }}
       >

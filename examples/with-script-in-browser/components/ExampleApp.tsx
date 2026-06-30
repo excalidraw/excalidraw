@@ -917,8 +917,9 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToViewport: true,
+              excalidrawAPI.scrollTo({
+                target: elements[0],
+                behavior: "zoomToTarget",
               });
             }}
           >
@@ -932,12 +933,9 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
+              excalidrawAPI.scrollTo({
+                target: elements[0],
+                behavior: "zoomToFit",
               });
             }}
           >
@@ -951,11 +949,10 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
+              excalidrawAPI.scrollTo({
+                target: elements[0],
+                behavior: "panOnly",
               });
-
-              excalidrawAPI.scrollToContent(elements[0]);
             }}
           >
             Scroll to first element, no fitToContent, no fitToViewport

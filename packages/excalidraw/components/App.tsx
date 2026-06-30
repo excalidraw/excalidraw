@@ -110,6 +110,8 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  isBounds,
+  type Bounds,
 } from "@excalidraw/common";
 
 import {
@@ -412,9 +414,10 @@ import {
 } from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
-  type ScrollToContentOptions,
+  type ScrollToOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
-  scrollToElements,
+  scrollToBounds,
+  getTargetViewport,
   constrainScrollState,
   animateToConstraints,
   isViewportOverscrolled,
@@ -501,6 +504,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ScrollConstraints,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -766,7 +770,7 @@ class App extends React.Component<AppProps, AppState> {
       history: {
         clear: this.resetHistory,
       },
-      scrollToContent: this.scrollToContent,
+      scrollTo: this.scrollTo,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -3022,7 +3026,11 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (isElementLink(window.location.href)) {
-      this.scrollToContent(window.location.href, { animate: false });
+      this.scrollTo({
+        target: window.location.href,
+        behavior: "zoomToFit",
+        animation: false,
+      });
     }
   };
 
@@ -4068,9 +4076,11 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
 
     if (opts.fitToContent) {
-      this.scrollToContent(duplicatedElements, {
-        fitToContent: true,
-        canvasOffsets: this.getEditorUIOffsets(),
+      this.scrollTo({
+        target: duplicatedElements,
+        behavior: "zoomToFit",
+        animation: false,
+        offset: this.getEditorUIOffsets(),
       });
     }
   };
@@ -4335,93 +4345,134 @@ class App extends React.Component<AppProps, AppState> {
      */
     value: number,
   ) => {
-    this.setState({
-      ...getStateForZoom(
-        {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(value),
-        },
-        this.state,
-      ),
+    this.setState((state) => {
+      const nextState = {
+        ...state,
+        ...getStateForZoom(
+          {
+            viewportX: state.width / 2 + state.offsetLeft,
+            viewportY: state.height / 2 + state.offsetTop,
+            nextZoom: getNormalizedZoom(value),
+          },
+          state,
+        ),
+      };
+      // re-clamp so a programmatic zoom can't escape an active scroll/zoom lock
+      return { ...nextState, ...constrainScrollState(nextState) };
     });
   };
 
-  scrollToContent = (
-    target?:
-      | string
-      | ExcalidrawElement
-      | readonly NonDeletedExcalidrawElement[],
-    opts?: ScrollToContentOptions,
-  ) => {
-    let elements: readonly NonDeleted<ExcalidrawElement>[];
+  /**
+   * Navigates the viewport to a target and, optionally, locks pan/zoom to it.
+   * The resolved target box drives both the navigation (pan + zoom per
+   * `behavior`) and the lock: the operations chain — the viewport animates onto
+   * the target, then the lock is installed against the settled viewport.
+   *
+   * Passing `null` clears any active lock without navigating.
+   */
+  scrollTo = (opts: ScrollToOptions | null) => {
+    // `null` clears all active locks
+    if (opts === null) {
+      if (this.state.scrollConstraints) {
+        this.setState({ scrollConstraints: null });
+      }
+      return;
+    }
+
+    const { target, behavior, lock, animation, offset } = opts;
+
+    // resolve the target to a scene-coordinate box. When the target was given
+    // as element(s), keep the element list too — `panOnly` uses it to preserve
+    // the closest-element overflow fallback.
+    let bounds: Bounds;
+    let elements: readonly NonDeleted<ExcalidrawElement>[] | undefined;
+
     if (typeof target === "string") {
       const id = isElementLink(target)
         ? parseElementLinkFromURL(target)
         : target;
-      elements = id ? this.scene.getElementsFromId(id) : [];
-    } else if (Array.isArray(target)) {
-      elements = target;
-    } else if (target) {
-      elements = [target as NonDeleted<ExcalidrawElement>];
-    } else {
-      elements = this.scene.getNonDeletedElements();
-    }
+      const resolved = id ? this.scene.getElementsFromId(id) : [];
 
-    const scrollConstraints = opts?.scrollConstraints ?? null;
-    const applyScrollConstraints = () => {
-      if (scrollConstraints || this.state.scrollConstraints) {
-        flushSync(() => {
-          this.setState((prevState) => ({
-            scrollConstraints,
-            ...constrainScrollState({ ...prevState, scrollConstraints }),
-          }));
-        });
-      }
-    };
-
-    if (!elements.length) {
-      // a string element-link that resolves to nothing is a broken link: show
-      // a toast and bail *without* touching the constraints — we never
-      // navigated, so there's nothing to constrain to
-      if (typeof target === "string" && isElementLink(target)) {
-        this.setState({
-          toast: {
-            message: t("elementLink.notFound"),
-            duration: 3000,
-            closable: true,
-          },
-        });
-
+      if (!resolved.length) {
+        // a string element-link that resolves to nothing is a broken link: show
+        // a toast and bail without touching the lock — we never navigated
+        if (isElementLink(target)) {
+          this.setState({
+            toast: {
+              message: t("elementLink.notFound"),
+              duration: 3000,
+              closable: true,
+            },
+          });
+        }
         return;
       }
 
-      // nothing to scroll to (an explicit empty target or an empty scene), but
-      // still apply the requested constraints
-      applyScrollConstraints();
-      return;
+      elements = resolved;
+      bounds = getCommonBounds(resolved);
+    } else if (isBounds(target)) {
+      bounds = target;
+    } else if (Array.isArray(target)) {
+      if (!target.length) {
+        return;
+      }
+      elements = target;
+      bounds = getCommonBounds(target);
+    } else {
+      elements = [target as NonDeleted<ExcalidrawElement>];
+      bounds = getCommonBounds(elements);
     }
 
-    // Navigating to an element by id or element-link defaults to zooming the
-    // element into view, animated — matching the historical element-link
-    // behavior — unless the caller opts out.
-    const resolvedOpts =
-      typeof target === "string"
-        ? {
-            ...opts,
-            fitToViewport: undefined,
-            fitToContent: opts?.fitToContent ?? true,
-            animate: opts?.animate ?? true,
-          }
-        : opts;
-
-    scrollToElements(
+    // capture the zoom we'll land on now, so a zoom lock can floor at it even
+    // after the (async) animation has mutated `this.state`
+    const resolvedZoom = getTargetViewport(
       this.state,
+      bounds,
+      behavior,
+      offset,
       elements,
+    ).zoom.value;
+
+    // chain: once the scroll/zoom has settled, install (or clear) the lock
+    const installLock = () => {
+      if (!lock?.scroll && !lock?.zoom) {
+        // no lock requested: a navigation supersedes any previous lock
+        if (this.state.scrollConstraints) {
+          flushSync(() => {
+            this.setState({ scrollConstraints: null });
+          });
+        }
+        return;
+      }
+
+      const [x1, y1, x2, y2] = bounds;
+      const scrollConstraints: ScrollConstraints = {
+        x: x1,
+        y: y1,
+        width: x2 - x1,
+        height: y2 - y1,
+        lockScroll: !!lock.scroll,
+        lockZoom: !!lock.zoom,
+        zoom: resolvedZoom,
+        tolerance: lock.tolerance ?? 0,
+        offset,
+      };
+
+      flushSync(() => {
+        this.setState((prevState) => ({
+          scrollConstraints,
+          ...constrainScrollState({ ...prevState, scrollConstraints }),
+        }));
+      });
+    };
+
+    scrollToBounds(
+      this.state,
+      bounds,
+      { behavior, animation, offset },
       this.setState.bind(this),
-      resolvedOpts,
-      // chain: enforce the constraints once the scroll/zoom has settled
-      applyScrollConstraints,
+      installLock,
+      elements,
     );
   };
 
@@ -4855,11 +4906,11 @@ class App extends React.Component<AppProps, AppState> {
               this.getEditorUIOffsets(),
             )
           ) {
-            this.scrollToContent(this.flowChartCreator.pendingNodes, {
-              animate: true,
-              duration: 300,
-              fitToContent: true,
-              canvasOffsets: this.getEditorUIOffsets(),
+            this.scrollTo({
+              target: this.flowChartCreator.pendingNodes,
+              behavior: "zoomToFit",
+              animation: { duration: 300 },
+              offset: this.getEditorUIOffsets(),
             });
           }
 
@@ -4912,10 +4963,11 @@ class App extends React.Component<AppProps, AppState> {
                   this.getEditorUIOffsets(),
                 )
               ) {
-                this.scrollToContent(nextNode, {
-                  animate: true,
-                  duration: 300,
-                  canvasOffsets: this.getEditorUIOffsets(),
+                this.scrollTo({
+                  target: nextNode,
+                  behavior: "panOnly",
+                  animation: { duration: 300 },
+                  offset: this.getEditorUIOffsets(),
                 });
               }
             }
@@ -5479,10 +5531,11 @@ class App extends React.Component<AppProps, AppState> {
               this.getEditorUIOffsets(),
             )
           ) {
-            this.scrollToContent(firstNode, {
-              animate: true,
-              duration: 300,
-              canvasOffsets: this.getEditorUIOffsets(),
+            this.scrollTo({
+              target: firstNode,
+              behavior: "panOnly",
+              animation: { duration: 300 },
+              offset: this.getEditorUIOffsets(),
             });
           }
         }

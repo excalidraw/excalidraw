@@ -279,28 +279,26 @@ export type ScrollConstraints = {
   y: number;
   width: number;
   height: number;
+  /** when set, panning is constrained so the viewport stays within the box */
+  lockScroll: boolean;
+  /** when set, the viewport cannot zoom out below `zoom` */
+  lockZoom: boolean;
   /**
-   * Pixel amount to allow to overscroll.
+   * The zoom resolved after the `scrollTo` navigation settled.
    */
-  tolerance?: number;
+  zoom: number;
   /**
-   * Lower zoom bound. When set, it takes precedence over the zoom the box would
-   * otherwise enforce (the fit zoom that keeps the box covering the viewport),
-   * letting the viewport zoom out past the box.
+   * Pixel amount the viewport may overscroll past the box before snapping back
+   * (rubberband). Screen pixels, zoom-independent.
    */
-  minZoom?: number;
+  tolerance: number;
   /**
-   * Upper zoom bound. When set, it takes precedence over the global `MAX_ZOOM`,
-   * capping how far the viewport can zoom in.
+   * Extra scrollable margin around the box (CSS-style), letting the viewport
+   * scroll past each box edge to reveal that much empty space. Values are
+   * viewport pixels and zoom-independent (a fixed on-screen distance). Mirrors
+   * the `offset` passed to `scrollTo`.
    */
-  maxZoom?: number;
-  /**
-   * Extra scrollable margin around the box, as `[top, right, bottom, left]`
-   * (cardinal order), letting the viewport scroll past each box edge to reveal
-   * that much empty space beyond it. Values are screen pixels, so the margin
-   * stays the same on-screen regardless of zoom. Defaults to `[0, 0, 0, 0]`.
-   */
-  padding?: [top: number, right: number, bottom: number, left: number];
+  offset?: Offsets;
 };
 
 export interface AppState {
@@ -410,8 +408,6 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
-  /** when set, pan & zoom are constrained so the viewport stays within this
-   * scene-coordinate box (see `scrollToContent`'s `scrollConstraints` option) */
   scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
@@ -861,7 +857,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
-  scrollToContent: App["scrollToContent"];
+  scrollTo: App["scrollTo"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -1003,7 +999,7 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  scrollTo: InstanceType<typeof App>["scrollTo"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

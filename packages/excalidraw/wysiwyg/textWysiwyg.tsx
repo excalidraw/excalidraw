@@ -635,7 +635,7 @@ export const textWysiwyg = ({
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
       updateWysiwygStyle();
-    } else if (!event.shiftKey && actionResetZoom.keyTest(event, app.state)) {
+    } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();

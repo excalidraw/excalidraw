@@ -222,22 +222,27 @@ export const actionResetZoom = register({
   icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  // resetting to 100% may violate active scroll constraints
-  predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (_elements, appState, _, app) => {
+    // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
+    // the locked minimum zoom (the lock's resting zoom level)
+    const nextZoom = appState.scrollConstraints?.lockZoom
+      ? appState.scrollConstraints.zoom
+      : 1;
+    const nextState = {
+      ...appState,
+      ...getStateForZoom(
+        {
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
+          nextZoom: getNormalizedZoom(nextZoom),
+        },
+        appState,
+      ),
+      userToFollow: null,
+    };
     return {
-      appState: {
-        ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(1),
-          },
-          appState,
-        ),
-        userToFollow: null,
-      },
+      // re-clamp so the reset can't escape an active scroll/zoom lock
+      appState: { ...nextState, ...constrainScrollState(nextState) },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -248,8 +253,6 @@ export const actionResetZoom = register({
         className="reset-zoom-button zoom-button"
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
-        // keep the zoom level visible, but non-resettable while constrained
-        disabled={!!appState.scrollConstraints}
         onClick={() => {
           updateData(null);
         }}
@@ -258,8 +261,7 @@ export const actionResetZoom = register({
       </ToolButton>
     </Tooltip>
   ),
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+  keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
