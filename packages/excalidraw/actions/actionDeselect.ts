@@ -2,6 +2,7 @@ import {
   getElementsInGroup,
   isSomeElementSelected,
   makeNextSelectedElementIds,
+  newElementWith,
   selectGroupsForSelectedElements,
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -79,7 +80,27 @@ export const actionDeselect = register({
   name: "deselect",
   label: "",
   trackEvent: false,
-  perform: (_elements, appState, _, app) => {
+  perform: (elements, appState, _, app) => {
+    if (appState.multiElement) {
+      return {
+        elements: elements.map((el) =>
+          el.id === appState.multiElement!.id
+            ? newElementWith(el, { isDeleted: true })
+            : el,
+        ),
+        appState: {
+          ...appState,
+          activeTool: updateActiveTool(appState, {
+            type: app.state.preferredSelectionTool.type,
+          }),
+          newElement: null,
+          multiElement: null,
+          selectionElement: null,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
     const activeTool = getNextActiveTool(appState, app);
 
     const shouldShowTooltip =
@@ -160,14 +181,15 @@ export const actionDeselect = register({
     }
 
     return (
-      !appState.newElement &&
-      appState.multiElement === null &&
-      !appState.selectedLinearElement?.isEditing &&
-      (appState.activeEmbeddable !== null ||
-        appState.activeTool.type !== app.state.preferredSelectionTool.type ||
-        !!appState.editingGroupId ||
-        !!appState.selectedLinearElement ||
-        isSomeElementSelected(app.scene.getNonDeletedElements(), appState))
+      appState.multiElement !== null ||
+      (!appState.newElement &&
+        appState.multiElement === null &&
+        !appState.selectedLinearElement?.isEditing &&
+        (appState.activeEmbeddable !== null ||
+          appState.activeTool.type !== app.state.preferredSelectionTool.type ||
+          !!appState.editingGroupId ||
+          !!appState.selectedLinearElement ||
+          isSomeElementSelected(app.scene.getNonDeletedElements(), appState)))
     );
   },
 });
