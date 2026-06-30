@@ -328,6 +328,11 @@ import {
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
+import {
+  actionConvertToRectangle,
+  actionConvertToDiamond,
+  actionConvertToEllipse,
+} from "../actions/actionConvertElementType";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
@@ -4754,6 +4759,28 @@ class App extends React.Component<AppProps, AppState> {
           this.flowChartCreator.clear();
           this.triggerRender(true);
           return;
+        }
+
+        // Alt/Option+{2..6}: convert selection to shape (mirrors toolbar numeric keys).
+        // 2=rectangle, 3=diamond, 4=ellipse, 5=sharpArrow, 6=line.
+        // Use event.code since macOS Option+digit emits special chars (™£¢…), not the digit.
+        if (event.altKey && /^Digit[2-6]$/.test(event.code)) {
+          const map = {
+            Digit2: ["generic", "rectangle"],
+            Digit3: ["generic", "diamond"],
+            Digit4: ["generic", "ellipse"],
+            Digit5: ["linear", "sharpArrow"],
+            Digit6: ["linear", "line"],
+          } as const;
+          const [conversionType, nextType] = map[event.code as "Digit2"];
+          const targetType = getConversionTypeFromElements(selectedElements);
+          if (targetType === conversionType) {
+            event.preventDefault();
+            if (convertElementTypes(this, { conversionType, nextType })) {
+              this.store.scheduleCapture();
+            }
+            return;
+          }
         }
 
         const arrowKeyPressed = isArrowKey(event.key);
@@ -12691,6 +12718,10 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
+      CONTEXT_MENU_SEPARATOR,
+      actionConvertToRectangle,
+      actionConvertToDiamond,
+      actionConvertToEllipse,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,
