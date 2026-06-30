@@ -1,4 +1,4 @@
-import { average } from "@excalidraw/math";
+import { average, round } from "@excalidraw/math";
 
 import type { GlobalCoord } from "@excalidraw/math";
 
@@ -300,11 +300,21 @@ export const viewportCoordsToSceneCoords = (
     scrollX: number;
     scrollY: number;
   },
+  decimals: number = 2,
 ) => {
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y } as GlobalCoord;
+  if (decimals === 0) {
+    return toBrandedType<GlobalCoord>({ x, y });
+  }
+
+  const precision = Math.pow(10, decimals);
+
+  return toBrandedType<GlobalCoord>({
+    x: round(x, precision),
+    y: round(y, precision),
+  });
 };
 
 export const sceneCoordsToViewportCoords = (

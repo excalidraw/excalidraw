@@ -25,6 +25,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import { stringifyWithPrecision } from "./data/json";
+
 import { ExcalidrawError } from "./errors";
 import {
   createFile,
@@ -188,7 +190,7 @@ export const serializeAsClipboardJSON = ({
     files: files ? _files : undefined,
   };
 
-  return JSON.stringify(contents);
+  return stringifyWithPrecision(contents);
 };
 
 export const copyToClipboard = async (

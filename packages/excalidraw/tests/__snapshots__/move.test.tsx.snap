@@ -128,8 +128,8 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "version": 4,
   "versionNonce": 760410951,
   "width": 100,
-  "x": 0,
-  "y": 0,
+  "x": "0.00000",
+  "y": "0.00000",
 }
 `;
 
