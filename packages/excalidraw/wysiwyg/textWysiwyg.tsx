@@ -838,6 +838,32 @@ export const textWysiwyg = ({
     });
   };
 
+  // When the user switches tabs/windows, the textarea loses focus and
+  // would normally trigger handleSubmit via the onblur handler, closing the
+  // editor. Instead, we temporarily disable onblur when the window loses
+  // focus and re-focus the textarea when the user returns.
+  const handleWindowBlur = () => {
+    if (isDestroyed) {
+      return;
+    }
+    editable.onblur = null;
+  };
+
+  const handleWindowFocus = () => {
+    if (isDestroyed) {
+      return;
+    }
+    // Use setTimeout to avoid interfering with other focus-related handlers
+    // that may run in the same tick (e.g. pointerdown on canvas).
+    setTimeout(() => {
+      if (isDestroyed) {
+        return;
+      }
+      editable.onblur = handleSubmit;
+      editable.focus();
+    });
+  };
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -853,6 +879,8 @@ export const textWysiwyg = ({
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
+    window.removeEventListener("blur", handleWindowBlur);
+    window.removeEventListener("focus", handleWindowFocus);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1014,6 +1042,8 @@ export const textWysiwyg = ({
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
   });
   window.addEventListener("beforeunload", handleSubmit);
+  window.addEventListener("blur", handleWindowBlur);
+  window.addEventListener("focus", handleWindowFocus);
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
