@@ -2,6 +2,7 @@ import {
   curvePointDistance,
   distanceToLineSegment,
   pointRotateRads,
+  polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
@@ -47,8 +48,9 @@ export const distanceToElement = (
       return distanceToEllipseElement(element, elementsMap, p);
     case "line":
     case "arrow":
-    case "freedraw":
       return distanceToLinearOrFreeDraElement(element, elementsMap, p);
+    case "freedraw":
+      return distanceToFreeDrawElement(element, elementsMap, p);
   }
 };
 
@@ -144,4 +146,31 @@ const distanceToLinearOrFreeDraElement = (
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),
   );
+};
+
+/**
+ * Returns the distance of a point to a freedraw element.
+ *
+ * @param element The freedraw element
+ * @param p The point to consider
+ * @returns 0 if the point is within the inked area, otherwise the euclidean
+ * distance to the stroke outline
+ */
+const distanceToFreeDrawElement = (
+  element: ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+) => {
+  const [lines] = deconstructLinearOrFreeDrawElement(element, elementsMap);
+
+  if (lines.length === 0) {
+    return Infinity;
+  }
+
+  const polygon = lines.map((line) => line[0]);
+  if (polygonIncludesPointNonZero(p, polygon)) {
+    return 0;
+  }
+
+  return Math.min(...lines.map((s) => distanceToLineSegment(p, s)));
 };

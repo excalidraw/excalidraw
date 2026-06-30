@@ -676,69 +676,45 @@ export const generateLinearCollisionShape = (
         });
     }
     case "freedraw": {
-      if (element.points.length < 2) {
+      const outlinePoints = getFreedrawOutlinePoints(element);
+
+      if (outlinePoints.length < 2) {
         return [];
       }
 
-      const simplifiedPoints = simplify(
-        element.points as Mutable<LocalPoint[]>,
-        0.75,
-      );
+      const collisionOutline =
+        element.strokeOptions?.variability === "constant" &&
+        CONSTANT_WIDTH_FREEDRAW.STREAMLINE > 0
+          ? (simplify(
+              outlinePoints as Mutable<LocalPoint[]>,
+              CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
+            ) as [number, number][])
+          : outlinePoints;
 
-      return generator
-        .curve(simplifiedPoints as [number, number][], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      if (collisionOutline.length < 2) {
+        return [];
+      }
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      // Close the outline polygon so its boundary never has a gap at the seam.
+      const [firstX, firstY] = collisionOutline[0];
+      const [lastX, lastY] = collisionOutline[collisionOutline.length - 1];
+      const closedOutline =
+        firstX === lastX && firstY === lastY
+          ? collisionOutline
+          : [...collisionOutline, collisionOutline[0]];
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
-        });
+      return closedOutline.map((point, idx) => {
+        const p = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+          center,
+          element.angle,
+        );
+
+        return {
+          op: idx === 0 ? "move" : "lineTo",
+          data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+        };
+      });
     }
   }
 };
