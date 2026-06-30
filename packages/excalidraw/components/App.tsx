@@ -12502,10 +12502,15 @@ class App extends React.Component<AppProps, AppState> {
       activeEmbeddable: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
+    // grid snapping applies to position (move/resize), but must not be applied
+    // when rotating, otherwise the snapped pointer quantizes the rotation angle
+    // and prevents reaching exact angles such as 90° (#4057)
     let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+      transformHandleType === "rotation" || event[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
     );
 
     const frameElementsOffsetsMap = new Map<
