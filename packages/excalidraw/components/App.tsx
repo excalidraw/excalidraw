@@ -4118,6 +4118,35 @@ class App extends React.Component<AppProps, AppState> {
           isPlainPaste,
         );
       }
+
+      // HTML-in-Canvas progressive enhancement: when the API is available,
+      // `"htmlContent"` nodes carry the raw HTML string. Render it natively
+      // on the canvas surface; fall back gracefully when unsupported.
+      const htmlNodes = mixedContent.filter(
+        (node) => node.type === "htmlContent",
+      );
+      if (htmlNodes.length) {
+        import("../htmlcanvas").then(({ pasteHtmlToCanvas }) => {
+          const interactiveCanvas = this.interactiveCanvas;
+          if (!interactiveCanvas) {
+            return;
+          }
+          const ctx = interactiveCanvas.getContext("2d");
+          if (!ctx) {
+            return;
+          }
+          const { scrollX, scrollY, zoom } = this.state;
+          htmlNodes.forEach((node) => {
+            pasteHtmlToCanvas(ctx, node.value, {
+              x: (sceneX + scrollX) * zoom.value,
+              y: (sceneY + scrollY) * zoom.value,
+              maxWidth: 600,
+              maxHeight: 400,
+              scale: zoom.value * window.devicePixelRatio,
+            });
+          });
+        });
+      }
     }
   }
 
