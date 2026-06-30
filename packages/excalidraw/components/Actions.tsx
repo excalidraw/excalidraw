@@ -250,6 +250,7 @@ export const SelectedShapeActions = ({
           {renderAction("sendToBack")}
           {renderAction("sendBackward")}
           {renderAction("bringForward")}
+          {renderAction("bringToMiddle")} {/* NEW */}
           {renderAction("bringToFront")}
         </div>
       </fieldset>
@@ -709,6 +710,7 @@ const CombinedExtraActions = ({
                   {renderAction("sendToBack")}
                   {renderAction("sendBackward")}
                   {renderAction("bringForward")}
+                  {renderAction("bringToMiddle")} {/* NEW */}
                   {renderAction("bringToFront")}
                 </div>
               </fieldset>
