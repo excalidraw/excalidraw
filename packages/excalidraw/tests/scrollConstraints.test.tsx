@@ -470,6 +470,59 @@ describe("scrollTo lock (integration)", () => {
     expect(h.state.scrollConstraints).toBe(null);
   });
 
+  it("supports rect targets and defaults missing dimensions to the viewport", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.scrollTo({
+        target: { x: 10, y: 20, width: 50 },
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+
+    expect(h.state.scrollConstraints).toMatchObject({
+      x: 10,
+      y: 20,
+      width: 50,
+      height: h.state.height,
+    });
+
+    React.act(() => {
+      h.app.scrollTo({
+        target: { x: 30, y: 40, height: 60 },
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+
+    expect(h.state.scrollConstraints).toMatchObject({
+      x: 30,
+      y: 40,
+      width: h.state.width,
+      height: 60,
+    });
+
+    React.act(() => {
+      h.app.scrollTo({
+        target: { x: 70, y: 80 },
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+
+    expect(h.state.scrollConstraints).toMatchObject({
+      x: 70,
+      y: 80,
+      width: h.state.width,
+      height: h.state.height,
+    });
+  });
+
   it("filters deleted, non-scene, and nullable element targets", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));

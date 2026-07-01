@@ -23,11 +23,37 @@ export type AnimationOptions = {
   duration?: number;
 };
 
+export type ScrollToRect = {
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+};
+
+export const isScrollToRect = (target: unknown): target is ScrollToRect => {
+  if (!target || typeof target !== "object" || Array.isArray(target)) {
+    return false;
+  }
+
+  const rect = target as Partial<ScrollToRect>;
+  return (
+    typeof rect.x === "number" &&
+    typeof rect.y === "number" &&
+    (rect.width == null || typeof rect.width === "number") &&
+    (rect.height == null || typeof rect.height === "number")
+  );
+};
+
 export type ScrollToOptions = {
-  /** what to scroll to: an explicit scene-coordinate box, element(s), or an
-   * element id / element-link URL
+  /** what to scroll to: an explicit scene-coordinate box/rect, element(s), or
+   * an element id / element-link URL
    */
-  target: Bounds | ExcalidrawElement | readonly ExcalidrawElement[] | string;
+  target:
+    | Bounds
+    | ScrollToRect
+    | ExcalidrawElement
+    | readonly ExcalidrawElement[]
+    | string;
 
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit

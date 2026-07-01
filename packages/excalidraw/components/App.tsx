@@ -265,6 +265,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   parseElementLinkFromURL,
+  isExcalidrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -422,6 +423,7 @@ import {
   constrainScrollState,
   animateToConstraints,
   isViewportOverscrolled,
+  isScrollToRect,
 } from "../viewport";
 import {
   setEraserCursor,
@@ -4411,6 +4413,10 @@ class App extends React.Component<AppProps, AppState> {
       bounds = getCommonBounds(resolved);
     } else if (isBounds(target)) {
       bounds = target;
+    } else if (isScrollToRect(target) && !isExcalidrawElement(target)) {
+      const width = target.width ?? this.state.width;
+      const height = target.height ?? this.state.height;
+      bounds = [target.x, target.y, target.x + width, target.y + height];
     } else {
       // widening to null values in case the host app doesn't have
       // noUncheckedIndexedAccess enabled
