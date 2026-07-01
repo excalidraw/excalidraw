@@ -919,7 +919,7 @@ export default function ExampleApp({
               const elements = excalidrawAPI.getSceneElements();
               excalidrawAPI.scrollTo({
                 target: elements[0],
-                behavior: "zoomToTarget",
+                fit: "contain",
               });
             }}
           >
@@ -935,27 +935,11 @@ export default function ExampleApp({
               const elements = excalidrawAPI.getSceneElements();
               excalidrawAPI.scrollTo({
                 target: elements[0],
-                behavior: "zoomToFit",
+                fit: "scale-down",
               });
             }}
           >
             Fit to content, first element
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!excalidrawAPI) {
-                return;
-              }
-
-              const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollTo({
-                target: elements[0],
-                behavior: "panOnly",
-              });
-            }}
-          >
-            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />
