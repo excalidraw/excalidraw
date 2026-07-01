@@ -470,6 +470,80 @@ describe("scrollTo lock (integration)", () => {
     expect(h.state.scrollConstraints).toBe(null);
   });
 
+  it("filters deleted, non-scene, and nullable element targets", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warnMessage =
+      "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out";
+
+    try {
+      const validRect = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 200,
+        width: 300,
+        height: 400,
+      });
+      const deletedRect = API.createElement({
+        type: "rectangle",
+        isDeleted: true,
+      });
+      const missingRect = API.createElement({
+        type: "rectangle",
+      });
+      API.setElements([validRect, deletedRect]);
+
+      React.act(() => {
+        h.app.scrollTo({
+          target: [
+            validRect,
+            deletedRect,
+            missingRect,
+            undefined,
+            null,
+          ] as unknown as readonly typeof validRect[],
+          fit: "scale-down",
+          animation: false,
+          lock: { scroll: true },
+        });
+      });
+
+      expect(warnSpy).toHaveBeenCalledWith(warnMessage);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: validRect.x,
+        y: validRect.y,
+        width: validRect.width,
+        height: validRect.height,
+      });
+
+      const scrollConstraints = h.state.scrollConstraints;
+      warnSpy.mockClear();
+
+      React.act(() => {
+        h.app.scrollTo({
+          target: [
+            deletedRect,
+            missingRect,
+            undefined,
+            null,
+          ] as unknown as readonly typeof validRect[],
+          fit: "scale-down",
+          animation: false,
+          lock: { scroll: true },
+        });
+      });
+
+      expect(warnSpy).toHaveBeenCalledWith(warnMessage);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(h.state.scrollConstraints).toBe(scrollConstraints);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
   it("disables zoom-to-fit actions while locked, but keeps reset-zoom enabled", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));

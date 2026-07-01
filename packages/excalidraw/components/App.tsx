@@ -4411,15 +4411,37 @@ class App extends React.Component<AppProps, AppState> {
       bounds = getCommonBounds(resolved);
     } else if (isBounds(target)) {
       bounds = target;
-    } else if (Array.isArray(target)) {
-      if (!target.length) {
+    } else {
+      // widening to null values in case the host app doesn't have
+      // noUncheckedIndexedAccess enabled
+      const targetElements: (ExcalidrawElement | undefined | null)[] =
+        Array.isArray(target) ? target : [target];
+      const sceneElementsMap = this.scene.getNonDeletedElementsMap();
+      elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
+        (acc, element) => {
+          if (element && !element.isDeleted) {
+            const sceneElement = sceneElementsMap.get(element.id);
+            if (sceneElement) {
+              acc.push(sceneElement);
+            }
+          }
+          return acc;
+        },
+        [],
+      );
+
+      const hasNoElements = !elements.length;
+      if (elements.length !== targetElements.length || hasNoElements) {
+        console.warn(
+          "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out",
+        );
+      }
+
+      if (hasNoElements) {
         return;
       }
-      elements = target;
-      bounds = getCommonBounds(target);
-    } else {
-      elements = [target as NonDeleted<ExcalidrawElement>];
-      bounds = getCommonBounds(elements);
+
+      bounds = getCommonBounds(elements, sceneElementsMap);
     }
 
     // capture the viewport we'll land on now, so the lock can be installed

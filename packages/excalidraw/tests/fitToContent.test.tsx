@@ -74,6 +74,7 @@ describe("scale-down", () => {
       x: 50,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.zoom.value).toBe(1);
 
@@ -106,6 +107,7 @@ describe("scale-down", () => {
       x: 80,
       y: 80,
     });
+    API.setElements([topLeft, bottomRight]);
 
     h.state.width = 10;
     h.state.height = 10;
@@ -168,6 +170,7 @@ describe("scale-down", () => {
       x: 100,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.zoom.value).toBe(1);
     expect(h.state.scrollX).toBe(0);
@@ -215,6 +218,7 @@ describe("scale-down animated", () => {
       x: -100,
       y: -100,
     });
+    API.setElements([rectElement]);
 
     act(() => {
       h.app.scrollTo({
@@ -255,6 +259,7 @@ describe("scale-down animated", () => {
       x: 100,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
@@ -293,6 +298,7 @@ describe("scale-down animated", () => {
       x: -100,
       y: -100,
     });
+    API.setElements([rectElement]);
 
     act(() => {
       // a short duration so the animation completes within a few frames
