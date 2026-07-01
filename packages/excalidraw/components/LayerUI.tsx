@@ -25,7 +25,7 @@ import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 
 import {
   SelectedShapeActions,
@@ -642,7 +642,7 @@ const LayerUI = ({
                     className="scroll-back-to-content"
                     onClick={() => {
                       setAppState((appState) => ({
-                        ...calculateScrollCenter(elements, appState),
+                        ...getScrollToContentState(elements, appState),
                       }));
                     }}
                   >

@@ -3,7 +3,6 @@ import {
   easeOut,
   MAX_ZOOM,
   MIN_ZOOM,
-  sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   ZOOM_STEP,
 } from "@excalidraw/common";
@@ -470,19 +469,11 @@ const animateToViewport = (
   );
 };
 
-const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
-  const [x1, y1, x2, y2] = cords;
-  const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
-    { sceneX: x1, sceneY: y1 },
-    appState,
-  );
-  const { x: viewportX2, y: viewportY2 } = sceneCoordsToViewportCoords(
-    { sceneX: x2, sceneY: y2 },
-    appState,
-  );
+const doBoundsExceedViewport = (appState: AppState, bounds: Bounds) => {
+  const [x1, y1, x2, y2] = bounds;
   return (
-    viewportX2 - viewportX1 > appState.width ||
-    viewportY2 - viewportY1 > appState.height
+    (x2 - x1) * appState.zoom.value > appState.width ||
+    (y2 - y1) * appState.zoom.value > appState.height
   );
 };
 
@@ -542,7 +533,7 @@ export const centerScrollOn = ({
   };
 };
 
-export const calculateScrollCenter = (
+export const getScrollToContentState = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): { scrollX: number; scrollY: number } => {
@@ -556,11 +547,14 @@ export const calculateScrollCenter = (
   }
   let [x1, y1, x2, y2] = getCommonBounds(elements);
 
-  if (isOutsideViewPort(appState, [x1, y1, x2, y2])) {
+  if (doBoundsExceedViewport(appState, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
       viewportCoordsToSceneCoords(
-        { clientX: appState.scrollX, clientY: appState.scrollY },
+        {
+          clientX: appState.offsetLeft + appState.width / 2,
+          clientY: appState.offsetTop + appState.height / 2,
+        },
         appState,
       ),
     );

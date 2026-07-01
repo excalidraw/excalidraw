@@ -369,7 +369,7 @@ import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
-  calculateScrollCenter,
+  getScrollToContentState,
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
@@ -3000,7 +3000,7 @@ class App extends React.Component<AppProps, AppState> {
     if (initialData?.scrollToContent) {
       restoredAppState = {
         ...restoredAppState,
-        ...calculateScrollCenter(restoredElements, {
+        ...getScrollToContentState(restoredElements, {
           ...restoredAppState,
           width: this.state.width,
           height: this.state.height,
