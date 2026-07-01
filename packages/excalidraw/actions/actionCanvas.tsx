@@ -292,6 +292,7 @@ export const zoomToFitBounds = ({
   viewportZoomFactor = 1,
   minZoom = -Infinity,
   maxZoom = Infinity,
+  steppedZoom = true,
 }: {
   bounds: SceneBounds;
   canvasOffsets?: Offsets;
@@ -302,6 +303,7 @@ export const zoomToFitBounds = ({
   viewportZoomFactor?: number;
   minZoom?: number;
   maxZoom?: number;
+  steppedZoom?: boolean;
 }) => {
   viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
 
@@ -341,8 +343,12 @@ export const zoomToFitBounds = ({
     );
   }
 
+  const targetZoomValue = steppedZoom
+    ? roundToStep(adjustedZoomValue, ZOOM_STEP, "floor")
+    : adjustedZoomValue;
+
   const newZoomValue = getNormalizedZoom(
-    clamp(roundToStep(adjustedZoomValue, ZOOM_STEP, "floor"), minZoom, maxZoom),
+    clamp(targetZoomValue, minZoom, maxZoom),
   );
 
   const centerScroll = centerScrollOn({

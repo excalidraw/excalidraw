@@ -95,17 +95,10 @@ export const constrainScrollState = (
 
   tolerance = Math.max(tolerance, 0);
 
-  // zoom floor: the locked zoom, relaxed by `tolerance` so the user can briefly
-  // zoom out past it (rubberband) — letting the viewport grow by up to
-  // `tolerance` screen px per axis. Zooming in is always allowed up to MAX_ZOOM.
-  const zoomRelax = scrollConstraints.lockZoom
-    ? Math.min(
-        width / (width + 2 * tolerance),
-        height / (height + 2 * tolerance),
-      )
-    : 1;
+  // zoom floor: the locked zoom is a hard minimum (no rubberband) — zooming in
+  // is always allowed up to MAX_ZOOM.
   const minZoom = scrollConstraints.lockZoom
-    ? scrollConstraints.zoom * zoomRelax
+    ? scrollConstraints.zoom
     : MIN_ZOOM;
   const zoomValue = getNormalizedZoom(
     clamp(state.zoom.value, minZoom, MAX_ZOOM),
@@ -271,6 +264,7 @@ export const getTargetViewport = (
     appState: state,
     fitToViewport: behavior === "zoomToTarget",
     canvasOffsets: offset,
+    steppedZoom: false,
   });
 
   return {
