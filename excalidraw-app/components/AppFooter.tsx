@@ -20,6 +20,7 @@ type ScrollToArgs = NonNullable<
 >;
 type ScrollToBehavior = ScrollToArgs["behavior"];
 type LockOptions = NonNullable<ScrollToArgs["lock"]>;
+type ScrollToTarget = ScrollToArgs["target"];
 
 const OFFSET_SIDES = ["top", "right", "bottom", "left"] as const;
 
@@ -57,35 +58,62 @@ const ScrollConstraintsDebugFooter = ({
     );
   }, [excalidrawAPI]);
 
-  // (re)lock the current viewport in place (no navigation) with the given lock
-  const lockCurrentView = useCallback(
-    (nextLock: LockOptions, nextOffset: Offsets) => {
+  const getCurrentLockTarget = useCallback((): ScrollToTarget | null => {
+    if (!excalidrawAPI) {
+      return null;
+    }
+
+    const selectedElements = getSelectedElementsForLock();
+    return selectedElements.length
+      ? selectedElements
+      : getVisibleSceneBounds(excalidrawAPI.getAppState());
+  }, [excalidrawAPI, getSelectedElementsForLock]);
+
+  const applyLockToCurrentTarget = useCallback(
+    (
+      nextLock: LockOptions,
+      nextOffset: Offsets,
+      nextBehavior: ScrollToBehavior,
+      animation: ScrollToArgs["animation"] = false,
+    ) => {
       if (!excalidrawAPI) {
         return;
       }
+      const target = getCurrentLockTarget();
+      if (!target) {
+        return;
+      }
       excalidrawAPI.scrollTo({
-        target: getVisibleSceneBounds(excalidrawAPI.getAppState()),
-        behavior: "panOnly",
-        animation: false,
+        target,
+        behavior: nextBehavior,
+        animation,
         lock: nextLock,
         offset: nextOffset,
       });
       setLocked(true);
     },
-    [excalidrawAPI],
+    [excalidrawAPI, getCurrentLockTarget],
+  );
+
+  const updateLocked = useCallback(
+    (nextLocked: boolean) => {
+      if (!excalidrawAPI) {
+        return;
+      }
+
+      if (nextLocked) {
+        applyLockToCurrentTarget(lock, offset, behavior);
+      } else {
+        excalidrawAPI.scrollTo(null);
+        setLocked(false);
+      }
+    },
+    [applyLockToCurrentTarget, behavior, excalidrawAPI, lock, offset],
   );
 
   const toggleLock = useCallback(() => {
-    if (!excalidrawAPI) {
-      return;
-    }
-    if (locked) {
-      excalidrawAPI.scrollTo(null);
-      setLocked(false);
-      return;
-    }
-    lockCurrentView(lock, offset);
-  }, [excalidrawAPI, locked, lock, offset, lockCurrentView]);
+    updateLocked(!locked);
+  }, [locked, updateLocked]);
 
   const scrollToSelectionWithLock = useCallback(() => {
     const selectedElements = getSelectedElementsForLock();
@@ -106,10 +134,20 @@ const ScrollConstraintsDebugFooter = ({
     (nextLock: LockOptions) => {
       setLock(nextLock);
       if (locked) {
-        lockCurrentView(nextLock, offset);
+        applyLockToCurrentTarget(nextLock, offset, behavior);
       }
     },
-    [locked, offset, lockCurrentView],
+    [applyLockToCurrentTarget, behavior, locked, offset],
+  );
+
+  const updateBehavior = useCallback(
+    (nextBehavior: ScrollToBehavior) => {
+      setBehavior(nextBehavior);
+      if (locked) {
+        applyLockToCurrentTarget(lock, offset, nextBehavior);
+      }
+    },
+    [applyLockToCurrentTarget, lock, locked, offset],
   );
 
   const updateOffset = useCallback(
@@ -120,10 +158,10 @@ const ScrollConstraintsDebugFooter = ({
       };
       setOffset(nextOffset);
       if (locked) {
-        lockCurrentView(lock, nextOffset);
+        applyLockToCurrentTarget(lock, nextOffset, behavior);
       }
     },
-    [offset, lock, locked, lockCurrentView],
+    [applyLockToCurrentTarget, behavior, offset, lock, locked],
   );
 
   const labelStyle = {
@@ -151,7 +189,7 @@ const ScrollConstraintsDebugFooter = ({
         <select
           value={behavior}
           onChange={(event) =>
-            setBehavior(event.target.value as ScrollToBehavior)
+            updateBehavior(event.target.value as ScrollToBehavior)
           }
         >
           <option value="panOnly">panOnly</option>
