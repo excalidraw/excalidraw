@@ -18,8 +18,6 @@ import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
-
 import {
   getDefaultAppState,
   isEraserActive,
@@ -372,38 +370,6 @@ export const zoomToFitBounds = ({
   };
 };
 
-export const zoomToFit = ({
-  canvasOffsets,
-  targetElements,
-  appState,
-  fitToViewport,
-  viewportZoomFactor,
-  minZoom,
-  maxZoom,
-}: {
-  canvasOffsets?: Offsets;
-  targetElements: readonly ExcalidrawElement[];
-  appState: Readonly<AppState>;
-  /** whether to fit content to viewport (beyond >100%) */
-  fitToViewport: boolean;
-  /** zoom content to cover X of the viewport, when fitToViewport=true */
-  viewportZoomFactor?: number;
-  minZoom?: number;
-  maxZoom?: number;
-}) => {
-  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
-
-  return zoomToFitBounds({
-    canvasOffsets,
-    bounds: commonBounds,
-    appState,
-    fitToViewport,
-    viewportZoomFactor,
-    minZoom,
-    maxZoom,
-  });
-};
-
 // Note, this action differs from actionZoomToFitSelection in that it doesn't
 // zoom beyond 100%. In other words, if the content is smaller than viewport
 // size, it won't be zoomed in.
@@ -415,8 +381,12 @@ export const actionZoomToFitSelectionInViewport = register({
   predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    return zoomToFit({
-      targetElements: selectedElements.length ? selectedElements : elements,
+    return zoomToFitBounds({
+      bounds: getCommonBounds(
+        getNonDeletedElements(
+          selectedElements.length ? selectedElements : elements,
+        ),
+      ),
       appState: {
         ...appState,
         userToFollow: null,
@@ -443,8 +413,12 @@ export const actionZoomToFitSelection = register({
   predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    return zoomToFit({
-      targetElements: selectedElements.length ? selectedElements : elements,
+    return zoomToFitBounds({
+      bounds: getCommonBounds(
+        getNonDeletedElements(
+          selectedElements.length ? selectedElements : elements,
+        ),
+      ),
       appState: {
         ...appState,
         userToFollow: null,
@@ -470,8 +444,8 @@ export const actionZoomToFit = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) =>
-    zoomToFit({
-      targetElements: elements,
+    zoomToFitBounds({
+      bounds: getCommonBounds(getNonDeletedElements(elements)),
       appState: {
         ...appState,
         userToFollow: null,
