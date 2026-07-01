@@ -1,8 +1,11 @@
 import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
 import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useMemo } from "react";
 
-import type { FileId, OrderedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  FileId,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
 import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "./app_constants";
@@ -12,7 +15,7 @@ const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 const EXCALIDRAW_PLUS_ORIGIN = import.meta.env.VITE_APP_PLUS_APP;
 
 // Tipagens (mantidas do original)
-type MESSAGE_REQUEST_SCENE = { type: "REQUEST_SCENE"; jwt: string; };
+type MESSAGE_REQUEST_SCENE = { type: "REQUEST_SCENE"; jwt: string };
 type MESSAGE_FROM_PLUS = MESSAGE_REQUEST_SCENE;
 type MESSAGE_READY = { type: "READY" };
 type MESSAGE_ERROR = { type: "ERROR"; message: string };
@@ -24,7 +27,6 @@ type MESSAGE_SCENE_DATA = {
 };
 type MESSAGE_FROM_EDITOR = MESSAGE_ERROR | MESSAGE_SCENE_DATA | MESSAGE_READY;
 
-
 // ============================================================================
 // 1. Aplicação do SRP (Princípio da Responsabilidade Única)
 // Serviço dedicado exclusivamente a lidar com JWT e Criptografia
@@ -32,18 +34,26 @@ type MESSAGE_FROM_EDITOR = MESSAGE_ERROR | MESSAGE_SCENE_DATA | MESSAGE_READY;
 class JwtValidatorService {
   static async verify(token: string, publicKey: string): Promise<void> {
     try {
-      if (!publicKey) throw new ExcalidrawError("Public key is undefined");
+      if (!publicKey) {
+        throw new ExcalidrawError("Public key is undefined");
+      }
 
       const [header, payload, signature] = token.split(".");
-      if (!header || !payload || !signature) throw new ExcalidrawError("Invalid JWT format");
+      if (!header || !payload || !signature) {
+        throw new ExcalidrawError("Invalid JWT format");
+      }
 
       const decodedPayload = base64urlToString(payload);
       const decodedSignature = base64urlToString(signature);
       const data = `${header}.${payload}`;
 
-      const signatureArrayBuffer = Uint8Array.from(decodedSignature, (c) => c.charCodeAt(0));
+      const signatureArrayBuffer = Uint8Array.from(decodedSignature, (c) =>
+        c.charCodeAt(0),
+      );
       const keyData = publicKey.replace(/-----\w+ PUBLIC KEY-----/g, "");
-      const keyArrayBuffer = Uint8Array.from(atob(keyData), (c) => c.charCodeAt(0));
+      const keyArrayBuffer = Uint8Array.from(atob(keyData), (c) =>
+        c.charCodeAt(0),
+      );
 
       const key = await crypto.subtle.importKey(
         "spki",
@@ -60,7 +70,9 @@ class JwtValidatorService {
         new TextEncoder().encode(data),
       );
 
-      if (!isValid) throw new Error("Invalid JWT");
+      if (!isValid) {
+        throw new Error("Invalid JWT");
+      }
 
       const parsedPayload = JSON.parse(decodedPayload);
       const currentTime = Math.floor(Date.now() / 1000);
@@ -107,7 +119,7 @@ class SceneExportFacade {
     // 1. Valida o Token
     await JwtValidatorService.verify(
       jwtToken,
-      import.meta.env.VITE_APP_PLUS_EXPORT_PUBLIC_KEY
+      import.meta.env.VITE_APP_PLUS_EXPORT_PUBLIC_KEY,
     );
 
     // 2. Pega os dados através do adaptador (sem saber que é LocalStorage)
@@ -118,15 +130,22 @@ class SceneExportFacade {
       throw new ExcalidrawError("Elements or appstate is missing.");
     }
 
-    const elements = JSON.parse(rawElementsString) as OrderedExcalidrawElement[];
+    const elements = JSON.parse(
+      rawElementsString,
+    ) as OrderedExcalidrawElement[];
     if (!elements.length) {
       throw new ExcalidrawError("Scene is empty, nothing to export.");
     }
 
-    const appState = JSON.parse(rawAppStateString) as Pick<AppState, "viewBackgroundColor">;
+    const appState = JSON.parse(rawAppStateString) as Pick<
+      AppState,
+      "viewBackgroundColor"
+    >;
 
     const fileIds = elements.reduce((acc, el) => {
-      if ("fileId" in el && el.fileId) acc.push(el.fileId);
+      if ("fileId" in el && el.fileId) {
+        acc.push(el.fileId);
+      }
       return acc;
     }, [] as FileId[]);
 
@@ -143,9 +162,11 @@ class SceneExportFacade {
 export const ExcalidrawPlusIframeExport = () => {
   const readyRef = useRef(false);
 
-  // Instanciando a Fachada injetando a dependência do LocalStorage
-  const storageAdapter = new LocalStorageSceneAdapter();
-  const exportFacade = new SceneExportFacade(storageAdapter);
+  // Instanciando a Fachada usando useMemo para manter a referência estável entre as renderizações
+  const exportFacade = useMemo(() => {
+    const adapter = new LocalStorageSceneAdapter();
+    return new SceneExportFacade(adapter);
+  }, []);
 
   useLayoutEffect(() => {
     const handleMessage = async (event: MessageEvent<MESSAGE_FROM_PLUS>) => {
@@ -160,7 +181,9 @@ export const ExcalidrawPlusIframeExport = () => {
 
         try {
           // Todo o trabalho sujo de validar JWT, buscar e parsear dados acontece aqui, em 1 linha
-          const parsedSceneData = await exportFacade.exportSceneData(event.data.jwt);
+          const parsedSceneData = await exportFacade.exportSceneData(
+            event.data.jwt,
+          );
 
           event.source!.postMessage(parsedSceneData, {
             targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
@@ -169,9 +192,10 @@ export const ExcalidrawPlusIframeExport = () => {
           console.error(error);
           const responseData: MESSAGE_ERROR = {
             type: "ERROR",
-            message: error instanceof ExcalidrawError || error instanceof Error
-              ? error.message
-              : "Failed to export scene data",
+            message:
+              error instanceof ExcalidrawError || error instanceof Error
+                ? error.message
+                : "Failed to export scene data",
           };
           event.source!.postMessage(responseData, {
             targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
@@ -189,7 +213,7 @@ export const ExcalidrawPlusIframeExport = () => {
     }
 
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [exportFacade]);
 
   return null;
 };
