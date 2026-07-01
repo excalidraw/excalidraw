@@ -25,7 +25,7 @@ export type ScrollToOptions = {
   target: Bounds | ExcalidrawElement | readonly ExcalidrawElement[] | string;
 
   // @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit
-  fit:
+  fit?:
     | "scale-down" // zoom out so the target fits the viewport, never zooming past 100%
     | "contain"; // zoom the target so it fills the viewport (may exceed 100%)
 
@@ -189,7 +189,7 @@ export const animateToConstraints = (
 };
 
 /**
- * Scrolls (and, per `behavior`, zooms) the viewport so the given target box is
+ * Scrolls (and, per `fit`, zooms) the viewport so the given target box is
  * in view, optionally animating the transition. `onComplete` runs once the
  * viewport has settled on the target. `elements` (when the target was resolved
  * from elements) is used only by `panOnly` to preserve the closest-element
@@ -231,18 +231,18 @@ export const scrollToBounds = (
 };
 
 /** Computes the viewport (scroll + zoom) that brings the target box into view,
- * based on the requested behavior. */
+ * based on the requested fit behavior. */
 export const getTargetViewport = (
   state: AppState,
   bounds: Bounds,
-  behavior: ScrollToOptions["fit"],
+  fit: ScrollToOptions["fit"] = "scale-down",
   offset?: Offsets,
   elements?: readonly ExcalidrawElement[],
 ): Viewport => {
   const { appState } = zoomToFitBounds({
     bounds,
     appState: state,
-    fitToViewport: behavior === "contain",
+    fitToViewport: fit === "contain",
     canvasOffsets: offset,
     steppedZoom: false,
   });

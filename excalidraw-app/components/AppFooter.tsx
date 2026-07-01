@@ -18,7 +18,7 @@ import { EncryptedIcon } from "./EncryptedIcon";
 type ScrollToArgs = NonNullable<
   Parameters<ExcalidrawImperativeAPI["scrollTo"]>[0]
 >;
-type ScrollToFit = ScrollToArgs["fit"];
+type ScrollToFit = NonNullable<ScrollToArgs["fit"]>;
 type LockOptions = NonNullable<ScrollToArgs["lock"]>;
 type ScrollToTarget = ScrollToArgs["target"];
 
