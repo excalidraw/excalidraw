@@ -4972,7 +4972,7 @@ class App extends React.Component<AppProps, AppState> {
               ) {
                 this.scrollTo({
                   target: nextNode,
-                  fit: "contain",
+                  fit: "scale-down",
                   animation: { duration: 300 },
                   offset: this.getEditorUIOffsets(),
                 });
@@ -5540,7 +5540,7 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             this.scrollTo({
               target: firstNode,
-              fit: "contain",
+              fit: "scale-down",
               animation: { duration: 300 },
               offset: this.getEditorUIOffsets(),
             });
