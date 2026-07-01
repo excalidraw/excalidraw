@@ -1,12 +1,17 @@
-import { easeOut, MAX_ZOOM, MIN_ZOOM } from "@excalidraw/common";
-import { clamp } from "@excalidraw/math";
+import { easeOut, MAX_ZOOM, MIN_ZOOM, ZOOM_STEP } from "@excalidraw/common";
+import { clamp, roundToStep } from "@excalidraw/math";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { SceneBounds } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { zoomToFitBounds } from "./actions/actionCanvas";
 import { AnimationController } from "./renderer/animation";
 import { getNormalizedZoom } from "./scene";
+
+import { centerScrollOn } from "./scene/scroll";
 
 import type { AppState, NormalizedZoomValue, Offsets } from "./types";
 
@@ -228,6 +233,112 @@ export const scrollToBounds = (
   } else {
     animateToViewport(state, viewport, duration, onFrame, onComplete);
   }
+};
+
+const zoomValueToFitBoundsOnViewport = (
+  bounds: SceneBounds,
+  viewportDimensions: { width: number; height: number },
+  viewportZoomFactor: number = 1, // default to 1 if not provided
+) => {
+  const [x1, y1, x2, y2] = bounds;
+  const commonBoundsWidth = x2 - x1;
+  const zoomValueForWidth = viewportDimensions.width / commonBoundsWidth;
+  const commonBoundsHeight = y2 - y1;
+  const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
+  const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
+
+  const adjustedZoomValue =
+    smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
+
+  return Math.min(adjustedZoomValue, 1);
+};
+
+export const zoomToFitBounds = ({
+  bounds,
+  appState,
+  canvasOffsets,
+  fitToViewport = false,
+  viewportZoomFactor = 1,
+  minZoom = -Infinity,
+  maxZoom = Infinity,
+  steppedZoom = true,
+}: {
+  bounds: SceneBounds;
+  canvasOffsets?: Offsets;
+  appState: Readonly<AppState>;
+  /** whether to fit content to viewport (beyond >100%) */
+  fitToViewport: boolean;
+  /** zoom content to cover X of the viewport, when fitToViewport=true */
+  viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
+  steppedZoom?: boolean;
+}) => {
+  viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
+
+  const [x1, y1, x2, y2] = bounds;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+
+  const canvasOffsetLeft = canvasOffsets?.left ?? 0;
+  const canvasOffsetTop = canvasOffsets?.top ?? 0;
+  const canvasOffsetRight = canvasOffsets?.right ?? 0;
+  const canvasOffsetBottom = canvasOffsets?.bottom ?? 0;
+
+  const effectiveCanvasWidth =
+    appState.width - canvasOffsetLeft - canvasOffsetRight;
+  const effectiveCanvasHeight =
+    appState.height - canvasOffsetTop - canvasOffsetBottom;
+
+  let adjustedZoomValue;
+
+  if (fitToViewport) {
+    const commonBoundsWidth = x2 - x1;
+    const commonBoundsHeight = y2 - y1;
+
+    adjustedZoomValue =
+      Math.min(
+        effectiveCanvasWidth / commonBoundsWidth,
+        effectiveCanvasHeight / commonBoundsHeight,
+      ) * viewportZoomFactor;
+  } else {
+    adjustedZoomValue = zoomValueToFitBoundsOnViewport(
+      bounds,
+      {
+        width: effectiveCanvasWidth,
+        height: effectiveCanvasHeight,
+      },
+      viewportZoomFactor,
+    );
+  }
+
+  const targetZoomValue = steppedZoom
+    ? roundToStep(adjustedZoomValue, ZOOM_STEP, "floor")
+    : adjustedZoomValue;
+
+  const newZoomValue = getNormalizedZoom(
+    clamp(targetZoomValue, minZoom, maxZoom),
+  );
+
+  const centerScroll = centerScrollOn({
+    scenePoint: { x: centerX, y: centerY },
+    viewportDimensions: {
+      width: appState.width,
+      height: appState.height,
+    },
+    offsets: canvasOffsets,
+    zoom: { value: newZoomValue },
+  });
+
+  return {
+    appState: {
+      ...appState,
+      scrollX: centerScroll.scrollX,
+      scrollY: centerScroll.scrollY,
+      zoom: { value: newZoomValue },
+    },
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
+  };
 };
 
 /** Computes the viewport (scroll + zoom) that brings the target box into view,
