@@ -7,6 +7,7 @@ import { pointFrom, type Radians } from "@excalidraw/math";
 import { getBoundTextElementPosition } from "@excalidraw/element";
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 import { newLinearElement } from "@excalidraw/element";
+import { getTransformHandles } from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -21,6 +22,7 @@ import type {
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
 import { Excalidraw } from "../index";
+import { resizeFlip } from "../interaction/trace";
 
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
 import * as blobModule from "../data/blob";
@@ -916,5 +918,61 @@ describe("mutliple elements", () => {
     expect(rectText.y - rectangle.y).toBeCloseTo(
       rectangle.y + rectangle.height - (rectText.y + rectText.height),
     );
+  });
+});
+
+// Milestone 1 trace oracle: assert the symbolic `resizeFlip` predicate agrees
+// with the real handler's outcome when flipping via a resize drag (as opposed
+// to the flip *actions* exercised above).
+describe("resize-drag flip predicate (trace)", () => {
+  const resizeAndCheck = (
+    handle: "nw" | "ne" | "sw" | "se" | "n" | "s" | "e" | "w",
+    move: [number, number],
+    expectedFlip: { x: boolean; y: boolean },
+  ) => {
+    const rectangle = UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+
+    const rect = getTransformHandles(
+      rectangle.get(),
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+      {},
+    )[handle]!;
+    const start = { x: rect[0] + rect[2] / 2, y: rect[1] + rect[3] / 2 };
+    const to = { x: start.x + move[0], y: start.y + move[1] };
+
+    const anchorMap: Record<string, { x: number; y: number }> = {
+      ne: { x: 0, y: 100 },
+      se: { x: 0, y: 0 },
+      sw: { x: 200, y: 0 },
+      nw: { x: 200, y: 100 },
+      e: { x: 0, y: 50 },
+      w: { x: 200, y: 50 },
+      n: { x: 100, y: 100 },
+      s: { x: 100, y: 0 },
+    };
+    const anchor = anchorMap[handle];
+
+    UI.resize(rectangle, handle, move);
+
+    expect(resizeFlip(handle, to, anchor)).toEqual(expectedFlip);
+  };
+
+  it("horizontal flip via the 'e' handle predicts flip.x", () => {
+    resizeAndCheck("e", [-245, 0], { x: true, y: false });
+  });
+
+  it("vertical flip via the 'n' handle predicts flip.y", () => {
+    resizeAndCheck("n", [0, 139], { x: false, y: true });
+  });
+
+  it("plain resize (no crossing) predicts no flip", () => {
+    resizeAndCheck("se", [40, 20], { x: false, y: false });
   });
 });
