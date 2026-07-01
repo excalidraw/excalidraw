@@ -3937,7 +3937,7 @@ class App extends React.Component<AppProps, AppState> {
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
-    fitToContent?: boolean;
+    fit?: ScrollToOptions["fit"];
     preserveFrameChildrenOrder?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
@@ -4076,10 +4076,10 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
 
-    if (opts.fitToContent) {
+    if (opts.fit) {
       this.scrollTo({
         target: duplicatedElements,
-        fit: "scale-down",
+        fit: opts.fit,
         animation: false,
         offset: this.getEditorUIOffsets(),
       });

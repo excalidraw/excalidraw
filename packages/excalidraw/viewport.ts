@@ -29,20 +29,27 @@ export type ScrollToOptions = {
    */
   target: Bounds | ExcalidrawElement | readonly ExcalidrawElement[] | string;
 
-  // @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit
-  fit?:
-    | "scale-down" // zoom out so the target fits the viewport, never zooming past 100%
-    | "contain"; // zoom the target so it fills the viewport (may exceed 100%)
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit
+   *
+   * - `scale-down` - zoom out so the target fits the viewport, never zooming past 100%
+   * - `contain` - zoom the target so it fills the viewport (may exceed 100%)
+   */
+  fit?: "scale-down" | "contain";
 
   lock?: {
-    scroll?: boolean; // constraints panning to the target box
-    zoom?: boolean; // makes the resolved zoom the minimum zoom
-    tolerance?: number; // rubberband overscroll allowance in viewport px
+    /** constraints panning to the target box */
+    scroll?: boolean;
+    /** makes the resolved zoom the minimum zoom */
+    zoom?: boolean;
+    /** rubberband overscroll allowance in viewport px */
+    tolerance?: number;
   };
 
   animation?: AnimationOptions | boolean;
 
-  offset?: Offsets; // CSS-style padding in viewport pixels, zoom-independent.
+  /** CSS-style padding in viewport pixels, zoom-independent. */
+  offset?: Offsets;
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
@@ -238,7 +245,6 @@ export const scrollToBounds = (
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
-  viewportZoomFactor: number = 1, // default to 1 if not provided
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -247,18 +253,14 @@ const zoomValueToFitBoundsOnViewport = (
   const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
   const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
 
-  const adjustedZoomValue =
-    smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
-
-  return Math.min(adjustedZoomValue, 1);
+  return Math.min(smallestZoomValue, 1);
 };
 
 export const zoomToFitBounds = ({
   bounds,
   appState,
   canvasOffsets,
-  fitToViewport = false,
-  viewportZoomFactor = 1,
+  fit = "scale-down",
   minZoom = -Infinity,
   maxZoom = Infinity,
   steppedZoom = true,
@@ -266,16 +268,11 @@ export const zoomToFitBounds = ({
   bounds: SceneBounds;
   canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
-  /** whether to fit content to viewport (beyond >100%) */
-  fitToViewport: boolean;
-  /** zoom content to cover X of the viewport, when fitToViewport=true */
-  viewportZoomFactor?: number;
+  fit?: ScrollToOptions["fit"];
   minZoom?: number;
   maxZoom?: number;
   steppedZoom?: boolean;
 }) => {
-  viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
-
   const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
@@ -292,24 +289,19 @@ export const zoomToFitBounds = ({
 
   let adjustedZoomValue;
 
-  if (fitToViewport) {
+  if (fit === "contain") {
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
-    adjustedZoomValue =
-      Math.min(
-        effectiveCanvasWidth / commonBoundsWidth,
-        effectiveCanvasHeight / commonBoundsHeight,
-      ) * viewportZoomFactor;
-  } else {
-    adjustedZoomValue = zoomValueToFitBoundsOnViewport(
-      bounds,
-      {
-        width: effectiveCanvasWidth,
-        height: effectiveCanvasHeight,
-      },
-      viewportZoomFactor,
+    adjustedZoomValue = Math.min(
+      effectiveCanvasWidth / commonBoundsWidth,
+      effectiveCanvasHeight / commonBoundsHeight,
     );
+  } else {
+    adjustedZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
+      width: effectiveCanvasWidth,
+      height: effectiveCanvasHeight,
+    });
   }
 
   const targetZoomValue = steppedZoom
@@ -353,7 +345,7 @@ export const getTargetViewport = (
   const { appState } = zoomToFitBounds({
     bounds,
     appState: state,
-    fitToViewport: fit === "contain",
+    fit,
     canvasOffsets: offset,
     steppedZoom: false,
   });

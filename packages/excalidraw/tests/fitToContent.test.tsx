@@ -61,7 +61,7 @@ const waitForAnimationToStop = (maxFrames = 200) => {
   );
 };
 
-describe("fitToContent", () => {
+describe("scale-down", () => {
   it("should zoom to fit the selected element", async () => {
     await render(<Excalidraw />);
 
@@ -189,7 +189,7 @@ describe("fitToContent", () => {
   });
 });
 
-describe("fitToContent animated", () => {
+describe("scale-down animated", () => {
   beforeEach(() => {
     // pace the animation via requestAnimationFrame instead of a tight
     // setTimeout(0) loop, which would otherwise starve the test's own timers

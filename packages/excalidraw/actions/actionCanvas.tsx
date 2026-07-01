@@ -282,7 +282,7 @@ export const actionZoomToFitSelectionInViewport = register({
         ...appState,
         userToFollow: null,
       },
-      fitToViewport: false,
+      fit: "scale-down",
       canvasOffsets: app.getEditorUIOffsets(),
     });
   },
@@ -314,7 +314,7 @@ export const actionZoomToFitSelection = register({
         ...appState,
         userToFollow: null,
       },
-      fitToViewport: true,
+      fit: "contain",
       canvasOffsets: app.getEditorUIOffsets(),
     });
   },
@@ -341,7 +341,7 @@ export const actionZoomToFit = register({
         ...appState,
         userToFollow: null,
       },
-      fitToViewport: false,
+      fit: "scale-down",
       canvasOffsets: app.getEditorUIOffsets(),
     }),
   keyTest: (event, appState) =>
