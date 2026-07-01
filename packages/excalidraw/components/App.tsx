@@ -51,6 +51,7 @@ import {
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
   ZOOM_STEP,
+  MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
   supportsResizeObserver,
@@ -110,6 +111,8 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  isBounds,
+  type Bounds,
 } from "@excalidraw/common";
 
 import {
@@ -262,6 +265,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   parseElementLinkFromURL,
+  isExcalidrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -412,10 +416,15 @@ import {
 } from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
-  type ScrollToContentOptions,
+  type ScrollToOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
-  scrollToElements,
-} from "../scroll";
+  scrollToBounds,
+  getTargetViewport,
+  constrainScrollState,
+  animateToConstraints,
+  isViewportOverscrolled,
+  isScrollToRect,
+} from "../viewport";
 import {
   setEraserCursor,
   setCursor,
@@ -498,6 +507,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ScrollConstraints,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -607,6 +617,10 @@ const YOUTUBE_VIDEO_STATES = new Map<
 >();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
+
+/** how long after the last pan/zoom we animate the rubberband back into the
+ * scroll constraints box */
+const SCROLL_CONSTRAINTS_SNAP_BACK_DELAY = 200;
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
@@ -759,7 +773,7 @@ class App extends React.Component<AppProps, AppState> {
       history: {
         clear: this.resetHistory,
       },
-      scrollToContent: this.scrollToContent,
+      scrollTo: this.scrollTo,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -3015,7 +3029,11 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (isElementLink(window.location.href)) {
-      this.scrollToContent(window.location.href, { animate: false });
+      this.scrollTo({
+        target: window.location.href,
+        fit: "scale-down",
+        animation: false,
+      });
     }
   };
 
@@ -3921,7 +3939,7 @@ class App extends React.Component<AppProps, AppState> {
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
-    fitToContent?: boolean;
+    fit?: ScrollToOptions["fit"];
     preserveFrameChildrenOrder?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
@@ -4060,10 +4078,12 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
 
-    if (opts.fitToContent) {
-      this.scrollToContent(duplicatedElements, {
-        fitToContent: true,
-        canvasOffsets: this.getEditorUIOffsets(),
+    if (opts.fit) {
+      this.scrollTo({
+        target: duplicatedElements,
+        fit: opts.fit,
+        animation: false,
+        offset: this.getEditorUIOffsets(),
       });
     }
   };
@@ -4328,71 +4348,157 @@ class App extends React.Component<AppProps, AppState> {
      */
     value: number,
   ) => {
-    this.setState({
-      ...getStateForZoom(
-        {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(value),
-        },
-        this.state,
-      ),
+    this.setState((state) => {
+      const nextState = {
+        ...state,
+        ...getStateForZoom(
+          {
+            viewportX: state.width / 2 + state.offsetLeft,
+            viewportY: state.height / 2 + state.offsetTop,
+            nextZoom: getNormalizedZoom(value),
+          },
+          state,
+        ),
+      };
+      // re-clamp so a programmatic zoom can't escape an active scroll/zoom lock
+      return { ...nextState, ...constrainScrollState(nextState) };
     });
   };
 
-  scrollToContent = (
-    target?:
-      | string
-      | ExcalidrawElement
-      | readonly NonDeletedExcalidrawElement[],
-    opts?: ScrollToContentOptions,
-  ) => {
-    let elements: readonly NonDeleted<ExcalidrawElement>[];
+  /**
+   * Navigates the viewport to a target and, optionally, locks pan/zoom to it.
+   * The resolved target box drives both the navigation (pan + zoom per
+   * `fit`) and the lock: the operations chain — the viewport animates onto
+   * the target, then the lock is installed against the settled viewport.
+   *
+   * Passing `null` clears any active lock without navigating.
+   */
+  scrollTo = (opts: ScrollToOptions | null) => {
+    // `null` clears all active locks
+    if (opts === null) {
+      if (this.state.scrollConstraints) {
+        this.setState({ scrollConstraints: null });
+      }
+      return;
+    }
+
+    const { target, fit, lock, animation, offset } = opts;
+
+    // resolve the target to a scene-coordinate box.
+    let bounds: Bounds;
+    let elements: readonly NonDeleted<ExcalidrawElement>[] | undefined;
+
     if (typeof target === "string") {
       const id = isElementLink(target)
         ? parseElementLinkFromURL(target)
         : target;
-      elements = id ? this.scene.getElementsFromId(id) : [];
-    } else if (Array.isArray(target)) {
-      elements = target;
-    } else if (target) {
-      elements = [target as NonDeleted<ExcalidrawElement>];
-    } else {
-      elements = this.scene.getNonDeletedElements();
-    }
+      const resolved = id ? this.scene.getElementsFromId(id) : [];
 
-    if (!elements.length) {
-      if (typeof target === "string" && isElementLink(target)) {
-        this.setState({
-          toast: {
-            message: t("elementLink.notFound"),
-            duration: 3000,
-            closable: true,
-          },
-        });
+      if (!resolved.length) {
+        // a string element-link that resolves to nothing is a broken link: show
+        // a toast and bail without touching the lock — we never navigated
+        if (isElementLink(target)) {
+          this.setState({
+            toast: {
+              message: t("elementLink.notFound"),
+              duration: 3000,
+              closable: true,
+            },
+          });
+        }
+        return;
       }
 
-      return;
+      elements = resolved;
+      bounds = getCommonBounds(resolved);
+    } else if (isBounds(target)) {
+      bounds = target;
+    } else if (isScrollToRect(target) && !isExcalidrawElement(target)) {
+      const width = target.width ?? this.state.width;
+      const height = target.height ?? this.state.height;
+      bounds = [target.x, target.y, target.x + width, target.y + height];
+    } else {
+      // widening to null values in case the host app doesn't have
+      // noUncheckedIndexedAccess enabled
+      const targetElements: (ExcalidrawElement | undefined | null)[] =
+        Array.isArray(target) ? target : [target];
+      const sceneElementsMap = this.scene.getNonDeletedElementsMap();
+      elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
+        (acc, element) => {
+          if (element && !element.isDeleted) {
+            const sceneElement = sceneElementsMap.get(element.id);
+            if (sceneElement) {
+              acc.push(sceneElement);
+            }
+          }
+          return acc;
+        },
+        [],
+      );
+
+      const hasNoElements = !elements.length;
+      if (elements.length !== targetElements.length || hasNoElements) {
+        console.warn(
+          "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out",
+        );
+      }
+
+      if (hasNoElements) {
+        return;
+      }
+
+      bounds = getCommonBounds(elements, sceneElementsMap);
     }
 
-    // Navigating to an element by id or element-link defaults to zooming the
-    // element into view, animated — matching the historical element-link
-    // behavior — unless the caller opts out.
-    const resolvedOpts =
-      typeof target === "string"
-        ? {
-            ...opts,
-            fitToViewport: undefined,
-            fitToContent: opts?.fitToContent ?? true,
-            animate: opts?.animate ?? true,
-          }
-        : opts;
+    // capture the viewport we'll land on now, so the lock can be installed
+    // against the intended final state even if the last animation frame hasn't
+    // committed yet.
+    const resolvedViewport = getTargetViewport(this.state, bounds, fit, offset);
+    const resolvedZoom = resolvedViewport.zoom.value;
 
-    scrollToElements(
+    // chain: once the scroll/zoom has settled, install (or clear) the lock
+    const installLock = () => {
+      if (!lock?.scroll && !lock?.zoom) {
+        // no lock requested: a navigation supersedes any previous lock
+        if (this.state.scrollConstraints) {
+          flushSync(() => {
+            this.setState({ ...resolvedViewport, scrollConstraints: null });
+          });
+        }
+        return;
+      }
+
+      const [x1, y1, x2, y2] = bounds;
+      const scrollConstraints: ScrollConstraints = {
+        x: x1,
+        y: y1,
+        width: x2 - x1,
+        height: y2 - y1,
+        lockScroll: !!lock.scroll,
+        lockZoom: !!lock.zoom,
+        zoom: resolvedZoom,
+        tolerance: lock.tolerance ?? 0,
+        offset,
+      };
+
+      flushSync(() => {
+        this.setState((prevState) => ({
+          scrollConstraints,
+          ...constrainScrollState({
+            ...prevState,
+            ...resolvedViewport,
+            scrollConstraints,
+          }),
+        }));
+      });
+    };
+
+    scrollToBounds(
       this.state,
-      elements,
+      bounds,
+      { fit, animation, offset },
       this.setState.bind(this),
-      resolvedOpts,
+      installLock,
     );
   };
 
@@ -4410,7 +4516,38 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
     this.setState(state);
+
+    // with rubberband tolerance, allow a soft overscroll while interacting and
+    // animate back to the box once the interaction settles; otherwise hard-clamp
+    const tolerance = this.state.scrollConstraints?.tolerance ?? 0;
+    this.constrainViewportToScrollConstraints(tolerance);
+    if (tolerance > 0) {
+      this.snapBackToScrollConstraintsDebounced();
+    }
   };
+
+  /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when
+   * unconstrained). Runs as a queued update, so it sees the preceding change.
+   * `tolerance` (screen px) relaxes the bounds for rubberbanding. */
+  private constrainViewportToScrollConstraints = (tolerance = 0) => {
+    this.setState((prevState) =>
+      prevState.scrollConstraints
+        ? constrainScrollState(prevState, tolerance)
+        : null,
+    );
+  };
+
+  /** animates an overscrolled viewport back inside the constraint box */
+  private snapBackToScrollConstraints = () => {
+    if (!this.unmounted) {
+      animateToConstraints(this.state, (viewport) => this.setState(viewport));
+    }
+  };
+
+  private snapBackToScrollConstraintsDebounced = debounce(
+    this.snapBackToScrollConstraints,
+    SCROLL_CONSTRAINTS_SNAP_BACK_DELAY,
+  );
 
   setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });
@@ -4795,11 +4932,11 @@ class App extends React.Component<AppProps, AppState> {
               this.getEditorUIOffsets(),
             )
           ) {
-            this.scrollToContent(this.flowChartCreator.pendingNodes, {
-              animate: true,
-              duration: 300,
-              fitToContent: true,
-              canvasOffsets: this.getEditorUIOffsets(),
+            this.scrollTo({
+              target: this.flowChartCreator.pendingNodes,
+              fit: "scale-down",
+              animation: { duration: 300 },
+              offset: this.getEditorUIOffsets(),
             });
           }
 
@@ -4852,10 +4989,11 @@ class App extends React.Component<AppProps, AppState> {
                   this.getEditorUIOffsets(),
                 )
               ) {
-                this.scrollToContent(nextNode, {
-                  animate: true,
-                  duration: 300,
-                  canvasOffsets: this.getEditorUIOffsets(),
+                this.scrollTo({
+                  target: nextNode,
+                  fit: "scale-down",
+                  animation: { duration: 300 },
+                  offset: this.getEditorUIOffsets(),
                 });
               }
             }
@@ -5419,10 +5557,11 @@ class App extends React.Component<AppProps, AppState> {
               this.getEditorUIOffsets(),
             )
           ) {
-            this.scrollToContent(firstNode, {
-              animate: true,
-              duration: 300,
-              canvasOffsets: this.getEditorUIOffsets(),
+            this.scrollTo({
+              target: firstNode,
+              fit: "scale-down",
+              animation: { duration: 300 },
+              offset: this.getEditorUIOffsets(),
             });
           }
         }
@@ -5590,9 +5729,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // while rubberband-overscrolled past the scroll constraints, suppress
+    // zooming until the viewport has snapped back inside the box
+    if (isViewportOverscrolled(this.state)) {
+      return;
+    }
+
     const initialScale = gesture.initialScale;
     if (initialScale) {
-      this.setState((state) => ({
+      this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
             viewportX: this.lastViewportPosition.x,
@@ -6840,7 +6985,11 @@ class App extends React.Component<AppProps, AppState> {
           ? 1
           : distance / gesture.initialDistance;
 
-      const nextZoom = scaleFactor
+      // while rubberband-overscrolled past the scroll constraints, pin the zoom
+      // (still allowing the pan below) until the viewport has snapped back
+      const nextZoom = isViewportOverscrolled(this.state)
+        ? this.state.zoom.value
+        : scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
         : this.state.zoom.value;
 
@@ -12734,6 +12883,12 @@ class App extends React.Component<AppProps, AppState> {
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
+        // while rubberband-overscrolled past the scroll constraints, suppress
+        // zooming until the viewport has snapped back inside the box
+        if (isViewportOverscrolled(this.state)) {
+          return;
+        }
+
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -12749,6 +12904,11 @@ class App extends React.Component<AppProps, AppState> {
           -sign *
           // reduced amplification for small deltas (small movements on a trackpad)
           Math.min(1, absDelta / 20);
+
+        const minZoom = this.state.scrollConstraints?.lockZoom
+          ? this.state.scrollConstraints.zoom
+          : MIN_ZOOM;
+        newZoom = Math.max(newZoom, minZoom);
 
         this.translateCanvas((state) => ({
           ...getStateForZoom(
@@ -12887,6 +13047,8 @@ class App extends React.Component<AppProps, AppState> {
           cb && cb();
         },
       );
+      // a smaller viewport may push the min zoom up / shrink the pan range
+      this.constrainViewportToScrollConstraints();
     }
   };
 

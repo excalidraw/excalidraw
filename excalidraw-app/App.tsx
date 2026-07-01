@@ -979,7 +979,11 @@ const ExcalidrawWrapper = () => {
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
-            excalidrawAPI?.scrollToContent(element.link, { animate: true });
+            excalidrawAPI?.scrollTo({
+              target: element.link,
+              fit: "scale-down",
+              animation: true,
+            });
           }
         }}
       >
@@ -1014,7 +1018,10 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        <AppFooter
+          excalidrawAPI={excalidrawAPI}
+          onChange={() => excalidrawAPI?.refresh()}
+        />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />

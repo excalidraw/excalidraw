@@ -273,6 +273,34 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+/** A box, in scene coordinates, that pan & zoom are constrained to. */
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** when set, panning is constrained so the viewport stays within the box */
+  lockScroll: boolean;
+  /** when set, the viewport cannot zoom out below `zoom` */
+  lockZoom: boolean;
+  /**
+   * The zoom resolved after the `scrollTo` navigation settled.
+   */
+  zoom: number;
+  /**
+   * Pixel amount the viewport may overscroll past the box before snapping back
+   * (rubberband). Screen pixels, zoom-independent.
+   */
+  tolerance: number;
+  /**
+   * Extra scrollable margin around the box (CSS-style), letting the viewport
+   * scroll past each box edge to reveal that much empty space. Values are
+   * viewport pixels and zoom-independent (a fixed on-screen distance). Mirrors
+   * the `offset` passed to `scrollTo`.
+   */
+  offset?: Offsets;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -380,6 +408,7 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -828,7 +857,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
-  scrollToContent: App["scrollToContent"];
+  scrollTo: App["scrollTo"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -970,7 +999,7 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  scrollTo: InstanceType<typeof App>["scrollTo"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

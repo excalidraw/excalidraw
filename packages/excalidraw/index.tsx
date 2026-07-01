@@ -394,7 +394,8 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
-export { zoomToFitBounds } from "./actions/actionCanvas";
+export { zoomToFitBounds } from "./viewport";
+
 export {
   getCommonBounds,
   getVisibleSceneBounds,

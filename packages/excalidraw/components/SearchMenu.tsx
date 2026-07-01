@@ -1,4 +1,3 @@
-import { round } from "@excalidraw/math";
 import clsx from "clsx";
 import debounce from "lodash.debounce";
 import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
@@ -233,27 +232,18 @@ export const SearchMenu = () => {
           ) ||
           isTextTiny
         ) {
-          let zoomOptions: Parameters<AppClassProperties["scrollToContent"]>[1];
+          // tiny, illegible text fills the viewport so it becomes readable;
+          // otherwise just fit the match into view (capped at 100%)
+          const behavior =
+            isTextTiny && fontSize < FONT_SIZE_LEGIBILITY_THRESHOLD
+              ? "contain"
+              : "scale-down";
 
-          if (isTextTiny) {
-            if (fontSize >= FONT_SIZE_LEGIBILITY_THRESHOLD) {
-              zoomOptions = { fitToContent: true };
-            } else {
-              zoomOptions = {
-                fitToViewport: true,
-                // calculate zoom level to make the fontSize ~equal to FONT_SIZE_THRESHOLD, rounded to nearest 10%
-                maxZoom: round(FONT_SIZE_LEGIBILITY_THRESHOLD / fontSize, 1),
-              };
-            }
-          } else {
-            zoomOptions = { fitToContent: true };
-          }
-
-          app.scrollToContent(matchAsElement, {
-            animate: true,
-            duration: 300,
-            ...zoomOptions,
-            canvasOffsets: app.getEditorUIOffsets(),
+          app.scrollTo({
+            target: matchAsElement,
+            fit: behavior,
+            animation: { duration: 300 },
+            offset: app.getEditorUIOffsets(),
           });
         }
       }

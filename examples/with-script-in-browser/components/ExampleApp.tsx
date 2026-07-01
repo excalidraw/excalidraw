@@ -917,8 +917,9 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToViewport: true,
+              excalidrawAPI.scrollTo({
+                target: elements[0],
+                fit: "contain",
               });
             }}
           >
@@ -932,33 +933,13 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
+              excalidrawAPI.scrollTo({
+                target: elements[0],
+                fit: "scale-down",
               });
             }}
           >
             Fit to content, first element
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!excalidrawAPI) {
-                return;
-              }
-
-              const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0]);
-            }}
-          >
-            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />
