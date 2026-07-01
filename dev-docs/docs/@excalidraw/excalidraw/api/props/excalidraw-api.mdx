@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
+  return <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -285,7 +285,7 @@ This is the history API. history.clear() will clear the history.
     | null
     | {
         target: Bounds | ExcalidrawElement | ExcalidrawElement[] | string;
-        behavior: "panOnly" | "zoomToFit" | "zoomToTarget";
+        fit: "scale-down" | "contain";
         lock?: {
           scroll?: boolean;
           zoom?: boolean;
@@ -297,12 +297,12 @@ This is the history API. history.clear() will clear the history.
 ) => void
 ```
 
-Navigates the viewport to a target and, optionally, locks pan/zoom to it. The resolved target box drives both the navigation and the lock: the viewport first animates onto the target (per `behavior`), then the lock is installed against the settled viewport. Passing `null` clears any active lock without navigating.
+Navigates the viewport to a target and, optionally, locks pan/zoom to it. The resolved target box drives both the navigation and the lock: the viewport first animates onto the target (per `fit`), then the lock is installed against the settled viewport. Passing `null` clears any active lock without navigating.
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
 | target | `Bounds` &#124; `ExcalidrawElement` &#124; `ExcalidrawElement[]` &#124; `string` | — | What to scroll to: an explicit scene-coordinate box, element(s), or an element id / element-link URL. |
-| behavior | `"panOnly"` &#124; `"zoomToFit"` &#124; `"zoomToTarget"` | — | `panOnly` keeps the current zoom and only recenters; `zoomToFit` zooms out to fit the target, capped at 100%; `zoomToTarget` scales the target to fill the viewport (may exceed 100%). |
+| fit | `"scale-down"` &#124; `"contain"` | — | `scale-down` zooms out to fit the target, capped at 100%; `contain` scales the target to fill the viewport (may exceed 100%). |
 | lock.scroll | boolean | false | Constrain panning so the viewport stays within the target box. |
 | lock.zoom | boolean | false | Make the resolved zoom the minimum the user can zoom out to. Zooming in (up to 3000%) is always allowed. |
 | lock.tolerance | number | 0 | Rubberband overscroll allowance, in viewport pixels (zoom-independent). |
@@ -363,10 +363,9 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 ```ts
 (
-  tool: (
-    | { type: ToolType }
-    | { type: "custom"; customType: string }
-  ) & { locked?: boolean },
+  tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
+    locked?: boolean;
+  },
 ) => {};
 ```
 
