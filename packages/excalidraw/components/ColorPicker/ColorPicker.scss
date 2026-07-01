@@ -383,6 +383,21 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--error {
+      border-color: #e03131;
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px #e03131;
+      }
+    }
+  }
+
+  .color-picker__input-error {
+    font-size: 0.75rem;
+    color: #e03131;
+    padding: 0 0.75rem 0.25rem;
+    margin-top: -0.25rem;
   }
 
   .color-picker__input-hash {
