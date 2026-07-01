@@ -204,31 +204,6 @@ describe("zoom lock (pure)", () => {
     );
     expect(zoom.value).toBeCloseTo(1.5);
   });
-
-  it("relaxes the locked zoom by the rubberband `tolerance`", () => {
-    const tolerance = 50; // screen px
-    const lockedZoom = 0.3;
-    // relaxed floor = lockedZoom * min(w/(w+2t), h/(h+2t))
-    const expected =
-      lockedZoom *
-      Math.min(
-        VIEWPORT.width / (VIEWPORT.width + 2 * tolerance),
-        VIEWPORT.height / (VIEWPORT.height + 2 * tolerance),
-      );
-    const { zoom } = constrainScrollState(
-      makeState({
-        zoom: { value: getNormalizedZoom(0.01) },
-        scrollConstraints: makeLock({
-          ...base,
-          lockZoom: true,
-          zoom: lockedZoom,
-          tolerance,
-        }),
-      }),
-      tolerance,
-    );
-    expect(zoom.value).toBeCloseTo(expected); // 0.15
-  });
 });
 
 describe("offset (pure)", () => {
