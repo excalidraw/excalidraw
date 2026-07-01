@@ -203,9 +203,7 @@ export const animateToConstraints = (
 /**
  * Scrolls (and, per `fit`, zooms) the viewport so the given target box is
  * in view, optionally animating the transition. `onComplete` runs once the
- * viewport has settled on the target. `elements` (when the target was resolved
- * from elements) is used only by `panOnly` to preserve the closest-element
- * overflow fallback.
+ * viewport has settled on the target.
  */
 export const scrollToBounds = (
   state: AppState,
@@ -218,17 +216,10 @@ export const scrollToBounds = (
     >,
   ) => void,
   onComplete?: () => void,
-  elements?: readonly ExcalidrawElement[],
 ) => {
   AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
 
-  const viewport = getTargetViewport(
-    state,
-    bounds,
-    opts.fit,
-    opts.offset,
-    elements,
-  );
+  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offset);
 
   const duration = resolveAnimationDuration(opts.animation);
 
@@ -340,7 +331,6 @@ export const getTargetViewport = (
   bounds: Bounds,
   fit: ScrollToOptions["fit"] = "scale-down",
   offset?: Offsets,
-  elements?: readonly ExcalidrawElement[],
 ): Viewport => {
   const { appState } = zoomToFitBounds({
     bounds,

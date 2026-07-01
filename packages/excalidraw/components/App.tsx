@@ -4382,9 +4382,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const { target, fit, lock, animation, offset } = opts;
 
-    // resolve the target to a scene-coordinate box. When the target was given
-    // as element(s), keep the element list too — `panOnly` uses it to preserve
-    // the closest-element overflow fallback.
+    // resolve the target to a scene-coordinate box.
     let bounds: Bounds;
     let elements: readonly NonDeleted<ExcalidrawElement>[] | undefined;
 
@@ -4427,13 +4425,7 @@ class App extends React.Component<AppProps, AppState> {
     // capture the viewport we'll land on now, so the lock can be installed
     // against the intended final state even if the last animation frame hasn't
     // committed yet.
-    const resolvedViewport = getTargetViewport(
-      this.state,
-      bounds,
-      fit,
-      offset,
-      elements,
-    );
+    const resolvedViewport = getTargetViewport(this.state, bounds, fit, offset);
     const resolvedZoom = resolvedViewport.zoom.value;
 
     // chain: once the scroll/zoom has settled, install (or clear) the lock
@@ -4479,7 +4471,6 @@ class App extends React.Component<AppProps, AppState> {
       { fit, animation, offset },
       this.setState.bind(this),
       installLock,
-      elements,
     );
   };
 
