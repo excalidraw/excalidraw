@@ -620,6 +620,18 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+/** Max scroll delta per frame at zoom 100%; scaled by 1/zoom like wheel pan. */
+const VIEW_MODE_KEYBOARD_PAN_MAX_DELTA = 34;
+/** Ease toward target velocity while holding keys / coast-down on release (~Miro-like). */
+const VIEW_MODE_KEYBOARD_PAN_RESPONSE = 0.11;
+const VIEW_MODE_KEYBOARD_PAN_STOP_EPSILON = 0.025;
+
+type ViewModeArrowKey =
+  | typeof KEYS.ARROW_LEFT
+  | typeof KEYS.ARROW_RIGHT
+  | typeof KEYS.ARROW_UP
+  | typeof KEYS.ARROW_DOWN;
+
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -708,6 +720,18 @@ class App extends React.Component<AppProps, AppState> {
   laserTrails = new LaserTrails(this);
   eraserTrail = new EraserTrail(this);
   lassoTrail = new LassoTrail(this);
+
+  /** Stable identity for {@link AnimationFrameHandler} keyboard panning in view mode. */
+  private viewModeKeyboardPanRafKey = {};
+
+  private viewModeKeyboardPanKeys: Record<ViewModeArrowKey, boolean> = {
+    [KEYS.ARROW_LEFT]: false,
+    [KEYS.ARROW_RIGHT]: false,
+    [KEYS.ARROW_UP]: false,
+    [KEYS.ARROW_DOWN]: false,
+  };
+
+  private viewModeKeyboardPanVelocity = { x: 0, y: 0 };
 
   onChangeEmitter = new Emitter<
     [
@@ -3149,6 +3173,10 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
 
+    this.animationFrameHandler.register(this.viewModeKeyboardPanRafKey, (ts) =>
+      this.viewModeKeyboardPanFrame(ts),
+    );
+
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
     }
@@ -3223,6 +3251,7 @@ class App extends React.Component<AppProps, AppState> {
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
+    this.resetViewModeKeyboardPanState();
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
@@ -3499,6 +3528,9 @@ class App extends React.Component<AppProps, AppState> {
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
       this.deselectElements();
+      if (!this.state.viewModeEnabled) {
+        this.resetViewModeKeyboardPanState();
+      }
     }
 
     // cleanup
@@ -4662,6 +4694,96 @@ class App extends React.Component<AppProps, AppState> {
         };
   };
 
+  private shouldHandleViewModeKeyboardPanForPanning(
+    event: KeyboardEvent | React.KeyboardEvent,
+  ) {
+    if (!this.state.viewModeEnabled || !isArrowKey(event.key)) {
+      return false;
+    }
+    if (this.state.activeTool.type === "laser") {
+      return false;
+    }
+    if (event[KEYS.CTRL_OR_CMD] || event.altKey) {
+      return false;
+    }
+    return true;
+  }
+
+  private registerViewModeKeyboardPanKey(key: string, down: boolean) {
+    if (!isArrowKey(key)) {
+      return;
+    }
+    this.viewModeKeyboardPanKeys[key as ViewModeArrowKey] = down;
+  }
+
+  private resetViewModeKeyboardPanState = () => {
+    this.viewModeKeyboardPanKeys[KEYS.ARROW_LEFT] = false;
+    this.viewModeKeyboardPanKeys[KEYS.ARROW_RIGHT] = false;
+    this.viewModeKeyboardPanKeys[KEYS.ARROW_UP] = false;
+    this.viewModeKeyboardPanKeys[KEYS.ARROW_DOWN] = false;
+    this.viewModeKeyboardPanVelocity.x = 0;
+    this.viewModeKeyboardPanVelocity.y = 0;
+    this.animationFrameHandler.stop(this.viewModeKeyboardPanRafKey);
+  };
+
+  private viewModeKeyboardPanFrame(_timestamp: number): boolean {
+    if (document.hidden) {
+      this.resetViewModeKeyboardPanState();
+      return true;
+    }
+
+    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+      this.resetViewModeKeyboardPanState();
+      return true;
+    }
+
+    let tx =
+      (this.viewModeKeyboardPanKeys[KEYS.ARROW_RIGHT] ? 1 : 0) -
+      (this.viewModeKeyboardPanKeys[KEYS.ARROW_LEFT] ? 1 : 0);
+    let ty =
+      (this.viewModeKeyboardPanKeys[KEYS.ARROW_DOWN] ? 1 : 0) -
+      (this.viewModeKeyboardPanKeys[KEYS.ARROW_UP] ? 1 : 0);
+
+    if (tx !== 0 && ty !== 0) {
+      const inv = 1 / Math.SQRT2;
+      tx *= inv;
+      ty *= inv;
+    }
+
+    const zoom = this.state.zoom.value;
+    const maxDelta = VIEW_MODE_KEYBOARD_PAN_MAX_DELTA / zoom;
+    const desiredVx = tx * maxDelta;
+    const desiredVy = ty * maxDelta;
+
+    const vx =
+      this.viewModeKeyboardPanVelocity.x +
+      (desiredVx - this.viewModeKeyboardPanVelocity.x) *
+        VIEW_MODE_KEYBOARD_PAN_RESPONSE;
+    const vy =
+      this.viewModeKeyboardPanVelocity.y +
+      (desiredVy - this.viewModeKeyboardPanVelocity.y) *
+        VIEW_MODE_KEYBOARD_PAN_RESPONSE;
+
+    const nextVx = Math.abs(vx) < VIEW_MODE_KEYBOARD_PAN_STOP_EPSILON ? 0 : vx;
+    const nextVy = Math.abs(vy) < VIEW_MODE_KEYBOARD_PAN_STOP_EPSILON ? 0 : vy;
+
+    this.viewModeKeyboardPanVelocity.x = nextVx;
+    this.viewModeKeyboardPanVelocity.y = nextVy;
+
+    if (nextVx === 0 && nextVy === 0 && tx === 0 && ty === 0) {
+      return true;
+    }
+
+    if (nextVx !== 0 || nextVy !== 0) {
+      this.translateCanvas((state) => ({
+        scrollX: state.scrollX + nextVx,
+        scrollY: state.scrollY + nextVy,
+      }));
+    }
+
+    return false;
+  }
+
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
@@ -4944,6 +5066,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.openDialog?.name === "elementLinkSelector") {
+        return;
+      }
+
+      if (this.shouldHandleViewModeKeyboardPanForPanning(event)) {
+        event.preventDefault();
+        if (!event.repeat) {
+          this.registerViewModeKeyboardPanKey(event.key, true);
+        }
+        this.animationFrameHandler.start(this.viewModeKeyboardPanRafKey);
         return;
       }
 
@@ -5253,6 +5384,14 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (
+      this.state.viewModeEnabled &&
+      this.state.activeTool.type !== "laser" &&
+      isArrowKey(event.key)
+    ) {
+      this.registerViewModeKeyboardPanKey(event.key, false);
+    }
+
     if (event.key === KEYS.SPACE) {
       if (
         (this.state.viewModeEnabled &&
