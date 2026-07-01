@@ -17,6 +17,8 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
+- `zoomToFitBounds` now accepts `fit: "scale-down" | "contain"` instead of `fitToViewport` / `viewportZoomFactor`. Use `fit: "scale-down"` for the previous fit-to-content behavior, and `fit: "contain"` for the previous fit-to-viewport behavior [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
+
 - Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
 
   - `MainMenu.DefaultItems.ToggleTheme` no longer accepts the item-level `onSelect` callback. Host apps that need to control light/dark/system theme should pass `onThemeChange` to `<Excalidraw />` instead.
