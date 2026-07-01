@@ -1,12 +1,14 @@
 import React from "react";
 
-import { KEYS } from "@excalidraw/common";
+import { KEYS, POINTER_BUTTON, ZOOM_STEP } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import {
+  fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
@@ -14,6 +16,7 @@ import {
 } from "./test-utils";
 
 const { h } = window;
+const MIDDLE_MOUSE_BUTTON_MASK = 4;
 
 describe("appState", () => {
   it("scroll-to-content on init works with non-zero offsets", async () => {
@@ -110,6 +113,103 @@ describe("appState", () => {
     // Assert we scroll properly with normal zoom
     API.setAppState({ zoom: { value: zoom } });
     scrollTest();
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("zooms with middle mouse button and wheel", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    const canvas = GlobalTestState.interactiveCanvas;
+    const initialZoom = h.state.zoom.value;
+
+    fireEvent.pointerDown(canvas, {
+      button: POINTER_BUTTON.WHEEL,
+      buttons: MIDDLE_MOUSE_BUTTON_MASK,
+      clientX: 100,
+      clientY: 100,
+      pointerType: "mouse",
+    });
+    fireEvent.wheel(canvas, {
+      buttons: MIDDLE_MOUSE_BUTTON_MASK,
+      clientX: 100,
+      clientY: 100,
+      deltaY: -100,
+    });
+    expect(h.state.zoom.value).toBeCloseTo(initialZoom + ZOOM_STEP);
+
+    fireEvent.wheel(canvas, {
+      buttons: MIDDLE_MOUSE_BUTTON_MASK,
+      clientX: 100,
+      clientY: 100,
+      deltaY: 100,
+    });
+    expect(h.state.zoom.value).toBeCloseTo(initialZoom);
+
+    fireEvent.pointerUp(window, {
+      button: POINTER_BUTTON.WHEEL,
+      buttons: 0,
+      clientX: 100,
+      clientY: 100,
+      pointerType: "mouse",
+    });
+
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("keeps normal wheel scrolling when middle mouse button is not pressed", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    const canvas = GlobalTestState.interactiveCanvas;
+    const initialZoom = h.state.zoom.value;
+    const initialScrollY = h.state.scrollY;
+
+    fireEvent.wheel(canvas, {
+      buttons: 0,
+      clientX: 100,
+      clientY: 100,
+      deltaY: 100,
+    });
+
+    expect(h.state.zoom.value).toBe(initialZoom);
+    expect(h.state.scrollY).toBe(initialScrollY - 100 / initialZoom);
+
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("keeps middle mouse drag panning", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    const canvas = GlobalTestState.interactiveCanvas;
+    const initialScrollX = h.state.scrollX;
+    const initialScrollY = h.state.scrollY;
+
+    fireEvent.pointerDown(canvas, {
+      button: POINTER_BUTTON.WHEEL,
+      buttons: MIDDLE_MOUSE_BUTTON_MASK,
+      clientX: 100,
+      clientY: 100,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerMove(window, {
+      buttons: MIDDLE_MOUSE_BUTTON_MASK,
+      clientX: 80,
+      clientY: 70,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerUp(window, {
+      button: POINTER_BUTTON.WHEEL,
+      buttons: 0,
+      clientX: 80,
+      clientY: 70,
+      pointerType: "mouse",
+    });
+
+    expect(h.state.scrollX).toBe(initialScrollX - 20);
+    expect(h.state.scrollY).toBe(initialScrollY - 30);
+
     restoreOriginalGetBoundingClientRect();
   });
 });
