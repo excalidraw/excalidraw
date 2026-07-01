@@ -1,8 +1,5 @@
 import { Footer } from "@excalidraw/excalidraw/index";
-import {
-  getSelectedElements,
-  getVisibleSceneBounds,
-} from "@excalidraw/element";
+import { getSelectedElements } from "@excalidraw/element";
 import React, { useCallback, useState } from "react";
 
 import type {
@@ -66,7 +63,7 @@ const ScrollConstraintsDebugFooter = ({
     const selectedElements = getSelectedElementsForLock();
     return selectedElements.length
       ? selectedElements
-      : getVisibleSceneBounds(excalidrawAPI.getAppState());
+      : excalidrawAPI.getSceneElements();
   }, [excalidrawAPI, getSelectedElementsForLock]);
 
   const applyLockToCurrentTarget = useCallback(
@@ -116,8 +113,8 @@ const ScrollConstraintsDebugFooter = ({
   }, [locked, updateLocked]);
 
   const scrollToSelectionWithLock = useCallback(() => {
-    const selectedElements = getSelectedElementsForLock();
-    if (!excalidrawAPI || !selectedElements.length) {
+    const selectedElements = getCurrentLockTarget();
+    if (!excalidrawAPI || !selectedElements) {
       return;
     }
     excalidrawAPI.scrollTo({
@@ -128,7 +125,7 @@ const ScrollConstraintsDebugFooter = ({
       offset,
     });
     setLocked(true);
-  }, [excalidrawAPI, fit, lock, offset, getSelectedElementsForLock]);
+  }, [excalidrawAPI, fit, lock, offset, getCurrentLockTarget]);
 
   const updateLock = useCallback(
     (nextLock: LockOptions) => {
