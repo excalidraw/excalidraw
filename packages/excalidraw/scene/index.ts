@@ -4,7 +4,7 @@ export {
   getSelectedElements,
   getTargetElements,
 } from "@excalidraw/element";
-export { calculateScrollCenter } from "./scroll";
+export { calculateScrollCenter } from "../viewport";
 export {
   hasBackground,
   hasStrokeWidth,
