@@ -289,6 +289,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
@@ -11080,49 +11081,11 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (resizingElement) {
-        this.store.scheduleCapture();
-      }
-
-      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        // update the store snapshot, so that invisible elements are not captured by the store
-        this.updateScene({
-          elements: this.scene
-            .getElementsIncludingDeleted()
-            .filter((el) => el.id !== resizingElement.id),
-          captureUpdate: CaptureUpdateAction.NEVER,
-        });
-      }
-
-      // handle frame membership for resizing frames and/or selected elements
-      if (pointerDownState.resize.isResizing) {
-        let nextElements = updateFrameMembershipOfSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-          this,
-        );
-
-        const selectedFrames = this.scene
-          .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
-          );
-
-        for (const frame of selectedFrames) {
-          nextElements = replaceAllElementsInFrame(
-            nextElements,
-            getElementsInResizingFrame(
-              this.scene.getElementsIncludingDeleted(),
-              frame,
-              this.state,
-              elementsMap,
-            ),
-            frame,
-          );
-        }
-
-        this.scene.replaceAllElements(nextElements);
-      }
+      this.handleResizePointerUp(
+        pointerDownState,
+        resizingElement,
+        elementsMap,
+      );
 
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
@@ -12470,6 +12433,8 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
+  // Move-side of resize: recomputes and applies the transform for the active
+  // handle on every pointer/key move. Finalization is in `handleResizePointerUp`.
   private maybeHandleResize = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
@@ -12599,6 +12564,59 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
     return false;
+  };
+
+  // Resize finalization run on pointerUp: capture history, drop invisibly-small
+  // elements from the store snapshot, and reconcile frame membership. The
+  // move-side of resize lives in `maybeHandleResize`.
+  private handleResizePointerUp = (
+    pointerDownState: PointerDownState,
+    resizingElement: NonDeletedExcalidrawElement | null,
+    elementsMap: NonDeletedSceneElementsMap,
+  ) => {
+    if (resizingElement) {
+      this.store.scheduleCapture();
+    }
+
+    if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+      // update the store snapshot, so that invisible elements are not captured by the store
+      this.updateScene({
+        elements: this.scene
+          .getElementsIncludingDeleted()
+          .filter((el) => el.id !== resizingElement.id),
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    }
+
+    // handle frame membership for resizing frames and/or selected elements
+    if (pointerDownState.resize.isResizing) {
+      let nextElements = updateFrameMembershipOfSelectedElements(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        this,
+      );
+
+      const selectedFrames = this.scene
+        .getSelectedElements(this.state)
+        .filter((element): element is ExcalidrawFrameLikeElement =>
+          isFrameLikeElement(element),
+        );
+
+      for (const frame of selectedFrames) {
+        nextElements = replaceAllElementsInFrame(
+          nextElements,
+          getElementsInResizingFrame(
+            this.scene.getElementsIncludingDeleted(),
+            frame,
+            this.state,
+            elementsMap,
+          ),
+          frame,
+        );
+      }
+
+      this.scene.replaceAllElements(nextElements);
+    }
   };
 
   private getContextMenuItems = (
