@@ -4424,15 +4424,17 @@ class App extends React.Component<AppProps, AppState> {
       bounds = getCommonBounds(elements);
     }
 
-    // capture the zoom we'll land on now, so a zoom lock can floor at it even
-    // after the (async) animation has mutated `this.state`
-    const resolvedZoom = getTargetViewport(
+    // capture the viewport we'll land on now, so the lock can be installed
+    // against the intended final state even if the last animation frame hasn't
+    // committed yet.
+    const resolvedViewport = getTargetViewport(
       this.state,
       bounds,
       behavior,
       offset,
       elements,
-    ).zoom.value;
+    );
+    const resolvedZoom = resolvedViewport.zoom.value;
 
     // chain: once the scroll/zoom has settled, install (or clear) the lock
     const installLock = () => {
@@ -4440,7 +4442,7 @@ class App extends React.Component<AppProps, AppState> {
         // no lock requested: a navigation supersedes any previous lock
         if (this.state.scrollConstraints) {
           flushSync(() => {
-            this.setState({ scrollConstraints: null });
+            this.setState({ ...resolvedViewport, scrollConstraints: null });
           });
         }
         return;
@@ -4462,7 +4464,11 @@ class App extends React.Component<AppProps, AppState> {
       flushSync(() => {
         this.setState((prevState) => ({
           scrollConstraints,
-          ...constrainScrollState({ ...prevState, scrollConstraints }),
+          ...constrainScrollState({
+            ...prevState,
+            ...resolvedViewport,
+            scrollConstraints,
+          }),
         }));
       });
     };
