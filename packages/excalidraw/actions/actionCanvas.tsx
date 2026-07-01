@@ -423,7 +423,11 @@ export const actionToggleEraserTool = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) => event.key === KEYS.E,
+  keyTest: (event, appState) =>
+    event.key === KEYS.E &&
+    !appState.newElement &&
+    !appState.selectedLinearElement?.isEditing &&
+    !appState.selectedLinearElement?.isDragging,
 });
 
 export const actionToggleLassoTool = register({
