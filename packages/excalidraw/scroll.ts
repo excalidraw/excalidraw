@@ -95,8 +95,6 @@ export const constrainScrollState = (
 
   tolerance = Math.max(tolerance, 0);
 
-  // zoom floor: the locked zoom is a hard minimum (no rubberband) — zooming in
-  // is always allowed up to MAX_ZOOM.
   const minZoom = scrollConstraints.lockZoom
     ? scrollConstraints.zoom
     : MIN_ZOOM;
