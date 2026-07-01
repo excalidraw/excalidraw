@@ -18,7 +18,7 @@ import { EncryptedIcon } from "./EncryptedIcon";
 type ScrollToArgs = NonNullable<
   Parameters<ExcalidrawImperativeAPI["scrollTo"]>[0]
 >;
-type ScrollToBehavior = ScrollToArgs["behavior"];
+type ScrollToFit = ScrollToArgs["fit"];
 type LockOptions = NonNullable<ScrollToArgs["lock"]>;
 type ScrollToTarget = ScrollToArgs["target"];
 
@@ -30,7 +30,7 @@ const ScrollConstraintsDebugFooter = ({
   excalidrawAPI: ExcalidrawImperativeAPI | null;
 }) => {
   const [locked, setLocked] = useState(false);
-  const [behavior, setBehavior] = useState<ScrollToBehavior>("zoomToFit");
+  const [fit, setFit] = useState<ScrollToFit>("scale-down");
   const [lock, setLock] = useState<LockOptions>({
     scroll: true,
     zoom: false,
@@ -73,7 +73,7 @@ const ScrollConstraintsDebugFooter = ({
     (
       nextLock: LockOptions,
       nextOffset: Offsets,
-      nextBehavior: ScrollToBehavior,
+      fit: ScrollToFit,
       animation: ScrollToArgs["animation"] = false,
     ) => {
       if (!excalidrawAPI) {
@@ -85,7 +85,7 @@ const ScrollConstraintsDebugFooter = ({
       }
       excalidrawAPI.scrollTo({
         target,
-        behavior: nextBehavior,
+        fit,
         animation,
         lock: nextLock,
         offset: nextOffset,
@@ -102,13 +102,13 @@ const ScrollConstraintsDebugFooter = ({
       }
 
       if (nextLocked) {
-        applyLockToCurrentTarget(lock, offset, behavior);
+        applyLockToCurrentTarget(lock, offset, fit);
       } else {
         excalidrawAPI.scrollTo(null);
         setLocked(false);
       }
     },
-    [applyLockToCurrentTarget, behavior, excalidrawAPI, lock, offset],
+    [applyLockToCurrentTarget, fit, excalidrawAPI, lock, offset],
   );
 
   const toggleLock = useCallback(() => {
@@ -122,27 +122,27 @@ const ScrollConstraintsDebugFooter = ({
     }
     excalidrawAPI.scrollTo({
       target: selectedElements,
-      behavior,
+      fit,
       animation: true,
       lock,
       offset,
     });
     setLocked(true);
-  }, [excalidrawAPI, behavior, lock, offset, getSelectedElementsForLock]);
+  }, [excalidrawAPI, fit, lock, offset, getSelectedElementsForLock]);
 
   const updateLock = useCallback(
     (nextLock: LockOptions) => {
       setLock(nextLock);
       if (locked) {
-        applyLockToCurrentTarget(nextLock, offset, behavior);
+        applyLockToCurrentTarget(nextLock, offset, fit);
       }
     },
-    [applyLockToCurrentTarget, behavior, locked, offset],
+    [applyLockToCurrentTarget, fit, locked, offset],
   );
 
   const updateBehavior = useCallback(
-    (nextBehavior: ScrollToBehavior) => {
-      setBehavior(nextBehavior);
+    (nextBehavior: ScrollToFit) => {
+      setFit(nextBehavior);
       if (locked) {
         applyLockToCurrentTarget(lock, offset, nextBehavior);
       }
@@ -158,10 +158,10 @@ const ScrollConstraintsDebugFooter = ({
       };
       setOffset(nextOffset);
       if (locked) {
-        applyLockToCurrentTarget(lock, nextOffset, behavior);
+        applyLockToCurrentTarget(lock, nextOffset, fit);
       }
     },
-    [applyLockToCurrentTarget, behavior, offset, lock, locked],
+    [applyLockToCurrentTarget, fit, offset, lock, locked],
   );
 
   const labelStyle = {
@@ -185,16 +185,15 @@ const ScrollConstraintsDebugFooter = ({
       </button>
       <button onClick={scrollToSelectionWithLock}>scroll + lock</button>
       <label style={labelStyle}>
-        behavior
+        fit
         <select
-          value={behavior}
+          value={fit}
           onChange={(event) =>
-            updateBehavior(event.target.value as ScrollToBehavior)
+            updateBehavior(event.target.value as ScrollToFit)
           }
         >
-          <option value="panOnly">panOnly</option>
-          <option value="zoomToFit">zoomToFit</option>
-          <option value="zoomToTarget">zoomToTarget</option>
+          <option value="scale-down">scale-down</option>
+          <option value="contain">contain</option>
         </select>
       </label>
       <label style={labelStyle}>

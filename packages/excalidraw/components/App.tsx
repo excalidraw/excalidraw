@@ -3029,7 +3029,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isElementLink(window.location.href)) {
       this.scrollTo({
         target: window.location.href,
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: false,
       });
     }
@@ -4079,7 +4079,7 @@ class App extends React.Component<AppProps, AppState> {
     if (opts.fitToContent) {
       this.scrollTo({
         target: duplicatedElements,
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: false,
         offset: this.getEditorUIOffsets(),
       });
@@ -4366,7 +4366,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * Navigates the viewport to a target and, optionally, locks pan/zoom to it.
    * The resolved target box drives both the navigation (pan + zoom per
-   * `behavior`) and the lock: the operations chain — the viewport animates onto
+   * `fit`) and the lock: the operations chain — the viewport animates onto
    * the target, then the lock is installed against the settled viewport.
    *
    * Passing `null` clears any active lock without navigating.
@@ -4380,7 +4380,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { target, behavior, lock, animation, offset } = opts;
+    const { target, fit, lock, animation, offset } = opts;
 
     // resolve the target to a scene-coordinate box. When the target was given
     // as element(s), keep the element list too — `panOnly` uses it to preserve
@@ -4430,7 +4430,7 @@ class App extends React.Component<AppProps, AppState> {
     const resolvedViewport = getTargetViewport(
       this.state,
       bounds,
-      behavior,
+      fit,
       offset,
       elements,
     );
@@ -4476,7 +4476,7 @@ class App extends React.Component<AppProps, AppState> {
     scrollToBounds(
       this.state,
       bounds,
-      { behavior, animation, offset },
+      { fit, animation, offset },
       this.setState.bind(this),
       installLock,
       elements,
@@ -4915,7 +4915,7 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             this.scrollTo({
               target: this.flowChartCreator.pendingNodes,
-              behavior: "zoomToFit",
+              fit: "scale-down",
               animation: { duration: 300 },
               offset: this.getEditorUIOffsets(),
             });
@@ -4972,7 +4972,7 @@ class App extends React.Component<AppProps, AppState> {
               ) {
                 this.scrollTo({
                   target: nextNode,
-                  behavior: "panOnly",
+                  fit: "contain",
                   animation: { duration: 300 },
                   offset: this.getEditorUIOffsets(),
                 });
@@ -5540,7 +5540,7 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             this.scrollTo({
               target: firstNode,
-              behavior: "panOnly",
+              fit: "contain",
               animation: { duration: 300 },
               offset: this.getEditorUIOffsets(),
             });

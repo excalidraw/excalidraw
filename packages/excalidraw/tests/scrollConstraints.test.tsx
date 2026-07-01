@@ -416,7 +416,7 @@ describe("scrollTo lock (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: [0, 0, 1000, 1000],
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: false,
         lock: { scroll: true },
       });
@@ -456,7 +456,7 @@ describe("scrollTo lock (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: rect,
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: { duration: 300 },
         lock: { scroll: true },
       });
@@ -480,7 +480,7 @@ describe("scrollTo lock (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: [0, 0, 500, 500],
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: false,
         lock: { scroll: true },
       });
@@ -511,7 +511,7 @@ describe("scrollTo lock (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: rect,
-        behavior: "zoomToTarget",
+        fit: "contain",
         animation: false,
         lock: { zoom: true },
       });
@@ -548,7 +548,7 @@ describe("scrollTo lock (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: rect,
-        behavior: "zoomToTarget",
+        fit: "contain",
         animation: false,
         lock: { zoom: true },
       });
@@ -584,7 +584,7 @@ describe("rubberband tolerance (integration)", () => {
     React.act(() => {
       h.app.scrollTo({
         target: [0, 0, 1000, 1000],
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: false,
         lock: { scroll: true, tolerance: 25 },
       });

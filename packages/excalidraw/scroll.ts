@@ -7,7 +7,6 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { zoomToFitBounds } from "./actions/actionCanvas";
 import { AnimationController } from "./renderer/animation";
 import { getNormalizedZoom } from "./scene";
-import { calculateScrollCenter, centerScrollOn } from "./scene/scroll";
 
 import type { AppState, NormalizedZoomValue, Offsets } from "./types";
 
@@ -25,10 +24,10 @@ export type ScrollToOptions = {
    */
   target: Bounds | ExcalidrawElement | readonly ExcalidrawElement[] | string;
 
-  behavior:
-    | "panOnly" // keep the current zoom, only recenter the viewport on the target
-    | "zoomToFit" // zoom out so the target fits the viewport, never zooming past 100%
-    | "zoomToTarget"; // zoom the target so it fills the viewport (may exceed 100%)
+  // @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit
+  fit:
+    | "scale-down" // zoom out so the target fits the viewport, never zooming past 100%
+    | "contain"; // zoom the target so it fills the viewport (may exceed 100%)
 
   lock?: {
     scroll?: boolean; // constraints panning to the target box
@@ -199,7 +198,7 @@ export const animateToConstraints = (
 export const scrollToBounds = (
   state: AppState,
   bounds: Bounds,
-  opts: Pick<ScrollToOptions, "behavior" | "animation" | "offset">,
+  opts: Pick<ScrollToOptions, "fit" | "animation" | "offset">,
   onFrame: (
     state: Pick<
       AppState,
@@ -214,7 +213,7 @@ export const scrollToBounds = (
   const viewport = getTargetViewport(
     state,
     bounds,
-    opts.behavior,
+    opts.fit,
     opts.offset,
     elements,
   );
@@ -236,31 +235,14 @@ export const scrollToBounds = (
 export const getTargetViewport = (
   state: AppState,
   bounds: Bounds,
-  behavior: ScrollToOptions["behavior"],
+  behavior: ScrollToOptions["fit"],
   offset?: Offsets,
   elements?: readonly ExcalidrawElement[],
 ): Viewport => {
-  if (behavior === "panOnly") {
-    // keep the current zoom, only recenter on the target
-    if (elements && elements.length) {
-      // element targets keep the closest-element overflow fallback
-      const { scrollX, scrollY } = calculateScrollCenter(elements, state);
-      return { scrollX, scrollY, zoom: state.zoom };
-    }
-    const [x1, y1, x2, y2] = bounds;
-    const { scrollX, scrollY } = centerScrollOn({
-      scenePoint: { x: (x1 + x2) / 2, y: (y1 + y2) / 2 },
-      viewportDimensions: { width: state.width, height: state.height },
-      zoom: state.zoom,
-      offsets: offset,
-    });
-    return { scrollX, scrollY, zoom: state.zoom };
-  }
-
   const { appState } = zoomToFitBounds({
     bounds,
     appState: state,
-    fitToViewport: behavior === "zoomToTarget",
+    fitToViewport: behavior === "contain",
     canvasOffsets: offset,
     steppedZoom: false,
   });

@@ -80,7 +80,7 @@ describe("fitToContent", () => {
     act(() => {
       h.app.scrollTo({
         target: rectElement,
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: false,
       });
     });
@@ -115,7 +115,7 @@ describe("fitToContent", () => {
     act(() => {
       h.app.scrollTo({
         target: [topLeft, bottomRight],
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: false,
       });
     });
@@ -146,7 +146,7 @@ describe("fitToContent", () => {
       // navigating by element id (a string target) with zoomToFit
       h.app.scrollTo({
         target: rectElement.id,
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: false,
       });
     });
@@ -176,13 +176,12 @@ describe("fitToContent", () => {
     act(() => {
       h.app.scrollTo({
         target: rectElement,
-        behavior: "panOnly",
+        fit: "contain",
         animation: false,
       });
     });
 
-    // zoom level should stay the same
-    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.zoom.value).toBe(0.1);
 
     // state should reflect some scrolling
     expect(h.state.scrollX).not.toBe(0);
@@ -220,7 +219,7 @@ describe("fitToContent animated", () => {
     act(() => {
       h.app.scrollTo({
         target: rectElement,
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: { duration: LONG_ANIMATION_DURATION },
       });
     });
@@ -263,7 +262,7 @@ describe("fitToContent animated", () => {
     act(() => {
       h.app.scrollTo({
         target: rectElement,
-        behavior: "zoomToFit",
+        fit: "scale-down",
         animation: { duration: LONG_ANIMATION_DURATION },
       });
     });
@@ -299,7 +298,7 @@ describe("fitToContent animated", () => {
       // a short duration so the animation completes within a few frames
       h.app.scrollTo({
         target: rectElement,
-        behavior: "panOnly",
+        fit: "scale-down",
         animation: { duration: 10 },
       });
     });

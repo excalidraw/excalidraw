@@ -236,12 +236,12 @@ export const SearchMenu = () => {
           // otherwise just fit the match into view (capped at 100%)
           const behavior =
             isTextTiny && fontSize < FONT_SIZE_LEGIBILITY_THRESHOLD
-              ? "zoomToTarget"
-              : "zoomToFit";
+              ? "contain"
+              : "scale-down";
 
           app.scrollTo({
             target: matchAsElement,
-            behavior,
+            fit: behavior,
             animation: { duration: 300 },
             offset: app.getEditorUIOffsets(),
           });

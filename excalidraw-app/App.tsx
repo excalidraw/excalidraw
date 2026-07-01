@@ -981,7 +981,7 @@ const ExcalidrawWrapper = () => {
             event.preventDefault();
             excalidrawAPI?.scrollTo({
               target: element.link,
-              behavior: "zoomToFit",
+              fit: "scale-down",
               animation: true,
             });
           }
