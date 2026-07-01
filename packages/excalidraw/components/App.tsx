@@ -422,7 +422,7 @@ import {
   constrainScrollState,
   animateToConstraints,
   isViewportOverscrolled,
-} from "../scroll";
+} from "../viewport";
 import {
   setEraserCursor,
   setCursor,

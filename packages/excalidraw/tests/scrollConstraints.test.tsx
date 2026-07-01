@@ -17,7 +17,7 @@ import {
   constrainScrollState,
   isViewportOverscrolled,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
-} from "../scroll";
+} from "../viewport";
 import { AnimationController } from "../renderer/animation";
 
 import { API } from "./helpers/api";

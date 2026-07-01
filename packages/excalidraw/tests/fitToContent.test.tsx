@@ -2,7 +2,7 @@ import React from "react";
 
 import { Excalidraw } from "../index";
 import { AnimationController } from "../renderer/animation";
-import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../scroll";
+import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../viewport";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";

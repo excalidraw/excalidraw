@@ -45,7 +45,7 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { constrainScrollState } from "../scroll";
+import { constrainScrollState } from "../viewport";
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
