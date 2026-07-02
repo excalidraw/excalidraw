@@ -306,7 +306,7 @@ export const zoomToFitBounds = ({
   fit = "scale-down",
   minZoom = -Infinity,
   maxZoom = Infinity,
-  steppedZoom = true,
+  steppedZoom = false,
 }: {
   bounds: SceneBounds;
   canvasOffsets?: Offsets;
