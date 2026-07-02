@@ -9,7 +9,6 @@ import {
 import {
   degreesToRadians,
   lineSegment,
-  pointDistance,
   pointFrom,
   pointFromArray,
   pointRotateRads,
