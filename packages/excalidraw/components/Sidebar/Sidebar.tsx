@@ -148,6 +148,11 @@ export const SidebarInner = forwardRef(
           { "sidebar--docked": docked },
           className,
         )}
+        // on mobile the sidebar shouldn't push the viewport around even
+        // when opened (it's treated as a temporary overlay)
+        data-viewport-ui={
+          editorInterface.formFactor !== "phone" ? "side" : undefined
+        }
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>

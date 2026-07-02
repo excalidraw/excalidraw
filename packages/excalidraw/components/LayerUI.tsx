@@ -246,6 +246,7 @@ const LayerUI = ({
           <Island
             className={clsx("compact-shape-actions-island")}
             padding={0}
+            data-viewport-ui="side"
             style={{
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
@@ -269,6 +270,7 @@ const LayerUI = ({
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
             }}
+            data-viewport-ui="side"
           >
             <SelectedShapeActions
               appState={appState}
@@ -349,6 +351,7 @@ const LayerUI = ({
                             "zen-mode": appState.zenModeEnabled,
                             "App-toolbar--compact": isCompactStylesPanel,
                           })}
+                          data-viewport-ui="top"
                         >
                           <HintViewer
                             appState={appState}

@@ -140,6 +140,7 @@ export const MobileMenu = ({
           style={{
             marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
           }}
+          data-viewport-ui="bottom"
         >
           <MobileShapeActions
             appState={appState}

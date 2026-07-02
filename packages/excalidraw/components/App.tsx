@@ -504,6 +504,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ViewportUIDock,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -4719,8 +4720,9 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * top/right/bottom/left override the final offsets for those sides.
    *
-   * Default side offsets are measured from the UI for given form factor,
-   * plus padding.
+   * Default side offsets are measured from the currently rendered UI
+   * surfaces marked with the `data-viewport-ui` attribute (see
+   * {@link ViewportUIDock}), plus padding.
    *
    * @param opts.padding - defaults to 24px (all sides)
    * @param opts.top - defaults to measured top UI height + padding
@@ -4742,71 +4744,54 @@ class App extends React.Component<AppProps, AppState> {
     const excalidrawContainer = this.excalidrawContainerRef?.current;
     const excalidrawContainerRect =
       excalidrawContainer?.getBoundingClientRect();
-    const formFactor = this.editorInterface.formFactor;
-    // measured relative to the excalidraw container (which the offsets are
-    // relative to), so that embedding the editor at a viewport offset
-    // doesn't skew the values
-    const getElementRect = (selector: string) => {
-      const rect = excalidrawContainer
-        ?.querySelector(selector)
-        ?.getBoundingClientRect();
 
-      if (!rect || !excalidrawContainerRect) {
-        return rect;
-      }
+    const measuredOffsets = { top: 0, right: 0, bottom: 0, left: 0 };
 
-      return {
-        top: rect.top - excalidrawContainerRect.top,
-        right: rect.right - excalidrawContainerRect.left,
-        bottom: rect.bottom - excalidrawContainerRect.top,
-        left: rect.left - excalidrawContainerRect.left,
-        width: rect.width,
-        height: rect.height,
-      };
-    };
-
-    const topToolbar =
-      formFactor === "phone" ? 0 : getElementRect(".App-toolbar")?.bottom ?? 0;
-    const bottomBar =
-      formFactor === "phone"
-        ? Math.max(
-            this.state.height -
-              (getElementRect(".App-bottom-bar")?.top ?? this.state.height),
-            0,
-          )
-        : 0;
-
-    const sidebarRect =
-      formFactor === "phone"
-        ? // on mobile, ignore sidebar even if opened
-          undefined
-        : getElementRect(`.${CLASSES.SIDEBAR}`);
-    const sideActionsRect =
-      formFactor === "tablet"
-        ? getElementRect(".selected-shape-actions-container")
-        : formFactor === "desktop"
-        ? getElementRect(`.${CLASSES.SHAPE_ACTIONS_MENU}`)
-        : undefined;
-    const horizontalOffsets = [sidebarRect, sideActionsRect].reduce(
-      (offsets, rect) => {
-        if (!rect) {
-          return offsets;
-        }
-
-        if (rect.left + rect.width / 2 < this.state.width / 2) {
-          return {
-            ...offsets,
-            left: Math.max(offsets.left, rect.right, 0),
-          };
-        }
-
-        return {
-          ...offsets,
-          right: Math.max(offsets.right, this.state.width - rect.left, 0),
+    if (excalidrawContainer && excalidrawContainerRect) {
+      for (const node of excalidrawContainer.querySelectorAll<HTMLElement>(
+        "[data-viewport-ui]",
+      )) {
+        const domRect = node.getBoundingClientRect();
+        // measured relative to the excalidraw container (which the offsets
+        // are relative to), so that embedding the editor at a viewport
+        // offset doesn't skew the values
+        const rect = {
+          top: domRect.top - excalidrawContainerRect.top,
+          right: domRect.right - excalidrawContainerRect.left,
+          bottom: domRect.bottom - excalidrawContainerRect.top,
+          left: domRect.left - excalidrawContainerRect.left,
+          width: domRect.width,
         };
-      },
-      { left: 0, right: 0 },
-    );
+
+        // offsets start at 0, so surfaces translated off-canvas (e.g.
+        // zen-mode transitions) never contribute negative values
+        switch (node.dataset.viewportUi as ViewportUIDock) {
+          case "top":
+            measuredOffsets.top = Math.max(measuredOffsets.top, rect.bottom);
+            break;
+          case "bottom":
+            measuredOffsets.bottom = Math.max(
+              measuredOffsets.bottom,
+              this.state.height - rect.top,
+            );
+            break;
+          case "side":
+            // which side a panel docks to is resolved from its rendered
+            // position (RTL / host-configured docking flip sides), by
+            // checking which half of the viewport its center sits in;
+            // the offset is then its intrusion depth from that edge
+            if (rect.left + rect.width / 2 < this.state.width / 2) {
+              measuredOffsets.left = Math.max(measuredOffsets.left, rect.right);
+            } else {
+              measuredOffsets.right = Math.max(
+                measuredOffsets.right,
+                this.state.width - rect.left,
+              );
+            }
+            break;
+        }
+      }
+    }
 
     const padding = opts?.padding ?? 24;
     const isRTL = getLanguage().rtl;
@@ -4818,10 +4803,10 @@ class App extends React.Component<AppProps, AppState> {
       (isRTL ? opts?.paddingRight : opts?.paddingLeft) ?? padding;
 
     const editorOffsets = {
-      top: topToolbar + topPadding,
-      right: horizontalOffsets.right + rightPadding,
-      bottom: bottomBar + bottomPadding,
-      left: horizontalOffsets.left + leftPadding,
+      top: measuredOffsets.top + topPadding,
+      right: measuredOffsets.right + rightPadding,
+      bottom: measuredOffsets.bottom + bottomPadding,
+      left: measuredOffsets.left + leftPadding,
     };
 
     return {
