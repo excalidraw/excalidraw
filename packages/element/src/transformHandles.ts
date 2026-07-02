@@ -21,7 +21,12 @@ import {
   isLinearElement,
 } from "./typeChecks";
 
-import type { ElementsMap, ExcalidrawElement, PointerType } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  PointerType,
+} from "./types";
 
 export type TransformHandleDirection =
   | "n"
@@ -321,7 +326,7 @@ export const getTransformHandles = (
 };
 
 export const hasBoundingBox = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
   editorInterface: EditorInterface,
 ) => {
