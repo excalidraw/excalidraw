@@ -393,40 +393,55 @@ export const getTargetViewport = (
  * Interpolates the viewport from `from` to `target` at the (already-eased)
  * blend amount `factor` (0 = `from`, 1 = `target`).
  *
- * Zoom is interpolated geometrically (so it feels uniform), and rather than
- * tweening scrollX/scrollY directly we tween the *focal point* — the scene
- * point under the viewport center — and derive scroll from it. Mixing a linear
- * scroll with a geometric zoom makes the focal point swoop sideways
- * mid-animation (most visible when zooming out); gliding the focal point keeps
- * it steady. `width/2/zoom - scroll` is the inverse of `centerScrollOn` without
- * offsets, so factor 0/1 land exactly on `from`/`target`.
+ * Zoom is interpolated geometrically (so it feels uniform), but the pan can't
+ * simply lerp alongside it: pairing a geometric zoom with a linear scroll (or
+ * a linearly-tweened focal point) makes scene points swoop along curved,
+ * non-monotone screen paths once the zoom ratio exceeds ~e (the destination
+ * visibly drifts away before converging). Instead we interpolate the view
+ * transform affinely — a scene point maps to screen as
+ * `(scenePt + scroll) * zoom`, and requiring every point to travel a straight
+ * screen line forces `zoom` to be a convex blend `(1-m)*z0 + m*z1` with
+ * `scroll * zoom` lerped by that same weight. Deriving `m` from the geometric
+ * zoom keeps its pacing while making all screen trajectories straight and
+ * monotone.
  */
 export const interpolateViewport = ({
   from,
   target,
   factor,
 }: {
-  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">;
+  from: Viewport;
   target: Viewport;
   factor: number;
 }): Viewport => {
+  if (factor >= 1) {
+    // land bit-exactly on the target (`z0 * (z1/z0)^1` can be off by an ulp)
+    return { ...target };
+  }
+
   const zoom = (from.zoom.value *
     Math.pow(
       target.zoom.value / from.zoom.value,
       factor,
     )) as NormalizedZoomValue;
 
-  const fromCenterX = from.width / 2 / from.zoom.value - from.scrollX;
-  const fromCenterY = from.height / 2 / from.zoom.value - from.scrollY;
-  const toCenterX = from.width / 2 / target.zoom.value - target.scrollX;
-  const toCenterY = from.height / 2 / target.zoom.value - target.scrollY;
-
-  const centerX = fromCenterX + (toCenterX - fromCenterX) * factor;
-  const centerY = fromCenterY + (toCenterY - fromCenterY) * factor;
+  // pan blend weight derived from the zoom blend (0/0 for pure pans, hence
+  // the `factor` fallback; near-equal zooms are fine — the ratio limits to
+  // `factor` smoothly)
+  const m =
+    target.zoom.value === from.zoom.value
+      ? factor
+      : (zoom - from.zoom.value) / (target.zoom.value - from.zoom.value);
 
   return {
-    scrollX: from.width / 2 / zoom - centerX,
-    scrollY: from.height / 2 / zoom - centerY,
+    scrollX:
+      ((1 - m) * from.scrollX * from.zoom.value +
+        m * target.scrollX * target.zoom.value) /
+      zoom,
+    scrollY:
+      ((1 - m) * from.scrollY * from.zoom.value +
+        m * target.scrollY * target.zoom.value) /
+      zoom,
     zoom: { value: zoom },
   };
 };
@@ -435,7 +450,7 @@ export const interpolateViewport = ({
  * driving the transition through the shared AnimationController so it doesn't
  * slow down other processes. */
 const animateToViewport = (
-  from: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">,
+  from: Viewport,
   target: Viewport,
   duration: number,
   onFrame: (
