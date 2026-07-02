@@ -240,7 +240,7 @@ const getOffsets = (
 };
 
 const addNewNode = (
-  element: ExcalidrawFlowchartNodeElement,
+  element: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
   scene: Scene,
@@ -278,8 +278,8 @@ const addNewNode = (
   );
 
   const bindingArrow = createBindingArrow(
-    element as NonDeleted<ExcalidrawFlowchartNodeElement>,
-    nextNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
+    element,
+    nextNode,
     direction,
     appState,
     scene,
@@ -292,7 +292,7 @@ const addNewNode = (
 };
 
 export const addNewNodes = (
-  startNode: ExcalidrawFlowchartNodeElement,
+  startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
   scene: Scene,
@@ -356,8 +356,8 @@ export const addNewNodes = (
     );
 
     const bindingArrow = createBindingArrow(
-      startNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
-      nextNode as NonDeleted<ExcalidrawFlowchartNodeElement>,
+      startNode,
+      nextNode,
       direction,
       appState,
       scene,
@@ -641,7 +641,7 @@ export class FlowChartCreator {
   pendingNodes: PendingExcalidrawElements | null = null;
 
   createNodes(
-    startNode: ExcalidrawFlowchartNodeElement,
+    startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
     appState: AppState,
     direction: LinkDirection,
     scene: Scene,
