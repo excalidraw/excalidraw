@@ -71,8 +71,14 @@ export const isScrollToRect = (target: unknown): target is ScrollToRect => {
 };
 
 export type ScrollToOptions = {
-  /** what to scroll to: an explicit scene-coordinate box/rect, element(s), or
-   * an element id / element-link URL
+  /**
+   * what to scroll to: an explicit scene-coordinate box/rect, element(s), or
+   * an element id / element-link URL.
+   *
+   * IMPORTANT: if supplying ExcalidrawElement(s), only non-deleted elements
+   * that actually exist on the canvas are considered. If you want to scroll
+   * to elements that's not on canvas yet, supply their bounds by using
+   * `getCommonBounds` (see {@link getCommonBounds}).
    */
   target:
     | Bounds

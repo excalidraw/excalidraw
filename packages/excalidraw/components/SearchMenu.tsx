@@ -10,7 +10,10 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { isElementCompletelyInViewport } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  isElementCompletelyInViewport,
+} from "@excalidraw/element";
 
 import { measureText } from "@excalidraw/element";
 
@@ -240,7 +243,7 @@ export const SearchMenu = () => {
               : "scale-down";
 
           app.scrollTo({
-            target: matchAsElement,
+            target: getCommonBounds([matchAsElement]),
             fit: behavior,
             animation: { duration: 300 },
             offset: app.getViewportOffsets(),

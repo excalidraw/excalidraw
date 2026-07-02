@@ -4945,7 +4945,7 @@ class App extends React.Component<AppProps, AppState> {
             )
           ) {
             this.scrollTo({
-              target: this.flowChartCreator.pendingNodes,
+              target: getCommonBounds(this.flowChartCreator.pendingNodes),
               fit: "scale-down",
               animation: { duration: 300 },
               offset: this.getViewportOffsets(),
