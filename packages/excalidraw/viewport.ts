@@ -28,6 +28,7 @@ import type {
   NormalizedZoomValue,
   Offsets,
   PointerCoords,
+  ScrollConstraints,
   Zoom,
 } from "./types";
 
@@ -81,17 +82,17 @@ export type ScrollToOptions = {
 
   lock?: {
     /** constraints panning to the target box */
-    scroll?: boolean;
+    scroll?: ScrollConstraints["lockScroll"];
     /** makes the resolved zoom the minimum zoom */
-    zoom?: boolean;
+    zoom?: ScrollConstraints["lockZoom"];
     /** rubberband overscroll allowance in viewport px */
-    tolerance?: number;
+    tolerance?: ScrollConstraints["tolerance"];
   };
 
   animation?: AnimationOptions | boolean;
 
   /** CSS-style padding in viewport pixels, zoom-independent. */
-  offset?: Offsets;
+  offset?: ScrollConstraints["offset"];
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;

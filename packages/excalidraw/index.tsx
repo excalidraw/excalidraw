@@ -71,6 +71,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onThemeChange,
     onIncrement,
     initialData,
+    initialState,
     onExcalidrawAPI,
     onMount,
     onUnmount,
@@ -190,6 +191,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onThemeChange={onThemeChange}
           onIncrement={onIncrement}
           initialData={initialData}
+          initialState={initialState}
           onExcalidrawAPI={handleExcalidrawAPI}
           onMount={onMount}
           onUnmount={onUnmount}

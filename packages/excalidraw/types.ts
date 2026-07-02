@@ -59,6 +59,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { ScrollToOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -587,6 +588,10 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type ExcalidrawInitialState = {
+  viewport?: Omit<ScrollToOptions, "animation">;
+};
+
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
@@ -613,6 +618,7 @@ export interface ExcalidrawProps {
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
+  initialState?: ExcalidrawInitialState;
   /**
    * Invoked as soon as the Excalidraw API is available
    * NOTE editor is not yet mounted, and state is not yet initialized

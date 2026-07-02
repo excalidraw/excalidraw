@@ -57,6 +57,59 @@ describe("appState", () => {
     restoreOriginalGetBoundingClientRect();
   });
 
+  it("initialState.viewport on init takes precedence over scrollToContent", async () => {
+    mockBoundingClientRect();
+
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [
+            API.createElement({
+              type: "rectangle",
+              id: "A",
+              width: 100,
+              height: 60,
+            }),
+            API.createElement({
+              type: "rectangle",
+              id: "B",
+              x: 1000,
+              y: 500,
+              width: 200,
+              height: 100,
+            }),
+          ],
+          scrollToContent: true,
+        }}
+        initialState={{
+          viewport: {
+            target: "B",
+            fit: "scale-down",
+            lock: { scroll: true, zoom: true, tolerance: 15 },
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(h.state.width).toBe(200);
+      expect(h.state.height).toBe(100);
+      expect(h.state.scrollX).toBe(-1000);
+      expect(h.state.scrollY).toBe(-500);
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: 1000,
+        y: 500,
+        width: 200,
+        height: 100,
+        lockScroll: true,
+        lockZoom: true,
+        tolerance: 15,
+      });
+    });
+
+    restoreOriginalGetBoundingClientRect();
+  });
+
   it("moving by page up/down/left/right", async () => {
     mockBoundingClientRect();
     await render(<Excalidraw handleKeyboardGlobally={true} />, {});
