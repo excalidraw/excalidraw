@@ -979,7 +979,7 @@ const ExcalidrawWrapper = () => {
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
-            excalidrawAPI?.scrollTo({
+            excalidrawAPI?.setViewport({
               target: element.link,
               fit: "scale-down",
               animation: true,

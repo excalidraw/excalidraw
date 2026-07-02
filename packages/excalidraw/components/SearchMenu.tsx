@@ -242,7 +242,7 @@ export const SearchMenu = () => {
               ? "contain"
               : "scale-down";
 
-          app.scrollTo({
+          app.setViewport({
             target: getCommonBounds([matchAsElement]),
             fit: behavior,
             animation: { duration: 300 },

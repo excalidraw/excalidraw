@@ -59,7 +59,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
-import type { ScrollToOptions } from "./viewport";
+import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -290,7 +290,7 @@ export type ScrollConstraints = {
   /** when set, the viewport cannot zoom out below `zoom` */
   lockZoom: boolean;
   /**
-   * The zoom resolved after the `scrollTo` navigation settled.
+   * The zoom resolved after the `setViewport` navigation settled.
    */
   zoom: number;
   /**
@@ -302,7 +302,7 @@ export type ScrollConstraints = {
    * Extra scrollable margin around the box (CSS-style), letting the viewport
    * scroll past each box edge to reveal that much empty space. Values are
    * viewport pixels and zoom-independent (a fixed on-screen distance). Mirrors
-   * the `offsets` passed to `scrollTo`.
+   * the `offsets` passed to `setViewport`.
    */
   offsets?: Offsets;
 };
@@ -594,7 +594,7 @@ export type ExcalidrawInitialDataState = Merge<
 >;
 
 export type ExcalidrawInitialState = {
-  viewport?: Omit<ScrollToOptions, "animation">;
+  viewport?: Omit<SetViewportOptions, "animation">;
 };
 
 export type OnUserFollowedPayload = {
@@ -868,7 +868,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
-  scrollTo: App["scrollTo"];
+  setViewport: App["setViewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -1010,7 +1010,7 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollTo: InstanceType<typeof App>["scrollTo"];
+  setViewport: InstanceType<typeof App>["setViewport"];
   getViewportOffsets: InstanceType<typeof App>["getViewportOffsets"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];

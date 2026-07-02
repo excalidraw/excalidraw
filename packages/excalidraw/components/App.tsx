@@ -413,10 +413,10 @@ import {
 } from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
-  type ScrollToOptions,
+  type SetViewportOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
-  scrollToBounds,
-  resolveScrollToTarget,
+  setViewportToBounds,
+  resolveViewportTarget,
   getConstrainedTargetViewport,
   constrainScrollState,
   animateToConstraints,
@@ -770,7 +770,7 @@ class App extends React.Component<AppProps, AppState> {
       history: {
         clear: this.resetHistory,
       },
-      scrollTo: this.scrollTo,
+      setViewport: this.setViewport,
       getViewportOffsets: this.getViewportOffsets,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
@@ -3012,7 +3012,7 @@ class App extends React.Component<AppProps, AppState> {
         restoredNonDeletedElements,
       ) as NonDeletedSceneElementsMap;
 
-      const { bounds } = resolveScrollToTarget(
+      const { bounds } = resolveViewportTarget(
         initialViewport.target,
         restoredElementsMap,
         viewportAppState,
@@ -3054,7 +3054,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (isElementLink(window.location.href)) {
-      this.scrollTo({
+      this.setViewport({
         target: window.location.href,
         fit: "scale-down",
         animation: false,
@@ -3964,7 +3964,7 @@ class App extends React.Component<AppProps, AppState> {
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
-    fit?: ScrollToOptions["fit"];
+    fit?: SetViewportOptions["fit"];
     preserveFrameChildrenOrder?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
@@ -4104,7 +4104,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
 
     if (opts.fit) {
-      this.scrollTo({
+      this.setViewport({
         target: duplicatedElements,
         fit: opts.fit,
         animation: false,
@@ -4398,7 +4398,7 @@ class App extends React.Component<AppProps, AppState> {
    *
    * Passing `null` clears any active lock without navigating.
    */
-  scrollTo = (opts: ScrollToOptions | null) => {
+  setViewport = (opts: SetViewportOptions | null) => {
     // `null` clears all active locks
     if (opts === null) {
       if (this.state.scrollConstraints) {
@@ -4410,7 +4410,7 @@ class App extends React.Component<AppProps, AppState> {
     const { target, fit, lock, animation, offsets } = opts;
 
     // resolve the target to a scene-coordinate box.
-    const { bounds, type } = resolveScrollToTarget(
+    const { bounds, type } = resolveViewportTarget(
       target,
       this.scene.getNonDeletedElementsMap(),
       this.state,
@@ -4450,7 +4450,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     };
 
-    scrollToBounds(
+    setViewportToBounds(
       this.state,
       bounds,
       { fit, animation, offsets },
@@ -4950,7 +4950,7 @@ class App extends React.Component<AppProps, AppState> {
               this.getViewportOffsets(),
             )
           ) {
-            this.scrollTo({
+            this.setViewport({
               target: getCommonBounds(this.flowChartCreator.pendingNodes),
               fit: "scale-down",
               animation: { duration: 300 },
@@ -5007,7 +5007,7 @@ class App extends React.Component<AppProps, AppState> {
                   this.getViewportOffsets(),
                 )
               ) {
-                this.scrollTo({
+                this.setViewport({
                   target: nextNode,
                   fit: "scale-down",
                   animation: { duration: 300 },
@@ -5575,7 +5575,7 @@ class App extends React.Component<AppProps, AppState> {
               this.getViewportOffsets(),
             )
           ) {
-            this.scrollTo({
+            this.setViewport({
               target: firstNode,
               fit: "scale-down",
               animation: { duration: 300 },

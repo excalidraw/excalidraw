@@ -399,7 +399,7 @@ describe("animateToConstraints (rubberband snap-back)", () => {
   });
 });
 
-describe("scrollTo lock (integration)", () => {
+describe("setViewport lock (integration)", () => {
   beforeEach(() => {
     mockBoundingClientRect();
   });
@@ -414,7 +414,7 @@ describe("scrollTo lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -432,7 +432,7 @@ describe("scrollTo lock (integration)", () => {
 
     // clearing the lock lets it scroll freely again
     React.act(() => {
-      h.app.scrollTo(null);
+      h.app.setViewport(null);
     });
     expect(h.state.scrollConstraints).toBe(null);
     const before = h.state.scrollY;
@@ -454,7 +454,7 @@ describe("scrollTo lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rect,
         fit: "scale-down",
         animation: { duration: 300 },
@@ -475,7 +475,7 @@ describe("scrollTo lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: { x: 10, y: 20, width: 50 },
         fit: "scale-down",
         animation: false,
@@ -491,7 +491,7 @@ describe("scrollTo lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: { x: 30, y: 40, height: 60 },
         fit: "scale-down",
         animation: false,
@@ -507,7 +507,7 @@ describe("scrollTo lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: { x: 70, y: 80 },
         fit: "scale-down",
         animation: false,
@@ -529,7 +529,7 @@ describe("scrollTo lock (integration)", () => {
 
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const warnMessage =
-      "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out";
+      "supplied element target(s) for setViewport contain deleted or non-existent elements which have been filtered out";
 
     try {
       const validRect = API.createElement({
@@ -549,7 +549,7 @@ describe("scrollTo lock (integration)", () => {
       API.setElements([validRect, deletedRect]);
 
       React.act(() => {
-        h.app.scrollTo({
+        h.app.setViewport({
           target: [
             validRect,
             deletedRect,
@@ -576,7 +576,7 @@ describe("scrollTo lock (integration)", () => {
       warnSpy.mockClear();
 
       React.act(() => {
-        h.app.scrollTo({
+        h.app.setViewport({
           target: [
             deletedRect,
             missingRect,
@@ -605,7 +605,7 @@ describe("scrollTo lock (integration)", () => {
     expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(true);
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: [0, 0, 500, 500],
         fit: "scale-down",
         animation: false,
@@ -636,7 +636,7 @@ describe("scrollTo lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -673,7 +673,7 @@ describe("scrollTo lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -709,7 +709,7 @@ describe("rubberband tolerance (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,

@@ -79,7 +79,7 @@ describe("scale-down", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement,
         fit: "scale-down",
         animation: false,
@@ -115,7 +115,7 @@ describe("scale-down", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: [topLeft, bottomRight],
         fit: "scale-down",
         animation: false,
@@ -146,7 +146,7 @@ describe("scale-down", () => {
 
     act(() => {
       // navigating by element id (a string target) with zoomToFit
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement.id,
         fit: "scale-down",
         animation: false,
@@ -177,7 +177,7 @@ describe("scale-down", () => {
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement,
         fit: "contain",
         animation: false,
@@ -221,7 +221,7 @@ describe("scale-down animated", () => {
     API.setElements([rectElement]);
 
     act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement,
         fit: "scale-down",
         animation: { duration: LONG_ANIMATION_DURATION },
@@ -265,7 +265,7 @@ describe("scale-down animated", () => {
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement,
         fit: "scale-down",
         animation: { duration: LONG_ANIMATION_DURATION },
@@ -302,7 +302,7 @@ describe("scale-down animated", () => {
 
     act(() => {
       // a short duration so the animation completes within a few frames
-      h.app.scrollTo({
+      h.app.setViewport({
         target: rectElement,
         fit: "scale-down",
         animation: { duration: 10 },

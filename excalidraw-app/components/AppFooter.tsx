@@ -12,12 +12,12 @@ import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { DebugFooter, isVisualDebuggerEnabled } from "./DebugCanvas";
 import { EncryptedIcon } from "./EncryptedIcon";
 
-type ScrollToArgs = NonNullable<
-  Parameters<ExcalidrawImperativeAPI["scrollTo"]>[0]
+type SetViewportArgs = NonNullable<
+  Parameters<ExcalidrawImperativeAPI["setViewport"]>[0]
 >;
-type ScrollToFit = NonNullable<ScrollToArgs["fit"]>;
-type LockOptions = NonNullable<ScrollToArgs["lock"]>;
-type ScrollToTarget = ScrollToArgs["target"];
+type SetViewportFit = NonNullable<SetViewportArgs["fit"]>;
+type LockOptions = NonNullable<SetViewportArgs["lock"]>;
+type SetViewportTarget = SetViewportArgs["target"];
 
 const OFFSET_SIDES = ["top", "right", "bottom", "left"] as const;
 
@@ -27,7 +27,7 @@ const ScrollConstraintsDebugFooter = ({
   excalidrawAPI: ExcalidrawImperativeAPI | null;
 }) => {
   const [locked, setLocked] = useState(false);
-  const [fit, setFit] = useState<ScrollToFit>("scale-down");
+  const [fit, setFit] = useState<SetViewportFit>("scale-down");
   const [lock, setLock] = useState<LockOptions>({
     scroll: true,
     zoom: false,
@@ -55,7 +55,7 @@ const ScrollConstraintsDebugFooter = ({
     );
   }, [excalidrawAPI]);
 
-  const getCurrentLockTarget = useCallback((): ScrollToTarget | null => {
+  const getCurrentLockTarget = useCallback((): SetViewportTarget | null => {
     if (!excalidrawAPI) {
       return null;
     }
@@ -70,8 +70,8 @@ const ScrollConstraintsDebugFooter = ({
     (
       nextLock: LockOptions,
       nextOffsets: Offsets,
-      fit: ScrollToFit,
-      animation: ScrollToArgs["animation"] = false,
+      fit: SetViewportFit,
+      animation: SetViewportArgs["animation"] = false,
     ) => {
       if (!excalidrawAPI) {
         return;
@@ -80,7 +80,7 @@ const ScrollConstraintsDebugFooter = ({
       if (!target) {
         return;
       }
-      excalidrawAPI.scrollTo({
+      excalidrawAPI.setViewport({
         target,
         fit,
         animation,
@@ -101,7 +101,7 @@ const ScrollConstraintsDebugFooter = ({
       if (nextLocked) {
         applyLockToCurrentTarget(lock, offsets, fit);
       } else {
-        excalidrawAPI.scrollTo(null);
+        excalidrawAPI.setViewport(null);
         setLocked(false);
       }
     },
@@ -112,12 +112,12 @@ const ScrollConstraintsDebugFooter = ({
     updateLocked(!locked);
   }, [locked, updateLocked]);
 
-  const scrollToSelectionWithLock = useCallback(() => {
+  const setViewportToSelectionWithLock = useCallback(() => {
     const selectedElements = getCurrentLockTarget();
     if (!excalidrawAPI || !selectedElements) {
       return;
     }
-    excalidrawAPI.scrollTo({
+    excalidrawAPI.setViewport({
       target: selectedElements,
       fit,
       animation: true,
@@ -138,7 +138,7 @@ const ScrollConstraintsDebugFooter = ({
   );
 
   const updateBehavior = useCallback(
-    (nextBehavior: ScrollToFit) => {
+    (nextBehavior: SetViewportFit) => {
       setFit(nextBehavior);
       if (locked) {
         applyLockToCurrentTarget(lock, offsets, nextBehavior);
@@ -180,13 +180,15 @@ const ScrollConstraintsDebugFooter = ({
       <button onClick={toggleLock}>
         {locked ? "disable lock" : "lock view"}
       </button>
-      <button onClick={scrollToSelectionWithLock}>scroll + lock</button>
+      <button onClick={setViewportToSelectionWithLock}>
+        set viewport + lock
+      </button>
       <label style={labelStyle}>
         fit
         <select
           value={fit}
           onChange={(event) =>
-            updateBehavior(event.target.value as ScrollToFit)
+            updateBehavior(event.target.value as SetViewportFit)
           }
         >
           <option value="scale-down">scale-down</option>

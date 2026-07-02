@@ -917,7 +917,7 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollTo({
+              excalidrawAPI.setViewport({
                 target: elements[0],
                 fit: "contain",
               });
@@ -933,7 +933,7 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollTo({
+              excalidrawAPI.setViewport({
                 target: elements[0],
                 fit: "scale-down",
               });

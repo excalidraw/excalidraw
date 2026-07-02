@@ -49,19 +49,21 @@ export type AnimationOptions = {
   duration?: number;
 };
 
-export type ScrollToRect = {
+export type SetViewportRect = {
   x: number;
   y: number;
   width?: number;
   height?: number;
 };
 
-export const isScrollToRect = (target: unknown): target is ScrollToRect => {
+export const isSetViewportRect = (
+  target: unknown,
+): target is SetViewportRect => {
   if (!target || typeof target !== "object" || Array.isArray(target)) {
     return false;
   }
 
-  const rect = target as Partial<ScrollToRect>;
+  const rect = target as Partial<SetViewportRect>;
   return (
     typeof rect.x === "number" &&
     typeof rect.y === "number" &&
@@ -70,19 +72,19 @@ export const isScrollToRect = (target: unknown): target is ScrollToRect => {
   );
 };
 
-export type ScrollToOptions = {
+export type SetViewportOptions = {
   /**
-   * what to scroll to: an explicit scene-coordinate box/rect, element(s), or
-   * an element id / element-link URL.
+   * what to show in the viewport: an explicit scene-coordinate box/rect,
+   * element(s), or an element id / element-link URL.
    *
    * IMPORTANT: if supplying ExcalidrawElement(s), only non-deleted elements
-   * that actually exist on the canvas are considered. If you want to scroll
+   * that actually exist on the canvas are considered. If you want to navigate
    * to elements that's not on canvas yet, supply their bounds by using
    * `getCommonBounds` (see {@link getCommonBounds}).
    */
   target:
     | Bounds
-    | ScrollToRect
+    | SetViewportRect
     | ExcalidrawElement
     | readonly ExcalidrawElement[]
     | string;
@@ -259,14 +261,14 @@ export const animateToConstraints = (
 };
 
 /**
- * Scrolls (and, per `fit`, zooms) the viewport so the given target box is
- * in view, optionally animating the transition. `onComplete` runs once the
+ * Scrolls (and, per `fit`, zooms) the viewport so the given target box is in
+ * view, optionally animating the transition. `onComplete` runs once the
  * viewport has settled on the target.
  */
-export const scrollToBounds = (
+export const setViewportToBounds = (
   state: AppState,
   bounds: Bounds,
-  opts: Pick<ScrollToOptions, "fit" | "animation" | "offsets">,
+  opts: Pick<SetViewportOptions, "fit" | "animation" | "offsets">,
   onFrame: (
     state: Pick<
       AppState,
@@ -317,7 +319,7 @@ export const zoomToFitBounds = ({
   bounds: SceneBounds;
   canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
-  fit?: ScrollToOptions["fit"];
+  fit?: SetViewportOptions["fit"];
   minZoom?: number;
   maxZoom?: number;
   steppedZoom?: boolean;
@@ -387,7 +389,7 @@ export const zoomToFitBounds = ({
 export const getTargetViewport = (
   state: AppState,
   bounds: Bounds,
-  fit: ScrollToOptions["fit"] = "scale-down",
+  fit: SetViewportOptions["fit"] = "scale-down",
   offsets?: Offsets,
 ): Viewport => {
   const { appState } = zoomToFitBounds({
@@ -417,7 +419,7 @@ const getElementsFromId = (
   return getElementsInGroup(elementsMap, id);
 };
 
-export type ResolvedScrollToTarget = {
+export type ResolvedViewportTarget = {
   /** null when the target couldn't be resolved (unknown id/link, or all
    * supplied elements deleted) */
   bounds: Bounds | null;
@@ -426,12 +428,12 @@ export type ResolvedScrollToTarget = {
   type: "element" | "area" | "link";
 };
 
-/** Resolves a `scrollTo` target to a scene-coordinate box. */
-export const resolveScrollToTarget = (
-  target: ScrollToOptions["target"],
+/** Resolves a `setViewport` target to a scene-coordinate box. */
+export const resolveViewportTarget = (
+  target: SetViewportOptions["target"],
   elementsMap: NonDeletedSceneElementsMap,
   appState: Pick<AppState, "width" | "height">,
-): ResolvedScrollToTarget => {
+): ResolvedViewportTarget => {
   if (typeof target === "string") {
     const isLink = isElementLink(target);
     const type = isLink ? ("link" as const) : ("element" as const);
@@ -449,7 +451,7 @@ export const resolveScrollToTarget = (
     return { bounds: target, type: "area" };
   }
 
-  if (isScrollToRect(target) && !isExcalidrawElement(target)) {
+  if (isSetViewportRect(target) && !isExcalidrawElement(target)) {
     const width = target.width ?? appState.width;
     const height = target.height ?? appState.height;
     return {
@@ -478,7 +480,7 @@ export const resolveScrollToTarget = (
   const hasNoElements = !elements.length;
   if (elements.length !== targetElements.length || hasNoElements) {
     console.warn(
-      "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out",
+      "supplied element target(s) for setViewport contain deleted or non-existent elements which have been filtered out",
     );
   }
 
@@ -495,7 +497,7 @@ export const resolveScrollToTarget = (
 export const getConstrainedTargetViewport = (
   appState: AppState,
   bounds: Bounds,
-  { fit, offsets, lock }: Pick<ScrollToOptions, "fit" | "offsets" | "lock">,
+  { fit, offsets, lock }: Pick<SetViewportOptions, "fit" | "offsets" | "lock">,
 ): Viewport & { scrollConstraints: ScrollConstraints | null } => {
   const viewport = getTargetViewport(appState, bounds, fit, offsets);
 
