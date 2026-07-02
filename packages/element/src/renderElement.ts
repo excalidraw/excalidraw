@@ -148,7 +148,7 @@ export interface ExcalidrawElementWithCanvas {
 }
 
 const cappedElementCanvasSize = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   zoom: Zoom,
 ): {
@@ -203,7 +203,7 @@ const cappedElementCanvasSize = (
 };
 
 const generateElementCanvas = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
@@ -386,7 +386,7 @@ const drawImagePlaceholder = (
 };
 
 const drawElementOnCanvas = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -607,7 +607,7 @@ export const elementWithCanvasCache = new WeakMap<
 >();
 
 const generateElementWithCanvas = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
@@ -779,7 +779,7 @@ export const renderSelectionElement = (
 };
 
 export const renderElement = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
   allElementsMap: NonDeletedSceneElementsMap,
   rc: RoughCanvas,

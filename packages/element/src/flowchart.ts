@@ -299,7 +299,7 @@ export const addNewNodes = (
   numberOfNodes: number,
 ) => {
   // always start from 0 and distribute evenly
-  const newNodes: ExcalidrawElement[] = [];
+  const newNodes: NonDeletedExcalidrawElement[] = [];
 
   for (let i = 0; i < numberOfNodes; i++) {
     let nextX: number;
@@ -500,6 +500,7 @@ const createBindingArrow = (
   return {
     ...bindingArrow,
     ...update,
+    isDeleted: bindingArrow.isDeleted,
   };
 };
 
