@@ -17,7 +17,14 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
-- `zoomToFitBounds` now accepts `fit: "scale-down" | "contain"` instead of `fitToViewport` / `viewportZoomFactor`. Use `fit: "scale-down"` for the previous fit-to-content behavior, and `fit: "contain"` for the previous fit-to-viewport behavior [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
+- Replaced `ExcalidrawAPI.scrollToContent(target?, opts?)` with `ExcalidrawAPI.scrollTo(opts | null)`. `scrollTo` now takes a required `target` option (`Bounds`, `{ x, y, width?, height? }`, element, elements, element id, or element-link URL), and computes the viewport using `fit` (previously `fitToContent/fitToViewport`). Rect targets default missing `width` / `height` to the viewport dimensions. Calls without a target no longer imply all scene elements; pass `target: excalidrawAPI.getSceneElements()` instead. Passing `null` clears active scroll/zoom locks [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
+
+  - `fitToContent` / `fitToViewport` were replaced with `fit: "scale-down" | "contain"`. Use `"scale-down"` for the previous fit-to-content behavior, and `"contain"` for the previous fit-to-viewport behavior.
+  - `animate` / `duration` were replaced with `animation: boolean | { duration?: number }`. Pass `animation: false` for the previous non-animated default.
+  - `canvasOffsets` was renamed to `offset`.
+  - `scrollLock` / constraint options were replaced with `lock: { scroll?: boolean; zoom?: boolean; tolerance?: number }`. `lock.scroll` constrains panning to the target, `lock.zoom` uses the resolved target zoom as the minimum zoom, and `tolerance` is the rubberband allowance in viewport pixels.
+  - `minZoom`, `maxZoom`, and `viewportZoomFactor` are no longer supported on `scrollTo`.
+  - `zoomToFitBounds` now also accepts `fit: "scale-down" | "contain"` instead of `fitToViewport` / `viewportZoomFactor`.
 
 - Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
 
@@ -30,6 +37,8 @@ Please add the latest change on the top under the correct section.
   - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
 ### Features
+
+- Added `<Excalidraw initialState={{ viewport }} />` for initializing the viewport and optional scroll/zoom lock once on scene load. This uses the same target options as `excalidrawAPI.scrollTo` except `animation`, and takes precedence over `initialData.scrollToContent` [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
 
 - Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on umount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 
@@ -45,7 +54,10 @@ Please add the latest change on the top under the correct section.
       });
 
       api.onEvent("editor:initialize").then((readyApi) => {
-        readyApi.scrollToContent();
+        readyApi.scrollTo({
+          target: readyApi.getSceneElements(),
+          animation: false,
+        });
       });
     }}
   />
