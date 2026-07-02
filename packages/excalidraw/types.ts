@@ -302,9 +302,9 @@ export type ScrollConstraints = {
    * Extra scrollable margin around the box (CSS-style), letting the viewport
    * scroll past each box edge to reveal that much empty space. Values are
    * viewport pixels and zoom-independent (a fixed on-screen distance). Mirrors
-   * the `offset` passed to `scrollTo`.
+   * the `offsets` passed to `scrollTo`.
    */
-  offset?: Offsets;
+  offsets?: Offsets;
 };
 
 export interface AppState {

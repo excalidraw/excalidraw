@@ -107,7 +107,7 @@ export type ScrollToOptions = {
   animation?: AnimationOptions | boolean;
 
   /** CSS-style padding in viewport pixels, zoom-independent. */
-  offset?: ScrollConstraints["offset"];
+  offsets?: ScrollConstraints["offsets"];
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
@@ -128,7 +128,7 @@ const resolveAnimationDuration = (
  * Clamps a single scroll axis so the visible scene span stays inside the box.
  * The visible span is `[-scroll, -scroll + visibleSize]`; we keep it within
  * `[boxStart, boxStart + boxSize]`, expanded by `startExpand` at the low edge
- * and `endExpand` at the high edge (rubberband overscroll plus any offset).
+ * and `endExpand` at the high edge (rubberband overscroll plus any offsets).
  * When the box can't cover the viewport on this axis (the viewport is larger
  * than the box) we center the box instead.
  */
@@ -180,11 +180,11 @@ export const constrainScrollState = (
   }
 
   const overscroll = tolerance / zoomValue;
-  const offset = scrollConstraints.offset;
-  const offsetTop = (offset?.top ?? 0) / zoomValue;
-  const offsetRight = (offset?.right ?? 0) / zoomValue;
-  const offsetBottom = (offset?.bottom ?? 0) / zoomValue;
-  const offsetLeft = (offset?.left ?? 0) / zoomValue;
+  const offsets = scrollConstraints.offsets;
+  const offsetTop = (offsets?.top ?? 0) / zoomValue;
+  const offsetRight = (offsets?.right ?? 0) / zoomValue;
+  const offsetBottom = (offsets?.bottom ?? 0) / zoomValue;
+  const offsetLeft = (offsets?.left ?? 0) / zoomValue;
 
   return {
     scrollX: constrainScrollAxis(
@@ -266,7 +266,7 @@ export const animateToConstraints = (
 export const scrollToBounds = (
   state: AppState,
   bounds: Bounds,
-  opts: Pick<ScrollToOptions, "fit" | "animation" | "offset">,
+  opts: Pick<ScrollToOptions, "fit" | "animation" | "offsets">,
   onFrame: (
     state: Pick<
       AppState,
@@ -277,7 +277,7 @@ export const scrollToBounds = (
 ) => {
   AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
 
-  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offset);
+  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offsets);
 
   const duration = resolveAnimationDuration(opts.animation);
 
@@ -388,13 +388,13 @@ export const getTargetViewport = (
   state: AppState,
   bounds: Bounds,
   fit: ScrollToOptions["fit"] = "scale-down",
-  offset?: Offsets,
+  offsets?: Offsets,
 ): Viewport => {
   const { appState } = zoomToFitBounds({
     bounds,
     appState: state,
     fit,
-    canvasOffsets: offset,
+    canvasOffsets: offsets,
     steppedZoom: false,
   });
 
@@ -495,9 +495,9 @@ export const resolveScrollToTarget = (
 export const getConstrainedTargetViewport = (
   appState: AppState,
   bounds: Bounds,
-  { fit, offset, lock }: Pick<ScrollToOptions, "fit" | "offset" | "lock">,
+  { fit, offsets, lock }: Pick<ScrollToOptions, "fit" | "offsets" | "lock">,
 ): Viewport & { scrollConstraints: ScrollConstraints | null } => {
-  const viewport = getTargetViewport(appState, bounds, fit, offset);
+  const viewport = getTargetViewport(appState, bounds, fit, offsets);
 
   if (!lock?.scroll && !lock?.zoom) {
     return { ...viewport, scrollConstraints: null };
@@ -513,7 +513,7 @@ export const getConstrainedTargetViewport = (
     lockZoom: !!lock.zoom,
     zoom: viewport.zoom.value,
     tolerance: lock.tolerance ?? 0,
-    offset,
+    offsets,
   };
 
   return {

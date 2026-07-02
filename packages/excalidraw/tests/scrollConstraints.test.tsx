@@ -53,7 +53,7 @@ const makeState = (
 });
 
 /** A lock box with sensible defaults; pass `lockScroll`/`lockZoom`/`zoom`/
- * `tolerance`/`offset` to override. */
+ * `tolerance`/`offsets` to override. */
 const makeLock = (
   overrides: Partial<ScrollConstraints> &
     Pick<ScrollConstraints, "x" | "y" | "width" | "height">,
@@ -206,14 +206,14 @@ describe("zoom lock (pure)", () => {
   });
 });
 
-describe("offset (pure)", () => {
+describe("offsets (pure)", () => {
   const base = { x: 0, y: 0, width: 1000, height: 1000 } as const;
 
   it("extends the scrollable area past each edge", () => {
-    const offset = { top: 10, right: 20, bottom: 30, left: 40 };
-    const lock = makeLock({ ...base, lockScroll: true, offset });
+    const offsets = { top: 10, right: 20, bottom: 30, left: 40 };
+    const lock = makeLock({ ...base, lockScroll: true, offsets });
 
-    // pan past the top-left corner → clamp to the offset corner
+    // pan past the top-left corner → clamp to the offsets corner
     const topLeft = constrainScrollState(
       makeState({ scrollX: 999, scrollY: 999, scrollConstraints: lock }),
     );
@@ -228,7 +228,7 @@ describe("offset (pure)", () => {
     expect(farEdge.scrollY).toBeCloseTo(VIEWPORT.height - base.height - 30); // -930
   });
 
-  it("keeps the offset a fixed screen distance regardless of zoom", () => {
+  it("keeps the offsets a fixed screen distance regardless of zoom", () => {
     // 40 screen px of top offset at zoom 2 → 20 scene px
     const result = constrainScrollState(
       makeState({
@@ -237,7 +237,7 @@ describe("offset (pure)", () => {
         scrollConstraints: makeLock({
           ...base,
           lockScroll: true,
-          offset: { top: 40 },
+          offsets: { top: 40 },
         }),
       }),
     );
@@ -263,7 +263,7 @@ describe("offset (pure)", () => {
           ...base,
           lockScroll: true,
           tolerance,
-          offset: { left: 40 },
+          offsets: { left: 40 },
         }),
       }),
       tolerance,

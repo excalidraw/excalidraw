@@ -33,7 +33,7 @@ const ScrollConstraintsDebugFooter = ({
     zoom: false,
     tolerance: 0,
   });
-  const [offset, setOffset] = useState<Offsets>({
+  const [offsets, setOffsets] = useState<Offsets>({
     top: 0,
     right: 0,
     bottom: 0,
@@ -69,7 +69,7 @@ const ScrollConstraintsDebugFooter = ({
   const applyLockToCurrentTarget = useCallback(
     (
       nextLock: LockOptions,
-      nextOffset: Offsets,
+      nextOffsets: Offsets,
       fit: ScrollToFit,
       animation: ScrollToArgs["animation"] = false,
     ) => {
@@ -85,7 +85,7 @@ const ScrollConstraintsDebugFooter = ({
         fit,
         animation,
         lock: nextLock,
-        offset: nextOffset,
+        offsets: nextOffsets,
       });
       setLocked(true);
     },
@@ -99,13 +99,13 @@ const ScrollConstraintsDebugFooter = ({
       }
 
       if (nextLocked) {
-        applyLockToCurrentTarget(lock, offset, fit);
+        applyLockToCurrentTarget(lock, offsets, fit);
       } else {
         excalidrawAPI.scrollTo(null);
         setLocked(false);
       }
     },
-    [applyLockToCurrentTarget, fit, excalidrawAPI, lock, offset],
+    [applyLockToCurrentTarget, fit, excalidrawAPI, lock, offsets],
   );
 
   const toggleLock = useCallback(() => {
@@ -122,43 +122,43 @@ const ScrollConstraintsDebugFooter = ({
       fit,
       animation: true,
       lock,
-      offset,
+      offsets,
     });
     setLocked(true);
-  }, [excalidrawAPI, fit, lock, offset, getCurrentLockTarget]);
+  }, [excalidrawAPI, fit, lock, offsets, getCurrentLockTarget]);
 
   const updateLock = useCallback(
     (nextLock: LockOptions) => {
       setLock(nextLock);
       if (locked) {
-        applyLockToCurrentTarget(nextLock, offset, fit);
+        applyLockToCurrentTarget(nextLock, offsets, fit);
       }
     },
-    [applyLockToCurrentTarget, fit, locked, offset],
+    [applyLockToCurrentTarget, fit, locked, offsets],
   );
 
   const updateBehavior = useCallback(
     (nextBehavior: ScrollToFit) => {
       setFit(nextBehavior);
       if (locked) {
-        applyLockToCurrentTarget(lock, offset, nextBehavior);
+        applyLockToCurrentTarget(lock, offsets, nextBehavior);
       }
     },
-    [applyLockToCurrentTarget, lock, locked, offset],
+    [applyLockToCurrentTarget, lock, locked, offsets],
   );
 
   const updateOffset = useCallback(
     (side: typeof OFFSET_SIDES[number], value: string) => {
-      const nextOffset = {
-        ...offset,
+      const nextOffsets = {
+        ...offsets,
         [side]: value === "" ? 0 : Number(value),
       };
-      setOffset(nextOffset);
+      setOffsets(nextOffsets);
       if (locked) {
-        applyLockToCurrentTarget(lock, nextOffset, fit);
+        applyLockToCurrentTarget(lock, nextOffsets, fit);
       }
     },
-    [applyLockToCurrentTarget, fit, offset, lock, locked],
+    [applyLockToCurrentTarget, fit, offsets, lock, locked],
   );
 
   const labelStyle = {
@@ -237,7 +237,7 @@ const ScrollConstraintsDebugFooter = ({
             type="number"
             min={0}
             step={1}
-            value={offset[side] ?? 0}
+            value={offsets[side] ?? 0}
             onChange={(event) => updateOffset(side, event.target.value)}
             style={{ width: 48 }}
           />

@@ -4107,7 +4107,7 @@ class App extends React.Component<AppProps, AppState> {
         target: duplicatedElements,
         fit: opts.fit,
         animation: false,
-        offset: this.getViewportOffsets(),
+        offsets: this.getViewportOffsets(),
       });
     }
   };
@@ -4406,7 +4406,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { target, fit, lock, animation, offset } = opts;
+    const { target, fit, lock, animation, offsets } = opts;
 
     // resolve the target to a scene-coordinate box.
     const { bounds, type } = resolveScrollToTarget(
@@ -4433,7 +4433,7 @@ class App extends React.Component<AppProps, AppState> {
     // committed yet.
     const viewportUpdate = getConstrainedTargetViewport(this.state, bounds, {
       fit,
-      offset,
+      offsets,
       lock,
     });
 
@@ -4452,7 +4452,7 @@ class App extends React.Component<AppProps, AppState> {
     scrollToBounds(
       this.state,
       bounds,
-      { fit, animation, offset },
+      { fit, animation, offsets },
       this.setState.bind(this),
       installLock,
     );
@@ -4948,7 +4948,7 @@ class App extends React.Component<AppProps, AppState> {
               target: getCommonBounds(this.flowChartCreator.pendingNodes),
               fit: "scale-down",
               animation: { duration: 300 },
-              offset: this.getViewportOffsets(),
+              offsets: this.getViewportOffsets(),
             });
           }
 
@@ -5005,7 +5005,7 @@ class App extends React.Component<AppProps, AppState> {
                   target: nextNode,
                   fit: "scale-down",
                   animation: { duration: 300 },
-                  offset: this.getViewportOffsets(),
+                  offsets: this.getViewportOffsets(),
                 });
               }
             }
@@ -5573,7 +5573,7 @@ class App extends React.Component<AppProps, AppState> {
               target: firstNode,
               fit: "scale-down",
               animation: { duration: 300 },
-              offset: this.getViewportOffsets(),
+              offsets: this.getViewportOffsets(),
             });
           }
         }
