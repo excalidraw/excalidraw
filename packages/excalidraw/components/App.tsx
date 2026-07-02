@@ -4740,9 +4740,30 @@ class App extends React.Component<AppProps, AppState> {
     right?: number;
   }): Offsets => {
     const excalidrawContainer = this.excalidrawContainerRef?.current;
+    const excalidrawContainerRect =
+      excalidrawContainer?.getBoundingClientRect();
     const formFactor = this.editorInterface.formFactor;
-    const getElementRect = (selector: string) =>
-      excalidrawContainer?.querySelector(selector)?.getBoundingClientRect();
+    // measured relative to the excalidraw container (which the offsets are
+    // relative to), so that embedding the editor at a viewport offset
+    // doesn't skew the values
+    const getElementRect = (selector: string) => {
+      const rect = excalidrawContainer
+        ?.querySelector(selector)
+        ?.getBoundingClientRect();
+
+      if (!rect || !excalidrawContainerRect) {
+        return rect;
+      }
+
+      return {
+        top: rect.top - excalidrawContainerRect.top,
+        right: rect.right - excalidrawContainerRect.left,
+        bottom: rect.bottom - excalidrawContainerRect.top,
+        left: rect.left - excalidrawContainerRect.left,
+        width: rect.width,
+        height: rect.height,
+      };
+    };
 
     const topToolbar =
       formFactor === "phone" ? 0 : getElementRect(".App-toolbar")?.bottom ?? 0;
