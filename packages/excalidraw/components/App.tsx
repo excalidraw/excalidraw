@@ -111,8 +111,6 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
-  isBounds,
-  type Bounds,
 } from "@excalidraw/common";
 
 import {
@@ -264,8 +262,6 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  parseElementLinkFromURL,
-  isExcalidrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -420,11 +416,11 @@ import {
   type ScrollToOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
   scrollToBounds,
-  getTargetViewport,
+  resolveScrollToTarget,
+  getConstrainedTargetViewport,
   constrainScrollState,
   animateToConstraints,
   isViewportOverscrolled,
-  isScrollToRect,
 } from "../viewport";
 import {
   setEraserCursor,
@@ -508,7 +504,6 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-  ScrollConstraints,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -3015,50 +3010,21 @@ class App extends React.Component<AppProps, AppState> {
         restoredNonDeletedElements,
       ) as NonDeletedSceneElementsMap;
 
-      const bounds = this.resolveScrollToTarget(
+      const { bounds } = resolveScrollToTarget(
         initialViewport.target,
         restoredElementsMap,
         viewportAppState,
       );
 
       if (bounds) {
-        const resolvedViewport = getTargetViewport(
-          viewportAppState,
-          bounds,
-          initialViewport.fit,
-          initialViewport.offset,
-        );
         restoredAppState = {
           ...restoredAppState,
-          ...resolvedViewport,
-          scrollConstraints: null,
+          ...getConstrainedTargetViewport(
+            viewportAppState,
+            bounds,
+            initialViewport,
+          ),
         };
-
-        const { lock, offset } = initialViewport;
-        if (lock?.scroll || lock?.zoom) {
-          const [x1, y1, x2, y2] = bounds;
-          const scrollConstraints: ScrollConstraints = {
-            x: x1,
-            y: y1,
-            width: x2 - x1,
-            height: y2 - y1,
-            lockScroll: !!lock.scroll,
-            lockZoom: !!lock.zoom,
-            zoom: resolvedViewport.zoom.value,
-            tolerance: lock.tolerance ?? 0,
-            offset,
-          };
-
-          restoredAppState = {
-            ...restoredAppState,
-            scrollConstraints,
-            ...constrainScrollState({
-              ...viewportAppState,
-              ...resolvedViewport,
-              scrollConstraints,
-            }),
-          };
-        }
       }
     } else if (initialData?.scrollToContent) {
       restoredAppState = {
@@ -3092,87 +3058,6 @@ class App extends React.Component<AppProps, AppState> {
         animation: false,
       });
     }
-  };
-
-  private getElementsFromId = (
-    id: string,
-    elementsMap: NonDeletedSceneElementsMap,
-  ) => {
-    const element = elementsMap.get(id);
-    if (element) {
-      return [element];
-    }
-
-    return getElementsInGroup(elementsMap, id);
-  };
-
-  private resolveScrollToTarget = (
-    target: ScrollToOptions["target"],
-    elementsMap: NonDeletedSceneElementsMap,
-    appState: Pick<AppState, "width" | "height">,
-    opts?: { showElementLinkNotFoundToast?: boolean },
-  ): Bounds | null => {
-    if (typeof target === "string") {
-      const id = isElementLink(target)
-        ? parseElementLinkFromURL(target)
-        : target;
-      const resolved = id ? this.getElementsFromId(id, elementsMap) : [];
-
-      if (!resolved.length) {
-        if (opts?.showElementLinkNotFoundToast && isElementLink(target)) {
-          this.setState({
-            toast: {
-              message: t("elementLink.notFound"),
-              duration: 3000,
-              closable: true,
-            },
-          });
-        }
-        return null;
-      }
-
-      return getCommonBounds(resolved, elementsMap);
-    }
-
-    if (isBounds(target)) {
-      return target;
-    }
-
-    if (isScrollToRect(target) && !isExcalidrawElement(target)) {
-      const width = target.width ?? appState.width;
-      const height = target.height ?? appState.height;
-      return [target.x, target.y, target.x + width, target.y + height];
-    }
-
-    // widening to null values in case the host app doesn't have
-    // noUncheckedIndexedAccess enabled
-    const targetElements: (ExcalidrawElement | undefined | null)[] =
-      Array.isArray(target) ? target : [target];
-    const elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
-      (acc, element) => {
-        if (element && !element.isDeleted) {
-          const sceneElement = elementsMap.get(element.id);
-          if (sceneElement) {
-            acc.push(sceneElement);
-          }
-        }
-        return acc;
-      },
-      [],
-    );
-
-    const hasNoElements = !elements.length;
-    if (elements.length !== targetElements.length || hasNoElements) {
-      console.warn(
-        "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out",
-      );
-    }
-
-    if (hasNoElements) {
-      return null;
-    }
-
-    return getCommonBounds(elements, elementsMap);
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
@@ -4523,57 +4408,43 @@ class App extends React.Component<AppProps, AppState> {
     const { target, fit, lock, animation, offset } = opts;
 
     // resolve the target to a scene-coordinate box.
-    const bounds = this.resolveScrollToTarget(
+    const { bounds, type } = resolveScrollToTarget(
       target,
       this.scene.getNonDeletedElementsMap(),
       this.state,
-      { showElementLinkNotFoundToast: true },
     );
 
     if (!bounds) {
+      if (type === "link") {
+        this.setState({
+          toast: {
+            message: t("elementLink.notFound"),
+            duration: 3000,
+            closable: true,
+          },
+        });
+      }
       return;
     }
 
     // capture the viewport we'll land on now, so the lock can be installed
     // against the intended final state even if the last animation frame hasn't
     // committed yet.
-    const resolvedViewport = getTargetViewport(this.state, bounds, fit, offset);
-    const resolvedZoom = resolvedViewport.zoom.value;
+    const viewportUpdate = getConstrainedTargetViewport(this.state, bounds, {
+      fit,
+      offset,
+      lock,
+    });
 
     // chain: once the scroll/zoom has settled, install (or clear) the lock
     const installLock = () => {
-      if (!lock?.scroll && !lock?.zoom) {
-        // no lock requested: a navigation supersedes any previous lock
-        if (this.state.scrollConstraints) {
-          flushSync(() => {
-            this.setState({ ...resolvedViewport, scrollConstraints: null });
-          });
-        }
+      if (!viewportUpdate.scrollConstraints && !this.state.scrollConstraints) {
+        // no lock requested and none to supersede
         return;
       }
 
-      const [x1, y1, x2, y2] = bounds;
-      const scrollConstraints: ScrollConstraints = {
-        x: x1,
-        y: y1,
-        width: x2 - x1,
-        height: y2 - y1,
-        lockScroll: !!lock.scroll,
-        lockZoom: !!lock.zoom,
-        zoom: resolvedZoom,
-        tolerance: lock.tolerance ?? 0,
-        offset,
-      };
-
       flushSync(() => {
-        this.setState((prevState) => ({
-          scrollConstraints,
-          ...constrainScrollState({
-            ...prevState,
-            ...resolvedViewport,
-            scrollConstraints,
-          }),
-        }));
+        this.setState(viewportUpdate);
       });
     };
 

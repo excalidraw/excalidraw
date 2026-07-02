@@ -1,6 +1,7 @@
 import {
   arrayToMap,
   easeOut,
+  isBounds,
   MAX_ZOOM,
   MIN_ZOOM,
   viewportCoordsToSceneCoords,
@@ -12,13 +13,21 @@ import {
   CaptureUpdateAction,
   getCommonBounds,
   getElementBounds,
+  getElementsInGroup,
   getVisibleElements,
+  isElementLink,
+  isExcalidrawElement,
+  parseElementLinkFromURL,
 } from "@excalidraw/element";
 
 import type { SceneBounds } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
 
 import { AnimationController } from "./renderer/animation";
 import { getNormalizedZoom } from "./scene";
@@ -387,6 +396,123 @@ export const getTargetViewport = (
     scrollX: appState.scrollX,
     scrollY: appState.scrollY,
     zoom: appState.zoom,
+  };
+};
+
+const getElementsFromId = (
+  id: string,
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  const element = elementsMap.get(id);
+  if (element) {
+    return [element];
+  }
+
+  return getElementsInGroup(elementsMap, id);
+};
+
+export type ResolvedScrollToTarget = {
+  /** null when the target couldn't be resolved (unknown id/link, or all
+   * supplied elements deleted) */
+  bounds: Bounds | null;
+  /** how the target was specified, so callers can react to unresolved
+   * targets themselves (e.g. toast on a broken element link) */
+  type: "element" | "area" | "link";
+};
+
+/** Resolves a `scrollTo` target to a scene-coordinate box. */
+export const resolveScrollToTarget = (
+  target: ScrollToOptions["target"],
+  elementsMap: NonDeletedSceneElementsMap,
+  appState: Pick<AppState, "width" | "height">,
+): ResolvedScrollToTarget => {
+  if (typeof target === "string") {
+    const isLink = isElementLink(target);
+    const type = isLink ? ("link" as const) : ("element" as const);
+    const id = isLink ? parseElementLinkFromURL(target) : target;
+    const resolved = id ? getElementsFromId(id, elementsMap) : [];
+
+    if (!resolved.length) {
+      return { bounds: null, type };
+    }
+
+    return { bounds: getCommonBounds(resolved, elementsMap), type };
+  }
+
+  if (isBounds(target)) {
+    return { bounds: target, type: "area" };
+  }
+
+  if (isScrollToRect(target) && !isExcalidrawElement(target)) {
+    const width = target.width ?? appState.width;
+    const height = target.height ?? appState.height;
+    return {
+      bounds: [target.x, target.y, target.x + width, target.y + height],
+      type: "area",
+    };
+  }
+
+  // widening to null values in case the host app doesn't have
+  // noUncheckedIndexedAccess enabled
+  const targetElements: (ExcalidrawElement | undefined | null)[] =
+    Array.isArray(target) ? target : [target];
+  const elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
+    (acc, element) => {
+      if (element && !element.isDeleted) {
+        const sceneElement = elementsMap.get(element.id);
+        if (sceneElement) {
+          acc.push(sceneElement);
+        }
+      }
+      return acc;
+    },
+    [],
+  );
+
+  const hasNoElements = !elements.length;
+  if (elements.length !== targetElements.length || hasNoElements) {
+    console.warn(
+      "supplied element(s) to scroll to contain deleted or non-existent elements which have been filtered out",
+    );
+  }
+
+  if (hasNoElements) {
+    return { bounds: null, type: "element" };
+  }
+
+  return { bounds: getCommonBounds(elements, elementsMap), type: "element" };
+};
+
+/** Computes the viewport patch for landing on `bounds`: the target
+ * scroll/zoom, plus the scroll lock to install — or `scrollConstraints: null`
+ * to clear a previous lock when none is requested. */
+export const getConstrainedTargetViewport = (
+  appState: AppState,
+  bounds: Bounds,
+  { fit, offset, lock }: Pick<ScrollToOptions, "fit" | "offset" | "lock">,
+): Viewport & { scrollConstraints: ScrollConstraints | null } => {
+  const viewport = getTargetViewport(appState, bounds, fit, offset);
+
+  if (!lock?.scroll && !lock?.zoom) {
+    return { ...viewport, scrollConstraints: null };
+  }
+
+  const [x1, y1, x2, y2] = bounds;
+  const scrollConstraints: ScrollConstraints = {
+    x: x1,
+    y: y1,
+    width: x2 - x1,
+    height: y2 - y1,
+    lockScroll: !!lock.scroll,
+    lockZoom: !!lock.zoom,
+    zoom: viewport.zoom.value,
+    tolerance: lock.tolerance ?? 0,
+    offset,
+  };
+
+  return {
+    ...constrainScrollState({ ...appState, ...viewport, scrollConstraints }),
+    scrollConstraints,
   };
 };
 
