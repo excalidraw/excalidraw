@@ -765,9 +765,10 @@ export const renderSceneToSvg = (
               boundTextElement.y + renderConfig.offsetY,
               renderConfig,
             );
-          } else {
+          } else if (boundTextElement) {
+            // SAFETY: This should never happen, but log it just in case
             console.error(
-              "[NONDELETED][INVARIANT] Rendering deleted bound text element",
+              "[NONDELETED][INVARIANT] Skipped rendering deleted bound text element",
             );
           }
         } catch (error: any) {

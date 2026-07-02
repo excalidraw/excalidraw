@@ -191,11 +191,17 @@ export const changeProperty = (
 
   return elements.map((element) => {
     if (
-      isNonDeletedElement(element) &&
-      (selectedElementIds.get(element.id) ||
-        element.id === appState.editingTextElement?.id)
+      selectedElementIds.get(element.id) ||
+      element.id === appState.editingTextElement?.id
     ) {
       // selected & editing elements are non-deleted
+      if (!isNonDeletedElement(element)) {
+        // SAFETY: This should never happen, but log it just in case
+        console.error(
+          "[NONDELETED][INVARIANT] changeProperty(): skipping deleted selected/editing element",
+        );
+        return element;
+      }
       return callback(element);
     }
     return element;

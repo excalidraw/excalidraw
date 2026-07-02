@@ -12927,6 +12927,11 @@ class App extends React.Component<AppProps, AppState> {
         ).forEach((element) => {
           if (isNonDeletedElement(element)) {
             elementsToHighlight.add(element);
+          } else {
+            // SAFETY: This should never happen, but log it just in case
+            console.error(
+              "[NONDELETED][INVARIANT] Skipped highlighting deleted element in resizing frame",
+            );
           }
         });
       });
