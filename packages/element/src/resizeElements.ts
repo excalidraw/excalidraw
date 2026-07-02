@@ -265,7 +265,7 @@ const rotateSingleElement = (
 };
 
 export const rescalePointsInElement = (
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   width: number,
   height: number,
   normalizePoints: boolean,
@@ -282,7 +282,7 @@ export const rescalePointsInElement = (
     : {};
 
 export const measureFontSizeFromWidth = (
-  element: ExcalidrawTextElement,
+  element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
   nextWidth: number,
 ): { size: number } | null => {
@@ -307,8 +307,8 @@ export const measureFontSizeFromWidth = (
 };
 
 export const resizeSingleTextElement = (
-  origElement: ExcalidrawTextElement,
-  element: ExcalidrawTextElement,
+  origElement: NonDeleted<ExcalidrawTextElement>,
+  element: NonDeleted<ExcalidrawTextElement>,
   scene: Scene,
   transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
