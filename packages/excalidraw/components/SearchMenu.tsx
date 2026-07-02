@@ -228,7 +228,7 @@ export const SearchMenu = () => {
               zoom: app.state.zoom,
             },
             app.scene.getNonDeletedElementsMap(),
-            app.getEditorUIOffsets(),
+            app.getViewportOffsets(),
           ) ||
           isTextTiny
         ) {
@@ -243,7 +243,7 @@ export const SearchMenu = () => {
             target: matchAsElement,
             fit: behavior,
             animation: { duration: 300 },
-            offset: app.getEditorUIOffsets(),
+            offset: app.getViewportOffsets(),
           });
         }
       }

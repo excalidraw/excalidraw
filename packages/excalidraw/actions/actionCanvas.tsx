@@ -283,7 +283,7 @@ export const actionZoomToFitSelectionInViewport = register({
         userToFollow: null,
       },
       fit: "scale-down",
-      canvasOffsets: app.getEditorUIOffsets(),
+      canvasOffsets: app.getViewportOffsets(),
     });
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
@@ -315,7 +315,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fit: "contain",
-      canvasOffsets: app.getEditorUIOffsets(),
+      canvasOffsets: app.getViewportOffsets(),
     });
   },
   // NOTE this action should use shift-2 per figma, alas
@@ -342,7 +342,7 @@ export const actionZoomToFit = register({
         userToFollow: null,
       },
       fit: "scale-down",
-      canvasOffsets: app.getEditorUIOffsets(),
+      canvasOffsets: app.getViewportOffsets(),
     }),
   keyTest: (event, appState) =>
     !appState.scrollConstraints &&

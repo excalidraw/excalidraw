@@ -274,7 +274,12 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
-/** A box, in scene coordinates, that pan & zoom are constrained to. */
+/**
+ * A box, in scene coordinates, that pan & zoom are constrained to.
+ *
+ * This is a private type. For public API, only use specific properties,
+ * needed.
+ */
 export type ScrollConstraints = {
   x: number;
   y: number;
@@ -878,7 +883,7 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
-  getEditorUIOffsets: App["getEditorUIOffsets"];
+  getViewportOffsets: App["getViewportOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
@@ -1006,6 +1011,7 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollTo: InstanceType<typeof App>["scrollTo"];
+  getViewportOffsets: InstanceType<typeof App>["getViewportOffsets"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

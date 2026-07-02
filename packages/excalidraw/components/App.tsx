@@ -770,6 +770,7 @@ class App extends React.Component<AppProps, AppState> {
         clear: this.resetHistory,
       },
       scrollTo: this.scrollTo,
+      getViewportOffsets: this.getViewportOffsets,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -4106,7 +4107,7 @@ class App extends React.Component<AppProps, AppState> {
         target: duplicatedElements,
         fit: opts.fit,
         animation: false,
-        offset: this.getEditorUIOffsets(),
+        offset: this.getViewportOffsets(),
       });
     }
   };
@@ -4715,8 +4716,27 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  public getEditorUIOffsets = (): Offsets => {
-    const toolbarBottom =
+  /**
+   * If top/right/bottom/left provided, paddings are ignored (set to 0).
+   *
+   * @param opts.padding - defaults to 24px (all sides)
+   * @param opts.top - defaults to toolbar UI height + padding
+   * @param opts.right - defaults to right sidebar width + padding
+   * @param opts.bottom - defaults to 0 + padding
+   * @param opts.left - defaults to left sidebar width + padding
+   */
+  public getViewportOffsets = (opts?: {
+    padding?: number;
+    paddingTop?: number;
+    paddingRight?: number;
+    paddingBottom?: number;
+    paddingLeft?: number;
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  }): Offsets => {
+    const topToolbar =
       this.excalidrawContainerRef?.current
         ?.querySelector(".App-toolbar")
         ?.getBoundingClientRect()?.bottom ?? 0;
@@ -4727,31 +4747,45 @@ class App extends React.Component<AppProps, AppState> {
       ?.querySelector(".App-menu__left")
       ?.getBoundingClientRect();
 
-    const PADDING = 16;
+    const padding = opts?.padding ?? 24;
+    const isRTL = getLanguage().rtl;
+    const topPadding = opts?.paddingTop ?? padding;
+    const rightPadding =
+      (isRTL ? opts?.paddingLeft : opts?.paddingRight) ?? padding;
+    const bottomPadding = opts?.paddingBottom ?? padding;
+    const leftPadding =
+      (isRTL ? opts?.paddingRight : opts?.paddingLeft) ?? padding;
 
-    return getLanguage().rtl
+    const editorOffsets = isRTL
       ? {
-          top: toolbarBottom + PADDING,
+          top: topToolbar + topPadding,
           right:
             Math.max(
               this.state.width -
                 (propertiesPanelRect?.left ?? this.state.width),
               0,
-            ) + PADDING,
-          bottom: PADDING,
-          left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
+            ) + rightPadding,
+          bottom: bottomPadding,
+          left: Math.max(sidebarRect?.right ?? 0, 0) + leftPadding,
         }
       : {
-          top: toolbarBottom + PADDING,
+          top: topToolbar + topPadding,
           right: Math.max(
             this.state.width -
               (sidebarRect?.left ?? this.state.width) +
-              PADDING,
+              rightPadding,
             0,
           ),
-          bottom: PADDING,
-          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
+          bottom: bottomPadding,
+          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + leftPadding,
         };
+
+    return {
+      top: opts?.top ?? editorOffsets.top,
+      right: (isRTL ? opts?.left : opts?.right) ?? editorOffsets.right,
+      bottom: opts?.bottom ?? editorOffsets.bottom,
+      left: (isRTL ? opts?.right : opts?.left) ?? editorOffsets.left,
+    };
   };
 
   // Input handling
@@ -4884,14 +4918,14 @@ class App extends React.Component<AppProps, AppState> {
                 zoom: this.state.zoom,
               },
               this.scene.getNonDeletedElementsMap(),
-              this.getEditorUIOffsets(),
+              this.getViewportOffsets(),
             )
           ) {
             this.scrollTo({
               target: this.flowChartCreator.pendingNodes,
               fit: "scale-down",
               animation: { duration: 300 },
-              offset: this.getEditorUIOffsets(),
+              offset: this.getViewportOffsets(),
             });
           }
 
@@ -4941,14 +4975,14 @@ class App extends React.Component<AppProps, AppState> {
                     zoom: this.state.zoom,
                   },
                   this.scene.getNonDeletedElementsMap(),
-                  this.getEditorUIOffsets(),
+                  this.getViewportOffsets(),
                 )
               ) {
                 this.scrollTo({
                   target: nextNode,
                   fit: "scale-down",
                   animation: { duration: 300 },
-                  offset: this.getEditorUIOffsets(),
+                  offset: this.getViewportOffsets(),
                 });
               }
             }
@@ -5509,14 +5543,14 @@ class App extends React.Component<AppProps, AppState> {
                 zoom: this.state.zoom,
               },
               this.scene.getNonDeletedElementsMap(),
-              this.getEditorUIOffsets(),
+              this.getViewportOffsets(),
             )
           ) {
             this.scrollTo({
               target: firstNode,
               fit: "scale-down",
               animation: { duration: 300 },
-              offset: this.getEditorUIOffsets(),
+              offset: this.getViewportOffsets(),
             });
           }
         }
