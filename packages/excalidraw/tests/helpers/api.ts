@@ -226,6 +226,7 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    name?: string;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -368,10 +369,10 @@ export class API {
         });
         break;
       case "frame":
-        element = newFrameElement({ ...base, width, height });
+        element = newFrameElement({ ...base, width, height, name: rest.name });
         break;
       case "magicframe":
-        element = newMagicFrameElement({ ...base, width, height });
+        element = newMagicFrameElement({ ...base, width, height, name: rest.name });
         break;
       default:
         assertNever(
