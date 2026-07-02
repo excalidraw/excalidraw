@@ -4717,13 +4717,16 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   /**
-   * If top/right/bottom/left provided, paddings are ignored (set to 0).
+   * top/right/bottom/left override the final offsets for those sides.
+   *
+   * Default side offsets are measured from the UI for given form factor,
+   * plus padding.
    *
    * @param opts.padding - defaults to 24px (all sides)
-   * @param opts.top - defaults to toolbar UI height + padding
-   * @param opts.right - defaults to right sidebar width + padding
-   * @param opts.bottom - defaults to 0 + padding
-   * @param opts.left - defaults to left sidebar width + padding
+   * @param opts.top - defaults to measured top UI height + padding
+   * @param opts.right - defaults to measured right UI width + padding
+   * @param opts.bottom - defaults to measured bottom UI height + padding
+   * @param opts.left - defaults to measured left UI width + padding
    */
   public getViewportOffsets = (opts?: {
     padding?: number;
@@ -4736,16 +4739,53 @@ class App extends React.Component<AppProps, AppState> {
     left?: number;
     right?: number;
   }): Offsets => {
+    const excalidrawContainer = this.excalidrawContainerRef?.current;
+    const formFactor = this.editorInterface.formFactor;
+    const getElementRect = (selector: string) =>
+      excalidrawContainer?.querySelector(selector)?.getBoundingClientRect();
+
     const topToolbar =
-      this.excalidrawContainerRef?.current
-        ?.querySelector(".App-toolbar")
-        ?.getBoundingClientRect()?.bottom ?? 0;
-    const sidebarRect = this.excalidrawContainerRef?.current
-      ?.querySelector(".sidebar")
-      ?.getBoundingClientRect();
-    const propertiesPanelRect = this.excalidrawContainerRef?.current
-      ?.querySelector(".App-menu__left")
-      ?.getBoundingClientRect();
+      formFactor === "phone" ? 0 : getElementRect(".App-toolbar")?.bottom ?? 0;
+    const bottomBar =
+      formFactor === "phone"
+        ? Math.max(
+            this.state.height -
+              (getElementRect(".App-bottom-bar")?.top ?? this.state.height),
+            0,
+          )
+        : 0;
+
+    const sidebarRect =
+      formFactor === "phone"
+        ? // on mobile, ignore sidebar even if opened
+          undefined
+        : getElementRect(`.${CLASSES.SIDEBAR}`);
+    const sideActionsRect =
+      formFactor === "tablet"
+        ? getElementRect(".selected-shape-actions-container")
+        : formFactor === "desktop"
+        ? getElementRect(`.${CLASSES.SHAPE_ACTIONS_MENU}`)
+        : undefined;
+    const horizontalOffsets = [sidebarRect, sideActionsRect].reduce(
+      (offsets, rect) => {
+        if (!rect) {
+          return offsets;
+        }
+
+        if (rect.left + rect.width / 2 < this.state.width / 2) {
+          return {
+            ...offsets,
+            left: Math.max(offsets.left, rect.right, 0),
+          };
+        }
+
+        return {
+          ...offsets,
+          right: Math.max(offsets.right, this.state.width - rect.left, 0),
+        };
+      },
+      { left: 0, right: 0 },
+    );
 
     const padding = opts?.padding ?? 24;
     const isRTL = getLanguage().rtl;
@@ -4756,29 +4796,12 @@ class App extends React.Component<AppProps, AppState> {
     const leftPadding =
       (isRTL ? opts?.paddingRight : opts?.paddingLeft) ?? padding;
 
-    const editorOffsets = isRTL
-      ? {
-          top: topToolbar + topPadding,
-          right:
-            Math.max(
-              this.state.width -
-                (propertiesPanelRect?.left ?? this.state.width),
-              0,
-            ) + rightPadding,
-          bottom: bottomPadding,
-          left: Math.max(sidebarRect?.right ?? 0, 0) + leftPadding,
-        }
-      : {
-          top: topToolbar + topPadding,
-          right: Math.max(
-            this.state.width -
-              (sidebarRect?.left ?? this.state.width) +
-              rightPadding,
-            0,
-          ),
-          bottom: bottomPadding,
-          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + leftPadding,
-        };
+    const editorOffsets = {
+      top: topToolbar + topPadding,
+      right: horizontalOffsets.right + rightPadding,
+      bottom: bottomBar + bottomPadding,
+      left: horizontalOffsets.left + leftPadding,
+    };
 
     return {
       top: opts?.top ?? editorOffsets.top,
