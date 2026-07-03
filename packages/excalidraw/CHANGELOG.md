@@ -25,7 +25,10 @@ Please add the latest change on the top under the correct section.
 
   ```tsx
   // before
-  excalidrawAPI.scrollToContent(element, { fitToViewport: true, animate: true });
+  excalidrawAPI.scrollToContent(element, {
+    fitToViewport: true,
+    animate: true,
+  });
   // after
   excalidrawAPI.setViewport({ target: element, fit: "contain" });
   ```
