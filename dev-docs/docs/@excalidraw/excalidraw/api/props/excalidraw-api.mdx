@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />;
+  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -29,7 +29,7 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 | [getSceneElements](#getsceneelements) | `function` | Returns all the elements excluding the deleted in the scene |
 | [getAppState](#getappstate) | `function` | Returns current appState |
 | [history](#history) | `object` | This is the history API. `history.clear()` will clear the history |
-| [setViewport](#setviewport) | `function` | Navigate the viewport to a target and optionally lock pan/zoom to it. |
+| [scrollToContent](#scrolltocontent) | `function` | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
 | [refresh](#refresh) | `function` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). |
 | [setToast](#settoast) | `function` | This API can be used to show the toast with custom message. |
 | [id](#id) | `string` | Unique ID for the excalidraw component. |
@@ -277,42 +277,36 @@ Returns current appState.
 
 This is the history API. history.clear() will clear the history.
 
-## setViewport
+## scrollToContent
 
 ```tsx
 (
-  opts:
-    | null
-    | {
-        target:
-          | Bounds
-          | { x: number; y: number; width?: number; height?: number }
-          | ExcalidrawElement
-          | ExcalidrawElement[]
-          | string;
-        fit: "scale-down" | "contain" | "none";
-        lock?: {
-          scroll?: boolean;
-          zoom?: boolean;
-          overscroll?: boolean | number;
-        };
-        animation?: { duration?: number } | boolean;
-        offsets?: { top?: number; right?: number; bottom?: number; left?: number };
-      }
+  target?: ExcalidrawElement | ExcalidrawElement[],
+  opts?:
+      | {
+          fitToContent?: boolean;
+          animate?: boolean;
+          duration?: number;
+        }
+      | {
+          fitToViewport?: boolean;
+          viewportZoomFactor?: number;
+          animate?: boolean;
+          duration?: number;
+        }
 ) => void
 ```
 
-Navigates the viewport to a target and, optionally, locks pan/zoom to it. The resolved target box drives both the navigation and the lock: the viewport first animates onto the target (per `fit`), then the lock is installed against the settled viewport. Passing `null` clears any active lock without navigating.
+Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | `Bounds` &#124; `{ x; y; width?; height? }` &#124; `ExcalidrawElement` &#124; `ExcalidrawElement[]` &#124; `string` | — | What to show in the viewport: an explicit scene-coordinate box/rect, element(s), or an element id / element-link URL. |
-| fit | `"scale-down"` &#124; `"contain"` &#124; `"none"` | `"scale-down"` | `scale-down` zooms out to fit the target, capped at 100%; `contain` scales the target to fill the viewport (may exceed 100%); `none` keeps the current zoom and only centers the target. |
-| lock.scroll | boolean | false | Constrain panning so the viewport stays within the target box. |
-| lock.zoom | boolean | false | Make the resolved zoom the minimum the user can zoom out to. Zooming in (up to 3000%) is always allowed. |
-| lock.overscroll | boolean &#124; number | true | Rubberband give past the lock, in viewport pixels (zoom-independent): how far the user can pan beyond the constraint before it snaps back. `true` uses the default (200px), `false` or `0` makes the lock rigid. |
-| animation | `{ duration?: number }` &#124; `boolean` | `{ duration: 250 }` | `true` (or omitted) animates with the default duration; `false` jumps instantly. |
-| offsets | `{ top?; right?; bottom?; left? }` | — | CSS-style padding in viewport pixels (zoom-independent). Insets the fit and extends the locked scroll area. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
+| opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
+| opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
+| opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
+| opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
 ## refresh
 
@@ -368,9 +362,10 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 ```ts
 (
-  tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
-    locked?: boolean;
-  },
+  tool: (
+    | { type: ToolType }
+    | { type: "custom"; customType: string }
+  ) & { locked?: boolean },
 ) => {};
 ```
 
