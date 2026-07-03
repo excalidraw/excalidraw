@@ -4538,15 +4538,28 @@ class App extends React.Component<AppProps, AppState> {
     AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
     this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
+
+    const prevZoom = this.state.zoom.value;
     this.setState(state);
 
-    // with rubberband overscroll, allow a soft give while interacting and
-    // animate back to the box once the interaction settles; otherwise hard-clamp
-    const overscroll = this.state.scrollConstraints?.overscroll ?? 0;
-    this.constrainViewportToScrollConstraints(overscroll);
-    if (overscroll > 0) {
-      this.snapBackToScrollConstraintsDebounced();
-    }
+    // constrain against the scroll lock; queued so it sees the update above
+    this.setState((prevState) => {
+      if (!prevState.scrollConstraints) {
+        return null;
+      }
+      // zoom changes are hard-clamped (no rubberband give): the post-zoom
+      // scroll is a continuous function of the zoom origin, so clamping it
+      // effectively slides the origin to the nearest focal point that keeps
+      // the viewport within bounds — zooming glides along the lock edge
+      // instead of overscrolling and snapping back on every zoom tick.
+      // Panning keeps the soft give, snapping back once interaction settles.
+      const zoomed = prevState.zoom.value !== prevZoom;
+      const overscroll = zoomed ? 0 : prevState.scrollConstraints.overscroll;
+      if (overscroll > 0) {
+        this.snapBackToScrollConstraintsDebounced();
+      }
+      return constrainScrollState(prevState, overscroll);
+    });
   };
 
   /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when

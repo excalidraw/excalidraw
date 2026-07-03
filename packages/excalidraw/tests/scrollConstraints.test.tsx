@@ -12,6 +12,7 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
+import { getStateForZoom } from "../scene/zoom";
 import {
   animateToConstraints,
   constrainScrollState,
@@ -746,6 +747,50 @@ describe("rubberband overscroll (integration)", () => {
     expect(h.state.scrollY).toBeGreaterThan(0);
     expect(h.state.scrollY).toBeLessThanOrEqual(
       25 / h.state.zoom.value + 0.001,
+    );
+  });
+
+  it("hard-clamps interactive zoom so it never enters the overscroll zone", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+    });
+
+    // fitted at zoom 0.1; the box rests centered horizontally (scrollX 500)
+    expect(h.state.zoom.value).toBeCloseTo(0.1);
+    expect(h.state.scrollX).toBeCloseTo(500);
+
+    // interactive zoom-in anchored at the top-left corner (the wheel-zoom
+    // path): keeping that focal point fixed would leave scrollX at 500,
+    // which at zoom 0.2 is 100 screen px past the hard bound (scrollX 0) —
+    // outside the 50px give. The zoom must be hard-clamped (equivalent to
+    // sliding the zoom origin back into bounds), not rubberbanded.
+    React.act(() => {
+      // eslint-disable-next-line dot-notation -- private method; bracket access is the TS escape hatch
+      h.app["translateCanvas"]((state: AppState) => ({
+        ...getStateForZoom(
+          { viewportX: 0, viewportY: 0, nextZoom: getNormalizedZoom(0.2) },
+          state,
+        ),
+      }));
+    });
+
+    expect(h.state.zoom.value).toBeCloseTo(0.2);
+    expect(h.state.scrollX).toBeCloseTo(0);
+    expect(isViewportOverscrolled(h.state)).toBe(false);
+
+    // panning, by contrast, still gets the rubberband give
+    Keyboard.keyPress(KEYS.PAGE_UP);
+    expect(h.state.scrollY).toBeGreaterThan(0);
+    expect(h.state.scrollY).toBeLessThanOrEqual(
+      50 / h.state.zoom.value + 0.001,
     );
   });
 
