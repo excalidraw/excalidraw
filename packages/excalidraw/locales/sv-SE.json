@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Hitta på canvas",
+    "resultsRegion": "Sökresultat på canvas",
     "noMatch": "Inga träffar hittades...",
     "singleResult": "resultat",
     "multipleResults": "resultat",

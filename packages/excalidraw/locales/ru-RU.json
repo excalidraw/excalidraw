@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Найти на холсте",
+    "resultsRegion": "Результаты поиска на холсте",
     "noMatch": "Совпадения не найдены...",
     "singleResult": "результат",
     "multipleResults": "результатов",

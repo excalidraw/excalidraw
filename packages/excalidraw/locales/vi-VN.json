@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Tìm trên vùng vẽ",
+    "resultsRegion": "Kết quả tìm kiếm trên bảng vẽ",
     "noMatch": "Không có kết quả phù hợp...",
     "singleResult": "kết quả",
     "multipleResults": "các kết quả",

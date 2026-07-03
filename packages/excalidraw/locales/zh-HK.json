@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "畫布搜索結果",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

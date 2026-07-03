@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Temukan di kanvas",
+    "resultsRegion": "Hasil pencarian di kanvas",
     "noMatch": "Tidak ada kecocokan yang ditemukan...",
     "singleResult": "hasil",
     "multipleResults": "semua hasil",

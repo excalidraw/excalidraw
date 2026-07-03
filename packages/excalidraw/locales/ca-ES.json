@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Troba al llenç",
+    "resultsRegion": "Resultats de cerca al llenç",
     "noMatch": "No hem trobat coincidències...",
     "singleResult": "resultat",
     "multipleResults": "resultats",

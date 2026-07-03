@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Găsire pe pânză",
+    "resultsRegion": "Rezultatele căutării pe pânză",
     "noMatch": "Nicio potrivire găsită...",
     "singleResult": "rezultat",
     "multipleResults": "rezultate",

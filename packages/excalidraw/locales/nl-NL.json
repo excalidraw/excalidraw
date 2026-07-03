@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Zoek op canvas",
+    "resultsRegion": "Zoekresultaten op het canvas",
     "noMatch": "Geen overeenkomsten gevonden...",
     "singleResult": "resultaat",
     "multipleResults": "resultaten",

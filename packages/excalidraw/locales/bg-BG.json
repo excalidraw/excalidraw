@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Резултати от търсене върху платното",
     "noMatch": "",
     "singleResult": "резултат",
     "multipleResults": "резултати",

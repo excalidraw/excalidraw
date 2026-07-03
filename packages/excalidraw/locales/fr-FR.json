@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Rechercher sur le canevas",
+    "resultsRegion": "Résultats de recherche sur le canevas",
     "noMatch": "Aucun résultat trouvé...",
     "singleResult": "résultat",
     "multipleResults": "résultats",

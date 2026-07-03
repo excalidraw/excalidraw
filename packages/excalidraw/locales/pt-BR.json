@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Procurar na tela",
+    "resultsRegion": "Resultados da busca na tela",
     "noMatch": "Nenhum resultado encontrado...",
     "singleResult": "resultado",
     "multipleResults": "resultados",

@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Rajzvászonon használt",
+    "resultsRegion": "Keresési találatok a vásznon",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

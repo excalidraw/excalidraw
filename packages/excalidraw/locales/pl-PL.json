@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Znajdź na płótnie",
+    "resultsRegion": "Wyniki wyszukiwania na płótnie",
     "noMatch": "Nie znaleziono pasujących elementów...",
     "singleResult": "wynik",
     "multipleResults": "wyniki",

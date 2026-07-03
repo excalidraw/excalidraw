@@ -1,7 +1,16 @@
 import { round } from "@excalidraw/math";
 import clsx from "clsx";
 import debounce from "lodash.debounce";
-import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   CLASSES,
@@ -49,6 +58,8 @@ import {
 } from "./icons";
 
 import "./SearchMenu.scss";
+
+import type { RefCallback } from "react";
 
 import type { AppClassProperties, SearchMatch } from "../types";
 
@@ -426,12 +437,18 @@ export const SearchMenu = () => {
           )}
       </div>
 
-      <MatchList
-        matches={searchMatches}
-        onItemClick={setFocusIndex}
-        focusIndex={focusIndex}
-        searchQuery={searchQuery}
-      />
+      <div
+        className="layer-ui__search-results-scroll"
+        role="region"
+        aria-label={t("search.resultsRegion")}
+      >
+        <MatchList
+          matches={searchMatches}
+          onItemClick={setFocusIndex}
+          focusIndex={focusIndex}
+          searchQuery={searchQuery}
+        />
+      </div>
     </div>
   );
 };
@@ -441,6 +458,7 @@ const ListItem = (props: {
   searchQuery: SearchQuery;
   highlighted: boolean;
   onClick?: () => void;
+  itemRef?: RefCallback<HTMLDivElement | null>;
 }) => {
   const preview = [
     props.preview.moreBefore ? "..." : "",
@@ -462,11 +480,7 @@ const ListItem = (props: {
         active: props.highlighted,
       })}
       onClick={props.onClick}
-      ref={(ref) => {
-        if (props.highlighted) {
-          ref?.scrollIntoView({ behavior: "auto", block: "nearest" });
-        }
-      }}
+      ref={props.itemRef}
     >
       <div className="preview-text">
         {preview.flatMap((text, idx) => (
@@ -485,6 +499,42 @@ interface MatchListProps {
 }
 
 const MatchListBase = (props: MatchListProps) => {
+  const itemRefs = useRef(new Map<number, HTMLDivElement | null>());
+  const itemRefCallbacksRef = useRef(
+    new Map<number, RefCallback<HTMLDivElement | null>>(),
+  );
+  const scrollIntoViewRafRef = useRef<number | null>(null);
+
+  const setItemRef = useCallback((index: number) => {
+    const callbacks = itemRefCallbacksRef.current;
+    let cb = callbacks.get(index);
+    if (!cb) {
+      cb = (el: HTMLDivElement | null) => {
+        const map = itemRefs.current;
+        if (el) {
+          map.set(index, el);
+        } else {
+          map.delete(index);
+          itemRefCallbacksRef.current.delete(index);
+        }
+      };
+      callbacks.set(index, cb);
+    }
+    return cb;
+  }, []);
+
+  useLayoutEffect(() => {
+    const len = props.matches.items.length;
+    const callbacks = itemRefCallbacksRef.current;
+    const elems = itemRefs.current;
+    for (const idx of [...callbacks.keys()]) {
+      if (idx < 0 || idx >= len) {
+        callbacks.delete(idx);
+        elems.delete(idx);
+      }
+    }
+  }, [props.matches.items.length, props.matches.nonce]);
+
   const frameNameMatches = useMemo(
     () =>
       props.matches.items.filter((match) => isFrameLikeElement(match.element)),
@@ -495,6 +545,40 @@ const MatchListBase = (props: MatchListProps) => {
     () => props.matches.items.filter((match) => isTextElement(match.element)),
     [props.matches],
   );
+
+  useLayoutEffect(() => {
+    const idx = props.focusIndex;
+    if (idx === null || idx < 0) {
+      return;
+    }
+
+    if (scrollIntoViewRafRef.current !== null) {
+      cancelAnimationFrame(scrollIntoViewRafRef.current);
+    }
+
+    scrollIntoViewRafRef.current = requestAnimationFrame(() => {
+      scrollIntoViewRafRef.current = null;
+      const el = itemRefs.current.get(idx);
+      if (!el) {
+        return;
+      }
+      const reduceMotion =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
+    });
+
+    return () => {
+      if (scrollIntoViewRafRef.current !== null) {
+        cancelAnimationFrame(scrollIntoViewRafRef.current);
+        scrollIntoViewRafRef.current = null;
+      }
+    };
+  }, [props.focusIndex, props.matches.nonce]);
 
   return (
     <div>
@@ -511,6 +595,7 @@ const MatchListBase = (props: MatchListProps) => {
               preview={searchMatch.preview}
               highlighted={index === props.focusIndex}
               onClick={() => props.onItemClick(index)}
+              itemRef={setItemRef(index)}
             />
           ))}
 
@@ -531,6 +616,7 @@ const MatchListBase = (props: MatchListProps) => {
               preview={searchMatch.preview}
               highlighted={index + frameNameMatches.length === props.focusIndex}
               onClick={() => props.onItemClick(index + frameNameMatches.length)}
+              itemRef={setItemRef(index + frameNameMatches.length)}
             />
           ))}
         </div>

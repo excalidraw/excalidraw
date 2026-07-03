@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "ผลการค้นหาบนผืนผ้าใบ",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
