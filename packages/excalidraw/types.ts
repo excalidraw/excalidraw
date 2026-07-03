@@ -301,8 +301,9 @@ export type ScrollConstraints = {
   /**
    * Extra scrollable margin around the box (CSS-style), letting the viewport
    * scroll past each box edge to reveal that much empty space. Values are
-   * viewport pixels and zoom-independent (a fixed on-screen distance). Mirrors
-   * the `offsets` passed to `setViewport`.
+   * viewport pixels and zoom-independent (a fixed on-screen distance).
+   * Resolved from the `offsets` passed to `setViewport` (see
+   * {@link ViewportOffsets}) at the time the lock was installed.
    */
   offsets?: Offsets;
 };
@@ -1149,6 +1150,76 @@ export type Offsets = Partial<{
  * push the viewport around.
  */
 export type ViewportUIDock = "top" | "bottom" | "side";
+
+/**
+ * Options for `getViewportOffsets` (and the `ui` key of
+ * {@link ViewportOffsets}), controlling how offsets are derived from the
+ * currently rendered editor UI.
+ *
+ * NOTE unlike the physical sides of {@link Offsets}, the horizontal values
+ * here are logical, i.e. flipped in RTL layouts (`left` refers to the
+ * reading-direction start side).
+ */
+export type ViewportOffsetsOptions = {
+  /** padding added to each measured side (default 24) */
+  padding?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  /** final value for the given side, replacing the measured UI size
+   * (padding is not added on top) */
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+  /**
+   * Reserve space for the given conditionally-rendered surfaces even while
+   * they're hidden, so the resulting offsets don't shift when they
+   * (dis)appear. Uses the surface's last-measured footprint, falling back
+   * to an approximate default if it hasn't been rendered yet. Ignored on
+   * phones (where these surfaces never occlude the canvas).
+   */
+  reserve?: {
+    /** styles panel (rendered when a tool or selection is active) */
+    stylesPanel?: boolean;
+    /** sidebar (e.g. library) */
+    sidebar?: boolean;
+  };
+};
+
+/**
+ * Viewport offsets accepted by the `setViewport`-family APIs (`setViewport`,
+ * `props.initialState.viewport`), insetting the usable viewport area per
+ * side so the target isn't fitted/centered underneath overlaid UI.
+ *
+ * Two (combinable) ways to specify:
+ *
+ * - **Static sides** (`top`/`right`/`bottom`/`left`) — absolute pixel
+ *   values, used as-is: physical (not flipped in RTL), zoom-independent,
+ *   no padding added. Sides not specified default to `0` (unless `ui` is
+ *   set, see below).
+ *
+ * - **`ui`** — derive the offsets from the editor UI (toolbar, styles
+ *   panel, sidebar...) as rendered at the time the viewport is set,
+ *   equivalent to calling `getViewportOffsets()`. Pass `true` for the
+ *   defaults, or options ({@link ViewportOffsetsOptions}) to customize
+ *   padding or reserve space for currently-hidden surfaces.
+ *
+ * When both are given, a static side always wins for that side — it
+ * replaces whatever `ui` would yield (including `ui`'s own side overrides,
+ * which — unlike the physical static sides — are RTL-relative). The
+ * remaining sides fall back to the `ui`-derived values.
+ *
+ * @example
+ * { top: 40 }                              // top 40px, other sides 0
+ * { ui: true }                             // measured UI + default padding
+ * { ui: { reserve: { stylesPanel: true } } } // + keep space for hidden panel
+ * { top: 40, ui: true }                    // top exactly 40px, rest from UI
+ */
+export type ViewportOffsets = Offsets & {
+  ui?: true | ViewportOffsetsOptions;
+};
 
 /**
  * Value of the `data-viewport-ui-name` attribute, identifying a

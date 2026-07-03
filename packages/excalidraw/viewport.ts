@@ -38,6 +38,7 @@ import type {
   Offsets,
   PointerCoords,
   ScrollConstraints,
+  ViewportOffsets,
   Zoom,
 } from "./types";
 
@@ -108,8 +109,12 @@ export type SetViewportOptions = {
 
   animation?: AnimationOptions | boolean;
 
-  /** CSS-style padding in viewport pixels, zoom-independent. */
-  offsets?: ScrollConstraints["offsets"];
+  /**
+   * CSS-style per-side viewport insets, in viewport pixels
+   * (zoom-independent) — static values, editor-UI-derived (`ui`), or a
+   * combination. See {@link ViewportOffsets}.
+   */
+  offsets?: ViewportOffsets;
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
@@ -268,7 +273,8 @@ export const animateToConstraints = (
 export const setViewportToBounds = (
   state: AppState,
   bounds: Bounds,
-  opts: Pick<SetViewportOptions, "fit" | "animation" | "offsets">,
+  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
+  opts: Pick<SetViewportOptions, "fit" | "animation"> & { offsets?: Offsets },
   onFrame: (
     state: Pick<
       AppState,
@@ -497,7 +503,12 @@ export const resolveViewportTarget = (
 export const getConstrainedTargetViewport = (
   appState: AppState,
   bounds: Bounds,
-  { fit, offsets, lock }: Pick<SetViewportOptions, "fit" | "offsets" | "lock">,
+  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
+  {
+    fit,
+    offsets,
+    lock,
+  }: Pick<SetViewportOptions, "fit" | "lock"> & { offsets?: Offsets },
 ): Viewport & { scrollConstraints: ScrollConstraints | null } => {
   const viewport = getTargetViewport(appState, bounds, fit, offsets);
 

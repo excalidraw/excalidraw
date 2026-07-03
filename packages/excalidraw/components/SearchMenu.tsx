@@ -246,7 +246,7 @@ export const SearchMenu = () => {
             target: getCommonBounds([matchAsElement]),
             fit: behavior,
             animation: { duration: 300 },
-            offsets: app.getViewportOffsets(),
+            offsets: { ui: true },
           });
         }
       }

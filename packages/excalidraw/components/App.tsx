@@ -504,6 +504,8 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ViewportOffsets,
+  ViewportOffsetsOptions,
   ViewportUIDock,
   ViewportUIName,
 } from "../types";
@@ -3044,11 +3046,12 @@ class App extends React.Component<AppProps, AppState> {
       if (bounds) {
         restoredAppState = {
           ...restoredAppState,
-          ...getConstrainedTargetViewport(
-            viewportAppState,
-            bounds,
-            initialViewport,
-          ),
+          ...getConstrainedTargetViewport(viewportAppState, bounds, {
+            ...initialViewport,
+            // resolved here (post-mount) so ui-derived offsets measure the
+            // actually-rendered editor UI
+            offsets: this.resolveViewportOffsets(initialViewport.offsets),
+          }),
         };
       }
     } else if (initialData?.scrollToContent) {
@@ -4135,7 +4138,7 @@ class App extends React.Component<AppProps, AppState> {
         target: duplicatedElements,
         fit: opts.fit,
         animation: false,
-        offsets: this.getViewportOffsets(),
+        offsets: { ui: true },
       });
     }
   };
@@ -4425,6 +4428,41 @@ class App extends React.Component<AppProps, AppState> {
    *
    * Passing `null` clears any active lock without navigating.
    */
+  /**
+   * Resolves user-supplied viewport offsets ({@link ViewportOffsets}) into
+   * concrete per-side pixel values: static sides are used as-is, and when
+   * `ui` is set, the remaining sides are derived from the currently
+   * rendered editor UI (via `getViewportOffsets`).
+   *
+   * Must be called at the time the offsets are applied (not e.g. cached at
+   * props-definition time), so the UI-derived values reflect the actual
+   * rendered UI.
+   */
+  private resolveViewportOffsets = (
+    offsets: ViewportOffsets | undefined,
+  ): Offsets | undefined => {
+    if (!offsets) {
+      return offsets;
+    }
+
+    const { ui, ...staticOffsets } = offsets;
+
+    if (!ui) {
+      return staticOffsets;
+    }
+
+    const uiOffsets = this.getViewportOffsets(ui === true ? undefined : ui);
+
+    // static sides win over the ui-derived values (incl. `ui`'s own
+    // side overrides)
+    return {
+      top: staticOffsets.top ?? uiOffsets.top,
+      right: staticOffsets.right ?? uiOffsets.right,
+      bottom: staticOffsets.bottom ?? uiOffsets.bottom,
+      left: staticOffsets.left ?? uiOffsets.left,
+    };
+  };
+
   setViewport = (opts: SetViewportOptions | null) => {
     // `null` clears all active locks
     if (opts === null) {
@@ -4434,7 +4472,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { target, fit, lock, animation, offsets } = opts;
+    const { target, fit, lock, animation } = opts;
+    const offsets = this.resolveViewportOffsets(opts.offsets);
 
     // resolve the target to a scene-coordinate box.
     const { bounds, type } = resolveViewportTarget(
@@ -4751,35 +4790,10 @@ class App extends React.Component<AppProps, AppState> {
    * surfaces marked with the `data-viewport-ui` attribute (see
    * {@link ViewportUIDock}), plus padding.
    *
-   * @param opts.padding - defaults to 24px (all sides)
-   * @param opts.top - defaults to measured top UI height + padding
-   * @param opts.right - defaults to measured right UI width + padding
-   * @param opts.bottom - defaults to measured bottom UI height + padding
-   * @param opts.left - defaults to measured left UI width + padding
-   * @param opts.reserve - reserve space for the given conditionally-rendered
-   * surfaces even while they're hidden, so the resulting offsets don't
-   * shift when they (dis)appear. Uses the surface's last-measured
-   * footprint, falling back to an approximate default if it hasn't been
-   * rendered yet. Ignored on phones (where these surfaces never occlude
-   * the canvas).
+   * See {@link ViewportOffsetsOptions} for the individual options
+   * (padding, per-side overrides, reserving space for hidden surfaces).
    */
-  public getViewportOffsets = (opts?: {
-    padding?: number;
-    paddingTop?: number;
-    paddingRight?: number;
-    paddingBottom?: number;
-    paddingLeft?: number;
-    top?: number;
-    bottom?: number;
-    left?: number;
-    right?: number;
-    reserve?: {
-      /** styles panel (rendered when a tool or selection is active) */
-      stylesPanel?: boolean;
-      /** sidebar (e.g. library) */
-      sidebar?: boolean;
-    };
-  }): Offsets => {
+  public getViewportOffsets = (opts?: ViewportOffsetsOptions): Offsets => {
     const excalidrawContainer = this.excalidrawContainerRef?.current;
     const excalidrawContainerRect =
       excalidrawContainer?.getBoundingClientRect();
@@ -5039,7 +5053,7 @@ class App extends React.Component<AppProps, AppState> {
               target: getCommonBounds(this.flowChartCreator.pendingNodes),
               fit: "scale-down",
               animation: { duration: 300 },
-              offsets: this.getViewportOffsets(),
+              offsets: { ui: true },
             });
           }
 
@@ -5096,7 +5110,7 @@ class App extends React.Component<AppProps, AppState> {
                   target: nextNode,
                   fit: "scale-down",
                   animation: { duration: 300 },
-                  offsets: this.getViewportOffsets(),
+                  offsets: { ui: true },
                 });
               }
             }
@@ -5664,7 +5678,7 @@ class App extends React.Component<AppProps, AppState> {
               target: firstNode,
               fit: "scale-down",
               animation: { duration: 300 },
-              offsets: this.getViewportOffsets(),
+              offsets: { ui: true },
             });
           }
         }
