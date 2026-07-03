@@ -59,6 +59,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -273,6 +274,42 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+/**
+ * A box, in scene coordinates, that pan & zoom are constrained to.
+ *
+ * This is a private type. For public API, only use specific properties,
+ * needed.
+ */
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** when set, panning is constrained so the viewport stays within the box */
+  lockScroll: boolean;
+  /** when set, the viewport cannot zoom out below `zoom` */
+  lockZoom: boolean;
+  /**
+   * The zoom resolved after the `setViewport` navigation settled.
+   */
+  zoom: number;
+  /**
+   * Pixel amount the viewport may overscroll past its resting clamp before
+   * snapping back (rubberband). Screen pixels, zoom-independent. Resolved
+   * from `lock.overscroll` at the time the lock was installed (`true` →
+   * default give, `false` → 0).
+   */
+  overscroll: number;
+  /**
+   * Extra scrollable margin around the box (CSS-style), letting the viewport
+   * scroll past each box edge to reveal that much empty space. Values are
+   * viewport pixels and zoom-independent (a fixed on-screen distance).
+   * Resolved from the `offsets` passed to `setViewport` (see
+   * {@link ViewportOffsets}) at the time the lock was installed.
+   */
+  offsets?: Offsets;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -380,6 +417,7 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -558,6 +596,10 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type ExcalidrawInitialState = {
+  viewport?: Omit<SetViewportOptions, "animation">;
+};
+
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
@@ -584,6 +626,7 @@ export interface ExcalidrawProps {
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
+  initialState?: ExcalidrawInitialState;
   /**
    * Invoked as soon as the Excalidraw API is available
    * NOTE editor is not yet mounted, and state is not yet initialized
@@ -828,7 +871,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
-  scrollToContent: App["scrollToContent"];
+  setViewport: App["setViewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -843,7 +886,7 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
-  getEditorUIOffsets: App["getEditorUIOffsets"];
+  getViewportOffsets: App["getViewportOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
@@ -970,7 +1013,8 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  setViewport: InstanceType<typeof App>["setViewport"];
+  getViewportOffsets: InstanceType<typeof App>["getViewportOffsets"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
@@ -1085,3 +1129,106 @@ export type Offsets = Partial<{
   bottom: number;
   left: number;
 }>;
+
+/**
+ * Value of the `data-viewport-ui` attribute, marking a DOM node as a UI
+ * surface that occludes the canvas. Such nodes are measured by
+ * `getViewportOffsets` to compute the default per-side viewport offsets:
+ *
+ * - `top` / `bottom` — offsets that side by the node's bottom/top edge
+ * - `side` — a panel hugging the left or right edge. Which side is not
+ *   declared but resolved geometrically: if the node's horizontal center
+ *   lies in the left half of the viewport it counts against the left
+ *   offset (by its right edge), otherwise against the right offset (by
+ *   `viewportWidth - left edge`). Measuring the rendered position instead
+ *   of declaring a side means RTL layouts and host-configurable docking
+ *   (e.g. sidebar side) are handled for free — but it assumes the surface
+ *   actually hugs one edge; don't mark a centered/near-full-width node as
+ *   `side` (its midpoint would classify it to one side and the offset
+ *   would swallow most of the viewport).
+ *
+ * The attribute should only be present while the surface is actually
+ * rendered — omit it (don't just hide the node) when the surface shouldn't
+ * push the viewport around.
+ */
+export type ViewportUIDock = "top" | "bottom" | "side";
+
+/**
+ * Options for `getViewportOffsets` (and the `ui` key of
+ * {@link ViewportOffsets}), controlling how offsets are derived from the
+ * currently rendered editor UI.
+ *
+ * NOTE unlike the physical sides of {@link Offsets}, the horizontal values
+ * here are logical, i.e. flipped in RTL layouts (`left` refers to the
+ * reading-direction start side).
+ */
+export type ViewportOffsetsOptions = {
+  /** padding added to each measured side (default 24) */
+  padding?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  /** final value for the given side, replacing the measured UI size
+   * (padding is not added on top) */
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+  /**
+   * Reserve space for the given conditionally-rendered surfaces even while
+   * they're hidden, so the resulting offsets don't shift when they
+   * (dis)appear. Uses the surface's last-measured footprint, falling back
+   * to an approximate default if it hasn't been rendered yet. Ignored on
+   * phones (where these surfaces never occlude the canvas).
+   */
+  reserve?: {
+    /** styles panel (rendered when a tool or selection is active) */
+    stylesPanel?: boolean;
+    /** sidebar (e.g. library) */
+    sidebar?: boolean;
+  };
+};
+
+/**
+ * Viewport offsets accepted by the `setViewport`-family APIs (`setViewport`,
+ * `props.initialState.viewport`), insetting the usable viewport area per
+ * side so the target isn't fitted/centered underneath overlaid UI.
+ *
+ * Two (combinable) ways to specify:
+ *
+ * - **Static sides** (`top`/`right`/`bottom`/`left`) — absolute pixel
+ *   values, used as-is: physical (not flipped in RTL), zoom-independent,
+ *   no padding added. Sides not specified default to `0` (unless `ui` is
+ *   set, see below).
+ *
+ * - **`ui`** — derive the offsets from the editor UI (toolbar, styles
+ *   panel, sidebar...) as rendered at the time the viewport is set,
+ *   equivalent to calling `getViewportOffsets()`. Pass `true` for the
+ *   defaults, or options ({@link ViewportOffsetsOptions}) to customize
+ *   padding or reserve space for currently-hidden surfaces.
+ *
+ * When both are given, a static side always wins for that side — it
+ * replaces whatever `ui` would yield (including `ui`'s own side overrides,
+ * which — unlike the physical static sides — are RTL-relative). The
+ * remaining sides fall back to the `ui`-derived values.
+ *
+ * @example
+ * { top: 40 }                              // top 40px, other sides 0
+ * { ui: true }                             // measured UI + default padding
+ * { ui: { reserve: { stylesPanel: true } } } // + keep space for hidden panel
+ * { top: 40, ui: true }                    // top exactly 40px, rest from UI
+ */
+export type ViewportOffsets = Offsets & {
+  ui?: true | ViewportOffsetsOptions;
+};
+
+/**
+ * Value of the `data-viewport-ui-name` attribute, identifying a
+ * conditionally-rendered surface (marked with `data-viewport-ui`) so that
+ * `getViewportOffsets` can reserve space for it while it's hidden (see the
+ * `reserve` option). Whenever a named surface is rendered, its measured
+ * footprint is remembered; reserving uses that remembered footprint, or an
+ * approximate default if the surface hasn't been rendered yet.
+ */
+export type ViewportUIName = "sidebar" | "stylesPanel";

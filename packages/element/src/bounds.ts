@@ -9,7 +9,6 @@ import {
 import {
   degreesToRadians,
   lineSegment,
-  pointDistance,
   pointFrom,
   pointFromArray,
   pointRotateRads,
@@ -1112,33 +1111,6 @@ export const getElementPointsCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
-};
-
-export const getClosestElementBounds = (
-  elements: readonly ExcalidrawElement[],
-  from: { x: number; y: number },
-): Bounds => {
-  if (!elements.length) {
-    return [0, 0, 0, 0];
-  }
-
-  let minDistance = Infinity;
-  let closestElement = elements[0];
-  const elementsMap = arrayToMap(elements);
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-    const distance = pointDistance(
-      pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
-      pointFrom(from.x, from.y),
-    );
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestElement = element;
-    }
-  });
-
-  return getElementBounds(closestElement, elementsMap);
 };
 
 export interface BoundingBox {

@@ -15,6 +15,42 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### Viewport control & scroll/zoom locking
+
+`ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
+
+#### Breaking changes
+
+- `ExcalidrawAPI.scrollToContent(target?, opts?)` was replaced with `ExcalidrawAPI.setViewport(opts | null)`.
+
+  ```tsx
+  // before
+  excalidrawAPI.scrollToContent(element, {
+    fitToViewport: true,
+    animate: true,
+  });
+  // after
+  excalidrawAPI.setViewport({ target: element, fit: "contain" });
+  ```
+
+  - `target` is required and no longer defaults to the whole scene — pass `target: excalidrawAPI.getSceneElements()` for the old default. Besides element(s) or an element id / element-link URL, it now also accepts `Bounds` and `{ x, y, width?, height? }` rects (missing dimensions default to the viewport size). Deleted and non-scene elements in the target are filtered out with a console warning.
+  - `fitToContent` / `fitToViewport` were replaced by `fit: "scale-down" | "contain"` respectively, defaulting to `"scale-down"` (zoomed so the target fits, at most 100%). For the old default behavior of recentering on the target at the current zoom, pass `fit: "none"`.
+  - `animate` / `duration` were replaced by `animation: boolean | { duration?: number }`. Navigation now animates by default over 250ms (previously it jumped unless `animate: true`, and animated over 500ms) — pass `animation: false` to jump instantly.
+  - `canvasOffsets` was replaced by `offsets`, which also accepts UI-derived offsets (see Features below).
+  - `viewportZoomFactor`, `minZoom`, and `maxZoom` are no longer supported.
+
+- `zoomToFitBounds` takes `fit: "scale-down" | "contain" | "none"` instead of `fitToViewport` / `viewportZoomFactor`, and no longer rounds the resulting zoom down to the nearest 10% step by default — pass `steppedZoom: true` to keep the old rounding.
+
+#### Features
+
+- `setViewport({ ..., lock })` locks the viewport to the resolved target: `lock.scroll` constrains panning to the target box and `lock.zoom` makes the resolved zoom the minimum zoom (zooming in stays allowed). When the navigation is animated, the lock is installed once the viewport settles. `setViewport(null)` clears an active lock without navigating; a navigation without `lock` also supersedes a previously installed one.
+
+- `lock.overscroll` adds a rubberband to the lock: panning can overshoot the constraint by the given amount (viewport px, zoom-independent) and snaps back once the interaction settles — on touch, once the multi-finger gesture ends. Defaults to `true` = `DEFAULT_OVERSCROLL` (150px, exported from the package root); pass a number to customize, or `false` / `0` for a rigid lock. Zooming is always hard-clamped against the lock, gliding along its edge instead of overscrolling.
+
+- Added `<Excalidraw initialState={{ viewport }} />` for initializing the viewport (and optionally installing a lock) once on scene load. Accepts the same options as `setViewport` except `animation`, and takes precedence over `initialData.scrollToContent`.
+
+- The `offsets` option (on `setViewport` and `initialState.viewport`) insets the usable viewport per side so targets aren't fitted underneath overlaid UI. It combines static pixel sides with `ui: true | ViewportOffsetsOptions`, which measures the currently rendered editor UI (toolbar, styles panel, sidebar…) — with configurable padding, per-side overrides, and reserving space for currently-hidden surfaces (`reserve: { stylesPanel?: boolean; sidebar?: boolean }`). The same measurement is exposed through the new `ExcalidrawAPI.getViewportOffsets(opts?)`, and custom UI rendered inside the editor container can opt into being measured via the `data-viewport-ui="top" | "bottom" | "side"` attribute.
+
 ### Breaking changes
 
 - Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
@@ -25,11 +61,11 @@ Please add the latest change on the top under the correct section.
   - `UIOptions.canvasActions.toggleTheme` still controls default theme UI availability. When it is `null`, it defaults to `true` if `props.theme` is omitted or `props.onThemeChange` is supplied, and otherwise defaults to disabled.
 
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
-  - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
+  - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUnmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
 ### Features
 
-- Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on umount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
+- Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on unmount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 
 - Added `onMount`, `onInitialize`, and `onUnmount` props. `onMount` receives `{ excalidrawAPI, container }` once the editor root is mounted. `onInitialize` fires once the initial scene has loaded. `onUnmount` fires just before unmounting.
 
@@ -43,7 +79,10 @@ Please add the latest change on the top under the correct section.
       });
 
       api.onEvent("editor:initialize").then((readyApi) => {
-        readyApi.scrollToContent();
+        readyApi.setViewport({
+          target: readyApi.getSceneElements(),
+          animation: false,
+        });
       });
     }}
   />
@@ -53,7 +92,7 @@ Please add the latest change on the top under the correct section.
 
 - Also added `"editor:unmount"` lifecycle event, only accessible via `api.onEvent("editor:unmount")`.
 
-- Exported `<ExcalidrawAPIProvider/>`, `useExcalidrawAPI()`, `useAppStateValue(prop | props | selectorFunction)`, and `useOnExcalidrawStateChange(prop | props | selectorFunction, callback)` from the package. The imperative API also now exposes `onStateChange(prop | props | selectorFunction, callback?)`, and `onEvent(name, callback)`.
+- Exported `<ExcalidrawAPIProvider/>`, `useExcalidrawAPI()`, `useExcalidrawStateValue(prop | props | selectorFunction)`, and `useOnExcalidrawStateChange(prop | props | selectorFunction, callback)` from the package. The imperative API also now exposes `onStateChange(prop | props | selectorFunction, callback?)`, and `onEvent(name, callback)`.
 
   ```tsx
   <ExcalidrawAPIProvider>
@@ -62,12 +101,12 @@ Please add the latest change on the top under the correct section.
   </ExcalidrawAPIProvider>;
 
   function Logger() {
-    // initially null before the ExcalidrawAPIProvider initializes ater
+    // initially null before the ExcalidrawAPIProvider initializes after
     // <Excalidraw/> renders
     // When <Excalidraw/> unmounts, is reset back to null
     const api = useExcalidrawAPI();
 
-    useAppStateValue("viewModeEnabled", (viewModeEnabled) => {
+    useExcalidrawStateValue("viewModeEnabled", (viewModeEnabled) => {
       console.log("view mode changed:", viewModeEnabled);
     });
 
@@ -100,6 +139,10 @@ Please add the latest change on the top under the correct section.
   ```
 
 ## Excalidraw Library
+
+### Breaking changes
+
+- `getClosestElementBounds` is no longer exported from `@excalidraw/element`. Use `getCommonBounds` / `getElementBounds` from `@excalidraw/element`, or reimplement the closest-target distance check with `getElementBounds` if you need the same behavior [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
 
 ## 0.18.0 (2025-03-11)
 

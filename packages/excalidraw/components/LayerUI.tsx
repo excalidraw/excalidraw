@@ -25,7 +25,7 @@ import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 
 import {
   SelectedShapeActions,
@@ -246,6 +246,8 @@ const LayerUI = ({
           <Island
             className={clsx("compact-shape-actions-island")}
             padding={0}
+            data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
             style={{
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
@@ -269,6 +271,8 @@ const LayerUI = ({
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
             }}
+            data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
           >
             <SelectedShapeActions
               appState={appState}
@@ -349,6 +353,7 @@ const LayerUI = ({
                             "zen-mode": appState.zenModeEnabled,
                             "App-toolbar--compact": isCompactStylesPanel,
                           })}
+                          data-viewport-ui="top"
                         >
                           <HintViewer
                             appState={appState}
@@ -642,7 +647,7 @@ const LayerUI = ({
                     className="scroll-back-to-content"
                     onClick={() => {
                       setAppState((appState) => ({
-                        ...calculateScrollCenter(elements, appState),
+                        ...getScrollToContentState(elements, appState),
                       }));
                     }}
                   >
