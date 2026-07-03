@@ -844,6 +844,49 @@ describe("rubberband overscroll (integration)", () => {
     finger2.up();
   });
 
+  it("withholds the rubberband snap-back until the touch gesture ends", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+    });
+
+    const finger1 = new Pointer("touch", 1);
+    const finger2 = new Pointer("touch", 2);
+
+    // two-finger pan past the top edge, into the overscroll zone
+    finger1.downAt(50, 2);
+    finger2.downAt(60, 2);
+    finger1.move(0, 5);
+    finger2.move(0, 5);
+    expect(isViewportOverscrolled(h.state)).toBe(true);
+
+    // the debounced snap-back elapses while the fingers are still down —
+    // it must be withheld, not fight the held gesture
+    React.act(() => {
+      // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
+      h.app["snapBackToScrollConstraintsDebounced"].flush();
+    });
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(isViewportOverscrolled(h.state)).toBe(true);
+
+    // lifting one finger ends the gesture → the rubberband releases
+    finger1.up();
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+
+    finger2.up();
+  });
+
   it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));

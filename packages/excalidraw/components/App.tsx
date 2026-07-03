@@ -4327,7 +4327,20 @@ class App extends React.Component<AppProps, AppState> {
       this.resetContextMenuTimer();
     }
 
+    const wasMultiTouchGesture = gesture.pointers.size >= 2;
     gesture.pointers.delete(event.pointerId);
+
+    // the multi-touch viewport gesture just disengaged: release the
+    // rubberband that was withheld while it was active
+    // (see `snapBackToScrollConstraints`)
+    if (
+      wasMultiTouchGesture &&
+      gesture.pointers.size < 2 &&
+      this.state.scrollConstraints
+    ) {
+      this.snapBackToScrollConstraintsDebounced.cancel();
+      this.snapBackToScrollConstraints();
+    }
   };
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
@@ -4590,9 +4603,14 @@ class App extends React.Component<AppProps, AppState> {
 
   /** animates an overscrolled viewport back inside the constraint box */
   private snapBackToScrollConstraints = () => {
-    if (!this.unmounted) {
-      animateToConstraints(this.state, (viewport) => this.setState(viewport));
+    // withhold the rubberband while a multi-touch gesture is still engaged —
+    // snapping back mid-gesture (e.g. while holding a pinch or between
+    // two-finger pans) fights the user's fingers and reads as jerky. It is
+    // released on gesture end instead (see `removePointer`).
+    if (this.unmounted || gesture.pointers.size >= 2) {
+      return;
     }
+    animateToConstraints(this.state, (viewport) => this.setState(viewport));
   };
 
   private snapBackToScrollConstraintsDebounced = debounce(
