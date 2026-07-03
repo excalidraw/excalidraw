@@ -2,6 +2,7 @@ import React from "react";
 
 import { Excalidraw } from "../index";
 import { AnimationController } from "../renderer/animation";
+import { getNormalizedZoom } from "../scene";
 import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../viewport";
 
 import { API } from "./helpers/api";
@@ -189,6 +190,42 @@ describe("scale-down", () => {
     // state should reflect some scrolling
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
+  });
+});
+
+describe("none", () => {
+  it("should keep the current zoom and only center the target", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 100;
+    h.state.height = 100;
+
+    const rectElement = API.createElement({
+      width: 50,
+      height: 50,
+      x: 1000,
+      y: 1000,
+    });
+    API.setElements([rectElement]);
+
+    act(() => {
+      API.setAppState({ zoom: { value: getNormalizedZoom(0.5) } });
+    });
+
+    act(() => {
+      h.app.setViewport({
+        target: rectElement,
+        fit: "none",
+        animation: false,
+      });
+    });
+
+    // pan-only: the zoom must stay untouched...
+    expect(h.state.zoom.value).toBe(0.5);
+    // ...with the target's center (1025, 1025) centered in the viewport
+    // (scroll = viewportSize / 2 / zoom - sceneCenter)
+    expect(h.state.scrollX).toBeCloseTo(100 / 2 / 0.5 - 1025);
+    expect(h.state.scrollY).toBeCloseTo(100 / 2 / 0.5 - 1025);
   });
 });
 

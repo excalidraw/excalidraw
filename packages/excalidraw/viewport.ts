@@ -98,8 +98,9 @@ export type SetViewportOptions = {
    *
    * - `scale-down` - zoom out so the target fits the viewport, never zooming past 100%
    * - `contain` - zoom the target so it fills the viewport (may exceed 100%)
+   * - `none` - keep the current zoom, only center the target in the viewport
    */
-  fit?: "scale-down" | "contain";
+  fit?: "scale-down" | "contain" | "none";
 
   lock?: {
     /** constraints panning to the target box */
@@ -375,7 +376,10 @@ export const zoomToFitBounds = ({
 
   let adjustedZoomValue;
 
-  if (fit === "contain") {
+  if (fit === "none") {
+    // pan-only: keep the current zoom, just center the target
+    adjustedZoomValue = appState.zoom.value;
+  } else if (fit === "contain") {
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
@@ -390,9 +394,10 @@ export const zoomToFitBounds = ({
     });
   }
 
-  const targetZoomValue = steppedZoom
-    ? roundToStep(adjustedZoomValue, ZOOM_STEP, "floor")
-    : adjustedZoomValue;
+  const targetZoomValue =
+    steppedZoom && fit !== "none"
+      ? roundToStep(adjustedZoomValue, ZOOM_STEP, "floor")
+      : adjustedZoomValue;
 
   const newZoomValue = getNormalizedZoom(
     clamp(targetZoomValue, minZoom, maxZoom),
