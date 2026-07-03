@@ -505,12 +505,25 @@ import type {
   NullableGridSize,
   Offsets,
   ViewportUIDock,
+  ViewportUIName,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
+
+/** single source of truth for the `--right-sidebar-width` CSS variable */
+const RIGHT_SIDEBAR_WIDTH = 302;
+
+/**
+ * Approximate styles panel footprints (panel width + editor edge inset),
+ * used by `getViewportOffsets` to reserve space for the panel before it was
+ * ever rendered (= measured). Keep roughly in sync with the CSS
+ * (`.App-menu__left` width / `.compact-shape-actions-island` min-width +
+ * `--editor-container-padding`).
+ */
+const STYLES_PANEL_APPROX_WIDTH = { full: 216, compact: 64 };
 
 const editorInterfaceContextInitialValue: EditorInterface = {
   formFactor: "desktop",
@@ -642,6 +655,16 @@ class App extends React.Component<AppProps, AppState> {
   private stylesPanelMode: StylesPanelMode = deriveStylesPanelMode(
     editorInterfaceContextInitialValue,
   );
+
+  /**
+   * Last-measured footprints of named viewport UI surfaces
+   * (`data-viewport-ui-name`), so `getViewportOffsets` can reserve space
+   * for them while they're hidden.
+   */
+  private viewportUILastMeasured = new Map<
+    ViewportUIName,
+    { side: "left" | "right"; offset: number }
+  >();
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -2165,7 +2188,7 @@ class App extends React.Component<AppProps, AppState> {
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
-          ["--right-sidebar-width" as any]: "302px",
+          ["--right-sidebar-width" as any]: `${RIGHT_SIDEBAR_WIDTH}px`,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -3107,6 +3130,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const prevStylesPanelMode = this.stylesPanelMode;
     this.stylesPanelMode = nextStylesPanelMode;
+
+    // the panel footprint differs between modes (compact vs full), so a
+    // measurement taken in the previous mode no longer applies
+    this.viewportUILastMeasured.delete("stylesPanel");
 
     if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
       this.setState((prevState) => ({
@@ -4729,6 +4756,12 @@ class App extends React.Component<AppProps, AppState> {
    * @param opts.right - defaults to measured right UI width + padding
    * @param opts.bottom - defaults to measured bottom UI height + padding
    * @param opts.left - defaults to measured left UI width + padding
+   * @param opts.reserve - reserve space for the given conditionally-rendered
+   * surfaces even while they're hidden, so the resulting offsets don't
+   * shift when they (dis)appear. Uses the surface's last-measured
+   * footprint, falling back to an approximate default if it hasn't been
+   * rendered yet. Ignored on phones (where these surfaces never occlude
+   * the canvas).
    */
   public getViewportOffsets = (opts?: {
     padding?: number;
@@ -4740,12 +4773,20 @@ class App extends React.Component<AppProps, AppState> {
     bottom?: number;
     left?: number;
     right?: number;
+    reserve?: {
+      /** styles panel (rendered when a tool or selection is active) */
+      stylesPanel?: boolean;
+      /** sidebar (e.g. library) */
+      sidebar?: boolean;
+    };
   }): Offsets => {
     const excalidrawContainer = this.excalidrawContainerRef?.current;
     const excalidrawContainerRect =
       excalidrawContainer?.getBoundingClientRect();
+    const isRTL = getLanguage().rtl;
 
     const measuredOffsets = { top: 0, right: 0, bottom: 0, left: 0 };
+    const renderedSurfaces = new Set<ViewportUIName>();
 
     if (excalidrawContainer && excalidrawContainerRect) {
       for (const node of excalidrawContainer.querySelectorAll<HTMLElement>(
@@ -4775,26 +4816,70 @@ class App extends React.Component<AppProps, AppState> {
               this.state.height - rect.top,
             );
             break;
-          case "side":
+          case "side": {
             // which side a panel docks to is resolved from its rendered
             // position (RTL / host-configured docking flip sides), by
             // checking which half of the viewport its center sits in;
             // the offset is then its intrusion depth from that edge
-            if (rect.left + rect.width / 2 < this.state.width / 2) {
-              measuredOffsets.left = Math.max(measuredOffsets.left, rect.right);
-            } else {
-              measuredOffsets.right = Math.max(
-                measuredOffsets.right,
-                this.state.width - rect.left,
-              );
+            const [side, offset] =
+              rect.left + rect.width / 2 < this.state.width / 2
+                ? (["left", rect.right] as const)
+                : (["right", this.state.width - rect.left] as const);
+
+            measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
+
+            const name = node.dataset.viewportUiName as
+              | ViewportUIName
+              | undefined;
+            if (name) {
+              renderedSurfaces.add(name);
+              // don't cache degenerate measurements (surface translated
+              // off-canvas, e.g. during zen-mode transitions)
+              if (offset > 0) {
+                this.viewportUILastMeasured.set(name, { side, offset });
+              }
             }
             break;
+          }
         }
       }
     }
 
+    // reserve space for requested surfaces that aren't currently rendered,
+    // using their last-measured footprint (or an approximate default if
+    // they weren't rendered yet); no-op for currently-rendered surfaces
+    // (already measured above) and on phones
+    if (opts?.reserve && this.editorInterface.formFactor !== "phone") {
+      const reserveSurface = (
+        name: ViewportUIName,
+        fallback: { side: "left" | "right"; offset: number },
+      ) => {
+        if (renderedSurfaces.has(name)) {
+          return;
+        }
+        const { side, offset } =
+          this.viewportUILastMeasured.get(name) ?? fallback;
+        measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
+      };
+
+      if (opts.reserve.stylesPanel) {
+        reserveSurface("stylesPanel", {
+          side: isRTL ? "right" : "left",
+          offset:
+            this.stylesPanelMode === "compact"
+              ? STYLES_PANEL_APPROX_WIDTH.compact
+              : STYLES_PANEL_APPROX_WIDTH.full,
+        });
+      }
+      if (opts.reserve.sidebar) {
+        reserveSurface("sidebar", {
+          side: isRTL ? "left" : "right",
+          offset: RIGHT_SIDEBAR_WIDTH,
+        });
+      }
+    }
+
     const padding = opts?.padding ?? 24;
-    const isRTL = getLanguage().rtl;
     const topPadding = opts?.paddingTop ?? padding;
     const rightPadding =
       (isRTL ? opts?.paddingLeft : opts?.paddingRight) ?? padding;

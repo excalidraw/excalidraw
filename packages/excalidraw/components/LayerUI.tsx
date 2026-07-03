@@ -247,6 +247,7 @@ const LayerUI = ({
             className={clsx("compact-shape-actions-island")}
             padding={0}
             data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
             style={{
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
@@ -271,6 +272,7 @@ const LayerUI = ({
               maxHeight: `${appState.height - 166}px`,
             }}
             data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
           >
             <SelectedShapeActions
               appState={appState}

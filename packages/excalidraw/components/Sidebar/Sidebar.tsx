@@ -153,6 +153,9 @@ export const SidebarInner = forwardRef(
         data-viewport-ui={
           editorInterface.formFactor !== "phone" ? "side" : undefined
         }
+        data-viewport-ui-name={
+          editorInterface.formFactor !== "phone" ? "sidebar" : undefined
+        }
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>
