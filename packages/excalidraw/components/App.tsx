@@ -4532,8 +4532,22 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /** use when changing scrollX/scrollY/zoom based on user interaction */
-  private translateCanvas: React.Component<any, AppState>["setState"] = (
-    state,
+  private translateCanvas = <K extends keyof AppState>(
+    state:
+      | AppState
+      | Pick<AppState, K>
+      | null
+      | ((
+          prevState: Readonly<AppState>,
+          props: Readonly<AppProps>,
+        ) => AppState | Pick<AppState, K> | null),
+    opts?: {
+      /** set when the caller has already hard-clamped the update's zoom
+       * component against the scroll lock — the update then gets the pan
+       * rubberband give instead of the zoom hard clamp (see the touch
+       * pinch handler, which composes both in one update) */
+      zoomPreConstrained?: boolean;
+    },
   ) => {
     AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
     this.setState({ shouldCacheIgnoreZoom: false });
@@ -4553,7 +4567,8 @@ class App extends React.Component<AppProps, AppState> {
       // the viewport within bounds — zooming glides along the lock edge
       // instead of overscrolling and snapping back on every zoom tick.
       // Panning keeps the soft give, snapping back once interaction settles.
-      const zoomed = prevState.zoom.value !== prevZoom;
+      const zoomed =
+        !opts?.zoomPreConstrained && prevState.zoom.value !== prevZoom;
       const overscroll = zoomed ? 0 : prevState.scrollConstraints.overscroll;
       if (overscroll > 0) {
         this.snapBackToScrollConstraintsDebounced();
@@ -7115,15 +7130,22 @@ class App extends React.Component<AppProps, AppState> {
           ? 1
           : distance / gesture.initialDistance;
 
-      // while rubberband-overscrolled past the scroll constraints, pin the zoom
-      // (still allowing the pan below) until the viewport has snapped back
-      const nextZoom = isViewportOverscrolled(this.state)
-        ? this.state.zoom.value
-        : scaleFactor
+      const nextZoom = scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
         : this.state.zoom.value;
 
       this.setState((state) => {
+        // constrain the zoom and pan components separately: the zoom step is
+        // hard-clamped against the scroll lock (sliding the focal point along
+        // the lock edge), while any pre-existing overscroll plus this frame's
+        // pan delta are re-applied on top and rubberband-clamped by
+        // `translateCanvas` — so pinch-zooming and overscroll-panning compose
+        // instead of the zoom yanking the viewport back inside the box.
+        const rest = constrainScrollState(state); // hard clamp (no give)
+        // pre-existing overscroll, in screen px (zoom-independent)
+        const overscrollX = (state.scrollX - rest.scrollX) * state.zoom.value;
+        const overscrollY = (state.scrollY - rest.scrollY) * state.zoom.value;
+
         const zoomState = getStateForZoom(
           {
             viewportX: center.x,
@@ -7132,16 +7154,23 @@ class App extends React.Component<AppProps, AppState> {
           },
           state,
         );
+        const zoomedViewport = constrainScrollState({ ...state, ...zoomState });
+        const zoomValue = zoomedViewport.zoom.value;
 
-        this.translateCanvas({
-          zoom: zoomState.zoom,
-          // 2x multiplier is just a magic number that makes this work correctly
-          // on touchscreen devices (note: if we get report that panning is slower/faster
-          // than actual movement, consider swapping with devicePixelRatio)
-          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
-          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
-          shouldCacheIgnoreZoom: true,
-        });
+        this.translateCanvas(
+          {
+            zoom: zoomedViewport.zoom,
+            // 2x multiplier is just a magic number that makes this work correctly
+            // on touchscreen devices (note: if we get report that panning is slower/faster
+            // than actual movement, consider swapping with devicePixelRatio)
+            scrollX:
+              zoomedViewport.scrollX + (overscrollX + 2 * deltaX) / zoomValue,
+            scrollY:
+              zoomedViewport.scrollY + (overscrollY + 2 * deltaY) / zoomValue,
+            shouldCacheIgnoreZoom: true,
+          },
+          { zoomPreConstrained: true },
+        );
 
         return null;
       });

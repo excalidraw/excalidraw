@@ -23,7 +23,7 @@ import {
 import { AnimationController } from "../renderer/animation";
 
 import { API } from "./helpers/api";
-import { Keyboard } from "./helpers/ui";
+import { Keyboard, Pointer } from "./helpers/ui";
 import {
   mockBoundingClientRect,
   render,
@@ -792,6 +792,56 @@ describe("rubberband overscroll (integration)", () => {
     expect(h.state.scrollY).toBeLessThanOrEqual(
       50 / h.state.zoom.value + 0.001,
     );
+  });
+
+  it("allows simultaneous pinch-zoom and rubberband pan on touch", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+    });
+
+    // fitted at zoom 0.1; the box exactly fills the viewport vertically,
+    // so the hard bound is scrollY = 0
+    const initialZoom = h.state.zoom.value;
+    expect(initialZoom).toBeCloseTo(0.1);
+    expect(h.state.scrollY).toBeCloseTo(0);
+
+    const finger1 = new Pointer("touch", 1);
+    const finger2 = new Pointer("touch", 2);
+
+    // spread the fingers (zoom in) while dragging both downward (pan past
+    // the top edge) — in a single two-finger gesture. Anchored near the top
+    // edge so the zoom's focal scroll doesn't counteract the pan.
+    finger1.downAt(50, 2);
+    finger2.downAt(60, 2);
+    finger1.move(-2, 5);
+    finger2.move(2, 5);
+
+    // zoomed in AND overscrolled past the top edge, bounded by the give
+    expect(h.state.zoom.value).toBeGreaterThan(initialZoom);
+    expect(h.state.scrollY).toBeGreaterThan(0);
+    expect(h.state.scrollY).toBeLessThanOrEqual(
+      50 / h.state.zoom.value + 0.001,
+    );
+    expect(isViewportOverscrolled(h.state)).toBe(true);
+
+    // zooming must keep working while overscrolled (used to be pinned),
+    // without yanking the viewport back inside the box
+    const zoomedWhileOverscrolled = h.state.zoom.value;
+    finger1.move(-2, 0);
+    finger2.move(2, 0);
+    expect(h.state.zoom.value).toBeGreaterThan(zoomedWhileOverscrolled);
+    expect(h.state.scrollY).toBeGreaterThan(0);
+
+    finger1.up();
+    finger2.up();
   });
 
   it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {
