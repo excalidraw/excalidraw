@@ -85,7 +85,7 @@ describe("appState", () => {
           viewport: {
             target: "B",
             fit: "scale-down",
-            lock: { scroll: true, zoom: true, tolerance: 15 },
+            lock: { scroll: true, zoom: true, overscroll: 15 },
           },
         }}
       />,
@@ -103,7 +103,7 @@ describe("appState", () => {
         height: 100,
         lockScroll: true,
         lockZoom: true,
-        tolerance: 15,
+        overscroll: 15,
       });
     });
 

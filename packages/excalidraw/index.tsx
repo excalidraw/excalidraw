@@ -396,7 +396,7 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
-export { zoomToFitBounds } from "./viewport";
+export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 
 export {
   getCommonBounds,

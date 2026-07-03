@@ -294,10 +294,12 @@ export type ScrollConstraints = {
    */
   zoom: number;
   /**
-   * Pixel amount the viewport may overscroll past the box before snapping back
-   * (rubberband). Screen pixels, zoom-independent.
+   * Pixel amount the viewport may overscroll past its resting clamp before
+   * snapping back (rubberband). Screen pixels, zoom-independent. Resolved
+   * from `lock.overscroll` at the time the lock was installed (`true` →
+   * default give, `false` → 0).
    */
-  tolerance: number;
+  overscroll: number;
   /**
    * Extra scrollable margin around the box (CSS-style), letting the viewport
    * scroll past each box edge to reveal that much empty space. Values are

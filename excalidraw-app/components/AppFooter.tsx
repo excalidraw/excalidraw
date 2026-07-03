@@ -1,4 +1,4 @@
-import { Footer } from "@excalidraw/excalidraw/index";
+import { Footer, DEFAULT_OVERSCROLL } from "@excalidraw/excalidraw/index";
 import { getSelectedElements } from "@excalidraw/element";
 import React, { useCallback, useState } from "react";
 
@@ -31,7 +31,6 @@ const ScrollConstraintsDebugFooter = ({
   const [lock, setLock] = useState<LockOptions>({
     scroll: true,
     zoom: false,
-    tolerance: 0,
   });
   const [offsets, setOffsets] = useState<Offsets>({
     top: 0,
@@ -216,16 +215,22 @@ const ScrollConstraintsDebugFooter = ({
         lock zoom
       </label>
       <label style={labelStyle}>
-        tolerance
+        overscroll
         <input
           type="number"
           min={0}
           step={1}
-          value={lock.tolerance ?? 0}
+          value={
+            typeof lock.overscroll === "number"
+              ? lock.overscroll
+              : lock.overscroll === false
+              ? 0
+              : DEFAULT_OVERSCROLL
+          }
           onChange={(event) =>
             updateLock({
               ...lock,
-              tolerance:
+              overscroll:
                 event.target.value === "" ? 0 : Number(event.target.value),
             })
           }

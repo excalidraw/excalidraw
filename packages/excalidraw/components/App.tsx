@@ -4540,22 +4540,22 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeUnfollowRemoteUser();
     this.setState(state);
 
-    // with rubberband tolerance, allow a soft overscroll while interacting and
+    // with rubberband overscroll, allow a soft give while interacting and
     // animate back to the box once the interaction settles; otherwise hard-clamp
-    const tolerance = this.state.scrollConstraints?.tolerance ?? 0;
-    this.constrainViewportToScrollConstraints(tolerance);
-    if (tolerance > 0) {
+    const overscroll = this.state.scrollConstraints?.overscroll ?? 0;
+    this.constrainViewportToScrollConstraints(overscroll);
+    if (overscroll > 0) {
       this.snapBackToScrollConstraintsDebounced();
     }
   };
 
   /** clamps scroll/zoom back into `appState.scrollConstraints` (no-op when
    * unconstrained). Runs as a queued update, so it sees the preceding change.
-   * `tolerance` (screen px) relaxes the bounds for rubberbanding. */
-  private constrainViewportToScrollConstraints = (tolerance = 0) => {
+   * `overscroll` (screen px) relaxes the bounds for rubberbanding. */
+  private constrainViewportToScrollConstraints = (overscroll = 0) => {
     this.setState((prevState) =>
       prevState.scrollConstraints
-        ? constrainScrollState(prevState, tolerance)
+        ? constrainScrollState(prevState, overscroll)
         : null,
     );
   };

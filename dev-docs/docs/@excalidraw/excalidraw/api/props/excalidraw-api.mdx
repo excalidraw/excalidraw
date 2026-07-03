@@ -294,7 +294,7 @@ This is the history API. history.clear() will clear the history.
         lock?: {
           scroll?: boolean;
           zoom?: boolean;
-          tolerance?: number;
+          overscroll?: boolean | number;
         };
         animation?: { duration?: number } | boolean;
         offsets?: { top?: number; right?: number; bottom?: number; left?: number };
@@ -310,7 +310,7 @@ Navigates the viewport to a target and, optionally, locks pan/zoom to it. The re
 | fit | `"scale-down"` &#124; `"contain"` | — | `scale-down` zooms out to fit the target, capped at 100%; `contain` scales the target to fill the viewport (may exceed 100%). |
 | lock.scroll | boolean | false | Constrain panning so the viewport stays within the target box. |
 | lock.zoom | boolean | false | Make the resolved zoom the minimum the user can zoom out to. Zooming in (up to 3000%) is always allowed. |
-| lock.tolerance | number | 0 | Rubberband overscroll allowance, in viewport pixels (zoom-independent). |
+| lock.overscroll | boolean &#124; number | true | Rubberband give past the lock, in viewport pixels (zoom-independent): how far the user can pan beyond the constraint before it snaps back. `true` uses the default (200px), `false` or `0` makes the lock rigid. |
 | animation | `{ duration?: number }` &#124; `boolean` | `{ duration: 250 }` | `true` (or omitted) animates with the default duration; `false` jumps instantly. |
 | offsets | `{ top?; right?; bottom?; left? }` | — | CSS-style padding in viewport pixels (zoom-independent). Insets the fit and extends the locked scroll area. |
 

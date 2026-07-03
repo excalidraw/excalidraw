@@ -46,6 +46,9 @@ export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
 
 const DEFAULT_SCROLL_ANIMATION_DURATION = 250;
 
+/** default rubberband overscroll give for scroll locks, in viewport px */
+export const DEFAULT_OVERSCROLL = 150;
+
 export type AnimationOptions = {
   duration?: number;
 };
@@ -103,8 +106,13 @@ export type SetViewportOptions = {
     scroll?: ScrollConstraints["lockScroll"];
     /** makes the resolved zoom the minimum zoom */
     zoom?: ScrollConstraints["lockZoom"];
-    /** rubberband overscroll allowance in viewport px */
-    tolerance?: ScrollConstraints["tolerance"];
+    /**
+     * Rubberband give past the lock, in viewport px (zoom-independent): how
+     * far the user can pan beyond the constraint before snapping back.
+     * `true` (default) uses {@link DEFAULT_OVERSCROLL}, `false` disables
+     * (rigid lock), a number sets the give explicitly.
+     */
+    overscroll?: boolean | number;
   };
 
   animation?: AnimationOptions | boolean;
@@ -131,45 +139,64 @@ const resolveAnimationDuration = (
   return animation.duration ?? DEFAULT_SCROLL_ANIMATION_DURATION;
 };
 
+const resolveOverscroll = (
+  overscroll: boolean | number | undefined,
+): number => {
+  if (overscroll === false) {
+    return 0;
+  }
+  if (overscroll === true || overscroll == null) {
+    return DEFAULT_OVERSCROLL;
+  }
+  return Math.max(overscroll, 0);
+};
+
 /**
  * Clamps a single scroll axis so the visible scene span stays inside the box.
  * The visible span is `[-scroll, -scroll + visibleSize]`; we keep it within
- * `[boxStart, boxStart + boxSize]`, expanded by `startExpand` at the low edge
- * and `endExpand` at the high edge (rubberband overscroll plus any offsets).
- * When the box can't cover the viewport on this axis (the viewport is larger
- * than the box) we center the box instead.
+ * `[boxStart, boxStart + boxSize]`, expanded by `offsetStart`/`offsetEnd` at
+ * the low/high edge. When the box can't cover the viewport on this axis (the
+ * viewport is larger than the box) the box rests centered instead.
+ * `overscroll` is pure rubberband give: it widens the allowed range by that
+ * much on both sides of the resting position, regardless of the geometry.
  */
 const constrainScrollAxis = (
   scroll: number,
   boxStart: number,
   boxSize: number,
   visibleSize: number,
-  startExpand: number,
-  endExpand: number,
+  offsetStart: number,
+  offsetEnd: number,
+  overscroll: number,
 ): number => {
-  const max = -boxStart + startExpand;
-  const min = visibleSize - (boxStart + boxSize) - endExpand;
-  return min > max ? (min + max) / 2 : clamp(scroll, min, max);
+  const max = -boxStart + offsetStart;
+  const min = visibleSize - (boxStart + boxSize) - offsetEnd;
+  if (min > max) {
+    // box can't cover the viewport: rest at center, with rubberband give
+    const center = (min + max) / 2;
+    return clamp(scroll, center - overscroll, center + overscroll);
+  }
+  return clamp(scroll, min - overscroll, max + overscroll);
 };
 
 /**
  * Clamps a proposed scroll/zoom against the active lock (`scrollConstraints`).
  * Returns the input scroll/zoom unchanged when there is no lock.
+ * `overscroll` (screen px, zoom-independent) is rubberband give past the
+ * resting clamp — pass 0 for a hard clamp.
  */
 export const constrainScrollState = (
   state: Pick<
     AppState,
     "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
   >,
-  tolerance = 0,
+  overscroll = 0,
 ): Viewport => {
   const { scrollConstraints, width, height } = state;
 
   if (!scrollConstraints) {
     return { scrollX: state.scrollX, scrollY: state.scrollY, zoom: state.zoom };
   }
-
-  tolerance = Math.max(tolerance, 0);
 
   const minZoom = scrollConstraints.lockZoom
     ? scrollConstraints.zoom
@@ -186,7 +213,7 @@ export const constrainScrollState = (
     };
   }
 
-  const overscroll = tolerance / zoomValue;
+  const give = Math.max(overscroll, 0) / zoomValue;
   const offsets = scrollConstraints.offsets;
   const offsetTop = (offsets?.top ?? 0) / zoomValue;
   const offsetRight = (offsets?.right ?? 0) / zoomValue;
@@ -199,16 +226,18 @@ export const constrainScrollState = (
       scrollConstraints.x,
       scrollConstraints.width,
       width / zoomValue,
-      overscroll + offsetLeft,
-      overscroll + offsetRight,
+      offsetLeft,
+      offsetRight,
+      give,
     ),
     scrollY: constrainScrollAxis(
       state.scrollY,
       scrollConstraints.y,
       scrollConstraints.height,
       height / zoomValue,
-      overscroll + offsetTop,
-      overscroll + offsetBottom,
+      offsetTop,
+      offsetBottom,
+      give,
     ),
     zoom: { value: zoomValue },
   };
@@ -224,7 +253,7 @@ export const isViewportOverscrolled = (
     return false;
   }
 
-  const target = constrainScrollState(state); // hard clamp (tolerance 0)
+  const target = constrainScrollState(state); // hard clamp (no overscroll give)
 
   return (
     target.scrollX !== state.scrollX ||
@@ -252,7 +281,7 @@ export const animateToConstraints = (
   ) => void,
   duration = DEFAULT_SCROLL_ANIMATION_DURATION,
 ) => {
-  const target = constrainScrollState(state); // hard clamp (tolerance 0)
+  const target = constrainScrollState(state); // hard clamp (no overscroll give)
 
   if (
     target.scrollX === state.scrollX &&
@@ -525,7 +554,7 @@ export const getConstrainedTargetViewport = (
     lockScroll: !!lock.scroll,
     lockZoom: !!lock.zoom,
     zoom: viewport.zoom.value,
-    tolerance: lock.tolerance ?? 0,
+    overscroll: resolveOverscroll(lock.overscroll),
     offsets,
   };
 

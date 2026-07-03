@@ -15,6 +15,7 @@ import { getNormalizedZoom } from "../scene";
 import {
   animateToConstraints,
   constrainScrollState,
+  DEFAULT_OVERSCROLL,
   isViewportOverscrolled,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
 } from "../viewport";
@@ -53,7 +54,7 @@ const makeState = (
 });
 
 /** A lock box with sensible defaults; pass `lockScroll`/`lockZoom`/`zoom`/
- * `tolerance`/`offsets` to override. */
+ * `overscroll`/`offsets` to override. */
 const makeLock = (
   overrides: Partial<ScrollConstraints> &
     Pick<ScrollConstraints, "x" | "y" | "width" | "height">,
@@ -61,7 +62,7 @@ const makeLock = (
   lockScroll: false,
   lockZoom: false,
   zoom: 1,
-  tolerance: 0,
+  overscroll: 0,
   ...overrides,
 });
 
@@ -254,55 +255,55 @@ describe("offsets (pure)", () => {
     expect(result.scrollX).toBeCloseTo(0);
   });
 
-  it("stacks with the rubberband tolerance", () => {
-    const tolerance = 30; // screen px
+  it("stacks with the rubberband overscroll", () => {
+    const overscroll = 30; // screen px
     const result = constrainScrollState(
       makeState({
         scrollX: 999,
         scrollConstraints: makeLock({
           ...base,
           lockScroll: true,
-          tolerance,
+          overscroll,
           offsets: { left: 40 },
         }),
       }),
-      tolerance,
+      overscroll,
     );
-    // left offset (40) + tolerance overscroll (30) at zoom 1
+    // left offset (40) + overscroll give (30) at zoom 1
     expect(result.scrollX).toBeCloseTo(70);
   });
 });
 
-describe("rubberband tolerance (pure)", () => {
+describe("rubberband overscroll (pure)", () => {
   const base = { x: 0, y: 0, width: 1000, height: 1000 } as const;
 
-  it("allows scroll overscroll up to `tolerance` screen pixels", () => {
-    const tolerance = 30; // screen px
+  it("allows scroll overscroll up to `overscroll` screen pixels", () => {
+    const overscroll = 30; // screen px
     const result = constrainScrollState(
       makeState({
         scrollX: 999,
-        scrollConstraints: makeLock({ ...base, lockScroll: true, tolerance }),
+        scrollConstraints: makeLock({ ...base, lockScroll: true, overscroll }),
       }),
-      tolerance,
+      overscroll,
     );
-    expect(result.scrollX).toBeCloseTo(tolerance / 1); // 30 (zoom 1)
+    expect(result.scrollX).toBeCloseTo(overscroll / 1); // 30 (zoom 1)
   });
 
   it("keeps the overscroll a fixed screen distance regardless of zoom", () => {
-    const tolerance = 30; // screen px
+    const overscroll = 30; // screen px
     const result = constrainScrollState(
       makeState({
         scrollX: 999,
         zoom: { value: getNormalizedZoom(2) },
-        scrollConstraints: makeLock({ ...base, lockScroll: true, tolerance }),
+        scrollConstraints: makeLock({ ...base, lockScroll: true, overscroll }),
       }),
-      tolerance,
+      overscroll,
     );
     // 30 screen px at zoom 2 -> 15 scene px of overscroll
-    expect(result.scrollX).toBeCloseTo(tolerance / 2); // 15
+    expect(result.scrollX).toBeCloseTo(overscroll / 2); // 15
   });
 
-  it("hard-clamps when tolerance is 0 (default)", () => {
+  it("hard-clamps when overscroll is 0 (default)", () => {
     const result = constrainScrollState(
       makeState({
         scrollX: 999,
@@ -310,6 +311,25 @@ describe("rubberband tolerance (pure)", () => {
       }),
     );
     expect(result.scrollX).toBeCloseTo(0);
+  });
+
+  it("gives ±overscroll around center when the box can't cover the viewport", () => {
+    const overscroll = 30; // screen px
+    // at zoom 0.1 the visible width (200/0.1 = 2000) exceeds the box (1000),
+    // so the box rests centered (scrollX 500) — but overscroll must still
+    // allow give around that resting position, regardless of the free space
+    const state = makeState({
+      scrollX: 9999,
+      zoom: { value: getNormalizedZoom(0.1) },
+      scrollConstraints: makeLock({ ...base, lockScroll: true, overscroll }),
+    });
+
+    // 30 screen px at zoom 0.1 -> 300 scene px of give past center
+    expect(constrainScrollState(state, overscroll).scrollX).toBeCloseTo(
+      500 + 300,
+    );
+    // the hard clamp still rests at dead center
+    expect(constrainScrollState(state).scrollX).toBeCloseTo(500);
   });
 });
 
@@ -418,7 +438,7 @@ describe("setViewport lock (integration)", () => {
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
-        lock: { scroll: true },
+        lock: { scroll: true, overscroll: false },
       });
     });
 
@@ -694,7 +714,7 @@ describe("setViewport lock (integration)", () => {
   });
 });
 
-describe("rubberband tolerance (integration)", () => {
+describe("rubberband overscroll (integration)", () => {
   beforeEach(() => {
     mockBoundingClientRect();
   });
@@ -704,7 +724,7 @@ describe("rubberband tolerance (integration)", () => {
     AnimationController.reset();
   });
 
-  it("lets the user pan past the box edge (bounded by tolerance)", async () => {
+  it("lets the user pan past the box edge (bounded by overscroll)", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
@@ -713,7 +733,7 @@ describe("rubberband tolerance (integration)", () => {
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
-        lock: { scroll: true, tolerance: 25 },
+        lock: { scroll: true, overscroll: 25 },
       });
     });
 
@@ -722,10 +742,38 @@ describe("rubberband tolerance (integration)", () => {
       Keyboard.keyPress(KEYS.PAGE_UP);
     }
 
-    // overscrolled past 0, but bounded by tolerance (25 screen px / zoom 1)
+    // overscrolled past 0, but bounded by the give (25 screen px / zoom 1)
     expect(h.state.scrollY).toBeGreaterThan(0);
     expect(h.state.scrollY).toBeLessThanOrEqual(
       25 / h.state.zoom.value + 0.001,
     );
+  });
+
+  it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const install = (overscroll?: boolean | number) => {
+      React.act(() => {
+        h.app.setViewport({
+          target: [0, 0, 1000, 1000],
+          fit: "scale-down",
+          animation: false,
+          lock: { scroll: true, overscroll },
+        });
+      });
+    };
+
+    install(undefined);
+    expect(h.state.scrollConstraints?.overscroll).toBe(DEFAULT_OVERSCROLL);
+
+    install(true);
+    expect(h.state.scrollConstraints?.overscroll).toBe(DEFAULT_OVERSCROLL);
+
+    install(false);
+    expect(h.state.scrollConstraints?.overscroll).toBe(0);
+
+    install(25);
+    expect(h.state.scrollConstraints?.overscroll).toBe(25);
   });
 });
