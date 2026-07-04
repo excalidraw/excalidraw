@@ -20,6 +20,8 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
+  "currentItemBlurRadius": 0,
+  "currentItemBlurStyle": "none",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,

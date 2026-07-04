@@ -34,6 +34,8 @@ export const getDefaultAppState = (): Omit<
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
+    currentItemBlurStyle: DEFAULT_ELEMENT_PROPS.blurStyle,
+    currentItemBlurRadius: DEFAULT_ELEMENT_PROPS.blurRadius,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
     currentItemStrokeVariability: "constant",
     currentItemStartArrowhead: null,
@@ -169,6 +171,8 @@ const APP_STATE_STORAGE_CONF = (<
     server: false,
   },
   currentItemOpacity: { browser: true, export: false, server: false },
+  currentItemBlurStyle: { browser: true, export: false, server: false },
+  currentItemBlurRadius: { browser: true, export: false, server: false },
   currentItemRoughness: { browser: true, export: false, server: false },
   currentItemStrokeVariability: {
     browser: true,

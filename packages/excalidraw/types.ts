@@ -406,6 +406,8 @@ export interface AppState {
   currentItemRoughness: number;
   currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
+  currentItemBlurStyle: ExcalidrawElement["blurStyle"];
+  currentItemBlurRadius: ExcalidrawElement["blurRadius"];
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;

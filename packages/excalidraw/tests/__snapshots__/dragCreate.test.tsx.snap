@@ -6,6 +6,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -57,6 +59,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -91,6 +95,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -123,6 +129,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "endArrowhead": null,
@@ -172,6 +180,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",

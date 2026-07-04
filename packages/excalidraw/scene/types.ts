@@ -37,6 +37,10 @@ export type StaticCanvasRenderConfig = {
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
+  /** Internal flag used by the blur overlay pass to ask the renderer to
+      paint a blur lens normally (after the main canvas content has been
+      sampled into a temp buffer). Defaults to false / undefined. */
+  isBlurOverlayPass?: boolean;
 };
 
 export type SVGRenderConfig = {
@@ -56,6 +60,16 @@ export type SVGRenderConfig = {
    */
   reuseImages: boolean;
   theme: AppState["theme"];
+  /** Per-lens pre-rendered raster snapshots with the blur effect baked in
+      using the canvas pipeline. The SVG export embeds these directly as
+      `<image>` nodes — no SVG `feGaussianBlur` is used (it produces a
+      viewer-scale-dependent blur strength that doesn't match the canvas
+      result). Each snapshot already includes the shape clip and outline
+      stroke. Indexed by element id. */
+  blurLensSnapshots?: Map<
+    string,
+    { dataUrl: string; x: number; y: number; w: number; h: number }
+  >;
 };
 
 export type InteractiveCanvasRenderConfig = {

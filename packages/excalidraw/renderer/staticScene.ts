@@ -36,6 +36,7 @@ import {
 } from "../components/hyperlink/helpers";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import { applyBlurOverlays } from "./blurOverlay";
 
 import type {
   StaticCanvasRenderConfig,
@@ -466,6 +467,17 @@ const _renderStaticScene = ({
         console.error(error);
       }
     });
+
+  // Blur overlay pass — composites blur "lens" shapes on top of the
+  // already-rendered scene by sampling the canvas pixels beneath each lens.
+  applyBlurOverlays(
+    context,
+    visibleElements,
+    appState,
+    canvas.width,
+    canvas.height,
+    scale,
+  );
 
   // render pending nodes for flowcharts
   renderConfig.pendingFlowchartNodes?.forEach((element) => {

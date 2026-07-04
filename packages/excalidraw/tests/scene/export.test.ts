@@ -575,3 +575,54 @@ describe("exporting frames", () => {
     });
   });
 });
+
+describe("exportToSvg blur lens", () => {
+  const BASE_OPTIONS = {
+    exportBackground: false,
+    viewBackgroundColor: "#ffffff",
+    files: {},
+  };
+
+  it("emits one <image> per blur lens with no SVG filter", async () => {
+    const svg = await exportUtils.exportToSvg(
+      [
+        {
+          ...rectangleWithLinkFixture,
+          link: null,
+          id: "lens",
+          blurStyle: "gaussian",
+          blurRadius: 14,
+          index: "a0",
+        } as NonDeletedExcalidrawElement,
+      ],
+      BASE_OPTIONS,
+      null,
+    );
+    const html = svg.outerHTML;
+    // No SVG filter primitives — blur is baked into a per-lens raster
+    expect(html).not.toContain("feGaussianBlur");
+    expect(html).not.toContain('in="BackgroundImage"');
+    // No xlink:href which would require xmlns:xlink declaration
+    expect(html).not.toContain("xlink:href");
+    // Embedded image with data URL
+    expect(html).toMatch(/<image[^>]+href="data:image\/png;base64,/);
+  });
+
+  it("non-blur shapes still render normally (no <image>)", async () => {
+    const svg = await exportUtils.exportToSvg(
+      [
+        {
+          ...rectangleWithLinkFixture,
+          link: null,
+          id: "plain",
+          blurStyle: "none",
+          blurRadius: 0,
+          index: "a0",
+        } as NonDeletedExcalidrawElement,
+      ],
+      BASE_OPTIONS,
+      null,
+    );
+    expect(svg.outerHTML).not.toContain("<image");
+  });
+});

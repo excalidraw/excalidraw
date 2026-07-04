@@ -283,6 +283,10 @@ export class API {
         : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
+      blurStyle:
+        (rest as any).blurStyle ?? appState.currentItemBlurStyle ?? "none",
+      blurRadius:
+        (rest as any).blurRadius ?? appState.currentItemBlurRadius ?? 0,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
     };

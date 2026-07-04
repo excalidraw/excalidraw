@@ -4,6 +4,8 @@ exports[`multi point mode in linear elements > arrow 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -57,6 +59,8 @@ exports[`multi point mode in linear elements > line 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "endArrowhead": null,

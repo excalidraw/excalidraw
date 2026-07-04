@@ -4,6 +4,8 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -36,6 +38,8 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -68,6 +72,8 @@ exports[`move element > rectangle 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -100,6 +106,8 @@ exports[`move element > rectangles with binding arrow 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id6",
@@ -137,6 +145,8 @@ exports[`move element > rectangles with binding arrow 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": [
     {
       "id": "id6",
@@ -174,6 +184,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,

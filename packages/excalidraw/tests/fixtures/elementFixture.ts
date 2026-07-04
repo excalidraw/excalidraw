@@ -18,6 +18,8 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   strokeStyle: "solid",
   roughness: 1,
   opacity: 100,
+  blurStyle: "none",
+  blurRadius: 0,
   groupIds: [],
   frameId: null,
   roundness: null,

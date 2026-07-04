@@ -4,6 +4,8 @@ exports[`select single element on the scene > arrow 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
@@ -53,6 +55,8 @@ exports[`select single element on the scene > arrow escape 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "endArrowhead": null,
@@ -100,6 +104,8 @@ exports[`select single element on the scene > diamond 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -132,6 +138,8 @@ exports[`select single element on the scene > ellipse 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
@@ -164,6 +172,8 @@ exports[`select single element on the scene > rectangle 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "blurRadius": 0,
+  "blurStyle": "none",
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",

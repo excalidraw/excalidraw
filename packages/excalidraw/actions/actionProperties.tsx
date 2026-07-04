@@ -106,6 +106,9 @@ import {
   FillHachureIcon,
   FillCrossHatchIcon,
   FillSolidIcon,
+  BlurNoneIcon,
+  BlurGaussianIcon,
+  BlurPixelateIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
@@ -862,6 +865,108 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
     );
   },
 });
+
+export const actionChangeBlurStyle = register<ExcalidrawElement["blurStyle"]>({
+  name: "changeBlurStyle",
+  label: "labels.blurStyle",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => newElementWith(el, { blurStyle: value }),
+        true,
+      ),
+      appState: { ...appState, currentItemBlurStyle: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const value = getFormValue(
+      elements,
+      app,
+      (el) => el.blurStyle,
+      true,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemBlurStyle ?? "none",
+    );
+    return (
+      <fieldset>
+        <legend>{t("labels.blurStyle")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            type="button"
+            options={[
+              {
+                value: "none",
+                text: t("labels.blurNone"),
+                icon: BlurNoneIcon,
+                testId: "blur-none",
+              },
+              {
+                value: "gaussian",
+                text: t("labels.blurGaussian"),
+                icon: BlurGaussianIcon,
+                testId: "blur-gaussian",
+              },
+              {
+                value: "pixelate",
+                text: t("labels.blurPixelate"),
+                icon: BlurPixelateIcon,
+                testId: "blur-pixelate",
+              },
+            ]}
+            value={value}
+            onClick={(v) => updateData(v as ExcalidrawElement["blurStyle"])}
+          />
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeBlurRadius = register<ExcalidrawElement["blurRadius"]>(
+  {
+    name: "changeBlurRadius",
+    label: "labels.blurRadius",
+    trackEvent: false,
+    perform: (elements, appState, value) => {
+      return {
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => newElementWith(el, { blurRadius: value }),
+          true,
+        ),
+        appState: { ...appState, currentItemBlurRadius: value },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    },
+    PanelComponent: ({ elements, appState, app, updateData }) => {
+      const value = getFormValue(
+        elements,
+        app,
+        (el) => el.blurRadius,
+        true,
+        (hasSelection) =>
+          hasSelection ? null : appState.currentItemBlurRadius ?? 12,
+      );
+      return (
+        <Range
+          label={t("labels.blurRadius")}
+          value={value ?? appState.currentItemBlurRadius ?? 12}
+          hasCommonValue={value !== null}
+          onChange={updateData}
+          min={0}
+          max={80}
+          step={1}
+          testId="blur-radius"
+        />
+      );
+    },
+  },
+);
 
 export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
   {
