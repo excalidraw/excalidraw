@@ -672,6 +672,12 @@ class App extends React.Component<AppProps, AppState> {
 
   public scene: Scene;
   public fonts: Fonts;
+  /**
+   * Tracks custom (string-based) font families that we've already attempted
+   * to resolve via the font provider. Prevents re-triggering resolution on
+   * every render for the same family (including failed resolutions).
+   */
+  private customFontsAttempted: Set<string> = new Set();
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   private resizeObserver: ResizeObserver | undefined;
@@ -878,6 +884,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
+    Fonts.fontProviders ??= this.props.fontProviders;
     this.fonts = new Fonts(this.scene);
     this.history = new History(this.store);
 
@@ -3289,6 +3296,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
+    Fonts.fontProviders ??= this.props.fontProviders;
     this.fonts = new Fonts(this.scene);
     this.renderer = new Renderer(this.scene);
     this.files = {};
@@ -3469,6 +3477,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    Fonts.fontProviders ??= this.props.fontProviders;
+
     // must be updated *before* state change listeners are triggered below
     if (!this._initialized && !this.state.isLoading) {
       this._initialized = true;
@@ -3620,6 +3630,32 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.commit(elementsMap, this.state);
+
+    // Auto-detect custom fonts in the scene that haven't been resolved yet.
+    // Covers all element sources: remote collab, paste, scene import, etc.
+    if (this.props.fontProviders) {
+      const unresolved = this.fonts
+        .getSceneFamilies()
+        .filter(
+          (f) =>
+            typeof f === "string" &&
+            !Fonts.registered.has(f) &&
+            !this.customFontsAttempted.has(f),
+        );
+
+      if (unresolved.length > 0) {
+        for (const family of unresolved) {
+          this.customFontsAttempted.add(family as string);
+        }
+        this.fonts.loadSceneFonts().then((fontFaces) => {
+          this.fonts.onLoaded(fontFaces);
+          const failed = unresolved.filter((f) => !Fonts.registered.has(f));
+          for (const family of failed) {
+            this.customFontsAttempted.delete(family as string);
+          }
+        });
+      }
+    }
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during

@@ -6,6 +6,7 @@ import {
   getFontFamilyFallbacks,
   FONT_SIZES,
 } from "@excalidraw/common";
+
 import { getContainerElement } from "@excalidraw/element";
 import { charWidth } from "@excalidraw/element";
 import { containsCJK } from "@excalidraw/element";
@@ -21,6 +22,8 @@ import {
 import { ShapeCache } from "@excalidraw/element";
 
 import { isTextElement } from "@excalidraw/element";
+
+import type { FontFamily } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -43,14 +46,20 @@ import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
+import type { FontProviders } from "../types";
+
 export class Fonts {
+  public static readonly FONT_PROVIDER_SEPARATOR = ":";
+
+  public static fontProviders?: FontProviders;
+
   // it's ok to track fonts across multiple instances only once, so let's use
   // a static member to reduce memory footprint
   public static readonly loadedFontsCache = new Set<string>();
 
   private static _registered:
     | Map<
-        number,
+        FontFamily,
         {
           metadata: FontMetadata;
           fontFaces: ExcalidrawFontFace[];
@@ -91,6 +100,60 @@ export class Fonts {
    */
   public getSceneFamilies = () => {
     return Fonts.getUniqueFamilies(this.scene.getNonDeletedElements());
+  };
+
+  /**
+   * Resolve custom (string-based) font families via configured font providers.
+   * Registers each resolved font so it can be loaded and rendered.
+   */
+  private static resolveCustomFonts = async (
+    families: Array<ExcalidrawTextElement["fontFamily"]>,
+  ): Promise<void> => {
+    if (!Fonts.fontProviders) {
+      return;
+    }
+
+    const customFamilies = families.filter(
+      (f) => typeof f === "string" && !Fonts.registered.has(f),
+    );
+
+    await Promise.all(
+      customFamilies.map(async (family) => {
+        try {
+          const parsed = Fonts.parseProviderFontFamily(family as string);
+
+          if (!parsed) {
+            console.error(
+              `Failed to resolve custom font "${family}": missing provider prefix`,
+            );
+            return;
+          }
+
+          const provider = Fonts.fontProviders![parsed.providerId];
+
+          if (!provider) {
+            console.error(
+              `Failed to resolve custom font "${family}": missing provider "${parsed.providerId}"`,
+            );
+            return;
+          }
+
+          const definition = await provider.resolve(parsed.familyName);
+          Fonts.registerCustomFont(
+            family as string,
+            {
+              metrics: definition.metrics,
+            },
+            ...definition.fontFaces,
+          );
+        } catch (e) {
+          console.error(
+            `Failed to resolve custom font "${family}" via font provider`,
+            e,
+          );
+        }
+      }),
+    );
   };
 
   /**
@@ -150,11 +213,33 @@ export class Fonts {
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = Fonts.getCharsPerFamily(
-      this.scene.getNonDeletedElements(),
+    const elements = this.scene.getNonDeletedElements();
+    const charsPerFamily = Fonts.getCharsPerFamily(elements);
+
+    // Split into built-in (numeric) and custom (string) families so that
+    // built-in fonts load immediately without waiting for custom font resolution
+    const builtInFamilies = sceneFamilies.filter((f) => typeof f === "number");
+    const customFamilies = sceneFamilies.filter(
+      (f) => typeof f === "string" && !Fonts.registered.has(f),
     );
 
-    return Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
+    // Load built-in fonts immediately
+    const builtInPromise = Fonts.loadFontFaces(builtInFamilies, charsPerFamily);
+
+    // Resolve and load custom fonts in parallel (if any)
+    const customPromise =
+      Fonts.fontProviders && customFamilies.length > 0
+        ? Fonts.resolveCustomFonts(sceneFamilies).then(() => {
+            return Fonts.loadFontFaces(customFamilies, charsPerFamily);
+          })
+        : Promise.resolve([]);
+
+    const [builtInFaces, customFaces] = await Promise.all([
+      builtInPromise,
+      customPromise,
+    ]);
+
+    return [...builtInFaces, ...customFaces];
   };
 
   /**
@@ -166,7 +251,30 @@ export class Fonts {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    return Fonts.loadFontFaces(fontFamilies, charsPerFamily);
+    // Split into built-in (numeric) and custom (string) families so that
+    // built-in fonts load immediately without waiting for custom font resolution
+    const builtInFamilies = fontFamilies.filter((f) => typeof f === "number");
+    const customFamilies = fontFamilies.filter(
+      (f) => typeof f === "string" && !Fonts.registered.has(f),
+    );
+
+    // Load built-in fonts immediately
+    const builtInPromise = Fonts.loadFontFaces(builtInFamilies, charsPerFamily);
+
+    // Resolve and load custom fonts in parallel (if any)
+    const customPromise =
+      Fonts.fontProviders && customFamilies.length > 0
+        ? Fonts.resolveCustomFonts(fontFamilies).then(() => {
+            return Fonts.loadFontFaces(customFamilies, charsPerFamily);
+          })
+        : Promise.resolve([]);
+
+    const [builtInFaces, customFaces] = await Promise.all([
+      builtInPromise,
+      customPromise,
+    ]);
+
+    return [...builtInFaces, ...customFaces];
   };
 
   /**
@@ -176,6 +284,10 @@ export class Fonts {
     elements: readonly ExcalidrawElement[],
   ) {
     const families = Fonts.getUniqueFamilies(elements);
+
+    // resolve any custom (string-based) font families via the provider
+    await Fonts.resolveCustomFonts(families);
+
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
     // for simplicity, assuming we have just one family with the CJK handdrawn fallback
@@ -211,7 +323,7 @@ export class Fonts {
 
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily: Record<number, Set<string>>,
+    charsPerFamily: Record<FontFamily, Set<string>>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
@@ -236,7 +348,7 @@ export class Fonts {
 
   private static *fontFacesLoader(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily: Record<number, Set<string>>,
+    charsPerFamily: Record<FontFamily, Set<string>>,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
@@ -271,8 +383,8 @@ export class Fonts {
   }
 
   private static *fontFacesStylesGenerator(
-    families: Array<number>,
-    charsPerFamily: Record<number, Set<string>>,
+    families: Array<FontFamily>,
+    charsPerFamily: Record<FontFamily, Set<string>>,
   ): Generator<Promise<void | readonly [number, string]>> {
     for (const [familyIndex, family] of families.entries()) {
       const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
@@ -328,7 +440,7 @@ export class Fonts {
       | Fonts
       | {
           registered: Map<
-            number,
+            FontFamily,
             { metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }
           >;
         },
@@ -357,12 +469,42 @@ export class Fonts {
   }
 
   /**
+   * Register a custom font with a string-based font family key.
+   *
+   * @param family CSS font-family name (used as the key)
+   * @param metadata font metadata (metrics, flags)
+   * @param fontFaceDescriptors font face descriptors (URIs + optional descriptors)
+   */
+  public static registerCustomFont(
+    family: string,
+    metadata: FontMetadata,
+    ...fontFaceDescriptors: ExcalidrawFontFaceDescriptor[]
+  ) {
+    const registeredFamily = Fonts.registered.get(family);
+
+    if (!registeredFamily) {
+      Fonts.registered.set(family, {
+        metadata,
+        fontFaces: fontFaceDescriptors.map(
+          ({ uri, descriptors }) =>
+            new ExcalidrawFontFace(family, uri, descriptors),
+        ),
+      });
+
+      // also populate FONT_METADATA so getLineHeight / getVerticalOffset work
+      FONT_METADATA[family] = metadata;
+    }
+
+    return Fonts.registered;
+  }
+
+  /**
    * WARN: should be called just once on init, even across multiple instances.
    */
   private static init() {
     const fonts = {
       registered: new Map<
-        ValueOf<typeof FONT_FAMILY | typeof FONT_FAMILY_FALLBACKS>,
+        ValueOf<typeof FONT_FAMILY | typeof FONT_FAMILY_FALLBACKS> | string,
         { metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }
       >(),
     };
@@ -414,7 +556,7 @@ export class Fonts {
           families.add(element.fontFamily);
         }
         return families;
-      }, new Set<number>()),
+      }, new Set<FontFamily>()),
     );
   }
 
@@ -423,8 +565,8 @@ export class Fonts {
    */
   private static getCharsPerFamily(
     elements: ReadonlyArray<ExcalidrawElement>,
-  ): Record<number, Set<string>> {
-    const charsPerFamily: Record<number, Set<string>> = {};
+  ): Record<FontFamily, Set<string>> {
+    const charsPerFamily: Record<FontFamily, Set<string>> = {};
 
     for (const element of elements) {
       if (!isTextElement(element)) {
@@ -448,8 +590,8 @@ export class Fonts {
    * Get characters for a given family.
    */
   private static getCharacters(
-    charsPerFamily: Record<number, Set<string>>,
-    family: number,
+    charsPerFamily: Record<FontFamily, Set<string>>,
+    family: FontFamily,
   ) {
     return charsPerFamily[family]
       ? Array.from(charsPerFamily[family]).join("")
@@ -461,6 +603,26 @@ export class Fonts {
    */
   private static getAllFamilies() {
     return Array.from(Fonts.registered.keys());
+  }
+
+  public static parseProviderFontFamily(fontFamily: string) {
+    const separatorIndex = fontFamily.indexOf(Fonts.FONT_PROVIDER_SEPARATOR);
+
+    if (separatorIndex <= 0 || separatorIndex === fontFamily.length - 1) {
+      return null;
+    }
+
+    return {
+      providerId: fontFamily.slice(0, separatorIndex),
+      familyName: fontFamily.slice(separatorIndex + 1),
+    };
+  }
+
+  public static createProviderFontFamily(
+    providerId: string,
+    familyName: string,
+  ) {
+    return `${providerId}${Fonts.FONT_PROVIDER_SEPARATOR}${familyName}`;
   }
 }
 

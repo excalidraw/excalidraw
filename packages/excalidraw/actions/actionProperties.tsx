@@ -65,6 +65,8 @@ import {
 
 import { deriveStylesPanelMode } from "@excalidraw/common";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -75,7 +77,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
   StrokeVariability,
   TextAlign,
   VerticalAlign,
@@ -1062,7 +1063,7 @@ export const actionChangeFontFamily = register<{
 
     let nextCaptureUpdateAction: CaptureUpdateActionType =
       CaptureUpdateAction.EVENTUALLY;
-    let nextFontFamily: FontFamilyValues | undefined;
+    let nextFontFamily: FontFamily | undefined;
     let skipOnHoverRender = false;
 
     if (currentItemFontFamily) {
@@ -1115,9 +1116,14 @@ export const actionChangeFontFamily = register<{
       let skipFontFaceCheck = false;
 
       const fontsCache = Array.from(Fonts.loadedFontsCache.values());
-      const fontFamily = Object.entries(FONT_FAMILY).find(
-        ([_, value]) => value === nextFontFamily,
-      )?.[0];
+      // For string-based (custom) font families, use the string directly as the family name
+      // For numeric (built-in) font families, look up the name from FONT_FAMILY
+      const fontFamily =
+        typeof nextFontFamily === "string"
+          ? nextFontFamily
+          : Object.entries(FONT_FAMILY).find(
+              ([_, value]) => value === nextFontFamily,
+            )?.[0];
 
       // skip `document.font.check` check on hover, if at least one font family has loaded as it's super slow (could result in slightly different bbox, which is fine)
       if (
@@ -1218,7 +1224,7 @@ export const actionChangeFontFamily = register<{
   },
   PanelComponent: ({ elements, appState, app, updateData }) => {
     const cachedElementsRef = useRef<ElementsMap>(new Map());
-    const prevSelectedFontFamilyRef = useRef<number | null>(null);
+    const prevSelectedFontFamilyRef = useRef<FontFamily | null>(null);
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
     const isUnmounted = useRef(true);

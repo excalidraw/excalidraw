@@ -1,7 +1,4 @@
-import type {
-  ExcalidrawElement,
-  FontFamilyValues,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
@@ -140,6 +137,13 @@ export const FONT_FAMILY = {
   Assistant: 10,
 };
 
+/**
+ * Font family identifier type. Built-in fonts use numeric IDs (from
+ * {@link FONT_FAMILY}), while custom fonts use their CSS font-family name
+ * as a string.
+ */
+export type FontFamily = number | string;
+
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";
@@ -157,7 +161,7 @@ export const FONT_FAMILY_FALLBACKS = {
 };
 
 export function getGenericFontFamilyFallback(
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
   switch (fontFamily) {
     case FONT_FAMILY.Cascadia:
@@ -170,7 +174,7 @@ export function getGenericFontFamilyFallback(
 }
 
 export const getFontFamilyFallbacks = (
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
   const genericFallbackFont = getGenericFontFamilyFallback(fontFamily);
 
@@ -211,7 +215,7 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+export const DEFAULT_FONT_FAMILY: FontFamily = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

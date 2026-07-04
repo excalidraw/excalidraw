@@ -105,6 +105,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderEmbeddable,
     aiEnabled,
     showDeprecatedFonts,
+    fontProviders,
     renderScrollbars,
     imageOptions,
   } = props;
@@ -225,6 +226,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderEmbeddable={renderEmbeddable}
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
+          fontProviders={fontProviders}
           renderScrollbars={renderScrollbars}
           imageOptions={normalizedImageOptions}
         >
@@ -397,6 +399,9 @@ export type {
 } from "./components/TTDDialog/types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
+
+export type { FontProvider, FontProviders, FontDefinition } from "./types";
+export type { ExcalidrawFontFaceDescriptor } from "./fonts";
 
 export {
   getCommonBounds,

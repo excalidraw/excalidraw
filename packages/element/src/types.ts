@@ -2,6 +2,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   FONT_FAMILY,
+  FontFamily,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
@@ -124,15 +125,14 @@ export type ExcalidrawIframeLikeElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
-export type IframeData =
-  | {
-      intrinsicSize: { w: number; h: number };
-      error?: Error;
-      sandbox?: { allowSameOrigin?: boolean };
-    } & (
-      | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: (theme: Theme) => string }
-    );
+export type IframeData = {
+  intrinsicSize: { w: number; h: number };
+  error?: Error;
+  sandbox?: { allowSameOrigin?: boolean };
+} & (
+  | { type: "video" | "generic"; link: string }
+  | { type: "document"; srcdoc: (theme: Theme) => string }
+);
 
 export type ImageCrop = {
   x: number;
@@ -236,7 +236,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     fontSize: number;
-    fontFamily: FontFamilyValues;
+    fontFamily: FontFamily;
     text: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
