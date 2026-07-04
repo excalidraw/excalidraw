@@ -43,7 +43,7 @@ export const AppSidebar = () => {
           </div>
           <LinkButton
             href={`${
-              import.meta.env.VITE_APP_PLUS_LP
+              (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=comments_promo#excalidraw-redirect`}
           >
             Sign up now
@@ -67,7 +67,7 @@ export const AppSidebar = () => {
           </div>
           <LinkButton
             href={`${
-              import.meta.env.VITE_APP_PLUS_LP
+              (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=presentations_promo#excalidraw-redirect`}
           >
             Sign up now
