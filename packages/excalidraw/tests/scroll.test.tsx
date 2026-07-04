@@ -11,6 +11,7 @@ import {
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
+  fireEvent,
 } from "./test-utils";
 
 const { h } = window;
@@ -163,6 +164,51 @@ describe("appState", () => {
     // Assert we scroll properly with normal zoom
     API.setAppState({ zoom: { value: zoom } });
     scrollTest();
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("wheel zoom / pan works when hovering over frame name", async () => {
+    mockBoundingClientRect();
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame-1",
+      name: "My Awesome Frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [frame],
+        }}
+      />
+    );
+
+    const frameNameElement = document.querySelector(".frame-name");
+    expect(frameNameElement).not.toBeNull();
+
+    const initialScrollX = h.state.scrollX;
+    const initialScrollY = h.state.scrollY;
+
+    fireEvent.wheel(frameNameElement!, {
+      deltaX: 50,
+      deltaY: 100,
+    });
+
+    expect(h.state.scrollX).toBe(initialScrollX - 50);
+    expect(h.state.scrollY).toBe(initialScrollY - 100);
+
+    const initialZoom = h.state.zoom.value;
+
+    fireEvent.wheel(frameNameElement!, {
+      deltaY: -100,
+      ctrlKey: true,
+    });
+
+    expect(h.state.zoom.value).toBeGreaterThan(initialZoom);
     restoreOriginalGetBoundingClientRect();
   });
 });
