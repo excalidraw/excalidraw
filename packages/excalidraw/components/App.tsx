@@ -5275,6 +5275,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         !shouldPreventToolSwitching &&
+        !event.repeat &&
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
