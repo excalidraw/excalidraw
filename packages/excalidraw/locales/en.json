@@ -309,7 +309,10 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "invalidCharactersInHex": "Invalid characters in hex code",
+    "invalidHexLength": "Hex code must be 3, 4, 6, or 8 characters",
+    "invalidHex": "Not a valid hex color"
   },
   "toolBar": {
     "selection": "Selection",
