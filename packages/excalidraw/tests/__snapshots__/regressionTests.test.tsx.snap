@@ -8699,7 +8699,14 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -9365,7 +9372,14 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {

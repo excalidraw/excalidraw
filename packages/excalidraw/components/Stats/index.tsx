@@ -12,10 +12,11 @@ import { frameAndChildrenSelectedTogether } from "@excalidraw/element";
 
 import { elementsAreInSameGroup } from "@excalidraw/element";
 
+import { isGridModeEnabled } from "@excalidraw/element";
+
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
-import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
 import { CloseIcon } from "../icons";
