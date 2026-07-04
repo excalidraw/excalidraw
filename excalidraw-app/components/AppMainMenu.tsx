@@ -21,6 +21,7 @@ export const AppMainMenu: React.FC<{
   isCollabEnabled: boolean;
   theme: Theme | "system";
   refresh: () => void;
+  onSettingsOpen: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -76,6 +77,9 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
+      <MainMenu.Item onSelect={() => props.onSettingsOpen()}>
+        Settings
+      </MainMenu.Item>
       <MainMenu.DefaultItems.Preferences />
       <MainMenu.DefaultItems.ToggleTheme allowSystemTheme theme={props.theme} />
       <MainMenu.ItemCustom>
