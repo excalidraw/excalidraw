@@ -114,6 +114,14 @@ export const SHAPES = [
     fillable: false,
     toolbar: false,
   },
+  {
+    icon: laserPointerToolIcon,
+    value: "annotation",
+    key: KEYS.Z,
+    numericKey: null,
+    fillable: false,
+    toolbar: false,
+  },
 ] as const;
 
 export const getToolbarTools = (app: AppClassProperties) => {

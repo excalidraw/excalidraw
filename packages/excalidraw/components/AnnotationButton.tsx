@@ -35,7 +35,7 @@ export const AnnotationButton = (props: AnnotationIconProps) => {
         onChange={props.onChange}
         checked={props.checked}
         aria-label={props.title}
-        data-testid="toolbar-Annotation"
+        data-testid="toolbar-annotation"
       />
       <div className="ToolIcon__icon">{laserPointerToolIcon}</div>
     </label>
