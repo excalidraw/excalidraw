@@ -88,7 +88,7 @@ const getFontFamilyIcon = (fontFamily: FontFamily): JSX.Element => {
 };
 
 const getFontFamilyLabel = (
-  fontFamily: FontFamilyValues,
+  fontFamily: FontFamily,
   fontFaces: ExcalidrawFontFace[],
 ) =>
   // prefer our config as the browser resolved names may be wrapped in quotes and such
