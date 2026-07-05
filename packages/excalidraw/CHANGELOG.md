@@ -60,7 +60,9 @@ Please add the latest change on the top under the correct section.
 
   const ZoomReadout = () => {
     // `undefined` on initial render, before the editor API initializes
-    const zoomValue = useExcalidrawStateValue((appState) => appState.zoom.value);
+    const zoomValue = useExcalidrawStateValue(
+      (appState) => appState.zoom.value,
+    );
 
     if (zoomValue == null) {
       return null;
