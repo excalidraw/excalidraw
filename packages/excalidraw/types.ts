@@ -539,7 +539,7 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  "cursorButton" | "scrollX" | "scrollY" | "zoom"
+  "cursorButton" | "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

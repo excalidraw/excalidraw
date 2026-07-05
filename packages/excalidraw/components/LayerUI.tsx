@@ -675,7 +675,14 @@ const LayerUI = ({
 };
 
 const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
-  const { cursorButton, scrollX, scrollY, zoom, ...ret } = appState;
+  const {
+    cursorButton,
+    scrollX,
+    scrollY,
+    zoom,
+    shouldCacheIgnoreZoom,
+    ...ret
+  } = appState;
   return ret;
 };
 
