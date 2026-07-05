@@ -97,6 +97,9 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
+  // must be passed from the host so that `areEqual` detects changes
+  // (the `app` instance itself is referentially stable)
+  uiEnabled?: boolean;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
 }
@@ -476,6 +479,24 @@ const LayerUI = ({
   };
 
   const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
+
+  // must come after all hooks
+  if (!app.uiEnabled) {
+    // host children must mount even with the UI disabled as they may be
+    // functional rather than presentational (e.g. excalidraw.com's
+    // <Collab/>, which scene initialization depends on). UI components
+    // among them tunnel into outlets that don't exist here, so they
+    // don't render.
+    return (
+      <UIAppStateContext.Provider value={appState}>
+        <TunnelsJotaiProvider>
+          <TunnelsContext.Provider value={tunnels}>
+            {children}
+          </TunnelsContext.Provider>
+        </TunnelsJotaiProvider>
+      </UIAppStateContext.Provider>
+    );
+  }
 
   const layerUIJSX = (
     <>

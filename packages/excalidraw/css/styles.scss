@@ -599,6 +599,24 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  &.excalidraw--non-interactive {
+    user-select: none;
+
+    canvas {
+      // let the page handle scrolling & other gestures over the editor
+      touch-action: auto;
+      // no !important — inline cursor styles must win so that
+      // `interactive: { links: true }` can show a pointer over links
+      cursor: default;
+    }
+
+    // override inline pointer-events set when embeddable is active
+    // (also covers custom `renderEmbeddable` content)
+    .excalidraw__embeddable-container__inner {
+      pointer-events: none !important;
+    }
+  }
+
   input.is-redacted {
     // we don't use type=password because browsers (chrome?) prompt
     // you to save it which is annoying

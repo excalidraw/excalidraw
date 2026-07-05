@@ -136,6 +136,7 @@ export const actionZoomIn = register({
   viewMode: true,
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -181,6 +182,7 @@ export const actionZoomOut = register({
   icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -226,6 +228,7 @@ export const actionResetZoom = register({
   icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
   perform: (_elements, appState, _, app) => {
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
@@ -281,7 +284,8 @@ export const actionZoomToFitSelectionInViewport = register({
   label: "labels.zoomToFitViewport",
   icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
+  predicate: (elements, appState, appProps, app) =>
+    !appState.scrollConstraints && app.interactionEnabled,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const nonDeletedSelectedElements = getNonDeletedElements(
@@ -314,7 +318,8 @@ export const actionZoomToFitSelection = register({
   label: "helpDialog.zoomToSelection",
   icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
+  predicate: (elements, appState, appProps, app) =>
+    !appState.scrollConstraints && app.interactionEnabled,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const nonDeletedSelectedElements = getNonDeletedElements(
@@ -347,7 +352,8 @@ export const actionZoomToFit = register({
   icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
+  predicate: (elements, appState, appProps, app) =>
+    !appState.scrollConstraints && app.interactionEnabled,
   perform: (elements, appState, _, app) =>
     zoomToFitBounds({
       bounds: getCommonBounds(getNonDeletedElements(elements)),

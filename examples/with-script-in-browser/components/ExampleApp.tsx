@@ -102,6 +102,9 @@ export default function ExampleApp({
   } = excalidrawLib;
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [interactive, setInteractive] = useState(true);
+  const [interactiveLinks, setInteractiveLinks] = useState(false);
+  const [ui, setUi] = useState(true);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
   const [renderScrollbars, setRenderScrollbars] = useState(false);
@@ -192,6 +195,10 @@ export default function ExampleApp({
           pointersMap: Gesture["pointers"];
         }) => setPointerData(payload),
         viewModeEnabled,
+        interaction: interactive
+          ? true
+          : { allowed: { links: interactiveLinks } },
+        ui,
         zenModeEnabled,
         renderScrollbars,
         gridModeEnabled,
@@ -695,6 +702,26 @@ export default function ExampleApp({
               onChange={() => setViewModeEnabled(!viewModeEnabled)}
             />
             View mode
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={!interactive}
+              onChange={() => setInteractive(!interactive)}
+            />
+            Non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveLinks}
+              onChange={() => setInteractiveLinks(!interactiveLinks)}
+            />
+            Links when non-interactive
+          </label>
+          <label>
+            <input type="checkbox" checked={!ui} onChange={() => setUi(!ui)} />
+            Hide UI
           </label>
           <label>
             <input

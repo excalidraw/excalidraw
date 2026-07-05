@@ -87,7 +87,7 @@ export const MobileMenu = ({
               <DefaultSidebarTriggerTunnel.Out />
             </>
           ))}
-        {appState.viewModeEnabled && (
+        {appState.viewModeEnabled && app.interactionEnabled && (
           <ExitViewModeButton actionManager={actionManager} />
         )}
       </div>

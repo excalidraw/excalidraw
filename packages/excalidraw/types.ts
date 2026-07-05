@@ -630,6 +630,23 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+export type InteractionConfig = {
+  /**
+   * Interactions that stay enabled while the editor is otherwise
+   * non-interactive. Opt-in: anything omitted or `false` is disabled.
+   */
+  allowed?: {
+    /**
+     * Element links render their link icon and stay clickable — clicking
+     * anywhere on a linked element opens the link, same as in view mode.
+     * When disabled, link icons are not rendered at all.
+     *
+     * @default false
+     */
+    links?: boolean;
+  };
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -698,6 +715,31 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
+  /**
+   * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
+   * clipboard, drag&drop). When `false`, the scene still renders and reacts
+   * to programmatic updates (imperative API), but the user cannot affect it
+   * in any way. Implies view mode.
+   *
+   * Pass a config object to keep specific interactions enabled while the
+   * editor is otherwise non-interactive (see `InteractionConfig`):
+   *
+   * ```tsx
+   * <Excalidraw interaction={{ allowed: { links: true } }} />
+   * ```
+   *
+   * @default true
+   */
+  interaction?: boolean | InteractionConfig;
+  /**
+   * Whether the editor UI (chrome) is rendered — toolbar, menus, footer,
+   * sidebars, dialogs, popups, context menu. Canvas content (elements,
+   * text editing surface, frame names, embeds) still renders, and the editor
+   * remains interactive unless `interactive` is set to `false`.
+   *
+   * @default true
+   */
+  ui?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
@@ -919,6 +961,9 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
+
+  interactionEnabled: App["interactionEnabled"];
+  uiEnabled: App["uiEnabled"];
 };
 
 export type PointerDownState = Readonly<{

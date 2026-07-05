@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
+import { useApp } from "../App";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -22,6 +23,7 @@ const Footer = ({
   renderWelcomeScreen: boolean;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  const app = useApp();
 
   return (
     <footer
@@ -36,7 +38,9 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            <ZoomActions renderAction={actionManager.renderAction} />
+            {app.interactionEnabled && (
+              <ZoomActions renderAction={actionManager.renderAction} />
+            )}
 
             {!appState.viewModeEnabled && (
               <UndoRedoActions

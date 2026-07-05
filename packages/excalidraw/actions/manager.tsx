@@ -87,6 +87,10 @@ export class ActionManager {
   }
 
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
+    if (!this.app.interactionEnabled) {
+      return false;
+    }
+
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
@@ -134,6 +138,12 @@ export class ActionManager {
     source: ActionSource = "api",
     value: Parameters<T["perform"]>[2] = null,
   ) {
+    // the user must not be able to affect a non-interactive editor
+    // (programmatic execution by the host remains allowed)
+    if (source !== "api" && !this.app.interactionEnabled) {
+      return;
+    }
+
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
 

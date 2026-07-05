@@ -376,7 +376,7 @@ const _renderStaticScene = ({
 
         context.restore();
 
-        if (!isExporting) {
+        if (!isExporting && renderConfig.renderLinks !== false) {
           renderLinkIcon(element, context, appState, elementsMap);
         }
       } catch (error: any) {
@@ -427,7 +427,7 @@ const _renderStaticScene = ({
               appState,
             );
           }
-          if (!isExporting) {
+          if (!isExporting && renderConfig.renderLinks !== false) {
             renderLinkIcon(element, context, appState, elementsMap);
           }
         };

@@ -46,6 +46,7 @@ type InteractiveCanvasProps = {
   renderScrollbars: boolean;
   editorInterface: EditorInterface;
   app: AppClassProperties;
+  interactionEnabled: boolean;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -205,6 +206,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         width: props.appState.width,
         height: props.appState.height,
         cursor:
+          props.interactionEnabled &&
           props.appState.viewModeEnabled &&
           props.appState.activeTool.type !== "laser"
             ? CURSOR_TYPE.GRAB
@@ -213,6 +215,10 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
+      // NOTE all the handlers early-exit in App when the editor is
+      // non-interactive (running only a restricted, link-only code path if
+      // `interaction.allowed.links` is enabled), so they're safe to bind
+      // unconditionally
       onContextMenu={props.onContextMenu}
       onClick={props.onClick}
       onPointerMove={props.onPointerMove}
@@ -288,7 +294,8 @@ const areEqual = (
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
     prevProps.selectedElements !== nextProps.selectedElements ||
-    prevProps.renderScrollbars !== nextProps.renderScrollbars
+    prevProps.renderScrollbars !== nextProps.renderScrollbars ||
+    prevProps.interactionEnabled !== nextProps.interactionEnabled
   ) {
     return false;
   }
