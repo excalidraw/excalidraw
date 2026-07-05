@@ -6285,7 +6285,6 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8754,7 +8753,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8989,7 +8987,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -9420,7 +9417,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -9837,7 +9833,6 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -14631,7 +14626,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,

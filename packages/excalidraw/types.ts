@@ -537,7 +537,24 @@ export type SearchMatch = {
   }[];
 };
 
-export type UIAppState = Omit<AppState, "cursorButton" | "scrollX" | "scrollY">;
+export type UIAppState = Omit<
+  AppState,
+  // stripped from the UI-relevant app state so their (often per-frame)
+  // updates don't re-render the editor UI — canvas-only concerns.
+  // Subscribe via `useExcalidrawStateValue` if you need them in UI.
+  | "cursorButton"
+  | "scrollX"
+  | "scrollY"
+  | "zoom"
+  | "shouldCacheIgnoreZoom"
+  // canvas-interaction transients (snapping, binding & frame
+  // highlights) — identity churns per pointermove while interacting
+  | "snapLines"
+  | "originSnapOffset"
+  | "suggestedBinding"
+  | "frameToHighlight"
+  | "elementsToHighlight"
+>;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 

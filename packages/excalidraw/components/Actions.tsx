@@ -91,7 +91,6 @@ import type {
   AppClassProperties,
   AppProps,
   UIAppState,
-  Zoom,
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -1315,10 +1314,8 @@ export const ShapesSwitcher = ({
 
 export const ZoomActions = ({
   renderAction,
-  zoom,
 }: {
   renderAction: ActionManager["renderAction"];
-  zoom: Zoom;
 }) => (
   <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
     <Stack.Row align="center">

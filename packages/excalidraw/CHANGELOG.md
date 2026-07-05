@@ -53,6 +53,27 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
+- `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
+
+  ```tsx
+  import { useExcalidrawStateValue } from "@excalidraw/excalidraw";
+
+  const ZoomReadout = () => {
+    // `undefined` on initial render, before the editor API initializes
+    const zoomValue = useExcalidrawStateValue(
+      (appState) => appState.zoom.value,
+    );
+
+    if (zoomValue == null) {
+      return null;
+    }
+
+    return <div>{(zoomValue * 100).toFixed(0)}%</div>;
+  };
+  ```
+
+  Outside of React components, you can also subscribe via `ExcalidrawAPI.onStateChange((appState) => appState.zoom.value, (zoomValue) => {...})`, or keep using the existing `onScrollChange(scrollX, scrollY, zoom)` prop.
+
 - Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
 
   - `MainMenu.DefaultItems.ToggleTheme` no longer accepts the item-level `onSelect` callback. Host apps that need to control light/dark/system theme should pass `onThemeChange` to `<Excalidraw />` instead.

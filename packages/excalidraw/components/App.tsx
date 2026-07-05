@@ -674,6 +674,9 @@ class App extends React.Component<AppProps, AppState> {
   public fonts: Fonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
+  /** whether the last render had any renderable elements (excludes e.g. the
+   * in-progress `newElement` and the edited text element) */
+  private hasRenderableElements: boolean = false;
   private resizeObserver: ResizeObserver | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
@@ -2132,7 +2135,7 @@ class App extends React.Component<AppProps, AppState> {
     const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
 
     const {
-      elementsMap,
+      elementsMap: renderableElementsMap,
       visibleElements,
       canvasNonce,
       /**
@@ -2156,6 +2159,7 @@ class App extends React.Component<AppProps, AppState> {
       frameToHighlight: this.state.frameToHighlight,
     });
     this.visibleElements = visibleElements;
+    this.hasRenderableElements = renderableElementsMap.size > 0;
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -2286,7 +2290,7 @@ class App extends React.Component<AppProps, AppState> {
                             isMagicFrameElement(firstSelectedElement) && (
                               <ElementCanvasButtons
                                 element={firstSelectedElement}
-                                elementsMap={elementsMap}
+                                elementsMap={renderableElementsMap}
                               >
                                 <ElementCanvasButton
                                   title={t("labels.convertToCode")}
@@ -2307,7 +2311,7 @@ class App extends React.Component<AppProps, AppState> {
                               ?.status === "done" && (
                               <ElementCanvasButtons
                                 element={firstSelectedElement}
-                                elementsMap={elementsMap}
+                                elementsMap={renderableElementsMap}
                               >
                                 <ElementCanvasButton
                                   title={t("labels.copySource")}
@@ -2370,7 +2374,7 @@ class App extends React.Component<AppProps, AppState> {
                           <StaticCanvas
                             canvas={this.canvas}
                             rc={this.rc}
-                            elementsMap={elementsMap}
+                            elementsMap={renderableElementsMap}
                             allElementsMap={allElementsMap}
                             visibleElements={visibleElements}
                             canvasNonce={canvasNonce}
@@ -2400,7 +2404,7 @@ class App extends React.Component<AppProps, AppState> {
                               newElement={newElementCanvasElement}
                               scale={window.devicePixelRatio}
                               rc={this.rc}
-                              elementsMap={elementsMap}
+                              elementsMap={renderableElementsMap}
                               allElementsMap={allElementsMap}
                               renderConfig={{
                                 imageCache: this.imageCache,
@@ -2421,7 +2425,7 @@ class App extends React.Component<AppProps, AppState> {
                             app={this}
                             containerRef={this.excalidrawContainerRef}
                             canvas={this.interactiveCanvas}
-                            elementsMap={elementsMap}
+                            elementsMap={renderableElementsMap}
                             visibleElements={visibleElements}
                             allElementsMap={allElementsMap}
                             selectedElements={selectedElements}
@@ -3619,6 +3623,21 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ editingTextElement: null });
     }
 
+    // Forced false while a viewport animation runs — the scroll-back-to-content
+    // button must not render mid-animation (clicking it would fight the
+    // animation, which overwrites the viewport every frame). The animation's
+    // final commit lands after the animation is unregistered, settling this
+    // on the target viewport.
+    const scrolledOutside =
+      // hide when editing text
+      this.state.editingTextElement ||
+      AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)
+        ? false
+        : !this.visibleElements.length && this.hasRenderableElements;
+    if (this.state.scrolledOutside !== scrolledOutside) {
+      this.setState({ scrolledOutside });
+    }
+
     this.store.commit(elementsMap, this.state);
 
     // Do not notify consumers if we're still loading the scene. Among other
@@ -3632,20 +3651,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderInteractiveSceneCallback = ({
-    atLeastOneVisibleElement,
     scrollBars,
-    elementsMap,
   }: RenderInteractiveSceneCallback) => {
     if (scrollBars) {
       currentScrollBars = scrollBars;
-    }
-    const scrolledOutside =
-      // hide when editing text
-      this.state.editingTextElement
-        ? false
-        : !atLeastOneVisibleElement && elementsMap.size > 0;
-    if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside });
     }
 
     this.scheduleImageRefresh();
@@ -9713,7 +9722,6 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState,
             bindMode: "orbit",
             newElement: element,
-            startBoundElement: boundElement,
             suggestedBinding:
               boundElement && isBindingElement(element)
                 ? {

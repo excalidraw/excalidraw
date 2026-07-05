@@ -36,6 +36,7 @@ import {
   ZoomResetIcon,
 } from "../components/icons";
 import { setCursor } from "../cursor";
+import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
@@ -151,19 +152,22 @@ export const actionZoomIn = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ updateData, appState }) => (
-    <ToolButton
-      type="button"
-      className="zoom-in-button zoom-button"
-      icon={ZoomInIcon}
-      title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
-      aria-label={t("buttons.zoomIn")}
-      disabled={appState.zoom.value >= MAX_ZOOM}
-      onClick={() => {
-        updateData(null);
-      }}
-    />
-  ),
+  PanelComponent: ({ updateData }) => {
+    const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+    return (
+      <ToolButton
+        type="button"
+        className="zoom-in-button zoom-button"
+        icon={ZoomInIcon}
+        title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
+        aria-label={t("buttons.zoomIn")}
+        disabled={zoomValue >= MAX_ZOOM}
+        onClick={() => {
+          updateData(null);
+        }}
+      />
+    );
+  },
   keyTest: (event) =>
     (event.code === CODES.EQUAL || event.code === CODES.NUM_ADD) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
@@ -193,19 +197,22 @@ export const actionZoomOut = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ updateData, appState }) => (
-    <ToolButton
-      type="button"
-      className="zoom-out-button zoom-button"
-      icon={ZoomOutIcon}
-      title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
-      aria-label={t("buttons.zoomOut")}
-      disabled={appState.zoom.value <= MIN_ZOOM}
-      onClick={() => {
-        updateData(null);
-      }}
-    />
-  ),
+  PanelComponent: ({ updateData }) => {
+    const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+    return (
+      <ToolButton
+        type="button"
+        className="zoom-out-button zoom-button"
+        icon={ZoomOutIcon}
+        title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
+        aria-label={t("buttons.zoomOut")}
+        disabled={zoomValue <= MIN_ZOOM}
+        onClick={() => {
+          updateData(null);
+        }}
+      />
+    );
+  },
   keyTest: (event) =>
     (event.code === CODES.MINUS || event.code === CODES.NUM_SUBTRACT) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
@@ -241,21 +248,24 @@ export const actionResetZoom = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ updateData, appState }) => (
-    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
-      <ToolButton
-        type="button"
-        className="reset-zoom-button zoom-button"
-        title={t("buttons.resetZoom")}
-        aria-label={t("buttons.resetZoom")}
-        onClick={() => {
-          updateData(null);
-        }}
-      >
-        {(appState.zoom.value * 100).toFixed(0)}%
-      </ToolButton>
-    </Tooltip>
-  ),
+  PanelComponent: ({ updateData }) => {
+    const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+    return (
+      <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+        <ToolButton
+          type="button"
+          className="reset-zoom-button zoom-button"
+          title={t("buttons.resetZoom")}
+          aria-label={t("buttons.resetZoom")}
+          onClick={() => {
+            updateData(null);
+          }}
+        >
+          {(zoomValue * 100).toFixed(0)}%
+        </ToolButton>
+      </Tooltip>
+    );
+  },
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
