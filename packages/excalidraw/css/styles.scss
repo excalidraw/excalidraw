@@ -603,11 +603,17 @@ body.excalidraw-cursor-resize * {
     user-select: none;
 
     canvas {
-      // let the page handle scrolling & other gestures over the editor
-      touch-action: auto;
+      // let the page handle scrolling over the editor, but not the browser
+      // zoom gestures (pinch, double-tap)
+      touch-action: pan-x pan-y;
       // no !important — inline cursor styles must win so that
-      // `interactive: { links: true }` can show a pointer over links
+      // `interaction: { allowed: { links: true } }` can show a pointer over
+      // links
       cursor: default;
+    }
+
+    &.excalidraw--allow-browser-zoom canvas {
+      touch-action: auto;
     }
 
     // override inline pointer-events set when embeddable is active

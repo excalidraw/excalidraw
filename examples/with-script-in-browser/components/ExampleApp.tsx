@@ -104,6 +104,7 @@ export default function ExampleApp({
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [interactive, setInteractive] = useState(true);
   const [interactiveLinks, setInteractiveLinks] = useState(false);
+  const [interactiveBrowserZoom, setInteractiveBrowserZoom] = useState(false);
   const [ui, setUi] = useState(true);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
@@ -197,7 +198,12 @@ export default function ExampleApp({
         viewModeEnabled,
         interaction: interactive
           ? true
-          : { allowed: { links: interactiveLinks } },
+          : {
+              allowed: {
+                links: interactiveLinks,
+                browserZoom: interactiveBrowserZoom,
+              },
+            },
         ui,
         zenModeEnabled,
         renderScrollbars,
@@ -718,6 +724,16 @@ export default function ExampleApp({
               onChange={() => setInteractiveLinks(!interactiveLinks)}
             />
             Links when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveBrowserZoom}
+              onChange={() =>
+                setInteractiveBrowserZoom(!interactiveBrowserZoom)
+              }
+            />
+            Browser zoom when non-interactive
           </label>
           <label>
             <input type="checkbox" checked={!ui} onChange={() => setUi(!ui)} />

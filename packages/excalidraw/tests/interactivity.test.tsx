@@ -294,6 +294,70 @@ describe("interaction={false}", () => {
   });
 });
 
+describe("browser zoom prevention (non-interactive)", () => {
+  // fireEvent returns `false` when a handler called preventDefault()
+  const firesCtrlWheel = () =>
+    fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+      ctrlKey: true,
+      deltaY: -100,
+    });
+
+  const firesPlainWheel = () =>
+    fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 40 });
+
+  const firesCtrlZoomKey = () =>
+    fireEvent.keyDown(document, { ctrlKey: true, code: CODES.EQUAL });
+
+  it("prevents ctrl+wheel & keyboard zoom by default, keeps page scroll", async () => {
+    await render(
+      <Excalidraw interaction={false} handleKeyboardGlobally={true} />,
+    );
+
+    // browser zoom vectors get preventDefault-ed...
+    expect(firesCtrlWheel()).toBe(false);
+    expect(firesCtrlZoomKey()).toBe(false);
+    // ...while regular scroll passes through to the page
+    expect(firesPlainWheel()).toBe(true);
+    // and the editor itself didn't zoom either
+    expect(h.state.zoom.value).toBe(1);
+  });
+
+  it("allowed.browserZoom keeps the browser defaults", async () => {
+    await render(
+      <Excalidraw
+        interaction={{ allowed: { browserZoom: true } }}
+        handleKeyboardGlobally={true}
+      />,
+    );
+
+    expect(
+      queryContainer(".excalidraw-container")!.classList.contains(
+        "excalidraw--allow-browser-zoom",
+      ),
+    ).toBe(true);
+
+    expect(firesCtrlWheel()).toBe(true);
+    expect(firesCtrlZoomKey()).toBe(true);
+    expect(firesPlainWheel()).toBe(true);
+    expect(h.state.zoom.value).toBe(1);
+  });
+
+  it("toggling allowed.browserZoom at runtime re-attaches listeners", async () => {
+    await render(
+      <Excalidraw interaction={false} handleKeyboardGlobally={true} />,
+    );
+    expect(firesCtrlWheel()).toBe(false);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={{ allowed: { browserZoom: true } }}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    expect(firesCtrlWheel()).toBe(true);
+  });
+});
+
 describe("toggling `interaction` at runtime", () => {
   afterEach(() => {
     restoreOriginalGetBoundingClientRect();

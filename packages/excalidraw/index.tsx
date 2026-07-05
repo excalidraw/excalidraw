@@ -159,6 +159,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     [setExcalidrawAPI],
   );
 
+  // whether the browser's own zoom is kept available while the editor is
+  // non-interactive
+  const browserZoomAllowed =
+    typeof interaction === "object" &&
+    interaction !== null &&
+    interaction.allowed?.browserZoom === true;
+
   useEffect(() => {
     const importPolyfill = async () => {
       //@ts-ignore
@@ -166,6 +173,10 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     };
 
     importPolyfill();
+
+    if (browserZoomAllowed) {
+      return;
+    }
 
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
@@ -182,7 +193,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     return () => {
       document.removeEventListener("touchmove", handleTouchMove);
     };
-  }, []);
+  }, [browserZoomAllowed]);
 
   return (
     <EditorJotaiProvider store={editorJotaiStore}>
@@ -269,7 +280,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       prevInteraction !== null &&
       typeof nextInteraction === "object" &&
       nextInteraction !== null &&
-      !!prevInteraction.allowed?.links === !!nextInteraction.allowed?.links);
+      !!prevInteraction.allowed?.links === !!nextInteraction.allowed?.links &&
+      !!prevInteraction.allowed?.browserZoom ===
+        !!nextInteraction.allowed?.browserZoom);
 
   if (!isInteractionSame) {
     return false;

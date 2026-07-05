@@ -659,6 +659,17 @@ const isLinkInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
   return props.interaction !== false;
 };
 
+// NOTE only consulted while non-interactive (the interactive editor
+// prevents/handles browser zoom through its own input handlers)
+const isBrowserZoomInteractionEnabled = (
+  props: Pick<AppProps, "interaction">,
+) => {
+  if (typeof props.interaction === "object" && props.interaction !== null) {
+    return props.interaction.allowed?.browserZoom === true;
+  }
+  return false;
+};
+
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -935,6 +946,15 @@ class App extends React.Component<AppProps, AppState> {
    */
   public get linksEnabled(): boolean {
     return isLinkInteractionEnabled(this.props);
+  }
+
+  /**
+   * Whether the browser's own zoom (ctrl/cmd + wheel, pinch, keyboard
+   * shortcuts) stays available over the non-interactive editor.
+   * Prevented by default.
+   */
+  public get browserZoomEnabled(): boolean {
+    return isBrowserZoomInteractionEnabled(this.props);
   }
 
   /**
@@ -2241,6 +2261,8 @@ class App extends React.Component<AppProps, AppState> {
             this.state.openDialog?.name === "elementLinkSelector",
           "excalidraw--mobile": this.editorInterface.formFactor === "phone",
           "excalidraw--non-interactive": !this.interactionEnabled,
+          "excalidraw--allow-browser-zoom":
+            !this.interactionEnabled && this.browserZoomEnabled,
           "excalidraw--ui-hidden": !this.uiEnabled,
         })}
         style={{
@@ -2989,6 +3011,29 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
+  // prevent the browser's own zoom over the non-interactive editor while
+  // letting regular scroll through (trackpad pinch is delivered as
+  // ctrl+wheel)
+  private preventBrowserZoomWheel = (event: WheelEvent) => {
+    if (event[KEYS.CTRL_OR_CMD]) {
+      event.preventDefault();
+    }
+  };
+
+  private preventBrowserZoomKeyDown = (event: KeyboardEvent) => {
+    if (
+      event[KEYS.CTRL_OR_CMD] &&
+      (event.code === CODES.EQUAL ||
+        event.code === CODES.MINUS ||
+        event.code === CODES.ZERO ||
+        event.code === CODES.NUM_ADD ||
+        event.code === CODES.NUM_SUBTRACT ||
+        event.code === CODES.NUM_ZERO)
+    ) {
+      event.preventDefault();
+    }
+  };
+
   private resetHistory = () => {
     this.history.clear();
   };
@@ -3459,6 +3504,46 @@ class App extends React.Component<AppProps, AppState> {
       // NOTE by not attaching the wheel/touch/gesture listeners below (which
       // preventDefault), the browser default behavior — such as scrolling the
       // page over the editor — is retained while non-interactive
+      if (!this.browserZoomEnabled) {
+        // ...except for the browser's own zoom, which we prevent over the
+        // editor by default, mirroring the interactive editor (opt out via
+        // `interaction: { allowed: { browserZoom: true } }`)
+        this.onRemoveEventListenersEmitter.once(
+          addEventListener(
+            this.excalidrawContainerRef.current,
+            EVENT.WHEEL,
+            this.preventBrowserZoomWheel,
+            { passive: false },
+          ),
+          // Safari-only desktop pinch
+          addEventListener(
+            this.excalidrawContainerRef.current,
+            EVENT.GESTURE_START as any,
+            this.disableEvent,
+            false,
+          ),
+          addEventListener(
+            this.excalidrawContainerRef.current,
+            EVENT.GESTURE_CHANGE as any,
+            this.disableEvent,
+            false,
+          ),
+          addEventListener(
+            this.excalidrawContainerRef.current,
+            EVENT.GESTURE_END as any,
+            this.disableEvent,
+            false,
+          ),
+          addEventListener(
+            this.props.handleKeyboardGlobally
+              ? document
+              : this.excalidrawContainerRef.current,
+            EVENT.KEYDOWN,
+            this.preventBrowserZoomKeyDown as EventListener,
+            false,
+          ),
+        );
+      }
       return;
     }
 
@@ -3698,6 +3783,12 @@ class App extends React.Component<AppProps, AppState> {
         hideHyperlinkToolip();
         resetCursor(this.interactiveCanvas);
       }
+    }
+
+    if (
+      isBrowserZoomInteractionEnabled(prevProps) !== this.browserZoomEnabled
+    ) {
+      this.addEventListeners();
     }
 
     // nothing (host `updateScene`, actions, ...) may unset view mode while

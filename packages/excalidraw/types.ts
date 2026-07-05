@@ -644,6 +644,15 @@ export type InteractionConfig = {
      * @default false
      */
     links?: boolean;
+    /**
+     * Whether the browser's own zoom remains available over the editor —
+     * ctrl/cmd + wheel, pinch, and (while the editor has focus)
+     * ctrl/cmd +/-/0 shortcuts. Prevented by default, mirroring the
+     * interactive editor. Regular page scrolling stays available either way.
+     *
+     * @default false
+     */
+    browserZoom?: boolean;
   };
 };
 
