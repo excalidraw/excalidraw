@@ -9722,7 +9722,6 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState,
             bindMode: "orbit",
             newElement: element,
-            startBoundElement: boundElement,
             suggestedBinding:
               boundElement && isBindingElement(element)
                 ? {
