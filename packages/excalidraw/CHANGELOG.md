@@ -53,7 +53,7 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
-- `UIAppState` no longer includes `zoom` and `shouldCacheIgnoreZoom`. Zoom changes (and the internal zoom-caching flag flipping during viewport animations and pinch gestures) no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
+- `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
 
   ```tsx
   import { useExcalidrawStateValue } from "@excalidraw/excalidraw";

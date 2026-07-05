@@ -681,6 +681,11 @@ const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
     scrollY,
     zoom,
     shouldCacheIgnoreZoom,
+    snapLines,
+    originSnapOffset,
+    suggestedBinding,
+    frameToHighlight,
+    elementsToHighlight,
     ...ret
   } = appState;
   return ret;
