@@ -44,7 +44,11 @@ import type {
 
 export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
 
-const DEFAULT_SCROLL_ANIMATION_DURATION = 250;
+const DEFAULT_SCROLL_ANIMATION_DURATION = 500;
+
+/** rubberband snap-back animation duration, in ms — kept snappier than the
+ * default scroll animation so releasing an overscroll feels responsive */
+const SNAP_BACK_ANIMATION_DURATION = 250;
 
 /** default rubberband overscroll give for scroll locks, in viewport px */
 export const DEFAULT_OVERSCROLL = 150;
@@ -280,7 +284,7 @@ export const animateToConstraints = (
       "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
     >,
   ) => void,
-  duration = DEFAULT_SCROLL_ANIMATION_DURATION,
+  duration = SNAP_BACK_ANIMATION_DURATION,
 ) => {
   const target = constrainScrollState(state); // hard clamp (no overscroll give)
 
