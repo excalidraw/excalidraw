@@ -34,8 +34,8 @@ Please add the latest change on the top under the correct section.
   ```
 
   - `target` is required and no longer defaults to the whole scene — pass `target: excalidrawAPI.getSceneElements()` for the old default. Besides element(s) or an element id / element-link URL, it now also accepts `Bounds` and `{ x, y, width?, height? }` rects (missing dimensions default to the viewport size). Deleted and non-scene elements in the target are filtered out with a console warning.
-  - `fitToContent` / `fitToViewport` were replaced by `fit: "scale-down" | "contain"` respectively, defaulting to `"scale-down"` (zoomed so the target fits, at most 100%). For the old default behavior of recentering on the target at the current zoom, pass `fit: "none"`.
-  - `animate` / `duration` were replaced by `animation: boolean | { duration?: number }`. Navigation now animates by default over 250ms (previously it jumped unless `animate: true`, and animated over 500ms) — pass `animation: false` to jump instantly.
+  - `fitToContent` / `fitToViewport` were replaced by `fit: "scale-down" | "contain"` respectively, defaulting to `"scale-down"` (zoomed so the target fits, at most 100%). Previously the default depended on the target: element-id / element-link (string) targets defaulted to fit-to-content — matching the new default — while element(s) or omitted targets defaulted to recentering at the current zoom without changing it; pass `fit: "none"` for that behavior.
+  - `animate` / `duration` were replaced by `animation: boolean | { duration?: number }`. Navigation now always animates by default; previously only string targets did, while element(s) targets jumped unless `animate: true` — pass `animation: false` to jump instantly.
   - `canvasOffsets` was replaced by `offsets`, which also accepts UI-derived offsets (see Features below).
   - `viewportZoomFactor`, `minZoom`, and `maxZoom` are no longer supported.
 
