@@ -15,7 +15,13 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-### Viewport control & scroll/zoom locking
+### Interaction and UI control (2026-07-05)
+
+- Added `interaction` prop (`boolean | { allowed?: { links?: boolean; browserZoom?: boolean } }`). When set to `false`, the editor becomes fully inert for the user — no panning, zooming, selecting, editing, keyboard shortcuts, clipboard, or drag&drop. It implies view mode (`appState.viewModeEnabled` reports `true` and cannot be unset while non-interactive), and the page scrolls naturally over the component since wheel/touch input is no longer captured (the browser's own zoom is still prevented over the editor by default). Interactions under `allowed` are opt-in exceptions: with `links` allowed, link icons render and linked elements stay clickable (view-mode behavior: clicking anywhere on a linked element opens its link) while the editor stays otherwise non-interactive — when links are not allowed, link icons are not rendered at all; with `browserZoom` allowed, the browser's own zoom gestures (ctrl/cmd + wheel, pinch, keyboard) stay available over the editor. The scene still renders and remains fully controllable through the imperative API (`updateScene`, `setViewport`, ...), making it suitable for live previews, thumbnails, and annotation overlays.
+
+- Added `ui` prop. When set to `false`, no editor UI (chrome) is rendered — toolbar, menus, footer, sidebars, dialogs, popups, context menu. Canvas content (elements, text editing, frame names, embeds) still renders, and the editor remains interactive unless `interaction={false}` is set as well, so host apps can supply their own UI. Children of `<Excalidraw>` still mount (they may be functional, e.g. a collaboration component); Excalidraw-exported UI components among them simply don't render. You're responsible for hiding your own presentational components.
+
+### Viewport control & scroll/zoom locking (2026-07-03)
 
 `ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
 
@@ -51,7 +57,7 @@ Please add the latest change on the top under the correct section.
 
 - The `offsets` option (on `setViewport` and `initialState.viewport`) insets the usable viewport per side so targets aren't fitted underneath overlaid UI. It combines static pixel sides with `ui: true | ViewportOffsetsOptions`, which measures the currently rendered editor UI (toolbar, styles panel, sidebar…) — with configurable padding, per-side overrides, and reserving space for currently-hidden surfaces (`reserve: { stylesPanel?: boolean; sidebar?: boolean }`). The same measurement is exposed through the new `ExcalidrawAPI.getViewportOffsets(opts?)`, and custom UI rendered inside the editor container can opt into being measured via the `data-viewport-ui="top" | "bottom" | "side"` attribute.
 
-### Breaking changes
+### Other Breaking changes
 
 - `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
 
@@ -84,7 +90,7 @@ Please add the latest change on the top under the correct section.
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
   - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUnmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
-### Features
+### Other Features
 
 - Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on unmount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 
