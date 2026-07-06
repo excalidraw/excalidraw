@@ -460,7 +460,15 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { CursorHint, cursorHintAtom } from "./CursorHint";
+import {
+  MagicIcon,
+  copyIcon,
+  fullscreenIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
+} from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
 import { findShapeByKey } from "./shapes";
@@ -902,6 +910,20 @@ class App extends React.Component<AppProps, AppState> {
     const result = editorJotaiStore.set(atom, ...args);
     this.triggerRender();
     return result;
+  };
+
+  private cursorHintNonce = 0;
+
+  /**
+   * Shows a transient tooltip next to the cursor, hidden automatically
+   * after a short delay. Repeated calls replace the content and restart
+   * the timer.
+   */
+  showCursorHint = (content: React.ReactNode) => {
+    this.updateEditorAtom(cursorHintAtom, {
+      content,
+      nonce: ++this.cursorHintNonce,
+    });
   };
 
   private onWindowMessage(event: MessageEvent) {
@@ -2269,6 +2291,7 @@ class App extends React.Component<AppProps, AppState> {
                               this.eraserTrail,
                             ]}
                           />
+                          <CursorHint />
                           {selectedElements.length === 1 &&
                             this.state.openDialog?.name !==
                               "elementLinkSelector" &&
@@ -5310,14 +5333,20 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
           if (shape === "arrow" && this.state.activeTool.type === "arrow") {
-            this.setState((prevState) => ({
-              currentItemArrowType:
-                prevState.currentItemArrowType === ARROW_TYPE.sharp
-                  ? ARROW_TYPE.round
-                  : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
-            }));
+            const nextArrowType =
+              this.state.currentItemArrowType === ARROW_TYPE.sharp
+                ? ARROW_TYPE.round
+                : this.state.currentItemArrowType === ARROW_TYPE.round
+                ? ARROW_TYPE.elbow
+                : ARROW_TYPE.sharp;
+            this.setState({ currentItemArrowType: nextArrowType });
+            this.showCursorHint(
+              nextArrowType === ARROW_TYPE.elbow
+                ? elbowArrowIcon
+                : nextArrowType === ARROW_TYPE.round
+                ? roundArrowIcon
+                : sharpArrowIcon,
+            );
           }
 
           if (shape === "lasso" && this.state.activeTool.type === "laser") {
