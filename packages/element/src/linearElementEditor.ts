@@ -2463,6 +2463,7 @@ const pointDraggingUpdates = (
             }
           : null,
       },
+      hit: suggestedBindingElement,
     };
   }
 
