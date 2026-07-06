@@ -367,7 +367,11 @@ export const getHoveredElementForBinding = (
     if (distance > -maxDistance) {
       candidates.push({ element, distance });
 
-      if (!isTransparent(element.backgroundColor) && distance >= 0) {
+      if (
+        hasBackground(element.type) &&
+        !isTransparent(element.backgroundColor) &&
+        distance >= 0
+      ) {
         break;
       }
     }
