@@ -75,12 +75,14 @@ import {
 import { FileStatusStore } from "../data/fileStatusStore";
 import { LocalData } from "../data/LocalData";
 import {
+  appendSceneHistoryToFirebase,
   isSavedToFirebase,
   loadFilesFromFirebase,
   loadFromFirebase,
   saveFilesToFirebase,
   saveToFirebase,
 } from "../data/firebase";
+import { createSceneHistoryId } from "../data/SceneHistory";
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
@@ -118,7 +120,12 @@ export interface CollabAPI {
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
+  isSyncPaused: CollabInstance["isSyncPaused"];
+  pauseSync: CollabInstance["pauseSync"];
+  resumeSync: CollabInstance["resumeSync"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
+  markNextHistorySaveAsRestore: CollabInstance["markNextHistorySaveAsRestore"];
+  getSceneHistorySessionId: CollabInstance["getSceneHistorySessionId"];
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
@@ -139,6 +146,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<SocketId, Collaborator>();
+  private sceneHistorySessionId = createSceneHistoryId();
+  private pendingHistoryRestoreSourceId: string | null = null;
+  // Only the client that originated a change records it in shared history, so
+  // remote-applied updates aren't misattributed to whoever persists them first.
+  private hasLocalSceneChangeForHistory = false;
+  private syncLocks = new Set<string>();
 
   constructor(props: CollabProps) {
     super(props);
@@ -232,7 +245,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       onPointerUpdate: this.onPointerUpdate,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
+      isSyncPaused: this.isSyncPaused,
+      pauseSync: this.pauseSync,
+      resumeSync: this.resumeSync,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      markNextHistorySaveAsRestore: this.markNextHistorySaveAsRestore,
+      getSceneHistorySessionId: this.getSceneHistorySessionId,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
       getUsername: this.getUsername,
@@ -326,6 +344,28 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.resetErrorIndicator();
 
       if (this.isCollaborating() && storedElements) {
+        const isLocalSceneChange = this.hasLocalSceneChangeForHistory;
+        this.hasLocalSceneChangeForHistory = false;
+        const restoreSourceId = this.pendingHistoryRestoreSourceId;
+        this.pendingHistoryRestoreSourceId = null;
+
+        if (isLocalSceneChange && this.portal.roomId && this.portal.roomKey) {
+          try {
+            await appendSceneHistoryToFirebase({
+              roomId: this.portal.roomId,
+              roomKey: this.portal.roomKey,
+              sessionId: this.sceneHistorySessionId,
+              author: this.getUsername() || undefined,
+              elements: storedElements as readonly OrderedExcalidrawElement[],
+              appState: this.excalidrawAPI.getAppState(),
+              kind: restoreSourceId ? "restore" : "change",
+              restoreSourceId: restoreSourceId ?? undefined,
+            });
+          } catch (error: any) {
+            console.error("Failed to save shared scene history:", error);
+          }
+        }
+
         this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
       }
     } catch (error: any) {
@@ -352,6 +392,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       console.error(error);
     }
+  };
+
+  markNextHistorySaveAsRestore = (sourceEntryId: string) => {
+    this.pendingHistoryRestoreSourceId = sourceEntryId;
+    window.setTimeout(() => {
+      if (this.pendingHistoryRestoreSourceId === sourceEntryId) {
+        this.pendingHistoryRestoreSourceId = null;
+      }
+    }, SYNC_FULL_SCENE_INTERVAL_MS * 2);
   };
 
   stopCollaboration = (keepRemoteState = true) => {
@@ -554,6 +603,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         captureUpdate: CaptureUpdateAction.NEVER,
       });
 
+      this.hasLocalSceneChangeForHistory = true;
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
     }
 
@@ -947,6 +997,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     ) {
       this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
+      this.hasLocalSceneChangeForHistory = true;
       this.queueBroadcastAllElements();
     }
   };
@@ -954,6 +1005,18 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
     this.broadcastElements(elements);
     this.queueSaveToFirebase();
+  };
+
+  isSyncPaused = () => {
+    return this.syncLocks.size > 0;
+  };
+
+  pauseSync = (lockType: string) => {
+    this.syncLocks.add(lockType);
+  };
+
+  resumeSync = (lockType: string) => {
+    this.syncLocks.delete(lockType);
   };
 
   queueBroadcastAllElements = throttle(() => {
@@ -990,6 +1053,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   getUsername = () => this.state.username;
+
+  getSceneHistorySessionId = () => this.sceneHistorySessionId;
 
   setActiveRoomLink = (activeRoomLink: string | null) => {
     this.setState({ activeRoomLink });

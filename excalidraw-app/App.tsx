@@ -679,7 +679,7 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (collabAPI?.isCollaborating()) {
+    if (collabAPI?.isCollaborating() && !collabAPI.isSyncPaused()) {
       collabAPI.syncElements(elements);
     }
 
@@ -1060,7 +1060,11 @@ const ExcalidrawWrapper = () => {
           }}
         />
 
-        <AppSidebar />
+        <AppSidebar
+          collabAPI={collabAPI}
+          excalidrawAPI={excalidrawAPI}
+          isCollaborating={isCollaborating}
+        />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>
