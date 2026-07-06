@@ -38,6 +38,7 @@ import {
 } from "../../excalidraw/tests/queries/dom";
 
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
@@ -328,9 +329,67 @@ describe("Test Linear Elements", () => {
     createTwoPointerLinearElement("arrow");
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
-    mouse.doubleClick();
+    mouse.doubleClickAt(midpoint[0], midpoint[1]);
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
     await getTextEditor();
+  });
+
+  describe("Arrowhead toggle on endpoint dblclick", () => {
+    // the toggle replaces the element (immutable update), so always re-read
+    // the arrow from the scene instead of holding on to a stale reference
+    const getArrow = () => h.elements[0] as ExcalidrawArrowElement;
+
+    it("should toggle end arrowhead between default and none", () => {
+      createTwoPointerLinearElement("arrow");
+      expect(getArrow().endArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe("arrow");
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe(null);
+    });
+
+    it("should toggle start arrowhead between default and none", () => {
+      createTwoPointerLinearElement("arrow");
+      expect(getArrow().startArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p1[0], p1[1]);
+      expect(getArrow().startArrowhead).toBe("arrow");
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+
+      mouse.doubleClickAt(p1[0], p1[1]);
+      expect(getArrow().startArrowhead).toBe(null);
+    });
+
+    it("should restore the arrowhead removed by the previous toggle", () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: p1[0],
+        y: p1[1],
+        width: p2[0] - p1[0],
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], p2[1] - p1[1])],
+        endArrowhead: "triangle",
+      });
+      API.setElements([arrow]);
+      mouse.clickAt(midpoint[0], midpoint[1]);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe("triangle");
+    });
+
+    it("should not toggle arrowheads on dblclick outside endpoints", () => {
+      createTwoPointerLinearElement("arrow");
+
+      mouse.doubleClickAt(midpoint[0], midpoint[1]);
+      expect(getArrow().startArrowhead).toBe(null);
+      expect(getArrow().endArrowhead).toBe(null);
+    });
   });
 
   it("shouldn't create text element on double click in line editor (arrow)", async () => {
@@ -1091,7 +1150,7 @@ describe("Test Linear Elements", () => {
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(arrow.id);
-      mouse.doubleClickAt(arrow.x, arrow.y);
+      mouse.doubleClickAt(midpoint[0], midpoint[1]);
       expect(h.elements.length).toBe(2);
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
