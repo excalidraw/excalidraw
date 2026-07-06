@@ -914,16 +914,14 @@ export const renderElement = (
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
-          // Draw arrow directly as vector and clear label hole separately.
-          // This avoids temp-canvas bitmap blit which introduces resampling blur.
+          // Draw arrow directly as vector (avoids temp-canvas bitmap blit
+          // which introduces resampling blur) with the bound text area
+          // clipped out, so the arrow is simply not drawn under the label.
+          // Whatever is rendered beneath (background, overlapping elements)
+          // shows through, matching the editor which clears the label area
+          // from the arrow's own cached canvas.
           shiftX = element.width / 2 - (element.x - x1);
           shiftY = element.height / 2 - (element.y - y1);
-
-          context.save();
-          context.rotate(element.angle);
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
-          context.restore();
 
           const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
             boundTextElement,
@@ -942,21 +940,22 @@ export const renderElement = (
           const holeWidth = boundTextElement.width + BOUND_TEXT_PADDING * 2;
           const holeHeight = boundTextElement.height + BOUND_TEXT_PADDING * 2;
 
-          const isTransparentHole =
-            "viewBackgroundColor" in appState &&
-            (appState.viewBackgroundColor === "transparent" ||
-              !appState.viewBackgroundColor);
-          if (!isTransparentHole) {
-            context.save();
-            context.fillStyle = applyDarkModeFilter(
-              renderConfig.canvasBackgroundColor,
-              renderConfig.theme === THEME.DARK,
-            );
-            context.fillRect(holeX, holeY, holeWidth, holeHeight);
-            context.restore();
-          } else {
-            context.clearRect(holeX, holeY, holeWidth, holeHeight);
-          }
+          // clip region = generous outer rect covering the whole arrow minus
+          // the label hole (even-odd rule). Built before rotating because the
+          // label stays axis-aligned regardless of the arrow's angle.
+          const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
+          const outerHalf = maxDim + getCanvasPadding(element) * 10;
+
+          context.save();
+          context.beginPath();
+          context.rect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
+          context.rect(holeX, holeY, holeWidth, holeHeight);
+          context.clip("evenodd");
+
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig);
+          context.restore();
         } else {
           context.rotate(element.angle);
 

@@ -237,6 +237,70 @@ describe("exportToSvg", () => {
   });
 });
 
+// #11591: canvas export used to "repair" the label hole on the shared export
+// canvas — painting it with the background color (or erasing it when the
+// background is transparent). Both overwrite whatever is rendered beneath the
+// label and can visibly differ from the editor, where the arrow is simply not
+// drawn under the label. The arrow must be clipped around the label instead.
+describe("exportToCanvas: arrow with bound text label (#11591)", () => {
+  const createLabeledArrow = () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow-11591",
+      width: 200,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      boundElements: [{ type: "text", id: "label-11591" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label-11591",
+      text: "label",
+      width: 50,
+      height: 20,
+      containerId: "arrow-11591",
+    });
+    return [arrow, label] as NonDeletedExcalidrawElement[];
+  };
+
+  // draw calls recorded by vitest-canvas-mock
+  const getEvents = (canvas: HTMLCanvasElement) =>
+    (canvas.getContext("2d") as any).__getEvents() as {
+      type: string;
+      props: Record<string, any>;
+    }[];
+
+  it("fills only the background, never the label area", async () => {
+    const canvas = await exportToCanvas({
+      elements: createLabeledArrow(),
+      files: null,
+    });
+
+    const fillRects = getEvents(canvas).filter((e) => e.type === "fillRect");
+    expect(fillRects.length).toBeGreaterThan(0);
+    // a fillRect smaller than the canvas means the label area was painted
+    // over, hiding whatever was rendered beneath it
+    for (const { props } of fillRects) {
+      expect(props.width).toBe(canvas.width);
+      expect(props.height).toBe(canvas.height);
+    }
+  });
+
+  it("does not erase the label area when exporting without background", async () => {
+    const canvas = await exportToCanvas({
+      elements: createLabeledArrow(),
+      appState: { exportBackground: false },
+      files: null,
+    });
+
+    const clearRects = getEvents(canvas).filter((e) => e.type === "clearRect");
+    for (const { props } of clearRects) {
+      expect(props.width).toBe(canvas.width);
+      expect(props.height).toBe(canvas.height);
+    }
+  });
+});
+
 describe("exporting frames", () => {
   const getFrameNameHeight = (exportType: "canvas" | "svg") => {
     const height =
