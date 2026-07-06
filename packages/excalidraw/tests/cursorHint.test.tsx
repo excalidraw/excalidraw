@@ -105,7 +105,8 @@ describe("cursor hint", () => {
     };
 
     const expireCooldown = () => {
-      (h.app as any).lastCursorHintShownAt = Date.now() - CURSOR_HINT_COOLDOWN;
+      (h.app.cursorHints as any).lastShownAt =
+        Date.now() - CURSOR_HINT_COOLDOWN;
     };
 
     it("suppresses tool-switch hint during cooldown", () => {

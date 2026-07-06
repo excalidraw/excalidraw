@@ -1,13 +1,21 @@
 import clsx from "clsx";
 import { useLayoutEffect, useEffect, useRef, useState } from "react";
 
-import { EVENT } from "@excalidraw/common";
+import { ARROW_TYPE, EVENT } from "@excalidraw/common";
 
 import { atom, useAtom } from "../editor-jotai";
 
 import { useApp, useExcalidrawContainer } from "./App";
+import {
+  LineIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
+} from "./icons";
 
 import "./CursorHint.scss";
+
+import type { AppClassProperties, AppState } from "../types";
 
 /** how long the hint stays visible before it starts fading out */
 const CURSOR_HINT_DURATION = 700;
@@ -25,14 +33,72 @@ export const CURSOR_HINT_COOLDOWN = 5 * 60 * 1000;
 
 export const cursorHintAtom = atom<{
   content: React.ReactNode;
-  /** bumped on every trigger so a re-trigger restarts the hide timer */
+  /** unique per trigger so a re-trigger restarts the hide timer */
   nonce: number;
 } | null>(null);
+
+const getArrowTypeIcon = (arrowType: AppState["currentItemArrowType"]) =>
+  arrowType === ARROW_TYPE.elbow
+    ? elbowArrowIcon
+    : arrowType === ARROW_TYPE.round
+    ? roundArrowIcon
+    : sharpArrowIcon;
+
+/**
+ * Owns the cursor-hint policy. App reports semantic interaction events
+ * (what the user did); all decisions about whether and what to show —
+ * cooldown, bypasses, hint content — are made here.
+ */
+export class CursorHints {
+  private app: AppClassProperties;
+  private lastShownAt = 0;
+
+  constructor(app: AppClassProperties) {
+    this.app = app;
+  }
+
+  /**
+   * Shows a transient tooltip next to the cursor, hidden automatically
+   * after a short delay. Repeated calls replace the content and restart
+   * the timer.
+   */
+  show = (content: React.ReactNode) => {
+    this.lastShownAt = Date.now();
+    this.app.updateEditorAtom(cursorHintAtom, {
+      content,
+      nonce: Math.random(),
+    });
+  };
+
+  private isOnCooldown = () =>
+    Date.now() - this.lastShownAt < CURSOR_HINT_COOLDOWN;
+
+  /** arrow type cycled via shortcut (arrow tool already active) */
+  onArrowTypeCycled = (arrowType: AppState["currentItemArrowType"]) => {
+    // always worth hinting — you need to see what you switched to
+    this.show(getArrowTypeIcon(arrowType));
+  };
+
+  /** arrow/line tool picked via keyboard shortcut */
+  onToolShortcut = (tool: "arrow" | "line", source: "letter" | "digit") => {
+    // digit shortcuts always hint (often pressed blind, without certainty
+    // which tool the digit maps to); letter shortcuts only after a
+    // cooldown — re-picking a tool you used moments ago doesn't need the
+    // reminder
+    if (source === "digit" || !this.isOnCooldown()) {
+      this.show(
+        tool === "line"
+          ? LineIcon
+          : getArrowTypeIcon(this.app.state.currentItemArrowType),
+      );
+    }
+  };
+}
 
 /**
  * Transient tooltip shown next to the cursor for added affordance after
  * actions that have no other visual feedback near the pointer (e.g. cycling
- * arrow types via shortcut). Trigger via `app.showCursorHint()`.
+ * arrow types via shortcut). Trigger via `app.cursorHints`.
  */
 export const CursorHint = () => {
   const [hint, setHint] = useAtom(cursorHintAtom);

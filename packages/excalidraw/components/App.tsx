@@ -460,16 +460,8 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
-import { CursorHint, cursorHintAtom, CURSOR_HINT_COOLDOWN } from "./CursorHint";
-import {
-  LineIcon,
-  MagicIcon,
-  copyIcon,
-  fullscreenIcon,
-  sharpArrowIcon,
-  roundArrowIcon,
-  elbowArrowIcon,
-} from "./icons";
+import { CursorHint, CursorHints } from "./CursorHint";
+import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
 import { findShapeByKey } from "./shapes";
@@ -655,13 +647,6 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-const getArrowTypeIcon = (arrowType: AppState["currentItemArrowType"]) =>
-  arrowType === ARROW_TYPE.elbow
-    ? elbowArrowIcon
-    : arrowType === ARROW_TYPE.round
-    ? roundArrowIcon
-    : sharpArrowIcon;
-
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -763,6 +748,7 @@ class App extends React.Component<AppProps, AppState> {
   laserTrails = new LaserTrails(this);
   eraserTrail = new EraserTrail(this);
   lassoTrail = new LassoTrail(this);
+  cursorHints = new CursorHints(this);
 
   onChangeEmitter = new Emitter<
     [
@@ -919,25 +905,6 @@ class App extends React.Component<AppProps, AppState> {
     this.triggerRender();
     return result;
   };
-
-  private cursorHintNonce = 0;
-  private lastCursorHintShownAt = 0;
-
-  /**
-   * Shows a transient tooltip next to the cursor, hidden automatically
-   * after a short delay. Repeated calls replace the content and restart
-   * the timer.
-   */
-  showCursorHint = (content: React.ReactNode) => {
-    this.lastCursorHintShownAt = Date.now();
-    this.updateEditorAtom(cursorHintAtom, {
-      content,
-      nonce: ++this.cursorHintNonce,
-    });
-  };
-
-  private isCursorHintOnCooldown = () =>
-    Date.now() - this.lastCursorHintShownAt < CURSOR_HINT_COOLDOWN;
 
   private onWindowMessage(event: MessageEvent) {
     if (
@@ -5353,21 +5320,12 @@ class App extends React.Component<AppProps, AppState> {
                 ? ARROW_TYPE.elbow
                 : ARROW_TYPE.sharp;
             this.setState({ currentItemArrowType: nextArrowType });
-            // cycling is always worth hinting — you need to see what you
-            // switched to
-            this.showCursorHint(getArrowTypeIcon(nextArrowType));
+            this.cursorHints.onArrowTypeCycled(nextArrowType);
           } else if (shape === "arrow" || shape === "line") {
-            // numeric shortcuts always hint (often pressed blind, without
-            // certainty which tool the digit maps to); letter shortcuts only
-            // after a cooldown — re-picking a tool you used moments ago
-            // doesn't need the reminder
-            if (/^\d$/.test(event.key) || !this.isCursorHintOnCooldown()) {
-              this.showCursorHint(
-                shape === "line"
-                  ? LineIcon
-                  : getArrowTypeIcon(this.state.currentItemArrowType),
-              );
-            }
+            this.cursorHints.onToolShortcut(
+              shape,
+              /^\d$/.test(event.key) ? "digit" : "letter",
+            );
           }
 
           if (shape === "lasso" && this.state.activeTool.type === "laser") {
