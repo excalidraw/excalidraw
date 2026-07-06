@@ -16,6 +16,13 @@ const CURSOR_HINT_FADE_DURATION = 100;
 /** distance from the pointer so the hint isn't covered by the cursor */
 const CURSOR_HINT_OFFSET = 16;
 
+/**
+ * While a recently shown hint is still fresh in memory, tool-switch hints
+ * are suppressed (repeatedly re-picking a tool you just used doesn't need
+ * the reminder). Cycling arrow types and numeric shortcuts bypass this.
+ */
+export const CURSOR_HINT_COOLDOWN = 5 * 60 * 1000;
+
 export const cursorHintAtom = atom<{
   content: React.ReactNode;
   /** bumped on every trigger so a re-trigger restarts the hide timer */

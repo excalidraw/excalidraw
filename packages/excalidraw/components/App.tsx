@@ -460,7 +460,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
-import { CursorHint, cursorHintAtom } from "./CursorHint";
+import { CursorHint, cursorHintAtom, CURSOR_HINT_COOLDOWN } from "./CursorHint";
 import {
   LineIcon,
   MagicIcon,
@@ -921,6 +921,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private cursorHintNonce = 0;
+  private lastCursorHintShownAt = 0;
 
   /**
    * Shows a transient tooltip next to the cursor, hidden automatically
@@ -928,11 +929,15 @@ class App extends React.Component<AppProps, AppState> {
    * the timer.
    */
   showCursorHint = (content: React.ReactNode) => {
+    this.lastCursorHintShownAt = Date.now();
     this.updateEditorAtom(cursorHintAtom, {
       content,
       nonce: ++this.cursorHintNonce,
     });
   };
+
+  private isCursorHintOnCooldown = () =>
+    Date.now() - this.lastCursorHintShownAt < CURSOR_HINT_COOLDOWN;
 
   private onWindowMessage(event: MessageEvent) {
     if (
@@ -5348,13 +5353,21 @@ class App extends React.Component<AppProps, AppState> {
                 ? ARROW_TYPE.elbow
                 : ARROW_TYPE.sharp;
             this.setState({ currentItemArrowType: nextArrowType });
+            // cycling is always worth hinting — you need to see what you
+            // switched to
             this.showCursorHint(getArrowTypeIcon(nextArrowType));
-          } else if (shape === "arrow") {
-            this.showCursorHint(
-              getArrowTypeIcon(this.state.currentItemArrowType),
-            );
-          } else if (shape === "line") {
-            this.showCursorHint(LineIcon);
+          } else if (shape === "arrow" || shape === "line") {
+            // numeric shortcuts always hint (often pressed blind, without
+            // certainty which tool the digit maps to); letter shortcuts only
+            // after a cooldown — re-picking a tool you used moments ago
+            // doesn't need the reminder
+            if (/^\d$/.test(event.key) || !this.isCursorHintOnCooldown()) {
+              this.showCursorHint(
+                shape === "line"
+                  ? LineIcon
+                  : getArrowTypeIcon(this.state.currentItemArrowType),
+              );
+            }
           }
 
           if (shape === "lasso" && this.state.activeTool.type === "laser") {

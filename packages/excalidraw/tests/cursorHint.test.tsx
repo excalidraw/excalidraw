@@ -2,6 +2,7 @@ import React from "react";
 
 import { ARROW_TYPE, KEYS } from "@excalidraw/common";
 
+import { CURSOR_HINT_COOLDOWN } from "../components/CursorHint";
 import { Excalidraw } from "../index";
 
 import { Keyboard, UI } from "./helpers/ui";
@@ -93,6 +94,78 @@ describe("cursor hint", () => {
 
     expect(h.state.activeTool.type).toBe("arrow");
     expect(getCursorHint()).toBeNull();
+  });
+
+  describe("cooldown", () => {
+    // dismiss outside the canvas so we don't start drawing an element
+    // (which would block subsequent tool-switch shortcuts)
+    const dismissHint = () => {
+      fireEvent.pointerDown(document.body);
+      expect(getCursorHint()).toBeNull();
+    };
+
+    const expireCooldown = () => {
+      (h.app as any).lastCursorHintShownAt = Date.now() - CURSOR_HINT_COOLDOWN;
+    };
+
+    it("suppresses tool-switch hint during cooldown", () => {
+      pressKey(KEYS.A);
+      expect(getCursorHint()).not.toBeNull();
+      dismissHint();
+
+      pressKey("v");
+      pressKey(KEYS.A);
+
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(getCursorHint()).toBeNull();
+    });
+
+    it("shows tool-switch hint again once cooldown expires", () => {
+      pressKey(KEYS.A);
+      dismissHint();
+      pressKey("v");
+
+      expireCooldown();
+      pressKey(KEYS.A);
+
+      expect(getCursorHint()).not.toBeNull();
+    });
+
+    it("cycling arrow types bypasses cooldown", () => {
+      pressKey(KEYS.A);
+      dismissHint();
+
+      // arrow tool already active -> cycles
+      pressKey(KEYS.A);
+
+      expect(getCursorHint()).not.toBeNull();
+    });
+
+    it("numeric shortcuts bypass cooldown", () => {
+      pressKey(KEYS.A);
+      dismissHint();
+      pressKey("v");
+
+      pressKey("6");
+      expect(h.state.activeTool.type).toBe("line");
+      expect(getCursorHint()).not.toBeNull();
+      dismissHint();
+
+      pressKey("v");
+      pressKey("5");
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(getCursorHint()).not.toBeNull();
+    });
+
+    it("letter shortcut to another tool is also suppressed during cooldown", () => {
+      pressKey(KEYS.A);
+      dismissHint();
+
+      pressKey(KEYS.L);
+
+      expect(h.state.activeTool.type).toBe("line");
+      expect(getCursorHint()).toBeNull();
+    });
   });
 
   it("tracks pointer position while visible", () => {
