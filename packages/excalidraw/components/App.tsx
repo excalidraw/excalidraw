@@ -7387,7 +7387,16 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
             this.state.zoom,
           );
-        if (hoveredElement) {
+        const isAmbiguousSelfBinding =
+          !!hoveredElement &&
+          multiElement.startBinding?.elementId === hoveredElement.id &&
+          isPointInElement(
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            hoveredElement,
+            this.scene.getNonDeletedElementsMap(),
+          );
+
+        if (hoveredElement && !isAmbiguousSelfBinding) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: event.nativeEvent,
             sceneCoords: {
