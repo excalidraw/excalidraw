@@ -366,6 +366,7 @@ export const getHoveredElementForBinding = (
     relativeArea?: number;
   };
 
+  const maxDistance = maxBindingDistance_simple(zoom);
   const candidates: Candidate[] = [];
   for (let index = elements.length - 1; index >= 0; --index) {
     const element = elements[index];
@@ -374,7 +375,6 @@ export const getHoveredElementForBinding = (
       continue;
     }
 
-    const maxDistance = maxBindingDistance_simple(zoom);
     const distance = bindableElementBorderDistanceIfClose(
       element,
       point,
