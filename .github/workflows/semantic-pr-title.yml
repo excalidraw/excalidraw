@@ -6,11 +6,97 @@ on:
       - opened
       - edited
       - synchronize
+      - labeled
+      - unlabeled
 
 jobs:
   semantic:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     steps:
       - uses: amannn/action-semantic-pull-request@e32d7e603df1aa1ba07e981f2a23455dee596825 # v5
+        with:
+          requireScope: true
+          scopes: |
+            app
+            editor
+            packages/excalidraw
+            packages/utils
+            docker
+            repo
+          ignoreLabels: |
+            skip-semantic-title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  label-scope:
+    needs: semantic
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Label scoped PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          scope_labels=(s-app s-editor s-package)
+
+          readarray -t desired_labels < <(
+            node <<'NODE'
+          const title = process.env.PR_TITLE;
+          const match = title.match(/^[a-z]+(?:\(([^)]+)\))?!?:/i);
+          const scopes = match?.[1]?.split(",").map((scope) => scope.trim()) ?? [];
+          const labels = new Set();
+
+          for (const scope of scopes) {
+            if (scope === "app") {
+              labels.add("s-app");
+            } else if (scope === "editor") {
+              labels.add("s-editor");
+            } else if (scope.startsWith("packages/")) {
+              labels.add("s-package");
+            }
+          }
+
+          process.stdout.write([...labels].join("\n"));
+          NODE
+          )
+
+          should_apply_label() {
+            local label="$1"
+
+            for desired_label in "${desired_labels[@]}"; do
+              if [[ "$desired_label" == "$label" ]]; then
+                return 0
+              fi
+            done
+
+            return 1
+          }
+
+          for label in "${scope_labels[@]}"; do
+            if ! should_apply_label "$label"; then
+              gh api \
+                --method DELETE \
+                "repos/${REPOSITORY}/issues/${PR_NUMBER}/labels/${label}" \
+                --silent 2>/dev/null || true
+            fi
+          done
+
+          for label in "${desired_labels[@]}"; do
+            if ! gh api \
+              --method POST \
+              "repos/${REPOSITORY}/issues/${PR_NUMBER}/labels" \
+              --field "labels[]=${label}" \
+              --silent; then
+              echo "::warning::Could not apply ${label}. The workflow token likely does not have issues:write permission for this PR."
+            fi
+          done

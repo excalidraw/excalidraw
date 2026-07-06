@@ -1,5 +1,4 @@
 import { queryByText, queryByTestId } from "@testing-library/react";
-import React from "react";
 import { useMemo } from "react";
 
 import { THEME } from "@excalidraw/common";
@@ -433,7 +432,7 @@ describe("<Excalidraw/>", () => {
         const customMenu = useMemo(() => {
           return (
             <MainMenu>
-              <MainMenu.DefaultItems.ToggleTheme />
+              <MainMenu.DefaultItems.ToggleTheme allowSystemTheme={false} />
             </MainMenu>
           );
         }, []);
@@ -456,6 +455,33 @@ describe("<Excalidraw/>", () => {
       expect(
         queryByTestId(container, "toggle-dark-mode")?.textContent,
       ).toContain(t("buttons.lightMode"));
+    });
+
+    it("should show theme toggle when the theme prop and onThemeChange are defined", async () => {
+      const onThemeChange = vi.fn();
+      const { container } = await render(
+        <Excalidraw theme={THEME.DARK} onThemeChange={onThemeChange} />,
+      );
+
+      expect(h.state.theme).toBe(THEME.DARK);
+      //open menu
+      toggleMenu(container);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeTruthy();
+    });
+
+    it("should call onThemeChange instead of mutating theme when defined", async () => {
+      const onThemeChange = vi.fn();
+      const { container } = await render(
+        <Excalidraw theme={THEME.LIGHT} onThemeChange={onThemeChange} />,
+      );
+
+      //open menu
+      toggleMenu(container);
+      fireEvent.click(queryByTestId(container, "toggle-dark-mode")!);
+
+      expect(onThemeChange).toHaveBeenCalledWith(THEME.DARK);
+      expect(h.state.theme).toBe(THEME.LIGHT);
     });
   });
 });

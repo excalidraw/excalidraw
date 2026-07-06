@@ -1,6 +1,9 @@
 import { arrayToMap } from "@excalidraw/common";
-import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
-import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
+import {
+  isPointWithinBounds,
+  pointFrom,
+  segmentsIntersectAt,
+} from "@excalidraw/math";
 
 import type {
   AppClassProperties,
@@ -19,9 +22,11 @@ import {
   getElementAbsoluteCoords,
   doBoundsIntersect,
   getElementBounds,
+  boundsContainBounds,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
+import { syncMovedIndices } from "./fractionalIndex";
 import {
   isFrameElement,
   isFrameLikeElement,
@@ -76,7 +81,7 @@ export function isElementIntersectingFrame(
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
-      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+      segmentsIntersectAt(frameLineSegment, elementLineSegment),
     ),
   );
 
@@ -101,8 +106,9 @@ export const isElementContainingFrame = (
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  return getElementsWithinSelection([frame], element, elementsMap).some(
-    (e) => e.id === frame.id,
+  return boundsContainBounds(
+    getElementBounds(element, elementsMap),
+    getElementBounds(frame, elementsMap),
   );
 };
 
@@ -489,10 +495,44 @@ export const filterElementsEligibleAsFrameChildren = (
   return eligibleElements;
 };
 
+export const getCommonFrameId = (elements: readonly ExcalidrawElement[]) => {
+  let commonFrameId: ExcalidrawElement["frameId"] | undefined;
+
+  for (const element of elements) {
+    if (isFrameLikeElement(element) || !element.frameId) {
+      return null;
+    }
+
+    if (commonFrameId === undefined) {
+      commonFrameId = element.frameId;
+    } else if (commonFrameId !== element.frameId) {
+      return null;
+    }
+  }
+
+  return commonFrameId ?? null;
+};
+
+export const getFrameChildrenInsertionIndex = (
+  elements: readonly ExcalidrawElement[],
+  frameId: ExcalidrawFrameLikeElement["id"],
+): number | null => {
+  for (let index = elements.length - 1; index >= 0; index--) {
+    const element = elements[index];
+
+    if (element.id === frameId) {
+      return index;
+    } else if (element.frameId === frameId) {
+      return index + 1;
+    }
+  }
+
+  return null;
+};
+
 /**
- * Retains (or repairs for target frame) the ordering invriant where children
- * elements come right before the parent frame:
- * [el, el, child, child, frame, el]
+ * Adds elements and their bound elements to frame. Reorders added elements to
+ * be just below frame, or just above its highest child (whichever is higher).
  *
  * @returns mutated allElements (same data structure)
  */
@@ -500,19 +540,11 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-  appState: AppState,
 ): T => {
   const elementsMap = arrayToMap(allElements);
-  const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
-  for (const element of allElements.values()) {
-    if (element.frameId === frame.id) {
-      currTargetFrameChildrenMap.set(element.id, true);
-    }
-  }
+  const commonFrameId = getCommonFrameId(elementsToAdd);
 
-  const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
-
-  const finalElementsToAdd: ExcalidrawElement[] = [];
+  const finalElementsToAdd = new Set<ExcalidrawElement>();
 
   const otherFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
 
@@ -523,7 +555,8 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   }
 
   // - add bound text elements if not already in the array
-  // - filter out elements that are already in the frame
+  // - keep elements already in the frame so mixed selections can be reordered
+  //   together
   for (const element of omitGroupsContainingFrameLikes(
     allElements,
     elementsToAdd,
@@ -536,38 +569,64 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       continue;
     }
 
-    // if the element is already in another frame (which is also in elementsToAdd),
-    // it means that frame and children are selected at the same time
-    // => keep original frame membership, do not add to the target frame
-    if (
-      element.frameId &&
-      appState.selectedElementIds[element.id] &&
-      appState.selectedElementIds[element.frameId]
-    ) {
-      continue;
-    }
-
-    if (!currTargetFrameChildrenMap.has(element.id)) {
-      finalElementsToAdd.push(element);
-    }
+    finalElementsToAdd.add(element);
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
-    if (
-      boundTextElement &&
-      !suppliedElementsToAddSet.has(boundTextElement.id) &&
-      !currTargetFrameChildrenMap.has(boundTextElement.id)
-    ) {
-      finalElementsToAdd.push(boundTextElement);
+    if (boundTextElement && !finalElementsToAdd.has(boundTextElement)) {
+      finalElementsToAdd.add(boundTextElement);
     }
   }
 
   for (const element of finalElementsToAdd) {
-    mutateElement(element, elementsMap, {
-      frameId: frame.id,
-    });
+    // we don't always need to update the element if it's already in the frame,
+    // but we still need to accumulate in finalElementsToAdd so we potentially
+    // reorder them if added together
+    if (element.frameId !== frame.id) {
+      mutateElement(element, elementsMap, {
+        frameId: frame.id,
+      });
+    }
   }
 
-  return allElements;
+  // (re)order elements to be just below the frame,
+  // or just above the highest child if that is higher
+  // (latter case is denormalized order until we migrate)
+  // ---------------------------------------------------------------------------
+
+  if (
+    !finalElementsToAdd.size ||
+    // if all elements to add already belong to the frame, then we don't want to
+    // reorder (case: we're dragging element children within the frame)
+    commonFrameId === frame.id
+  ) {
+    return allElements;
+  }
+
+  const otherElements = Array.from(allElements.values()).filter(
+    (element) => !finalElementsToAdd.has(element),
+  );
+  const insertionIndex = getFrameChildrenInsertionIndex(
+    otherElements,
+    frame.id,
+  );
+
+  if (insertionIndex === null) {
+    return allElements;
+  }
+
+  const reorderedElements = [
+    ...otherElements.slice(0, insertionIndex),
+    ...finalElementsToAdd,
+    ...otherElements.slice(insertionIndex),
+  ];
+
+  syncMovedIndices(reorderedElements, arrayToMap([...finalElementsToAdd]));
+
+  return (
+    Array.isArray(allElements)
+      ? reorderedElements
+      : new Map(reorderedElements.map((element) => [element.id, element]))
+  ) as T;
 };
 
 export const removeElementsFromFrame = (
@@ -621,13 +680,11 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
   allElements: readonly T[],
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-  app: AppClassProperties,
 ): T[] => {
   return addElementsToFrame(
     removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
-    app.state,
   ).slice();
 };
 

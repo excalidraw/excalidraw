@@ -831,14 +831,13 @@ const convertElementType = <
       newElement({
         ...element,
         type: targetType,
-        roundness:
-          targetType === "diamond" && element.roundness
-            ? {
-                type: isUsingAdaptiveRadius(targetType)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : element.roundness,
+        roundness: element.roundness
+          ? {
+              type: isUsingAdaptiveRadius(targetType)
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
+            }
+          : element.roundness,
       }),
     ) as typeof element;
 

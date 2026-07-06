@@ -422,10 +422,10 @@ const drawElementOnCanvas = (
 
       for (const shape of shapes) {
         if (typeof shape === "string") {
-          context.fillStyle =
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor;
+          context.fillStyle = applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          );
           context.fill(new Path2D(shape));
         } else {
           rc.draw(shape);
@@ -555,10 +555,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle =
-          renderConfig.theme === THEME.DARK
-            ? applyDarkModeFilter(element.strokeColor)
-            : element.strokeColor;
+        context.fillStyle = applyDarkModeFilter(
+          element.strokeColor,
+          renderConfig.theme === THEME.DARK,
+        );
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -811,10 +811,10 @@ export const renderElement = (
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle =
-          appState.theme === THEME.DARK
-            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
-            : FRAME_STYLE.strokeColor;
+        context.strokeStyle = applyDarkModeFilter(
+          FRAME_STYLE.strokeColor,
+          appState.theme === THEME.DARK,
+        );
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
@@ -889,8 +889,10 @@ export const renderElement = (
     case "embeddable": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-        const cx = (x1 + x2) / 2 + appState.scrollX;
-        const cy = (y1 + y2) / 2 + appState.scrollY;
+        const centerX = (x1 + x2) / 2;
+        const centerY = (y1 + y2) / 2;
+        const cx = centerX + appState.scrollX;
+        const cy = centerY + appState.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
@@ -912,64 +914,49 @@ export const renderElement = (
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
-          const tempCanvas = document.createElement("canvas");
-
-          const tempCanvasContext = tempCanvas.getContext("2d")!;
-
-          // Take max dimensions of arrow canvas so that when canvas is rotated
-          // the arrow doesn't get clipped
-          const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
-          const padding = getCanvasPadding(element);
-          tempCanvas.width =
-            maxDim * appState.exportScale + padding * 10 * appState.exportScale;
-          tempCanvas.height =
-            maxDim * appState.exportScale + padding * 10 * appState.exportScale;
-
-          tempCanvasContext.translate(
-            tempCanvas.width / 2,
-            tempCanvas.height / 2,
-          );
-          tempCanvasContext.scale(appState.exportScale, appState.exportScale);
-
-          // Shift the canvas to left most point of the arrow
+          // Draw arrow directly as vector and clear label hole separately.
+          // This avoids temp-canvas bitmap blit which introduces resampling blur.
           shiftX = element.width / 2 - (element.x - x1);
           shiftY = element.height / 2 - (element.y - y1);
 
-          tempCanvasContext.rotate(element.angle);
-          const tempRc = rough.canvas(tempCanvas);
+          context.save();
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig);
+          context.restore();
 
-          tempCanvasContext.translate(-shiftX, -shiftY);
-
-          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
-
-          tempCanvasContext.translate(shiftX, shiftY);
-
-          tempCanvasContext.rotate(-element.angle);
-
-          // Shift the canvas to center of bound text
           const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
             boundTextElement,
             elementsMap,
           );
-          const boundTextShiftX = (x1 + x2) / 2 - boundTextCx;
-          const boundTextShiftY = (y1 + y2) / 2 - boundTextCy;
-          tempCanvasContext.translate(-boundTextShiftX, -boundTextShiftY);
+          const holeX =
+            boundTextCx -
+            centerX -
+            boundTextElement.width / 2 -
+            BOUND_TEXT_PADDING;
+          const holeY =
+            boundTextCy -
+            centerY -
+            boundTextElement.height / 2 -
+            BOUND_TEXT_PADDING;
+          const holeWidth = boundTextElement.width + BOUND_TEXT_PADDING * 2;
+          const holeHeight = boundTextElement.height + BOUND_TEXT_PADDING * 2;
 
-          // Clear the bound text area
-          tempCanvasContext.clearRect(
-            -boundTextElement.width / 2,
-            -boundTextElement.height / 2,
-            boundTextElement.width,
-            boundTextElement.height,
-          );
-          context.scale(1 / appState.exportScale, 1 / appState.exportScale);
-          context.drawImage(
-            tempCanvas,
-            -tempCanvas.width / 2,
-            -tempCanvas.height / 2,
-            tempCanvas.width,
-            tempCanvas.height,
-          );
+          const isTransparentHole =
+            "viewBackgroundColor" in appState &&
+            (appState.viewBackgroundColor === "transparent" ||
+              !appState.viewBackgroundColor);
+          if (!isTransparentHole) {
+            context.save();
+            context.fillStyle = applyDarkModeFilter(
+              renderConfig.canvasBackgroundColor,
+              renderConfig.theme === THEME.DARK,
+            );
+            context.fillRect(holeX, holeY, holeWidth, holeHeight);
+            context.restore();
+          } else {
+            context.clearRect(holeX, holeY, holeWidth, holeHeight);
+          }
         } else {
           context.rotate(element.angle);
 

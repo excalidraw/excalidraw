@@ -1,8 +1,9 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
@@ -18,6 +19,9 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  STROKE_WIDTH,
+  STROKE_WIDTH_KEYS,
+  type StrokeWidthKey,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -70,6 +74,7 @@ import type {
   FontFamilyValues,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
+  StrokeVariability,
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
@@ -95,6 +100,100 @@ type RestoredAppState = Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
+
+const MAX_LINEAR_PX = 75_000;
+
+// Last resort fix for extremely large linear elements (lines / arrows), which
+// would otherwise freeze the editor while rendering — e.g. a dotted or dashed
+// stroke spanning a huge distance generates an enormous dash array.
+// https://github.com/excalidraw/excalidraw/issues/11497
+const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
+  element: T,
+): T => {
+  if (element.width <= MAX_LINEAR_PX && element.height <= MAX_LINEAR_PX) {
+    return element;
+  }
+
+  const label =
+    element.type === "arrow"
+      ? `${isElbowArrow(element) ? "elbow" : "simple"} arrow`
+      : element.type;
+
+  console.error(
+    `Removing extremely large ${label} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
+  );
+
+  return {
+    ...element,
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+    isDeleted: true,
+  };
+};
+
+const restoreLinearElementPoints = (
+  points: unknown,
+  width: unknown,
+  height: unknown,
+): LocalPoint[] => {
+  const restoredPoints = Array.isArray(points)
+    ? points.reduce<LocalPoint[]>((acc, point) => {
+        if (isValidPoint(point)) {
+          acc.push(pointFrom<LocalPoint>(point[0], point[1]));
+        }
+        return acc;
+      }, [])
+    : [];
+
+  return restoredPoints.length < 2
+    ? [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(
+          isFiniteNumber(width) ? width : 0,
+          isFiniteNumber(height) ? height : 0,
+        ),
+      ]
+    : restoredPoints;
+};
+
+const restoreFreedrawPoints = (
+  points: unknown,
+  pressures: unknown,
+): {
+  points: LocalPoint[];
+  pressures: number[];
+} => {
+  if (!Array.isArray(points)) {
+    return {
+      points: [],
+      pressures: [],
+    };
+  }
+
+  const pressureValues: readonly unknown[] = Array.isArray(pressures)
+    ? pressures
+    : [];
+  const restoredPoints: LocalPoint[] = [];
+  const restoredPressures: number[] = [];
+
+  points.forEach((point, index) => {
+    if (isValidPoint(point)) {
+      restoredPoints.push(pointFrom<LocalPoint>(point[0], point[1]));
+      if (index in pressureValues) {
+        const pressure = pressureValues[index];
+        restoredPressures.push(isFiniteNumber(pressure) ? pressure : 0.5);
+      }
+    }
+  });
+
+  return {
+    points: restoredPoints,
+    pressures: restoredPressures,
+  };
+};
 
 export const AllowedExcalidrawActiveTools: Record<
   AppState["activeTool"]["type"],
@@ -123,6 +222,43 @@ export type RestoredDataState = {
   elements: OrderedExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
+};
+
+const ALLOWED_STROKE_VARIABILITIES = new Set<StrokeVariability>([
+  "constant",
+  "variable",
+]);
+
+const restoreStrokeVariability = (
+  variability: unknown,
+  defaultValue: StrokeVariability,
+): StrokeVariability => {
+  return typeof variability === "string" &&
+    ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
+    ? (variability as StrokeVariability)
+    : defaultValue;
+};
+
+const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
+  return isFiniteNumber(strokeWidth)
+    ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
+    : null;
+};
+
+const restoreFreedrawStrokeOptions = (
+  strokeOptions: unknown,
+): { variability: StrokeVariability; streamline: number } => {
+  const options =
+    strokeOptions && typeof strokeOptions === "object"
+      ? (strokeOptions as { variability?: unknown; streamline?: unknown })
+      : null;
+
+  return {
+    variability: restoreStrokeVariability(options?.variability, "variable"),
+    streamline: isFiniteNumber(options?.streamline)
+      ? options?.streamline
+      : DEFAULT_STROKE_STREAMLINE,
+  };
 };
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
@@ -412,10 +548,16 @@ export const restoreElement = (
 
       return element;
     case "freedraw": {
+      const { points, pressures } = restoreFreedrawPoints(
+        element.points,
+        element.pressures,
+      );
+
       return restoreElementWithProperties(element, {
-        points: element.points,
+        points,
         simulatePressure: element.simulatePressure,
-        pressures: element.pressures,
+        strokeOptions: restoreFreedrawStrokeOptions(element.strokeOptions),
+        pressures,
       });
     }
     case "image":
@@ -433,17 +575,23 @@ export const restoreElement = (
       const endArrowhead = normalizeArrowhead(element.endArrowhead);
       let x = element.x;
       let y = element.y;
-      let points = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
+      let points = restoreLinearElementPoints(
+        element.points,
+        element.width,
+        element.height,
+      );
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
         ({ points, x, y } =
-          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
+          LinearElementEditor.getNormalizeElementPointsAndCoords({
+            ...element,
+            points,
+            x: x ?? 0,
+            y: y ?? 0,
+          } as ExcalidrawLinearElement));
       }
 
-      return restoreElementWithProperties(element, {
+      const restoredLine = restoreElementWithProperties(element, {
         type: "line",
         startBinding: null,
         endBinding: null,
@@ -454,37 +602,46 @@ export const restoreElement = (
         y,
         ...(isLineElement(element)
           ? {
-              polygon: isValidPolygon(element.points)
+              polygon: isValidPolygon(points)
                 ? element.polygon ?? false
                 : false,
             }
           : {}),
         ...getSizeFromPoints(points),
       });
+
+      return handleOversizedLinearElements(restoredLine);
     case "arrow": {
       const startArrowhead = normalizeArrowhead(element.startArrowhead);
       const endArrowhead =
         element.endArrowhead === undefined
           ? "arrow"
           : normalizeArrowhead(element.endArrowhead);
-      const x: number | undefined = element.x;
-      const y: number | undefined = element.y;
-      const points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
-        !Array.isArray(element.points) || element.points.length < 2
-          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
-          : element.points;
+      const x = element.x as number | undefined;
+      const y = element.y as number | undefined;
+      const points = restoreLinearElementPoints(
+        element.points,
+        element.width,
+        element.height,
+      );
+      const elementWithRestoredPoints = {
+        ...element,
+        points,
+        x: x ?? 0,
+        y: y ?? 0,
+      } as ExcalidrawArrowElement;
 
       const base = {
         type: element.type,
         startBinding: repairBinding(
-          element as ExcalidrawArrowElement,
+          elementWithRestoredPoints,
           element.startBinding,
           targetElementsMap,
           existingElementsMap,
           "start",
         ),
         endBinding: repairBinding(
-          element as ExcalidrawArrowElement,
+          elementWithRestoredPoints,
           element.endBinding,
           targetElementsMap,
           existingElementsMap,
@@ -493,8 +650,8 @@ export const restoreElement = (
         startArrowhead,
         endArrowhead,
         points,
-        x,
-        y,
+        x: x ?? 0,
+        y: y ?? 0,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
       };
@@ -513,12 +670,14 @@ export const restoreElement = (
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
-      return {
+      const normalizedRestoredElement = {
         ...restoredElement,
         ...LinearElementEditor.getNormalizeElementPointsAndCoords(
           restoredElement,
         ),
       };
+
+      return handleOversizedLinearElements(normalizedRestoredElement);
     }
 
     // generic elements
@@ -666,6 +825,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
+
   const restoredElements = syncInvalidIndices(
     (targetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
@@ -762,7 +922,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
-  // NOTE (mtolmacs): Temporary fix for extremely large arrows
+  // NOTE (mtolmacs): Temporary fix for invalid/self-bound elbow arrows
   // Need to iterate again so we have attached text nodes in elementsMap
   return restoredElements.map((element) => {
     if (
@@ -940,6 +1100,13 @@ export const restoreAppState = (
     appState.boxSelectionMode ?? localAppState?.boxSelectionMode;
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
+  }
+
+  // legacy
+  if ((appState as any).currentItemStrokeWidth !== undefined) {
+    nextAppState.currentItemStrokeWidthKey =
+      getStrokeWidthKey((appState as any).currentItemStrokeWidth) ??
+      defaultAppState.currentItemStrokeWidthKey;
   }
 
   return {

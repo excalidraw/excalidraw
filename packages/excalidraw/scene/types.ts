@@ -74,8 +74,6 @@ export type InteractiveCanvasRenderConfig = {
 };
 
 export type RenderInteractiveSceneCallback = {
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 

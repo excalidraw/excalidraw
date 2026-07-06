@@ -101,6 +101,7 @@ export const actionDeselect = register({
           selectionElement: null,
           showHyperlinkPopup: false,
           suggestedBinding: null,
+          frameToHighlight: null,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
@@ -118,6 +119,7 @@ export const actionDeselect = register({
         selectionElement: null,
         showHyperlinkPopup: false,
         suggestedBinding: null,
+        frameToHighlight: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

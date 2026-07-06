@@ -14,6 +14,7 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 
 interface NewElementCanvasProps {
   appState: AppState;
+  newElement: NonNullable<AppState["newElement"]>;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
@@ -31,7 +32,7 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       {
         canvas: canvasRef.current,
         scale: props.scale,
-        newElement: props.appState.newElement,
+        newElement: props.newElement,
         elementsMap: props.elementsMap,
         allElementsMap: props.allElementsMap,
         rc: props.rc,

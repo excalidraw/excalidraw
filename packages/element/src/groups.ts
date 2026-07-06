@@ -212,7 +212,10 @@ export const selectGroupsForSelectedElements = (function () {
  * selection border around it.
  */
 export const isSelectedViaGroup = (
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    InteractiveCanvasAppState,
+    "editingGroupId" | "selectedGroupIds"
+  >,
   element: ExcalidrawElement,
 ) => getSelectedGroupForElement(appState, element) != null;
 
@@ -228,7 +231,7 @@ export const getSelectedGroupForElement = (
     .find((groupId) => appState.selectedGroupIds[groupId]);
 
 export const getSelectedGroupIds = (
-  appState: InteractiveCanvasAppState,
+  appState: Pick<InteractiveCanvasAppState, "selectedGroupIds">,
 ): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
@@ -410,7 +413,7 @@ export const getNewGroupIdsForDuplication = (
 export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
-  appState: Readonly<AppState>,
+  appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
 ): ExcalidrawElement[][] => {
   const selectedGroupIds = getSelectedGroupIds(appState);
   const unboundElements = selectedElements.filter(
