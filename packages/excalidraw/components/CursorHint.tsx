@@ -10,9 +10,9 @@ import { useApp, useExcalidrawContainer } from "./App";
 import "./CursorHint.scss";
 
 /** how long the hint stays visible before it starts fading out */
-const CURSOR_HINT_DURATION = 600;
+const CURSOR_HINT_DURATION = 700;
 /** fade-out duration (keep in sync with CursorHint.scss) */
-const CURSOR_HINT_FADE_DURATION = 50;
+const CURSOR_HINT_FADE_DURATION = 100;
 /** distance from the pointer so the hint isn't covered by the cursor */
 const CURSOR_HINT_OFFSET = 16;
 

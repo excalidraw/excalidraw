@@ -20,7 +20,7 @@
 
     animation: CursorHint-fade-in 100ms ease-out;
     // fade-out duration (keep in sync with CursorHint.tsx)
-    transition: opacity 50ms ease-out;
+    transition: opacity 100ms ease-out;
 
     &--fade-out {
       opacity: 0;
