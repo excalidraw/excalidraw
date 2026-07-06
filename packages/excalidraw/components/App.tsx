@@ -199,7 +199,6 @@ import {
   FlowChartCreator,
   FlowChartNavigator,
   getLinkDirectionFromKey,
-  cropElement,
   wrapText,
   isElementLink,
   isMeasureTextSupported,
@@ -225,7 +224,6 @@ import {
   makeNextSelectedElementIds,
   getResizeOffsetXY,
   getResizeArrowDirection,
-  transformElements,
   getCursorForResizingElement,
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
@@ -405,7 +403,6 @@ import {
   snapDraggedElements,
   isActiveToolNonLinearSnappable,
   snapNewElement,
-  snapResizingElements,
   isSnappingEnabled,
   getVisibleGaps,
   getReferenceSnapPoints,
@@ -441,6 +438,11 @@ import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 import { AnimationController } from "../renderer/animation";
+import {
+  resizeKeyUpFromPointerDownHandler,
+  resizeOnKeyDownFromPointerDownHandler,
+  resizePointerMoveFromPointerDownHandler,
+} from "../resize";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -9994,9 +9996,12 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
-      if (this.maybeHandleResize(pointerDownState, event)) {
+      if (
+        resizeOnKeyDownFromPointerDownHandler(this, pointerDownState, event)
+      ) {
         return;
       }
+
       this.maybeDragNewGenericElement(pointerDownState, event);
     });
   }
@@ -10007,9 +10012,11 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
-      if (this.maybeHandleResize(pointerDownState, event)) {
+
+      if (resizeKeyUpFromPointerDownHandler(this, pointerDownState, event)) {
         return;
       }
+
       this.maybeDragNewGenericElement(pointerDownState, event);
     });
   }
@@ -10122,15 +10129,10 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
-      if (pointerDownState.resize.isResizing) {
-        pointerDownState.lastCoords.x = pointerCoords.x;
-        pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.maybeHandleCrop(pointerDownState, event)) {
-          return true;
-        }
-        if (this.maybeHandleResize(pointerDownState, event)) {
-          return true;
-        }
+      if (
+        resizePointerMoveFromPointerDownHandler(this, pointerDownState, event)
+      ) {
+        return true;
       }
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -12790,229 +12792,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
       });
     }
-  };
-
-  private maybeHandleCrop = (
-    pointerDownState: PointerDownState,
-    event: MouseEvent | KeyboardEvent,
-  ): boolean => {
-    // to crop, we must already be in the cropping mode, where croppingElement has been set
-    if (!this.state.croppingElementId) {
-      return false;
-    }
-
-    const transformHandleType = pointerDownState.resize.handleType;
-    const pointerCoords = pointerDownState.lastCoords;
-    const [x, y] = getGridPoint(
-      pointerCoords.x - pointerDownState.resize.offset.x,
-      pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-    );
-
-    const croppingElement = this.scene
-      .getNonDeletedElementsMap()
-      .get(this.state.croppingElementId);
-
-    if (
-      transformHandleType &&
-      croppingElement &&
-      isImageElement(croppingElement)
-    ) {
-      const croppingAtStateStart = pointerDownState.originalElements.get(
-        croppingElement.id,
-      );
-
-      const image =
-        isInitializedImageElement(croppingElement) &&
-        this.imageCache.get(croppingElement.fileId)?.image;
-
-      if (
-        croppingAtStateStart &&
-        isImageElement(croppingAtStateStart) &&
-        image &&
-        !(image instanceof Promise)
-      ) {
-        const [gridX, gridY] = getGridPoint(
-          pointerCoords.x,
-          pointerCoords.y,
-          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-        );
-
-        const dragOffset = {
-          x: gridX - pointerDownState.originInGrid.x,
-          y: gridY - pointerDownState.originInGrid.y,
-        };
-
-        this.maybeCacheReferenceSnapPoints(event, [croppingElement]);
-
-        const { snapOffset, snapLines } = snapResizingElements(
-          [croppingElement],
-          [croppingAtStateStart],
-          this,
-          event,
-          dragOffset,
-          transformHandleType,
-        );
-
-        this.scene.mutateElement(
-          croppingElement,
-          cropElement(
-            croppingElement,
-            this.scene.getNonDeletedElementsMap(),
-            transformHandleType,
-            image.naturalWidth,
-            image.naturalHeight,
-            x + snapOffset.x,
-            y + snapOffset.y,
-            event.shiftKey
-              ? croppingAtStateStart.width / croppingAtStateStart.height
-              : undefined,
-          ),
-        );
-
-        updateBoundElements(croppingElement, this.scene);
-
-        this.setState({
-          isCropping: transformHandleType && transformHandleType !== "rotation",
-          snapLines,
-        });
-      }
-
-      return true;
-    }
-
-    return false;
-  };
-
-  private maybeHandleResize = (
-    pointerDownState: PointerDownState,
-    event: MouseEvent | KeyboardEvent,
-  ): boolean => {
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    const selectedFrames = selectedElements.filter(
-      (element): element is ExcalidrawFrameLikeElement =>
-        isFrameLikeElement(element),
-    );
-
-    const transformHandleType = pointerDownState.resize.handleType;
-
-    if (
-      // Frames cannot be rotated.
-      (selectedFrames.length > 0 && transformHandleType === "rotation") ||
-      // Elbow arrows cannot be transformed (resized or rotated).
-      (selectedElements.length === 1 && isElbowArrow(selectedElements[0])) ||
-      // Do not resize when in crop mode
-      this.state.croppingElementId
-    ) {
-      return false;
-    }
-
-    this.setState({
-      // TODO: rename this state field to "isScaling" to distinguish
-      // it from the generic "isResizing" which includes scaling and
-      // rotating
-      isResizing: transformHandleType && transformHandleType !== "rotation",
-      isRotating: transformHandleType === "rotation",
-      activeEmbeddable: null,
-    });
-    const pointerCoords = pointerDownState.lastCoords;
-    let [resizeX, resizeY] = getGridPoint(
-      pointerCoords.x - pointerDownState.resize.offset.x,
-      pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-    );
-
-    const frameElementsOffsetsMap = new Map<
-      string,
-      {
-        x: number;
-        y: number;
-      }
-    >();
-
-    selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameChildren(
-        this.scene.getNonDeletedElements(),
-        frame.id,
-      );
-
-      elementsInFrame.forEach((element) => {
-        frameElementsOffsetsMap.set(frame.id + element.id, {
-          x: element.x - frame.x,
-          y: element.y - frame.y,
-        });
-      });
-    });
-
-    // check needed for avoiding flickering when a key gets pressed
-    // during dragging
-    if (!this.state.selectedElementsAreBeingDragged) {
-      const [gridX, gridY] = getGridPoint(
-        pointerCoords.x,
-        pointerCoords.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-      );
-
-      const dragOffset = {
-        x: gridX - pointerDownState.originInGrid.x,
-        y: gridY - pointerDownState.originInGrid.y,
-      };
-
-      const originalElements = [...pointerDownState.originalElements.values()];
-
-      this.maybeCacheReferenceSnapPoints(event, selectedElements);
-
-      const { snapOffset, snapLines } = snapResizingElements(
-        selectedElements,
-        getSelectedElements(originalElements, this.state),
-        this,
-        event,
-        dragOffset,
-        transformHandleType,
-      );
-
-      resizeX += snapOffset.x;
-      resizeY += snapOffset.y;
-
-      this.setState({
-        snapLines,
-      });
-    }
-
-    if (
-      transformElements(
-        pointerDownState.originalElements,
-        transformHandleType,
-        selectedElements,
-        this.scene,
-        shouldRotateWithDiscreteAngle(event),
-        shouldResizeFromCenter(event),
-        selectedElements.some((element) => isImageElement(element))
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
-        resizeX,
-        resizeY,
-        pointerDownState.resize.center.x,
-        pointerDownState.resize.center.y,
-      )
-    ) {
-      const elementsToHighlight = new Set<ExcalidrawElement>();
-      selectedFrames.forEach((frame) => {
-        getElementsInResizingFrame(
-          this.scene.getNonDeletedElements(),
-          frame,
-          this.state,
-          this.scene.getNonDeletedElementsMap(),
-        ).forEach((element) => elementsToHighlight.add(element));
-      });
-
-      this.setState({
-        elementsToHighlight: [...elementsToHighlight],
-      });
-
-      return true;
-    }
-    return false;
   };
 
   private getContextMenuItems = (
