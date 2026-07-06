@@ -462,6 +462,7 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { CursorHint, cursorHintAtom } from "./CursorHint";
 import {
+  LineIcon,
   MagicIcon,
   copyIcon,
   fullscreenIcon,
@@ -653,6 +654,13 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
+
+const getArrowTypeIcon = (arrowType: AppState["currentItemArrowType"]) =>
+  arrowType === ARROW_TYPE.elbow
+    ? elbowArrowIcon
+    : arrowType === ARROW_TYPE.round
+    ? roundArrowIcon
+    : sharpArrowIcon;
 
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
@@ -5340,13 +5348,13 @@ class App extends React.Component<AppProps, AppState> {
                 ? ARROW_TYPE.elbow
                 : ARROW_TYPE.sharp;
             this.setState({ currentItemArrowType: nextArrowType });
+            this.showCursorHint(getArrowTypeIcon(nextArrowType));
+          } else if (shape === "arrow") {
             this.showCursorHint(
-              nextArrowType === ARROW_TYPE.elbow
-                ? elbowArrowIcon
-                : nextArrowType === ARROW_TYPE.round
-                ? roundArrowIcon
-                : sharpArrowIcon,
+              getArrowTypeIcon(this.state.currentItemArrowType),
             );
+          } else if (shape === "line") {
+            this.showCursorHint(LineIcon);
           }
 
           if (shape === "lasso" && this.state.activeTool.type === "laser") {

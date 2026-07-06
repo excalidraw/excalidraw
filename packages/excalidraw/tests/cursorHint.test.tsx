@@ -51,10 +51,45 @@ describe("cursor hint", () => {
     });
   });
 
-  it("does not show hint when merely switching to the arrow tool", () => {
+  it("shows hint when switching to the arrow tool via shortcut", () => {
     UI.clickTool("rectangle");
 
     pressKey(KEYS.A);
+
+    expect(h.state.activeTool.type).toBe("arrow");
+    expect(getCursorHint()).not.toBeNull();
+  });
+
+  it("shows hint when picking the line tool via shortcut", () => {
+    pressKey(KEYS.L);
+
+    expect(h.state.activeTool.type).toBe("line");
+    expect(getCursorHint()).not.toBeNull();
+  });
+
+  it("shows hint when picking a tool via numeric shortcut", () => {
+    pressKey("6");
+
+    expect(h.state.activeTool.type).toBe("line");
+    expect(getCursorHint()).not.toBeNull();
+  });
+
+  it("hides hint immediately on pointerdown", () => {
+    UI.clickTool("arrow");
+
+    pressKey(KEYS.A);
+    expect(getCursorHint()).not.toBeNull();
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 100,
+      clientY: 100,
+    });
+
+    expect(getCursorHint()).toBeNull();
+  });
+
+  it("does not show hint when picking a tool via toolbar", () => {
+    UI.clickTool("arrow");
 
     expect(h.state.activeTool.type).toBe("arrow");
     expect(getCursorHint()).toBeNull();
