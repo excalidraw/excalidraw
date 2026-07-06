@@ -402,14 +402,8 @@ export const getHoveredElementForBinding = (
       }
 
       const [x1, y1, x2, y2] = getElementBounds(c.element, elementsMap);
-      const overlapWidth = Math.max(
-        0,
-        Math.min(x2, cx2) - Math.max(x1, cx1),
-      );
-      const overlapHeight = Math.max(
-        0,
-        Math.min(y2, cy2) - Math.max(y1, cy1),
-      );
+      const overlapWidth = Math.max(0, Math.min(x2, cx2) - Math.max(x1, cx1));
+      const overlapHeight = Math.max(0, Math.min(y2, cy2) - Math.max(y1, cy1));
       const area = Math.max(0.00001, Math.abs(x2 - x1) * Math.abs(y2 - y1));
       const overlapPercent = (overlapHeight * overlapWidth) / area;
 
