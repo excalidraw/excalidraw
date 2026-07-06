@@ -71,6 +71,13 @@ export const CursorHint = () => {
     };
   }, [nonce, container, app]);
 
+  // hints are transient — don't let a stale one reappear on remount
+  useEffect(() => {
+    return () => {
+      setHint(null);
+    };
+  }, [setHint]);
+
   useEffect(() => {
     if (nonce == null) {
       return;
@@ -85,9 +92,21 @@ export const CursorHint = () => {
       setHint(null);
     }, CURSOR_HINT_DURATION + CURSOR_HINT_FADE_DURATION);
 
+    // hide immediately when the user starts interacting (e.g. drawing)
+    // so the hint doesn't get in the way
+    const onPointerDown = () => {
+      setHint(null);
+    };
+    window.addEventListener(EVENT.POINTER_DOWN, onPointerDown, {
+      capture: true,
+    });
+
     return () => {
       window.clearTimeout(fadeTimer);
       window.clearTimeout(hideTimer);
+      window.removeEventListener(EVENT.POINTER_DOWN, onPointerDown, {
+        capture: true,
+      });
     };
   }, [nonce, setHint]);
 
