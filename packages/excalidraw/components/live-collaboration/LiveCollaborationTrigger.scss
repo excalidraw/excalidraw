@@ -61,6 +61,6 @@
     background-color: $color-green-2;
     color: $color-green-9;
     font-size: 0.6rem;
-    font-family: "Cascadia";
+    font-family: var(--ui-font);
   }
 }
