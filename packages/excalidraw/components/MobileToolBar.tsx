@@ -461,7 +461,7 @@ export const MobileToolBar = ({
             icon={laserPointerToolIcon}
             data-testid="toolbar-annotation"
             selected={annotationToolSelected}
-            shortcut={KEYS.Z.toLocaleUpperCase()}
+            shortcut={KEYS.W.toLocaleUpperCase()}
           >
             {t("toolBar.annotation")}
           </DropdownMenu.Item>
