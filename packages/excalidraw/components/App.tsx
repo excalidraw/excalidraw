@@ -112,7 +112,6 @@ import {
   isSelectionLikeTool,
   oneOf,
   getElementBoundsFromPoints,
-  ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
   getStrokeWidthByKey,
 } from "@excalidraw/common";
 
@@ -267,6 +266,7 @@ import {
   isEligibleFrameChildType,
   convertToShape,
   getBindingStrategyForDraggingBindingElementEndpoints,
+  convertToShapeHandlePointerMoveFromPointerDown,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -295,7 +295,6 @@ import type {
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   ExcalidrawBindableElement,
-  ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -9801,47 +9800,7 @@ class App extends React.Component<AppProps, AppState> {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
-      if (this.state.activeTool.type === "drawShape") {
-        this.drawShapeTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
-      }
-
-      // Set up drawShape tool preview
-      if (this.state.activeTool.type === "drawShape") {
-        const drawShapeTrailPoints = this.drawShapeTrail.getCurrentPoints();
-        if (drawShapeTrailPoints.length >= 3) {
-          const [minX, minY, maxX, maxY] =
-            getElementBoundsFromPoints(drawShapeTrailPoints);
-          const width = maxX - minX;
-          const height = maxY - minY;
-
-          if (width > 2 && height > 2) {
-            const shapePreview = convertToShape(
-              drawShapeTrailPoints,
-              this.state,
-              this.scene.getNonDeletedElementsMap(),
-              this.state.newElement,
-            ) as ExcalidrawNonSelectionElement | undefined;
-
-            if (shapePreview) {
-              this.setState({
-                newElement: {
-                  ...shapePreview,
-                  seed: 1,
-                  opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
-                },
-              });
-            } else {
-              this.setState({
-                newElement: null,
-              });
-            }
-          } else {
-            this.setState({
-              newElement: null,
-            });
-          }
-        }
-
+      if (convertToShapeHandlePointerMoveFromPointerDown(this, pointerCoords)) {
         return;
       }
 
@@ -11649,6 +11608,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state,
                 this.scene.getNonDeletedElementsMap(),
                 this.state.newElement,
+                this.scene.getNonDeletedFramesLikes(),
               );
 
             if (detectedElement) {

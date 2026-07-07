@@ -5,13 +5,14 @@ import {
   newLinearElement,
 } from "@excalidraw/element/newElement";
 import {
+  ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
   getElementBoundsFromPoints,
   getStrokeWidthByKey,
   ROUNDNESS,
 } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { App, AppState } from "@excalidraw/excalidraw/types";
 
 import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
@@ -21,13 +22,15 @@ import type {
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawFrameLikeElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ElementsMap,
+  ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
 import { getFrameLikeElements } from "./frame";
-import { isUsingAdaptiveRadius } from "./typeChecks";
+import { isLinearElement, isUsingAdaptiveRadius } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 
 // A simplified Protractor recognizer (Yang Li, 2010) customized forour specific
@@ -221,49 +224,70 @@ function vectorise<P extends LocalPoint | GlobalPoint>(
   return v;
 }
 
+// Scratch buffers for the rolling two-row Fréchet DP. Preallocated at module
+// scope so the hot recognition path (invoked per pointermove) allocates nothing
+// per call. `frechetDistance` is synchronous and non-reentrant, so sharing is
+// safe.
+const _frechetRowA = new Float64Array(PROTRACTOR_N);
+const _frechetRowB = new Float64Array(PROTRACTOR_N);
+
 // Discrete Fréchet distance between two parameterized curves.
 //
 // This is curve-aware (not just point-to-point), so it penalizes structural
 // mismatches like direction reversal in the arrow template vs a monotonic line.
 //
-// Returns a raw distance in [0, 2*sqrt(2)] for unit-magnitude vectors.
-function frechetDistance(v1: Vec, v2: Vec): number {
+// Uses a rolling two-row DP (O(n) memory, zero per-call allocation) instead of
+// a full n×n matrix. `maxDist` is the best (smallest) distance found so far
+// across templates: because the DP frontier row's minimum is monotonically
+// non-decreasing, once an entire row exceeds `maxDist` the final coupling
+// distance is provably >= `maxDist`, so we early-abandon with Infinity rather
+// than finishing the matrix. This is behaviour-preserving for callers that only
+// compare the result against `maxDist`.
+//
+// Returns a raw distance in [0, 2*sqrt(2)] for unit-magnitude vectors (or
+// Infinity when early-abandoned).
+function frechetDistance(v1: Vec, v2: Vec, maxDist: number = Infinity): number {
   const n = v1.length / 2;
-  const INF = Infinity;
+  let prev = _frechetRowA;
+  let curr = _frechetRowB;
 
-  // F[i][j] = min Fréchet distance aligning v1[0..i] with v2[0..j]
-  const F: number[][] = Array.from({ length: n }, () => new Array(n).fill(INF));
-
-  // Base case
-  F[0][0] = Math.hypot(v1[0] - v2[0], v1[1] - v2[1]);
-
-  // First column: v1[0..i] aligned with v2[0]
-  for (let i = 1; i < n; i++) {
-    const ptDist = Math.hypot(v1[2 * i] - v2[0], v1[2 * i + 1] - v2[1]);
-    F[i][0] = Math.max(F[i - 1][0], ptDist);
-  }
-
-  // First row: v1[0] aligned with v2[0..j]
+  // Row 0: v1[0] aligned with v2[0..j]
+  prev[0] = Math.hypot(v1[0] - v2[0], v1[1] - v2[1]);
   for (let j = 1; j < n; j++) {
     const ptDist = Math.hypot(v1[0] - v2[2 * j], v1[1] - v2[2 * j + 1]);
-    F[0][j] = Math.max(F[0][j - 1], ptDist);
+    prev[j] = Math.max(prev[j - 1], ptDist);
   }
 
-  // Fill the DP table
   for (let i = 1; i < n; i++) {
+    const x = v1[2 * i];
+    const y = v1[2 * i + 1];
+
+    // First column: v1[0..i] aligned with v2[0]
+    curr[0] = Math.max(prev[0], Math.hypot(x - v2[0], y - v2[1]));
+    let rowMin = curr[0];
+
     for (let j = 1; j < n; j++) {
-      const ptDist = Math.hypot(
-        v1[2 * i] - v2[2 * j],
-        v1[2 * i + 1] - v2[2 * j + 1],
-      );
-      F[i][j] = Math.max(
-        Math.min(F[i - 1][j], F[i][j - 1], F[i - 1][j - 1]),
-        ptDist,
-      );
+      const ptDist = Math.hypot(x - v2[2 * j], y - v2[2 * j + 1]);
+      const best = Math.min(prev[j], curr[j - 1], prev[j - 1]);
+      const val = best > ptDist ? best : ptDist;
+      curr[j] = val;
+      if (val < rowMin) {
+        rowMin = val;
+      }
     }
+
+    // Early abandon: the whole frontier row is already worse than the best
+    // match found so far, so this template cannot win.
+    if (rowMin > maxDist) {
+      return Infinity;
+    }
+
+    const tmp = prev;
+    prev = curr;
+    curr = tmp;
   }
 
-  return F[n - 1][n - 1];
+  return prev[n - 1];
 }
 
 // Convert a Fréchet distance to a similarity score in [0, 1].
@@ -762,44 +786,37 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   const candidateVecRotInv = vectorise(resampled, true);
   const candidateVecRotInvRev = vectorise(resampledRev, true);
 
-  let bestScore = -1;
+  // Track the smallest Fréchet distance (= highest score) so we can feed it
+  // back into frechetDistance as an early-abandon threshold. Distance is
+  // monotonic in score, so tracking min-distance is equivalent to the previous
+  // max-score logic, and passing the running best lets each template bail as
+  // soon as it can no longer win.
+  let bestDist = Infinity;
   let bestType: Shape = "freedraw";
 
-  if (previousElement?.type === "arrow") {
-    for (const tmpl of ARROW_TEMPLATES) {
-      const cv = tmpl.rotationInvariant
-        ? candidateVecRotInv
-        : candidateVecFixed;
-      const cvRev = tmpl.rotationInvariant
-        ? candidateVecRotInvRev
-        : candidateVecFixedRev;
-      const score = Math.max(
-        frechetScore(frechetDistance(cv, tmpl.vec)),
-        frechetScore(frechetDistance(cvRev, tmpl.vec)),
-      );
-      if (score > bestScore) {
-        bestScore = score;
-        bestType = tmpl.type;
-      }
+  const templates =
+    previousElement?.type === "arrow" ? ARROW_TEMPLATES : TEMPLATES;
+
+  for (const tmpl of templates) {
+    const cv = tmpl.rotationInvariant ? candidateVecRotInv : candidateVecFixed;
+    const cvRev = tmpl.rotationInvariant
+      ? candidateVecRotInvRev
+      : candidateVecFixedRev;
+
+    const distFwd = frechetDistance(cv, tmpl.vec, bestDist);
+    if (distFwd < bestDist) {
+      bestDist = distFwd;
+      bestType = tmpl.type;
     }
-  } else {
-    for (const tmpl of TEMPLATES) {
-      const cv = tmpl.rotationInvariant
-        ? candidateVecRotInv
-        : candidateVecFixed;
-      const cvRev = tmpl.rotationInvariant
-        ? candidateVecRotInvRev
-        : candidateVecFixedRev;
-      const score = Math.max(
-        frechetScore(frechetDistance(cv, tmpl.vec)),
-        frechetScore(frechetDistance(cvRev, tmpl.vec)),
-      );
-      if (score > bestScore) {
-        bestScore = score;
-        bestType = tmpl.type;
-      }
+
+    const distRev = frechetDistance(cvRev, tmpl.vec, bestDist);
+    if (distRev < bestDist) {
+      bestDist = distRev;
+      bestType = tmpl.type;
     }
   }
+
+  const bestScore = frechetScore(bestDist);
 
   let type: Shape;
   if (
@@ -816,20 +833,28 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   return { type, points, boundingBox };
 };
 
-// Converts a freedraw element to the detected shape
+// Converts a freedraw element to the detected shape.
+//
+// `frames` lets callers pass the scene's cached frame-like elements (e.g.
+// scene.getNonDeletedFramesLikes()) to avoid spreading and re-filtering the
+// whole element map on every invocation; when omitted it is derived from
+// `elementsMap`.
 export const convertToShape = (
   points: GlobalPoint[],
   appState: AppState,
   elementsMap: ElementsMap,
   previousElement: ExcalidrawElement | null,
+  frames?: readonly ExcalidrawFrameLikeElement[],
 ): ExcalidrawElement | undefined => {
   const recognizedShape = recognizeShape(points, previousElement);
 
   const boundingBox = recognizedShape.boundingBox;
   const [minX, minY, maxX, maxY] = boundingBox;
 
+  const frameLikeElements =
+    frames ?? getFrameLikeElements([...elementsMap.values()]);
   const frameId =
-    getFrameLikeElements([...elementsMap.values()]).find((frame) => {
+    frameLikeElements.find((frame) => {
       const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
       return fx1 <= minX && fy1 <= minY && fx2 >= maxX && fy2 >= maxY;
     })?.id ?? null;
@@ -1012,4 +1037,96 @@ export const convertToShape = (
   }
 
   return undefined;
+};
+
+// Whether two drawShape preview elements are visually identical, so a redundant
+// preview recompute on pointermove can skip setState (avoiding a no-op React
+// re-render and roughjs shape regeneration).
+const isDrawShapePreviewEqual = (
+  a: ExcalidrawNonSelectionElement | null,
+  b: ExcalidrawNonSelectionElement,
+): boolean => {
+  if (
+    !a ||
+    a.type !== b.type ||
+    a.x !== b.x ||
+    a.y !== b.y ||
+    a.width !== b.width ||
+    a.height !== b.height ||
+    a.angle !== b.angle
+  ) {
+    return false;
+  }
+  if (isLinearElement(a) && isLinearElement(b)) {
+    if (a.points.length !== b.points.length) {
+      return false;
+    }
+    for (let i = 0; i < a.points.length; i++) {
+      if (
+        a.points[i][0] !== b.points[i][0] ||
+        a.points[i][1] !== b.points[i][1]
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+// Append to the trail and recompute the shape preview. This runs inside
+// withBatchedUpdatesThrottled (throttleRAF), so it fires at most once per
+// animation frame regardless of raw pointermove rate.
+export const convertToShapeHandlePointerMoveFromPointerDown = (
+  app: App,
+  pointerCoords: { x: number; y: number },
+) => {
+  if (app.state.activeTool.type === "drawShape") {
+    app.drawShapeTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+
+    const drawShapeTrailPoints = app.drawShapeTrail.getCurrentPoints();
+    if (drawShapeTrailPoints.length >= 3) {
+      const [minX, minY, maxX, maxY] =
+        getElementBoundsFromPoints(drawShapeTrailPoints);
+      const width = maxX - minX;
+      const height = maxY - minY;
+
+      if (width > 2 && height > 2) {
+        const shapePreview = convertToShape(
+          drawShapeTrailPoints,
+          app.state,
+          app.scene.getNonDeletedElementsMap(),
+          app.state.newElement,
+          app.scene.getNonDeletedFramesLikes(),
+        ) as ExcalidrawNonSelectionElement | undefined;
+
+        if (shapePreview) {
+          const prevPreview = app.state.newElement;
+          const nextPreview = {
+            ...shapePreview,
+            // Keep a stable id across the gesture while the recognized type
+            // is unchanged, so the preview element's identity doesn't churn
+            // frame to frame.
+            id:
+              prevPreview?.type === shapePreview.type
+                ? prevPreview.id
+                : shapePreview.id,
+            seed: 1,
+            opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
+          } as ExcalidrawNonSelectionElement;
+
+          if (!isDrawShapePreviewEqual(prevPreview, nextPreview)) {
+            app.setState({ newElement: nextPreview });
+          }
+        } else if (app.state.newElement !== null) {
+          app.setState({ newElement: null });
+        }
+      } else if (app.state.newElement !== null) {
+        app.setState({ newElement: null });
+      }
+    }
+
+    return true;
+  }
+
+  return false;
 };
