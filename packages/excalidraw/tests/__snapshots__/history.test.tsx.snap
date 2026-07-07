@@ -12703,12 +12703,11 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "roughness": 1,
   "roundness": null,
   "simulatePressure": false,
-  "strokeColor": "#e03131",
+  "strokeColor": "#1e1e1e",
   "strokeOptions": {
     "streamline": "0.50000",
     "variability": "constant",
   },
-  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "freedraw",
