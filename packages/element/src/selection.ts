@@ -19,6 +19,8 @@ import { getFrameChildren } from "./frame";
 import { LinearElementEditor } from "./linearElementEditor";
 import { selectGroupsForSelectedElements } from "./groups";
 
+import { isNonDeletedElement } from ".";
+
 import type {
   ElementsMap,
   ElementsMapOrArray,
@@ -169,8 +171,14 @@ export const getSelectedElements = (
   const selectedElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements.values()) {
     if (appState.selectedElementIds[element.id]) {
-      selectedElements.push(element as NonDeletedExcalidrawElement);
-      addedElements.add(element.id);
+      if (isNonDeletedElement(element)) {
+        selectedElements.push(element as NonDeletedExcalidrawElement);
+        addedElements.add(element.id);
+      } else {
+        console.error(
+          "[NONDELETED][INVARIANT] getSelectedElements skipping deleted selected element which should not be in the selection",
+        );
+      }
       continue;
     }
     if (
