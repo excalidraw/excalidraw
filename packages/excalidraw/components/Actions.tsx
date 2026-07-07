@@ -459,7 +459,9 @@ const CombinedArrowProperties = ({
   container: HTMLDivElement | null;
   app: AppClassProperties;
 }) => {
-  const showArrowProperties = toolIsArrow(appState.activeTool.type);
+  const showArrowProperties =
+    toolIsArrow(appState.activeTool.type) ||
+    targetElements.some((element) => toolIsArrow(element.type));
 
   if (!showArrowProperties) {
     return null;

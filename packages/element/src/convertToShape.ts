@@ -891,8 +891,8 @@ export const convertToShape = (
         globalEndY - arrowY,
       );
       const arrowLen = Math.hypot(
-        endPoint[0] - recognizedShape.points[0][0],
-        endPoint[1] - recognizedShape.points[0][1],
+        globalEndX - recognizedShape.points[0][0],
+        globalEndY - recognizedShape.points[0][1],
       );
       if (arrowLen < 60) {
         const tempElement = newLinearElement({

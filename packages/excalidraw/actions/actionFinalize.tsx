@@ -519,7 +519,7 @@ function handleDrawShapeArrowConversion(
       backgroundColor: line.backgroundColor,
       fillStyle: line.fillStyle,
       roughness: line.roughness,
-      opacity: line.opacity,
+      opacity: appState.currentItemOpacity,
       strokeStyle: line.strokeStyle,
       strokeWidth: line.strokeWidth,
     });

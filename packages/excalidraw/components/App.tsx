@@ -7082,6 +7082,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
+      const { newElement } = this.state;
       if (!newElement && isBindingEnabled(this.state)) {
         const globalPoint = pointFrom<GlobalPoint>(
           scenePointerX,
