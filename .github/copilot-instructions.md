@@ -2,7 +2,7 @@
 
 ## Generic Communication Guidelines
 
-- Be succint and be aware that expansive generative AI answers are costly and slow
+- Be succinct and be aware that expansive generative AI answers are costly and slow
 - Avoid providing explanations, trying to teach unless asked for, your chat partner is an expert
 - Stop apologising if corrected, just provide the correct information or code
 - Prefer code unless asked for explanation

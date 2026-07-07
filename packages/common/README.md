@@ -6,7 +6,7 @@
 npm install @excalidraw/common
 ```
 
-If you prefer Yarn over npm, use this command to install the Excalidraw utils package:
+If you prefer Yarn over npm, use this command to install the package:
 
 ```bash
 yarn add @excalidraw/common
