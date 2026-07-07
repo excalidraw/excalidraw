@@ -9196,22 +9196,38 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
-    const element = this.getElementAtPosition(sceneX, sceneY, {
-      includeBoundTextElement: true,
-    });
+    const containerAtPosition = this.getTextBindableContainerAtPosition(
+      sceneX,
+      sceneY,
+    );
+    let container: ExcalidrawTextContainer | null = null;
 
-    // FIXME
-    let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+    if (containerAtPosition && !event[KEYS.CTRL_OR_CMD]) {
+      const existingBoundText = getBoundTextElement(
+        containerAtPosition,
+        this.scene.getNonDeletedElementsMap(),
+      );
 
-    if (hasBoundTextElement(element)) {
-      container = element as ExcalidrawTextContainer;
-      sceneX = element.x + element.width / 2;
-      sceneY = element.y + element.height / 2;
+      if (existingBoundText) {
+        container = containerAtPosition;
+        sceneX = existingBoundText.x + existingBoundText.width / 2;
+        sceneY = existingBoundText.y + existingBoundText.height / 2;
+      } else if (
+        this.getTextWysiwygSnappedToCenterPosition(
+          sceneX,
+          sceneY,
+          this.state,
+          containerAtPosition,
+        )
+      ) {
+        container = containerAtPosition;
+      }
     }
+
     this.startTextEditing({
       sceneX,
       sceneY,
-      insertAtParentCenter: !event.altKey,
+      insertAtParentCenter: !event[KEYS.CTRL_OR_CMD],
       container,
       autoEdit: false,
       initialCaretSceneCoords: { x: sceneX, y: sceneY },
