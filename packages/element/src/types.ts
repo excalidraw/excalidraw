@@ -445,6 +445,10 @@ export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
 
+export type NonDeletedElementsMapOrArray =
+  | readonly NonDeletedExcalidrawElement[]
+  | Readonly<NonDeletedElementsMap | NonDeletedSceneElementsMap>;
+
 export type ExcalidrawLinearElementSubType =
   | "line"
   | "sharpArrow"

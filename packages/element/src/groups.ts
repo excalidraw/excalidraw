@@ -18,6 +18,7 @@ import type {
   ElementsMapOrArray,
   ElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedElementsMapOrArray,
 } from "./types";
 
 export const selectGroup = (
@@ -288,7 +289,9 @@ export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
 export const getElementsInGroup = <
   P extends NonDeletedExcalidrawElement | ExcalidrawElement,
 >(
-  elements: ElementsMapOrArray,
+  elements: P extends NonDeletedExcalidrawElement
+    ? NonDeletedElementsMapOrArray
+    : ElementsMapOrArray,
   groupId: string,
 ): P[] => {
   const elementsInGroup: P[] = [];
