@@ -1,0 +1,42 @@
+---
+description: Add purpose comments when creating new code
+alwaysApply: true
+---
+
+# Comments in New Code
+
+When adding **new** files, components, functions, or non-trivial logic blocks, include brief comments that explain **why** the code exists and what it does.
+
+## What to comment
+
+- **New files**: A short header comment describing the feature or module's role.
+- **New exports** (components, hooks, classes, utilities): A one-line doc comment on purpose and when to use it.
+- **Non-obvious logic**: Comments for placement algorithms, shortcuts, state resets, side effects, or integration points with external APIs.
+
+## What to skip
+
+- Do not narrate obvious code (`// increment i`).
+- Do not comment unchanged existing code unless you are modifying it.
+- Prefer self-explanatory names; use comments where intent is not clear from the code alone.
+
+## Examples
+
+```typescript
+// ❌ BAD — no context on a new feature module
+export const BrainstormMode = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  // ...
+};
+
+// ✅ GOOD — new component explains its purpose
+/** Rapid sticky-note capture overlay toggled by Cmd/Ctrl+Shift+B. */
+export const BrainstormMode = () => {
+  // ...
+};
+
+// ✅ GOOD — non-obvious placement logic
+// Cascade stickies diagonally from viewport center; wrap after 8 to stay on screen.
+const col = dropIndex % CASCADE_WRAP;
+```
+
+Keep comments concise (1–2 lines). Update or remove comments when behavior changes.

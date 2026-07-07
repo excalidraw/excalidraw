@@ -70,7 +70,7 @@
     "arrowtype_elbowed": "Elbow arrow",
     "fontSize": "Font size",
     "fontFamily": "Font family",
-    "addWatermark": "Add \"Made with Excalidraw\"",
+    "addWatermark": "Add \"Made with Adobe\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
     "code": "Code",
@@ -105,7 +105,7 @@
     "untitled": "Untitled",
     "name": "Name",
     "yourName": "Your name",
-    "madeWithExcalidraw": "Made with Excalidraw",
+    "madeWithExcalidraw": "Made with Adobe",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
@@ -135,7 +135,7 @@
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
     "personalLib": "Personal Library",
-    "excalidrawLib": "Excalidraw Library",
+    "excalidrawLib": "Adobe Library",
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
@@ -177,7 +177,7 @@
     "zoomToFitViewport": "Zoom to fit in viewport",
     "zoomToFitSelection": "Zoom to fit selection",
     "zoomToFit": "Zoom to fit all elements",
-    "installPWA": "Install Excalidraw locally (PWA)",
+    "installPWA": "Install Adobe Whiteboard locally (PWA)",
     "autoResize": "Enable text auto-resizing",
     "imageCropping": "Image cropping",
     "unCroppedDimension": "Uncropped dimension",
@@ -269,7 +269,7 @@
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard.",
     "decryptFailed": "Couldn't decrypt data.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Adobe's servers and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
     "errorAddingToLibrary": "Couldn't add item to the library",
@@ -277,7 +277,7 @@
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "This image does not seem to contain any scene data. Have you enabled scene embedding during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
-    "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
+    "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Adobe JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
@@ -333,7 +333,7 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "mermaidToExcalidraw": "Mermaid to Adobe Whiteboard",
     "convertElementType": "Toggle shape type"
   },
   "element": {
@@ -411,7 +411,7 @@
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
     "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version.",
-    "shareTitle": "Join a live collaboration session on Excalidraw"
+    "shareTitle": "Join a live collaboration session on Adobe Whiteboard"
   },
   "errorDialog": {
     "title": "Error"
@@ -427,9 +427,9 @@
     "link_title": "Shareable link",
     "link_details": "Export as a read-only link.",
     "link_button": "Export to Link",
-    "excalidrawplus_description": "Save the scene to your Excalidraw+ workspace.",
+    "excalidrawplus_description": "Save the scene to your Adobe+ workspace.",
     "excalidrawplus_button": "Export",
-    "excalidrawplus_exportError": "Couldn't export to Excalidraw+ at this moment..."
+    "excalidrawplus_exportError": "Couldn't export to Adobe+ at this moment..."
   },
   "helpDialog": {
     "blog": "Read our blog",
@@ -528,8 +528,8 @@
     }
   },
   "encrypted": {
-    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
-    "link": "Blog post on end-to-end encryption in Excalidraw"
+    "tooltip": "Your drawings are end-to-end encrypted so Adobe's servers will never see them.",
+    "link": "Blog post on end-to-end encryption in Adobe"
   },
   "stats": {
     "angle": "Angle",
@@ -585,7 +585,7 @@
       "center_heading": "Your drawings are saved in your browser's storage.",
       "center_heading_line2": "Browser storage can be cleared unexpectedly.",
       "center_heading_line3": "Save your work to a file regularly to avoid losing it.",
-      "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
+      "center_heading_plus": "Did you want to go to the Adobe+ instead?",
       "menuHint": "Export, preferences, languages, ..."
     },
     "defaults": {
@@ -616,9 +616,9 @@
         "description": "Export the scene data to a file from which you can import later."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
-        "button": "Export to Excalidraw+",
-        "description": "Save the scene to your Excalidraw+ workspace."
+        "title": "Adobe+",
+        "button": "Export to Adobe+",
+        "description": "Save the scene to your Adobe+ workspace."
       }
     },
     "modal": {
@@ -635,9 +635,9 @@
     }
   },
   "mermaid": {
-    "title": "Mermaid to Excalidraw",
+    "title": "Mermaid to Adobe Whiteboard",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Adobe.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
@@ -684,7 +684,7 @@
       "mermaidParseError": "Mermaid syntax error"
     },
     "rateLimit": {
-      "messageLimit": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",
+      "messageLimit": "You've hit your AI limit on the free plan. Try out Adobe+ for more or come back tomorrow.",
       "generalRateLimit": "Hold your horses, you're too fast for us! Please wait a moment before trying again.",
       "messageLimitInputPlaceholder": "You've reached your message limit"
     },

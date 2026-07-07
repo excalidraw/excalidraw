@@ -226,10 +226,10 @@ export default defineConfig(({ mode }) => {
           maximumFileSizeToCacheInBytes: 2.3 * 1024 ** 2, // 2.3MB
         },
         manifest: {
-          short_name: "Excalidraw",
-          name: "Excalidraw",
+          short_name: "Adobe",
+          name: "Adobe Whiteboard",
           description:
-            "Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
+            "Adobe Whiteboard is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
           icons: [
             {
               src: "android-chrome-192x192.png",
@@ -255,7 +255,7 @@ export default defineConfig(({ mode }) => {
           start_url: "/",
           id: "excalidraw",
           display: "standalone",
-          theme_color: "#121212",
+          theme_color: "#EB1000",
           background_color: "#ffffff",
           file_handlers: [
             {

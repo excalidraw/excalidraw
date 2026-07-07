@@ -14,6 +14,7 @@ import {
   CommandPalette,
   DEFAULT_CATEGORIES,
 } from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
+import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
 import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
@@ -862,7 +863,7 @@ const ExcalidrawWrapper = () => {
   }
 
   const ExcalidrawPlusCommand = {
-    label: "Excalidraw+",
+    label: "Adobe+",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
@@ -952,6 +953,25 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
+        renderTopLeftUI={(_isMobile, appState) => {
+          if (appState.zenModeEnabled || appState.viewModeEnabled) {
+            return null;
+          }
+
+          const elements =
+            excalidrawAPI?.getSceneElementsIncludingDeleted() ?? [];
+          const welcomeVisible =
+            !appState.isLoading &&
+            appState.showWelcomeScreen &&
+            appState.activeTool.type === appState.preferredSelectionTool.type &&
+            elements.length === 0;
+
+          if (welcomeVisible) {
+            return null;
+          }
+
+          return <ExcalidrawLogo size="xs" />;
+        }}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
@@ -1210,7 +1230,7 @@ const ExcalidrawWrapper = () => {
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
+                    label: "Sign in / Go to Adobe+",
                   },
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
