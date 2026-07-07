@@ -16,6 +16,8 @@ import { getCommonBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   getDefaultAppState,
   isEraserActive,
@@ -282,12 +284,13 @@ export const actionZoomToFitSelectionInViewport = register({
   predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
+    const nonDeletedSelectedElements = getNonDeletedElements(
+      (selectedElements.length
+        ? selectedElements
+        : elements) as ExcalidrawElement[],
+    );
     return zoomToFitBounds({
-      bounds: getCommonBounds(
-        getNonDeletedElements(
-          selectedElements.length ? selectedElements : elements,
-        ),
-      ),
+      bounds: getCommonBounds(nonDeletedSelectedElements),
       appState: {
         ...appState,
         userToFollow: null,
@@ -314,12 +317,13 @@ export const actionZoomToFitSelection = register({
   predicate: (elements, appState) => !appState.scrollConstraints,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
+    const nonDeletedSelectedElements = getNonDeletedElements(
+      (selectedElements.length
+        ? selectedElements
+        : elements) as ExcalidrawElement[],
+    );
     return zoomToFitBounds({
-      bounds: getCommonBounds(
-        getNonDeletedElements(
-          selectedElements.length ? selectedElements : elements,
-        ),
-      ),
+      bounds: getCommonBounds(nonDeletedSelectedElements),
       appState: {
         ...appState,
         userToFollow: null,

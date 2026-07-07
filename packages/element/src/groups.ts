@@ -15,15 +15,16 @@ import type {
   GroupId,
   ExcalidrawElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
   ElementsMapOrArray,
   ElementsMap,
+  NonDeletedExcalidrawElement,
+  NonDeletedElementsMapOrArray,
 } from "./types";
 
 export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
 ): Pick<
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
@@ -68,14 +69,14 @@ export const selectGroupsForSelectedElements = (function () {
     "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
   >;
 
-  let lastSelectedElements: readonly NonDeleted<ExcalidrawElement>[] | null =
+  let lastSelectedElements: readonly NonDeletedExcalidrawElement[] | null =
     null;
-  let lastElements: readonly NonDeleted<ExcalidrawElement>[] | null = null;
+  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
   let lastReturnValue: SelectGroupsReturnType | null = null;
 
   const _selectGroups = (
-    selectedElements: readonly NonDeleted<ExcalidrawElement>[],
-    elements: readonly NonDeleted<ExcalidrawElement>[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly NonDeletedExcalidrawElement[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
     prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
@@ -240,7 +241,7 @@ export const getSelectedGroupIds = (
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
   let nextAppState: InteractiveCanvasAppState = {
@@ -285,14 +286,18 @@ export const editGroupForSelectedElement = (
 export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
   element.groupIds.includes(groupId);
 
-export const getElementsInGroup = (
-  elements: ElementsMapOrArray,
+export const getElementsInGroup = <
+  P extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
+  elements: P extends NonDeletedExcalidrawElement
+    ? NonDeletedElementsMapOrArray
+    : ElementsMapOrArray,
   groupId: string,
-) => {
-  const elementsInGroup: ExcalidrawElement[] = [];
+): P[] => {
+  const elementsInGroup: P[] = [];
   for (const element of elements.values()) {
     if (isElementInGroup(element, groupId)) {
-      elementsInGroup.push(element);
+      elementsInGroup.push(element as P);
     }
   }
   return elementsInGroup;
@@ -324,15 +329,14 @@ export const removeFromSelectedGroups = (
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
 
-export const getMaximumGroups = (
-  elements: ExcalidrawElement[],
+export const getMaximumGroups = <
+  T extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
+  elements: T[],
   elementsMap: ElementsMap,
-): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
-  elements.forEach((element: ExcalidrawElement) => {
+): T[][] => {
+  const groups: Map<String, T[]> = new Map<String, T[]>();
+  elements.forEach((element: T) => {
     const groupId =
       element.groupIds.length === 0
         ? element.id
@@ -343,7 +347,7 @@ export const getMaximumGroups = (
     // Include bound text if present when grouping
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      currentGroupMembers.push(boundTextElement);
+      currentGroupMembers.push(boundTextElement as T);
     }
     groups.set(groupId, [...currentGroupMembers, element]);
   });
@@ -386,7 +390,7 @@ export const elementsAreInSameGroup = (
   return maxGroup === elements.length;
 };
 
-export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+export const isInGroup = (element: ExcalidrawElement) => {
   return element.groupIds.length > 0;
 };
 
@@ -414,7 +418,7 @@ export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
-): ExcalidrawElement[][] => {
+): NonDeletedExcalidrawElement[][] => {
   const selectedGroupIds = getSelectedGroupIds(appState);
   const unboundElements = selectedElements.filter(
     (element) => !isBoundToContainer(element),
@@ -480,5 +484,7 @@ export const getSelectedElementsByGroup = (
       addToGroupsMap(element, selectedGroupId);
     }
   });
-  return Array.from(groups.values()).concat(Array.from(elements.values()));
+  return Array.from(groups.values()).concat(
+    Array.from(elements.values()),
+  ) as NonDeletedExcalidrawElement[][];
 };
