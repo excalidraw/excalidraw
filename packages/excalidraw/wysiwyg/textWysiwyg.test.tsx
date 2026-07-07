@@ -1842,6 +1842,76 @@ describe("textWysiwyg", () => {
       expect(text.angle).toBe(0);
     });
 
+    it("should edit the existing label only when clicking on the label itself", async () => {
+      // create a centered label ("Hello!" → 60x25 label centered in the
+      // 90x75 rectangle at (10, 20), so the label bbox is (25, 45)-(85, 70))
+      Keyboard.keyPress(KEYS.ENTER);
+      let editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(label.containerId).toBe(rectangle.id);
+
+      // clicking on the label itself should edit it
+      UI.clickTool("text");
+      mouse.clickAt(55, 57.5);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(label.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.elements.length).toBe(2);
+
+      // clicking inside the container but off the label should create
+      // a free text at the clicked position instead
+      UI.clickTool("text");
+      mouse.clickAt(20, 30);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(label.id);
+      updateTextEditor(editor, "Excalidraw");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(3);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: label.id, type: "text" },
+      ]);
+      const text = h.elements[2] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.text).toBe("Excalidraw");
+      // created at the clicked position (first line box centered on cursor),
+      // not warped to the container or label center
+      expect(text.x).toBe(20);
+      expect(text.y).toBe(17.5);
+    });
+
+    it("should allow dragging a free text box inside a labeled container", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      let editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      UI.clickTool("text");
+      mouse.downAt(20, 30);
+      mouse.moveTo(150, 30);
+      mouse.up();
+
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(label.id);
+      updateTextEditor(editor, "Excalidraw");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(3);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: label.id, type: "text" },
+      ]);
+      const text = h.elements[2] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.autoResize).toBe(false);
+    });
+
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
       const text = API.createElement({
         type: "text",

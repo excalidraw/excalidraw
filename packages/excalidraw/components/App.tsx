@@ -9894,8 +9894,8 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.editingTextElement) {
       return;
     }
-    let sceneX = pointerDownState.origin.x;
-    let sceneY = pointerDownState.origin.y;
+    const sceneX = pointerDownState.origin.x;
+    const sceneY = pointerDownState.origin.y;
 
     // the click transitions into text editing either way, consuming (or
     // bypassing) whatever anchor was highlighted — don't leave it lingering
@@ -9919,24 +9919,32 @@ class App extends React.Component<AppProps, AppState> {
         arrowEndpoint,
       });
     } else {
-      const element = this.getElementAtPosition(sceneX, sceneY, {
-        includeBoundTextElement: true,
-      });
+      const containerAtPosition = this.getTextBindableContainerAtPosition(
+        sceneX,
+        sceneY,
+      );
 
-      // FIXME
-      let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+      // pass the container only if the new text will actually get bound to it
+      // (container without a label yet + click near its center). In all other
+      // cases free text is created:
+      // - editing an existing label happens only by clicking the label itself,
+      //   which startTextEditing resolves on its own (the label, not the
+      //   container, is what's hit at that point)
+      // - a non-null container that ends up not binding would still suppress
+      //   the drag-to-size free text flow in startTextEditing
+      const container =
+        containerAtPosition &&
+        !hasBoundTextElement(containerAtPosition) &&
+        !event.altKey &&
+        this.getTextWysiwygSnappedToCenterPosition(
+          sceneX,
+          sceneY,
+          this.state,
+          containerAtPosition,
+        )
+          ? containerAtPosition
+          : null;
 
-      if (hasBoundTextElement(element)) {
-        container = element as NonDeleted<ExcalidrawTextContainer>;
-        const labelCenter = this.arrowText.getLabelCenter(element);
-        if (labelCenter) {
-          sceneX = labelCenter.x;
-          sceneY = labelCenter.y;
-        } else {
-          sceneX = element.x + element.width / 2;
-          sceneY = element.y + element.height / 2;
-        }
-      }
       this.startTextEditing({
         sceneX,
         sceneY,
