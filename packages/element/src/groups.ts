@@ -23,7 +23,7 @@ import type {
 export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
 ): Pick<
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
@@ -239,7 +239,7 @@ export const getSelectedGroupIds = (
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
   let nextAppState: InteractiveCanvasAppState = {
@@ -284,14 +284,16 @@ export const editGroupForSelectedElement = (
 export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
   element.groupIds.includes(groupId);
 
-export const getElementsInGroup = (
+export const getElementsInGroup = <
+  P extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
   elements: ElementsMapOrArray,
   groupId: string,
-) => {
-  const elementsInGroup: ExcalidrawElement[] = [];
+): P[] => {
+  const elementsInGroup: P[] = [];
   for (const element of elements.values()) {
     if (isElementInGroup(element, groupId)) {
-      elementsInGroup.push(element);
+      elementsInGroup.push(element as P);
     }
   }
   return elementsInGroup;

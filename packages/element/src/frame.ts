@@ -33,6 +33,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import { getNonDeletedElements } from ".";
+
 import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 
 import type {
@@ -347,9 +349,12 @@ export const getElementsInResizingFrame = (
   const newGroupElementsCompletelyInFrame = Array.from(
     elementsCompletelyInFrame,
   ).filter((element) => element.groupIds.length > 0);
+  const nonDeletedNewGroupElementsCompletelyInFrame = getNonDeletedElements(
+    newGroupElementsCompletelyInFrame,
+  );
 
   const groupIds = selectGroupsFromGivenElements(
-    newGroupElementsCompletelyInFrame,
+    nonDeletedNewGroupElementsCompletelyInFrame,
     appState,
   );
 
