@@ -20,6 +20,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "../src/types";
 
 const { h } = window;
@@ -758,7 +759,7 @@ describe("adding elements to frames", () => {
       });
 
       API.setElements([rect2, frame, frameChild]);
-      API.setSelectedElements([rect2]);
+      API.setSelectedElements([rect2] as NonDeletedExcalidrawElement[]);
       API.updateElement(rect2, {
         x: 10,
         y: 10,

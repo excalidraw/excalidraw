@@ -68,13 +68,14 @@ export const selectGroupsForSelectedElements = (function () {
     "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
   >;
 
-  let lastSelectedElements: readonly ExcalidrawElement[] | null = null;
-  let lastElements: readonly ExcalidrawElement[] | null = null;
+  let lastSelectedElements: readonly NonDeletedExcalidrawElement[] | null =
+    null;
+  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
   let lastReturnValue: SelectGroupsReturnType | null = null;
 
   const _selectGroups = (
-    selectedElements: readonly ExcalidrawElement[],
-    elements: readonly ExcalidrawElement[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly NonDeletedExcalidrawElement[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
     prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
@@ -162,7 +163,7 @@ export const selectGroupsForSelectedElements = (function () {
    */
   const selectGroupsForSelectedElements = (
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
-    elements: readonly ExcalidrawElement[],
+    elements: readonly NonDeletedExcalidrawElement[],
     prevAppState: InteractiveCanvasAppState,
     /**
      * supply null in cases where you don't have access to App instance and

@@ -44,6 +44,7 @@ import type {
   ExcalidrawArrowElement,
   FixedSegment,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -85,7 +86,7 @@ export class API {
     });
   };
 
-  static setSelectedElements = (elements: ExcalidrawElement[], editingGroupId?: string | null) => {
+  static setSelectedElements = (elements: NonDeletedExcalidrawElement[], editingGroupId?: string | null) => {
     act(() => {
       h.setState({
         ...selectGroupsForSelectedElements(

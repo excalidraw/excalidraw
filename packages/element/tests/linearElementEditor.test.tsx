@@ -42,6 +42,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FontString,
+  NonDeletedExcalidrawElement,
 } from "../src/types";
 
 const renderInteractiveScene = vi.spyOn(
@@ -129,7 +130,7 @@ describe("Test Linear Elements", () => {
     selectProgrammatically = false,
   ) => {
     if (selectProgrammatically) {
-      API.setSelectedElements([line]);
+      API.setSelectedElements([line] as NonDeletedExcalidrawElement[]);
     } else {
       mouse.clickAt(p1[0], p1[1]);
     }
@@ -932,7 +933,7 @@ describe("Test Linear Elements", () => {
         }),
       ]);
       const dragEndPositionOffset = [100, 100] as const;
-      API.setSelectedElements([line]);
+      API.setSelectedElements([line] as NonDeletedExcalidrawElement[]);
       enterLineEditingMode(line, true);
       drag(
         pointFrom(line.points[0][0] + line.x, line.points[0][1] + line.y),
@@ -1288,7 +1289,7 @@ describe("Test Linear Elements", () => {
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       createBoundTextElement(DEFAULT_TEXT, arrow);
-      API.setSelectedElements([arrow]);
+      API.setSelectedElements([arrow] as NonDeletedExcalidrawElement[]);
 
       expect(queryByTestId(container, "align-top")).toBeNull();
       expect(queryByTestId(container, "align-middle")).toBeNull();
@@ -1359,7 +1360,7 @@ describe("Test Linear Elements", () => {
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       createBoundTextElement(DEFAULT_TEXT, arrow);
-      API.setSelectedElements([arrow]);
+      API.setSelectedElements([arrow] as NonDeletedExcalidrawElement[]);
 
       expect(queryByTestId(container, "align-left")).toBeNull();
       expect(queryByTestId(container, "align-horizontal-center")).toBeNull();
@@ -1378,7 +1379,10 @@ describe("Test Linear Elements", () => {
       API.setElements([h.elements[0], text]);
 
       const container = h.elements[0];
-      API.setSelectedElements([container, text]);
+      API.setSelectedElements([
+        container,
+        text,
+      ] as NonDeletedExcalidrawElement[]);
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
@@ -1402,7 +1406,10 @@ describe("Test Linear Elements", () => {
       );
       mouse.down();
       mouse.up();
-      API.setSelectedElements([h.elements[0], h.elements[1]]);
+      API.setSelectedElements([
+        h.elements[0],
+        h.elements[1],
+      ] as NonDeletedExcalidrawElement[]);
 
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
