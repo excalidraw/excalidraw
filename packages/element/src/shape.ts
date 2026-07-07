@@ -1006,6 +1006,7 @@ const debugRoundedArrowControlPoints = (
   elementX: number,
   elementY: number,
   points: readonly LocalPoint[],
+  permanent: boolean = false,
 ) => {
   if (points.length < 2) {
     return;
@@ -1014,17 +1015,9 @@ const debugRoundedArrowControlPoints = (
   const g = (p: LocalPoint): GlobalPoint =>
     pointFrom<GlobalPoint>(elementX + p[0], elementY + p[1]);
 
-  const PERMANENT = { permanent: true } as const;
+  const PERMANENT = { permanent } as const;
   const CP_RADIUS = 5;
   const DIAMOND_RADIUS = 6;
-
-  if (points.length === 2) {
-    debugDrawLine(lineSegment(g(points[0]), g(points[1])), {
-      color: "#888888",
-      ...PERMANENT,
-    });
-    return;
-  }
 
   for (const [start, cp1Local, cp2Local, end] of curveChordC2Spline(points)) {
     const p0 = g(start);
