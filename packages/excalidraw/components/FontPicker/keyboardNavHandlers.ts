@@ -1,5 +1,6 @@
 import { KEYS } from "@excalidraw/common";
 
+import type { FontFamily } from "@excalidraw/common";
 import type { Node } from "@excalidraw/common";
 
 import { type FontDescriptor } from "./FontPickerList";
@@ -10,8 +11,9 @@ interface FontPickerKeyNavHandlerProps {
   hoveredFont: Node<FontDescriptor> | undefined;
   filteredFonts: Node<FontDescriptor>[];
   onClose: () => void;
-  onSelect: (value: number) => void;
-  onHover: (value: number) => void;
+  onSelect: (value: FontFamily) => void;
+  onHover: (value: FontFamily) => void;
+  onUseCustomFont?: () => void;
 }
 
 export const fontPickerKeyHandler = ({
@@ -22,6 +24,7 @@ export const fontPickerKeyHandler = ({
   onClose,
   onSelect,
   onHover,
+  onUseCustomFont,
 }: FontPickerKeyNavHandlerProps) => {
   if (
     !event[KEYS.CTRL_OR_CMD] &&
@@ -41,6 +44,8 @@ export const fontPickerKeyHandler = ({
   if (event.key === KEYS.ENTER) {
     if (hoveredFont?.value) {
       onSelect(hoveredFont.value);
+    } else if (onUseCustomFont) {
+      onUseCustomFont();
     }
 
     return true;

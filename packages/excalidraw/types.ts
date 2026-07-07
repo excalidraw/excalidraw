@@ -5,6 +5,7 @@ import type {
   MIME_TYPES,
   EditorInterface,
   StrokeWidthKey,
+  FontFamily,
 } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element";
@@ -21,7 +22,6 @@ import type {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
-  FontFamilyValues,
   FileId,
   Theme,
   StrokeRoundness,
@@ -62,6 +62,9 @@ import type { ImportedDataState } from "./data/types";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
+
+import type { ExcalidrawFontFaceDescriptor } from "./fonts";
+
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
@@ -406,12 +409,12 @@ export interface AppState {
   currentItemRoughness: number;
   currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
-  currentItemFontFamily: FontFamilyValues;
+  currentItemFontFamily: FontFamily;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
-  currentHoveredFontFamily: FontFamilyValues | null;
+  currentHoveredFontFamily: FontFamily | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
@@ -629,6 +632,32 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+/**
+ * Definition of a custom font, returned by a FontProvider's resolve method.
+ */
+export interface FontDefinition {
+  fontFaces: ExcalidrawFontFaceDescriptor[];
+  metrics: {
+    /** head.unitsPerEm metric */
+    unitsPerEm: 1000 | 1024 | 2048;
+    /** hhea.ascender metric */
+    ascender: number;
+    /** hhea.descender metric */
+    descender: number;
+    /** unitless line-height */
+    lineHeight: number;
+  };
+}
+
+export interface FontProvider {
+  icon: React.JSX.Element;
+  resolve(fontFamily: string): Promise<FontDefinition>;
+  availableFonts: { value: string; text: string }[];
+  onNewFontUsed?(fontFamily: string): void;
+}
+
+export type FontProviders = Record<string, FontProvider>;
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -748,6 +777,17 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  /**
+   * Font providers for custom font support.
+   *
+   * Note: font providers are currently treated as runtime-global by the
+   * internal font registry. Multiple editors with different provider configs
+   * are not isolated from each other.
+   *
+   * Custom fonts are identified by prefix in `fontFamily`, e.g. `"google:Roboto"`.
+   * Built-in fonts are unaffected; providers handle additional/custom fonts only.
+   */
+  fontProviders?: FontProviders;
   renderScrollbars?: boolean;
   /**
    * Called before exporting to a file.

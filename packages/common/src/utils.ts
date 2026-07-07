@@ -2,7 +2,7 @@ import { average } from "@excalidraw/math";
 
 import type { GlobalCoord } from "@excalidraw/math";
 
-import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
+import type { FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -22,7 +22,7 @@ import {
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
 
-import type { EVENT } from "./constants";
+import type { EVENT, FontFamily } from "./constants";
 
 let mockDateTime: string | null = null;
 
@@ -94,8 +94,17 @@ export const isWritableElement = (
 export const getFontFamilyString = ({
   fontFamily,
 }: {
-  fontFamily: FontFamilyValues;
+  fontFamily: FontFamily;
 }) => {
+  // Custom font - use the string directly as CSS font-family with generic fallbacks
+  if (typeof fontFamily === "string") {
+    const fallbacks = getFontFamilyFallbacks(fontFamily);
+    const cssFamily = `"${fontFamily
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"')}"`;
+    return `${cssFamily}${fallbacks.map((x) => `, ${x}`).join("")}`;
+  }
+
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
       return `${fontFamilyString}${getFontFamilyFallbacks(id)
@@ -112,7 +121,7 @@ export const getFontString = ({
   fontFamily,
 }: {
   fontSize: number;
-  fontFamily: FontFamilyValues;
+  fontFamily: FontFamily;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };

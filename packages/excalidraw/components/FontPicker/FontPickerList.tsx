@@ -7,8 +7,6 @@ import React, {
   type KeyboardEventHandler,
 } from "react";
 
-import { type FontFamilyValues } from "@excalidraw/element/types";
-
 import {
   arrayToList,
   debounce,
@@ -16,6 +14,7 @@ import {
   getFontFamilyString,
 } from "@excalidraw/common";
 
+import type { FontFamily } from "@excalidraw/common";
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { Fonts } from "../../fonts";
@@ -41,6 +40,7 @@ import {
   FontFamilyHeadingIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
+  searchIcon,
 } from "../icons";
 
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
@@ -49,7 +49,7 @@ import type { JSX } from "react";
 import type { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
 
 export interface FontDescriptor {
-  value: number;
+  value: FontFamily;
   icon: JSX.Element;
   text: string;
   deprecated?: true;
@@ -60,16 +60,16 @@ export interface FontDescriptor {
 }
 
 interface FontPickerListProps {
-  selectedFontFamily: FontFamilyValues | null;
-  hoveredFontFamily: FontFamilyValues | null;
-  onSelect: (value: number) => void;
-  onHover: (value: number) => void;
+  selectedFontFamily: FontFamily | null;
+  hoveredFontFamily: FontFamily | null;
+  onSelect: (value: FontFamily) => void;
+  onHover: (value: FontFamily) => void;
   onLeave: () => void;
   onOpen: () => void;
   onClose: () => void;
 }
 
-const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
+const getFontFamilyIcon = (fontFamily: FontFamily): JSX.Element => {
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
     case FONT_FAMILY.Virgil:
@@ -88,7 +88,7 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
 };
 
 const getFontFamilyLabel = (
-  fontFamily: FontFamilyValues,
+  fontFamily: FontFamily,
   fontFaces: ExcalidrawFontFace[],
 ) =>
   // prefer our config as the browser resolved names may be wrapped in quotes and such
@@ -109,16 +109,26 @@ export const FontPickerList = React.memo(
     const { container } = useExcalidrawContainer();
     const app = useApp();
     const { fonts } = app;
-    const { showDeprecatedFonts } = useAppProps();
+    const { showDeprecatedFonts, fontProviders } = useAppProps();
     const stylesPanelMode = useStylesPanelMode();
 
-    const [searchTerm, setSearchTerm] = useState("");
+    const [rawSearchTerm, setRawSearchTerm] = useState("");
+    const searchTerm = useMemo(
+      () => rawSearchTerm.toLowerCase(),
+      [rawSearchTerm],
+    );
     const inputRef = useRef<HTMLInputElement>(null);
     const allFonts = useMemo(
-      () =>
-        Array.from(Fonts.registered.entries())
+      () => {
+        // Built-in fonts from the registry
+        const builtInFonts: FontDescriptor[] = Array.from(
+          Fonts.registered.entries(),
+        )
           .filter(
-            ([_, { metadata }]) => !metadata.private && !metadata.fallback,
+            ([familyId, { metadata }]) =>
+              typeof familyId === "number" &&
+              !metadata.private &&
+              !metadata.fallback,
           )
           .map(([familyId, { metadata, fontFaces }]) => {
             const fontDescriptor = {
@@ -138,11 +148,32 @@ export const FontPickerList = React.memo(
             }
 
             return fontDescriptor as FontDescriptor;
-          })
-          .sort((a, b) =>
-            a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
-          ),
-      [],
+          });
+
+        // Custom fonts from all configured font providers
+        const providerFonts: FontDescriptor[] = fontProviders
+          ? Object.entries(fontProviders).flatMap(([providerId, provider]) =>
+              provider.availableFonts.map((f) => ({
+                value: Fonts.createProviderFontFamily(providerId, f.value),
+                icon: provider.icon,
+                text: f.text,
+              })),
+            )
+          : [];
+
+        // Merge and deduplicate (provider fonts that are already registered get skipped)
+        const builtInValues = new Set(builtInFonts.map((f) => f.value));
+        const mergedFonts = [
+          ...builtInFonts,
+          ...providerFonts.filter((f) => !builtInValues.has(f.value)),
+        ];
+
+        return mergedFonts.sort((a, b) =>
+          a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
+        );
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [fontProviders],
     );
 
     const sceneFamilies = useMemo(
@@ -152,10 +183,34 @@ export const FontPickerList = React.memo(
       [selectedFontFamily],
     );
 
-    const sceneFonts = useMemo(
-      () => allFonts.filter((font) => sceneFamilies.has(font.value)), // always show all the fonts in the scene, even those that were deprecated
-      [allFonts, sceneFamilies],
-    );
+    const sceneFonts = useMemo(() => {
+      const knownValues = new Set(allFonts.map((f) => f.value));
+      // Always show all fonts in the scene, even those that were deprecated
+      const known = allFonts.filter((font) => sceneFamilies.has(font.value));
+      // Create synthetic descriptors for scene fonts not in allFonts
+      // (e.g., custom fonts pasted from another scene, or removed from provider)
+      const unknown: FontDescriptor[] = Array.from(sceneFamilies)
+        .filter((family) => !knownValues.has(family))
+        .map((family) => {
+          let icon = FontFamilyNormalIcon;
+          let text = typeof family === "string" ? family : String(family);
+
+          if (typeof family === "string") {
+            const parsed = Fonts.parseProviderFontFamily(family);
+            if (parsed) {
+              icon = fontProviders?.[parsed.providerId]?.icon ?? icon;
+              text = parsed.familyName;
+            }
+          }
+
+          return {
+            value: family,
+            icon,
+            text,
+          };
+        });
+      return [...known, ...unknown];
+    }, [allFonts, sceneFamilies, fontProviders]);
 
     const availableFonts = useMemo(
       () =>
@@ -166,6 +221,20 @@ export const FontPickerList = React.memo(
         ),
       [allFonts, sceneFamilies, showDeprecatedFonts],
     );
+
+    const [isResolvingCustomFont, setIsResolvingCustomFont] = useState(false);
+
+    // Show "Use X" item when the search term doesn't exactly match any font
+    // and at least one provider exists
+    const showUseCustomFont = useMemo(() => {
+      if (!rawSearchTerm.trim() || !fontProviders) {
+        return false;
+      }
+      const allCombined = [...sceneFonts, ...availableFonts];
+      return !allCombined.some(
+        (font) => font.text?.toLowerCase() === searchTerm,
+      );
+    }, [rawSearchTerm, searchTerm, fontProviders, sceneFonts, availableFonts]);
 
     const filteredFonts = useMemo(
       () =>
@@ -208,7 +277,7 @@ export const FontPickerList = React.memo(
 
     // Create a wrapped onSelect function that preserves caret position
     const wrappedOnSelect = useCallback(
-      (fontFamily: FontFamilyValues) => {
+      (fontFamily: FontFamily) => {
         // Save caret position before font selection if editing text
         let savedSelection: { start: number; end: number } | null = null;
         if (app.state.editingTextElement) {
@@ -242,6 +311,63 @@ export const FontPickerList = React.memo(
       [onSelect, app.state.editingTextElement],
     );
 
+    const handleUseCustomFont = useCallback(async () => {
+      if (!fontProviders || !rawSearchTerm.trim() || isResolvingCustomFont) {
+        return;
+      }
+
+      setIsResolvingCustomFont(true);
+
+      try {
+        // Try each provider until one resolves successfully
+        for (const [providerId, provider] of Object.entries(fontProviders)) {
+          try {
+            const familyName = rawSearchTerm.trim();
+            const definition = await provider.resolve(familyName);
+            const prefixedFamily = Fonts.createProviderFontFamily(
+              providerId,
+              familyName,
+            );
+
+            // Register the font
+            Fonts.registerCustomFont(
+              prefixedFamily,
+              { metrics: definition.metrics },
+              ...definition.fontFaces,
+            );
+
+            // Add font faces to document.fonts for rendering
+            const registered = Fonts.registered.get(prefixedFamily);
+            if (registered) {
+              for (const { fontFace } of registered.fontFaces) {
+                if (!document.fonts.has(fontFace)) {
+                  document.fonts.add(fontFace);
+                }
+              }
+            }
+
+            // Select the font
+            wrappedOnSelect(prefixedFamily);
+
+            // Notify the provider (fire-and-forget)
+            provider.onNewFontUsed?.(familyName);
+
+            return; // success — stop trying other providers
+          } catch {
+            // This provider couldn't resolve it; try the next one
+            continue;
+          }
+        }
+
+        // All providers failed
+        console.warn(
+          `No font provider could resolve "${rawSearchTerm.trim()}"`,
+        );
+      } finally {
+        setIsResolvingCustomFont(false);
+      }
+    }, [fontProviders, rawSearchTerm, isResolvingCustomFont, wrappedOnSelect]);
+
     const onKeyDown = useCallback<KeyboardEventHandler<HTMLDivElement>>(
       (event) => {
         const handled = fontPickerKeyHandler({
@@ -252,6 +378,7 @@ export const FontPickerList = React.memo(
           onSelect: wrappedOnSelect,
           onHover,
           onClose,
+          onUseCustomFont: showUseCustomFont ? handleUseCustomFont : undefined,
         });
 
         if (handled) {
@@ -259,7 +386,15 @@ export const FontPickerList = React.memo(
           event.stopPropagation();
         }
       },
-      [hoveredFont, filteredFonts, wrappedOnSelect, onHover, onClose],
+      [
+        hoveredFont,
+        filteredFonts,
+        wrappedOnSelect,
+        onHover,
+        onClose,
+        showUseCustomFont,
+        handleUseCustomFont,
+      ],
     );
 
     useEffect(() => {
@@ -270,6 +405,70 @@ export const FontPickerList = React.memo(
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Resolve and register custom fonts from providers when the picker opens,
+    // so that font names render in their actual typeface in the picker list
+    useEffect(() => {
+      if (!fontProviders || Object.keys(fontProviders).length === 0) {
+        return;
+      }
+
+      const customFamilies = Object.entries(fontProviders).flatMap(
+        ([providerId, provider]) =>
+          provider.availableFonts
+            .map((f) => Fonts.createProviderFontFamily(providerId, f.value))
+            .filter(
+              (v): v is string =>
+                typeof v === "string" && !Fonts.registered.has(v),
+            ),
+      );
+
+      if (customFamilies.length === 0) {
+        return;
+      }
+
+      // Resolve and register custom fonts, then add FontFace objects to document.fonts
+      Promise.all(
+        customFamilies.map(async (family) => {
+          try {
+            const parsed = Fonts.parseProviderFontFamily(family);
+            if (!parsed) {
+              return;
+            }
+
+            const provider = fontProviders[parsed.providerId];
+            if (!provider) {
+              return;
+            }
+
+            const definition = await provider.resolve(parsed.familyName);
+            Fonts.registerCustomFont(
+              family,
+              { metrics: definition.metrics },
+              ...definition.fontFaces,
+            );
+          } catch (e) {
+            console.error(
+              `Failed to resolve custom font "${family}" via font provider`,
+              e,
+            );
+          }
+        }),
+      ).then(() => {
+        // Add all registered font faces to document.fonts for CSS-driven lazy loading
+        for (const { fontFaces, metadata } of Fonts.registered.values()) {
+          if (metadata.local) {
+            continue;
+          }
+          for (const { fontFace } of fontFaces) {
+            if (!document.fonts.has(fontFace)) {
+              document.fonts.add(fontFace);
+            }
+          }
+        }
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fontProviders]);
 
     const sceneFilteredFonts = useMemo(
       () => filteredFonts.filter((font) => sceneFamilies.has(font.value)),
@@ -314,7 +513,9 @@ export const FontPickerList = React.memo(
           // allow to tab between search and selected font
           tabIndex={isSelected ? 0 : -1}
           onClick={(e) => {
-            wrappedOnSelect(Number(e.currentTarget.value));
+            const rawValue = e.currentTarget.value;
+            const numValue = Number(rawValue);
+            wrappedOnSelect(Number.isNaN(numValue) ? rawValue : numValue);
           }}
           onMouseMove={() => {
             if (hoveredFont?.value !== font.value) {
@@ -367,6 +568,31 @@ export const FontPickerList = React.memo(
       );
     }
 
+    if (showUseCustomFont) {
+      const firstProviderIcon = fontProviders
+        ? Object.values(fontProviders)[0]?.icon
+        : undefined;
+
+      groups.push(
+        <DropdownMenuGroup key="group_custom">
+          <button
+            type="button"
+            className={getDropdownMenuItemClassName("", false, false)}
+            title={rawSearchTerm.trim()}
+            tabIndex={-1}
+            disabled={isResolvingCustomFont}
+            onClick={handleUseCustomFont}
+          >
+            <MenuItemContent icon={firstProviderIcon ?? searchIcon}>
+              {isResolvingCustomFont
+                ? `${rawSearchTerm.trim()}...`
+                : rawSearchTerm.trim()}
+            </MenuItemContent>
+          </button>
+        </DropdownMenuGroup>,
+      );
+    }
+
     return (
       <PropertiesPopover
         className="properties-content"
@@ -395,7 +621,7 @@ export const FontPickerList = React.memo(
           <QuickSearch
             ref={inputRef}
             placeholder={t("quickSearch.placeholder")}
-            onChange={debounce(setSearchTerm, 20)}
+            onChange={debounce(setRawSearchTerm, 20)}
           />
         )}
         <ScrollableList

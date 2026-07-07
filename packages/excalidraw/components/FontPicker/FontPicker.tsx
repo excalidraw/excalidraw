@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from "react";
 
 import { FONT_FAMILY } from "@excalidraw/common";
 
-import type { FontFamilyValues } from "@excalidraw/element/types";
+import type { FontFamily } from "@excalidraw/common";
 
 import { t } from "../../i18n";
 import { RadioSelection } from "../RadioSelection";
@@ -43,20 +43,20 @@ export const DEFAULT_FONTS = [
 
 const defaultFontFamilies = new Set(DEFAULT_FONTS.map((x) => x.value));
 
-export const isDefaultFont = (fontFamily: number | null) => {
+export const isDefaultFont = (fontFamily: FontFamily | null) => {
   if (!fontFamily) {
     return false;
   }
 
-  return defaultFontFamilies.has(fontFamily);
+  return defaultFontFamilies.has(fontFamily as number);
 };
 
 interface FontPickerProps {
   isOpened: boolean;
-  selectedFontFamily: FontFamilyValues | null;
-  hoveredFontFamily: FontFamilyValues | null;
-  onSelect: (fontFamily: FontFamilyValues) => void;
-  onHover: (fontFamily: FontFamilyValues) => void;
+  selectedFontFamily: FontFamily | null;
+  hoveredFontFamily: FontFamily | null;
+  onSelect: (fontFamily: FontFamily) => void;
+  onHover: (fontFamily: FontFamily) => void;
   onLeave: () => void;
   onPopupChange: (open: boolean) => void;
   compactMode?: boolean;
@@ -75,7 +75,7 @@ export const FontPicker = React.memo(
   }: FontPickerProps) => {
     const defaultFonts = useMemo(() => DEFAULT_FONTS, []);
     const onSelectCallback = useCallback(
-      (value: number | false) => {
+      (value: FontFamily | false) => {
         if (value) {
           onSelect(value);
         }
@@ -93,7 +93,7 @@ export const FontPicker = React.memo(
       >
         {!compactMode && (
           <div className="buttonList">
-            <RadioSelection<FontFamilyValues | false>
+            <RadioSelection<FontFamily | false>
               type="button"
               options={defaultFonts}
               value={selectedFontFamily}

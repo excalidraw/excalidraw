@@ -134,7 +134,7 @@ export const UserList = React.memo(
     const [searchTerm, setSearchTerm] = React.useState("");
     const filteredCollaborators = uniqueCollaboratorsArray.filter(
       (collaborator) =>
-        collaborator.username?.toLowerCase().includes(searchTerm),
+        collaborator.username?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     const userListWrapper = React.useRef<HTMLDivElement | null>(null);

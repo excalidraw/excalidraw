@@ -13,6 +13,8 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { Radians } from "@excalidraw/math";
 
 import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
@@ -39,7 +41,6 @@ import type {
   VerticalAlign,
   Arrowhead,
   ExcalidrawFreeDrawElement,
-  FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
@@ -242,7 +243,7 @@ export const newTextElement = (
     text: string;
     originalText?: string;
     fontSize?: number;
-    fontFamily?: FontFamilyValues;
+    fontFamily?: FontFamily;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;

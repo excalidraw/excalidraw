@@ -1,9 +1,8 @@
-import type {
-  ExcalidrawTextElement,
-  FontFamilyValues,
-} from "@excalidraw/element/types";
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "./constants";
+
+import type { FontFamily } from "./constants";
 
 /**
  * Encapsulates font metrics with additional font metadata.
@@ -32,7 +31,7 @@ export interface FontMetadata {
   fallback?: true;
 }
 
-export const FONT_METADATA: Record<number, FontMetadata> = {
+export const FONT_METADATA: Record<FontFamily, FontMetadata> = {
   [FONT_FAMILY.Excalifont]: {
     metrics: {
       unitsPerEm: 1000,
@@ -172,7 +171,7 @@ export const getVerticalOffset = (
 /**
  * Gets line height for a selected family.
  */
-export const getLineHeight = (fontFamily: FontFamilyValues) => {
+export const getLineHeight = (fontFamily: FontFamily) => {
   const { lineHeight } =
     FONT_METADATA[fontFamily]?.metrics ||
     FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
