@@ -91,6 +91,20 @@ describe("exportToSvg", () => {
     expect(passedOptionsWhenDefault).toMatchSnapshot();
   });
 
+  // Regression test: when all elements are deleted, exportToSvg should pass
+  // zero elements to the lower-level export (line 184-188 of export.ts calls
+  // getNonDeletedElements which filters them out).
+  it("with deleted elements", async () => {
+    await utils.exportToSvg({
+      ...diagramFactory({
+        overrides: { appState: void 0 },
+        elementOverrides: { isDeleted: true },
+      }),
+    });
+
+    expect(passedElements().length).toBe(0);
+  });
+
   it("with exportPadding", async () => {
     await utils.exportToSvg({
       ...diagramFactory({

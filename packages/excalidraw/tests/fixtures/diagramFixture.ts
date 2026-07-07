@@ -1,6 +1,9 @@
 import { VERSIONS } from "@excalidraw/common";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import {
   diamondFixture,
@@ -22,24 +25,24 @@ export const diagramFixture = {
 
 export const diagramFactory = ({
   overrides = {},
-  elementOverrides = {},
+  elementOverrides = {} as Partial<ExcalidrawElement>,
 } = {}) => ({
   ...diagramFixture,
   elements: [
     {
       ...diamondFixture,
       ...elementOverrides,
-      isDeleted: false,
+      isDeleted: elementOverrides.isDeleted ?? false,
     } as NonDeletedExcalidrawElement,
     {
       ...ellipseFixture,
       ...elementOverrides,
-      isDeleted: false,
+      isDeleted: elementOverrides.isDeleted ?? false,
     } as NonDeletedExcalidrawElement,
     {
       ...rectangleFixture,
       ...elementOverrides,
-      isDeleted: false,
+      isDeleted: elementOverrides.isDeleted ?? false,
     } as NonDeletedExcalidrawElement,
   ],
   ...overrides,
