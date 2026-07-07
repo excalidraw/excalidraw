@@ -34,6 +34,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
@@ -475,7 +476,7 @@ function handleDrawShapeArrowConversion(
   appState: AppState,
   scene: App["scene"],
   line: ExcalidrawLinearElement,
-): ExcalidrawLinearElement | undefined {
+): NonDeleted<ExcalidrawArrowElement> | undefined {
   const elementsMap = scene.getNonDeletedElementsMap();
   const startGlobal = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     line,

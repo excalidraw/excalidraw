@@ -23,10 +23,12 @@ import type {
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawFrameLikeElement,
-  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ElementsMap,
   ExcalidrawNonSelectionElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
 import { getFrameLikeElements } from "./frame";
@@ -40,13 +42,16 @@ import { LinearElementEditor } from "./linearElementEditor";
 // each stroke to its indicative angle before matching, which is sufficient
 // when no rotation invariance is required.
 
-type Shape =
-  | ExcalidrawRectangleElement["type"]
-  | ExcalidrawEllipseElement["type"]
-  | ExcalidrawDiamondElement["type"]
-  | ExcalidrawArrowElement["type"]
-  | ExcalidrawLinearElement["type"]
-  | ExcalidrawFreeDrawElement["type"];
+type NonDeletedRecognizedShapeElement = NonDeleted<
+  | ExcalidrawRectangleElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawArrowElement
+  | ExcalidrawLineElement
+  | ExcalidrawFreeDrawElement
+>;
+
+type Shape = NonDeletedRecognizedShapeElement["type"];
 
 interface Template {
   type: Shape;
@@ -845,7 +850,7 @@ export const convertToShape = (
   elementsMap: ElementsMap,
   previousElement: ExcalidrawElement | null,
   frames?: readonly ExcalidrawFrameLikeElement[],
-): ExcalidrawElement | undefined => {
+): NonDeletedRecognizedShapeElement | undefined => {
   const recognizedShape = recognizeShape(points, previousElement);
 
   const boundingBox = recognizedShape.boundingBox;
@@ -892,7 +897,7 @@ export const convertToShape = (
           recognizedShape.type,
           appState.currentItemStrokeWidthKey,
         ),
-      });
+      }) as NonDeletedRecognizedShapeElement;
     }
     case "arrow": {
       const [arrowX, arrowY] = recognizedShape.points[0];
@@ -954,7 +959,7 @@ export const convertToShape = (
         return newLinearElement({
           ...tempElement,
           ...normalized,
-        });
+        }) as NonDeletedRecognizedShapeElement;
       }
       const tempElement = newArrowElement({
         type: "arrow",
@@ -1032,7 +1037,7 @@ export const convertToShape = (
       return newLinearElement({
         ...tempElement,
         ...normalized,
-      });
+      }) as NonDeletedRecognizedShapeElement;
     }
   }
 
@@ -1043,8 +1048,8 @@ export const convertToShape = (
 // preview recompute on pointermove can skip setState (avoiding a no-op React
 // re-render and roughjs shape regeneration).
 const isDrawShapePreviewEqual = (
-  a: ExcalidrawNonSelectionElement | null,
-  b: ExcalidrawNonSelectionElement,
+  a: NonDeletedExcalidrawElement | null,
+  b: NonDeletedExcalidrawElement,
 ): boolean => {
   if (
     !a ||
@@ -1112,7 +1117,8 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
                 : shapePreview.id,
             seed: 1,
             opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
-          } as ExcalidrawNonSelectionElement;
+            isDeleted: false as const,
+          } as NonDeletedRecognizedShapeElement;
 
           if (!isDrawShapePreviewEqual(prevPreview, nextPreview)) {
             app.setState({ newElement: nextPreview });
