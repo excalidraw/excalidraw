@@ -7,6 +7,8 @@ import {
   sizeOf,
 } from "@excalidraw/common";
 import {
+  curveChordC2Spline,
+  curveTangent,
   degreesToRadians,
   lineSegment,
   pointFrom,
@@ -34,6 +36,7 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isLinearElement,
@@ -790,32 +793,52 @@ export const getArrowheadPoints = (
   const [x2, y2] = position === "start" ? p0 : p3;
 
   // Use the analytic tangent at the Bézier endpoint for a precise arrowhead
-  // direction. For a cubic Bézier B(t) with control points p0p3:
+  // direction. For a cubic Bézier B(t) with control points p0..p3:
   //   B'(1): (p3 − p2) tangent at the end
   //   B'(0): (p1 − p0) for start arrowhead, arrow points away: (p0 − p1)
-  let dx: number;
-  let dy: number;
-  if (position === "end") {
-    dx = p3[0] - p2[0];
-    dy = p3[1] - p2[1];
-    if (Math.hypot(dx, dy) < 1e-6) {
-      dx = p3[0] - p1[0];
-      dy = p3[1] - p1[1];
-    }
-    if (Math.hypot(dx, dy) < 1e-6) {
-      dx = p3[0] - p0[0];
-      dy = p3[1] - p0[1];
-    }
-  } else {
-    dx = p0[0] - p1[0];
-    dy = p0[1] - p1[1];
-    if (Math.hypot(dx, dy) < 1e-6) {
-      dx = p0[0] - p2[0];
-      dy = p0[1] - p2[1];
-    }
-    if (Math.hypot(dx, dy) < 1e-6) {
-      dx = p0[0] - p3[0];
-      dy = p0[1] - p3[1];
+  let dx = 0;
+  let dy = 0;
+
+  // For rounded (curved) arrows the rendered ops are randomness-jittered by
+  // roughjs, which wobbles the arrowhead direction.
+  if (
+    element.roundness &&
+    !isElbowArrow(element) &&
+    element.points.length > 2
+  ) {
+    const curves = curveChordC2Spline(element.points);
+    const seg = position === "start" ? curves[0] : curves[curves.length - 1];
+    const tangent = curveTangent(seg, position === "start" ? 0 : 1);
+    // Arrow points away from the line at the start, along it at the end.
+    dx = position === "start" ? -tangent[0] : tangent[0];
+    dy = position === "start" ? -tangent[1] : tangent[1];
+  }
+
+  // Straight/elbow arrows, or a degenerate spline endpoint: fall back to the
+  // rendered Bézier control-point differences.
+  if (Math.hypot(dx, dy) < 1e-6) {
+    if (position === "end") {
+      dx = p3[0] - p2[0];
+      dy = p3[1] - p2[1];
+      if (Math.hypot(dx, dy) < 1e-6) {
+        dx = p3[0] - p1[0];
+        dy = p3[1] - p1[1];
+      }
+      if (Math.hypot(dx, dy) < 1e-6) {
+        dx = p3[0] - p0[0];
+        dy = p3[1] - p0[1];
+      }
+    } else {
+      dx = p0[0] - p1[0];
+      dy = p0[1] - p1[1];
+      if (Math.hypot(dx, dy) < 1e-6) {
+        dx = p0[0] - p2[0];
+        dy = p0[1] - p2[1];
+      }
+      if (Math.hypot(dx, dy) < 1e-6) {
+        dx = p0[0] - p3[0];
+        dy = p0[1] - p3[1];
+      }
     }
   }
   const distance = Math.hypot(dx, dy);
