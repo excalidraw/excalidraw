@@ -10,19 +10,6 @@
     }
   }
 
-  .App-toolbar-container {
-    // Yellow highlight for selected and active toolbar tools.
-    --color-surface-primary-container: #fff3b0;
-    --color-on-primary-container: #4a3b00;
-    --button-active-border: #e6a800;
-
-    @at-root .excalidraw.theme--dark#{&} {
-      --color-surface-primary-container: #5c4a00;
-      --color-on-primary-container: #fff3b0;
-      --button-active-border: #ffd54f;
-    }
-  }
-
   .App-toolbar {
     &.zen-mode {
       .ToolIcon__keybinding,
@@ -71,8 +58,8 @@
 
     &--selected,
     &--selected:hover {
-      background: var(--color-surface-primary-container);
-      color: var(--color-on-primary-container);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
     }
   }
 

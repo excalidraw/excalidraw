@@ -1,0 +1,40 @@
+---
+description: Run Bugbot after every successful commit and push
+alwaysApply: true
+---
+
+# Review After Push
+
+After every successful `git commit` and `git push`, launch Bugbot on `branch changes` and summarize findings in a table. Do not wait for the user to ask.
+
+Skip only when:
+- The user says "commit without review"
+- Commit or push failed
+- Nothing was committed
+
+## Launch Bugbot
+
+Launch exactly one `bugbot` subagent:
+
+- `subagent_type: "bugbot"`
+- `description: "Bugbot"`
+- `readonly: true`
+- `run_in_background: false`
+
+Prompt:
+
+```text
+Full Repository Path: <absolute repository path>
+Diff: branch changes
+```
+
+Follow the `review-bugbot` skill for retries if the diff cannot be computed.
+
+## Summarize results
+
+- **No issues** — one line, e.g. "Bugbot found no bugs."
+- **Findings** — markdown table, severity high → low:
+
+| Severity | Location (file:line) | Finding |
+
+Do not fix findings unless the user asks.
