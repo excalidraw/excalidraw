@@ -56,6 +56,10 @@ import {
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
+import {
+  CURRENT_ELEMENT_SCHEMA_VERSION,
+  upgradeElementSchema,
+} from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
@@ -454,6 +458,7 @@ const restoreElementWithProperties = <
     // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
+    schemaVersion: element.schemaVersion || CURRENT_ELEMENT_SCHEMA_VERSION,
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
@@ -527,7 +532,7 @@ export const restoreElement = (
     deleteInvisibleElements?: boolean;
   },
 ): typeof element | null => {
-  element = { ...element };
+  element = upgradeElementSchema({ ...element });
 
   switch (element.type) {
     case "text":

@@ -25,6 +25,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   seed: 1041657908,
   version: 120,
   versionNonce: 1188004276,
+  schemaVersion: 1,
   isDeleted: false,
   boundElements: null,
   updated: 1,

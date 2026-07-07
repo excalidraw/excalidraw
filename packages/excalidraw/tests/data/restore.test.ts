@@ -13,6 +13,7 @@ import {
 } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
+import { CURRENT_ELEMENT_SCHEMA_VERSION } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
 import { getStickyNoteLayout } from "@excalidraw/element";
@@ -111,6 +112,41 @@ describe("restoreElements", () => {
     const restoredElement = restore.restoreElements([stickyNote], null)[0];
 
     expect(restoredElement.strokeColor).toBe(COLOR_PALETTE.black);
+  });
+
+  it("lifts a legacy (unversioned) element to the current schema version", () => {
+    // element persisted before schema versioning existed
+    const legacyElement = {
+      type: "rectangle",
+      id: "legacy",
+      x: 0,
+      y: 0,
+    } as any as ExcalidrawElement;
+
+    expect(legacyElement).not.toHaveProperty("schemaVersion");
+
+    const [restored] = restore.restoreElements([legacyElement], null);
+    expect(restored.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+  });
+
+  it("keeps the schema version of an already-versioned element", () => {
+    const versionedElement = API.createElement({ type: "rectangle" });
+    expect(versionedElement.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+
+    const [restored] = restore.restoreElements([versionedElement], null);
+    expect(restored.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+  });
+
+  it("stamps newly created elements with the current schema version", () => {
+    expect(API.createElement({ type: "rectangle" }).schemaVersion).toBe(
+      CURRENT_ELEMENT_SCHEMA_VERSION,
+    );
+    expect(API.createElement({ type: "text" }).schemaVersion).toBe(
+      CURRENT_ELEMENT_SCHEMA_VERSION,
+    );
+    expect(API.createElement({ type: "arrow" }).schemaVersion).toBe(
+      CURRENT_ELEMENT_SCHEMA_VERSION,
+    );
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {

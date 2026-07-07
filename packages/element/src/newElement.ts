@@ -33,6 +33,7 @@ import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
+import { CURRENT_ELEMENT_SCHEMA_VERSION } from "./versioning";
 
 import type {
   ExcalidrawElement,
@@ -70,6 +71,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "seed"
   | "version"
   | "versionNonce"
+  | "schemaVersion"
   | "link"
   | "strokeStyle"
   | "fillStyle"
@@ -159,6 +161,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
+    schemaVersion: rest.schemaVersion ?? CURRENT_ELEMENT_SCHEMA_VERSION,
     isDeleted: false as false,
     boundElements,
     updated: timestamp,

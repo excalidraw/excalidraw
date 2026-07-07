@@ -62,6 +62,11 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
+  /** Schema version of the element's shape/semantics. Unrelated to `version` 
+      (the collab/reconciliation counter). Legacy elements persisted before
+      schema versioning lack it and are lifted to the current version on
+      restore. See `CURRENT_ELEMENT_SCHEMA_VERSION`. */
+  schemaVersion: number;
   /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
       Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
       Always kept in sync with the array order by `syncMovedIndices` and `syncInvalidIndices`.
