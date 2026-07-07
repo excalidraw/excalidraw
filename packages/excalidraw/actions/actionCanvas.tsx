@@ -323,9 +323,7 @@ export const actionZoomToFitSelection = register({
         : elements) as ExcalidrawElement[],
     );
     return zoomToFitBounds({
-      bounds: getCommonBounds(
-        getNonDeletedElements(nonDeletedSelectedElements),
-      ),
+      bounds: getCommonBounds(nonDeletedSelectedElements),
       appState: {
         ...appState,
         userToFollow: null,
