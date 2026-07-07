@@ -48,6 +48,7 @@ import type {
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getMimeType } from "../../data/blob";
+import { clearSelection } from "../../selection";
 import { createTestHook } from "../../components/App";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
@@ -148,8 +149,7 @@ export class API {
 
   static clearSelection = () => {
     act(() => {
-      // @ts-ignore
-      h.app.clearSelection(null);
+      clearSelection(h.app, null);
     });
     expect(API.getSelectedElements().length).toBe(0);
   };
