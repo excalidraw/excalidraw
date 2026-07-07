@@ -3,6 +3,10 @@
     "paste": "Itsatsi",
     "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
     "moveCanvas": "Mugitu oihala",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Errorea"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Gorde diskoan",
     "disk_details": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun fitxategi batan.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid-etik Excalidraw-ra",
     "button": "Txertatu",
-    "description": "Momentu honetan <flowchartLink>Flowchart</flowchartLink>, <sequenceLink> Sequence, </sequenceLink> eta <classLink>Class </classLink>Diagramak onartzen dira. Beste motak irudi gisa errendatuko dira Excalidrawn.",
+    "description": "",
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
