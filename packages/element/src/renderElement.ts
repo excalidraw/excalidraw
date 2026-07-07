@@ -152,9 +152,9 @@ export interface ExcalidrawElementWithCanvas {
   canvasOriginSceneY?: number;
   /**
    * Tip canvas for incremental freedraw rendering.  Contains only the last
-   * unfinalised segment (whose Catmull-Rom right-hand tangent changes with
-   * each new point) and is cleared + redrawn every frame.  Composited on top
-   * of `canvas` (the committed accumulation canvas) in drawElementFromCanvas.
+   * unfinalised spline interval (whose geometry changes with each new point)
+   * and is cleared + redrawn every frame.  Composited on top of `canvas`
+   * (the committed accumulation canvas) in drawElementFromCanvas.
    */
   tipCanvas?: HTMLCanvasElement;
 }

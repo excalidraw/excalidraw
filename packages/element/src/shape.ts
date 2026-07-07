@@ -44,6 +44,8 @@ import type {
 
 import { elementWithCanvasCache } from "./renderElement";
 
+import { getFreeDrawCapsuleSegments } from "./freedraw";
+
 import {
   canBecomePolygon,
   isElbowArrow,
@@ -1164,10 +1166,6 @@ export const toggleLinePolygonState = (
 //                         freedraw shape helper
 // -----------------------------------------------------------------------------
 
-const FREEDRAW_DEFAULT_PRESSURE = 0.5;
-const FREEDRAW_BEZIER_SUBDIVIDE_TARGET_SPACING = 3;
-const FREEDRAW_PRESSURE_SMOOTHING_RADIUS = 6;
-
 // Round to 2 dp — sub-pixel accuracy at SVG 96 dpi
 const r2 = (v: number) => Math.round(v * 100) / 100;
 
@@ -1232,209 +1230,51 @@ const freedrawTaperedCapsulePath = (
 };
 
 /**
- * Catmull-Rom tangent at points[i].Identical math to `getCatmullRomTangent`
- * in renderElement.ts (predictedPoint is not needed for finalised strokes).
- */
-const freedrawCatmullRomTangent = (
-  points: readonly (readonly [number, number])[],
-  i: number,
-): [number, number] => {
-  const N = points.length;
-  const cur = points[i];
-
-  let next: readonly [number, number];
-  if (i < N - 1) {
-    next = points[i + 1];
-  } else {
-    const prev2 = i > 0 ? points[i - 1] : cur;
-    next = [2 * cur[0] - prev2[0], 2 * cur[1] - prev2[1]];
-  }
-
-  let tx: number;
-  let ty: number;
-  if (i === 0) {
-    tx = (next[0] - cur[0]) * 0.5;
-    ty = (next[1] - cur[1]) * 0.5;
-  } else {
-    const prev = points[i - 1];
-    tx = (next[0] - prev[0]) * 0.5;
-    ty = (next[1] - prev[1]) * 0.5;
-  }
-
-  // Chord-length clamping (PCHIP-style).
-  const magSq = tx * tx + ty * ty;
-  if (magSq > 0) {
-    const dNx = next[0] - cur[0];
-    const dNy = next[1] - cur[1];
-    const chordNext = Math.sqrt(dNx * dNx + dNy * dNy);
-    let chordPrev = chordNext;
-    if (i > 0) {
-      const prev = points[i - 1];
-      const dPx = cur[0] - prev[0];
-      const dPy = cur[1] - prev[1];
-      chordPrev = Math.sqrt(dPx * dPx + dPy * dPy);
-    }
-    const maxMag = 3 * Math.min(chordNext, chordPrev);
-    const mag = Math.sqrt(magSq);
-    if (mag > maxMag) {
-      const s = maxMag / mag;
-      tx *= s;
-      ty *= s;
-    }
-  }
-
-  return [tx, ty];
-};
-
-/**
- * Triangular-kernel causal weighted pressure average (backward-only window).
- * When `simulatePressure` is true or pressures array is empty, returns the
- * default constant pressure so the geometry mirrors constant-pressure rendering.
- */
-const getFreeDrawSmoothedPressure = (
-  element: ExcalidrawFreeDrawElement,
-  i: number,
-): number => {
-  const { pressures } = element;
-  if (element.simulatePressure || pressures.length === 0) {
-    return FREEDRAW_DEFAULT_PRESSURE;
-  }
-  let sum = 0;
-  let totalWeight = 0;
-  for (let k = -FREEDRAW_PRESSURE_SMOOTHING_RADIUS; k <= 0; k++) {
-    const idx = i + k;
-    if (idx < 0) {
-      continue;
-    }
-    const p =
-      idx < pressures.length ? pressures[idx] : FREEDRAW_DEFAULT_PRESSURE;
-    const w = FREEDRAW_PRESSURE_SMOOTHING_RADIUS + 1 + k;
-    sum += p * w;
-    totalWeight += w;
-  }
-  return totalWeight > 0 ? sum / totalWeight : FREEDRAW_DEFAULT_PRESSURE;
-};
-
-/**
  * Returns one SVG path `d` string per tapered-capsule sub-segment for a
- * freedraw element, using the same Catmull-Rom Bezier subdivision and pressure
- * smoothing as the canvas renderer.
+ * freedraw element.  The subdivided capsule geometry is produced by
+ * `getFreeDrawCapsuleSegments` (shared with the canvas renderer) so the SVG
+ * export matches the live render exactly.
  */
 const getFreeDrawCapsulePaths = (
   element: ExcalidrawFreeDrawElement,
-): SVGPathString[] => {
-  const { points } = element;
-  const N = points.length;
-  const baseRadius = (element.strokeWidth * 1.25) / 2;
-
-  const getSmoothedPressure = (i: number): number =>
-    getFreeDrawSmoothedPressure(element, i);
-
-  const paths: SVGPathString[] = [];
-
-  if (N === 1) {
-    // Single-point stroke — filled circle.
-    const rr = r2(baseRadius * getSmoothedPressure(0) * 2);
-    const cx = r2(points[0][0]);
-    const cy = r2(points[0][1]);
-    paths.push(
-      `M ${(cx - rr).toFixed(2)} ${cy.toFixed(2)} A ${rr} ${rr} 0 1 1 ${(
-        cx + rr
-      ).toFixed(2)} ${cy.toFixed(2)} A ${rr} ${rr} 0 1 1 ${(cx - rr).toFixed(
-        2,
-      )} ${cy.toFixed(2)} Z` as SVGPathString,
-    );
-    return paths;
-  }
-
-  for (let i = 1; i < N; i++) {
-    const p0 = points[i - 1];
-    const p1 = points[i];
-    const r0 = baseRadius * getSmoothedPressure(i - 1) * 2;
-    const r1 = baseRadius * getSmoothedPressure(i) * 2;
-
-    const t0 = freedrawCatmullRomTangent(points, i - 1);
-    const t1 = freedrawCatmullRomTangent(points, i);
-
-    // Bezier subdivision.
-    const segLen = Math.sqrt((p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2);
-    const nSubdiv = Math.max(
-      1,
-      Math.ceil(segLen / FREEDRAW_BEZIER_SUBDIVIDE_TARGET_SPACING),
-    );
-
-    const cp1x = p0[0] + t0[0] / 3;
-    const cp1y = p0[1] + t0[1] / 3;
-    const cp2x = p1[0] - t1[0] / 3;
-    const cp2y = p1[1] - t1[1] / 3;
-
-    let prevX = p0[0];
-    let prevY = p0[1];
-    let prevR = r0;
-
-    for (let k = 1; k <= nSubdiv; k++) {
-      const t = k / nSubdiv;
-      const mt = 1 - t;
-      const mt2 = mt * mt;
-      const t2 = t * t;
-      const mt3 = mt2 * mt;
-      const t3 = t2 * t;
-
-      const x =
-        mt3 * p0[0] + 3 * mt2 * t * cp1x + 3 * mt * t2 * cp2x + t3 * p1[0];
-      const y =
-        mt3 * p0[1] + 3 * mt2 * t * cp1y + 3 * mt * t2 * cp2y + t3 * p1[1];
-      const r = r0 + (r1 - r0) * t;
-
-      paths.push(
-        freedrawTaperedCapsulePath(
-          prevX,
-          prevY,
-          prevR,
-          x,
-          y,
-          r,
-        ) as SVGPathString,
-      );
-      prevX = x;
-      prevY = y;
-      prevR = r;
-    }
-  }
-
-  return paths;
-};
+): SVGPathString[] =>
+  getFreeDrawCapsuleSegments(element).map(
+    (s) =>
+      freedrawTaperedCapsulePath(
+        s.x0,
+        s.y0,
+        s.r0,
+        s.x1,
+        s.y1,
+        s.r1,
+      ) as SVGPathString,
+  );
 
 /**
- * Generates an outline polygon for a freedraw element using the same
- * Catmull-Rom Bezier subdivision and pressure smoothing as the canvas renderer.
- * Returns `[x, y]` points in element-local coordinates that form a closed
- * polygon around the stroke (left side + right side reversed), suitable for
- * hit-testing and eraser intersection.
+ * Generates an outline polygon for a freedraw element from the shared
+ * capsule-segment geometry (`getFreeDrawCapsuleSegments`), so hit-testing and
+ * eraser intersection see the exact silhouette that is rendered.  Returns
+ * `[x, y]` points in element-local coordinates that form a closed polygon
+ * around the stroke (left side + right side reversed).
  */
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] => {
-  const { points } = element;
-  const N = points.length;
-  const baseRadius = (element.strokeWidth * 1.25) / 2;
+  const segments = getFreeDrawCapsuleSegments(element);
 
-  if (N === 0) {
+  if (segments.length === 0) {
     return [];
   }
 
-  const radius0 = baseRadius * getFreeDrawSmoothedPressure(element, 0) * 2;
-
-  if (N === 1) {
+  const first = segments[0];
+  if (segments.length === 1 && first.x0 === first.x1 && first.y0 === first.y1) {
     // Single point case
-    const cx = points[0][0];
-    const cy = points[0][1];
     const result: [number, number][] = [];
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
       result.push([
-        cx + Math.cos(angle) * radius0,
-        cy + Math.sin(angle) * radius0,
+        first.x0 + Math.cos(angle) * first.r0,
+        first.y0 + Math.sin(angle) * first.r0,
       ]);
     }
     return result;
@@ -1443,68 +1283,24 @@ export const getFreedrawOutlinePoints = (
   const leftPoints: [number, number][] = [];
   const rightPoints: [number, number][] = [];
 
-  for (let i = 1; i < N; i++) {
-    const p0 = points[i - 1];
-    const p1 = points[i];
-    const r0 = baseRadius * getFreeDrawSmoothedPressure(element, i - 1) * 2;
-    const r1 = baseRadius * getFreeDrawSmoothedPressure(element, i) * 2;
-
-    const t0 = freedrawCatmullRomTangent(points, i - 1);
-    const t1 = freedrawCatmullRomTangent(points, i);
-
-    const segLen = Math.sqrt((p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2);
-    const nSubdiv = Math.max(
-      1,
-      Math.ceil(segLen / FREEDRAW_BEZIER_SUBDIVIDE_TARGET_SPACING),
-    );
-
-    const cp1x = p0[0] + t0[0] / 3;
-    const cp1y = p0[1] + t0[1] / 3;
-    const cp2x = p1[0] - t1[0] / 3;
-    const cp2y = p1[1] - t1[1] / 3;
-
-    // Include the start point of the first segment.
-    const kStart = i === 1 ? 0 : 1;
-
-    for (let k = kStart; k <= nSubdiv; k++) {
-      const tParam = k / nSubdiv;
-      const mt = 1 - tParam;
-      const mt2 = mt * mt;
-      const t2 = tParam * tParam;
-      const mt3 = mt2 * mt;
-      const t3 = t2 * tParam;
-
-      const x =
-        mt3 * p0[0] + 3 * mt2 * tParam * cp1x + 3 * mt * t2 * cp2x + t3 * p1[0];
-      const y =
-        mt3 * p0[1] + 3 * mt2 * tParam * cp1y + 3 * mt * t2 * cp2y + t3 * p1[1];
-
-      // Bezier first derivative for the tangent direction.
-      const dtx =
-        3 *
-        (mt2 * (cp1x - p0[0]) +
-          2 * mt * tParam * (cp2x - cp1x) +
-          t2 * (p1[0] - cp2x));
-      const dty =
-        3 *
-        (mt2 * (cp1y - p0[1]) +
-          2 * mt * tParam * (cp2y - cp1y) +
-          t2 * (p1[1] - cp2y));
-
-      const len = Math.sqrt(dtx * dtx + dty * dty);
-      if (len === 0) {
-        continue;
-      }
-
-      // Perpendicular (left = +, right = −).
-      const px = -dty / len;
-      const py = dtx / len;
-
-      const r = r0 + (r1 - r0) * tParam;
-
-      leftPoints.push([x + px * r, y + py * r]);
-      rightPoints.push([x - px * r, y - py * r]);
+  for (let i = 0; i < segments.length; i++) {
+    const s = segments[i];
+    const dx = s.x1 - s.x0;
+    const dy = s.y1 - s.y0;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) {
+      continue;
     }
+    // Perpendicular (left = +, right = −).
+    const px = -dy / len;
+    const py = dx / len;
+
+    if (leftPoints.length === 0) {
+      leftPoints.push([s.x0 + px * s.r0, s.y0 + py * s.r0]);
+      rightPoints.push([s.x0 - px * s.r0, s.y0 - py * s.r0]);
+    }
+    leftPoints.push([s.x1 + px * s.r1, s.y1 + py * s.r1]);
+    rightPoints.push([s.x1 - px * s.r1, s.y1 - py * s.r1]);
   }
 
   // Closed polygon: left side (start -> end) + right side (end -> start).
