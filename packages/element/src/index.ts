@@ -99,6 +99,7 @@ export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";
+export * from "./versioning";
 export * from "./zindex";
 export * from "./arrows/helpers";
 export * from "./arrowheads";
