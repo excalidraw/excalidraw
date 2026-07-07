@@ -5,17 +5,7 @@ import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
 import { nanoid } from "nanoid";
 
-import {
-  clamp,
-  pointFrom,
-  pointDistance,
-  vector,
-  pointRotateRads,
-  vectorFromPoint,
-  vectorSubtract,
-  vectorDot,
-  vectorNormalize,
-} from "@excalidraw/math";
+import { clamp, pointFrom, pointDistance } from "@excalidraw/math";
 
 import {
   COLOR_PALETTE,
@@ -181,7 +171,6 @@ import {
   getFrameChildrenInsertionIndex,
   isCursorInFrame,
   addElementsToFrame,
-  replaceAllElementsInFrame,
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
@@ -222,11 +211,6 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectionStateForElements,
   makeNextSelectedElementIds,
-  getResizeOffsetXY,
-  getResizeArrowDirection,
-  getCursorForResizingElement,
-  getElementWithTransformHandleType,
-  getTransformHandleTypeFromCoords,
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
@@ -256,7 +240,6 @@ import {
   handleFocusPointPointerDown,
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
-  getUncroppedWidthAndHeight,
   getActiveTextElement,
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
@@ -439,9 +422,13 @@ import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 import { AnimationController } from "../renderer/animation";
 import {
+  maybeMoveCropRegion,
   resizeKeyUpFromPointerDownHandler,
   resizeOnKeyDownFromPointerDownHandler,
+  resizeOnPointerUpFromPointerDownHandler,
   resizePointerMoveFromPointerDownHandler,
+  resizeSetupOnPointerDownHandler,
+  setResizeCursorOnPointerMove,
 } from "../resize";
 
 import ConvertElementTypePopup, {
@@ -7614,77 +7601,17 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      selectedElements.length === 1 &&
-      !isOverScrollBar &&
-      !this.state.selectedLinearElement?.isEditing
-    ) {
-      // for linear elements, we'd like to prioritize point dragging over edge resizing
-      // therefore, we update and check hovered point index first
-      if (this.state.selectedLinearElement) {
-        this.handleHoverSelectedLinearElement(
-          this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
-        );
-      }
-
-      if (
-        (!this.state.selectedLinearElement ||
-          this.state.selectedLinearElement.hoverPointIndex === -1) &&
-        this.state.openDialog?.name !== "elementLinkSelector" &&
-        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
-        // HACK: Disable transform handles for linear elements on mobile until a
-        // better way of showing them is found
-        !(
-          isLinearElement(selectedElements[0]) &&
-          (this.editorInterface.userAgent.isMobileDevice ||
-            selectedElements[0].points.length === 2)
-        )
-      ) {
-        const elementWithTransformHandleType =
-          getElementWithTransformHandleType(
-            elements,
-            this.state,
-            scenePointerX,
-            scenePointerY,
-            this.state.zoom,
-            event.pointerType,
-            this.scene.getNonDeletedElementsMap(),
-            this.editorInterface,
-          );
-        if (
-          elementWithTransformHandleType &&
-          elementWithTransformHandleType.transformHandleType
-        ) {
-          setCursor(
-            this.interactiveCanvas,
-            getCursorForResizingElement(elementWithTransformHandleType),
-          );
-          return;
-        }
-      }
-    } else if (
-      selectedElements.length > 1 &&
-      !isOverScrollBar &&
-      this.state.openDialog?.name !== "elementLinkSelector"
-    ) {
-      const transformHandleType = getTransformHandleTypeFromCoords(
-        getCommonBounds(selectedElements),
+      setResizeCursorOnPointerMove(
+        this,
+        event,
+        elements,
+        selectedElements,
         scenePointerX,
         scenePointerY,
-        this.state.zoom,
-        event.pointerType,
-        this.editorInterface,
-      );
-      if (transformHandleType) {
-        setCursor(
-          this.interactiveCanvas,
-          getCursorForResizingElement({
-            transformHandleType,
-          }),
-        );
-        return;
-      }
+        isOverScrollBar,
+      )
+    ) {
+      return;
     }
 
     if (isEraserActive(this.state)) {
@@ -8811,86 +8738,9 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (isSelectionLikeTool(this.state.activeTool.type)) {
-      const elements = this.scene.getNonDeletedElements();
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      const selectedElements = this.scene.getSelectedElements(this.state);
-
-      if (
-        selectedElements.length === 1 &&
-        !this.state.selectedLinearElement?.isEditing &&
-        !isElbowArrow(selectedElements[0]) &&
-        !(
-          isLinearElement(selectedElements[0]) &&
-          (this.editorInterface.userAgent.isMobileDevice ||
-            selectedElements[0].points.length === 2)
-        ) &&
-        !(
-          this.state.selectedLinearElement &&
-          this.state.selectedLinearElement.hoverPointIndex !== -1
-        )
-      ) {
-        const elementWithTransformHandleType =
-          getElementWithTransformHandleType(
-            elements,
-            this.state,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            this.state.zoom,
-            event.pointerType,
-            this.scene.getNonDeletedElementsMap(),
-            this.editorInterface,
-          );
-        if (elementWithTransformHandleType != null) {
-          if (
-            elementWithTransformHandleType.transformHandleType === "rotation"
-          ) {
-            this.setState({
-              resizingElement: elementWithTransformHandleType.element,
-            });
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          } else if (this.state.croppingElementId) {
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          } else {
-            this.setState({
-              resizingElement: elementWithTransformHandleType.element,
-            });
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          }
-        }
-      } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
-          getCommonBounds(selectedElements),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-          this.editorInterface,
-        );
-      }
-      if (pointerDownState.resize.handleType) {
-        pointerDownState.resize.isResizing = true;
-        pointerDownState.resize.offset = tupleToCoors(
-          getResizeOffsetXY(
-            pointerDownState.resize.handleType,
-            selectedElements,
-            elementsMap,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ),
-        );
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0]) &&
-          selectedElements[0].points.length === 2
-        ) {
-          pointerDownState.resize.arrowDirection = getResizeArrowDirection(
-            pointerDownState.resize.handleType,
-            selectedElements[0],
-          );
-        }
+      if (resizeSetupOnPointerDownHandler(this, event, pointerDownState)) {
+        // a transform (resize/rotate) handle was grabbed; resize setup takes
+        // over the pointer interaction, so skip selection handling below
       } else {
         if (this.state.selectedLinearElement) {
           const linearElementEditor = this.state.selectedLinearElement;
@@ -10384,100 +10234,16 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           // #region move crop region
-          if (this.state.croppingElementId) {
-            const croppingElement = this.scene
-              .getNonDeletedElementsMap()
-              .get(this.state.croppingElementId);
-
-            if (
-              croppingElement &&
-              isImageElement(croppingElement) &&
-              croppingElement.crop !== null &&
-              pointerDownState.hit.element === croppingElement
-            ) {
-              const crop = croppingElement.crop;
-              const image =
-                isInitializedImageElement(croppingElement) &&
-                this.imageCache.get(croppingElement.fileId)?.image;
-
-              if (image && !(image instanceof Promise)) {
-                const uncroppedSize =
-                  getUncroppedWidthAndHeight(croppingElement);
-                const instantDragOffset = vector(
-                  pointerCoords.x - lastPointerCoords.x,
-                  pointerCoords.y - lastPointerCoords.y,
-                );
-
-                // to reduce cursor:image drift, we need to take into account
-                // the canvas image element scaling so we can accurately
-                // track the pixels on movement
-                instantDragOffset[0] *=
-                  image.naturalWidth / uncroppedSize.width;
-                instantDragOffset[1] *=
-                  image.naturalHeight / uncroppedSize.height;
-
-                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-                  croppingElement,
-                  elementsMap,
-                );
-
-                const topLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const topRight = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x2, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const bottomLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y2),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const topEdge = vectorNormalize(
-                  vectorSubtract(topRight, topLeft),
-                );
-                const leftEdge = vectorNormalize(
-                  vectorSubtract(bottomLeft, topLeft),
-                );
-
-                // project instantDrafOffset onto leftEdge and topEdge to decompose
-                const offsetVector = vector(
-                  vectorDot(instantDragOffset, topEdge),
-                  vectorDot(instantDragOffset, leftEdge),
-                );
-
-                const nextCrop = {
-                  ...crop,
-                  x: clamp(
-                    crop.x -
-                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
-                    0,
-                    image.naturalWidth - crop.width,
-                  ),
-                  y: clamp(
-                    crop.y -
-                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
-                    0,
-                    image.naturalHeight - crop.height,
-                  ),
-                };
-
-                this.scene.mutateElement(croppingElement, {
-                  crop: nextCrop,
-                });
-
-                return;
-              }
-            }
+          if (
+            maybeMoveCropRegion(
+              this,
+              pointerDownState,
+              pointerCoords,
+              lastPointerCoords,
+              elementsMap,
+            )
+          ) {
+            return;
           }
 
           // Snap cache *must* be synchronously popuplated before initial drag,
@@ -11500,45 +11266,12 @@ class App extends React.Component<AppProps, AppState> {
         this.store.scheduleCapture();
       }
 
-      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        // update the store snapshot, so that invisible elements are not captured by the store
-        this.updateScene({
-          elements: this.scene
-            .getElementsIncludingDeleted()
-            .filter((el) => el.id !== resizingElement.id),
-          captureUpdate: CaptureUpdateAction.NEVER,
-        });
-      }
-
-      // handle frame membership for resizing frames and/or selected elements
-      if (pointerDownState.resize.isResizing) {
-        let nextElements = updateFrameMembershipOfSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-          this,
-        );
-
-        const selectedFrames = this.scene
-          .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
-          );
-
-        for (const frame of selectedFrames) {
-          nextElements = replaceAllElementsInFrame(
-            nextElements,
-            getElementsInResizingFrame(
-              this.scene.getElementsIncludingDeleted(),
-              frame,
-              this.state,
-              elementsMap,
-            ),
-            frame,
-          );
-        }
-
-        this.scene.replaceAllElements(nextElements);
-      }
+      resizeOnPointerUpFromPointerDownHandler(
+        this,
+        pointerDownState,
+        resizingElement,
+        elementsMap,
+      );
 
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
