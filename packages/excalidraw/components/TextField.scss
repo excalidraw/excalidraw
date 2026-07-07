@@ -36,7 +36,7 @@
     }
 
     &__label {
-      font-family: "Assistant";
+      font-family: var(--ui-font);
       font-style: normal;
       font-weight: 600;
       font-size: 0.875rem;
@@ -87,7 +87,7 @@
 
         color: var(--ExcTextField--color);
 
-        font-family: "Assistant";
+        font-family: var(--ui-font);
         font-style: normal;
         font-weight: 400;
         font-size: 1rem;

@@ -11,6 +11,10 @@ export const supportsResizeObserver =
 
 export const APP_NAME = "Excalidraw";
 
+/** CSS font stack for interface chrome (menus, dialogs, tooltips, frame labels). */
+export const UI_FONT_FAMILY =
+  '"Century Gothic", CenturyGothic, AppleGothic, sans-serif';
+
 // distance when creating text before it's considered `autoResize: false`
 // we're using higher threshold so that clicks that end up being drags
 // don't unintentionally create text elements that are wrapped to a few chars

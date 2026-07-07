@@ -36,8 +36,7 @@ body.excalidraw-cursor-resize * {
 }
 
 .excalidraw {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
@@ -796,7 +795,7 @@ body.excalidraw-cursor-resize * {
     textarea {
       width: 100%;
       margin: 10px 0;
-      font-family: "Cascadia";
+      font-family: var(--ui-font);
       font-size: 0.8em;
     }
   }
@@ -836,6 +835,6 @@ body.excalidraw-cursor-resize * {
     color: #fff;
     font-weight: 700;
     letter-spacing: 0.6px;
-    font-family: "Assistant";
+    font-family: var(--ui-font);
   }
 }

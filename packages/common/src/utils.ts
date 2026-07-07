@@ -17,6 +17,7 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
+  UI_FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -96,6 +97,10 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamilyValues;
 }) => {
+  if (fontFamily === FONT_FAMILY.Assistant) {
+    return UI_FONT_FAMILY;
+  }
+
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
       return `${fontFamilyString}${getFontFamilyFallbacks(id)
