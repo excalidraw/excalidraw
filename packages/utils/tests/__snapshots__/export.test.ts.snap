@@ -32,6 +32,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidth": 2,
   "currentItemStrokeWidthKey": "medium",
   "currentItemTextAlign": "left",
   "cursorButton": "up",
