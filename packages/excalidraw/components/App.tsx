@@ -7040,13 +7040,12 @@ class App extends React.Component<AppProps, AppState> {
           shouldBindToContainer && container && isArrowElement(container)
             ? DEFAULT_BOUND_TEXT_LABEL_POSITION
             : null,
-        groupIds: container?.groupIds ?? [],
+        groupIds: shouldBindToContainer ? container?.groupIds ?? [] : [],
         lineHeight,
-        angle: container
-          ? isArrowElement(container)
-            ? (0 as Radians)
-            : container.angle
-          : (0 as Radians),
+        angle:
+          shouldBindToContainer && container && !isArrowElement(container)
+            ? container.angle
+            : (0 as Radians),
         frameId,
       });
 

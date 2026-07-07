@@ -1814,6 +1814,34 @@ describe("textWysiwyg", () => {
       expect(text.text).toBe("Excalidraw");
     });
 
+    it("shouldn't inherit groupIds or angle when creating unbound text inside a grouped/rotated container", async () => {
+      const groupedRectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        groupIds: ["group1"],
+        angle: 0.3,
+      });
+      API.setElements([groupedRectangle]);
+
+      UI.clickTool("text");
+      // click inside the container but away from its center so the text
+      // doesn't bind to it
+      mouse.clickAt(90, 57.5);
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.groupIds).toEqual([]);
+      expect(text.angle).toBe(0);
+    });
+
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
       const text = API.createElement({
         type: "text",
