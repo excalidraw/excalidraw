@@ -200,9 +200,8 @@ export const changeProperty = (
         console.error(
           "[NONDELETED][INVARIANT] changeProperty(): skipping deleted selected/editing element",
         );
-        return element;
       }
-      return callback(element);
+      return callback(element as NonDeletedExcalidrawElement);
     }
     return element;
   });
