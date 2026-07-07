@@ -29,6 +29,11 @@ const pressKey = (key: string) => {
 describe("cursor hint", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
+    // hints are only shown once the pointer position is known
+    fireEvent.pointerMove(GlobalTestState.interactiveCanvas, {
+      clientX: 100,
+      clientY: 50,
+    });
   });
 
   it("shows hint when cycling arrow types via shortcut, and auto-hides it", async () => {
@@ -87,6 +92,12 @@ describe("cursor hint", () => {
     });
 
     expect(getCursorHint()).toBeNull();
+
+    // complete the gesture so no drag state leaks into other tests
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      clientX: 100,
+      clientY: 100,
+    });
   });
 
   it("does not show hint when picking a tool via toolbar", () => {
@@ -167,6 +178,18 @@ describe("cursor hint", () => {
       expect(h.state.activeTool.type).toBe("line");
       expect(getCursorHint()).toBeNull();
     });
+  });
+
+  it("does not show hint when pointer position is unknown", () => {
+    // simulate no pointermove having happened yet
+    h.app.lastViewportPosition.x = 0;
+    h.app.lastViewportPosition.y = 0;
+
+    UI.clickTool("arrow");
+    pressKey(KEYS.A);
+
+    expect(h.state.currentItemArrowType).toBe(ARROW_TYPE.elbow);
+    expect(getCursorHint()).toBeNull();
   });
 
   it("tracks pointer position while visible", () => {

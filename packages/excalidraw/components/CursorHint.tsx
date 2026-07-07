@@ -63,6 +63,13 @@ export class CursorHints {
    * the timer.
    */
   show = (content: React.ReactNode) => {
+    // `lastViewportPosition` stays at its initial (0, 0) until the first
+    // pointermove, so in pointer-less flows (e.g. keyboard-only session so
+    // far) we don't know where to show the hint — don't show it at all
+    const { x, y } = this.app.lastViewportPosition;
+    if (x === 0 && y === 0) {
+      return;
+    }
     this.lastShownAt = Date.now();
     this.app.updateEditorAtom(cursorHintAtom, {
       content,
