@@ -226,9 +226,10 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <div style={{ position: "relative" }}>
+    <div className="excalidraw-ui-top-left" style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
+      {renderTopLeftUI?.(false, appState)}
       <tunnels.MainMenuTunnel.Out />
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>

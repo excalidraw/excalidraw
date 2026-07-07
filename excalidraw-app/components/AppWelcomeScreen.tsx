@@ -15,9 +15,9 @@ export const AppWelcomeScreen: React.FC<{
 
   if (isExcalidrawPlusSignedUser) {
     headingContent = t("welcomeScreen.app.center_heading_plus")
-      .split(/(Excalidraw\+)/)
+      .split(/(Adobe\+)/)
       .map((bit, idx) => {
-        if (bit === "Excalidraw+") {
+        if (bit === "Adobe+") {
           return (
             <a
               style={{ pointerEvents: POINTER_EVENTS.inheritFromUI }}
@@ -26,7 +26,7 @@ export const AppWelcomeScreen: React.FC<{
               }?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
               key={idx}
             >
-              Excalidraw+
+              Adobe+
             </a>
           );
         }
