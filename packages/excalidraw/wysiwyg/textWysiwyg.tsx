@@ -889,7 +889,7 @@ export const textWysiwyg = ({
 
       // Otherwise, re-enable submit on blur and refocus the editor.
       const handleBlur = () => {
-        if(!document.hasFocus*()) {
+        if(!document.hasFocus()) {
           return;
         }
         handleSubmit();
