@@ -45,6 +45,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -680,6 +681,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1243,6 +1245,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1605,6 +1608,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1969,6 +1973,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2234,6 +2239,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2689,6 +2695,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2994,6 +3001,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3315,6 +3323,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3611,6 +3620,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3899,6 +3909,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4136,6 +4147,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4395,6 +4407,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4668,6 +4681,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4899,6 +4913,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5130,6 +5145,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5379,6 +5395,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5637,6 +5654,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5897,6 +5915,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -6228,6 +6247,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -6657,6 +6677,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7033,6 +7054,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7347,6 +7369,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7641,6 +7664,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7873,6 +7897,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8227,6 +8252,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8581,6 +8607,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8989,6 +9016,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9278,6 +9306,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9544,6 +9573,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9811,6 +9841,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10045,6 +10076,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10344,6 +10376,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10663,6 +10696,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10901,6 +10935,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -11828,6 +11863,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12090,6 +12126,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12327,6 +12364,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12566,6 +12604,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12971,6 +13010,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13183,6 +13223,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13392,6 +13433,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13695,6 +13737,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13995,6 +14038,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14242,6 +14286,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14481,6 +14526,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14720,6 +14766,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14969,6 +15016,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -15302,6 +15350,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -15474,6 +15523,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -15760,6 +15810,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -16025,6 +16076,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -16180,6 +16232,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -16464,6 +16517,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -16628,6 +16682,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -17378,6 +17433,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -18026,6 +18082,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -18674,6 +18731,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -19425,6 +19483,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -20195,6 +20254,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -20677,6 +20737,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -21190,6 +21251,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -21651,6 +21713,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,

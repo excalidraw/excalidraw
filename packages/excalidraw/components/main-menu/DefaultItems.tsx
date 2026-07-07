@@ -17,6 +17,7 @@ import {
   actionToggleStats,
   actionToggleTheme,
   actionToggleZenMode,
+  actionToggleFocusMode,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
@@ -544,6 +545,24 @@ export const PreferencesToggleGridModeItem = () => {
   );
 };
 
+export const PreferencesToggleFocusModeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.focusModeEnabled}
+      shortcut={getShortcutFromShortcutName("focusMode")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleFocusMode);
+        event.preventDefault();
+      }}
+    >
+      {t("buttons.focusMode")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleZenModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -619,6 +638,7 @@ export const Preferences = ({
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
             <PreferencesToggleZenModeItem />
+            <PreferencesToggleFocusModeItem />
             <PreferencesToggleViewModeItem />
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
@@ -638,6 +658,7 @@ Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
+Preferences.ToggleFocusMode = PreferencesToggleFocusModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
 Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
 

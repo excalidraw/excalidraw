@@ -787,7 +787,9 @@ export const renderElement = (
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
-    appState.openDialog?.name === "elementLinkSelector" &&
+    (appState.openDialog?.name === "elementLinkSelector" ||
+      (appState.focusModeEnabled &&
+        Object.keys(appState.selectedElementIds).length > 0)) &&
     !appState.selectedElementIds[element.id] &&
     !appState.hoveredElementIds[element.id];
 
