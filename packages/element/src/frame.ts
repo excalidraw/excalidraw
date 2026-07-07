@@ -42,6 +42,7 @@ import type {
   ElementsMapOrArray,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 
@@ -161,7 +162,7 @@ export const isCursorInFrame = (
     x: number;
     y: number;
   },
-  frame: ExcalidrawFrameLikeElement,
+  frame: NonDeleted<ExcalidrawFrameLikeElement>,
   elementsMap: ElementsMap,
 ) => {
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);

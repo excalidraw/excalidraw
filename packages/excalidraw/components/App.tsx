@@ -232,7 +232,6 @@ import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
-  isNonDeletedElement,
   Scene,
   Store,
   CaptureUpdateAction,
@@ -262,6 +261,7 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
+  isNonDeletedElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6296,10 +6296,17 @@ class App extends React.Component<AppProps, AppState> {
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit
         const containingFrame = getContainingFrame(element, elementsMap);
+        if (containingFrame && !isNonDeletedElement(containingFrame)) {
+          console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
+        }
         return containingFrame &&
           this.state.frameRendering.enabled &&
           this.state.frameRendering.clip
-          ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
+          ? isCursorInFrame(
+              { x, y },
+              containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
+              elementsMap,
+            )
           : true;
       })
       .filter((el) => {
