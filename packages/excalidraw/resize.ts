@@ -51,6 +51,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { setCursor } from "./cursor";
+import { handleHoverSelectedLinearElement } from "./linear";
 import {
   getReferenceSnapPoints,
   isSnappingEnabled,
@@ -538,7 +539,8 @@ export const setResizeCursorOnPointerMove = (
     // for linear elements, we'd like to prioritize point dragging over edge resizing
     // therefore, we update and check hovered point index first
     if (app.state.selectedLinearElement) {
-      app.handleHoverSelectedLinearElement(
+      handleHoverSelectedLinearElement(
+        app,
         app.state.selectedLinearElement,
         scenePointerX,
         scenePointerY,
