@@ -24,7 +24,7 @@ import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, UIAppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -123,7 +123,7 @@ export const actionupdateFrameRendering = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  checked: (appState: AppState) => appState.frameRendering.enabled,
+  checked: (appState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
@@ -205,7 +205,6 @@ export const actionWrapSelectionInFrame = register({
       [...app.scene.getElementsIncludingDeleted(), frame],
       selectedElements,
       frame,
-      appState,
     );
 
     return {

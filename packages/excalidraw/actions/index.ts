@@ -13,6 +13,7 @@ export {
   actionChangeStrokeWidth,
   actionChangeFillStyle,
   actionChangeSloppiness,
+  actionChangeFreedrawMode,
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,
@@ -34,6 +35,7 @@ export {
 export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
 
 export { actionFinalize } from "./actionFinalize";
+export { actionDeselect } from "./actionDeselect";
 
 export {
   actionChangeProjectName,

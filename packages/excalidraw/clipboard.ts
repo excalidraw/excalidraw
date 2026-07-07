@@ -22,6 +22,7 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { IMAGE_MIME_TYPES, STRING_MIME_TYPES } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -32,8 +33,6 @@ import {
   isSupportedImageFileType,
   normalizeFile,
 } from "./data/blob";
-
-import type { FileSystemHandle } from "./data/filesystem";
 
 import type { BinaryFiles } from "./types";
 
@@ -149,7 +148,7 @@ export const serializeAsClipboardJSON = ({
   files: BinaryFiles | null;
 }) => {
   const elementsMap = arrayToMap(elements);
-  const framesToCopy = new Set(
+  const framesToCopy = new Set<ExcalidrawFrameLikeElement>(
     elements.filter((element) => isFrameLikeElement(element)),
   );
   let foundFile = false;
@@ -369,7 +368,7 @@ type AllowedParsedDataTransferItem =
       type: ValueOf<typeof IMAGE_MIME_TYPES>;
       kind: "file";
       file: File;
-      fileHandle: FileSystemHandle | null;
+      fileHandle: FileSystemFileHandle | null;
     }
   | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
 
@@ -378,7 +377,7 @@ type ParsedDataTransferItem =
       type: string;
       kind: "file";
       file: File;
-      fileHandle: FileSystemHandle | null;
+      fileHandle: FileSystemFileHandle | null;
     }
   | { type: string; kind: "string"; value: string };
 

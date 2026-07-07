@@ -6,11 +6,16 @@ import {
   FRAME_STYLE,
 } from "@excalidraw/common";
 
+import { pointFrom } from "@excalidraw/math";
+
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
@@ -81,7 +86,7 @@ describe("exportToSvg", () => {
           originalText:
             "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
           index: "a4" as FractionalIndex,
-        } as ExcalidrawTextElement,
+        } as NonDeleted<ExcalidrawTextElement>,
       ],
       DEFAULT_OPTIONS,
       null,
@@ -186,11 +191,50 @@ describe("exportToSvg", () => {
 
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
-      [rectangleWithLinkFixture],
+      [rectangleWithLinkFixture] as NonDeletedExcalidrawElement[],
       DEFAULT_OPTIONS,
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();
+  });
+
+  // #11439: a perfectly horizontal/vertical arrow has a zero-size bounding box.
+  // The bound-text "gap" mask must use userSpaceOnUse units, otherwise its
+  // objectBoundingBox region collapses to zero area and the whole arrow line
+  // disappears from the SVG export (only the label remains).
+  it("keeps a horizontal arrow with a bound label visible (#11439)", async () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow-11439",
+      width: 200,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      boundElements: [{ type: "text", id: "label-11439" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label-11439",
+      text: "label",
+      width: 50,
+      height: 20,
+      containerId: "arrow-11439",
+    });
+
+    const svgElement = await exportUtils.exportToSvg(
+      [arrow, label] as NonDeletedExcalidrawElement[],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    const mask = svgElement.querySelector("mask");
+    expect(mask).not.toBeNull();
+    expect(mask?.getAttribute("maskUnits")).toBe("userSpaceOnUse");
+    // a degenerate (objectBoundingBox) region would be zero-area here
+    expect(Number(mask?.getAttribute("width"))).toBeGreaterThan(0);
+    expect(Number(mask?.getAttribute("height"))).toBeGreaterThan(0);
+
+    // the masked arrow group still renders its line (not clipped away)
+    expect(svgElement.querySelector("g[mask] path")).not.toBeNull();
   });
 });
 

@@ -74,8 +74,6 @@ export type InteractiveCanvasRenderConfig = {
 };
 
 export type RenderInteractiveSceneCallback = {
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
@@ -113,7 +111,7 @@ export type InteractiveSceneRenderConfig = {
 export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
-  newElement: ExcalidrawElement | null;
+  newElement: NonDeletedExcalidrawElement | null;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;

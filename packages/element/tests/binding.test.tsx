@@ -178,6 +178,64 @@ describe("binding for simple arrows", () => {
     });
   });
 
+  describe("self-binding (both ends to the same element) single-click finalize", () => {
+    // rect spans x:200..400, y:200..400; orbit ring is ~15px outside the outline
+    const INSIDE: [number, number] = [250, 250];
+    const ORBIT_LEFT: [number, number] = [187, 300];
+    const ORBIT_RIGHT: [number, number] = [413, 300];
+    const MIDDLE: [number, number] = [550, 100];
+
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      UI.createElement("rectangle", {
+        x: 200,
+        y: 200,
+        width: 200,
+        height: 200,
+      });
+    });
+
+    const drawSelfArrow = (start: [number, number], end: [number, number]) => {
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.clickAt(...start);
+      mouse.moveTo(...MIDDLE);
+      mouse.clickAt(...MIDDLE); // commit a middle point so it's a multi-point arrow
+      mouse.moveTo(...end);
+      mouse.clickAt(...end); // single click at the end
+    };
+
+    it("orbit -> orbit finalizes on a single click", () => {
+      drawSelfArrow(ORBIT_LEFT, ORBIT_RIGHT);
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(h.state.multiElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("selection");
+      expect(arrow.startBinding?.elementId).toBe(arrow.endBinding?.elementId);
+      expect(arrow.endBinding?.elementId).not.toBe(undefined);
+    });
+
+    it("inside -> orbit finalizes on a single click", () => {
+      drawSelfArrow(INSIDE, ORBIT_RIGHT);
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(h.state.multiElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("selection");
+      expect(arrow.startBinding?.elementId).toBe(arrow.endBinding?.elementId);
+      expect(arrow.endBinding?.elementId).not.toBe(undefined);
+    });
+
+    it("inside -> inside keep in multi-point mode (no single-click finalize)", () => {
+      drawSelfArrow(INSIDE, [INSIDE[0] + 50, INSIDE[1] + 50]); // end dropped inside the rect
+
+      // ambiguous → must be confirmed with a second click, so still in progress
+      expect(h.state.multiElement).not.toBe(null);
+      expect(h.state.activeTool.type).toBe("arrow");
+    });
+  });
+
   describe("when arrow is outside of shape", () => {
     beforeEach(async () => {
       mouse.reset();
@@ -403,6 +461,7 @@ describe("binding for simple arrows", () => {
       mouse.moveTo(340, 251);
       mouse.moveTo(410, 251);
       mouse.clickAt(410, 251);
+      mouse.clickAt(410, 251);
       const arrow = h.elements[h.elements.length - 1] as any;
 
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
@@ -446,6 +505,7 @@ describe("binding for simple arrows", () => {
       mouse.clickAt(300, 200);
       mouse.moveTo(350, 251);
       mouse.moveTo(410, 251);
+      mouse.clickAt(410, 251);
       mouse.clickAt(410, 251);
 
       const arrow = API.getSelectedElement() as ExcalidrawArrowElement;

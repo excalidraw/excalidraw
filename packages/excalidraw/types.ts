@@ -4,6 +4,7 @@ import type {
   throttleRAF,
   MIME_TYPES,
   EditorInterface,
+  StrokeWidthKey,
 } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element";
@@ -32,6 +33,8 @@ import type {
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
   BindMode,
+  ExcalidrawTextElement,
+  StrokeVariability,
 } from "@excalidraw/element/types";
 
 import type {
@@ -53,10 +56,10 @@ import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
 import type Library from "./data/library";
-import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -269,6 +272,44 @@ export type ObservedElementsAppState = {
   activeLockedId: AppState["activeLockedId"];
 };
 
+export type BoxSelectionMode = "contain" | "overlap";
+
+/**
+ * A box, in scene coordinates, that pan & zoom are constrained to.
+ *
+ * This is a private type. For public API, only use specific properties,
+ * needed.
+ */
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** when set, panning is constrained so the viewport stays within the box */
+  lockScroll: boolean;
+  /** when set, the viewport cannot zoom out below `zoom` */
+  lockZoom: boolean;
+  /**
+   * The zoom resolved after the `setViewport` navigation settled.
+   */
+  zoom: number;
+  /**
+   * Pixel amount the viewport may overscroll past its resting clamp before
+   * snapping back (rubberband). Screen pixels, zoom-independent. Resolved
+   * from `lock.overscroll` at the time the lock was installed (`true` →
+   * default give, `false` → 0).
+   */
+  overscroll: number;
+  /**
+   * Extra scrollable margin around the box (CSS-style), letting the viewport
+   * scroll past each box edge to reveal that much empty space. Values are
+   * viewport pixels and zoom-independent (a fixed on-screen distance).
+   * Resolved from the `offsets` passed to `setViewport` (see
+   * {@link ViewportOffsets}) at the time the lock was installed.
+   */
+  offsets?: Offsets;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -307,11 +348,16 @@ export interface AppState {
    * `bindingPreference` and keyboard modifiers (ctrl/alt)
    */
   isBindingEnabled: boolean;
+  /** user box selection preference; defaults to "contain" when unset */
+  boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
+  /**
+   * The bindable element the UI highlights for the user when an arrow is
+   * dragged or otherwise its endpoint being close to said element.
+   */
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
@@ -324,11 +370,11 @@ export interface AppState {
     clip: boolean;
   };
   editingFrame: string | null;
-  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
+  elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
    */
-  editingTextElement: NonDeletedExcalidrawElement | null;
+  editingTextElement: ExcalidrawTextElement | null;
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
@@ -343,8 +389,11 @@ export interface AppState {
     type: "selection" | "lasso";
     initialized: boolean;
   };
+
+  // Pen handling
   penMode: boolean;
   penDetected: boolean;
+
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -352,9 +401,10 @@ export interface AppState {
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
-  currentItemStrokeWidth: number;
+  currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
+  currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
@@ -367,6 +417,7 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -408,7 +459,11 @@ export interface AppState {
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
-  toast: { message: string; closable?: boolean; duration?: number } | null;
+  toast: {
+    message: React.ReactNode;
+    closable?: boolean;
+    duration?: number;
+  } | null;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
@@ -427,7 +482,7 @@ export interface AppState {
   offsetTop: number;
   offsetLeft: number;
 
-  fileHandle: FileSystemHandle | null;
+  fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;
@@ -464,6 +519,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  // Stores the current bind mode which is detemined at various points during
+  // a drag operation (like pointer position vs bindable element) but needed
+  // globally for calculating the binding strategy
   bindMode: BindMode;
 }
 
@@ -481,7 +539,21 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
+  // stripped from the UI-relevant app state so their (often per-frame)
+  // updates don't re-render the editor UI — canvas-only concerns.
+  // Subscribe via `useExcalidrawStateValue` if you need them in UI.
+  | "cursorButton"
+  | "scrollX"
+  | "scrollY"
+  | "zoom"
+  | "shouldCacheIgnoreZoom"
+  // canvas-interaction transients (snapping, binding & frame
+  // highlights) — identity churns per pointermove while interacting
+  | "snapLines"
+  | "originSnapOffset"
+  | "suggestedBinding"
+  | "frameToHighlight"
+  | "elementsToHighlight"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -541,9 +613,20 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type ExcalidrawInitialState = {
+  viewport?: Omit<SetViewportOptions, "animation">;
+};
+
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
+};
+
+export type OnExportProgress = {
+  type: "progress";
+  message?: React.ReactNode;
+  /** 0-1 range */
+  progress?: number;
 };
 
 export interface ExcalidrawProps {
@@ -552,11 +635,32 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onThemeChange?: (theme: Theme | "system") => void;
+  /**
+   * note: only subscribes if the props.onIncrement is defined on initial render
+   */
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
-  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
+  initialState?: ExcalidrawInitialState;
+  /**
+   * Invoked as soon as the Excalidraw API is available
+   * NOTE editor is not yet mounted, and state is not yet initialized
+   */
+  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI | null) => void;
+  /**
+   * Invoked once the editor root is mounted.
+   */
+  onMount?: (payload: ExcalidrawMountPayload) => void;
+  /**
+   * Invoked when the editor root is unmounted.
+   */
+  onUnmount?: () => void;
+  /**
+   * Invoked once the initial scene is loaded.
+   */
+  onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -605,6 +709,10 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
+  /**
+   * dimensions and size constraints for inserted images
+   */
+  imageOptions?: ImageOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -641,6 +749,32 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  /**
+   * Called before exporting to a file.
+   *
+   * Allows the host app to intercept and delay saving until async operations
+   * (e.g., images are loaded) complete.
+   *
+   * If Promise/AsyncGenerator is returned, a progress toast will be shown
+   * until the operation completes. Generator can yield progress updates.
+   */
+  onExport?: (
+    /** type of export. Currently we only call for JSON exports or
+     * JSON-embedded PNG (which is also identified as `json` type here)*/
+    type: "json",
+    data: {
+      elements: readonly ExcalidrawElement[];
+      appState: AppState;
+      files: BinaryFiles;
+    },
+    options: {
+      /** signal that gets aborted if user cancels the export (e.g. closes
+       * the native file picker dialog). In that case, you can either
+       * return immediately, or throw AbortError.
+       */
+      signal: AbortSignal;
+    },
+  ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
 }
 
 export type SceneData = {
@@ -665,6 +799,11 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+export type ImageOptions = Partial<{
+  maxWidthOrHeight: number;
+  maxFileSizeBytes: number;
+}>;
+
 // NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
@@ -675,6 +814,11 @@ export type CanvasActions = Partial<{
   export: false | ExportOpts;
   loadScene: boolean;
   saveToActiveFile: boolean;
+  /**
+   * defaults to true if `props.theme` is omitted or `props.onThemeChange`
+   * is supplied (at which point the theme is considered as host-app controlled),
+   * else default to false
+   * */
   toggleTheme: boolean | null;
   saveAsImage: boolean;
 }>;
@@ -706,6 +850,7 @@ export type AppProps = Merge<
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
     >;
+    imageOptions: Required<ImageOptions>;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
@@ -719,6 +864,8 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  api: App["api"];
+  sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
@@ -741,7 +888,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
-  scrollToContent: App["scrollToContent"];
+  setViewport: App["setViewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -756,16 +903,20 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
-  getEditorUIOffsets: App["getEditorUIOffsets"];
+  getViewportOffsets: App["getViewportOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+  onEvent: App["onEvent"];
+  onStateChange: App["onStateChange"];
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
+
+  setAppState: App["setAppState"];
 };
 
 export type PointerDownState = Readonly<{
@@ -804,8 +955,13 @@ export type PointerDownState = Readonly<{
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // Whether the pointer is hitting the common bounding box of selected
+    // elements, which is useful for discriminating between selecitng
+    // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
+  // This is determined on the initial pointer down event to
+  // set various interaction modalities
   withCmdOrCtrl: boolean;
   drag: {
     // Might change during the pointer interaction
@@ -815,9 +971,8 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
-    // Whether to block drag after lasso selection
-    // this is meant to be used to block dragging after lasso selection on PCs
-    // until the next pointer down
+    // explicit flag for specific scenarios such as:
+    // - after lasso selection until the next pointer down
     blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
@@ -832,13 +987,31 @@ export type PointerDownState = Readonly<{
     onKeyUp: null | ((event: KeyboardEvent) => void);
   };
   boxSelection: {
+    // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
   };
 }>;
 
 export type UnsubscribeCallback = () => void;
 
+export type ExcalidrawMountPayload = {
+  excalidrawAPI: ExcalidrawImperativeAPI;
+  /*
+   *Excalidraw container.
+   * should never be null, but just to be safe
+   */
+  container: HTMLDivElement | null;
+};
+
+export type ExcalidrawImperativeAPIEventMap = {
+  "editor:mount": [payload: ExcalidrawMountPayload];
+  "editor:initialize": [api: ExcalidrawImperativeAPI];
+  "editor:unmount": [];
+};
+
 export interface ExcalidrawImperativeAPI {
+  /** Whether the editor has been unmounted and the API is no longer usable. */
+  isDestroyed: boolean;
   updateScene: InstanceType<typeof App>["updateScene"];
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
@@ -857,7 +1030,8 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  setViewport: InstanceType<typeof App>["setViewport"];
+  getViewportOffsets: InstanceType<typeof App>["getViewportOffsets"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
@@ -904,6 +1078,8 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
+  onStateChange: InstanceType<typeof App>["onStateChange"];
+  onEvent: InstanceType<typeof App>["onEvent"];
 }
 
 export type FrameNameBounds = {
@@ -952,7 +1128,7 @@ export type EmbedsValidationStatus = Map<
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 
-export type PendingExcalidrawElements = ExcalidrawElement[];
+export type PendingExcalidrawElements = NonDeletedExcalidrawElement[];
 
 /** Runtime gridSize value. Null indicates disabled grid. */
 export type NullableGridSize =
@@ -960,8 +1136,8 @@ export type NullableGridSize =
   | null;
 
 export type GenerateDiagramToCode = (props: {
-  frame: ExcalidrawMagicFrameElement;
-  children: readonly ExcalidrawElement[];
+  frame: NonDeleted<ExcalidrawMagicFrameElement>;
+  children: readonly NonDeletedExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
 
 export type Offsets = Partial<{
@@ -970,3 +1146,106 @@ export type Offsets = Partial<{
   bottom: number;
   left: number;
 }>;
+
+/**
+ * Value of the `data-viewport-ui` attribute, marking a DOM node as a UI
+ * surface that occludes the canvas. Such nodes are measured by
+ * `getViewportOffsets` to compute the default per-side viewport offsets:
+ *
+ * - `top` / `bottom` — offsets that side by the node's bottom/top edge
+ * - `side` — a panel hugging the left or right edge. Which side is not
+ *   declared but resolved geometrically: if the node's horizontal center
+ *   lies in the left half of the viewport it counts against the left
+ *   offset (by its right edge), otherwise against the right offset (by
+ *   `viewportWidth - left edge`). Measuring the rendered position instead
+ *   of declaring a side means RTL layouts and host-configurable docking
+ *   (e.g. sidebar side) are handled for free — but it assumes the surface
+ *   actually hugs one edge; don't mark a centered/near-full-width node as
+ *   `side` (its midpoint would classify it to one side and the offset
+ *   would swallow most of the viewport).
+ *
+ * The attribute should only be present while the surface is actually
+ * rendered — omit it (don't just hide the node) when the surface shouldn't
+ * push the viewport around.
+ */
+export type ViewportUIDock = "top" | "bottom" | "side";
+
+/**
+ * Options for `getViewportOffsets` (and the `ui` key of
+ * {@link ViewportOffsets}), controlling how offsets are derived from the
+ * currently rendered editor UI.
+ *
+ * NOTE unlike the physical sides of {@link Offsets}, the horizontal values
+ * here are logical, i.e. flipped in RTL layouts (`left` refers to the
+ * reading-direction start side).
+ */
+export type ViewportOffsetsOptions = {
+  /** padding added to each measured side (default 24) */
+  padding?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  /** final value for the given side, replacing the measured UI size
+   * (padding is not added on top) */
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+  /**
+   * Reserve space for the given conditionally-rendered surfaces even while
+   * they're hidden, so the resulting offsets don't shift when they
+   * (dis)appear. Uses the surface's last-measured footprint, falling back
+   * to an approximate default if it hasn't been rendered yet. Ignored on
+   * phones (where these surfaces never occlude the canvas).
+   */
+  reserve?: {
+    /** styles panel (rendered when a tool or selection is active) */
+    stylesPanel?: boolean;
+    /** sidebar (e.g. library) */
+    sidebar?: boolean;
+  };
+};
+
+/**
+ * Viewport offsets accepted by the `setViewport`-family APIs (`setViewport`,
+ * `props.initialState.viewport`), insetting the usable viewport area per
+ * side so the target isn't fitted/centered underneath overlaid UI.
+ *
+ * Two (combinable) ways to specify:
+ *
+ * - **Static sides** (`top`/`right`/`bottom`/`left`) — absolute pixel
+ *   values, used as-is: physical (not flipped in RTL), zoom-independent,
+ *   no padding added. Sides not specified default to `0` (unless `ui` is
+ *   set, see below).
+ *
+ * - **`ui`** — derive the offsets from the editor UI (toolbar, styles
+ *   panel, sidebar...) as rendered at the time the viewport is set,
+ *   equivalent to calling `getViewportOffsets()`. Pass `true` for the
+ *   defaults, or options ({@link ViewportOffsetsOptions}) to customize
+ *   padding or reserve space for currently-hidden surfaces.
+ *
+ * When both are given, a static side always wins for that side — it
+ * replaces whatever `ui` would yield (including `ui`'s own side overrides,
+ * which — unlike the physical static sides — are RTL-relative). The
+ * remaining sides fall back to the `ui`-derived values.
+ *
+ * @example
+ * { top: 40 }                              // top 40px, other sides 0
+ * { ui: true }                             // measured UI + default padding
+ * { ui: { reserve: { stylesPanel: true } } } // + keep space for hidden panel
+ * { top: 40, ui: true }                    // top exactly 40px, rest from UI
+ */
+export type ViewportOffsets = Offsets & {
+  ui?: true | ViewportOffsetsOptions;
+};
+
+/**
+ * Value of the `data-viewport-ui-name` attribute, identifying a
+ * conditionally-rendered surface (marked with `data-viewport-ui`) so that
+ * `getViewportOffsets` can reserve space for it while it's hidden (see the
+ * `reserve` option). Whenever a named surface is rendered, its measured
+ * footprint is remembered; reserving uses that remembered footprint, or an
+ * approximate default if the surface hasn't been rendered yet.
+ */
+export type ViewportUIName = "sidebar" | "stylesPanel";

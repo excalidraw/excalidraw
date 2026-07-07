@@ -41,22 +41,22 @@ import {
   maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
-} from "@excalidraw/element";
-
-import { renderSelectionElement } from "@excalidraw/element";
-
-import {
+  getActiveTextElement,
   getElementsInGroup,
   getSelectedGroupIds,
   isSelectedViaGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
 
+import { renderSelectionElement } from "@excalidraw/element";
+
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 import {
   getGlobalFixedPointForBindableElement,
   isFocusPointVisible,
 } from "@excalidraw/element";
+
+import type { EditorInterface } from "@excalidraw/common";
 
 import type {
   TransformHandles,
@@ -74,6 +74,7 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -86,6 +87,10 @@ import {
 } from "../scene/scrollbars";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
+import {
+  getTextAutoResizeHandle,
+  getTextBoxPadding,
+} from "../textAutoResizeHandle";
 
 import {
   bootstrapCanvas,
@@ -1025,7 +1030,7 @@ const renderFrameHighlight = (
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
   const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
@@ -1149,6 +1154,7 @@ const renderLinearPointHandles = (
           points[idx],
           idx,
           appState.zoom,
+          elementsMap,
         )
       ) {
         renderSingleLinearPoint(
@@ -1483,24 +1489,61 @@ const renderCropHandles = (
 };
 
 const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const padding = getTextBoxPadding(appState.zoom.value);
   const width = text.width + padding * 2;
   const height = text.height + padding * 2;
-  const cx = text.x + width / 2;
-  const cy = text.y + height / 2;
-  const shiftX = -(width / 2 + padding);
-  const shiftY = -(height / 2 + padding);
+  const cx = text.x + text.width / 2;
+  const cy = text.y + text.height / 2;
+  const shiftX = -(text.width / 2 + padding);
+  const shiftY = -(text.height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
   context.lineWidth = 1 / appState.zoom.value;
   context.strokeStyle = selectionColor;
+  context.globalAlpha = 0.5;
+  context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
   context.strokeRect(shiftX, shiftY, width, height);
+  context.restore();
+};
+
+const renderResetAutoResizeHandle = (
+  text: ExcalidrawTextElement,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  formFactor: EditorInterface["formFactor"],
+) => {
+  const autoResizeHandle = getTextAutoResizeHandle(
+    text,
+    appState.zoom.value,
+    formFactor,
+  );
+
+  if (!autoResizeHandle) {
+    return;
+  }
+
+  context.save();
+  context.globalAlpha = 0.5;
+  context.lineWidth = 1.5 / appState.zoom.value;
+  context.lineCap = "round";
+  context.strokeStyle = selectionColor;
+  context.beginPath();
+  context.moveTo(
+    autoResizeHandle.start[0] + appState.scrollX,
+    autoResizeHandle.start[1] + appState.scrollY,
+  );
+  context.lineTo(
+    autoResizeHandle.end[0] + appState.scrollX,
+    autoResizeHandle.end[1] + appState.scrollY,
+  );
+  context.stroke();
   context.restore();
 };
 
@@ -1519,12 +1562,10 @@ const _renderInteractiveScene = ({
   deltaTime,
 }: InteractiveSceneRenderConfig): {
   scrollBars?: ReturnType<typeof getScrollBars>;
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   animationState?: typeof animationState;
 } => {
   if (canvas === null) {
-    return { atLeastOneVisibleElement: false, elementsMap };
+    return {};
   }
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -1584,10 +1625,19 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (
-    appState.editingTextElement &&
-    isTextElement(appState.editingTextElement)
-  ) {
+  const activeTextElement = getActiveTextElement(selectedElements, appState);
+
+  if (activeTextElement && !activeTextElement.autoResize) {
+    renderResetAutoResizeHandle(
+      activeTextElement,
+      context,
+      appState,
+      renderConfig.selectionColor,
+      editorInterface.formFactor,
+    );
+  }
+
+  if (appState.editingTextElement) {
     const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;
@@ -1639,10 +1689,15 @@ const _renderInteractiveScene = ({
     const elements = element
       ? [element]
       : getElementsInGroup(allElementsMap, appState.activeLockedId);
-    renderElementsBoxHighlight(context, appState, elements, {
-      colors: ["#ced4da"],
-      dashed: true,
-    });
+    renderElementsBoxHighlight(
+      context,
+      appState,
+      elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
+      {
+        colors: ["#ced4da"],
+        dashed: true,
+      },
+    );
   }
 
   const isFrameSelected = selectedElements.some((element) =>
@@ -1728,7 +1783,7 @@ const _renderInteractiveScene = ({
       renderLinearPointHandles(
         context,
         appState,
-        selectedElements[0] as ExcalidrawLinearElement,
+        selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
         elementsMap,
       );
     }
@@ -2015,8 +2070,6 @@ const _renderInteractiveScene = ({
 
   return {
     scrollBars,
-    atLeastOneVisibleElement: visibleElements.length > 0,
-    elementsMap,
     animationState: nextAnimationState,
   };
 };
