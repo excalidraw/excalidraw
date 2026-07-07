@@ -71,6 +71,7 @@ import { ShapeCache } from "./shape";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
@@ -1016,7 +1017,10 @@ export const renderElement = (
           context.globalAlpha = 0.1;
 
           const uncroppedElementCanvas = generateElementCanvas(
-            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
+            getUncroppedImageElement(
+              elementWithCanvas.element,
+              elementsMap,
+            ) as NonDeleted<ExcalidrawImageElement>,
             allElementsMap,
             appState.zoom,
             renderConfig,

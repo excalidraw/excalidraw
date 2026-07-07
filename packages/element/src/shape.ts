@@ -26,7 +26,6 @@ import {
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   applyDarkModeFilter,
   DEFAULT_STROKE_STREAMLINE,
-  DEFAULT_STROKE_STREAMLINE_PRECISE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -69,7 +68,6 @@ import { shouldTestInside } from "./collision";
 
 import type {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
@@ -261,7 +259,7 @@ export const generateRoughOptions = (
 };
 
 const modifyIframeLikeForRoughOptions = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   isExporting: boolean,
   embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
@@ -752,7 +750,7 @@ export const generateLinearCollisionShape = (
  * @private
  */
 const _generateElementShape = (
-  element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
+  element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
     isExporting,
@@ -1186,20 +1184,15 @@ const VARIABLE_WIDTH_FREEDRAW = {
   SIZE_FACTOR: 4.25,
   THINNING: 0.6,
   SMOOTHING: 0.5,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE,
 } as const;
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
   SIZE_FACTOR: 1.4,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
 } as const;
 
 const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
-  element.strokeOptions?.streamline ??
-  (element.strokeOptions?.variability === "constant"
-    ? CONSTANT_WIDTH_FREEDRAW.STREAMLINE
-    : VARIABLE_WIDTH_FREEDRAW.STREAMLINE);
+  element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
 
 /**
  * Pressure-sensitive (variable width) freedraw outline, rendered with

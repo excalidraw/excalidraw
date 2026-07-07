@@ -9,7 +9,6 @@ import {
 import {
   degreesToRadians,
   lineSegment,
-  pointDistance,
   pointFrom,
   pointFromArray,
   pointRotateRads,
@@ -1029,7 +1028,7 @@ export const getCommonBounds = (
 };
 
 export const getDraggedElementsBounds = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   dragOffset: { x: number; y: number },
 ) => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1112,33 +1111,6 @@ export const getElementPointsCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
-};
-
-export const getClosestElementBounds = (
-  elements: readonly ExcalidrawElement[],
-  from: { x: number; y: number },
-): Bounds => {
-  if (!elements.length) {
-    return [0, 0, 0, 0];
-  }
-
-  let minDistance = Infinity;
-  let closestElement = elements[0];
-  const elementsMap = arrayToMap(elements);
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-    const distance = pointDistance(
-      pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
-      pointFrom(from.x, from.y),
-    );
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestElement = element;
-    }
-  });
-
-  return getElementBounds(closestElement, elementsMap);
 };
 
 export interface BoundingBox {
@@ -1297,7 +1269,7 @@ export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
  * It can be used to get elements overlapping a selection box, for example.
  *
  */
-export const elementsOverlappingBBox = ({
+export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
   elements,
   elementsMap,
   bounds,
@@ -1305,7 +1277,7 @@ export const elementsOverlappingBBox = ({
   excludeElementsInFrames,
   shouldIgnoreElementFromSelection,
 }: {
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly T[];
   elementsMap?: ElementsMap;
   bounds: Bounds | ExcalidrawElement;
   /**
@@ -1314,9 +1286,7 @@ export const elementsOverlappingBBox = ({
    **/
   type: "contain" | "overlap";
   excludeElementsInFrames?: boolean;
-  shouldIgnoreElementFromSelection?: (
-    element: NonDeletedExcalidrawElement,
-  ) => boolean;
+  shouldIgnoreElementFromSelection?: (element: T) => boolean;
 }) => {
   if (!elementsMap) {
     elementsMap = arrayToMap(elements) as ElementsMap;
@@ -1345,10 +1315,10 @@ export const elementsOverlappingBBox = ({
   ];
 
   const framesInSelection = excludeElementsInFrames
-    ? new Set<NonDeletedExcalidrawElement["id"]>()
+    ? new Set<ExcalidrawElement["id"]>()
     : null;
-  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
-  const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
+  const groups: Record<string, T[]> = {};
+  const elementsInSelection: Set<T> = new Set();
 
   for (const element of elements) {
     if (shouldIgnoreElementFromSelection?.(element)) {
