@@ -188,6 +188,7 @@ type _CommonCanvasAppState = {
   width: AppState["width"];
   height: AppState["height"];
   viewModeEnabled: AppState["viewModeEnabled"];
+  focusModeEnabled: AppState["focusModeEnabled"];
   openDialog: AppState["openDialog"];
   editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
   selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
@@ -465,6 +466,7 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  focusModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;

@@ -238,6 +238,7 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  focusModeEnabled: appState.focusModeEnabled,
   activeTool: appState.activeTool,
   openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,

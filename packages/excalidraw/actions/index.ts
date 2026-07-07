@@ -80,6 +80,7 @@ export {
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
+export { actionToggleFocusMode } from "./actionToggleFocusMode";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";

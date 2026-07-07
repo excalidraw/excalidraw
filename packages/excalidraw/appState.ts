@@ -109,6 +109,7 @@ export const getDefaultAppState = (): Omit<
     toast: null,
     viewBackgroundColor: "#f8f9fa",
     zenModeEnabled: false,
+    focusModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
     },
@@ -247,6 +248,7 @@ const APP_STATE_STORAGE_CONF = (<
   viewBackgroundColor: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
+  focusModeEnabled: { browser: false, export: false, server: false },
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },

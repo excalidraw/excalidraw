@@ -45,6 +45,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -473,6 +474,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -891,6 +893,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1459,6 +1462,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1668,6 +1672,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2054,6 +2059,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2301,6 +2307,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2483,6 +2490,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2810,6 +2818,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3067,6 +3076,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3310,6 +3320,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3548,6 +3559,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3808,6 +3820,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4124,6 +4137,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4562,6 +4576,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4847,6 +4862,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5125,6 +5141,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5335,6 +5352,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5537,6 +5555,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5932,6 +5951,7 @@ exports[`regression tests > drags selected elements from point inside common bou
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -6231,6 +6251,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7025,6 +7046,7 @@ exports[`regression tests > given a group of selected elements with an element t
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7361,6 +7383,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7642,6 +7665,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7879,6 +7903,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8121,6 +8146,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8303,6 +8329,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8449,7 +8476,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
-    "type": "selection",
+    "type": "arrow",
   },
   "bindMode": "orbit",
   "bindingPreference": "enabled",
@@ -8485,6 +8512,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8530,9 +8558,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "scrollY": 0,
   "scrolledOutside": false,
   "searchMatches": null,
-  "selectedElementIds": {
-    "id0": true,
-  },
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
@@ -8561,66 +8587,11 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
 
 exports[`regression tests > key 4 selects ellipse tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 4 selects ellipse tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key 4 selects ellipse tool > [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests > key 4 selects ellipse tool > [end of test] redo stack 1`] = `[]`;
 
-exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id0": {
-          "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 30,
-            "index": "a0",
-            "isDeleted": false,
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "roughness": 1,
-            "roundness": null,
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "ellipse",
-            "version": 3,
-            "width": 30,
-            "x": 10,
-            "y": 10,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 2,
-          },
-        },
-      },
-      "updated": {},
-    },
-    "id": "id2",
-  },
-]
-`;
+exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stack 1`] = `[]`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`] = `
 {
@@ -8631,7 +8602,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
-    "type": "selection",
+    "type": "ellipse",
   },
   "bindMode": "orbit",
   "bindingPreference": "enabled",
@@ -8667,6 +8638,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8712,42 +8684,10 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "scrollY": 0,
   "scrolledOutside": false,
   "searchMatches": null,
-  "selectedElementIds": {
-    "id0": true,
-  },
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
-  "selectedLinearElement": LinearElementEditor {
-    "customLineAngle": null,
-    "draggedFocusPointBinding": null,
-    "elbowed": false,
-    "elementId": "id0",
-    "hoverPointIndex": -1,
-    "hoveredFocusPointBinding": null,
-    "initialState": {
-      "altFocusPoint": null,
-      "arrowStartIsInside": false,
-      "lastClickedPoint": -1,
-      "origin": null,
-      "prevSelectedPointsIndices": null,
-      "segmentMidpoint": {
-        "added": false,
-        "index": null,
-        "value": null,
-      },
-    },
-    "isDragging": false,
-    "isEditing": false,
-    "lastCommittedPoint": null,
-    "lastUncommittedPoint": null,
-    "pointerDownState": undefined,
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
-    "segmentMidPointHoveredCoords": null,
-    "selectedPointsIndices": null,
-  },
+  "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -8773,88 +8713,11 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-          "selectedLinearElement": {
-            "elementId": "id0",
-            "isEditing": false,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-          "selectedLinearElement": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id0": {
-          "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "elbowed": false,
-            "endArrowhead": "arrow",
-            "endBinding": null,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 30,
-            "index": "a0",
-            "isDeleted": false,
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                30,
-                30,
-              ],
-            ],
-            "roughness": 1,
-            "roundness": {
-              "type": 2,
-            },
-            "startArrowhead": null,
-            "startBinding": null,
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "arrow",
-            "version": 4,
-            "width": 30,
-            "x": 10,
-            "y": 10,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 3,
-          },
-        },
-      },
-      "updated": {},
-    },
-    "id": "id2",
-  },
-]
-`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 1`] = `[]`;
 
 exports[`regression tests > key 6 selects line tool > [end of test] appState 1`] = `
 {
@@ -8901,6 +8764,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9133,6 +8997,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9331,6 +9196,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9565,6 +9431,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9747,6 +9614,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9979,6 +9847,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10161,6 +10030,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10359,6 +10229,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -10541,6 +10412,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -11074,6 +10946,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -11356,6 +11229,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -11481,6 +11355,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -11683,6 +11558,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12004,6 +11880,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -12435,6 +12312,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13077,6 +12955,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13205,6 +13084,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -13838,6 +13718,7 @@ exports[`regression tests > switches from group of selected elements to another 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14179,6 +14060,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14445,6 +14327,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14570,6 +14453,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -14936,6 +14820,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -15061,6 +14946,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "focusModeEnabled": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
