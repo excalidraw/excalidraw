@@ -431,10 +431,20 @@ export function deconstructDiamondElement(
 
   const baseCorners = getDiamondBaseCorners(element, offset);
 
-  const corners = baseCorners.map(
-    (corner) =>
-      curveCatmullRomCubicApproxPoints(curveOffsetPoints(corner, offset))!,
-  );
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
 
   const sides = [
     lineSegment<GlobalPoint>(
