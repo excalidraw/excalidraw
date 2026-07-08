@@ -65,8 +65,12 @@ import {
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
-
 import { ShapeCache } from "./shape";
+import {
+  drawFreeDrawSegments,
+  generateOrUpdateFreeDrawIncrementalCanvas,
+  getFreedrawCanvasPadding,
+} from "./renderFreedraw";
 
 import type {
   ExcalidrawElement,
@@ -93,7 +97,7 @@ const isPendingImageElement = (
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
-      return element.strokeWidth * 12;
+      return getFreedrawCanvasPadding(element);
     case "text":
       return element.fontSize / 2;
     case "arrow":
@@ -145,6 +149,15 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
+  canvasOriginSceneX?: number;
+  canvasOriginSceneY?: number;
+  /**
+   * Tip canvas for incremental freedraw rendering.  Contains only the last
+   * unfinalised segment (whose Catmull-Rom right-hand tangent changes with
+   * each new point) and is cleared + redrawn every frame.  Composited on top
+   * of `canvas` (the committed accumulation canvas) in drawElementFromCanvas.
+   */
+  tipCanvas?: HTMLCanvasElement;
 }
 
 const cappedElementCanvasSize = (
@@ -254,7 +267,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, scale);
 
   context.restore();
 
@@ -390,6 +403,7 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  scale = 1,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -416,23 +430,8 @@ const drawElementOnCanvas = (
       break;
     }
     case "freedraw": {
-      // Draw directly to canvas
       context.save();
-
-      const shapes = ShapeCache.generateElementShape(element, renderConfig);
-
-      for (const shape of shapes) {
-        if (typeof shape === "string") {
-          context.fillStyle = applyDarkModeFilter(
-            element.strokeColor,
-            renderConfig.theme === THEME.DARK,
-          );
-          context.fill(new Path2D(shape));
-        } else {
-          rc.draw(shape);
-        }
-      }
-
+      drawFreeDrawSegments(element, context, renderConfig, 0, undefined, scale);
       context.restore();
       break;
     }
@@ -617,6 +616,24 @@ const generateElementWithCanvas = (
     : {
         value: 1 as NormalizedZoomValue,
       };
+
+  // Incremental rendering path for freedraw elements being actively drawn.
+  // ShapeCache.delete() clears elementWithCanvasCache on every added point, so
+  // we bypass that cache entirely and use freedrawIncrementalCache instead.
+  if (
+    isFreeDrawElement(element) &&
+    "newElement" in appState &&
+    appState.newElement?.id === element.id
+  ) {
+    return generateOrUpdateFreeDrawIncrementalCanvas(
+      element as ExcalidrawFreeDrawElement,
+      elementsMap,
+      zoom,
+      renderConfig,
+      appState,
+    );
+  }
+
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
@@ -719,15 +736,38 @@ const drawElementFromCanvas = (
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
+    // For the incremental freedraw path, the canvas origin is stored explicitly
+    // because the canvas is over-allocated beyond the tight element bounds.
+    const destX =
+      elementWithCanvas.canvasOriginSceneX !== undefined
+        ? (elementWithCanvas.canvasOriginSceneX + appState.scrollX) *
+          window.devicePixelRatio
+        : (x1 + appState.scrollX) * window.devicePixelRatio - padding;
+    const destY =
+      elementWithCanvas.canvasOriginSceneY !== undefined
+        ? (elementWithCanvas.canvasOriginSceneY + appState.scrollY) *
+          window.devicePixelRatio
+        : (y1 + appState.scrollY) * window.devicePixelRatio - padding;
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      destX,
+      destY,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
+
+    // Composite the tip canvas (incremental freedraw path) on top.  It is
+    // the same size and at the same scene origin as the committed canvas, so
+    // it uses identical destX / destY / dimensions.
+    if (elementWithCanvas.tipCanvas) {
+      context.drawImage(
+        elementWithCanvas.tipCanvas,
+        destX,
+        destY,
+        elementWithCanvas.tipCanvas.width / elementWithCanvas.scale,
+        elementWithCanvas.tipCanvas.height / elementWithCanvas.scale,
+      );
+    }
 
     if (
       import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
@@ -868,6 +908,14 @@ export const renderElement = (
           return;
         }
 
+        const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+        if (
+          !appState?.shouldCacheIgnoreZoom &&
+          (!element.angle || isRightAngleRads(element.angle))
+        ) {
+          context.imageSmoothingEnabled = false;
+        }
+
         drawElementFromCanvas(
           elementWithCanvas,
           context,
@@ -875,6 +923,8 @@ export const renderElement = (
           appState,
           allElementsMap,
         );
+
+        context.imageSmoothingEnabled = currentImageSmoothingStatus;
       }
 
       break;
@@ -971,7 +1021,7 @@ export const renderElement = (
         }
 
         context.restore();
-        // not exporting → optimized rendering (cache & render from element
+        // not exporting -> optimized rendering (cache & render from element
         // canvases)
       } else {
         const elementWithCanvas = generateElementWithCanvas(

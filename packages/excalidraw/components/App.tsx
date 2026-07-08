@@ -9335,7 +9335,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure = this.state.currentItemFreedrawConstantPressure;
 
     const strokeVariability = this.state.currentItemStrokeVariability;
 
@@ -10025,10 +10025,61 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  /**
+   * Returns the timestamp of a pointer event, in milliseconds.
+   * Extracted as a method so tests can spy on it and return a fixed value,
+   * making the One Euro Filter in the freedraw handler deterministic.
+   */
+  protected getPointerEventTimestamp(
+    ev: Pick<PointerEvent, "timeStamp">,
+  ): number {
+    return ev.timeStamp;
+  }
+
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
-    return withBatchedUpdatesThrottled((event: PointerEvent) => {
+    // Per-stroke One Euro Filter state for mouse freedraw smoothing.
+    // Reference: Casiez et al. 2012 "1€ Filter: A Simple Speed-based Low-pass
+    // Filter for Noisy Input in Interactive Systems".
+    //
+    // The filter adapts its EMA alpha to the current speed of the pointer:
+    //   slow movement  → low cutoff → heavy smoothing (removes jitter)
+    //   fast movement  → high cutoff → near-raw tracking (minimal lag)
+    //
+    // State variables (reset at stroke start via null sentinel):
+    let emaX: number | null = null; // smoothed position x
+    let emaY: number | null = null; // smoothed position y
+    let emaDx = 0; // smoothed derivative x
+    let emaDy = 0; // smoothed derivative y
+    let prevRawX: number | null = null; // previous raw x for derivative
+    let prevRawY: number | null = null;
+    let prevTs: number | null = null; // previous event timestamp (ms)
+
+    // Pen pressure warmup: the first few samples from a pen digitizer are
+    // unreliable (often spike to ~0.5).  We apply an EMA whose alpha ramps
+    // from PEN_PRESSURE_INITIAL_ALPHA up to 1 over PEN_PRESSURE_WARMUP_SAMPLES
+    // so the stroke gradually eases from heavy smoothing into raw pressure.
+    let penPressureEma: number | null = null;
+    let penPressureSampleCount = 0;
+    const PEN_PRESSURE_WARMUP_SAMPLES = 20;
+    const PEN_PRESSURE_INITIAL_ALPHA = 0.1;
+
+    // Tuning constants:
+    //   MIN_CUTOFF  – cutoff frequency (Hz) when speed ≈ 0; smaller = more smoothing
+    //   BETA        – rate at which cutoff grows with speed; larger = quicker adaptation
+    //   D_CUTOFF    – fixed cutoff for the derivative pre-filter
+    const MIN_CUTOFF = 0.5;
+    const BETA = 0.01;
+    const D_CUTOFF = 2.0;
+
+    /** Compute EMA alpha from cutoff frequency (Hz) and timestep (seconds). */
+    const emaAlpha = (cutoff: number, dt: number): number => {
+      const tau = 1 / (2 * Math.PI * cutoff);
+      return 1 / (1 + tau / dt);
+    };
+
+    const handler = (event: PointerEvent) => {
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
@@ -10720,23 +10771,98 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          const coalescedEvents: PointerEvent[] =
+            event.getCoalescedEvents?.() ?? [];
+          const allEvents =
+            coalescedEvents.length > 0 ? coalescedEvents : [event];
+          const newPoints: LocalPoint[] = [];
+          const newPressures: number[] = [];
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          let lastPoint =
+            newElement.points.length > 0
+              ? newElement.points[newElement.points.length - 1]
+              : null;
 
-          if (!discardPoint) {
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+          for (const ev of allEvents) {
+            const coords = viewportCoordsToSceneCoords(ev, this.state);
+            const rawDx = coords.x - newElement.x;
+            const rawDy = coords.y - newElement.y;
+            let dx = rawDx;
+            let dy = rawDy;
+
+            if (event.pointerType === "mouse") {
+              // One Euro Filter: speed-adaptive low-pass for mouse events.
+              const evTs = this.getPointerEventTimestamp(ev);
+              const dt = Math.max(
+                prevTs !== null ? (evTs - prevTs) / 1000 : 1 / 60,
+                0.001,
+              ); // seconds
+
+              // 1. Smooth the derivative (fixed D_CUTOFF pre-filter).
+              const alphaD = emaAlpha(D_CUTOFF, dt);
+              const rawDxDt = prevRawX !== null ? (rawDx - prevRawX) / dt : 0;
+              const rawDyDt = prevRawY !== null ? (rawDy - prevRawY) / dt : 0;
+              emaDx = alphaD * rawDxDt + (1 - alphaD) * emaDx;
+              emaDy = alphaD * rawDyDt + (1 - alphaD) * emaDy;
+
+              // 2. Adaptive cutoff: higher speed → higher cutoff → less lag.
+              // Normalize to screen-space pixels/sec so BETA behaves the same
+              // regardless of zoom level (scene units are 1/zoom px at high zoom).
+              const speed =
+                Math.sqrt(emaDx * emaDx + emaDy * emaDy) *
+                this.state.zoom.value;
+              const cutoff = MIN_CUTOFF + BETA * speed;
+              const alphaP = emaAlpha(cutoff, dt);
+
+              // 3. Smooth position with adaptive alpha.
+              emaX =
+                emaX === null ? rawDx : alphaP * rawDx + (1 - alphaP) * emaX;
+              emaY =
+                emaY === null ? rawDy : alphaP * rawDy + (1 - alphaP) * emaY;
+
+              prevRawX = rawDx;
+              prevRawY = rawDy;
+              prevTs = evTs;
+
+              dx = emaX;
+              dy = emaY;
+            }
+
+            if (!lastPoint || lastPoint[0] !== dx || lastPoint[1] !== dy) {
+              const pt = pointFrom<LocalPoint>(dx, dy);
+              newPoints.push(pt);
+
+              let pressure = ev.pressure;
+              if (event.pointerType === "pen") {
+                // Gradually ease from aggressive smoothing into raw pressure to
+                // suppress the unreliable spike at the start of a pen stroke.
+                const progress = Math.min(
+                  1,
+                  penPressureSampleCount / PEN_PRESSURE_WARMUP_SAMPLES,
+                );
+                const alpha =
+                  PEN_PRESSURE_INITIAL_ALPHA +
+                  progress * (1 - PEN_PRESSURE_INITIAL_ALPHA);
+                penPressureEma =
+                  penPressureEma === null
+                    ? pressure
+                    : alpha * pressure + (1 - alpha) * penPressureEma;
+                pressure = penPressureEma;
+                penPressureSampleCount++;
+              }
+
+              newPressures.push(pressure);
+              lastPoint = pt;
+            }
+          }
+
+          if (newPoints.length > 0) {
+            const pressures = [...newElement.pressures, ...newPressures];
 
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [...newElement.points, ...newPoints],
                 pressures,
               },
               {
@@ -10912,7 +11038,23 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    });
+    };
+
+    // For freedraw, bypass RAF throttling so every pointer event is processed
+    // synchronously. This preserves coalesced pointer events and eliminates
+    // stroke lag on high-frequency stylus / pointer input.
+    if (this.state.activeTool.type === "freedraw") {
+      const immediate = withBatchedUpdates(handler);
+      const result = immediate as typeof immediate & {
+        flush(): void;
+        cancel(): void;
+      };
+      result.flush = () => {};
+      result.cancel = () => {};
+      return result;
+    }
+
+    return withBatchedUpdatesThrottled(handler);
   }
 
   // Returns whether the pointer move happened over either scrollbar
@@ -11203,9 +11345,7 @@ class App extends React.Component<AppProps, AppState> {
           dx += 0.0001;
         }
 
-        const pressures = newElement.simulatePressure
-          ? []
-          : [...newElement.pressures, childEvent.pressure];
+        const pressures = [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],
