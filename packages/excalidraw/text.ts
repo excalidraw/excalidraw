@@ -58,6 +58,7 @@ import { actionTextAutoResize } from "./actions/actionTextAutoResize";
 import { resetCursor, setCursorForShape } from "./cursor";
 import { t } from "./i18n";
 import { withBatchedUpdates } from "./reactUtils";
+import { deselectElements } from "./selection";
 import { getShortcutKey } from "./shortcut";
 import { isPointHittingTextAutoResizeHandle } from "./textAutoResizeHandle";
 import { textWysiwyg } from "./wysiwyg/textWysiwyg";
@@ -364,7 +365,7 @@ const handleTextWysiwyg = (
     autoSelect: !app.editorInterface.isTouchScreen,
   });
   // deselect all other elements when inserting text
-  app.deselectElements();
+  deselectElements(app);
 
   // do an initial update to re-initialize element position since we were
   // modifying element's x/y for sake of editor (case: syncing to remote)
