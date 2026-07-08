@@ -309,7 +309,8 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "filesystemPermissionError": "Excalidraw doesn't have permission to save to the file system — this can happen if it was denied in your browser, or disabled by an organization policy (if the setting appears grayed out). Try \"Save to disk\" instead, or check your browser's site permissions."
   },
   "toolBar": {
     "selection": "Selection",
