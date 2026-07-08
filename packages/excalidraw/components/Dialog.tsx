@@ -27,6 +27,8 @@ export interface DialogProps {
   size?: DialogSize;
   onCloseRequest(): void;
   title: React.ReactNode | false;
+  /** accessible dialog name; required when `title` is `false` */
+  ariaLabel?: string;
   autofocus?: boolean;
   closeOnClickOutside?: boolean;
 }
@@ -108,7 +110,8 @@ export const Dialog = (props: DialogProps) => {
       className={clsx("Dialog", props.className, {
         "Dialog--fullscreen": isFullscreen,
       })}
-      labelledBy="dialog-title"
+      labelledBy={props.title ? `${id}-dialog-title` : undefined}
+      ariaLabel={props.title ? undefined : props.ariaLabel}
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}

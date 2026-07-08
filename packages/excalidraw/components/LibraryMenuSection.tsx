@@ -70,6 +70,7 @@ export const LibraryMenuSection = memo(
               selected={isItemSelected(item.id)}
               onToggle={onItemSelectToggle}
               onDrag={onItemDrag}
+              name={"name" in item ? item.name : undefined}
               key={item?.id ?? i}
             />
           ) : (

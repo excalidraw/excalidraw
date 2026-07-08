@@ -223,20 +223,15 @@ export const PasteChartDialog = ({
           <div className="PasteChartDialog__titleText">
             {t("labels.pasteCharts")}
           </div>
-          <div
+          <button
+            type="button"
             className="PasteChartDialog__reshuffleBtn"
             onClick={handleReshuffleColors}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                handleReshuffleColors();
-              }
-            }}
+            aria-label={t("buttons.reshuffleColors")}
+            title={t("buttons.reshuffleColors")}
           >
             {bucketFillIcon}
-          </div>
+          </button>
         </div>
       }
       className={"PasteChartDialog"}

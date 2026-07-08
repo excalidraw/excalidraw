@@ -292,7 +292,8 @@ const addNewNodes = (
   return { nodes, crossStart };
 };
 
-const createBindingArrow = (
+// exported for the a11y "connect two selected shapes" action
+export const createBindingArrow = (
   startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,

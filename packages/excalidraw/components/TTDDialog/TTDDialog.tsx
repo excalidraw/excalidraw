@@ -89,6 +89,11 @@ const TTDDialogBase = withInternalFallback(
         }}
         size={1520}
         title={false}
+        ariaLabel={
+          "__fallback" in rest && rest.__fallback
+            ? t("mermaid.title")
+            : t("labels.textToDiagram")
+        }
         {...rest}
         autofocus={false}
       >

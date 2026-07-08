@@ -71,7 +71,14 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     );
   });
 
-  return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
+  return (
+    <div
+      className="excalidraw__canvas-wrapper"
+      // the scene is exposed to assistive tech via SceneProxyLayer
+      aria-hidden="true"
+      ref={wrapperRef}
+    />
+  );
 };
 
 const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {

@@ -10,7 +10,9 @@ export const CheckboxItem: React.FC<{
   onChange: (checked: boolean, event: React.MouseEvent) => void;
   className?: string;
   children?: React.ReactNode;
-}> = ({ children, checked, onChange, className }) => {
+  /** accessible name for the checkbox when it has no visible label */
+  ariaLabel?: string;
+}> = ({ children, checked, onChange, className, ariaLabel }) => {
   return (
     <div
       className={clsx("Checkbox", className, { "is-checked": checked })}
@@ -28,6 +30,7 @@ export const CheckboxItem: React.FC<{
         className="Checkbox-box"
         role="checkbox"
         aria-checked={checked}
+        aria-label={ariaLabel}
       >
         {checkIcon}
       </button>

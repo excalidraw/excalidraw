@@ -1,5 +1,7 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect, useRef } from "react";
+
+import { KEYS } from "@excalidraw/common";
 
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { t } from "../i18n";
@@ -34,6 +36,56 @@ export const ContextMenu = React.memo(
   ({ actionManager, items, top, left, onClose }: ContextMenuProps) => {
     const appState = useExcalidrawAppState();
     const elements = useExcalidrawElements();
+    const menuRef = useRef<HTMLUListElement>(null);
+
+    useEffect(() => {
+      menuRef.current
+        ?.querySelector<HTMLButtonElement>("button.context-menu-item")
+        ?.focus();
+    }, []);
+
+    const getMenuItems = () =>
+      Array.from(
+        menuRef.current?.querySelectorAll<HTMLButtonElement>(
+          "button.context-menu-item",
+        ) ?? [],
+      );
+
+    const handleMenuKeyDown = (event: React.KeyboardEvent) => {
+      const menuItems = getMenuItems();
+      if (!menuItems.length) {
+        return;
+      }
+      const currentIndex = menuItems.indexOf(
+        document.activeElement as HTMLButtonElement,
+      );
+
+      let nextIndex = -1;
+      if (event.key === KEYS.ARROW_DOWN) {
+        nextIndex =
+          currentIndex < 0 ? 0 : (currentIndex + 1) % menuItems.length;
+      } else if (event.key === KEYS.ARROW_UP) {
+        nextIndex =
+          currentIndex < 0
+            ? menuItems.length - 1
+            : (currentIndex - 1 + menuItems.length) % menuItems.length;
+      } else if (event.key === KEYS.HOME) {
+        nextIndex = 0;
+      } else if (event.key === KEYS.END) {
+        nextIndex = menuItems.length - 1;
+      } else if (event.key === KEYS.ESCAPE || event.key === KEYS.TAB) {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+
+      if (nextIndex > -1) {
+        event.preventDefault();
+        event.stopPropagation();
+        menuItems[nextIndex].focus();
+      }
+    };
 
     const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
       if (
@@ -68,6 +120,10 @@ export const ContextMenu = React.memo(
       >
         <ul
           className="context-menu"
+          role="menu"
+          aria-label={t("labels.contextMenu")}
+          ref={menuRef}
+          onKeyDown={handleMenuKeyDown}
           onContextMenu={(event) => event.preventDefault()}
         >
           {filteredItems.map((item, idx) => {
@@ -100,6 +156,7 @@ export const ContextMenu = React.memo(
             return (
               <li
                 key={idx}
+                role="none"
                 data-testid={actionName}
                 onClick={() => {
                   // we need update state before executing the action in case
@@ -112,6 +169,11 @@ export const ContextMenu = React.memo(
               >
                 <button
                   type="button"
+                  role={item.checked ? "menuitemcheckbox" : "menuitem"}
+                  aria-checked={
+                    item.checked ? item.checked(appState) : undefined
+                  }
+                  tabIndex={-1}
                   className={clsx("context-menu-item", {
                     dangerous: actionName === "deleteSelectedElements",
                     checkmark: item.checked?.(appState),

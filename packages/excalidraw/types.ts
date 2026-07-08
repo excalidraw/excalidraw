@@ -498,6 +498,9 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
+  /** single-character tool shortcuts (r, o, d, 1…) active — a toggle is
+   * required by WCAG 2.1.4 so stray keystrokes can't mutate state */
+  singleKeyShortcutsEnabled: boolean;
   /** the user's socket id & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
@@ -892,6 +895,7 @@ export type AppClassProperties = {
   setViewport: App["setViewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
+  insertElementFromKeyboard: App["insertElementFromKeyboard"];
   togglePenMode: App["togglePenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];

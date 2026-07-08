@@ -45,6 +45,8 @@ const MainMenu = Object.assign(
               }}
               data-testid="main-menu-trigger"
               className="main-menu-trigger"
+              title={t("buttons.menu")}
+              aria-label={t("buttons.menu")}
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>

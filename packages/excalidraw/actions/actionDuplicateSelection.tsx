@@ -29,6 +29,8 @@ import { getShortcutKey } from "../shortcut";
 
 import { useStylesPanelMode } from "../components/App";
 
+import { announce } from "../a11y";
+
 import { register } from "./register";
 
 export const actionDuplicateSelection = register({
@@ -49,6 +51,8 @@ export const actionDuplicateSelection = register({
           appState,
           app.scene,
         );
+
+        announce(t("a11y.pointAdded"));
 
         return {
           elements,
@@ -91,6 +95,8 @@ export const actionDuplicateSelection = register({
         elementsWithDuplicates = mappedElements;
       }
     }
+
+    announce(t("a11y.duplicated", { count: duplicatedElements.length }));
 
     return {
       elements: syncMovedIndices(

@@ -12,6 +12,8 @@ export type RangeProps = {
   minLabel?: React.ReactNode;
   hasCommonValue?: boolean;
   testId?: string;
+  /** human-readable value for screen readers, e.g. "60%" */
+  ariaValueText?: string;
 };
 
 export const Range = ({
@@ -24,6 +26,7 @@ export const Range = ({
   minLabel = min,
   hasCommonValue = true,
   testId,
+  ariaValueText,
 }: RangeProps) => {
   const rangeRef = React.useRef<HTMLInputElement>(null);
   const valueRef = React.useRef<HTMLDivElement>(null);
@@ -66,6 +69,7 @@ export const Range = ({
             onChange(+event.target.value);
           }}
           value={value}
+          aria-valuetext={ariaValueText}
           className="range-input"
           data-testid={testId}
         />

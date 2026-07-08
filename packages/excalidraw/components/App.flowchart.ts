@@ -124,7 +124,8 @@ export class AppFlowchart {
         return { type: "creating", pending: creator.pendingNodes ?? [] };
       }
 
-      if (event.altKey) {
+      // !shiftKey: Alt+Shift+Arrow is keyboard resize (actionA11yTransform)
+      if (event.altKey && !event.shiftKey) {
         const elementsMap = app.scene.getNonDeletedElementsMap();
         const selectedElements = getSelectedElements(elementsMap, app.state);
 

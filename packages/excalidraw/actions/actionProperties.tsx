@@ -865,6 +865,7 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
       <Range
         label={t("labels.opacity")}
         value={opacity ?? appState.currentItemOpacity}
+        ariaValueText={`${opacity ?? appState.currentItemOpacity}%`}
         hasCommonValue={opacity !== null}
         onChange={updateData}
         min={0}

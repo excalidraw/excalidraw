@@ -11,6 +11,7 @@ import { orderByFractionalIndex } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
+import { announce } from "../a11y";
 import { IconButton } from "../components/IconButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
@@ -68,10 +69,12 @@ export const createUndoAction: ActionCreator = (history) => ({
   icon: UndoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState, value, app) =>
-    executeHistoryAction(app, appState, () =>
+  perform: (elements, appState, value, app) => {
+    announce(t("buttons.undo"), { coalesceKey: "a11y-history" });
+    return executeHistoryAction(app, appState, () =>
       history.undo(arrayToMap(elements) as SceneElementsMap, appState),
-    ),
+    );
+  },
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
   PanelComponent: ({ appState, updateData, data, app }) => {
@@ -107,10 +110,12 @@ export const createRedoAction: ActionCreator = (history) => ({
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState, __, app) =>
-    executeHistoryAction(app, appState, () =>
+  perform: (elements, appState, __, app) => {
+    announce(t("buttons.redo"), { coalesceKey: "a11y-history" });
+    return executeHistoryAction(app, appState, () =>
       history.redo(arrayToMap(elements) as SceneElementsMap, appState),
-    ),
+    );
+  },
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
     (event[KEYS.CTRL_OR_CMD] && !event.shiftKey && matchKey(event, KEYS.Y)),

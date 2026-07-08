@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { memo, useRef, useState } from "react";
 
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
+import { t } from "../i18n";
 
 import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
@@ -22,6 +23,7 @@ export const LibraryUnit = memo(
     onToggle,
     onDrag,
     svgCache,
+    name,
   }: {
     id: LibraryItem["id"] | /** for pending item */ null;
     elements?: LibraryItem["elements"];
@@ -31,6 +33,7 @@ export const LibraryUnit = memo(
     onToggle: (id: string, event: React.MouseEvent) => void;
     onDrag: (id: string, event: React.DragEvent) => void;
     svgCache: SvgCache;
+    name?: string;
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
     const svg = useLibraryItemSvg(id, elements, svgCache, ref);
@@ -58,6 +61,26 @@ export const LibraryUnit = memo(
           })}
           ref={ref}
           draggable={!!elements}
+          // keyboard/SR access (WCAG 2.1.1): insert with Enter, toggle
+          // selection with Space — the pointer equivalent of click /
+          // shift-click / the hover-only checkbox
+          role={!!elements || !!isPending ? "button" : undefined}
+          tabIndex={!!elements || !!isPending ? 0 : undefined}
+          aria-label={name || t("a11y.libraryItem")}
+          aria-pressed={id ? selected : undefined}
+          onKeyDown={
+            !!elements || !!isPending
+              ? (event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    onClick(id);
+                  } else if (event.key === " " && id) {
+                    event.preventDefault();
+                    onToggle(id, event as unknown as React.MouseEvent);
+                  }
+                }
+              : undefined
+          }
           onClick={
             !!elements || !!isPending
               ? (event) => {
@@ -84,6 +107,7 @@ export const LibraryUnit = memo(
             checked={selected}
             onChange={(checked, event) => onToggle(id, event)}
             className="library-unit__checkbox"
+            ariaLabel={t("a11y.selectLibraryItem")}
           />
         )}
       </div>

@@ -340,6 +340,7 @@ export default function LibraryMenuItems({
             onClick={(event) => {
               setSearchInputValue("");
             }}
+            aria-hidden="true"
           >
             <kbd>esc</kbd> to clear
           </div>
@@ -396,6 +397,7 @@ export default function LibraryMenuItems({
               hideCancelButton: editorInterface.formFactor !== "phone",
             })}
             placeholder={t("library.search.inputPlaceholder")}
+            inputProps={{ "aria-label": t("library.search.inputPlaceholder") }}
             value={searchInputValue}
             onChange={(value) => setSearchInputValue(value)}
           />

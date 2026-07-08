@@ -29,5 +29,9 @@ export const actionToggleViewMode = register({
     return typeof appProps.viewModeEnabled === "undefined";
   },
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,
+    // Alt+Shift+R is keyboard rotate (actionA11yTransform)
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    !event.shiftKey &&
+    event.code === CODES.R,
 });

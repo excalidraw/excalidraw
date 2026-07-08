@@ -48,7 +48,12 @@ export const ShareableLinkDialog = ({
   };
   const { onCopy, copyStatus } = useCopyStatus();
   return (
-    <Dialog onCloseRequest={onCloseRequest} title={false} size="small">
+    <Dialog
+      onCloseRequest={onCloseRequest}
+      title={false}
+      size="small"
+      ariaLabel="Shareable link"
+    >
       <div className="ShareableLinkDialog">
         <h3>Shareable link</h3>
         <div className="ShareableLinkDialog__linkRow">

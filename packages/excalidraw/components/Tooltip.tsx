@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 
+import { KEYS } from "@excalidraw/common";
+
 import "./Tooltip.scss";
+
+const TOOLTIP_ID = "excalidraw-tooltip";
 
 export const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
@@ -12,8 +16,16 @@ export const getTooltipDiv = () => {
   const div = document.createElement("div");
   document.body.appendChild(div);
   div.classList.add("excalidraw-tooltip");
+  div.id = TOOLTIP_ID;
+  div.setAttribute("role", "tooltip");
   return div;
 };
+
+const hideTooltip = () =>
+  getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+
+const isTooltipVisible = () =>
+  getTooltipDiv().classList.contains("excalidraw-tooltip--visible");
 
 export const updateTooltipPosition = (
   tooltip: HTMLDivElement,
@@ -91,8 +103,7 @@ export const Tooltip = ({
   disabled,
 }: TooltipProps) => {
   useEffect(() => {
-    return () =>
-      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    return () => hideTooltip();
   }, []);
   if (disabled) {
     return null;
@@ -108,9 +119,34 @@ export const Tooltip = ({
           long,
         )
       }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      onPointerLeave={() => hideTooltip()}
+      onFocus={(event) => {
+        // only show visually for keyboard focus so pointer clicks don't
+        // pop the tooltip (keeps the pointer experience unchanged)
+        if ((event.target as HTMLElement).matches?.(":focus-visible")) {
+          updateTooltip(
+            event.currentTarget as HTMLDivElement,
+            getTooltipDiv(),
+            label,
+            long,
+          );
+        }
+        (event.target as HTMLElement).setAttribute(
+          "aria-describedby",
+          TOOLTIP_ID,
+        );
+      }}
+      onBlur={(event) => {
+        hideTooltip();
+        (event.target as HTMLElement).removeAttribute("aria-describedby");
+      }}
+      onKeyDown={(event) => {
+        // WCAG 1.4.13: tooltip must be dismissible without moving focus
+        if (event.key === KEYS.ESCAPE && isTooltipVisible()) {
+          hideTooltip();
+          event.stopPropagation();
+        }
+      }}
       style={style}
     >
       {children}

@@ -12,8 +12,11 @@ import {
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
+import { useEffect } from "react";
+
 import type { EditorInterface } from "@excalidraw/common";
 
+import { announce } from "../a11y";
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
@@ -260,13 +263,24 @@ export const HintViewer = ({
     app,
   });
 
-  if (!hints) {
+  const hint = hints
+    ? Array.isArray(hints)
+      ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(", ")
+      : hints
+    : null;
+
+  // mirror contextual hints to screen readers (they are visual-only
+  // otherwise); coalesced so rapid hint changes don't chatter
+  const plainHint = hint?.replace(/<\/?kbd>/g, "") ?? null;
+  useEffect(() => {
+    if (plainHint) {
+      announce(plainHint, { coalesceKey: "a11y-hint", coalesceDelay: 800 });
+    }
+  }, [plainHint]);
+
+  if (!hint) {
     return null;
   }
-
-  const hint = Array.isArray(hints)
-    ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(", ")
-    : hints;
 
   const hintJSX = hint.split(/(<kbd>[^<]+<\/kbd>)/g).map((part, index) => {
     if (index % 2 === 1) {

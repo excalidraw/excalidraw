@@ -1,0 +1,29 @@
+.excalidraw {
+  // invisible, spatially-positioned screen-reader mirror of the scene;
+  // must never affect pointer interaction or visuals (except the
+  // keyboard-only focus ring below)
+  .excalidraw-a11y-scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2; // above canvases (same layer as embeddables), below UI
+    transform-origin: top left;
+    pointer-events: none;
+
+    &__element {
+      position: absolute;
+      pointer-events: none;
+
+      &:focus {
+        outline: none;
+      }
+
+      // keyboard-only focus indicator (WCAG 2.4.7); pointer users never
+      // focus proxies, so the visual experience is unchanged
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+}

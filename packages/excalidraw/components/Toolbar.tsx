@@ -193,6 +193,8 @@ export const Toolbar = ({
         "zen-mode": appState.zenModeEnabled,
         "App-toolbar--compact": isCompactStylesPanel,
       })}
+      role="toolbar"
+      aria-label={t("headings.toolbar")}
       data-viewport-ui="top"
     >
       <HintViewer

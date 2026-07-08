@@ -348,6 +348,7 @@ export const SearchMenu = () => {
           value={inputValue}
           ref={searchInputRef}
           placeholder={t("search.placeholder")}
+          inputProps={{ "aria-label": t("search.title") }}
           icon={searchIcon}
           onChange={(value) => {
             setInputValue(value);
@@ -381,7 +382,7 @@ export const SearchMenu = () => {
         />
       </div>
 
-      <div className="layer-ui__search-count">
+      <div className="layer-ui__search-count" role="status" aria-live="polite">
         {searchMatches.items.length > 0 && (
           <>
             {focusIndex !== null && focusIndex > -1 ? (
@@ -397,6 +398,7 @@ export const SearchMenu = () => {
                   goToNextItem();
                 }}
                 className="result-nav-btn"
+                aria-label={t("a11y.nextMatch")}
               >
                 {collapseDownIcon}
               </Button>
@@ -405,6 +407,7 @@ export const SearchMenu = () => {
                   goToPreviousItem();
                 }}
                 className="result-nav-btn"
+                aria-label={t("a11y.previousMatch")}
               >
                 {upIcon}
               </Button>
@@ -451,6 +454,8 @@ const ListItem = (props: {
   return (
     <div
       tabIndex={-1}
+      role="option"
+      aria-selected={props.highlighted}
       className={clsx("layer-ui__result-item", {
         active: props.highlighted,
       })}
@@ -490,7 +495,7 @@ const MatchListBase = (props: MatchListProps) => {
   );
 
   return (
-    <div>
+    <div role="listbox" aria-label={t("a11y.searchResults")}>
       {frameNameMatches.length > 0 && (
         <div className="layer-ui__search-result-container">
           <div className="layer-ui__search-result-title">

@@ -61,7 +61,7 @@ export const Popover = ({
           if (event.shiftKey) {
             focusableElements[focusableElements.length - 1]?.focus();
           } else {
-            focusableElements[0].focus();
+            focusableElements[0]?.focus();
           }
           event.preventDefault();
           event.stopImmediatePropagation();

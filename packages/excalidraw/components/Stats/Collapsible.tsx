@@ -32,6 +32,15 @@ const Collapsible = ({
         }}
         className={className}
         onClick={openTrigger}
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openTrigger();
+          }
+        }}
       >
         {label}
         {showCollapsedIcon && (

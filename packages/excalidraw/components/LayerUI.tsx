@@ -27,6 +27,8 @@ import { useAtom, useAtomValue } from "../editor-jotai";
 import { t } from "../i18n";
 import { getScrollToContentState } from "../scene";
 
+import { A11yAnnouncer, A11yHelpDialog, ImageAltTextDialog } from "../a11y";
+
 import { SelectedShapeActions, CompactShapeActions } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { MobileMenu } from "./MobileMenu";
@@ -43,6 +45,7 @@ import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { sidebarRightIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
+
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import ElementLinkDialog from "./ElementLinkDialog";
@@ -436,6 +439,9 @@ const LayerUI = ({
 
   const layerUIJSX = (
     <>
+      <A11yAnnouncer />
+      <ImageAltTextDialog />
+      <A11yHelpDialog />
       {/* ------------------------- tunneled UI ---------------------------- */}
       {/* make sure we render host app components first so that we can detect
           them first on initial render to optimize layout shift */}
