@@ -121,6 +121,7 @@ export const MobileToolBar = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const annotationToolSelected = activeTool.type === "annotation";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -161,6 +162,7 @@ export const MobileToolBar = ({
     "embeddable",
     "laser",
     "magicframe",
+    "annotation",
   ].filter((tool) => {
     if (showTextToolOutside && tool === "text") {
       return false;
@@ -184,6 +186,8 @@ export const MobileToolBar = ({
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
+      ? laserPointerToolIcon
+      : activeTool.type === "annotation"
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
@@ -454,6 +458,15 @@ export const MobileToolBar = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "annotation" })}
+            icon={laserPointerToolIcon}
+            data-testid="toolbar-annotation"
+            selected={annotationToolSelected}
+            shortcut="W"
+          >
+            {t("toolBar.annotation")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

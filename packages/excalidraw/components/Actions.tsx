@@ -1284,7 +1284,7 @@ export const ShapesSwitcher = ({
             icon={laserPointerToolIcon}
             data-testid="toolbar-annotation"
             selected={annotationToolSelected}
-            shortcut={KEYS.L.toLocaleUpperCase()}
+            shortcut="W"
           >
             {t("toolBar.annotation")}
           </DropdownMenu.Item>
