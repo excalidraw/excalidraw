@@ -11,6 +11,26 @@ O projeto utiliza **GitHub Actions** como ferramenta principal de CI/CD. A arqui
 
 Apesar de ser uma pipeline robusta, a análise técnica identificou um gargalo de performance nos _workflows_ de validação contínua (acionados em cada _Pull Request_ e _Push_). As rotinas de instalação de dependências (`yarn install`) estão sendo executadas de forma "fria" (sem reaproveitamento de dados prévios).
 
+### Testes de aceitação da feature criada
+
+#### Instruções de Execução
+
+Para executar a suíte de testes de aceitação da nova ferramenta de forma isolada, utilize o comando: `yarn test annotation`
+
+#### Cenários de Aceitação (Gherkin)
+
+**Cenário 1: Interação com Hiperlinks** **Dado** que o usuário está com a ferramenta "Annotation" (Laser Persistente) ativa **E** existe uma forma geométrica no canvas contendo um hiperlink **Quando** o usuário passa o mouse sobre o ícone do hiperlink **Então** o cursor deve mudar para o tipo "pointer" (indicando clicabilidade) **E** ao clicar, a função de abrir o link deve ser disparada.
+
+**Cenário 2: Interação com Elementos Incorporados (Embeds)** **Dado** que o usuário está com a ferramenta "Annotation" ativa **E** existe um elemento de vídeo (YouTube) ou Iframe incorporado no canvas **Quando** o usuário clica no centro desse elemento **Então** o elemento deve mudar para o estado "ativo" **E** a interação com o Iframe (ex: dar play no vídeo) não deve ser bloqueada pela ferramenta.
+
+**Cenário 3: Bloqueio de Movimentação (Pan) em Modo de Visualização** **Dado** que o aplicativo está no modo "Apenas Visualização" (View Mode) **E** a ferramenta "Annotation" está ativa **Quando** o usuário clica e arrasta o mouse pelo canvas **Então** a tela não deve ser deslocada (as coordenadas de scroll devem permanecer idênticas) **E** o cursor não deve assumir a forma de "mão" (grab), permitindo apenas o desenho da trilha do laser.
+
+#### Cobertura dos Testes
+
+1. **Abertura de Links:** Garante que a ferramenta não sobrepõe ou quebra eventos de clique nativos de outras formas na tela.
+2. **Embeds:** Assegura a coexistência da ferramenta com iframes complexos, sem interceptar os eventos de foco no centro do componente.
+3. **Bloqueio de Pan:** Valida se as regras de física de arrasto (drag/pan) são corretamente suspensas no modo de visualização para permitir que a trilha seja desenhada sem mover a câmera acidentalmente.
+
 ### Proposta de Melhoria: Implementação de Cache de Dependências
 
 A melhoria proposta consiste em implementar o **Cache de Dependências do Gerenciador de Pacotes (Yarn)** nas _Actions_ de setup.
