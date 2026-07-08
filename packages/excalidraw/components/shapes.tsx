@@ -117,7 +117,7 @@ export const SHAPES = [
   {
     icon: laserPointerToolIcon,
     value: "annotation",
-    key: KEYS.W,
+    key: "w",
     numericKey: null,
     fillable: false,
     toolbar: false,

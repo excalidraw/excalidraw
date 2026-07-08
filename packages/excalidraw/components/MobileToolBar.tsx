@@ -162,6 +162,7 @@ export const MobileToolBar = ({
     "embeddable",
     "laser",
     "magicframe",
+    "annotation",
   ].filter((tool) => {
     if (showTextToolOutside && tool === "text") {
       return false;
@@ -185,6 +186,8 @@ export const MobileToolBar = ({
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
+      ? laserPointerToolIcon
+      : activeTool.type === "annotation"
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
@@ -461,7 +464,7 @@ export const MobileToolBar = ({
             icon={laserPointerToolIcon}
             data-testid="toolbar-annotation"
             selected={annotationToolSelected}
-            shortcut={KEYS.W.toLocaleUpperCase()}
+            shortcut="W"
           >
             {t("toolBar.annotation")}
           </DropdownMenu.Item>
