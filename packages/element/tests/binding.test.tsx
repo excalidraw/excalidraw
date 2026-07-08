@@ -28,6 +28,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawLinearElement,
   FixedPointBinding,
+  NonDeleted,
 } from "../src/types";
 
 const { h } = window;
@@ -781,7 +782,7 @@ describe("binding to a point-like (sub-pixel) element", () => {
         y: 50,
         width: 0.00005,
         height: 0.00005,
-      }) as ExcalidrawBindableElement;
+      }) as NonDeleted<ExcalidrawBindableElement>;
       const arrow = API.createElement({
         type: "arrow",
         elbowed,
@@ -790,7 +791,7 @@ describe("binding to a point-like (sub-pixel) element", () => {
         width: 195,
         height: 0,
         points: [pointFrom(0, 0), pointFrom(195, 0)],
-      }) as ExcalidrawArrowElement;
+      }) as NonDeleted<ExcalidrawArrowElement>;
       API.setElements([rect, arrow]);
 
       bindBindingElement(arrow, rect, "orbit", "end", h.scene);
