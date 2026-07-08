@@ -28,6 +28,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawLinearElement,
   FixedPointBinding,
+  NonDeleted,
 } from "../src/types";
 
 const { h } = window;
@@ -793,7 +794,13 @@ describe("binding to a point-like (sub-pixel) element", () => {
       }) as ExcalidrawArrowElement;
       API.setElements([rect, arrow]);
 
-      bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+      bindBindingElement(
+        arrow as NonDeleted<ExcalidrawArrowElement>,
+        rect as NonDeleted<ExcalidrawBindableElement>,
+        "orbit",
+        "end",
+        h.scene,
+      );
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.elementId).toBe(rect.id);
@@ -803,7 +810,10 @@ describe("binding to a point-like (sub-pixel) element", () => {
 
       // Grow the element to a normal size and let bound arrows follow
       h.scene.mutateElement(rect, { width: 300, height: 200 });
-      updateBoundElements(rect, h.scene);
+      updateBoundElements(
+        rect as NonDeleted<ExcalidrawBindableElement>,
+        h.scene,
+      );
 
       // The arrow endpoint must track the element (its center), not fly off
       expect(Math.abs(arrow.width)).toBeLessThan(1000);
