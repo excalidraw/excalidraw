@@ -21,8 +21,6 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
-  ELEMENT_SHIFT_TRANSLATE_AMOUNT,
-  ELEMENT_TRANSLATE_AMOUNT,
   EVENT,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
@@ -214,7 +212,6 @@ import {
   mutateElement,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
-  maybeHandleArrowPointlikeDrag,
   getActiveTextElement,
   isEligibleFrameChildType,
 } from "@excalidraw/element";
@@ -403,8 +400,10 @@ import {
 } from "../resize";
 import {
   handleHoverSelectedLinearElement,
-  handleSkipBindMode,
+  linearAltKeyDownBindModeHandler,
+  linearArrowKeyMoveFromKeyDownHandler,
   linearBoxSelectionFromPointerDownHandler,
+  linearCtrlKeyDownBindModeHandler,
   linearEditorOnPointerDownHandler,
   linearElementDoubleClickHandler,
   linearFixedSegmentDragFromPointerDownHandler,
@@ -4931,14 +4930,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // Handle Alt key for bind mode
-      if (event.key === KEYS.ALT) {
-        if (getFeatureFlag("COMPLEX_BINDINGS")) {
-          handleSkipBindMode(this);
-        } else {
-          maybeHandleArrowPointlikeDrag({ app: this, event });
-        }
-      }
+      linearAltKeyDownBindModeHandler(this, event);
 
       if (this.actionManager.handleKeyDown(event)) {
         return;
@@ -5021,92 +5013,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
-        if (getFeatureFlag("COMPLEX_BINDINGS")) {
-          resetDelayedBindMode(this);
-        }
+      linearCtrlKeyDownBindModeHandler(this, event);
 
-        flushSync(() => {
-          this.setState({
-            isBindingEnabled: this.state.bindingPreference !== "enabled",
-          });
-        });
-
-        maybeHandleArrowPointlikeDrag({ app: this, event });
-      }
-
-      if (isArrowKey(event.key)) {
-        let selectedElements = this.scene.getSelectedElements({
-          selectedElementIds: this.state.selectedElementIds,
-          includeBoundTextElement: true,
-          includeElementsInFrames: true,
-        });
-
-        const arrowIdsToRemove = new Set<string>();
-
-        selectedElements
-          .filter((el): el is NonDeleted<ExcalidrawArrowElement> =>
-            isBindingElement(el),
-          )
-          .filter((arrow) => {
-            const startElementNotInSelection =
-              arrow.startBinding &&
-              !selectedElements.some(
-                (el) => el.id === arrow.startBinding?.elementId,
-              );
-            const endElementNotInSelection =
-              arrow.endBinding &&
-              !selectedElements.some(
-                (el) => el.id === arrow.endBinding?.elementId,
-              );
-            return startElementNotInSelection || endElementNotInSelection;
-          })
-          .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
-
-        selectedElements = selectedElements.filter(
-          (el) => !arrowIdsToRemove.has(el.id),
-        );
-
-        const step =
-          (this.getEffectiveGridSize() &&
-            (event.shiftKey
-              ? ELEMENT_TRANSLATE_AMOUNT
-              : this.getEffectiveGridSize())) ||
-          (event.shiftKey
-            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-            : ELEMENT_TRANSLATE_AMOUNT);
-
-        let offsetX = 0;
-        let offsetY = 0;
-
-        if (event.key === KEYS.ARROW_LEFT) {
-          offsetX = -step;
-        } else if (event.key === KEYS.ARROW_RIGHT) {
-          offsetX = step;
-        } else if (event.key === KEYS.ARROW_UP) {
-          offsetY = -step;
-        } else if (event.key === KEYS.ARROW_DOWN) {
-          offsetY = step;
-        }
-
-        selectedElements.forEach((element) => {
-          this.scene.mutateElement(
-            element,
-            {
-              x: element.x + offsetX,
-              y: element.y + offsetY,
-            },
-            { informMutation: false, isDragging: false },
-          );
-
-          updateBoundElements(element, this.scene, {
-            simultaneouslyUpdated: selectedElements,
-          });
-        });
-
-        this.scene.triggerUpdate();
-
-        event.preventDefault();
+      if (linearArrowKeyMoveFromKeyDownHandler(this, event)) {
+        // arrow-key nudge handled in linear.ts
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {

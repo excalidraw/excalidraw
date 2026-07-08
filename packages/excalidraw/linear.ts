@@ -2,6 +2,8 @@ import {
   ARROW_TYPE,
   BIND_MODE_TIMEOUT,
   CURSOR_TYPE,
+  ELEMENT_SHIFT_TRANSLATE_AMOUNT,
+  ELEMENT_TRANSLATE_AMOUNT,
   KEYS,
   LINE_CONFIRM_THRESHOLD,
   MINIMUM_ARROW_SIZE,
@@ -50,6 +52,7 @@ import {
   newElementWith,
   newLinearElement,
   removeElementsFromFrame,
+  updateBoundElements,
 } from "@excalidraw/element";
 import { pointDistance, pointFrom } from "@excalidraw/math";
 
@@ -64,6 +67,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -1738,6 +1742,126 @@ export const linearFrameMembershipOnPointerUpHandler = (
  * Handles the arrow/binding concerns of a key release: ALT point-like drag,
  * bind-mode restoration and fixed-point binding updates after arrow-key moves.
  */
+export const linearAltKeyDownBindModeHandler = (
+  app: App,
+  event: React.KeyboardEvent | KeyboardEvent,
+): void => {
+  // Handle Alt key for bind mode
+  if (event.key === KEYS.ALT) {
+    if (getFeatureFlag("COMPLEX_BINDINGS")) {
+      handleSkipBindMode(app);
+    } else {
+      maybeHandleArrowPointlikeDrag({ app, event });
+    }
+  }
+};
+
+export const linearCtrlKeyDownBindModeHandler = (
+  app: App,
+  event: React.KeyboardEvent | KeyboardEvent,
+): void => {
+  if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
+    if (getFeatureFlag("COMPLEX_BINDINGS")) {
+      resetDelayedBindMode(app);
+    }
+
+    flushSync(() => {
+      app.setState({
+        isBindingEnabled: app.state.bindingPreference !== "enabled",
+      });
+    });
+
+    maybeHandleArrowPointlikeDrag({ app, event });
+  }
+};
+
+/**
+ * Moves the selected elements by a keyboard step when an arrow key is pressed,
+ * dropping bound arrows whose bound element isn't part of the selection and
+ * updating bound elements after the move.
+ *
+ * @returns whether an arrow key was handled (the caller should skip the
+ * `Enter` branch).
+ */
+export const linearArrowKeyMoveFromKeyDownHandler = (
+  app: App,
+  event: React.KeyboardEvent | KeyboardEvent,
+): boolean => {
+  if (!isArrowKey(event.key)) {
+    return false;
+  }
+
+  let selectedElements = app.scene.getSelectedElements({
+    selectedElementIds: app.state.selectedElementIds,
+    includeBoundTextElement: true,
+    includeElementsInFrames: true,
+  });
+
+  const arrowIdsToRemove = new Set<string>();
+
+  selectedElements
+    .filter((el): el is NonDeleted<ExcalidrawArrowElement> =>
+      isBindingElement(el),
+    )
+    .filter((arrow) => {
+      const startElementNotInSelection =
+        arrow.startBinding &&
+        !selectedElements.some((el) => el.id === arrow.startBinding?.elementId);
+      const endElementNotInSelection =
+        arrow.endBinding &&
+        !selectedElements.some((el) => el.id === arrow.endBinding?.elementId);
+      return startElementNotInSelection || endElementNotInSelection;
+    })
+    .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
+
+  selectedElements = selectedElements.filter(
+    (el) => !arrowIdsToRemove.has(el.id),
+  );
+
+  const step =
+    (app.getEffectiveGridSize() &&
+      (event.shiftKey
+        ? ELEMENT_TRANSLATE_AMOUNT
+        : app.getEffectiveGridSize())) ||
+    (event.shiftKey
+      ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+      : ELEMENT_TRANSLATE_AMOUNT);
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  if (event.key === KEYS.ARROW_LEFT) {
+    offsetX = -step;
+  } else if (event.key === KEYS.ARROW_RIGHT) {
+    offsetX = step;
+  } else if (event.key === KEYS.ARROW_UP) {
+    offsetY = -step;
+  } else if (event.key === KEYS.ARROW_DOWN) {
+    offsetY = step;
+  }
+
+  selectedElements.forEach((element) => {
+    app.scene.mutateElement(
+      element,
+      {
+        x: element.x + offsetX,
+        y: element.y + offsetY,
+      },
+      { informMutation: false, isDragging: false },
+    );
+
+    updateBoundElements(element, app.scene, {
+      simultaneouslyUpdated: selectedElements,
+    });
+  });
+
+  app.scene.triggerUpdate();
+
+  event.preventDefault();
+
+  return true;
+};
+
 export const linearOnKeyUpHandler = (app: App, event: KeyboardEvent): void => {
   if (event.key === KEYS.ALT) {
     maybeHandleArrowPointlikeDrag({ app, event });
