@@ -1329,7 +1329,12 @@ class App extends React.Component<AppProps, AppState> {
       // panning
       isHoldingSpace ||
       // wrong tool
-      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+      !oneOf(this.state.activeTool.type, [
+        "laser",
+        "selection",
+        "lasso",
+        "annotation",
+      ])
     ) {
       return false;
     }
@@ -1375,6 +1380,7 @@ class App extends React.Component<AppProps, AppState> {
       isIframeLikeElement(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "annotation" ||
         this.isIframeLikeElementCenter(
           hitElement,
           this.lastPointerUpEvent,
@@ -7180,7 +7186,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const isPressingAnyButton = Boolean(event.buttons);
-    const isLaserTool = this.state.activeTool.type === "laser";
+    const isLaserTool =
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "annotation";
     if (
       isPressingAnyButton ||
       // checking against laser so that if you mouseover with a laser tool
@@ -12851,7 +12859,11 @@ class App extends React.Component<AppProps, AppState> {
     const pointer: CollaboratorPointer = {
       x: sceneX,
       y: sceneY,
-      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+      tool:
+        this.state.activeTool.type === "laser" ||
+        this.state.activeTool.type === "annotation"
+          ? "laser"
+          : "pointer",
     };
 
     this.props.onPointerUpdate?.({
