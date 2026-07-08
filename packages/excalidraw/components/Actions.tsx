@@ -2,49 +2,23 @@ import clsx from "clsx";
 import { useRef, useState } from "react";
 import { Popover } from "radix-ui";
 
-import {
-  CLASSES,
-  KEYS,
-  capitalizeString,
-  isTransparent,
-} from "@excalidraw/common";
+import { CLASSES, KEYS, capitalizeString } from "@excalidraw/common";
 
-import {
-  shouldAllowVerticalAlign,
-  suppportsHorizontalAlign,
-  hasBoundTextElement,
-  isElbowArrow,
-  isImageElement,
-  isLinearElement,
-  isTextElement,
-  isArrowElement,
-  hasStrokeColor,
-  toolIsArrow,
-} from "@excalidraw/element";
+import { isArrowElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
-  ExcalidrawElementType,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { actionToggleZenMode } from "../actions";
 
-import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
 import { useTunnels } from "../context/tunnels";
 
 import { t } from "../i18n";
-import {
-  canChangeRoundness,
-  canHaveArrowheads,
-  getTargetElements,
-  hasBackground,
-  hasFreedrawMode,
-  hasStrokeStyle,
-  hasStrokeWidth,
-} from "../scene";
+import { getTargetElements } from "../scene";
 
 import { getFormValue } from "../actions/actionProperties";
 
@@ -56,11 +30,7 @@ import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
 
-import {
-  useEditorInterface,
-  useStylesPanelMode,
-  useExcalidrawContainer,
-} from "./App";
+import { useStylesPanelMode, useExcalidrawContainer } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { ToolPopover } from "./ToolPopover";
@@ -87,6 +57,9 @@ import {
 
 import { Island } from "./Island";
 
+import { getShapeActionPredicates } from "./shapeActionPredicates";
+
+import type { ShapeActionPredicates } from "./shapeActionPredicates";
 import type {
   AppClassProperties,
   AppProps,
@@ -95,45 +68,92 @@ import type {
 } from "../types";
 import type { ActionManager } from "../actions/manager";
 
+// re-exported for consumers outside the styles panel (e.g. CommandPalette)
+export {
+  canChangeStrokeColor,
+  canChangeBackgroundColor,
+} from "./shapeActionPredicates";
+
 // Common CSS class combinations
 const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
 
-export const canChangeStrokeColor = (
-  appState: UIAppState,
-  targetElements: ExcalidrawElement[],
-) => {
-  let commonSelectedType: ExcalidrawElementType | null =
-    targetElements[0]?.type || null;
+/**
+ * The "arrange" (z-order) fieldset, identical across every styles-panel layout.
+ */
+const LayersFieldset = ({
+  renderAction,
+}: {
+  renderAction: ActionManager["renderAction"];
+}) => (
+  <fieldset>
+    <legend>{t("labels.layers")}</legend>
+    <div className="buttonList">
+      {renderAction("sendToBack")}
+      {renderAction("sendBackward")}
+      {renderAction("bringForward")}
+      {renderAction("bringToFront")}
+    </div>
+  </fieldset>
+);
 
-  for (const element of targetElements) {
-    if (element.type !== commonSelectedType) {
-      commonSelectedType = null;
-      break;
-    }
-  }
+/**
+ * The align + distribute fieldset, identical across every styles-panel layout.
+ * Button order is mirrored for RTL so the leftmost button always aligns left.
+ */
+const AlignFieldset = ({
+  renderAction,
+  showDistribute,
+}: {
+  renderAction: ActionManager["renderAction"];
+  showDistribute: boolean;
+}) => {
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   return (
-    (hasStrokeColor(appState.activeTool.type) &&
-      commonSelectedType !== "image" &&
-      commonSelectedType !== "frame" &&
-      commonSelectedType !== "magicframe") ||
-    targetElements.some((element) => hasStrokeColor(element.type))
+    <fieldset>
+      <legend>{t("labels.align")}</legend>
+      <div className="buttonList">
+        {isRTL ? (
+          <>
+            {renderAction("alignRight")}
+            {renderAction("alignHorizontallyCentered")}
+            {renderAction("alignLeft")}
+          </>
+        ) : (
+          <>
+            {renderAction("alignLeft")}
+            {renderAction("alignHorizontallyCentered")}
+            {renderAction("alignRight")}
+          </>
+        )}
+        {showDistribute && renderAction("distributeHorizontally")}
+        {/* breaks the row ˇˇ */}
+        <div style={{ flexBasis: "100%", height: 0 }} />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: ".5rem",
+            marginTop: "-0.5rem",
+          }}
+        >
+          {renderAction("alignTop")}
+          {renderAction("alignVerticallyCentered")}
+          {renderAction("alignBottom")}
+          {showDistribute && renderAction("distributeVertically")}
+        </div>
+      </div>
+    </fieldset>
   );
 };
 
-export const canChangeBackgroundColor = (
-  appState: UIAppState,
-  targetElements: ExcalidrawElement[],
-) => {
-  return (
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
-  );
-};
-
+/**
+ * Full styles panel: the wide, always-expanded layout used on desktop when the
+ * UI is in "full" mode.
+ */
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -146,168 +166,68 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
-  const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
   );
-  const editorInterface = useEditorInterface();
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
-
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
-
-  const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
-    targetElements.length === 1 &&
-    isLinearElement(targetElements[0]) &&
-    !isElbowArrow(targetElements[0]);
-
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-
-  const showAlignActions =
-    !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
   return (
     <div className="selected-shape-actions">
-      <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeStrokeColor")}
-      </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
+      <div>{predicates.strokeColor && renderAction("changeStrokeColor")}</div>
+      {predicates.backgroundColor && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {showFillIcons && renderAction("changeFillStyle")}
+      {predicates.fill && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type))) &&
-        renderAction("changeStrokeWidth")}
+      {predicates.strokeWidth && renderAction("changeStrokeWidth")}
 
-      {(hasFreedrawMode(appState.activeTool.type) ||
-        targetElements.some((element) => hasFreedrawMode(element.type))) &&
-        renderAction("changeFreedrawMode")}
+      {predicates.freedrawMode && renderAction("changeFreedrawMode")}
 
-      {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
+      {predicates.strokeStyle && (
         <>
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>
       )}
 
-      {(canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
-      )}
+      {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
-      {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
-        <>{renderAction("changeArrowType")}</>
-      )}
+      {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
+      {predicates.text && (
         <>
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements, elementsMap)) &&
-            renderAction("changeTextAlign")}
+          {predicates.textAlign && renderAction("changeTextAlign")}
         </>
       )}
 
-      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-        renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
-      )}
+      {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+      {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
       {renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
+      <LayersFieldset renderAction={renderAction} />
 
-      {showAlignActions && !isSingleElementBoundContainer && (
-        <fieldset>
-          <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
-            }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
-            ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
-            )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
-            </div>
-          </div>
-        </fieldset>
+      {predicates.align && (
+        <AlignFieldset
+          renderAction={renderAction}
+          showDistribute={predicates.distribute}
+        />
       )}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {editorInterface.formFactor !== "phone" &&
-              renderAction("duplicateSelection")}
-            {editorInterface.formFactor !== "phone" &&
-              renderAction("deleteSelectedElements")}
+            {renderAction("duplicateSelection")}
+            {renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
+            {predicates.link && renderAction("hyperlink")}
+            {predicates.cropEditor && renderAction("cropEditor")}
+            {predicates.lineEditor && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
@@ -319,25 +239,17 @@ const CombinedShapeProperties = ({
   appState,
   renderAction,
   setAppState,
-  targetElements,
+  predicates,
   container,
 }: {
-  targetElements: ExcalidrawElement[];
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
   setAppState: React.Component<any, AppState>["setState"];
+  predicates: ShapeActionPredicates;
   container: HTMLDivElement | null;
 }) => {
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-
   const shouldShowCombinedProperties =
-    targetElements.length > 0 ||
+    predicates.hasSelection ||
     (appState.activeTool.type !== "selection" &&
       appState.activeTool.type !== "eraser" &&
       appState.activeTool.type !== "hand" &&
@@ -388,37 +300,22 @@ const CombinedShapeProperties = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              {showFillIcons && renderAction("changeFillStyle")}
-              {(hasStrokeWidth(appState.activeTool.type) ||
-                targetElements.some((element) =>
-                  hasStrokeWidth(element.type),
-                )) &&
-                renderAction("changeStrokeWidth")}
+              {predicates.fill && renderAction("changeFillStyle")}
+              {predicates.strokeWidth && renderAction("changeStrokeWidth")}
               {
                 /* in compact UI the freedraw pressure setting is rendered as a
                   standalone cycle button in the compact actions list; we render
                   it in the combined properties popup as well for clarity
                 */
-                (hasFreedrawMode(appState.activeTool.type) ||
-                  targetElements.some((element) =>
-                    hasFreedrawMode(element.type),
-                  )) &&
-                  renderAction("changeFreedrawMode")
+                predicates.freedrawMode && renderAction("changeFreedrawMode")
               }
-              {(hasStrokeStyle(appState.activeTool.type) ||
-                targetElements.some((element) =>
-                  hasStrokeStyle(element.type),
-                )) && (
+              {predicates.strokeStyle && (
                 <>
                   {renderAction("changeStrokeStyle")}
                   {renderAction("changeSloppiness")}
                 </>
               )}
-              {(canChangeRoundness(appState.activeTool.type) ||
-                targetElements.some((element) =>
-                  canChangeRoundness(element.type),
-                )) &&
-                renderAction("changeRoundness")}
+              {predicates.roundness && renderAction("changeRoundness")}
               {renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
@@ -433,22 +330,21 @@ const CombinedArrowProperties = ({
   renderAction,
   setAppState,
   targetElements,
+  predicates,
   container,
   app,
 }: {
-  targetElements: ExcalidrawElement[];
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
   setAppState: React.Component<any, AppState>["setState"];
+  targetElements: ExcalidrawElement[];
+  predicates: ShapeActionPredicates;
   container: HTMLDivElement | null;
   app: AppClassProperties;
 }) => {
-  const showShowArrowProperties =
-    toolIsArrow(appState.activeTool.type) ||
-    targetElements.some((element) => toolIsArrow(element.type));
   const isOpen = appState.openPopup === "compactArrowProperties";
 
-  if (!showShowArrowProperties) {
+  if (!predicates.arrowType) {
     return null;
   }
 
@@ -529,16 +425,14 @@ const CombinedTextProperties = ({
   appState,
   renderAction,
   setAppState,
-  targetElements,
+  predicates,
   container,
-  elementsMap,
 }: {
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
   setAppState: React.Component<any, AppState>["setState"];
-  targetElements: ExcalidrawElement[];
+  predicates: ShapeActionPredicates;
   container: HTMLDivElement | null;
-  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
 }) => {
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const isOpen = appState.openPopup === "compactTextProperties";
@@ -600,14 +494,9 @@ const CombinedTextProperties = ({
             }}
           >
             <div className="selected-shape-actions">
-              {(appState.activeTool.type === "text" ||
-                targetElements.some(isTextElement)) &&
-                renderAction("changeFontSize")}
-              {(appState.activeTool.type === "text" ||
-                suppportsHorizontalAlign(targetElements, elementsMap)) &&
-                renderAction("changeTextAlign")}
-              {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-                renderAction("changeVerticalAlign")}
+              {predicates.text && renderAction("changeFontSize")}
+              {predicates.textAlign && renderAction("changeTextAlign")}
+              {predicates.verticalAlign && renderAction("changeVerticalAlign")}
             </div>
           </PropertiesPopover>
         )}
@@ -619,44 +508,23 @@ const CombinedTextProperties = ({
 const CombinedExtraActions = ({
   appState,
   renderAction,
-  targetElements,
+  predicates,
   setAppState,
   container,
-  app,
   showDuplicate,
   showDelete,
 }: {
   appState: UIAppState;
-  targetElements: ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
+  predicates: ShapeActionPredicates;
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
-  app: AppClassProperties;
   showDuplicate?: boolean;
   showDelete?: boolean;
 }) => {
-  const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
-  );
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-  const showLinkIcon = targetElements.length === 1;
-  const showAlignActions = alignActionsPredicate(appState, app);
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
-
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
   const isOpen = appState.openPopup === "compactOtherProperties";
 
-  if (isEditingTextOrNewElement || targetElements.length === 0) {
+  if (predicates.isEditingTextOrNewElement || !predicates.hasSelection) {
     return null;
   }
 
@@ -702,61 +570,21 @@ const CombinedExtraActions = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              <fieldset>
-                <legend>{t("labels.layers")}</legend>
-                <div className="buttonList">
-                  {renderAction("sendToBack")}
-                  {renderAction("sendBackward")}
-                  {renderAction("bringForward")}
-                  {renderAction("bringToFront")}
-                </div>
-              </fieldset>
+              <LayersFieldset renderAction={renderAction} />
 
-              {showAlignActions && !isSingleElementBoundContainer && (
-                <fieldset>
-                  <legend>{t("labels.align")}</legend>
-                  <div className="buttonList">
-                    {isRTL ? (
-                      <>
-                        {renderAction("alignRight")}
-                        {renderAction("alignHorizontallyCentered")}
-                        {renderAction("alignLeft")}
-                      </>
-                    ) : (
-                      <>
-                        {renderAction("alignLeft")}
-                        {renderAction("alignHorizontallyCentered")}
-                        {renderAction("alignRight")}
-                      </>
-                    )}
-                    {targetElements.length > 2 &&
-                      renderAction("distributeHorizontally")}
-                    {/* breaks the row ˇˇ */}
-                    <div style={{ flexBasis: "100%", height: 0 }} />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: ".5rem",
-                        marginTop: "-0.5rem",
-                      }}
-                    >
-                      {renderAction("alignTop")}
-                      {renderAction("alignVerticallyCentered")}
-                      {renderAction("alignBottom")}
-                      {targetElements.length > 2 &&
-                        renderAction("distributeVertically")}
-                    </div>
-                  </div>
-                </fieldset>
+              {predicates.align && (
+                <AlignFieldset
+                  renderAction={renderAction}
+                  showDistribute={predicates.distribute}
+                />
               )}
               <fieldset>
                 <legend>{t("labels.actions")}</legend>
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
-                  {showLinkIcon && renderAction("hyperlink")}
-                  {showCropEditorAction && renderAction("cropEditor")}
+                  {predicates.linkSingleOnly && renderAction("hyperlink")}
+                  {predicates.cropEditor && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
                   {showDelete && renderAction("deleteSelectedElements")}
                 </div>
@@ -770,21 +598,13 @@ const CombinedExtraActions = ({
 };
 
 const LinearEditorAction = ({
-  appState,
   renderAction,
-  targetElements,
+  predicates,
 }: {
-  appState: UIAppState;
-  targetElements: ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
+  predicates: ShapeActionPredicates;
 }) => {
-  const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
-    targetElements.length === 1 &&
-    isLinearElement(targetElements[0]) &&
-    !isElbowArrow(targetElements[0]);
-
-  if (!showLineEditorAction) {
+  if (!predicates.lineEditor) {
     return null;
   }
 
@@ -795,6 +615,10 @@ const LinearEditorAction = ({
   );
 };
 
+/**
+ * Compact styles panel — the collapsed, popover-driven layout used on tablets
+ * and on desktop when the UI is in "compact" mode.
+ */
 export const CompactShapeActions = ({
   appState,
   elementsMap,
@@ -809,37 +633,32 @@ export const CompactShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const { container } = useExcalidrawContainer();
-
-  const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
   );
-
-  const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
-    targetElements.length === 1 &&
-    isLinearElement(targetElements[0]) &&
-    !isElbowArrow(targetElements[0]);
+  const { container } = useExcalidrawContainer();
 
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
-      {canChangeStrokeColor(appState, targetElements) && (
+      {predicates.strokeColor && (
         <div className={clsx("compact-action-item")}>
           {renderAction("changeStrokeColor")}
         </div>
       )}
 
       {/* Background Color */}
-      {canChangeBackgroundColor(appState, targetElements) && (
+      {predicates.backgroundColor && (
         <div className="compact-action-item">
           {renderAction("changeBackgroundColor")}
         </div>
       )}
 
       {/* Freedraw pressure: standalone button cycling the variability mode */}
-      {(hasFreedrawMode(appState.activeTool.type) ||
-        targetElements.some((element) => hasFreedrawMode(element.type))) && (
+      {predicates.freedrawMode && (
         <div className="compact-action-item">
           {renderAction("changeFreedrawMode", { cycle: true })}
         </div>
@@ -849,7 +668,7 @@ export const CompactShapeActions = ({
         appState={appState}
         renderAction={renderAction}
         setAppState={setAppState}
-        targetElements={targetElements}
+        predicates={predicates}
         container={container}
       />
 
@@ -858,19 +677,19 @@ export const CompactShapeActions = ({
         renderAction={renderAction}
         setAppState={setAppState}
         targetElements={targetElements}
+        predicates={predicates}
         container={container}
         app={app}
       />
       {/* Linear Editor */}
-      {showLineEditorAction && (
+      {predicates.lineEditor && (
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
         </div>
       )}
 
       {/* Text Properties */}
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
+      {predicates.text && (
         <>
           <div className="compact-action-item">
             {renderAction("changeFontFamily")}
@@ -879,22 +698,21 @@ export const CompactShapeActions = ({
             appState={appState}
             renderAction={renderAction}
             setAppState={setAppState}
-            targetElements={targetElements}
+            predicates={predicates}
             container={container}
-            elementsMap={elementsMap}
           />
         </>
       )}
 
       {/* Dedicated Copy Button */}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
         <div className="compact-action-item">
           {renderAction("duplicateSelection")}
         </div>
       )}
 
       {/* Dedicated Delete Button */}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
         <div className="compact-action-item">
           {renderAction("deleteSelectedElements")}
         </div>
@@ -903,15 +721,19 @@ export const CompactShapeActions = ({
       <CombinedExtraActions
         appState={appState}
         renderAction={renderAction}
-        targetElements={targetElements}
+        predicates={predicates}
         setAppState={setAppState}
         container={container}
-        app={app}
       />
     </div>
   );
 };
 
+/**
+ * Mobile styles panel — the horizontal action bar used on phones, with an
+ * overflow measurement that promotes duplicate/delete out of the popover when
+ * there is room.
+ */
 export const MobileShapeActions = ({
   appState,
   elementsMap,
@@ -926,6 +748,12 @@ export const MobileShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
+  );
   const { container } = useExcalidrawContainer();
   const mobileActionsRef = useRef<HTMLDivElement>(null);
 
@@ -971,12 +799,12 @@ export const MobileShapeActions = ({
           flex: 1,
         }}
       >
-        {canChangeStrokeColor(appState, targetElements) && (
+        {predicates.strokeColor && (
           <div className={clsx("compact-action-item")}>
             {renderAction("changeStrokeColor")}
           </div>
         )}
-        {canChangeBackgroundColor(appState, targetElements) && (
+        {predicates.backgroundColor && (
           <div className="compact-action-item">
             {renderAction("changeBackgroundColor")}
           </div>
@@ -985,7 +813,7 @@ export const MobileShapeActions = ({
           appState={appState}
           renderAction={renderAction}
           setAppState={setAppState}
-          targetElements={targetElements}
+          predicates={predicates}
           container={container}
         />
         {/* Combined Arrow Properties */}
@@ -994,18 +822,17 @@ export const MobileShapeActions = ({
           renderAction={renderAction}
           setAppState={setAppState}
           targetElements={targetElements}
+          predicates={predicates}
           container={container}
           app={app}
         />
         {/* Linear Editor */}
         <LinearEditorAction
-          appState={appState}
           renderAction={renderAction}
-          targetElements={targetElements}
+          predicates={predicates}
         />
         {/* Text Properties */}
-        {(appState.activeTool.type === "text" ||
-          targetElements.some(isTextElement)) && (
+        {predicates.text && (
           <>
             <div className="compact-action-item">
               {renderAction("changeFontFamily")}
@@ -1014,9 +841,8 @@ export const MobileShapeActions = ({
               appState={appState}
               renderAction={renderAction}
               setAppState={setAppState}
-              targetElements={targetElements}
+              predicates={predicates}
               container={container}
-              elementsMap={elementsMap}
             />
           </>
         )}
@@ -1025,10 +851,9 @@ export const MobileShapeActions = ({
         <CombinedExtraActions
           appState={appState}
           renderAction={renderAction}
-          targetElements={targetElements}
+          predicates={predicates}
           setAppState={setAppState}
           container={container}
-          app={app}
           showDuplicate={!showDuplicateOutside}
           showDelete={!showDeleteOutside}
         />
