@@ -116,6 +116,10 @@ export const BASE_BINDING_GAP_ELBOW = 5;
 export const BASE_ARROW_MIN_LENGTH = 10;
 export const FOCUS_POINT_SIZE = 10 / 1.5;
 
+// Below this size (in px) a bindable element has no meaningful interior to
+// anchor a proportional fixedPoint into
+const MIN_BINDABLE_SIZE = 1;
+
 export const getBindingGap = (
   bindTarget: ExcalidrawBindableElement,
   opts: Pick<ExcalidrawArrowElement, "elbowed">,
@@ -1958,12 +1962,28 @@ export const calculateFixedPointForElbowArrowBinding = (
     -hoveredElement.angle as Radians,
   );
 
+  // A point-like element has no interior to anchor a proportional point into,
+  // and outline snapping above can fall back to an unrelated point; bind to
+  // the center so the arrow stays put when the element is later resized.
+  if (
+    hoveredElement.width < MIN_BINDABLE_SIZE ||
+    hoveredElement.height < MIN_BINDABLE_SIZE
+  ) {
+    return { fixedPoint: normalizeFixedPoint([0.5, 0.5]) };
+  }
+
+  // Floor the divisor at the binding gap (rather than at ~0) so that
+  // elements smaller than the gap don't blow up the ratio: the snapped
+  // point sits at most one gap-width outside the outline, so this keeps
+  // the resulting fixedPoint bounded even for zero/near-zero-size elements.
+  const sizeFloor = getBindingGap(hoveredElement, linearElement);
+
   return {
     fixedPoint: normalizeFixedPoint([
       (nonRotatedSnappedGlobalPoint[0] - hoveredElement.x) /
-        Math.max(hoveredElement.width, PRECISION),
+        Math.max(hoveredElement.width, sizeFloor),
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
-        Math.max(hoveredElement.height, PRECISION),
+        Math.max(hoveredElement.height, sizeFloor),
     ]),
   };
 };
@@ -1992,13 +2012,29 @@ export const calculateFixedPointForNonElbowArrowBinding = (
     -hoveredElement.angle as Radians,
   );
 
+  // A point-like element has no interior to anchor a proportional point into;
+  // bind to the center so the arrow stays put when the element is later
+  // resized.
+  if (
+    hoveredElement.width < MIN_BINDABLE_SIZE ||
+    hoveredElement.height < MIN_BINDABLE_SIZE
+  ) {
+    return { fixedPoint: normalizeFixedPoint([0.5, 0.5]) };
+  }
+
+  // Floor the divisor at the binding gap (rather than at ~0) so that
+  // elements smaller than the gap don't blow up the ratio: the bound
+  // point sits at most one gap-width outside the outline, so this keeps
+  // the resulting fixedPoint bounded even for zero/near-zero-size elements.
+  const sizeFloor = getBindingGap(hoveredElement, linearElement);
+
   // Calculate the ratio relative to the element's bounds
   const fixedPointX =
     (nonRotatedPoint[0] - hoveredElement.x) /
-    Math.max(hoveredElement.width, PRECISION);
+    Math.max(hoveredElement.width, sizeFloor);
   const fixedPointY =
     (nonRotatedPoint[1] - hoveredElement.y) /
-    Math.max(hoveredElement.height, PRECISION);
+    Math.max(hoveredElement.height, sizeFloor);
 
   return {
     fixedPoint: normalizeFixedPoint([fixedPointX, fixedPointY]),
@@ -2505,6 +2541,9 @@ export const isFixedPoint = (
   );
 };
 
+// Fixed point ratios should stay close to the 0.0-1.0 range.
+const FIXED_POINT_BOUND = 10;
+
 export const normalizeFixedPoint = <T extends FixedPoint>(
   fixedPoint: T,
 ): FixedPoint => {
@@ -2514,18 +2553,22 @@ export const normalizeFixedPoint = <T extends FixedPoint>(
 
   const EPSILON = 0.0001;
 
+  const clamped = fixedPoint.map((ratio) =>
+    clamp(ratio, -FIXED_POINT_BOUND, FIXED_POINT_BOUND),
+  ) as FixedPoint;
+
   // Do not allow a precise 0.5 for fixed point ratio
   // to avoid jumping arrow heading due to floating point imprecision
   if (
-    Math.abs(fixedPoint[0] - 0.5) < EPSILON ||
-    Math.abs(fixedPoint[1] - 0.5) < EPSILON
+    Math.abs(clamped[0] - 0.5) < EPSILON ||
+    Math.abs(clamped[1] - 0.5) < EPSILON
   ) {
-    return fixedPoint.map((ratio) =>
+    return clamped.map((ratio) =>
       Math.abs(ratio - 0.5) < EPSILON ? 0.5001 : ratio,
     ) as FixedPoint;
   }
 
-  return fixedPoint;
+  return clamped;
 };
 
 type Side =
