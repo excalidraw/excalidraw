@@ -419,8 +419,7 @@ export const getSelectedElementsByGroup = (
   elementsMap: ElementsMap,
   appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
 ): NonDeletedExcalidrawElement[][] => {
-  const groups: Map<string, NonDeletedExcalidrawElement[]> = new Map();
-  const elements: Map<string, NonDeletedExcalidrawElement[]> = new Map();
+  const buckets: Map<string, NonDeletedExcalidrawElement[]> = new Map();
   const selectedGroupIds = getSelectedGroupIds(appState);
   const isSingleSelectedGroupCase =
     selectedGroupIds.length === 1 &&
@@ -429,12 +428,11 @@ export const getSelectedElementsByGroup = (
     );
 
   selectedElements.forEach((element) => {
-    // skip dependent boundTextElements, they are incl. at the end of each iteration
+    // skip dependent boundTextElements, they are appended after their container
     if (isBoundToContainer(element)) {
       return;
     }
 
-    let bucketType: "group" | "element";
     let bucketKey: string;
     const selectedGroupId = getSelectedGroupIdForElement(
       element,
@@ -442,7 +440,6 @@ export const getSelectedElementsByGroup = (
     );
 
     if (!selectedGroupId) {
-      bucketType = "element";
       bucketKey = element.id;
     } else {
       // if only one group is selected, grouping is based on inner hierarchy
@@ -450,25 +447,19 @@ export const getSelectedElementsByGroup = (
         ? element.groupIds.indexOf(selectedGroupId) - 1
         : element.groupIds.indexOf(selectedGroupId);
 
-      if (keyIndex < 0) {
-        bucketType = "element";
-        bucketKey = element.id;
-      } else {
-        bucketType = "group";
-        bucketKey = element.groupIds[keyIndex];
-      }
+      // edge case: single selected group where element is non member of inner group
+      bucketKey = keyIndex < 0 ? element.id : element.groupIds[keyIndex];
     }
 
-    const bucketMap = bucketType === "group" ? groups : elements;
-    const currentBucketMembers = bucketMap.get(bucketKey) ?? [];
+    const currentBucketMembers = buckets.get(bucketKey) ?? [];
     const boundTextElement = getBoundTextElement(element, elementsMap);
 
     // preserve boundtext after container ordering
-    bucketMap.set(bucketKey, [
+    buckets.set(bucketKey, [
       ...currentBucketMembers,
       element,
       ...(boundTextElement ? [boundTextElement] : []),
     ]);
   });
-  return [...groups.values(), ...elements.values()];
+  return [...buckets.values()];
 };
