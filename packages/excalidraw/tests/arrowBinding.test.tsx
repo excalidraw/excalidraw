@@ -419,6 +419,47 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
         expect(endY).toBeCloseTo(startY);
       });
     });
+
+    it("uses the incoming direction to choose the grid axis for rotated bindables", async () => {
+      const ellipse = API.createElement({
+        type: "ellipse",
+        id: "ellipse-rotated-grid-binding",
+        x: 610,
+        y: 300,
+        width: 240,
+        height: 120,
+        angle: Math.PI / 3,
+      }) as ExcalidrawBindableElement;
+      API.setElements([ellipse]);
+      API.setAppState({ gridModeEnabled: true, gridSize: 20 });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 400, sceneY: 360 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 658, sceneY: 360 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      mouse.moveTo(target.x, target.y);
+      mouse.upAt();
+
+      await waitFor(() => {
+        const arrow = h.elements.find(
+          (element): element is ExcalidrawArrowElement =>
+            element.type === "arrow",
+        );
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(ellipse.id);
+
+        const startY = arrow!.y + arrow!.points[0][1];
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(startY, 1);
+      });
+    });
   });
 
   // -------------------------------------------------------------------------

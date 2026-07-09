@@ -1828,20 +1828,14 @@ const snapBoundPointToGrid = (
       ? vectorToHeading(vectorFromPoint(adjacentPoint, outlinePoint))
       : headingForPointFromElement(bindableElement, aabb, outlinePoint);
 
-  const normalLocal = pointFrom<GlobalPoint>(heading[0], heading[1]);
-  const normalGlobal = pointRotateRads(
-    normalLocal,
-    pointFrom<GlobalPoint>(0, 0),
-    bindableElement.angle,
-  );
-
   const bindingGap = getBindingGap(bindableElement, arrowElement);
   const extent =
     Math.max(bindableElement.width, bindableElement.height) + bindingGap * 2;
   const center = getCenterForBounds(aabb);
 
-  const absNX = Math.abs(normalGlobal[0]);
-  const absNY = Math.abs(normalGlobal[1]);
+  // Both heading strategies above return global-axis directions.
+  const absNX = Math.abs(heading[0]);
+  const absNY = Math.abs(heading[1]);
   if (absNX >= absNY) {
     // Global X is closest to the perpendicular so snap Y, intersect horizontal line
     const [, snappedY] = getGridPoint(
