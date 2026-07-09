@@ -2,7 +2,13 @@ import type { ActionManager } from "../../actions/manager";
 import type { Action } from "../../actions/types";
 
 export type CommandPaletteItem = {
-  label: string;
+  /**
+   * Command label. Pass a function to have it resolved lazily on each
+   * language change, so labels stay in sync with the active language
+   * (see #11569). Plain strings are captured at creation time and won't
+   * update when the language changes.
+   */
+  label: string | (() => string);
   /** additional keywords to match against
    * (appended to haystack, not displayed) */
   keywords?: string[];
@@ -22,4 +28,13 @@ export type CommandPaletteItem = {
     actionManager: ActionManager;
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent;
   }) => void;
+};
+
+/**
+ * A {@link CommandPaletteItem} after its (possibly lazy) `label` has been
+ * resolved to a string. Used internally once commands have been built, so
+ * the rest of the palette can treat `label` as a plain string.
+ */
+export type ResolvedCommandPaletteItem = Omit<CommandPaletteItem, "label"> & {
+  label: string;
 };

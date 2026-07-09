@@ -1071,7 +1071,7 @@ const ExcalidrawWrapper = () => {
         <CommandPalette
           customCommandPaletteItems={[
             {
-              label: t("labels.liveCollaboration"),
+              label: () => t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
               keywords: [
                 "team",
@@ -1090,7 +1090,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("roomDialog.button_stopSession"),
+              label: () => t("roomDialog.button_stopSession"),
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!collabAPI?.isCollaborating(),
               keywords: [
@@ -1112,7 +1112,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("labels.share"),
+              label: () => t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
               predicate: true,
               icon: share,
@@ -1154,7 +1154,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("labels.followUs"),
+              label: () => t("labels.followUs"),
               icon: XBrandIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
@@ -1168,7 +1168,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("labels.discordChat"),
+              label: () => t("labels.discordChat"),
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
               icon: DiscordIcon,
@@ -1216,7 +1216,7 @@ const ExcalidrawWrapper = () => {
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
-              label: t("overwriteConfirm.action.excalidrawPlus.button"),
+              label: () => t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
               icon: exportToPlus,
               predicate: true,
@@ -1233,7 +1233,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("labels.installPWA"),
+              label: () => t("labels.installPWA"),
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!pwaEvent,
               perform: () => {
