@@ -30,6 +30,7 @@ import {
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
+  isNonDeletedElement,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
@@ -72,6 +73,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   StrokeVariability,
@@ -101,7 +103,38 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-const MAX_ARROW_PX = 75_000;
+const MAX_LINEAR_PX = 75_000;
+
+// Last resort fix for extremely large linear elements (lines / arrows), which
+// would otherwise freeze the editor while rendering — e.g. a dotted or dashed
+// stroke spanning a huge distance generates an enormous dash array.
+// https://github.com/excalidraw/excalidraw/issues/11497
+const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
+  element: T,
+): T => {
+  if (element.width <= MAX_LINEAR_PX && element.height <= MAX_LINEAR_PX) {
+    return element;
+  }
+
+  const label =
+    element.type === "arrow"
+      ? `${isElbowArrow(element) ? "elbow" : "simple"} arrow`
+      : element.type;
+
+  console.error(
+    `Removing extremely large ${label} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
+  );
+
+  return {
+    ...element,
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+    isDeleted: true,
+  };
+};
 
 const restoreLinearElementPoints = (
   points: unknown,
@@ -313,6 +346,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       const mode = isPointInElement(p, boundElement, elementsMap)
         ? "inside"
         : "orbit";
+
+      if (!isNonDeletedElement(element)) {
+        console.error("[NONDELETED][INVARIANT] Restoring a deleted element");
+      }
+
       const safeElement = {
         ...element,
         startBinding: element.startBinding?.elementId
@@ -342,8 +380,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-        safeElement,
-        boundElement,
+        safeElement as NonDeleted<ExcalidrawArrowElement>,
+        boundElement as NonDeleted<ExcalidrawBindableElement>,
         startOrEnd,
         elementsMap,
         focusPoint,
@@ -560,7 +598,7 @@ export const restoreElement = (
           } as ExcalidrawLinearElement));
       }
 
-      return restoreElementWithProperties(element, {
+      const restoredLine = restoreElementWithProperties(element, {
         type: "line",
         startBinding: null,
         endBinding: null,
@@ -578,6 +616,8 @@ export const restoreElement = (
           : {}),
         ...getSizeFromPoints(points),
       });
+
+      return handleOversizedLinearElements(restoredLine);
     case "arrow": {
       const startArrowhead = normalizeArrowhead(element.startArrowhead);
       const endArrowhead =
@@ -644,37 +684,7 @@ export const restoreElement = (
         ),
       };
 
-      // Last resort fix for extremely large arrows
-      if (
-        normalizedRestoredElement.width > MAX_ARROW_PX ||
-        normalizedRestoredElement.height > MAX_ARROW_PX
-      ) {
-        console.error(
-          `Removing extremely large arrow ${
-            normalizedRestoredElement.id
-          } (type: ${
-            isElbowArrow(normalizedRestoredElement) ? "elbow" : "simple"
-          }, width: ${normalizedRestoredElement.width}, height: ${
-            normalizedRestoredElement.height
-          }, x: ${normalizedRestoredElement.x}, y: ${
-            normalizedRestoredElement.y
-          })`,
-        );
-        return {
-          ...normalizedRestoredElement,
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 100,
-          points: [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(100, 100),
-          ],
-          isDeleted: true,
-        };
-      }
-
-      return normalizedRestoredElement;
+      return handleOversizedLinearElements(normalizedRestoredElement);
     }
 
     // generic elements
@@ -1147,10 +1157,9 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
-  const elements = restoreElements(
-    getNonDeletedElements(libraryItem.elements),
-    null,
+const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
+  const elements = getNonDeletedElements(
+    restoreElements(libraryItem.elements, null),
   );
   return elements.length ? { ...libraryItem, elements } : null;
 };

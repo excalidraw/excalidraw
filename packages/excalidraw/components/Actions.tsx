@@ -91,7 +91,6 @@ import type {
   AppClassProperties,
   AppProps,
   UIAppState,
-  Zoom,
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -395,11 +394,17 @@ const CombinedShapeProperties = ({
                   hasStrokeWidth(element.type),
                 )) &&
                 renderAction("changeStrokeWidth")}
-              {(hasFreedrawMode(appState.activeTool.type) ||
-                targetElements.some((element) =>
-                  hasFreedrawMode(element.type),
-                )) &&
-                renderAction("changeFreedrawMode")}
+              {
+                /* in compact UI the freedraw pressure setting is rendered as a
+                  standalone cycle button in the compact actions list; we render
+                  it in the combined properties popup as well for clarity
+                */
+                (hasFreedrawMode(appState.activeTool.type) ||
+                  targetElements.some((element) =>
+                    hasFreedrawMode(element.type),
+                  )) &&
+                  renderAction("changeFreedrawMode")
+              }
               {(hasStrokeStyle(appState.activeTool.type) ||
                 targetElements.some((element) =>
                   hasStrokeStyle(element.type),
@@ -832,6 +837,14 @@ export const CompactShapeActions = ({
         </div>
       )}
 
+      {/* Freedraw pressure: standalone button cycling the variability mode */}
+      {(hasFreedrawMode(appState.activeTool.type) ||
+        targetElements.some((element) => hasFreedrawMode(element.type))) && (
+        <div className="compact-action-item">
+          {renderAction("changeFreedrawMode", { cycle: true })}
+        </div>
+      )}
+
       <CombinedShapeProperties
         appState={appState}
         renderAction={renderAction}
@@ -1060,6 +1073,11 @@ export const ShapesSwitcher = ({
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
 
+  // a pen detected on a tool button's pointer-down, to be applied (enabling
+  // pen mode) only after the tap's `change` has committed — see the tool
+  // button handlers below
+  const pendingPenDetectionRef = useRef(false);
+
   const SELECTION_TOOLS = [
     {
       type: "selection",
@@ -1158,8 +1176,13 @@ export const ShapesSwitcher = ({
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
               onPointerDown={({ pointerType }) => {
+                // Detect the pen here (pointerType is reliable on pointer-down)
+                // but DON'T enable pen mode yet: calling setState mid-gesture
+                // re-renders the controlled radio and, on iOS/iPadOS, aborts
+                // the ensuing click so the tool isn't selected on the first pen
+                // tap. Defer it until the tap's `change` has committed (below).
                 if (!app.state.penDetected && pointerType === "pen") {
-                  app.togglePenMode(true);
+                  pendingPenDetectionRef.current = true;
                 }
 
                 if (value === "selection") {
@@ -1170,16 +1193,21 @@ export const ShapesSwitcher = ({
                   }
                 }
               }}
-              onChange={({ pointerType }) => {
+              onChange={() => {
                 if (app.state.activeTool.type !== value) {
                   trackEvent("toolbar", value, "ui");
                 }
-                if (value === "image") {
-                  app.setActiveTool({
-                    type: value,
-                  });
-                } else {
-                  app.setActiveTool({ type: value });
+                app.setActiveTool({ type: value });
+
+                // Apply the pen detection captured on pointer-down now that the
+                // tool is selected. rAF keeps the resulting re-render out of the
+                // `change` event itself. We rely on the pointer-down detection
+                // rather than this handler's pointerType because the latter is
+                // unreliable on iOS (its backing ref is cleared before the
+                // delayed click fires).
+                if (pendingPenDetectionRef.current) {
+                  pendingPenDetectionRef.current = false;
+                  requestAnimationFrame(() => app.togglePenMode(true));
                 }
               }}
             />
@@ -1286,10 +1314,8 @@ export const ShapesSwitcher = ({
 
 export const ZoomActions = ({
   renderAction,
-  zoom,
 }: {
   renderAction: ActionManager["renderAction"];
-  zoom: Zoom;
 }) => (
   <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
     <Stack.Row align="center">

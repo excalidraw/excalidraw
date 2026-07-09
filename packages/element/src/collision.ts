@@ -373,7 +373,7 @@ export const getHoveredElementForFocusPoint = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
-): ExcalidrawBindableElement | null => {
+): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index

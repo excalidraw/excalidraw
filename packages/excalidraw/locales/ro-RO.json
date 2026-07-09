@@ -3,6 +3,10 @@
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
+    "chartType_bar": "Diagramă cu bare",
+    "chartType_line": "Diagramă cu linii",
+    "chartType_radar": "Diagramă radar",
+    "chartType_plaintext": "Text simplu",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Model entitate-asociere (multe)",
     "arrowhead_crowfoot_one": "Model entitate-asociere (unul)",
     "arrowhead_crowfoot_one_or_many": "Model entitate-asociere (unul sau multe)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Mai multe opțiuni",
+    "cardinality": "",
     "arrowtypes": "Tip de săgeată",
     "arrowtype_sharp": "Săgeată ascuțită",
     "arrowtype_round": "Săgeată curbată",
@@ -171,7 +182,11 @@
     "linkToElement": "Link către obiect",
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
     "tab": "Filă",
-    "shapeSwitch": "Comutare formă"
+    "shapeSwitch": "Comutare formă",
+    "preferences": "Preferințe",
+    "preferences_toolLock": "Blocare instrument",
+    "arrowBinding": "Legare săgeată",
+    "midpointSnapping": "Ancorare la punctele medii"
   },
   "elementLink": {
     "title": "Link către obiect",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Eroare"
   },
+  "progressDialog": {
+    "title": "În curs de salvare",
+    "defaultMessage": "Se pregătește salvarea..."
+  },
   "exportDialog": {
     "disk_title": "Salvare pe disc",
     "disk_details": "Exportă datele scenei pe un fișier din care poți importa mai târziu.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid la Excalidraw",
     "button": "Introducere",
-    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "description": "",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
-    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
+    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici...",
+    "autoFixAvailable": "Este disponibilă funcția de fixare automată"
   },
   "ttd": {
     "error": "Eroare!"
@@ -641,7 +661,7 @@
     "placeholder": {
       "title": "Hai să-ți proiectăm diagrama",
       "description": "Descrie diagrama pe care vrei să o creezi și o vom genera pentru tine.",
-      "hint": "În acest moment cunoaștem organigrame, diagrame de secvență și diagrame de clasă."
+      "hint": ""
     },
     "preview": "Previzualizare",
     "insert": "Introducere",

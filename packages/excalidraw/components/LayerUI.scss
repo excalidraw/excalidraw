@@ -120,6 +120,24 @@
     }
   }
 
+  // on tablet, the pen mode button is rendered as a separate floating button
+  // below the compact actions menu (see LayerUI.tsx)
+  .App-menu_top__left > .ToolIcon__penMode {
+    justify-self: center;
+
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      background-color: var(--island-bg-color);
+      box-shadow: var(--shadow-island);
+    }
+
+    // no shadow while pen mode is active (the active fill is enough)
+    .ToolIcon_type_checkbox:checked + .ToolIcon__icon {
+      box-shadow: none;
+    }
+  }
+
   .disable-view-mode {
     display: flex;
     justify-content: center;

@@ -30,10 +30,12 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import {
+  type NonDeleted,
   type ElementsMap,
   type ExcalidrawBindableElement,
   type ExcalidrawElement,
   type ExcalidrawFlowchartNodeElement,
+  type NonDeletedExcalidrawElement,
   type NonDeletedSceneElementsMap,
   type Ordered,
   type OrderedExcalidrawElement,
@@ -344,7 +346,7 @@ const getObstacleClearance = (
 };
 
 const addNewNode = (
-  element: ExcalidrawFlowchartNodeElement,
+  element: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
   scene: Scene,
@@ -416,13 +418,14 @@ const addNewNode = (
 };
 
 export const addNewNodes = (
-  startNode: ExcalidrawFlowchartNodeElement,
+  startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
   scene: Scene,
   numberOfNodes: number,
 ) => {
-  const newNodes: ExcalidrawElement[] = [];
+  // always start from 0 and distribute evenly
+  const newNodes: NonDeletedExcalidrawElement[] = [];
 
   // existing siblings in this direction; the batch must clear their bounding
   // box so it never overlaps previously-committed children (#8518)
@@ -562,8 +565,8 @@ export const addNewNodes = (
 };
 
 const createBindingArrow = (
-  startBindingElement: ExcalidrawFlowchartNodeElement,
-  endBindingElement: ExcalidrawFlowchartNodeElement,
+  startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
+  endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,
   appState: AppState,
   scene: Scene,
@@ -683,7 +686,7 @@ const createBindingArrow = (
         [startBindingElement.id, startBindingElement],
         [endBindingElement.id, endBindingElement],
         [bindingArrow.id, bindingArrow],
-      ] as [string, Ordered<ExcalidrawElement>][]),
+      ] as [string, Ordered<NonDeletedExcalidrawElement>][]),
     ),
     { points: bindingArrow.points },
   );
@@ -691,6 +694,7 @@ const createBindingArrow = (
   return {
     ...bindingArrow,
     ...update,
+    isDeleted: bindingArrow.isDeleted,
   };
 };
 
@@ -832,7 +836,7 @@ export class FlowChartCreator {
   pendingNodes: PendingExcalidrawElements | null = null;
 
   createNodes(
-    startNode: ExcalidrawFlowchartNodeElement,
+    startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
     appState: AppState,
     direction: LinkDirection,
     scene: Scene,

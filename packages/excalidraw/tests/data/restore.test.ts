@@ -526,6 +526,53 @@ describe("restoreElements", () => {
     ]);
   });
 
+  it("should mark extremely large linear elements as deleted to avoid freezing", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // a degenerate line with astronomical coordinates (see #11497)
+    const hugeLine: any = API.createElement({
+      type: "line",
+      x: 419048829414166,
+      y: 8484,
+    });
+    hugeLine.points = [
+      [0, 0],
+      [-302985021938436, 0],
+      [-838097658820234, 30],
+    ];
+
+    const hugeArrow: any = API.createElement({ type: "arrow" });
+    hugeArrow.points = [
+      [0, 0],
+      [900000, 0],
+    ];
+
+    const normalLine: any = API.createElement({ type: "line" });
+    normalLine.points = [
+      [0, 0],
+      [100, 200],
+    ];
+
+    const [restoredLine, restoredArrow, restoredNormal] =
+      restore.restoreElements([hugeLine, hugeArrow, normalLine], null);
+
+    expect(restoredLine.isDeleted).toBe(true);
+    expect(restoredLine.width).toBe(100);
+    expect(restoredLine.height).toBe(100);
+
+    expect(restoredArrow.isDeleted).toBe(true);
+    expect(restoredArrow.width).toBe(100);
+    expect(restoredArrow.height).toBe(100);
+
+    expect(restoredNormal.isDeleted).toBe(false);
+    expect(restoredNormal.width).toBe(100);
+    expect(restoredNormal.height).toBe(200);
+
+    consoleError.mockRestore();
+  });
+
   it("when the number of points of a line is greater or equal 2", () => {
     const lineElement_0 = API.createElement({
       type: "line",
@@ -626,7 +673,9 @@ describe("restoreElements", () => {
   it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true }); // version=2
+    const rectangle_modified = newElementWith(rectangle as ExcalidrawElement, {
+      isDeleted: true,
+    }); // version=2
 
     const restoredElements = restore.bumpElementVersions(
       restore.restoreElements([rectangle, ellipse], null),

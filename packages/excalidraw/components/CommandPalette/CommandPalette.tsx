@@ -261,7 +261,7 @@ function CommandPaletteInner({
           label = t(
             action.label(
               app.scene.getNonDeletedElements(),
-              uiAppState as AppState,
+              uiAppState,
               app,
             ) as unknown as TranslationKeys,
           );

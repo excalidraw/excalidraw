@@ -13,6 +13,7 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
+  Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./types";
@@ -203,9 +204,9 @@ export const syncMovedIndices = (
  *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
-export const syncInvalidIndices = (
-  elements: readonly ExcalidrawElement[],
-): OrderedExcalidrawElement[] => {
+export const syncInvalidIndices = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+): Ordered<T>[] => {
   const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
@@ -214,7 +215,7 @@ export const syncInvalidIndices = (
     mutateElement(element, elementsMap, { index });
   }
 
-  return elements as OrderedExcalidrawElement[];
+  return elements as Ordered<T>[];
 };
 
 /**
