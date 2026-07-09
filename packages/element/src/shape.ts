@@ -71,6 +71,7 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawEllipseElement,
   ElementsMap,
   ExcalidrawLineElement,
   Arrowhead,
@@ -229,7 +230,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "cloud": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -743,6 +745,28 @@ export const generateLinearCollisionShape = (
 };
 
 /**
+ * Generates an SVG path string for a cloud shape that fits within the given
+ * bounding box (0,0)→(width,height). Produces three Bézier bumps on top
+ * with a smooth curved base.
+ */
+const generateCloudPath = (width: number, height: number): string => {
+  const w = width;
+  const h = height;
+  return (
+    `M ${w * 0.15} ${h} ` +
+    // Left bump
+    `C ${w * -0.05} ${h} ${w * -0.05} ${h * 0.4} ${w * 0.2} ${h * 0.4} ` +
+    // Top large dome
+    `C ${w * 0.2} ${h * -0.05} ${w * 0.7} ${h * -0.05} ${w * 0.7} ${h * 0.35} ` +
+    // Right small upper puff
+    `C ${w * 0.85} ${h * 0.25} ${w * 0.95} ${h * 0.4} ${w * 0.85} ${h * 0.55} ` +
+    // Right bottom bump
+    `C ${w * 1.05} ${h * 0.55} ${w * 1.05} ${h} ${w * 0.8} ${h} ` +
+    `Z`
+  );
+};
+
+/**
  * Generates the roughjs shape for given element.
  *
  * Low-level. Use `ShapeCache.generateElementShape` instead.
@@ -866,6 +890,13 @@ const _generateElementShape = (
         element.width,
         element.height,
         generateRoughOptions(element, false, isDarkMode),
+      );
+      return shape;
+    }
+    case "cloud": {
+      const shape: ElementShapes[typeof element.type] = generator.path(
+        generateCloudPath(element.width, element.height),
+        generateRoughOptions(element, true, isDarkMode),
       );
       return shape;
     }
@@ -1105,6 +1136,10 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 
     case "ellipse":
       return getEllipseShape(element);
+
+    case "cloud":
+      // Approximate cloud hit-testing with an inscribed ellipse
+      return getEllipseShape(element as unknown as ExcalidrawEllipseElement);
 
     case "freedraw": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);

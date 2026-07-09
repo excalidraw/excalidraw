@@ -487,6 +487,7 @@ export const TOOL_TYPE = {
   rectangle: "rectangle",
   diamond: "diamond",
   ellipse: "ellipse",
+  cloud: "cloud",
   arrow: "arrow",
   line: "line",
   freedraw: "freedraw",

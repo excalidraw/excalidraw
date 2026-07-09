@@ -478,6 +478,28 @@ export const intersectElementWithLineSegment = (
         line,
         offset,
       );
+    case "cloud": {
+      // Approximate cloud intersection as an inscribed ellipse
+      const center = elementCenterPoint(element, elementsMap);
+      const rotatedA = pointRotateRads(
+        line[0],
+        center,
+        -element.angle as Radians,
+      );
+      const rotatedB = pointRotateRads(
+        line[1],
+        center,
+        -element.angle as Radians,
+      );
+      return ellipseSegmentInterceptPoints(
+        ellipse(
+          center,
+          element.width / 2 + offset,
+          element.height / 2 + offset,
+        ),
+        lineSegment(rotatedA, rotatedB),
+      ).map((p) => pointRotateRads(p, center, element.angle));
+    }
     case "line":
     case "freedraw":
     case "arrow":

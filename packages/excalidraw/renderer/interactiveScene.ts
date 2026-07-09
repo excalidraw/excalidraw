@@ -363,6 +363,19 @@ const renderBindingHighlightForBindableElement_simple = (
           }
 
           break;
+        case "cloud": {
+          context.beginPath();
+          const w = suggestedBinding.element.width;
+          const h = suggestedBinding.element.height;
+          context.moveTo(w * 0.15, h);
+          context.bezierCurveTo(w * -0.05, h, w * -0.05, h * 0.4, w * 0.2, h * 0.4);
+          context.bezierCurveTo(w * 0.2, h * -0.05, w * 0.7, h * -0.05, w * 0.7, h * 0.35);
+          context.bezierCurveTo(w * 0.85, h * 0.25, w * 0.95, h * 0.4, w * 0.85, h * 0.55);
+          context.bezierCurveTo(w * 1.05, h * 0.55, w * 1.05, h, w * 0.8, h);
+          context.closePath();
+          context.stroke();
+          break;
+        }
         default:
           {
             const [segments, curves] = deconstructRectanguloidElement(
@@ -705,6 +718,19 @@ const renderBindingHighlightForBindableElement_complex = (
           }
 
           break;
+        case "cloud": {
+          context.beginPath();
+          const w = element.width + offset * 2;
+          const h = element.height + offset * 2;
+          context.moveTo(w * 0.15, h);
+          context.bezierCurveTo(w * -0.05, h, w * -0.05, h * 0.4, w * 0.2, h * 0.4);
+          context.bezierCurveTo(w * 0.2, h * -0.05, w * 0.7, h * -0.05, w * 0.7, h * 0.35);
+          context.bezierCurveTo(w * 0.85, h * 0.25, w * 0.95, h * 0.4, w * 0.85, h * 0.55);
+          context.bezierCurveTo(w * 1.05, h * 0.55, w * 1.05, h, w * 0.8, h);
+          context.closePath();
+          context.stroke();
+          break;
+        }
         default:
           {
             const [segments, curves] = deconstructRectanguloidElement(

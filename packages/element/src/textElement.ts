@@ -377,7 +377,7 @@ export const getContainerCoords = (container: ExcalidrawElement) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
-  if (container.type === "ellipse") {
+  if (container.type === "ellipse" || container.type === "cloud") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
     offsetX += (container.width / 2) * (1 - Math.sqrt(2) / 2);
     offsetY += (container.height / 2) * (1 - Math.sqrt(2) / 2);
@@ -458,6 +458,7 @@ const VALID_CONTAINER_TYPES = new Set([
   "ellipse",
   "diamond",
   "arrow",
+  "cloud",
 ]);
 
 export const isValidTextContainer = (element: {
@@ -472,7 +473,7 @@ export const computeContainerDimensionForBoundText = (
   dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
 
-  if (containerType === "ellipse") {
+  if (containerType === "ellipse" || containerType === "cloud") {
     return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
   if (containerType === "arrow") {
@@ -495,7 +496,7 @@ export const getBoundTextMaxWidth = (
       ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO;
     return Math.max(ARROW_LABEL_WIDTH_FRACTION * width, minWidth);
   }
-  if (container.type === "ellipse") {
+  if (container.type === "ellipse" || container.type === "cloud") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
@@ -521,7 +522,7 @@ export const getBoundTextMaxHeight = (
     }
     return height;
   }
-  if (container.type === "ellipse") {
+  if (container.type === "ellipse" || container.type === "cloud") {
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
