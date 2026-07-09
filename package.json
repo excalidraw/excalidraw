@@ -92,5 +92,8 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "next": "14.2.25"
   }
 }
