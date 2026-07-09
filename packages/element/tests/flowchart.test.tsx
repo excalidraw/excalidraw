@@ -234,6 +234,58 @@ describe("flow chart creation", () => {
       }
     }
   });
+
+  // regression for #8518: a new child must also clear nodes that aren't the
+  // start node's direct siblings but sit where it would land — e.g. a sibling
+  // reached through a shared parent
+  it("does not overlap a sibling reached through a shared parent", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+
+    // two right-children stack into a column to the right of the parent
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+
+    const rightChildren = h.elements
+      .filter((el) => el.type === "rectangle" && el.id !== parent.id)
+      .sort((a, b) => a.y - b.y);
+    expect(rightChildren.length).toBe(2);
+    const [upper, lower] = rightChildren;
+
+    // add a child below the upper sibling; it must not land on the lower one
+    // that sits directly beneath it
+    API.setSelectedElements([upper]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+
+    const newChild = h.elements.filter(
+      (el) =>
+        el.type === "rectangle" &&
+        el.id !== parent.id &&
+        el.id !== upper.id &&
+        el.id !== lower.id,
+    )[0];
+    expect(newChild).toBeTruthy();
+
+    const overlaps = (a: typeof newChild, b: typeof lower) =>
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y;
+
+    expect(overlaps(newChild, lower)).toBe(false);
+  });
 });
 
 describe("flow chart navigation", () => {

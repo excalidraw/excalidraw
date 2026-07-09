@@ -251,6 +251,98 @@ const getOffsets = (
   };
 };
 
+type Box = { x: number; y: number; width: number; height: number };
+
+// Walk the arrow bindings to collect every node that belongs to the same
+// flowchart as `node`. Placement only aligns against the start node's direct
+// relatives, but a new node can still land on top of a node further out in the
+// chart (a parent, or a sibling reached through a shared parent), so we need
+// the whole connected component to check for overlaps (#8518).
+const getConnectedFlowchartNodes = (
+  node: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): ExcalidrawBindableElement[] => {
+  const arrows = [...elementsMap.values()].filter(isElbowArrow);
+  const visited = new Set<string>([node.id]);
+  const queue: string[] = [node.id];
+  const connected: ExcalidrawBindableElement[] = [];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    for (const arrow of arrows) {
+      const startId = arrow.startBinding?.elementId;
+      const endId = arrow.endBinding?.elementId;
+
+      let neighborId: string | undefined;
+      if (startId === currentId) {
+        neighborId = endId;
+      } else if (endId === currentId) {
+        neighborId = startId;
+      }
+
+      if (!neighborId || visited.has(neighborId)) {
+        continue;
+      }
+
+      visited.add(neighborId);
+      const neighbor = elementsMap.get(neighborId);
+      if (neighbor && isBindableElement(neighbor)) {
+        connected.push(neighbor);
+        queue.push(neighborId);
+      }
+    }
+  }
+
+  return connected;
+};
+
+// Given already-positioned node boxes, return how far they must move along
+// `axis` (the axis the new nodes spread on) to clear any obstacle sharing their
+// lane. Relative spacing is preserved by shifting the whole group by the same
+// amount; the smaller of the two clearing moves is picked so the batch stays
+// close to the start node.
+const getObstacleClearance = (
+  boxes: Box[],
+  obstacles: Box[],
+  axis: "x" | "y",
+): number => {
+  if (boxes.length === 0 || obstacles.length === 0) {
+    return 0;
+  }
+
+  const size = axis === "x" ? "width" : "height";
+  const perp = axis === "x" ? "y" : "x";
+  const perpSize = axis === "x" ? "height" : "width";
+  const gap = axis === "x" ? HORIZONTAL_OFFSET : VERTICAL_OFFSET;
+
+  const min = Math.min(...boxes.map((b) => b[axis]));
+  const max = Math.max(...boxes.map((b) => b[axis] + b[size]));
+  const perpMin = Math.min(...boxes.map((b) => b[perp]));
+  const perpMax = Math.max(...boxes.map((b) => b[perp] + b[perpSize]));
+
+  const blocking = obstacles.filter(
+    (o) =>
+      o[perp] < perpMax &&
+      o[perp] + o[perpSize] > perpMin &&
+      o[axis] < max &&
+      o[axis] + o[size] > min,
+  );
+
+  if (blocking.length === 0) {
+    return 0;
+  }
+
+  const obstacleMin = Math.min(...blocking.map((o) => o[axis]));
+  const obstacleMax = Math.max(...blocking.map((o) => o[axis] + o[size]));
+
+  const shiftPositive = obstacleMax + gap - min;
+  const shiftNegative = obstacleMin - gap - max;
+
+  return Math.abs(shiftPositive) <= Math.abs(shiftNegative)
+    ? shiftPositive
+    : shiftNegative;
+};
+
 const addNewNode = (
   element: ExcalidrawFlowchartNodeElement,
   appState: AppState,
@@ -266,6 +358,26 @@ const addNewNode = (
     [...successors, ...predeccessors],
     direction,
   );
+
+  // nudge the new node off any other node in the same flowchart that happens
+  // to sit where it would land, not just the start node's direct siblings
+  const axis = direction === "up" || direction === "down" ? "x" : "y";
+  const candidate: Box = {
+    x: element.x + offsets.x,
+    y: element.y + offsets.y,
+    width: element.width,
+    height: element.height,
+  };
+  const clearance = getObstacleClearance(
+    [candidate],
+    getConnectedFlowchartNodes(element, elementsMap),
+    axis,
+  );
+  if (axis === "x") {
+    offsets.x += clearance;
+  } else {
+    offsets.y += clearance;
+  }
 
   const nextNode = newElement({
     type: element.type,
@@ -320,6 +432,7 @@ export const addNewNodes = (
     ...getPredecessors(startNode, elementsMap, direction),
   ];
 
+  const positions: { x: number; y: number }[] = [];
   for (let i = 0; i < numberOfNodes; i++) {
     let nextX: number;
     let nextY: number;
@@ -392,10 +505,29 @@ export const addNewNodes = (
       nextX = startX + offsetX;
     }
 
+    positions.push({ x: nextX, y: nextY });
+  }
+
+  // shift the whole batch off any other node in the same flowchart sitting in
+  // its lane (a parent or a sibling reached through a shared parent), keeping
+  // the batch's internal spacing intact
+  const axis = direction === "left" || direction === "right" ? "y" : "x";
+  const clearance = getObstacleClearance(
+    positions.map((p) => ({
+      x: p.x,
+      y: p.y,
+      width: startNode.width,
+      height: startNode.height,
+    })),
+    getConnectedFlowchartNodes(startNode, elementsMap),
+    axis,
+  );
+
+  for (const position of positions) {
     const nextNode = newElement({
       type: startNode.type,
-      x: nextX,
-      y: nextY,
+      x: axis === "x" ? position.x + clearance : position.x,
+      y: axis === "y" ? position.y + clearance : position.y,
       // TODO: extract this to a util
       width: startNode.width,
       height: startNode.height,
