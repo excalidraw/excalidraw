@@ -1121,9 +1121,10 @@ export const ShapesSwitcher = ({
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
+          const shortcut =
+            [letter, numericKey]
+              .filter(Boolean)
+              .join(` ${t("helpDialog.or")} `) || undefined;
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
 
@@ -1170,7 +1171,11 @@ export const ShapesSwitcher = ({
               icon={icon}
               checked={activeTool.type === value}
               name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${shortcut}`}
+              title={
+                shortcut
+                  ? `${capitalizeString(label)} — ${shortcut}`
+                  : capitalizeString(label)
+              }
               keyBindingLabel={keybindingLabel}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
