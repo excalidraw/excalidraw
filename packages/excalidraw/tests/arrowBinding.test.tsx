@@ -18,7 +18,7 @@ import { actionToggleArrowBinding } from "../actions/actionToggleArrowBinding";
 import { Excalidraw, sceneCoordsToViewportCoords } from "../index";
 
 import { API } from "./helpers/api";
-import { Pointer, UI } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -374,6 +374,50 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
       expect(snappedWithMidpoint).toEqual([500, 200]);
       expect(snappedWithoutMidpoint).not.toEqual([500, 200]);
+    });
+  });
+
+  describe("Grid binding interactions", () => {
+    it("does not snap angle-locked binding to grid when grid mode is disabled", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect-angle-lock-no-grid",
+        x: 600,
+        y: 300,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([rect]);
+      API.setAppState({ gridModeEnabled: false, gridSize: 20 });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 300, sceneY: 333 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 596, sceneY: 347 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(target.x, target.y);
+        mouse.upAt();
+      });
+
+      await waitFor(() => {
+        const arrow = h.elements.find(
+          (element): element is ExcalidrawArrowElement =>
+            element.type === "arrow",
+        );
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(rect.id);
+
+        const startY = arrow!.y + arrow!.points[0][1];
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(startY);
+      });
     });
   });
 

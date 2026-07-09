@@ -834,7 +834,9 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              opts?.angleLocked || appState.gridModeEnabled
+              opts?.angleLocked
+                ? globalPoint
+                : appState.gridModeEnabled
                 ? snapBoundPointToGrid(
                     pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
                     hit,
