@@ -423,9 +423,7 @@ export const getSelectedElementsByGroup = (
   const selectedGroupIds = getSelectedGroupIds(appState);
   const isSingleSelectedGroupCase =
     selectedGroupIds.length === 1 &&
-    selectedElements.every((element) =>
-      element.groupIds.includes(selectedGroupIds[0]),
-    );
+    selectedElements.every((element) => isSelectedViaGroup(appState, element));
 
   selectedElements.forEach((element) => {
     // skip dependent boundTextElements, they are appended after their container
