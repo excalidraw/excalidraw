@@ -94,32 +94,62 @@ export const actionFinalize = register<FormData>({
             ? [element.points.length - 1] // New arrow creation
             : appState.selectedLinearElement.selectedPointsIndices;
 
+        const angleLocked = shouldRotateWithDiscreteAngle(event);
+
+        // When angleLocked (Shift held), handlePointerMove has already
+        // snapped the element's points to the discrete angle. Use those
+        // snapped points directly instead of the raw mouse position so
+        // that binding doesn't pull the endpoint to an element that is
+        // merely under the cursor rather than under the snapped endpoint.
+        const useSnappedPoints =
+          angleLocked && selectedPointsIndices.length === 1;
+
         const draggedPoints: PointsPositionUpdates =
           selectedPointsIndices.reduce((map, index) => {
             map.set(index, {
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                element,
-                pointFrom<GlobalPoint>(
-                  sceneCoords.x - linearElementEditor.pointerOffset.x,
-                  sceneCoords.y - linearElementEditor.pointerOffset.y,
-                ),
-                elementsMap,
-              ),
+              point: useSnappedPoints
+                ? element.points[index]
+                : LinearElementEditor.pointFromAbsoluteCoords(
+                    element,
+                    pointFrom<GlobalPoint>(
+                      sceneCoords.x - linearElementEditor.pointerOffset.x,
+                      sceneCoords.y - linearElementEditor.pointerOffset.y,
+                    ),
+                    elementsMap,
+                  ),
             });
 
             return map;
           }, new Map()) ?? new Map();
+
+        // Derive the effective scene pointer from the snapped endpoint so
+        // that the binding hit-test also uses the snapped position.
+        const snappedGlobalPoint = useSnappedPoints
+          ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              element,
+              selectedPointsIndices[0],
+              elementsMap,
+            )
+          : null;
+
+        const bindingSceneX =
+          snappedGlobalPoint?.[0] ??
+          sceneCoords.x - linearElementEditor.pointerOffset.x;
+        const bindingSceneY =
+          snappedGlobalPoint?.[1] ??
+          sceneCoords.y - linearElementEditor.pointerOffset.y;
+
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          sceneCoords.x - linearElementEditor.pointerOffset.x,
-          sceneCoords.y - linearElementEditor.pointerOffset.y,
+          bindingSceneX,
+          bindingSceneY,
           scene,
           appState,
           {
             newArrow,
             altKey: event.altKey,
-            angleLocked: shouldRotateWithDiscreteAngle(event),
+            angleLocked,
           },
         );
       } else if (isLineElement(element)) {
