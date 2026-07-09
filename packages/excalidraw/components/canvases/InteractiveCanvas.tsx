@@ -255,6 +255,7 @@ const getRelevantAppStateProps = (
   multiElement: appState.multiElement,
   newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
+  orbitBindOverrideEnabled: appState.orbitBindOverrideEnabled,
   isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
   gridModeEnabled: appState.gridModeEnabled,
   suggestedBinding: appState.suggestedBinding,

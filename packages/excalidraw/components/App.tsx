@@ -5430,6 +5430,42 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (
+        (this.state.activeTool.type === "arrow" ||
+          this.state.activeTool.type === "selection") &&
+        event.key === KEYS.F
+      ) {
+        if (event.repeat) {
+          return;
+        }
+        const linearElement = this.state.selectedLinearElement;
+        if (linearElement) {
+          if (linearElement.isDragging || this.state.multiElement) {
+            flushSync(() => {
+              this.setState({
+                orbitBindOverrideEnabled: true,
+              });
+            });
+            if (linearElement.isDragging) {
+              maybeHandleArrowPointlikeDrag({ app: this, event });
+            } else if (
+              this.lastPointerMoveEvent &&
+              this.lastPointerMoveCoords
+            ) {
+              const { x, y } = this.lastPointerMoveCoords;
+              LinearElementEditor.handlePointerMove(
+                this.lastPointerMoveEvent,
+                this,
+                x,
+                y,
+                linearElement,
+              );
+            }
+          }
+          return;
+        }
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -5809,6 +5845,32 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
+    }
+    if (event.key === KEYS.F) {
+      if (this.state.orbitBindOverrideEnabled) {
+        flushSync(() => {
+          this.setState({ orbitBindOverrideEnabled: false });
+        });
+        const linearElement = this.state.selectedLinearElement;
+        if (linearElement) {
+          if (linearElement.isDragging) {
+            maybeHandleArrowPointlikeDrag({ app: this, event });
+          } else if (
+            this.state.multiElement &&
+            this.lastPointerMoveEvent &&
+            this.lastPointerMoveCoords
+          ) {
+            const { x, y } = this.lastPointerMoveCoords;
+            LinearElementEditor.handlePointerMove(
+              this.lastPointerMoveEvent,
+              this,
+              x,
+              y,
+              linearElement,
+            );
+          }
+        }
+      }
     }
     if (isArrowKey(event.key)) {
       bindOrUnbindBindingElements(
