@@ -179,7 +179,9 @@ export const bindOrUnbindBindingElement = (
   );
 
   const isMidpointSnappingEnabled =
-    appState.isMidpointSnappingEnabled && !appState.gridModeEnabled;
+    appState.isMidpointSnappingEnabled &&
+    !opts?.angleLocked &&
+    !appState.gridModeEnabled;
 
   bindOrUnbindBindingElementEdge(
     arrow,

@@ -329,7 +329,7 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
   // -------------------------------------------------------------------------
   // Arrow does snap to midpoint when isMidpointSnappingEnabled is true
   // -------------------------------------------------------------------------
-  describe("Arrow doesn't snap to midpoint when midpoint snapping is disabled", () => {
+  describe("Midpoint snapping", () => {
     it("does not snap to midpoint when midpoint snapping is turned off", () => {
       const rect = API.createElement({
         type: "rectangle",
@@ -374,6 +374,48 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
       expect(snappedWithMidpoint).toEqual([500, 200]);
       expect(snappedWithoutMidpoint).not.toEqual([500, 200]);
+    });
+
+    it("does not snap an angle-locked elbow binding to midpoint on finalize", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect-elbow-angle-lock",
+        x: 600,
+        y: 300,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([rect]);
+      API.setAppState({
+        currentItemArrowType: "elbow",
+        gridModeEnabled: false,
+        isMidpointSnappingEnabled: true,
+      });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 480, sceneY: 392 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 596, sceneY: 397 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(target.x, target.y);
+        mouse.upAt();
+      });
+
+      await waitFor(() => {
+        const arrow = h.elements.find(isElbowArrow);
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(rect.id);
+
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(397, 1);
+      });
     });
   });
 
