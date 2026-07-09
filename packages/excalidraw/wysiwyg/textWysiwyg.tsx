@@ -47,10 +47,11 @@ import {
 } from "@excalidraw/element";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
+  NonDeleted,
+  ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
 import { actionSaveToActiveFile } from "../actions";
@@ -196,7 +197,6 @@ const getLineCaretOffsetFromNativeLayout = ({
 type SubmitHandler = () => void;
 
 export const textWysiwyg = ({
-  id,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -207,7 +207,6 @@ export const textWysiwyg = ({
   autoSelect = true,
   initialCaretSceneCoords = null,
 }: {
-  id: ExcalidrawElement["id"];
   /**
    * textWysiwyg only deals with `originalText`
    *
@@ -261,7 +260,9 @@ export const textWysiwyg = ({
     LAST_THEME = app.state.theme;
 
     const appState = app.state;
-    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    const updatedTextElement = app.scene.getElement<
+      NonDeleted<ExcalidrawTextElement>
+    >(element.id);
 
     if (!updatedTextElement) {
       return;
@@ -271,10 +272,10 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(
-        updatedTextElement,
-        app.scene.getNonDeletedElementsMap(),
-      );
+      const container = getContainerElement<
+        NonDeleted<ExcalidrawTextElement>,
+        NonDeleted<ExcalidrawTextContainer>
+      >(updatedTextElement, app.scene.getNonDeletedElementsMap());
 
       let width = updatedTextElement.width;
 
@@ -392,10 +393,10 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color:
-          appState.theme === THEME.DARK
-            ? applyDarkModeFilter(updatedTextElement.strokeColor)
-            : updatedTextElement.strokeColor,
+        color: applyDarkModeFilter(
+          updatedTextElement.strokeColor,
+          appState.theme === THEME.DARK,
+        ),
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });

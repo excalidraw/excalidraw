@@ -1,4 +1,7 @@
-import { isEmbeddableElement } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isEmbeddableElement,
+} from "@excalidraw/element";
 
 import { KEYS } from "@excalidraw/common";
 
@@ -15,7 +18,8 @@ import { register } from "./register";
 
 export const actionLink = register({
   name: "hyperlink",
-  label: (elements, appState) => getContextMenuLabel(elements, appState),
+  label: (elements, appState) =>
+    getContextMenuLabel(getNonDeletedElements(elements), appState),
   icon: LinkIcon,
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
@@ -45,7 +49,9 @@ export const actionLink = register({
       <ToolButton
         type="button"
         icon={LinkIcon}
-        aria-label={t(getContextMenuLabel(elements, appState))}
+        aria-label={t(
+          getContextMenuLabel(getNonDeletedElements(elements), appState),
+        )}
         title={`${
           isEmbeddableElement(elements[0])
             ? t("labels.link.labelEmbed")

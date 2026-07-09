@@ -19,6 +19,8 @@ import { elementOverlapsWithFrame } from "../src/frame";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "../src/types";
 
 const { h } = window;
@@ -692,6 +694,34 @@ describe("adding elements to frames", () => {
       expect(rect2.frameId).toBe(frame.id);
     });
 
+    it("should move an element dragged from one frame into another", () => {
+      const otherFrame = API.createElement({
+        id: "otherFrame",
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 150,
+        height: 150,
+      });
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([frame, frameChild, otherFrame]);
+
+      expect(frameChild.frameId).toBe(frame.id);
+
+      dragElementIntoFrame(otherFrame, frameChild);
+
+      expect(frameChild.frameId).toBe(otherFrame.id);
+    });
+
     it("should layer a dragged element above the highest frame child", () => {
       const frameChild = API.createElement({
         id: "frameChild",
@@ -729,7 +759,7 @@ describe("adding elements to frames", () => {
       });
 
       API.setElements([rect2, frame, frameChild]);
-      API.setSelectedElements([rect2]);
+      API.setSelectedElements([rect2] as NonDeletedExcalidrawElement[]);
       API.updateElement(rect2, {
         x: 10,
         y: 10,
@@ -751,7 +781,7 @@ describe("adding elements to frames", () => {
             newElement: h.state.newElement,
             selectedElements: getSelectedElements(h.elements, h.state),
             selectedElementsAreBeingDragged,
-            frameToHighlight: frame as ExcalidrawFrameLikeElement,
+            frameToHighlight: frame as NonDeleted<ExcalidrawFrameLikeElement>,
           })
           .visibleElements.map((element) => element.id);
       };
@@ -815,7 +845,7 @@ describe("adding elements to frames", () => {
           newElement: h.state.newElement,
           selectedElements: getSelectedElements(h.elements, h.state),
           selectedElementsAreBeingDragged: true,
-          frameToHighlight: frame as ExcalidrawFrameLikeElement,
+          frameToHighlight: frame as NonDeleted<ExcalidrawFrameLikeElement>,
         })
         .visibleElements.map((element) => element.id);
 

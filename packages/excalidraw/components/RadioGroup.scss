@@ -29,6 +29,7 @@
     gap: 2px;
 
     &__choice {
+      box-sizing: content-box;
       position: relative;
       display: flex;
       align-items: center;
@@ -50,13 +51,11 @@
       user-select: none;
       letter-spacing: 0.4px;
 
-      transition: all 75ms ease-out;
-
       &:hover {
         color: var(--RadioGroup-choice-color-off-hover);
       }
 
-      &:active {
+      &:not(.active):active {
         background: var(--RadioGroup-choice-background-off-active);
       }
 

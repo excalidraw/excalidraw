@@ -47,7 +47,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -68,7 +68,7 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements({

@@ -1,6 +1,7 @@
 import {
   DiagramToCodePlugin,
   exportToBlob,
+  getNonDeletedElements,
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
@@ -24,8 +25,15 @@ export const AIComponents = ({
         generate={async ({ frame, children }) => {
           const appState = excalidrawAPI.getAppState();
 
+          // SAFETY: This should never happen, but log it just in case
+          if (children.some((el) => el.isDeleted)) {
+            console.error(
+              "[NONDELETED][INVARIANT] Generated children elements should not be `isDeleted: true`",
+            );
+          }
+
           const blob = await exportToBlob({
-            elements: children,
+            elements: getNonDeletedElements(children),
             appState: {
               ...appState,
               exportBackground: true,
