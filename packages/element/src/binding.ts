@@ -1,6 +1,7 @@
 import {
   arrayToMap,
   getFeatureFlag,
+  getGridPoint,
   invariant,
   isTransparent,
 } from "@excalidraw/common";
@@ -22,7 +23,7 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
@@ -160,6 +161,7 @@ export const bindOrUnbindBindingElement = (
     altKey?: boolean;
     angleLocked?: boolean;
     initialBinding?: boolean;
+    gridSize?: NullableGridSize;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
@@ -176,12 +178,18 @@ export const bindOrUnbindBindingElement = (
     },
   );
 
+  const isMidpointSnappingEnabled =
+    appState.isMidpointSnappingEnabled &&
+    !opts?.angleLocked &&
+    !appState.gridModeEnabled;
+
   bindOrUnbindBindingElementEdge(
     arrow,
     start,
     "start",
     scene,
     appState.isBindingEnabled,
+    isMidpointSnappingEnabled,
   );
   bindOrUnbindBindingElementEdge(
     arrow,
@@ -189,6 +197,7 @@ export const bindOrUnbindBindingElement = (
     "end",
     scene,
     appState.isBindingEnabled,
+    isMidpointSnappingEnabled,
   );
   if (start.focusPoint || end.focusPoint) {
     // If the strategy dictates a focus point override, then
@@ -233,6 +242,7 @@ const bindOrUnbindBindingElementEdge = (
   startOrEnd: "start" | "end",
   scene: Scene,
   shouldSnapToOutline = true,
+  isMidpointSnappingEnabled = true,
 ): void => {
   if (mode === null) {
     // null means break the binding
@@ -246,6 +256,7 @@ const bindOrUnbindBindingElementEdge = (
       scene,
       focusPoint,
       shouldSnapToOutline,
+      isMidpointSnappingEnabled,
     );
   }
 };
@@ -601,6 +612,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     finalize?: boolean;
     initialBinding?: boolean;
     zoom?: AppState["zoom"];
+    gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -641,6 +653,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     finalize?: boolean;
     initialBinding?: boolean;
     zoom?: AppState["zoom"];
+    gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const startIdx = 0;
@@ -706,7 +719,9 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
-    globalPoint,
+    opts?.angleLocked || appState.gridModeEnabled
+      ? pointFrom<GlobalPoint>(scenePointerX, scenePointerY)
+      : globalPoint,
     elements,
     elementsMap,
     maxBindingDistance_simple(appState.zoom),
@@ -758,7 +773,11 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           ? globalPoint
           : // NOTE: Can only affect the start point because new arrows always drag the end point
           opts?.newArrow
-          ? appState.selectedLinearElement!.initialState.origin!
+          ? getGridPoint(
+              appState.selectedLinearElement!.initialState.origin![0],
+              appState.selectedLinearElement!.initialState.origin![1],
+              opts.gridSize as NullableGridSize,
+            )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               0,
@@ -817,12 +836,29 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              globalPoint,
+              opts?.angleLocked
+                ? globalPoint
+                : appState.gridModeEnabled
+                ? snapBoundPointToGrid(
+                    pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+                    hit,
+                    elementsMap,
+                    appState.gridSize as NullableGridSize,
+                    arrow,
+                    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                      arrow,
+                      startDragged ? 1 : -2,
+                      elementsMap,
+                    ),
+                  )
+                : globalPoint,
               hit,
               startDragged ? "start" : "end",
               elementsMap,
               appState.zoom,
-              appState.isMidpointSnappingEnabled,
+              appState.isMidpointSnappingEnabled &&
+                !opts?.angleLocked &&
+                !appState.gridModeEnabled,
             ) || globalPoint,
         }
     : { mode: null };
@@ -867,7 +903,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               startDragged ? "end" : "start",
               elementsMap,
               appState.zoom,
-              appState.isMidpointSnappingEnabled,
+              false,
             ) || otherEndpoint,
         }
       : { mode: undefined }
@@ -1035,6 +1071,7 @@ export const bindBindingElement = (
   scene: Scene,
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
+  isMidpointSnappingEnabled = true,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -1050,6 +1087,7 @@ export const bindBindingElement = (
         startOrEnd,
         elementsMap,
         shouldSnapToOutline,
+        isMidpointSnappingEnabled,
       ),
     };
   } else {
@@ -1761,6 +1799,86 @@ const extractBinding = (
     binding,
     mode: binding.mode,
   };
+};
+
+/**
+ * Snaps a bound arrow endpoint to the grid on the axis parallel to the
+ * bindable element's side, while preserving the binding gap distance on the
+ * perpendicular axis. In other words, the grid axis closest to the side's
+ * perpendicular (normal) is used as the snap axis and the other axis is kept at
+ * the binding gap distance.
+ */
+const snapBoundPointToGrid = (
+  outlinePoint: GlobalPoint,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  gridSize: NullableGridSize,
+  arrowElement: ExcalidrawArrowElement,
+  adjacentPoint?: GlobalPoint,
+): GlobalPoint => {
+  if (!gridSize) {
+    return outlinePoint;
+  }
+
+  const aabb = aabbForElement(bindableElement, elementsMap);
+  // For ellipses and diamonds use the arrow's incoming direction instead of
+  // the position-based heading, which can give the wrong axis when the
+  // outline point is near a cardinal zone or an angled diamond face.
+  const heading =
+    adjacentPoint &&
+    (bindableElement.type === "ellipse" || bindableElement.type === "diamond")
+      ? vectorToHeading(vectorFromPoint(adjacentPoint, outlinePoint))
+      : headingForPointFromElement(bindableElement, aabb, outlinePoint);
+
+  const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const extent =
+    Math.max(bindableElement.width, bindableElement.height) + bindingGap * 2;
+  const center = getCenterForBounds(aabb);
+
+  // Both heading strategies above return global-axis directions.
+  const absNX = Math.abs(heading[0]);
+  const absNY = Math.abs(heading[1]);
+  if (absNX >= absNY) {
+    // Global X is closest to the perpendicular so snap Y, intersect horizontal line
+    const [, snappedY] = getGridPoint(
+      outlinePoint[0],
+      outlinePoint[1],
+      gridSize,
+    );
+    const intersector = lineSegment<GlobalPoint>(
+      pointFrom<GlobalPoint>(center[0] - extent, snappedY),
+      pointFrom<GlobalPoint>(center[0] + extent, snappedY),
+    );
+    const intersection = intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      intersector,
+      bindingGap,
+    ).sort(
+      (a, b) =>
+        pointDistanceSq(a, outlinePoint) - pointDistanceSq(b, outlinePoint),
+    )[0];
+
+    return intersection ?? pointFrom<GlobalPoint>(outlinePoint[0], snappedY);
+  }
+
+  // Global Y is closest to the perpendicular so snap X, intersect vertical line
+  const [snappedX] = getGridPoint(outlinePoint[0], outlinePoint[1], gridSize);
+  const intersector = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(snappedX, center[1] - extent),
+    pointFrom<GlobalPoint>(snappedX, center[1] + extent),
+  );
+  const intersection = intersectElementWithLineSegment(
+    bindableElement,
+    elementsMap,
+    intersector,
+    bindingGap,
+  ).sort(
+    (a, b) =>
+      pointDistanceSq(a, outlinePoint) - pointDistanceSq(b, outlinePoint),
+  )[0];
+
+  return intersection ?? pointFrom<GlobalPoint>(snappedX, outlinePoint[1]);
 };
 
 const elementArea = (element: ExcalidrawBindableElement) =>
