@@ -100,13 +100,13 @@ export const getShapeActionPredicates = (
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
+  const hasSelection = targetElements.length > 0;
 
   return {
-    // selection shape
-    singleSelected,
-    hasSelection: targetElements.length > 0,
-    isSingleElementBoundContainer,
-    isEditingTextOrNewElement,
+    /** some element(s) selected */
+    hasSelection,
+    /** actions on selected elements (delete/duplicate/...) */
+    showExtraActions: hasSelection && !isEditingTextOrNewElement,
 
     // color
     strokeColor: canChangeStrokeColor(appState, targetElements),

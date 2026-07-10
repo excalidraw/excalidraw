@@ -217,7 +217,7 @@ export const SelectedShapeActions = ({
           showDistribute={predicates.distribute}
         />
       )}
-      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
+      {predicates.showExtraActions && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
@@ -524,7 +524,7 @@ const CombinedExtraActions = ({
 }) => {
   const isOpen = appState.openPopup === "compactOtherProperties";
 
-  if (predicates.isEditingTextOrNewElement || !predicates.hasSelection) {
+  if (!predicates.showExtraActions) {
     return null;
   }
 
@@ -705,14 +705,14 @@ export const CompactShapeActions = ({
       )}
 
       {/* Dedicated Copy Button */}
-      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
+      {predicates.showExtraActions && (
         <div className="compact-action-item">
           {renderAction("duplicateSelection")}
         </div>
       )}
 
       {/* Dedicated Delete Button */}
-      {!predicates.isEditingTextOrNewElement && predicates.hasSelection && (
+      {predicates.showExtraActions && (
         <div className="compact-action-item">
           {renderAction("deleteSelectedElements")}
         </div>
