@@ -233,6 +233,7 @@ export type InteractiveCanvasAppState = Readonly<
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
     collaborators: AppState["collaborators"];
+    collaboratorsCursorsHidden: AppState["collaboratorsCursorsHidden"];
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
@@ -485,6 +486,7 @@ export interface AppState {
 
   fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
+  collaboratorsCursorsHidden: boolean;
   stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */

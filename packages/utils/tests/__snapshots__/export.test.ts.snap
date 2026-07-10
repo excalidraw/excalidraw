@@ -15,6 +15,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,

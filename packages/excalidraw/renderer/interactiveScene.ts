@@ -1831,7 +1831,7 @@ const _renderInteractiveScene = ({
             selectionColors.push(selectionColor);
           }
           // remote users
-          if (remoteClients) {
+          if (remoteClients && !appState.collaboratorsCursorsHidden) {
             selectionColors.push(
               ...remoteClients.map((socketId) => {
                 const background = getClientColor(
@@ -2045,13 +2045,15 @@ const _renderInteractiveScene = ({
 
   context.restore();
 
-  renderRemoteCursors({
-    context,
-    renderConfig,
-    appState,
-    normalizedWidth,
-    normalizedHeight,
-  });
+  if (!appState.collaboratorsCursorsHidden) {
+    renderRemoteCursors({
+      context,
+      renderConfig,
+      appState,
+      normalizedWidth,
+      normalizedHeight,
+    });
+  }
 
   // Paint scrollbars
   let scrollBars;
