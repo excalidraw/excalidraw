@@ -12069,7 +12069,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         } catch (error: any) {
           console.error(
-            "Error trying to resizing image file on insertion",
+            "Error trying to resize image file on insertion",
             error,
           );
         }
