@@ -154,7 +154,11 @@ describe("image insertion", () => {
   });
 
   it("does not resize images that fit within the size limit", async () => {
-    await setupImageTest([DEER_IMAGE_DIMENSIONS]);
+    // maxWidthOrHeight below the image dimensions — the file must still be
+    // stored untouched since it fits within maxFileSizeBytes
+    await setupImageTest([DEER_IMAGE_DIMENSIONS], {
+      imageOptions: { maxWidthOrHeight: 200 },
+    });
 
     await API.drop([
       { kind: "file", file: await API.loadFile("./fixtures/deer.png") },
