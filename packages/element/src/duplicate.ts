@@ -38,10 +38,13 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 
 import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 
+import { isNonDeletedElement } from ".";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   GroupId,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 
@@ -157,7 +160,7 @@ export const duplicateElements = (
   // loop over them.
   const processedIds = new Map<ExcalidrawElement["id"], true>();
   const groupIdMap = new Map();
-  const duplicatedElements: ExcalidrawElement[] = [];
+  const duplicatedElements: NonDeletedExcalidrawElement[] = [];
   const origElements: ExcalidrawElement[] = [];
   const origIdToDuplicateId = new Map<
     ExcalidrawElement["id"],
@@ -167,7 +170,7 @@ export const duplicateElements = (
     ExcalidrawElement["id"],
     ExcalidrawElement
   >();
-  const duplicateElementsMap = new Map<string, ExcalidrawElement>();
+  const duplicateElementsMap = new Map<string, NonDeletedExcalidrawElement>();
   const elementsMap = arrayToMap(elements) as ElementsMap;
   const _idsOfElementsToDuplicate =
     opts.type === "in-place"
@@ -209,12 +212,20 @@ export const duplicateElements = (
 
         processedIds.set(element.id, true);
 
+        // SAFETY: this should never happen, but we
+        // want to make sure we log it if it does
+        if (!isNonDeletedElement(element)) {
+          console.error(
+            "[NONDELETED][INVARIANT] Element to duplicate should be non-deleted",
+          );
+        }
+
         const newElement = duplicateElement(
           appState.editingGroupId,
           groupIdMap,
           element,
           opts.randomizeSeed,
-        );
+        ) as NonDeletedExcalidrawElement;
 
         processedIds.set(newElement.id, true);
 

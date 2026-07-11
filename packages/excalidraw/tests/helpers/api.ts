@@ -4,7 +4,12 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import {
+  DEFAULT_VERTICAL_ALIGN,
+  ROUNDNESS,
+  assertNever,
+  getStrokeWidthByKey,
+} from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -19,8 +24,7 @@ import {
   newTextElement,
 } from "@excalidraw/element";
 
-import { isLinearElementType } from "@excalidraw/element";
-import { getSelectedElements } from "@excalidraw/element";
+import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import { FONT_SIZES } from "@excalidraw/common";
@@ -39,6 +43,8 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -80,7 +86,7 @@ export class API {
     });
   };
 
-  static setSelectedElements = (elements: ExcalidrawElement[], editingGroupId?: string | null) => {
+  static setSelectedElements = (elements: NonDeletedExcalidrawElement[], editingGroupId?: string | null) => {
     act(() => {
       h.setState({
         ...selectGroupsForSelectedElements(
@@ -201,6 +207,9 @@ export class API {
       ? ExcalidrawTextElement["containerId"]
       : never;
     points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
+    strokeOptions?: T extends "freedraw"
+      ? ExcalidrawFreeDrawElement["strokeOptions"]
+      : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -219,19 +228,21 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
-  }): T extends "arrow" | "line"
-    ? ExcalidrawLinearElement
-    : T extends "freedraw"
-    ? ExcalidrawFreeDrawElement
-    : T extends "text"
-    ? ExcalidrawTextElement
-    : T extends "image"
-    ? ExcalidrawImageElement
-    : T extends "frame"
-    ? ExcalidrawFrameElement
-    : T extends "magicframe"
-    ? ExcalidrawMagicFrameElement
-    : ExcalidrawGenericElement => {
+  }): NonDeleted<
+    T extends "arrow" | "line"
+      ? ExcalidrawLinearElement
+      : T extends "freedraw"
+      ? ExcalidrawFreeDrawElement
+      : T extends "text"
+      ? ExcalidrawTextElement
+      : T extends "image"
+      ? ExcalidrawImageElement
+      : T extends "frame"
+      ? ExcalidrawFrameElement
+      : T extends "magicframe"
+      ? ExcalidrawMagicFrameElement
+      : ExcalidrawGenericElement
+  > => {
     let element: Mutable<ExcalidrawElement> = null!;
 
     const appState = h?.state || getDefaultAppState();
@@ -259,7 +270,9 @@ export class API {
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
-      strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
+      strokeWidth:
+        rest.strokeWidth ??
+        getStrokeWidthByKey(type, appState.currentItemStrokeWidthKey),
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
       roundness: (
         rest.roundness === undefined
@@ -267,9 +280,9 @@ export class API {
           : rest.roundness
       )
         ? {
-            type: isLinearElementType(type)
-              ? ROUNDNESS.PROPORTIONAL_RADIUS
-              : ROUNDNESS.ADAPTIVE_RADIUS,
+            type: isUsingAdaptiveRadius(type)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
           }
         : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
@@ -318,6 +331,7 @@ export class API {
           type: type as "freedraw",
           simulatePressure: true,
           points: rest.points,
+          strokeOptions: rest.strokeOptions,
           ...base,
         });
         break;

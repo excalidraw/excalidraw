@@ -1,25 +1,68 @@
 import React from "react";
-import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
+import { AnimationController } from "../renderer/animation";
+import { getNormalizedZoom } from "../scene";
+import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../viewport";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
 
 const { h } = window;
 
-const waitForNextAnimationFrame = () => {
+/**
+ * The scroll/zoom animation is driven by `AnimationController`. With render
+ * throttling enabled (see the `beforeEach` below) it schedules frames via
+ * `requestAnimationFrame`, advancing the easing based on elapsed wall-clock
+ * time. We use a very long animation `duration` (see `LONG_ANIMATION_DURATION`)
+ * so it can never complete while we sample it, and let a few frames pass
+ * between samples so the easing makes observable (but partial) progress.
+ */
+const LONG_ANIMATION_DURATION = 1_000_000;
+
+const waitForAnimationProgress = (frames = 4) => {
   return act(
     () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
+      new Promise<void>((resolve) => {
+        let remaining = frames;
+        const step = () => {
+          if (--remaining <= 0) {
+            resolve();
+          } else {
+            requestAnimationFrame(step);
+          }
+        };
+        requestAnimationFrame(step);
       }),
   );
 };
 
-describe("fitToContent", () => {
+/**
+ * Polls until the scroll/zoom animation has removed itself from the
+ * `AnimationController` (i.e. it ran to completion), or until `maxFrames`
+ * elapses as a safety net so a regression can't hang the suite.
+ */
+const waitForAnimationToStop = (maxFrames = 200) => {
+  return act(
+    () =>
+      new Promise<void>((resolve) => {
+        let remaining = maxFrames;
+        const check = () => {
+          if (
+            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+            --remaining <= 0
+          ) {
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+};
+
+describe("scale-down", () => {
   it("should zoom to fit the selected element", async () => {
     await render(<Excalidraw />);
 
@@ -32,11 +75,16 @@ describe("fitToContent", () => {
       x: 50,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollToContent(rectElement, { fitToContent: true });
+      h.app.setViewport({
+        target: rectElement,
+        fit: "scale-down",
+        animation: false,
+      });
     });
 
     // element is 10x taller than the viewport size,
@@ -60,6 +108,7 @@ describe("fitToContent", () => {
       x: 80,
       y: 80,
     });
+    API.setElements([topLeft, bottomRight]);
 
     h.state.width = 10;
     h.state.height = 10;
@@ -67,13 +116,46 @@ describe("fitToContent", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.scrollToContent([topLeft, bottomRight], {
-        fitToContent: true,
+      h.app.setViewport({
+        target: [topLeft, bottomRight],
+        fit: "scale-down",
+        animation: false,
       });
     });
 
     // elements take 100x100, which is 10x bigger than the viewport size,
     // zoom should be at least 1/10
+    expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
+  });
+
+  it("should zoom to fit when scrolling to an element by id", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 10;
+    h.state.height = 10;
+
+    const rectElement = API.createElement({
+      width: 50,
+      height: 100,
+      x: 50,
+      y: 100,
+    });
+
+    API.setElements([rectElement]);
+
+    expect(h.state.zoom.value).toBe(1);
+
+    act(() => {
+      // navigating by element id (a string target) with zoomToFit
+      h.app.setViewport({
+        target: rectElement.id,
+        fit: "scale-down",
+        animation: false,
+      });
+    });
+
+    // element is 10x taller than the viewport, so fit-to-content should
+    // drop the zoom to <= 1/10
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
 
@@ -89,17 +171,21 @@ describe("fitToContent", () => {
       x: 100,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.zoom.value).toBe(1);
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollToContent(rectElement);
+      h.app.setViewport({
+        target: rectElement,
+        fit: "contain",
+        animation: false,
+      });
     });
 
-    // zoom level should stay the same
-    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.zoom.value).toBe(0.1);
 
     // state should reflect some scrolling
     expect(h.state.scrollX).not.toBe(0);
@@ -107,13 +193,54 @@ describe("fitToContent", () => {
   });
 });
 
-describe("fitToContent animated", () => {
+describe("none", () => {
+  it("should keep the current zoom and only center the target", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 100;
+    h.state.height = 100;
+
+    const rectElement = API.createElement({
+      width: 50,
+      height: 50,
+      x: 1000,
+      y: 1000,
+    });
+    API.setElements([rectElement]);
+
+    act(() => {
+      API.setAppState({ zoom: { value: getNormalizedZoom(0.5) } });
+    });
+
+    act(() => {
+      h.app.setViewport({
+        target: rectElement,
+        fit: "none",
+        animation: false,
+      });
+    });
+
+    // pan-only: the zoom must stay untouched...
+    expect(h.state.zoom.value).toBe(0.5);
+    // ...with the target's center (1025, 1025) centered in the viewport
+    // (scroll = viewportSize / 2 / zoom - sceneCenter)
+    expect(h.state.scrollX).toBeCloseTo(100 / 2 / 0.5 - 1025);
+    expect(h.state.scrollY).toBeCloseTo(100 / 2 / 0.5 - 1025);
+  });
+});
+
+describe("scale-down animated", () => {
   beforeEach(() => {
-    vi.spyOn(window, "requestAnimationFrame");
+    // pace the animation via requestAnimationFrame instead of a tight
+    // setTimeout(0) loop, which would otherwise starve the test's own timers
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    // stop any in-flight scroll/zoom animation so it doesn't keep ticking on
+    // the unmounted component and leak into the next test via the singleton
+    AnimationController.reset();
   });
 
   it("should ease scroll the viewport to the selected element", async () => {
@@ -128,19 +255,22 @@ describe("fitToContent animated", () => {
       x: -100,
       y: -100,
     });
+    API.setElements([rectElement]);
 
     act(() => {
-      h.app.scrollToContent(rectElement, { animate: true });
+      h.app.setViewport({
+        target: rectElement,
+        fit: "scale-down",
+        animation: { duration: LONG_ANIMATION_DURATION },
+      });
     });
 
-    expect(window.requestAnimationFrame).toHaveBeenCalled();
-
-    // Since this is an animation, we expect values to change through time.
-    // We'll verify that the scroll values change at 50ms and 100ms
+    // the animation hasn't progressed yet, so we're still at the origin
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    await waitForNextAnimationFrame();
+    // Since this is an animation, we expect values to change through time.
+    await waitForAnimationProgress();
 
     const prevScrollX = h.state.scrollX;
     const prevScrollY = h.state.scrollY;
@@ -148,7 +278,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
 
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     expect(h.state.scrollX).not.toBe(prevScrollX);
     expect(h.state.scrollY).not.toBe(prevScrollY);
@@ -166,17 +296,20 @@ describe("fitToContent animated", () => {
       x: 100,
       y: 100,
     });
+    API.setElements([rectElement]);
 
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
     act(() => {
-      h.app.scrollToContent(rectElement, { animate: true, fitToContent: true });
+      h.app.setViewport({
+        target: rectElement,
+        fit: "scale-down",
+        animation: { duration: LONG_ANIMATION_DURATION },
+      });
     });
 
-    expect(window.requestAnimationFrame).toHaveBeenCalled();
-
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     const prevScrollX = h.state.scrollX;
     const prevScrollY = h.state.scrollY;
@@ -184,9 +317,53 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
 
-    await waitForNextAnimationFrame();
+    await waitForAnimationProgress();
 
     expect(h.state.scrollX).not.toBe(prevScrollX);
     expect(h.state.scrollY).not.toBe(prevScrollY);
+  });
+
+  it("should stop ticking and settle on the target once complete", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 10;
+    h.state.height = 10;
+
+    const rectElement = API.createElement({
+      width: 100,
+      height: 100,
+      x: -100,
+      y: -100,
+    });
+    API.setElements([rectElement]);
+
+    act(() => {
+      // a short duration so the animation completes within a few frames
+      h.app.setViewport({
+        target: rectElement,
+        fit: "scale-down",
+        animation: { duration: 10 },
+      });
+    });
+
+    await waitForAnimationToStop();
+
+    // the animation must remove itself from the controller rather than keep
+    // ticking forever after reaching the target
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+
+    // it should have settled on the target viewport (moved off the origin)
+    const settledScrollX = h.state.scrollX;
+    const settledScrollY = h.state.scrollY;
+    expect(settledScrollX).not.toBe(0);
+    expect(settledScrollY).not.toBe(0);
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
+
+    // further frames must not move the viewport (no perpetual re-rendering)
+    await waitForAnimationProgress();
+    expect(h.state.scrollX).toBe(settledScrollX);
+    expect(h.state.scrollY).toBe(settledScrollY);
   });
 });

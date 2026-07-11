@@ -1,6 +1,9 @@
 import { arrayToMap } from "@excalidraw/common";
-import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
-import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
+import {
+  isPointWithinBounds,
+  pointFrom,
+  segmentsIntersectAt,
+} from "@excalidraw/math";
 
 import type {
   AppClassProperties,
@@ -29,6 +32,8 @@ import {
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
+
+import { getNonDeletedElements } from ".";
 
 import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 
@@ -78,7 +83,7 @@ export function isElementIntersectingFrame(
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
-      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+      segmentsIntersectAt(frameLineSegment, elementLineSegment),
     ),
   );
 
@@ -263,8 +268,8 @@ export const getFrameLikeElements = (
  *
  * Considers non-frame bound elements (container or arrow labels) as root.
  */
-export const getRootElements = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const getRootElements = <T extends ExcalidrawElement>(
+  allElements: readonly T[],
 ) => {
   const frameElements = arrayToMap(getFrameLikeElements(allElements));
   return allElements.filter(
@@ -345,9 +350,12 @@ export const getElementsInResizingFrame = (
   const newGroupElementsCompletelyInFrame = Array.from(
     elementsCompletelyInFrame,
   ).filter((element) => element.groupIds.length > 0);
+  const nonDeletedNewGroupElementsCompletelyInFrame = getNonDeletedElements(
+    newGroupElementsCompletelyInFrame,
+  );
 
   const groupIds = selectGroupsFromGivenElements(
-    newGroupElementsCompletelyInFrame,
+    nonDeletedNewGroupElementsCompletelyInFrame,
     appState,
   );
 
@@ -535,7 +543,7 @@ export const getFrameChildrenInsertionIndex = (
  */
 export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
-  elementsToAdd: NonDeletedExcalidrawElement[],
+  elementsToAdd: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ): T => {
   const elementsMap = arrayToMap(allElements);
@@ -563,10 +571,6 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       isFrameLikeElement(element) ||
       (element.frameId && otherFrames.has(element.frameId))
     ) {
-      continue;
-    }
-
-    if (element.frameId && element.frameId !== frame.id) {
       continue;
     }
 
@@ -631,7 +635,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 };
 
 export const removeElementsFromFrame = (
-  elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsToRemove: ReadonlySetLike<ExcalidrawElement>,
   elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
@@ -976,8 +980,8 @@ export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
   return element.name === null ? getDefaultFrameName(element) : element.name;
 };
 
-export const getElementsOverlappingFrame = (
-  elements: readonly ExcalidrawElement[],
+export const getElementsOverlappingFrame = <T extends ExcalidrawElement>(
+  elements: readonly T[],
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {

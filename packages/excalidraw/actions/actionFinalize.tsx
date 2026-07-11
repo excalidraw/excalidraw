@@ -27,7 +27,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -54,6 +54,7 @@ export const actionFinalize = register<FormData>({
   label: "",
   trackEvent: false,
   perform: (elements, appState, data, app) => {
+    let shouldCommit = true;
     let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
@@ -93,32 +94,40 @@ export const actionFinalize = register<FormData>({
             ? [element.points.length - 1] // New arrow creation
             : appState.selectedLinearElement.selectedPointsIndices;
 
+        const angleLocked = shouldRotateWithDiscreteAngle(event);
+        const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
+          ? null
+          : app.getEffectiveGridSize();
+
         const draggedPoints: PointsPositionUpdates =
           selectedPointsIndices.reduce((map, index) => {
             map.set(index, {
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                element,
-                pointFrom<GlobalPoint>(
-                  sceneCoords.x - linearElementEditor.pointerOffset.x,
-                  sceneCoords.y - linearElementEditor.pointerOffset.y,
-                ),
-                elementsMap,
-              ),
+              point: angleLocked
+                ? element.points[index]
+                : LinearElementEditor.createPointAt(
+                    element,
+                    elementsMap,
+                    sceneCoords.x - linearElementEditor.pointerOffset.x,
+                    sceneCoords.y - linearElementEditor.pointerOffset.y,
+                    effectiveGridSize,
+                  ),
             });
 
             return map;
           }, new Map()) ?? new Map();
+
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          sceneCoords.x - linearElementEditor.pointerOffset.x,
-          sceneCoords.y - linearElementEditor.pointerOffset.y,
+          sceneCoords.x,
+          sceneCoords.y,
           scene,
           appState,
           {
             newArrow,
             altKey: event.altKey,
-            angleLocked: shouldRotateWithDiscreteAngle(event),
+            angleLocked,
+            gridSize: app.getEffectiveGridSize(),
           },
         );
       } else if (isLineElement(element)) {
@@ -222,9 +231,44 @@ export const actionFinalize = register<FormData>({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
+          shouldCommit = false;
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
           });
+          if (
+            isBindingElement(element) &&
+            element.endBinding &&
+            // after slicing the trailing point a <2-point arrow may be left
+            element.points.length > 1
+          ) {
+            const newArrow = !!appState.newElement;
+            const draggedPoints: PointsPositionUpdates = new Map([
+              [
+                element.points.length - 1,
+                {
+                  point: element.points[element.points.length - 1],
+                  isDragging: false,
+                },
+              ],
+            ]);
+            const globalPoint =
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                elementsMap,
+              );
+            bindOrUnbindBindingElement(
+              element,
+              draggedPoints,
+              globalPoint[0],
+              globalPoint[1],
+              scene,
+              appState,
+              {
+                newArrow,
+              },
+            );
+          }
         }
       }
 
@@ -344,7 +388,9 @@ export const actionFinalize = register<FormData>({
         selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      captureUpdate: shouldCommit
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.NEVER,
     };
   },
   keyTest: (event, appState) =>

@@ -123,4 +123,9 @@ export class AnimationController {
     AnimationController.animations.delete(key);
     AnimationController.cancelScheduledFrameIfIdle();
   }
+
+  static reset() {
+    AnimationController.animations.clear();
+    AnimationController.cancelScheduledFrame();
+  }
 }

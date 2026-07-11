@@ -178,7 +178,7 @@ const deleteSelectedElements = (
           selectedElementIds,
           editingGroupId: nextEditingGroupId,
         },
-        nextElements,
+        getNonDeletedElements(nextElements),
         appState,
         null,
       ),

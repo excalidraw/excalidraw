@@ -232,18 +232,22 @@ export const ToggleTheme = (
   props:
     | {
         allowSystemTheme: true;
+        /**
+         * Controls the theme of this UI component only.
+         * You should subscribe to `props.onThemeChange` and control the theme
+         * upstream.
+         */
         theme: Theme | "system";
-        onSelect: (theme: Theme | "system") => void;
       }
     | {
-        allowSystemTheme?: false;
-        onSelect?: (theme: Theme) => void;
+        allowSystemTheme: false;
       },
 ) => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
   const shortcut = getShortcutFromShortcutName("toggleTheme");
+  const appProps = useAppProps();
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
     return null;
@@ -254,7 +258,16 @@ export const ToggleTheme = (
       <DropdownMenuItemContentRadio
         name="theme"
         value={props.theme}
-        onChange={(value: Theme | "system") => props.onSelect(value)}
+        onChange={(value: Theme | "system") => {
+          if (appProps.onThemeChange) {
+            appProps.onThemeChange(value);
+            return;
+          }
+
+          console.warn(
+            "MainMenu.DefaultItems.ToggleTheme: `<Excalidraw/> props.onThemeChange` must be defined to use system theme selection.",
+          );
+        }}
         choices={[
           {
             value: THEME.LIGHT,
@@ -284,13 +297,7 @@ export const ToggleTheme = (
         // do not close the menu when changing theme
         event.preventDefault();
 
-        if (props?.onSelect) {
-          props.onSelect(
-            appState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
-          );
-        } else {
-          return actionManager.executeAction(actionToggleTheme);
-        }
+        actionManager.executeAction(actionToggleTheme);
       }}
       icon={appState.theme === THEME.DARK ? SunIcon : MoonIcon}
       data-testid="toggle-dark-mode"

@@ -68,6 +68,7 @@ export type ActionName =
   | "changeStrokeWidth"
   | "changeStrokeShape"
   | "changeSloppiness"
+  | "changeFreedrawMode"
   | "changeStrokeStyle"
   | "changeArrowhead"
   | "changeArrowType"
@@ -149,7 +150,10 @@ export type ActionName =
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  // UIAppState (not AppState) because PanelComponents only re-render when
+  // the UI does — reading UI-stripped props (zoom, scroll, …) would render
+  // stale values; subscribe via useAppStateValue for those instead
+  appState: UIAppState;
   updateData: <T = any>(formData?: T) => void;
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
@@ -166,7 +170,7 @@ export interface Action<TData = any> {
     | string
     | ((
         elements: readonly ExcalidrawElement[],
-        appState: Readonly<AppState>,
+        appState: Readonly<UIAppState>,
         app: AppClassProperties,
       ) => string);
   keywords?: string[];
@@ -191,7 +195,7 @@ export interface Action<TData = any> {
     appProps: ExcalidrawProps,
     app: AppClassProperties,
   ) => boolean;
-  checked?: (appState: Readonly<AppState>) => boolean;
+  checked?: (appState: Readonly<UIAppState>) => boolean;
   trackEvent:
     | false
     | {

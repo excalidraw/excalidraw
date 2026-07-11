@@ -3,6 +3,10 @@
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Інші опції",
+    "cardinality": "",
     "arrowtypes": "Тип стрілки",
     "arrowtype_sharp": "Гостра стрілка",
     "arrowtype_round": "Вигнута стрілка",
@@ -171,7 +182,11 @@
     "linkToElement": "Посилання на об’єкт",
     "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Посилання на об’єкт",
@@ -186,7 +201,7 @@
       "inputPlaceholder": "",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Очистити пошук"
     }
   },
   "search": {
@@ -234,7 +249,7 @@
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "",
+    "publishLibrary": "Перейменувати або опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -357,7 +372,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "",
+    "bindTextToElement": "{{shortcut}} щоб додати текст",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -394,6 +409,10 @@
   },
   "errorDialog": {
     "title": "Помилка"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
@@ -571,7 +590,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Колір",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
@@ -612,31 +631,32 @@
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
-    "description": "Наразі підтримується тільки <flowchartLink>блок-схеми</flowchartLink><sequenceLink>діаграми послідовностей</sequenceLink> та <classLink>діаграми класів</classLink>. Інші типи будуть відображатися як зображення в Excalidraw.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
-    "error": ""
+    "error": "Помилка!"
   },
   "chat": {
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
     "generating": "",
-    "rateLimitRemaining": "",
+    "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Ви",
+      "assistant": "ШІ-асистент",
+      "system": "Система"
     },
     "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "label": "Чат",
+    "menu": "Меню",
+    "newChat": "Новий чат",
+    "deleteChat": "Видалити чат",
+    "deleteMessage": "Видалити повідомлення",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
@@ -644,10 +664,10 @@
       "hint": ""
     },
     "preview": "",
-    "insert": "",
-    "retry": "",
+    "insert": "Вставити",
+    "retry": "Спробувати знову",
     "errors": {
-      "promptTooShort": "",
+      "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
       "promptTooLong": "",
       "generationFailed": "",
       "invalidDiagram": "",
@@ -660,7 +680,7 @@
     "rateLimit": {
       "messageLimit": "",
       "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
     "upsellBtnLabel": ""
   },
@@ -701,15 +721,15 @@
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Коліщатко"
   }
 }
