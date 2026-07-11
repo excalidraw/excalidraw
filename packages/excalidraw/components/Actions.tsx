@@ -302,6 +302,8 @@ export const SelectedShapeActions = ({
             {editorInterface.formFactor !== "phone" &&
               renderAction("duplicateSelection")}
             {editorInterface.formFactor !== "phone" &&
+              renderAction("duplicateInPlace")}
+            {editorInterface.formFactor !== "phone" &&
               renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
