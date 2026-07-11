@@ -750,6 +750,8 @@ class App extends React.Component<AppProps, AppState> {
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
+  private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
+    null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -3034,6 +3036,152 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /** Ends active input sessions before switching to a view-mode/non-interactive
+   *  mode. */
+  private terminateActiveInteraction = () => {
+    // Complete any active pointer interaction before clearing the state it
+    // relies on. Among other things this tears down window-level listeners.
+    this.maybeCleanupAfterMissingPointerUp(null);
+
+    isHoldingSpace = false;
+    isPanning = false;
+    isDraggingScrollBar = false;
+    lastPointerUp = null;
+
+    gesture.pointers.clear();
+    gesture.lastCenter = null;
+    gesture.initialDistance = null;
+    gesture.initialScale = null;
+
+    clearTimeout(tappedTwiceTimer);
+    tappedTwiceTimer = 0;
+    App.resetTapTwice();
+    this.resetContextMenuTimer();
+
+    clearTimeout(IS_PLAIN_PASTE_TIMER);
+    IS_PLAIN_PASTE_TIMER = 0;
+    IS_PLAIN_PASTE = false;
+
+    if (this.bindModeHandler) {
+      clearTimeout(this.bindModeHandler);
+      this.bindModeHandler = null;
+    }
+
+    this.flowChartCreator.clear();
+    this.flowChartNavigator.clear();
+
+    // These components install their own DOM listeners rather than going
+    // through App's input handlers, so they must be explicitly unmounted.
+    editorJotaiStore.set(activeEyeDropperAtom, null);
+    editorJotaiStore.set(convertElementTypePopupAtom, null);
+
+    if (this.state.editingFrame) {
+      const frame = this.scene.getNonDeletedElement(this.state.editingFrame);
+      this.resetEditingFrame(frame && isFrameLikeElement(frame) ? frame : null);
+    }
+
+    // textWysiwyg's submit path uses flushSync. Defer until after the current
+    // componentDidUpdate lifecycle, then submit whichever text-editing session
+    // is active if editing is still disabled.
+    queueMicrotask(() => {
+      if (!this.interactionEnabled || this.state.viewModeEnabled) {
+        this.textWysiwygSubmitHandler?.();
+      }
+    });
+
+    this.setState({
+      contextMenu: null,
+      openMenu: null,
+      openPopup: null,
+      cursorButton: "up",
+      bindMode: "orbit",
+      activeLockedId: null,
+      selectedElementsAreBeingDragged: false,
+      selectionElement: null,
+      resizingElement: null,
+      isResizing: false,
+      isRotating: false,
+      isCropping: false,
+      croppingElementId: null,
+      suggestedBinding: null,
+      frameToHighlight: null,
+      elementsToHighlight: null,
+      snapLines: [],
+      showHyperlinkPopup: false,
+    });
+    this.deselectElements();
+    if (!this.interactionEnabled) {
+      this.setState({ originSnapOffset: null });
+      resetCursor(this.interactiveCanvas);
+    }
+  };
+
+  private handleInteractionStateChange = (
+    prevProps: AppProps,
+    prevState: AppState,
+  ) => {
+    const wasInteractionEnabled = isInteractionEnabled(prevProps);
+    const interactionEnabledChanged =
+      wasInteractionEnabled !== this.interactionEnabled;
+    const viewModePropChanged =
+      prevProps.viewModeEnabled !== this.props.viewModeEnabled;
+
+    // Preserve internally toggled view mode while interactive and
+    // uncontrolled. Synchronize it when its prop changes, when interaction is
+    // re-enabled, or when non-interactive mode needs to force it on.
+    let nextViewModeEnabled = this.state.viewModeEnabled;
+    if (!this.interactionEnabled) {
+      nextViewModeEnabled = true;
+    } else if (viewModePropChanged || interactionEnabledChanged) {
+      nextViewModeEnabled = !!this.props.viewModeEnabled;
+    }
+    if (nextViewModeEnabled !== this.state.viewModeEnabled) {
+      this.setState({ viewModeEnabled: nextViewModeEnabled });
+    }
+
+    const editingWasEnabled =
+      wasInteractionEnabled && !prevState.viewModeEnabled;
+    const editingEnabled =
+      this.interactionEnabled && !this.state.viewModeEnabled;
+    const becameNonInteractive =
+      interactionEnabledChanged && !this.interactionEnabled;
+
+    if (becameNonInteractive || (editingWasEnabled && !editingEnabled)) {
+      this.terminateActiveInteraction();
+    }
+
+    if (interactionEnabledChanged) {
+      // listener tiers depend on `props.interaction` even when
+      // `state.viewModeEnabled` ends up unchanged
+      this.addEventListeners();
+    }
+
+    // NOTE link icons appearing/disappearing is handled by the re-render
+    // itself (`renderConfig.renderLinks`)
+    if (isLinkInteractionEnabled(prevProps) !== this.linksEnabled) {
+      if (!this.linksEnabled) {
+        this.hitLinkElement = undefined;
+        hideHyperlinkToolip();
+        resetCursor(this.interactiveCanvas);
+      }
+    }
+
+    if (
+      isBrowserZoomInteractionEnabled(prevProps) !== this.browserZoomEnabled
+    ) {
+      this.addEventListeners();
+    }
+
+    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
+      if (this.interactionEnabled) {
+        this.addEventListeners();
+      }
+      if (!this.state.viewModeEnabled) {
+        this.deselectElements();
+      }
+    }
+  };
+
   private resetHistory = () => {
     this.history.clear();
   };
@@ -3655,6 +3803,8 @@ class App extends React.Component<AppProps, AppState> {
       this.props.onInitialize?.(this.api);
     }
 
+    this.handleInteractionStateChange(prevProps, prevState);
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -3742,64 +3892,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isEraserActive(prevState) && !isEraserActive(this.state)) {
       this.eraserTrail.endPath();
-    }
-
-    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
-      this.setState({
-        viewModeEnabled:
-          !this.interactionEnabled || !!this.props.viewModeEnabled,
-      });
-    }
-
-    // NOTE compare derived flags, not the raw prop, so that hosts inlining
-    // the object form (`interaction={{ allowed: { links: true } }}`) don't
-    // retrigger
-    // this on every render
-    if (isInteractionEnabled(prevProps) !== this.interactionEnabled) {
-      if (!this.interactionEnabled) {
-        // reset transient interaction state; view mode gets forced below
-        // which in turn re-runs addEventListeners & deselects elements
-        this.setState({
-          contextMenu: null,
-          openMenu: null,
-          openPopup: null,
-          cursorButton: "up",
-        });
-        this.maybeCleanupAfterMissingPointerUp(null);
-        resetCursor(this.interactiveCanvas);
-      } else {
-        this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
-      }
-      // listener tiers depend on `props.interaction` even when
-      // `state.viewModeEnabled` ends up unchanged
-      this.addEventListeners();
-    }
-
-    // NOTE link icons appearing/disappearing is handled by the re-render
-    // itself (`renderConfig.renderLinks`)
-    if (isLinkInteractionEnabled(prevProps) !== this.linksEnabled) {
-      if (!this.linksEnabled) {
-        this.hitLinkElement = undefined;
-        hideHyperlinkToolip();
-        resetCursor(this.interactiveCanvas);
-      }
-    }
-
-    if (
-      isBrowserZoomInteractionEnabled(prevProps) !== this.browserZoomEnabled
-    ) {
-      this.addEventListeners();
-    }
-
-    // nothing (host `updateScene`, actions, ...) may unset view mode while
-    // the editor is non-interactive
-    if (!this.interactionEnabled && !this.state.viewModeEnabled) {
-      this.setState({ viewModeEnabled: true });
-    }
-
-    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
-      this.addEventListeners();
-      this.deselectElements();
     }
 
     // cleanup
@@ -6241,7 +6333,7 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    textWysiwyg({
+    this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
@@ -6263,6 +6355,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        this.textWysiwygSubmitHandler = null;
+
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
 

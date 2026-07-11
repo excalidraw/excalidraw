@@ -11,6 +11,7 @@ import { Excalidraw, MainMenu } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import {
   act,
   fireEvent,
@@ -420,6 +421,170 @@ describe("toggling `interaction` at runtime", () => {
     // and wheel zoom works again
     wheelZoom();
     expect(h.state.zoom.value).toBeGreaterThan(zoom);
+  });
+
+  it("deselects when disabled while already in view mode", async () => {
+    mockBoundingClientRect();
+    await render(
+      <Excalidraw
+        viewModeEnabled={true}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+    expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={false}
+        viewModeEnabled={true}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(h.state.selectedElementIds).toEqual({});
+    });
+  });
+
+  it("submits an active text editor when interaction is disabled", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const text = API.createElement({
+      type: "text",
+      text: "before",
+      x: 20,
+      y: 20,
+    });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    Keyboard.keyPress("Enter");
+
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "committed before disable");
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={false}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(h.state.editingTextElement).toBe(null);
+      expect(queryContainer(".excalidraw-wysiwyg")).toBe(null);
+    });
+    expect(h.elements.find((element) => element.id === text.id)).toMatchObject({
+      originalText: "committed before disable",
+    });
+
+    // The detached editor must no longer have a live input listener.
+    editor.value = "changed after disable";
+    fireEvent.input(editor);
+    expect(h.elements.find((element) => element.id === text.id)).toMatchObject({
+      originalText: "committed before disable",
+    });
+  });
+
+  it("commits and closes frame-name editing when interaction is disabled", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const frame = API.createElement({
+      type: "frame",
+      x: 20,
+      y: 30,
+      width: 80,
+      height: 50,
+    });
+    API.setElements([frame]);
+    API.updateElement(frame, { name: "before" });
+    act(() => h.setState({ editingFrame: frame.id }));
+
+    const frameNameInput = await waitFor(() => {
+      const input = queryContainer(".frame-name input");
+      expect(input).not.toBe(null);
+      return input as HTMLInputElement;
+    });
+    fireEvent.change(frameNameInput, { target: { value: "  committed  " } });
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={false}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(h.state.editingFrame).toBe(null);
+      expect(queryContainer(".frame-name input")).toBe(null);
+    });
+    expect(h.elements.find((element) => element.id === frame.id)).toMatchObject(
+      { name: "committed" },
+    );
+  });
+
+  it("clears held-key state before interaction is re-enabled", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    // If the keyup occurs while non-interactive, App's keyup listener is not
+    // attached. The transition itself must therefore clear this state.
+    Keyboard.keyDown(" ");
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={false}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    await waitFor(() => expect(h.state.viewModeEnabled).toBe(true));
+    Keyboard.keyUp(" ");
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+    );
+    await waitFor(() => expect(h.state.viewModeEnabled).toBe(false));
+
+    act(() => h.app.setActiveTool({ type: "rectangle" }));
+    mouse.downAt(20, 20);
+    mouse.moveTo(80, 70);
+    mouse.upAt(80, 70);
+    expect(h.elements).toHaveLength(1);
+  });
+
+  it("closes native-listener interaction surfaces when disabled", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    Keyboard.keyPress("i");
+    await waitFor(() => {
+      expect(queryContainer(".excalidraw-eye-dropper-preview")).not.toBe(null);
+    });
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={false}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    await waitFor(() => {
+      expect(queryContainer(".excalidraw-eye-dropper-preview")).toBe(null);
+    });
   });
 });
 

@@ -370,7 +370,10 @@ export interface AppState {
     outline: boolean;
     clip: boolean;
   };
-  editingFrame: string | null;
+  /**
+   * frame-like element whose name is currently being edited
+   */
+  editingFrame: ExcalidrawFrameLikeElement["id"] | null;
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
@@ -744,7 +747,7 @@ export interface ExcalidrawProps {
    * Whether the editor UI (chrome) is rendered — toolbar, menus, footer,
    * sidebars, dialogs, popups, context menu. Canvas content (elements,
    * text editing surface, frame names, embeds) still renders, and the editor
-   * remains interactive unless `interactive` is set to `false`.
+   * remains interactive unless `interaction` is set to `false`.
    *
    * @default true
    */
