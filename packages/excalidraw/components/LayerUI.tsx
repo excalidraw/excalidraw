@@ -316,7 +316,6 @@ const LayerUI = ({
               !appState.viewModeEnabled &&
               shouldRenderSelectedShapeActions && (
                 <PenModeButton
-                  zenModeEnabled={appState.zenModeEnabled}
                   checked={appState.penMode}
                   onChange={() => onPenModeToggle(null)}
                   title={t("toolBar.penMode")}

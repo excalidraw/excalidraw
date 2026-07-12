@@ -207,7 +207,6 @@ export const Toolbar = ({
             floating button below the compact actions menu */}
         {!isCompactStylesPanel && (
           <PenModeButton
-            zenModeEnabled={appState.zenModeEnabled}
             checked={appState.penMode}
             onChange={() => onPenModeToggle(null)}
             title={t("toolBar.penMode")}

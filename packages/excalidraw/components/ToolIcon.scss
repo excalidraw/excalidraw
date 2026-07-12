@@ -25,15 +25,9 @@
     }
   }
 
-  .ToolIcon_type_checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  // a <button> replacement for the radio-input ToolIcon — resets the native
-  // button chrome; state styling lives on the inner .ToolIcon__icon
-  // (see toolbarButtonColorStates)
+  // a <button> replacement for the former radio/checkbox-input ToolIcon —
+  // resets the native button chrome; state styling lives on the inner
+  // .ToolIcon__icon (see toolbarButtonColorStates)
   .ToolIcon_type_toggle {
     appearance: none;
     margin: 0;

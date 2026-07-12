@@ -30,11 +30,9 @@ $color-blue-8: #1971c2;
 }
 
 // the .ToolIcon_type_toggle.ToolIcon--checked selectors use both classes so
-// they keep outranking the :hover/:active rules below, same as the :checked
-// selectors do
+// they keep outranking the :hover/:active rules below
 @mixin toolbarButtonColorStates {
   &.fillable {
-    .ToolIcon_type_checkbox:checked + .ToolIcon__icon,
     &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
       --icon-fill-color: var(--color-on-primary-container);
 
@@ -44,7 +42,6 @@ $color-blue-8: #1971c2;
     }
   }
 
-  .ToolIcon_type_checkbox:checked + .ToolIcon__icon,
   &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
     background: var(--color-surface-primary-container);
     --keybinding-color: var(--color-on-primary-container);
