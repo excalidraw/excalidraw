@@ -24,6 +24,7 @@ import {
   LassoIcon,
   handIcon,
   frameToolIcon,
+  EmbedIcon,
 } from "./icons";
 
 import type {
@@ -123,6 +124,9 @@ export const TOOLS = defineTools({
   frame: {
     icon: frameToolIcon,
     letterKey: KEYS.F,
+  },
+  embeddable: {
+    icon: EmbedIcon,
   },
   laser: {
     icon: laserPointerToolIcon,

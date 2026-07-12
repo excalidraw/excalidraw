@@ -130,7 +130,6 @@ export type ActionName =
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"
-  | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"
