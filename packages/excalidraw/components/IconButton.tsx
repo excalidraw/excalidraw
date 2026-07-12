@@ -27,7 +27,6 @@ type IconButtonBaseProps = {
   showAriaLabel?: boolean;
   hidden?: boolean;
   visible?: boolean;
-  selected?: boolean;
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -119,7 +118,6 @@ export const IconButton = React.forwardRef(
               : "ToolIcon_type_button--hide",
             {
               ToolIcon: !props.hidden,
-              "ToolIcon--selected": props.selected,
               "ToolIcon--plain": props.type === "icon",
             },
           )}
@@ -164,6 +162,7 @@ export const IconButton = React.forwardRef(
           "ToolIcon--checked": props.checked,
         })}
         type="button"
+        style={props.style}
         title={props.title}
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}

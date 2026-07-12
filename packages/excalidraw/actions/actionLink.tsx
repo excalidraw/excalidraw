@@ -47,7 +47,7 @@ export const actionLink = register({
 
     return (
       <IconButton
-        type="button"
+        type="toggle"
         icon={LinkIcon}
         aria-label={t(
           getContextMenuLabel(getNonDeletedElements(elements), appState),
@@ -57,8 +57,8 @@ export const actionLink = register({
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
-        onClick={() => updateData(null)}
-        selected={selectedElements.length === 1 && !!selectedElements[0].link}
+        onSelect={() => updateData(null)}
+        checked={selectedElements.length === 1 && !!selectedElements[0].link}
       />
     );
   },

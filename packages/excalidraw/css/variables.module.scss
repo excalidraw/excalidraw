@@ -120,7 +120,8 @@ $color-blue-8: #1971c2;
     border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
-  &.active {
+  &.active,
+  &.ToolIcon--checked {
     background-color: var(
       --button-selected-bg,
       var(--color-surface-primary-container)
