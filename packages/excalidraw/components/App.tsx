@@ -331,7 +331,6 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -465,7 +464,7 @@ import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByKey, TOGGLE_TOOLS } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -4001,7 +4000,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setActiveTool(
         { type: this.state.preferredSelectionTool.type },
-        true,
+        { keepSelection: true },
       );
       event?.preventDefault();
     },
@@ -4152,7 +4151,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
+    this.setActiveTool(
+      { type: this.state.preferredSelectionTool.type },
+      { keepSelection: true },
+    );
 
     if (opts.fit) {
       this.setViewport({
@@ -4424,7 +4426,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
+    this.setActiveTool({ type: "hand" }, { toggle: true });
   };
 
   /**
@@ -5342,7 +5344,10 @@ class App extends React.Component<AppProps, AppState> {
               type: this.state.preferredSelectionTool.type,
             });
           } else {
-            this.setActiveTool({ type: shape });
+            this.setActiveTool(
+              { type: shape },
+              { toggle: TOGGLE_TOOLS.includes(shape) },
+            );
           }
 
           event.stopPropagation();
@@ -5778,8 +5783,17 @@ class App extends React.Component<AppProps, AppState> {
       locked?: boolean;
       fromSelection?: boolean;
     },
-    keepSelection = false,
+    opts: {
+      keepSelection?: boolean;
+      /**
+       * when the tool is already active, switch back to the previously
+       * active tool (recorded on activation) instead
+       */
+      toggle?: boolean;
+    } = {},
   ) => {
+    const { keepSelection = false, toggle = false } = opts;
+
     if (!this.isToolSupported(tool.type)) {
       console.warn(
         `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
@@ -5787,7 +5801,21 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
+    const nextActiveTool = toggle
+      ? this.state.activeTool.type === tool.type
+        ? // toggle back to the tool that was active before this one
+          updateActiveTool(this.state, {
+            ...(this.state.activeTool.lastActiveTool || {
+              type: this.state.preferredSelectionTool.type,
+            }),
+            lastActiveTool: null,
+          })
+        : // record the currently active tool so we can toggle back to it
+          updateActiveTool(this.state, {
+            ...tool,
+            lastActiveTool: this.state.activeTool,
+          })
+      : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -8161,7 +8189,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           activeTool: updateActiveTool(this.state, {
             type: TOOL_TYPE.eraser,
-            lastActiveToolBeforeEraser: this.state.activeTool,
+            lastActiveTool: this.state.activeTool,
           }),
         },
         () => {
@@ -8175,7 +8203,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...(this.state.activeTool.lastActiveTool || {
                     type: TOOL_TYPE.selection,
                   }),
-                  lastActiveToolBeforeEraser: null,
+                  lastActiveTool: null,
                 }),
               });
             }
@@ -10684,7 +10712,7 @@ class App extends React.Component<AppProps, AppState> {
         if (event.altKey) {
           this.setActiveTool(
             { type: "lasso", fromSelection: true },
-            event.shiftKey,
+            { keepSelection: event.shiftKey },
           );
           this.lassoTrail.startPath(
             pointerDownState.origin.x,

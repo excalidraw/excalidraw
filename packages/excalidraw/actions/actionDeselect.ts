@@ -9,6 +9,8 @@ import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
 
 import type { GroupId } from "@excalidraw/element/types";
 
+import { TOGGLE_TOOLS } from "../components/shapes";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
@@ -17,12 +19,12 @@ const getNextActiveTool = (
   appState: Readonly<AppState>,
   app: AppClassProperties,
 ) => {
-  if (appState.activeTool.type === "eraser") {
+  if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
     return updateActiveTool(appState, {
       ...(appState.activeTool.lastActiveTool || {
         type: app.state.preferredSelectionTool.type,
       }),
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
     });
   }
 

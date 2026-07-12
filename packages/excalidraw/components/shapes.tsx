@@ -15,7 +15,7 @@ import {
   handIcon,
 } from "./icons";
 
-import type { AppClassProperties } from "../types";
+import type { AppClassProperties, ToolType } from "../types";
 
 export const SHAPES = [
   {
@@ -115,6 +115,15 @@ export const SHAPES = [
     toolbar: false,
   },
 ] as const;
+
+/**
+ * tools that, when activated while already active, switch back to the
+ * previously active tool (see `setActiveTool`'s `toggle` option)
+ */
+export const TOGGLE_TOOLS: readonly (ToolType | "custom")[] = [
+  "hand",
+  "eraser",
+];
 
 export const getToolbarTools = (app: AppClassProperties) => {
   return app.state.preferredSelectionTool.type === "lasso"

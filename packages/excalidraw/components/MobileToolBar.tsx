@@ -12,6 +12,7 @@ import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
 
 import { HandButton } from "./HandButton";
+import { TOGGLE_TOOLS } from "./shapes";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ToolPopover } from "./ToolPopover";
@@ -137,7 +138,22 @@ export const MobileToolBar = ({
         app.setActiveTool({ type: "selection" });
       }
     } else {
-      app.setActiveTool({ type: toolType as ToolType });
+      const isToggleTool = TOGGLE_TOOLS.includes(toolType as ToolType);
+
+      if (app.state.activeTool.type !== toolType) {
+        // `toggle` records the current tool so ESC (and re-tap, below) can
+        // switch back to it
+        app.setActiveTool(
+          { type: toolType as ToolType },
+          { toggle: isToggleTool },
+        );
+      } else if (
+        isToggleTool &&
+        (pointerType === "touch" || pointerType === "pen")
+      ) {
+        // toggle back on re-tap only on touch devices
+        app.setActiveTool({ type: toolType as ToolType }, { toggle: true });
+      }
     }
   };
 
@@ -258,7 +274,9 @@ export const MobileToolBar = ({
         title={`${capitalizeString(t("toolBar.eraser"))}`}
         aria-label={capitalizeString(t("toolBar.eraser"))}
         data-testid="toolbar-eraser"
-        onChange={() => handleToolChange("eraser")}
+        onChange={({ pointerType }) =>
+          handleToolChange("eraser", pointerType ?? undefined)
+        }
       />
 
       {/* Rectangle */}

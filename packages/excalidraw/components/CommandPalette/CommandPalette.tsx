@@ -52,9 +52,10 @@ import {
   brainIconThin,
   LibraryIcon,
   historyCommandIcon,
+  LassoIcon,
 } from "../icons";
 
-import { SHAPES } from "../shapes";
+import { SHAPES, TOGGLE_TOOLS } from "../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -357,10 +358,20 @@ function CommandPaletteInner({
         ),
       );
       const toolCommands: CommandPaletteItem[] = [
-        actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
-        actionManager.actions.toggleLassoTool,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
+
+      toolCommands.push({
+        label: t("toolBar.lasso"),
+        category: DEFAULT_CATEGORIES.tools,
+        icon: LassoIcon,
+        keywords: ["toolbar"],
+        viewMode: false,
+        predicate: () => app.state.preferredSelectionTool.type !== "lasso",
+        perform: () => {
+          app.setActiveTool({ type: "lasso" }, { toggle: true });
+        },
+      });
 
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
@@ -539,14 +550,11 @@ function CommandPaletteInner({
             icon,
             keywords: ["toolbar"],
             viewMode: false,
-            perform: ({ event }) => {
-              if (value === "image") {
-                app.setActiveTool({
-                  type: value,
-                });
-              } else {
-                app.setActiveTool({ type: value });
-              }
+            perform: () => {
+              app.setActiveTool(
+                { type: value },
+                { toggle: TOGGLE_TOOLS.includes(value) },
+              );
             },
           };
 

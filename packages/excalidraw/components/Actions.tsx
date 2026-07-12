@@ -26,7 +26,7 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { getToolbarTools } from "./shapes";
+import { getToolbarTools, TOGGLE_TOOLS } from "./shapes";
 
 import "./Actions.scss";
 
@@ -1022,19 +1022,34 @@ export const ShapesSwitcher = ({
                   }
                 }
               }}
-              onClick={(event) => {
+              onClick={(event, data) => {
                 // pointer gestures on the selection button are fully handled
                 // on pointer-down above — `detail === 0` means keyboard or AT
                 // activation, which gets no pointer-down
                 const handledOnPointerDown =
                   value === "selection" && event.detail > 0;
 
-                if (
-                  !handledOnPointerDown &&
-                  app.state.activeTool.type !== value
-                ) {
-                  trackEvent("toolbar", value, "ui");
-                  app.setActiveTool({ type: value });
+                const isToggleTool = TOGGLE_TOOLS.includes(value);
+
+                if (!handledOnPointerDown) {
+                  if (app.state.activeTool.type !== value) {
+                    trackEvent("toolbar", value, "ui");
+                    // `toggle` records the current tool so ESC (and re-tap,
+                    // below) can switch back to it
+                    app.setActiveTool(
+                      { type: value },
+                      { toggle: isToggleTool },
+                    );
+                  } else if (
+                    isToggleTool &&
+                    (data?.pointerType === "touch" ||
+                      data?.pointerType === "pen")
+                  ) {
+                    // toggle back on re-tap only on touch devices — on
+                    // desktop, re-clicking the active tool is a no-op
+                    // (keyboard shortcut & ESC toggle back instead)
+                    app.setActiveTool({ type: value }, { toggle: true });
+                  }
                 }
 
                 // Apply the pen detection captured on pointer-down now that

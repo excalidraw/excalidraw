@@ -38,6 +38,7 @@ import type {
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
+import { TOGGLE_TOOLS } from "../components/shapes";
 import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
@@ -325,12 +326,12 @@ export const actionFinalize = register<FormData>({
     }
 
     let activeTool: AppState["activeTool"];
-    if (appState.activeTool.type === "eraser") {
+    if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
           type: app.state.preferredSelectionTool.type,
         }),
-        lastActiveToolBeforeEraser: null,
+        lastActiveTool: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
