@@ -29,6 +29,7 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isValid, setIsValid] = useState(true);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
@@ -44,6 +45,9 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setIsValid(true);
+      } else {
+        setIsValid(false);
       }
       setInnerValue(value);
     },
@@ -68,7 +72,12 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div className="color-picker-input-wrapper">
+      <div
+        className={clsx("color-picker__input-label", {
+          "color-picker__input-label--error": !isValid && innerValue !== "",
+        })}
+      >
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -82,6 +91,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsValid(true);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -128,6 +138,12 @@ export const ColorInput = ({
             {eyeDropperIcon}
           </div>
         </>
+      )}
+      </div>
+      {!isValid && innerValue !== "" && (
+        <div className="color-picker__input-error">
+          {t("errors.invalidColor")}
+        </div>
       )}
     </div>
   );
