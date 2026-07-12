@@ -369,7 +369,7 @@ function CommandPaletteInner({
         viewMode: false,
         predicate: () => app.state.preferredSelectionTool.type !== "lasso",
         perform: () => {
-          app.setActiveTool({ type: "lasso" }, { toggle: true });
+          app.setActiveTool({ type: "lasso" });
         },
       });
 
@@ -551,9 +551,15 @@ function CommandPaletteInner({
             keywords: ["toolbar"],
             viewMode: false,
             perform: () => {
+              // `toggle` records the current tool so ESC can switch back to
+              // it; guarded so re-running the command doesn't toggle back
               app.setActiveTool(
                 { type: value },
-                { toggle: TOGGLE_TOOLS.includes(value) },
+                {
+                  toggle:
+                    TOGGLE_TOOLS.includes(value) &&
+                    app.state.activeTool.type !== value,
+                },
               );
             },
           };

@@ -126,7 +126,7 @@ export const MobileToolBar = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
-  const handleToolChange = (toolType: string, pointerType?: string) => {
+  const handleToolChange = (toolType: string) => {
     if (app.state.activeTool.type !== toolType) {
       trackEvent("toolbar", toolType, "ui");
     }
@@ -137,23 +137,12 @@ export const MobileToolBar = ({
       } else {
         app.setActiveTool({ type: "selection" });
       }
-    } else {
-      const isToggleTool = TOGGLE_TOOLS.includes(toolType as ToolType);
-
-      if (app.state.activeTool.type !== toolType) {
-        // `toggle` records the current tool so ESC (and re-tap, below) can
-        // switch back to it
-        app.setActiveTool(
-          { type: toolType as ToolType },
-          { toggle: isToggleTool },
-        );
-      } else if (
-        isToggleTool &&
-        (pointerType === "touch" || pointerType === "pen")
-      ) {
-        // toggle back on re-tap only on touch devices
-        app.setActiveTool({ type: toolType as ToolType }, { toggle: true });
-      }
+    } else if (app.state.activeTool.type !== toolType) {
+      // `toggle` records the current tool so ESC can switch back to it
+      app.setActiveTool(
+        { type: toolType as ToolType },
+        { toggle: TOGGLE_TOOLS.includes(toolType as ToolType) },
+      );
     }
   };
 
@@ -274,9 +263,7 @@ export const MobileToolBar = ({
         title={`${capitalizeString(t("toolBar.eraser"))}`}
         aria-label={capitalizeString(t("toolBar.eraser"))}
         data-testid="toolbar-eraser"
-        onChange={({ pointerType }) =>
-          handleToolChange("eraser", pointerType ?? undefined)
-        }
+        onChange={() => handleToolChange("eraser")}
       />
 
       {/* Rectangle */}

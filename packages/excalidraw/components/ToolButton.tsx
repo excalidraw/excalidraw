@@ -63,12 +63,14 @@ type ToolButtonProps =
   | (ToolButtonBaseProps & {
       type: "toggle";
       checked: boolean;
-      onClick?(
-        event: React.MouseEvent,
-        // pointerType is null for keyboard/AT activation
-        data?: { pointerType: PointerType | null },
-      ): void;
-      onPointerDown?(data: { pointerType: PointerType }): void;
+      /**
+       * Fired on activation — a completed pointer gesture (via `click`, so a
+       * press canceled by sliding off the button doesn't select) or
+       * keyboard/AT activation, in which case pointerType is null.
+       * pointerType is captured on pointer-down, where it's reliable
+       * (unlike the click event's own pointerType on iOS).
+       */
+      onSelect?(data: { pointerType: PointerType | null }): void;
     });
 
 export const ToolButton = React.forwardRef(
@@ -198,17 +200,14 @@ export const ToolButton = React.forwardRef(
           data-testid={props["data-testid"]}
           onPointerDown={(event) => {
             lastPointerTypeRef.current = event.pointerType || null;
-            props.onPointerDown?.({ pointerType: event.pointerType || null });
           }}
           onPointerUp={() => {
             requestAnimationFrame(() => {
               lastPointerTypeRef.current = null;
             });
           }}
-          onClick={(event) => {
-            props.onClick?.(event, {
-              pointerType: lastPointerTypeRef.current,
-            });
+          onClick={() => {
+            props.onSelect?.({ pointerType: lastPointerTypeRef.current });
           }}
           ref={innerRef}
         >

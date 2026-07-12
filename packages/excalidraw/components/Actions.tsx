@@ -898,11 +898,6 @@ export const ShapesSwitcher = ({
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
 
-  // a pen detected on a tool button's pointer-down, to be applied (enabling
-  // pen mode) only after the tap's `change` has committed — see the tool
-  // button handlers below
-  const pendingPenDetectionRef = useRef(false);
-
   const SELECTION_TOOLS = [
     {
       type: "selection",
@@ -1000,64 +995,31 @@ export const ShapesSwitcher = ({
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
-              onPointerDown={({ pointerType }) => {
-                // Detect the pen here (pointerType is reliable on pointer-down)
-                // but DON'T enable pen mode yet: calling setState mid-gesture
-                // re-renders the toolbar and, on iOS/iPadOS, can abort the
-                // ensuing click so the tool isn't selected on the first pen
-                // tap. Defer it until the tap's `click` has committed (below).
+              onSelect={({ pointerType }) => {
                 if (!app.state.penDetected && pointerType === "pen") {
-                  pendingPenDetectionRef.current = true;
+                  app.togglePenMode(true);
                 }
 
-                if (value === "selection") {
-                  // toggle selection ⇄ lasso on pointer-down (also gives pen
-                  // and touch immediate feedback); the ensuing `click` skips
-                  // pointer gestures on this button so it doesn't override
-                  // the toggle
-                  if (app.state.activeTool.type === "selection") {
-                    app.setActiveTool({ type: "lasso" });
-                  } else {
-                    app.setActiveTool({ type: "selection" });
-                  }
-                }
-              }}
-              onClick={(event, data) => {
-                // pointer gestures on the selection button are fully handled
-                // on pointer-down above — `detail === 0` means keyboard or AT
-                // activation, which gets no pointer-down
-                const handledOnPointerDown =
-                  value === "selection" && event.detail > 0;
-
-                const isToggleTool = TOGGLE_TOOLS.includes(value);
-
-                if (!handledOnPointerDown) {
-                  if (app.state.activeTool.type !== value) {
-                    trackEvent("toolbar", value, "ui");
-                    // `toggle` records the current tool so ESC (and re-tap,
-                    // below) can switch back to it
-                    app.setActiveTool(
-                      { type: value },
-                      { toggle: isToggleTool },
-                    );
-                  } else if (
-                    isToggleTool &&
-                    (data?.pointerType === "touch" ||
-                      data?.pointerType === "pen")
-                  ) {
-                    // toggle back on re-tap only on touch devices — on
-                    // desktop, re-clicking the active tool is a no-op
-                    // (keyboard shortcut & ESC toggle back instead)
-                    app.setActiveTool({ type: value }, { toggle: true });
-                  }
+                if (
+                  value === "selection" &&
+                  app.state.activeTool.type === "selection" &&
+                  pointerType !== null
+                ) {
+                  // pointer-clicking the active selection tool switches to
+                  // lasso; keyboard/AT activation stays on selection
+                  app.setActiveTool({ type: "lasso" });
+                  return;
                 }
 
-                // Apply the pen detection captured on pointer-down now that
-                // the tap has committed. rAF keeps the resulting re-render out
-                // of the `click` event itself.
-                if (pendingPenDetectionRef.current) {
-                  pendingPenDetectionRef.current = false;
-                  requestAnimationFrame(() => app.togglePenMode(true));
+                if (app.state.activeTool.type !== value) {
+                  trackEvent("toolbar", value, "ui");
+                  // `toggle` records the current tool so ESC can switch back
+                  // to it; re-clicking a toggle tool is itself a no-op (the
+                  // keyboard shortcut and ESC toggle back instead)
+                  app.setActiveTool(
+                    { type: value },
+                    { toggle: TOGGLE_TOOLS.includes(value) },
+                  );
                 }
               }}
             />
