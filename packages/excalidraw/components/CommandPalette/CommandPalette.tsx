@@ -6,7 +6,6 @@ import {
   DEFAULT_SIDEBAR,
   EVENT,
   KEYS,
-  capitalizeString,
   isWritableElement,
 } from "@excalidraw/common";
 
@@ -55,7 +54,7 @@ import {
   LassoIcon,
 } from "../icons";
 
-import { SHAPES, TOGGLE_TOOLS } from "../shapes";
+import { TOOLS, TOGGLE_TOOLS, getToolLetter } from "../Tools";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -77,6 +76,7 @@ import * as defaultItems from "./defaultCommandPaletteItems";
 import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
+import type { ToolbarToolType } from "../Tools";
 import type { AppProps, AppState, LibraryItem, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
@@ -525,49 +525,55 @@ function CommandPaletteInner({
             }));
           },
         },
-        ...SHAPES.reduce((acc: CommandPaletteItem[], shape) => {
-          const { value, icon, key, numericKey } = shape;
+        ...(Object.keys(TOOLS) as ToolbarToolType[]).reduce(
+          (acc: CommandPaletteItem[], value) => {
+            const config = TOOLS[value];
 
-          if (
-            appProps.UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
-            ] === false
-          ) {
+            // lasso gets its own entry (with a predicate) above
+            if (value === "lasso") {
+              return acc;
+            }
+
+            if (
+              appProps.UIOptions.tools?.[
+                value as Extract<
+                  typeof value,
+                  keyof AppProps["UIOptions"]["tools"]
+                >
+              ] === false
+            ) {
+              return acc;
+            }
+
+            const shortcut = getToolLetter(value) || config.numericKey;
+
+            const command: CommandPaletteItem = {
+              label: t(`toolBar.${value}`),
+              category: DEFAULT_CATEGORIES.tools,
+              shortcut,
+              icon: config.icon,
+              keywords: ["toolbar"],
+              viewMode: false,
+              perform: () => {
+                // `toggle` records the current tool so ESC can switch back to
+                // it; guarded so re-running the command doesn't toggle back
+                app.setActiveTool(
+                  { type: value },
+                  {
+                    toggle:
+                      TOGGLE_TOOLS.includes(value) &&
+                      app.state.activeTool.type !== value,
+                  },
+                );
+              },
+            };
+
+            acc.push(command);
+
             return acc;
-          }
-
-          const letter =
-            key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter || numericKey;
-
-          const command: CommandPaletteItem = {
-            label: t(`toolBar.${value}`),
-            category: DEFAULT_CATEGORIES.tools,
-            shortcut,
-            icon,
-            keywords: ["toolbar"],
-            viewMode: false,
-            perform: () => {
-              // `toggle` records the current tool so ESC can switch back to
-              // it; guarded so re-running the command doesn't toggle back
-              app.setActiveTool(
-                { type: value },
-                {
-                  toggle:
-                    TOGGLE_TOOLS.includes(value) &&
-                    app.state.activeTool.type !== value,
-                },
-              );
-            },
-          };
-
-          acc.push(command);
-
-          return acc;
-        }, []),
+          },
+          [],
+        ),
         ...toolCommands,
         {
           label: t("toolBar.lock"),

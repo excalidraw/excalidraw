@@ -38,7 +38,7 @@ import type {
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
-import { TOGGLE_TOOLS } from "../components/shapes";
+import { TOGGLE_TOOLS } from "../components/Tools";
 import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";

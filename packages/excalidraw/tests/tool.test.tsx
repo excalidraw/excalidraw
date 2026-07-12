@@ -4,7 +4,7 @@ import { resolvablePromise } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
-import { getToolbarTools } from "../components/shapes";
+import { findShapeByKey } from "../components/Tools";
 
 import { Pointer } from "./helpers/ui";
 import { act, render } from "./test-utils";
@@ -68,27 +68,29 @@ describe("setActiveTool()", () => {
     expect(h.state.activeTool.customType).toBe("comment");
   });
 });
-describe("getToolbarTools()", () => {
-  const getToolValues = (preferredSelectionTool: "selection" | "lasso") =>
-    getToolbarTools({
+describe("findShapeByKey()", () => {
+  const appWithPreferredTool = (
+    preferredSelectionTool: "selection" | "lasso",
+  ) =>
+    ({
       state: {
         preferredSelectionTool: {
           type: preferredSelectionTool,
         },
       },
-    } as AppClassProperties).map((tool) => tool.value);
+    } as AppClassProperties);
 
-  it("does not include lasso when selection is preferred", () => {
-    const toolValues = getToolValues("selection");
+  it("selection shortcuts activate selection when it's preferred", () => {
+    const app = appWithPreferredTool("selection");
 
-    expect(toolValues.filter((value) => value === "selection")).toHaveLength(1);
-    expect(toolValues.filter((value) => value === "lasso")).toHaveLength(0);
+    expect(findShapeByKey("v", app)).toBe("selection");
+    expect(findShapeByKey("1", app)).toBe("selection");
   });
 
-  it("replaces selection with lasso when lasso is preferred", () => {
-    const toolValues = getToolValues("lasso");
+  it("selection shortcuts activate lasso when it's preferred", () => {
+    const app = appWithPreferredTool("lasso");
 
-    expect(toolValues.filter((value) => value === "lasso")).toHaveLength(1);
-    expect(toolValues.filter((value) => value === "selection")).toHaveLength(0);
+    expect(findShapeByKey("v", app)).toBe("lasso");
+    expect(findShapeByKey("1", app)).toBe("lasso");
   });
 });

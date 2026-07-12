@@ -12,7 +12,7 @@ import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
 
 import { HandButton } from "./HandButton";
-import { TOGGLE_TOOLS } from "./shapes";
+import { TOGGLE_TOOLS } from "./Tools";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ToolPopover } from "./ToolPopover";

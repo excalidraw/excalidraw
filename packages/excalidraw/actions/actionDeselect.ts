@@ -9,7 +9,7 @@ import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
 
 import type { GroupId } from "@excalidraw/element/types";
 
-import { TOGGLE_TOOLS } from "../components/shapes";
+import { TOGGLE_TOOLS } from "../components/Tools";
 
 import { register } from "./register";
 
