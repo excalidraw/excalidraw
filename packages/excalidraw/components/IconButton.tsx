@@ -13,16 +13,16 @@ import Spinner from "./Spinner";
 
 import type { CSSProperties } from "react";
 
-export type ToolButtonSize = "small" | "medium";
+export type IconButtonSize = "small" | "medium";
 
-type ToolButtonBaseProps = {
+type IconButtonBaseProps = {
   icon?: React.ReactNode;
   "aria-label": string;
   "aria-keyshortcuts"?: string;
   "data-testid"?: string;
   label?: string;
   title?: string;
-  size?: ToolButtonSize;
+  size?: IconButtonSize;
   keyBindingLabel?: string | null;
   showAriaLabel?: boolean;
   hidden?: boolean;
@@ -34,19 +34,19 @@ type ToolButtonBaseProps = {
   isLoading?: boolean;
 };
 
-type ToolButtonProps =
-  | (ToolButtonBaseProps & {
+type IconButtonProps =
+  | (IconButtonBaseProps & {
       type: "button";
       children?: React.ReactNode;
       onClick?(event: React.MouseEvent): void;
     })
-  | (ToolButtonBaseProps & {
+  | (IconButtonBaseProps & {
       type: "icon";
       children?: React.ReactNode;
       onClick?(): void;
     })
   // a stateful (pressed/unpressed) tool button
-  | (ToolButtonBaseProps & {
+  | (IconButtonBaseProps & {
       type: "toggle";
       checked: boolean;
       /**
@@ -59,14 +59,14 @@ type ToolButtonProps =
       onSelect?(data: { pointerType: PointerType | null }): void;
     });
 
-export const ToolButton = React.forwardRef(
+export const IconButton = React.forwardRef(
   (
     {
       size = "medium",
       visible = true,
       className = "",
       ...props
-    }: ToolButtonProps,
+    }: IconButtonProps,
     ref,
   ) => {
     const innerRef = React.useRef(null);
@@ -195,4 +195,4 @@ export const ToolButton = React.forwardRef(
   },
 );
 
-ToolButton.displayName = "ToolButton";
+IconButton.displayName = "IconButton";

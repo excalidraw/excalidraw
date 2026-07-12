@@ -81,7 +81,7 @@ import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 
 import "./ConvertElementTypePopup.scss";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import {
   DiamondIcon,
   elbowArrowIcon,
@@ -332,7 +332,7 @@ const Panel = ({
               getLinearElementSubType(linearElements[0]) === type));
 
         return (
-          <ToolButton
+          <IconButton
             key={`${elements[0].id}${elements[0].version}_${type}`}
             type="toggle"
             icon={icon}

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import { laserPointerToolIcon } from "./icons";
 
 type LaserPointerButtonProps = {
@@ -12,7 +12,7 @@ type LaserPointerButtonProps = {
 
 export const LaserPointerButton = (props: LaserPointerButtonProps) => {
   return (
-    <ToolButton
+    <IconButton
       className={clsx("ToolIcon__LaserPointer", {
         "is-mobile": props.isMobile,
       })}

@@ -7,7 +7,7 @@ import { KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
 import { t } from "../i18n";
@@ -46,7 +46,7 @@ export const actionLink = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={LinkIcon}
         aria-label={t(

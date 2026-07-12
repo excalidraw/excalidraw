@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 
 import type { JSX } from "react";
 
@@ -12,7 +12,7 @@ export const ElementCanvasButton = (props: {
   isMobile?: boolean;
 }) => {
   return (
-    <ToolButton
+    <IconButton
       className={clsx("ToolIcon__MagicButton", {
         "is-mobile": props.isMobile,
       })}

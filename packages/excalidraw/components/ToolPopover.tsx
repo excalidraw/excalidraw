@@ -7,7 +7,7 @@ import { Popover } from "radix-ui";
 
 import { trackEvent } from "../analytics";
 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 
 import "./ToolPopover.scss";
 
@@ -64,7 +64,7 @@ export const ToolPopover = ({
   return (
     <Popover.Root open={isPopupOpen}>
       <Popover.Trigger asChild>
-        <ToolButton
+        <IconButton
           className={clsx({ fillable: displayedOption.fillable })}
           type="toggle"
           icon={displayedOption.icon}
@@ -85,7 +85,7 @@ export const ToolPopover = ({
         collisionBoundary={container ?? undefined}
       >
         {options.map(({ type, icon, title, fillable }) => (
-          <ToolButton
+          <IconButton
             className={clsx({ fillable })}
             key={type}
             type="toggle"

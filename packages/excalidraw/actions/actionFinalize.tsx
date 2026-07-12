@@ -39,7 +39,7 @@ import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
 import { TOGGLE_TOOLS } from "../components/Tools";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 
 import { register } from "./register";
 
@@ -399,7 +399,7 @@ export const actionFinalize = register<FormData>({
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
-    <ToolButton
+    <IconButton
       type="button"
       icon={done}
       title={t("buttons.done")}

@@ -7,7 +7,7 @@ import type { PointerType } from "@excalidraw/element/types";
 import { trackEvent } from "../analytics";
 import { t } from "../i18n";
 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import { ToolPopover } from "./ToolPopover";
 import {
   SelectionIcon,
@@ -240,7 +240,7 @@ const createToolButton = (
     const shortcut = hideShortcut ? null : getToolShortcut(shortcutType);
 
     return (
-      <ToolButton
+      <IconButton
         className={clsx({ fillable: config.fillable })}
         type="toggle"
         icon={config.icon}
@@ -276,7 +276,7 @@ const createToolButton = (
     );
   };
 
-  ToolButtonComponent.displayName = `${capitalizeString(type)}ToolButton`;
+  ToolButtonComponent.displayName = `${capitalizeString(type)}IconButton`;
 
   return ToolButtonComponent;
 };

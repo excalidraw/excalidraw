@@ -18,7 +18,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   MoonIcon,
@@ -148,7 +148,7 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-in-button zoom-button"
         icon={ZoomInIcon}
@@ -193,7 +193,7 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-out-button zoom-button"
         icon={ZoomOutIcon}
@@ -245,7 +245,7 @@ export const actionResetZoom = register({
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
       <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
-        <ToolButton
+        <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
           title={t("buttons.resetZoom")}
@@ -255,7 +255,7 @@ export const actionResetZoom = register({
           }}
         >
           {(zoomValue * 100).toFixed(0)}%
-        </ToolButton>
+        </IconButton>
       </Tooltip>
     );
   },

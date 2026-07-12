@@ -16,7 +16,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
 
@@ -98,7 +98,7 @@ export const actionToggleLinearEditor = register({
         : "labels.lineEditor.edit",
     );
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={lineEditorIcon}
         title={label}

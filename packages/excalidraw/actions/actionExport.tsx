@@ -9,7 +9,7 @@ import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
 import { Toast } from "../components/Toast";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
@@ -377,7 +377,7 @@ export const actionSaveFileToDisk = register({
     event.shiftKey &&
     event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ updateData }) => (
-    <ToolButton
+    <IconButton
       type="button"
       icon={saveAs}
       title={t("buttons.saveAs")}
