@@ -32,16 +32,16 @@ import {
 } from "./icons";
 
 import "./ToolIcon.scss";
-import "./MobileToolBar.scss";
+import "./MobileToolbar.scss";
 
 import type { AppClassProperties, UIAppState } from "../types";
 
-type MobileToolBarProps = {
+type MobileToolbarProps = {
   app: AppClassProperties;
   setAppState: React.Component<any, UIAppState>["setState"];
 };
 
-export const MobileToolBar = ({ app, setAppState }: MobileToolBarProps) => {
+export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
