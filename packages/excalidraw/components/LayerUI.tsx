@@ -27,13 +27,8 @@ import { useAtom, useAtomValue } from "../editor-jotai";
 import { t } from "../i18n";
 import { getScrollToContentState } from "../scene";
 
-import {
-  SelectedShapeActions,
-  ShapesSwitcher,
-  CompactShapeActions,
-} from "./Actions";
+import { SelectedShapeActions, CompactShapeActions } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
-import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
@@ -55,12 +50,12 @@ import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HelpDialog } from "./HelpDialog";
-import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
+import { Toolbar } from "./Toolbar";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -85,7 +80,6 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -145,7 +139,6 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
-  onHandToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
@@ -323,7 +316,6 @@ const LayerUI = ({
               !appState.viewModeEnabled &&
               shouldRenderSelectedShapeActions && (
                 <PenModeButton
-                  zenModeEnabled={appState.zenModeEnabled}
                   checked={appState.penMode}
                   onChange={() => onPenModeToggle(null)}
                   title={t("toolBar.penMode")}
@@ -347,50 +339,15 @@ const LayerUI = ({
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <Island
-                          padding={spacing.islandPadding}
-                          className={clsx("App-toolbar", {
-                            "zen-mode": appState.zenModeEnabled,
-                            "App-toolbar--compact": isCompactStylesPanel,
-                          })}
-                          data-viewport-ui="top"
-                        >
-                          <HintViewer
-                            appState={appState}
-                            isMobile={editorInterface.formFactor === "phone"}
-                            editorInterface={editorInterface}
-                            app={app}
-                          />
-                          {heading}
-                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
-                            {/* in compact UI the pen mode button is rendered
-                                as a separate floating button below the compact
-                                actions menu */}
-                            {!isCompactStylesPanel && (
-                              <PenModeButton
-                                zenModeEnabled={appState.zenModeEnabled}
-                                checked={appState.penMode}
-                                onChange={() => onPenModeToggle(null)}
-                                title={t("toolBar.penMode")}
-                                penDetected={appState.penDetected}
-                              />
-                            )}
-                            <LockButton
-                              checked={appState.activeTool.locked}
-                              onChange={onLockToggle}
-                              title={t("toolBar.lock")}
-                            />
-
-                            <div className="App-toolbar__divider" />
-
-                            <ShapesSwitcher
-                              setAppState={setAppState}
-                              activeTool={appState.activeTool}
-                              UIOptions={UIOptions}
-                              app={app}
-                            />
-                          </Stack.Row>
-                        </Island>
+                        <Toolbar
+                          app={app}
+                          appState={appState}
+                          setAppState={setAppState}
+                          UIOptions={UIOptions}
+                          onPenModeToggle={onPenModeToggle}
+                          onLockToggle={onLockToggle}
+                          heading={heading}
+                        />
                         {isCollaborating && (
                           <Island
                             style={{
@@ -602,7 +559,6 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
