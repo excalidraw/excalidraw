@@ -53,7 +53,7 @@ import {
   historyCommandIcon,
 } from "../icons";
 
-import { TOOLS, TOGGLE_TOOLS, getToolLetter } from "../Tools";
+import { TOOLS, getToolLetter } from "../Tools";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -533,16 +533,7 @@ function CommandPaletteInner({
               keywords: ["toolbar"],
               viewMode: false,
               perform: () => {
-                // `toggle` records the current tool so ESC can switch back to
-                // it; guarded so re-running the command doesn't toggle back
-                app.setActiveTool(
-                  { type: value },
-                  {
-                    toggle:
-                      TOGGLE_TOOLS.includes(value) &&
-                      app.state.activeTool.type !== value,
-                  },
-                );
+                app.setActiveTool({ type: value }, { toggle: false });
               },
             };
 

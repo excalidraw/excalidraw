@@ -266,10 +266,7 @@ const createToolButton = (
 
           if (app.state.activeTool.type !== type) {
             trackEvent("toolbar", type, "ui");
-            // `toggle` records the current tool so ESC can switch back to
-            // it; re-clicking a toggle tool is itself a no-op (the keyboard
-            // shortcut and ESC toggle back instead)
-            app.setActiveTool({ type }, { toggle: !!config.toggle });
+            app.setActiveTool({ type });
           }
         }}
       />

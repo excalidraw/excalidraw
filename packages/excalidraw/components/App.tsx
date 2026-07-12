@@ -5342,10 +5342,7 @@ class App extends React.Component<AppProps, AppState> {
               type: this.state.preferredSelectionTool.type,
             });
           } else {
-            this.setActiveTool(
-              { type: shape },
-              { toggle: TOGGLE_TOOLS.includes(shape) },
-            );
+            this.setActiveTool({ type: shape }, { toggle: true });
           }
 
           event.stopPropagation();
@@ -5784,13 +5781,16 @@ class App extends React.Component<AppProps, AppState> {
     opts: {
       keepSelection?: boolean;
       /**
-       * when the tool is already active, switch back to the previously
-       * active tool (recorded on activation) instead
+       * When `true`, re-activating an already-active toggle tool (see
+       * `TOGGLE_TOOLS`) switches back to the previously active tool.
+       * Activation is idempotent by default; toggle tools always record the
+       * previously active tool regardless (so ESC and the next `toggle`
+       * activation can switch back to it).
        */
       toggle?: boolean;
     } = {},
   ) => {
-    const { keepSelection = false, toggle = false } = opts;
+    const { keepSelection = false } = opts;
 
     if (!this.isToolSupported(tool.type)) {
       console.warn(
@@ -5799,8 +5799,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const nextActiveTool = toggle
-      ? this.state.activeTool.type === tool.type
+    const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
+    const toggle = opts.toggle === true && isToggleTool;
+
+    const nextActiveTool =
+      toggle && this.state.activeTool.type === tool.type
         ? // toggle back to the tool that was active before this one
           updateActiveTool(this.state, {
             ...(this.state.activeTool.lastActiveTool || {
@@ -5808,12 +5811,14 @@ class App extends React.Component<AppProps, AppState> {
             }),
             lastActiveTool: null,
           })
-        : // record the currently active tool so we can toggle back to it
+        : isToggleTool && this.state.activeTool.type !== tool.type
+        ? // activating a toggle tool records the currently active tool so
+          // ESC and the next `toggle` activation can switch back to it
           updateActiveTool(this.state, {
             ...tool,
             lastActiveTool: this.state.activeTool,
           })
-      : updateActiveTool(this.state, tool);
+        : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
