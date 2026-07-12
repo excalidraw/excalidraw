@@ -93,4 +93,12 @@ describe("findShapeByKey()", () => {
     expect(findShapeByKey("v", app)).toBe("lasso");
     expect(findShapeByKey("1", app)).toBe("lasso");
   });
+
+  it("letter shortcuts are CapsLock-insensitive", () => {
+    const app = appWithPreferredTool("selection");
+
+    expect(findShapeByKey("V", app)).toBe("selection");
+    expect(findShapeByKey("R", app)).toBe("rectangle");
+    expect(findShapeByKey("X", app)).toBe("freedraw");
+  });
 });

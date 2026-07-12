@@ -3,36 +3,30 @@ import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
 
-import { trackEvent } from "../analytics";
-
 import { t } from "../i18n";
-
-import { isHandToolActive } from "../appState";
 
 import { useTunnels } from "../context/tunnels";
 
-import { HandButton } from "./HandButton";
-import { TOGGLE_TOOLS } from "./Tools";
-import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ToolPopover } from "./ToolPopover";
+import {
+  EraserToolButton,
+  FrameToolButton,
+  FreedrawToolButton,
+  HandToolButton,
+  ImageToolButton,
+  SelectionToolPopover,
+  TextToolButton,
+  TOOLS,
+} from "./Tools";
 
 import {
-  SelectionIcon,
-  FreedrawIcon,
-  EraserIcon,
-  RectangleIcon,
-  ArrowIcon,
-  extraToolsIcon,
-  DiamondIcon,
-  EllipseIcon,
-  LineIcon,
   TextIcon,
   ImageIcon,
+  extraToolsIcon,
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
-  LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
@@ -40,59 +34,14 @@ import {
 import "./ToolIcon.scss";
 import "./MobileToolBar.scss";
 
-import type { AppClassProperties, ToolType, UIAppState } from "../types";
-
-const SHAPE_TOOLS = [
-  {
-    type: "rectangle",
-    icon: RectangleIcon,
-    title: capitalizeString(t("toolBar.rectangle")),
-  },
-  {
-    type: "diamond",
-    icon: DiamondIcon,
-    title: capitalizeString(t("toolBar.diamond")),
-  },
-  {
-    type: "ellipse",
-    icon: EllipseIcon,
-    title: capitalizeString(t("toolBar.ellipse")),
-  },
-] as const;
-
-const SELECTION_TOOLS = [
-  {
-    type: "selection",
-    icon: SelectionIcon,
-    title: capitalizeString(t("toolBar.selection")),
-  },
-  {
-    type: "lasso",
-    icon: LassoIcon,
-    title: capitalizeString(t("toolBar.lasso")),
-  },
-] as const;
-
-const LINEAR_ELEMENT_TOOLS = [
-  {
-    type: "arrow",
-    icon: ArrowIcon,
-    title: capitalizeString(t("toolBar.arrow")),
-  },
-  { type: "line", icon: LineIcon, title: capitalizeString(t("toolBar.line")) },
-] as const;
+import type { AppClassProperties, UIAppState } from "../types";
 
 type MobileToolBarProps = {
   app: AppClassProperties;
-  onHandToolToggle: () => void;
   setAppState: React.Component<any, UIAppState>["setState"];
 };
 
-export const MobileToolBar = ({
-  app,
-  onHandToolToggle,
-  setAppState,
-}: MobileToolBarProps) => {
+export const MobileToolBar = ({ app, setAppState }: MobileToolBarProps) => {
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
@@ -126,25 +75,21 @@ export const MobileToolBar = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
-  const handleToolChange = (toolType: string) => {
-    if (app.state.activeTool.type !== toolType) {
-      trackEvent("toolbar", toolType, "ui");
-    }
+  const SHAPE_TOOLS = (["rectangle", "diamond", "ellipse"] as const).map(
+    (type) => ({
+      type,
+      icon: TOOLS[type].icon,
+      title: capitalizeString(t(`toolBar.${type}`)),
+      fillable: TOOLS[type].fillable,
+    }),
+  );
 
-    if (toolType === "selection") {
-      if (app.state.activeTool.type === "selection") {
-        // Toggle selection tool behavior if needed
-      } else {
-        app.setActiveTool({ type: "selection" });
-      }
-    } else if (app.state.activeTool.type !== toolType) {
-      // `toggle` records the current tool so ESC can switch back to it
-      app.setActiveTool(
-        { type: toolType as ToolType },
-        { toggle: TOGGLE_TOOLS.includes(toolType as ToolType) },
-      );
-    }
-  };
+  const LINEAR_ELEMENT_TOOLS = (["arrow", "line"] as const).map((type) => ({
+    type,
+    icon: TOOLS[type].icon,
+    title: capitalizeString(t(`toolBar.${type}`)),
+    fillable: TOOLS[type].fillable,
+  }));
 
   const [toolbarWidth, setToolbarWidth] = useState(0);
 
@@ -160,17 +105,10 @@ export const MobileToolBar = ({
   const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
   const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
-  const extraTools = [
-    "text",
-    "frame",
-    "embeddable",
-    "laser",
-    "magicframe",
-  ].filter((tool) => {
+  const extraTools: readonly typeof activeTool.type[] = (
+    ["text", "frame", "embeddable", "laser", "magicframe"] as const
+  ).filter((tool) => {
     if (showTextToolOutside && tool === "text") {
-      return false;
-    }
-    if (showImageToolOutside && tool === "image") {
       return false;
     }
     if (showFrameToolOutside && tool === "frame") {
@@ -195,6 +133,8 @@ export const MobileToolBar = ({
       : extraToolsIcon
     : extraToolsIcon;
 
+  const toolProps = { app, activeTool };
+
   return (
     <div
       className="mobile-toolbar"
@@ -205,85 +145,23 @@ export const MobileToolBar = ({
       }}
     >
       {/* Hand Tool */}
-      <HandButton
-        checked={isHandToolActive(app.state)}
-        onChange={onHandToolToggle}
-        title={t("toolBar.hand")}
-        isMobile
-      />
+      <HandToolButton {...toolProps} hideKeyBinding />
 
       {/* Selection Tool */}
-      <ToolPopover
-        app={app}
-        options={SELECTION_TOOLS}
-        activeTool={activeTool}
-        defaultOption={app.state.preferredSelectionTool.type}
-        namePrefix="selectionType"
-        title={capitalizeString(t("toolBar.selection"))}
-        data-testid="toolbar-selection"
-        onToolChange={(type: string) => {
-          if (type === "selection" || type === "lasso") {
-            app.setActiveTool({ type });
-            setAppState({
-              preferredSelectionTool: { type, initialized: true },
-            });
-          }
-        }}
-        displayedOption={
-          SELECTION_TOOLS.find(
-            (tool) => tool.type === app.state.preferredSelectionTool.type,
-          ) || SELECTION_TOOLS[0]
-        }
-      />
+      <SelectionToolPopover {...toolProps} setAppState={setAppState} />
 
       {/* Free Draw */}
-      <ToolButton
-        className={clsx({
-          active: activeTool.type === "freedraw",
-        })}
-        type="radio"
-        icon={FreedrawIcon}
-        checked={activeTool.type === "freedraw"}
-        name="editor-current-shape"
-        title={`${capitalizeString(t("toolBar.freedraw"))}`}
-        aria-label={capitalizeString(t("toolBar.freedraw"))}
-        data-testid="toolbar-freedraw"
-        onChange={() => handleToolChange("freedraw")}
-      />
+      <FreedrawToolButton {...toolProps} hideShortcut />
 
       {/* Eraser */}
-      <ToolButton
-        className={clsx({
-          active: activeTool.type === "eraser",
-        })}
-        type="radio"
-        icon={EraserIcon}
-        checked={activeTool.type === "eraser"}
-        name="editor-current-shape"
-        title={`${capitalizeString(t("toolBar.eraser"))}`}
-        aria-label={capitalizeString(t("toolBar.eraser"))}
-        data-testid="toolbar-eraser"
-        onChange={() => handleToolChange("eraser")}
-      />
+      <EraserToolButton {...toolProps} hideShortcut />
 
-      {/* Rectangle */}
+      {/* Rectangle/Diamond/Ellipse */}
       <ToolPopover
         app={app}
         options={SHAPE_TOOLS}
         activeTool={activeTool}
         defaultOption={lastActiveGenericShape}
-        namePrefix="shapeType"
-        title={capitalizeString(
-          t(
-            lastActiveGenericShape === "rectangle"
-              ? "toolBar.rectangle"
-              : lastActiveGenericShape === "diamond"
-              ? "toolBar.diamond"
-              : lastActiveGenericShape === "ellipse"
-              ? "toolBar.ellipse"
-              : "toolBar.rectangle",
-          ),
-        )}
         data-testid="toolbar-rectangle"
         onToolChange={(type: string) => {
           if (
@@ -307,16 +185,7 @@ export const MobileToolBar = ({
         options={LINEAR_ELEMENT_TOOLS}
         activeTool={activeTool}
         defaultOption={lastActiveLinearElement}
-        namePrefix="linearElementType"
-        title={capitalizeString(
-          t(
-            lastActiveLinearElement === "arrow"
-              ? "toolBar.arrow"
-              : "toolBar.line",
-          ),
-        )}
         data-testid="toolbar-arrow"
-        fillable={true}
         onToolChange={(type: string) => {
           if (type === "arrow" || type === "line") {
             setLastActiveLinearElement(type);
@@ -331,53 +200,13 @@ export const MobileToolBar = ({
       />
 
       {/* Text Tool */}
-      {showTextToolOutside && (
-        <ToolButton
-          className={clsx({
-            active: activeTool.type === "text",
-          })}
-          type="radio"
-          icon={TextIcon}
-          checked={activeTool.type === "text"}
-          name="editor-current-shape"
-          title={`${capitalizeString(t("toolBar.text"))}`}
-          aria-label={capitalizeString(t("toolBar.text"))}
-          data-testid="toolbar-text"
-          onChange={() => handleToolChange("text")}
-        />
-      )}
+      {showTextToolOutside && <TextToolButton {...toolProps} hideShortcut />}
 
       {/* Image */}
-      {showImageToolOutside && (
-        <ToolButton
-          className={clsx({
-            active: activeTool.type === "image",
-          })}
-          type="radio"
-          icon={ImageIcon}
-          checked={activeTool.type === "image"}
-          name="editor-current-shape"
-          title={`${capitalizeString(t("toolBar.image"))}`}
-          aria-label={capitalizeString(t("toolBar.image"))}
-          data-testid="toolbar-image"
-          onChange={() => handleToolChange("image")}
-        />
-      )}
+      {showImageToolOutside && <ImageToolButton {...toolProps} hideShortcut />}
 
       {/* Frame Tool */}
-      {showFrameToolOutside && (
-        <ToolButton
-          className={clsx({ active: frameToolSelected })}
-          type="radio"
-          icon={frameToolIcon}
-          checked={frameToolSelected}
-          name="editor-current-shape"
-          title={`${capitalizeString(t("toolBar.frame"))}`}
-          aria-label={capitalizeString(t("toolBar.frame"))}
-          data-testid="toolbar-frame"
-          onChange={() => handleToolChange("frame")}
-        />
-      )}
+      {showFrameToolOutside && <FrameToolButton {...toolProps} hideShortcut />}
 
       {/* Other Shapes */}
       <DropdownMenu open={isOtherShapesMenuOpen}>

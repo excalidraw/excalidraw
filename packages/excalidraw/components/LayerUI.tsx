@@ -80,7 +80,6 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -140,7 +139,6 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
-  onHandToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
@@ -562,7 +560,6 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}

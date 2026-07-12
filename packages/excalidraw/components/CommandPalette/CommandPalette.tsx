@@ -51,7 +51,6 @@ import {
   brainIconThin,
   LibraryIcon,
   historyCommandIcon,
-  LassoIcon,
 } from "../icons";
 
 import { TOOLS, TOGGLE_TOOLS, getToolLetter } from "../Tools";
@@ -357,22 +356,6 @@ function CommandPaletteInner({
           }),
         ),
       );
-      const toolCommands: CommandPaletteItem[] = [
-        actionManager.actions.setFrameAsActiveTool,
-      ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
-
-      toolCommands.push({
-        label: t("toolBar.lasso"),
-        category: DEFAULT_CATEGORIES.tools,
-        icon: LassoIcon,
-        keywords: ["toolbar"],
-        viewMode: false,
-        predicate: () => app.state.preferredSelectionTool.type !== "lasso",
-        perform: () => {
-          app.setActiveTool({ type: "lasso" });
-        },
-      });
-
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
         actionManager.actions.redo,
@@ -529,11 +512,6 @@ function CommandPaletteInner({
           (acc: CommandPaletteItem[], value) => {
             const config = TOOLS[value];
 
-            // lasso gets its own entry (with a predicate) above
-            if (value === "lasso") {
-              return acc;
-            }
-
             if (
               appProps.UIOptions.tools?.[
                 value as Extract<
@@ -574,7 +552,6 @@ function CommandPaletteInner({
           },
           [],
         ),
-        ...toolCommands,
         {
           label: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,

@@ -2236,7 +2236,6 @@ class App extends React.Component<AppProps, AppState> {
                             elements={this.scene.getNonDeletedElements()}
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
-                            onHandToolToggle={this.onHandToolToggle}
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
                             renderTopRightUI={renderTopRightUI}
@@ -4425,10 +4424,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  onHandToolToggle = () => {
-    this.setActiveTool({ type: "hand" }, { toggle: true });
-  };
-
   /**
    * Zooms on canvas viewport center
    */
@@ -5301,6 +5296,9 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
+        // so that an uppercase letter can only mean CapsLock (Shift+letter
+        // must not switch tools — findShapeByKey lowercases the key)
+        !event.shiftKey &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged

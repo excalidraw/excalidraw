@@ -23,6 +23,7 @@ import {
   laserPointerToolIcon,
   LassoIcon,
   handIcon,
+  frameToolIcon,
 } from "./icons";
 
 import type {
@@ -119,6 +120,10 @@ export const TOOLS = defineTools({
     numericKey: KEYS["0"],
     toggle: true,
   },
+  frame: {
+    icon: frameToolIcon,
+    letterKey: KEYS.F,
+  },
   laser: {
     icon: laserPointerToolIcon,
     letterKey: KEYS.K,
@@ -157,14 +162,18 @@ export const getToolShortcut = (type: ToolbarToolType) => {
 };
 
 export const findShapeByKey = (key: string, app: AppClassProperties) => {
+  // CapsLock-insensitive (the caller excludes modified keypresses, incl.
+  // shift, so a capital letter here means CapsLock)
+  const lowerKey = key.toLowerCase();
+
   for (const type of Object.keys(TOOLS) as ToolbarToolType[]) {
     const { letterKey, numericKey } = TOOLS[type];
     if (
       (numericKey != null && key === numericKey) ||
       (letterKey &&
         (typeof letterKey === "string"
-          ? letterKey === key
-          : letterKey.includes(key)))
+          ? letterKey === lowerKey
+          : letterKey.includes(lowerKey)))
     ) {
       // the selection shortcut activates whichever selection tool the user
       // prefers (selection or lasso)
@@ -179,7 +188,13 @@ export const findShapeByKey = (key: string, app: AppClassProperties) => {
 export type ToolButtonComponentProps = {
   app: AppClassProperties;
   activeTool: UIAppState["activeTool"];
+  /** hide the keybinding badge rendered in the button's corner */
   hideKeyBinding?: boolean;
+  /**
+   * hide all shortcut affordances (tooltip hint, aria-keyshortcuts, and the
+   * keybinding badge) — used on mobile where there's no keyboard
+   */
+  hideShortcut?: boolean;
 };
 
 type ToolButtonBehavior = {
@@ -215,9 +230,10 @@ const createToolButton = (
     app,
     activeTool,
     hideKeyBinding,
+    hideShortcut,
   }: ToolButtonComponentProps) => {
     const label = capitalizeString(t(`toolBar.${type}`));
-    const shortcut = getToolShortcut(shortcutType);
+    const shortcut = hideShortcut ? null : getToolShortcut(shortcutType);
 
     return (
       <ToolButton
@@ -225,14 +241,14 @@ const createToolButton = (
         type="toggle"
         icon={config.icon}
         checked={activeTool.type === type}
-        title={`${label} — ${shortcut}`}
+        title={shortcut ? `${label} — ${shortcut}` : label}
         keyBindingLabel={
-          hideKeyBinding
+          hideKeyBinding || hideShortcut
             ? undefined
             : TOOLS[shortcutType].numericKey || getToolLetter(shortcutType)
         }
         aria-label={label}
-        aria-keyshortcuts={shortcut}
+        aria-keyshortcuts={shortcut ?? undefined}
         data-testid={`toolbar-${type}`}
         onSelect={({ pointerType }) => {
           if (!app.state.penDetected && pointerType === "pen") {
@@ -271,6 +287,7 @@ export const FreedrawToolButton = createToolButton("freedraw");
 export const TextToolButton = createToolButton("text");
 export const ImageToolButton = createToolButton("image");
 export const EraserToolButton = createToolButton("eraser");
+export const FrameToolButton = createToolButton("frame");
 
 /**
  * The selection tool button — pointer-clicking it while the selection tool
@@ -317,14 +334,21 @@ export const SelectionToolPopover = ({
     {
       type: "selection",
       icon: TOOLS.selection.icon,
+      fillable: TOOLS.selection.fillable,
       title: capitalizeString(t("toolBar.selection")),
     },
     {
       type: "lasso",
       icon: TOOLS.lasso.icon,
+      fillable: TOOLS.lasso.fillable,
       title: capitalizeString(t("toolBar.lasso")),
     },
   ] as const;
+
+  const displayedOption =
+    SELECTION_TOOLS.find(
+      (tool) => tool.type === app.state.preferredSelectionTool.type,
+    ) || SELECTION_TOOLS[0];
 
   return (
     <ToolPopover
@@ -332,8 +356,6 @@ export const SelectionToolPopover = ({
       options={SELECTION_TOOLS}
       activeTool={activeTool}
       defaultOption={app.state.preferredSelectionTool.type}
-      namePrefix="selectionType"
-      title={capitalizeString(t("toolBar.selection"))}
       data-testid="toolbar-selection"
       onToolChange={(type: string) => {
         if (type === "selection" || type === "lasso") {
@@ -343,12 +365,7 @@ export const SelectionToolPopover = ({
           });
         }
       }}
-      displayedOption={
-        SELECTION_TOOLS.find(
-          (tool) => tool.type === app.state.preferredSelectionTool.type,
-        ) || SELECTION_TOOLS[0]
-      }
-      fillable={activeTool.type === "selection"}
+      displayedOption={displayedOption}
     />
   );
 };
