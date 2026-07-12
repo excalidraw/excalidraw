@@ -58,6 +58,13 @@ type ToolButtonProps =
       checked: boolean;
       onChange?(data: { pointerType: PointerType | null }): void;
       onPointerDown?(data: { pointerType: PointerType }): void;
+    })
+  // a regular <button> replacement for the "radio" type
+  | (ToolButtonBaseProps & {
+      type: "toggle";
+      checked: boolean;
+      onClick?(event: React.MouseEvent): void;
+      onPointerDown?(data: { pointerType: PointerType }): void;
     });
 
 export const ToolButton = React.forwardRef(
@@ -163,6 +170,42 @@ export const ToolButton = React.forwardRef(
             </div>
           )}
           {props.children}
+        </button>
+      );
+    }
+
+    if (props.type === "toggle") {
+      return (
+        <button
+          className={clsx(
+            "ToolIcon",
+            "ToolIcon_type_toggle",
+            sizeCn,
+            className,
+            {
+              "ToolIcon--checked": props.checked,
+            },
+          )}
+          type="button"
+          title={props.title}
+          aria-label={props["aria-label"]}
+          aria-keyshortcuts={props["aria-keyshortcuts"]}
+          aria-pressed={props.checked}
+          data-testid={props["data-testid"]}
+          onPointerDown={(event) => {
+            props.onPointerDown?.({ pointerType: event.pointerType || null });
+          }}
+          onClick={props.onClick}
+          ref={innerRef}
+        >
+          <div className="ToolIcon__icon">
+            {props.icon}
+            {props.keyBindingLabel && (
+              <span className="ToolIcon__keybinding">
+                {props.keyBindingLabel}
+              </span>
+            )}
+          </div>
         </button>
       );
     }

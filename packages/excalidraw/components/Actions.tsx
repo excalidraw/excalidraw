@@ -946,9 +946,10 @@ export const ShapesSwitcher = ({
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
+          const shortcut =
+            letter && numericKey != null
+              ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+              : `${letter || numericKey}`;
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
 
@@ -991,10 +992,9 @@ export const ShapesSwitcher = ({
             <ToolButton
               className={clsx("Shape", { fillable })}
               key={value}
-              type="radio"
+              type="toggle"
               icon={icon}
               checked={activeTool.type === value}
-              name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
               keyBindingLabel={keybindingLabel}
               aria-label={capitalizeString(label)}
@@ -1003,14 +1003,18 @@ export const ShapesSwitcher = ({
               onPointerDown={({ pointerType }) => {
                 // Detect the pen here (pointerType is reliable on pointer-down)
                 // but DON'T enable pen mode yet: calling setState mid-gesture
-                // re-renders the controlled radio and, on iOS/iPadOS, aborts
-                // the ensuing click so the tool isn't selected on the first pen
-                // tap. Defer it until the tap's `change` has committed (below).
+                // re-renders the toolbar and, on iOS/iPadOS, can abort the
+                // ensuing click so the tool isn't selected on the first pen
+                // tap. Defer it until the tap's `click` has committed (below).
                 if (!app.state.penDetected && pointerType === "pen") {
                   pendingPenDetectionRef.current = true;
                 }
 
                 if (value === "selection") {
+                  // toggle selection ⇄ lasso on pointer-down (also gives pen
+                  // and touch immediate feedback); the ensuing `click` skips
+                  // pointer gestures on this button so it doesn't override
+                  // the toggle
                   if (app.state.activeTool.type === "selection") {
                     app.setActiveTool({ type: "lasso" });
                   } else {
@@ -1018,18 +1022,24 @@ export const ShapesSwitcher = ({
                   }
                 }
               }}
-              onChange={() => {
-                if (app.state.activeTool.type !== value) {
-                  trackEvent("toolbar", value, "ui");
-                }
-                app.setActiveTool({ type: value });
+              onClick={(event) => {
+                // pointer gestures on the selection button are fully handled
+                // on pointer-down above — `detail === 0` means keyboard or AT
+                // activation, which gets no pointer-down
+                const handledOnPointerDown =
+                  value === "selection" && event.detail > 0;
 
-                // Apply the pen detection captured on pointer-down now that the
-                // tool is selected. rAF keeps the resulting re-render out of the
-                // `change` event itself. We rely on the pointer-down detection
-                // rather than this handler's pointerType because the latter is
-                // unreliable on iOS (its backing ref is cleared before the
-                // delayed click fires).
+                if (
+                  !handledOnPointerDown &&
+                  app.state.activeTool.type !== value
+                ) {
+                  trackEvent("toolbar", value, "ui");
+                  app.setActiveTool({ type: value });
+                }
+
+                // Apply the pen detection captured on pointer-down now that
+                // the tap has committed. rAF keeps the resulting re-render out
+                // of the `click` event itself.
                 if (pendingPenDetectionRef.current) {
                   pendingPenDetectionRef.current = false;
                   requestAnimationFrame(() => app.togglePenMode(true));

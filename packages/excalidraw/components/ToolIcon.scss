@@ -32,6 +32,24 @@
     pointer-events: none;
   }
 
+  // a <button> replacement for the radio-input ToolIcon — resets the native
+  // button chrome; state styling lives on the inner .ToolIcon__icon
+  // (see toolbarButtonColorStates)
+  .ToolIcon_type_toggle {
+    appearance: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+  }
+
   .ToolIcon__icon {
     box-sizing: border-box;
     width: var(--default-button-size);
