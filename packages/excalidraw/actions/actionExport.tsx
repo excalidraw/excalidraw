@@ -1,11 +1,4 @@
-import {
-  KEYS,
-  DEFAULT_EXPORT_PADDING,
-  EXPORT_SCALES,
-  THEME,
-} from "@excalidraw/common";
-
-import { getNonDeletedElements } from "@excalidraw/element";
+import { KEYS, THEME } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -26,8 +19,6 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { resaveAsImageWithScene } from "../data/resave";
 
 import { t } from "../i18n";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getExportSize } from "../scene/export";
 
 import "../components/ToolIcon.scss";
 
@@ -72,44 +63,6 @@ export const actionChangeExportScale = register<AppState["exportScale"]>({
       appState: { ...appState, exportScale: value },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
-  },
-  PanelComponent: ({ elements: allElements, appState, updateData }) => {
-    const elements = getNonDeletedElements(allElements);
-    const exportSelected = isSomeElementSelected(elements, appState);
-    const exportedElements = exportSelected
-      ? getSelectedElements(elements, appState)
-      : elements;
-
-    return (
-      <>
-        {EXPORT_SCALES.map((s) => {
-          const [width, height] = getExportSize(
-            exportedElements,
-            DEFAULT_EXPORT_PADDING,
-            s,
-          );
-
-          const scaleButtonTitle = `${t(
-            "imageExportDialog.label.scale",
-          )} ${s}x (${width}x${height})`;
-
-          return (
-            <ToolButton
-              key={s}
-              size="small"
-              type="radio"
-              icon={`${s}x`}
-              name="export-canvas-scale"
-              title={scaleButtonTitle}
-              aria-label={scaleButtonTitle}
-              id="export-canvas-scale"
-              checked={s === appState.exportScale}
-              onChange={() => updateData(s)}
-            />
-          );
-        })}
-      </>
-    );
   },
 });
 

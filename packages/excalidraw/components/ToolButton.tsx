@@ -10,7 +10,6 @@ import { AbortError } from "../errors";
 import "./ToolIcon.scss";
 
 import Spinner from "./Spinner";
-import { useExcalidrawContainer } from "./App";
 
 import type { CSSProperties } from "react";
 
@@ -23,8 +22,6 @@ type ToolButtonBaseProps = {
   "data-testid"?: string;
   label?: string;
   title?: string;
-  name?: string;
-  id?: string;
   size?: ToolButtonSize;
   keyBindingLabel?: string | null;
   showAriaLabel?: boolean;
@@ -53,13 +50,7 @@ type ToolButtonProps =
       children?: React.ReactNode;
       onClick?(): void;
     })
-  | (ToolButtonBaseProps & {
-      type: "radio";
-      checked: boolean;
-      onChange?(data: { pointerType: PointerType | null }): void;
-      onPointerDown?(data: { pointerType: PointerType }): void;
-    })
-  // a regular <button> replacement for the "radio" type
+  // a stateful (pressed/unpressed) tool button
   | (ToolButtonBaseProps & {
       type: "toggle";
       checked: boolean;
@@ -83,7 +74,6 @@ export const ToolButton = React.forwardRef(
     }: ToolButtonProps,
     ref,
   ) => {
-    const { id: excalId } = useExcalidrawContainer();
     const innerRef = React.useRef(null);
     React.useImperativeHandle(ref, () => innerRef.current);
     const sizeCn = `ToolIcon_size_${size}`;
@@ -180,77 +170,30 @@ export const ToolButton = React.forwardRef(
       );
     }
 
-    if (props.type === "toggle") {
-      return (
-        <button
-          className={clsx(
-            "ToolIcon",
-            "ToolIcon_type_toggle",
-            sizeCn,
-            className,
-            {
-              "ToolIcon--checked": props.checked,
-            },
-          )}
-          type="button"
-          title={props.title}
-          aria-label={props["aria-label"]}
-          aria-keyshortcuts={props["aria-keyshortcuts"]}
-          aria-pressed={props.checked}
-          data-testid={props["data-testid"]}
-          onPointerDown={(event) => {
-            lastPointerTypeRef.current = event.pointerType || null;
-          }}
-          onPointerUp={() => {
-            requestAnimationFrame(() => {
-              lastPointerTypeRef.current = null;
-            });
-          }}
-          onClick={() => {
-            props.onSelect?.({ pointerType: lastPointerTypeRef.current });
-          }}
-          ref={innerRef}
-        >
-          <div className="ToolIcon__icon">
-            {props.icon}
-            {props.keyBindingLabel && (
-              <span className="ToolIcon__keybinding">
-                {props.keyBindingLabel}
-              </span>
-            )}
-          </div>
-        </button>
-      );
-    }
-
     return (
-      <label
-        className={clsx("ToolIcon", className)}
+      <button
+        className={clsx("ToolIcon", "ToolIcon_type_toggle", sizeCn, className, {
+          "ToolIcon--checked": props.checked,
+        })}
+        type="button"
         title={props.title}
+        aria-label={props["aria-label"]}
+        aria-keyshortcuts={props["aria-keyshortcuts"]}
+        aria-pressed={props.checked}
+        data-testid={props["data-testid"]}
         onPointerDown={(event) => {
           lastPointerTypeRef.current = event.pointerType || null;
-          props.onPointerDown?.({ pointerType: event.pointerType || null });
         }}
         onPointerUp={() => {
           requestAnimationFrame(() => {
             lastPointerTypeRef.current = null;
           });
         }}
+        onClick={() => {
+          props.onSelect?.({ pointerType: lastPointerTypeRef.current });
+        }}
+        ref={innerRef}
       >
-        <input
-          className={`ToolIcon_type_radio ${sizeCn}`}
-          type="radio"
-          name={props.name}
-          aria-label={props["aria-label"]}
-          aria-keyshortcuts={props["aria-keyshortcuts"]}
-          data-testid={props["data-testid"]}
-          id={`${excalId}-${props.id}`}
-          onChange={() => {
-            props.onChange?.({ pointerType: lastPointerTypeRef.current });
-          }}
-          checked={props.checked}
-          ref={innerRef}
-        />
         <div className="ToolIcon__icon">
           {props.icon}
           {props.keyBindingLabel && (
@@ -259,7 +202,7 @@ export const ToolButton = React.forwardRef(
             </span>
           )}
         </div>
-      </label>
+      </button>
     );
   },
 );

@@ -333,17 +333,18 @@ const Panel = ({
 
         return (
           <ToolButton
-            className="Shape"
             key={`${elements[0].id}${elements[0].version}_${type}`}
-            type="radio"
+            type="toggle"
             icon={icon}
             checked={isSelected}
-            name="convertElementType-option"
             title={type}
-            keyBindingLabel={""}
             aria-label={type}
             data-testid={`toolbar-${type}`}
-            onChange={() => {
+            onSelect={() => {
+              // selecting the already-selected type is a no-op
+              if (isSelected) {
+                return;
+              }
               if (app.state.activeTool.type !== type) {
                 trackEvent("convertElementType", type, "ui");
               }
