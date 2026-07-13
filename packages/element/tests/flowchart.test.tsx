@@ -303,7 +303,7 @@ describe("flow chart band-search placement", () => {
     h.elements.filter((el) => el.type === "rectangle" && el.id !== parent.id);
 
   const pendingRects = () =>
-    (h.app.flowChartCreator.pendingNodes ?? [])
+    (h.app.flowchart.pendingNodes ?? [])
       .filter((el) => el.type === "rectangle")
       .map((el) => ({ x: el.x, y: el.y }));
 

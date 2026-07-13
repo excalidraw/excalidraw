@@ -1,9 +1,4 @@
-import {
-  KEYS,
-  invariant,
-  toBrandedType,
-  type Bounds,
-} from "@excalidraw/common";
+import { invariant, toBrandedType, type Bounds } from "@excalidraw/common";
 
 import {
   clamp,
@@ -53,25 +48,10 @@ import {
 
 import type { Scene } from "./Scene";
 
-type LinkDirection = "up" | "right" | "down" | "left";
+export type LinkDirection = "up" | "right" | "down" | "left";
 
 const VERTICAL_OFFSET = 100;
 const HORIZONTAL_OFFSET = 100;
-
-export const getLinkDirectionFromKey = (key: string): LinkDirection => {
-  switch (key) {
-    case KEYS.ARROW_UP:
-      return "up";
-    case KEYS.ARROW_DOWN:
-      return "down";
-    case KEYS.ARROW_RIGHT:
-      return "right";
-    case KEYS.ARROW_LEFT:
-      return "left";
-    default:
-      return "right";
-  }
-};
 
 type Interval = { start: number; end: number };
 
@@ -219,10 +199,7 @@ const placeCluster = (
   const anchoredStart =
     stickyCrossStart === null
       ? null
-      : // append keeps `crossStart`, prepend shifts it back one step; either
-        // way the existing pending nodes stay put. Prefer the anchoring that
-        // keeps the cluster centered on the parent.
-        [stickyCrossStart, stickyCrossStart - step]
+      : [stickyCrossStart, stickyCrossStart - step]
           .filter((start) => intervalIsFree(start, clusterCrossSize, occupied))
           .sort(
             (a, b) =>
@@ -277,7 +254,7 @@ const cloneFlowchartNode = (
   return node;
 };
 
-export const addNewNodes = (
+const addNewNodes = (
   startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
