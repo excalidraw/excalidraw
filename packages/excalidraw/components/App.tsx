@@ -4983,7 +4983,6 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      // normalize `event.key` when CapsLock is pressed #2372
 
       if (
         "Proxy" in window &&
@@ -5521,6 +5520,20 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "elementStroke" });
+          event.stopPropagation();
+        }
+      }
+
+      if (
+        event.key.toLowerCase() === "j" &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.some((el) => isArrowElement(el))) {
+          const popup = event.shiftKey ? "arrowheadStart" : "arrowheadEnd";
+          const next = this.state.openPopup === popup ? null : popup;
+          this.setState({ openPopup: next });
           event.stopPropagation();
         }
       }
