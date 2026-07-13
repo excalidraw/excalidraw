@@ -869,11 +869,16 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     const collaborators: InstanceType<typeof Collab>["collaborators"] =
       new Map();
     for (const socketId of sockets) {
+      const isCurrentUser = socketId === this.portal.socket?.id;
       collaborators.set(
         socketId,
-        Object.assign({}, this.collaborators.get(socketId), {
-          isCurrentUser: socketId === this.portal.socket?.id,
-        }),
+        Object.assign(
+          // we never receive our own broadcasts, so we need to seed
+          // our own collaborator entry with the local username
+          isCurrentUser ? { username: this.state.username } : {},
+          this.collaborators.get(socketId),
+          { isCurrentUser },
+        ),
       );
     }
     this.collaborators = collaborators;
@@ -881,14 +886,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   }
 
   updateCollaborator = (socketId: SocketId, updates: Partial<Collaborator>) => {
+    const isCurrentUser = socketId === this.portal.socket?.id;
     const collaborators = new Map(this.collaborators);
     const user: Mutable<Collaborator> = Object.assign(
-      {},
+      // we never receive our own broadcasts, so we need to seed
+      // our own collaborator entry with the local username
+      isCurrentUser ? { username: this.state.username } : {},
       collaborators.get(socketId),
       updates,
-      {
-        isCurrentUser: socketId === this.portal.socket?.id,
-      },
+      { isCurrentUser },
     );
     collaborators.set(socketId, user);
     this.collaborators = collaborators;
@@ -987,6 +993,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   setUsername = (username: string) => {
     this.setState({ username });
     saveUsernameToLocalStorage(username);
+
+    // keep our own collaborator entry in sync
+    const socketId = this.portal.socket?.id as SocketId | undefined;
+    if (socketId && this.collaborators.has(socketId)) {
+      this.updateCollaborator(socketId, { username });
+    }
   };
 
   getUsername = () => this.state.username;
