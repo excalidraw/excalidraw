@@ -194,13 +194,9 @@ export const UserList = React.memo(
 
     // Ensure current user is always last (rightmost) and always visible
     if (effectiveCurrentUserMenu && slotsForAvatars >= 1) {
-      const currentUser = uniqueCollaboratorsArray.find(
-        (c) => c.isCurrentUser,
-      );
+      const currentUser = uniqueCollaboratorsArray.find((c) => c.isCurrentUser);
       if (currentUser) {
-        const others = uniqueCollaboratorsArray.filter(
-          (c) => !c.isCurrentUser,
-        );
+        const others = uniqueCollaboratorsArray.filter((c) => !c.isCurrentUser);
         firstNCollaborators = [
           ...others.slice(0, Math.max(0, slotsForAvatars - 1)),
           currentUser,
@@ -222,15 +218,17 @@ export const UserList = React.memo(
 
       // Wrap current user's avatar in a pill with chevron + popover
       // only when the "+N" overflow is not shown (menu goes there instead)
-      if (collaborator.isCurrentUser && effectiveCurrentUserMenu && !hasOverflow) {
+      if (
+        collaborator.isCurrentUser &&
+        effectiveCurrentUserMenu &&
+        !hasOverflow
+      ) {
         return (
           <Popover.Root key={collaborator.socketId}>
             <Popover.Trigger asChild>
               <div className="UserList__pill">
                 {avatarJSX}
-                <div className="UserList__pill-chevron">
-                  {chevronDownIcon}
-                </div>
+                <div className="UserList__pill-chevron">{chevronDownIcon}</div>
               </div>
             </Popover.Trigger>
             <Popover.Content
@@ -274,9 +272,7 @@ export const UserList = React.memo(
           {hasOverflow && (
             <Popover.Root>
               <Popover.Trigger className="UserList__more">
-                +
-                {uniqueCollaboratorsArray.length -
-                  firstNCollaborators.length}
+                +{uniqueCollaboratorsArray.length - firstNCollaborators.length}
               </Popover.Trigger>
               <Popover.Content
                 style={{
