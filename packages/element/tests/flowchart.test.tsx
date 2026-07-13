@@ -9,6 +9,8 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 unmountComponent();
 
 const { h } = window;
@@ -109,7 +111,7 @@ describe("flow chart creation", () => {
     expect(firstChildNode).not.toBe(null);
     expect(firstChildNode.id).toBe(Object.keys(h.state.selectedElementIds)[0]);
 
-    API.setSelectedElements([initialNode]);
+    API.setSelectedElements([initialNode] as NonDeletedExcalidrawElement[]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
@@ -129,7 +131,7 @@ describe("flow chart creation", () => {
     expect(secondChildNode).not.toBe(null);
     expect(secondChildNode.id).toBe(Object.keys(h.state.selectedElementIds)[0]);
 
-    API.setSelectedElements([initialNode]);
+    API.setSelectedElements([initialNode] as NonDeletedExcalidrawElement[]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
@@ -376,7 +378,7 @@ describe("flow chart navigation", () => {
     const predecessorToRightMostNode = h.elements[h.elements.length - 4];
     expect(predecessorToRightMostNode.type).toBe("rectangle");
 
-    API.setSelectedElements([rightMostNode]);
+    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
     Keyboard.withModifierKeys({ alt: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
     });
@@ -385,7 +387,7 @@ describe("flow chart navigation", () => {
     expect(h.state.selectedElementIds[predecessorToRightMostNode.id]).toBe(
       true,
     );
-    API.setSelectedElements([rightMostNode]);
+    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
     Keyboard.withModifierKeys({ alt: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_UP);
     });
@@ -394,7 +396,7 @@ describe("flow chart navigation", () => {
     expect(h.state.selectedElementIds[predecessorToRightMostNode.id]).toBe(
       true,
     );
-    API.setSelectedElements([rightMostNode]);
+    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
     Keyboard.withModifierKeys({ alt: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_DOWN);
     });

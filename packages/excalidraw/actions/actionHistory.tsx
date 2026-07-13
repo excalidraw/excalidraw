@@ -1,5 +1,4 @@
 import {
-  isWindows,
   KEYS,
   matchKey,
   arrayToMap,
@@ -18,7 +17,7 @@ import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
-import { useStylesPanelMode } from "..";
+import { useStylesPanelMode } from "../components/App";
 
 import type { History } from "../history";
 import type { AppClassProperties, AppState } from "../types";
@@ -114,7 +113,7 @@ export const createRedoAction: ActionCreator = (history) => ({
     ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
-    (isWindows && event.ctrlKey && !event.shiftKey && matchKey(event, KEYS.Y)),
+    (event[KEYS.CTRL_OR_CMD] && !event.shiftKey && matchKey(event, KEYS.Y)),
   PanelComponent: ({ appState, updateData, data, app }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,

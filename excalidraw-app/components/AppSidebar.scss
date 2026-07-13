@@ -4,21 +4,32 @@
     display: flex;
     flex-direction: column;
     text-align: center;
-    gap: 1rem;
+    gap: 1.5rem;
     flex: 1 1 auto;
+
+    .link-button {
+      margin: 0 auto !important;
+      width: 100%;
+      button {
+        width: 100%;
+      }
+    }
   }
 
   .app-sidebar-promo-image {
     margin: 1rem 0;
 
-    height: 16.25rem;
+    height: 295px;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    background-size: calc(
+      var(--right-sidebar-width, 100%) - var(--space-factor) * 2
+    );
 
     background-image: radial-gradient(
         circle,
-        transparent 60%,
+        transparent 0%,
         var(--sidebar-bg-color) 100%
       ),
       var(--image-source);
@@ -32,5 +43,50 @@
 
   .link-button {
     margin: 0 auto;
+  }
+
+  .app-sidebar-promo-text {
+    padding: 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .app-sidebar-promo-illustration {
+    position: relative;
+    min-height: 7rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 0.125rem;
+
+    .app-sidebar-promo-heart {
+      width: 46px;
+      transform: translateX(-14px);
+      height: auto;
+    }
+
+    .app-sidebar-promo-trial-note {
+      position: absolute;
+      top: 2.75rem;
+      left: 50%;
+      transform: translateX(-56%) rotate(-7deg);
+      font-size: 1rem;
+      line-height: 1.15;
+      color: var(--color-primary);
+
+      white-space: nowrap;
+    }
+
+    .app-sidebar-promo-trial-arrow {
+      position: absolute;
+      top: 3.35rem;
+      left: 55%;
+      width: 4.5rem;
+      height: 3rem;
+      transform: translateX(1.75rem) rotate(10deg);
+      color: var(--color-primary);
+      overflow: visible;
+    }
   }
 }

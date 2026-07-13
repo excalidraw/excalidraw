@@ -3,6 +3,10 @@
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
+    "chartType_bar": "Гистограмма",
+    "chartType_line": "Линейная диаграмма",
+    "chartType_radar": "Лепестковая диаграмма",
+    "chartType_plaintext": "Обычный текст",
     "selectAll": "Выбрать всё",
     "multiSelect": "Добавить элемент в выделенный фрагмент",
     "moveCanvas": "Переместить холст",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Морщинки (много)",
     "arrowhead_crowfoot_one": "Морщинки (одна)",
     "arrowhead_crowfoot_one_or_many": "Морщинки (одна или много)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Больше вариантов",
+    "cardinality": "",
     "arrowtypes": "Тип стрелки",
     "arrowtype_sharp": "Острая стрелка",
     "arrowtype_round": "Изогнутая стрелка",
@@ -171,7 +182,11 @@
     "linkToElement": "Ссылка на объект",
     "wrapSelectionInFrame": "Поместить выделенное в фрейм",
     "tab": "Вкладка",
-    "shapeSwitch": "Сменить форму"
+    "shapeSwitch": "Сменить форму",
+    "preferences": "Настройки",
+    "preferences_toolLock": "Закрепить инструмент",
+    "arrowBinding": "Привязка стрелкой",
+    "midpointSnapping": "Привязка к средней точке"
   },
   "elementLink": {
     "title": "Ссылка на объект",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Ошибка"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Сохранить на диск",
     "disk_details": "Экспортировать данные сцены в файл, из которого можно импортировать позже.",
@@ -557,9 +576,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Ваши рисунки сохраняются в памяти вашего браузера.",
+      "center_heading_line2": "Хранилище браузера может быть очищено неожиданно.",
+      "center_heading_line3": "Сохраните свою работу в файл регулярно, чтобы избежать потери файла.",
       "center_heading_plus": "Хотите перейти на Excalidraw+?",
       "menuHint": "Экспорт, настройки, языки, ..."
     },
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>диаграммы последовательности</sequenceLink> и <classLink>диаграммы классов</classLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
-    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid..."
+    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid...",
+    "autoFixAvailable": "Автоисправление доступно"
   },
   "ttd": {
     "error": "Ошибка!"
@@ -624,7 +644,7 @@
   "chat": {
     "inputPlaceholder": "Начните вводить сюда идею диаграммы... ({{shortcut}} для новой строки)",
     "inputPlaceholderWithMessages": "Продолжайте доработку диаграммы...",
-    "generating": "",
+    "generating": "Генерация...",
     "rateLimitRemaining": "Осталось запросов сегодня: {{count}}",
     "role": {
       "user": "Вы",
@@ -641,7 +661,7 @@
     "placeholder": {
       "title": "Давайте создадим вашу диаграмму",
       "description": "Опишите диаграмму, которую вы хотите создать, и мы сгенерируем её для вас.",
-      "hint": "На данный момент мы знаем диаграммы блок-схемы, последовательности и классов."
+      "hint": ""
     },
     "preview": "Предпросмотр",
     "insert": "Вставить",
@@ -655,7 +675,7 @@
       "aiRepair": "Перегенерировать (автоисправление) →",
       "requestAborted": "Запрос отменён",
       "requestFailed": "Запрос не удался",
-      "mermaidParseError": ""
+      "mermaidParseError": "Синтаксическая ошибка Mermaid"
     },
     "rateLimit": {
       "messageLimit": "Вы достигли лимита ИИ на бесплатном тарифном плане. Попробуйте Excalidraw+ или вернитесь завтра.",

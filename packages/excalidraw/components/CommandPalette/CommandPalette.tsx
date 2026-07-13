@@ -10,16 +10,16 @@ import {
   isWritableElement,
 } from "@excalidraw/common";
 
-import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
-
-import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
-
 import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import { actionToggleShapeSwitch } from "../../actions/actionToggleShapeSwitch";
+import { getShortcutKey } from "../../shortcut";
 
 import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
+  actionToggleTheme,
 } from "../../actions";
 import {
   actionCopyElementLink,
@@ -261,7 +261,7 @@ function CommandPaletteInner({
           label = t(
             action.label(
               app.scene.getNonDeletedElements(),
-              uiAppState as AppState,
+              uiAppState,
               app,
             ) as unknown as TranslationKeys,
           );
@@ -425,6 +425,7 @@ function CommandPaletteInner({
       ];
 
       const additionalCommands: CommandPaletteItem[] = [
+        actionToCommand(actionToggleTheme, DEFAULT_CATEGORIES.app),
         {
           label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,

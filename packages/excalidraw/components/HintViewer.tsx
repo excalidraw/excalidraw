@@ -1,6 +1,7 @@
 import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
 
 import {
+  isArrowElement,
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
@@ -184,6 +185,16 @@ const getHints = ({
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
+        if (
+          isArrowElement(selectedElements[0]) &&
+          appState.selectedLinearElement?.elementId ===
+            selectedElements[0].id &&
+          (appState.selectedLinearElement.hoverPointIndex === 0 ||
+            appState.selectedLinearElement.hoverPointIndex ===
+              selectedElements[0].points.length - 1)
+        ) {
+          return t("hints.toggleArrowhead");
+        }
         if (appState.selectedLinearElement?.isEditing) {
           return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected", {

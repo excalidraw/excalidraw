@@ -40,6 +40,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   options?: {
     isDragging?: boolean;
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   let didChange = false;
@@ -59,7 +61,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       angle: 0 as Radians,
       ...updateElbowArrowPoints(
         {
-          ...element,
+          ...(element as ExcalidrawElbowArrowElement),
           x: updates.x || element.x,
           y: updates.y || element.y,
         },

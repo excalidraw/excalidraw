@@ -1,10 +1,14 @@
 import { pointFrom } from "@excalidraw/math";
-
-import { arrayToMap, ROUNDNESS } from "@excalidraw/common";
+import { arrayToMap, type Bounds, ROUNDNESS } from "@excalidraw/common";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { getElementAbsoluteCoords, getElementBounds } from "../src/bounds";
+import {
+  elementsOverlappingBBox,
+  getElementAbsoluteCoords,
+  getElementBounds,
+} from "../src/bounds";
 
 import type { ExcalidrawElement, ExcalidrawLinearElement } from "../src/types";
 
@@ -139,5 +143,67 @@ describe("getElementBounds", () => {
     expect(y1).toEqual(185.24770129343722);
     expect(x2).toEqual(481.4815539037601);
     expect(y2).toEqual(319.8162855827246);
+  });
+});
+
+const makeElement = (x: number, y: number, width: number, height: number) =>
+  API.createElement({
+    type: "rectangle",
+    x,
+    y,
+    width,
+    height,
+  });
+
+const makeBBox = (
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+): Bounds => [minX, minY, maxX, maxY];
+
+describe("elementsOverlappingBBox()", () => {
+  it("should return elements that overlap bbox", () => {
+    const bbox = makeBBox(0, 0, 100, 100);
+
+    const rectOutside = makeElement(110, 110, 100, 100);
+    const rectInside = makeElement(10, 10, 85, 85);
+    const rectContainingBBox = makeElement(-10, -10, 110, 110);
+    const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
+
+    expect(
+      elementsOverlappingBBox({
+        bounds: bbox,
+        type: "overlap",
+        elements: [
+          rectOutside,
+          rectInside,
+          rectContainingBBox,
+          rectOverlappingTopLeft,
+        ],
+      }),
+    ).toEqual([rectInside, rectOverlappingTopLeft]);
+  });
+
+  it("should return elements inside/containing bbox", () => {
+    const bbox = makeBBox(0, 0, 100, 100);
+
+    const rectOutside = makeElement(110, 110, 100, 100);
+    const rectInside = makeElement(10, 10, 85, 85);
+    const rectContainingBBox = makeElement(-10, -10, 110, 110);
+    const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
+
+    expect(
+      elementsOverlappingBBox({
+        bounds: bbox,
+        type: "contain",
+        elements: [
+          rectOutside,
+          rectInside,
+          rectContainingBBox,
+          rectOverlappingTopLeft,
+        ],
+      }),
+    ).toEqual([rectInside]);
   });
 });

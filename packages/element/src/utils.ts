@@ -124,6 +124,7 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
  */
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
@@ -131,10 +132,7 @@ export function deconstructLinearOrFreeDrawElement(
     return cachedShape;
   }
 
-  const ops = generateLinearCollisionShape(element) as {
-    op: string;
-    data: number[];
-  }[];
+  const ops = generateLinearCollisionShape(element, elementsMap);
   const lines = [];
   const curves = [];
 
@@ -659,20 +657,23 @@ export const projectFixedPointOntoDiagonal = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   zoom: AppState["zoom"],
+  isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
   if (arrow.width < 3 && arrow.height < 3) {
     return null;
   }
 
-  const sideMidPoint = getSnapOutlineMidPoint(
-    point,
-    element,
-    elementsMap,
-    zoom,
-  );
-  if (sideMidPoint) {
-    return sideMidPoint;
+  if (isMidpointSnappingEnabled) {
+    const sideMidPoint = getSnapOutlineMidPoint(
+      point,
+      element,
+      elementsMap,
+      zoom,
+    );
+    if (sideMidPoint) {
+      return sideMidPoint;
+    }
   }
 
   // Do the projection onto the diagonals (or center lines

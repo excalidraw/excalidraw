@@ -1,5 +1,5 @@
 import { degreesToRadians } from "./angle";
-import { PRECISION } from "./utils";
+import { isFiniteNumber, PRECISION } from "./utils";
 import { vectorFromPoint, vectorScale } from "./vector";
 
 import type {
@@ -123,10 +123,15 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
  * @returns The rotated point
  */
 export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
-  [x, y]: Point,
-  [cx, cy]: Point,
+  point: Point,
+  center: Point,
   angle: Radians,
 ): Point {
+  if (!angle) {
+    return point;
+  }
+  const [x, y] = point;
+  const [cx, cy] = center;
   return pointFrom(
     (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
     (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
@@ -246,5 +251,14 @@ export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
     q[0] >= Math.min(p[0], r[0]) &&
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
+  );
+};
+
+export const isValidPoint = (point: unknown): point is LocalPoint => {
+  return (
+    Array.isArray(point) &&
+    point.length === 2 &&
+    isFiniteNumber(point[0]) &&
+    isFiniteNumber(point[1])
   );
 };
