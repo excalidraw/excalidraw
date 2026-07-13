@@ -4,7 +4,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawImageElement } from "@excalidraw/element/types";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { cropIcon } from "../components/icons";
 import { t } from "../i18n";
 
@@ -47,7 +47,7 @@ export const actionToggleCropEditor = register({
     const label = t("helpDialog.cropStart");
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={cropIcon}
         title={label}

@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Popover } from "radix-ui";
 
-import { CLASSES, KEYS, capitalizeString } from "@excalidraw/common";
+import { CLASSES } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -14,9 +14,6 @@ import type {
 
 import { actionToggleZenMode } from "../actions";
 
-import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
-
 import { t } from "../i18n";
 import { getTargetElements } from "../scene";
 
@@ -26,32 +23,19 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { getToolbarTools } from "./shapes";
-
 import "./Actions.scss";
 
-import { useStylesPanelMode, useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { ToolPopover } from "./ToolPopover";
 import { Tooltip } from "./Tooltip";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
-  EmbedIcon,
-  extraToolsIcon,
-  frameToolIcon,
-  mermaidLogoIcon,
-  laserPointerToolIcon,
-  MagicIcon,
-  LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
-  SelectionIcon,
   pencilIcon,
 } from "./icons";
 
@@ -60,12 +44,7 @@ import { Island } from "./Island";
 import { getShapeActionPredicates } from "./shapeActionPredicates";
 
 import type { ShapeActionPredicates } from "./shapeActionPredicates";
-import type {
-  AppClassProperties,
-  AppProps,
-  UIAppState,
-  AppState,
-} from "../types";
+import type { AppClassProperties, UIAppState, AppState } from "../types";
 import type { ActionManager } from "../actions/manager";
 
 // re-exported for consumers outside the styles panel (e.g. CommandPalette)
@@ -879,261 +858,6 @@ export const MobileShapeActions = ({
         )}
       </div>
     </Island>
-  );
-};
-
-export const ShapesSwitcher = ({
-  activeTool,
-  setAppState,
-  app,
-  UIOptions,
-}: {
-  activeTool: UIAppState["activeTool"];
-  setAppState: React.Component<any, AppState>["setState"];
-  app: AppClassProperties;
-  UIOptions: AppProps["UIOptions"];
-}) => {
-  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-  const stylesPanelMode = useStylesPanelMode();
-  const isFullStylesPanel = stylesPanelMode === "full";
-  const isCompactStylesPanel = stylesPanelMode === "compact";
-
-  // a pen detected on a tool button's pointer-down, to be applied (enabling
-  // pen mode) only after the tap's `change` has committed — see the tool
-  // button handlers below
-  const pendingPenDetectionRef = useRef(false);
-
-  const SELECTION_TOOLS = [
-    {
-      type: "selection",
-      icon: SelectionIcon,
-      title: capitalizeString(t("toolBar.selection")),
-    },
-    {
-      type: "lasso",
-      icon: LassoIcon,
-      title: capitalizeString(t("toolBar.lasso")),
-    },
-  ] as const;
-
-  const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected =
-    isFullStylesPanel &&
-    activeTool.type === "lasso" &&
-    app.state.preferredSelectionTool.type !== "lasso";
-
-  const embeddableToolSelected = activeTool.type === "embeddable";
-
-  const { TTDDialogTriggerTunnel } = useTunnels();
-
-  return (
-    <>
-      {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable, toolbar }) => {
-          if (
-            toolbar === false ||
-            UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
-            ] === false
-          ) {
-            return null;
-          }
-
-          const label = t(`toolBar.${value}`);
-          const letter =
-            key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
-          const keybindingLabel =
-            value === "hand" ? undefined : numericKey || letter;
-
-          // when in compact styles panel mode (tablet)
-          // use a ToolPopover for selection/lasso toggle as well
-          if (
-            (value === "selection" || value === "lasso") &&
-            isCompactStylesPanel
-          ) {
-            return (
-              <ToolPopover
-                key={"selection-popover"}
-                app={app}
-                options={SELECTION_TOOLS}
-                activeTool={activeTool}
-                defaultOption={app.state.preferredSelectionTool.type}
-                namePrefix="selectionType"
-                title={capitalizeString(t("toolBar.selection"))}
-                data-testid="toolbar-selection"
-                onToolChange={(type: string) => {
-                  if (type === "selection" || type === "lasso") {
-                    app.setActiveTool({ type });
-                    setAppState({
-                      preferredSelectionTool: { type, initialized: true },
-                    });
-                  }
-                }}
-                displayedOption={
-                  SELECTION_TOOLS.find(
-                    (tool) =>
-                      tool.type === app.state.preferredSelectionTool.type,
-                  ) || SELECTION_TOOLS[0]
-                }
-                fillable={activeTool.type === "selection"}
-              />
-            );
-          }
-
-          return (
-            <ToolButton
-              className={clsx("Shape", { fillable })}
-              key={value}
-              type="radio"
-              icon={icon}
-              checked={activeTool.type === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={keybindingLabel}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={shortcut}
-              data-testid={`toolbar-${value}`}
-              onPointerDown={({ pointerType }) => {
-                // Detect the pen here (pointerType is reliable on pointer-down)
-                // but DON'T enable pen mode yet: calling setState mid-gesture
-                // re-renders the controlled radio and, on iOS/iPadOS, aborts
-                // the ensuing click so the tool isn't selected on the first pen
-                // tap. Defer it until the tap's `change` has committed (below).
-                if (!app.state.penDetected && pointerType === "pen") {
-                  pendingPenDetectionRef.current = true;
-                }
-
-                if (value === "selection") {
-                  if (app.state.activeTool.type === "selection") {
-                    app.setActiveTool({ type: "lasso" });
-                  } else {
-                    app.setActiveTool({ type: "selection" });
-                  }
-                }
-              }}
-              onChange={() => {
-                if (app.state.activeTool.type !== value) {
-                  trackEvent("toolbar", value, "ui");
-                }
-                app.setActiveTool({ type: value });
-
-                // Apply the pen detection captured on pointer-down now that the
-                // tool is selected. rAF keeps the resulting re-render out of the
-                // `change` event itself. We rely on the pointer-down detection
-                // rather than this handler's pointerType because the latter is
-                // unreliable on iOS (its backing ref is cleared before the
-                // delayed click fires).
-                if (pendingPenDetectionRef.current) {
-                  pendingPenDetectionRef.current = false;
-                  requestAnimationFrame(() => app.togglePenMode(true));
-                }
-              }}
-            />
-          );
-        },
-      )}
-      <div className="App-toolbar__divider" />
-
-      <DropdownMenu open={isExtraToolsMenuOpen}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => {
-            setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
-            setAppState({ openMenu: null, openPopup: null });
-          }}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-          onSelect={() => setIsExtraToolsMenuOpen(false)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          {isFullStylesPanel && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "lasso" })}
-              icon={LassoIcon}
-              data-testid="toolbar-lasso"
-              selected={lassoToolSelected}
-            >
-              {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <DropdownMenu.Item
-              onSelect={() => app.onMagicframeToolSelect()}
-              icon={MagicIcon}
-              data-testid="toolbar-magicframe"
-              badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
-            >
-              {t("toolBar.magicframe")}
-            </DropdownMenu.Item>
-          )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-    </>
   );
 };
 

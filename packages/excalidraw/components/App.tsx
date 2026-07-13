@@ -331,7 +331,6 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -466,7 +465,7 @@ import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -2238,7 +2237,6 @@ class App extends React.Component<AppProps, AppState> {
                             elements={this.scene.getNonDeletedElements()}
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
-                            onHandToolToggle={this.onHandToolToggle}
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
                             renderTopRightUI={renderTopRightUI}
@@ -4008,7 +4006,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setActiveTool(
         { type: this.state.preferredSelectionTool.type },
-        true,
+        { keepSelection: true },
       );
       event?.preventDefault();
     },
@@ -4159,7 +4157,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
+    this.setActiveTool(
+      { type: this.state.preferredSelectionTool.type },
+      { keepSelection: true },
+    );
 
     if (opts.fit) {
       this.setViewport({
@@ -4428,10 +4429,6 @@ class App extends React.Component<AppProps, AppState> {
           : prevState.currentItemStrokeVariability,
       };
     });
-  };
-
-  onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
   };
 
   /**
@@ -5306,6 +5303,9 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
+        // so that an uppercase letter can only mean CapsLock (Shift+letter
+        // must not switch tools — findShapeByKey lowercases the key)
+        !event.shiftKey &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
@@ -5349,7 +5349,7 @@ class App extends React.Component<AppProps, AppState> {
               type: this.state.preferredSelectionTool.type,
             });
           } else {
-            this.setActiveTool({ type: shape });
+            this.setActiveTool({ type: shape }, { toggle: true });
           }
 
           event.stopPropagation();
@@ -5785,8 +5785,20 @@ class App extends React.Component<AppProps, AppState> {
       locked?: boolean;
       fromSelection?: boolean;
     },
-    keepSelection = false,
+    opts: {
+      keepSelection?: boolean;
+      /**
+       * When `true`, re-activating an already-active toggle tool (see
+       * `TOGGLE_TOOLS`) switches back to the previously active tool.
+       * Activation is idempotent by default; toggle tools always record the
+       * previously active tool regardless (so ESC and the next `toggle`
+       * activation can switch back to it).
+       */
+      toggle?: boolean;
+    } = {},
   ) => {
+    const { keepSelection = false } = opts;
+
     if (!this.isToolSupported(tool.type)) {
       console.warn(
         `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
@@ -5794,7 +5806,26 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
+    const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
+    const toggle = opts.toggle === true && isToggleTool;
+
+    const nextActiveTool =
+      toggle && this.state.activeTool.type === tool.type
+        ? // toggle back to the tool that was active before this one
+          updateActiveTool(this.state, {
+            ...(this.state.activeTool.lastActiveTool || {
+              type: this.state.preferredSelectionTool.type,
+            }),
+            lastActiveTool: null,
+          })
+        : isToggleTool && this.state.activeTool.type !== tool.type
+        ? // activating a toggle tool records the currently active tool so
+          // ESC and the next `toggle` activation can switch back to it
+          updateActiveTool(this.state, {
+            ...tool,
+            lastActiveTool: this.state.activeTool,
+          })
+        : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -8168,7 +8199,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           activeTool: updateActiveTool(this.state, {
             type: TOOL_TYPE.eraser,
-            lastActiveToolBeforeEraser: this.state.activeTool,
+            lastActiveTool: this.state.activeTool,
           }),
         },
         () => {
@@ -8182,7 +8213,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...(this.state.activeTool.lastActiveTool || {
                     type: TOOL_TYPE.selection,
                   }),
-                  lastActiveToolBeforeEraser: null,
+                  lastActiveTool: null,
                 }),
               });
             }
@@ -10691,7 +10722,7 @@ class App extends React.Component<AppProps, AppState> {
         if (event.altKey) {
           this.setActiveTool(
             { type: "lasso", fromSelection: true },
-            event.shiftKey,
+            { keepSelection: event.shiftKey },
           );
           this.lassoTrail.startPath(
             pointerDownState.origin.x,

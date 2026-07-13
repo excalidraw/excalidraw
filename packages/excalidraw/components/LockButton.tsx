@@ -1,50 +1,26 @@
 import clsx from "clsx";
 
-import "./ToolIcon.scss";
-
+import { IconButton } from "./IconButton";
 import { LockedIcon, UnlockedIcon } from "./icons";
 
-import type { ToolButtonSize } from "./ToolButton";
-
-type LockIconProps = {
+type LockButtonProps = {
   title?: string;
-  name?: string;
   checked: boolean;
   onChange?(): void;
   isMobile?: boolean;
 };
 
-const DEFAULT_SIZE: ToolButtonSize = "medium";
-
-const ICONS = {
-  CHECKED: LockedIcon,
-  UNCHECKED: UnlockedIcon,
-};
-
-export const LockButton = (props: LockIconProps) => {
+export const LockButton = (props: LockButtonProps) => {
   return (
-    <label
-      className={clsx(
-        "ToolIcon ToolIcon__lock",
-        `ToolIcon_size_${DEFAULT_SIZE}`,
-        {
-          "is-mobile": props.isMobile,
-        },
-      )}
+    <IconButton
+      className={clsx("ToolIcon__lock", { "is-mobile": props.isMobile })}
+      type="toggle"
+      icon={props.checked ? LockedIcon : UnlockedIcon}
+      checked={props.checked}
       title={`${props.title} — Q`}
-    >
-      <input
-        className="ToolIcon_type_checkbox"
-        type="checkbox"
-        name={props.name}
-        onChange={props.onChange}
-        checked={props.checked}
-        aria-label={props.title}
-        data-testid="toolbar-lock"
-      />
-      <div className="ToolIcon__icon">
-        {props.checked ? ICONS.CHECKED : ICONS.UNCHECKED}
-      </div>
-    </label>
+      aria-label={`${props.title}`}
+      data-testid="toolbar-lock"
+      onSelect={() => props.onChange?.()}
+    />
   );
 };

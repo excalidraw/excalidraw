@@ -1,11 +1,9 @@
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
-  CURSOR_TYPE,
   MAX_ZOOM,
   MIN_ZOOM,
   THEME,
   ZOOM_STEP,
-  updateActiveTool,
   CODES,
   KEYS,
 } from "@excalidraw/common";
@@ -18,17 +16,11 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
+import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
 import {
-  handIcon,
-  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -37,7 +29,6 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { setCursor } from "../cursor";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
@@ -157,7 +148,7 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-in-button zoom-button"
         icon={ZoomInIcon}
@@ -202,7 +193,7 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-out-button zoom-button"
         icon={ZoomOutIcon}
@@ -254,7 +245,7 @@ export const actionResetZoom = register({
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
       <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
-        <ToolButton
+        <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
           title={t("buttons.resetZoom")}
@@ -264,7 +255,7 @@ export const actionResetZoom = register({
           }}
         >
           {(zoomValue * 100).toFixed(0)}%
-        </ToolButton>
+        </IconButton>
       </Tooltip>
     );
   },
@@ -403,118 +394,4 @@ export const actionToggleTheme = register<AppState["theme"]>({
   predicate: (elements, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
   },
-});
-
-export const actionToggleEraserTool = register({
-  name: "toggleEraserTool",
-  label: "toolBar.eraser",
-  trackEvent: { category: "toolbar" },
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (isEraserActive(appState)) {
-      activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveTool || {
-          type: app.state.preferredSelectionTool.type,
-        }),
-        lastActiveToolBeforeEraser: null,
-      });
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "eraser",
-        lastActiveToolBeforeEraser: appState.activeTool,
-      });
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-  keyTest: (event, appState) =>
-    event.key === KEYS.E &&
-    !appState.newElement &&
-    !appState.selectedLinearElement?.isEditing &&
-    !appState.selectedLinearElement?.isDragging,
-});
-
-export const actionToggleLassoTool = register({
-  name: "toggleLassoTool",
-  label: "toolBar.lasso",
-  icon: LassoIcon,
-  trackEvent: { category: "toolbar" },
-  predicate: (elements, appState, props, app) => {
-    return app.state.preferredSelectionTool.type !== "lasso";
-  },
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (appState.activeTool.type !== "lasso") {
-      activeTool = updateActiveTool(appState, {
-        type: "lasso",
-        fromSelection: false,
-      });
-      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "selection",
-      });
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.NEVER,
-    };
-  },
-});
-
-export const actionToggleHandTool = register({
-  name: "toggleHandTool",
-  label: "toolBar.hand",
-  trackEvent: { category: "toolbar" },
-  icon: handIcon,
-  viewMode: false,
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (isHandToolActive(appState)) {
-      activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
-        }),
-        lastActiveToolBeforeEraser: null,
-      });
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "hand",
-        lastActiveToolBeforeEraser: appState.activeTool,
-      });
-      setCursor(app.interactiveCanvas, CURSOR_TYPE.GRAB);
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-  keyTest: (event) =>
-    !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
