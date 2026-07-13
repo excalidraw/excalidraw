@@ -1089,7 +1089,6 @@ export type FrameNameBounds = {
   y: number;
   width: number;
   height: number;
-  angle: number;
 };
 
 export type FrameNameBoundsCache = {

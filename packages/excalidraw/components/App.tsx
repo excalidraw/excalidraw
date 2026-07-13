@@ -1934,7 +1934,6 @@ class App extends React.Component<AppProps, AppState> {
             y: boxSceneTopLeft.y,
             width: boxSceneBottomRight.x - boxSceneTopLeft.x,
             height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-            angle: 0,
             zoom: this.state.zoom.value,
             versionNonce: frameElement.versionNonce,
           };
