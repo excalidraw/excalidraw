@@ -236,8 +236,8 @@
       // if iframe
       if (window.self !== window.top) {
         scriptEle.addEventListener("load", () => {
-          if (window.sa_pageview) {
-            window.window.sa_event(action, {
+          if (window.sa_event) {
+            window.sa_event("embed", {
               category: "iframe",
               label: "embed",
               value: window.location.pathname,
