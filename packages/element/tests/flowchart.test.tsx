@@ -290,6 +290,148 @@ describe("flow chart creation", () => {
   });
 });
 
+describe("flow chart band-search placement", () => {
+  const addChild = (parent: NonDeletedExcalidrawElement, key: string) => {
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(key);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  };
+
+  const children = (parent: NonDeletedExcalidrawElement) =>
+    h.elements.filter((el) => el.type === "rectangle" && el.id !== parent.id);
+
+  const pendingRects = () =>
+    (h.app.flowChartCreator.pendingNodes ?? [])
+      .filter((el) => el.type === "rectangle")
+      .map((el) => ({ x: el.x, y: el.y }));
+
+  it("places the first child exactly one offset away in every direction", () => {
+    const cases = [
+      { key: KEYS.ARROW_RIGHT, x: 300, y: 0 },
+      { key: KEYS.ARROW_LEFT, x: -300, y: 0 },
+      { key: KEYS.ARROW_DOWN, x: 0, y: 200 },
+      { key: KEYS.ARROW_UP, x: 0, y: -200 },
+    ];
+
+    for (const { key, x, y } of cases) {
+      API.clearSelection();
+      const parent = API.createElement({
+        type: "rectangle",
+        width: 200,
+        height: 100,
+      });
+      API.setElements([parent]);
+
+      addChild(parent, key);
+
+      const [child] = children(parent);
+      expect(child).toBeTruthy();
+      expect(child.x).toBe(x);
+      expect(child.y).toBe(y);
+    }
+  });
+
+  it("slides into the nearest free gap between obstacles without moving them", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+
+    addChild(parent, KEYS.ARROW_DOWN);
+    addChild(parent, KEYS.ARROW_DOWN);
+
+    const [c1, c2] = children(parent).sort((a, b) => a.x - b.x);
+    expect([c1.x, c2.x]).toEqual([0, 300]);
+
+    // widen the gap between the siblings so a third child fits in between
+    API.updateElement(c2, { x: 600 });
+
+    addChild(parent, KEYS.ARROW_DOWN);
+
+    const c3 = children(parent).find(
+      (el) => el.id !== c1.id && el.id !== c2.id,
+    )!;
+    expect({ x: c3.x, y: c3.y }).toEqual({ x: 300, y: 200 });
+
+    // the obstacles were not moved
+    expect({ x: c1.x, y: c1.y }).toEqual({ x: 0, y: 200 });
+    expect({ x: c2.x, y: c2.y }).toEqual({ x: 600, y: 200 });
+  });
+
+  it("keeps pending nodes in place while the cluster grows", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+    API.setSelectedElements([parent]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([{ x: 300, y: 0 }]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+      ]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: -200 },
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  });
+
+  it("repositions the whole pending cluster when it no longer fits", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+
+    // box in the space right of the parent, leaving room for a single node
+    addChild(parent, KEYS.ARROW_RIGHT);
+    const [c1] = children(parent);
+    API.updateElement(c1, { y: -300 });
+
+    addChild(parent, KEYS.ARROW_RIGHT);
+    const c2 = children(parent).find((el) => el.id !== c1.id)!;
+    expect({ x: c2.x, y: c2.y }).toEqual({ x: 300, y: 0 });
+    API.updateElement(c2, { y: 300 });
+
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([{ x: 300, y: 0 }]);
+
+      // growing cannot extend at either end, so the cluster moves as a whole
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: -100 },
+        { x: 300, y: 100 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+
+    // the obstacles were not moved
+    expect({ x: c1.x, y: c1.y }).toEqual({ x: 300, y: -300 });
+    expect({ x: c2.x, y: c2.y }).toEqual({ x: 300, y: 300 });
+  });
+});
+
 describe("flow chart navigation", () => {
   it("single node at each level", () => {
     /**
