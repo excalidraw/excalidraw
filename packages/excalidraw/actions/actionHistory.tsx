@@ -35,7 +35,7 @@ const executeHistoryAction = (
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement &&
-    !app.flowChartCreator.isCreatingChart
+    !app.flowchart.isCreatingChart
   ) {
     const result = updater();
 

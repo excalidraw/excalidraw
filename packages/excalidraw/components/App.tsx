@@ -154,7 +154,6 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
-  isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
   getNormalizedDimensions,
@@ -196,9 +195,6 @@ import {
   hitElementBoundingBoxOnly,
   hitElementItself,
   getVisibleSceneBounds,
-  FlowChartCreator,
-  FlowChartNavigator,
-  getLinkDirectionFromKey,
   cropElement,
   wrapText,
   isElementLink,
@@ -448,6 +444,7 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { AppFlowchart } from "./App.flowchart";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -723,8 +720,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
-  public flowChartCreator: FlowChartCreator = new FlowChartCreator();
-  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
+  public flowchart: AppFlowchart = new AppFlowchart(this);
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
@@ -2399,7 +2395,7 @@ class App extends React.Component<AppProps, AppState> {
                               elementsPendingErasure:
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes:
-                                this.flowChartCreator.pendingNodes,
+                                this.flowchart.pendingNodes,
                               theme: this.state.theme,
                             }}
                           />
@@ -4556,6 +4552,38 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  // scroll `elements` into view only if they aren't already fully visible.
+  // Targets their bounds rather than the elements so it also works for
+  // elements not yet committed to the canvas.
+  revealIfHidden = (elements: NonDeletedExcalidrawElement[]) => {
+    if (
+      !elements.length ||
+      isElementCompletelyInViewport(
+        elements,
+        this.canvas.width / window.devicePixelRatio,
+        this.canvas.height / window.devicePixelRatio,
+        {
+          offsetLeft: this.state.offsetLeft,
+          offsetTop: this.state.offsetTop,
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          zoom: this.state.zoom,
+        },
+        this.scene.getNonDeletedElementsMap(),
+        this.getViewportOffsets(),
+      )
+    ) {
+      return;
+    }
+
+    this.setViewport({
+      target: getCommonBounds(elements),
+      fit: "scale-down",
+      animation: { duration: 300 },
+      offsets: { ui: true },
+    });
+  };
+
   private maybeUnfollowRemoteUser = () => {
     if (this.state.userToFollow) {
       this.setState({ userToFollow: null });
@@ -4794,7 +4822,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private triggerRender = (
+  public triggerRender = (
     /** force always re-renders canvas even if no change */
     force?: boolean,
   ) => {
@@ -5065,121 +5093,8 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
-          event.key === KEYS.ESCAPE &&
-          this.flowChartCreator.isCreatingChart
-        ) {
-          this.flowChartCreator.clear();
-          this.triggerRender(true);
+        if (this.flowchart.handleKeyEvent(event)) {
           return;
-        }
-
-        const arrowKeyPressed = isArrowKey(event.key);
-
-        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
-          event.preventDefault();
-
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (
-            selectedElements.length === 1 &&
-            isFlowchartNodeElement(selectedElements[0])
-          ) {
-            this.flowChartCreator.createNodes(
-              selectedElements[0],
-              this.state,
-              getLinkDirectionFromKey(event.key),
-              this.scene,
-            );
-          }
-
-          if (
-            this.flowChartCreator.pendingNodes?.length &&
-            !isElementCompletelyInViewport(
-              this.flowChartCreator.pendingNodes,
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getViewportOffsets(),
-            )
-          ) {
-            this.setViewport({
-              target: getCommonBounds(this.flowChartCreator.pendingNodes),
-              fit: "scale-down",
-              animation: { duration: 300 },
-              offsets: { ui: true },
-            });
-          }
-
-          return;
-        }
-
-        if (event.altKey) {
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (selectedElements.length === 1 && arrowKeyPressed) {
-            event.preventDefault();
-
-            const nextId = this.flowChartNavigator.exploreByDirection(
-              selectedElements[0],
-              this.scene.getNonDeletedElementsMap(),
-              getLinkDirectionFromKey(event.key),
-            );
-
-            if (nextId) {
-              this.setState((prevState) => ({
-                selectedElementIds: makeNextSelectedElementIds(
-                  {
-                    [nextId]: true,
-                  },
-                  prevState,
-                ),
-              }));
-
-              const nextNode = this.scene
-                .getNonDeletedElementsMap()
-                .get(nextId);
-
-              if (
-                nextNode &&
-                !isElementCompletelyInViewport(
-                  [nextNode],
-                  this.canvas.width / window.devicePixelRatio,
-                  this.canvas.height / window.devicePixelRatio,
-                  {
-                    offsetLeft: this.state.offsetLeft,
-                    offsetTop: this.state.offsetTop,
-                    scrollX: this.state.scrollX,
-                    scrollY: this.state.scrollY,
-                    zoom: this.state.zoom,
-                  },
-                  this.scene.getNonDeletedElementsMap(),
-                  this.getViewportOffsets(),
-                )
-              ) {
-                this.setViewport({
-                  target: nextNode,
-                  fit: "scale-down",
-                  animation: { duration: 300 },
-                  offsets: { ui: true },
-                });
-              }
-            }
-            return;
-          }
         }
       }
 
@@ -5703,64 +5618,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBinding: null });
     }
 
-    if (!event.altKey) {
-      if (this.flowChartNavigator.isExploring) {
-        this.flowChartNavigator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
-      if (this.flowChartCreator.isCreatingChart) {
-        if (this.flowChartCreator.pendingNodes?.length) {
-          this.insertNewElements(this.flowChartCreator.pendingNodes);
-        }
-
-        const firstNode = this.flowChartCreator.pendingNodes?.[0];
-
-        if (firstNode) {
-          this.setState((prevState) => ({
-            selectedElementIds: makeNextSelectedElementIds(
-              {
-                [firstNode.id]: true,
-              },
-              prevState,
-            ),
-          }));
-
-          if (
-            !isElementCompletelyInViewport(
-              [firstNode],
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getViewportOffsets(),
-            )
-          ) {
-            this.setViewport({
-              target: firstNode,
-              fit: "scale-down",
-              animation: { duration: 300 },
-              offsets: { ui: true },
-            });
-          }
-        }
-
-        this.flowChartCreator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
+    this.flowchart.handleKeyEvent(event);
   });
 
   // We purposely widen the `tool` type so this helper can be called with
@@ -7200,7 +7058,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private insertNewElements = (elements: readonly ExcalidrawElement[]) => {
+  public insertNewElements = (elements: readonly ExcalidrawElement[]) => {
     if (!elements.length) {
       return;
     }
