@@ -438,7 +438,7 @@ export const getSelectedElementsByGroup = (
     );
 
     if (!selectedGroupId) {
-      bucketKey = element.id;
+      bucketKey = `${element.id}_element`;
     } else {
       // if only one group is selected, grouping is based on inner hierarchy
       const keyIndex = isSingleSelectedGroupCase
@@ -446,7 +446,10 @@ export const getSelectedElementsByGroup = (
         : element.groupIds.indexOf(selectedGroupId);
 
       // edge case: single selected group where element is non member of inner group
-      bucketKey = keyIndex < 0 ? element.id : element.groupIds[keyIndex];
+      bucketKey =
+        keyIndex < 0
+          ? `${element.id}_element`
+          : `${element.groupIds[keyIndex]}_group`;
     }
 
     const currentBucketMembers = buckets.get(bucketKey) ?? [];
