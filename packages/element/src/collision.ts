@@ -127,8 +127,7 @@ const frameNameBoundsEqual = (
     a.x === b.x &&
     a.y === b.y &&
     a.width === b.width &&
-    a.height === b.height &&
-    a.angle === b.angle);
+    a.height === b.height);
 
 export const hitElementItself = ({
   point,
