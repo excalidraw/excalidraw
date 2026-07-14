@@ -13,6 +13,7 @@ export {
 } from "./description";
 export {
   getGeometricContainer,
+  getContainedElements,
   getContainedElementsCount,
 } from "./containment";
 export {

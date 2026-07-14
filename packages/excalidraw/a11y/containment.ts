@@ -2,6 +2,8 @@ import { getBoundTextElement } from "@excalidraw/element";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
+import { getSceneReadingOrder } from "./readingOrder";
+
 /**
  * Geometric containment ("layers"): many boards express structure by nesting
  * boxes inside larger labeled boxes (swimlanes, zones, architecture layers)
@@ -17,8 +19,8 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 type ContainmentIndex = {
   /** element id -> id of its nearest (smallest) enclosing labeled shape */
   containerOf: Map<string, string>;
-  /** container id -> number of elements whose nearest container it is */
-  childCount: Map<string, number>;
+  /** container id -> ids of elements whose nearest container it is */
+  childrenOf: Map<string, string[]>;
 };
 
 // beyond this the O(elements × containers) sweep isn't worth the payoff
@@ -40,8 +42,8 @@ const encloses = (container: ExcalidrawElement, element: ExcalidrawElement) =>
 
 const buildIndex = (elementsMap: ElementsMap): ContainmentIndex => {
   const containerOf = new Map<string, string>();
-  const childCount = new Map<string, number>();
-  const index = { containerOf, childCount };
+  const childrenOf = new Map<string, string[]>();
+  const index = { containerOf, childrenOf };
 
   if (elementsMap.size > MAX_ELEMENTS_FOR_CONTAINMENT) {
     return index;
@@ -77,7 +79,12 @@ const buildIndex = (elementsMap: ElementsMap): ContainmentIndex => {
         encloses(container, element)
       ) {
         containerOf.set(element.id, container.id);
-        childCount.set(container.id, (childCount.get(container.id) ?? 0) + 1);
+        let children = childrenOf.get(container.id);
+        if (!children) {
+          children = [];
+          childrenOf.set(container.id, children);
+        }
+        children.push(element.id);
         break;
       }
     }
@@ -107,4 +114,28 @@ export const getGeometricContainer = (
 export const getContainedElementsCount = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): number => getIndex(elementsMap).childCount.get(element.id) ?? 0;
+): number => getIndex(elementsMap).childrenOf.get(element.id)?.length ?? 0;
+
+/**
+ * The elements visually nested inside this box (those whose nearest labeled
+ * container it is), in reading order; for frames, the frame's members.
+ */
+export const getContainedElements = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): ExcalidrawElement[] => {
+  let children: ExcalidrawElement[];
+  if (element.type === "frame" || element.type === "magicframe") {
+    children = [...elementsMap.values()].filter(
+      (el) =>
+        !el.isDeleted &&
+        el.frameId === element.id &&
+        !("containerId" in el && el.containerId),
+    );
+  } else {
+    children = (getIndex(elementsMap).childrenOf.get(element.id) ?? [])
+      .map((id) => elementsMap.get(id))
+      .filter((el): el is ExcalidrawElement => !!el && !el.isDeleted);
+  }
+  return getSceneReadingOrder(children);
+};

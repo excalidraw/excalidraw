@@ -8,6 +8,7 @@ import {
 import type {
   ExcalidrawElement,
   ExcalidrawFlowchartNodeElement,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import { announce, getElementText, getElementTypeLabel } from "../a11y";
@@ -21,7 +22,12 @@ import type { AppState } from "../types";
 const getConnectCandidates = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
-): [ExcalidrawFlowchartNodeElement, ExcalidrawFlowchartNodeElement] | null => {
+):
+  | [
+      NonDeleted<ExcalidrawFlowchartNodeElement>,
+      NonDeleted<ExcalidrawFlowchartNodeElement>,
+    ]
+  | null => {
   const selected = getSelectedElements(elements, appState);
   if (
     selected.length === 2 &&
@@ -30,8 +36,8 @@ const getConnectCandidates = (
     )
   ) {
     return selected as [
-      ExcalidrawFlowchartNodeElement,
-      ExcalidrawFlowchartNodeElement,
+      NonDeleted<ExcalidrawFlowchartNodeElement>,
+      NonDeleted<ExcalidrawFlowchartNodeElement>,
     ];
   }
   return null;

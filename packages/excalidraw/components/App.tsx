@@ -447,9 +447,11 @@ import {
   a11yHelpDialogAtom,
   announce,
   getConnectedElements,
+  getContainedElements,
   getElementDescription,
   getElementText,
   getElementTypeLabel,
+  getGeometricContainer,
 } from "../a11y";
 
 import ConvertElementTypePopup, {
@@ -480,8 +482,6 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
-
-import type { TranslationKeys } from "../i18n";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -739,9 +739,10 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public flowchart: AppFlowchart = new AppFlowchart(this);
-  // Alt+N connection cycling (a11y): remembers the anchor whose
-  // connections are being enumerated across successive presses
-  private a11yConnectionCycle: {
+  // Alt+N / Alt+I cycling (a11y): remembers the anchor whose connections
+  // or nested elements are being enumerated across successive presses
+  private a11yCycle: {
+    kind: "connections" | "contained";
     anchorId: string;
     index: number;
     lastTargetId: string;
@@ -3515,6 +3516,21 @@ class App extends React.Component<AppProps, AppState> {
 
     this.appStateObserver.flush(prevState);
 
+    // Alt+N / Alt+I cycles only survive while the selection is what the
+    // cycle itself produced — any other selection change starts fresh
+    if (
+      this.a11yCycle &&
+      prevState.selectedElementIds !== this.state.selectedElementIds
+    ) {
+      const selectedIds = Object.keys(this.state.selectedElementIds);
+      if (
+        selectedIds.length !== 1 ||
+        selectedIds[0] !== this.a11yCycle.lastTargetId
+      ) {
+        this.a11yCycle = null;
+      }
+    }
+
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5194,12 +5210,18 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        // Alt+N: cycle through ALL connections of the anchor element
-        // regardless of geometry. Alt+Arrow requires knowing which side
-        // an elbow arrow happens to attach to — something a non-visual
-        // user cannot guess. (Alt+Arrow announcements live in
-        // AppFlowchart.handleKeyEvent.)
-        if (event.altKey && !event.shiftKey && event.code === "KeyN") {
+        // Alt+N cycles through ALL connections of the anchor element
+        // regardless of geometry (Alt+Arrow requires knowing which side an
+        // elbow arrow attaches to — something a non-visual user cannot
+        // guess; its announcements live in AppFlowchart.handleKeyEvent).
+        // Alt+I cycles through the elements nested inside the box — boards
+        // often express structure by containment (layers, swimlanes)
+        // rather than arrows
+        if (
+          event.altKey &&
+          !event.shiftKey &&
+          (event.code === "KeyN" || event.code === "KeyI")
+        ) {
           const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
             this.state,
@@ -5207,58 +5229,29 @@ class App extends React.Component<AppProps, AppState> {
 
           if (selectedElements.length === 1) {
             event.preventDefault();
-            const elementsMap = this.scene.getNonDeletedElementsMap();
-            const current = selectedElements[0];
-
-            // keep cycling the same anchor while we keep landing on its
-            // connections (so several Alt+N presses enumerate them all
-            // instead of ping-ponging between two neighbors)
-            let anchor = current;
-            let index = 0;
-            const prevCycle = this.a11yConnectionCycle;
-            if (prevCycle && prevCycle.lastTargetId === current.id) {
-              const prevAnchor = elementsMap.get(prevCycle.anchorId);
-              if (prevAnchor && !prevAnchor.isDeleted) {
-                anchor = prevAnchor;
-                index = prevCycle.index + 1;
-              }
-            }
-
-            const connections = getConnectedElements(anchor, elementsMap);
-            if (!connections.length) {
-              this.a11yConnectionCycle = null;
-              announce(t("a11y.noConnections"));
-              return;
-            }
-
-            index %= connections.length;
-            const target = connections[index];
-            this.a11yConnectionCycle = {
-              anchorId: anchor.id,
-              index,
-              lastTargetId: target.id,
-            };
-
-            this.setState((prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
-                { [target.id]: true },
-                prevState,
-              ),
-            }));
-
-            // while browsing proxies, the selection→focus sync makes the
-            // screen reader read the target itself — only add the position
-            const position = t("a11y.connectionPosition", {
-              position: index + 1,
-              total: connections.length,
-            });
-            announce(
-              document.activeElement?.closest(".excalidraw-a11y-scene")
-                ? position
-                : `${getElementDescription(target, elementsMap)}, ${position}`,
+            this.cycleA11yTargets(
+              event.code === "KeyN" ? "connections" : "contained",
+              selectedElements[0],
             );
+            return;
+          }
+        }
 
-            this.revealIfHidden([target]);
+        // Alt+Shift+I: jump to the box/frame that visually contains the
+        // element — the inverse of Alt+I
+        if (
+          event.altKey &&
+          event.shiftKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          event.code === "KeyI"
+        ) {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+          if (selectedElements.length === 1) {
+            event.preventDefault();
+            this.focusA11yContainer(selectedElements[0]);
             return;
           }
         }
@@ -5702,7 +5695,9 @@ class App extends React.Component<AppProps, AppState> {
       const isPickingStroke =
         lowerCased === KEYS.S && event.shiftKey && !event[KEYS.CTRL_OR_CMD];
       const isPickingBackground =
-        event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
+        // !altKey: Alt+I cycles nested elements (a11y)
+        (event.key === KEYS.I && !event.altKey) ||
+        (lowerCased === KEYS.G && event.shiftKey);
 
       if (isPickingStroke || isPickingBackground) {
         this.openEyeDropper({
@@ -10175,6 +10170,101 @@ class App extends React.Component<AppProps, AppState> {
       '.excalidraw-a11y-scene [tabindex="0"]',
     );
     (currentProxy ?? container).focus();
+  };
+
+  /**
+   * Alt+N / Alt+I cycling: selects the anchor's connections (or nested
+   * elements) one per keypress. The anchor is kept while successive
+   * presses land on its own targets, so the cycle enumerates them all
+   * instead of ping-ponging, and wraps at the end.
+   */
+  private cycleA11yTargets = (
+    kind: "connections" | "contained",
+    current: ExcalidrawElement,
+  ) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
+    let anchor = current;
+    let index = 0;
+    const prevCycle = this.a11yCycle;
+    if (prevCycle?.kind === kind && prevCycle.lastTargetId === current.id) {
+      const prevAnchor = elementsMap.get(prevCycle.anchorId);
+      if (prevAnchor && !prevAnchor.isDeleted) {
+        anchor = prevAnchor;
+        index = prevCycle.index + 1;
+      }
+    }
+
+    const targets =
+      kind === "connections"
+        ? getConnectedElements(anchor, elementsMap)
+        : getContainedElements(anchor, elementsMap);
+    if (!targets.length) {
+      this.a11yCycle = null;
+      announce(
+        t(
+          kind === "connections"
+            ? "a11y.noConnections"
+            : "a11y.noContainedElements",
+        ),
+      );
+      return;
+    }
+
+    index %= targets.length;
+    const target = targets[index];
+    this.a11yCycle = {
+      kind,
+      anchorId: anchor.id,
+      index,
+      lastTargetId: target.id,
+    };
+
+    this.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        { [target.id]: true },
+        prevState,
+      ),
+    }));
+
+    // while browsing proxies, the selection→focus sync makes the screen
+    // reader read the target itself — only add the position
+    const position = t(
+      kind === "connections"
+        ? "a11y.connectionPosition"
+        : "a11y.containedPosition",
+      { position: index + 1, total: targets.length },
+    );
+    announce(
+      document.activeElement?.closest(".excalidraw-a11y-scene")
+        ? position
+        : `${getElementDescription(target, elementsMap)}, ${position}`,
+    );
+
+    this.revealIfHidden([target as NonDeletedExcalidrawElement]);
+  };
+
+  /** Alt+Shift+I: move to the box/frame that visually contains the element */
+  private focusA11yContainer = (current: ExcalidrawElement) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const container =
+      getGeometricContainer(current, elementsMap) ??
+      (current.frameId ? elementsMap.get(current.frameId) : null);
+    if (!container || container.isDeleted) {
+      announce(t("a11y.noContainer"));
+      return;
+    }
+    this.a11yCycle = null;
+    this.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        { [container.id]: true },
+        prevState,
+      ),
+    }));
+    if (!document.activeElement?.closest(".excalidraw-a11y-scene")) {
+      announce(getElementDescription(container, elementsMap));
+    }
+    this.revealIfHidden([container as NonDeletedExcalidrawElement]);
   };
 
   private cycleFocusAcrossRegions = (backwards: boolean) => {

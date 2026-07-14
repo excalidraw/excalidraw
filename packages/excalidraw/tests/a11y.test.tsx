@@ -825,6 +825,86 @@ describe("a11y connection navigation feedback", () => {
     fireEvent.keyDown(document, { key: "n", code: "KeyN", altKey: true });
     expect(liveRegionText()).toContain("No connections");
   });
+
+  it("cycles through nested elements with Alt+I and jumps up with Alt+Shift+I", () => {
+    const zone = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 600,
+      height: 600,
+    });
+    const zoneLabel = API.createElement({
+      type: "text",
+      containerId: zone.id,
+      text: "Zone",
+    });
+    const first = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+    const second = API.createElement({
+      type: "ellipse",
+      x: 300,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([
+      { ...zone, boundElements: [{ type: "text" as const, id: zoneLabel.id }] },
+      zoneLabel,
+      first,
+      second,
+    ]);
+    focusProxyOf(zone.id);
+
+    // enumerate the zone's nested elements in reading order, wrapping
+    fireEvent.keyDown(document, { key: "i", code: "KeyI", altKey: true });
+    expect(window.h.state.selectedElementIds[first.id]).toBe(true);
+    expect(liveRegionText()).toContain("Contained element 1 of 2");
+
+    fireEvent.keyDown(document, { key: "i", code: "KeyI", altKey: true });
+    expect(window.h.state.selectedElementIds[second.id]).toBe(true);
+    expect(liveRegionText()).toContain("Contained element 2 of 2");
+
+    fireEvent.keyDown(document, { key: "i", code: "KeyI", altKey: true });
+    expect(window.h.state.selectedElementIds[first.id]).toBe(true);
+    expect(liveRegionText()).toContain("Contained element 1 of 2");
+
+    // Alt+Shift+I: back up to the containing box
+    fireEvent.keyDown(document, {
+      key: "I",
+      code: "KeyI",
+      altKey: true,
+      shiftKey: true,
+    });
+    expect(window.h.state.selectedElementIds[zone.id]).toBe(true);
+
+    // moving focus by other means resets the cycle: Alt+I on a leaf
+    // then drills into the leaf (which has nothing inside)
+    fireEvent.keyDown(document, { key: "i", code: "KeyI", altKey: true });
+    expect(liveRegionText()).toContain("Contained element 1 of 2");
+    focusProxyOf(second.id);
+    fireEvent.keyDown(document, { key: "i", code: "KeyI", altKey: true });
+    expect(liveRegionText()).toContain("No contained elements");
+  });
+
+  it("announces when the element is not inside any box", () => {
+    const lone = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    API.setElements([lone]);
+    focusProxyOf(lone.id);
+
+    fireEvent.keyDown(document, {
+      key: "I",
+      code: "KeyI",
+      altKey: true,
+      shiftKey: true,
+    });
+    expect(liveRegionText()).toContain("Not inside a box");
+  });
 });
 
 describe("a11y jump to canvas", () => {

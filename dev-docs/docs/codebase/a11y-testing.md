@@ -33,6 +33,7 @@ Manual test protocol for the accessibility layer (see `ACCESSIBILITY_PLAN.md` in
 - `Alt+Arrow` follows arrow connections; when a direction has none, "No connection above/below/to the left/to the right" is announced (never silence).
 - `Alt+N` pressed repeatedly cycles through ALL connections of the element ("Connection 1 of 2", then 2 of 2, then wraps) — no need to guess which side an elbow arrow attaches to; "No connections" on an unconnected element.
 - Nesting is announced: an element inside a larger labelled box says `inside "…"`, containers say "contains N elements" (test with an architecture-style board where structure is boxes-in-boxes rather than arrows).
+- `Alt+I` on a box cycles through its nested elements ("Contained element 1 of 8", wraps; also works on frames); on a leaf it announces "No contained elements". `Alt+Shift+I` jumps up to the containing box ("Not inside a box" at top level). Moving focus by any other means restarts the cycle from the element you are on.
 - Escape returns to the editor container; no keyboard trap either way.
 - Element descriptions include the conceptual color ("red", "blue, light green fill") — color a few shapes alike and verify they can be recognized as belonging together; custom (non-palette) colors must still announce a sensible family name, never a hex code.
 

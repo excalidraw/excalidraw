@@ -15,6 +15,7 @@ const SECTIONS: { title: string; items: string[] }[] = [
       "browse3",
       "browse3b",
       "browse3c",
+      "browse3d",
       "browse4",
       "browse5",
     ],
