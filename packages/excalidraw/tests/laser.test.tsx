@@ -107,6 +107,49 @@ describe("laser tool interactions", () => {
     handleIframeLikeCenterClickSpy.mockRestore();
   });
 
+  it("activates embeddables covered by a higher z-index canvas element", async () => {
+    await render(<Excalidraw />);
+
+    const embeddable = API.createElement({
+      type: "embeddable",
+      x: 40,
+      y: 40,
+      width: 300,
+      height: 180,
+    });
+    const coveringRectangle = API.createElement({
+      type: "rectangle",
+      x: 40,
+      y: 40,
+      width: 300,
+      height: 180,
+      backgroundColor: "#ff0000",
+      fillStyle: "solid",
+    });
+    API.setElements([embeddable, coveringRectangle]);
+    API.updateElement(embeddable, {
+      link: "https://www.youtube.com/watch?v=gkGMXY0wekg",
+    });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    const centerX = embeddable.x + embeddable.width / 2;
+    const centerY = embeddable.y + embeddable.height / 2;
+
+    mouse.moveTo(centerX, centerY);
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.POINTER,
+    );
+    mouse.clickAt(centerX, centerY);
+
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable?.element.id).toBe(embeddable.id);
+      expect(h.state.activeEmbeddable?.state).toBe("active");
+    });
+  });
+
   it("doesn't pan in view mode when laser tool is active", async () => {
     await render(<Excalidraw />);
 
