@@ -127,13 +127,9 @@ export type ActionName =
   | "unlockAllElements"
   | "toggleElementLock"
   | "toggleLinearEditor"
-  | "toggleEraserTool"
-  | "toggleHandTool"
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"
-  | "setFrameAsActiveTool"
-  | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"
@@ -144,7 +140,6 @@ export type ActionName =
   | "linkToElement"
   | "cropEditor"
   | "wrapSelectionInFrame"
-  | "toggleLassoTool"
   | "toggleShapeSwitch"
   | "togglePolygon";
 

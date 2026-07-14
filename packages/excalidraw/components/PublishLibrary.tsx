@@ -16,7 +16,7 @@ import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import { CloseIcon } from "./icons";
 
@@ -148,7 +148,7 @@ const SingleLibraryItem = ({
         </span>
       )}
       <div ref={svgRef} className="single-library-item__svg" />
-      <ToolButton
+      <IconButton
         aria-label={t("buttons.remove")}
         type="button"
         icon={CloseIcon}

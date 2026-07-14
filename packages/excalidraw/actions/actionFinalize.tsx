@@ -38,7 +38,8 @@ import type {
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { TOGGLE_TOOLS } from "../components/Tools";
+import { IconButton } from "../components/IconButton";
 
 import { register } from "./register";
 
@@ -325,12 +326,12 @@ export const actionFinalize = register<FormData>({
     }
 
     let activeTool: AppState["activeTool"];
-    if (appState.activeTool.type === "eraser") {
+    if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
           type: app.state.preferredSelectionTool.type,
         }),
-        lastActiveToolBeforeEraser: null,
+        lastActiveTool: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
@@ -398,7 +399,7 @@ export const actionFinalize = register<FormData>({
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
-    <ToolButton
+    <IconButton
       type="button"
       icon={done}
       title={t("buttons.done")}

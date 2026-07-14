@@ -154,7 +154,6 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
-  isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
   getNormalizedDimensions,
@@ -196,9 +195,6 @@ import {
   hitElementBoundingBoxOnly,
   hitElementItself,
   getVisibleSceneBounds,
-  FlowChartCreator,
-  FlowChartNavigator,
-  getLinkDirectionFromKey,
   cropElement,
   wrapText,
   isElementLink,
@@ -331,7 +327,6 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -449,6 +444,7 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { AppFlowchart } from "./App.flowchart";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -465,7 +461,7 @@ import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -768,8 +764,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
-  public flowChartCreator: FlowChartCreator = new FlowChartCreator();
-  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
+  public flowchart: AppFlowchart = new AppFlowchart(this);
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
   private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
@@ -2042,7 +2037,6 @@ class App extends React.Component<AppProps, AppState> {
             y: boxSceneTopLeft.y,
             width: boxSceneBottomRight.x - boxSceneTopLeft.x,
             height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-            angle: 0,
             zoom: this.state.zoom.value,
             versionNonce: frameElement.versionNonce,
           };
@@ -2354,7 +2348,6 @@ class App extends React.Component<AppProps, AppState> {
                             elements={this.scene.getNonDeletedElements()}
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
-                            onHandToolToggle={this.onHandToolToggle}
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
                             renderTopRightUI={renderTopRightUI}
@@ -2522,7 +2515,7 @@ class App extends React.Component<AppProps, AppState> {
                               elementsPendingErasure:
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes:
-                                this.flowChartCreator.pendingNodes,
+                                this.flowchart.pendingNodes,
                               theme: this.state.theme,
                             }}
                           />
@@ -4432,7 +4425,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setActiveTool(
         { type: this.state.preferredSelectionTool.type },
-        true,
+        { keepSelection: true },
       );
       event?.preventDefault();
     },
@@ -4583,7 +4576,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
+    this.setActiveTool(
+      { type: this.state.preferredSelectionTool.type },
+      { keepSelection: true },
+    );
 
     if (opts.fit) {
       this.setViewport({
@@ -4854,10 +4850,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
-  };
-
   /**
    * Zooms on canvas viewport center
    */
@@ -4988,6 +4980,38 @@ class App extends React.Component<AppProps, AppState> {
       this.setState.bind(this),
       installLock,
     );
+  };
+
+  // scroll `elements` into view only if they aren't already fully visible.
+  // Targets their bounds rather than the elements so it also works for
+  // elements not yet committed to the canvas.
+  revealIfHidden = (elements: NonDeletedExcalidrawElement[]) => {
+    if (
+      !elements.length ||
+      isElementCompletelyInViewport(
+        elements,
+        this.canvas.width / window.devicePixelRatio,
+        this.canvas.height / window.devicePixelRatio,
+        {
+          offsetLeft: this.state.offsetLeft,
+          offsetTop: this.state.offsetTop,
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          zoom: this.state.zoom,
+        },
+        this.scene.getNonDeletedElementsMap(),
+        this.getViewportOffsets(),
+      )
+    ) {
+      return;
+    }
+
+    this.setViewport({
+      target: getCommonBounds(elements),
+      fit: "scale-down",
+      animation: { duration: 300 },
+      offsets: { ui: true },
+    });
   };
 
   private maybeUnfollowRemoteUser = () => {
@@ -5228,7 +5252,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private triggerRender = (
+  public triggerRender = (
     /** force always re-renders canvas even if no change */
     force?: boolean,
   ) => {
@@ -5503,121 +5527,8 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
-          event.key === KEYS.ESCAPE &&
-          this.flowChartCreator.isCreatingChart
-        ) {
-          this.flowChartCreator.clear();
-          this.triggerRender(true);
+        if (this.flowchart.handleKeyEvent(event)) {
           return;
-        }
-
-        const arrowKeyPressed = isArrowKey(event.key);
-
-        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
-          event.preventDefault();
-
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (
-            selectedElements.length === 1 &&
-            isFlowchartNodeElement(selectedElements[0])
-          ) {
-            this.flowChartCreator.createNodes(
-              selectedElements[0],
-              this.state,
-              getLinkDirectionFromKey(event.key),
-              this.scene,
-            );
-          }
-
-          if (
-            this.flowChartCreator.pendingNodes?.length &&
-            !isElementCompletelyInViewport(
-              this.flowChartCreator.pendingNodes,
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getViewportOffsets(),
-            )
-          ) {
-            this.setViewport({
-              target: getCommonBounds(this.flowChartCreator.pendingNodes),
-              fit: "scale-down",
-              animation: { duration: 300 },
-              offsets: { ui: true },
-            });
-          }
-
-          return;
-        }
-
-        if (event.altKey) {
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (selectedElements.length === 1 && arrowKeyPressed) {
-            event.preventDefault();
-
-            const nextId = this.flowChartNavigator.exploreByDirection(
-              selectedElements[0],
-              this.scene.getNonDeletedElementsMap(),
-              getLinkDirectionFromKey(event.key),
-            );
-
-            if (nextId) {
-              this.setState((prevState) => ({
-                selectedElementIds: makeNextSelectedElementIds(
-                  {
-                    [nextId]: true,
-                  },
-                  prevState,
-                ),
-              }));
-
-              const nextNode = this.scene
-                .getNonDeletedElementsMap()
-                .get(nextId);
-
-              if (
-                nextNode &&
-                !isElementCompletelyInViewport(
-                  [nextNode],
-                  this.canvas.width / window.devicePixelRatio,
-                  this.canvas.height / window.devicePixelRatio,
-                  {
-                    offsetLeft: this.state.offsetLeft,
-                    offsetTop: this.state.offsetTop,
-                    scrollX: this.state.scrollX,
-                    scrollY: this.state.scrollY,
-                    zoom: this.state.zoom,
-                  },
-                  this.scene.getNonDeletedElementsMap(),
-                  this.getViewportOffsets(),
-                )
-              ) {
-                this.setViewport({
-                  target: nextNode,
-                  fit: "scale-down",
-                  animation: { duration: 300 },
-                  offsets: { ui: true },
-                });
-              }
-            }
-            return;
-          }
         }
       }
 
@@ -5734,6 +5645,9 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
+        // so that an uppercase letter can only mean CapsLock (Shift+letter
+        // must not switch tools — findShapeByKey lowercases the key)
+        !event.shiftKey &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
@@ -5777,7 +5691,7 @@ class App extends React.Component<AppProps, AppState> {
               type: this.state.preferredSelectionTool.type,
             });
           } else {
-            this.setActiveTool({ type: shape });
+            this.setActiveTool({ type: shape }, { toggle: true });
           }
 
           event.stopPropagation();
@@ -6141,64 +6055,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBinding: null });
     }
 
-    if (!event.altKey) {
-      if (this.flowChartNavigator.isExploring) {
-        this.flowChartNavigator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
-      if (this.flowChartCreator.isCreatingChart) {
-        if (this.flowChartCreator.pendingNodes?.length) {
-          this.insertNewElements(this.flowChartCreator.pendingNodes);
-        }
-
-        const firstNode = this.flowChartCreator.pendingNodes?.[0];
-
-        if (firstNode) {
-          this.setState((prevState) => ({
-            selectedElementIds: makeNextSelectedElementIds(
-              {
-                [firstNode.id]: true,
-              },
-              prevState,
-            ),
-          }));
-
-          if (
-            !isElementCompletelyInViewport(
-              [firstNode],
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getViewportOffsets(),
-            )
-          ) {
-            this.setViewport({
-              target: firstNode,
-              fit: "scale-down",
-              animation: { duration: 300 },
-              offsets: { ui: true },
-            });
-          }
-        }
-
-        this.flowChartCreator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
+    this.flowchart.handleKeyEvent(event);
   });
 
   // We purposely widen the `tool` type so this helper can be called with
@@ -6216,8 +6073,20 @@ class App extends React.Component<AppProps, AppState> {
       locked?: boolean;
       fromSelection?: boolean;
     },
-    keepSelection = false,
+    opts: {
+      keepSelection?: boolean;
+      /**
+       * When `true`, re-activating an already-active toggle tool (see
+       * `TOGGLE_TOOLS`) switches back to the previously active tool.
+       * Activation is idempotent by default; toggle tools always record the
+       * previously active tool regardless (so ESC and the next `toggle`
+       * activation can switch back to it).
+       */
+      toggle?: boolean;
+    } = {},
   ) => {
+    const { keepSelection = false } = opts;
+
     if (!this.isToolSupported(tool.type)) {
       console.warn(
         `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
@@ -6225,7 +6094,26 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
+    const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
+    const toggle = opts.toggle === true && isToggleTool;
+
+    const nextActiveTool =
+      toggle && this.state.activeTool.type === tool.type
+        ? // toggle back to the tool that was active before this one
+          updateActiveTool(this.state, {
+            ...(this.state.activeTool.lastActiveTool || {
+              type: this.state.preferredSelectionTool.type,
+            }),
+            lastActiveTool: null,
+          })
+        : isToggleTool && this.state.activeTool.type !== tool.type
+        ? // activating a toggle tool records the currently active tool so
+          // ESC and the next `toggle` activation can switch back to it
+          updateActiveTool(this.state, {
+            ...tool,
+            lastActiveTool: this.state.activeTool,
+          })
+        : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -7747,7 +7635,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private insertNewElements = (elements: readonly ExcalidrawElement[]) => {
+  public insertNewElements = (elements: readonly ExcalidrawElement[]) => {
     if (!elements.length) {
       return;
     }
@@ -8683,7 +8571,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           activeTool: updateActiveTool(this.state, {
             type: TOOL_TYPE.eraser,
-            lastActiveToolBeforeEraser: this.state.activeTool,
+            lastActiveTool: this.state.activeTool,
           }),
         },
         () => {
@@ -8697,7 +8585,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...(this.state.activeTool.lastActiveTool || {
                     type: TOOL_TYPE.selection,
                   }),
-                  lastActiveToolBeforeEraser: null,
+                  lastActiveTool: null,
                 }),
               });
             }
@@ -11281,7 +11169,7 @@ class App extends React.Component<AppProps, AppState> {
         if (event.altKey) {
           this.setActiveTool(
             { type: "lasso", fromSelection: true },
-            event.shiftKey,
+            { keepSelection: event.shiftKey },
           );
           this.lassoTrail.startPath(
             pointerDownState.origin.x,

@@ -254,6 +254,23 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // an icon button rendered outside a .buttonList context (e.g. the font
+  // picker trigger)
+  button.standalone {
+    @include outlineButtonIconStyles;
+
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    & > * {
+      // disallow pointer events on children, so we always have event.target
+      // on the button itself
+      pointer-events: none;
+    }
+  }
+
   .App-top-bar {
     z-index: var(--zIndex-ui-top);
     display: flex;

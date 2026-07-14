@@ -93,7 +93,7 @@ import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -737,7 +737,7 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
     if (data?.cycle) {
       const isVariable = strokeVariability === "variable";
       return (
-        <ToolButton
+        <IconButton
           type="button"
           icon={
             isVariable

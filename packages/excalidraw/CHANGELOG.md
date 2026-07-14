@@ -21,6 +21,35 @@ Please add the latest change on the top under the correct section.
 
 - Added `ui` prop. When set to `false`, Excalidraw's default UI is not rendered — toolbar, default menu and footer controls, sidebars, canvas popups, and context menu. Canvas content (elements, text editing, frame names, embeds) still renders, and the editor remains interactive unless `interaction={false}` is set as well. Host children continue to mount (they may be functional, e.g. a collaboration component), and host-supplied UI — including Excalidraw-exported components such as `<MainMenu>` and `<Footer>` — continues to render together with any supporting dialogs it opens. You're responsible for hiding your own presentational components. [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
 
+### Tool system & toolbar rework
+
+The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>` elements composed from a central tool registry, and all tool activation now goes through a single `setActiveTool` code path.
+
+#### Breaking changes
+
+- `ExcalidrawAPI.setActiveTool(tool, keepSelection?)` — the second parameter changed from a boolean to an options object: `setActiveTool(tool, { keepSelection?: boolean; toggle?: boolean = false })`. The hand and eraser tools are now _toggle tools_: activating one records the previously active tool, and if `toggle=true`, activating it again switches back — including via `setActiveTool` itself, so repeated `setActiveTool({ type: "hand" }, { toggle: true })` calls alternate rather than no-op. By default `false` for idempotent activation.
+
+- Tool buttons render as semantic `<button>` elements with `aria-pressed` instead of `<label>`-wrapped hidden `<input type="radio">` / `<input type="checkbox">`. If you style or query the editor DOM:
+
+  - The `.ToolIcon_type_radio`, `.ToolIcon_type_checkbox`, and `.ToolIcon--selected` class names no longer exist — the pressed state is exposed through the `.ToolIcon--checked` class and the `aria-pressed` attribute.
+  - `<Sidebar.Trigger>` (including the default Library trigger) renders a `<button>` instead of a `<label>` + checkbox.
+
+- Removed internal actions superseded by the `setActiveTool` funnel and the tool registry: `toggleHandTool`, `toggleEraserTool`, `toggleLassoTool`, `setFrameAsActiveTool`, `setEmbeddableAsActiveTool` (these `ActionName`s no longer exist).
+
+#### Behavior changes
+
+- Hand (`H`) and eraser (`E`) shortcuts now reliably toggle back to the previously active tool (previously inconsistent across platforms and input paths, and unavailable for hand in view mode). Pressing `Escape` while hand or eraser is active likewise returns to the previous tool. Re-clicking their toolbar buttons is a no-op.
+- Clicking the active selection tool switches to lasso on all platforms (previously this only worked on iOS due to a controlled-radio quirk).
+- Tool letter shortcuts are CapsLock-insensitive, `Shift+letter` never switches tools, and `Ctrl+E` no longer toggles the eraser.
+- Switching tools no longer creates undo-history entries.
+- Command palette tool commands are derived from the tool registry: the duplicate "Hand" entry is gone, "Web Embed" was added, and "Lasso" is always listed.
+- Pen mode now activates on the first pen tap on any tool button (previously deferred and occasionally dropped).
+
+#### Fixes
+
+- Mobile toolbar popovers: the active option stays highlighted after tapping it (the highlight was being suppressed by sticky touch-hover).
+- The active-tool highlight can no longer desync from the actually active tool (controlled-radio DOM desync).
+
 ### Viewport control & scroll/zoom locking (2026-07-03)
 
 `ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
@@ -170,6 +199,8 @@ Please add the latest change on the top under the correct section.
 ## Excalidraw Library
 
 ### Breaking changes
+
+- `updateActiveTool` (from `@excalidraw/common`): the `lastActiveToolBeforeEraser` property of the `data` parameter was renamed to `lastActiveTool` (it was already stored under that name on `appState.activeTool`, and is no longer eraser-specific).
 
 - `getClosestElementBounds` is no longer exported from `@excalidraw/element`. Use `getCommonBounds` / `getElementBounds` from `@excalidraw/element`, or reimplement the closest-target distance check with `getElementBounds` if you need the same behavior [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
 
