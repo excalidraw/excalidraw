@@ -553,8 +553,8 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "line": {
-        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        const width = element.width ?? DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = element.height ?? DEFAULT_LINEAR_ELEMENT_PROPS.height;
         excalidrawElement = newLinearElement({
           width,
           height,
@@ -565,8 +565,8 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "arrow": {
-        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        const width = element.width ?? DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = element.height ?? DEFAULT_LINEAR_ELEMENT_PROPS.height;
         excalidrawElement = newArrowElement({
           width,
           height,
