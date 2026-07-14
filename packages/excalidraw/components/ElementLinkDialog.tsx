@@ -16,7 +16,7 @@ import { getSelectedElements } from "../scene";
 
 import DialogActionButton from "./DialogActionButton";
 import { TextField } from "./TextField";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import { TrashIcon } from "./icons";
 
 import "./ElementLinkDialog.scss";
@@ -137,7 +137,7 @@ const ElementLinkDialog = ({
         />
 
         {originalLink && nextLink && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.remove")}
             aria-label={t("buttons.remove")}

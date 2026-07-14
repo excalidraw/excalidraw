@@ -8,8 +8,6 @@ import {
 } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
 
-import { KEYS, updateActiveTool } from "@excalidraw/common";
-
 import { getElementsInGroup } from "@excalidraw/element";
 
 import { getCommonBounds } from "@excalidraw/element";
@@ -18,13 +16,11 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { setCursorForShape } from "../cursor";
-import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, UIAppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -123,41 +119,7 @@ export const actionupdateFrameRendering = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  checked: (appState: AppState) => appState.frameRendering.enabled,
-});
-
-export const actionSetFrameAsActiveTool = register({
-  name: "setFrameAsActiveTool",
-  label: "toolBar.frame",
-  trackEvent: { category: "toolbar" },
-  icon: frameToolIcon,
-  viewMode: false,
-  perform: (elements, appState, _, app) => {
-    const nextActiveTool = updateActiveTool(appState, {
-      type: "frame",
-    });
-
-    setCursorForShape(app.interactiveCanvas, {
-      ...appState,
-      activeTool: nextActiveTool,
-    });
-
-    return {
-      elements,
-      appState: {
-        ...appState,
-        activeTool: updateActiveTool(appState, {
-          type: "frame",
-        }),
-      },
-      captureUpdate: CaptureUpdateAction.EVENTUALLY,
-    };
-  },
-  keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    !event.altKey &&
-    event.key.toLocaleLowerCase() === KEYS.F,
+  checked: (appState) => appState.frameRendering.enabled,
 });
 
 export const actionWrapSelectionInFrame = register({
@@ -205,7 +167,6 @@ export const actionWrapSelectionInFrame = register({
       [...app.scene.getElementsIncludingDeleted(), frame],
       selectedElements,
       frame,
-      appState,
     );
 
     return {

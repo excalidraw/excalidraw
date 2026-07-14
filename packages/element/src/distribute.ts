@@ -1,11 +1,15 @@
 import type { AppState } from "@excalidraw/excalidraw/types";
 
+import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
-import { newElementWith } from "./mutateElement";
 
 import { getSelectedElementsByGroup } from "./groups";
 
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import { getNonDeletedElements } from ".";
+
+import type { Scene } from "./Scene";
+
+import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
 
 export interface Distribution {
   space: "between";
@@ -13,11 +17,12 @@ export interface Distribution {
 }
 
 export const distributeElements = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
   appState: Readonly<AppState>,
-): ExcalidrawElement[] => {
+  scene: Scene,
+): NonDeletedExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
       ? (["minX", "midX", "maxX", "width"] as const)
@@ -29,6 +34,7 @@ export const distributeElements = (
     elementsMap,
     appState,
   )
+    .map(getNonDeletedElements) // Nothing to distribute on deleted elements
     .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
 
@@ -66,12 +72,16 @@ export const distributeElements = (
         translation[distribution.axis] = pos - box[mid];
       }
 
-      return group.map((element) =>
-        newElementWith(element, {
+      return group.map((element) => {
+        const updatedElement = scene.mutateElement(element, {
           x: element.x + translation.x,
           y: element.y + translation.y,
-        }),
-      );
+        });
+        updateBoundElements(element, scene, {
+          simultaneouslyUpdated: group,
+        });
+        return updatedElement;
+      });
     });
   }
 
@@ -90,11 +100,15 @@ export const distributeElements = (
     pos += step;
     pos += box[extent];
 
-    return group.map((element) =>
-      newElementWith(element, {
+    return group.map((element) => {
+      const updatedElement = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
-      }),
-    );
+      });
+      updateBoundElements(element, scene, {
+        simultaneouslyUpdated: group,
+      });
+      return updatedElement;
+    });
   });
 };

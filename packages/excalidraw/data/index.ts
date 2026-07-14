@@ -6,6 +6,7 @@ import {
   MIME_TYPES,
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -17,6 +18,7 @@ import { getElementsOverlappingFrame } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -33,8 +35,6 @@ import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
-import type { FileSystemHandle } from "./filesystem";
-
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
@@ -46,17 +46,18 @@ export type ExportedElements = readonly NonDeletedExcalidrawElement[] & {
 };
 
 export const prepareElementsForExport = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   { selectedElementIds }: Pick<AppState, "selectedElementIds">,
   exportSelectionOnly: boolean,
 ) => {
-  elements = getNonDeletedElements(elements);
+  const elements = getNonDeletedElements(allElements);
+  const elementsMap = arrayToMap(elements);
 
   const isExportingSelection =
     exportSelectionOnly &&
     isSomeElementSelected(elements, { selectedElementIds });
 
-  let exportingFrame: ExcalidrawFrameLikeElement | null = null;
+  let exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
         elements,
@@ -68,12 +69,14 @@ export const prepareElementsForExport = (
     : elements;
 
   if (isExportingSelection) {
-    if (
-      exportedElements.length === 1 &&
-      isFrameLikeElement(exportedElements[0])
-    ) {
-      exportingFrame = exportedElements[0];
-      exportedElements = getElementsOverlappingFrame(elements, exportingFrame);
+    const firstElement = exportedElements[0];
+    if (exportedElements.length === 1 && isFrameLikeElement(firstElement)) {
+      exportingFrame = firstElement;
+      exportedElements = getElementsOverlappingFrame(
+        elements,
+        firstElement,
+        elementsMap,
+      );
     } else if (exportedElements.length > 1) {
       exportedElements = getSelectedElements(
         elements,
@@ -110,8 +113,8 @@ export const exportCanvas = async (
     viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
-    fileHandle?: FileSystemHandle | null;
-    exportingFrame: ExcalidrawFrameLikeElement | null;
+    fileHandle?: FileSystemFileHandle | null;
+    exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
   },
 ) => {
   if (elements.length === 0) {

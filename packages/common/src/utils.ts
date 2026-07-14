@@ -1,5 +1,7 @@
 import { average } from "@excalidraw/math";
 
+import type { GlobalCoord } from "@excalidraw/math";
+
 import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
@@ -86,7 +88,8 @@ export const isWritableElement = (
     (target.type === "text" ||
       target.type === "number" ||
       target.type === "password" ||
-      target.type === "search"));
+      target.type === "search")) ||
+  (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -148,38 +151,27 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
-// throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(
-  fn: (...args: T) => void,
-  opts?: { trailing?: boolean },
-) => {
+// throttle callback to execute once per animation frame using the latest args
+export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T) => {
+  const scheduleFunc = () => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      fn(...args);
+      const args = lastArgs;
       lastArgs = null;
-      if (lastArgsTrailing) {
-        lastArgs = lastArgsTrailing;
-        lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
+
+      if (args) {
+        fn(...args);
       }
     });
   };
 
   const ret = (...args: T) => {
-    if (isTestEnv()) {
-      fn(...args);
-      return;
-    }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc(lastArgs);
-    } else if (opts?.trailing) {
-      lastArgsTrailing = args;
+      scheduleFunc();
     }
   };
   ret.flush = () => {
@@ -188,12 +180,12 @@ export const throttleRAF = <T extends any[]>(
       timerId = null;
     }
     if (lastArgs) {
-      fn(...(lastArgsTrailing || lastArgs));
-      lastArgs = lastArgsTrailing = null;
+      fn(...lastArgs);
+      lastArgs = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = lastArgsTrailing = null;
+    lastArgs = null;
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
@@ -210,135 +202,6 @@ export const throttleRAF = <T extends any[]>(
  */
 export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-};
-
-const easeOutInterpolate = (from: number, to: number, progress: number) => {
-  return (to - from) * easeOut(progress) + from;
-};
-
-/**
- * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
- * Executes the `onStep` callback on each step with the interpolated values.
- * Returns a function that can be called to cancel the animation.
- *
- * @example
- * // Example usage:
- * const fromValues = { x: 0, y: 0 };
- * const toValues = { x: 100, y: 200 };
- * const onStep = ({x, y}) => {
- *   setState(x, y)
- * };
- * const onCancel = () => {
- *   console.log("Animation canceled");
- * };
- *
- * const cancelAnimation = easeToValuesRAF({
- *   fromValues,
- *   toValues,
- *   onStep,
- *   onCancel,
- * });
- *
- * // To cancel the animation:
- * cancelAnimation();
- */
-export const easeToValuesRAF = <
-  T extends Record<keyof T, number>,
-  K extends keyof T,
->({
-  fromValues,
-  toValues,
-  onStep,
-  duration = 250,
-  interpolateValue,
-  onStart,
-  onEnd,
-  onCancel,
-}: {
-  fromValues: T;
-  toValues: T;
-  /**
-   * Interpolate a single value.
-   * Return undefined to be handled by the default interpolator.
-   */
-  interpolateValue?: (
-    fromValue: number,
-    toValue: number,
-    /** no easing applied  */
-    progress: number,
-    key: K,
-  ) => number | undefined;
-  onStep: (values: T) => void;
-  duration?: number;
-  onStart?: () => void;
-  onEnd?: () => void;
-  onCancel?: () => void;
-}) => {
-  let canceled = false;
-  let frameId = 0;
-  let startTime: number;
-
-  function step(timestamp: number) {
-    if (canceled) {
-      return;
-    }
-    if (startTime === undefined) {
-      startTime = timestamp;
-      onStart?.();
-    }
-
-    const elapsed = Math.min(timestamp - startTime, duration);
-    const factor = easeOut(elapsed / duration);
-
-    const newValues = {} as T;
-
-    Object.keys(fromValues).forEach((key) => {
-      const _key = key as keyof T;
-      const result = ((toValues[_key] - fromValues[_key]) * factor +
-        fromValues[_key]) as T[keyof T];
-      newValues[_key] = result;
-    });
-
-    onStep(newValues);
-
-    if (elapsed < duration) {
-      const progress = elapsed / duration;
-
-      const newValues = {} as T;
-
-      Object.keys(fromValues).forEach((key) => {
-        const _key = key as K;
-        const startValue = fromValues[_key];
-        const endValue = toValues[_key];
-
-        let result;
-
-        result = interpolateValue
-          ? interpolateValue(startValue, endValue, progress, _key)
-          : easeOutInterpolate(startValue, endValue, progress);
-
-        if (result == null) {
-          result = easeOutInterpolate(startValue, endValue, progress);
-        }
-
-        newValues[_key] = result as T[K];
-      });
-      onStep(newValues);
-
-      frameId = window.requestAnimationFrame(step);
-    } else {
-      onStep(toValues);
-      onEnd?.();
-    }
-  }
-
-  frameId = window.requestAnimationFrame(step);
-
-  return () => {
-    onCancel?.();
-    canceled = true;
-    window.cancelAnimationFrame(frameId);
-  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
@@ -389,7 +252,7 @@ export const updateActiveTool = (
       }
     | { type: "custom"; customType: string }
   ) & { locked?: boolean; fromSelection?: boolean }) & {
-    lastActiveToolBeforeEraser?: ActiveTool | null;
+    lastActiveTool?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
@@ -404,9 +267,9 @@ export const updateActiveTool = (
   return {
     ...appState.activeTool,
     lastActiveTool:
-      data.lastActiveToolBeforeEraser === undefined
+      data.lastActiveTool === undefined
         ? appState.activeTool.lastActiveTool
-        : data.lastActiveToolBeforeEraser,
+        : data.lastActiveTool,
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
@@ -441,7 +304,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y };
+  return { x, y } as GlobalCoord;
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -1329,4 +1192,11 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
   } catch (e) {
     console.error("unable to set feature flag", e);
   }
+};
+
+export const oneOf = <N extends string | number | symbol | null, H extends N>(
+  needle: N,
+  haystack: readonly H[],
+): needle is H => {
+  return haystack.includes(needle as any);
 };

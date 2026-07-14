@@ -126,9 +126,10 @@
 
     .dropdown-menu-container {
       width: 196px;
-      box-shadow: var(--library-dropdown-shadow);
       border-radius: var(--border-radius-lg);
       padding: 0.25rem 0.5rem;
+
+      --box-shadow: var(--library-dropdown-shadow);
     }
   }
 

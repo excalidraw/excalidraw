@@ -38,10 +38,12 @@ import {
 } from "../../excalidraw/tests/queries/dom";
 
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FontString,
+  NonDeletedExcalidrawElement,
 } from "../src/types";
 
 const renderInteractiveScene = vi.spyOn(
@@ -129,7 +131,7 @@ describe("Test Linear Elements", () => {
     selectProgrammatically = false,
   ) => {
     if (selectProgrammatically) {
-      API.setSelectedElements([line]);
+      API.setSelectedElements([line] as NonDeletedExcalidrawElement[]);
     } else {
       mouse.clickAt(p1[0], p1[1]);
     }
@@ -218,7 +220,7 @@ describe("Test Linear Elements", () => {
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`8`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       [
@@ -328,9 +330,67 @@ describe("Test Linear Elements", () => {
     createTwoPointerLinearElement("arrow");
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
-    mouse.doubleClick();
+    mouse.doubleClickAt(midpoint[0], midpoint[1]);
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
     await getTextEditor();
+  });
+
+  describe("Arrowhead toggle on endpoint dblclick", () => {
+    // the toggle replaces the element (immutable update), so always re-read
+    // the arrow from the scene instead of holding on to a stale reference
+    const getArrow = () => h.elements[0] as ExcalidrawArrowElement;
+
+    it("should toggle end arrowhead between default and none", () => {
+      createTwoPointerLinearElement("arrow");
+      expect(getArrow().endArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe("arrow");
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe(null);
+    });
+
+    it("should toggle start arrowhead between default and none", () => {
+      createTwoPointerLinearElement("arrow");
+      expect(getArrow().startArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p1[0], p1[1]);
+      expect(getArrow().startArrowhead).toBe("arrow");
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+
+      mouse.doubleClickAt(p1[0], p1[1]);
+      expect(getArrow().startArrowhead).toBe(null);
+    });
+
+    it("should restore the arrowhead removed by the previous toggle", () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: p1[0],
+        y: p1[1],
+        width: p2[0] - p1[0],
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], p2[1] - p1[1])],
+        endArrowhead: "triangle",
+      });
+      API.setElements([arrow]);
+      mouse.clickAt(midpoint[0], midpoint[1]);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe(null);
+
+      mouse.doubleClickAt(p2[0], p2[1]);
+      expect(getArrow().endArrowhead).toBe("triangle");
+    });
+
+    it("should not toggle arrowheads on dblclick outside endpoints", () => {
+      createTwoPointerLinearElement("arrow");
+
+      mouse.doubleClickAt(midpoint[0], midpoint[1]);
+      expect(getArrow().startArrowhead).toBe(null);
+      expect(getArrow().endArrowhead).toBe(null);
+    });
   });
 
   it("shouldn't create text element on double click in line editor (arrow)", async () => {
@@ -378,7 +438,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `11`,
+        `12`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -419,7 +479,7 @@ describe("Test Linear Elements", () => {
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `9`,
+        `10`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -480,7 +540,7 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `11`,
+        `12`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -548,7 +608,7 @@ describe("Test Linear Elements", () => {
         );
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `14`,
+          `15`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
 
@@ -599,7 +659,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `11`,
+          `12`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -640,7 +700,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `11`,
+          `12`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -688,7 +748,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `17`,
+          `18`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`10`);
 
@@ -746,7 +806,7 @@ describe("Test Linear Elements", () => {
           ),
         );
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `14`,
+          `15`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
         expect(line.points.length).toEqual(5);
@@ -844,7 +904,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `11`,
+          `12`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -932,7 +992,7 @@ describe("Test Linear Elements", () => {
         }),
       ]);
       const dragEndPositionOffset = [100, 100] as const;
-      API.setSelectedElements([line]);
+      API.setSelectedElements([line] as NonDeletedExcalidrawElement[]);
       enterLineEditingMode(line, true);
       drag(
         pointFrom(line.points[0][0] + line.x, line.points[0][1] + line.y),
@@ -1091,7 +1151,7 @@ describe("Test Linear Elements", () => {
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(arrow.id);
-      mouse.doubleClickAt(arrow.x, arrow.y);
+      mouse.doubleClickAt(midpoint[0], midpoint[1]);
       expect(h.elements.length).toBe(2);
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
@@ -1288,7 +1348,7 @@ describe("Test Linear Elements", () => {
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       createBoundTextElement(DEFAULT_TEXT, arrow);
-      API.setSelectedElements([arrow]);
+      API.setSelectedElements([arrow] as NonDeletedExcalidrawElement[]);
 
       expect(queryByTestId(container, "align-top")).toBeNull();
       expect(queryByTestId(container, "align-middle")).toBeNull();
@@ -1317,7 +1377,7 @@ describe("Test Linear Elements", () => {
       const textElement = h.elements[2] as ExcalidrawTextElementWithContainer;
 
       expect(arrow.endBinding?.elementId).toBe(rect.id);
-      expect(arrow.width).toBeCloseTo(399);
+      expect(arrow.width).toBeCloseTo(404);
       expect(rect.x).toBe(400);
       expect(rect.y).toBe(0);
       expect(
@@ -1336,13 +1396,14 @@ describe("Test Linear Elements", () => {
       mouse.downAt(rect.x, rect.y);
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
-      expect(arrow.width).toBeCloseTo(199);
+      expect(arrow.width).toBeCloseTo(204);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
         h.elements[0],
         h.app.scene,
         "nw",
+        false,
         false,
       );
       expect(
@@ -1359,7 +1420,7 @@ describe("Test Linear Elements", () => {
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       createBoundTextElement(DEFAULT_TEXT, arrow);
-      API.setSelectedElements([arrow]);
+      API.setSelectedElements([arrow] as NonDeletedExcalidrawElement[]);
 
       expect(queryByTestId(container, "align-left")).toBeNull();
       expect(queryByTestId(container, "align-horizontal-center")).toBeNull();
@@ -1378,7 +1439,10 @@ describe("Test Linear Elements", () => {
       API.setElements([h.elements[0], text]);
 
       const container = h.elements[0];
-      API.setSelectedElements([container, text]);
+      API.setSelectedElements([
+        container,
+        text,
+      ] as NonDeletedExcalidrawElement[]);
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
@@ -1402,7 +1466,10 @@ describe("Test Linear Elements", () => {
       );
       mouse.down();
       mouse.up();
-      API.setSelectedElements([h.elements[0], h.elements[1]]);
+      API.setSelectedElements([
+        h.elements[0],
+        h.elements[1],
+      ] as NonDeletedExcalidrawElement[]);
 
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,

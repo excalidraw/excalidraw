@@ -2,7 +2,11 @@
   "labels": {
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
-    "pasteCharts": "Plak grafieken",
+    "pasteCharts": "Grafieken plakken",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
     "arrowhead_crowfoot_one": "Kraaienpoot (enkel)",
     "arrowhead_crowfoot_one_or_many": "Kraaienpoot (enkel of veel)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Meer opties",
+    "cardinality": "",
     "arrowtypes": "Pijl type",
     "arrowtype_sharp": "Scherpe pijl",
     "arrowtype_round": "Gebogen pijl",
@@ -171,7 +182,11 @@
     "linkToElement": "Link naar object",
     "wrapSelectionInFrame": "Selectie omslaan in frame",
     "tab": "Tab",
-    "shapeSwitch": "Verander vorm"
+    "shapeSwitch": "Verander vorm",
+    "preferences": "Voorkeuren",
+    "preferences_toolLock": "Tool vergrendelen",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link naar object",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Fout"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Opslaan op schijf",
     "disk_details": "De scènegegevens exporteren naar een bestand waaruit u later kunt importeren.",
@@ -557,7 +576,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Al je data is lokaal opgeslagen in je browser.",
+      "center_heading": "Je tekeningen worden bewaard in de opslag van je browser.",
+      "center_heading_line2": "Browser opslag kan onverwacht gewist worden.",
+      "center_heading_line3": "Sla je werk regelmatig op in een bestand om te voorkomen dat je het kwijtraakt.",
       "center_heading_plus": "Wil je in plaats daarvan naar Excalidraw+ gaan?",
       "menuHint": "Exporteren, voorkeuren en meer, ..."
     },
@@ -610,9 +631,58 @@
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
     "button": "Invoegen",
-    "description": "Momenteel worden alleen <flowchartLink>Flowchart</flowchartLink>-, <sequenceLink>Sequence</sequenceLink>- en <classLink>Class</classLink>-diagrammen ondersteund. De andere types worden als afbeelding weergegeven in Excalidraw.",
+    "description": "",
     "syntax": "Mermaid Syntaxis",
-    "preview": "Voorbeeld"
+    "preview": "Voorbeeld",
+    "label": "Mermaid",
+    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier...",
+    "autoFixAvailable": ""
+  },
+  "ttd": {
+    "error": "Fout!"
+  },
+  "chat": {
+    "inputPlaceholder": "Begin je diagram idee hier in te typen... ({{shortcut}} voor een nieuwe lijn)",
+    "inputPlaceholderWithMessages": "Ga door met het verfijnen van je diagram...",
+    "generating": "Genereren...",
+    "rateLimitRemaining": "{{count}} verzoeken over vandaag",
+    "role": {
+      "user": "Jij",
+      "assistant": "AI Assistent",
+      "system": "Systeem"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Nieuwe Chat",
+    "deleteChat": "Chat verwijderen",
+    "deleteMessage": "Bericht verwijderen",
+    "viewAsMermaid": "Weergeven als Mermaid",
+    "placeholder": {
+      "title": "Laten we jouw diagram ontwerpen",
+      "description": "Beschrijf het diagram dat je wilt aanmaken, en we genereren het voor je.",
+      "hint": ""
+    },
+    "preview": "Voorbeeld",
+    "insert": "Invoegen",
+    "retry": "Opnieuw proberen",
+    "errors": {
+      "promptTooShort": "Vraag is te kort (min {{min}} karakters)",
+      "promptTooLong": "Vraag is te kort (max {{max}} karakters)",
+      "generationFailed": "Generatie mislukt",
+      "invalidDiagram": "Een ongeldige diagram gegenereerd :(. Je kunt handmatig bewerken, opnieuw proberen met automatisch repareren of een andere vraag proberen.",
+      "fixInMermaid": "Mermaid handmatig bewerken →",
+      "aiRepair": "Opnieuw genereren (automatisch repareren) →",
+      "requestAborted": "Verzoek gestopt",
+      "requestFailed": "Verzoek mislukt",
+      "mermaidParseError": "Mermaid syntax fout"
+    },
+    "rateLimit": {
+      "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",
+      "generalRateLimit": "Ho ho, rustig aan, je gaat te snel voor ons! Wacht even voor je het opnieuw probeert.",
+      "messageLimitInputPlaceholder": "Je hebt je berichtenlimiet bereikt"
+    },
+    "upsellBtnLabel": "Upgrade naar Plus"
   },
   "quickSearch": {
     "placeholder": "Snel Zoeken"

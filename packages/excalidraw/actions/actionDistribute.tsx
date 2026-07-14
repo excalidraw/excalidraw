@@ -16,7 +16,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Distribution } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
@@ -30,15 +30,15 @@ import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
-const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
+const enableActionGroup = (appState: UIAppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
     getSelectedElementsByGroup(
       selectedElements,
       app.scene.getNonDeletedElementsMap(),
-      appState as Readonly<AppState>,
+      appState,
     ).length > 2 &&
     // TODO enable distributing frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
@@ -58,6 +58,7 @@ const distributeSelectedElements = (
     app.scene.getNonDeletedElementsMap(),
     distribution,
     appState,
+    app.scene,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);
@@ -86,7 +87,7 @@ export const distributeHorizontally = register({
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={DistributeHorizontallyIcon}
@@ -117,7 +118,7 @@ export const distributeVertically = register({
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={DistributeVerticallyIcon}

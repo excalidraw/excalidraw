@@ -1,5 +1,6 @@
 import {
   applyDarkModeFilter,
+  COLOR_WHITE,
   FRAME_STYLE,
   THEME,
   throttleRAF,
@@ -204,7 +205,13 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
+
+      // Seed a sane default so a corrupted color (silently rejected by the
+      // canvas) falls back to white instead of a stale fillStyle.
+      linkCanvasCacheContext.fillStyle = COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle =
+        appState.viewBackgroundColor || COLOR_WHITE;
+
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {
@@ -221,6 +228,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
+    context.globalAlpha = element.opacity / 100;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -482,7 +490,6 @@ export const renderStaticSceneThrottled = throttleRAF(
   (config: StaticSceneRenderConfig) => {
     _renderStaticScene(config);
   },
-  { trailing: true },
 );
 
 /**

@@ -3,6 +3,10 @@
     "paste": "បិទភ្ជាប់",
     "pasteAsPlaintext": "បិទភ្ជាប់ជាអត្ថបទធម្មតា",
     "pasteCharts": "បិទភ្ជាប់តារាង",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ជ្រើសរើស​ទាំងអស់",
     "multiSelect": "បន្ថែមធាតុទៅលើការជ្រើសរើស",
     "moveCanvas": "ផ្លាស់ទីបាវ",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "មានកំហុស"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "រក្សាទុកទៅថាស",
     "disk_details": "នាំចេញទិន្នន័យរបស់ស៊ីនជាឯកសារដែលអ្នកអាចនាំចូលនៅពេលក្រោយ។",
@@ -557,7 +576,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "ទិន្នន័យទាំងអស់របស់អ្នក ត្រូវបានរក្សាទុកនៅក្នុង browser របស់អ្នក ។",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "តើ​អ្នក​ចង់​ទៅ Excalidraw+ ​វិញ ឬ មែន?",
       "menuHint": "នាំចេញ ចំណូលចិត្ត ភាសា ..."
     },
@@ -612,7 +633,56 @@
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": ""

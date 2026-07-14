@@ -80,7 +80,11 @@ const cssInvert = (
   return { r: invertedR, g: invertedG, b: invertedB };
 };
 
-export const applyDarkModeFilter = (color: string): string => {
+export const applyDarkModeFilter = (color: string, enable = true): string => {
+  if (!enable) {
+    return color;
+  }
+
   const cached = DARK_MODE_COLORS_CACHE?.get(color);
   if (cached) {
     return cached;
@@ -240,22 +244,21 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
 // -----------------------------------------------------------------------------
 
 // !!!MUST BE WITHOUT GRAY, TRANSPARENT AND BLACK!!!
-export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
-  [
-    // 2nd row
-    COLOR_PALETTE.cyan[index],
-    COLOR_PALETTE.blue[index],
-    COLOR_PALETTE.violet[index],
-    COLOR_PALETTE.grape[index],
-    COLOR_PALETTE.pink[index],
+export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) => [
+  // 2nd row
+  COLOR_PALETTE.cyan[index],
+  COLOR_PALETTE.blue[index],
+  COLOR_PALETTE.violet[index],
+  COLOR_PALETTE.grape[index],
+  COLOR_PALETTE.pink[index],
 
-    // 3rd row
-    COLOR_PALETTE.green[index],
-    COLOR_PALETTE.teal[index],
-    COLOR_PALETTE.yellow[index],
-    COLOR_PALETTE.orange[index],
-    COLOR_PALETTE.red[index],
-  ] as const;
+  // 3rd row
+  COLOR_PALETTE.green[index],
+  COLOR_PALETTE.teal[index],
+  COLOR_PALETTE.yellow[index],
+  COLOR_PALETTE.orange[index],
+  COLOR_PALETTE.red[index],
+];
 
 // -----------------------------------------------------------------------------
 // other helpers
@@ -346,7 +349,7 @@ export const normalizeInputColor = (color: string): string | null => {
   if (tc.isValid()) {
     // testing for `#` first fixes a bug on Electron (more specfically, an
     // Obsidian popout window), where a hex color without `#` is considered valid
-    if (tc.getFormat() === "hex" && !color.startsWith("#")) {
+    if (["hex", "hex8"].includes(tc.getFormat()) && !color.startsWith("#")) {
       return `#${color}`;
     }
     return color;

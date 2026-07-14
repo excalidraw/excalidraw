@@ -20,7 +20,6 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
   theme: Theme | "system";
-  setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
   return (
@@ -62,7 +61,7 @@ export const AppMainMenu: React.FC<{
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
-          onClick={() => {
+          onSelect={() => {
             if (window.visualDebug) {
               delete window.visualDebug;
               saveDebugState({ enabled: false });
@@ -77,11 +76,8 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme
-        allowSystemTheme
-        theme={props.theme}
-        onSelect={props.setTheme}
-      />
+      <MainMenu.DefaultItems.Preferences />
+      <MainMenu.DefaultItems.ToggleTheme allowSystemTheme theme={props.theme} />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>

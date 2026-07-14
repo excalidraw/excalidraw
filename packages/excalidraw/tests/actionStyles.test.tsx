@@ -1,6 +1,8 @@
 import React from "react";
 
-import { CODES } from "@excalidraw/common";
+import { CODES, STROKE_WIDTH } from "@excalidraw/common";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
@@ -58,7 +60,7 @@ describe("actionStyles", () => {
 
     mouse.reset();
 
-    API.setSelectedElements([h.elements[1]]);
+    API.setSelectedElements([h.elements[1]] as NonDeletedExcalidrawElement[]);
 
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       Keyboard.codeDown(CODES.C);
@@ -68,7 +70,7 @@ describe("actionStyles", () => {
 
     mouse.reset();
     // Paste styles to first rectangle
-    API.setSelectedElements([h.elements[0]]);
+    API.setSelectedElements([h.elements[0]] as NonDeletedExcalidrawElement[]);
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       Keyboard.codeDown(CODES.V);
     });
@@ -78,7 +80,7 @@ describe("actionStyles", () => {
     expect(firstRect.strokeColor).toBe("#e03131");
     expect(firstRect.backgroundColor).toBe("#a5d8ff");
     expect(firstRect.fillStyle).toBe("cross-hatch");
-    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
+    expect(firstRect.strokeWidth).toBe(STROKE_WIDTH.bold);
     expect(firstRect.strokeStyle).toBe("dotted");
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);

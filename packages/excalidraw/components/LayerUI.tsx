@@ -20,21 +20,15 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
-import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 
-import {
-  SelectedShapeActions,
-  ShapesSwitcher,
-  CompactShapeActions,
-} from "./Actions";
+import { SelectedShapeActions, CompactShapeActions } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
-import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
@@ -55,13 +49,13 @@ import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { HandButton } from "./HandButton";
 import { HelpDialog } from "./HelpDialog";
-import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { Toast } from "./Toast";
+import { Toolbar } from "./Toolbar";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -86,7 +80,6 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -123,7 +116,7 @@ const DefaultMainMenu: React.FC<{
         <MainMenu.DefaultItems.Socials />
       </MainMenu.Group>
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ToggleTheme allowSystemTheme={false} />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
@@ -146,7 +139,6 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
-  onHandToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
@@ -236,8 +228,6 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    const isCompactMode = isCompactStylesPanel;
-
     return (
       <Section
         heading="selectedShapeActions"
@@ -245,10 +235,12 @@ const LayerUI = ({
           "transition-left": appState.zenModeEnabled,
         })}
       >
-        {isCompactMode ? (
+        {isCompactStylesPanel ? (
           <Island
             className={clsx("compact-shape-actions-island")}
             padding={0}
+            data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
             style={{
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
@@ -272,6 +264,8 @@ const LayerUI = ({
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
             }}
+            data-viewport-ui="side"
+            data-viewport-ui-name="stylesPanel"
           >
             <SelectedShapeActions
               appState={appState}
@@ -313,6 +307,22 @@ const LayerUI = ({
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </div>
+            {/* in compact UI the pen mode button lives outside the toolbar, as
+                a separate floating button below the compact actions menu
+                (same as we render it on mobile); shown alongside the compact
+                actions island, i.e. when a drawing tool or elements are
+                selected */}
+            {isCompactStylesPanel &&
+              !appState.viewModeEnabled &&
+              shouldRenderSelectedShapeActions && (
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={() => onPenModeToggle(null)}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
+                />
+              )}
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
@@ -329,51 +339,15 @@ const LayerUI = ({
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <Island
-                          padding={spacing.islandPadding}
-                          className={clsx("App-toolbar", {
-                            "zen-mode": appState.zenModeEnabled,
-                            "App-toolbar--compact": isCompactStylesPanel,
-                          })}
-                        >
-                          <HintViewer
-                            appState={appState}
-                            isMobile={editorInterface.formFactor === "phone"}
-                            editorInterface={editorInterface}
-                            app={app}
-                          />
-                          {heading}
-                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
-                            <PenModeButton
-                              zenModeEnabled={appState.zenModeEnabled}
-                              checked={appState.penMode}
-                              onChange={() => onPenModeToggle(null)}
-                              title={t("toolBar.penMode")}
-                              penDetected={appState.penDetected}
-                            />
-                            <LockButton
-                              checked={appState.activeTool.locked}
-                              onChange={onLockToggle}
-                              title={t("toolBar.lock")}
-                            />
-
-                            <div className="App-toolbar__divider" />
-
-                            <HandButton
-                              checked={isHandToolActive(appState)}
-                              onChange={() => onHandToolToggle()}
-                              title={t("toolBar.hand")}
-                              isMobile
-                            />
-
-                            <ShapesSwitcher
-                              setAppState={setAppState}
-                              activeTool={appState.activeTool}
-                              UIOptions={UIOptions}
-                              app={app}
-                            />
-                          </Stack.Row>
-                        </Island>
+                        <Toolbar
+                          app={app}
+                          appState={appState}
+                          setAppState={setAppState}
+                          UIOptions={UIOptions}
+                          onPenModeToggle={onPenModeToggle}
+                          onLockToggle={onLockToggle}
+                          heading={heading}
+                        />
                         {isCollaborating && (
                           <Island
                             style={{
@@ -565,13 +539,13 @@ const LayerUI = ({
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
-      {appState.pasteDialog.shown && (
+      {appState.openDialog?.name === "charts" && (
         <PasteChartDialog
-          setAppState={setAppState}
-          appState={appState}
+          data={appState.openDialog.data}
+          rawText={appState.openDialog.rawText}
           onClose={() =>
             setAppState({
-              pasteDialog: { shown: false, data: null },
+              openDialog: null,
             })
           }
         />
@@ -585,7 +559,6 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
@@ -614,18 +587,30 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
-            {appState.scrolledOutside && (
-              <button
-                type="button"
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState((appState) => ({
-                    ...calculateScrollCenter(elements, appState),
-                  }));
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
+            {(appState.toast || appState.scrolledOutside) && (
+              <div className="floating-status-stack">
+                {appState.toast && (
+                  <Toast
+                    message={appState.toast.message}
+                    onClose={() => setAppState({ toast: null })}
+                    duration={appState.toast.duration}
+                    closable={appState.toast.closable}
+                  />
+                )}
+                {!appState.toast && appState.scrolledOutside && (
+                  <button
+                    type="button"
+                    className="scroll-back-to-content"
+                    onClick={() => {
+                      setAppState((appState) => ({
+                        ...getScrollToContentState(elements, appState),
+                      }));
+                    }}
+                  >
+                    {t("buttons.scrollBackToContent")}
+                  </button>
+                )}
+              </div>
             )}
           </div>
           {renderSidebars()}
@@ -646,8 +631,19 @@ const LayerUI = ({
 };
 
 const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
-  const { startBoundElement, cursorButton, scrollX, scrollY, ...ret } =
-    appState;
+  const {
+    cursorButton,
+    scrollX,
+    scrollY,
+    zoom,
+    shouldCacheIgnoreZoom,
+    snapLines,
+    originSnapOffset,
+    suggestedBinding,
+    frameToHighlight,
+    elementsToHighlight,
+    ...ret
+  } = appState;
   return ret;
 };
 

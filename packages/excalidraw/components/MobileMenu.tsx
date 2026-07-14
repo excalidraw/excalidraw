@@ -4,11 +4,11 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
-import { MobileToolBar } from "./MobileToolBar";
+import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
@@ -31,7 +31,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
 
   renderTopRightUI?: (
@@ -53,7 +52,6 @@ export const MobileMenu = ({
   elements,
   actionManager,
   setAppState,
-  onHandToolToggle,
   renderTopLeftUI,
   renderTopRightUI,
   renderSidebars,
@@ -116,13 +114,7 @@ export const MobileMenu = ({
   };
 
   const renderToolbar = () => {
-    return (
-      <MobileToolBar
-        app={app}
-        onHandToolToggle={onHandToolToggle}
-        setAppState={setAppState}
-      />
-    );
+    return <MobileToolbar app={app} setAppState={setAppState} />;
   };
 
   return (
@@ -140,6 +132,7 @@ export const MobileMenu = ({
           style={{
             marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
           }}
+          data-viewport-ui="bottom"
         >
           <MobileShapeActions
             appState={appState}
@@ -161,7 +154,7 @@ export const MobileMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState),
+                      ...getScrollToContentState(elements, appState),
                     }));
                   }}
                 >

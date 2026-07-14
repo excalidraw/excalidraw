@@ -3,6 +3,10 @@
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Notacja Martina (wiele)",
     "arrowhead_crowfoot_one": "Notacja Martina (jeden)",
     "arrowhead_crowfoot_one_or_many": "Notacja Martina (jeden lub wiele)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Więcej opcji",
+    "cardinality": "",
     "arrowtypes": "Typ strzałki",
     "arrowtype_sharp": "Ostra strzałka",
     "arrowtype_round": "Zaokrąglona strzałka",
@@ -171,7 +182,11 @@
     "linkToElement": "Link do obiektu",
     "wrapSelectionInFrame": "Owiń wybór w ramkę",
     "tab": "Tab",
-    "shapeSwitch": "Wybór kształtu"
+    "shapeSwitch": "Wybór kształtu",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link do obiektu",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Wystąpił błąd"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Zapisz na dysku",
     "disk_details": "Eksportuj dane sceny do pliku, z którego możesz importować później.",
@@ -557,7 +576,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Wszystkie dane są zapisywane lokalnie w przeglądarce.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Czy zamiast tego chcesz przejść do Excalidraw+?",
       "menuHint": "Eksportuj, preferencje, języki..."
     },
@@ -610,9 +631,58 @@
   "mermaid": {
     "title": "Konwertuj diagram Mermaid do Excalidraw",
     "button": "Wstaw",
-    "description": "Obecnie wspierane są jedynie <flowchartLink>proste grafy</flowchartLink>, <sequenceLink>sekwencje</sequenceLink> i <classLink>diagramy klas</classLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
+    "description": "",
     "syntax": "Składnia diagramów Mermaid",
-    "preview": "Podgląd"
+    "preview": "Podgląd",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Szybkie wyszukiwanie"

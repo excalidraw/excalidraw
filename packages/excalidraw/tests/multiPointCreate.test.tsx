@@ -182,4 +182,46 @@ describe("multi point mode in linear elements", () => {
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
+
+  it("prevents switching to eraser while creating a multi-point line", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    // select tool
+    const tool = getByToolName("line");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    // first point is added on pointer down
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+
+    // second point, enable multi point
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+
+    expect(h.state.activeTool.type).toEqual("line");
+
+    // try to switch to eraser
+    fireEvent.keyDown(canvas, {
+      key: KEYS.E,
+    });
+
+    expect(h.state.activeTool.type).toEqual("line");
+
+    // third point should still be added to the line instead of erasing
+    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.pointerUp(canvas);
+    fireEvent.pointerMove(canvas, { clientX: 100, clientY: 140 });
+
+    // done
+    fireEvent.pointerDown(canvas);
+    fireEvent.pointerUp(canvas);
+    fireEvent.keyDown(document, {
+      key: KEYS.ENTER,
+    });
+
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+      `11`,
+    );
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+    expect(h.elements.length).toEqual(1);
+  });
 });

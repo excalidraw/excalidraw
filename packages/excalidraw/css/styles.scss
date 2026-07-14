@@ -11,11 +11,13 @@
   --zIndex-eyeDropperBackdrop: 5;
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
+  --zIndex-cursorHint: 8;
 
   --zIndex-ui-bottom: 60;
   --zIndex-ui-context-menu: 90;
   --zIndex-ui-styles-popup: 100;
   --zIndex-ui-top: 100;
+  --zIndex-ui-main-menu: 110;
   --zIndex-ui-library: 120;
 
   --zIndex-modal: 1000;
@@ -223,6 +225,18 @@ body.excalidraw-cursor-resize * {
     box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
+  // radix doesn't allow differntiating between hover and keyboard active
+  // states (it's forcing :focus on both).
+  //
+  // proper handling would be to disable :focus-visible by default, and enable
+  // on keyboard arrows (it'd then have to be disabled again, e.g. on keydown
+  // or container focus)
+  //
+  // alas, that is left for another day
+  [data-radix-collection-item]:focus-visible {
+    box-shadow: none !important;
+  }
+
   .buttonList {
     .ToolIcon__icon {
       all: unset !important;
@@ -237,6 +251,23 @@ body.excalidraw-cursor-resize * {
     button,
     .zIndexButton {
       @include outlineButtonIconStyles;
+    }
+  }
+
+  // an icon button rendered outside a .buttonList context (e.g. the font
+  // picker trigger)
+  button.standalone {
+    @include outlineButtonIconStyles;
+
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    & > * {
+      // disallow pointer events on children, so we always have event.target
+      // on the button itself
+      pointer-events: none;
     }
   }
 
@@ -487,6 +518,26 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .floating-status-stack {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+
+    .scroll-back-to-content {
+      position: static;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
   .help-icon {
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;
@@ -670,6 +721,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .main-menu {
+    z-index: var(--zIndex-ui-main-menu);
+  }
   .main-menu-trigger {
     @include filledButtonOnCanvas;
   }
@@ -778,6 +832,14 @@ body.excalidraw-cursor-resize * {
   .excalidraw__embeddable__outer {
     width: 100%;
     height: 100%;
+  }
+
+  .excalidraw__embeddable__content {
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+
+    &,
     & > * {
       border-radius: var(--embeddable-radius);
     }

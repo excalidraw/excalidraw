@@ -33,6 +33,7 @@ export type FilledButtonProps = {
   fullWidth?: boolean;
 
   icon?: React.ReactNode;
+  disabled?: boolean;
 };
 
 export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
@@ -48,6 +49,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       fullWidth,
       className,
       status,
+      disabled,
     },
     ref,
   ) => {
@@ -94,7 +96,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
         type="button"
         aria-label={label}
         ref={ref}
-        disabled={_status === "loading" || _status === "success"}
+        disabled={disabled || _status === "loading" || _status === "success"}
       >
         <div className="ExcButton__contents">
           {_status === "loading" ? (
