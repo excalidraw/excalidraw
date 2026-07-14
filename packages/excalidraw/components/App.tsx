@@ -3106,8 +3106,7 @@ class App extends React.Component<AppProps, AppState> {
       this.bindModeHandler = null;
     }
 
-    this.flowChartCreator.clear();
-    this.flowChartNavigator.clear();
+    this.flowchart.clear();
 
     // These components install their own DOM listeners rather than going
     // through App's input handlers, so they must be explicitly unmounted.

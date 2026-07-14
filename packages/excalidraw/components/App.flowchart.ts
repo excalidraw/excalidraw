@@ -44,6 +44,12 @@ export class AppFlowchart {
     return this.creator.isCreatingChart;
   }
 
+  /** ends any in-progress flowchart creation/navigation session */
+  clear = () => {
+    this.creator.clear();
+    this.navigator.clear();
+  };
+
   handleKeyEvent = (event: React.KeyboardEvent | KeyboardEvent): boolean => {
     const operation = this.resolveKeyboardEventToOperation(event);
 
