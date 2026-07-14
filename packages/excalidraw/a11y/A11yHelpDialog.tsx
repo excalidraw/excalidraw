@@ -9,7 +9,15 @@ export const a11yHelpDialogAtom = atom(false);
 const SECTIONS: { title: string; items: string[] }[] = [
   {
     title: "browseTitle",
-    items: ["browse1", "browse2", "browse3", "browse4", "browse5"],
+    items: [
+      "browse1",
+      "browse2",
+      "browse3",
+      "browse3b",
+      "browse3c",
+      "browse4",
+      "browse5",
+    ],
   },
   { title: "createTitle", items: ["create1", "create2", "create3"] },
   { title: "textTitle", items: ["text1", "text2"] },

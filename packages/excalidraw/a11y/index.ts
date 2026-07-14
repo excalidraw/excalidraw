@@ -6,10 +6,15 @@ export { A11yHelpDialog, a11yHelpDialogAtom } from "./A11yHelpDialog";
 export { SceneProxyLayer } from "./SceneProxyLayer";
 export { getSceneReadingOrder } from "./readingOrder";
 export {
+  getConnectedElements,
   getElementDescription,
   getElementText,
   getElementTypeLabel,
 } from "./description";
+export {
+  getGeometricContainer,
+  getContainedElementsCount,
+} from "./containment";
 export {
   getConceptualColor,
   getColorName,

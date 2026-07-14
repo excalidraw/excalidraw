@@ -15,6 +15,11 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import { announce, getElementDescription } from "../a11y";
+import { t } from "../i18n";
+
+import type { TranslationKeys } from "../i18n";
+
 import type React from "react";
 import type App from "./App";
 import type { PendingExcalidrawElements } from "../types";
@@ -23,7 +28,11 @@ type FlowchartOperation =
   | { type: "none" }
   | { type: "canceled" }
   | { type: "creating"; pending: PendingExcalidrawElements }
-  | { type: "navigating"; nodeId: ExcalidrawElement["id"] | null }
+  | {
+      type: "navigating";
+      nodeId: ExcalidrawElement["id"] | null;
+      direction: LinkDirection;
+    }
   | { type: "committed"; nodes: PendingExcalidrawElements }
   | { type: "navigationEnded" };
 
@@ -61,11 +70,27 @@ export class AppFlowchart {
         return true;
       case "navigating": {
         event.preventDefault();
-        const node =
-          operation.nodeId &&
-          this.app.scene.getNonDeletedElementsMap().get(operation.nodeId);
+        const elementsMap = this.app.scene.getNonDeletedElementsMap();
+        const node = operation.nodeId && elementsMap.get(operation.nodeId);
+        // connection navigation is invisible to screen readers unless
+        // both outcomes are voiced: silence on a miss reads as "nothing
+        // happened at all" (WCAG 4.1.3)
         if (node) {
           this.selectAndReveal(node);
+          // while browsing proxies the selection→focus sync makes the
+          // screen reader announce the target itself; outside of it,
+          // announce explicitly
+          if (!document.activeElement?.closest(".excalidraw-a11y-scene")) {
+            announce(getElementDescription(node, elementsMap));
+          }
+        } else {
+          announce(
+            t(
+              `a11y.noConnection.${operation.direction}` as TranslationKeys,
+              null,
+              "No connection",
+            ),
+          );
         }
         return true;
       }
@@ -130,13 +155,15 @@ export class AppFlowchart {
         const selectedElements = getSelectedElements(elementsMap, app.state);
 
         if (selectedElements.length === 1) {
+          const direction = AppFlowchart.getLinkDirectionFromKey(event.key);
           return {
             type: "navigating",
             nodeId: navigator.exploreByDirection(
               selectedElements[0],
               elementsMap,
-              AppFlowchart.getLinkDirectionFromKey(event.key),
+              direction,
             ),
+            direction,
           };
         }
       }

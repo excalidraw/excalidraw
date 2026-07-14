@@ -446,6 +446,8 @@ import {
   SceneProxyLayer,
   a11yHelpDialogAtom,
   announce,
+  getConnectedElements,
+  getElementDescription,
   getElementText,
   getElementTypeLabel,
 } from "../a11y";
@@ -478,6 +480,8 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { TranslationKeys } from "../i18n";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -735,6 +739,13 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public flowchart: AppFlowchart = new AppFlowchart(this);
+  // Alt+N connection cycling (a11y): remembers the anchor whose
+  // connections are being enumerated across successive presses
+  private a11yConnectionCycle: {
+    anchorId: string;
+    index: number;
+    lastTargetId: string;
+  } | null = null;
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
@@ -5181,6 +5192,75 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           event.preventDefault();
           return;
+        }
+
+        // Alt+N: cycle through ALL connections of the anchor element
+        // regardless of geometry. Alt+Arrow requires knowing which side
+        // an elbow arrow happens to attach to — something a non-visual
+        // user cannot guess. (Alt+Arrow announcements live in
+        // AppFlowchart.handleKeyEvent.)
+        if (event.altKey && !event.shiftKey && event.code === "KeyN") {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+
+          if (selectedElements.length === 1) {
+            event.preventDefault();
+            const elementsMap = this.scene.getNonDeletedElementsMap();
+            const current = selectedElements[0];
+
+            // keep cycling the same anchor while we keep landing on its
+            // connections (so several Alt+N presses enumerate them all
+            // instead of ping-ponging between two neighbors)
+            let anchor = current;
+            let index = 0;
+            const prevCycle = this.a11yConnectionCycle;
+            if (prevCycle && prevCycle.lastTargetId === current.id) {
+              const prevAnchor = elementsMap.get(prevCycle.anchorId);
+              if (prevAnchor && !prevAnchor.isDeleted) {
+                anchor = prevAnchor;
+                index = prevCycle.index + 1;
+              }
+            }
+
+            const connections = getConnectedElements(anchor, elementsMap);
+            if (!connections.length) {
+              this.a11yConnectionCycle = null;
+              announce(t("a11y.noConnections"));
+              return;
+            }
+
+            index %= connections.length;
+            const target = connections[index];
+            this.a11yConnectionCycle = {
+              anchorId: anchor.id,
+              index,
+              lastTargetId: target.id,
+            };
+
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                { [target.id]: true },
+                prevState,
+              ),
+            }));
+
+            // while browsing proxies, the selection→focus sync makes the
+            // screen reader read the target itself — only add the position
+            const position = t("a11y.connectionPosition", {
+              position: index + 1,
+              total: connections.length,
+            });
+            announce(
+              document.activeElement?.closest(".excalidraw-a11y-scene")
+                ? position
+                : `${getElementDescription(target, elementsMap)}, ${position}`,
+            );
+
+            this.revealIfHidden([target]);
+            return;
+          }
         }
       }
 

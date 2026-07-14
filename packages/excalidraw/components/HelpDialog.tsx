@@ -355,6 +355,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey(`CtrlOrCmd+Alt+Arrow Key`)]}
             />
             <Shortcut
+              label={t("helpDialog.cycleConnections")}
+              shortcuts={[getShortcutKey("Alt+N")]}
+            />
+            <Shortcut
               label={t("helpDialog.insertShapeAtCenter")}
               shortcuts={[getShortcutKey("Enter")]}
             />

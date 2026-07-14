@@ -214,6 +214,106 @@ describe("a11y element descriptions", () => {
   });
 });
 
+describe("a11y geometric containment (layers)", () => {
+  it("describes nesting inside labeled boxes and their child counts", () => {
+    const zone = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 500,
+    });
+    const zoneLabel = API.createElement({
+      type: "text",
+      containerId: zone.id,
+      text: "Storage zone",
+    });
+    const zoneLabeled = {
+      ...zone,
+      boundElements: [{ type: "text" as const, id: zoneLabel.id }],
+    };
+    const inner = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+    const outside = API.createElement({
+      type: "rectangle",
+      x: 800,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const elementsMap = arrayToMap([zoneLabeled, zoneLabel, inner, outside]);
+
+    expect(getElementDescription(inner, elementsMap)).toBe(
+      'Rectangle, black, inside "Storage zone"',
+    );
+    expect(getElementDescription(zoneLabeled, elementsMap)).toBe(
+      '"Storage zone", Rectangle, black, contains 1 element',
+    );
+    expect(getElementDescription(outside, elementsMap)).toBe(
+      "Rectangle, black",
+    );
+  });
+
+  it("assigns elements to the nearest (smallest) labeled container", () => {
+    const outer = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 1000,
+      height: 1000,
+    });
+    const outerLabel = API.createElement({
+      type: "text",
+      containerId: outer.id,
+      text: "Outer",
+    });
+    const innerZone = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 400,
+      height: 400,
+    });
+    const innerLabel = API.createElement({
+      type: "text",
+      containerId: innerZone.id,
+      text: "Inner",
+    });
+    const leaf = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+    });
+    const elementsMap = arrayToMap([
+      {
+        ...outer,
+        boundElements: [{ type: "text" as const, id: outerLabel.id }],
+      },
+      outerLabel,
+      {
+        ...innerZone,
+        boundElements: [{ type: "text" as const, id: innerLabel.id }],
+      },
+      innerLabel,
+      leaf,
+    ]);
+
+    expect(getElementDescription(leaf, elementsMap)).toContain(
+      'inside "Inner"',
+    );
+    expect(getElementDescription(leaf, elementsMap)).not.toContain(
+      'inside "Outer"',
+    );
+  });
+});
+
 describe("a11y scene proxy layer", () => {
   beforeEach(async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
@@ -607,6 +707,123 @@ describe("a11y screen reader help dialog", () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     expect(editorJotaiStore.get(a11yHelpDialogAtom)).toBe(false);
     expect(document.querySelector(".a11y-help-dialog")).toBeNull();
+  });
+});
+
+describe("a11y connection navigation feedback", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const liveRegionText = () =>
+    document.getElementById("excalidraw-a11y-announcer")?.textContent ?? "";
+
+  const focusProxyOf = (elementId: string) => {
+    const proxy = queryProxies().find(
+      (p) => p.getAttribute("data-a11y-element-id") === elementId,
+    )!;
+    act(() => proxy.focus());
+  };
+
+  it("announces when Alt+Arrow finds no connection", () => {
+    const lone = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    API.setElements([lone]);
+    focusProxyOf(lone.id);
+
+    fireEvent.keyDown(document, { key: "ArrowRight", altKey: true });
+    expect(liveRegionText()).toContain("No connection to the right");
+  });
+
+  it("cycles through all connections with Alt+N regardless of direction", () => {
+    const anchor = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 300,
+      width: 50,
+      height: 50,
+    });
+    const west = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 300,
+      width: 50,
+      height: 50,
+    });
+    const north = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const arrowToWest = API.createElement({
+      type: "arrow",
+      x: 290,
+      y: 325,
+      startBinding: {
+        elementId: anchor.id,
+        fixedPoint: [0, 0.5],
+        mode: "orbit",
+      },
+      endBinding: { elementId: west.id, fixedPoint: [1, 0.5], mode: "orbit" },
+    });
+    const arrowToNorth = API.createElement({
+      type: "arrow",
+      x: 325,
+      y: 290,
+      startBinding: {
+        elementId: anchor.id,
+        fixedPoint: [0.5, 0],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: north.id,
+        fixedPoint: [0.5, 1],
+        mode: "orbit",
+      },
+    });
+    API.setElements([
+      {
+        ...anchor,
+        boundElements: [
+          { type: "arrow" as const, id: arrowToWest.id },
+          { type: "arrow" as const, id: arrowToNorth.id },
+        ],
+      },
+      {
+        ...west,
+        boundElements: [{ type: "arrow" as const, id: arrowToWest.id }],
+      },
+      {
+        ...north,
+        boundElements: [{ type: "arrow" as const, id: arrowToNorth.id }],
+      },
+      arrowToWest,
+      arrowToNorth,
+    ]);
+    focusProxyOf(anchor.id);
+
+    fireEvent.keyDown(document, { key: "n", code: "KeyN", altKey: true });
+    expect(window.h.state.selectedElementIds[west.id]).toBe(true);
+    expect(liveRegionText()).toContain("Connection 1 of 2");
+
+    fireEvent.keyDown(document, { key: "n", code: "KeyN", altKey: true });
+    expect(window.h.state.selectedElementIds[north.id]).toBe(true);
+    expect(liveRegionText()).toContain("Connection 2 of 2");
+
+    // wraps around, still enumerating the original anchor's connections
+    fireEvent.keyDown(document, { key: "n", code: "KeyN", altKey: true });
+    expect(window.h.state.selectedElementIds[west.id]).toBe(true);
+    expect(liveRegionText()).toContain("Connection 1 of 2");
+  });
+
+  it("announces when the element has no connections at all", () => {
+    const lone = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    API.setElements([lone]);
+    focusProxyOf(lone.id);
+
+    fireEvent.keyDown(document, { key: "n", code: "KeyN", altKey: true });
+    expect(liveRegionText()).toContain("No connections");
   });
 });
 

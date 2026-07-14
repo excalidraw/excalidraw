@@ -30,6 +30,9 @@ Manual test protocol for the accessibility layer (see `ACCESSIBILITY_PLAN.md` in
 
 - Tab / Shift+Tab move through elements in reading order with "…, N of M, …" announcements; focus ring visible; viewport pans to off-screen elements.
 - `Ctrl+Alt+Arrow` jumps spatially.
+- `Alt+Arrow` follows arrow connections; when a direction has none, "No connection above/below/to the left/to the right" is announced (never silence).
+- `Alt+N` pressed repeatedly cycles through ALL connections of the element ("Connection 1 of 2", then 2 of 2, then wraps) — no need to guess which side an elbow arrow attaches to; "No connections" on an unconnected element.
+- Nesting is announced: an element inside a larger labelled box says `inside "…"`, containers say "contains N elements" (test with an architecture-style board where structure is boxes-in-boxes rather than arrows).
 - Escape returns to the editor container; no keyboard trap either way.
 - Element descriptions include the conceptual color ("red", "blue, light green fill") — color a few shapes alike and verify they can be recognized as belonging together; custom (non-palette) colors must still announce a sensible family name, never a hex code.
 
