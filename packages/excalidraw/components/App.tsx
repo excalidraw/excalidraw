@@ -418,12 +418,6 @@ import {
   animateToConstraints,
   isViewportOverscrolled,
 } from "../viewport";
-import {
-  setEraserCursor,
-  setCursor,
-  resetCursor,
-  setCursorForShape,
-} from "../cursor";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
@@ -444,6 +438,7 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { AppCursor } from "./App.cursor";
 import { AppFlowchart } from "./App.flowchart";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -721,6 +716,7 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public flowchart: AppFlowchart = new AppFlowchart(this);
+  public cursor: AppCursor = new AppCursor(this);
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
   private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
@@ -814,8 +810,8 @@ class App extends React.Component<AppProps, AppState> {
       setToast: this.setToast,
       id: this.id,
       setActiveTool: this.setActiveTool,
-      setCursor: this.setCursor,
-      resetCursor: this.resetCursor,
+      setCursor: this.cursor.set,
+      resetCursor: this.cursor.reset,
       getEditorInterface: () => this.editorInterface,
       updateFrameRendering: this.updateFrameRendering,
       toggleSidebar: this.toggleSidebar,
@@ -1046,34 +1042,13 @@ class App extends React.Component<AppProps, AppState> {
    * capture the pointer trivially since view mode implies they're not
    * active; this predicate only matters where view-mode gates apply.)
    */
-  private isActiveToolPointerCapturing(): boolean {
+  public isActiveToolPointerCapturing(): boolean {
     if (!this.isInteractionEnabled()) {
       // an active tool that isn't allowed via `interaction.enabled.tools`
       // is inert — including the laser
       return this.isToolSupported(this.state.activeTool.type);
     }
     return this.state.activeTool.type === "laser";
-  }
-
-  /**
-   * Applies the cursor shown when no interaction/hover sets one — the
-   * view-mode grab cursor when drag-to-pan applies, the active tool's
-   * cursor otherwise. All cursor management is imperative (an inline
-   * `style.cursor` on the canvas would clobber it on the next rerender).
-   */
-  private applyRestingCursor() {
-    if (!this.interactiveCanvas) {
-      return;
-    }
-    if (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()) {
-      if (this.isNavigationEnabled()) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else {
-        resetCursor(this.interactiveCanvas);
-      }
-    } else {
-      setCursorForShape(this.interactiveCanvas, this.state);
-    }
   }
 
   /** Whether Excalidraw's default UI is rendered. */
@@ -1533,7 +1508,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointer.y,
         ))
     ) {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.cursor.set(CURSOR_TYPE.POINTER);
       this.setState({
         activeEmbeddable: { element: hitElement, state: "hover" },
       });
@@ -3243,7 +3218,7 @@ class App extends React.Component<AppProps, AppState> {
     this.deselectElements();
     if (!this.isInteractionEnabled()) {
       this.setState({ originSnapOffset: null });
-      resetCursor(this.interactiveCanvas);
+      this.cursor.reset();
     }
   };
 
@@ -3293,7 +3268,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
         hideHyperlinkToolip();
-        resetCursor(this.interactiveCanvas);
+        this.cursor.reset();
       }
     }
 
@@ -3312,7 +3287,7 @@ class App extends React.Component<AppProps, AppState> {
         // listeners tear down on the next pointerup)
         this.laserTrails.endPath();
       }
-      this.applyRestingCursor();
+      this.cursor.reset();
     }
 
     // invariant: while non-interactive, the active tool is either
@@ -3335,7 +3310,7 @@ class App extends React.Component<AppProps, AppState> {
       this.isNavigationEnabled(prevProps) !== this.isNavigationEnabled()
     ) {
       this.addEventListeners();
-      this.applyRestingCursor();
+      this.cursor.reset();
     }
 
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
@@ -3345,7 +3320,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.state.viewModeEnabled) {
         this.deselectElements();
       }
-      this.applyRestingCursor();
+      this.cursor.reset();
     }
   };
 
@@ -4155,7 +4130,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type === "eraser" &&
       prevState.theme !== this.state.theme
     ) {
-      setEraserCursor(this.interactiveCanvas, this.state.theme);
+      this.cursor.applyForTool();
     }
 
     // Hide hyperlink popup if shown when element type is not selection
@@ -6027,7 +6002,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
 
@@ -6122,11 +6097,11 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeTool.type !== "laser") ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (isSelectionLikeTool(this.state.activeTool.type)) {
-        resetCursor(this.interactiveCanvas);
+        this.cursor.reset();
       } else {
-        setCursorForShape(this.interactiveCanvas, this.state);
+        this.cursor.applyForTool();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds({}, this.state),
           selectedGroupIds: {},
@@ -6301,12 +6276,9 @@ class App extends React.Component<AppProps, AppState> {
           })
         : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      this.cursor.set(CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
-      setCursorForShape(this.interactiveCanvas, {
-        ...this.state,
-        activeTool: nextActiveTool,
-      });
+      this.cursor.applyForTool(nextActiveTool);
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
@@ -6370,13 +6342,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ openDialog: dialogType });
   };
 
-  private setCursor = (cursor: string) => {
-    setCursor(this.interactiveCanvas, cursor);
-  };
-
-  private resetCursor = () => {
-    resetCursor(this.interactiveCanvas);
-  };
   /**
    * returns whether user is making a gesture with >= 2 fingers (points)
    * on o touch screen (not on a trackpad). Currently only relates to Darwin
@@ -6583,7 +6548,7 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         if (this.state.activeTool.locked) {
-          setCursorForShape(this.interactiveCanvas, this.state);
+          this.cursor.applyForTool();
         }
 
         this.focusContainer();
@@ -6738,7 +6703,7 @@ class App extends React.Component<AppProps, AppState> {
       // due to the pointerdown
       activeTextElement,
     );
-    this.resetCursor();
+    this.cursor.reset();
     return true;
   };
 
@@ -7380,7 +7345,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    resetCursor(this.interactiveCanvas);
+    this.cursor.reset();
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
@@ -7409,7 +7374,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    resetCursor(this.interactiveCanvas);
+    this.cursor.reset();
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
@@ -7591,7 +7556,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.cursor.set(CURSOR_TYPE.POINTER);
 
       showHyperlinkTooltip(
         this.hitLinkElement,
@@ -7674,11 +7639,7 @@ class App extends React.Component<AppProps, AppState> {
       ? this.getElementLinkAtPosition(scenePointer, hitElementMightBeLocked)
       : undefined;
     if (!this.applyElementLinkHoverAffordance()) {
-      if (this.isNavigationEnabled()) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else {
-        resetCursor(this.interactiveCanvas);
-      }
+      this.cursor.reset();
     }
   };
 
@@ -7916,9 +7877,9 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.multiElement
     ) {
       if (isOverScrollBar) {
-        resetCursor(this.interactiveCanvas);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else {
-        setCursorForShape(this.interactiveCanvas, this.state);
+        this.cursor.applyForTool();
       }
     }
 
@@ -8048,7 +8009,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const { lastCommittedPoint } = selectedLinearElement;
 
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
 
       if (lastPoint === lastCommittedPoint) {
         if (
@@ -8088,7 +8049,7 @@ class App extends React.Component<AppProps, AppState> {
             { informMutation: false, isDragging: false },
           );
         } else {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+          this.cursor.set(CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
           // point exists. Thus do nothing (don't add/remove points).
         }
@@ -8100,7 +8061,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        this.cursor.set(CURSOR_TYPE.POINTER);
         this.scene.mutateElement(
           multiElement,
           {
@@ -8130,7 +8091,7 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else {
         if (isPathALoop(points, this.state.zoom.value)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+          this.cursor.set(CURSOR_TYPE.POINTER);
         }
 
         // Update arrow points
@@ -8214,7 +8175,7 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (this.isHittingTextAutoResizeHandle(selectedElements, scenePointer)) {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.cursor.set(CURSOR_TYPE.POINTER);
       return;
     }
 
@@ -8261,8 +8222,7 @@ class App extends React.Component<AppProps, AppState> {
           elementWithTransformHandleType &&
           elementWithTransformHandleType.transformHandleType
         ) {
-          setCursor(
-            this.interactiveCanvas,
+          this.cursor.set(
             getCursorForResizingElement(elementWithTransformHandleType),
           );
           return;
@@ -8282,8 +8242,7 @@ class App extends React.Component<AppProps, AppState> {
         this.editorInterface,
       );
       if (transformHandleType) {
-        setCursor(
-          this.interactiveCanvas,
+        this.cursor.set(
           getCursorForResizingElement({
             transformHandleType,
           }),
@@ -8338,8 +8297,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
-        setCursor(
-          this.interactiveCanvas,
+        this.cursor.set(
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
         );
       } else if (
@@ -8349,13 +8307,13 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements,
         )
       ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+        this.cursor.set(CURSOR_TYPE.MOVE);
       } else if (this.state.viewModeEnabled) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (this.state.openDialog?.name === "elementLinkSelector") {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else if (isOverScrollBar) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD] &&
@@ -8380,12 +8338,12 @@ class App extends React.Component<AppProps, AppState> {
               this.state.activeTool.type !== "lasso" ||
               selectedElements.length > 0
             ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+              this.cursor.set(CURSOR_TYPE.MOVE);
             }
           }
         }
       } else {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       }
 
       if (this.state.selectedLinearElement) {
@@ -8491,7 +8449,7 @@ class App extends React.Component<AppProps, AppState> {
             hoverPointIndex === element.points.length - 1
           : hoverPointIndex >= 0;
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+          this.cursor.set(CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
             // Elbow arrows can only be moved when unconnected
@@ -8502,7 +8460,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state.activeTool.type !== "lasso" ||
               Object.keys(this.state.selectedElementIds).length > 0
             ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+              this.cursor.set(CURSOR_TYPE.MOVE);
             }
           }
         }
@@ -8516,7 +8474,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeTool.type !== "lasso" ||
             Object.keys(this.state.selectedElementIds).length > 0
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            this.cursor.set(CURSOR_TYPE.MOVE);
           }
         }
       }
@@ -8574,10 +8532,10 @@ class App extends React.Component<AppProps, AppState> {
 
       // Set cursor to pointer when hovering over a focus point
       if (hoveredFocusPointBinding) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        this.cursor.set(CURSOR_TYPE.POINTER);
       }
     } else {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      this.cursor.set(CURSOR_TYPE.AUTO);
     }
   }
 
@@ -9007,7 +8965,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
     } else if (
       this.state.activeTool.type === TOOL_TYPE.frame ||
       this.state.activeTool.type === TOOL_TYPE.magicframe
@@ -9204,7 +9162,7 @@ class App extends React.Component<AppProps, AppState> {
         ? false
         : /Linux/.test(window.navigator.platform);
 
-    setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+    this.cursor.set(CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
@@ -9256,7 +9214,7 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          this.applyRestingCursor();
+          this.cursor.reset();
         }
         this.setState({
           cursorButton: "up",
@@ -9471,7 +9429,7 @@ class App extends React.Component<AppProps, AppState> {
     const onPointerUp = withBatchedUpdates(() => {
       lastPointerUp = null;
       isDraggingScrollBar = false;
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
       this.setState({
         cursorButton: "up",
       });
@@ -9995,13 +9953,18 @@ class App extends React.Component<AppProps, AppState> {
       initialCaretSceneCoords: { x: sceneX, y: sceneY },
     });
 
-    resetCursor(this.interactiveCanvas);
     if (!this.state.activeTool.locked) {
-      this.setState({
-        activeTool: updateActiveTool(this.state, {
-          type: this.state.preferredSelectionTool.type,
-        }),
-      });
+      this.setState(
+        {
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        },
+        // reset once the tool revert has settled
+        () => this.cursor.reset(),
+      );
+    } else {
+      this.cursor.reset();
     }
   };
 
@@ -10346,7 +10309,7 @@ class App extends React.Component<AppProps, AppState> {
         ),
       }));
 
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.cursor.set(CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
@@ -11959,24 +11922,27 @@ class App extends React.Component<AppProps, AppState> {
           }
           this.setState({ suggestedBinding: null });
           if (!activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
-            this.setState((prevState) => ({
-              newElement: null,
-              activeTool: updateActiveTool(this.state, {
-                type: this.state.preferredSelectionTool.type,
+            this.setState(
+              (prevState) => ({
+                newElement: null,
+                activeTool: updateActiveTool(this.state, {
+                  type: this.state.preferredSelectionTool.type,
+                }),
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    ...prevState.selectedElementIds,
+                    [newElement.id]: true,
+                  },
+                  prevState,
+                ),
+                selectedLinearElement: new LinearElementEditor(
+                  newElement,
+                  this.scene.getNonDeletedElementsMap(),
+                ),
               }),
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [newElement.id]: true,
-                },
-                prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                newElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            }));
+              // reset once the tool revert has settled
+              () => this.cursor.reset(),
+            );
           } else {
             this.setState({
               newElement: null,
@@ -12003,7 +11969,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        this.resetCursor();
+        this.cursor.reset();
 
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
@@ -12508,7 +12474,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
         // reset cursor
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
         return;
       }
 
@@ -12596,14 +12562,17 @@ class App extends React.Component<AppProps, AppState> {
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))
       ) {
-        resetCursor(this.interactiveCanvas);
-        this.setState({
-          newElement: null,
-          suggestedBinding: null,
-          activeTool: updateActiveTool(this.state, {
-            type: this.state.preferredSelectionTool.type,
-          }),
-        });
+        this.setState(
+          {
+            newElement: null,
+            suggestedBinding: null,
+            activeTool: updateActiveTool(this.state, {
+              type: this.state.preferredSelectionTool.type,
+            }),
+          },
+          // reset once the tool revert has settled
+          () => this.cursor.reset(),
+        );
       } else {
         this.setState({
           newElement: null,
@@ -12713,7 +12682,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const mimeType = imageFile.type;
 
-    setCursor(this.interactiveCanvas, "wait");
+    this.cursor.set("wait");
 
     if (mimeType === MIME_TYPES.svg) {
       try {
@@ -13012,7 +12981,7 @@ class App extends React.Component<AppProps, AppState> {
       // reflect state that landed before the canvas existed — the cursor is
       // otherwise only set imperatively on *changes* (e.g. the host-forced
       // tool seeded from `props.activeTool`, or view-mode drag-to-pan)
-      this.applyRestingCursor();
+      this.cursor.reset();
 
       // -----------------------------------------------------------------------
       // NOTE wheel, touchstart, touchend events must be registered outside

@@ -1042,6 +1042,7 @@ export type AppClassProperties = {
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
+  cursor: App["cursor"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
@@ -1184,8 +1185,8 @@ export interface ExcalidrawImperativeAPI {
   addFiles: (data: BinaryFileData[]) => void;
   id: string;
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
-  setCursor: InstanceType<typeof App>["setCursor"];
-  resetCursor: InstanceType<typeof App>["resetCursor"];
+  setCursor: InstanceType<typeof App>["cursor"]["set"];
+  resetCursor: InstanceType<typeof App>["cursor"]["reset"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getEditorInterface: () => EditorInterface;
   /**

@@ -203,9 +203,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
     <canvas
       className="excalidraw__canvas interactive"
       // NOTE no `cursor` style here — the cursor is managed imperatively
-      // (`applyRestingCursor`, `setCursorForShape`, hover handlers...); an
-      // inline style would clobber it whenever its computed value changes
-      // across rerenders
+      // (see `AppCursor`); an inline style would clobber it whenever its
+      // computed value changes across rerenders
       style={{
         width: props.appState.width,
         height: props.appState.height,

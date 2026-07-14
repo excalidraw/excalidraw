@@ -36,7 +36,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
-import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
 import { TOGGLE_TOOLS } from "../components/Tools";
 import { IconButton } from "../components/IconButton";
@@ -57,7 +56,7 @@ export const actionFinalize = register<FormData>({
   perform: (elements, appState, data, app) => {
     let shouldCommit = true;
     let newElements = elements;
-    const { interactiveCanvas, focusContainer, scene } = app;
+    const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (data && appState.selectedLinearElement) {
@@ -317,14 +316,6 @@ export const actionFinalize = register<FormData>({
       }
     }
 
-    if (
-      (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
-      !element
-    ) {
-      resetCursor(interactiveCanvas);
-    }
-
     let activeTool: AppState["activeTool"];
     if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
       activeTool = updateActiveTool(appState, {
@@ -337,6 +328,16 @@ export const actionFinalize = register<FormData>({
       activeTool = updateActiveTool(appState, {
         type: app.state.preferredSelectionTool.type,
       });
+    }
+
+    if (
+      (!appState.activeTool.locked &&
+        appState.activeTool.type !== "freedraw") ||
+      !element
+    ) {
+      // the active tool reverts (see the returned `appState.activeTool`) —
+      // apply the reverted tool's cursor
+      app.cursor.applyForTool(activeTool);
     }
 
     let selectedLinearElement =
