@@ -226,6 +226,22 @@ describe("props.activeTool (forced tool)", () => {
     expect(queryToolButton("eraser")!.disabled).toBe(true);
     expect(queryToolButton("lock")).toBe(null);
 
+    // the extra-tools dropdown items are disabled as well
+    fireEvent.click(
+      GlobalTestState.renderResult.container.querySelector(
+        ".App-toolbar__extra-tools-trigger",
+      )!,
+    );
+    const frameItem = document.querySelector<HTMLButtonElement>(
+      '[data-testid="toolbar-frame"]',
+    );
+    expect(frameItem).not.toBe(null);
+    expect(frameItem!.disabled).toBe(true);
+    const laserItem = document.querySelector<HTMLButtonElement>(
+      '[data-testid="toolbar-laser"]',
+    );
+    expect(laserItem!.disabled).toBe(true);
+
     // Q (toggle tool lock) is ignored — the lock state is host-implied
     expect(h.state.activeTool.locked).toBe(true);
     fireEvent.keyDown(document, { key: "q", code: "KeyQ" });

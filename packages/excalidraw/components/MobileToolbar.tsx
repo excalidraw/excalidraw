@@ -15,6 +15,7 @@ import {
   FreedrawToolButton,
   HandToolButton,
   ImageToolButton,
+  isToolButtonDisabled,
   SelectionToolPopover,
   TextToolButton,
   TOOLS,
@@ -246,6 +247,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               shortcut={KEYS.T.toLocaleUpperCase()}
               data-testid="toolbar-text"
               selected={activeTool.type === "text"}
+              disabled={isToolButtonDisabled(app, "text")}
             >
               {t("toolBar.text")}
             </DropdownMenu.Item>
@@ -257,6 +259,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               icon={ImageIcon}
               data-testid="toolbar-image"
               selected={activeTool.type === "image"}
+              disabled={isToolButtonDisabled(app, "image")}
             >
               {t("toolBar.image")}
             </DropdownMenu.Item>
@@ -268,6 +271,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               shortcut={KEYS.F.toLocaleUpperCase()}
               data-testid="toolbar-frame"
               selected={frameToolSelected}
+              disabled={isToolButtonDisabled(app, "frame")}
             >
               {t("toolBar.frame")}
             </DropdownMenu.Item>
@@ -277,6 +281,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             icon={EmbedIcon}
             data-testid="toolbar-embeddable"
             selected={embeddableToolSelected}
+            disabled={isToolButtonDisabled(app, "embeddable")}
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
@@ -286,6 +291,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             data-testid="toolbar-laser"
             selected={laserToolSelected}
             shortcut={KEYS.K.toLocaleUpperCase()}
+            disabled={isToolButtonDisabled(app, "laser")}
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
@@ -307,6 +313,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
                 icon={MagicIcon}
                 data-testid="toolbar-magicframe"
                 badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
+                disabled={isToolButtonDisabled(app, "magicframe")}
               >
                 {t("toolBar.magicframe")}
               </DropdownMenu.Item>
