@@ -201,6 +201,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   return (
     <canvas
       className="excalidraw__canvas interactive"
+      // the scene is exposed to assistive tech via SceneProxyLayer
+      aria-hidden="true"
       style={{
         width: props.appState.width,
         height: props.appState.height,

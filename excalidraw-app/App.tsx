@@ -901,7 +901,7 @@ const ExcalidrawWrapper = () => {
   };
 
   return (
-    <div
+    <main
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
@@ -1257,7 +1257,7 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
-    </div>
+    </main>
   );
 };
 

@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 
 import type { ColorPaletteCustom } from "@excalidraw/common";
 
+import { getColorName } from "../../a11y/colorName";
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 
@@ -64,7 +65,11 @@ export const ShadeList = ({
                 "color-picker__button color-picker__button--large has-outline",
                 { active: i === shade },
               )}
-              aria-label="Shade"
+              aria-label={t("a11y.colorShadeOption", {
+                color: getColorName(color) ?? colorName,
+                position: i + 1,
+                total: shades.length,
+              })}
               title={`${colorName} - ${i + 1}`}
               style={color ? { "--swatch-color": color } : undefined}
               onClick={() => {

@@ -10,6 +10,8 @@ type IslandProps = {
   padding?: number;
   className?: string | boolean;
   style?: object;
+  role?: React.AriaRole;
+  "aria-label"?: string;
   /** marks the island as a canvas-occluding UI surface measured by
    * `getViewportOffsets` (see {@link ViewportUIDock}) */
   "data-viewport-ui"?: ViewportUIDock;
@@ -25,6 +27,8 @@ export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
       padding,
       className,
       style,
+      role,
+      "aria-label": ariaLabel,
       "data-viewport-ui": viewportUI,
       "data-viewport-ui-name": viewportUIName,
     },
@@ -33,6 +37,8 @@ export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
     <div
       className={clsx("Island", className)}
       style={{ "--padding": padding, ...style }}
+      role={role}
+      aria-label={ariaLabel}
       data-viewport-ui={viewportUI}
       data-viewport-ui-name={viewportUIName}
       ref={ref}

@@ -91,3 +91,16 @@ export { actionToggleLinearEditor } from "./actionLinearEditor";
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
 
 export { actionToggleCropEditor } from "./actionCropEditor";
+
+export {
+  actionA11yIncreaseWidth,
+  actionA11yDecreaseWidth,
+  actionA11yIncreaseHeight,
+  actionA11yDecreaseHeight,
+  actionA11yRotateCW,
+  actionA11yRotateCCW,
+} from "./actionA11yTransform";
+export { actionImageAltText } from "./actionImageAltText";
+export { actionConnectElements } from "./actionConnectElements";
+export { actionA11yHelp, actionA11yFocusCanvas } from "./actionA11yHelp";
+export { actionToggleSingleKeyShortcuts } from "./actionToggleSingleKeyShortcuts";

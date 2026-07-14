@@ -23,6 +23,7 @@ export const Switch = ({
         name={name}
         id={name}
         title={title}
+        aria-label={title}
         type="checkbox"
         checked={checked}
         disabled={disabled}

@@ -84,8 +84,12 @@ export const distributeHorizontally = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+  // `!shiftKey` so it doesn't shadow Alt+Shift+H (screen reader guide)
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    !event.shiftKey &&
+    event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
       hidden={!enableActionGroup(appState, app)}

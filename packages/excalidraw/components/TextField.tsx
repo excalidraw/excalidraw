@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import {
   forwardRef,
+  useId,
   useRef,
   useImperativeHandle,
   useLayoutEffect,
@@ -29,6 +30,8 @@ type TextFieldProps = {
   placeholder?: string;
   isRedacted?: boolean;
   type?: "text" | "search";
+  /** extra attributes (e.g. combobox aria) spread onto the inner <input> */
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 } & ({ value: string } | { defaultValue: string });
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -45,11 +48,13 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       icon,
       className,
       type,
+      inputProps,
       ...rest
     },
     ref,
   ) => {
     const innerRef = useRef<HTMLInputElement | null>(null);
+    const labelId = useId();
 
     useImperativeHandle(ref, () => innerRef.current!);
 
@@ -75,7 +80,11 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         }}
       >
         {icon}
-        {label && <div className="ExcTextField__label">{label}</div>}
+        {label && (
+          <div className="ExcTextField__label" id={labelId}>
+            {label}
+          </div>
+        )}
         <div
           className={clsx("ExcTextField__input", {
             "ExcTextField__input--readonly": readonly,
@@ -95,10 +104,12 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
               "defaultValue" in rest ? rest.defaultValue : undefined
             }
             placeholder={placeholder}
+            aria-labelledby={label ? labelId : undefined}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
             type={type}
+            {...inputProps}
           />
           {isRedacted && (
             <Button

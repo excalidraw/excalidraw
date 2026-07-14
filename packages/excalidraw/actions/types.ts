@@ -43,6 +43,17 @@ export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
+  | "a11yIncreaseWidth"
+  | "a11yDecreaseWidth"
+  | "a11yIncreaseHeight"
+  | "a11yDecreaseHeight"
+  | "a11yRotateCW"
+  | "a11yRotateCCW"
+  | "imageAltText"
+  | "connectElements"
+  | "a11yHelp"
+  | "a11yFocusCanvas"
+  | "toggleSingleKeyShortcuts"
   | "copy"
   | "cut"
   | "paste"

@@ -335,6 +335,8 @@ function CommandPaletteInner({
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
         actionManager.actions.togglePolygon,
+        actionManager.actions.connectElements,
+        actionManager.actions.imageAltText,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -372,7 +374,34 @@ function CommandPaletteInner({
         actionManager.actions.toggleElementLock,
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
+        actionManager.actions.a11yHelp,
+        actionManager.actions.a11yFocusCanvas,
+        actionManager.actions.toggleSingleKeyShortcuts,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.editor));
+
+      // pointer-free element creation (WCAG 2.5.7) — same placement logic
+      // as pressing Enter with a shape tool active
+      const insertElementCommands: CommandPaletteItem[] = (
+        [
+          "rectangle",
+          "diamond",
+          "ellipse",
+          "arrow",
+          "line",
+          "frame",
+          "text",
+        ] as const
+      ).map((type) => ({
+        label: t("labels.insertElement", {
+          type: t(`a11y.elementType.${type}`),
+        }),
+        category: DEFAULT_CATEGORIES.elements,
+        keywords: ["insert", "add", "create", "place", type],
+        viewMode: false,
+        perform: () => {
+          app.insertElementFromKeyboard(type);
+        },
+      }));
 
       const exportCommands: CommandPaletteItem[] = [
         actionManager.actions.saveToActiveFile,
@@ -383,6 +412,7 @@ function CommandPaletteInner({
 
       commandsFromActions = [
         ...elementsCommands,
+        ...insertElementCommands,
         ...editorCommands,
         {
           label: getActionLabel(actionClearCanvas),
@@ -878,6 +908,7 @@ function CommandPaletteInner({
       onCloseRequest={() => closeCommandPalette()}
       closeOnClickOutside
       title={false}
+      ariaLabel={t("commandPalette.title")}
       size={720}
       autofocus
       className="command-palette-dialog"
@@ -890,6 +921,18 @@ function CommandPaletteInner({
         }}
         selectOnRender
         ref={inputRef}
+        inputProps={{
+          role: "combobox",
+          "aria-expanded": true,
+          "aria-haspopup": "listbox",
+          "aria-controls": COMMAND_PALETTE_LISTBOX_ID,
+          "aria-autocomplete": "list",
+          "aria-activedescendant": currentCommand
+            ? currentCommand === lastUsed && !commandSearch
+              ? commandItemId(currentCommand.label, "recent")
+              : commandItemId(currentCommand.label)
+            : undefined,
+        }}
       />
 
       {app.editorInterface.formFactor !== "phone" && (
@@ -906,10 +949,19 @@ function CommandPaletteInner({
         </div>
       )}
 
-      <div className="commands">
+      <div
+        className="commands"
+        role="listbox"
+        id={COMMAND_PALETTE_LISTBOX_ID}
+        aria-label={t("commandPalette.title")}
+      >
         {lastUsed && !commandSearch && (
-          <div className="command-category">
-            <div className="command-category-title">
+          <div
+            className="command-category"
+            role="group"
+            aria-label={t("commandPalette.recents")}
+          >
+            <div className="command-category-title" aria-hidden="true">
               {t("commandPalette.recents")}
               <div
                 className="icon"
@@ -922,6 +974,7 @@ function CommandPaletteInner({
             </div>
             <CommandItem
               command={lastUsed}
+              idSuffix="recent"
               isSelected={lastUsed.label === currentCommand?.label}
               onClick={(event) => executeCommand(lastUsed, event)}
               disabled={!isCommandAvailable(lastUsed)}
@@ -935,8 +988,15 @@ function CommandPaletteInner({
         {Object.keys(commandsByCategory).length > 0 ? (
           Object.keys(commandsByCategory).map((category, idx) => {
             return (
-              <div className="command-category" key={category}>
-                <div className="command-category-title">{category}</div>
+              <div
+                className="command-category"
+                key={category}
+                role="group"
+                aria-label={category}
+              >
+                <div className="command-category-title" aria-hidden="true">
+                  {category}
+                </div>
                 {commandsByCategory[category].map((command) => (
                   <CommandItem
                     key={command.label}
@@ -953,7 +1013,7 @@ function CommandPaletteInner({
             );
           })
         ) : allCommands ? (
-          <div className="no-match">
+          <div className="no-match" role="status">
             <div className="icon">{searchIcon}</div>{" "}
             {t("commandPalette.search.noMatch")}
           </div>
@@ -962,6 +1022,12 @@ function CommandPaletteInner({
     </Dialog>
   );
 }
+const COMMAND_PALETTE_LISTBOX_ID = "command-palette-listbox";
+
+// labels are unique (used as react keys); ids allow any non-whitespace char
+const commandItemId = (label: string, suffix?: string) =>
+  `command-item-${label.replace(/\s+/g, "-")}${suffix ? `-${suffix}` : ""}`;
+
 const LibraryItemIcon = ({
   id,
   elements,
@@ -986,6 +1052,7 @@ const CommandItem = ({
   showShortcut,
   appState,
   size = "small",
+  idSuffix,
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
@@ -995,6 +1062,7 @@ const CommandItem = ({
   showShortcut: boolean;
   appState: UIAppState;
   size?: "small" | "large";
+  idSuffix?: string;
 }) => {
   const noop = () => {};
 
@@ -1005,6 +1073,10 @@ const CommandItem = ({
         "item-disabled": disabled,
         "command-item-large": size === "large",
       })}
+      role="option"
+      id={commandItemId(command.label, idSuffix)}
+      aria-selected={isSelected}
+      aria-disabled={disabled}
       ref={(ref) => {
         if (isSelected && !disabled) {
           ref?.scrollIntoView?.({

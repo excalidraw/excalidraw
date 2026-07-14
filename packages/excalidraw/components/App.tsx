@@ -290,6 +290,8 @@ import type {
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
+import type { TransformHandleDirection } from "@excalidraw/element";
+
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import {
@@ -325,6 +327,8 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionImageAltText,
+  actionConnectElements,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionPaste } from "../actions/actionClipboard";
@@ -437,6 +441,19 @@ import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 import { AnimationController } from "../renderer/animation";
 
+import {
+  A11yHelpRegion,
+  SceneProxyLayer,
+  a11yHelpDialogAtom,
+  announce,
+  getConnectedElements,
+  getContainedElements,
+  getElementDescription,
+  getElementText,
+  getElementTypeLabel,
+  getGeometricContainer,
+} from "../a11y";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -454,6 +471,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
@@ -721,6 +739,14 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public flowchart: AppFlowchart = new AppFlowchart(this);
+  // Alt+N / Alt+I cycling (a11y): remembers the anchor whose connections
+  // or nested elements are being enumerated across successive presses
+  private a11yCycle: {
+    kind: "connections" | "contained";
+    anchorId: string;
+    index: number;
+    lastTargetId: string;
+  } | null = null;
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
@@ -2205,6 +2231,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerEnter={this.toggleOverscrollBehavior}
         onPointerLeave={this.toggleOverscrollBehavior}
       >
+        <A11yHelpRegion />
         <ExcalidrawAPIContext.Provider value={this.api}>
           <AppContext.Provider value={this}>
             <AppPropsContext.Provider value={this.props}>
@@ -2452,6 +2479,7 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
+                          <SceneProxyLayer />
                           {this.state.userToFollow && (
                             <FollowMode
                               width={this.state.width}
@@ -3180,6 +3208,10 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
+    // the jotai store is a module singleton, so a remount (HMR, host app
+    // re-render) could resurrect an open guide — always start closed
+    editorJotaiStore.set(a11yHelpDialogAtom, false);
+
     if (isTestEnv() || isDevEnv()) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -3483,6 +3515,21 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.appStateObserver.flush(prevState);
+
+    // Alt+N / Alt+I cycles only survive while the selection is what the
+    // cycle itself produced — any other selection change starts fresh
+    if (
+      this.a11yCycle &&
+      prevState.selectedElementIds !== this.state.selectedElementIds
+    ) {
+      const selectedIds = Object.keys(this.state.selectedElementIds);
+      if (
+        selectedIds.length !== 1 ||
+        selectedIds[0] !== this.a11yCycle.lastTargetId
+      ) {
+        this.a11yCycle = null;
+      }
+    }
 
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
@@ -5035,6 +5082,15 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // F6 / Shift+F6 cycle keyboard focus between the editor regions
+      // (toolbar → canvas → panels → footer) — WCAG-friendly landmark
+      // navigation for keyboard and screen reader users
+      if (event.key === KEYS.F6) {
+        event.preventDefault();
+        this.cycleFocusAcrossRegions(event.shiftKey);
+        return;
+      }
+
       if (!isInputLike(event.target)) {
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
@@ -5056,6 +5112,49 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           this.startImageCropping(selectedElements[0]);
           return;
+        }
+
+        // keyboard point selection in the linear editor (WCAG 2.1.1):
+        // Tab / Shift+Tab cycle through the points; arrows then move the
+        // active point, Delete removes it, Ctrl+D duplicates it
+        if (
+          event.key === KEYS.TAB &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          !event.altKey &&
+          this.state.selectedLinearElement?.isEditing
+        ) {
+          const linearElement = this.scene
+            .getNonDeletedElementsMap()
+            .get(this.state.selectedLinearElement.elementId);
+          if (linearElement && isLinearElement(linearElement)) {
+            event.preventDefault();
+            const total = linearElement.points.length;
+            const current =
+              this.state.selectedLinearElement.selectedPointsIndices?.[0] ??
+              (event.shiftKey ? total : -1);
+            const next = (current + (event.shiftKey ? -1 : 1) + total) % total;
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                selectedPointsIndices: [next],
+              },
+            });
+            const [globalX, globalY] =
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                linearElement,
+                next,
+                this.scene.getNonDeletedElementsMap(),
+              );
+            announce(
+              t("a11y.pointFocused", {
+                position: next + 1,
+                total,
+                x: Math.round(globalX),
+                y: Math.round(globalY),
+              }),
+            );
+            return;
+          }
         }
 
         // Shape switching
@@ -5094,6 +5193,67 @@ class App extends React.Component<AppProps, AppState> {
 
         if (this.flowchart.handleKeyEvent(event)) {
           return;
+        }
+
+        const arrowKeyPressed = isArrowKey(event.key);
+
+        // keyboard cropping (WCAG 2.1.1 / 2.5.7): while in crop mode,
+        // arrows move the bottom/right crop edges, Shift+arrows the
+        // top/left ones
+        if (
+          arrowKeyPressed &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          !event.altKey &&
+          this.handleKeyboardCrop(event)
+        ) {
+          event.preventDefault();
+          return;
+        }
+
+        // Alt+N cycles through ALL connections of the anchor element
+        // regardless of geometry (Alt+Arrow requires knowing which side an
+        // elbow arrow attaches to — something a non-visual user cannot
+        // guess; its announcements live in AppFlowchart.handleKeyEvent).
+        // Alt+I cycles through the elements nested inside the box — boards
+        // often express structure by containment (layers, swimlanes)
+        // rather than arrows
+        if (
+          event.altKey &&
+          !event.shiftKey &&
+          (event.code === "KeyN" || event.code === "KeyI")
+        ) {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+
+          if (selectedElements.length === 1) {
+            event.preventDefault();
+            this.cycleA11yTargets(
+              event.code === "KeyN" ? "connections" : "contained",
+              selectedElements[0],
+            );
+            return;
+          }
+        }
+
+        // Alt+Shift+I: jump to the box/frame that visually contains the
+        // element — the inverse of Alt+I
+        if (
+          event.altKey &&
+          event.shiftKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          event.code === "KeyI"
+        ) {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+          if (selectedElements.length === 1) {
+            event.preventDefault();
+            this.focusA11yContainer(selectedElements[0]);
+            return;
+          }
         }
       }
 
@@ -5207,6 +5367,8 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         !shouldPreventToolSwitching &&
+        // user-disableable per WCAG 2.1.4 (character key shortcuts)
+        this.state.singleKeyShortcutsEnabled &&
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
@@ -5288,6 +5450,17 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
+        // with a point selected in the linear editor, arrows move the
+        // point, not the whole element (keyboard point editing)
+        if (
+          this.state.selectedLinearElement?.isEditing &&
+          this.state.selectedLinearElement.selectedPointsIndices?.length &&
+          this.moveSelectedLinearPointsFromKeyboard(event)
+        ) {
+          event.preventDefault();
+          return;
+        }
+
         let selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
@@ -5358,8 +5531,31 @@ class App extends React.Component<AppProps, AppState> {
 
         this.scene.triggerUpdate();
 
+        if (selectedElements.length === 1) {
+          announce(
+            t("a11y.movedTo", {
+              x: Math.round(selectedElements[0].x),
+              y: Math.round(selectedElements[0].y),
+            }),
+            { coalesceKey: "a11y-move", coalesceDelay: 500 },
+          );
+        }
+
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
+        // pointer-free creation: with a shape tool active, Enter places a
+        // default-sized element at the viewport center
+        if (
+          !event[KEYS.CTRL_OR_CMD] &&
+          !event.altKey &&
+          !event.shiftKey &&
+          this.state.activeTool.type !== "selection" &&
+          this.state.activeTool.type !== "lasso" &&
+          this.insertElementFromKeyboard()
+        ) {
+          event.preventDefault();
+          return;
+        }
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
@@ -5372,6 +5568,23 @@ class App extends React.Component<AppProps, AppState> {
               ) {
                 this.store.scheduleCapture();
                 if (!isElbowArrow(selectedElement)) {
+                  // keyboard-only selection (Ctrl+A, scene browsing…)
+                  // never went through pointer-down, so the linear editor
+                  // state the toggle action requires may not exist yet
+                  if (
+                    !this.state.selectedLinearElement ||
+                    this.state.selectedLinearElement.elementId !==
+                      selectedElement.id
+                  ) {
+                    flushSync(() => {
+                      this.setState({
+                        selectedLinearElement: new LinearElementEditor(
+                          selectedElement,
+                          this.scene.getNonDeletedElementsMap(),
+                        ),
+                      });
+                    });
+                  }
                   this.actionManager.executeAction(actionToggleLinearEditor);
                 }
               }
@@ -5482,7 +5695,9 @@ class App extends React.Component<AppProps, AppState> {
       const isPickingStroke =
         lowerCased === KEYS.S && event.shiftKey && !event[KEYS.CTRL_OR_CMD];
       const isPickingBackground =
-        event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
+        // !altKey: Alt+I cycles nested elements (a11y)
+        (event.key === KEYS.I && !event.altKey) ||
+        (lowerCased === KEYS.G && event.shiftKey);
 
       if (isPickingStroke || isPickingBackground) {
         this.openEyeDropper({
@@ -9752,6 +9967,521 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  /**
+   * The element new keyboard-inserted content should be placed relative to:
+   * the element whose scene proxy is focused (screen-reader browsing keeps
+   * DOM focus on the proxy even after a tool switch clears selection), or
+   * the single selected element.
+   */
+  private getKeyboardInsertionAnchor = (): ExcalidrawElement | null => {
+    const activeProxyId = document.activeElement?.getAttribute?.(
+      "data-a11y-element-id",
+    );
+    if (activeProxyId) {
+      const element = this.scene.getNonDeletedElementsMap().get(activeProxyId);
+      if (element) {
+        return element;
+      }
+    }
+    const selectedElements = this.scene.getSelectedElements(this.state);
+    return selectedElements.length === 1 ? selectedElements[0] : null;
+  };
+
+  /**
+   * Pointer-free element creation (WCAG 2.1.1 / 2.5.7): with a shape tool
+   * active, Enter inserts a default-sized element — below the browsed or
+   * selected anchor element if there is one, at the viewport center
+   * otherwise — ready for arrow-key move / keyboard resize.
+   *
+   * Public so the command palette "Insert …" commands can create elements
+   * for a specific tool without switching tools first.
+   *
+   * @returns whether an element was inserted (i.e. the event was handled)
+   */
+  public insertElementFromKeyboard = (type?: ToolType | "custom"): boolean => {
+    const activeToolType = type ?? this.state.activeTool.type;
+    if (
+      this.state.viewModeEnabled ||
+      this.state.editingTextElement ||
+      this.state.newElement ||
+      this.state.multiElement ||
+      this.state.selectedLinearElement?.isEditing
+    ) {
+      return false;
+    }
+
+    const ANCHOR_GAP = 40;
+    const anchor = this.getKeyboardInsertionAnchor();
+    const anchorName = anchor
+      ? getElementText(anchor, this.scene.getNonDeletedElementsMap()) ??
+        getElementTypeLabel(anchor)
+      : null;
+
+    const sceneX = anchor
+      ? anchor.x
+      : -this.state.scrollX + this.state.width / this.state.zoom.value / 2;
+    const sceneY = anchor
+      ? anchor.y + anchor.height + ANCHOR_GAP
+      : -this.state.scrollY + this.state.height / this.state.zoom.value / 2;
+
+    const announceInsertion = (type: string) => {
+      announce(
+        anchor && anchorName
+          ? t("a11y.elementInsertedBelow", { type, target: anchorName })
+          : t("a11y.elementInserted", { type }),
+      );
+    };
+
+    if (activeToolType === "text") {
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: false,
+      });
+      announceInsertion(t("a11y.elementType.text"));
+      return true;
+    }
+
+    const toolType = activeToolType;
+    if (
+      toolType !== "rectangle" &&
+      toolType !== "diamond" &&
+      toolType !== "ellipse" &&
+      toolType !== "arrow" &&
+      toolType !== "line" &&
+      toolType !== "frame"
+    ) {
+      return false;
+    }
+
+    const DEFAULT_SIZE = 100;
+    const baseAttributes = {
+      x: sceneX - DEFAULT_SIZE / 2,
+      y: sceneY - DEFAULT_SIZE / 2,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.getCurrentItemStrokeWidth(toolType),
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      frameId: null,
+      width: DEFAULT_SIZE,
+      height: DEFAULT_SIZE,
+    } as const;
+
+    let element: ExcalidrawElement;
+    switch (toolType) {
+      case "rectangle":
+      case "diamond":
+      case "ellipse":
+        element = newElement({
+          type: toolType,
+          ...baseAttributes,
+          roundness: this.getCurrentItemRoundness(toolType),
+        });
+        break;
+      case "arrow":
+      case "line": {
+        const points = [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(DEFAULT_SIZE * 1.5, 0),
+        ];
+        const linearAttributes = {
+          ...baseAttributes,
+          points,
+          width: DEFAULT_SIZE * 1.5,
+          height: 0,
+          roundness:
+            this.state.currentItemRoundness === "round"
+              ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+              : null,
+        };
+        element =
+          toolType === "arrow"
+            ? newArrowElement({
+                type: "arrow",
+                ...linearAttributes,
+                roundness:
+                  this.state.currentItemArrowType === ARROW_TYPE.round
+                    ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+                    : null,
+                startArrowhead: this.state.currentItemStartArrowhead,
+                endArrowhead: this.state.currentItemEndArrowhead,
+                elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+                fixedSegments:
+                  this.state.currentItemArrowType === ARROW_TYPE.elbow
+                    ? []
+                    : null,
+              })
+            : newLinearElement({
+                type: "line",
+                ...linearAttributes,
+              });
+        break;
+      }
+      case "frame":
+        element = newFrameElement({
+          x: sceneX - 200,
+          y: sceneY - 150,
+          width: 400,
+          height: 300,
+        });
+        break;
+      default:
+        return false;
+    }
+
+    // addElementsFromPasteOrLibrary centers the inserted element on the
+    // given client point
+    const sceneCenter = anchor
+      ? { x: sceneX + element.width / 2, y: sceneY + element.height / 2 }
+      : { x: sceneX, y: sceneY };
+    const { x: clientX, y: clientY } = sceneCoordsToViewportCoords(
+      { sceneX: sceneCenter.x, sceneY: sceneCenter.y },
+      this.state,
+    );
+    this.addElementsFromPasteOrLibrary({
+      elements: [element],
+      files: null,
+      position: { clientX, clientY },
+    });
+    announceInsertion(getElementTypeLabel(element));
+    return true;
+  };
+
+  /**
+   * F6-style region cycling: moves keyboard focus between the major
+   * editor regions (toolbar, canvas/scene, styles panel, sidebar,
+   * footer), skipping regions that aren't currently shown.
+   */
+  /**
+   * Moves focus straight to the canvas area (Alt+Shift+A): the current
+   * element proxy when the scene has elements, the container otherwise —
+   * a direct jump complementing the F6 region cycle.
+   */
+  public focusCanvasRegion = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const currentProxy = container.querySelector<HTMLElement>(
+      '.excalidraw-a11y-scene [tabindex="0"]',
+    );
+    (currentProxy ?? container).focus();
+  };
+
+  /**
+   * Alt+N / Alt+I cycling: selects the anchor's connections (or nested
+   * elements) one per keypress. The anchor is kept while successive
+   * presses land on its own targets, so the cycle enumerates them all
+   * instead of ping-ponging, and wraps at the end.
+   */
+  private cycleA11yTargets = (
+    kind: "connections" | "contained",
+    current: ExcalidrawElement,
+  ) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
+    let anchor = current;
+    let index = 0;
+    const prevCycle = this.a11yCycle;
+    if (prevCycle?.kind === kind && prevCycle.lastTargetId === current.id) {
+      const prevAnchor = elementsMap.get(prevCycle.anchorId);
+      if (prevAnchor && !prevAnchor.isDeleted) {
+        anchor = prevAnchor;
+        index = prevCycle.index + 1;
+      }
+    }
+
+    const targets =
+      kind === "connections"
+        ? getConnectedElements(anchor, elementsMap)
+        : getContainedElements(anchor, elementsMap);
+    if (!targets.length) {
+      this.a11yCycle = null;
+      announce(
+        t(
+          kind === "connections"
+            ? "a11y.noConnections"
+            : "a11y.noContainedElements",
+        ),
+      );
+      return;
+    }
+
+    index %= targets.length;
+    const target = targets[index];
+    this.a11yCycle = {
+      kind,
+      anchorId: anchor.id,
+      index,
+      lastTargetId: target.id,
+    };
+
+    this.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        { [target.id]: true },
+        prevState,
+      ),
+    }));
+
+    // while browsing proxies, the selection→focus sync makes the screen
+    // reader read the target itself — only add the position
+    const position = t(
+      kind === "connections"
+        ? "a11y.connectionPosition"
+        : "a11y.containedPosition",
+      { position: index + 1, total: targets.length },
+    );
+    announce(
+      document.activeElement?.closest(".excalidraw-a11y-scene")
+        ? position
+        : `${getElementDescription(target, elementsMap)}, ${position}`,
+    );
+
+    this.revealIfHidden([target as NonDeletedExcalidrawElement]);
+  };
+
+  /** Alt+Shift+I: move to the box/frame that visually contains the element */
+  private focusA11yContainer = (current: ExcalidrawElement) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const container =
+      getGeometricContainer(current, elementsMap) ??
+      (current.frameId ? elementsMap.get(current.frameId) : null);
+    if (!container || container.isDeleted) {
+      announce(t("a11y.noContainer"));
+      return;
+    }
+    this.a11yCycle = null;
+    this.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        { [container.id]: true },
+        prevState,
+      ),
+    }));
+    if (!document.activeElement?.closest(".excalidraw-a11y-scene")) {
+      announce(getElementDescription(container, elementsMap));
+    }
+    this.revealIfHidden([container as NonDeletedExcalidrawElement]);
+  };
+
+  private cycleFocusAcrossRegions = (backwards: boolean) => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const FOCUSABLE_SELECTOR =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const regionSelectors = [
+      ".App-toolbar",
+      ".excalidraw-a11y-scene",
+      ".selected-shape-actions",
+      ".sidebar",
+      ".layer-ui__wrapper__footer",
+    ];
+    // regions are conditionally rendered, so presence implies visibility
+    const regions = regionSelectors
+      .map((selector) => container.querySelector<HTMLElement>(selector))
+      .filter((root): root is HTMLElement => !!root);
+    // an empty canvas has no proxy layer — the container stands in for it
+    if (!container.querySelector(".excalidraw-a11y-scene")) {
+      regions.splice(1, 0, container);
+    }
+    if (!regions.length) {
+      return;
+    }
+
+    const active = document.activeElement;
+    const currentIndex = regions.findIndex(
+      (root) => root === active || root.contains(active),
+    );
+    const nextIndex =
+      currentIndex === -1
+        ? backwards
+          ? regions.length - 1
+          : 0
+        : (currentIndex + (backwards ? -1 : 1) + regions.length) %
+          regions.length;
+    const nextRegion = regions[nextIndex];
+
+    if (nextRegion === container) {
+      container.focus();
+      return;
+    }
+    const target =
+      nextRegion.querySelector<HTMLElement>('[tabindex="0"]') ??
+      nextRegion.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ??
+      nextRegion;
+    target.focus();
+  };
+
+  /**
+   * Keyboard alternative to dragging crop handles (WCAG 2.5.7): arrows
+   * move the south/east crop edges by 10px, Shift+arrows the north/west
+   * ones. Uses the same `cropElement` math as pointer cropping by
+   * synthesizing the pointer position the drag would have produced.
+   *
+   * @returns whether the event was handled
+   */
+  private handleKeyboardCrop = (
+    event: React.KeyboardEvent | KeyboardEvent,
+  ): boolean => {
+    if (!this.state.croppingElementId) {
+      return false;
+    }
+    const croppingElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(this.state.croppingElementId);
+    if (!croppingElement || !isImageElement(croppingElement)) {
+      return false;
+    }
+    const image =
+      isInitializedImageElement(croppingElement) &&
+      this.imageCache.get(croppingElement.fileId)?.image;
+    if (!image || image instanceof Promise) {
+      return false;
+    }
+
+    const CROP_STEP = 10;
+    const isHorizontal =
+      event.key === KEYS.ARROW_LEFT || event.key === KEYS.ARROW_RIGHT;
+    const delta =
+      event.key === KEYS.ARROW_LEFT || event.key === KEYS.ARROW_UP
+        ? -CROP_STEP
+        : CROP_STEP;
+
+    let handle: TransformHandleDirection;
+    let pointerX = croppingElement.x + croppingElement.width / 2;
+    let pointerY = croppingElement.y + croppingElement.height / 2;
+    if (isHorizontal) {
+      handle = event.shiftKey ? "w" : "e";
+      pointerX =
+        handle === "w"
+          ? croppingElement.x + delta
+          : croppingElement.x + croppingElement.width + delta;
+    } else {
+      handle = event.shiftKey ? "n" : "s";
+      pointerY =
+        handle === "n"
+          ? croppingElement.y + delta
+          : croppingElement.y + croppingElement.height + delta;
+    }
+
+    // cropElement un-rotates the pointer, so pre-rotate the synthetic one
+    const [rotatedX, rotatedY] = pointRotateRads(
+      pointFrom(pointerX, pointerY),
+      pointFrom(
+        croppingElement.x + croppingElement.width / 2,
+        croppingElement.y + croppingElement.height / 2,
+      ),
+      croppingElement.angle,
+    );
+
+    this.store.scheduleCapture();
+    this.scene.mutateElement(
+      croppingElement,
+      cropElement(
+        croppingElement,
+        this.scene.getNonDeletedElementsMap(),
+        handle,
+        image.naturalWidth,
+        image.naturalHeight,
+        rotatedX,
+        rotatedY,
+      ),
+    );
+    updateBoundElements(croppingElement, this.scene);
+
+    announce(
+      t("a11y.cropped", {
+        width: Math.round(croppingElement.width),
+        height: Math.round(croppingElement.height),
+      }),
+      { coalesceKey: "a11y-crop", coalesceDelay: 500 },
+    );
+    return true;
+  };
+
+  /**
+   * Keyboard alternative to dragging linear-element points (WCAG 2.5.7):
+   * with points selected in the linear editor (Tab/Shift+Tab cycle them),
+   * arrows move the selection by the usual translate step.
+   *
+   * @returns whether the event was handled
+   */
+  private moveSelectedLinearPointsFromKeyboard = (
+    event: React.KeyboardEvent | KeyboardEvent,
+  ): boolean => {
+    const linearEditor = this.state.selectedLinearElement;
+    if (!linearEditor?.isEditing || !linearEditor.selectedPointsIndices) {
+      return false;
+    }
+    const element = this.scene
+      .getNonDeletedElementsMap()
+      .get(linearEditor.elementId);
+    if (!element || !isLinearElement(element)) {
+      return false;
+    }
+
+    const step = event.shiftKey
+      ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+      : ELEMENT_TRANSLATE_AMOUNT;
+    const offsetX =
+      event.key === KEYS.ARROW_LEFT
+        ? -step
+        : event.key === KEYS.ARROW_RIGHT
+        ? step
+        : 0;
+    const offsetY =
+      event.key === KEYS.ARROW_UP
+        ? -step
+        : event.key === KEYS.ARROW_DOWN
+        ? step
+        : 0;
+
+    const indices = linearEditor.selectedPointsIndices.filter(
+      (index) => index >= 0 && index < element.points.length,
+    );
+    if (!indices.length) {
+      return false;
+    }
+
+    this.store.scheduleCapture();
+    LinearElementEditor.movePoints(
+      element,
+      this.scene,
+      new Map(
+        indices.map((index) => [
+          index,
+          {
+            point: pointFrom<LocalPoint>(
+              element.points[index][0] + offsetX,
+              element.points[index][1] + offsetY,
+            ),
+            isDragging: false,
+          },
+        ]),
+      ),
+    );
+
+    const [globalX, globalY] =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        element,
+        indices[0],
+        this.scene.getNonDeletedElementsMap(),
+      );
+    announce(
+      t("a11y.pointMoved", {
+        x: Math.round(globalX),
+        y: Math.round(globalY),
+      }),
+      { coalesceKey: "a11y-point-move", coalesceDelay: 500 },
+    );
+    return true;
+  };
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
@@ -12994,6 +13724,8 @@ class App extends React.Component<AppProps, AppState> {
       actionWrapSelectionInFrame,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
+      actionImageAltText,
+      actionConnectElements,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,

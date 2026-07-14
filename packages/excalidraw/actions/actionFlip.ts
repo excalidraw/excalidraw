@@ -22,6 +22,9 @@ import { getSelectedElements } from "../scene";
 
 import { flipHorizontal, flipVertical } from "../components/icons";
 
+import { announce } from "../a11y";
+import { t } from "../i18n";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
@@ -32,6 +35,7 @@ export const actionFlipHorizontal = register({
   icon: flipHorizontal,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    announce(t("labels.flipHorizontal"));
     return {
       elements: updateFrameMembershipOfSelectedElements(
         flipSelectedElements(
@@ -48,7 +52,8 @@ export const actionFlipHorizontal = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === CODES.H,
+  // `!altKey` so it doesn't shadow Alt+Shift+H (screen reader guide)
+  keyTest: (event) => event.shiftKey && !event.altKey && event.code === CODES.H,
 });
 
 export const actionFlipVertical = register({
@@ -57,6 +62,7 @@ export const actionFlipVertical = register({
   icon: flipVertical,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    announce(t("labels.flipVertical"));
     return {
       elements: updateFrameMembershipOfSelectedElements(
         flipSelectedElements(

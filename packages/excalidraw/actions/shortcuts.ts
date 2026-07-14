@@ -48,6 +48,8 @@ export type ShortcutName =
       | "saveToActiveFile"
       | "toggleShortcuts"
       | "wrapSelectionInFrame"
+      | "a11yHelp"
+      | "connectElements"
     >
   | "saveScene"
   | "imageExport"
@@ -111,6 +113,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
+  a11yHelp: [getShortcutKey("Alt+Shift+H")],
+  connectElements: [getShortcutKey("Alt+C")],
   wrapSelectionInFrame: [],
   toolLock: [getShortcutKey("Q")],
 };

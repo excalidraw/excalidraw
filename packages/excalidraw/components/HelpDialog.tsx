@@ -346,6 +346,81 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               isOr={true}
             />
             <Shortcut
+              label={t("helpDialog.browseElements")}
+              shortcuts={[getShortcutKey("Tab"), getShortcutKey("Shift+Tab")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.browseElementsSpatially")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+Alt+Arrow Key`)]}
+            />
+            <Shortcut
+              label={t("helpDialog.cycleConnections")}
+              shortcuts={[getShortcutKey("Alt+N")]}
+            />
+            <Shortcut
+              label={t("helpDialog.cycleContained")}
+              shortcuts={[getShortcutKey("Alt+I")]}
+            />
+            <Shortcut
+              label={t("helpDialog.focusContainer")}
+              shortcuts={[getShortcutKey("Alt+Shift+I")]}
+            />
+            <Shortcut
+              label={t("helpDialog.insertShapeAtCenter")}
+              shortcuts={[getShortcutKey("Enter")]}
+            />
+            <Shortcut
+              label={t("helpDialog.resizeElement")}
+              shortcuts={[getShortcutKey(`Alt+Shift+Arrow Key`)]}
+            />
+            <Shortcut
+              label={t("helpDialog.rotateElement")}
+              shortcuts={[
+                getShortcutKey("Alt+Shift+R"),
+                getShortcutKey("Alt+Shift+E"),
+              ]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.toggleElementSelection")}
+              shortcuts={[getShortcutKey("Space")]}
+            />
+            <Shortcut
+              label={t("helpDialog.moveFocusWithoutSelecting")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+Shift+Arrow Key")]}
+            />
+            <Shortcut
+              label={t("helpDialog.connectElements")}
+              shortcuts={[getShortcutKey("Alt+C")]}
+            />
+            <Shortcut
+              label={t("helpDialog.editLinearPoints")}
+              shortcuts={[getShortcutKey("Tab"), getShortcutKey("Shift+Tab")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.adjustCropEdges")}
+              shortcuts={[
+                getShortcutKey("Arrow Key"),
+                getShortcutKey("Shift+Arrow Key"),
+              ]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.cycleRegions")}
+              shortcuts={[getShortcutKey("F6"), getShortcutKey("Shift+F6")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.focusCanvas")}
+              shortcuts={[getShortcutKey("Alt+Shift+A")]}
+            />
+            <Shortcut
+              label={t("helpDialog.screenReaderGuide")}
+              shortcuts={[getShortcutKey("Alt+Shift+H")]}
+            />
+            <Shortcut
               label={t("labels.moveCanvas")}
               shortcuts={[
                 getShortcutKey(`Space+${t("helpDialog.drag")}`),

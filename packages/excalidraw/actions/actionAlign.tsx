@@ -26,6 +26,7 @@ import {
   CenterVerticallyIcon,
 } from "../components/icons";
 
+import { announce } from "../a11y";
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
@@ -57,8 +58,11 @@ const alignSelectedElements = (
   appState: Readonly<AppState>,
   app: AppClassProperties,
   alignment: Alignment,
+  announcement: string,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
+
+  announce(announcement);
 
   const updatedElements = alignElements(
     selectedElements,
@@ -86,10 +90,16 @@ export const actionAlignTop = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "start",
-        axis: "y",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "start",
+          axis: "y",
+        },
+        t("labels.alignTop"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -120,10 +130,16 @@ export const actionAlignBottom = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "end",
-        axis: "y",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "end",
+          axis: "y",
+        },
+        t("labels.alignBottom"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -154,10 +170,16 @@ export const actionAlignLeft = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "start",
-        axis: "x",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "start",
+          axis: "x",
+        },
+        t("labels.alignLeft"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -188,10 +210,16 @@ export const actionAlignRight = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "end",
-        axis: "x",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "end",
+          axis: "x",
+        },
+        t("labels.alignRight"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -222,10 +250,16 @@ export const actionAlignVerticallyCentered = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "center",
-        axis: "y",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "center",
+          axis: "y",
+        },
+        t("labels.centerVertically"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -252,10 +286,16 @@ export const actionAlignHorizontallyCentered = register({
   perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, app, {
-        position: "center",
-        axis: "x",
-      }),
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        app,
+        {
+          position: "center",
+          axis: "x",
+        },
+        t("labels.centerHorizontally"),
+      ),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

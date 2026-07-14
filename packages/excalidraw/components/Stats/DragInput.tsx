@@ -345,6 +345,13 @@ const StatsDragInput = <
         className="drag-input"
         autoComplete="off"
         spellCheck="false"
+        // the visible label is a sibling div (often a single letter or an
+        // icon) — give the input a real accessible name instead
+        aria-label={
+          typeof label === "string" && label.length > 2
+            ? label
+            : String(property)
+        }
         onKeyDown={(event) => {
           if (editable) {
             const eventTarget = event.target;

@@ -45,6 +45,8 @@ import { isSomeElementSelected } from "../scene";
 
 import { getShortcutKey } from "../shortcut";
 
+import { announce } from "../a11y";
+
 import { register } from "./register";
 
 import type { AppClassProperties, UIAppState } from "../types";
@@ -95,6 +97,9 @@ export const actionGroup = register({
         includeBoundTextElement: true,
       }),
     );
+    if (selectedElements.length >= 2) {
+      announce(t("a11y.grouped", { count: selectedElements.length }));
+    }
     if (selectedElements.length < 2) {
       // nothing to group
       return {
@@ -227,6 +232,8 @@ export const actionUngroup = register({
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
+
+    announce(t("a11y.ungrouped"));
 
     let nextElements = [...elements];
 

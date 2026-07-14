@@ -68,6 +68,12 @@
     height: 16px;
     width: 16px;
     cursor: pointer;
+    // it is a real <button> now (for keyboard/SR access) — reset the UA
+    // button styles so the visuals stay unchanged
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
     svg {
       width: 100%;
       height: 100%;

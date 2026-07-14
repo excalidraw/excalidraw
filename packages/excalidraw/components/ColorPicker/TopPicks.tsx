@@ -6,7 +6,11 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
+  isTransparent,
 } from "@excalidraw/common";
+
+import { getColorName } from "../../a11y/colorName";
+import { t } from "../../i18n";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
@@ -62,6 +66,11 @@ export const TopPicks = ({
           key={color}
           type="button"
           title={color}
+          aria-label={
+            !color || isTransparent(color)
+              ? t("colors.transparent")
+              : getColorName(color) ?? color
+          }
           onClick={() => onChange(color)}
           data-testid={`color-top-pick-${color}`}
         >

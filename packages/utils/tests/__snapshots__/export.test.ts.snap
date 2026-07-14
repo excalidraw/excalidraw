@@ -99,6 +99,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
+  "singleKeyShortcutsEnabled": true,
   "snapLines": [],
   "stats": {
     "open": false,

@@ -20,6 +20,7 @@ import {
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
@@ -41,6 +42,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+
+import { getElementDescription } from "../a11y/description";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
@@ -131,6 +134,10 @@ const renderElementToSvg = (
     if (isTestEnv()) {
       node.setAttribute("data-id", element.id);
     }
+    // accessible name for the exported node (WCAG 1.1.1)
+    const title = svgRoot.ownerDocument.createElementNS(SVG_NS, "title");
+    title.textContent = getElementDescription(element, elementsMap);
+    node.prepend(title);
     root.appendChild(node);
   };
 

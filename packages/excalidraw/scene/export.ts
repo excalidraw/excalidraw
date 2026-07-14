@@ -300,6 +300,8 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     frameRendering?: AppState["frameRendering"];
+    /** accessible name of the exported drawing */
+    name?: string | null;
   },
   files: BinaryFiles | null,
   opts?: {
@@ -357,6 +359,9 @@ export const exportToSvg = async (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
+  // accessible root semantics; per-element <title>s carry the details
+  svgRoot.setAttribute("role", "img");
+  svgRoot.setAttribute("aria-label", appState.name || "Excalidraw drawing");
 
   const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
 

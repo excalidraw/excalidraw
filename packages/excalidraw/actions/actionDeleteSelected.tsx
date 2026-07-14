@@ -25,6 +25,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import { announce } from "../a11y";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
@@ -256,6 +257,8 @@ export const actionDeleteSelected = register({
         selectedPointsIndices,
       );
 
+      announce(t("a11y.pointDeleted"));
+
       return {
         elements,
         appState: {
@@ -270,6 +273,13 @@ export const actionDeleteSelected = register({
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
+    }
+
+    const selectedCount = getSelectedElements(elements, appState, {
+      includeBoundTextElement: false,
+    }).length;
+    if (selectedCount > 0) {
+      announce(t("a11y.deleted", { count: selectedCount }));
     }
 
     let { elements: nextElements, appState: nextAppState } =
