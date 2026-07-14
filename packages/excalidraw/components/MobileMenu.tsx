@@ -43,6 +43,7 @@ type MobileMenuProps = {
   ) => JSX.Element | null;
   renderSidebars: () => JSX.Element | null;
   renderWelcomeScreen: boolean;
+  defaultUIEnabled: boolean;
   UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
 };
@@ -56,6 +57,7 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderSidebars,
   renderWelcomeScreen,
+  defaultUIEnabled,
   UIOptions,
   app,
   onPenModeToggle,
@@ -75,19 +77,23 @@ export const MobileMenu = ({
         {renderTopRightUI?.(true, appState) ??
           (!appState.viewModeEnabled && (
             <>
-              <PenModeButton
-                checked={appState.penMode}
-                onChange={() => onPenModeToggle(null)}
-                title={t("toolBar.penMode")}
-                isMobile
-                penDetected={appState.penDetected}
-              />
+              {defaultUIEnabled && (
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={() => onPenModeToggle(null)}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
+                />
+              )}
               <DefaultSidebarTriggerTunnel.Out />
             </>
           ))}
-        {appState.viewModeEnabled && (
-          <ExitViewModeButton actionManager={actionManager} />
-        )}
+        {defaultUIEnabled &&
+          appState.viewModeEnabled &&
+          app.isInteractionEnabled() && (
+            <ExitViewModeButton actionManager={actionManager} />
+          )}
       </div>
     );
 
@@ -126,7 +132,7 @@ export const MobileMenu = ({
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </div>
 
-      {!appState.viewModeEnabled && (
+      {defaultUIEnabled && !appState.viewModeEnabled && (
         <div
           className="App-bottom-bar"
           style={{

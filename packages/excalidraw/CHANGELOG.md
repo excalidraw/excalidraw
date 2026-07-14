@@ -15,6 +15,12 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### Interaction and UI control (2026-07-05) [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
+
+- Added `interaction` prop (`boolean | { enabled?: { navigation?: boolean; links?: boolean; embeds?: boolean; interactiveContent?: boolean; browserZoom?: boolean } }`). When set to `false`, the editor becomes fully inert for the user — no panning, zooming, selecting, editing, keyboard shortcuts, clipboard, or drag&drop. It implies view mode (`appState.viewModeEnabled` reports `true` and cannot be unset while non-interactive), and the page scrolls naturally over the component since wheel/touch input is no longer captured (the browser's own zoom is still prevented over the editor by default). Interactions under `enabled` are opt-in exceptions: with `navigation` allowed, the user can pan (pointer drag, wheel) and zoom (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts — ctrl/cmd +/-/0, shift+1/2/3) the canvas view-mode style — respecting `appState.scrollConstraints`, so it composes with viewport locking for constrained viewers, while the rest of the keyboard stays disabled and the editor consumes wheel & touch input again (the page no longer scrolls over the editor); with `links` allowed, link icons render and linked elements stay clickable (view-mode behavior: clicking anywhere on a linked element opens its link) while the editor stays otherwise non-interactive — when links are not allowed, link icons are not rendered at all; with `embeds` allowed, embeddable & iframe elements stay interactive (hover & click activates them, view-mode style); `interactiveContent` is an additive shorthand enabling `links` & `embeds` (and future interactive content kinds) together; with `browserZoom` allowed, the browser's own zoom gestures (ctrl/cmd + wheel, pinch, keyboard) stay available over the editor (moot when `navigation` is allowed, since the editor consumes the zoom input instead). The scene still renders and remains fully controllable through the imperative API (`updateScene`, `setViewport`, ...), making it suitable for live previews, thumbnails, and annotation overlays.
+
+- Added `ui` prop. When set to `false`, Excalidraw's default UI is not rendered — toolbar, default menu and footer controls, sidebars, canvas popups, and context menu. Canvas content (elements, text editing, frame names, embeds) still renders, and the editor remains interactive unless `interaction={false}` is set as well. Host children continue to mount (they may be functional, e.g. a collaboration component), and host-supplied UI — including Excalidraw-exported components such as `<MainMenu>` and `<Footer>` — continues to render together with any supporting dialogs it opens. You're responsible for hiding your own presentational components.
+
 ### Tool system & toolbar rework
 
 The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>` elements composed from a central tool registry, and all tool activation now goes through a single `setActiveTool` code path.
@@ -44,9 +50,9 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 - Mobile toolbar popovers: the active option stays highlighted after tapping it (the highlight was being suppressed by sticky touch-hover).
 - The active-tool highlight can no longer desync from the actually active tool (controlled-radio DOM desync).
 
-### Viewport control & scroll/zoom locking
+### Viewport control & scroll/zoom locking (2026-07-03) [#11554](https://github.com/excalidraw/excalidraw/pull/11554)
 
-`ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
+`ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load.
 
 #### Breaking changes
 
@@ -76,11 +82,13 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 - `lock.overscroll` adds a rubberband to the lock: panning can overshoot the constraint by the given amount (viewport px, zoom-independent) and snaps back once the interaction settles — on touch, once the multi-finger gesture ends. Defaults to `true` = `DEFAULT_OVERSCROLL` (150px, exported from the package root); pass a number to customize, or `false` / `0` for a rigid lock. Zooming is always hard-clamped against the lock, gliding along its edge instead of overscrolling.
 
+- While a lock is active, the zoom-to-fit shortcuts (shift+1/2/3) target the locked box instead of the scene elements (with no selection), so they return the viewport to the lock's resting state; reset-zoom (ctrl/cmd+0) resets to the lock's minimum zoom instead of 100%. Fit results are always re-clamped against the lock. [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
+
 - Added `<Excalidraw initialState={{ viewport }} />` for initializing the viewport (and optionally installing a lock) once on scene load. Accepts the same options as `setViewport` except `animation`, and takes precedence over `initialData.scrollToContent`.
 
 - The `offsets` option (on `setViewport` and `initialState.viewport`) insets the usable viewport per side so targets aren't fitted underneath overlaid UI. It combines static pixel sides with `ui: true | ViewportOffsetsOptions`, which measures the currently rendered editor UI (toolbar, styles panel, sidebar…) — with configurable padding, per-side overrides, and reserving space for currently-hidden surfaces (`reserve: { stylesPanel?: boolean; sidebar?: boolean }`). The same measurement is exposed through the new `ExcalidrawAPI.getViewportOffsets(opts?)`, and custom UI rendered inside the editor container can opt into being measured via the `data-viewport-ui="top" | "bottom" | "side"` attribute.
 
-### Breaking changes
+### Other Breaking changes
 
 - `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
 
@@ -113,7 +121,7 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
   - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUnmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
-### Features
+### Other Features
 
 - Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on unmount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 

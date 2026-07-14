@@ -370,7 +370,10 @@ export interface AppState {
     outline: boolean;
     clip: boolean;
   };
-  editingFrame: string | null;
+  /**
+   * frame-like element whose name is currently being edited
+   */
+  editingFrame: ExcalidrawFrameLikeElement["id"] | null;
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
@@ -630,6 +633,62 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+export type InteractionConfig = {
+  /**
+   * Interactions that stay enabled while the editor is otherwise
+   * non-interactive. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled?: {
+    /**
+     * Element links render their link icon and stay clickable — clicking
+     * anywhere on a linked element opens the link, same as in view mode.
+     * When disabled, link icons are not rendered at all.
+     *
+     * @default false
+     */
+    links?: boolean;
+    /**
+     * Embeddable & iframe elements stay interactive — hovering & clicking
+     * activates them so their content can be used, same as in view mode.
+     *
+     * @default false
+     */
+    embeds?: boolean;
+    /**
+     * Umbrella for all interactive content on canvas — shorthand for
+     * enabling `links` & `embeds` (and future interactive content kinds)
+     * together. Additive: `interactiveContent: true` enables them
+     * regardless of their individual values.
+     *
+     * @default false
+     */
+    interactiveContent?: boolean;
+    /**
+     * Canvas navigation — panning (pointer drag, wheel) and zooming
+     * (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts:
+     * ctrl/cmd +/-/0, shift+1/2/3), same as in view mode. Respects
+     * `appState.scrollConstraints` if set, so it composes with viewport
+     * locking. The rest of the keyboard stays disabled. Note the editor
+     * consumes wheel & touch input again when enabled, so the page no
+     * longer scrolls over the editor.
+     *
+     * @default false
+     */
+    navigation?: boolean;
+    /**
+     * Whether the browser's own zoom remains available over the editor —
+     * ctrl/cmd + wheel, pinch, and (while the editor has focus)
+     * ctrl/cmd +/-/0 shortcuts. Prevented by default, mirroring the
+     * interactive editor. Regular page scrolling stays available either way.
+     * With `navigation` enabled, the zoom input (wheel, pinch, keyboard
+     * shortcuts) zooms the canvas instead either way, making this moot.
+     *
+     * @default false
+     */
+    browserZoom?: boolean;
+  };
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -698,6 +757,39 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
+  /**
+   * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
+   * clipboard, drag&drop). When `false`, the scene still renders and reacts
+   * to programmatic updates (imperative API), but the user cannot affect it
+   * in any way. Implies view mode.
+   *
+   * Pass a config object to keep specific interactions enabled while the
+   * editor is otherwise non-interactive (see `InteractionConfig`):
+   *
+   * ```tsx
+   * <Excalidraw interaction={{ enabled: { links: true } }} />
+   * ```
+   *
+   * @default true
+   */
+  interaction?: boolean | InteractionConfig;
+  /**
+   * Whether Excalidraw's default UI is rendered — toolbar, default menus,
+   * footer controls, sidebars, and canvas popups. Host UI passed through
+   * children (including exported components such as `MainMenu` and `Footer`)
+   * or render props continues to render, together with any supporting dialogs
+   * it opens.
+   *
+   * Canvas content (elements, text editing surface, frame names, embeds) still
+   * renders, and the editor remains interactive unless `interaction` is set to
+   * `false`.
+   *
+   * NOTE: this is WIP and what default UI is/is not rendered when ui=false
+   * may yet change.
+   *
+   * @default true
+   */
+  ui?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
@@ -919,6 +1011,9 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
+
+  isInteractionEnabled: App["isInteractionEnabled"];
+  isNavigationEnabled: App["isNavigationEnabled"];
 };
 
 export type PointerDownState = Readonly<{

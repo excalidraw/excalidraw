@@ -566,6 +566,9 @@ const PreferencesToggleViewModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
   const appState = useUIAppState();
+  if (!actionManager.isActionEnabled(actionToggleViewMode)) {
+    return null;
+  }
   return (
     <DropdownMenuItemCheckbox
       checked={appState.viewModeEnabled}
