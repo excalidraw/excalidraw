@@ -91,6 +91,7 @@ import type { ElementUpdate, Scene } from "@excalidraw/element";
 
 import type { CaptureUpdateActionType } from "@excalidraw/element";
 
+import { announce, getColorName } from "../a11y";
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { IconButton } from "../components/IconButton";
@@ -344,6 +345,12 @@ export const actionChangeStrokeColor = register<
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    if (value?.currentItemStrokeColor) {
+      const colorName = getColorName(value.currentItemStrokeColor);
+      if (colorName) {
+        announce(t("a11y.strokeColorChanged", { color: colorName }));
+      }
+    }
     return {
       ...(value?.currentItemStrokeColor && {
         elements: changeProperty(
@@ -414,6 +421,15 @@ export const actionChangeBackgroundColor = register<
         },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
+    }
+
+    if (isTransparent(value.currentItemBackgroundColor)) {
+      announce(t("a11y.backgroundColorTransparent"));
+    } else {
+      const colorName = getColorName(value.currentItemBackgroundColor);
+      if (colorName) {
+        announce(t("a11y.backgroundColorChanged", { color: colorName }));
+      }
     }
 
     let nextElements;

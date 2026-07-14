@@ -11,6 +11,11 @@ export {
   getElementTypeLabel,
 } from "./description";
 export {
+  getConceptualColor,
+  getColorName,
+  getElementColorDescription,
+} from "./colorName";
+export {
   ImageAltTextDialog,
   imageAltTextDialogAtom,
   getImageAltText,

@@ -108,7 +108,7 @@ describe("a11y element descriptions", () => {
         total: 12,
         selected: true,
       }),
-    ).toBe('"Start", Rectangle, 3 of 12, selected');
+    ).toBe('"Start", Rectangle, black, 3 of 12, selected');
   });
 
   it("describes arrows by their bound endpoints", () => {
@@ -141,7 +141,7 @@ describe("a11y element descriptions", () => {
     const elementsMap = arrayToMap([startLabeled, startText, end, arrow]);
 
     expect(getElementDescription(arrow, elementsMap)).toBe(
-      "Arrow from Start to Ellipse",
+      "Arrow from Start to Ellipse, black",
     );
   });
 
@@ -169,7 +169,42 @@ describe("a11y element descriptions", () => {
     const elementsMap = arrayToMap([frame, rectangle]);
 
     expect(getElementDescription(rectangle, elementsMap)).toBe(
-      'Rectangle, in frame "Login flow", locked, has link',
+      'Rectangle, black, in frame "Login flow", locked, has link',
+    );
+  });
+
+  it("describes stroke and fill colors conceptually", () => {
+    const redOutline = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      strokeColor: "#e03131",
+    });
+    expect(getElementDescription(redOutline, arrayToMap([redOutline]))).toBe(
+      "Rectangle, red",
+    );
+
+    const filled = API.createElement({
+      type: "ellipse",
+      x: 0,
+      y: 0,
+      strokeColor: "#1971c2",
+      backgroundColor: "#b2f2bb",
+    });
+    expect(getElementDescription(filled, arrayToMap([filled]))).toBe(
+      "Ellipse, blue, light green fill",
+    );
+
+    // same conceptual color for stroke and fill is announced once
+    const monochrome = API.createElement({
+      type: "diamond",
+      x: 0,
+      y: 0,
+      strokeColor: "#e03131",
+      backgroundColor: "#fa5252",
+    });
+    expect(getElementDescription(monochrome, arrayToMap([monochrome]))).toBe(
+      "Diamond, red",
     );
   });
 });
@@ -199,8 +234,12 @@ describe("a11y scene proxy layer", () => {
     const proxies = queryProxies();
     expect(proxies.length).toBe(2);
     expect(proxies[0].getAttribute("data-a11y-element-id")).toBe(first.id);
-    expect(proxies[0].getAttribute("aria-label")).toBe("Rectangle, 1 of 2");
-    expect(proxies[1].getAttribute("aria-label")).toBe("Ellipse, 2 of 2");
+    expect(proxies[0].getAttribute("aria-label")).toBe(
+      "Rectangle, black, 1 of 2",
+    );
+    expect(proxies[1].getAttribute("aria-label")).toBe(
+      "Ellipse, black, 2 of 2",
+    );
     // roving tabindex: only the current proxy is tabbable
     expect(proxies[0].tabIndex).toBe(0);
     expect(proxies[1].tabIndex).toBe(-1);
@@ -376,7 +415,7 @@ describe("a11y keyboard creation & manipulation", () => {
     const elementsMap = arrayToMap([startBound, endBound, endText, arrow]);
 
     expect(getElementDescription(startBound, elementsMap)).toBe(
-      "Rectangle, connected to End",
+      "Rectangle, black, connected to End",
     );
   });
 

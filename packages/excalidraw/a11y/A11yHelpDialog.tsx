@@ -7,7 +7,10 @@ import type { TranslationKeys } from "../i18n";
 export const a11yHelpDialogAtom = atom(false);
 
 const SECTIONS: { title: string; items: string[] }[] = [
-  { title: "browseTitle", items: ["browse1", "browse2", "browse3", "browse4"] },
+  {
+    title: "browseTitle",
+    items: ["browse1", "browse2", "browse3", "browse4", "browse5"],
+  },
   { title: "createTitle", items: ["create1", "create2", "create3"] },
   { title: "textTitle", items: ["text1", "text2"] },
   { title: "editTitle", items: ["edit1", "edit2", "edit3"] },

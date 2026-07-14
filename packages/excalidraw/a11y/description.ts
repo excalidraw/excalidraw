@@ -12,6 +12,7 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 
+import { getElementColorDescription } from "./colorName";
 import { getImageAltText } from "./ImageAltTextDialog";
 
 import type { TranslationKeys } from "../i18n";
@@ -95,6 +96,13 @@ export const getElementDescription = (
       parts.push(`"${truncate(text)}"`);
     }
     parts.push(getElementTypeLabel(element));
+  }
+
+  // conceptual color ("red", "blue, light green fill") — lets non-visual
+  // users tell that elements sharing a color belong together
+  const color = getElementColorDescription(element);
+  if (color) {
+    parts.push(color);
   }
 
   if (position && total) {
