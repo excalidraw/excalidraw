@@ -91,7 +91,7 @@ export const MobileMenu = ({
           ))}
         {defaultUIEnabled &&
           appState.viewModeEnabled &&
-          app.interactionEnabled && (
+          app.isInteractionEnabled() && (
             <ExitViewModeButton actionManager={actionManager} />
           )}
       </div>

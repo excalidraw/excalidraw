@@ -44,7 +44,7 @@ const Footer = ({
         >
           <Stack.Col gap={2}>
             <Section heading="canvasActions">
-              {app.navigationEnabled && (
+              {app.isNavigationEnabled() && (
                 <ZoomActions renderAction={actionManager.renderAction} />
               )}
 

@@ -644,50 +644,6 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-const isInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
-  return props.interaction !== false && typeof props.interaction !== "object";
-};
-
-const isLinkInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
-  if (typeof props.interaction === "object" && props.interaction !== null) {
-    return (
-      props.interaction.enabled?.links === true ||
-      props.interaction.enabled?.interactiveContent === true
-    );
-  }
-  return props.interaction !== false;
-};
-
-const isEmbedInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
-  if (typeof props.interaction === "object" && props.interaction !== null) {
-    return (
-      props.interaction.enabled?.embeds === true ||
-      props.interaction.enabled?.interactiveContent === true
-    );
-  }
-  return props.interaction !== false;
-};
-
-const isNavigationInteractionEnabled = (
-  props: Pick<AppProps, "interaction">,
-) => {
-  if (typeof props.interaction === "object" && props.interaction !== null) {
-    return props.interaction.enabled?.navigation === true;
-  }
-  return props.interaction !== false;
-};
-
-// NOTE only consulted while non-interactive (the interactive editor
-// prevents/handles browser zoom through its own input handlers)
-const isBrowserZoomInteractionEnabled = (
-  props: Pick<AppProps, "interaction">,
-) => {
-  if (typeof props.interaction === "object" && props.interaction !== null) {
-    return props.interaction.enabled?.browserZoom === true;
-  }
-  return false;
-};
-
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -895,7 +851,9 @@ class App extends React.Component<AppProps, AppState> {
       ...this.getCanvasOffsets(),
       // non-interactive editor implies view mode so that all edit-mode
       // gates apply
-      viewModeEnabled: isInteractionEnabled(props) ? viewModeEnabled : true,
+      viewModeEnabled: this.isInteractionEnabled(props)
+        ? viewModeEnabled
+        : true,
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
@@ -952,8 +910,10 @@ class App extends React.Component<AppProps, AppState> {
    * All user-input entry points must consult this getter (directly or by
    * not being attached/rendered at all).
    */
-  public get interactionEnabled(): boolean {
-    return isInteractionEnabled(this.props);
+  public isInteractionEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    return props.interaction !== false && typeof props.interaction !== "object";
   }
 
   /**
@@ -963,8 +923,16 @@ class App extends React.Component<AppProps, AppState> {
    * (in which case clicking anywhere on a linked element opens the link,
    * same as in view mode).
    */
-  public get linksEnabled(): boolean {
-    return isLinkInteractionEnabled(this.props);
+  public isLinksEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return (
+        props.interaction.enabled?.links === true ||
+        props.interaction.enabled?.interactiveContent === true
+      );
+    }
+    return props.interaction !== false;
   }
 
   /**
@@ -972,8 +940,13 @@ class App extends React.Component<AppProps, AppState> {
    * enabled. True when fully interactive, or when `interaction: { enabled:
    * { navigation: true } }`. Respects `appState.scrollConstraints`.
    */
-  public get navigationEnabled(): boolean {
-    return isNavigationInteractionEnabled(this.props);
+  public isNavigationEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return props.interaction.enabled?.navigation === true;
+    }
+    return props.interaction !== false;
   }
 
   /**
@@ -981,8 +954,16 @@ class App extends React.Component<AppProps, AppState> {
    * activate, view-mode style). True when fully interactive, or when
    * allowed via `interaction.enabled.embeds` / `.interactiveContent`.
    */
-  public get embedsEnabled(): boolean {
-    return isEmbedInteractionEnabled(this.props);
+  public isEmbedsEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return (
+        props.interaction.enabled?.embeds === true ||
+        props.interaction.enabled?.interactiveContent === true
+      );
+    }
+    return props.interaction !== false;
   }
 
   /**
@@ -990,13 +971,18 @@ class App extends React.Component<AppProps, AppState> {
    * shortcuts) stays available over the non-interactive editor.
    * Prevented by default.
    */
-  public get browserZoomEnabled(): boolean {
-    return isBrowserZoomInteractionEnabled(this.props);
+  public isBrowserZoomEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return props.interaction.enabled?.browserZoom === true;
+    }
+    return false;
   }
 
   /** Whether Excalidraw's default UI is rendered. */
-  public get defaultUIEnabled(): boolean {
-    return this.props.ui !== false;
+  public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
+    return props.ui !== false;
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -2292,13 +2278,14 @@ class App extends React.Component<AppProps, AppState> {
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
           "excalidraw--mobile": this.editorInterface.formFactor === "phone",
-          "excalidraw--non-interactive": !this.interactionEnabled,
+          "excalidraw--non-interactive": !this.isInteractionEnabled(),
           "excalidraw--navigation":
-            !this.interactionEnabled && this.navigationEnabled,
-          "excalidraw--embeds": !this.interactionEnabled && this.embedsEnabled,
+            !this.isInteractionEnabled() && this.isNavigationEnabled(),
+          "excalidraw--embeds":
+            !this.isInteractionEnabled() && this.isEmbedsEnabled(),
           "excalidraw--allow-browser-zoom":
-            !this.interactionEnabled && this.browserZoomEnabled,
-          "excalidraw--ui-hidden": !this.defaultUIEnabled,
+            !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
+          "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
         })}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
@@ -2307,18 +2294,22 @@ class App extends React.Component<AppProps, AppState> {
           ["--right-sidebar-width" as any]: `${RIGHT_SIDEBAR_WIDTH}px`,
         }}
         ref={this.excalidrawContainerRef}
-        onDrop={this.interactionEnabled ? this.handleAppOnDrop : undefined}
+        onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
         tabIndex={0}
         onKeyDown={
-          this.props.handleKeyboardGlobally || !this.interactionEnabled
+          this.props.handleKeyboardGlobally || !this.isInteractionEnabled()
             ? undefined
             : this.onKeyDown
         }
         onPointerEnter={
-          this.interactionEnabled ? this.toggleOverscrollBehavior : undefined
+          this.isInteractionEnabled()
+            ? this.toggleOverscrollBehavior
+            : undefined
         }
         onPointerLeave={
-          this.interactionEnabled ? this.toggleOverscrollBehavior : undefined
+          this.isInteractionEnabled()
+            ? this.toggleOverscrollBehavior
+            : undefined
         }
       >
         <ExcalidrawAPIContext.Provider value={this.api}>
@@ -2341,7 +2332,7 @@ class App extends React.Component<AppProps, AppState> {
                           <LayerUI
                             canvas={this.canvas}
                             appState={this.state}
-                            defaultUIEnabled={this.defaultUIEnabled}
+                            defaultUIEnabled={this.isDefaultUIEnabled()}
                             files={this.files}
                             setAppState={this.setAppState}
                             actionManager={this.actionManager}
@@ -2385,8 +2376,8 @@ class App extends React.Component<AppProps, AppState> {
                               this.eraserTrail,
                             ]}
                           />
-                          {this.defaultUIEnabled && <CursorHint />}
-                          {this.defaultUIEnabled &&
+                          {this.isDefaultUIEnabled() && <CursorHint />}
+                          {this.isDefaultUIEnabled() &&
                             selectedElements.length === 1 &&
                             this.state.openDialog?.name !==
                               "elementLinkSelector" &&
@@ -2403,7 +2394,7 @@ class App extends React.Component<AppProps, AppState> {
                                 }
                               />
                             )}
-                          {this.defaultUIEnabled &&
+                          {this.isDefaultUIEnabled() &&
                             this.props.aiEnabled !== false &&
                             selectedElements.length === 1 &&
                             isMagicFrameElement(firstSelectedElement) && (
@@ -2424,7 +2415,7 @@ class App extends React.Component<AppProps, AppState> {
                                 />
                               </ElementCanvasButtons>
                             )}
-                          {this.defaultUIEnabled &&
+                          {this.isDefaultUIEnabled() &&
                             selectedElements.length === 1 &&
                             isIframeElement(firstSelectedElement) &&
                             firstSelectedElement.customData?.generationData
@@ -2477,7 +2468,7 @@ class App extends React.Component<AppProps, AppState> {
                               </ElementCanvasButtons>
                             )}
 
-                          {this.defaultUIEnabled && this.state.contextMenu && (
+                          {this.isDefaultUIEnabled() && this.state.contextMenu && (
                             <ContextMenu
                               items={this.state.contextMenu.items}
                               top={this.state.contextMenu.top}
@@ -2507,7 +2498,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: isGridModeEnabled(this),
-                              renderLinks: this.linksEnabled,
+                              renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
@@ -2560,8 +2551,8 @@ class App extends React.Component<AppProps, AppState> {
                               this.props.renderScrollbars === true
                             }
                             editorInterface={this.editorInterface}
-                            interactionEnabled={this.interactionEnabled}
-                            navigationEnabled={this.navigationEnabled}
+                            interactionEnabled={this.isInteractionEnabled()}
+                            navigationEnabled={this.isNavigationEnabled()}
                             renderInteractiveSceneCallback={
                               this.renderInteractiveSceneCallback
                             }
@@ -2575,25 +2566,27 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.defaultUIEnabled && this.state.userToFollow && (
-                            <FollowMode
-                              width={this.state.width}
-                              height={this.state.height}
-                              userToFollow={this.state.userToFollow}
-                              onDisconnect={this.maybeUnfollowRemoteUser}
-                            />
-                          )}
+                          {this.isDefaultUIEnabled() &&
+                            this.state.userToFollow && (
+                              <FollowMode
+                                width={this.state.width}
+                                height={this.state.height}
+                                userToFollow={this.state.userToFollow}
+                                onDisconnect={this.maybeUnfollowRemoteUser}
+                              />
+                            )}
                           {this.renderFrameNames()}
-                          {this.defaultUIEnabled &&
+                          {this.isDefaultUIEnabled() &&
                             this.state.activeLockedId && (
                               <UnlockPopup
                                 app={this}
                                 activeLockedId={this.state.activeLockedId}
                               />
                             )}
-                          {this.defaultUIEnabled && showShapeSwitchPanel && (
-                            <ConvertElementTypePopup app={this} />
-                          )}
+                          {this.isDefaultUIEnabled() &&
+                            showShapeSwitchPanel && (
+                              <ConvertElementTypePopup app={this} />
+                            )}
                         </ExcalidrawActionManagerContext.Provider>
                         {this.renderEmbeddables()}
                       </ExcalidrawElementsContext.Provider>
@@ -2973,7 +2966,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // non-interactive editor implies view mode (overrides both the action
       // result and the host-supplied `viewModeEnabled` prop)
-      if (!this.interactionEnabled) {
+      if (!this.isInteractionEnabled()) {
         viewModeEnabled = true;
       }
 
@@ -3122,7 +3115,7 @@ class App extends React.Component<AppProps, AppState> {
     // componentDidUpdate lifecycle, then submit whichever text-editing session
     // is active if editing is still disabled.
     queueMicrotask(() => {
-      if (!this.interactionEnabled || this.state.viewModeEnabled) {
+      if (!this.isInteractionEnabled() || this.state.viewModeEnabled) {
         this.textWysiwygSubmitHandler?.();
       }
     });
@@ -3149,7 +3142,7 @@ class App extends React.Component<AppProps, AppState> {
       showHyperlinkPopup: false,
     });
     this.deselectElements();
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       this.setState({ originSnapOffset: null });
       resetCursor(this.interactiveCanvas);
     }
@@ -3159,9 +3152,9 @@ class App extends React.Component<AppProps, AppState> {
     prevProps: AppProps,
     prevState: AppState,
   ) => {
-    const wasInteractionEnabled = isInteractionEnabled(prevProps);
+    const wasInteractionEnabled = this.isInteractionEnabled(prevProps);
     const interactionEnabledChanged =
-      wasInteractionEnabled !== this.interactionEnabled;
+      wasInteractionEnabled !== this.isInteractionEnabled();
     const viewModePropChanged =
       prevProps.viewModeEnabled !== this.props.viewModeEnabled;
 
@@ -3169,7 +3162,7 @@ class App extends React.Component<AppProps, AppState> {
     // uncontrolled. Synchronize it when its prop changes, when interaction is
     // re-enabled, or when non-interactive mode needs to force it on.
     let nextViewModeEnabled = this.state.viewModeEnabled;
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       nextViewModeEnabled = true;
     } else if (viewModePropChanged || interactionEnabledChanged) {
       nextViewModeEnabled = !!this.props.viewModeEnabled;
@@ -3181,9 +3174,9 @@ class App extends React.Component<AppProps, AppState> {
     const editingWasEnabled =
       wasInteractionEnabled && !prevState.viewModeEnabled;
     const editingEnabled =
-      this.interactionEnabled && !this.state.viewModeEnabled;
+      this.isInteractionEnabled() && !this.state.viewModeEnabled;
     const becameNonInteractive =
-      interactionEnabledChanged && !this.interactionEnabled;
+      interactionEnabledChanged && !this.isInteractionEnabled();
 
     if (becameNonInteractive || (editingWasEnabled && !editingEnabled)) {
       this.terminateActiveInteraction();
@@ -3197,29 +3190,29 @@ class App extends React.Component<AppProps, AppState> {
 
     // NOTE link icons appearing/disappearing is handled by the re-render
     // itself (`renderConfig.renderLinks`)
-    if (isLinkInteractionEnabled(prevProps) !== this.linksEnabled) {
-      if (!this.linksEnabled) {
+    if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
+      if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
         hideHyperlinkToolip();
         resetCursor(this.interactiveCanvas);
       }
     }
 
-    if (isEmbedInteractionEnabled(prevProps) !== this.embedsEnabled) {
-      if (!this.embedsEnabled) {
+    if (this.isEmbedsEnabled(prevProps) !== this.isEmbedsEnabled()) {
+      if (!this.isEmbedsEnabled()) {
         this.setState({ activeEmbeddable: null });
       }
     }
 
     if (
-      isBrowserZoomInteractionEnabled(prevProps) !== this.browserZoomEnabled ||
-      isNavigationInteractionEnabled(prevProps) !== this.navigationEnabled
+      this.isBrowserZoomEnabled(prevProps) !== this.isBrowserZoomEnabled() ||
+      this.isNavigationEnabled(prevProps) !== this.isNavigationEnabled()
     ) {
       this.addEventListeners();
     }
 
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
-      if (this.interactionEnabled) {
+      if (this.isInteractionEnabled()) {
         this.addEventListeners();
       }
       if (!this.state.viewModeEnabled) {
@@ -3694,11 +3687,11 @@ class App extends React.Component<AppProps, AppState> {
       ),
     );
 
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       // NOTE by not attaching the wheel/touch/gesture listeners below (which
       // preventDefault), the browser default behavior — such as scrolling the
       // page over the editor — is retained while non-interactive
-      if (this.navigationEnabled) {
+      if (this.isNavigationEnabled()) {
         // wheel pan/zoom & pinch — the editor consumes these again, so the
         // page no longer scrolls over the editor
         this.onRemoveEventListenersEmitter.once(
@@ -3745,11 +3738,11 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
       }
-      if (!this.browserZoomEnabled) {
+      if (!this.isBrowserZoomEnabled()) {
         // the browser's own zoom is prevented over the editor by default,
         // mirroring the interactive editor (opt out via
         // `interaction: { enabled: { browserZoom: true } }`)
-        if (!this.navigationEnabled) {
+        if (!this.isNavigationEnabled()) {
           // with navigation enabled, wheel & pinch are consumed by the
           // editor's own handlers above instead
           this.onRemoveEventListenersEmitter.once(
@@ -4088,7 +4081,7 @@ class App extends React.Component<AppProps, AppState> {
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
@@ -4103,7 +4096,7 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
@@ -4123,7 +4116,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTouchStart = (event: TouchEvent) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
 
@@ -4188,7 +4181,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onTouchEnd = (event: TouchEvent) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     this.resetContextMenuTimer();
@@ -4375,7 +4368,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
-      if (!this.interactionEnabled) {
+      if (!this.isInteractionEnabled()) {
         return;
       }
 
@@ -5440,7 +5433,7 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      if (!this.interactionEnabled) {
+      if (!this.isInteractionEnabled()) {
         return;
       }
 
@@ -5928,7 +5921,7 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     if (event.key === KEYS.SPACE) {
@@ -6213,7 +6206,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
-    if (!this.navigationEnabled) {
+    if (!this.isNavigationEnabled()) {
       return;
     }
     event.preventDefault();
@@ -6231,7 +6224,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // fires only on Safari
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
-    if (!this.navigationEnabled) {
+    if (!this.isNavigationEnabled()) {
       return;
     }
     event.preventDefault();
@@ -6272,7 +6265,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // fires only on Safari
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
-    if (!this.navigationEnabled) {
+    if (!this.isNavigationEnabled()) {
       return;
     }
     event.preventDefault();
@@ -7055,7 +7048,7 @@ class App extends React.Component<AppProps, AppState> {
     >,
   ) => {
     if (
-      !this.interactionEnabled ||
+      !this.isInteractionEnabled() ||
       this.state.editingTextElement ||
       !this.shouldHandleBrowserCanvasDoubleClick(event.type)
     ) {
@@ -7274,7 +7267,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     if (event.button !== POINTER_BUTTON.MAIN) {
@@ -7468,7 +7461,7 @@ class App extends React.Component<AppProps, AppState> {
       { includeLockedElements: true },
     );
 
-    if (this.embedsEnabled) {
+    if (this.isEmbedsEnabled()) {
       const hitElement = hitElementMightBeLocked?.locked
         ? null
         : hitElementMightBeLocked;
@@ -7483,11 +7476,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    this.hitLinkElement = this.linksEnabled
+    this.hitLinkElement = this.isLinksEnabled()
       ? this.getElementLinkAtPosition(scenePointer, hitElementMightBeLocked)
       : undefined;
     if (!this.applyElementLinkHoverAffordance()) {
-      if (this.navigationEnabled) {
+      if (this.isNavigationEnabled()) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else {
         resetCursor(this.interactiveCanvas);
@@ -7500,13 +7493,13 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUpEvent = event;
 
-    if (this.embedsEnabled && this.handleIframeLikeCenterClick()) {
+    if (this.isEmbedsEnabled() && this.handleIframeLikeCenterClick()) {
       return;
     }
 
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     if (
-      this.linksEnabled &&
+      this.isLinksEnabled() &&
       this.maybeHandleElementLinkClick(event, scenePointer)
     ) {
       return;
@@ -7679,13 +7672,13 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    if (!this.interactionEnabled) {
-      if (this.navigationEnabled) {
+    if (!this.isInteractionEnabled()) {
+      if (this.isNavigationEnabled()) {
         // two-finger pinch zoom/pan (single-pointer panning is handled by
         // the pan session set up on pointerdown)
         this.updateMultiTouchGesture(event);
       }
-      if ((this.linksEnabled || this.embedsEnabled) && !isPanning) {
+      if ((this.isLinksEnabled() || this.isEmbedsEnabled()) && !isPanning) {
         this.handleInteractiveContentPointerMove(event);
       }
       return;
@@ -8247,7 +8240,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     invalidateContextMenu = true;
@@ -8391,13 +8384,13 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    if (!this.interactionEnabled) {
-      if (this.linksEnabled || this.embedsEnabled) {
+    if (!this.isInteractionEnabled()) {
+      if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
         // needed by handleElementLinkClick & handleIframeLikeCenterClick
         // (drag-distance & hit checks)
         this.lastPointerDownEvent = event;
       }
-      if (this.navigationEnabled) {
+      if (this.isNavigationEnabled()) {
         this.updateGestureOnPointerDown(event);
         if (!isPanning) {
           // pans on drag same as view mode (the pan session manages its own
@@ -8869,8 +8862,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    if (!this.interactionEnabled) {
-      if (this.linksEnabled || this.embedsEnabled) {
+    if (!this.isInteractionEnabled()) {
+      if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
         this.handleInteractiveContentPointerUp(event);
       }
       return;
@@ -12897,7 +12890,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // NOTE no preventDefault so the host page can handle the drop itself
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
@@ -13108,7 +13101,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
     // NOTE no preventDefault so the browser default context menu applies
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     event.preventDefault();
@@ -13634,7 +13627,7 @@ class App extends React.Component<AppProps, AppState> {
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
       // NOTE no preventDefault so the page can scroll over the editor
-      if (!this.navigationEnabled) {
+      if (!this.isNavigationEnabled()) {
         return;
       }
       if (
@@ -13759,7 +13752,7 @@ class App extends React.Component<AppProps, AppState> {
   private savePointer = (x: number, y: number, button: "up" | "down") => {
     // don't broadcast pointer updates (props.onPointerUpdate) when
     // non-interactive
-    if (!this.interactionEnabled) {
+    if (!this.isInteractionEnabled()) {
       return;
     }
     if (!x || !y) {

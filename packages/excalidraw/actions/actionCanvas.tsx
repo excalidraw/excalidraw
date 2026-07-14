@@ -128,7 +128,7 @@ export const actionZoomIn = register({
   navigation: true,
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -175,7 +175,7 @@ export const actionZoomOut = register({
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -222,7 +222,7 @@ export const actionResetZoom = register({
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
@@ -296,7 +296,7 @@ export const actionZoomToFitSelectionInViewport = register({
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const bounds = selectedElements.length
@@ -341,7 +341,7 @@ export const actionZoomToFitSelection = register({
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const bounds = selectedElements.length
@@ -382,7 +382,7 @@ export const actionZoomToFit = register({
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
     // under a viewport lock, fits the locked box rather than the elements
     const bounds = appState.scrollConstraints

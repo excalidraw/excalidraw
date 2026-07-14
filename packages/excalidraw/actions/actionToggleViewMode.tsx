@@ -27,7 +27,8 @@ export const actionToggleViewMode = register({
   checked: (appState) => appState.viewModeEnabled,
   predicate: (elements, appState, appProps, app) => {
     return (
-      typeof appProps.viewModeEnabled === "undefined" && app.interactionEnabled
+      typeof appProps.viewModeEnabled === "undefined" &&
+      app.isInteractionEnabled()
     );
   },
   keyTest: (event) =>

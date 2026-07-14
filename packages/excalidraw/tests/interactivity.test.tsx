@@ -823,7 +823,7 @@ describe("interaction={{ enabled: { links } }}", () => {
       />,
     );
 
-    expect(h.app.linksEnabled).toBe(true);
+    expect(h.app.isLinksEnabled()).toBe(true);
     expect(h.state.viewModeEnabled).toBe(true);
     expect(queryContainer(".excalidraw--non-interactive")).not.toBe(null);
 
@@ -892,7 +892,7 @@ describe("interaction={{ enabled: { links } }}", () => {
     );
     addRect("https://excalidraw.com");
 
-    expect(h.app.linksEnabled).toBe(false);
+    expect(h.app.isLinksEnabled()).toBe(false);
     expect(h.state.viewModeEnabled).toBe(true);
     expect(queryContainer(".excalidraw--non-interactive")).not.toBe(null);
 
@@ -903,7 +903,7 @@ describe("interaction={{ enabled: { links } }}", () => {
     GlobalTestState.renderResult.rerender(
       <Excalidraw interaction={{}} onLinkOpen={onLinkOpen} />,
     );
-    expect(h.app.linksEnabled).toBe(false);
+    expect(h.app.isLinksEnabled()).toBe(false);
     expect(h.state.viewModeEnabled).toBe(true);
 
     clickElementCenter();
@@ -915,7 +915,7 @@ describe("interaction={{ enabled: { links } }}", () => {
     await render(<Excalidraw interaction={false} onLinkOpen={onLinkOpen} />);
     addRect("https://excalidraw.com");
 
-    expect(h.app.linksEnabled).toBe(false);
+    expect(h.app.isLinksEnabled()).toBe(false);
 
     clickElementCenter();
     expect(onLinkOpenSpy).not.toHaveBeenCalled();
@@ -940,7 +940,7 @@ describe("interaction={{ enabled: { links } }}", () => {
         onLinkOpen={onLinkOpen}
       />,
     );
-    expect(h.app.linksEnabled).toBe(true);
+    expect(h.app.isLinksEnabled()).toBe(true);
     // still non-interactive overall
     expect(h.state.viewModeEnabled).toBe(true);
 
@@ -981,7 +981,7 @@ describe("interaction={{ enabled: { navigation } }}", () => {
   });
 
   it("wheel pans & ctrl+wheel zooms the canvas", () => {
-    expect(h.app.navigationEnabled).toBe(true);
+    expect(h.app.isNavigationEnabled()).toBe(true);
     expect(h.state.viewModeEnabled).toBe(true);
     expect(queryContainer(".excalidraw--navigation")).not.toBe(null);
 
@@ -1130,8 +1130,8 @@ describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
     const embed = addEmbeddable();
 
-    expect(h.app.embedsEnabled).toBe(true);
-    expect(h.app.linksEnabled).toBe(false);
+    expect(h.app.isEmbedsEnabled()).toBe(true);
+    expect(h.app.isLinksEnabled()).toBe(false);
     expect(queryContainer(".excalidraw--embeds")).not.toBe(null);
 
     mouse.reset();
@@ -1158,7 +1158,7 @@ describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
     addEmbeddable();
 
-    expect(h.app.embedsEnabled).toBe(false);
+    expect(h.app.isEmbedsEnabled()).toBe(false);
     expect(queryContainer(".excalidraw--embeds")).toBe(null);
 
     mouse.reset();
@@ -1173,11 +1173,11 @@ describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
     );
     await waitFor(() => expect(h.state.width).toBe(200));
 
-    expect(h.app.linksEnabled).toBe(true);
-    expect(h.app.embedsEnabled).toBe(true);
+    expect(h.app.isLinksEnabled()).toBe(true);
+    expect(h.app.isEmbedsEnabled()).toBe(true);
     // still non-interactive overall
     expect(h.state.viewModeEnabled).toBe(true);
-    expect(h.app.interactionEnabled).toBe(false);
+    expect(h.app.isInteractionEnabled()).toBe(false);
 
     // additive: explicit false on individual keys doesn't override the
     // umbrella
@@ -1188,7 +1188,7 @@ describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
         }}
       />,
     );
-    expect(h.app.linksEnabled).toBe(true);
-    expect(h.app.embedsEnabled).toBe(true);
+    expect(h.app.isLinksEnabled()).toBe(true);
+    expect(h.app.isEmbedsEnabled()).toBe(true);
   });
 });
