@@ -217,6 +217,8 @@ export const Toolbar = ({
           checked={appState.activeTool.locked}
           onChange={onLockToggle}
           title={t("toolBar.lock")}
+          // the active tool — including its lock state — is host-controlled
+          disabled={app.props.activeTool != null}
         />
 
         <div className="App-toolbar__divider" />

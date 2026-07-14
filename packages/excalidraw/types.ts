@@ -820,6 +820,25 @@ export interface ExcalidrawProps {
    * @default true
    */
   ui?: boolean;
+  /**
+   * Forces the active editor tool (controlled). While set, user- and
+   * API-driven tool switching is ignored — `setActiveTool` refuses with a
+   * console warning, non-forced toolbar buttons render disabled — and the
+   * editor snaps back if internal flows reset the tool. Non-selection tools
+   * are activated with `locked: true`, so e.g. a forced drawing tool doesn't
+   * revert to selection after each drawn shape. Unset to return tool control
+   * to the editor (the current tool stays active).
+   *
+   * The forced tool must be activatable to take effect: not disabled via
+   * `UIOptions.tools`, and — while the editor is non-interactive — allowed
+   * via `interaction.enabled.tools`. Otherwise the editor stays on (or, when
+   * non-interactive, resets to) the `selection` tool, and the forced tool is
+   * applied once it becomes activatable. `image` cannot be forced (its
+   * activation opens the file picker).
+   */
+  activeTool?:
+    | { type: Exclude<ToolType, "image"> }
+    | { type: "custom"; customType: string };
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;

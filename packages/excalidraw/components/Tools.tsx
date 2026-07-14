@@ -245,6 +245,11 @@ const createToolButton = (
         type="toggle"
         icon={config.icon}
         checked={activeTool.type === type}
+        // while the active tool is host-controlled, other tools cannot be
+        // activated (`setActiveTool` refuses them)
+        disabled={
+          app.props.activeTool != null && app.props.activeTool.type !== type
+        }
         title={shortcut ? `${label} — ${shortcut}` : label}
         keyBindingLabel={
           hideKeyBinding || hideShortcut

@@ -84,6 +84,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     interaction,
     ui,
+    activeTool,
     zenModeEnabled,
     gridModeEnabled,
     libraryReturnUrl,
@@ -219,6 +220,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           interaction={interaction}
           ui={ui}
+          activeTool={activeTool}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
@@ -263,6 +265,7 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     UIOptions: prevUIOptions = {},
     imageOptions: prevImageOptions,
     interaction: prevInteraction,
+    activeTool: prevActiveTool,
     ...prev
   } = prevProps;
   const {
@@ -270,8 +273,21 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     UIOptions: nextUIOptions = {},
     imageOptions: nextImageOptions,
     interaction: nextInteraction,
+    activeTool: nextActiveTool,
     ...next
   } = nextProps;
+
+  // compare `activeTool` semantically so that hosts inlining the object
+  // (`activeTool={{ type: "laser" }}`) don't bust the memo every render
+  const isActiveToolSame =
+    prevActiveTool === nextActiveTool ||
+    (prevActiveTool?.type === nextActiveTool?.type &&
+      (prevActiveTool?.type === "custom" ? prevActiveTool.customType : null) ===
+        (nextActiveTool?.type === "custom" ? nextActiveTool.customType : null));
+
+  if (!isActiveToolSame) {
+    return false;
+  }
 
   // compare `interaction` semantically so that hosts inlining the config
   // object (`interaction={{ enabled: { links: true } }}`) don't bust the

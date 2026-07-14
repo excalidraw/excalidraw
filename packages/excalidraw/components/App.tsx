@@ -843,6 +843,25 @@ class App extends React.Component<AppProps, AppState> {
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
 
+    // seed the host-forced tool so the first render already has it
+    // (`handleForcedToolChange` keeps it in sync from then on)
+    let forcedActiveTool: AppState["activeTool"] | null = null;
+    if (props.activeTool) {
+      if ((props.activeTool.type as string) === "image") {
+        console.warn(`"image" tool cannot be forced via "props.activeTool"`);
+      } else if (!this.isToolSupported(props.activeTool.type, props)) {
+        console.warn(
+          `"${props.activeTool.type}" tool ("props.activeTool") cannot be activated — disabled via "UIOptions.tools", or not enabled while non-interactive (see "interaction.enabled.tools")`,
+        );
+      } else {
+        forcedActiveTool = updateActiveTool(defaultAppState, {
+          ...props.activeTool,
+          // a forced tool must not revert to selection (e.g. after drawing)
+          locked: !isSelectionLikeTool(props.activeTool.type),
+        });
+      }
+    }
+
     this.state = {
       ...defaultAppState,
       theme,
@@ -854,6 +873,7 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled: this.isInteractionEnabled(props)
         ? viewModeEnabled
         : true,
+      activeTool: forcedActiveTool ?? defaultAppState.activeTool,
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
@@ -3306,6 +3326,65 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /** whether the two values reference the same tool (incl. custom subtype) */
+  private isSameForcedTool = (
+    a: { type: string; customType?: string | null } | null | undefined,
+    b: { type: string; customType?: string | null } | null | undefined,
+  ) =>
+    a?.type === b?.type &&
+    (a?.type === "custom" ? a.customType ?? null : null) ===
+      (b?.type === "custom" ? b.customType ?? null : null);
+
+  /**
+   * Keeps `state.activeTool` synced to the host-controlled
+   * `props.activeTool`. `setActiveTool` refuses non-matching activations
+   * while forced (user input, API); this backstop covers the writers that
+   * bypass the funnel (`actionFinalize`/`actionDeselect`, `restore()` on
+   * scene load, ...) and re-applies the tool once it becomes activatable
+   * (e.g. `interaction` config changes).
+   */
+  private handleForcedToolChange = (
+    prevProps: AppProps,
+    prevState: AppState,
+  ) => {
+    const forcedTool = this.props.activeTool;
+    if (!forcedTool) {
+      return;
+    }
+
+    const forcedToolChanged = !this.isSameForcedTool(
+      prevProps.activeTool,
+      forcedTool,
+    );
+
+    if ((forcedTool.type as string) === "image") {
+      if (forcedToolChanged) {
+        console.warn(`"image" tool cannot be forced via "props.activeTool"`);
+      }
+      return;
+    }
+
+    if (this.isSameForcedTool(forcedTool, this.state.activeTool)) {
+      return;
+    }
+
+    // (re)force only on relevant changes so that a standing refusal (tool
+    // disabled, or not enabled while non-interactive) warns once instead of
+    // on every update
+    if (
+      forcedToolChanged ||
+      prevState.activeTool !== this.state.activeTool ||
+      this.isToolSupported(forcedTool.type, prevProps) !==
+        this.isToolSupported(forcedTool.type, this.props)
+    ) {
+      this.setActiveTool({
+        ...forcedTool,
+        // a forced tool must not revert to selection (e.g. after drawing)
+        locked: !isSelectionLikeTool(forcedTool.type),
+      });
+    }
+  };
+
   private resetHistory = () => {
     this.history.clear();
   };
@@ -3981,6 +4060,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.handleInteractionStateChange(prevProps, prevState);
+    this.handleForcedToolChange(prevProps, prevState);
 
     this.appStateObserver.flush(prevState);
 
@@ -4869,6 +4949,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
+    if (this.props.activeTool) {
+      // the active tool — including its lock state — is host-controlled
+      return;
+    }
     if (!this.state.activeTool.locked) {
       trackEvent(
         "toolbar",
@@ -6159,6 +6243,16 @@ class App extends React.Component<AppProps, AppState> {
         this.isInteractionEnabled()
           ? `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`
           : `"${tool.type}" tool cannot be activated while the editor is non-interactive (see "interaction.enabled.tools")`,
+      );
+      return;
+    }
+
+    if (
+      this.props.activeTool &&
+      !this.isSameForcedTool(this.props.activeTool, tool)
+    ) {
+      console.warn(
+        `"${tool.type}" tool activation ignored — the active tool is controlled by the host via "props.activeTool"`,
       );
       return;
     }
@@ -8648,8 +8742,10 @@ class App extends React.Component<AppProps, AppState> {
     if (
       event.button === POINTER_BUTTON.ERASER &&
       // must not switch tools while non-interactive (reachable when the
-      // active tool is allowed via `interaction.enabled.tools`)
+      // active tool is allowed via `interaction.enabled.tools`) or while
+      // the active tool is host-controlled
       this.isInteractionEnabled() &&
+      !this.props.activeTool &&
       this.state.activeTool.type !== TOOL_TYPE.eraser
     ) {
       this.setState(
