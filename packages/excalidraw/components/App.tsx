@@ -1047,11 +1047,33 @@ class App extends React.Component<AppProps, AppState> {
    * active; this predicate only matters where view-mode gates apply.)
    */
   private isActiveToolPointerCapturing(): boolean {
-    return (
-      this.state.activeTool.type === "laser" ||
-      (!this.isInteractionEnabled() &&
-        this.isToolSupported(this.state.activeTool.type))
-    );
+    if (!this.isInteractionEnabled()) {
+      // an active tool that isn't allowed via `interaction.enabled.tools`
+      // is inert — including the laser
+      return this.isToolSupported(this.state.activeTool.type);
+    }
+    return this.state.activeTool.type === "laser";
+  }
+
+  /**
+   * Applies the cursor shown when no interaction/hover sets one — the
+   * view-mode grab cursor when drag-to-pan applies, the active tool's
+   * cursor otherwise. All cursor management is imperative (an inline
+   * `style.cursor` on the canvas would clobber it on the next rerender).
+   */
+  private applyRestingCursor() {
+    if (!this.interactiveCanvas) {
+      return;
+    }
+    if (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()) {
+      if (this.isNavigationEnabled()) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else {
+        resetCursor(this.interactiveCanvas);
+      }
+    } else {
+      setCursorForShape(this.interactiveCanvas, this.state);
+    }
   }
 
   /** Whether Excalidraw's default UI is rendered. */
@@ -2630,7 +2652,6 @@ class App extends React.Component<AppProps, AppState> {
                             editorInterface={this.editorInterface}
                             interactionEnabled={this.isInteractionEnabled()}
                             navigationEnabled={this.isNavigationEnabled()}
-                            toolCapturesPointer={this.isActiveToolPointerCapturing()}
                             renderInteractiveSceneCallback={
                               this.renderInteractiveSceneCallback
                             }
@@ -3290,8 +3311,8 @@ class App extends React.Component<AppProps, AppState> {
         // end a possibly mid-stroke laser trail (the stroke's own window
         // listeners tear down on the next pointerup)
         this.laserTrails.endPath();
-        resetCursor(this.interactiveCanvas);
       }
+      this.applyRestingCursor();
     }
 
     // invariant: while non-interactive, the active tool is either
@@ -3314,6 +3335,7 @@ class App extends React.Component<AppProps, AppState> {
       this.isNavigationEnabled(prevProps) !== this.isNavigationEnabled()
     ) {
       this.addEventListeners();
+      this.applyRestingCursor();
     }
 
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
@@ -3323,6 +3345,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.state.viewModeEnabled) {
         this.deselectElements();
       }
+      this.applyRestingCursor();
     }
   };
 
@@ -9233,14 +9256,7 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          if (
-            this.state.viewModeEnabled &&
-            !this.isActiveToolPointerCapturing()
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-          } else {
-            setCursorForShape(this.interactiveCanvas, this.state);
-          }
+          this.applyRestingCursor();
         }
         this.setState({
           cursorButton: "up",
@@ -12992,6 +13008,11 @@ class App extends React.Component<AppProps, AppState> {
     // canvas is null when unmounting
     if (canvas !== null) {
       this.interactiveCanvas = canvas;
+
+      // reflect state that landed before the canvas existed — the cursor is
+      // otherwise only set imperatively on *changes* (e.g. the host-forced
+      // tool seeded from `props.activeTool`, or view-mode drag-to-pan)
+      this.applyRestingCursor();
 
       // -----------------------------------------------------------------------
       // NOTE wheel, touchstart, touchend events must be registered outside

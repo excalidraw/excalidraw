@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
 import {
-  CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
   type EditorInterface,
@@ -48,12 +47,6 @@ type InteractiveCanvasProps = {
   app: AppClassProperties;
   interactionEnabled: boolean;
   navigationEnabled: boolean;
-  /**
-   * whether the active tool captures the primary pointer instead of the
-   * view-mode drag-to-pan (laser, or `interaction.enabled.tools` while
-   * non-interactive)
-   */
-  toolCapturesPointer: boolean;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -209,15 +202,13 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   return (
     <canvas
       className="excalidraw__canvas interactive"
+      // NOTE no `cursor` style here — the cursor is managed imperatively
+      // (`applyRestingCursor`, `setCursorForShape`, hover handlers...); an
+      // inline style would clobber it whenever its computed value changes
+      // across rerenders
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor:
-          props.navigationEnabled &&
-          props.appState.viewModeEnabled &&
-          !props.toolCapturesPointer
-            ? CURSOR_TYPE.GRAB
-            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
@@ -303,8 +294,7 @@ const areEqual = (
     prevProps.selectedElements !== nextProps.selectedElements ||
     prevProps.renderScrollbars !== nextProps.renderScrollbars ||
     prevProps.interactionEnabled !== nextProps.interactionEnabled ||
-    prevProps.navigationEnabled !== nextProps.navigationEnabled ||
-    prevProps.toolCapturesPointer !== nextProps.toolCapturesPointer
+    prevProps.navigationEnabled !== nextProps.navigationEnabled
   ) {
     return false;
   }

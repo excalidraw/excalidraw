@@ -1,7 +1,11 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { resolvablePromise, updateActiveTool } from "@excalidraw/common";
+import {
+  CURSOR_TYPE,
+  resolvablePromise,
+  updateActiveTool,
+} from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
@@ -126,6 +130,10 @@ describe("props.activeTool (forced tool)", () => {
     await render(<Excalidraw activeTool={{ type: "rectangle" }} />);
     expect(h.state.activeTool.type).toBe("rectangle");
     expect(h.state.activeTool.locked).toBe(true);
+    // the cursor reflects the forced tool without any pointer interaction
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.CROSSHAIR,
+    );
 
     // drawing doesn't revert to selection (implied lock)
     mouse.down(10, 10);
@@ -216,7 +224,7 @@ describe("props.activeTool (forced tool)", () => {
     );
     expect(queryToolButton("freedraw")!.disabled).toBe(true);
     expect(queryToolButton("eraser")!.disabled).toBe(true);
-    expect(queryToolButton("lock")!.disabled).toBe(true);
+    expect(queryToolButton("lock")).toBe(null);
 
     // Q (toggle tool lock) is ignored — the lock state is host-implied
     expect(h.state.activeTool.locked).toBe(true);
@@ -245,6 +253,8 @@ describe("props.activeTool (forced tool)", () => {
     expect(h.state.activeTool.type).toBe("laser");
     expect(h.app.isInteractionEnabled()).toBe(false);
     expect(h.app.isToolSupported("laser")).toBe(true);
+    // the laser cursor applies without any pointer interaction
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("url(");
 
     // viewer: fully inert, tool resolves to the default selection
     GlobalTestState.renderResult.rerender(
