@@ -638,7 +638,7 @@ export type InteractionConfig = {
    * Interactions that stay enabled while the editor is otherwise
    * non-interactive. Opt-in: anything omitted or `false` is disabled.
    */
-  allowed?: {
+  enabled?: {
     /**
      * Element links render their link icon and stay clickable — clicking
      * anywhere on a linked element opens the link, same as in view mode.
@@ -767,7 +767,7 @@ export interface ExcalidrawProps {
    * editor is otherwise non-interactive (see `InteractionConfig`):
    *
    * ```tsx
-   * <Excalidraw interaction={{ allowed: { links: true } }} />
+   * <Excalidraw interaction={{ enabled: { links: true } }} />
    * ```
    *
    * @default true
@@ -783,6 +783,9 @@ export interface ExcalidrawProps {
    * Canvas content (elements, text editing surface, frame names, embeds) still
    * renders, and the editor remains interactive unless `interaction` is set to
    * `false`.
+   *
+   * NOTE: this is WIP and what default UI is/is not rendered when ui=false
+   * may yet change.
    *
    * @default true
    */

@@ -655,8 +655,8 @@ const isInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
 const isLinkInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
   if (typeof props.interaction === "object" && props.interaction !== null) {
     return (
-      props.interaction.allowed?.links === true ||
-      props.interaction.allowed?.interactiveContent === true
+      props.interaction.enabled?.links === true ||
+      props.interaction.enabled?.interactiveContent === true
     );
   }
   return props.interaction !== false;
@@ -665,8 +665,8 @@ const isLinkInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
 const isEmbedInteractionEnabled = (props: Pick<AppProps, "interaction">) => {
   if (typeof props.interaction === "object" && props.interaction !== null) {
     return (
-      props.interaction.allowed?.embeds === true ||
-      props.interaction.allowed?.interactiveContent === true
+      props.interaction.enabled?.embeds === true ||
+      props.interaction.enabled?.interactiveContent === true
     );
   }
   return props.interaction !== false;
@@ -676,7 +676,7 @@ const isNavigationInteractionEnabled = (
   props: Pick<AppProps, "interaction">,
 ) => {
   if (typeof props.interaction === "object" && props.interaction !== null) {
-    return props.interaction.allowed?.navigation === true;
+    return props.interaction.enabled?.navigation === true;
   }
   return props.interaction !== false;
 };
@@ -687,7 +687,7 @@ const isBrowserZoomInteractionEnabled = (
   props: Pick<AppProps, "interaction">,
 ) => {
   if (typeof props.interaction === "object" && props.interaction !== null) {
-    return props.interaction.allowed?.browserZoom === true;
+    return props.interaction.enabled?.browserZoom === true;
   }
   return false;
 };
@@ -963,7 +963,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Whether element links render their link icon and are clickable.
-   * True when fully interactive, or when `interaction: { allowed: { links:
+   * True when fully interactive, or when `interaction: { enabled: { links:
    * true } }`
    * (in which case clicking anywhere on a linked element opens the link,
    * same as in view mode).
@@ -974,7 +974,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Whether canvas navigation — panning & zooming, view-mode style — is
-   * enabled. True when fully interactive, or when `interaction: { allowed:
+   * enabled. True when fully interactive, or when `interaction: { enabled:
    * { navigation: true } }`. Respects `appState.scrollConstraints`.
    */
   public get navigationEnabled(): boolean {
@@ -984,7 +984,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * Whether embeddable & iframe elements are interactive (hover & click to
    * activate, view-mode style). True when fully interactive, or when
-   * allowed via `interaction.allowed.embeds` / `.interactiveContent`.
+   * allowed via `interaction.enabled.embeds` / `.interactiveContent`.
    */
   public get embedsEnabled(): boolean {
     return isEmbedInteractionEnabled(this.props);
@@ -3756,7 +3756,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.browserZoomEnabled) {
         // the browser's own zoom is prevented over the editor by default,
         // mirroring the interactive editor (opt out via
-        // `interaction: { allowed: { browserZoom: true } }`)
+        // `interaction: { enabled: { browserZoom: true } }`)
         if (!this.navigationEnabled) {
           // with navigation enabled, wheel & pinch are consumed by the
           // editor's own handlers above instead
@@ -7566,7 +7566,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Restricted pointer handling for the non-interactive editor with links
-   * and/or embeds allowed (`interaction.allowed.links` / `.embeds` /
+   * and/or embeds allowed (`interaction.enabled.links` / `.embeds` /
    * `.interactiveContent`) — runs only the element-link & embed concerns
    * (shared with the full pointer handlers above) so they behave like in
    * view mode without the rest of the canvas pointer machinery.

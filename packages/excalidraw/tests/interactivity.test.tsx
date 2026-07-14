@@ -323,10 +323,10 @@ describe("browser zoom prevention (non-interactive)", () => {
     expect(h.state.zoom.value).toBe(1);
   });
 
-  it("allowed.browserZoom keeps the browser defaults", async () => {
+  it("enabled.browserZoom keeps the browser defaults", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { browserZoom: true } }}
+        interaction={{ enabled: { browserZoom: true } }}
         handleKeyboardGlobally={true}
       />,
     );
@@ -343,7 +343,7 @@ describe("browser zoom prevention (non-interactive)", () => {
     expect(h.state.zoom.value).toBe(1);
   });
 
-  it("toggling allowed.browserZoom at runtime re-attaches listeners", async () => {
+  it("toggling enabled.browserZoom at runtime re-attaches listeners", async () => {
     await render(
       <Excalidraw interaction={false} handleKeyboardGlobally={true} />,
     );
@@ -351,7 +351,7 @@ describe("browser zoom prevention (non-interactive)", () => {
 
     GlobalTestState.renderResult.rerender(
       <Excalidraw
-        interaction={{ allowed: { browserZoom: true } }}
+        interaction={{ enabled: { browserZoom: true } }}
         handleKeyboardGlobally={true}
       />,
     );
@@ -770,7 +770,7 @@ describe("interaction={false} ui={false}", () => {
   });
 });
 
-describe("interaction={{ allowed: { links } }}", () => {
+describe("interaction={{ enabled: { links } }}", () => {
   let onLinkOpenSpy: ReturnType<typeof vi.fn>;
   let windowOpenSpy: MockInstance<typeof window.open>;
 
@@ -815,10 +815,10 @@ describe("interaction={{ allowed: { links } }}", () => {
     mouse.clickAt(80, 65);
   };
 
-  it("{allowed: {links: true}}: editor is otherwise inert", async () => {
+  it("{enabled: {links: true}}: editor is otherwise inert", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { links: true } }}
+        interaction={{ enabled: { links: true } }}
         handleKeyboardGlobally={true}
       />,
     );
@@ -837,10 +837,10 @@ describe("interaction={{ allowed: { links } }}", () => {
     expect(h.state.contextMenu).toBe(null);
   });
 
-  it("{allowed: {links: true}}: clicking a linked element opens the link", async () => {
+  it("{enabled: {links: true}}: clicking a linked element opens the link", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { links: true } }}
+        interaction={{ enabled: { links: true } }}
         onLinkOpen={onLinkOpen}
       />,
     );
@@ -867,10 +867,10 @@ describe("interaction={{ allowed: { links } }}", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
-  it("{allowed: {links: true}}: clicking an element without a link does nothing", async () => {
+  it("{enabled: {links: true}}: clicking an element without a link does nothing", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { links: true } }}
+        interaction={{ enabled: { links: true } }}
         onLinkOpen={onLinkOpen}
       />,
     );
@@ -883,10 +883,10 @@ describe("interaction={{ allowed: { links } }}", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
-  it("{allowed: {links: false}} and {} behave like interaction={false}", async () => {
+  it("{enabled: {links: false}} and {} behave like interaction={false}", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { links: false } }}
+        interaction={{ enabled: { links: false } }}
         onLinkOpen={onLinkOpen}
       />,
     );
@@ -922,10 +922,10 @@ describe("interaction={{ allowed: { links } }}", () => {
     expect(windowOpenSpy).not.toHaveBeenCalled();
   });
 
-  it("toggling allowed.links false → true at runtime enables link clicks", async () => {
+  it("toggling enabled.links false → true at runtime enables link clicks", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { links: false } }}
+        interaction={{ enabled: { links: false } }}
         onLinkOpen={onLinkOpen}
       />,
     );
@@ -936,7 +936,7 @@ describe("interaction={{ allowed: { links } }}", () => {
 
     GlobalTestState.renderResult.rerender(
       <Excalidraw
-        interaction={{ allowed: { links: true } }}
+        interaction={{ enabled: { links: true } }}
         onLinkOpen={onLinkOpen}
       />,
     );
@@ -952,12 +952,12 @@ describe("interaction={{ allowed: { links } }}", () => {
   });
 });
 
-describe("interaction={{ allowed: { navigation } }}", () => {
+describe("interaction={{ enabled: { navigation } }}", () => {
   beforeEach(async () => {
     mockBoundingClientRect();
     await render(
       <Excalidraw
-        interaction={{ allowed: { navigation: true } }}
+        interaction={{ enabled: { navigation: true } }}
         autoFocus={true}
         handleKeyboardGlobally={true}
         initialData={{
@@ -1043,7 +1043,7 @@ describe("interaction={{ allowed: { navigation } }}", () => {
 
     GlobalTestState.renderResult.rerender(
       <Excalidraw
-        interaction={{ allowed: { navigation: true, links: true } }}
+        interaction={{ enabled: { navigation: true, links: true } }}
         autoFocus={true}
         handleKeyboardGlobally={true}
         onLinkOpen={(...args) => {
@@ -1072,10 +1072,10 @@ describe("interaction={{ allowed: { navigation } }}", () => {
     windowOpenSpy.mockRestore();
   });
 
-  it("toggling allowed.navigation at runtime re-attaches listeners", () => {
+  it("toggling enabled.navigation at runtime re-attaches listeners", () => {
     GlobalTestState.renderResult.rerender(
       <Excalidraw
-        interaction={{ allowed: { navigation: false } }}
+        interaction={{ enabled: { navigation: false } }}
         autoFocus={true}
         handleKeyboardGlobally={true}
       />,
@@ -1086,7 +1086,7 @@ describe("interaction={{ allowed: { navigation } }}", () => {
 
     GlobalTestState.renderResult.rerender(
       <Excalidraw
-        interaction={{ allowed: { navigation: true } }}
+        interaction={{ enabled: { navigation: true } }}
         autoFocus={true}
         handleKeyboardGlobally={true}
       />,
@@ -1096,7 +1096,7 @@ describe("interaction={{ allowed: { navigation } }}", () => {
   });
 });
 
-describe("interaction={{ allowed: { embeds / interactiveContent } }}", () => {
+describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
   beforeEach(() => {
     mockBoundingClientRect();
   });
@@ -1123,7 +1123,7 @@ describe("interaction={{ allowed: { embeds / interactiveContent } }}", () => {
   it("embeds: hovering & clicking an embeddable activates it", async () => {
     await render(
       <Excalidraw
-        interaction={{ allowed: { embeds: true } }}
+        interaction={{ enabled: { embeds: true } }}
         validateEmbeddable={true}
       />,
     );
@@ -1169,7 +1169,7 @@ describe("interaction={{ allowed: { embeds / interactiveContent } }}", () => {
 
   it("interactiveContent enables links & embeds together (additive)", async () => {
     await render(
-      <Excalidraw interaction={{ allowed: { interactiveContent: true } }} />,
+      <Excalidraw interaction={{ enabled: { interactiveContent: true } }} />,
     );
     await waitFor(() => expect(h.state.width).toBe(200));
 
@@ -1184,7 +1184,7 @@ describe("interaction={{ allowed: { embeds / interactiveContent } }}", () => {
     GlobalTestState.renderResult.rerender(
       <Excalidraw
         interaction={{
-          allowed: { interactiveContent: true, links: false, embeds: false },
+          enabled: { interactiveContent: true, links: false, embeds: false },
         }}
       />,
     );

@@ -222,6 +222,6 @@ export interface Action<TData = any> {
   viewMode?: boolean;
   /** if set to `true`, the action counts as canvas navigation and remains
    *  available in the non-interactive editor when
-   *  `interaction: { allowed: { navigation: true } }`. Defaults to `false` */
+   *  `interaction: { enabled: { navigation: true } }`. Defaults to `false` */
   navigation?: boolean;
 }

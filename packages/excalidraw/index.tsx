@@ -165,8 +165,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   const browserZoomAllowed =
     typeof interaction === "object" &&
     interaction !== null &&
-    interaction.allowed?.browserZoom === true &&
-    interaction.allowed?.navigation !== true;
+    interaction.enabled?.browserZoom === true &&
+    interaction.enabled?.navigation !== true;
 
   useEffect(() => {
     const importPolyfill = async () => {
@@ -274,7 +274,7 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   } = nextProps;
 
   // compare `interaction` semantically so that hosts inlining the config
-  // object (`interaction={{ allowed: { links: true } }}`) don't bust the
+  // object (`interaction={{ enabled: { links: true } }}`) don't bust the
   // memo every render
   const isInteractionSame =
     prevInteraction === nextInteraction ||
@@ -282,14 +282,14 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       prevInteraction !== null &&
       typeof nextInteraction === "object" &&
       nextInteraction !== null &&
-      !!prevInteraction.allowed?.links === !!nextInteraction.allowed?.links &&
-      !!prevInteraction.allowed?.embeds === !!nextInteraction.allowed?.embeds &&
-      !!prevInteraction.allowed?.interactiveContent ===
-        !!nextInteraction.allowed?.interactiveContent &&
-      !!prevInteraction.allowed?.navigation ===
-        !!nextInteraction.allowed?.navigation &&
-      !!prevInteraction.allowed?.browserZoom ===
-        !!nextInteraction.allowed?.browserZoom);
+      !!prevInteraction.enabled?.links === !!nextInteraction.enabled?.links &&
+      !!prevInteraction.enabled?.embeds === !!nextInteraction.enabled?.embeds &&
+      !!prevInteraction.enabled?.interactiveContent ===
+        !!nextInteraction.enabled?.interactiveContent &&
+      !!prevInteraction.enabled?.navigation ===
+        !!nextInteraction.enabled?.navigation &&
+      !!prevInteraction.enabled?.browserZoom ===
+        !!nextInteraction.enabled?.browserZoom);
 
   if (!isInteractionSame) {
     return false;

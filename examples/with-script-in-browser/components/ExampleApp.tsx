@@ -201,7 +201,7 @@ export default function ExampleApp({
         interaction: interactive
           ? true
           : {
-              allowed: {
+              enabled: {
                 links: interactiveLinks,
                 embeds: interactiveEmbeds,
                 navigation: interactiveNavigation,

@@ -613,7 +613,7 @@ body.excalidraw-cursor-resize * {
       // zoom gestures (pinch, double-tap)
       touch-action: pan-x pan-y;
       // no !important — inline cursor styles must win so that
-      // `interaction: { allowed: { links: true } }` can show a pointer over
+      // `interaction: { enabled: { links: true } }` can show a pointer over
       // links
       cursor: default;
     }
