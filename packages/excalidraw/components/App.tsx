@@ -3121,11 +3121,46 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // dispatches only `navigation`-flagged action shortcuts (canvas zoom &
-  // zoom-to-fit — see `ActionManager.handleKeyDown` gates); the rest of the
-  // keyboard handling stays disabled while non-interactive
+  // handles only the navigation keyboard: page-scroll keys and
+  // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit — see
+  // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
+  // stays disabled while non-interactive
   private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
+    if (this.maybeHandlePageScrollKeyDown(event)) {
+      // the editor consumes the input — the page must not scroll along
+      event.preventDefault();
+      return;
+    }
     this.actionManager.handleKeyDown(event);
+  };
+
+  /**
+   * PageUp/PageDown scroll the canvas by a page — vertically, or
+   * horizontally with shift. Respects `appState.scrollConstraints`
+   * (via `translateCanvas`).
+   */
+  private maybeHandlePageScrollKeyDown = (
+    event: KeyboardEvent | React.KeyboardEvent,
+  ): boolean => {
+    if (event.key !== KEYS.PAGE_UP && event.key !== KEYS.PAGE_DOWN) {
+      return false;
+    }
+    let offset =
+      (event.shiftKey ? this.state.width : this.state.height) /
+      this.state.zoom.value;
+    if (event.key === KEYS.PAGE_DOWN) {
+      offset = -offset;
+    }
+    if (event.shiftKey) {
+      this.translateCanvas((state) => ({
+        scrollX: state.scrollX + offset,
+      }));
+    } else {
+      this.translateCanvas((state) => ({
+        scrollY: state.scrollY + offset,
+      }));
+    }
+    return true;
   };
 
   private preventBrowserZoomKeyDown = (event: KeyboardEvent) => {
@@ -5752,23 +5787,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event.key === KEYS.PAGE_UP || event.key === KEYS.PAGE_DOWN) {
-        let offset =
-          (event.shiftKey ? this.state.width : this.state.height) /
-          this.state.zoom.value;
-        if (event.key === KEYS.PAGE_DOWN) {
-          offset = -offset;
-        }
-        if (event.shiftKey) {
-          this.translateCanvas((state) => ({
-            scrollX: state.scrollX + offset,
-          }));
-        } else {
-          this.translateCanvas((state) => ({
-            scrollY: state.scrollY + offset,
-          }));
-        }
-      }
+      this.maybeHandlePageScrollKeyDown(event);
 
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;

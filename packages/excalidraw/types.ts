@@ -664,13 +664,13 @@ export type InteractionConfig = {
      */
     interactiveContent?: boolean;
     /**
-     * Canvas navigation — panning (pointer drag, wheel) and zooming
-     * (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts:
-     * ctrl/cmd +/-/0, shift+1/2/3), same as in view mode. Respects
-     * `appState.scrollConstraints` if set, so it composes with viewport
-     * locking. The rest of the keyboard stays disabled. Note the editor
-     * consumes wheel & touch input again when enabled, so the page no
-     * longer scrolls over the editor.
+     * Canvas navigation — panning (pointer drag, wheel, PageUp/PageDown)
+     * and zooming (ctrl/cmd + wheel, pinch, and the canvas zoom &
+     * zoom-to-fit shortcuts: ctrl/cmd +/-/0, shift+1/2/3), same as in view
+     * mode. Respects `appState.scrollConstraints` if set, so it composes
+     * with viewport locking. The rest of the keyboard stays disabled. Note
+     * the editor consumes wheel & touch input again when enabled, so the
+     * page no longer scrolls over the editor.
      *
      * @default false
      */

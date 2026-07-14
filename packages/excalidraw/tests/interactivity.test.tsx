@@ -202,6 +202,11 @@ describe("interaction={false}", () => {
 
     pressZoomShortcut(CODES.ZERO);
     expect(h.state.zoom.value).toBe(zoom);
+
+    // page-scroll keys are inert as well (navigation-only)
+    const { scrollY } = h.state;
+    fireEvent.keyDown(document, { key: "PageDown", code: "PageDown" });
+    expect(h.state.scrollY).toBe(scrollY);
   });
 
   it("pointer down+drag neither selects nor pans", () => {
@@ -1008,6 +1013,25 @@ describe("interaction={{ enabled: { navigation } }}", () => {
 
     expect([h.state.scrollX, h.state.scrollY]).not.toEqual([scrollX, scrollY]);
     expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("supports page-scroll keys (PageUp/PageDown)", () => {
+    const { scrollY } = h.state;
+    fireEvent.keyDown(document, { key: "PageDown", code: "PageDown" });
+    expect(h.state.scrollY).toBeLessThan(scrollY);
+
+    fireEvent.keyDown(document, { key: "PageUp", code: "PageUp" });
+    expect(h.state.scrollY).toBe(scrollY);
+
+    // shift scrolls horizontally
+    const { scrollX } = h.state;
+    fireEvent.keyDown(document, {
+      key: "PageDown",
+      code: "PageDown",
+      shiftKey: true,
+    });
+    expect(h.state.scrollX).toBeLessThan(scrollX);
+    expect(h.state.scrollY).toBe(scrollY);
   });
 
   it("supports canvas zoom & zoom-to-fit keyboard shortcuts", () => {
