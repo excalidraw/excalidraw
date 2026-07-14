@@ -623,6 +623,15 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export type CanvasNotification = {
+  label: string;
+  icon?: JSX.Element;
+  color?: string;
+  textColor?: string;
+  borderColor?: string;
+  onDismiss?: () => void;
+};
+
 export type OnExportProgress = {
   type: "progress";
   message?: React.ReactNode;
@@ -750,6 +759,8 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  canvasNotification?: CanvasNotification | null;
+  currentUserMenu?: React.ReactNode;
   /**
    * Called before exporting to a file.
    *

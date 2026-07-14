@@ -448,6 +448,7 @@ import { AppFlowchart } from "./App.flowchart";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import CanvasNotification from "./CanvasNotification/CanvasNotification";
 import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
@@ -2254,6 +2255,7 @@ class App extends React.Component<AppProps, AppState> {
                             generateLinkForSelection={
                               this.props.generateLinkForSelection
                             }
+                            currentUserMenu={this.props.currentUserMenu}
                           >
                             {this.props.children}
                           </LayerUI>
@@ -2461,6 +2463,11 @@ class App extends React.Component<AppProps, AppState> {
                             />
                           )}
                           {this.renderFrameNames()}
+                          {this.props.canvasNotification && (
+                            <CanvasNotification
+                              notification={this.props.canvasNotification}
+                            />
+                          )}
                           {this.state.activeLockedId && (
                             <UnlockPopup
                               app={this}

@@ -9,6 +9,7 @@ import type { MarkRequired } from "@excalidraw/common/utility-types";
 import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
+import { chevronDownIcon } from "./icons";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";
 import { ScrollableList } from "./ScrollableList";
@@ -90,6 +91,7 @@ type UserListUserObject = Pick<
   | "isInCall"
   | "isSpeaking"
   | "isMuted"
+  | "isCurrentUser"
 >;
 
 type UserListProps = {
@@ -97,6 +99,7 @@ type UserListProps = {
   mobile?: boolean;
   collaborators: Map<SocketId, UserListUserObject>;
   userToFollow: SocketId | null;
+  currentUserMenu?: React.ReactNode;
 };
 
 const collaboratorComparatorKeys = [
@@ -107,10 +110,17 @@ const collaboratorComparatorKeys = [
   "isInCall",
   "isSpeaking",
   "isMuted",
+  "isCurrentUser",
 ] as const;
 
 export const UserList = React.memo(
-  ({ className, mobile, collaborators, userToFollow }: UserListProps) => {
+  ({
+    className,
+    mobile,
+    collaborators,
+    userToFollow,
+    currentUserMenu,
+  }: UserListProps) => {
     const actionManager = useExcalidrawActionManager();
 
     const uniqueCollaboratorsMap = new Map<
@@ -169,20 +179,75 @@ export const UserList = React.memo(
 
     const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
 
-    const firstNCollaborators = uniqueCollaboratorsArray.slice(
+    const hasOtherCollaborators = uniqueCollaboratorsArray.some(
+      (c) => !c.isCurrentUser,
+    );
+    const effectiveCurrentUserMenu =
+      currentUserMenu && hasOtherCollaborators ? currentUserMenu : null;
+
+    const slotsForAvatars = maxAvatars - 1;
+
+    let firstNCollaborators = uniqueCollaboratorsArray.slice(
       0,
-      maxAvatars - 1,
+      slotsForAvatars,
     );
 
-    const firstNAvatarsJSX = firstNCollaborators.map((collaborator) =>
-      renderCollaborator({
+    // Ensure current user is always last (rightmost) and always visible
+    if (effectiveCurrentUserMenu && slotsForAvatars >= 1) {
+      const currentUser = uniqueCollaboratorsArray.find((c) => c.isCurrentUser);
+      if (currentUser) {
+        const others = uniqueCollaboratorsArray.filter((c) => !c.isCurrentUser);
+        firstNCollaborators = [
+          ...others.slice(0, Math.max(0, slotsForAvatars - 1)),
+          currentUser,
+        ];
+      }
+    }
+
+    const hasOverflow =
+      uniqueCollaboratorsArray.length > firstNCollaborators.length;
+
+    const firstNAvatarsJSX = firstNCollaborators.map((collaborator) => {
+      const avatarJSX = renderCollaborator({
         actionManager,
         collaborator,
         socketId: collaborator.socketId,
         shouldWrapWithTooltip: true,
         isBeingFollowed: collaborator.socketId === userToFollow,
-      }),
-    );
+      });
+
+      // Wrap current user's avatar in a pill with chevron + popover
+      // only when the "+N" overflow is not shown (menu goes there instead)
+      if (
+        collaborator.isCurrentUser &&
+        effectiveCurrentUserMenu &&
+        !hasOverflow
+      ) {
+        return (
+          <Popover.Root key={collaborator.socketId}>
+            <Popover.Trigger asChild>
+              <div className="UserList__pill">
+                {avatarJSX}
+                <div className="UserList__pill-chevron">{chevronDownIcon}</div>
+              </div>
+            </Popover.Trigger>
+            <Popover.Content
+              align="end"
+              sideOffset={10}
+              className="dropdown-menu"
+            >
+              <Island padding={2} className="dropdown-menu-container">
+                <Popover.Close asChild>
+                  <div>{effectiveCurrentUserMenu}</div>
+                </Popover.Close>
+              </Island>
+            </Popover.Content>
+          </Popover.Root>
+        );
+      }
+
+      return avatarJSX;
+    });
 
     return mobile ? (
       <div className={clsx("UserList UserList_mobile", className)}>
@@ -204,10 +269,10 @@ export const UserList = React.memo(
         >
           {firstNAvatarsJSX}
 
-          {uniqueCollaboratorsArray.length > maxAvatars - 1 && (
+          {hasOverflow && (
             <Popover.Root>
               <Popover.Trigger className="UserList__more">
-                +{uniqueCollaboratorsArray.length - maxAvatars + 1}
+                +{uniqueCollaboratorsArray.length - firstNCollaborators.length}
               </Popover.Trigger>
               <Popover.Content
                 style={{
@@ -247,6 +312,16 @@ export const UserList = React.memo(
                         ]
                       : []}
                   </ScrollableList>
+                  {effectiveCurrentUserMenu && (
+                    <>
+                      <div className="UserList__more-menu-divider" />
+                      <Popover.Close asChild>
+                        <div className="dropdown-menu">
+                          {effectiveCurrentUserMenu}
+                        </div>
+                      </Popover.Close>
+                    </>
+                  )}
                   <Popover.Arrow
                     width={20}
                     height={10}
@@ -268,7 +343,8 @@ export const UserList = React.memo(
       prev.collaborators.size !== next.collaborators.size ||
       prev.mobile !== next.mobile ||
       prev.className !== next.className ||
-      prev.userToFollow !== next.userToFollow
+      prev.userToFollow !== next.userToFollow ||
+      prev.currentUserMenu !== next.currentUserMenu
     ) {
       return false;
     }

@@ -106,6 +106,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
+    canvasNotification,
+    currentUserMenu,
     imageOptions,
   } = props;
 
@@ -226,6 +228,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
+          canvasNotification={canvasNotification}
+          currentUserMenu={currentUserMenu}
           imageOptions={normalizedImageOptions}
         >
           {children}
@@ -395,6 +399,8 @@ export type {
   SavedChat,
   SavedChats,
 } from "./components/TTDDialog/types";
+
+export type { CanvasNotification } from "./types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 
