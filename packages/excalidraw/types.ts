@@ -824,10 +824,12 @@ export interface ExcalidrawProps {
    * Forces the active editor tool (controlled). While set, user- and
    * API-driven tool switching is ignored — `setActiveTool` refuses with a
    * console warning, non-forced toolbar buttons render disabled — and the
-   * editor snaps back if internal flows reset the tool. Non-selection tools
-   * are activated with `locked: true`, so e.g. a forced drawing tool doesn't
-   * revert to selection after each drawn shape. Unset to return tool control
-   * to the editor (the current tool stays active).
+   * editor snaps back if internal flows reset the tool. The forced tool
+   * behaves as if locked (see the tool lock / padlock): it doesn't revert to
+   * the selection tool after use, and elements drawn with it aren't
+   * auto-selected — without mutating `appState.activeTool.locked`, so the
+   * user's persisted padlock preference stays untouched. Unset to return
+   * tool control to the editor (the current tool stays active).
    *
    * The forced tool must be activatable to take effect: not disabled via
    * `UIOptions.tools`, and — while the editor is non-interactive — allowed
@@ -1043,6 +1045,7 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
   cursor: App["cursor"];
+  isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];

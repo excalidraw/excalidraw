@@ -330,9 +330,11 @@ export const actionFinalize = register<FormData>({
       });
     }
 
+    // locked via the tool lock or host-forced (`props.activeTool`)
+    const isToolLocked = app.isToolLocked();
+
     if (
-      (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
+      (!isToolLocked && appState.activeTool.type !== "freedraw") ||
       !element
     ) {
       // the active tool reverts (see the returned `appState.activeTool`) —
@@ -365,9 +367,7 @@ export const actionFinalize = register<FormData>({
         ...appState,
         cursorButton: "up",
         activeTool:
-          (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
-          element
+          (isToolLocked || appState.activeTool.type === "freedraw") && element
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -378,9 +378,7 @@ export const actionFinalize = register<FormData>({
         suggestedBinding: null,
         frameToHighlight: null,
         selectedElementIds:
-          element &&
-          !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+          element && !isToolLocked && appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,

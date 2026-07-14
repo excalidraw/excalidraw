@@ -850,11 +850,7 @@ class App extends React.Component<AppProps, AppState> {
           `"${props.activeTool.type}" tool ("props.activeTool") cannot be activated — disabled via "UIOptions.tools", or not enabled while non-interactive (see "interaction.enabled.tools")`,
         );
       } else {
-        forcedActiveTool = updateActiveTool(defaultAppState, {
-          ...props.activeTool,
-          // a forced tool must not revert to selection (e.g. after drawing)
-          locked: !isSelectionLikeTool(props.activeTool.type),
-        });
+        forcedActiveTool = updateActiveTool(defaultAppState, props.activeTool);
       }
     }
 
@@ -1034,6 +1030,17 @@ class App extends React.Component<AppProps, AppState> {
     }
     return false;
   };
+
+  /**
+   * Whether the active tool is locked in place — via the tool lock
+   * (padlock / Q) or by being host-forced (`props.activeTool`). A locked
+   * tool doesn't revert to the selection tool after use, and elements drawn
+   * with it aren't selected. Forcing deliberately does not mutate
+   * `activeTool.locked`, which is the user's persisted padlock preference.
+   */
+  public isToolLocked(): boolean {
+    return this.state.activeTool.locked || this.props.activeTool != null;
+  }
 
   /**
    * Whether the active tool captures the primary pointer instead of the
@@ -3410,11 +3417,7 @@ class App extends React.Component<AppProps, AppState> {
       this.isToolSupported(forcedTool.type, prevProps) !==
         this.isToolSupported(forcedTool.type, this.props)
     ) {
-      this.setActiveTool({
-        ...forcedTool,
-        // a forced tool must not revert to selection (e.g. after drawing)
-        locked: !isSelectionLikeTool(forcedTool.type),
-      });
+      this.setActiveTool(forcedTool);
     }
   };
 
@@ -6566,7 +6569,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
-        if (this.state.activeTool.locked) {
+        if (this.isToolLocked()) {
           this.cursor.applyForTool();
         }
 
@@ -9972,7 +9975,7 @@ class App extends React.Component<AppProps, AppState> {
       initialCaretSceneCoords: { x: sceneX, y: sceneY },
     });
 
-    if (!this.state.activeTool.locked) {
+    if (!this.isToolLocked()) {
       this.setState(
         {
           activeTool: updateActiveTool(this.state, {
@@ -10474,7 +10477,7 @@ class App extends React.Component<AppProps, AppState> {
             };
           }
 
-          nextSelectedElementIds = !this.state.activeTool.locked
+          nextSelectedElementIds = !this.isToolLocked()
             ? makeNextSelectedElementIds({ [element.id]: true }, prevState)
             : prevState.selectedElementIds;
 
@@ -11940,7 +11943,7 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
           this.setState({ suggestedBinding: null });
-          if (!activeTool.locked) {
+          if (!this.isToolLocked()) {
             this.setState(
               (prevState) => ({
                 newElement: null,
@@ -12526,7 +12529,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw" && newElement) {
+      if (
+        !this.isToolLocked() &&
+        activeTool.type !== "freedraw" &&
+        newElement
+      ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -12575,7 +12582,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !activeTool.locked &&
+        !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection

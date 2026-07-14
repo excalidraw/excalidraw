@@ -126,20 +126,46 @@ describe("props.activeTool (forced tool)", () => {
     vi.restoreAllMocks();
   });
 
-  it("forces the tool from the first render, implying locked", async () => {
+  it("forces the tool from the first render, behaving as locked", async () => {
     await render(<Excalidraw activeTool={{ type: "rectangle" }} />);
     expect(h.state.activeTool.type).toBe("rectangle");
-    expect(h.state.activeTool.locked).toBe(true);
+    // forcing behaves as locked without mutating the user's padlock state
+    expect(h.state.activeTool.locked).toBe(false);
     // the cursor reflects the forced tool without any pointer interaction
     expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
       CURSOR_TYPE.CROSSHAIR,
     );
 
-    // drawing doesn't revert to selection (implied lock)
+    // drawing doesn't revert to selection, and the drawn element isn't
+    // auto-selected (locked-tool behavior)
     mouse.down(10, 10);
     mouse.up(20, 20);
     expect(h.state.activeTool.type).toBe("rectangle");
     expect(h.elements.length).toBe(1);
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("does not clobber the user's padlock preference", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    // user locks the tool (Q)
+    fireEvent.keyDown(document, { key: "q", code: "KeyQ" });
+    expect(h.state.activeTool.locked).toBe(true);
+
+    // forcing & unforcing leaves the preference alone
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        activeTool={{ type: "freedraw" }}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    expect(h.state.activeTool.type).toBe("freedraw");
+    expect(h.state.activeTool.locked).toBe(true);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw handleKeyboardGlobally={true} />,
+    );
+    expect(h.state.activeTool.locked).toBe(true);
   });
 
   it("ignores user & API tool switching without side effects", async () => {
@@ -242,10 +268,10 @@ describe("props.activeTool (forced tool)", () => {
     );
     expect(laserItem!.disabled).toBe(true);
 
-    // Q (toggle tool lock) is ignored — the lock state is host-implied
-    expect(h.state.activeTool.locked).toBe(true);
+    // Q (toggle tool lock) is ignored — locking is implied while forced
+    expect(h.state.activeTool.locked).toBe(false);
     fireEvent.keyDown(document, { key: "q", code: "KeyQ" });
-    expect(h.state.activeTool.locked).toBe(true);
+    expect(h.state.activeTool.locked).toBe(false);
     expect(h.state.activeTool.type).toBe("rectangle");
   });
 
