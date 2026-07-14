@@ -88,6 +88,18 @@ export const PlusPromoIcon = createIcon(
   tablerIconProps,
 );
 
+export const TableIcon = createIcon(
+  <g strokeWidth="2">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <line x1="4" y1="10" x2="20" y2="10" />
+    <line x1="4" y1="15" x2="20" y2="15" />
+    <line x1="10" y1="4" x2="10" y2="20" />
+    <line x1="15" y1="4" x2="15" y2="20" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: book
 export const LibraryIcon = createIcon(
   <g strokeWidth="1.25">

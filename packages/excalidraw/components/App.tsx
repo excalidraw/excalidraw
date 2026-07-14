@@ -341,6 +341,16 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import {
+  getSelectedTableCellElements,
+  alignTableInElements,
+  actionInsertRowAbove,
+  actionInsertRowBelow,
+  actionInsertColLeft,
+  actionInsertColRight,
+  actionDeleteRow,
+  actionDeleteCol,
+} from "../actions/actionTable";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
@@ -11813,6 +11823,36 @@ class App extends React.Component<AppProps, AppState> {
           suggestedBinding: null,
         });
       }
+
+      const wasResizingOrDragging =
+        pointerDownState.resize.isResizing ||
+        pointerDownState.drag.hasOccurred;
+      if (wasResizingOrDragging) {
+        const selectedTableCells = getSelectedTableCellElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+        if (selectedTableCells.length > 0) {
+          const tableIds = new Set(
+            selectedTableCells.map((c) => c.customData.tableId),
+          );
+          const allElements = this.scene.getElementsIncludingDeleted();
+          let elementsCopy = [...allElements];
+          let updated = false;
+          for (const tableId of tableIds) {
+            elementsCopy = alignTableInElements(
+              elementsCopy,
+              tableId,
+              this.scene,
+            );
+            updated = true;
+          }
+          if (updated) {
+            this.scene.replaceAllElements(elementsCopy);
+            this.store.scheduleCapture();
+          }
+        }
+      }
     });
   }
 
@@ -12967,6 +13007,29 @@ class App extends React.Component<AppProps, AppState> {
     // -------------------------------------------------------------------------
 
     options.push(copyText);
+
+    const selectedTableCells = getSelectedTableCellElements(
+      this.scene.getElementsIncludingDeleted(),
+      this.state,
+    );
+
+    if (selectedTableCells.length > 0) {
+      return [
+        actionInsertRowAbove,
+        actionInsertRowBelow,
+        actionInsertColLeft,
+        actionInsertColRight,
+        CONTEXT_MENU_SEPARATOR,
+        actionDeleteRow,
+        actionDeleteCol,
+        CONTEXT_MENU_SEPARATOR,
+        actionCut,
+        actionCopy,
+        actionPaste,
+        CONTEXT_MENU_SEPARATOR,
+        actionDeleteSelected,
+      ];
+    }
 
     if (this.state.viewModeEnabled) {
       return [actionCopy, ...options];

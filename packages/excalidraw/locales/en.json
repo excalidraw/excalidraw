@@ -309,7 +309,13 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "insertRowAbove": "Insert row above",
+    "insertRowBelow": "Insert row below",
+    "insertColLeft": "Insert column left",
+    "insertColRight": "Insert column right",
+    "deleteRow": "Delete row",
+    "deleteCol": "Delete column"
   },
   "toolBar": {
     "selection": "Selection",
@@ -334,7 +340,8 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "convertElementType": "Toggle shape type"
+    "convertElementType": "Toggle shape type",
+    "table": "Table"
   },
   "element": {
     "rectangle": "Rectangle",

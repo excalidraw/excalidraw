@@ -56,6 +56,7 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
+import { TableCreationDialog } from "./TableCreationDialog";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -517,6 +518,13 @@ const LayerUI = ({
       )}
       {appState.openDialog?.name === "help" && (
         <HelpDialog
+          onClose={() => {
+            setAppState({ openDialog: null });
+          }}
+        />
+      )}
+      {appState.openDialog?.name === "table" && (
+        <TableCreationDialog
           onClose={() => {
             setAppState({ openDialog: null });
           }}
