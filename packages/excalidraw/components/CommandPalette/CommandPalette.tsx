@@ -375,6 +375,7 @@ function CommandPaletteInner({
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
         actionManager.actions.a11yHelp,
+        actionManager.actions.a11yFocusCanvas,
         actionManager.actions.toggleSingleKeyShortcuts,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.editor));
 

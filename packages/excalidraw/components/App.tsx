@@ -444,6 +444,7 @@ import { AnimationController } from "../renderer/animation";
 import {
   A11yHelpRegion,
   SceneProxyLayer,
+  a11yHelpDialogAtom,
   announce,
   getElementText,
   getElementTypeLabel,
@@ -3194,6 +3195,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
+
+    // the jotai store is a module singleton, so a remount (HMR, host app
+    // re-render) could resurrect an open guide — always start closed
+    editorJotaiStore.set(a11yHelpDialogAtom, false);
 
     if (isTestEnv() || isDevEnv()) {
       const setState = this.setState.bind(this);
@@ -10076,6 +10081,22 @@ class App extends React.Component<AppProps, AppState> {
    * editor regions (toolbar, canvas/scene, styles panel, sidebar,
    * footer), skipping regions that aren't currently shown.
    */
+  /**
+   * Moves focus straight to the canvas area (Alt+Shift+A): the current
+   * element proxy when the scene has elements, the container otherwise —
+   * a direct jump complementing the F6 region cycle.
+   */
+  public focusCanvasRegion = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const currentProxy = container.querySelector<HTMLElement>(
+      '.excalidraw-a11y-scene [tabindex="0"]',
+    );
+    (currentProxy ?? container).focus();
+  };
+
   private cycleFocusAcrossRegions = (backwards: boolean) => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {

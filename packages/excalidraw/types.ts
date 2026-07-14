@@ -896,6 +896,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   insertElementFromKeyboard: App["insertElementFromKeyboard"];
+  focusCanvasRegion: App["focusCanvasRegion"];
   togglePenMode: App["togglePenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];

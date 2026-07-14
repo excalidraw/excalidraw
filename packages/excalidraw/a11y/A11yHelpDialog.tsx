@@ -18,7 +18,7 @@ const SECTIONS: { title: string; items: string[] }[] = [
   { title: "pointsTitle", items: ["points1", "points2", "points3"] },
   { title: "cropTitle", items: ["crop1", "crop2"] },
   { title: "imageTitle", items: ["image1"] },
-  { title: "regionsTitle", items: ["regions1"] },
+  { title: "regionsTitle", items: ["regions1", "regions2"] },
   { title: "settingsTitle", items: ["settings1"] },
   { title: "moreTitle", items: ["more1", "more2"] },
 ];

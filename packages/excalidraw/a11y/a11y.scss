@@ -1,4 +1,20 @@
 .excalidraw {
+  // screen-reader-only quick guide at the top of the editor; must never
+  // be visible or take up space (self-contained clip pattern so it does
+  // not depend on a host-app .visually-hidden class)
+  .excalidraw-a11y-help-region {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   // invisible, spatially-positioned screen-reader mirror of the scene;
   // must never affect pointer interaction or visuals (except the
   // keyboard-only focus ring below)

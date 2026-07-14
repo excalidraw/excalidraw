@@ -25,3 +25,23 @@ export const actionA11yHelp = register({
     event.shiftKey &&
     !event[KEYS.CTRL_OR_CMD],
 });
+
+export const actionA11yFocusCanvas = register({
+  name: "a11yFocusCanvas",
+  label: "a11y.focusCanvas",
+  trackEvent: { category: "canvas" },
+  viewMode: true,
+  perform: (elements, appState, value, app) => {
+    app.focusCanvasRegion();
+    return {
+      elements,
+      appState,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  keyTest: (event) =>
+    event.code === "KeyA" &&
+    event.altKey &&
+    event.shiftKey &&
+    !event[KEYS.CTRL_OR_CMD],
+});

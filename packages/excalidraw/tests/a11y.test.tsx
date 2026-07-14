@@ -8,11 +8,16 @@ import { pointFrom } from "@excalidraw/math";
 import type { LocalPoint } from "@excalidraw/math";
 
 import { Excalidraw } from "../index";
-import { getElementDescription, getSceneReadingOrder } from "../a11y";
+import {
+  a11yHelpDialogAtom,
+  getElementDescription,
+  getSceneReadingOrder,
+} from "../a11y";
 import {
   actionConnectElements,
   actionToggleSingleKeyShortcuts,
 } from "../actions";
+import { editorJotaiStore } from "../editor-jotai";
 
 import { API } from "./helpers/api";
 import { Keyboard, UI } from "./helpers/ui";
@@ -583,14 +588,57 @@ describe("a11y screen reader help dialog", () => {
     expect(document.querySelector(".a11y-help-dialog")).toBeNull();
   });
 
-  it("has a visually hidden trigger in the help region", () => {
-    const region = document.querySelector("section.visually-hidden");
+  it("presents the help region as a list with a hidden trigger", () => {
+    const region = document.querySelector(
+      "section.excalidraw-a11y-help-region",
+    );
     expect(region).not.toBeNull();
+    const items = region!.querySelectorAll("ul > li");
+    expect(items.length).toBeGreaterThanOrEqual(4);
     const button = region!.querySelector("button");
     expect(button).not.toBeNull();
 
     act(() => button!.click());
     expect(document.querySelector(".a11y-help-dialog")).not.toBeNull();
+  });
+
+  it("starts closed even when the atom was left open by a previous mount", async () => {
+    act(() => editorJotaiStore.set(a11yHelpDialogAtom, true));
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    expect(editorJotaiStore.get(a11yHelpDialogAtom)).toBe(false);
+    expect(document.querySelector(".a11y-help-dialog")).toBeNull();
+  });
+});
+
+describe("a11y jump to canvas", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("focuses the current element proxy with Alt+Shift+A", () => {
+    const first = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    const second = API.createElement({ type: "ellipse", x: 300, y: 0 });
+    API.setElements([first, second]);
+
+    fireEvent.keyDown(document, {
+      key: "A",
+      code: "KeyA",
+      altKey: true,
+      shiftKey: true,
+    });
+    expect(document.activeElement?.getAttribute("data-a11y-element-id")).toBe(
+      first.id,
+    );
+  });
+
+  it("focuses the container when the canvas is empty", () => {
+    fireEvent.keyDown(document, {
+      key: "A",
+      code: "KeyA",
+      altKey: true,
+      shiftKey: true,
+    });
+    expect(document.activeElement?.classList.contains("excalidraw")).toBe(true);
   });
 });
 

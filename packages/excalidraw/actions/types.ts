@@ -52,6 +52,7 @@ export type ActionName =
   | "imageAltText"
   | "connectElements"
   | "a11yHelp"
+  | "a11yFocusCanvas"
   | "toggleSingleKeyShortcuts"
   | "copy"
   | "cut"

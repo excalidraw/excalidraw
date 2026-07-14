@@ -401,6 +401,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               isOr={true}
             />
             <Shortcut
+              label={t("helpDialog.focusCanvas")}
+              shortcuts={[getShortcutKey("Alt+Shift+A")]}
+            />
+            <Shortcut
               label={t("helpDialog.screenReaderGuide")}
               shortcuts={[getShortcutKey("Alt+Shift+H")]}
             />

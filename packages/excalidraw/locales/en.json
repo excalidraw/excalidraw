@@ -465,6 +465,7 @@
     "editLinearPoints": "Cycle line or arrow points (in line editor)",
     "adjustCropEdges": "Adjust crop edges (in crop mode)",
     "cycleRegions": "Move between toolbar, canvas and panels",
+    "focusCanvas": "Jump to the canvas",
     "screenReaderGuide": "How to navigate with a screen reader",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
@@ -837,10 +838,13 @@
     "colorShadeOption": "{{color}}, shade {{position}} of {{total}}",
     "help": {
       "title": "Screen reader guide",
-      "browse": "Tab and Shift+Tab move through the canvas elements in reading order. Ctrl+Alt+Arrow keys jump to the nearest element in that direction. Alt+Arrow keys follow arrow connections between shapes.",
+      "browse": "Tab and Shift+Tab move through the canvas elements in reading order.",
+      "spatial": "Ctrl+Alt+Arrow keys jump to the nearest element in that direction. Alt+Arrow keys follow arrow connections between shapes.",
       "create": "To draw without a mouse: choose a tool with its shortcut key — R rectangle, O ellipse, D diamond, A arrow, L line, T text, F frame — then press Enter. The element is placed below the element you are on, or at the center of the view.",
+      "focusCanvas": "Alt+Shift+A jumps straight to the canvas area from anywhere in the app.",
       "openGuide": "How to navigate with a screen reader — open the full guide (Alt+Shift+H)"
     },
+    "focusCanvas": "Jump to the canvas",
     "helpDialog": {
       "title": "How to navigate with a screen reader",
       "intro": "Excalidraw is a drawing canvas. Every element on the canvas can be reached, created and edited with the keyboard alone. Press Escape at any time to leave a mode. Press Alt+Shift+H to reopen this guide, and Escape to close it.",
@@ -876,6 +880,7 @@
       "image1": "To give an image a description, open the context menu (Shift+F10 or the Menu key) and choose Alt text.",
       "regionsTitle": "Move between app areas",
       "regions1": "F6 and Shift+F6 cycle between the toolbar, the canvas and the open panels.",
+      "regions2": "Alt+Shift+A jumps straight to the canvas area from anywhere in the app.",
       "settingsTitle": "Accessibility settings",
       "settings1": "To keep stray keystrokes from switching tools, turn single-key shortcuts off from the command palette (Toggle single-key shortcuts).",
       "moreTitle": "More help",

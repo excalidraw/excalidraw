@@ -11,8 +11,9 @@ Manual test protocol for the accessibility layer (see `ACCESSIBILITY_PLAN.md` in
 
 ### 1. Orientation (empty canvas)
 
-- Land on the page: browse mode should read the visually-hidden **"Screen reader guide"** before the toolbar, ending with the "How to navigate with a screen reader" button.
+- Land on the page: nothing guide-related is visible, and no dialog is open. In browse mode the visually-hidden **"Screen reader guide"** region comes before the toolbar — a heading plus a **list** (one shortcut topic per item, skimmable with list-item navigation), ending with the "How to navigate with a screen reader" button.
 - Activate that button (or press `Alt+Shift+H` anywhere): the guide dialog opens, reads linearly in browse mode (headings + lists), and closes with `Escape`, restoring focus.
+- `Alt+Shift+A` from anywhere (toolbar, panels, dialogs closed) jumps focus straight to the canvas area: the current element proxy, or the editor container on an empty canvas.
 - Tab through the toolbar: every tool announces name + shortcut (e.g. "Rectangle, radio button, r 2"), never "or null".
 - The hamburger button announces "Menu"; its items (Open, Save to…, Export image…) all have names.
 
@@ -39,7 +40,7 @@ Manual test protocol for the accessibility layer (see `ACCESSIBILITY_PLAN.md` in
 - Changing stroke/background color announces "Stroke red" / "Fill light blue" (transparent → "Fill transparent"); the color-picker quick picks and shade buttons are named by color concept, not hex.
 - Line points: select a line, `Enter` → "Point 1 of N…" after `Tab`; arrows move the point ("Point at x, y"), `Ctrl+D` duplicates ("Point added"), `Delete` removes ("Point deleted"), `Escape` exits.
 - Crop: `Enter` on an image starts cropping; arrows / `Shift+Arrows` announce "Cropped to W by H"; `Escape`/`Enter` finish.
-- `F6` / `Shift+F6` cycle toolbar → canvas → styles panel → sidebar → footer.
+- `F6` / `Shift+F6` cycle toolbar → canvas → styles panel → sidebar → footer; `Alt+Shift+A` jumps straight to the canvas area from anywhere.
 - Command palette → "Toggle single-key shortcuts": after disabling, `r` must NOT switch tools (announced); re-enable and verify `r` works again.
 
 ### 5. Images

@@ -102,5 +102,5 @@ export {
 } from "./actionA11yTransform";
 export { actionImageAltText } from "./actionImageAltText";
 export { actionConnectElements } from "./actionConnectElements";
-export { actionA11yHelp } from "./actionA11yHelp";
+export { actionA11yHelp, actionA11yFocusCanvas } from "./actionA11yHelp";
 export { actionToggleSingleKeyShortcuts } from "./actionToggleSingleKeyShortcuts";
