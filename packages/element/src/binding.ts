@@ -762,14 +762,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   const otherEndpointInitialBinding =
     appState.selectedLinearElement?.initialState
       .arrowOtherEndpointInitialBinding;
-  const otherEndpointInitialGlobalFixedPoint =
-    otherBindableElement && otherEndpointInitialBinding?.fixedPoint
-      ? getGlobalFixedPointForBindableElement(
-          otherEndpointInitialBinding.fixedPoint,
-          otherBindableElement,
-          elementsMap,
-        )
-      : null;
 
   // Handle outside-outside binding to the same element
   if (
@@ -792,8 +784,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
                 opts.gridSize as NullableGridSize,
               ),
             )!
-          : otherEndpointInitialGlobalFixedPoint ??
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               0,
               elementsMap,
@@ -804,8 +795,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         element: hit,
         focusPoint: endDragged
           ? globalPoint
-          : otherEndpointInitialGlobalFixedPoint ??
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               -1,
               elementsMap,
@@ -905,7 +895,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     if (
       otherBinding?.mode === "inside" &&
       !otherPointWasInsideAtStart &&
-      otherBindableElement
+      otherBindableElement &&
+      !opts?.newArrow
     ) {
       other = {
         mode: "orbit",
