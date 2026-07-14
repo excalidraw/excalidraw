@@ -367,8 +367,13 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:first-child {
-    justify-self: flex-start;
+  .App-menu_top > .App-menu_top__left {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .App-menu_top > .shapes-section {
+    grid-column: 2;
   }
 
   .selected-shape-actions-container {
@@ -379,8 +384,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:last-child {
-    justify-self: flex-end;
+  .App-menu_top > .layer-ui__wrapper__top-right {
+    grid-column: 3;
+    justify-self: end;
   }
 
   .App-menu_bottom {

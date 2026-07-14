@@ -744,10 +744,15 @@ export interface ExcalidrawProps {
    */
   interaction?: boolean | InteractionConfig;
   /**
-   * Whether the editor UI (chrome) is rendered — toolbar, menus, footer,
-   * sidebars, dialogs, popups, context menu. Canvas content (elements,
-   * text editing surface, frame names, embeds) still renders, and the editor
-   * remains interactive unless `interaction` is set to `false`.
+   * Whether Excalidraw's default UI is rendered — toolbar, default menus,
+   * footer controls, sidebars, and canvas popups. Host UI passed through
+   * children (including exported components such as `MainMenu` and `Footer`)
+   * or render props continues to render, together with any supporting dialogs
+   * it opens.
+   *
+   * Canvas content (elements, text editing surface, frame names, embeds) still
+   * renders, and the editor remains interactive unless `interaction` is set to
+   * `false`.
    *
    * @default true
    */
@@ -975,7 +980,6 @@ export type AppClassProperties = {
   setAppState: App["setAppState"];
 
   interactionEnabled: App["interactionEnabled"];
-  uiEnabled: App["uiEnabled"];
 };
 
 export type PointerDownState = Readonly<{

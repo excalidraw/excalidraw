@@ -959,12 +959,8 @@ class App extends React.Component<AppProps, AppState> {
     return isBrowserZoomInteractionEnabled(this.props);
   }
 
-  /**
-   * Whether the editor UI (chrome) is rendered — toolbar, menus, footer,
-   * sidebars, dialogs, popups, context menu. Canvas content (elements, text
-   * editing surface, frame names, embeds) renders regardless.
-   */
-  public get uiEnabled(): boolean {
+  /** Whether Excalidraw's default UI is rendered. */
+  public get defaultUIEnabled(): boolean {
     return this.props.ui !== false;
   }
 
@@ -2265,7 +2261,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--non-interactive": !this.interactionEnabled,
           "excalidraw--allow-browser-zoom":
             !this.interactionEnabled && this.browserZoomEnabled,
-          "excalidraw--ui-hidden": !this.uiEnabled,
+          "excalidraw--ui-hidden": !this.defaultUIEnabled,
         })}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
@@ -2308,9 +2304,7 @@ class App extends React.Component<AppProps, AppState> {
                           <LayerUI
                             canvas={this.canvas}
                             appState={this.state}
-                            // NOTE read via `app.uiEnabled` inside LayerUI;
-                            // passed as prop only to bust the memo comparator
-                            uiEnabled={this.uiEnabled}
+                            defaultUIEnabled={this.defaultUIEnabled}
                             files={this.files}
                             setAppState={this.setAppState}
                             actionManager={this.actionManager}
@@ -2355,8 +2349,8 @@ class App extends React.Component<AppProps, AppState> {
                               this.eraserTrail,
                             ]}
                           />
-                          <CursorHint />
-                          {this.uiEnabled &&
+                          {this.defaultUIEnabled && <CursorHint />}
+                          {this.defaultUIEnabled &&
                             selectedElements.length === 1 &&
                             this.state.openDialog?.name !==
                               "elementLinkSelector" &&
@@ -2373,7 +2367,7 @@ class App extends React.Component<AppProps, AppState> {
                                 }
                               />
                             )}
-                          {this.uiEnabled &&
+                          {this.defaultUIEnabled &&
                             this.props.aiEnabled !== false &&
                             selectedElements.length === 1 &&
                             isMagicFrameElement(firstSelectedElement) && (
@@ -2394,7 +2388,7 @@ class App extends React.Component<AppProps, AppState> {
                                 />
                               </ElementCanvasButtons>
                             )}
-                          {this.uiEnabled &&
+                          {this.defaultUIEnabled &&
                             selectedElements.length === 1 &&
                             isIframeElement(firstSelectedElement) &&
                             firstSelectedElement.customData?.generationData
@@ -2447,7 +2441,7 @@ class App extends React.Component<AppProps, AppState> {
                               </ElementCanvasButtons>
                             )}
 
-                          {this.uiEnabled && this.state.contextMenu && (
+                          {this.defaultUIEnabled && this.state.contextMenu && (
                             <ContextMenu
                               items={this.state.contextMenu.items}
                               top={this.state.contextMenu.top}
@@ -2544,7 +2538,7 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.uiEnabled && this.state.userToFollow && (
+                          {this.defaultUIEnabled && this.state.userToFollow && (
                             <FollowMode
                               width={this.state.width}
                               height={this.state.height}
@@ -2553,13 +2547,14 @@ class App extends React.Component<AppProps, AppState> {
                             />
                           )}
                           {this.renderFrameNames()}
-                          {this.uiEnabled && this.state.activeLockedId && (
-                            <UnlockPopup
-                              app={this}
-                              activeLockedId={this.state.activeLockedId}
-                            />
-                          )}
-                          {this.uiEnabled && showShapeSwitchPanel && (
+                          {this.defaultUIEnabled &&
+                            this.state.activeLockedId && (
+                              <UnlockPopup
+                                app={this}
+                                activeLockedId={this.state.activeLockedId}
+                              />
+                            )}
+                          {this.defaultUIEnabled && showShapeSwitchPanel && (
                             <ConvertElementTypePopup app={this} />
                           )}
                         </ExcalidrawActionManagerContext.Provider>

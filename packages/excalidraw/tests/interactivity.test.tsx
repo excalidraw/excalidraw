@@ -7,7 +7,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionZoomIn } from "../actions/actionCanvas";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
-import { Excalidraw, MainMenu } from "../index";
+import { DefaultSidebar, Excalidraw, Footer, MainMenu } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -608,35 +608,30 @@ describe("ui={false}", () => {
         }}
       >
         {/* children may be functional (e.g. excalidraw.com's <Collab/>),
-            so they must mount even with the UI disabled */}
+            so they must mount even with the default UI disabled */}
         <div data-testid="host-child" />
-        <MainMenu>
-          <MainMenu.Item onSelect={() => {}}>menu item</MainMenu.Item>
-        </MainMenu>
       </Excalidraw>,
     );
   });
 
-  it("renders canvases but no UI chrome", () => {
+  it("renders canvases but no default UI chrome", () => {
     // canvas layers keep rendering
     expect(queryContainer("canvas.static")).not.toBe(null);
     expect(queryContainer("canvas.interactive")).not.toBe(null);
     expect(queryContainer(".SVGLayer")).not.toBe(null);
     expect(queryContainer(".excalidraw-textEditorContainer")).not.toBe(null);
 
-    // no chrome
-    expect(queryContainer(".layer-ui__wrapper")).toBe(null);
+    // The placement scaffold remains for host UI, but default controls don't.
     expect(queryContainer(".App-toolbar")).toBe(null);
-    expect(queryContainer(".App-menu")).toBe(null);
-    expect(queryContainer(".layer-ui__wrapper__footer")).toBe(null);
+    expect(queryContainer(".dropdown-menu-button")).toBe(null);
+    expect(queryContainer(".default-sidebar-trigger")).toBe(null);
+    expect(queryContainer(".layer-ui__wrapper__footer-left")).toBe(null);
+    expect(queryContainer(".help-icon")).toBe(null);
   });
 
-  it("host children still mount, while tunneled UI children don't render", () => {
+  it("host children still mount", () => {
     // functional children (e.g. collab) keep working
     expect(queryContainer("[data-testid='host-child']")).not.toBe(null);
-    // UI children tunnel into outlets that don't exist -> not rendered
-    expect(queryContainer(".dropdown-menu")).toBe(null);
-    expect(document.querySelector(".dropdown-menu-button")).toBe(null);
   });
 
   it("container gets the excalidraw--ui-hidden class", () => {
@@ -668,6 +663,42 @@ describe("ui={false}", () => {
     rightClickCanvas();
     expect(h.state.contextMenu).not.toBe(null);
     expect(UI.queryContextMenu()).toBe(null);
+  });
+});
+
+describe("ui={false} with host UI", () => {
+  it("renders host outlets and dialogs invoked by host UI", async () => {
+    const { container } = await render(
+      <Excalidraw
+        ui={false}
+        renderTopLeftUI={() => <div data-testid="host-top-left" />}
+        renderTopRightUI={() => <div data-testid="host-top-right" />}
+      >
+        <MainMenu>
+          <MainMenu.Item onSelect={() => {}}>host menu item</MainMenu.Item>
+          <MainMenu.DefaultItems.SaveAsImage />
+        </MainMenu>
+        <Footer>
+          <div data-testid="host-footer" />
+        </Footer>
+        <DefaultSidebar.Trigger title="host sidebar" />
+      </Excalidraw>,
+    );
+
+    expect(queryContainer("[data-testid='host-top-left']")).not.toBe(null);
+    expect(queryContainer("[data-testid='host-top-right']")).not.toBe(null);
+    expect(queryContainer("[data-testid='host-footer']")).not.toBe(null);
+    expect(queryContainer("[aria-label='host sidebar']")).not.toBe(null);
+
+    fireEvent.click(container.querySelector(".dropdown-menu-button")!);
+    expect(container.textContent).toContain("host menu item");
+    // The internal fallback menu must not be composed.
+    expect(queryContainer("[data-testid='load-button']")).toBe(null);
+
+    fireEvent.click(queryContainer("[data-testid='image-export-button']")!);
+    await waitFor(() => {
+      expect(document.querySelector(".ImageExportModal")).not.toBe(null);
+    });
   });
 });
 
@@ -703,11 +734,12 @@ describe("interaction={false} ui={false}", () => {
   it("renders canvases without chrome and stays fully inert", () => {
     expect(h.state.viewModeEnabled).toBe(true);
 
-    // canvases render, chrome does not
+    // canvases and host-placement infrastructure render, default chrome does
+    // not
     expect(queryContainer("canvas.static")).not.toBe(null);
     expect(queryContainer("canvas.interactive")).not.toBe(null);
-    expect(queryContainer(".layer-ui__wrapper")).toBe(null);
     expect(queryContainer(".App-toolbar")).toBe(null);
+    expect(queryContainer(".dropdown-menu-button")).toBe(null);
 
     const container = queryContainer(".excalidraw-container")!;
     expect(container.classList.contains("excalidraw--non-interactive")).toBe(
