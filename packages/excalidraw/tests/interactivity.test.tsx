@@ -995,6 +995,11 @@ describe("interaction={{ enabled: { navigation } }}", () => {
   });
 
   it("pointer drag pans without selecting", () => {
+    // the grab cursor applies from mount (managed imperatively)
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.GRAB,
+    );
+
     const { scrollX, scrollY } = h.state;
 
     mouse.downAt(80, 80);

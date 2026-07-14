@@ -213,15 +213,19 @@ export const Toolbar = ({
             penDetected={appState.penDetected}
           />
         )}
-        <LockButton
-          checked={appState.activeTool.locked}
-          onChange={onLockToggle}
-          title={t("toolBar.lock")}
-          // the active tool — including its lock state — is host-controlled
-          disabled={app.props.activeTool != null}
-        />
+        {app.props.activeTool == null && (
+          <>
+            <LockButton
+              checked={appState.activeTool.locked}
+              onChange={onLockToggle}
+              title={t("toolBar.lock")}
+              // the active tool — including its lock state — is host-controlled
+              disabled={app.props.activeTool != null}
+            />
 
-        <div className="App-toolbar__divider" />
+            <div className="App-toolbar__divider" />
+          </>
+        )}
 
         <HandToolButton {...toolProps} hideKeyBinding />
         {isCompactStylesPanel ? (
