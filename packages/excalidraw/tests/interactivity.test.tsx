@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CODES, CURSOR_TYPE } from "@excalidraw/common";
+import { CODES, CURSOR_TYPE, POINTER_BUTTON } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -1190,5 +1190,331 @@ describe("interaction={{ enabled: { embeds / interactiveContent } }}", () => {
     );
     expect(h.app.isLinksEnabled()).toBe(true);
     expect(h.app.isEmbedsEnabled()).toBe(true);
+  });
+});
+
+describe("interaction={{ enabled: { tools } }}", () => {
+  const onPointerDownSpy = vi.fn();
+  const onPointerUpSpy = vi.fn();
+  const onPointerUpdateSpy = vi.fn();
+
+  const renderWithInteraction = async (
+    interaction: ExcalidrawProps["interaction"],
+  ) => {
+    await render(
+      <Excalidraw
+        interaction={interaction}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        onPointerDown={onPointerDownSpy}
+        onPointerUp={onPointerUpSpy}
+        onPointerUpdate={onPointerUpdateSpy}
+        initialData={{
+          elements: [
+            API.createElement({
+              type: "rectangle",
+              x: 10,
+              y: 10,
+              width: 50,
+              height: 50,
+            }),
+          ],
+        }}
+      />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.canvas,
+    });
+  };
+
+  const rerenderWithInteraction = (
+    interaction: ExcalidrawProps["interaction"],
+  ) => {
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={interaction}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        onPointerDown={onPointerDownSpy}
+        onPointerUp={onPointerUpSpy}
+        onPointerUpdate={onPointerUpdateSpy}
+      />,
+    );
+  };
+
+  beforeEach(() => {
+    onPointerDownSpy.mockClear();
+    onPointerUpSpy.mockClear();
+    onPointerUpdateSpy.mockClear();
+    mockBoundingClientRect();
+  });
+
+  afterEach(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("laser: pointer strokes draw the laser trail without editing effects", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    expect(h.app.isToolSupported(h.state.activeTool.type)).toBe(true);
+    expect(h.state.viewModeEnabled).toBe(true);
+    expect(h.app.isInteractionEnabled()).toBe(false);
+
+    const { scrollX, scrollY } = h.state;
+
+    // stroke starting on top of the rectangle
+    mouse.downAt(30, 30);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(true);
+    expect(onPointerDownSpy).toHaveBeenCalledTimes(1);
+    expect(onPointerDownSpy.mock.calls[0][0]).toMatchObject({ type: "laser" });
+
+    mouse.moveTo(80, 80);
+    mouse.upAt(80, 80);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
+
+    // no selection, no panning, no scene changes
+    expect(h.state.selectedElementIds).toEqual({});
+    expect([h.state.scrollX, h.state.scrollY]).toEqual([scrollX, scrollY]);
+    expect(h.elements.length).toBe(1);
+  });
+
+  it("laser: pointer positions broadcast via onPointerUpdate", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    // between strokes (plain hover)
+    mouse.moveTo(50, 50);
+    expect(onPointerUpdateSpy).toHaveBeenCalled();
+    expect(onPointerUpdateSpy.mock.calls.at(-1)![0].pointer.tool).toBe("laser");
+
+    // during a stroke
+    onPointerUpdateSpy.mockClear();
+    mouse.downAt(30, 30);
+    mouse.moveTo(60, 60);
+    mouse.upAt(60, 60);
+    expect(
+      onPointerUpdateSpy.mock.calls.some(
+        ([payload]) => payload.button === "down",
+      ),
+    ).toBe(true);
+    expect(onPointerUpdateSpy.mock.calls.at(-1)![0].button).toBe("up");
+  });
+
+  it("custom: onPointerDown/onPointerUp keep dispatching when enabled", async () => {
+    await renderWithInteraction({ enabled: { tools: { custom: true } } });
+
+    act(() => {
+      h.app.setActiveTool({
+        type: "custom",
+        customType: "comment",
+        locked: true,
+      });
+    });
+    expect(h.app.isToolSupported(h.state.activeTool.type)).toBe(true);
+
+    mouse.downAt(40, 40);
+    expect(onPointerDownSpy).toHaveBeenCalledTimes(1);
+    expect(onPointerDownSpy.mock.calls[0][0]).toMatchObject({
+      type: "custom",
+      customType: "comment",
+    });
+
+    mouse.upAt(40, 40);
+    expect(onPointerUpSpy).toHaveBeenCalledTimes(1);
+    expect(onPointerUpSpy.mock.calls[0][0]).toMatchObject({
+      type: "custom",
+      customType: "comment",
+    });
+
+    // tool stays active (activated with `locked: true`), scene untouched
+    expect(h.state.activeTool.type).toBe("custom");
+    expect(h.state.selectedElementIds).toEqual({});
+    expect(h.elements.length).toBe(1);
+  });
+
+  it("pointer input stays inert when the active tool is not enabled", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    // default (selection) tool is not in the enabled set
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(h.app.isToolSupported(h.state.activeTool.type)).toBe(false);
+
+    mouse.downAt(30, 30);
+    mouse.moveTo(80, 80);
+    mouse.upAt(80, 80);
+    expect(h.state.selectedElementIds).toEqual({});
+    expect(onPointerDownSpy).not.toHaveBeenCalled();
+    expect(onPointerUpdateSpy).not.toHaveBeenCalled();
+
+    // a custom tool isn't covered by `tools.laser` — the switch itself is
+    // refused
+    act(() => {
+      h.app.setActiveTool({
+        type: "custom",
+        customType: "comment",
+        locked: true,
+      });
+    });
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(h.app.isToolSupported(h.state.activeTool.type)).toBe(false);
+    mouse.reset();
+    mouse.downAt(40, 40);
+    expect(onPointerDownSpy).not.toHaveBeenCalled();
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
+  });
+
+  it("setActiveTool only activates enabled tools while non-interactive", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    // enabled tool activates
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+
+    // tools outside the enabled set are refused
+    act(() => {
+      h.app.setActiveTool({ type: "rectangle" });
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+
+    act(() => {
+      h.app.setActiveTool({ type: "hand" });
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+  });
+
+  it("active tool resets to selection when it loses its interaction exception", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+
+    // exception removed (e.g. presenter → viewer) → neutral default
+    rerenderWithInteraction(false);
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(queryContainer(".excalidraw--tools")).toBe(null);
+
+    // re-enabling the exception doesn't restore the tool — tool selection
+    // stays host-driven
+    rerenderWithInteraction({ enabled: { tools: { laser: true } } });
+    expect(h.state.activeTool.type).toBe("selection");
+  });
+
+  it("interaction={false} refuses tool switching and keeps the laser inert", async () => {
+    await renderWithInteraction(false);
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    // the switch is refused — no tool is enabled while fully non-interactive
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(h.app.isToolSupported(h.state.activeTool.type)).toBe(false);
+
+    mouse.downAt(30, 30);
+    mouse.moveTo(80, 80);
+    mouse.upAt(80, 80);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
+    expect(onPointerDownSpy).not.toHaveBeenCalled();
+    expect(onPointerUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it("container gets the excalidraw--tools class only while the active tool is enabled", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    // selection active — not in the enabled set
+    expect(queryContainer(".excalidraw--tools")).toBe(null);
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    expect(queryContainer(".excalidraw--tools")).not.toBe(null);
+
+    rerenderWithInteraction(false);
+    expect(queryContainer(".excalidraw--tools")).toBe(null);
+  });
+
+  it("editor is otherwise inert (keyboard, context menu, wheel, eraser button)", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    // letter shortcuts don't switch tools
+    fireEvent.keyDown(document, { key: "r", code: "KeyR" });
+    fireEvent.keyDown(document, { key: "v", code: "KeyV" });
+    expect(h.state.activeTool.type).toBe("laser");
+
+    // the pen's hardware eraser button doesn't switch tools either
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      button: POINTER_BUTTON.ERASER,
+      clientX: 30,
+      clientY: 30,
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      button: POINTER_BUTTON.ERASER,
+      clientX: 30,
+      clientY: 30,
+    });
+
+    rightClickCanvas();
+    expect(h.state.contextMenu).toBe(null);
+
+    // wheel stays with the page (no navigation enabled)
+    const { scrollX, scrollY } = h.state;
+    const zoom = h.state.zoom.value;
+    wheelPan();
+    wheelZoom();
+    expect([h.state.scrollX, h.state.scrollY]).toEqual([scrollX, scrollY]);
+    expect(h.state.zoom.value).toBe(zoom);
+  });
+
+  it("composes with navigation: drag draws the laser, wheel pans", async () => {
+    await renderWithInteraction({
+      enabled: { navigation: true, tools: { laser: true } },
+    });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    wheelPan();
+    const { scrollX, scrollY } = h.state;
+    expect([scrollX, scrollY]).not.toEqual([0, 0]);
+
+    // primary-pointer drag goes to the laser, not panning
+    mouse.downAt(30, 30);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(true);
+    mouse.moveTo(80, 80);
+    mouse.upAt(80, 80);
+    expect([h.state.scrollX, h.state.scrollY]).toEqual([scrollX, scrollY]);
+  });
+
+  it("disabling the tool exception mid-stroke ends the trail", async () => {
+    await renderWithInteraction({ enabled: { tools: { laser: true } } });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    mouse.downAt(30, 30);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(true);
+
+    rerenderWithInteraction(false);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
+
+    mouse.upAt(30, 30);
+    expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
   });
 });

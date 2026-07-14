@@ -980,6 +980,60 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   }
 
+  /**
+   * Whether the tool can be activated & driven by user input. False when
+   * disabled via `UIOptions.tools`, or when the editor is non-interactive
+   * and the tool isn't kept user-driven via `interaction.enabled.tools`.
+   *
+   * (Once UI tool availability is split from input availability — e.g.
+   * `props.ui.tools` vs `interaction.disabled.tools` — the UI axis moves
+   * out into its own predicate.)
+   *
+   * We purposely widen the `tool` type so this helper can be called with
+   * any tool without having to type check it.
+   */
+  public isToolSupported = <T extends ToolType | "custom">(
+    tool: T,
+    props: Pick<AppProps, "interaction" | "UIOptions"> = this.props,
+  ): boolean => {
+    if (
+      props.UIOptions.tools?.[
+        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
+      ] === false
+    ) {
+      return false;
+    }
+    if (this.isInteractionEnabled(props)) {
+      return true;
+    }
+    const tools =
+      typeof props.interaction === "object" && props.interaction !== null
+        ? props.interaction.enabled?.tools
+        : undefined;
+    if (tool === "laser") {
+      return tools?.laser === true;
+    }
+    if (tool === "custom") {
+      return tools?.custom === true;
+    }
+    return false;
+  };
+
+  /**
+   * Whether the active tool captures the primary pointer instead of the
+   * view-mode drag-to-pan — the laser always does; while non-interactive,
+   * any tool allowed via `interaction.enabled.tools` does. (Editing tools
+   * capture the pointer trivially since view mode implies they're not
+   * active; this predicate only matters where view-mode gates apply.)
+   */
+  private isActiveToolPointerCapturing(): boolean {
+    return (
+      this.state.activeTool.type === "laser" ||
+      (!this.isInteractionEnabled() &&
+        this.isToolSupported(this.state.activeTool.type))
+    );
+  }
+
   /** Whether Excalidraw's default UI is rendered. */
   public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
     return props.ui !== false;
@@ -2281,6 +2335,9 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--non-interactive": !this.isInteractionEnabled(),
           "excalidraw--navigation":
             !this.isInteractionEnabled() && this.isNavigationEnabled(),
+          "excalidraw--tools":
+            !this.isInteractionEnabled() &&
+            this.isToolSupported(this.state.activeTool.type),
           "excalidraw--embeds":
             !this.isInteractionEnabled() && this.isEmbedsEnabled(),
           "excalidraw--allow-browser-zoom":
@@ -2553,6 +2610,7 @@ class App extends React.Component<AppProps, AppState> {
                             editorInterface={this.editorInterface}
                             interactionEnabled={this.isInteractionEnabled()}
                             navigationEnabled={this.isNavigationEnabled()}
+                            toolCapturesPointer={this.isActiveToolPointerCapturing()}
                             renderInteractiveSceneCallback={
                               this.renderInteractiveSceneCallback
                             }
@@ -3202,6 +3260,33 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.isEmbedsEnabled()) {
         this.setState({ activeEmbeddable: null });
       }
+    }
+
+    if (
+      this.isToolSupported(prevState.activeTool.type, prevProps) !==
+      this.isToolSupported(this.state.activeTool.type)
+    ) {
+      if (!this.isToolSupported(this.state.activeTool.type)) {
+        // end a possibly mid-stroke laser trail (the stroke's own window
+        // listeners tear down on the next pointerup)
+        this.laserTrails.endPath();
+        resetCursor(this.interactiveCanvas);
+      }
+    }
+
+    // invariant: while non-interactive, the active tool is either
+    // input-enabled (`interaction.enabled.tools`) or the neutral default —
+    // reset stale tool state (e.g. a presenter's laser after handing off)
+    // so it doesn't leak through `onChange` / collab pointer payloads or
+    // linger until interaction is re-enabled
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type) &&
+      this.state.activeTool.type !== "selection"
+    ) {
+      this.setState({
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
+      });
     }
 
     if (
@@ -6050,16 +6135,6 @@ class App extends React.Component<AppProps, AppState> {
     this.flowchart.handleKeyEvent(event);
   });
 
-  // We purposely widen the `tool` type so this helper can be called with
-  // any tool without having to type check it
-  private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
-    return (
-      this.props.UIOptions.tools?.[
-        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
-      ] !== false
-    );
-  };
-
   setActiveTool = (
     tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
       locked?: boolean;
@@ -6081,7 +6156,9 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!this.isToolSupported(tool.type)) {
       console.warn(
-        `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
+        this.isInteractionEnabled()
+          ? `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`
+          : `"${tool.type}" tool cannot be activated while the editor is non-interactive (see "interaction.enabled.tools")`,
       );
       return;
     }
@@ -7673,6 +7750,12 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     if (!this.isInteractionEnabled()) {
+      if (this.isToolSupported(this.state.activeTool.type)) {
+        // keep broadcasting the pointer (`props.onPointerUpdate`) between
+        // strokes of the enabled tool, so e.g. a presenter's cursor stays
+        // visible to collaborators while the laser isn't drawing
+        this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+      }
       if (this.isNavigationEnabled()) {
         // two-finger pinch zoom/pan (single-pointer panning is handled by
         // the pan session set up on pointerdown)
@@ -8384,7 +8467,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    if (!this.isInteractionEnabled()) {
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type)
+    ) {
       if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
         // needed by handleElementLinkClick & handleIframeLikeCenterClick
         // (drag-distance & hit checks)
@@ -8400,6 +8486,10 @@ class App extends React.Component<AppProps, AppState> {
       }
       return;
     }
+    // with the active tool allowed via `interaction.enabled.tools`, the
+    // pointer keeps driving it through the full flow below — safe while
+    // non-interactive because that implies view mode, whose gates constrain
+    // everything except the tool-usage path (laser & custom tools)
 
     const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8557,6 +8647,9 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       event.button === POINTER_BUTTON.ERASER &&
+      // must not switch tools while non-interactive (reachable when the
+      // active tool is allowed via `interaction.enabled.tools`)
+      this.isInteractionEnabled() &&
       this.state.activeTool.type !== TOOL_TYPE.eraser
     ) {
       this.setState(
@@ -8847,7 +8940,7 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+    if (!this.state.viewModeEnabled || this.isActiveToolPointerCapturing()) {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -8959,11 +9052,14 @@ class App extends React.Component<AppProps, AppState> {
     if (
       !(
         gesture.pointers.size <= 1 &&
-        (event.button === POINTER_BUTTON.WHEEL ||
+        (((event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isHandToolActive(this.state) ||
-          (this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"))
+          isHandToolActive(this.state)) &&
+          // reachable while non-interactive when the active tool is allowed
+          // via `interaction.enabled.tools` — panning must remain gated on
+          // `navigation` then
+          (this.isInteractionEnabled() || this.isNavigationEnabled())) ||
+          (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()))
       )
     ) {
       return false;
@@ -9043,7 +9139,7 @@ class App extends React.Component<AppProps, AppState> {
         if (!isHoldingSpace) {
           if (
             this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"
+            !this.isActiveToolPointerCapturing()
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
           } else {
@@ -13751,8 +13847,13 @@ class App extends React.Component<AppProps, AppState> {
 
   private savePointer = (x: number, y: number, button: "up" | "down") => {
     // don't broadcast pointer updates (props.onPointerUpdate) when
-    // non-interactive
-    if (!this.isInteractionEnabled()) {
+    // non-interactive, unless the active tool stays user-driven via
+    // `interaction.enabled.tools` — collaborators render e.g. a presenter's
+    // laser through these updates
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type)
+    ) {
       return;
     }
     if (!x || !y) {

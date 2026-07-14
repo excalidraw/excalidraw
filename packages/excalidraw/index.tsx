@@ -289,7 +289,11 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       !!prevInteraction.enabled?.navigation ===
         !!nextInteraction.enabled?.navigation &&
       !!prevInteraction.enabled?.browserZoom ===
-        !!nextInteraction.enabled?.browserZoom);
+        !!nextInteraction.enabled?.browserZoom &&
+      !!prevInteraction.enabled?.tools?.laser ===
+        !!nextInteraction.enabled?.tools?.laser &&
+      !!prevInteraction.enabled?.tools?.custom ===
+        !!nextInteraction.enabled?.tools?.custom);
 
   if (!isInteractionSame) {
     return false;

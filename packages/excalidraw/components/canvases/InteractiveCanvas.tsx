@@ -48,6 +48,12 @@ type InteractiveCanvasProps = {
   app: AppClassProperties;
   interactionEnabled: boolean;
   navigationEnabled: boolean;
+  /**
+   * whether the active tool captures the primary pointer instead of the
+   * view-mode drag-to-pan (laser, or `interaction.enabled.tools` while
+   * non-interactive)
+   */
+  toolCapturesPointer: boolean;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -209,7 +215,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         cursor:
           props.navigationEnabled &&
           props.appState.viewModeEnabled &&
-          props.appState.activeTool.type !== "laser"
+          !props.toolCapturesPointer
             ? CURSOR_TYPE.GRAB
             : CURSOR_TYPE.AUTO,
       }}
@@ -297,7 +303,8 @@ const areEqual = (
     prevProps.selectedElements !== nextProps.selectedElements ||
     prevProps.renderScrollbars !== nextProps.renderScrollbars ||
     prevProps.interactionEnabled !== nextProps.interactionEnabled ||
-    prevProps.navigationEnabled !== nextProps.navigationEnabled
+    prevProps.navigationEnabled !== nextProps.navigationEnabled ||
+    prevProps.toolCapturesPointer !== nextProps.toolCapturesPointer
   ) {
     return false;
   }

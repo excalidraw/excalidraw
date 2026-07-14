@@ -686,6 +686,36 @@ export type InteractionConfig = {
      * @default false
      */
     browserZoom?: boolean;
+    /**
+     * Tools that stay user-driven while the editor is otherwise
+     * non-interactive: pointer input keeps driving the listed tool when it's
+     * the active tool. Does not enable user-driven tool *switching* — the
+     * keyboard stays disabled and tool selection remains host-driven
+     * (`ExcalidrawAPI.setActiveTool`).
+     *
+     * Composes with `navigation`: the enabled tool wins the primary-pointer
+     * drag, while wheel input (and wheel-button drag) still pans/zooms.
+     */
+    tools?: {
+      /**
+       * The laser pointer stays usable — pointer strokes draw laser trails
+       * and pointer positions keep broadcasting via `onPointerUpdate`, so
+       * e.g. collaborators see a presenter's laser & cursor.
+       *
+       * @default false
+       */
+      laser?: boolean;
+      /**
+       * Custom tools (`activeTool.type === "custom"`) stay usable — the
+       * editor keeps dispatching `onPointerDown` / `onPointerUp` for them.
+       * Tool behavior is host-implemented; activate custom tools with
+       * `locked: true` or they revert to the selection tool (and go inert)
+       * after the first pointer interaction.
+       *
+       * @default false
+       */
+      custom?: boolean;
+    };
   };
 };
 
