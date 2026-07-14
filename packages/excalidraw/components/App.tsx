@@ -6642,7 +6642,10 @@ class App extends React.Component<AppProps, AppState> {
         }
         return containingFrame &&
           this.state.frameRendering.enabled &&
-          this.state.frameRendering.clip
+          this.state.frameRendering.clip &&
+          // iframe-like elements are rendered as DOM overlays and are not
+          // visually clipped by their containing frames
+          !isIframeLikeElement(element)
           ? isCursorInFrame(
               { x, y },
               containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
