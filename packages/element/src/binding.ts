@@ -784,6 +784,12 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
                 opts.gridSize as NullableGridSize,
               ),
             )!
+          : otherBindableElement
+          ? getGlobalFixedPointForBindableElement(
+              otherBinding.fixedPoint,
+              otherBindableElement,
+              elementsMap,
+            )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               0,
@@ -795,6 +801,12 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         element: hit,
         focusPoint: endDragged
           ? globalPoint
+          : otherBindableElement
+          ? getGlobalFixedPointForBindableElement(
+              otherBinding.fixedPoint,
+              otherBindableElement,
+              elementsMap,
+            )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               -1,
