@@ -47,6 +47,7 @@ type InteractiveCanvasProps = {
   editorInterface: EditorInterface;
   app: AppClassProperties;
   interactionEnabled: boolean;
+  navigationEnabled: boolean;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -206,7 +207,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         width: props.appState.width,
         height: props.appState.height,
         cursor:
-          props.interactionEnabled &&
+          props.navigationEnabled &&
           props.appState.viewModeEnabled &&
           props.appState.activeTool.type !== "laser"
             ? CURSOR_TYPE.GRAB
@@ -295,7 +296,8 @@ const areEqual = (
     prevProps.visibleElements !== nextProps.visibleElements ||
     prevProps.selectedElements !== nextProps.selectedElements ||
     prevProps.renderScrollbars !== nextProps.renderScrollbars ||
-    prevProps.interactionEnabled !== nextProps.interactionEnabled
+    prevProps.interactionEnabled !== nextProps.interactionEnabled ||
+    prevProps.navigationEnabled !== nextProps.navigationEnabled
   ) {
     return false;
   }

@@ -160,11 +160,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   );
 
   // whether the browser's own zoom is kept available while the editor is
-  // non-interactive
+  // non-interactive (with navigation allowed, pinch is consumed by the
+  // editor instead, which relies on the pinch prevention below)
   const browserZoomAllowed =
     typeof interaction === "object" &&
     interaction !== null &&
-    interaction.allowed?.browserZoom === true;
+    interaction.allowed?.browserZoom === true &&
+    interaction.allowed?.navigation !== true;
 
   useEffect(() => {
     const importPolyfill = async () => {
@@ -281,6 +283,11 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       typeof nextInteraction === "object" &&
       nextInteraction !== null &&
       !!prevInteraction.allowed?.links === !!nextInteraction.allowed?.links &&
+      !!prevInteraction.allowed?.embeds === !!nextInteraction.allowed?.embeds &&
+      !!prevInteraction.allowed?.interactiveContent ===
+        !!nextInteraction.allowed?.interactiveContent &&
+      !!prevInteraction.allowed?.navigation ===
+        !!nextInteraction.allowed?.navigation &&
       !!prevInteraction.allowed?.browserZoom ===
         !!nextInteraction.allowed?.browserZoom);
 

@@ -16,7 +16,7 @@ import { getCommonBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { Bounds } from "@excalidraw/common";
 
 import {
   getDefaultAppState,
@@ -134,9 +134,10 @@ export const actionZoomIn = register({
   name: "zoomIn",
   label: "buttons.zoomIn",
   viewMode: true,
+  navigation: true,
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -181,8 +182,9 @@ export const actionZoomOut = register({
   label: "buttons.zoomOut",
   icon: ZoomOutIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
@@ -227,8 +229,9 @@ export const actionResetZoom = register({
   label: "buttons.resetZoom",
   icon: ZoomResetIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) => app.interactionEnabled,
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
   perform: (_elements, appState, _, app) => {
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
@@ -276,6 +279,19 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
+// under a viewport lock, zoom-to-fit targets the locked box rather than the
+// scene elements
+const getScrollConstraintsBounds = (
+  scrollConstraints: NonNullable<AppState["scrollConstraints"]>,
+) => {
+  return [
+    scrollConstraints.x,
+    scrollConstraints.y,
+    scrollConstraints.x + scrollConstraints.width,
+    scrollConstraints.y + scrollConstraints.height,
+  ] as Bounds;
+};
+
 // Note, this action differs from actionZoomToFitSelection in that it doesn't
 // zoom beyond 100%. In other words, if the content is smaller than viewport
 // size, it won't be zoomed in.
@@ -283,18 +299,22 @@ export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
   label: "labels.zoomToFitViewport",
   icon: zoomAreaIcon,
+  // with no selection (as is always the case in view mode & when
+  // non-interactive), fits all elements, or the locked viewport box when
+  // a viewport lock is active
+  viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) =>
-    !appState.scrollConstraints && app.interactionEnabled,
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    const nonDeletedSelectedElements = getNonDeletedElements(
-      (selectedElements.length
-        ? selectedElements
-        : elements) as ExcalidrawElement[],
-    );
-    return zoomToFitBounds({
-      bounds: getCommonBounds(nonDeletedSelectedElements),
+    const bounds = selectedElements.length
+      ? getCommonBounds(getNonDeletedElements(selectedElements))
+      : appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
       appState: {
         ...appState,
         userToFollow: null,
@@ -302,11 +322,18 @@ export const actionZoomToFitSelectionInViewport = register({
       fit: "scale-down",
       canvasOffsets: app.getViewportOffsets(),
     });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
   // TBD on how proceed
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+  keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
     !event.altKey &&
@@ -317,18 +344,22 @@ export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
   label: "helpDialog.zoomToSelection",
   icon: zoomAreaIcon,
+  // with no selection (as is always the case in view mode & when
+  // non-interactive), fits all elements, or the locked viewport box when
+  // a viewport lock is active
+  viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) =>
-    !appState.scrollConstraints && app.interactionEnabled,
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    const nonDeletedSelectedElements = getNonDeletedElements(
-      (selectedElements.length
-        ? selectedElements
-        : elements) as ExcalidrawElement[],
-    );
-    return zoomToFitBounds({
-      bounds: getCommonBounds(nonDeletedSelectedElements),
+    const bounds = selectedElements.length
+      ? getCommonBounds(getNonDeletedElements(selectedElements))
+      : appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
       appState: {
         ...appState,
         userToFollow: null,
@@ -336,10 +367,17 @@ export const actionZoomToFitSelection = register({
       fit: "contain",
       canvasOffsets: app.getViewportOffsets(),
     });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
   },
   // NOTE this action should use shift-2 per figma, alas
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+  keyTest: (event) =>
     event.code === CODES.THREE &&
     event.shiftKey &&
     !event.altKey &&
@@ -351,21 +389,33 @@ export const actionZoomToFit = register({
   label: "helpDialog.zoomToFit",
   icon: zoomAreaIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState, appProps, app) =>
-    !appState.scrollConstraints && app.interactionEnabled,
-  perform: (elements, appState, _, app) =>
-    zoomToFitBounds({
-      bounds: getCommonBounds(getNonDeletedElements(elements)),
+  predicate: (elements, appState, appProps, app) => app.navigationEnabled,
+  perform: (elements, appState, _, app) => {
+    // under a viewport lock, fits the locked box rather than the elements
+    const bounds = appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
       appState: {
         ...appState,
         userToFollow: null,
       },
       fit: "scale-down",
       canvasOffsets: app.getViewportOffsets(),
-    }),
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+    });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
+  },
+  keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&

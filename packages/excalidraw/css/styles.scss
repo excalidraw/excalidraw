@@ -622,9 +622,16 @@ body.excalidraw-cursor-resize * {
       touch-action: auto;
     }
 
+    // with navigation allowed, touch input drives the canvas pan/zoom again
+    &.excalidraw--navigation canvas {
+      touch-action: none;
+    }
+
     // override inline pointer-events set when embeddable is active
-    // (also covers custom `renderEmbeddable` content)
-    .excalidraw__embeddable-container__inner {
+    // (also covers custom `renderEmbeddable` content) — unless embeds are
+    // an allowed interaction, in which case the inline (activation-driven)
+    // pointer-events apply, same as in view mode
+    &:not(.excalidraw--embeds) .excalidraw__embeddable-container__inner {
       pointer-events: none !important;
     }
   }

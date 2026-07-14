@@ -618,7 +618,7 @@ describe("setViewport lock (integration)", () => {
     }
   });
 
-  it("disables zoom-to-fit actions while locked, but keeps reset-zoom enabled", async () => {
+  it("keeps zoom-to-fit actions enabled while locked, fitting the locked box", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
@@ -630,16 +630,37 @@ describe("setViewport lock (integration)", () => {
         target: [0, 0, 500, 500],
         fit: "scale-down",
         animation: false,
-        lock: { scroll: true },
+        lock: { scroll: true, zoom: true },
       });
     });
 
-    // reset-zoom stays available (it re-clamps into the lock)
     expect(h.app.actionManager.isActionEnabled(actionResetZoom)).toBe(true);
-    expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(false);
+    expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(true);
     expect(h.app.actionManager.isActionEnabled(actionZoomToFitSelection)).toBe(
-      false,
+      true,
     );
+
+    const restingViewport = {
+      scrollX: h.state.scrollX,
+      scrollY: h.state.scrollY,
+      zoom: h.state.zoom.value,
+    };
+
+    // zoom & pan away from the resting viewport...
+    React.act(() => {
+      h.app.actionManager.executeAction(actionZoomIn);
+      h.app.actionManager.executeAction(actionZoomIn);
+    });
+    expect(h.state.zoom.value).toBeGreaterThan(restingViewport.zoom);
+
+    // ...then zoom-to-fit → lands back on the locked box, not the elements
+    // (the scene is empty, so fitting elements would be degenerate anyway)
+    React.act(() => {
+      h.app.actionManager.executeAction(actionZoomToFit);
+    });
+    expect(h.state.zoom.value).toBeCloseTo(restingViewport.zoom);
+    expect(h.state.scrollX).toBeCloseTo(restingViewport.scrollX);
+    expect(h.state.scrollY).toBeCloseTo(restingViewport.scrollY);
   });
 
   it("resets zoom to the locked minimum zoom when zoom is locked", async () => {

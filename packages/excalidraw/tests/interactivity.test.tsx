@@ -951,3 +951,244 @@ describe("interaction={{ allowed: { links } }}", () => {
     });
   });
 });
+
+describe("interaction={{ allowed: { navigation } }}", () => {
+  beforeEach(async () => {
+    mockBoundingClientRect();
+    await render(
+      <Excalidraw
+        interaction={{ allowed: { navigation: true } }}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        initialData={{
+          elements: [
+            API.createElement({
+              type: "rectangle",
+              x: 10,
+              y: 10,
+              width: 50,
+              height: 50,
+            }),
+          ],
+        }}
+      />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+  });
+
+  afterEach(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("wheel pans & ctrl+wheel zooms the canvas", () => {
+    expect(h.app.navigationEnabled).toBe(true);
+    expect(h.state.viewModeEnabled).toBe(true);
+    expect(queryContainer(".excalidraw--navigation")).not.toBe(null);
+
+    const { scrollX, scrollY } = h.state;
+    wheelPan();
+    expect([h.state.scrollX, h.state.scrollY]).not.toEqual([scrollX, scrollY]);
+
+    const zoom = h.state.zoom.value;
+    wheelZoom();
+    expect(h.state.zoom.value).toBeGreaterThan(zoom);
+  });
+
+  it("pointer drag pans without selecting", () => {
+    const { scrollX, scrollY } = h.state;
+
+    mouse.downAt(80, 80);
+    mouse.moveTo(30, 30);
+    mouse.upAt(30, 30);
+
+    expect([h.state.scrollX, h.state.scrollY]).not.toEqual([scrollX, scrollY]);
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("supports canvas zoom & zoom-to-fit keyboard shortcuts", () => {
+    // ctrl+"=" zooms in (and is prevented from zooming the browser)
+    const zoom = h.state.zoom.value;
+    expect(
+      fireEvent.keyDown(document, { ctrlKey: true, code: CODES.EQUAL }),
+    ).toBe(false);
+    expect(h.state.zoom.value).toBeGreaterThan(zoom);
+
+    // ctrl+"0" resets zoom
+    fireEvent.keyDown(document, { ctrlKey: true, code: CODES.ZERO });
+    expect(h.state.zoom.value).toBe(1);
+
+    // shift+"1" fits all elements
+    const { scrollX, scrollY } = h.state;
+    fireEvent.keyDown(document, { shiftKey: true, code: CODES.ONE });
+    expect([h.state.scrollX, h.state.scrollY]).not.toEqual([scrollX, scrollY]);
+  });
+
+  it("editor is otherwise inert", () => {
+    // non-navigation shortcuts stay disabled (e.g. select all)
+    fireEvent.keyDown(document, { ctrlKey: true, key: "a", code: "KeyA" });
+    expect(h.state.selectedElementIds).toEqual({});
+
+    // no selection, no context menu
+    mouse.reset();
+    mouse.clickAt(30, 30);
+    expect(h.state.selectedElementIds).toEqual({});
+
+    rightClickCanvas();
+    expect(h.state.contextMenu).toBe(null);
+  });
+
+  it("composes with links", async () => {
+    const onLinkOpenSpy = vi.fn();
+    const windowOpenSpy = vi.spyOn(window, "open").mockReturnValue(null);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={{ allowed: { navigation: true, links: true } }}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        onLinkOpen={(...args) => {
+          onLinkOpenSpy(...args);
+          args[1].preventDefault();
+        }}
+      />,
+    );
+
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      width: 120,
+      height: 90,
+    });
+    API.setElements([rect]);
+    API.updateElement(rect, { link: "https://excalidraw.com" });
+
+    mouse.reset();
+    mouse.moveTo(80, 65);
+    mouse.clickAt(80, 65);
+
+    expect(onLinkOpenSpy).toHaveBeenCalledTimes(1);
+    expect(onLinkOpenSpy.mock.calls[0][0]).toMatchObject({ id: rect.id });
+    windowOpenSpy.mockRestore();
+  });
+
+  it("toggling allowed.navigation at runtime re-attaches listeners", () => {
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={{ allowed: { navigation: false } }}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    const zoom = h.state.zoom.value;
+    wheelZoom();
+    expect(h.state.zoom.value).toBe(zoom);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={{ allowed: { navigation: true } }}
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+      />,
+    );
+    wheelZoom();
+    expect(h.state.zoom.value).toBeGreaterThan(zoom);
+  });
+});
+
+describe("interaction={{ allowed: { embeds / interactiveContent } }}", () => {
+  beforeEach(() => {
+    mockBoundingClientRect();
+  });
+
+  afterEach(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  const addEmbeddable = () => {
+    const embed = API.createElement({
+      type: "embeddable",
+      x: 20,
+      y: 20,
+      width: 120,
+      height: 90,
+    });
+    API.setElements([embed]);
+    API.updateElement(embed, {
+      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    });
+    return embed;
+  };
+
+  it("embeds: hovering & clicking an embeddable activates it", async () => {
+    await render(
+      <Excalidraw
+        interaction={{ allowed: { embeds: true } }}
+        validateEmbeddable={true}
+      />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+    const embed = addEmbeddable();
+
+    expect(h.app.embedsEnabled).toBe(true);
+    expect(h.app.linksEnabled).toBe(false);
+    expect(queryContainer(".excalidraw--embeds")).not.toBe(null);
+
+    mouse.reset();
+    mouse.moveTo(80, 65);
+    expect(h.state.activeEmbeddable).toMatchObject({
+      element: expect.objectContaining({ id: embed.id }),
+      state: "hover",
+    });
+
+    mouse.clickAt(80, 65);
+    // activation is deferred (see handleIframeLikeCenterClick)
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable).toMatchObject({ state: "active" });
+    });
+
+    // clicking outside deactivates (clicks inside an active embed are
+    // consumed by the embed itself)
+    mouse.clickAt(5, 5);
+    expect(h.state.activeEmbeddable).toBe(null);
+  });
+
+  it("without embeds allowed, embeddables stay inert", async () => {
+    await render(<Excalidraw interaction={false} validateEmbeddable={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+    addEmbeddable();
+
+    expect(h.app.embedsEnabled).toBe(false);
+    expect(queryContainer(".excalidraw--embeds")).toBe(null);
+
+    mouse.reset();
+    mouse.moveTo(80, 65);
+    mouse.clickAt(80, 65);
+    expect(h.state.activeEmbeddable).toBe(null);
+  });
+
+  it("interactiveContent enables links & embeds together (additive)", async () => {
+    await render(
+      <Excalidraw interaction={{ allowed: { interactiveContent: true } }} />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    expect(h.app.linksEnabled).toBe(true);
+    expect(h.app.embedsEnabled).toBe(true);
+    // still non-interactive overall
+    expect(h.state.viewModeEnabled).toBe(true);
+    expect(h.app.interactionEnabled).toBe(false);
+
+    // additive: explicit false on individual keys doesn't override the
+    // umbrella
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        interaction={{
+          allowed: { interactiveContent: true, links: false, embeds: false },
+        }}
+      />,
+    );
+    expect(h.app.linksEnabled).toBe(true);
+    expect(h.app.embedsEnabled).toBe(true);
+  });
+});

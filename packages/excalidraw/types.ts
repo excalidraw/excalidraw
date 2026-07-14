@@ -648,10 +648,40 @@ export type InteractionConfig = {
      */
     links?: boolean;
     /**
+     * Embeddable & iframe elements stay interactive — hovering & clicking
+     * activates them so their content can be used, same as in view mode.
+     *
+     * @default false
+     */
+    embeds?: boolean;
+    /**
+     * Umbrella for all interactive content on canvas — shorthand for
+     * enabling `links` & `embeds` (and future interactive content kinds)
+     * together. Additive: `interactiveContent: true` enables them
+     * regardless of their individual values.
+     *
+     * @default false
+     */
+    interactiveContent?: boolean;
+    /**
+     * Canvas navigation — panning (pointer drag, wheel) and zooming
+     * (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts:
+     * ctrl/cmd +/-/0, shift+1/2/3), same as in view mode. Respects
+     * `appState.scrollConstraints` if set, so it composes with viewport
+     * locking. The rest of the keyboard stays disabled. Note the editor
+     * consumes wheel & touch input again when enabled, so the page no
+     * longer scrolls over the editor.
+     *
+     * @default false
+     */
+    navigation?: boolean;
+    /**
      * Whether the browser's own zoom remains available over the editor —
      * ctrl/cmd + wheel, pinch, and (while the editor has focus)
      * ctrl/cmd +/-/0 shortcuts. Prevented by default, mirroring the
      * interactive editor. Regular page scrolling stays available either way.
+     * With `navigation` enabled, the zoom input (wheel, pinch, keyboard
+     * shortcuts) zooms the canvas instead either way, making this moot.
      *
      * @default false
      */
@@ -980,6 +1010,7 @@ export type AppClassProperties = {
   setAppState: App["setAppState"];
 
   interactionEnabled: App["interactionEnabled"];
+  navigationEnabled: App["navigationEnabled"];
 };
 
 export type PointerDownState = Readonly<{

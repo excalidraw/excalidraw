@@ -87,7 +87,7 @@ export class ActionManager {
   }
 
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
-    if (!this.app.interactionEnabled) {
+    if (!this.app.interactionEnabled && !this.app.navigationEnabled) {
       return false;
     }
 
@@ -117,6 +117,12 @@ export class ActionManager {
 
     const action = data[0];
 
+    // in the non-interactive editor, only navigation actions are allowed
+    // (when navigation itself is)
+    if (!this.app.interactionEnabled && action.navigation !== true) {
+      return false;
+    }
+
     if (this.getAppState().viewModeEnabled && action.viewMode !== true) {
       return false;
     }
@@ -139,8 +145,13 @@ export class ActionManager {
     value: Parameters<T["perform"]>[2] = null,
   ) {
     // the user must not be able to affect a non-interactive editor
-    // (programmatic execution by the host remains allowed)
-    if (source !== "api" && !this.app.interactionEnabled) {
+    // (programmatic execution by the host remains allowed, as are
+    // navigation actions when navigation is)
+    if (
+      source !== "api" &&
+      !this.app.interactionEnabled &&
+      !(this.app.navigationEnabled && action.navigation === true)
+    ) {
       return;
     }
 

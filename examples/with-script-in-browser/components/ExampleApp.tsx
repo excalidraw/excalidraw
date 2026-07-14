@@ -104,6 +104,8 @@ export default function ExampleApp({
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [interactive, setInteractive] = useState(true);
   const [interactiveLinks, setInteractiveLinks] = useState(false);
+  const [interactiveEmbeds, setInteractiveEmbeds] = useState(false);
+  const [interactiveNavigation, setInteractiveNavigation] = useState(false);
   const [interactiveBrowserZoom, setInteractiveBrowserZoom] = useState(false);
   const [ui, setUi] = useState(true);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -201,6 +203,8 @@ export default function ExampleApp({
           : {
               allowed: {
                 links: interactiveLinks,
+                embeds: interactiveEmbeds,
+                navigation: interactiveNavigation,
                 browserZoom: interactiveBrowserZoom,
               },
             },
@@ -724,6 +728,22 @@ export default function ExampleApp({
               onChange={() => setInteractiveLinks(!interactiveLinks)}
             />
             Links when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveEmbeds}
+              onChange={() => setInteractiveEmbeds(!interactiveEmbeds)}
+            />
+            Embeds when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveNavigation}
+              onChange={() => setInteractiveNavigation(!interactiveNavigation)}
+            />
+            Navigation when non-interactive
           </label>
           <label>
             <input
