@@ -331,16 +331,10 @@ export const ColorPicker = ({
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {
-              // atomic switch: if another popup is open, close it first, then open this one next tick
-              if (appState.openPopup === type) {
-                // toggle off on same trigger
-                updateData({ openPopup: null });
-              } else if (appState.openPopup) {
-                updateData({ openPopup: type });
-              } else {
-                // open this one
-                updateData({ openPopup: type });
-              }
+              // toggle off on same trigger, otherwise open this one
+              updateData({
+                openPopup: appState.openPopup === type ? null : type,
+              });
             }}
           />
           {/* popup content */}
