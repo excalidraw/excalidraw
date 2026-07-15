@@ -1,7 +1,7 @@
 import {
-  loginIcon,
-  ExcalLogo,
   eyeIcon,
+  gridIcon,
+  LoadIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -11,53 +11,68 @@ import { isDevEnv } from "@excalidraw/common";
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
 
+const formatRoomDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const getRoomDate = (daysAgo: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+
+  return formatRoomDate(date);
+};
+
+const navigateToRoom = (date: string) => {
+  window.location.href = `/room/${date}`;
+};
+
 export const AppMainMenu: React.FC<{
-  onCollabDialogOpen: () => any;
-  isCollaborating: boolean;
-  isCollabEnabled: boolean;
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
+  const today = getRoomDate(0);
+  const archiveDates = Array.from({ length: 7 }, (_, index) =>
+    getRoomDate(index + 1),
+  );
+
   return (
     <MainMenu>
-      <MainMenu.DefaultItems.LoadScene />
-      <MainMenu.DefaultItems.SaveToActiveFile />
-      <MainMenu.DefaultItems.Export />
+      <MainMenu.Item
+        icon={gridIcon}
+        selected={window.location.pathname === `/room/${today}`}
+        onSelect={() => navigateToRoom(today)}
+      >
+        今日看板
+      </MainMenu.Item>
+      <MainMenu.Sub>
+        <MainMenu.Sub.Trigger icon={LoadIcon}>归档（只读）</MainMenu.Sub.Trigger>
+        <MainMenu.Sub.Content>
+          {archiveDates.map((date) => (
+            <MainMenu.Item
+              key={date}
+              selected={window.location.pathname === `/room/${date}`}
+              onSelect={() => navigateToRoom(date)}
+            >
+              {date}
+            </MainMenu.Item>
+          ))}
+        </MainMenu.Sub.Content>
+      </MainMenu.Sub>
+      <MainMenu.Separator />
       <MainMenu.DefaultItems.SaveAsImage />
-      {props.isCollabEnabled && (
-        <MainMenu.DefaultItems.LiveCollaborationTrigger
-          isCollaborating={props.isCollaborating}
-          onSelect={() => props.onCollabDialogOpen()}
-        />
-      )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.ItemLink
-        icon={ExcalLogo}
-        href={`${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
-        className=""
-      >
-        Excalidraw+
-      </MainMenu.ItemLink>
       <MainMenu.DefaultItems.Socials />
-      <MainMenu.ItemLink
-        icon={loginIcon}
-        href={`${import.meta.env.VITE_APP_PLUS_APP}${
-          isExcalidrawPlusSignedUser ? "" : "/sign-up"
-        }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
-        className="highlighted"
-      >
-        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
-      </MainMenu.ItemLink>
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}

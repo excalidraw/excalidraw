@@ -1,10 +1,8 @@
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
-  useEditorInterface,
   ExcalidrawAPIProvider,
   useExcalidrawAPI,
 } from "@excalidraw/excalidraw";
@@ -41,10 +39,7 @@ import {
   GithubIcon,
   XBrandIcon,
   DiscordIcon,
-  ExcalLogo,
   usersIcon,
-  exportToPlus,
-  share,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
@@ -89,7 +84,6 @@ import {
 } from "./app-jotai";
 import {
   FIREBASE_STORAGE_PREFIXES,
-  isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -97,21 +91,21 @@ import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
   isOfflineAtom,
+  isSocketConnectedAtom,
 } from "./collab/Collab";
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
-import {
-  ExportToExcalidrawPlus,
-  exportToExcalidrawPlus,
-} from "./components/ExportToExcalidrawPlus";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
 import {
   exportToBackend,
   getCollaborationLinkData,
+  getRoomAlias,
+  getRoomAliasCollaborationLinkData,
   importFromBackend,
   isCollaborationLink,
+  isReadOnlyRoomAlias,
 } from "./data";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
@@ -144,7 +138,6 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
 
-import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
@@ -169,6 +162,24 @@ declare global {
 }
 
 let pwaEvent: BeforeInstallPromptEvent | null = null;
+
+const formatRoomDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const getTodayRoomDate = () => formatRoomDate(new Date());
+
+const getMsUntilNextDay = () => {
+  const now = new Date();
+  const nextDay = new Date(now);
+  nextDay.setHours(24, 0, 0, 0);
+
+  return nextDay.getTime() - now.getTime();
+};
 
 // Adding a listener outside of the component as it may (?) need to be
 // subscribed early to catch the event.
@@ -245,7 +256,9 @@ const initializeScene = async (opts: {
     appState: restoreAppState(localDataState?.appState, null),
   };
 
-  let roomLinkData = getCollaborationLinkData(window.location.href);
+  let roomLinkData =
+    getCollaborationLinkData(window.location.href) ||
+    (await getRoomAliasCollaborationLinkData(window.location.href));
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -380,8 +393,6 @@ const ExcalidrawWrapper = () => {
 
   const [langCode, setLangCode] = useAppLangCode();
 
-  const editorInterface = useEditorInterface();
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -406,9 +417,43 @@ const ExcalidrawWrapper = () => {
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
-    return isCollaborationLink(window.location.href);
+    return (
+      isCollaborationLink(window.location.href) ||
+      !!getRoomAlias(window.location.href)
+    );
   });
+  const [isReadOnlyRoom, setIsReadOnlyRoom] = useState(() =>
+    isReadOnlyRoomAlias(window.location.href),
+  );
+  const [dayRollover, setDayRollover] = useState<{
+    previousDate: string;
+    today: string;
+  } | null>(null);
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+
+  useEffect(() => {
+    let timeoutId = 0;
+
+    const scheduleNextDayCheck = () => {
+      timeoutId = window.setTimeout(() => {
+        const roomDate = getRoomAlias(window.location.href);
+        const today = getTodayRoomDate();
+
+        if (roomDate && roomDate !== today) {
+          setIsReadOnlyRoom(true);
+          setDayRollover({ previousDate: roomDate, today });
+        }
+
+        scheduleNextDayCheck();
+      }, getMsUntilNextDay() + 1000);
+    };
+
+    scheduleNextDayCheck();
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -535,7 +580,8 @@ const ExcalidrawWrapper = () => {
       if (!libraryUrlTokens) {
         if (
           collabAPI?.isCollaborating() &&
-          !isCollaborationLink(window.location.href)
+          !isCollaborationLink(window.location.href) &&
+          !getRoomAlias(window.location.href)
         ) {
           collabAPI.stopCollaboration(false);
         }
@@ -784,6 +830,13 @@ const ExcalidrawWrapper = () => {
   };
 
   const isOffline = useAtomValue(isOfflineAtom);
+  const isSocketConnected = useAtomValue(isSocketConnectedAtom);
+
+  useEffect(() => {
+    document.title = isCollaborating
+      ? `上班（${isSocketConnected ? "在线" : "离线"}）`
+      : "上班";
+  }, [isCollaborating, isSocketConnected]);
 
   const localStorageQuotaExceeded = useAtomValue(localStorageQuotaExceededAtom);
 
@@ -861,45 +914,6 @@ const ExcalidrawWrapper = () => {
     );
   }
 
-  const ExcalidrawPlusCommand = {
-    label: "Excalidraw+",
-    category: DEFAULT_CATEGORIES.links,
-    predicate: true,
-    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
-    keywords: ["plus", "cloud", "server"],
-    perform: () => {
-      window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
-        "_blank",
-      );
-    },
-  };
-  const ExcalidrawPlusAppCommand = {
-    label: "Sign up",
-    category: DEFAULT_CATEGORIES.links,
-    predicate: true,
-    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
-    keywords: [
-      "excalidraw",
-      "plus",
-      "cloud",
-      "server",
-      "signin",
-      "login",
-      "signup",
-    ],
-    perform: () => {
-      window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
-        }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
-        "_blank",
-      );
-    },
-  };
-
   return (
     <div
       style={{ height: "100%" }}
@@ -912,36 +926,13 @@ const ExcalidrawWrapper = () => {
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
+        viewModeEnabled={isReadOnlyRoom}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
             export: {
               onExportToBackend,
-              renderCustomUI: excalidrawAPI
-                ? (elements, appState, files) => {
-                    return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                    );
-                  }
-                : undefined,
             },
           },
         }}
@@ -953,26 +944,18 @@ const ExcalidrawWrapper = () => {
         theme={editorTheme}
         onThemeChange={setAppTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+          if (
+            isMobile ||
+            !collabAPI ||
+            isCollabDisabled ||
+            !collabError.message
+          ) {
             return null;
           }
 
           return (
             <div className="excalidraw-ui-top-right">
-              {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
-                <ExcalidrawPlusPromoBanner
-                  isSignedIn={isExcalidrawPlusSignedUser}
-                />
-              )}
-
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-                editorInterface={editorInterface}
-              />
+              <CollabError collabError={collabError} />
             </div>
           );
         }}
@@ -988,9 +971,6 @@ const ExcalidrawWrapper = () => {
         }}
       >
         <AppMainMenu
-          onCollabDialogOpen={onCollabDialogOpen}
-          isCollaborating={isCollaborating}
-          isCollabEnabled={!isCollabDisabled}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
         />
@@ -1001,22 +981,6 @@ const ExcalidrawWrapper = () => {
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
           <OverwriteConfirmDialog.Actions.SaveToDisk />
-          {excalidrawAPI && (
-            <OverwriteConfirmDialog.Action
-              title={t("overwriteConfirm.action.excalidrawPlus.title")}
-              actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
-              onClick={() => {
-                exportToExcalidrawPlus(
-                  excalidrawAPI.getSceneElements(),
-                  excalidrawAPI.getAppState(),
-                  excalidrawAPI.getFiles(),
-                  excalidrawAPI.getName(),
-                );
-              }}
-            >
-              {t("overwriteConfirm.action.excalidrawPlus.description")}
-            </OverwriteConfirmDialog.Action>
-          )}
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
@@ -1030,6 +994,50 @@ const ExcalidrawWrapper = () => {
         {localStorageQuotaExceeded && (
           <div className="alert alert--danger">
             {t("alerts.localStorageQuotaExceeded")}
+          </div>
+        )}
+        {dayRollover && (
+          <div
+            role="dialog"
+            aria-live="polite"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 20,
+              display: "grid",
+              placeItems: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                width: "min(420px, calc(100vw - 32px))",
+                borderRadius: 8,
+                background: "var(--popup-bg-color)",
+                color: "var(--text-primary-color)",
+                boxShadow: "0 10px 28px rgba(0, 0, 0, 0.18)",
+                border: "1px solid var(--dialog-border-color)",
+                padding: 20,
+                pointerEvents: "auto",
+              }}
+            >
+              <h2 style={{ margin: "0 0 8px", fontSize: 18 }}>
+                新的一天开始了
+              </h2>
+              <p style={{ margin: "0 0 16px", lineHeight: 1.6 }}>
+                {dayRollover.previousDate} 已进入只读归档。今日看板已切换到{" "}
+                {dayRollover.today}。
+              </p>
+              <button
+                type="button"
+                className="button"
+                onClick={() => {
+                  window.location.href = `/room/${dayRollover.today}`;
+                }}
+              >
+                前往今日看板
+              </button>
+            </div>
           </div>
         )}
         {latestShareableLink && (
@@ -1112,26 +1120,6 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: t("labels.share"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: true,
-              icon: share,
-              keywords: [
-                "link",
-                "shareable",
-                "readonly",
-                "export",
-                "publish",
-                "snapshot",
-                "url",
-                "collaborate",
-                "invite",
-              ],
-              perform: async () => {
-                setShareDialogState({ isOpen: true, type: "share" });
-              },
-            },
-            {
               label: "GitHub",
               icon: GithubIcon,
               category: DEFAULT_CATEGORIES.links,
@@ -1204,32 +1192,6 @@ const ExcalidrawWrapper = () => {
                   "_blank",
                   "noopener noreferrer",
                 );
-              },
-            },
-            ...(isExcalidrawPlusSignedUser
-              ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
-              : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
-
-            {
-              label: t("overwriteConfirm.action.excalidrawPlus.button"),
-              category: DEFAULT_CATEGORIES.export,
-              icon: exportToPlus,
-              predicate: true,
-              keywords: ["plus", "export", "save", "backup"],
-              perform: () => {
-                if (excalidrawAPI) {
-                  exportToExcalidrawPlus(
-                    excalidrawAPI.getSceneElements(),
-                    excalidrawAPI.getAppState(),
-                    excalidrawAPI.getFiles(),
-                    excalidrawAPI.getName(),
-                  );
-                }
               },
             },
             {

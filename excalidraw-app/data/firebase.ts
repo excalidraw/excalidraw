@@ -57,7 +57,23 @@ let firebaseApp: ReturnType<typeof initializeApp> | null = null;
 let firestore: ReturnType<typeof getFirestore> | null = null;
 let firebaseStorage: ReturnType<typeof getStorage> | null = null;
 
+const isFirebaseConfigured = () => {
+  if (import.meta.env.VITE_APP_DISABLE_FIREBASE === "true") {
+    return false;
+  }
+
+  return !!(
+    FIREBASE_CONFIG.apiKey &&
+    FIREBASE_CONFIG.projectId &&
+    FIREBASE_CONFIG.storageBucket
+  );
+};
+
 const _initializeFirebase = () => {
+  if (!isFirebaseConfigured()) {
+    throw new Error("Firebase is not configured.");
+  }
+
   if (!firebaseApp) {
     firebaseApp = initializeApp(FIREBASE_CONFIG);
   }
@@ -132,6 +148,10 @@ export const isSavedToFirebase = (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
 ): boolean => {
+  if (!isFirebaseConfigured()) {
+    return true;
+  }
+
   if (portal.socket && portal.roomId && portal.roomKey) {
     const sceneVersion = getSceneVersion(elements);
 
@@ -149,6 +169,10 @@ export const saveFilesToFirebase = async ({
   prefix: string;
   files: { id: FileId; buffer: Uint8Array }[];
 }) => {
+  if (!isFirebaseConfigured()) {
+    return { savedFiles: [], erroredFiles: files.map(({ id }) => id) };
+  }
+
   const storage = await loadFirebaseStorage();
 
   const erroredFiles: FileId[] = [];
@@ -197,6 +221,11 @@ export const saveToFirebase = async (
     !socket ||
     isSavedToFirebase(portal, elements)
   ) {
+    return null;
+  }
+
+  if (!isFirebaseConfigured()) {
+    FirebaseSceneVersionCache.set(socket, elements);
     return null;
   }
 
@@ -251,6 +280,10 @@ export const loadFromFirebase = async (
   roomKey: string,
   socket: Socket | null,
 ): Promise<readonly SyncableExcalidrawElement[] | null> => {
+  if (!isFirebaseConfigured()) {
+    return null;
+  }
+
   const firestore = _getFirestore();
   const docRef = doc(firestore, "scenes", roomId);
   const docSnap = await getDoc(docRef);

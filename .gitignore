@@ -16,6 +16,8 @@ build
 dist
 firebase
 logs
+local_run.sh
+deploy.sh
 node_modules
 npm-debug.log*
 package-lock.json

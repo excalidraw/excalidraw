@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Excalidraw Whiteboard</title>
+    <title>在线上班</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
@@ -14,26 +14,26 @@
     <!-- Primary Meta Tags -->
     <meta
       name="title"
-      content="Free, collaborative whiteboard • Hand-drawn look & feel | Excalidraw"
+      content="在线上班"
     />
     <meta
       name="description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="在线上班是一个默认协同的在线白板。"
     />
     <meta name="image" content="https://excalidraw.com/og-image-3.png" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:site_name" content="Excalidraw" />
+    <meta property="og:site_name" content="在线上班" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://excalidraw.com" />
     <meta
       property="og:title"
-      content="Excalidraw — Collaborative whiteboarding made easy"
+      content="在线上班"
     />
-    <meta property="og:image:alt" content="Excalidraw logo" />
+    <meta property="og:image:alt" content="在线上班" />
     <meta
       property="og:description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="在线上班是一个默认协同的在线白板。"
     />
     <meta property="og:image" content="https://excalidraw.com/og-image-3.png" />
 
@@ -43,11 +43,11 @@
     <meta property="twitter:url" content="https://excalidraw.com" />
     <meta
       property="twitter:title"
-      content="Excalidraw — Collaborative whiteboarding made easy"
+      content="在线上班"
     />
     <meta
       property="twitter:description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="在线上班是一个默认协同的在线白板。"
     />
     <meta
       property="twitter:image"
@@ -95,6 +95,51 @@
     <!-- Warmup the connection for Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <script>
+      (() => {
+        const formatDate = (date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        };
+        const today = new Date();
+        const allowedDates = new Set();
+
+        for (let index = 0; index <= 7; index++) {
+          const date = new Date(today);
+          date.setDate(today.getDate() - index);
+          allowedDates.add(formatDate(date));
+        }
+
+        if (
+          window.location.pathname === "/" &&
+          !window.location.hash &&
+          !window.location.search
+        ) {
+          window.location.replace(`/room/${formatDate(today)}`);
+          return;
+        }
+
+        const roomMatch = window.location.pathname.match(
+          /^\/room\/([^/]+)\/?$/,
+        );
+
+        const date = roomMatch?.[1];
+        const isAllowedRoomPath = !!date && allowedDates.has(date);
+        const isBlockedPath =
+          window.location.pathname !== "/" && !isAllowedRoomPath;
+
+        if (isBlockedPath) {
+          document.documentElement.dataset.shangbanNotFound = "true";
+          document.addEventListener("DOMContentLoaded", () => {
+            document.body.innerHTML =
+              '<main style="min-height:100vh;display:grid;place-items:center;font-family:Arial,sans-serif;color:#1f2937;background:#f8fafc"><section style="text-align:center"><h1 style="font-size:48px;margin:0 0 12px">404</h1><p style="font-size:16px;margin:0">页面不存在或日期已超出可访问范围</p></section></main>';
+          });
+        }
+      })();
+    </script>
 
     <!------------------------------------------------------------------------->
     <% if (typeof PROD != 'undefined' && PROD == true) { %>

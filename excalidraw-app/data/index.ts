@@ -129,6 +129,52 @@ export type SocketUpdateData =
   };
 
 const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
+const RE_ROOM_ALIAS_PATH = /^\/room\/(\d{4}-\d{2}-\d{2})$/;
+const ROOM_ALIAS_STORAGE_KEY = "excalidraw-room-aliases";
+const ROOM_SERVER_URL =
+  import.meta.env.VITE_APP_ROOM_SERVER_URL ||
+  import.meta.env.VITE_APP_WS_SERVER_URL;
+
+type CollaborationLinkData = {
+  roomId: string;
+  roomKey: string;
+};
+
+const getRoomAliases = (): Record<string, CollaborationLinkData> => {
+  try {
+    return JSON.parse(localStorage.getItem(ROOM_ALIAS_STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+};
+
+const saveRoomAlias = (alias: string, data: CollaborationLinkData) => {
+  const aliases = getRoomAliases();
+  aliases[alias] = data;
+  localStorage.setItem(ROOM_ALIAS_STORAGE_KEY, JSON.stringify(aliases));
+};
+
+const getRoomAliasCollaborationLinkDataFromServer = async (alias: string) => {
+  if (!ROOM_SERVER_URL) {
+    return null;
+  }
+
+  const response = await fetch(
+    `${ROOM_SERVER_URL}/api/rooms/resolve?alias=${encodeURIComponent(alias)}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to resolve room alias: ${response.status}`);
+  }
+
+  const data = (await response.json()) as CollaborationLinkData;
+
+  if (!data.roomId || !data.roomKey || data.roomKey.length !== 22) {
+    throw new Error("Invalid room alias response");
+  }
+
+  return data;
+};
 
 export const isCollaborationLink = (link: string) => {
   const hash = new URL(link).hash;
@@ -154,6 +200,53 @@ export const generateCollaborationLinkData = async () => {
   }
 
   return { roomId, roomKey };
+};
+
+export const getRoomAlias = (link: string) => {
+  const { pathname } = new URL(link);
+  return pathname.match(RE_ROOM_ALIAS_PATH)?.[1] || null;
+};
+
+const formatRoomAliasDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+export const isReadOnlyRoomAlias = (link: string) => {
+  const alias = getRoomAlias(link);
+
+  if (!alias) {
+    return false;
+  }
+
+  return alias !== formatRoomAliasDate(new Date());
+};
+
+export const getRoomAliasCollaborationLinkData = async (link: string) => {
+  const alias = getRoomAlias(link);
+
+  if (!alias) {
+    return null;
+  }
+
+  try {
+    const roomLinkData = await getRoomAliasCollaborationLinkDataFromServer(
+      alias,
+    );
+
+    if (roomLinkData) {
+      saveRoomAlias(alias, roomLinkData);
+      return roomLinkData;
+    }
+  } catch (error) {
+    console.error("Failed to resolve room alias", error);
+    throw error;
+  }
+
+  return null;
 };
 
 export const getCollaborationLink = (data: {

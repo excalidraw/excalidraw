@@ -98,6 +98,7 @@ import type {
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
+export const isSocketConnectedAtom = atom(false);
 
 interface CollabState {
   errorMessage: string | null;
@@ -405,6 +406,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   private destroySocketClient = (opts?: { isUnload: boolean }) => {
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
+    appJotaiStore.set(isSocketConnectedAtom, false);
     this.fileManager.reset();
     if (!opts?.isUnload) {
       this.setIsCollaborating(false);
@@ -528,6 +530,16 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         roomKey,
       );
 
+      appJotaiStore.set(isSocketConnectedAtom, this.portal.socket.connected);
+      this.portal.socket.on("connect", () => {
+        appJotaiStore.set(isSocketConnectedAtom, true);
+      });
+      this.portal.socket.on("disconnect", () => {
+        appJotaiStore.set(isSocketConnectedAtom, false);
+      });
+      this.portal.socket.on("connect_error", () => {
+        appJotaiStore.set(isSocketConnectedAtom, false);
+      });
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
     } catch (error: any) {
       console.error(error);

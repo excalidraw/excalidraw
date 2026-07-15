@@ -8,10 +8,13 @@ import ExcalidrawApp from "./App";
 
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;
-const root = createRoot(rootElement);
 registerSW();
-root.render(
-  <StrictMode>
-    <ExcalidrawApp />
-  </StrictMode>,
-);
+
+if (document.documentElement.dataset.shangbanNotFound !== "true") {
+  const root = createRoot(rootElement);
+  root.render(
+    <StrictMode>
+      <ExcalidrawApp />
+    </StrictMode>,
+  );
+}

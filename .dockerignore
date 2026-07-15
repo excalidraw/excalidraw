@@ -4,6 +4,7 @@
 !.eslintrc.json
 !.npmrc
 !.prettierrc
+!collab-server/
 !excalidraw-app/
 !package.json
 !public/
