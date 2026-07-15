@@ -9,13 +9,6 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-/**
- * Sketches a freehand path with the drawShape tool and finalizes it.
- *
- * Points are fed into the trail directly rather than via `mouse.moveTo`,
- * because the pointer-move handler is rAF-throttled (`withBatchedUpdatesThrottled`)
- * and would drop all but one point per frame.
- */
 const sketch = (points: [number, number][]) => {
   const [startX, startY] = points[0];
 
