@@ -1086,9 +1086,9 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
   pointerCoords: { x: number; y: number },
 ) => {
   if (app.state.activeTool.type === "drawShape") {
-    app.drawShapeTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+    app.drawShape.trail.addPointToPath(pointerCoords.x, pointerCoords.y);
 
-    const drawShapeTrailPoints = app.drawShapeTrail.getCurrentPoints();
+    const drawShapeTrailPoints = app.drawShape.trail.getCurrentPoints();
     if (drawShapeTrailPoints.length >= 3) {
       const [minX, minY, maxX, maxY] =
         getElementBoundsFromPoints(drawShapeTrailPoints);

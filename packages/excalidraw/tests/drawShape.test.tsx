@@ -15,7 +15,7 @@ const sketch = (points: [number, number][]) => {
   mouse.downAt(startX, startY);
   act(() => {
     for (const [x, y] of points.slice(1)) {
-      h.app.drawShapeTrail.addPointToPath(x, y);
+      h.app.drawShape.trail.addPointToPath(x, y);
     }
   });
   const [endX, endY] = points[points.length - 1];

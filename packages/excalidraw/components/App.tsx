@@ -110,7 +110,6 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
-  getElementBoundsFromPoints,
   getStrokeWidthByKey,
 } from "@excalidraw/common";
 
@@ -257,9 +256,7 @@ import {
   getUncroppedWidthAndHeight,
   getActiveTextElement,
   isEligibleFrameChildType,
-  convertToShape,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  convertToShapeHandlePointerMoveFromPointerDown,
   isNonDeletedElement,
 } from "@excalidraw/element";
 
@@ -422,7 +419,6 @@ import {
   isViewportOverscrolled,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { DrawShapeTrail } from "../drawShapeTrail";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
@@ -443,6 +439,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppCursor } from "./App.cursor";
+import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -746,7 +743,7 @@ class App extends React.Component<AppProps, AppState> {
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
-  drawShapeTrail = new DrawShapeTrail(this);
+  drawShape = new AppDrawShape(this);
   laserTrails = new LaserTrails(this);
   eraserTrail = new EraserTrail(this);
   lassoTrail = new LassoTrail(this);
@@ -2460,7 +2457,7 @@ class App extends React.Component<AppProps, AppState> {
                               this.laserTrails,
                               this.lassoTrail,
                               this.eraserTrail,
-                              this.drawShapeTrail,
+                              this.drawShape.trail,
                             ]}
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
@@ -3816,7 +3813,7 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.library.destroy();
     this.laserTrails.stop();
-    this.drawShapeTrail.stop();
+    this.drawShape.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -7844,7 +7841,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private insertNewElement = (element: ExcalidrawElement) => {
+  public insertNewElement = (element: ExcalidrawElement) => {
     this.insertNewElements([element]);
 
     const frame = element.frameId
@@ -9012,10 +9009,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.y,
       );
     } else if (this.state.activeTool.type === "drawShape") {
-      this.drawShapeTrail.startPath(
-        pointerDownState.lastCoords.x,
-        pointerDownState.lastCoords.y,
-      );
+      this.drawShape.handlePointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -10814,7 +10808,7 @@ class App extends React.Component<AppProps, AppState> {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
-      if (convertToShapeHandlePointerMoveFromPointerDown(this, pointerCoords)) {
+      if (this.drawShape.handlePointerMove(pointerCoords)) {
         return;
       }
 
@@ -12611,79 +12605,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "drawShape") {
-        const points = this.drawShapeTrail.getCurrentPoints();
-        this.drawShapeTrail.endPath();
-
-        if (points.length >= 3) {
-          const [minX, minY, maxX, maxY] = getElementBoundsFromPoints(points);
-          const width = maxX - minX;
-          const height = maxY - minY;
-
-          if (width > 2 && height > 2) {
-            const detectedElement =
-              this.state.newElement ||
-              convertToShape(
-                points,
-                this.state,
-                this.scene.getNonDeletedElementsMap(),
-                this.state.newElement,
-                this.scene.getNonDeletedFramesLikes(),
-              );
-
-            if (detectedElement) {
-              const _detectedElement = {
-                ...detectedElement,
-                seed: randomInteger(),
-                opacity: this.state.currentItemOpacity,
-              };
-              this.insertNewElement(_detectedElement);
-
-              if (isBindingElement(_detectedElement)) {
-                const [x, y] =
-                  LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                    _detectedElement,
-                    1,
-                    this.scene.getNonDeletedElementsMap(),
-                  );
-
-                this.scene.mutateElement(_detectedElement, {
-                  startArrowhead: this.state.currentItemStartArrowhead,
-                  endArrowhead: this.state.currentItemEndArrowhead,
-                });
-
-                flushSync(() => {
-                  const linearElement = new LinearElementEditor(
-                    _detectedElement,
-                    this.scene.getNonDeletedElementsMap(),
-                  );
-                  this.setState({
-                    newElement: _detectedElement,
-                    selectedLinearElement: {
-                      ...linearElement,
-                      pointerOffset: {
-                        x: 0,
-                        y: 0,
-                      },
-                      initialState: {
-                        ...linearElement.initialState,
-                        lastClickedPoint: 1,
-                      },
-                      selectedPointsIndices: [1],
-                    },
-                  });
-                });
-
-                this.actionManager.executeAction(actionFinalize, "ui", {
-                  event: childEvent,
-                  sceneCoords: { x, y },
-                });
-              }
-            }
-          }
-        }
-
-        this.actionManager.executeAction(actionFinalize);
-        this.drawShapeTrail.clearTrails();
+        this.drawShape.handlePointerUp(childEvent);
         return;
       }
 
