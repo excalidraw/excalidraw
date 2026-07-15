@@ -189,6 +189,14 @@ export const findShapeByKey = (key: string, app: AppClassProperties) => {
   return null;
 };
 
+/**
+ * Whether a toolbar entry activating the given tool renders disabled — true
+ * when the active tool is host-controlled (`props.activeTool`) and the entry
+ * doesn't activate the forced tool (`setActiveTool` refuses it).
+ */
+export const isToolButtonDisabled = (app: AppClassProperties, type: string) =>
+  app.props.activeTool != null && app.props.activeTool.type !== type;
+
 export type ToolButtonComponentProps = {
   app: AppClassProperties;
   activeTool: UIAppState["activeTool"];
@@ -245,6 +253,7 @@ const createToolButton = (
         type="toggle"
         icon={config.icon}
         checked={activeTool.type === type}
+        disabled={isToolButtonDisabled(app, type)}
         title={shortcut ? `${label} — ${shortcut}` : label}
         keyBindingLabel={
           hideKeyBinding || hideShortcut

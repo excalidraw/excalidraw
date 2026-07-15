@@ -644,6 +644,13 @@ body.excalidraw-cursor-resize * {
       touch-action: none;
     }
 
+    // with the active tool allowed (`interaction.enabled.tools`), touch
+    // input drives the tool again — e.g. laser strokes must not scroll the
+    // page
+    &.excalidraw--tools canvas {
+      touch-action: none;
+    }
+
     // override inline pointer-events set when embeddable is active
     // (also covers custom `renderEmbeddable` content) — unless embeds are
     // an allowed interaction, in which case the inline (activation-driven)

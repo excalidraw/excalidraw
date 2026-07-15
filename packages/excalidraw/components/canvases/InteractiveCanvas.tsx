@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
 import {
-  CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
   type EditorInterface,
@@ -203,15 +202,12 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   return (
     <canvas
       className="excalidraw__canvas interactive"
+      // NOTE no `cursor` style here — the cursor is managed imperatively
+      // (see `AppCursor`); an inline style would clobber it whenever its
+      // computed value changes across rerenders
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor:
-          props.navigationEnabled &&
-          props.appState.viewModeEnabled &&
-          props.appState.activeTool.type !== "laser"
-            ? CURSOR_TYPE.GRAB
-            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}

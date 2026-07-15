@@ -664,13 +664,13 @@ export type InteractionConfig = {
      */
     interactiveContent?: boolean;
     /**
-     * Canvas navigation — panning (pointer drag, wheel) and zooming
-     * (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts:
-     * ctrl/cmd +/-/0, shift+1/2/3), same as in view mode. Respects
-     * `appState.scrollConstraints` if set, so it composes with viewport
-     * locking. The rest of the keyboard stays disabled. Note the editor
-     * consumes wheel & touch input again when enabled, so the page no
-     * longer scrolls over the editor.
+     * Canvas navigation — panning (pointer drag, wheel, PageUp/PageDown)
+     * and zooming (ctrl/cmd + wheel, pinch, and the canvas zoom &
+     * zoom-to-fit shortcuts: ctrl/cmd +/-/0, shift+1/2/3), same as in view
+     * mode. Respects `appState.scrollConstraints` if set, so it composes
+     * with viewport locking. The rest of the keyboard stays disabled. Note
+     * the editor consumes wheel & touch input again when enabled, so the
+     * page no longer scrolls over the editor.
      *
      * @default false
      */
@@ -686,6 +686,36 @@ export type InteractionConfig = {
      * @default false
      */
     browserZoom?: boolean;
+    /**
+     * Tools that stay user-driven while the editor is otherwise
+     * non-interactive: pointer input keeps driving the listed tool when it's
+     * the active tool. Does not enable user-driven tool *switching* — the
+     * keyboard stays disabled and tool selection remains host-driven
+     * (`ExcalidrawAPI.setActiveTool`).
+     *
+     * Composes with `navigation`: the enabled tool wins the primary-pointer
+     * drag, while wheel input (and wheel-button drag) still pans/zooms.
+     */
+    tools?: {
+      /**
+       * The laser pointer stays usable — pointer strokes draw laser trails
+       * and pointer positions keep broadcasting via `onPointerUpdate`, so
+       * e.g. collaborators see a presenter's laser & cursor.
+       *
+       * @default false
+       */
+      laser?: boolean;
+      /**
+       * Custom tools (`activeTool.type === "custom"`) stay usable — the
+       * editor keeps dispatching `onPointerDown` / `onPointerUp` for them.
+       * Tool behavior is host-implemented; activate custom tools with
+       * `locked: true` or they revert to the selection tool (and go inert)
+       * after the first pointer interaction.
+       *
+       * @default false
+       */
+      custom?: boolean;
+    };
   };
 };
 
@@ -790,6 +820,27 @@ export interface ExcalidrawProps {
    * @default true
    */
   ui?: boolean;
+  /**
+   * Forces the active editor tool (controlled). While set, user- and
+   * API-driven tool switching is ignored — `setActiveTool` refuses with a
+   * console warning, non-forced toolbar buttons render disabled — and the
+   * editor snaps back if internal flows reset the tool. The forced tool
+   * behaves as if locked (see the tool lock / padlock): it doesn't revert to
+   * the selection tool after use, and elements drawn with it aren't
+   * auto-selected — without mutating `appState.activeTool.locked`, so the
+   * user's persisted padlock preference stays untouched. Unset to return
+   * tool control to the editor (the current tool stays active).
+   *
+   * The forced tool must be activatable to take effect: not disabled via
+   * `UIOptions.tools`, and — while the editor is non-interactive — allowed
+   * via `interaction.enabled.tools`. Otherwise the editor stays on (or, when
+   * non-interactive, resets to) the `selection` tool, and the forced tool is
+   * applied once it becomes activatable. `image` cannot be forced (its
+   * activation opens the file picker).
+   */
+  activeTool?:
+    | { type: Exclude<ToolType, "image"> }
+    | { type: "custom"; customType: string };
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
@@ -993,6 +1044,8 @@ export type AppClassProperties = {
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
+  cursor: App["cursor"];
+  isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
@@ -1135,8 +1188,8 @@ export interface ExcalidrawImperativeAPI {
   addFiles: (data: BinaryFileData[]) => void;
   id: string;
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
-  setCursor: InstanceType<typeof App>["setCursor"];
-  resetCursor: InstanceType<typeof App>["resetCursor"];
+  setCursor: InstanceType<typeof App>["cursor"]["set"];
+  resetCursor: InstanceType<typeof App>["cursor"]["reset"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getEditorInterface: () => EditorInterface;
   /**

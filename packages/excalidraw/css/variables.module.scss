@@ -79,6 +79,29 @@ $color-blue-8: #1971c2;
       }
     }
   }
+
+  // disabled toggle buttons (e.g. non-forced tools while `props.activeTool`
+  // is set) — greyed out, without hover/active affordances
+  &.ToolIcon_type_toggle:disabled {
+    cursor: default;
+    --keybinding-color: var(--color-disabled);
+
+    .ToolIcon__icon {
+      svg {
+        color: var(--color-disabled);
+      }
+
+      &:hover,
+      &:active {
+        background: initial;
+        border: none;
+
+        svg {
+          color: var(--color-disabled);
+        }
+      }
+    }
+  }
 }
 
 @mixin outlineButtonStyles {

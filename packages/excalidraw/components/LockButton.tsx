@@ -8,6 +8,7 @@ type LockButtonProps = {
   checked: boolean;
   onChange?(): void;
   isMobile?: boolean;
+  disabled?: boolean;
 };
 
 export const LockButton = (props: LockButtonProps) => {
@@ -17,6 +18,7 @@ export const LockButton = (props: LockButtonProps) => {
       type="toggle"
       icon={props.checked ? LockedIcon : UnlockedIcon}
       checked={props.checked}
+      disabled={props.disabled}
       title={`${props.title} — Q`}
       aria-label={`${props.title}`}
       data-testid="toolbar-lock"
