@@ -1,0 +1,37 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_APP_WS_SERVER_URL: ${PUBLIC_COLLAB_URL}
+        VITE_APP_ROOM_SERVER_URL: ${PUBLIC_COLLAB_URL}
+        VITE_APP_DISABLE_SENTRY: "true"
+        VITE_APP_DISABLE_FIREBASE: "true"
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - collab
+
+  collab:
+    build:
+      context: .
+      dockerfile: Dockerfile.collab
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: "3002"
+      CLIENT_ORIGIN: ${PUBLIC_WEB_URL}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      REDIS_URL: ${REDIS_URL}
+      ROOM_ALIAS_TIME_ZONE: ${ROOM_ALIAS_TIME_ZONE:-Asia/Shanghai}
+      ROOM_ALIAS_MAX_PAST_DAYS: ${ROOM_ALIAS_MAX_PAST_DAYS:-7}
+      SCENE_LATEST_THROTTLE_MS: ${SCENE_LATEST_THROTTLE_MS:-5000}
+      SCENE_LATEST_TTL_SECONDS: ${SCENE_LATEST_TTL_SECONDS:-691200}
+      SCENE_HISTORY_INTERVAL_MS: ${SCENE_HISTORY_INTERVAL_MS:-3600000}

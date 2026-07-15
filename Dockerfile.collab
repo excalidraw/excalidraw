@@ -1,0 +1,13 @@
+FROM node:24-alpine
+
+WORKDIR /opt/collab-server
+
+COPY collab-server/package.json ./
+RUN npm install --omit=dev
+
+COPY collab-server/schema.sql ./schema.sql
+COPY collab-server/src ./src
+
+EXPOSE 3002
+
+CMD ["npm", "start"]

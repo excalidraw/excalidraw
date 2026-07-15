@@ -1,0 +1,16 @@
+{
+  "name": "excalidraw-collab-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "init-db": "node src/init-db.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "8.3.0",
+    "mysql2": "3.22.6",
+    "redis": "6.1.0",
+    "socket.io": "4.8.1"
+  }
+}

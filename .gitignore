@@ -16,7 +16,7 @@ build
 dist
 firebase
 logs
-local_run.sh
+deploy_dev.sh
 deploy.sh
 node_modules
 npm-debug.log*
