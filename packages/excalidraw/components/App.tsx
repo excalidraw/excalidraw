@@ -5768,7 +5768,9 @@ class App extends React.Component<AppProps, AppState> {
         // inside an input
         (isWritableElement(event.target) &&
           // unless pressing escape (finalize action)
-          event.key !== KEYS.ESCAPE) ||
+          event.key !== KEYS.ESCAPE &&
+          // unless pressing CTRL+S (to save)
+          !(event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.S)) ||
         // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
