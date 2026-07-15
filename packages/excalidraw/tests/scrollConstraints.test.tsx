@@ -12,12 +12,13 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
 import {
-  animateToConstraints,
+  snapBackToConstraints,
   constrainScrollState,
   DEFAULT_OVERSCROLL,
+  getViewportForZoomWithScrollConstraints,
   isViewportOverscrolled,
+  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
 } from "../viewport";
 import { AnimationController } from "../renderer/animation";
@@ -25,6 +26,8 @@ import { AnimationController } from "../renderer/animation";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
 import {
+  fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
@@ -67,16 +70,13 @@ const makeLock = (
   ...overrides,
 });
 
-const waitForViewportAnimationToStop = (maxFrames = 200) => {
+const waitForAnimationToStop = (key: string, maxFrames = 200) => {
   return React.act(
     () =>
       new Promise<void>((resolve) => {
         let remaining = maxFrames;
         const check = () => {
-          if (
-            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
-            --remaining <= 0
-          ) {
+          if (!AnimationController.running(key) || --remaining <= 0) {
             resolve();
           } else {
             requestAnimationFrame(check);
@@ -417,26 +417,77 @@ describe("animateToConstraints (rubberband snap-back)", () => {
   it("starts an animation toward the box when overscrolled", () => {
     const onFrame = vi.fn();
     // scrollX 200 is outside the hard range [-800, 0]
-    animateToConstraints(
+    snapBackToConstraints(
       makeState({ scrollX: 200, scrollConstraints: lock }),
       onFrame,
     );
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
     expect(onFrame).toHaveBeenCalled();
   });
 
   it("is a no-op when already within the box", () => {
     const onFrame = vi.fn();
-    animateToConstraints(
+    snapBackToConstraints(
       makeState({ scrollX: -100, scrollConstraints: lock }),
       onFrame,
     );
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
     expect(onFrame).not.toHaveBeenCalled();
+  });
+
+  it("does not supersede an active viewport navigation", () => {
+    AnimationController.start(SCROLL_TO_CONTENT_ANIMATION_KEY, () => ({}));
+
+    snapBackToConstraints(
+      makeState({ scrollX: 200, scrollConstraints: lock }),
+      vi.fn(),
+    );
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+  });
+});
+
+describe("getViewportForZoomWithScrollConstraints", () => {
+  it("preserves the screen-space overscroll distance while zooming", () => {
+    const state = {
+      ...makeState({
+        scrollY: 50,
+        scrollConstraints: makeLock({
+          x: 0,
+          y: 0,
+          width: 1000,
+          height: 1000,
+          lockScroll: true,
+          overscroll: 50,
+        }),
+      }),
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as AppState;
+
+    const viewport = getViewportForZoomWithScrollConstraints(
+      {
+        viewportX: 0,
+        viewportY: 0,
+        nextZoom: getNormalizedZoom(2),
+      },
+      state,
+    );
+    const restingViewport = constrainScrollState({ ...state, ...viewport });
+
+    expect(viewport.zoom.value).toBe(2);
+    expect(
+      (viewport.scrollY - restingViewport.scrollY) * viewport.zoom.value,
+    ).toBeCloseTo(50);
   });
 });
 
@@ -512,7 +563,7 @@ describe("setViewport lock (integration)", () => {
       );
       expect(h.state.scrollConstraints).toBe(null);
 
-      await waitForViewportAnimationToStop();
+      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
 
       expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
         false,
@@ -861,7 +912,7 @@ describe("rubberband overscroll (integration)", () => {
     React.act(() => {
       // eslint-disable-next-line dot-notation -- private method; bracket access is the TS escape hatch
       h.app["translateCanvas"]((state: AppState) => ({
-        ...getStateForZoom(
+        ...getViewportForZoomWithScrollConstraints(
           { viewportX: 0, viewportY: 0, nextZoom: getNormalizedZoom(0.2) },
           state,
         ),
@@ -959,16 +1010,16 @@ describe("rubberband overscroll (integration)", () => {
       // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
       h.app["snapBackToScrollConstraintsDebounced"].flush();
     });
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
     expect(isViewportOverscrolled(h.state)).toBe(true);
 
     // lifting one finger ends the gesture → the rubberband releases
     finger1.up();
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
 
     finger2.up();
   });
@@ -1000,15 +1051,73 @@ describe("rubberband overscroll (integration)", () => {
       // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
       h.app["snapBackToScrollConstraintsDebounced"].flush();
     });
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
     expect(isViewportOverscrolled(h.state)).toBe(true);
 
     mouse.up();
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
+
+    // Direct manipulation takes ownership of the viewport again.
+    mouse.downAt(50, 7);
+    mouse.move(0, 1);
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+    mouse.up();
+  });
+
+  it("continues rubberband snap-back while wheel-zooming", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      mouse.downAt(50, 2);
+      mouse.move(0, 5);
+      mouse.up();
+
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(true);
+      expect(isViewportOverscrolled(h.state)).toBe(true);
+
+      const zoomBefore = h.state.zoom.value;
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+
+      expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
+      expect(isViewportOverscrolled(h.state)).toBe(true);
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(true);
+
+      await waitForAnimationToStop(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(false);
+      expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
+      expect(isViewportOverscrolled(h.state)).toBe(false);
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
   });
 
   it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {

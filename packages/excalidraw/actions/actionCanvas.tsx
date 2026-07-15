@@ -33,8 +33,11 @@ import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
-import { constrainScrollState, zoomToFitBounds } from "../viewport";
+import {
+  constrainScrollState,
+  getViewportForZoomWithScrollConstraints,
+  zoomToFitBounds,
+} from "../viewport";
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
@@ -132,7 +135,7 @@ export const actionZoomIn = register({
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -143,7 +146,7 @@ export const actionZoomIn = register({
       userToFollow: null,
     };
     return {
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -179,7 +182,7 @@ export const actionZoomOut = register({
   perform: (_elements, appState, _, app) => {
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -190,7 +193,7 @@ export const actionZoomOut = register({
       userToFollow: null,
     };
     return {
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -231,7 +234,7 @@ export const actionResetZoom = register({
       : 1;
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -242,8 +245,7 @@ export const actionResetZoom = register({
       userToFollow: null,
     };
     return {
-      // re-clamp so the reset can't escape an active scroll/zoom lock
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },

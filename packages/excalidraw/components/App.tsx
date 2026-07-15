@@ -369,7 +369,6 @@ import {
   hasBackground,
   isSomeElementSelected,
 } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
 import {
   dataURLToString,
   generateIdFromFile,
@@ -411,12 +410,13 @@ import { Renderer } from "../scene/Renderer";
 import {
   type SetViewportOptions,
   SCROLL_TO_CONTENT_ANIMATION_KEY,
+  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
   setViewportToBounds,
   resolveViewportTarget,
   getConstrainedTargetViewport,
   constrainScrollState,
-  animateToConstraints,
-  isViewportOverscrolled,
+  snapBackToConstraints,
+  getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laserTrails";
@@ -4240,7 +4240,8 @@ class App extends React.Component<AppProps, AppState> {
     const scrolledOutside =
       // hide when editing text
       this.state.editingTextElement ||
-      AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)
+      AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY)
         ? false
         : !this.visibleElements.length && this.hasRenderableElements;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -5057,19 +5058,14 @@ class App extends React.Component<AppProps, AppState> {
     value: number,
   ) => {
     this.setState((state) => {
-      const nextState = {
-        ...state,
-        ...getStateForZoom(
-          {
-            viewportX: state.width / 2 + state.offsetLeft,
-            viewportY: state.height / 2 + state.offsetTop,
-            nextZoom: getNormalizedZoom(value),
-          },
-          state,
-        ),
-      };
-      // re-clamp so a programmatic zoom can't escape an active scroll/zoom lock
-      return { ...nextState, ...constrainScrollState(nextState) };
+      return getViewportForZoomWithScrollConstraints(
+        {
+          viewportX: state.width / 2 + state.offsetLeft,
+          viewportY: state.height / 2 + state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        state,
+      );
     });
   };
 
@@ -5119,6 +5115,7 @@ class App extends React.Component<AppProps, AppState> {
   setViewport = (opts: SetViewportOptions | null) => {
     // `null` clears all active locks
     if (opts === null) {
+      AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
       if (this.state.scrollConstraints) {
         this.setState({ scrollConstraints: null });
       }
@@ -5232,9 +5229,15 @@ class App extends React.Component<AppProps, AppState> {
        * rubberband give instead of the zoom hard clamp (see the touch
        * pinch handler, which composes both in one update) */
       zoomPreConstrained?: boolean;
+      /** keep an in-flight scroll-constraint snap-back running while this
+       * update changes the viewport (used by zoom, which composes with it) */
+      preserveScrollConstraintsSnapBack?: boolean;
     },
   ) => {
     AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+    if (!opts?.preserveScrollConstraintsSnapBack) {
+      AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+    }
     this.setState({ shouldCacheIgnoreZoom: false });
     this.maybeUnfollowRemoteUser();
 
@@ -5282,7 +5285,9 @@ class App extends React.Component<AppProps, AppState> {
     if (this.unmounted || gesture.pointers.size >= 2 || isPanning) {
       return;
     }
-    animateToConstraints(this.state, (viewport) => this.setState(viewport));
+    snapBackToConstraints(this.state, (updater) =>
+      this.setState((state) => updater(state)),
+    );
   };
 
   private releaseScrollConstraintsOverscroll = () => {
@@ -6430,24 +6435,24 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // while rubberband-overscrolled past the scroll constraints, suppress
-    // zooming until the viewport has snapped back inside the box
-    if (isViewportOverscrolled(this.state)) {
-      return;
-    }
-
     const initialScale = gesture.initialScale;
     if (initialScale) {
-      this.translateCanvas((state) => ({
-        ...getStateForZoom(
-          {
-            viewportX: this.lastViewportPosition.x,
-            viewportY: this.lastViewportPosition.y,
-            nextZoom: getNormalizedZoom(initialScale * event.scale),
-          },
-          state,
-        ),
-      }));
+      this.translateCanvas(
+        (state) => ({
+          ...getViewportForZoomWithScrollConstraints(
+            {
+              viewportX: this.lastViewportPosition.x,
+              viewportY: this.lastViewportPosition.y,
+              nextZoom: getNormalizedZoom(initialScale * event.scale),
+            },
+            state,
+          ),
+        }),
+        {
+          zoomPreConstrained: true,
+          preserveScrollConstraintsSnapBack: true,
+        },
+      );
     }
   });
 
@@ -9325,18 +9330,10 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.zoom.value;
 
       this.setState((state) => {
-        // constrain the zoom and pan components separately: the zoom step is
-        // hard-clamped against the scroll lock (sliding the focal point along
-        // the lock edge), while any pre-existing overscroll plus this frame's
-        // pan delta are re-applied on top and rubberband-clamped by
-        // `translateCanvas` — so pinch-zooming and overscroll-panning compose
-        // instead of the zoom yanking the viewport back inside the box.
-        const rest = constrainScrollState(state); // hard clamp (no give)
-        // pre-existing overscroll, in screen px (zoom-independent)
-        const overscrollX = (state.scrollX - rest.scrollX) * state.zoom.value;
-        const overscrollY = (state.scrollY - rest.scrollY) * state.zoom.value;
-
-        const zoomState = getStateForZoom(
+        // Preserve any existing screen-space overscroll through the zoom,
+        // then apply this frame's pan delta on top. `translateCanvas`
+        // rubberband-clamps the combined result against the scroll lock.
+        const zoomedViewport = getViewportForZoomWithScrollConstraints(
           {
             viewportX: center.x,
             viewportY: center.y,
@@ -9344,7 +9341,6 @@ class App extends React.Component<AppProps, AppState> {
           },
           state,
         );
-        const zoomedViewport = constrainScrollState({ ...state, ...zoomState });
         const zoomValue = zoomedViewport.zoom.value;
 
         this.translateCanvas(
@@ -9353,10 +9349,8 @@ class App extends React.Component<AppProps, AppState> {
             // 2x multiplier is just a magic number that makes this work correctly
             // on touchscreen devices (note: if we get report that panning is slower/faster
             // than actual movement, consider swapping with devicePixelRatio)
-            scrollX:
-              zoomedViewport.scrollX + (overscrollX + 2 * deltaX) / zoomValue,
-            scrollY:
-              zoomedViewport.scrollY + (overscrollY + 2 * deltaY) / zoomValue,
+            scrollX: zoomedViewport.scrollX + (2 * deltaX) / zoomValue,
+            scrollY: zoomedViewport.scrollY + (2 * deltaY) / zoomValue,
             shouldCacheIgnoreZoom: true,
           },
           { zoomPreConstrained: true },
@@ -13879,12 +13873,6 @@ class App extends React.Component<AppProps, AppState> {
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
-        // while rubberband-overscrolled past the scroll constraints, suppress
-        // zooming until the viewport has snapped back inside the box
-        if (isViewportOverscrolled(this.state)) {
-          return;
-        }
-
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -13906,17 +13894,23 @@ class App extends React.Component<AppProps, AppState> {
           : MIN_ZOOM;
         newZoom = Math.max(newZoom, minZoom);
 
-        this.translateCanvas((state) => ({
-          ...getStateForZoom(
-            {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
-              nextZoom: getNormalizedZoom(newZoom),
-            },
-            state,
-          ),
-          shouldCacheIgnoreZoom: true,
-        }));
+        this.translateCanvas(
+          (state) => ({
+            ...getViewportForZoomWithScrollConstraints(
+              {
+                viewportX: this.lastViewportPosition.x,
+                viewportY: this.lastViewportPosition.y,
+                nextZoom: getNormalizedZoom(newZoom),
+              },
+              state,
+            ),
+            shouldCacheIgnoreZoom: true,
+          }),
+          {
+            zoomPreConstrained: true,
+            preserveScrollConstraintsSnapBack: true,
+          },
+        );
         this.resetShouldCacheIgnoreZoomDebounced();
         return;
       }
