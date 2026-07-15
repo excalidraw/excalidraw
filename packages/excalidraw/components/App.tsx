@@ -4979,8 +4979,7 @@ class App extends React.Component<AppProps, AppState> {
       gesture.pointers.size < 2 &&
       this.state.scrollConstraints
     ) {
-      this.snapBackToScrollConstraintsDebounced.cancel();
-      this.snapBackToScrollConstraints();
+      this.releaseScrollConstraintsOverscroll();
     }
   };
 
@@ -5276,14 +5275,22 @@ class App extends React.Component<AppProps, AppState> {
 
   /** animates an overscrolled viewport back inside the constraint box */
   private snapBackToScrollConstraints = () => {
-    // withhold the rubberband while a multi-touch gesture is still engaged —
-    // snapping back mid-gesture (e.g. while holding a pinch or between
-    // two-finger pans) fights the user's fingers and reads as jerky. It is
-    // released on gesture end instead (see `removePointer`).
-    if (this.unmounted || gesture.pointers.size >= 2) {
+    // withhold the rubberband while a viewport pointer gesture is still
+    // engaged — snapping back mid-gesture fights the user's fingers/cursor
+    // and reads as jerky. It is released on touch gesture end (`removePointer`)
+    // or desktop pan teardown (`handleCanvasPanUsingWheelOrSpaceDrag`).
+    if (this.unmounted || gesture.pointers.size >= 2 || isPanning) {
       return;
     }
     animateToConstraints(this.state, (viewport) => this.setState(viewport));
+  };
+
+  private releaseScrollConstraintsOverscroll = () => {
+    if (!this.state.scrollConstraints) {
+      return;
+    }
+    this.snapBackToScrollConstraintsDebounced.cancel();
+    this.snapBackToScrollConstraints();
   };
 
   private snapBackToScrollConstraintsDebounced = debounce(
@@ -9241,9 +9248,14 @@ class App extends React.Component<AppProps, AppState> {
         if (!isHoldingSpace) {
           this.cursor.reset();
         }
-        this.setState({
-          cursorButton: "up",
-        });
+        this.setState(
+          {
+            cursorButton: "up",
+          },
+          // Runs after the trailing throttled pointer move has committed, so
+          // the snap-back starts from the pan's actual final viewport.
+          this.releaseScrollConstraintsOverscroll,
+        );
         this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
         window.removeEventListener(EVENT.POINTER_UP, teardown);

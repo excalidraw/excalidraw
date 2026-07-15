@@ -973,6 +973,44 @@ describe("rubberband overscroll (integration)", () => {
     finger2.up();
   });
 
+  it("withholds the rubberband snap-back until a desktop pan ends", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+
+    // Drag down past the top edge and hold the mouse button there.
+    mouse.downAt(50, 2);
+    mouse.move(0, 5);
+    expect(isViewportOverscrolled(h.state)).toBe(true);
+
+    // The debounce may elapse while the mouse is still held, but the viewport
+    // must remain attached to the pointer until the pan session ends.
+    React.act(() => {
+      // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
+      h.app["snapBackToScrollConstraintsDebounced"].flush();
+    });
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(isViewportOverscrolled(h.state)).toBe(true);
+
+    mouse.up();
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+  });
+
   it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));
