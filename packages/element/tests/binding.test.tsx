@@ -16,6 +16,7 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
+import { bindBindingElement, updateBoundElements } from "../src/binding";
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -24,8 +25,10 @@ import {
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawLinearElement,
   FixedPointBinding,
+  NonDeleted,
 } from "../src/types";
 
 const { h } = window;
@@ -754,4 +757,58 @@ describe("binding for simple arrows", () => {
       expect(arrow.endBinding).toBe(null);
     });
   });
+});
+
+describe("binding to a point-like (sub-pixel) element", () => {
+  beforeEach(async () => {
+    mouse.reset();
+    await act(() => setLanguage(defaultLang));
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  // Regression: binding to a zero/near-zero-size element used to yield an
+  // enormous fixedPoint ratio (offset / ~0), which exploded into an arrow
+  // hundreds of thousands of px wide once the element was resized to a normal
+  // size
+  it.each([
+    ["simple", false],
+    ["elbow", true],
+  ])(
+    "%s arrow binds to the center and stays put when the element grows",
+    (_label, elbowed) => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 200,
+        y: 50,
+        width: 0.00005,
+        height: 0.00005,
+      }) as NonDeleted<ExcalidrawBindableElement>;
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed,
+        x: 0,
+        y: 50,
+        width: 195,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(195, 0)],
+      }) as NonDeleted<ExcalidrawArrowElement>;
+      API.setElements([rect, arrow]);
+
+      bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+
+      const endBinding = arrow.endBinding as FixedPointBinding;
+      expect(endBinding.elementId).toBe(rect.id);
+      // Point-like element => bind to center (0.5 is normalized to 0.5001)
+      expect(endBinding.fixedPoint[0]).toBeCloseTo(0.5001);
+      expect(endBinding.fixedPoint[1]).toBeCloseTo(0.5001);
+
+      // Grow the element to a normal size and let bound arrows follow
+      h.scene.mutateElement(rect, { width: 300, height: 200 });
+      updateBoundElements(rect, h.scene);
+
+      // The arrow endpoint must track the element (its center), not fly off
+      expect(Math.abs(arrow.width)).toBeLessThan(1000);
+      expect(Math.abs(arrow.height)).toBeLessThan(1000);
+    },
+  );
 });

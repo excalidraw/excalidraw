@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { ButtonIcon } from "./ButtonIcon";
+import { RadioButton } from "./RadioButton";
 
 import type { JSX } from "react";
 
@@ -30,7 +30,7 @@ export const RadioSelection = <T extends Object>(
   <>
     {props.options.map((option) =>
       props.type === "button" ? (
-        <ButtonIcon
+        <RadioButton
           key={option.text}
           icon={option.icon}
           title={option.text}

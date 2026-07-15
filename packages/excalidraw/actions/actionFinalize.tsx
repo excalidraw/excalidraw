@@ -32,7 +32,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
@@ -42,9 +42,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
-import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { TOGGLE_TOOLS } from "../components/Tools";
+import { IconButton } from "../components/IconButton";
 
 import { register } from "./register";
 
@@ -62,7 +62,7 @@ export const actionFinalize = register<FormData>({
   perform: (elements, appState, data, app) => {
     let shouldCommit = true;
     let newElements = elements;
-    const { interactiveCanvas, focusContainer, scene } = app;
+    const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (data && appState.selectedLinearElement) {
@@ -100,32 +100,40 @@ export const actionFinalize = register<FormData>({
             ? [element.points.length - 1] // New arrow creation
             : appState.selectedLinearElement.selectedPointsIndices;
 
+        const angleLocked = shouldRotateWithDiscreteAngle(event);
+        const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
+          ? null
+          : app.getEffectiveGridSize();
+
         const draggedPoints: PointsPositionUpdates =
           selectedPointsIndices.reduce((map, index) => {
             map.set(index, {
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                element,
-                pointFrom<GlobalPoint>(
-                  sceneCoords.x - linearElementEditor.pointerOffset.x,
-                  sceneCoords.y - linearElementEditor.pointerOffset.y,
-                ),
-                elementsMap,
-              ),
+              point: angleLocked
+                ? element.points[index]
+                : LinearElementEditor.createPointAt(
+                    element,
+                    elementsMap,
+                    sceneCoords.x - linearElementEditor.pointerOffset.x,
+                    sceneCoords.y - linearElementEditor.pointerOffset.y,
+                    effectiveGridSize,
+                  ),
             });
 
             return map;
           }, new Map()) ?? new Map();
+
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          sceneCoords.x - linearElementEditor.pointerOffset.x,
-          sceneCoords.y - linearElementEditor.pointerOffset.y,
+          sceneCoords.x,
+          sceneCoords.y,
           scene,
           appState,
           {
             newArrow,
             altKey: event.altKey,
-            angleLocked: shouldRotateWithDiscreteAngle(event),
+            angleLocked,
+            gridSize: app.getEffectiveGridSize(),
           },
         );
       } else if (isLineElement(element)) {
@@ -375,27 +383,33 @@ export const actionFinalize = register<FormData>({
       }
     }
 
-    if (
-      (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw" &&
-        appState.activeTool.type !== "drawShape") ||
-      !element
-    ) {
-      resetCursor(interactiveCanvas);
-    }
-
     let activeTool: AppState["activeTool"];
-    if (appState.activeTool.type === "eraser") {
+    if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
           type: app.state.preferredSelectionTool.type,
         }),
-        lastActiveToolBeforeEraser: null,
+        lastActiveTool: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
         type: app.state.preferredSelectionTool.type,
       });
+    }
+
+    // locked via the tool lock or host-forced (`props.activeTool`)
+    const isToolLocked = app.isToolLocked();
+
+    // the drawShape flow finalizes without a `newElement` (the sketch is
+    // converted separately), so it stays active regardless of `element`
+    const keepActiveTool =
+      appState.activeTool.type === "drawShape" ||
+      ((isToolLocked || appState.activeTool.type === "freedraw") && !!element);
+
+    if (!keepActiveTool) {
+      // the active tool reverts (see the returned `appState.activeTool`) —
+      // apply the reverted tool's cursor
+      app.cursor.applyForTool(activeTool);
     }
 
     let selectedLinearElement =
@@ -422,12 +436,7 @@ export const actionFinalize = register<FormData>({
       appState: {
         ...appState,
         cursorButton: "up",
-        activeTool:
-          appState.activeTool.locked ||
-          appState.activeTool.type === "freedraw" ||
-          appState.activeTool.type === "drawShape"
-            ? appState.activeTool
-            : activeTool,
+        activeTool: keepActiveTool ? appState.activeTool : activeTool,
         activeEmbeddable: null,
         newElement: null,
         selectionElement: null,
@@ -437,7 +446,7 @@ export const actionFinalize = register<FormData>({
         frameToHighlight: null,
         selectedElementIds:
           element &&
-          !appState.activeTool.locked &&
+          !isToolLocked &&
           appState.activeTool.type !== "freedraw" &&
           appState.activeTool.type !== "drawShape"
             ? {
@@ -459,7 +468,7 @@ export const actionFinalize = register<FormData>({
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
-    <ToolButton
+    <IconButton
       type="button"
       icon={done}
       title={t("buttons.done")}

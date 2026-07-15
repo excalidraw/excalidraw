@@ -11,7 +11,7 @@ import { orderByFractionalIndex } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
@@ -35,7 +35,7 @@ const executeHistoryAction = (
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement &&
-    !app.flowChartCreator.isCreatingChart
+    !app.flowchart.isCreatingChart
   ) {
     const result = updater();
 
@@ -85,7 +85,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={UndoIcon}
         aria-label={t("buttons.undo")}
@@ -125,7 +125,7 @@ export const createRedoAction: ActionCreator = (history) => ({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={RedoIcon}
         aria-label={t("buttons.redo")}

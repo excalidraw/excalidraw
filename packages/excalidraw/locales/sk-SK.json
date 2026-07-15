@@ -3,6 +3,10 @@
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Crow's foot (viacero)",
     "arrowhead_crowfoot_one": "Crow's foot (jedna)",
     "arrowhead_crowfoot_one_or_many": "Crow's foot (jedna k viacero)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Ďalšie možnosti",
+    "cardinality": "",
     "arrowtypes": "Typ šípky",
     "arrowtype_sharp": "Ostrá šípka",
     "arrowtype_round": "Zakrivená šípka",
@@ -171,7 +182,11 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
     "tab": "Tab",
-    "shapeSwitch": "Zmeniť tvar"
+    "shapeSwitch": "Zmeniť tvar",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Chyba"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Uložiť na disk",
     "disk_details": "Exportovať údaje scény do súboru, z ktorého môžu byť neskôr importované.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid do Excalidraw",
     "button": "Vložiť",
-    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové diagramy</flowchartLink>, <sequenceLink>sekvenčné diagramy</sequenceLink> a <classLink>diagramy tried</classLink>. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
+    "description": "",
     "syntax": "Mermaid syntax",
     "preview": "Ukážka",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -254,6 +254,23 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // an icon button rendered outside a .buttonList context (e.g. the font
+  // picker trigger)
+  button.standalone {
+    @include outlineButtonIconStyles;
+
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    & > * {
+      // disallow pointer events on children, so we always have event.target
+      // on the button itself
+      pointer-events: none;
+    }
+  }
+
   .App-top-bar {
     z-index: var(--zIndex-ui-top);
     display: flex;
@@ -367,8 +384,13 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:first-child {
-    justify-self: flex-start;
+  .App-menu_top > .App-menu_top__left {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .App-menu_top > .shapes-section {
+    grid-column: 2;
   }
 
   .selected-shape-actions-container {
@@ -379,8 +401,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:last-child {
-    justify-self: flex-end;
+  .App-menu_top > .layer-ui__wrapper__top-right {
+    grid-column: 3;
+    justify-self: end;
   }
 
   .App-menu_bottom {
@@ -596,6 +619,44 @@ body.excalidraw-cursor-resize * {
     .App-menu {
       display: flex;
       justify-content: space-between;
+    }
+  }
+
+  &.excalidraw--non-interactive {
+    user-select: none;
+
+    canvas {
+      // let the page handle scrolling over the editor, but not the browser
+      // zoom gestures (pinch, double-tap)
+      touch-action: pan-x pan-y;
+      // no !important — inline cursor styles must win so that
+      // `interaction: { enabled: { links: true } }` can show a pointer over
+      // links
+      cursor: default;
+    }
+
+    &.excalidraw--allow-browser-zoom canvas {
+      touch-action: auto;
+    }
+
+    // with navigation allowed, touch input drives the canvas pan/zoom again
+    &.excalidraw--navigation canvas {
+      touch-action: none;
+    }
+
+    // with the active tool allowed (`interaction.enabled.tools`), touch
+    // input drives the tool again — e.g. laser strokes must not scroll the
+    // page
+    &.excalidraw--tools canvas {
+      touch-action: none;
+    }
+
+    // override inline pointer-events set when embeddable is active
+    // (also covers custom `renderEmbeddable` content) — unless embeds are
+    // an allowed interaction, in which case the inline (activation-driven)
+    // pointer-events apply, same as in view mode
+    &:not(.excalidraw--embeds) .excalidraw__embeddable-container__inner {
+      pointer-events: none !important;
     }
   }
 

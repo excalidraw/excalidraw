@@ -3,6 +3,10 @@
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
     "moveCanvas": "Premakni platno",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Vranja noga (več)",
     "arrowhead_crowfoot_one": "Vranja noga (ena)",
     "arrowhead_crowfoot_one_or_many": "Vranja noga (ena ali več)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Več možnosti",
+    "cardinality": "",
     "arrowtypes": "Vrsta puščice",
     "arrowtype_sharp": "Ostra puščica",
     "arrowtype_round": "Ukrivljena puščica",
@@ -171,7 +182,11 @@
     "linkToElement": "Povezava do objekta",
     "wrapSelectionInFrame": "Zavij izbor v okvir",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Povezava do objekta",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Napaka"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Shrani na disk",
     "disk_details": "Izvozite podatke scene v datoteko, iz katere jo lahko pozneje uvozite.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid v Excalidraw",
     "button": "Vstavi",
-    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
+    "description": "",
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

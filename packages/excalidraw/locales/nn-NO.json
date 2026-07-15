@@ -3,6 +3,10 @@
     "paste": "Lim inn",
     "pasteAsPlaintext": "",
     "pasteCharts": "Lim inn diagram",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Feil"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Lagre til disk",
     "disk_details": "Eksporter scenedataa til ei fil du kan importere seinare.",
@@ -616,7 +635,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

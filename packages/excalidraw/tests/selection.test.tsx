@@ -9,7 +9,7 @@ import {
 } from "@excalidraw/element";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
-import { SHAPES } from "../components/shapes";
+import { TOOLS } from "../components/Tools";
 
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
@@ -1339,14 +1339,18 @@ describe("tool locking & selection", () => {
     UI.clickTool("lock");
     expect(h.state.activeTool.locked).toBe(true);
 
-    for (const { value } of Object.values(SHAPES)) {
+    for (const value of Object.keys(TOOLS) as (keyof typeof TOOLS)[]) {
       if (
         value !== "image" &&
         value !== "selection" &&
+        value !== "lasso" &&
         value !== "eraser" &&
         value !== "arrow" &&
         value !== "hand" &&
         value !== "laser" &&
+        // no top-level toolbar button (rendered in the extra-tools dropdown)
+        value !== "frame" &&
+        value !== "embeddable" &&
         value !== "drawShape"
       ) {
         const element = UI.createElement(value);
