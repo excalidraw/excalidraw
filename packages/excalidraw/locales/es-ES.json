@@ -3,6 +3,10 @@
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar como texto sin formato",
     "pasteCharts": "Pegar gráficos",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Seleccionar todo",
     "multiSelect": "Añadir elemento a la selección",
     "moveCanvas": "Mover el lienzo",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Pie de la corona (varios)",
     "arrowhead_crowfoot_one": "Pie de la corona (uno)",
     "arrowhead_crowfoot_one_or_many": "Pie de la corona (uno o varios)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Más opciones",
+    "cardinality": "",
     "arrowtypes": "Tipo de flecha",
     "arrowtype_sharp": "Flecha Afilada",
     "arrowtype_round": "Flecha Curva",
@@ -171,7 +182,11 @@
     "linkToElement": "Enlace al objeto",
     "wrapSelectionInFrame": "Ajustar la selección en el marco",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Enlace al objeto",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Guardar en disco",
     "disk_details": "Exportar los datos de la escena a un archivo desde el cual pueda importar más tarde.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Insertar",
-    "description": "Actualmente sólo estos tipos de <flowchartLink>diagrama de flujo</flowchartLink>,<sequenceLink> Secuencia, </sequenceLink> y <classLink>Clase </classLink> son soportados. Los otros tipos de diagramas se renderizarán como imagen en Excalidraw.",
+    "description": "",
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

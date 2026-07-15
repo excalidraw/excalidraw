@@ -87,6 +87,10 @@ export class ActionManager {
   }
 
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
+    if (!this.app.isInteractionEnabled() && !this.app.isNavigationEnabled()) {
+      return false;
+    }
+
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
@@ -113,6 +117,12 @@ export class ActionManager {
 
     const action = data[0];
 
+    // in the non-interactive editor, only navigation actions are allowed
+    // (when navigation itself is)
+    if (!this.app.isInteractionEnabled() && action.navigation !== true) {
+      return false;
+    }
+
     if (this.getAppState().viewModeEnabled && action.viewMode !== true) {
       return false;
     }
@@ -134,6 +144,17 @@ export class ActionManager {
     source: ActionSource = "api",
     value: Parameters<T["perform"]>[2] = null,
   ) {
+    // the user must not be able to affect a non-interactive editor
+    // (programmatic execution by the host remains allowed, as are
+    // navigation actions when navigation is)
+    if (
+      source !== "api" &&
+      !this.app.isInteractionEnabled() &&
+      !(this.app.isNavigationEnabled() && action.navigation === true)
+    ) {
+      return;
+    }
+
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
 

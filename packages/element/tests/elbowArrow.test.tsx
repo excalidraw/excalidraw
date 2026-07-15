@@ -24,6 +24,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
+  NonDeleted,
 } from "../src/types";
 
 const { h } = window;
@@ -142,7 +143,7 @@ describe("elbow arrow routing", () => {
     const arrow = API.createElement({
       type: "arrow",
       elbowed: true,
-    }) as ExcalidrawElbowArrowElement;
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
     scene.insertElement(arrow);
     h.app.scene.mutateElement(arrow, {
       points: [
@@ -169,14 +170,14 @@ describe("elbow arrow routing", () => {
       y: -150,
       width: 100,
       height: 100,
-    }) as ExcalidrawBindableElement;
+    }) as NonDeleted<ExcalidrawBindableElement>;
     const rectangle2 = API.createElement({
       type: "rectangle",
       x: 50,
       y: 50,
       width: 100,
       height: 100,
-    }) as ExcalidrawBindableElement;
+    }) as NonDeleted<ExcalidrawBindableElement>;
     const arrow = API.createElement({
       type: "arrow",
       elbowed: true,
@@ -185,7 +186,7 @@ describe("elbow arrow routing", () => {
       width: 90,
       height: 200,
       points: [pointFrom(0, 0), pointFrom(90, 200)],
-    }) as ExcalidrawElbowArrowElement;
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
     API.setElements([rectangle1, rectangle2, arrow]);
 
     bindBindingElement(arrow, rectangle1, "orbit", "start", h.scene, {

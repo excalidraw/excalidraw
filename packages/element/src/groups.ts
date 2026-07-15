@@ -15,15 +15,16 @@ import type {
   GroupId,
   ExcalidrawElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
   ElementsMapOrArray,
   ElementsMap,
+  NonDeletedExcalidrawElement,
+  NonDeletedElementsMapOrArray,
 } from "./types";
 
 export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
 ): Pick<
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
@@ -68,14 +69,14 @@ export const selectGroupsForSelectedElements = (function () {
     "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
   >;
 
-  let lastSelectedElements: readonly NonDeleted<ExcalidrawElement>[] | null =
+  let lastSelectedElements: readonly NonDeletedExcalidrawElement[] | null =
     null;
-  let lastElements: readonly NonDeleted<ExcalidrawElement>[] | null = null;
+  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
   let lastReturnValue: SelectGroupsReturnType | null = null;
 
   const _selectGroups = (
-    selectedElements: readonly NonDeleted<ExcalidrawElement>[],
-    elements: readonly NonDeleted<ExcalidrawElement>[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly NonDeletedExcalidrawElement[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
     prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
@@ -240,7 +241,7 @@ export const getSelectedGroupIds = (
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
   let nextAppState: InteractiveCanvasAppState = {
@@ -285,14 +286,18 @@ export const editGroupForSelectedElement = (
 export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
   element.groupIds.includes(groupId);
 
-export const getElementsInGroup = (
-  elements: ElementsMapOrArray,
+export const getElementsInGroup = <
+  P extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
+  elements: P extends NonDeletedExcalidrawElement
+    ? NonDeletedElementsMapOrArray
+    : ElementsMapOrArray,
   groupId: string,
-) => {
-  const elementsInGroup: ExcalidrawElement[] = [];
+): P[] => {
+  const elementsInGroup: P[] = [];
   for (const element of elements.values()) {
     if (isElementInGroup(element, groupId)) {
-      elementsInGroup.push(element);
+      elementsInGroup.push(element as P);
     }
   }
   return elementsInGroup;
@@ -324,15 +329,14 @@ export const removeFromSelectedGroups = (
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
 
-export const getMaximumGroups = (
-  elements: ExcalidrawElement[],
+export const getMaximumGroups = <
+  T extends NonDeletedExcalidrawElement | ExcalidrawElement,
+>(
+  elements: T[],
   elementsMap: ElementsMap,
-): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
-  elements.forEach((element: ExcalidrawElement) => {
+): T[][] => {
+  const groups: Map<String, T[]> = new Map<String, T[]>();
+  elements.forEach((element: T) => {
     const groupId =
       element.groupIds.length === 0
         ? element.id
@@ -343,7 +347,7 @@ export const getMaximumGroups = (
     // Include bound text if present when grouping
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      currentGroupMembers.push(boundTextElement);
+      currentGroupMembers.push(boundTextElement as T);
     }
     groups.set(groupId, [...currentGroupMembers, element]);
   });
@@ -386,7 +390,7 @@ export const elementsAreInSameGroup = (
   return maxGroup === elements.length;
 };
 
-export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+export const isInGroup = (element: ExcalidrawElement) => {
   return element.groupIds.length > 0;
 };
 
@@ -411,74 +415,52 @@ export const getNewGroupIdsForDuplication = (
 // given a list of selected elements, return the element grouped by their immediate group selected state
 // in the case if only one group is selected and all elements selected are within the group, it will respect group hierarchy in accordance to their nested grouping order
 export const getSelectedElementsByGroup = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
-): ExcalidrawElement[][] => {
+): NonDeletedExcalidrawElement[][] => {
+  const buckets: Map<string, NonDeletedExcalidrawElement[]> = new Map();
   const selectedGroupIds = getSelectedGroupIds(appState);
-  const unboundElements = selectedElements.filter(
-    (element) => !isBoundToContainer(element),
-  );
-  const groups: Map<string, ExcalidrawElement[]> = new Map();
-  const elements: Map<string, ExcalidrawElement[]> = new Map();
+  const isSingleSelectedGroupCase =
+    selectedGroupIds.length === 1 &&
+    selectedElements.every((element) => isSelectedViaGroup(appState, element));
 
-  // helper function to add an element to the elements map
-  const addToElementsMap = (element: ExcalidrawElement) => {
-    // elements
-    const currentElementMembers = elements.get(element.id) || [];
-    const boundTextElement = getBoundTextElement(element, elementsMap);
-
-    if (boundTextElement) {
-      currentElementMembers.push(boundTextElement);
+  selectedElements.forEach((element) => {
+    // skip dependent boundTextElements, they are appended after their container
+    if (isBoundToContainer(element)) {
+      return;
     }
-    elements.set(element.id, [...currentElementMembers, element]);
-  };
 
-  // helper function to add an element to the groups map
-  const addToGroupsMap = (element: ExcalidrawElement, groupId: string) => {
-    // groups
-    const currentGroupMembers = groups.get(groupId) || [];
-    const boundTextElement = getBoundTextElement(element, elementsMap);
-
-    if (boundTextElement) {
-      currentGroupMembers.push(boundTextElement);
-    }
-    groups.set(groupId, [...currentGroupMembers, element]);
-  };
-
-  // helper function to handle the case where a single group is selected
-  // and all elements selected are within the group, it will respect group hierarchy in accordance to
-  // their nested grouping order
-  const handleSingleSelectedGroupCase = (
-    element: ExcalidrawElement,
-    selectedGroupId: GroupId,
-  ) => {
-    const indexOfSelectedGroupId = element.groupIds.indexOf(selectedGroupId, 0);
-    const nestedGroupCount = element.groupIds.slice(
-      0,
-      indexOfSelectedGroupId,
-    ).length;
-    return nestedGroupCount > 0
-      ? addToGroupsMap(element, element.groupIds[indexOfSelectedGroupId - 1])
-      : addToElementsMap(element);
-  };
-
-  const isAllInSameGroup = selectedElements.every((element) =>
-    isSelectedViaGroup(appState, element),
-  );
-
-  unboundElements.forEach((element) => {
+    let bucketKey: string;
     const selectedGroupId = getSelectedGroupIdForElement(
       element,
       appState.selectedGroupIds,
     );
+
     if (!selectedGroupId) {
-      addToElementsMap(element);
-    } else if (selectedGroupIds.length === 1 && isAllInSameGroup) {
-      handleSingleSelectedGroupCase(element, selectedGroupId);
+      bucketKey = `${element.id}_element`;
     } else {
-      addToGroupsMap(element, selectedGroupId);
+      // if only one group is selected, grouping is based on inner hierarchy
+      const keyIndex = isSingleSelectedGroupCase
+        ? element.groupIds.indexOf(selectedGroupId) - 1
+        : element.groupIds.indexOf(selectedGroupId);
+
+      // edge case: single selected group where element is non member of inner group
+      bucketKey =
+        keyIndex < 0
+          ? `${element.id}_element`
+          : `${element.groupIds[keyIndex]}_group`;
     }
+
+    const currentBucketMembers = buckets.get(bucketKey) ?? [];
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+
+    // preserve boundtext after container ordering
+    buckets.set(bucketKey, [
+      ...currentBucketMembers,
+      element,
+      ...(boundTextElement ? [boundTextElement] : []),
+    ]);
   });
-  return Array.from(groups.values()).concat(Array.from(elements.values()));
+  return [...buckets.values()];
 };

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
 import {
-  CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
   type EditorInterface,
@@ -46,6 +45,8 @@ type InteractiveCanvasProps = {
   renderScrollbars: boolean;
   editorInterface: EditorInterface;
   app: AppClassProperties;
+  interactionEnabled: boolean;
+  navigationEnabled: boolean;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -201,18 +202,20 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   return (
     <canvas
       className="excalidraw__canvas interactive"
+      // NOTE no `cursor` style here — the cursor is managed imperatively
+      // (see `AppCursor`); an inline style would clobber it whenever its
+      // computed value changes across rerenders
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor:
-          props.appState.viewModeEnabled &&
-          props.appState.activeTool.type !== "laser"
-            ? CURSOR_TYPE.GRAB
-            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
+      // NOTE all the handlers early-exit in App when the editor is
+      // non-interactive (running only a restricted, link-only code path if
+      // `interaction.allowed.links` is enabled), so they're safe to bind
+      // unconditionally
       onContextMenu={props.onContextMenu}
       onClick={props.onClick}
       onPointerMove={props.onPointerMove}
@@ -253,6 +256,7 @@ const getRelevantAppStateProps = (
   newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
   isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
+  gridModeEnabled: appState.gridModeEnabled,
   suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
@@ -287,7 +291,9 @@ const areEqual = (
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
     prevProps.selectedElements !== nextProps.selectedElements ||
-    prevProps.renderScrollbars !== nextProps.renderScrollbars
+    prevProps.renderScrollbars !== nextProps.renderScrollbars ||
+    prevProps.interactionEnabled !== nextProps.interactionEnabled ||
+    prevProps.navigationEnabled !== nextProps.navigationEnabled
   ) {
     return false;
   }
