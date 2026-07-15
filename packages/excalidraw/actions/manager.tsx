@@ -86,6 +86,9 @@ export class ActionManager {
     actions.forEach((action) => this.registerAction(action));
   }
 
+  private isActionBlockedByViewportTransition = (action: Action) =>
+    action.navigation === true && this.app.viewport.isLockedTransitionPending;
+
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
     if (!this.app.isInteractionEnabled() && !this.app.isNavigationEnabled()) {
       return false;
@@ -127,6 +130,12 @@ export class ActionManager {
       return false;
     }
 
+    if (this.isActionBlockedByViewportTransition(action)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return true;
+    }
+
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
     const value = null;
@@ -152,6 +161,10 @@ export class ActionManager {
       !this.app.isInteractionEnabled() &&
       !(this.app.isNavigationEnabled() && action.navigation === true)
     ) {
+      return;
+    }
+
+    if (this.isActionBlockedByViewportTransition(action)) {
       return;
     }
 
@@ -182,6 +195,10 @@ export class ActionManager {
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
+        if (this.isActionBlockedByViewportTransition(action)) {
+          return;
+        }
+
         trackAction(action, "ui", appState, elements, this.app, formState);
 
         this.updater(

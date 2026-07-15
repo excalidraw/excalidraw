@@ -1,14 +1,11 @@
 import { debounce, easeOut, type StylesPanelMode } from "@excalidraw/common";
 import { clamp } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/common";
-
 import { getLanguage, t } from "../i18n";
 import { AnimationController } from "../renderer/animation";
 import {
   constrainScrollState,
   getConstrainedTargetViewport,
-  getTargetViewport,
   interpolateViewport,
   resolveViewportTarget,
   type SetViewportOptions,
@@ -84,7 +81,7 @@ const animateToViewport = (
       "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
     >,
   ) => void,
-  onComplete?: () => void,
+  onComplete: () => void,
 ) => {
   AnimationController.start<{ elapsed: number }>(
     SCROLL_TO_CONTENT_ANIMATION_KEY,
@@ -93,54 +90,19 @@ const animateToViewport = (
       const progress = Math.min(elapsed / duration, 1);
       const factor = easeOut(clamp(progress, 0, 1));
 
-      onFrame({
-        ...interpolateViewport({ from, target, factor }),
-        shouldCacheIgnoreZoom: progress < 1,
-      });
-
       if (progress < 1) {
+        onFrame({
+          ...interpolateViewport({ from, target, factor }),
+          shouldCacheIgnoreZoom: true,
+        });
         return { elapsed };
       }
 
-      onComplete?.();
+      onComplete();
 
       return null;
     },
   );
-};
-
-/**
- * Scrolls (and, per `fit`, zooms) the viewport so the given target box is in
- * view, optionally animating the transition. `onComplete` runs once the
- * viewport has settled on the target.
- */
-const setViewportToBounds = (
-  state: AppState,
-  bounds: Bounds,
-  // NOTE offsets must be resolved (see `AppViewport.resolveOffsets`)
-  opts: Pick<SetViewportOptions, "fit" | "animation"> & { offsets?: Offsets },
-  onFrame: (
-    state: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  onComplete?: () => void,
-) => {
-  AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
-  AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
-
-  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offsets);
-  const duration = resolveAnimationDuration(opts.animation);
-
-  if (duration === null) {
-    // no animation: jump straight to the target. Re-enable zoom caching in
-    // case we just cancelled an in-flight animation that had suppressed it.
-    onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
-    onComplete?.();
-  } else {
-    animateToViewport(state, viewport, duration, onFrame, onComplete);
-  }
 };
 
 /**
@@ -225,6 +187,10 @@ export const snapBackToConstraints = (
 export class AppViewport {
   public lastPosition = { x: 0, y: 0 };
 
+  private activeTransition: {
+    target: Viewport & Pick<AppState, "scrollConstraints">;
+  } | null = null;
+
   private uiLastMeasured = new Map<
     ViewportUIName,
     { side: "left" | "right"; offset: number }
@@ -240,6 +206,12 @@ export class AppViewport {
       AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY)
     );
+  }
+
+  /** Whether a programmatic transition into a locked viewport currently owns
+   * user pan/zoom input. */
+  get isLockedTransitionPending() {
+    return !!this.activeTransition?.target.scrollConstraints;
   }
 
   invalidateUIOffset = (name: ViewportUIName) => {
@@ -387,10 +359,13 @@ export class AppViewport {
   /** Navigates to a target and optionally installs scroll/zoom constraints. */
   setViewport = (opts: SetViewportOptions | null) => {
     if (opts === null) {
+      this.cancelTransition();
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
-      if (this.app.state.scrollConstraints) {
-        this.app.setState({ scrollConstraints: null });
-      }
+      this.snapBackDebounced.cancel();
+      this.app.setState({
+        scrollConstraints: null,
+        shouldCacheIgnoreZoom: false,
+      });
       return;
     }
 
@@ -420,23 +395,59 @@ export class AppViewport {
       bounds,
       { fit, offsets, lock },
     );
-
-    const installLock = () => {
-      this.app.setState((prevState) => {
-        if (!viewportUpdate.scrollConstraints && !prevState.scrollConstraints) {
-          return null;
-        }
-
-        return viewportUpdate;
-      });
+    const duration = resolveAnimationDuration(animation);
+    const from = {
+      scrollX: this.app.state.scrollX,
+      scrollY: this.app.state.scrollY,
+      zoom: this.app.state.zoom,
     };
 
-    setViewportToBounds(
-      this.app.state,
-      bounds,
-      { fit, animation, offsets },
-      this.app.setState.bind(this.app),
-      installLock,
+    // A new programmatic navigation supersedes the previous one and starts
+    // from whatever viewport its last rendered frame reached.
+    this.cancelTransition();
+    AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+    this.snapBackDebounced.cancel();
+
+    if (duration === null) {
+      this.app.setState({
+        ...viewportUpdate,
+        shouldCacheIgnoreZoom: false,
+      });
+      return;
+    }
+
+    const transition = {
+      target: viewportUpdate,
+    };
+    this.activeTransition = transition;
+
+    // The old lock has been superseded. Keep the new lock pending outside
+    // AppState so it cannot constrain animation frames back toward either
+    // endpoint, and install it together with the final viewport.
+    if (this.app.state.scrollConstraints) {
+      this.app.setState({ scrollConstraints: null });
+    }
+
+    animateToViewport(
+      from,
+      viewportUpdate,
+      duration,
+      (state) => {
+        if (this.activeTransition === transition) {
+          this.app.setState(state);
+        }
+      },
+      () => {
+        if (this.activeTransition !== transition) {
+          return;
+        }
+
+        this.activeTransition = null;
+        this.app.setState({
+          ...transition.target,
+          shouldCacheIgnoreZoom: false,
+        });
+      },
     );
   };
 
@@ -455,7 +466,11 @@ export class AppViewport {
       preserveScrollConstraintsSnapBack?: boolean;
     },
   ) => {
-    AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+    if (this.isLockedTransitionPending) {
+      return false;
+    }
+
+    this.cancelTransition();
     if (!opts?.preserveScrollConstraintsSnapBack) {
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     }
@@ -479,6 +494,8 @@ export class AppViewport {
       }
       return constrainScrollState(prevState, overscroll);
     });
+
+    return true;
   };
 
   /** Clamps the viewport into the active scroll constraints. */
@@ -513,7 +530,14 @@ export class AppViewport {
     SCROLL_CONSTRAINTS_SNAP_BACK_DELAY,
   );
 
+  private cancelTransition = () => {
+    this.activeTransition = null;
+    AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+  };
+
   destroy = () => {
+    this.cancelTransition();
+    AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     this.snapBackDebounced.cancel();
   };
 }

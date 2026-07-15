@@ -5417,7 +5417,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      this.maybeHandlePageScrollKeyDown(event);
+      if (this.maybeHandlePageScrollKeyDown(event)) {
+        // Page navigation belongs to the canvas even when a pending locked
+        // viewport transition is temporarily withholding the mutation.
+        event.preventDefault();
+        return;
+      }
 
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
@@ -8973,7 +8978,9 @@ class App extends React.Component<AppProps, AppState> {
 
         return null;
       });
-      this.resetShouldCacheIgnoreZoomDebounced();
+      if (!this.viewport.isLockedTransitionPending) {
+        this.resetShouldCacheIgnoreZoomDebounced();
+      }
     } else {
       gesture.lastCenter =
         gesture.initialDistance =
@@ -13509,7 +13516,7 @@ class App extends React.Component<AppProps, AppState> {
           : MIN_ZOOM;
         newZoom = Math.max(newZoom, minZoom);
 
-        this.viewport.translate(
+        const didTranslate = this.viewport.translate(
           (state) => ({
             ...getViewportForZoomWithScrollConstraints(
               {
@@ -13526,7 +13533,9 @@ class App extends React.Component<AppProps, AppState> {
             preserveScrollConstraintsSnapBack: true,
           },
         );
-        this.resetShouldCacheIgnoreZoomDebounced();
+        if (didTranslate) {
+          this.resetShouldCacheIgnoreZoomDebounced();
+        }
         return;
       }
 

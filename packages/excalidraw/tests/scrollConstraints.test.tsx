@@ -534,8 +534,8 @@ describe("setViewport lock (integration)", () => {
     expect(h.state.scrollY).toBeLessThan(before);
   });
 
-  it("installs the lock only after an animated scroll settles", async () => {
-    await render(<Excalidraw />);
+  it("withholds user viewport input until an animated lock settles", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
     const rect = API.createElement({
@@ -546,6 +546,16 @@ describe("setViewport lock (integration)", () => {
       height: 100,
     });
     API.setElements([rect]);
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+    expect(h.state.scrollConstraints).not.toBe(null);
 
     window.EXCALIDRAW_THROTTLE_RENDER = true;
     try {
@@ -563,13 +573,47 @@ describe("setViewport lock (integration)", () => {
       expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
         true,
       );
+      // The previous active lock is superseded immediately; the destination
+      // lock is held internally until the animation lands.
       expect(h.state.scrollConstraints).toBe(null);
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      const viewportDuringTransition = {
+        scrollX: h.state.scrollX,
+        scrollY: h.state.scrollY,
+        zoom: h.state.zoom.value,
+      };
+
+      // Pan, wheel/pinch zoom, zoom controls, and fit actions are all
+      // consumed while the pending lock owns the viewport. None may cancel
+      // the animation or perturb its current frame.
+      Keyboard.keyPress(KEYS.PAGE_DOWN);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+      React.act(() => {
+        h.app.actionManager.executeAction(actionZoomIn, "ui");
+        h.app.actionManager.executeAction(actionResetZoom, "ui");
+        h.app.actionManager.executeAction(actionZoomToFit, "ui");
+        h.app.actionManager.executeAction(actionZoomToFitSelection, "ui");
+      });
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      expect({
+        scrollX: h.state.scrollX,
+        scrollY: h.state.scrollY,
+        zoom: h.state.zoom.value,
+      }).toEqual(viewportDuringTransition);
 
       await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
 
       expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
         false,
       );
+      expect(h.app.viewport.isLockedTransitionPending).toBe(false);
       expect(h.state.scrollConstraints).toMatchObject({
         x: rect.x,
         y: rect.y,
@@ -580,6 +624,131 @@ describe("setViewport lock (integration)", () => {
     } finally {
       window.EXCALIDRAW_THROTTLE_RENDER = undefined;
     }
+  });
+
+  it("lets a newer animated lock supersede an older one", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const firstTarget = API.createElement({
+      type: "rectangle",
+      x: 1000,
+      y: 1000,
+      width: 100,
+      height: 100,
+    });
+    const secondTarget = API.createElement({
+      type: "rectangle",
+      x: 3000,
+      y: 3000,
+      width: 200,
+      height: 200,
+    });
+    API.setElements([firstTarget, secondTarget]);
+
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      React.act(() => {
+        h.app.viewport.setViewport({
+          target: firstTarget,
+          animation: { duration: 1000 },
+          lock: { scroll: true },
+        });
+      });
+
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      React.act(() => {
+        h.app.viewport.setViewport({
+          target: secondTarget,
+          animation: { duration: 10 },
+          lock: { scroll: true, zoom: true },
+        });
+      });
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
+
+      expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: secondTarget.x,
+        y: secondTarget.y,
+        width: secondTarget.width,
+        height: secondTarget.height,
+        lockScroll: true,
+        lockZoom: true,
+      });
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
+  });
+
+  it("clears both active and pending locks with setViewport(null)", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+    expect(h.state.scrollConstraints).not.toBe(null);
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: { duration: 1000 },
+        lock: { scroll: true, zoom: true },
+      });
+    });
+
+    // The superseded active lock is removed while the target lock is pending.
+    expect(h.state.scrollConstraints).toBe(null);
+    expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+    React.act(() => {
+      h.app.viewport.setViewport(null);
+    });
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+    expect(h.state.scrollConstraints).toBe(null);
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
+  });
+
+  it("still lets user input cancel an unlocked viewport animation", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: { duration: 1000 },
+      });
+    });
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+    expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+
+    React.act(() => {
+      h.app.viewport.translate({ scrollX: 123, scrollY: 456 });
+    });
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(h.state.scrollX).toBe(123);
+    expect(h.state.scrollY).toBe(456);
   });
 
   it("applies back-to-back lock updates in call order", async () => {
