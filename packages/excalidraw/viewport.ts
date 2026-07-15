@@ -1,6 +1,5 @@
 import {
   arrayToMap,
-  easeOut,
   isBounds,
   MAX_ZOOM,
   MIN_ZOOM,
@@ -29,7 +28,6 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { AnimationController } from "./renderer/animation";
 import { getNormalizedZoom } from "./scene";
 
 import type {
@@ -41,16 +39,6 @@ import type {
   ViewportOffsets,
   Zoom,
 } from "./types";
-
-export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
-export const SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY =
-  "animateScrollConstraintsSnapBack";
-
-const DEFAULT_SCROLL_ANIMATION_DURATION = 500;
-
-/** rubberband snap-back animation duration, in ms — kept snappier than the
- * default scroll animation so releasing an overscroll feels responsive */
-const SNAP_BACK_ANIMATION_DURATION = 250;
 
 /** default rubberband overscroll give for scroll locks, in viewport px */
 export const DEFAULT_OVERSCROLL = 150;
@@ -139,18 +127,6 @@ export type SetViewportOptions = {
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
-
-const resolveAnimationDuration = (
-  animation: AnimationOptions | boolean | undefined,
-): number | null => {
-  if (animation === false) {
-    return null;
-  }
-  if (animation === true || animation == null) {
-    return DEFAULT_SCROLL_ANIMATION_DURATION;
-  }
-  return animation.duration ?? DEFAULT_SCROLL_ANIMATION_DURATION;
-};
 
 const resolveOverscroll = (
   overscroll: boolean | number | undefined,
@@ -337,115 +313,6 @@ export const getViewportForZoomWithScrollConstraints = (
     },
     state.scrollConstraints.overscroll,
   );
-};
-
-/**
- * Rubberband snap-back: animates the viewport from its current (possibly
- * overscrolled) position back inside the lock box via the shared
- * AnimationController. No-op when already within the hard bounds (or when there
- * is no lock).
- */
-export const snapBackToConstraints = (
-  state: Pick<
-    AppState,
-    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
-  >,
-  onFrame: (
-    updater: (
-      state: Pick<
-        AppState,
-        | "scrollX"
-        | "scrollY"
-        | "zoom"
-        | "width"
-        | "height"
-        | "scrollConstraints"
-      >,
-    ) => Viewport | null,
-  ) => void,
-  duration = SNAP_BACK_ANIMATION_DURATION,
-) => {
-  const target = constrainScrollState(state); // hard clamp (no overscroll give)
-
-  if (
-    target.scrollX === state.scrollX &&
-    target.scrollY === state.scrollY &&
-    target.zoom.value === state.zoom.value
-  ) {
-    return;
-  }
-
-  // A programmatic navigation owns the viewport until it settles. A stale
-  // rubberband debounce must not supersede it.
-  if (AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)) {
-    return;
-  }
-
-  // Keep the displacement zoom-independent. Each animation frame resolves
-  // the resting viewport from the latest state, allowing zoom to update the
-  // underlying viewport while the same on-screen rubberband distance decays.
-  const overscrollX = (state.scrollX - target.scrollX) * state.zoom.value;
-  const overscrollY = (state.scrollY - target.scrollY) * state.zoom.value;
-
-  AnimationController.start<{ elapsed: number }>(
-    SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
-    ({ deltaTime, state: animationState }) => {
-      const elapsed = (animationState?.elapsed ?? 0) + deltaTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const remaining = 1 - easeOut(clamp(progress, 0, 1));
-
-      onFrame((currentState) => {
-        if (!currentState.scrollConstraints) {
-          return null;
-        }
-
-        const restingViewport = constrainScrollState(currentState);
-        const zoom = restingViewport.zoom.value;
-        return {
-          scrollX: restingViewport.scrollX + (overscrollX * remaining) / zoom,
-          scrollY: restingViewport.scrollY + (overscrollY * remaining) / zoom,
-          zoom: restingViewport.zoom,
-        };
-      });
-
-      return progress < 1 ? { elapsed } : null;
-    },
-  );
-};
-
-/**
- * Scrolls (and, per `fit`, zooms) the viewport so the given target box is in
- * view, optionally animating the transition. `onComplete` runs once the
- * viewport has settled on the target.
- */
-export const setViewportToBounds = (
-  state: AppState,
-  bounds: Bounds,
-  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
-  opts: Pick<SetViewportOptions, "fit" | "animation"> & { offsets?: Offsets },
-  onFrame: (
-    state: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  onComplete?: () => void,
-) => {
-  AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
-  AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
-
-  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offsets);
-
-  const duration = resolveAnimationDuration(opts.animation);
-
-  if (duration === null) {
-    // no animation: jump straight to the target. Re-enable zoom caching in
-    // case we just cancelled an in-flight animation that had suppressed it.
-    onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
-    onComplete?.();
-  } else {
-    animateToViewport(state, viewport, duration, onFrame, onComplete);
-  }
 };
 
 const zoomValueToFitBoundsOnViewport = (
@@ -656,7 +523,7 @@ export const resolveViewportTarget = (
 export const getConstrainedTargetViewport = (
   appState: AppState,
   bounds: Bounds,
-  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
+  // NOTE offsets must be resolved (see `AppViewport.resolveOffsets`)
   {
     fit,
     offsets,
@@ -743,44 +610,6 @@ export const interpolateViewport = ({
       zoom,
     zoom: { value: zoom },
   };
-};
-
-/** Eases the viewport from its current position to `target` over `duration`,
- * driving the transition through the shared AnimationController so it doesn't
- * slow down other processes. */
-const animateToViewport = (
-  from: Viewport,
-  target: Viewport,
-  duration: number,
-  onFrame: (
-    state: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  onComplete?: () => void,
-) => {
-  AnimationController.start<{ elapsed: number }>(
-    SCROLL_TO_CONTENT_ANIMATION_KEY,
-    ({ deltaTime, state }) => {
-      const elapsed = (state?.elapsed ?? 0) + deltaTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const factor = easeOut(clamp(progress, 0, 1));
-
-      onFrame({
-        ...interpolateViewport({ from, target, factor }),
-        shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
-      });
-
-      if (progress < 1) {
-        return { elapsed };
-      }
-
-      onComplete?.();
-
-      return null;
-    },
-  );
 };
 
 const doBoundsExceedViewport = (appState: AppState, bounds: Bounds) => {

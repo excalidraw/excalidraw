@@ -161,7 +161,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         selectionColor,
         renderScrollbars: props.renderScrollbars,
         // NOTE not memoized on so we don't rerender on cursor move
-        lastViewportPosition: props.app.lastViewportPosition,
+        lastViewportPosition: props.app.viewport.lastPosition,
       },
       editorInterface: props.editorInterface,
       callback: props.renderInteractiveSceneCallback,

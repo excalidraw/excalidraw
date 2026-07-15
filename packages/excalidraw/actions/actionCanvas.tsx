@@ -313,7 +313,7 @@ export const actionZoomToFitSelectionInViewport = register({
         userToFollow: null,
       },
       fit: "scale-down",
-      canvasOffsets: app.getViewportOffsets(),
+      canvasOffsets: app.viewport.getOffsets(),
     });
     return {
       ...result,
@@ -358,7 +358,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fit: "contain",
-      canvasOffsets: app.getViewportOffsets(),
+      canvasOffsets: app.viewport.getOffsets(),
     });
     return {
       ...result,
@@ -397,7 +397,7 @@ export const actionZoomToFit = register({
         userToFollow: null,
       },
       fit: "scale-down",
-      canvasOffsets: app.getViewportOffsets(),
+      canvasOffsets: app.viewport.getOffsets(),
     });
     return {
       ...result,

@@ -14,12 +14,14 @@ import {
 import { getNormalizedZoom } from "../scene";
 import {
   snapBackToConstraints,
+  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
+  SCROLL_TO_CONTENT_ANIMATION_KEY,
+} from "../components/App.viewport";
+import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
   getViewportForZoomWithScrollConstraints,
   isViewportOverscrolled,
-  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
-  SCROLL_TO_CONTENT_ANIMATION_KEY,
 } from "../viewport";
 import { AnimationController } from "../renderer/animation";
 
@@ -506,7 +508,7 @@ describe("setViewport lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -524,7 +526,7 @@ describe("setViewport lock (integration)", () => {
 
     // clearing the lock lets it scroll freely again
     React.act(() => {
-      h.app.setViewport(null);
+      h.app.viewport.setViewport(null);
     });
     expect(h.state.scrollConstraints).toBe(null);
     const before = h.state.scrollY;
@@ -548,7 +550,7 @@ describe("setViewport lock (integration)", () => {
     window.EXCALIDRAW_THROTTLE_RENDER = true;
     try {
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: rect,
           fit: "scale-down",
           animation: { duration: 10 },
@@ -585,17 +587,17 @@ describe("setViewport lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         animation: false,
         lock: { scroll: true },
       });
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [1000, 1000, 2000, 2000],
         animation: false,
         lock: { scroll: true, zoom: true },
       });
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [2000, 2000, 3000, 3000],
         animation: false,
       });
@@ -612,7 +614,7 @@ describe("setViewport lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 10, y: 20, width: 50 },
         fit: "scale-down",
         animation: false,
@@ -628,7 +630,7 @@ describe("setViewport lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 30, y: 40, height: 60 },
         fit: "scale-down",
         animation: false,
@@ -644,7 +646,7 @@ describe("setViewport lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 70, y: 80 },
         fit: "scale-down",
         animation: false,
@@ -686,7 +688,7 @@ describe("setViewport lock (integration)", () => {
       API.setElements([validRect, deletedRect]);
 
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [
             validRect,
             deletedRect,
@@ -713,7 +715,7 @@ describe("setViewport lock (integration)", () => {
       warnSpy.mockClear();
 
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [
             deletedRect,
             missingRect,
@@ -742,7 +744,7 @@ describe("setViewport lock (integration)", () => {
     expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(true);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 500, 500],
         fit: "scale-down",
         animation: false,
@@ -794,7 +796,7 @@ describe("setViewport lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -831,7 +833,7 @@ describe("setViewport lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -867,7 +869,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -892,7 +894,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -910,8 +912,7 @@ describe("rubberband overscroll (integration)", () => {
     // outside the 50px give. The zoom must be hard-clamped (equivalent to
     // sliding the zoom origin back into bounds), not rubberbanded.
     React.act(() => {
-      // eslint-disable-next-line dot-notation -- private method; bracket access is the TS escape hatch
-      h.app["translateCanvas"]((state: AppState) => ({
+      h.app.viewport.translate((state: AppState) => ({
         ...getViewportForZoomWithScrollConstraints(
           { viewportX: 0, viewportY: 0, nextZoom: getNormalizedZoom(0.2) },
           state,
@@ -936,7 +937,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -986,7 +987,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -1008,7 +1009,7 @@ describe("rubberband overscroll (integration)", () => {
     // it must be withheld, not fight the held gesture
     React.act(() => {
       // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
-      h.app["snapBackToScrollConstraintsDebounced"].flush();
+      h.app.viewport["snapBackDebounced"].flush();
     });
     expect(
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
@@ -1029,7 +1030,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -1049,7 +1050,7 @@ describe("rubberband overscroll (integration)", () => {
     // must remain attached to the pointer until the pan session ends.
     React.act(() => {
       // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
-      h.app["snapBackToScrollConstraintsDebounced"].flush();
+      h.app.viewport["snapBackDebounced"].flush();
     });
     expect(
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
@@ -1075,7 +1076,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -1126,7 +1127,7 @@ describe("rubberband overscroll (integration)", () => {
 
     const install = (overscroll?: boolean | number) => {
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [0, 0, 1000, 1000],
           fit: "scale-down",
           animation: false,
