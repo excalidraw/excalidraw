@@ -5160,13 +5160,13 @@ class App extends React.Component<AppProps, AppState> {
 
     // chain: once the scroll/zoom has settled, install (or clear) the lock
     const installLock = () => {
-      if (!viewportUpdate.scrollConstraints && !this.state.scrollConstraints) {
-        // no lock requested and none to supersede
-        return;
-      }
+      this.setState((prevState) => {
+        if (!viewportUpdate.scrollConstraints && !prevState.scrollConstraints) {
+          // no lock requested and none to supersede
+          return null;
+        }
 
-      flushSync(() => {
-        this.setState(viewportUpdate);
+        return viewportUpdate;
       });
     };
 

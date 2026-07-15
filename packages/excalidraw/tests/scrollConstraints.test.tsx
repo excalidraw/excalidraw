@@ -67,6 +67,26 @@ const makeLock = (
   ...overrides,
 });
 
+const waitForViewportAnimationToStop = (maxFrames = 200) => {
+  return React.act(
+    () =>
+      new Promise<void>((resolve) => {
+        let remaining = maxFrames;
+        const check = () => {
+          if (
+            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+            --remaining <= 0
+          ) {
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+};
+
 describe("constrainScrollState (pure)", () => {
   it("returns scroll/zoom unchanged when there is no lock", () => {
     const state = makeState({
@@ -461,7 +481,7 @@ describe("setViewport lock (integration)", () => {
     expect(h.state.scrollY).toBeLessThan(before);
   });
 
-  it("defers installing the lock until an animated scroll settles", async () => {
+  it("installs the lock only after an animated scroll settles", async () => {
     await render(<Excalidraw />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
@@ -474,21 +494,66 @@ describe("setViewport lock (integration)", () => {
     });
     API.setElements([rect]);
 
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      React.act(() => {
+        h.app.setViewport({
+          target: rect,
+          fit: "scale-down",
+          animation: { duration: 10 },
+          lock: { scroll: true },
+        });
+      });
+
+      // the animation is in flight and the lock has NOT been installed yet —
+      // it's chained to run once the scroll settles
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      expect(h.state.scrollConstraints).toBe(null);
+
+      await waitForViewportAnimationToStop();
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        false,
+      );
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        lockScroll: true,
+      });
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
+  });
+
+  it("applies back-to-back lock updates in call order", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
     React.act(() => {
       h.app.setViewport({
-        target: rect,
-        fit: "scale-down",
-        animation: { duration: 300 },
+        target: [0, 0, 1000, 1000],
+        animation: false,
         lock: { scroll: true },
+      });
+      h.app.setViewport({
+        target: [1000, 1000, 2000, 2000],
+        animation: false,
+        lock: { scroll: true, zoom: true },
+      });
+      h.app.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: false,
       });
     });
 
-    // the animation is in flight and the lock has NOT been installed yet —
-    // it's chained to run once the scroll settles
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
     expect(h.state.scrollConstraints).toBe(null);
+    expect(h.state.zoom.value).toBeCloseTo(0.1);
+    expect(h.state.scrollX).toBeCloseTo(-1500);
+    expect(h.state.scrollY).toBeCloseTo(-2000);
   });
 
   it("supports rect targets and defaults missing dimensions to the viewport", async () => {
