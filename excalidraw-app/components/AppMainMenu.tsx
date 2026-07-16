@@ -3,6 +3,7 @@ import {
   gridIcon,
   LoadIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -37,6 +38,7 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t } = useI18n();
   const today = getRoomDate(0);
   const archiveDates = Array.from({ length: 7 }, (_, index) =>
     getRoomDate(index + 1),
@@ -49,10 +51,12 @@ export const AppMainMenu: React.FC<{
         selected={window.location.pathname === `/room/${today}`}
         onSelect={() => navigateToRoom(today)}
       >
-        今日看板
+        {t("shangban.menu.todayBoard")}
       </MainMenu.Item>
       <MainMenu.Sub>
-        <MainMenu.Sub.Trigger icon={LoadIcon}>归档（只读）</MainMenu.Sub.Trigger>
+        <MainMenu.Sub.Trigger icon={LoadIcon}>
+          {t("shangban.menu.archiveReadOnly")}
+        </MainMenu.Sub.Trigger>
         <MainMenu.Sub.Content>
           {archiveDates.map((date) => (
             <MainMenu.Item

@@ -22,7 +22,7 @@ export const config = {
       process.env.SCENE_LATEST_TTL_SECONDS || 8 * 24 * 60 * 60,
     ),
     historySnapshotIntervalMs: Number(
-      process.env.SCENE_HISTORY_INTERVAL_MS || 60 * 60 * 1000,
+      process.env.SCENE_HISTORY_INTERVAL_MS || 10 * 60 * 1000,
     ),
   },
 };

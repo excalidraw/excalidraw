@@ -589,6 +589,15 @@
       "helpHint": "快捷键和帮助"
     }
   },
+  "shangban": {
+    "menu": {
+      "todayBoard": "今日看板",
+      "archiveReadOnly": "归档（只读）"
+    },
+    "welcome": {
+      "heading": "阳光照进办公室的时候，我总会想起窗外还有一整个世界。"
+    }
+  },
   "colorPicker": {
     "color": "颜色",
     "mostUsedCustomColors": "常用自定义颜色",

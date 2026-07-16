@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 
 import { config } from "./config.js";
-import { resolveRoomAlias } from "./rooms.js";
+import { findRoomAliasByRoomId, resolveRoomAlias } from "./rooms.js";
 import {
   getLatestScene,
   getRoomPresence,
@@ -15,7 +15,7 @@ import {
 import {
   getLatestSceneFromMysql,
   saveLatestSceneSnapshot,
-  saveHourlySnapshotsFromRedis,
+  saveHistorySnapshotsFromRedis,
 } from "./snapshots.js";
 
 const json = (res, statusCode, body) => {
@@ -55,6 +55,16 @@ const getAllowedRoomDates = () => {
 
 const isAllowedRoomAlias = (alias) =>
   /^\d{4}-\d{2}-\d{2}$/.test(alias) && getAllowedRoomDates().has(alias);
+
+const isWritableRoom = async (roomId) => {
+  const roomAlias = await findRoomAliasByRoomId(roomId);
+
+  if (!roomAlias?.alias) {
+    return true;
+  }
+
+  return roomAlias.alias === formatRoomDate(new Date());
+};
 
 const server = createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
@@ -224,10 +234,14 @@ io.on("connection", (socket) => {
     await markSocketOnline({ roomId, socketId: socket.id });
 
     if (existingClients.length === 0) {
-      if (!storedScene) {
+      if (storedScene) {
+        // Let the stored SCENE_INIT be the first initialization payload.
+        // Emitting first-in-room first makes the client mark the socket as
+        // initialized, causing it to ignore the replayed persisted scene.
+      } else {
         roomHydratingUntil.delete(roomId);
+        socket.emit("first-in-room");
       }
-      socket.emit("first-in-room");
     } else {
       socket.to(roomId).emit("new-user", socket.id);
     }
@@ -246,8 +260,33 @@ io.on("connection", (socket) => {
     await emitRoomUserChange(roomId);
   });
 
-  socket.on("server-broadcast", (roomId, encryptedData, iv) => {
+  const canWriteScene = async (roomId) => {
+    try {
+      return await isWritableRoom(roomId);
+    } catch (error) {
+      console.error("Failed to check room write permission", error);
+      return false;
+    }
+  };
+
+  const saveScene = async (roomId, encryptedData, iv) => {
+    if (!(await canWriteScene(roomId))) {
+      return;
+    }
+
     queueLatestSceneSave(roomId, encryptedData, iv);
+  };
+
+  socket.on("server-broadcast", async (roomId, encryptedData, iv) => {
+    if (!(await canWriteScene(roomId))) {
+      return;
+    }
+
+    socket.to(roomId).emit("client-broadcast", encryptedData, iv);
+  });
+
+  socket.on("server-save-scene", async (roomId, encryptedData, iv) => {
+    await saveScene(roomId, encryptedData, iv);
     socket.to(roomId).emit("client-broadcast", encryptedData, iv);
   });
 
@@ -297,8 +336,8 @@ io.on("connection", (socket) => {
 await setupRedis(io);
 
 setInterval(() => {
-  saveHourlySnapshotsFromRedis().catch((error) => {
-    console.error("Failed to save hourly scene snapshots", error);
+  saveHistorySnapshotsFromRedis().catch((error) => {
+    console.error("Failed to save history scene snapshots", error);
   });
 }, config.scene.historySnapshotIntervalMs);
 

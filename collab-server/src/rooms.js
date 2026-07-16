@@ -38,6 +38,18 @@ const findRoomAlias = async (alias) => {
   return rows[0] || null;
 };
 
+export const findRoomAliasByRoomId = async (roomId) => {
+  const [rows] = await pool.execute(
+    `SELECT alias, room_id AS roomId, room_key AS roomKey
+     FROM room_aliases
+     WHERE room_id = :roomId
+     LIMIT 1`,
+    { roomId },
+  );
+
+  return rows[0] || null;
+};
+
 export const resolveRoomAlias = async (alias) => {
   let existing;
 

@@ -16,6 +16,7 @@ export const FILE_CACHE_MAX_AGE_SEC = 31536000;
 export const WS_EVENTS = {
   SERVER_VOLATILE: "server-volatile-broadcast",
   SERVER: "server-broadcast",
+  SERVER_SAVE_SCENE: "server-save-scene",
   USER_FOLLOW_CHANGE: "user-follow",
   USER_FOLLOW_ROOM_CHANGE: "user-follow-room-change",
 } as const;

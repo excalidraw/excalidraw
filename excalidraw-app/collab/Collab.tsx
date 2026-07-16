@@ -139,6 +139,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
+  private isInitializingRoom = false;
   private collaborators = new Map<SocketId, Collaborator>();
 
   constructor(props: CollabProps) {
@@ -318,6 +319,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     syncableElements = cloneJSON(syncableElements);
     try {
+      await this.portal.saveScene(syncableElements);
+
       const storedElements = await saveToFirebase(
         this.portal,
         syncableElements,
@@ -356,6 +359,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   stopCollaboration = (keepRemoteState = true) => {
+    this.isInitializingRoom = false;
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
@@ -549,6 +553,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     if (existingRoomLinkData) {
       // when joining existing room, don't merge it with current scene data
+      this.isInitializingRoom = true;
       this.excalidrawAPI.resetScene();
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
@@ -610,15 +615,22 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             }
             break;
           }
-          case WS_SUBTYPES.UPDATE:
-            this.handleRemoteSceneUpdate(
-              this._reconcileElements(
-                toBrandedType<readonly RemoteExcalidrawElement[]>(
-                  decryptedData.payload.elements,
-                ),
-              ),
-            );
+          case WS_SUBTYPES.UPDATE: {
+            const remoteElements = toBrandedType<
+              readonly RemoteExcalidrawElement[]
+            >(decryptedData.payload.elements);
+            const reconciledElements = this._reconcileElements(remoteElements);
+            this.handleRemoteSceneUpdate(reconciledElements);
+
+            if (!this.portal.socketInitialized) {
+              this.initializeRoom({ fetchScene: false });
+              scenePromise.resolve({
+                elements: reconciledElements,
+                scrollToContent: true,
+              });
+            }
             break;
+          }
           case WS_SUBTYPES.MOUSE_LOCATION: {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
@@ -756,9 +768,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         console.error(error);
       } finally {
         this.portal.socketInitialized = true;
+        this.isInitializingRoom = false;
       }
     } else {
       this.portal.socketInitialized = true;
+      this.isInitializingRoom = false;
     }
     return null;
   };
@@ -964,6 +978,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
+    if (this.isInitializingRoom) {
+      return;
+    }
+
     this.broadcastElements(elements);
     this.queueSaveToFirebase();
   };

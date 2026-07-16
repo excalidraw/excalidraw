@@ -182,6 +182,30 @@ class Portal {
     await this._broadcastSocketData(data as SocketUpdateData);
   };
 
+  saveScene = async (elements: readonly OrderedExcalidrawElement[]) => {
+    if (!this.isOpen()) {
+      return;
+    }
+
+    const data: SocketUpdateDataSource["SCENE_INIT"] = {
+      type: WS_SUBTYPES.INIT,
+      payload: {
+        elements,
+      },
+    };
+
+    const json = JSON.stringify(data);
+    const encoded = new TextEncoder().encode(json);
+    const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
+
+    this.socket?.emit(
+      WS_EVENTS.SERVER_SAVE_SCENE,
+      this.roomId,
+      encryptedBuffer,
+      iv,
+    );
+  };
+
   broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {

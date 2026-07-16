@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS room_scene_snapshots (
   room_id VARCHAR(64) NOT NULL,
   encrypted_data LONGBLOB NOT NULL,
   iv VARBINARY(64) NOT NULL,
-  source VARCHAR(32) NOT NULL DEFAULT 'hourly',
+  content_hash CHAR(64) NULL,
+  source VARCHAR(32) NOT NULL DEFAULT 'history',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_room_scene_snapshots_room_created (room_id, created_at),
+  KEY idx_room_scene_snapshots_room_hash (room_id, content_hash),
   KEY idx_room_scene_snapshots_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

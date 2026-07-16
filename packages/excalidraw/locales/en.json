@@ -596,6 +596,15 @@
       "helpHint": "Shortcuts & help"
     }
   },
+  "shangban": {
+    "menu": {
+      "todayBoard": "Today board",
+      "archiveReadOnly": "Archive (read-only)"
+    },
+    "welcome": {
+      "heading": "When sunlight enters the office, I always remember there is a whole world outside the window."
+    }
+  },
   "colorPicker": {
     "color": "Color",
     "mostUsedCustomColors": "Most used custom colors",

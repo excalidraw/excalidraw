@@ -17,7 +17,9 @@ export const AppWelcomeScreen: React.FC<{
       <WelcomeScreen.Hints.HelpHint />
       <WelcomeScreen.Center>
         <WelcomeScreen.Center.Logo />
-        <WelcomeScreen.Center.Heading>Shang Ban</WelcomeScreen.Center.Heading>
+        <WelcomeScreen.Center.Heading>
+          {t("shangban.welcome.heading")}
+        </WelcomeScreen.Center.Heading>
       </WelcomeScreen.Center>
     </WelcomeScreen>
   );
