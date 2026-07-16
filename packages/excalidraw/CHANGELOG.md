@@ -15,11 +15,11 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-### Host-controlled active tool (2026-07-14)
+### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 
 - Added `activeTool` prop (`{ type: ToolType } | { type: "custom"; customType: string }`) for forcing the active editor tool (controlled). While set, user- and API-driven tool switching is ignored — `setActiveTool` refuses non-matching activations with a console warning, non-forced toolbar buttons render disabled, and the tool-lock toggle (`Q`) is inert — and the editor snaps back if internal flows reset the tool (e.g. `restore()` on scene load). The forced tool behaves as if locked — it doesn't revert to selection after use and drawn elements aren't auto-selected — without mutating `appState.activeTool.locked`, so the user's persisted padlock preference stays untouched. Unset the prop to return tool control to the editor (the current tool stays active). The forced tool must be activatable to take effect — not disabled via `UIOptions.tools`, and (while non-interactive) allowed via `interaction.enabled.tools`; otherwise the editor stays on the `selection` tool and applies the forced tool once it becomes activatable. `image` cannot be forced (its activation opens the file picker). Composes with `interaction.enabled.tools` for presentation-style hosts: force `laser` for the presenter, `selection` + `interaction={false}` for viewers.
 
-### User-driven tools while non-interactive (2026-07-14)
+### User-driven tools while non-interactive (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 
 - Added `interaction.enabled.tools` (`{ laser?: boolean; custom?: boolean }`) — the listed tools stay user-driven while the editor is otherwise non-interactive: pointer input keeps driving the tool when it's the active tool. With `laser` enabled, pointer strokes draw laser trails and pointer positions keep broadcasting through `onPointerUpdate`, so e.g. collaborators see a presenter's laser & cursor while the presenter's editor is otherwise inert. With `custom` enabled, custom tools (`activeTool.type === "custom"`) keep receiving `onPointerDown` / `onPointerUp` — activate them with `locked: true` or they revert to the selection tool (and go inert) after the first pointer interaction. Enabling a tool does not enable user-driven tool _switching_ — the keyboard stays disabled and tool selection remains host-driven (`ExcalidrawAPI.setActiveTool`). Composes with `enabled.navigation`: the enabled tool wins the primary-pointer drag, while wheel input (and wheel-button drag) still pans/zooms. The editor consumes touch input over the canvas while the active tool is enabled (strokes don't scroll the page).
 
@@ -31,7 +31,7 @@ Please add the latest change on the top under the correct section.
 
 - Added `ui` prop. When set to `false`, Excalidraw's default UI is not rendered — toolbar, default menu and footer controls, sidebars, canvas popups, and context menu. Canvas content (elements, text editing, frame names, embeds) still renders, and the editor remains interactive unless `interaction={false}` is set as well. Host children continue to mount (they may be functional, e.g. a collaboration component), and host-supplied UI — including Excalidraw-exported components such as `<MainMenu>` and `<Footer>` — continues to render together with any supporting dialogs it opens. You're responsible for hiding your own presentational components.
 
-### Tool system & toolbar rework
+### Tool system & toolbar rework [#11649](https://github.com/excalidraw/excalidraw/pull/11649)
 
 The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>` elements composed from a central tool registry, and all tool activation now goes through a single `setActiveTool` code path.
 
@@ -88,9 +88,9 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 #### Features
 
-- `setViewport({ ..., lock })` locks the viewport to the resolved target: `lock.scroll` constrains panning to the target box and `lock.zoom` makes the resolved zoom the minimum zoom (zooming in stays allowed). When the navigation is animated, the lock is installed once the viewport settles. `setViewport(null)` clears an active lock without navigating; a navigation without `lock` also supersedes a previously installed one.
+- `setViewport({ ..., lock })` locks the viewport to the resolved target: `lock.scroll` constrains panning to the target box and `lock.zoom` makes the resolved zoom the minimum zoom (zooming in stays allowed). During an animated navigation into a locked viewport, user pan, zoom, fit, and page-navigation input is consumed without mutating or cancelling the transition; the destination lock is installed together with the final viewport once the animation settles. A newer `setViewport(...)` supersedes the transition and starts from the currently rendered viewport. `setViewport(null)` cancels a pending transition and clears any pending or active lock without navigating; a navigation without `lock` likewise supersedes any lock.
 
-- `lock.overscroll` adds a rubberband to the lock: panning can overshoot the constraint by the given amount (viewport px, zoom-independent) and snaps back once the interaction settles — on touch, once the multi-finger gesture ends. Defaults to `true` = `DEFAULT_OVERSCROLL` (150px, exported from the package root); pass a number to customize, or `false` / `0` for a rigid lock. Zooming is always hard-clamped against the lock, gliding along its edge instead of overscrolling.
+- `lock.overscroll` adds a rubberband to the lock: panning can overshoot the constraint by the given amount (viewport px, zoom-independent) and snaps back once wheel input settles or the active pointer or multi-finger gesture is released. Defaults to `true` = `DEFAULT_OVERSCROLL` (150px, exported from the package root); pass a number to customize, or `false` / `0` for a rigid lock. Zooming itself remains hard-clamped against the lock, gliding along its edge instead of overscrolling, and stays available during snap-back without cancelling the rubberband animation or discarding its existing screen-space overscroll.
 
 - While a lock is active, the zoom-to-fit shortcuts (shift+1/2/3) target the locked box instead of the scene elements (with no selection), so they return the viewport to the lock's resting state; reset-zoom (ctrl/cmd+0) resets to the lock's minimum zoom instead of 100%. Fit results are always re-clamped against the lock. [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
 
