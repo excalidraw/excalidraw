@@ -409,8 +409,6 @@ import {
 import { Renderer } from "../scene/Renderer";
 import {
   type SetViewportOptions,
-  resolveViewportTarget,
-  getConstrainedTargetViewport,
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
@@ -3516,21 +3514,16 @@ class App extends React.Component<AppProps, AppState> {
         restoredNonDeletedElements,
       ) as NonDeletedSceneElementsMap;
 
-      const { bounds } = resolveViewportTarget(
-        initialViewport.target,
+      const initialViewportState = this.viewport.resolveInitialViewport(
+        initialViewport,
         restoredElementsMap,
         viewportAppState,
       );
 
-      if (bounds) {
+      if (initialViewportState) {
         restoredAppState = {
           ...restoredAppState,
-          ...getConstrainedTargetViewport(viewportAppState, bounds, {
-            ...initialViewport,
-            // resolved here (post-mount) so ui-derived offsets measure the
-            // actually-rendered editor UI
-            offsets: this.viewport.resolveOffsets(initialViewport.offsets),
-          }),
+          ...initialViewportState,
         };
       }
     } else if (initialData?.scrollToContent) {

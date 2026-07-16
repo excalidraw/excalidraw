@@ -1,20 +1,42 @@
-import { debounce, easeOut, type StylesPanelMode } from "@excalidraw/common";
+import {
+  debounce,
+  easeOut,
+  isBounds,
+  type Bounds,
+  type StylesPanelMode,
+} from "@excalidraw/common";
 import { clamp } from "@excalidraw/math";
+
+import {
+  getCommonBounds,
+  getElementsInGroup,
+  isElementLink,
+  isExcalidrawElement,
+  parseElementLinkFromURL,
+} from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
 
 import { getLanguage, t } from "../i18n";
 import { AnimationController } from "../renderer/animation";
 import {
   constrainScrollState,
-  getConstrainedTargetViewport,
-  interpolateViewport,
-  resolveViewportTarget,
+  DEFAULT_OVERSCROLL,
   type SetViewportOptions,
+  type SetViewportRect,
+  zoomToFitBounds,
 } from "../viewport";
 
 import type {
   AppProps,
   AppState,
+  NormalizedZoomValue,
   Offsets,
+  ScrollConstraints,
   ViewportOffsets,
   ViewportOffsetsOptions,
   ViewportUIDock,
@@ -49,6 +71,234 @@ export const RIGHT_SIDEBAR_WIDTH = 302;
 const STYLES_PANEL_APPROX_WIDTH = { full: 216, compact: 64 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
+
+const isSetViewportRect = (target: unknown): target is SetViewportRect => {
+  if (!target || typeof target !== "object" || Array.isArray(target)) {
+    return false;
+  }
+
+  const rect = target as Partial<SetViewportRect>;
+  return (
+    typeof rect.x === "number" &&
+    typeof rect.y === "number" &&
+    (rect.width == null || typeof rect.width === "number") &&
+    (rect.height == null || typeof rect.height === "number")
+  );
+};
+
+const getElementsFromId = (
+  id: string,
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  const element = elementsMap.get(id);
+  if (element) {
+    return [element];
+  }
+
+  return getElementsInGroup(elementsMap, id);
+};
+
+type ResolvedViewportTarget = {
+  /** null when the target couldn't be resolved (unknown id/link, or all
+   * supplied elements deleted) */
+  bounds: Bounds | null;
+  /** how the target was specified, so callers can react to unresolved
+   * targets themselves (e.g. toast on a broken element link) */
+  type: "element" | "area" | "link";
+};
+
+/** Resolves a `setViewport` target to a scene-coordinate box. */
+const resolveViewportTarget = (
+  target: SetViewportOptions["target"],
+  elementsMap: NonDeletedSceneElementsMap,
+  appState: Pick<AppState, "width" | "height">,
+): ResolvedViewportTarget => {
+  if (typeof target === "string") {
+    const isLink = isElementLink(target);
+    const type = isLink ? ("link" as const) : ("element" as const);
+    const id = isLink ? parseElementLinkFromURL(target) : target;
+    const resolved = id ? getElementsFromId(id, elementsMap) : [];
+
+    if (!resolved.length) {
+      return { bounds: null, type };
+    }
+
+    return { bounds: getCommonBounds(resolved, elementsMap), type };
+  }
+
+  if (isBounds(target)) {
+    return { bounds: target, type: "area" };
+  }
+
+  if (isSetViewportRect(target) && !isExcalidrawElement(target)) {
+    const width = target.width ?? appState.width;
+    const height = target.height ?? appState.height;
+    return {
+      bounds: [target.x, target.y, target.x + width, target.y + height],
+      type: "area",
+    };
+  }
+
+  // widening to null values in case the host app doesn't have
+  // noUncheckedIndexedAccess enabled
+  const targetElements: (ExcalidrawElement | undefined | null)[] =
+    Array.isArray(target) ? target : [target];
+  const elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
+    (acc, element) => {
+      if (element && !element.isDeleted) {
+        const sceneElement = elementsMap.get(element.id);
+        if (sceneElement) {
+          acc.push(sceneElement);
+        }
+      }
+      return acc;
+    },
+    [],
+  );
+
+  const hasNoElements = !elements.length;
+  if (elements.length !== targetElements.length || hasNoElements) {
+    console.warn(
+      "supplied element target(s) for setViewport contain deleted or non-existent elements which have been filtered out",
+    );
+  }
+
+  if (hasNoElements) {
+    return { bounds: null, type: "element" };
+  }
+
+  return { bounds: getCommonBounds(elements, elementsMap), type: "element" };
+};
+
+const resolveOverscroll = (
+  overscroll: boolean | number | undefined,
+): number => {
+  if (overscroll === false) {
+    return 0;
+  }
+  if (overscroll === true || overscroll == null) {
+    return DEFAULT_OVERSCROLL;
+  }
+  return Math.max(overscroll, 0);
+};
+
+/** Computes the viewport (scroll + zoom) that brings the target box into view,
+ * based on the requested fit behavior. */
+const getTargetViewport = (
+  state: AppState,
+  bounds: Bounds,
+  fit: SetViewportOptions["fit"] = "scale-down",
+  offsets?: Offsets,
+): Viewport => {
+  const { appState } = zoomToFitBounds({
+    bounds,
+    appState: state,
+    fit,
+    canvasOffsets: offsets,
+    steppedZoom: false,
+  });
+
+  return {
+    scrollX: appState.scrollX,
+    scrollY: appState.scrollY,
+    zoom: appState.zoom,
+  };
+};
+
+/** Computes the viewport patch for landing on `bounds`: the target
+ * scroll/zoom, plus the scroll lock to install — or `scrollConstraints: null`
+ * to clear a previous lock when none is requested. */
+const getConstrainedTargetViewport = (
+  appState: AppState,
+  bounds: Bounds,
+  // NOTE offsets must be resolved (see `AppViewport.resolveOffsets`)
+  {
+    fit,
+    offsets,
+    lock,
+  }: Pick<SetViewportOptions, "fit" | "lock"> & { offsets?: Offsets },
+): Viewport & { scrollConstraints: ScrollConstraints | null } => {
+  const viewport = getTargetViewport(appState, bounds, fit, offsets);
+
+  if (!lock?.scroll && !lock?.zoom) {
+    return { ...viewport, scrollConstraints: null };
+  }
+
+  const [x1, y1, x2, y2] = bounds;
+  const scrollConstraints: ScrollConstraints = {
+    x: x1,
+    y: y1,
+    width: x2 - x1,
+    height: y2 - y1,
+    lockScroll: !!lock.scroll,
+    lockZoom: !!lock.zoom,
+    zoom: viewport.zoom.value,
+    overscroll: resolveOverscroll(lock.overscroll),
+    offsets,
+  };
+
+  return {
+    ...constrainScrollState({ ...appState, ...viewport, scrollConstraints }),
+    scrollConstraints,
+  };
+};
+
+/**
+ * Interpolates the viewport from `from` to `target` at the (already-eased)
+ * blend amount `factor` (0 = `from`, 1 = `target`).
+ *
+ * Zoom is interpolated geometrically (so it feels uniform), but the pan can't
+ * simply lerp alongside it: pairing a geometric zoom with a linear scroll (or
+ * a linearly-tweened focal point) makes scene points swoop along curved,
+ * non-monotone screen paths once the zoom ratio exceeds ~e (the destination
+ * visibly drifts away before converging). Instead we interpolate the view
+ * transform affinely — a scene point maps to screen as
+ * `(scenePt + scroll) * zoom`, and requiring every point to travel a straight
+ * screen line forces `zoom` to be a convex blend `(1-m)*z0 + m*z1` with
+ * `scroll * zoom` lerped by that same weight. Deriving `m` from the geometric
+ * zoom keeps its pacing while making all screen trajectories straight and
+ * monotone.
+ */
+const interpolateViewport = ({
+  from,
+  target,
+  factor,
+}: {
+  from: Viewport;
+  target: Viewport;
+  factor: number;
+}): Viewport => {
+  if (factor >= 1) {
+    // land bit-exactly on the target (`z0 * (z1/z0)^1` can be off by an ulp)
+    return { ...target };
+  }
+
+  const zoom = (from.zoom.value *
+    Math.pow(
+      target.zoom.value / from.zoom.value,
+      factor,
+    )) as NormalizedZoomValue;
+
+  // pan blend weight derived from the zoom blend (0/0 for pure pans, hence
+  // the `factor` fallback; near-equal zooms are fine — the ratio limits to
+  // `factor` smoothly)
+  const m =
+    target.zoom.value === from.zoom.value
+      ? factor
+      : (zoom - from.zoom.value) / (target.zoom.value - from.zoom.value);
+
+  return {
+    scrollX:
+      ((1 - m) * from.scrollX * from.zoom.value +
+        m * target.scrollX * target.zoom.value) /
+      zoom,
+    scrollY:
+      ((1 - m) * from.scrollY * from.zoom.value +
+        m * target.scrollY * target.zoom.value) /
+      zoom,
+    zoom: { value: zoom },
+  };
+};
 
 type AppViewportDependencies = {
   getContainer: () => HTMLDivElement | null;
@@ -354,6 +604,30 @@ export class AppViewport {
       bottom: opts?.bottom ?? editorOffsets.bottom,
       left: (isRTL ? opts?.right : opts?.left) ?? editorOffsets.left,
     };
+  };
+
+  /** Resolves the host-supplied initial viewport against restored scene data. */
+  resolveInitialViewport = (
+    opts: Omit<SetViewportOptions, "animation">,
+    elementsMap: NonDeletedSceneElementsMap,
+    appState: AppState,
+  ) => {
+    const { bounds } = resolveViewportTarget(
+      opts.target,
+      elementsMap,
+      appState,
+    );
+
+    if (!bounds) {
+      return null;
+    }
+
+    return getConstrainedTargetViewport(appState, bounds, {
+      ...opts,
+      // Initial state is resolved post-mount so UI-derived offsets measure
+      // the actually-rendered editor UI.
+      offsets: this.resolveOffsets(opts.offsets),
+    });
   };
 
   /** Navigates to a target and optionally installs scroll/zoom constraints. */
