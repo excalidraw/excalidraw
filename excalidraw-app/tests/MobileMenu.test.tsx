@@ -1,11 +1,10 @@
+import { Excalidraw, WelcomeScreen } from "@excalidraw/excalidraw";
 import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
 } from "@excalidraw/excalidraw/tests/test-utils";
-
-import ExcalidrawApp from "../App";
 
 describe("Test MobileMenu", () => {
   const { h } = window;
@@ -16,7 +15,11 @@ describe("Test MobileMenu", () => {
   });
 
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(
+      <Excalidraw>
+        <WelcomeScreen />
+      </Excalidraw>,
+    );
     h.app.refreshEditorInterface();
   });
 
