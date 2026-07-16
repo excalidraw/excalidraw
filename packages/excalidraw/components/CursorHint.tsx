@@ -63,10 +63,10 @@ export class CursorHints {
    * the timer.
    */
   show = (content: React.ReactNode) => {
-    // `lastViewportPosition` stays at its initial (0, 0) until the first
+    // `viewport.lastPosition` stays at its initial (0, 0) until the first
     // pointermove, so in pointer-less flows (e.g. keyboard-only session so
     // far) we don't know where to show the hint — don't show it at all
-    const { x, y } = this.app.lastViewportPosition;
+    const { x, y } = this.app.viewport.lastPosition;
     if (x === 0 && y === 0) {
       return;
     }
@@ -139,7 +139,7 @@ export const CursorHint = () => {
       element.style.transform = `translate(${x}px, ${y}px)`;
     };
 
-    updatePosition(app.lastViewportPosition.x, app.lastViewportPosition.y);
+    updatePosition(app.viewport.lastPosition.x, app.viewport.lastPosition.y);
 
     const onPointerMove = (event: PointerEvent) => {
       updatePosition(event.clientX, event.clientY);

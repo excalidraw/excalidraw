@@ -247,7 +247,7 @@ describe("interaction={false}", () => {
     expect(h.state.zoom.value).toBe(1);
 
     act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,

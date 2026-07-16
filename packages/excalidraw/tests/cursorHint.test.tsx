@@ -182,8 +182,8 @@ describe("cursor hint", () => {
 
   it("does not show hint when pointer position is unknown", () => {
     // simulate no pointermove having happened yet
-    h.app.lastViewportPosition.x = 0;
-    h.app.lastViewportPosition.y = 0;
+    h.app.viewport.lastPosition.x = 0;
+    h.app.viewport.lastPosition.y = 0;
 
     UI.clickTool("arrow");
     pressKey(KEYS.A);
