@@ -10,7 +10,12 @@ on:
       - unlabeled
 
 jobs:
+  check_ci:
+    uses: ./.github/workflows/check-ci.yml
+
   semantic:
+    needs: check_ci
+    if: needs.check_ci.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read

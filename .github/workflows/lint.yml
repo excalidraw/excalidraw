@@ -3,7 +3,12 @@ name: Lint
 on: pull_request
 
 jobs:
+  check_ci:
+    uses: ./.github/workflows/check-ci.yml
+
   lint:
+    needs: check_ci
+    if: needs.check_ci.outputs.should_run == 'true'
     runs-on: ubuntu-latest
 
     steps:

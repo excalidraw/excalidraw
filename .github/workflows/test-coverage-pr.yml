@@ -3,7 +3,12 @@ on:
   pull_request:
 
 jobs:
+  check_ci:
+    uses: ./.github/workflows/check-ci.yml
+
   coverage:
+    needs: check_ci
+    if: needs.check_ci.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

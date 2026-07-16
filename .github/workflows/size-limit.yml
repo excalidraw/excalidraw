@@ -4,7 +4,12 @@ on:
     branches:
       - master
 jobs:
+  check_ci:
+    uses: ./.github/workflows/check-ci.yml
+
   size:
+    needs: check_ci
+    if: needs.check_ci.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     env:
       CI_JOB_NUMBER: 1

@@ -1,0 +1,32 @@
+name: Check CI skip marker
+
+on:
+  workflow_call:
+    outputs:
+      should_run:
+        description: Whether CI jobs should run
+        value: ${{ jobs.check.outputs.should_run }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.commit_message.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+      - name: Check triggering commit message
+        id: commit_message
+        run: |
+          commit_message="$(git log -1 --format=%B)"
+
+          if [[ "${commit_message}" == *"[skip-ci]"* ]]; then
+            echo "should_run=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "should_run=true" >> "${GITHUB_OUTPUT}"
+          fi
