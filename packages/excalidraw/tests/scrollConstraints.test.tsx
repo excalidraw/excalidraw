@@ -21,7 +21,6 @@ import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
   getViewportForZoomWithScrollConstraints,
-  isViewportOverscrolled,
 } from "../viewport";
 import { AnimationController } from "../renderer/animation";
 
@@ -353,53 +352,6 @@ describe("rubberband overscroll (pure)", () => {
     );
     // the hard clamp still rests at dead center
     expect(constrainScrollState(state).scrollX).toBeCloseTo(500);
-  });
-});
-
-describe("isViewportOverscrolled (pure)", () => {
-  const base = { x: 0, y: 0, width: 1000, height: 1000 } as const;
-
-  it("is false when there is no lock", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({ scrollX: 9999, scrollConstraints: null }),
-      ),
-    ).toBe(false);
-  });
-
-  it("is false when the viewport is within the hard bounds", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          scrollX: -100,
-          scrollY: -100,
-          scrollConstraints: makeLock({ ...base, lockScroll: true }),
-        }),
-      ),
-    ).toBe(false);
-  });
-
-  it("is true when panned past an edge (scroll lock)", () => {
-    // scrollX 30 is past the hard max of 0
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          scrollX: 30,
-          scrollConstraints: makeLock({ ...base, lockScroll: true }),
-        }),
-      ),
-    ).toBe(true);
-  });
-
-  it("is true when zoomed out below the locked zoom (zoom lock)", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          zoom: { value: getNormalizedZoom(0.1) },
-          scrollConstraints: makeLock({ ...base, lockZoom: true, zoom: 0.2 }),
-        }),
-      ),
-    ).toBe(true);
   });
 });
 
@@ -1091,7 +1043,6 @@ describe("rubberband overscroll (integration)", () => {
 
     expect(h.state.zoom.value).toBeCloseTo(0.2);
     expect(h.state.scrollX).toBeCloseTo(0);
-    expect(isViewportOverscrolled(h.state)).toBe(false);
 
     // panning, by contrast, still gets the rubberband give
     Keyboard.keyPress(KEYS.PAGE_UP);
@@ -1137,7 +1088,6 @@ describe("rubberband overscroll (integration)", () => {
     expect(h.state.scrollY).toBeLessThanOrEqual(
       50 / h.state.zoom.value + 0.001,
     );
-    expect(isViewportOverscrolled(h.state)).toBe(true);
 
     // zooming must keep working while overscrolled (used to be pinned),
     // without yanking the viewport back inside the box
@@ -1172,7 +1122,8 @@ describe("rubberband overscroll (integration)", () => {
     finger2.downAt(60, 2);
     finger1.move(0, 5);
     finger2.move(0, 5);
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    const heldScrollY = h.state.scrollY;
+    expect(heldScrollY).toBeGreaterThan(0);
 
     // the debounced snap-back elapses while the fingers are still down —
     // it must be withheld, not fight the held gesture
@@ -1183,7 +1134,7 @@ describe("rubberband overscroll (integration)", () => {
     expect(
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
     ).toBe(false);
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    expect(h.state.scrollY).toBe(heldScrollY);
 
     // lifting one finger ends the gesture → the rubberband releases
     finger1.up();
@@ -1213,7 +1164,8 @@ describe("rubberband overscroll (integration)", () => {
     // Drag down past the top edge and hold the mouse button there.
     mouse.downAt(50, 2);
     mouse.move(0, 5);
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    const heldScrollY = h.state.scrollY;
+    expect(heldScrollY).toBeGreaterThan(0);
 
     // The debounce may elapse while the mouse is still held, but the viewport
     // must remain attached to the pointer until the pan session ends.
@@ -1224,7 +1176,7 @@ describe("rubberband overscroll (integration)", () => {
     expect(
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
     ).toBe(false);
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    expect(h.state.scrollY).toBe(heldScrollY);
 
     mouse.up();
     expect(
@@ -1264,7 +1216,9 @@ describe("rubberband overscroll (integration)", () => {
       expect(
         AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
       ).toBe(true);
-      expect(isViewportOverscrolled(h.state)).toBe(true);
+      expect(h.state.scrollY).toBeGreaterThan(
+        constrainScrollState(h.state).scrollY,
+      );
 
       const zoomBefore = h.state.zoom.value;
       fireEvent.wheel(GlobalTestState.interactiveCanvas, {
@@ -1273,7 +1227,9 @@ describe("rubberband overscroll (integration)", () => {
       });
 
       expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
-      expect(isViewportOverscrolled(h.state)).toBe(true);
+      expect(h.state.scrollY).toBeGreaterThan(
+        constrainScrollState(h.state).scrollY,
+      );
       expect(
         AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
       ).toBe(true);
@@ -1284,7 +1240,10 @@ describe("rubberband overscroll (integration)", () => {
         AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
       ).toBe(false);
       expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
-      expect(isViewportOverscrolled(h.state)).toBe(false);
+      const restingViewport = constrainScrollState(h.state);
+      expect(h.state.scrollX).toBeCloseTo(restingViewport.scrollX);
+      expect(h.state.scrollY).toBeCloseTo(restingViewport.scrollY);
+      expect(h.state.zoom.value).toBeCloseTo(restingViewport.zoom.value);
     } finally {
       window.EXCALIDRAW_THROTTLE_RENDER = undefined;
     }

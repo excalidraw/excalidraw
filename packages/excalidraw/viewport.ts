@@ -232,25 +232,6 @@ export const constrainScrollState = (
   };
 };
 
-export const isViewportOverscrolled = (
-  state: Pick<
-    AppState,
-    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
-  >,
-): boolean => {
-  if (!state.scrollConstraints) {
-    return false;
-  }
-
-  const target = constrainScrollState(state); // hard clamp (no overscroll give)
-
-  return (
-    target.scrollX !== state.scrollX ||
-    target.scrollY !== state.scrollY ||
-    target.zoom.value !== state.zoom.value
-  );
-};
-
 /** private helper. Use {@link getViewportForZoomWithScrollConstraints} instead */
 const getViewportForZoom = (
   { viewportX, viewportY, nextZoom }: ZoomOptions,
