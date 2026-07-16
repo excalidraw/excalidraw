@@ -12932,11 +12932,12 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
-    // NOTE no preventDefault so the browser default context menu applies
+    // Always suppress the native menu over the canvas. In non-interactive
+    // mode we stop here so it cannot be mistaken for Excalidraw's own menu.
+    event.preventDefault();
     if (!this.isInteractionEnabled()) {
       return;
     }
-    event.preventDefault();
 
     if (
       (("pointerType" in event.nativeEvent &&

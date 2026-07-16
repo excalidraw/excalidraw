@@ -57,11 +57,15 @@ const pressZoomShortcut = (code: string) => {
 };
 
 const rightClickCanvas = () => {
-  fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+  const event = new MouseEvent("contextmenu", {
+    bubbles: true,
+    cancelable: true,
     button: 2,
     clientX: 5,
     clientY: 5,
   });
+  fireEvent(GlobalTestState.interactiveCanvas, event);
+  return event;
 };
 
 const dispatchPaste = async () => {
@@ -227,8 +231,9 @@ describe("interaction={false}", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
-  it("context menu does not open", () => {
-    rightClickCanvas();
+  it("prevents the native context menu without opening Excalidraw's", () => {
+    const event = rightClickCanvas();
+    expect(event.defaultPrevented).toBe(true);
     expect(h.state.contextMenu).toBe(null);
     expect(UI.queryContextMenu()).toBe(null);
   });
