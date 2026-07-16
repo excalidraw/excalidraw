@@ -676,6 +676,100 @@ describe("ui={false}", () => {
   });
 });
 
+describe("ui={{ enabled: ... }}", () => {
+  beforeEach(() => {
+    mockBoundingClientRect();
+  });
+
+  afterEach(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  const rectangle = () =>
+    API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+    });
+
+  const scrollAwayFromContent = async () => {
+    act(() => {
+      h.app.setState({ scrollX: -10_000, scrollY: -10_000 });
+    });
+    await waitFor(() => expect(h.state.scrolledOutside).toBe(true));
+  };
+
+  it("renders opted-in zoom controls while the rest of the default UI stays hidden", async () => {
+    await render(<Excalidraw ui={{ enabled: { zoom: true } }} />);
+
+    expect(queryContainer(".zoom-actions")).not.toBe(null);
+    expect(queryContainer(".undo-redo-buttons")).toBe(null);
+    expect(queryContainer(".App-toolbar")).toBe(null);
+    expect(queryContainer(".dropdown-menu-button")).toBe(null);
+    expect(queryContainer(".default-sidebar-trigger")).toBe(null);
+    expect(queryContainer(".help-icon")).toBe(null);
+    expect(
+      queryContainer(".excalidraw-container")!.classList.contains(
+        "excalidraw--ui-hidden",
+      ),
+    ).toBe(true);
+  });
+
+  it("renders an opted-in scroll-back-to-content control", async () => {
+    await render(
+      <Excalidraw
+        ui={{ enabled: { scrollBackToContent: true } }}
+        initialData={{ elements: [rectangle()] }}
+      />,
+    );
+
+    expect(queryContainer(".zoom-actions")).toBe(null);
+    expect(queryContainer(".scroll-back-to-content")).toBe(null);
+
+    await scrollAwayFromContent();
+
+    const scrollBackButton = queryContainer(".scroll-back-to-content");
+    expect(scrollBackButton).not.toBe(null);
+    fireEvent.click(scrollBackButton!);
+    await waitFor(() => expect(h.state.scrolledOutside).toBe(false));
+  });
+
+  it("keeps omitted or false controls hidden", async () => {
+    await render(
+      <Excalidraw
+        ui={{
+          enabled: { zoom: false, scrollBackToContent: false },
+        }}
+        initialData={{ elements: [rectangle()] }}
+      />,
+    );
+
+    await scrollAwayFromContent();
+
+    expect(queryContainer(".zoom-actions")).toBe(null);
+    expect(queryContainer(".scroll-back-to-content")).toBe(null);
+  });
+
+  it("supports the scroll-back-to-content control on mobile", async () => {
+    await render(
+      <Excalidraw
+        ui={{ enabled: { scrollBackToContent: true } }}
+        UIOptions={{ getFormFactor: () => "phone" }}
+        initialData={{ elements: [rectangle()] }}
+      />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    await scrollAwayFromContent();
+
+    expect(queryContainer(".scroll-back-to-content")).not.toBe(null);
+    expect(queryContainer(".mobile-toolbar")).toBe(null);
+  });
+});
+
 describe("ui={false} with host UI", () => {
   it("renders host outlets and dialogs invoked by host UI", async () => {
     const { container } = await render(

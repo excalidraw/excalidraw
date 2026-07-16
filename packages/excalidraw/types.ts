@@ -719,6 +719,27 @@ export type InteractionConfig = {
   };
 };
 
+export type UIConfig = {
+  /**
+   * Default UI controls that stay enabled while the rest of Excalidraw's
+   * default UI is hidden. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled: {
+    /**
+     * The zoom-out, reset-zoom, and zoom-in controls.
+     *
+     * @default false
+     */
+    zoom?: boolean;
+    /**
+     * The button shown when the viewport is scrolled away from all content.
+     *
+     * @default false
+     */
+    scrollBackToContent?: boolean;
+  };
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -814,12 +835,19 @@ export interface ExcalidrawProps {
    * renders, and the editor remains interactive unless `interaction` is set to
    * `false`.
    *
+   * Pass a config object to keep specific default controls rendered while the
+   * rest of the default UI is hidden (see `UIConfig`):
+   *
+   * ```tsx
+   * <Excalidraw ui={{ enabled: { zoom: true } }} />
+   * ```
+   *
    * NOTE: this is WIP and what default UI is/is not rendered when ui=false
    * may yet change.
    *
    * @default true
    */
-  ui?: boolean;
+  ui?: boolean | UIConfig;
   /**
    * Forces the active editor tool (controlled). While set, user- and
    * API-driven tool switching is ignored — `setActiveTool` refuses with a

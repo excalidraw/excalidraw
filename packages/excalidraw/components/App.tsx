@@ -489,6 +489,7 @@ import type {
   ExcalidrawImperativeAPIEventMap,
   GenerateDiagramToCode,
   NullableGridSize,
+  UIConfig,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -1023,8 +1024,21 @@ class App extends React.Component<AppProps, AppState> {
     return this.state.activeTool.type === "laser";
   }
 
-  /** Whether Excalidraw's default UI is rendered. */
+  /** Whether Excalidraw's full default UI is rendered. */
   public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
+    return (
+      props.ui !== false && (typeof props.ui !== "object" || props.ui === null)
+    );
+  }
+
+  /** Whether an individual default UI control is rendered. */
+  public isUIControlEnabled(
+    control: keyof UIConfig["enabled"],
+    props: Pick<AppProps, "ui"> = this.props,
+  ): boolean {
+    if (typeof props.ui === "object" && props.ui !== null) {
+      return props.ui.enabled?.[control] === true;
+    }
     return props.ui !== false;
   }
 
@@ -2379,6 +2393,10 @@ class App extends React.Component<AppProps, AppState> {
                             canvas={this.canvas}
                             appState={this.state}
                             defaultUIEnabled={this.isDefaultUIEnabled()}
+                            zoomUIEnabled={this.isUIControlEnabled("zoom")}
+                            scrollBackToContentUIEnabled={this.isUIControlEnabled(
+                              "scrollBackToContent",
+                            )}
                             files={this.files}
                             setAppState={this.setAppState}
                             actionManager={this.actionManager}
