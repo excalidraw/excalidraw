@@ -74,6 +74,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
+  "orbitBindOverrideEnabled": false,
   "originSnapOffset": {
     "x": 0,
     "y": 0,

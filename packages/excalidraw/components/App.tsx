@@ -121,6 +121,7 @@ import {
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
+  orbitBindOverrideEnabled,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -5847,7 +5848,7 @@ class App extends React.Component<AppProps, AppState> {
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
     if (event.key === KEYS.F) {
-      if (this.state.orbitBindOverrideEnabled) {
+      if (orbitBindOverrideEnabled(this.state)) {
         flushSync(() => {
           this.setState({ orbitBindOverrideEnabled: false });
         });
