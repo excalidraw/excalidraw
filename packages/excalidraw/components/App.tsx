@@ -11903,13 +11903,6 @@ class App extends React.Component<AppProps, AppState> {
         isLinearElement(newElement) &&
         this.state.activeTool.type !== "drawShape"
       ) {
-        if (
-          newElement!.points.length > 1 &&
-          newElement.points[1][0] !== 0 &&
-          newElement.points[1][1] !== 0
-        ) {
-          this.store.scheduleCapture();
-        }
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
