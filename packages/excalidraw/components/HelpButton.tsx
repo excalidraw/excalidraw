@@ -21,4 +21,3 @@ export const HelpButton = (props: HelpButtonProps) => (
     </button>
   </Tooltip>
 );
-
