@@ -10,7 +10,18 @@ import {
   getStrokeWidthByKey,
   ROUNDNESS,
 } from "@excalidraw/common";
-import { pointFrom } from "@excalidraw/math";
+import {
+  convexHull,
+  elongation,
+  kurtosis,
+  orientPrincipalAxes,
+  pointFrom,
+  polygonArea,
+  principalAxes,
+  principalCoords,
+  simplifyConvexPolygon,
+  skewness,
+} from "@excalidraw/math";
 
 import type { App, AppState } from "@excalidraw/excalidraw/types";
 
@@ -35,12 +46,10 @@ import { getFrameLikeElements } from "./frame";
 import { isLinearElement, isUsingAdaptiveRadius } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 
-// A simplified Protractor recognizer (Yang Li, 2010) customized forour specific
-// shape set and use case.
+// A moment-based shape recognizer.
 //
-// NOTE: We skip Golden Section Search and instead zero-out orientation by rotating
-// each stroke to its indicative angle before matching, which is sufficient
-// when no rotation invariance is required.
+// NOTE: Rectangle vs. diamond is deliberately *not* rotation invariant. A 45
+// rectangle = diamond.
 
 type NonDeletedRecognizedShapeElement = NonDeleted<
   | ExcalidrawRectangleElement
@@ -52,13 +61,6 @@ type NonDeletedRecognizedShapeElement = NonDeleted<
 >;
 
 type Shape = NonDeletedRecognizedShapeElement["type"];
-
-interface Template {
-  type: Shape;
-  vec: Vec;
-  // Whether this template was vectorised with rotation normalisation.
-  rotationInvariant: boolean;
-}
 
 interface ShapeRecognitionResult<P extends LocalPoint | GlobalPoint> {
   // The type of the recognized shape, or "freedraw" if no good match was found
@@ -72,21 +74,33 @@ interface ShapeRecognitionResult<P extends LocalPoint | GlobalPoint> {
   boundingBox: Bounds;
 }
 
-// Number of resampled points used for every template and candidate.
-const PROTRACTOR_N = 64;
+// Number of points every stroke is resampled to before feature extraction.
+const RESAMPLE_N = 64;
 
-// Side length of the reference square used for scaling.
-const PROTRACTOR_SQUARE_SIZE = 250;
+// A stroke whose endpoints are farther apart than this fraction of its own
+// path length is treated as open (a line or an arrow) rather than closed (a
+// rectangle, diamond or ellipse).
+const CLOSED_GAP_MAX_RATIO = 0.15;
 
-// Minimum score (0–1) required to commit to a shape; below that we assume
-// freedraw.
-const PROTRACTOR_SCORE_THRESHOLD = 0.95;
-const PROTRACTOR_LINEAR_SCORE_THRESHOLD = 0.95;
+// Maximum elongation for an open stroke to count as straight.
+const LINEAR_MAX_ELONGATION = 0.25;
 
-type Vec = Float64Array; // interleaved [x0, y0, x1, y1, …] of length 2*N
+// Minimum |skew| along the major axis for an open, straight stroke to be an
+// arrow rather than a plain line. Arrowhead add "mass" -> skews that way.
+const ARROW_MIN_SKEW = 0.3;
+
+// Maximum feature-space distance to a shape prototype, in units of the
+// per-feature tolerances in CLOSED_SHAPE_PROTOTYPES. Beyond this the stroke is
+// not enough like any known shape and stays freedraw.
+const CLOSED_SHAPE_MAX_DISTANCE = 1.5;
+
+// Accumulated turn required for a hull vertex to survive simplification. Sets
+// the corner count an ellipse reports (~360°/25° ≈ 14) while leaving the four
+// right-angle corners of a rectangle or diamond intact.
+const HULL_CORNER_ANGLE_THRESHOLD = (25 * Math.PI) / 180;
 
 // =============================================================================
-// Protractor recognizer helpers
+// Feature extraction
 // =============================================================================
 
 // Resample `pts` to exactly `n` evenly-spaced points along the stroke path.
@@ -141,571 +155,147 @@ function resample<P extends LocalPoint | GlobalPoint>(
   return result;
 }
 
-// Translate points so their centroid is at the origin.
-function translateToOrigin<P extends LocalPoint | GlobalPoint>(pts: P[]): P[] {
-  let cx = 0;
-  let cy = 0;
-  for (const p of pts) {
-    cx += p[0];
-    cy += p[1];
-  }
-  cx /= pts.length;
-  cy /= pts.length;
-  return pts.map(([x, y]) => [x - cx, y - cy] as P);
+// Statistical description of a stroke, in terms that don't depend on where,
+// how big, or (except where noted) how rotated it was drawn.
+interface StrokeFeatures {
+  // Straight-line distance between the endpoints over the stroke's own path
+  // length. ~0 when the stroke returns to its start.
+  gapRatio: number;
+
+  // Point cloud elongation along the major axis.
+  elongation: number;
+
+  // Skew of the points projected onto the major axis. Signed so that it is
+  // <= 0 by construction.
+  majorSkew: number;
+
+  // Convex hull area over axis-aligned bounding box area, in the screen
+  // frame: ~1 for a rectangle, ~PI/4 for an ellipse, ~1/2 for a diamond.
+  hullFillRatio: number;
+
+  // Corner count of the simplified convex hull: 4 for a rectangle or diamond,
+  // many for an ellipse.
+  hullCorners: number;
+
+  // kurtosis along x times kurtosis along y, in the screen frame. The two
+  // factors each vary with the aspect ratio, but their product barely does:
+  // ~1.83 for any rectangle, 2.25 for any ellipse, 3.24 for any diamond.
+  kurtosisProduct: number;
 }
 
-// Scale points to fit inside a square of `size` centred at origin.
-function scaleTo<P extends LocalPoint | GlobalPoint>(
-  pts: P[],
-  size: number,
-): P[] {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of pts) {
-    if (x < minX) {
-      minX = x;
-    }
-    if (y < minY) {
-      minY = y;
-    }
-    if (x > maxX) {
-      maxX = x;
-    }
-    if (y > maxY) {
-      maxY = y;
-    }
-  }
-  const w = maxX - minX;
-  const h = maxY - minY;
-  const scale = size / Math.max(w, h);
-  return pts.map(([x, y]) => [x * scale, y * scale] as P);
-}
+function extractFeatures<P extends LocalPoint | GlobalPoint>(
+  points: readonly P[],
+): StrokeFeatures {
+  // Resample first: features are moments of the point set, so they would
+  // otherwise be biased by pointer speed, which crowds samples wherever the
+  // user drew slowly.
+  const pts = resample(points, RESAMPLE_N);
 
-// Rotate points by `angle` radians around the origin.
-// Used to zero-out the indicative angle of each stroke.
-function rotateBy<P extends LocalPoint | GlobalPoint>(
-  pts: P[],
-  angle: number,
-): P[] {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  return pts.map(([x, y]) => [x * cos - y * sin, x * sin + y * cos] as P);
-}
-
-// Vectorise a point sequence: translate to origin, scale, optionally rotate to
-// indicative angle = 0, then flatten to an interleaved Float64Array
-// normalised to unit length (required by the Protractor distance formula).
-//
-// rotationInvariant: True zeros out the indicative angle so the match is
-// independent of drawing start position (needed for ellipses). False preserves
-// absolute orientation so that rotationally distinct shapes (rectangle vs.
-// diamond) remain distinguishable.
-function vectorise<P extends LocalPoint | GlobalPoint>(
-  pts: P[],
-  rotationInvariant = false,
-): Vec {
-  let processed = translateToOrigin(pts);
-  processed = scaleTo(processed, PROTRACTOR_SQUARE_SIZE);
-
-  if (rotationInvariant) {
-    // Indicative angle: angle from centroid (already at origin) to first point
-    const indicativeAngle = Math.atan2(processed[0][1], processed[0][0]);
-    processed = rotateBy(processed, -indicativeAngle);
-  }
-
-  const v = new Float64Array(processed.length * 2);
-  let sum = 0;
-  for (let i = 0; i < processed.length; i++) {
-    v[2 * i] = processed[i][0];
-    v[2 * i + 1] = processed[i][1];
-    sum += processed[i][0] ** 2 + processed[i][1] ** 2;
-  }
-  const mag = Math.sqrt(sum);
-  for (let i = 0; i < v.length; i++) {
-    v[i] /= mag;
-  }
-  return v;
-}
-
-// Scratch buffers for the rolling two-row Fréchet DP. Preallocated at module
-// scope so the hot recognition path (invoked per pointermove) allocates nothing
-// per call. `frechetDistance` is synchronous and non-reentrant, so sharing is
-// safe.
-const _frechetRowA = new Float64Array(PROTRACTOR_N);
-const _frechetRowB = new Float64Array(PROTRACTOR_N);
-
-// Discrete Fréchet distance between two parameterized curves.
-//
-// This is curve-aware (not just point-to-point), so it penalizes structural
-// mismatches like direction reversal in the arrow template vs a monotonic line.
-//
-// Uses a rolling two-row DP (O(n) memory, zero per-call allocation) instead of
-// a full n×n matrix. `maxDist` is the best (smallest) distance found so far
-// across templates: because the DP frontier row's minimum is monotonically
-// non-decreasing, once an entire row exceeds `maxDist` the final coupling
-// distance is provably >= `maxDist`, so we early-abandon with Infinity rather
-// than finishing the matrix. This is behaviour-preserving for callers that only
-// compare the result against `maxDist`.
-//
-// Returns a raw distance in [0, 2*sqrt(2)] for unit-magnitude vectors (or
-// Infinity when early-abandoned).
-function frechetDistance(v1: Vec, v2: Vec, maxDist: number = Infinity): number {
-  const n = v1.length / 2;
-  let prev = _frechetRowA;
-  let curr = _frechetRowB;
-
-  // Row 0: v1[0] aligned with v2[0..j]
-  prev[0] = Math.hypot(v1[0] - v2[0], v1[1] - v2[1]);
-  for (let j = 1; j < n; j++) {
-    const ptDist = Math.hypot(v1[0] - v2[2 * j], v1[1] - v2[2 * j + 1]);
-    prev[j] = Math.max(prev[j - 1], ptDist);
-  }
-
-  for (let i = 1; i < n; i++) {
-    const x = v1[2 * i];
-    const y = v1[2 * i + 1];
-
-    // First column: v1[0..i] aligned with v2[0]
-    curr[0] = Math.max(prev[0], Math.hypot(x - v2[0], y - v2[1]));
-    let rowMin = curr[0];
-
-    for (let j = 1; j < n; j++) {
-      const ptDist = Math.hypot(x - v2[2 * j], y - v2[2 * j + 1]);
-      const best = Math.min(prev[j], curr[j - 1], prev[j - 1]);
-      const val = best > ptDist ? best : ptDist;
-      curr[j] = val;
-      if (val < rowMin) {
-        rowMin = val;
-      }
-    }
-
-    // Early abandon: the whole frontier row is already worse than the best
-    // match found so far, so this template cannot win.
-    if (rowMin > maxDist) {
-      return Infinity;
-    }
-
-    const tmp = prev;
-    prev = curr;
-    curr = tmp;
-  }
-
-  return prev[n - 1];
-}
-
-// Convert a Fréchet distance to a similarity score in [0, 1].
-//
-// For unit-magnitude vectors, the maximum point-to-point distance is 2,
-// so the maximum Fréchet distance is also bounded by 2.
-function frechetScore(distance: number): number {
-  return Math.max(0, 1 - distance / 2);
-}
-
-// =============================================================================
-// Template — canonical point sequences for each shape
-// =============================================================================
-
-// Build a template for a rectangle drawn clockwise.
-//
-// startCorner selects which corner (0=TL, 1=TR, 2=BR, 3=BL) the stroke begins
-// from.
-//
-// aspectRatio is width/height (>1 = wide, <1 = tall, 1 = square).Points
-// are distributed proportionally to side length to match the arc-length uniform
-// resampling of a real user stroke.
-function makeRectangleTemplate(
-  startCorner: number = 0,
-  aspectRatio: number = 1,
-): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  // Scale axes to produce the target aspect ratio while keeping the longer
-  // axis at s so scaleTo() in vectorise() normalises to a consistent size.
-  const w = aspectRatio >= 1 ? s * aspectRatio : s;
-  const h = aspectRatio >= 1 ? s : s / aspectRatio;
-  const allCorners: LocalPoint[] = [
-    pointFrom<LocalPoint>(-w, -h),
-    pointFrom<LocalPoint>(w, -h),
-    pointFrom<LocalPoint>(w, h),
-    pointFrom<LocalPoint>(-w, h),
-  ];
-  const corners: LocalPoint[] = [
-    ...allCorners.slice(startCorner),
-    ...allCorners.slice(0, startCorner),
-  ];
-  // Compute side lengths for proportional point distribution.
-  // resample() spaces points by arc length, so the template must mirror that
-  // distribution — long sides get more points than short sides.
-  const sideLengths = corners.map((c, i) => {
-    const next = corners[(i + 1) % 4];
-    return Math.hypot(next[0] - c[0], next[1] - c[1]);
-  });
-  const perimeter = sideLengths.reduce((a, b) => a + b, 0);
-  const pts: LocalPoint[] = [];
-  for (let side = 0; side < 4; side++) {
-    const from = corners[side];
-    const to = corners[(side + 1) % 4];
-    const pointsForSide = Math.round(
-      (sideLengths[side] / perimeter) * PROTRACTOR_N,
+  let pathLength = 0;
+  for (let i = 1; i < pts.length; i++) {
+    pathLength += Math.hypot(
+      pts[i][0] - pts[i - 1][0],
+      pts[i][1] - pts[i - 1][1],
     );
-    for (let k = 0; k < pointsForSide; k++) {
-      const t = k / pointsForSide;
-      pts.push([
-        from[0] + t * (to[0] - from[0]),
-        from[1] + t * (to[1] - from[1]),
-      ] as LocalPoint);
+  }
+  const gap = Math.hypot(
+    pts[pts.length - 1][0] - pts[0][0],
+    pts[pts.length - 1][1] - pts[0][1],
+  );
+
+  const axes = orientPrincipalAxes(pts, principalAxes(pts));
+  const majorProjection = principalCoords(pts, axes).map(([u]) => u);
+
+  const hull = convexHull(pts);
+  const hullCorners = simplifyConvexPolygon(
+    hull,
+    HULL_CORNER_ANGLE_THRESHOLD,
+  ).length;
+  const [minX, minY, maxX, maxY] = getElementBoundsFromPoints(pts);
+  const boxArea = (maxX - minX) * (maxY - minY);
+
+  return {
+    gapRatio: pathLength > 0 ? gap / pathLength : 0,
+    elongation: elongation(axes),
+    majorSkew: skewness(majorProjection),
+    hullFillRatio: boxArea > 0 ? polygonArea(hull) / boxArea : 0,
+    hullCorners,
+    kurtosisProduct:
+      kurtosis(pts.map(([x]) => x)) * kurtosis(pts.map(([, y]) => y)),
+  };
+}
+
+// =============================================================================
+// Classification
+// =============================================================================
+
+const CLOSED_SHAPE_PROTOTYPES: readonly {
+  type: Shape;
+  hullFillRatio: number;
+  hullCorners: number;
+  kurtosisProduct: number;
+}[] = [
+  {
+    type: "rectangle",
+    hullFillRatio: 1,
+    hullCorners: 4,
+    kurtosisProduct: 1.83,
+  },
+  {
+    type: "diamond",
+    hullFillRatio: 0.5,
+    hullCorners: 4,
+    kurtosisProduct: 3.24,
+  },
+  {
+    type: "ellipse",
+    hullFillRatio: Math.PI / 4,
+    hullCorners: 14,
+    kurtosisProduct: 2.25,
+  },
+];
+
+const HULL_FILL_RATIO_TOLERANCE = 0.15;
+const HULL_CORNERS_TOLERANCE = 6;
+const KURTOSIS_PRODUCT_TOLERANCE = 0.7;
+
+// Pick the closed shape whose prototype the stroke's features sit closest to,
+// or freedraw when even the nearest one is too far away.
+function classifyClosedStroke(features: StrokeFeatures): Shape {
+  let best: Shape = "freedraw";
+  let bestDistance = CLOSED_SHAPE_MAX_DISTANCE;
+
+  for (const prototype of CLOSED_SHAPE_PROTOTYPES) {
+    const distance = Math.hypot(
+      (features.hullFillRatio - prototype.hullFillRatio) /
+        HULL_FILL_RATIO_TOLERANCE,
+      (features.hullCorners - prototype.hullCorners) / HULL_CORNERS_TOLERANCE,
+      (features.kurtosisProduct - prototype.kurtosisProduct) /
+        KURTOSIS_PRODUCT_TOLERANCE,
+    );
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = prototype.type;
     }
   }
-  while (pts.length < PROTRACTOR_N) {
-    pts.push(corners[0]);
-  }
-  return pts.slice(0, PROTRACTOR_N);
+
+  return best;
 }
 
-// Build a template for a diamond drawn clockwise.
-//
-// startCorner selects which vertex (0=Top, 1=Right, 2=Bottom, 3=Left) the
-// stroke begins from.
-//
-// aspectRatio is width/height of the bounding box (>1 = wide, <1 = tall,
-// 1 = square). All four sides of a diamond are always equal in length so equal
-// point distribution per side is already arc-length proportional.
-function makeDiamondTemplate(
-  startCorner: number = 0,
-  aspectRatio: number = 1,
-): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  const hw = aspectRatio >= 1 ? s * aspectRatio : s; // half-width
-  const hh = aspectRatio >= 1 ? s : s / aspectRatio; // half-height
-  const allCorners: LocalPoint[] = [
-    pointFrom<LocalPoint>(0, -hh),
-    pointFrom<LocalPoint>(hw, 0),
-    pointFrom<LocalPoint>(0, hh),
-    pointFrom<LocalPoint>(-hw, 0),
-  ];
-  const corners: LocalPoint[] = [
-    ...allCorners.slice(startCorner),
-    ...allCorners.slice(0, startCorner),
-  ];
-  const pts: LocalPoint[] = [];
-  const perSide = Math.floor(PROTRACTOR_N / 4);
-  for (let side = 0; side < 4; side++) {
-    const from = corners[side];
-    const to = corners[(side + 1) % 4];
-    for (let k = 0; k < perSide; k++) {
-      const t = k / perSide;
-      pts.push([
-        from[0] + t * (to[0] - from[0]),
-        from[1] + t * (to[1] - from[1]),
-      ] as LocalPoint);
-    }
+// An open stroke is a line or an arrow, provided it is straight enough; the
+// arrowhead is what makes the point distribution lopsided.
+function classifyOpenStroke(features: StrokeFeatures): Shape {
+  if (features.elongation > LINEAR_MAX_ELONGATION) {
+    return "freedraw";
   }
-  while (pts.length < PROTRACTOR_N) {
-    pts.push(corners[0]);
-  }
-  return pts;
+  return Math.abs(features.majorSkew) >= ARROW_MIN_SKEW ? "arrow" : "line";
 }
 
-//  Build a template for an ellipse (circle) sampled uniformly.
-//
-//  startAngle shifts the starting position so multiple templates can cover
-//  all common drawing start positions without needing rotation normalisation.
-function makeEllipseTemplate(startAngle: number = 0): LocalPoint[] {
-  const r = PROTRACTOR_SQUARE_SIZE / 2;
-  return Array.from({ length: PROTRACTOR_N }, (_, i) => {
-    const angle = startAngle + (2 * Math.PI * i) / PROTRACTOR_N;
-    return [r * Math.cos(angle), r * Math.sin(angle)] as LocalPoint;
-  });
+function classify(features: StrokeFeatures): Shape {
+  return features.gapRatio > CLOSED_GAP_MAX_RATIO
+    ? classifyOpenStroke(features)
+    : classifyClosedStroke(features);
 }
-
-// Build a template for a straight line at the given angle (radians).
-function makeLineTemplate(angle: number = 0): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  const basePts: LocalPoint[] = [];
-  for (let i = 0; i < PROTRACTOR_N; i++) {
-    const t = i / (PROTRACTOR_N - 1);
-    basePts.push([-s + t * PROTRACTOR_SQUARE_SIZE, 0] as LocalPoint);
-  }
-  if (angle === 0) {
-    return basePts;
-  }
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  return basePts.map(([x, y]) => {
-    return [x * cos - y * sin, x * sin + y * cos] as LocalPoint;
-  });
-}
-
-// Build a template for an arrow with a V-shaped arrowhead pointing right.
-// Drawn as a single continuous stroke: left -> right (shaft), then
-// back-left-up, right-tip, back-left-down.
-//
-// headLenRatio: ratio of arrowhead length to half-square (0.1 to 0.5 for
-// small to large heads).
-function makeVShapedArrowTemplate(headLenRatio: number = 0.35): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  const tipX = s;
-  const headLen = s * headLenRatio;
-  const headAngle = Math.PI / 6; // 30°
-
-  // Shaft: from (-s, 0) to (s, 0)
-  const shaftPts = Math.floor(PROTRACTOR_N * 0.5);
-  // Arrowhead: tip to upper base to back to tip to lower base
-  const headPts = PROTRACTOR_N - shaftPts;
-  const perHead = Math.floor(headPts / 2);
-
-  const pts: LocalPoint[] = [];
-  for (let i = 0; i < shaftPts; i++) {
-    const t = i / (shaftPts - 1);
-    pts.push([-s + t * (tipX - -s), 0] as LocalPoint);
-  }
-
-  // Upper arm: tip to upper-left
-  const ux = tipX - headLen * Math.cos(headAngle);
-  const uy = -headLen * Math.sin(headAngle);
-  for (let i = 0; i < perHead; i++) {
-    const t = i / (perHead - 1);
-    pts.push([tipX + t * (ux - tipX), t * uy] as LocalPoint);
-  }
-
-  // Lower arm: tip to lower-left (back to tip first)
-  const lx = tipX - headLen * Math.cos(headAngle);
-  const ly = headLen * Math.sin(headAngle);
-  const remaining = PROTRACTOR_N - pts.length;
-  for (let i = 0; i < remaining; i++) {
-    const t = i / Math.max(remaining - 1, 1);
-    pts.push([tipX + t * (lx - tipX), t * ly] as LocalPoint);
-  }
-
-  while (pts.length < PROTRACTOR_N) {
-    pts.push(pts[pts.length - 1]);
-  }
-  return pts.slice(0, PROTRACTOR_N);
-}
-
-// Build a template for an arrow with a solid triangular arrowhead pointing right.
-// Drawn as a single continuous stroke: left -> right (shaft), then trace the
-// triangle: tip -> upper-left -> lower-left -> back to tip.
-//
-// headLenRatio: ratio of arrowhead length to half-square (0.1 to 0.5 for
-// small to large heads).
-function makeTriangleArrowTemplate(headLenRatio: number = 0.4): LocalPoint[] {
-  const s = PROTRACTOR_SQUARE_SIZE / 2;
-  const tipX = s;
-  const headLen = s * headLenRatio;
-  const headAngle = Math.PI / 6; // 30°
-
-  // Shaft: from (-s, 0) to (s, 0)
-  const shaftPts = Math.floor(PROTRACTOR_N * 0.5);
-  // Arrowhead triangle: three sides of the triangle
-  const headPts = PROTRACTOR_N - shaftPts;
-  const perSide = Math.floor(headPts / 3);
-
-  const pts: LocalPoint[] = [];
-
-  // Draw shaft
-  for (let i = 0; i < shaftPts; i++) {
-    const t = i / (shaftPts - 1);
-    pts.push([-s + t * (tipX - -s), 0] as LocalPoint);
-  }
-
-  // Triangle vertices
-  const ux = tipX - headLen * Math.cos(headAngle);
-  const uy = -headLen * Math.sin(headAngle);
-  const lx = tipX - headLen * Math.cos(headAngle);
-  const ly = headLen * Math.sin(headAngle);
-
-  // First side: tip to upper-left
-  for (let i = 0; i < perSide; i++) {
-    const t = i / (perSide - 1);
-    pts.push([tipX + t * (ux - tipX), t * uy] as LocalPoint);
-  }
-
-  // Second side: upper-left to lower-left
-  for (let i = 0; i < perSide; i++) {
-    const t = i / (perSide - 1);
-    pts.push([ux + t * (lx - ux), uy + t * (ly - uy)] as LocalPoint);
-  }
-
-  // Third side: lower-left back to tip
-  const remaining = PROTRACTOR_N - pts.length;
-  for (let i = 0; i < remaining; i++) {
-    const t = i / Math.max(remaining - 1, 1);
-    pts.push([lx + t * (tipX - lx), ly + t * (0 - ly)] as LocalPoint);
-  }
-
-  while (pts.length < PROTRACTOR_N) {
-    pts.push(pts[pts.length - 1]);
-  }
-  return pts.slice(0, PROTRACTOR_N);
-}
-
-// Pre-computed template library. We need mutiple templates per shape to cover
-// different drawing start positions and configurations.
-const ARROW_TEMPLATES: readonly Template[] = (() => {
-  const defs: Array<{
-    type: Shape;
-    pts: LocalPoint[];
-    rotationInvariant?: boolean;
-  }> = [
-    // V-shaped arrow templates with increasing arrowhead size (0.1 to 0.5)
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.1),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.15),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.2),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.25),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.3),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.35),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.4),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.45),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeVShapedArrowTemplate(0.5),
-      rotationInvariant: true,
-    },
-    // Triangle arrow templates with increasing arrowhead size (0.1 to 0.5)
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.1),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.15),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.2),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.25),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.3),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.35),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.4),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.45),
-      rotationInvariant: true,
-    },
-    {
-      type: "arrow",
-      pts: makeTriangleArrowTemplate(0.5),
-      rotationInvariant: true,
-    },
-  ];
-  return defs.map(({ type, pts, rotationInvariant = false }) => ({
-    type,
-    vec: vectorise(pts, rotationInvariant),
-    rotationInvariant,
-  }));
-})();
-const OTHER_TEMPLATES: readonly Template[] = (() => {
-  const defs: Array<{
-    type: Shape;
-    pts: LocalPoint[];
-    rotationInvariant?: boolean;
-  }> = [
-    // Square (1:1) templates
-    { type: "rectangle", pts: makeRectangleTemplate(0) },
-    { type: "rectangle", pts: makeRectangleTemplate(1) },
-    { type: "rectangle", pts: makeRectangleTemplate(2) },
-    { type: "rectangle", pts: makeRectangleTemplate(3) },
-    // Wide (3:1) rectangle templates — thin horizontal shape
-    { type: "rectangle", pts: makeRectangleTemplate(0, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(1, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(2, 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(3, 3) },
-    // Tall (1:3) rectangle templates — thin vertical shape
-    { type: "rectangle", pts: makeRectangleTemplate(0, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(1, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(2, 1 / 3) },
-    { type: "rectangle", pts: makeRectangleTemplate(3, 1 / 3) },
-    // Square (1:1) diamond templates
-    { type: "diamond", pts: makeDiamondTemplate(0) },
-    { type: "diamond", pts: makeDiamondTemplate(1) },
-    { type: "diamond", pts: makeDiamondTemplate(2) },
-    { type: "diamond", pts: makeDiamondTemplate(3) },
-    // Wide (3:1) diamond templates: thin horizontal diamond
-    { type: "diamond", pts: makeDiamondTemplate(0, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(1, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(2, 3) },
-    { type: "diamond", pts: makeDiamondTemplate(3, 3) },
-    // Tall (1:3) diamond templates: thin vertical diamond
-    { type: "diamond", pts: makeDiamondTemplate(0, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(1, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(2, 1 / 3) },
-    { type: "diamond", pts: makeDiamondTemplate(3, 1 / 3) },
-    // Ellipse: 8 templates at 45° increments
-    { type: "ellipse", pts: makeEllipseTemplate(0) },
-    { type: "ellipse", pts: makeEllipseTemplate(Math.PI / 2) },
-    { type: "ellipse", pts: makeEllipseTemplate(Math.PI) },
-    { type: "ellipse", pts: makeEllipseTemplate((3 * Math.PI) / 2) },
-    // Line: 8 templates at 45° increments
-    { type: "line", pts: makeLineTemplate(0) },
-    { type: "line", pts: makeLineTemplate(Math.PI / 4) },
-    { type: "line", pts: makeLineTemplate(Math.PI / 2) },
-    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 4) },
-    { type: "line", pts: makeLineTemplate(Math.PI) },
-    { type: "line", pts: makeLineTemplate((5 * Math.PI) / 4) },
-    { type: "line", pts: makeLineTemplate((3 * Math.PI) / 2) },
-    { type: "line", pts: makeLineTemplate((7 * Math.PI) / 4) },
-  ];
-  return defs.map(({ type, pts, rotationInvariant = false }) => ({
-    type,
-    vec: vectorise(pts, rotationInvariant),
-    rotationInvariant,
-  }));
-})();
-const TEMPLATES = [...ARROW_TEMPLATES, ...OTHER_TEMPLATES];
 
 // Arrow endpoint selection
 
@@ -781,59 +371,11 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
     return { type: "freedraw", points, boundingBox };
   }
 
-  const resampled = resample(points, PROTRACTOR_N);
-  const resampledRev = [...resampled].reverse();
-
-  // Pre-compute both fixed and rotation-invariant candidate vectors so each
-  // template is compared with a consistently vectorised candidate.
-  const candidateVecFixed = vectorise(resampled, false);
-  const candidateVecFixedRev = vectorise(resampledRev, false);
-  const candidateVecRotInv = vectorise(resampled, true);
-  const candidateVecRotInvRev = vectorise(resampledRev, true);
-
-  // Track the smallest Fréchet distance (= highest score) so we can feed it
-  // back into frechetDistance as an early-abandon threshold. Distance is
-  // monotonic in score, so tracking min-distance is equivalent to the previous
-  // max-score logic, and passing the running best lets each template bail as
-  // soon as it can no longer win.
-  let bestDist = Infinity;
-  let bestType: Shape = "freedraw";
-
-  const templates =
-    previousElement?.type === "arrow" ? ARROW_TEMPLATES : TEMPLATES;
-
-  for (const tmpl of templates) {
-    const cv = tmpl.rotationInvariant ? candidateVecRotInv : candidateVecFixed;
-    const cvRev = tmpl.rotationInvariant
-      ? candidateVecRotInvRev
-      : candidateVecFixedRev;
-
-    const distFwd = frechetDistance(cv, tmpl.vec, bestDist);
-    if (distFwd < bestDist) {
-      bestDist = distFwd;
-      bestType = tmpl.type;
-    }
-
-    const distRev = frechetDistance(cvRev, tmpl.vec, bestDist);
-    if (distRev < bestDist) {
-      bestDist = distRev;
-      bestType = tmpl.type;
-    }
-  }
-
-  const bestScore = frechetScore(bestDist);
-
-  let type: Shape;
-  if (
-    bestScore >= PROTRACTOR_LINEAR_SCORE_THRESHOLD ||
-    (bestType !== "arrow" &&
-      bestType !== "line" &&
-      bestScore >= PROTRACTOR_SCORE_THRESHOLD)
-  ) {
-    type = bestType;
-  } else {
-    type = "freedraw";
-  }
+  const recognized = classify(extractFeatures(points));
+  const type =
+    previousElement?.type === "arrow" && recognized !== "arrow"
+      ? "freedraw"
+      : recognized;
 
   return { type, points, boundingBox };
 };
