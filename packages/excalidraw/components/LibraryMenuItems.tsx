@@ -5,6 +5,12 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+
+import {
+  recentlyUsedLibraryItemsAtom,
+  trackRecentlyUsedAtom,
+} from "../data/recentlyUsed";
 
 import { MIME_TYPES, arrayToMap, nextAnimationFrame } from "@excalidraw/common";
 
@@ -85,12 +91,12 @@ export default function LibraryMenuItems({
       libraryContainerRef.current?.scrollTo(0, scrollPosition);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   const { svgCache } = useLibraryCache();
+  const recentlyUsedIds = useAtomValue(recentlyUsedLibraryItemsAtom);
+const trackRecentlyUsed = useSetAtom(trackRecentlyUsedAtom);
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
-
   const [searchInputValue, setSearchInputValue] = useState("");
 
   const IS_LIBRARY_EMPTY = !libraryItems.length && !pendingElements.length;
@@ -120,11 +126,40 @@ export default function LibraryMenuItems({
     () => libraryItems.filter((item) => item.status === "published"),
     [libraryItems],
   );
+const unpublishedWithoutRecent = useMemo(
+  () =>
+    unpublishedItems.filter(
+      (item) => !recentlyUsedIds.includes(item.id),
+    ),
+  [unpublishedItems, recentlyUsedIds],
+);
 
+const publishedWithoutRecent = useMemo(
+  () =>
+    publishedItems.filter(
+      (item) => !recentlyUsedIds.includes(item.id),
+    ),
+  [publishedItems, recentlyUsedIds],
+);
+const recentlyUsedItems = useMemo(() => {
+  const allItems = [...unpublishedItems, ...publishedItems];
+
+  return recentlyUsedIds
+    .map((id) => allItems.find((item) => item.id === id))
+    .filter(Boolean) as LibraryItems;
+}, [
+  recentlyUsedIds,
+  unpublishedItems,
+  publishedItems,
+]);
   const onItemSelectToggle = useCallback(
     (id: LibraryItem["id"], event: React.MouseEvent) => {
       const shouldSelect = !selectedItems.includes(id);
-      const orderedItems = [...unpublishedItems, ...publishedItems];
+      const orderedItems = [
+    ...recentlyUsedItems,
+    ...unpublishedWithoutRecent,
+    ...publishedWithoutRecent,
+];
       if (shouldSelect) {
         if (event.shiftKey && lastSelectedItem) {
           const rangeStart = orderedItems.findIndex(
@@ -235,15 +270,22 @@ export default function LibraryMenuItems({
   const onAddToLibraryClick = useCallback(() => {
     onAddToLibrary(pendingElements);
   }, [pendingElements, onAddToLibrary]);
+const onItemClick = useCallback(
+  (id: LibraryItem["id"] | null) => {
+    if (!id) {
+      return;
+    }
 
-  const onItemClick = useCallback(
-    (id: LibraryItem["id"] | null) => {
-      if (id) {
-        onInsertLibraryItems(getInsertedElements(id));
-      }
-    },
-    [getInsertedElements, onInsertLibraryItems],
-  );
+    trackRecentlyUsed(id);
+
+    onInsertLibraryItems(getInsertedElements(id));
+  },
+  [
+    getInsertedElements,
+    onInsertLibraryItems,
+    trackRecentlyUsed,
+  ],
+);
 
   const itemsRenderedPerBatch =
     svgCache.size >=
@@ -261,6 +303,25 @@ export default function LibraryMenuItems({
 
   const JSX_whenNotSearching = !IS_SEARCHING && (
     <>
+    {recentlyUsedItems.length > 0 && (
+  <>
+    <div className="library-menu-items-container__header">
+      {t("labels.recentlyUsed")}
+    </div>
+
+    <LibraryMenuSectionGrid>
+      <LibraryMenuSection
+        itemsRenderedPerBatch={itemsRenderedPerBatch}
+        items={recentlyUsedItems}
+        onItemSelectToggle={onItemSelectToggle}
+        onItemDrag={onItemDrag}
+        onClick={onItemClick}
+        isItemSelected={isItemSelected}
+        svgCache={svgCache}
+      />
+    </LibraryMenuSectionGrid>
+  </>
+)}
       {!IS_LIBRARY_EMPTY && (
         <div className="library-menu-items-container__header">
           {t("labels.personalLib")}
@@ -292,15 +353,17 @@ export default function LibraryMenuItems({
               svgCache={svgCache}
             />
           )}
-          <LibraryMenuSection
-            itemsRenderedPerBatch={itemsRenderedPerBatch}
-            items={unpublishedItems}
-            onItemSelectToggle={onItemSelectToggle}
-            onItemDrag={onItemDrag}
-            onClick={onItemClick}
-            isItemSelected={isItemSelected}
-            svgCache={svgCache}
-          />
+          {unpublishedWithoutRecent.length > 0 && (
+  <LibraryMenuSection
+    itemsRenderedPerBatch={itemsRenderedPerBatch}
+    items={unpublishedWithoutRecent}
+    onItemSelectToggle={onItemSelectToggle}
+    onItemDrag={onItemDrag}
+    onClick={onItemClick}
+    isItemSelected={isItemSelected}
+    svgCache={svgCache}
+  />
+)}
         </LibraryMenuSectionGrid>
       )}
 
@@ -312,11 +375,11 @@ export default function LibraryMenuItems({
           {t("labels.excalidrawLib")}
         </div>
       )}
-      {publishedItems.length > 0 && (
+      {publishedWithoutRecent.length > 0 && (
         <LibraryMenuSectionGrid>
           <LibraryMenuSection
             itemsRenderedPerBatch={itemsRenderedPerBatch}
-            items={publishedItems}
+            items={publishedWithoutRecent}
             onItemSelectToggle={onItemSelectToggle}
             onItemDrag={onItemDrag}
             onClick={onItemClick}
