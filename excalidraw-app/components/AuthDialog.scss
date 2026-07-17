@@ -1,0 +1,69 @@
+.auth-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.auth-dialog {
+  position: relative;
+  width: min(420px, calc(100vw - 32px));
+  padding: 20px;
+  border: 1px solid var(--dialog-border-color);
+  border-radius: 8px;
+  background: var(--popup-bg-color);
+  color: var(--text-primary-color);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  pointer-events: auto;
+
+  .auth-dialog__title {
+    margin: 0 32px 8px 0;
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  p {
+    margin: 0 0 16px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-secondary-color);
+  }
+}
+
+.auth-dialog__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+
+  &:hover {
+    background: var(--color-surface-low);
+  }
+}
+
+.auth-dialog__button {
+  min-width: 132px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+
+  &:hover {
+    background: var(--color-primary-darker);
+  }
+}

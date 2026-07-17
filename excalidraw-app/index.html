@@ -12,24 +12,15 @@
     <meta name="theme-color" content="#121212" />
 
     <!-- Primary Meta Tags -->
-    <meta
-      name="title"
-      content="在线上班"
-    />
-    <meta
-      name="description"
-      content="在线上班是一个默认协同的在线白板。"
-    />
+    <meta name="title" content="在线上班" />
+    <meta name="description" content="在线上班是一个默认协同的在线白板。" />
     <meta name="image" content="https://excalidraw.com/og-image-3.png" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:site_name" content="在线上班" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://excalidraw.com" />
-    <meta
-      property="og:title"
-      content="在线上班"
-    />
+    <meta property="og:title" content="在线上班" />
     <meta property="og:image:alt" content="在线上班" />
     <meta
       property="og:description"
@@ -41,10 +32,7 @@
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:site" content="@excalidraw" />
     <meta property="twitter:url" content="https://excalidraw.com" />
-    <meta
-      property="twitter:title"
-      content="在线上班"
-    />
+    <meta property="twitter:title" content="在线上班" />
     <meta
       property="twitter:description"
       content="在线上班是一个默认协同的在线白板。"
@@ -122,14 +110,14 @@
           return;
         }
 
-        const roomMatch = window.location.pathname.match(
-          /^\/room\/([^/]+)\/?$/,
-        );
+        const roomMatch =
+          window.location.pathname.match(/^\/room\/([^/]+)\/?$/);
 
         const date = roomMatch?.[1];
         const isAllowedRoomPath = !!date && allowedDates.has(date);
+        const isApiPath = window.location.pathname.startsWith("/api/");
         const isBlockedPath =
-          window.location.pathname !== "/" && !isAllowedRoomPath;
+          window.location.pathname !== "/" && !isAllowedRoomPath && !isApiPath;
 
         if (isBlockedPath) {
           document.documentElement.dataset.shangbanNotFound = "true";
@@ -178,6 +166,7 @@
     </script>
     <% } %>
 
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />

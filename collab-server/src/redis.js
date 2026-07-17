@@ -117,7 +117,12 @@ export const getRoomPresence = async (roomId) => {
   }
 };
 
-export const saveLatestScene = async ({ roomId, encryptedData, iv }) => {
+export const saveLatestScene = async ({
+  roomId,
+  encryptedData,
+  iv,
+  contentHash,
+}) => {
   if (!canUseRedis()) {
     return false;
   }
@@ -126,6 +131,7 @@ export const saveLatestScene = async ({ roomId, encryptedData, iv }) => {
     roomId,
     encryptedData: Buffer.from(encryptedData).toString("base64"),
     iv: Buffer.from(iv).toString("base64"),
+    contentHash,
     updatedAt: new Date().toISOString(),
   });
   const latestSceneKey = `${LATEST_SCENE_KEY_PREFIX}${roomId}`;

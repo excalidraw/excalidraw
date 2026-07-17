@@ -135,12 +135,20 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import {
+  fetchCurrentUser,
+  getAuthServerUrl,
+  getQqLoginUrl,
+  logout,
+} from "./auth";
 
 import "./index.scss";
 
 import { AppSidebar } from "./components/AppSidebar";
+import { AuthDialog } from "./components/AuthDialog";
 
 import type { CollabAPI } from "./collab/Collab";
+import type { AuthState } from "./auth";
 
 polyfill();
 
@@ -425,11 +433,116 @@ const ExcalidrawWrapper = () => {
   const [isReadOnlyRoom, setIsReadOnlyRoom] = useState(() =>
     isReadOnlyRoomAlias(window.location.href),
   );
+  const [authState, setAuthState] = useState<AuthState>({
+    status: "loading",
+    user: null,
+  });
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [dayRollover, setDayRollover] = useState<{
     previousDate: string;
     today: string;
   } | null>(null);
+  const lastObservedElementsSignatureRef = useRef<string | null>(null);
+  const lastAllowedSceneRef = useRef<{
+    elements: readonly OrderedExcalidrawElement[];
+    files: BinaryFiles;
+  } | null>(null);
+  const guestPointerMayEditRef = useRef(false);
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const roomAlias = getRoomAlias(window.location.href);
+  const requiresLoginForEditing =
+    !!roomAlias && !isReadOnlyRoom && authState.status !== "authenticated";
+
+  useEffect(() => {
+    if (!excalidrawAPI || !requiresLoginForEditing) {
+      return;
+    }
+
+    const activateHandTool = () => {
+      excalidrawAPI.setActiveTool({ type: "hand" });
+    };
+
+    const animationFrameId = window.requestAnimationFrame(activateHandTool);
+    const timeoutId = window.setTimeout(activateHandTool, 250);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [excalidrawAPI, requiresLoginForEditing]);
+
+  useEffect(() => {
+    let didCancel = false;
+
+    fetchCurrentUser()
+      .then((user) => {
+        if (didCancel) {
+          return;
+        }
+        setAuthState(
+          user
+            ? { status: "authenticated", user }
+            : { status: "guest", user: null },
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to load auth state", error);
+        if (!didCancel) {
+          setAuthState({ status: "guest", user: null });
+        }
+      });
+
+    return () => {
+      didCancel = true;
+    };
+  }, []);
+
+  const handleQqLogin = useCallback(() => {
+    if (!getAuthServerUrl()) {
+      setErrorMessage("登录服务未配置，请设置 VITE_APP_AUTH_SERVER_URL。");
+      return;
+    }
+
+    window.location.href = getQqLoginUrl(window.location.pathname);
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    setAuthState({ status: "guest", user: null });
+    setIsAuthDialogOpen(false);
+  }, []);
+
+  const restoreLastAllowedScene = useCallback(() => {
+    if (!excalidrawAPI || !lastAllowedSceneRef.current) {
+      window.location.reload();
+      return;
+    }
+
+    excalidrawAPI.updateScene({
+      elements: lastAllowedSceneRef.current.elements,
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+    excalidrawAPI.addFiles(Object.values(lastAllowedSceneRef.current.files));
+    lastObservedElementsSignatureRef.current = getElementsSignature(
+      lastAllowedSceneRef.current.elements,
+    );
+  }, [excalidrawAPI]);
+
+  const blockGuestEditing = useCallback(() => {
+    if (!requiresLoginForEditing) {
+      return;
+    }
+
+    setIsAuthDialogOpen(true);
+    restoreLastAllowedScene();
+  }, [requiresLoginForEditing, restoreLastAllowedScene]);
+
+  const getElementsSignature = (
+    elements: readonly OrderedExcalidrawElement[],
+  ) =>
+    elements
+      .map((element) => `${element.id}:${element.version}:${element.isDeleted}`)
+      .join("|");
 
   useEffect(() => {
     let timeoutId = 0;
@@ -729,6 +842,41 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
+    if (requiresLoginForEditing) {
+      const elementsSignature = getElementsSignature(elements);
+      const lastElementsSignature = lastObservedElementsSignatureRef.current;
+
+      if (
+        lastElementsSignature !== null &&
+        lastElementsSignature !== elementsSignature
+      ) {
+        if (guestPointerMayEditRef.current) {
+          guestPointerMayEditRef.current = false;
+          blockGuestEditing();
+        } else {
+          lastObservedElementsSignatureRef.current = elementsSignature;
+          lastAllowedSceneRef.current = {
+            elements,
+            files,
+          };
+        }
+      } else {
+        lastObservedElementsSignatureRef.current = elementsSignature;
+        lastAllowedSceneRef.current = {
+          elements,
+          files,
+        };
+      }
+
+      return;
+    }
+
+    lastObservedElementsSignatureRef.current = getElementsSignature(elements);
+    lastAllowedSceneRef.current = {
+      elements,
+      files,
+    };
+
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
@@ -932,6 +1080,11 @@ const ExcalidrawWrapper = () => {
         isCollaborating={isCollaborating}
         viewModeEnabled={isReadOnlyRoom}
         onPointerUpdate={collabAPI?.onPointerUpdate}
+        onPointerDown={(activeTool) => {
+          if (requiresLoginForEditing && activeTool.type !== "hand") {
+            guestPointerMayEditRef.current = true;
+          }
+        }}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
@@ -1014,6 +1167,7 @@ const ExcalidrawWrapper = () => {
             }}
           >
             <div
+              className="excalifont"
               style={{
                 width: "min(420px, calc(100vw - 32px))",
                 borderRadius: 8,
@@ -1025,12 +1179,14 @@ const ExcalidrawWrapper = () => {
                 pointerEvents: "auto",
               }}
             >
-              <h2 style={{ margin: "0 0 8px", fontSize: 18 }}>
-                新的一天开始了
+              <h2 style={{ margin: "0 0 8px", fontSize: 24 }}>
+                {t("dayRolloverDialog.title")}
               </h2>
-              <p style={{ margin: "0 0 16px", lineHeight: 1.6 }}>
-                {dayRollover.previousDate} 已进入只读归档。今日看板已切换到{" "}
-                {dayRollover.today}。
+              <p style={{ margin: "0 0 16px", fontSize: 18, lineHeight: 1.6 }}>
+                {t("dayRolloverDialog.description", {
+                  previousDate: dayRollover.previousDate,
+                  today: dayRollover.today,
+                })}
               </p>
               <button
                 type="button"
@@ -1039,7 +1195,7 @@ const ExcalidrawWrapper = () => {
                   window.location.href = `/room/${dayRollover.today}`;
                 }}
               >
-                前往今日看板
+                {t("dayRolloverDialog.goToToday")}
               </button>
             </div>
           </div>
@@ -1073,6 +1229,21 @@ const ExcalidrawWrapper = () => {
         />
 
         <AppSidebar />
+
+        <AuthDialog
+          isOpen={isAuthDialogOpen}
+          user={authState.user}
+          onLogin={handleQqLogin}
+          onLogout={handleLogout}
+          onClose={() => {
+            if (requiresLoginForEditing) {
+              restoreLastAllowedScene();
+              setIsAuthDialogOpen(false);
+              return;
+            }
+            setIsAuthDialogOpen(false);
+          }}
+        />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>

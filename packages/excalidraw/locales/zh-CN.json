@@ -397,6 +397,19 @@
   "shareDialog": {
     "or": "或"
   },
+  "authDialog": {
+    "loginTitle": "登录后即可编辑",
+    "loginDescription": "你可以继续浏览今日看板。需要绘制、移动、删除或同步保存时，请先使用 QQ 快捷登录。",
+    "loginWithQQ": "使用 QQ 登录",
+    "signedInTitle": "已登录",
+    "signedInAs": "当前账号：{{nickname}}",
+    "logout": "退出登录"
+  },
+  "dayRolloverDialog": {
+    "title": "新的一天开始了",
+    "description": "{{previousDate}} 已进入只读归档。今日看板已切换到 {{today}}。",
+    "goToToday": "前往今日看板"
+  },
   "roomDialog": {
     "desc_intro": "邀请他人协作绘图。",
     "desc_privacy": "别担心，会话是端到端加密、完全私密的。即使是我们的服务器也无法看到您绘制的内容。",

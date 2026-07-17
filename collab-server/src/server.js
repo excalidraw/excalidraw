@@ -2,6 +2,14 @@ import { createServer } from "node:http";
 
 import { Server } from "socket.io";
 
+import {
+  getCorsHeaders,
+  handleAuthLogout,
+  handleAuthMe,
+  handleQqCallback,
+  handleQqLogin,
+  isAuthenticatedSocket,
+} from "./auth.js";
 import { config } from "./config.js";
 import { findRoomAliasByRoomId, resolveRoomAlias } from "./rooms.js";
 import {
@@ -20,9 +28,7 @@ import {
 
 const json = (res, statusCode, body) => {
   res.writeHead(statusCode, {
-    "Access-Control-Allow-Origin": config.clientOrigin,
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    ...getCorsHeaders(),
     "Content-Type": "application/json; charset=utf-8",
   });
   res.end(JSON.stringify(body));
@@ -60,7 +66,7 @@ const isWritableRoom = async (roomId) => {
   const roomAlias = await findRoomAliasByRoomId(roomId);
 
   if (!roomAlias?.alias) {
-    return true;
+    return false;
   }
 
   return roomAlias.alias === formatRoomDate(new Date());
@@ -72,6 +78,25 @@ const server = createServer(async (req, res) => {
   }
 
   const url = new URL(req.url || "/", `http://${req.headers.host}`);
+
+  if (req.method === "GET" && url.pathname === "/api/auth/me") {
+    return handleAuthMe(req, res, json);
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/auth/logout") {
+    return handleAuthLogout(req, res, json);
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/auth/qq/login") {
+    if (!config.qq.appId || !config.qq.appKey) {
+      return json(res, 500, { error: "QQ login is not configured" });
+    }
+    return handleQqLogin(req, res);
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/auth/qq/callback") {
+    return handleQqCallback(req, res, json);
+  }
 
   if (req.method === "GET" && url.pathname === "/api/rooms/resolve") {
     const alias = url.searchParams.get("alias");
@@ -104,6 +129,7 @@ const server = createServer(async (req, res) => {
 const io = new Server(server, {
   cors: {
     origin: config.clientOrigin,
+    credentials: true,
     methods: ["GET", "POST"],
   },
 });
@@ -133,13 +159,14 @@ const latestSceneSaveTimers = new Map();
 const latestScenePayloads = new Map();
 const roomHydratingUntil = new Map();
 
-const toPersistedScenePayload = ({ roomId, encryptedData, iv }) => ({
+const toPersistedScenePayload = ({ roomId, encryptedData, iv, contentHash }) => ({
   roomId,
   encryptedData: Buffer.from(encryptedData).toString("base64"),
   iv: Buffer.from(iv).toString("base64"),
+  contentHash,
 });
 
-const queueLatestSceneSave = (roomId, encryptedData, iv) => {
+const queueLatestSceneSave = (roomId, encryptedData, iv, contentHash) => {
   const hydratingUntil = roomHydratingUntil.get(roomId);
 
   if (hydratingUntil && Date.now() < hydratingUntil) {
@@ -154,6 +181,7 @@ const queueLatestSceneSave = (roomId, encryptedData, iv) => {
     roomId,
     encryptedData,
     iv,
+    contentHash,
   });
 
   if (latestSceneSaveTimers.has(roomId)) {
@@ -193,7 +221,9 @@ const emitScene = (socket, scene) => {
 };
 
 const getStoredScene = async (roomId) => {
-  return (await getLatestScene(roomId)) || (await getLatestSceneFromMysql(roomId));
+  return (
+    (await getLatestScene(roomId)) || (await getLatestSceneFromMysql(roomId))
+  );
 };
 
 const replayLatestScene = async (socket, roomId) => {
@@ -208,6 +238,10 @@ const replayLatestScene = async (socket, roomId) => {
 
 io.on("connection", (socket) => {
   socket.emit("init-room");
+  const authenticatedPromise = isAuthenticatedSocket(socket).catch((error) => {
+    console.error("Failed to authenticate socket", error);
+    return false;
+  });
 
   socket.on("join-room", async (roomId) => {
     if (typeof roomId !== "string" || !roomId) {
@@ -261,6 +295,10 @@ io.on("connection", (socket) => {
   });
 
   const canWriteScene = async (roomId) => {
+    if (!(await authenticatedPromise)) {
+      return false;
+    }
+
     try {
       return await isWritableRoom(roomId);
     } catch (error) {
@@ -269,12 +307,13 @@ io.on("connection", (socket) => {
     }
   };
 
-  const saveScene = async (roomId, encryptedData, iv) => {
+  const saveScene = async (roomId, encryptedData, iv, contentHash) => {
     if (!(await canWriteScene(roomId))) {
-      return;
+      return false;
     }
 
-    queueLatestSceneSave(roomId, encryptedData, iv);
+    queueLatestSceneSave(roomId, encryptedData, iv, contentHash);
+    return true;
   };
 
   socket.on("server-broadcast", async (roomId, encryptedData, iv) => {
@@ -285,8 +324,11 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("client-broadcast", encryptedData, iv);
   });
 
-  socket.on("server-save-scene", async (roomId, encryptedData, iv) => {
-    await saveScene(roomId, encryptedData, iv);
+  socket.on("server-save-scene", async (roomId, encryptedData, iv, contentHash) => {
+    if (!(await saveScene(roomId, encryptedData, iv, contentHash))) {
+      return;
+    }
+
     socket.to(roomId).emit("client-broadcast", encryptedData, iv);
   });
 

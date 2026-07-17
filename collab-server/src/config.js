@@ -10,6 +10,18 @@ export const config = {
     connectionLimit: Number(process.env.MYSQL_CONNECTION_LIMIT || 10),
   },
   redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+  auth: {
+    publicBaseUrl: process.env.AUTH_PUBLIC_BASE_URL || "",
+    sessionTtlSeconds: Number(
+      process.env.AUTH_SESSION_TTL_SECONDS || 30 * 24 * 60 * 60,
+    ),
+    cookieSecure: process.env.AUTH_COOKIE_SECURE === "true",
+    cookieSameSite: process.env.AUTH_COOKIE_SAME_SITE || "Lax",
+  },
+  qq: {
+    appId: process.env.QQ_APP_ID || "",
+    appKey: process.env.QQ_APP_KEY || "",
+  },
   allowMemoryRoomAliasFallback:
     process.env.ALLOW_MEMORY_ROOM_ALIAS_FALLBACK === "true",
   roomAlias: {

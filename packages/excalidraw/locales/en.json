@@ -404,6 +404,19 @@
   "shareDialog": {
     "or": "Or"
   },
+  "authDialog": {
+    "loginTitle": "Sign in to edit",
+    "loginDescription": "You can keep browsing today's board. To draw, move, delete, or sync changes, sign in with QQ first.",
+    "loginWithQQ": "Sign in with QQ",
+    "signedInTitle": "Signed in",
+    "signedInAs": "Current account: {{nickname}}",
+    "logout": "Sign out"
+  },
+  "dayRolloverDialog": {
+    "title": "A new day has started",
+    "description": "{{previousDate}} is now a read-only archive. Today's board has switched to {{today}}.",
+    "goToToday": "Go to today's board"
+  },
   "roomDialog": {
     "desc_intro": "Invite people to collaborate on your drawing.",
     "desc_privacy": "Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.",

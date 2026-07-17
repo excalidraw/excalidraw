@@ -22,6 +22,15 @@ import type {
 import type { TCollabClass } from "./Collab";
 import type { Socket } from "socket.io-client";
 
+const getSceneContentHash = async (json: string) => {
+  const encoded = new TextEncoder().encode(json);
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", encoded);
+
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
 class Portal {
   collab: TCollabClass;
   socket: Socket | null = null;
@@ -195,6 +204,7 @@ class Portal {
     };
 
     const json = JSON.stringify(data);
+    const contentHash = await getSceneContentHash(json);
     const encoded = new TextEncoder().encode(json);
     const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
 
@@ -203,6 +213,7 @@ class Portal {
       this.roomId,
       encryptedBuffer,
       iv,
+      contentHash,
     );
   };
 

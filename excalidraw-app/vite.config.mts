@@ -162,6 +162,7 @@ export default defineConfig(({ mode }) => {
         },
 
         workbox: {
+          navigateFallbackDenylist: [/^\/api\//],
           // don't precache fonts, locales and separate chunks
           globIgnores: [
             "fonts.css",

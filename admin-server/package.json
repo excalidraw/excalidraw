@@ -1,0 +1,14 @@
+{
+  "name": "excalidraw-admin-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "16.0.1",
+    "mysql2": "3.22.6",
+    "redis": "6.1.0"
+  }
+}
