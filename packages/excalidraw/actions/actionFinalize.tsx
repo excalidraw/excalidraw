@@ -64,6 +64,7 @@ export const actionFinalize = register<FormData>({
     let newElements = elements;
     const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
+    const isDrawShape = appState.activeTool.type === "drawShape";
 
     if (data && appState.selectedLinearElement) {
       const { event, sceneCoords } = data;
@@ -180,18 +181,19 @@ export const actionFinalize = register<FormData>({
           appState: {
             ...appState,
             cursorButton: "up",
-            selectedLinearElement: activeToolLocked
-              ? null
-              : {
-                  ...linearElementEditor,
-                  selectedPointsIndices: null,
-                  isEditing: false,
-                  initialState: {
-                    ...linearElementEditor.initialState,
-                    lastClickedPoint: -1,
+            selectedLinearElement:
+              activeToolLocked || isDrawShape
+                ? null
+                : {
+                    ...linearElementEditor,
+                    selectedPointsIndices: null,
+                    isEditing: false,
+                    initialState: {
+                      ...linearElementEditor.initialState,
+                      lastClickedPoint: -1,
+                    },
+                    pointerOffset: { x: 0, y: 0 },
                   },
-                  pointerOffset: { x: 0, y: 0 },
-                },
             selectionElement: null,
             suggestedBinding: null,
             newElement: null,
@@ -448,14 +450,14 @@ export const actionFinalize = register<FormData>({
           element &&
           !isToolLocked &&
           appState.activeTool.type !== "freedraw" &&
-          appState.activeTool.type !== "drawShape"
+          !isDrawShape
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,
               }
             : appState.selectedElementIds,
 
-        selectedLinearElement,
+        selectedLinearElement: isDrawShape ? null : selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: shouldCommit

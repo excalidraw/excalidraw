@@ -1,7 +1,10 @@
 import { KEYS } from "@excalidraw/common";
 
+import { isArrowElement } from "@excalidraw/element";
+
 import { Excalidraw } from "../index";
 
+import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
 import { GlobalTestState, act, fireEvent, render } from "./test-utils";
 
@@ -45,6 +48,48 @@ const rectanglePath = (
   }
   points.push([x, y]);
   return points;
+};
+
+const seg = (
+  from: [number, number],
+  to: [number, number],
+  steps: number,
+): [number, number][] => {
+  const points: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    points.push([
+      from[0] + ((to[0] - from[0]) * i) / steps,
+      from[1] + ((to[1] - from[1]) * i) / steps,
+    ]);
+  }
+  return points;
+};
+
+/** a V-headed arrow: the shaft, then both head arms drawn back from the tip */
+const arrowPath = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): [number, number][] => {
+  const tip: [number, number] = [x2, y2];
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const ux = (x2 - x1) / length;
+  const uy = (y2 - y1) / length;
+  const headLength = length * 0.3;
+  const headAngle = Math.PI / 6;
+  const arm = (sign: number): [number, number] => [
+    x2 -
+      headLength * (ux * Math.cos(headAngle) - sign * uy * Math.sin(headAngle)),
+    y2 -
+      headLength * (uy * Math.cos(headAngle) + sign * ux * Math.sin(headAngle)),
+  ];
+  return [
+    ...seg([x1, y1], tip, 20),
+    ...seg(tip, arm(1), 8),
+    ...seg(arm(1), tip, 8),
+    ...seg(tip, arm(-1), 8),
+  ];
 };
 
 /** a closed, roughly circular path */
@@ -94,6 +139,43 @@ describe("drawShape tool", () => {
     sketch(rectanglePath(100, 100, 200, 120));
 
     expect(h.elements).toHaveLength(1);
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("does not select a recognized arrow, yet still binds it", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 300,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([start, end]);
+
+    sketch(arrowPath(160, 160, 390, 290));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(h.state.selectedLinearElement).toBeNull();
+    expect(h.state.selectedElementIds).toEqual({});
+
+    expect(arrow.startBinding?.elementId).toBe(start.id);
+    expect(arrow.endBinding?.elementId).toBe(end.id);
+  });
+
+  it("does not select a recognized arrow that binds nothing", () => {
+    sketch(arrowPath(100, 100, 400, 300));
+
+    expect(h.elements.map((element) => element.type)).toEqual(["arrow"]);
+    expect(h.state.selectedLinearElement).toBeNull();
     expect(h.state.selectedElementIds).toEqual({});
   });
 
