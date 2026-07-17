@@ -13,6 +13,7 @@ import {
   EraserToolButton,
   FrameToolButton,
   FreedrawToolButton,
+  getToolShortcut,
   HandToolButton,
   ImageToolButton,
   isToolButtonDisabled,
@@ -292,7 +293,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "drawShape" })}
             icon={drawShapeToolIcon}
-            shortcut={KEYS.S.toLocaleUpperCase()}
+            shortcut={getToolShortcut("drawShape")}
             data-testid="toolbar-drawShape"
             selected={drawShapeToolSelected}
             disabled={isToolButtonDisabled(app, "drawShape")}

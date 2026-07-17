@@ -29,6 +29,7 @@ import {
   EllipseToolButton,
   EraserToolButton,
   FreedrawToolButton,
+  getToolShortcut,
   HandToolButton,
   ImageToolButton,
   isToolButtonDisabled,
@@ -128,7 +129,7 @@ const ExtraToolsDropdown = ({
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "drawShape" })}
           icon={drawShapeToolIcon}
-          shortcut={KEYS.S.toLocaleUpperCase()}
+          shortcut={getToolShortcut("drawShape")}
           data-testid="toolbar-drawShape"
           selected={drawShapeToolSelected}
           disabled={isToolButtonDisabled(app, "drawShape")}

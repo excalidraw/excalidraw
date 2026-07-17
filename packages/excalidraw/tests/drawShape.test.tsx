@@ -133,9 +133,17 @@ describe("drawShape tool activation", () => {
   it("activates via its keyboard shortcut", () => {
     expect(h.state.activeTool.type).toBe("selection");
 
-    Keyboard.keyPress(KEYS.S);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress(KEYS.X);
+    });
 
     expect(h.state.activeTool.type).toBe("drawShape");
+  });
+
+  it("is not activated by an unmodified X (freedraw's shortcut)", () => {
+    Keyboard.keyPress(KEYS.X);
+
+    expect(h.state.activeTool.type).toBe("freedraw");
   });
 
   it("activates from the extra tools dropdown", () => {

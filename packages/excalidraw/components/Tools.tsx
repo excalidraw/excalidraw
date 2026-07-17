@@ -6,6 +6,7 @@ import type { PointerType } from "@excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
 import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
 
 import { IconButton } from "./IconButton";
 import { ToolPopover } from "./ToolPopover";
@@ -39,6 +40,8 @@ export type ToolConfig = {
   icon: React.ReactNode;
   /** letter shortcut(s) — the first one is shown in tooltips */
   letterKey?: string | readonly string[];
+  /** whether `letterKey` requires Shift to be held (e.g. Shift+X) */
+  shiftKey?: boolean;
   numericKey?: string;
   /** whether the tool's shapes can be filled — fills the icon when active */
   fillable?: boolean;
@@ -128,7 +131,8 @@ export const TOOLS = defineTools({
   },
   drawShape: {
     icon: drawShapeToolIcon,
-    letterKey: KEYS.S,
+    letterKey: KEYS.X,
+    shiftKey: true,
     fillable: true,
   },
   embeddable: {
@@ -155,11 +159,14 @@ export const TOGGLE_TOOLS: readonly (ToolType | "custom")[] = (
 ).filter((type) => TOOLS[type].toggle);
 
 export const getToolLetter = (type: ToolbarToolType) => {
-  const { letterKey } = TOOLS[type];
-  return (
-    letterKey &&
-    capitalizeString(typeof letterKey === "string" ? letterKey : letterKey[0])
+  const { letterKey, shiftKey } = TOOLS[type];
+  if (!letterKey) {
+    return letterKey;
+  }
+  const letter = capitalizeString(
+    typeof letterKey === "string" ? letterKey : letterKey[0],
   );
+  return shiftKey ? getShortcutKey(`Shift+${letter}`) : letter;
 };
 
 /** human-readable shortcut hint, e.g. "R or 2", used in tooltips & aria */
@@ -171,13 +178,22 @@ export const getToolShortcut = (type: ToolbarToolType) => {
     : `${letter || numericKey}`;
 };
 
-export const findShapeByKey = (key: string, app: AppClassProperties) => {
-  // CapsLock-insensitive (the caller excludes modified keypresses, incl.
-  // shift, so a capital letter here means CapsLock)
+export const findShapeByKey = (
+  key: string,
+  app: AppClassProperties,
+  shiftKey: boolean = false,
+) => {
+  // CapsLock-insensitive: the caller excludes every modifier but shift, and
+  // shift is matched explicitly below, so a capital letter on its own means
+  // CapsLock
   const lowerKey = key.toLowerCase();
 
   for (const type of Object.keys(TOOLS) as ToolbarToolType[]) {
-    const { letterKey, numericKey } = TOOLS[type];
+    const { letterKey, numericKey, shiftKey: requiresShift } = TOOLS[type];
+    // shift-bound tools require shift; plain-bound ones require its absence
+    if (shiftKey !== Boolean(requiresShift)) {
+      continue;
+    }
     if (
       (numericKey != null && key === numericKey) ||
       (letterKey &&

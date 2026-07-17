@@ -107,6 +107,22 @@ describe("findShapeByKey()", () => {
     expect(findShapeByKey("R", app)).toBe("rectangle");
     expect(findShapeByKey("X", app)).toBe("freedraw");
   });
+
+  it("matches shift-bound tools only when shift is held", () => {
+    const app = appWithPreferredTool("selection");
+
+    expect(findShapeByKey("X", app, true)).toBe("drawShape");
+    expect(findShapeByKey("x", app, true)).toBe("drawShape");
+    // Pressing "X" while CapsLock is active (no shift) stays freedraw
+    expect(findShapeByKey("X", app, false)).toBe("freedraw");
+  });
+
+  it("does not match plain-bound tools when shift is held", () => {
+    const app = appWithPreferredTool("selection");
+
+    expect(findShapeByKey("R", app, true)).toBeNull();
+    expect(findShapeByKey("V", app, true)).toBeNull();
+  });
 });
 
 describe("props.activeTool (forced tool)", () => {
