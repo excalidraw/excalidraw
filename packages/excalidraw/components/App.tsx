@@ -5431,37 +5431,42 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // Handle F key for orbit bind override
       if (
         (this.state.activeTool.type === "arrow" ||
           this.state.activeTool.type === "selection") &&
-        event.key === KEYS.F
+        event.key.toLowerCase() === KEYS.F
       ) {
         if (event.repeat) {
+          if (event[KEYS.CTRL_OR_CMD]) {
+            event.preventDefault();
+          }
           return;
         }
         const linearElement = this.state.selectedLinearElement;
-        if (linearElement) {
-          if (linearElement.isDragging || this.state.multiElement) {
-            flushSync(() => {
-              this.setState({
-                orbitBindOverrideEnabled: true,
-              });
+        if (
+          linearElement &&
+          (linearElement.isDragging || this.state.multiElement)
+        ) {
+          if (event[KEYS.CTRL_OR_CMD]) {
+            event.preventDefault();
+          }
+          flushSync(() => {
+            this.setState({
+              orbitBindOverrideEnabled: true,
             });
-            if (linearElement.isDragging) {
-              maybeHandleArrowPointlikeDrag({ app: this, event });
-            } else if (
-              this.lastPointerMoveEvent &&
-              this.lastPointerMoveCoords
-            ) {
-              const { x, y } = this.lastPointerMoveCoords;
-              LinearElementEditor.handlePointerMove(
-                this.lastPointerMoveEvent,
-                this,
-                x,
-                y,
-                linearElement,
-              );
-            }
+          });
+          if (linearElement.isDragging) {
+            maybeHandleArrowPointlikeDrag({ app: this, event });
+          } else if (this.lastPointerMoveEvent && this.lastPointerMoveCoords) {
+            const { x, y } = this.lastPointerMoveCoords;
+            LinearElementEditor.handlePointerMove(
+              this.lastPointerMoveEvent,
+              this,
+              x,
+              y,
+              linearElement,
+            );
           }
           return;
         }
@@ -5847,29 +5852,31 @@ class App extends React.Component<AppProps, AppState> {
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
-    if (event.key === KEYS.F) {
-      if (orbitBindOverrideEnabled(this.state)) {
-        flushSync(() => {
-          this.setState({ orbitBindOverrideEnabled: false });
-        });
-        const linearElement = this.state.selectedLinearElement;
-        if (linearElement) {
-          if (linearElement.isDragging) {
-            maybeHandleArrowPointlikeDrag({ app: this, event });
-          } else if (
-            this.state.multiElement &&
-            this.lastPointerMoveEvent &&
-            this.lastPointerMoveCoords
-          ) {
-            const { x, y } = this.lastPointerMoveCoords;
-            LinearElementEditor.handlePointerMove(
-              this.lastPointerMoveEvent,
-              this,
-              x,
-              y,
-              linearElement,
-            );
-          }
+    // Handle F Key release for orbit bind override
+    if (
+      event.key.toLowerCase() === KEYS.F &&
+      orbitBindOverrideEnabled(this.state)
+    ) {
+      flushSync(() => {
+        this.setState({ orbitBindOverrideEnabled: false });
+      });
+      const linearElement = this.state.selectedLinearElement;
+      if (linearElement) {
+        if (linearElement.isDragging) {
+          maybeHandleArrowPointlikeDrag({ app: this, event });
+        } else if (
+          this.state.multiElement &&
+          this.lastPointerMoveEvent &&
+          this.lastPointerMoveCoords
+        ) {
+          const { x, y } = this.lastPointerMoveCoords;
+          LinearElementEditor.handlePointerMove(
+            this.lastPointerMoveEvent,
+            this,
+            x,
+            y,
+            linearElement,
+          );
         }
       }
     }

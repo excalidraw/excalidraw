@@ -9,7 +9,6 @@ import { pointFrom } from "@excalidraw/math";
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import type {
-  BindMode,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
