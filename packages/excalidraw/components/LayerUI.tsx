@@ -595,7 +595,6 @@ const LayerUI = ({
           renderWelcomeScreen={renderWelcomeScreen}
           defaultUIEnabled={defaultUIEnabled}
           scrollBackToContentUIEnabled={scrollBackToContentUIEnabled}
-          UIOptions={UIOptions}
         />
       )}
       {editorInterface.formFactor !== "phone" && (
