@@ -136,7 +136,6 @@ import {
   newImageElement,
   newLinearElement,
   computeBucketFillPolygon,
-  rendersOpaqueFill,
   newTextElement,
   refreshTextDimensions,
   deepCopyElement,
@@ -8424,38 +8423,18 @@ class App extends React.Component<AppProps, AppState> {
       },
     });
 
-    // Z-order: the fill should sit above any participating element whose
-    // opaque background would otherwise render over (hide) it, but below
-    // participants that only contribute an outline, so their borders stay
-    // visible. A participant "covers" the fill when it paints an opaque
-    // background (same predicate the geometry uses for boundary clipping)
-    // and the filled region lies inside it (the click lands inside).
-    // Indices are computed against the deleted-inclusive array that
-    // `insertElementsAtIndex` operates on.
-    const participantIds = new Set<string>([
-      result.ownerId,
-      ...result.boundaryElementIds,
-    ]);
-    const orderedElements = this.scene.getElementsIncludingDeleted();
-    let lowestParticipantIndex = -1;
-    let aboveCoveringIndex = -1;
-    for (let i = 0; i < orderedElements.length; i++) {
-      const el = orderedElements[i];
-      if (!participantIds.has(el.id)) {
-        continue;
-      }
-      if (lowestParticipantIndex < 0) {
-        lowestParticipantIndex = i;
-      }
-      if (rendersOpaqueFill(el) && isPointInElement(point, el, elementsMap)) {
-        aboveCoveringIndex = i;
-      }
-    }
-    const insertIndex =
-      aboveCoveringIndex >= 0 ? aboveCoveringIndex + 1 : lowestParticipantIndex;
+    // resolve the geometry's relative placement against the
+    // deleted-inclusive array that `insertElementsAtIndex` operates on
+    const anchorIndex = this.scene
+      .getElementsIncludingDeleted()
+      .findIndex((el) => el.id === result.insertion.elementId);
     this.scene.insertElementsAtIndex(
       [fill],
-      insertIndex < 0 ? null : insertIndex,
+      anchorIndex < 0
+        ? null
+        : result.insertion.placement === "above"
+        ? anchorIndex + 1
+        : anchorIndex,
     );
 
     // Keep the bucket fill tool active and do NOT select the new fill, so the

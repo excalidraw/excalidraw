@@ -73,12 +73,23 @@ export type BucketFillFailureReason =
   | "too_small"
   | "invalid_polygon";
 
+/**
+ * Where the generated fill element belongs in the scene order, expressed
+ * relative to an existing element so the caller can resolve it against
+ * whatever (e.g. deleted-inclusive) array it inserts into.
+ */
+export type BucketFillInsertion = {
+  placement: "above" | "below";
+  elementId: ExcalidrawElement["id"];
+};
+
 export type BucketFillGeometryResult =
   | {
       ok: true;
       ownerId: ExcalidrawElement["id"];
       boundaryElementIds: ExcalidrawElement["id"][];
       scenePoints: GlobalPoint[];
+      insertion: BucketFillInsertion;
     }
   | {
       ok: false;
@@ -871,12 +882,37 @@ export const computeBucketFillPolygon = (args: {
     return { ok: false, reason: "too_small" };
   }
 
+  // 6. z-order: the fill should sit above any participating element whose
+  // opaque background would otherwise render over (hide) it, but below
+  // participants that only contribute an outline, so their borders stay
+  // visible. A participant "covers" the fill when it paints an opaque
+  // background (same predicate boundary clipping uses) and the filled
+  // region lies inside it (the click lands inside).
+  const participantIds = new Set<string>([owner.id, ...contributors]);
+  let lowestParticipant: ExcalidrawElement | null = null;
+  let covering: ExcalidrawElement | null = null;
+  for (const element of elements) {
+    if (!participantIds.has(element.id)) {
+      continue;
+    }
+    lowestParticipant = lowestParticipant ?? element;
+    if (
+      rendersOpaqueFill(element) &&
+      isPointInElement(point, element, elementsMap)
+    ) {
+      covering = element;
+    }
+  }
+  const insertion: BucketFillInsertion = covering
+    ? { placement: "above", elementId: covering.id }
+    : { placement: "below", elementId: (lowestParticipant ?? owner).id };
+
   return {
     ok: true,
     ownerId: owner.id,
-    // elements (other than the owner) whose outlines actually bound the fill;
-    // the app inserts the fill below the lowest of these + the owner
+    // elements (other than the owner) whose outlines actually bound the fill
     boundaryElementIds: [...contributors].filter((id) => id !== owner.id),
     scenePoints,
+    insertion,
   };
 };

@@ -51,6 +51,11 @@ describe("computeBucketFillPolygon", () => {
     }
     expect(result.ownerId).toBe(rect.id);
     expect(result.boundaryElementIds).toEqual([]);
+    // transparent owner => the fill goes below it
+    expect(result.insertion).toEqual({
+      placement: "below",
+      elementId: rect.id,
+    });
     expect(isClosed(result.scenePoints)).toBe(true);
     expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -1);
   });
@@ -237,6 +242,11 @@ describe("computeBucketFillPolygon", () => {
     }
     expect(result.ownerId).toBe(owner.id);
     expect(result.boundaryElementIds).toContain(below.id);
+    // both participants are transparent => below the lowest one
+    expect(result.insertion).toEqual({
+      placement: "below",
+      elementId: below.id,
+    });
     // overlap region is the 50x50 square (50,50)-(100,100) => area 2500,
     // much smaller than either full 100x100 rectangle
     expect(polygonArea(result.scenePoints)).toBeGreaterThan(2300);
@@ -500,6 +510,11 @@ describe("computeBucketFillPolygon", () => {
     expect(result.ownerId).toBe(top.id);
     // the whole top rectangle (~10000), NOT the 50x50 overlap (~2500)
     expect(polygonArea(result.scenePoints)).toBeGreaterThan(9000);
+    // the opaque owner would hide a fill beneath it => above it
+    expect(result.insertion).toEqual({
+      placement: "above",
+      elementId: top.id,
+    });
   });
 
   it("fills a rounded owner partially covered by a thin opaque overlap", () => {
