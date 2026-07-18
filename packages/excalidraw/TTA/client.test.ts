@@ -335,6 +335,49 @@ describe("TTAStreamFetch", () => {
     expect(result.error?.message).toMatch(/ended the stream/i);
   });
 
+  it("drains the stream to EOF after the done chunk so the fetch completes cleanly", async () => {
+    const encoder = new TextEncoder();
+    const chunks = [
+      createChunk({
+        type: "done",
+        lifecycleStatus: "completed",
+        finishReason: "stop",
+        skeletons: [],
+      }),
+      "data: [DONE]\n\n",
+    ];
+    let index = 0;
+    let fullyRead = false;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (index >= chunks.length) {
+          fullyRead = true;
+          controller.close();
+          return;
+        }
+        controller.enqueue(encoder.encode(chunks[index]));
+        index++;
+      },
+    });
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers(),
+      body,
+    });
+
+    const result = await TTAStreamFetch({
+      payload: { prompt: "hello" },
+      fetch: createTransportFetch(),
+    });
+
+    // the result resolves at the `done` frame, before the trailing sentinel…
+    expect(result.error).toBeNull();
+    // …and the detached drain then reads the body to EOF (no ERR_ABORTED)
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(fullyRead).toBe(true);
+  });
+
   it("returns an abort error when the request is cancelled", async () => {
     const abortController = new AbortController();
 

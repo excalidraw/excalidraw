@@ -179,6 +179,44 @@ export interface TTADefaultTransportAdapterConfig {
   truncate: TTATruncateResponseFetch;
 }
 
+/**
+ * After a terminal `done`/`error` chunk the response body still holds a few
+ * unread frames (the `[DONE]` sentinel, then EOF). Read them so the stream
+ * completes instead of being abandoned mid-body — an abandoned body forces
+ * the browser to tear down the connection, while a drained one can return to
+ * the keep-alive pool. Detached and bounded: the result is resolved before
+ * this runs, and a server that doesn't close promptly gets cancelled after
+ * the deadline (the old behavior).
+ *
+ * NOTE this does NOT silence the `net::ERR_ABORTED` annotation DevTools
+ * attaches to these requests — verified empirically that Chrome logs it for
+ * cross-origin SSE fetches even when the body is read fully to EOF.
+ */
+const drainStreamToEof = (body: ReadableStream<Uint8Array>) => {
+  void (async () => {
+    try {
+      // the for-await teardown releases the SSE parser's reader lock
+      // asynchronously — wait briefly for it
+      for (let i = 0; i < 10 && body.locked; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      if (body.locked) {
+        return;
+      }
+      const reader = body.getReader();
+      const deadline = setTimeout(() => {
+        reader.cancel().catch(() => {});
+      }, 2_000);
+      while (!(await reader.read()).done) {
+        // discard trailing frames
+      }
+      clearTimeout(deadline);
+    } catch {
+      // teardown races are fine — nothing user-visible depends on the drain
+    }
+  })();
+};
+
 const toStreamError = (
   message: string,
   code?: AI_ERROR_CODE | number,
@@ -275,6 +313,7 @@ export const TTAStreamFetch = async (
           });
           break;
         case "done":
+          drainStreamToEof(stream);
           return {
             ...rateLimitInfo,
             finalPayload: {
@@ -294,6 +333,7 @@ export const TTAStreamFetch = async (
             error: null,
           };
         case "error":
+          drainStreamToEof(stream);
           return {
             ...rateLimitInfo,
             error: toStreamError(
