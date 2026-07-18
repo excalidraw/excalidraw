@@ -63,6 +63,12 @@ export interface AIStreamFinalPayload extends AIStreamPartialPayload {
   messageId?: string | null;
   lifecycleStatus?: Extract<AIAssistantLifecycleStatus, "completed">;
   updatedAt?: number | null;
+  /**
+   * Provider finish reason, forwarded from the `done` frame. `"length"` /
+   * `"content_filter"` mean the generation was truncated/blocked even though
+   * it parsed — not a clean success.
+   */
+  finishReason?: "stop" | "length" | "content_filter" | "tool_calls" | null;
 }
 
 export const AI_ERRORS = {
@@ -102,6 +108,7 @@ export type StreamChunk =
   | {
       type: "partial";
       skeletons: ExcalidrawElementSkeleton[];
+      isComplete?: boolean;
     }
   | {
       type: "done";

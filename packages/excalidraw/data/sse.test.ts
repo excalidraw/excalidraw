@@ -123,4 +123,38 @@ describe("iterateSSEJSONChunks", () => {
     expect(chunks).toEqual([{ value: "kept" }]);
     expect(invalidJSONSpy).not.toHaveBeenCalled();
   });
+
+  it("surfaces the DONE sentinel via onDoneSentinel", async () => {
+    const doneSentinelSpy = vi.fn();
+    const chunks: Array<{ value: string }> = [];
+
+    for await (const chunk of iterateSSEJSONChunks<{ value: string }>(
+      createMockStream([
+        'data: {"value":"first"}\n\n',
+        "data: [DONE]\n\n",
+        'data: {"value":"second"}\n\n',
+      ]),
+      { onDoneSentinel: doneSentinelSpy },
+    )) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual([{ value: "first" }]);
+    expect(doneSentinelSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call onDoneSentinel when the stream ends without the sentinel", async () => {
+    const doneSentinelSpy = vi.fn();
+    const chunks: Array<{ value: string }> = [];
+
+    for await (const chunk of iterateSSEJSONChunks<{ value: string }>(
+      createMockStream(['data: {"value":"only"}\n\n']),
+      { onDoneSentinel: doneSentinelSpy },
+    )) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual([{ value: "only" }]);
+    expect(doneSentinelSpy).not.toHaveBeenCalled();
+  });
 });

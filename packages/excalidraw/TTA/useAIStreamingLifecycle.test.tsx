@@ -24,16 +24,20 @@ const t = ((key: string) => key) as any;
 
 const TestHarness = ({
   streamResult,
+  streamFetch: streamFetchProp,
   onRateLimitInfo,
 }: {
-  streamResult: TTAStreamFetchResult;
+  streamResult?: TTAStreamFetchResult;
+  streamFetch?: ReturnType<typeof vi.fn>;
   onRateLimitInfo: (rateLimitInfo: {
     rateLimit?: number | null;
     rateLimitRemaining?: number | null;
   }) => void;
 }) => {
   const [app] = useState(createMockApp);
-  const [streamFetch] = useState(() => vi.fn().mockResolvedValue(streamResult));
+  const [streamFetch] = useState(
+    () => streamFetchProp ?? vi.fn().mockResolvedValue(streamResult),
+  );
   const [applyServerChatMetadata] = useState(() => vi.fn());
   const [removeGeneratedElementsByMessageId] = useState(() => vi.fn());
   const [commitQueuedGenerationReplacements] = useState(() => vi.fn());
@@ -137,6 +141,46 @@ describe("useAIStreamingLifecycle", () => {
         rateLimit: 100,
         rateLimitRemaining: 0,
       },
+    });
+  });
+
+  it("keeps streamed partial skeletons on the message when the stream is interrupted", async () => {
+    const onRateLimitInfo = vi.fn();
+    const skeleton = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
+    const streamFetch = vi.fn().mockImplementation(async (options) => {
+      // Deliberately no onStarted: activeMessageId stays null, which skips the
+      // canvas-preview path — this test pins message-state behavior only.
+      options.onChunk?.({ skeletons: [skeleton], isComplete: false });
+      return {
+        error: {
+          code: 1002,
+          message: "Connection interrupted before the response completed",
+          lifecycleStatus: "failed",
+        },
+      };
+    });
+
+    render(
+      <TestHarness
+        onRateLimitInfo={onRateLimitInfo}
+        streamFetch={streamFetch}
+      />,
+    );
+
+    await waitFor(() => {
+      const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+      expect(messages[1].isComplete).toBe(true);
+    });
+
+    const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+    expect(messages).toHaveLength(2);
+    expect(messages[1]).toMatchObject({
+      id: "assistant-1",
+      role: "assistant",
+      isComplete: true,
+      lifecycleStatus: "failed",
+      skeletons: [skeleton],
+      error: { code: 1002 },
     });
   });
 });

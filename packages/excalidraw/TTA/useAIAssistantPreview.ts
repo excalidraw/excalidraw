@@ -148,7 +148,10 @@ export const useAIAssistantPreview = (
 
   const [previewState, setPreviewState] = useState<AIAssistantPreviewState>(
     () => {
-      if (!skeletons?.length || message.error) {
+      // NOTE errored messages may still carry partial skeletons streamed
+      // before the failure (C2 in tta.md) — render them so the salvaged
+      // partial result stays previewable alongside the error.
+      if (!skeletons?.length) {
         return {
           previewSvg: null,
           status: "unavailable",
@@ -310,7 +313,7 @@ export const useAIAssistantPreview = (
       clearScheduledRender();
       renderTokenRef.current += 1;
 
-      if (skeletons?.length && !message.error) {
+      if (skeletons?.length) {
         const cachedPreview = getCachedPreview(
           message.id,
           renderKey,
@@ -336,7 +339,7 @@ export const useAIAssistantPreview = (
       return;
     }
 
-    if (!skeletons?.length || message.error) {
+    if (!skeletons?.length) {
       latestRenderKeyRef.current = null;
       pendingRenderRef.current = null;
       clearScheduledRender();

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { TTAStreamFetch } from "./client";
+import { AI_CLIENT_ERRORS } from "./utils";
 
 function createMockStream(chunks: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -118,8 +119,48 @@ describe("TTAStreamFetch", () => {
       chatId: "chat-1",
       turnId: "turn-1",
       messageId: "message-1",
+      finishReason: "stop",
       lifecycleStatus: "completed",
       updatedAt: 1710000000000,
+    });
+  });
+
+  it("forwards the server's isComplete flag on partial chunks", async () => {
+    const onChunk = vi.fn();
+    const skeleton = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers(),
+      body: createMockStream([
+        createChunk({ type: "partial", skeletons: [skeleton] }),
+        createChunk({
+          type: "partial",
+          skeletons: [skeleton],
+          isComplete: true,
+        }),
+        createChunk({
+          type: "done",
+          lifecycleStatus: "completed",
+          finishReason: "stop",
+          skeletons: [skeleton],
+        }),
+      ]),
+    });
+
+    await TTAStreamFetch({
+      payload: { prompt: "hello" },
+      onChunk,
+      fetch: createTransportFetch(),
+    });
+
+    expect(onChunk).toHaveBeenNthCalledWith(1, {
+      skeletons: [skeleton],
+      isComplete: false,
+    });
+    expect(onChunk).toHaveBeenNthCalledWith(2, {
+      skeletons: [skeleton],
+      isComplete: true,
     });
   });
 
@@ -227,15 +268,58 @@ describe("TTAStreamFetch", () => {
     expect(result.rateLimitRemaining).toBe(0);
   });
 
-  it("ignores ai-server diagnostics and synthesizes a final payload when needed", async () => {
-    const consoleWarnSpy = vi
-      .spyOn(console, "warn")
-      .mockImplementation(() => {});
+  it("reports an interrupted stream when EOF arrives without a terminal chunk", async () => {
+    const onChunk = vi.fn();
+    const skeleton = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       headers: new Headers(),
-      body: createMockStream(["data: [ai-server] debug line\n\n"]),
+      body: createMockStream([
+        createChunk({
+          type: "started",
+          chatId: "chat-1",
+          turnId: "turn-1",
+          messageId: "message-1",
+          lifecycleStatus: "pending",
+        }),
+        createChunk({ type: "partial", skeletons: [skeleton] }),
+        // stream cut here: no `done`/`error` chunk, no `[DONE]` sentinel
+      ]),
+    });
+
+    const result = await TTAStreamFetch({
+      payload: { prompt: "hello" },
+      onChunk,
+      fetch: createTransportFetch(),
+    });
+
+    expect(onChunk).toHaveBeenCalledWith({
+      skeletons: [skeleton],
+      isComplete: false,
+    });
+    expect(result.finalPayload).toBeFalsy();
+    expect(result.error).toMatchObject({
+      code: AI_CLIENT_ERRORS.STREAM_INTERRUPTED,
+      lifecycleStatus: "failed",
+    });
+    expect(result.error?.message).toMatch(/connection interrupted/i);
+  });
+
+  it("reports a server-ended stream when [DONE] arrives without a result", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers(),
+      body: createMockStream([
+        createChunk({
+          type: "started",
+          chatId: "chat-1",
+          turnId: "turn-1",
+          messageId: "message-1",
+          lifecycleStatus: "pending",
+        }),
+        "data: [DONE]\n\n",
+      ]),
     });
 
     const result = await TTAStreamFetch({
@@ -243,15 +327,12 @@ describe("TTAStreamFetch", () => {
       fetch: createTransportFetch(),
     });
 
-    expect(result.error).toBeNull();
-    expect(result.finalPayload).toEqual({
-      skeletons: [],
-      isComplete: true,
-      chatId: undefined,
-      turnId: undefined,
-      messageId: undefined,
+    expect(result.finalPayload).toBeFalsy();
+    expect(result.error).toMatchObject({
+      code: AI_CLIENT_ERRORS.STREAM_INTERRUPTED,
+      lifecycleStatus: "failed",
     });
-    expect(consoleWarnSpy).not.toHaveBeenCalled();
+    expect(result.error?.message).toMatch(/ended the stream/i);
   });
 
   it("returns an abort error when the request is cancelled", async () => {

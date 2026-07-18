@@ -175,9 +175,7 @@ const TTAAssistantChatMessage = ({
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const scrolledStreamingPreviewKeyRef = useRef<string | null>(null);
   const pendingStreamingPreviewScrollKeyRef = useRef<string | null>(null);
-  const { previewSvg, status: previewStatus } = useAIAssistantPreview(message, {
-    enabled: !message.error,
-  });
+  const { previewSvg, status: previewStatus } = useAIAssistantPreview(message);
 
   const isGeneratingPreview = message.isComplete === false;
   const hasCurrentPreview = Boolean(previewSvg);
@@ -244,8 +242,16 @@ const TTAAssistantChatMessage = ({
     visibleContent = message.statusText;
   }
 
+  // A failed generation may still carry the partial skeletons streamed before
+  // the failure (e.g. connection interruptions — C2 in tta.md). Surface them
+  // so the user can preview/insert the partial result alongside the error.
+  const hasSalvageablePartialResult = Boolean(
+    assistantError && !isRateLimitWarning && message.skeletons?.length,
+  );
   const assistantOutputExists =
-    !message.error && !visibleContent && hasCurrentPreview;
+    (!assistantError || hasSalvageablePartialResult) &&
+    !visibleContent &&
+    hasCurrentPreview;
 
   // --- Error presentation ---
   const errorPresentation = assistantError

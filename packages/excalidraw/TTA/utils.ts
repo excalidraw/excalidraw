@@ -2,6 +2,8 @@ import { AI_ERRORS, type AI_ERROR_CODE } from "./types";
 
 export const AI_CLIENT_ERRORS = {
   INVALID_RESULT: 1001,
+  /** SSE stream reached EOF without a terminal `done`/`error` chunk. */
+  STREAM_INTERRUPTED: 1002,
 } as const;
 
 type AIChatError = {
@@ -48,6 +50,14 @@ export const getAIErrorMessageKey = (
     error.code === AI_ERRORS.GENERATION_ERROR.code
   ) {
     return "ai.chat.errors.invalidResult";
+  }
+  // NOTE: client-side codes (1001/1002) are numerically >= 500, so this must
+  // be matched before the generic `error.code >= 500` server branch below.
+  if (error.code === AI_CLIENT_ERRORS.STREAM_INTERRUPTED) {
+    if (opts?.isOffline) {
+      return "ai.chat.errors.offline";
+    }
+    return "ai.chat.errors.connection";
   }
   if (
     error.code === AI_ERRORS.SERVER_ERROR.code ||

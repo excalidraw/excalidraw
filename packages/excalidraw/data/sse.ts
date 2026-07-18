@@ -7,6 +7,12 @@ export interface IterateSSEJSONChunksOptions<T> {
   ignorePayload?: (payload: string) => boolean;
   onInvalidJSON?: (payload: string, error: unknown) => void;
   parse?: (payload: string) => T;
+  /**
+   * Called when the stream's `[DONE]` terminator payload is received (the
+   * iterator stops either way). Lets callers distinguish "the server ended
+   * the stream deliberately" from "the connection was cut at EOF".
+   */
+  onDoneSentinel?: () => void;
 }
 
 export const extractRateLimitHeaders = (
@@ -133,7 +139,7 @@ export async function* iterateSSEJSONChunks<T>(
   stream: ReadableStream<Uint8Array>,
   options: IterateSSEJSONChunksOptions<T> = {},
 ): AsyncGenerator<T, void, unknown> {
-  const { signal, ignorePayload, onInvalidJSON } = options;
+  const { signal, ignorePayload, onInvalidJSON, onDoneSentinel } = options;
   const parsePayload =
     options.parse ?? ((payload: string) => JSON.parse(payload) as T);
 
@@ -143,6 +149,7 @@ export async function* iterateSSEJSONChunks<T>(
     }
 
     if (payload === "[DONE]") {
+      onDoneSentinel?.();
       break;
     }
 

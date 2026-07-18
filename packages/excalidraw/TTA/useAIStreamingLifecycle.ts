@@ -256,8 +256,12 @@ export const useAIStreamingLifecycle = ({
               if (!activeMessageId) {
                 return;
               }
+              // Always render partials as non-final: the server marks its last
+              // partial `isComplete: true`, but the authoritative final render
+              // (IMMEDIATELY capture + selection) happens once on `done` —
+              // honoring it here would commit the draft twice.
               throttledApplyStreamingCanvasPreviewResult(
-                partialPayload,
+                { skeletons: partialPayload.skeletons, isComplete: false },
                 activeMessageId,
               );
             },
@@ -283,15 +287,13 @@ export const useAIStreamingLifecycle = ({
             },
             isComplete: true,
           });
-          if (activeMessageId) {
-            applyStreamingCanvasPreviewResult(
-              {
-                skeletons: [],
-                isComplete: true,
-              },
-              activeMessageId,
-            );
-          }
+          // On-error canvas policy (tta_rewrite_final.md §2.2): treat a failed
+          // stream like user Stop — commit whatever draft rendered so the chat
+          // bubble, thumbnail, and canvas agree. If nothing rendered this is a
+          // no-op and the previous generation stays visible (its queued
+          // replacement tag survives, so the next successful generation still
+          // replaces it).
+          commitStreamingCanvasPreview();
           return;
         }
 
@@ -303,9 +305,6 @@ export const useAIStreamingLifecycle = ({
         cancelPendingCanvasPreviewRenders();
         const finalTurnId = finalPayload.turnId ?? activeTurnId;
         const finalMessageId = finalPayload.messageId ?? activeMessageId;
-        if (!finalTurnId || !finalMessageId) {
-          return;
-        }
         activeTurnId = finalTurnId;
         activeMessageId = finalMessageId;
 
@@ -314,20 +313,33 @@ export const useAIStreamingLifecycle = ({
           updatedAt: finalPayload.updatedAt,
         });
 
+        // A `done` carrying finishReason "length"/"content_filter" parsed, but
+        // the generation was truncated/blocked — not a clean success (M10).
+        const isTruncated =
+          finalPayload.finishReason === "length" ||
+          finalPayload.finishReason === "content_filter";
+
         patchAssistantMessage(assistantId, {
           lifecycleStatus: finalPayload.lifecycleStatus ?? "completed",
           progressPhase: undefined,
           generationElapsedMs: getElapsedMs(generationStartedAt),
-          statusText: finalPayload.skeletons.length
+          statusText: isTruncated
+            ? t("ai.chat.status.truncatedResponse")
+            : finalPayload.skeletons.length
             ? t("ai.chat.status.generatedResponse")
             : t("ai.chat.status.emptyResponse"),
           skeletons: finalPayload.skeletons,
           parseError: undefined,
           isComplete: true,
-          turnId: finalTurnId,
-          messageId: finalMessageId,
+          turnId: finalTurnId ?? undefined,
+          messageId: finalMessageId ?? undefined,
         });
-        applyStreamingCanvasPreviewResult(finalPayload, finalMessageId);
+        // Without a message id the draft can't be tagged/keyed — unreachable
+        // against today's server (`started` always precedes `done`), but never
+        // leave the bubble spinning because of it (N5 in tta_rewrite_final.md).
+        if (finalMessageId) {
+          applyStreamingCanvasPreviewResult(finalPayload, finalMessageId);
+        }
 
         if (isExhaustedRateLimit(rateLimitRemaining)) {
           appendRateLimitWarningMessage(rateLimit, rateLimitRemaining);
@@ -350,8 +362,11 @@ export const useAIStreamingLifecycle = ({
           return;
         }
 
-        removeGeneratedElementsByMessageId(activeMessageId);
-        clearStreamingCanvasPreview();
+        // Same on-error canvas policy as the transport-error branch above:
+        // commit the rendered draft instead of wiping it. Even when the final
+        // render threw mid-insert (INVALID_RESULT) after tombstoning the
+        // preview frame, the commit resurrects those elements as committed.
+        commitStreamingCanvasPreview();
 
         patchAssistantMessage(assistantId, {
           lifecycleStatus: "failed",
@@ -380,10 +395,9 @@ export const useAIStreamingLifecycle = ({
       applyStreamingCanvasPreviewResult,
       appendRateLimitWarningMessage,
       cancelPendingCanvasPreviewRenders,
-      clearStreamingCanvasPreview,
+      commitStreamingCanvasPreview,
       onRateLimitInfo,
       patchAssistantMessage,
-      removeGeneratedElementsByMessageId,
       resetCanvasPreviewRenderState,
       t,
       throttledApplyStreamingCanvasPreviewResult,

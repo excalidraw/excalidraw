@@ -1,5 +1,7 @@
 import { extractRateLimitHeaders, iterateSSEJSONChunks } from "../data/sse";
 
+import { AI_CLIENT_ERRORS } from "./utils";
+
 import type {
   AIAssistantLifecycleStatus,
   AIGenerateRequestPayload,
@@ -66,7 +68,6 @@ export type AIChatTruncateRequest = {
 export type AIChatTruncateResponse = {
   ok: boolean;
   chatId: string;
-  revision: number;
   updatedAt?: number;
 };
 
@@ -117,7 +118,23 @@ export const truncateChat = async (
     );
   }
 
-  return (await response.json()) as AIChatTruncateResponse;
+  const data = (await response.json().catch(() => null)) as Record<
+    string,
+    unknown
+  > | null;
+  if (!data || typeof data.chatId !== "string") {
+    throw withErrorCode(
+      new Error("AI server returned an invalid truncate response"),
+      500,
+    );
+  }
+  return {
+    ok: Boolean(data.ok),
+    chatId: data.chatId,
+    ...(typeof data.updatedAt === "number"
+      ? { updatedAt: data.updatedAt }
+      : {}),
+  };
 };
 
 export interface TTAStreamFetchOptions {
@@ -222,12 +239,15 @@ export const TTAStreamFetch = async (
 
     onStreamCreated?.();
     let startedPayload: AIStreamStartedPayload | null = null;
+    let receivedDoneSentinel = false;
 
     for await (const event of iterateSSEJSONChunks<StreamChunk>(stream, {
       signal,
-      ignorePayload: (rawPayload) => /^\[ai-server\]/i.test(rawPayload.trim()),
       onInvalidJSON: (rawPayload) => {
         console.warn("AI Client: Failed to parse JSON payload", rawPayload);
+      },
+      onDoneSentinel: () => {
+        receivedDoneSentinel = true;
       },
     })) {
       switch (event.type) {
@@ -251,26 +271,10 @@ export const TTAStreamFetch = async (
         case "partial":
           onChunk?.({
             skeletons: event.skeletons ?? [],
-            isComplete: false,
+            isComplete: event.isComplete ?? false,
           });
           break;
         case "done":
-          if (event.chatId && event.chatId !== startedPayload?.chatId) {
-            const nextTurnId = event.turnId ?? startedPayload?.turnId;
-            const nextMessageId = event.messageId ?? startedPayload?.messageId;
-            if (nextTurnId && nextMessageId) {
-              startedPayload = {
-                chatId: event.chatId,
-                turnId: nextTurnId,
-                messageId: nextMessageId,
-                lifecycleStatus: "pending",
-                ...(typeof event.updatedAt === "number"
-                  ? { updatedAt: event.updatedAt }
-                  : {}),
-              };
-              onStarted?.(startedPayload);
-            }
-          }
           return {
             ...rateLimitInfo,
             finalPayload: {
@@ -279,6 +283,7 @@ export const TTAStreamFetch = async (
               chatId: event.chatId ?? startedPayload?.chatId,
               turnId: event.turnId ?? startedPayload?.turnId,
               messageId: event.messageId ?? startedPayload?.messageId,
+              finishReason: event.finishReason,
               ...(event.lifecycleStatus
                 ? { lifecycleStatus: event.lifecycleStatus }
                 : {}),
@@ -307,16 +312,21 @@ export const TTAStreamFetch = async (
       };
     }
 
+    // Every deliberately-ended generation terminates with a `done` or `error`
+    // chunk (the success path additionally appends a `[DONE]` sentinel — see
+    // StreamingResponse.end() server-side). Reaching EOF without one means
+    // the stream was cut (proxy idle timeout, server restart, network blip).
+    // Never fabricate an empty success here: it would overwrite the streamed
+    // partial skeletons and wipe the canvas preview (C2 in tta.md).
     return {
       ...rateLimitInfo,
-      finalPayload: {
-        skeletons: [],
-        isComplete: true,
-        chatId: startedPayload?.chatId,
-        turnId: startedPayload?.turnId,
-        messageId: startedPayload?.messageId,
-      },
-      error: null,
+      error: toStreamError(
+        receivedDoneSentinel
+          ? "The AI server ended the stream without a result"
+          : "Connection interrupted before the response completed",
+        AI_CLIENT_ERRORS.STREAM_INTERRUPTED,
+        "failed",
+      ),
     };
   } catch (error) {
     if ((error as { name?: string }).name === "AbortError" || signal?.aborted) {

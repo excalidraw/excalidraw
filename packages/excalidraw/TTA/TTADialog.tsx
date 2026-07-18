@@ -937,9 +937,11 @@ const TTADialogContent = ({
 
       const isErrorRetry = Boolean(message.error);
       clearStreamingCanvasPreview();
-      if (!isErrorRetry) {
-        queueGenerationReplacement(message.messageId ?? null);
-      }
+      // A failed generation commits its rendered partial to the canvas (the
+      // on-error policy in useAIStreamingLifecycle), so an error-retry must
+      // queue it for replacement just like regenerate does — otherwise the
+      // retried generation would render on top of the stale partial.
+      queueGenerationReplacement(message.messageId ?? null);
 
       const retryAssistantId = isErrorRetry
         ? messageId

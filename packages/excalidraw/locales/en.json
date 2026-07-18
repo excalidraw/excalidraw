@@ -813,7 +813,8 @@
         "retrying": "Retrying...",
         "regenerating": "Regenerating...",
         "generatedResponse": "Generated response.",
-        "emptyResponse": "(empty response)"
+        "emptyResponse": "(empty response)",
+        "truncatedResponse": "Response was cut short — try a simpler prompt."
       },
       "stopReason": {
         "user": "Generation stopped by user.",
