@@ -46,10 +46,32 @@ import type {
  * search box around the click (owner-less fallback).
  */
 
+/**
+ * How big a visual gap between strokes still counts as closed, in scene px.
+ *
+ * This is a BRIDGING radius, not a snapping radius: gaps are closed by
+ * adding short connector edges between loose stroke ends (see the bridging
+ * pass in `buildFaces`), never by relocating vertices — so a generous value
+ * here does not distort the filled shape.
+ */
+const BUCKET_FILL_GAP_TOLERANCE = 6;
+
 export type BucketFillOptions = {
-  /** endpoints closer than this collapse to the same graph node */
+  /**
+   * geometric fidelity: vertices closer than this collapse to the same graph
+   * node, and a node this close to a stroke splits it (T-junction). Keep
+   * SMALL — every merge can relocate a vertex by up to this distance, so
+   * this value is the upper bound on how far the filled shape may deviate
+   * from the actual strokes.
+   */
   snapEpsilon: number;
-  /** broad-phase padding around the owner bounds */
+  /**
+   * connectivity: loose stroke ends within this distance of another stroke
+   * are bridged with a connector edge so the region reads as closed. Also
+   * used as broad-phase padding around the owner bounds. Unlike
+   * `snapEpsilon` this does not affect the shape's fidelity (bridges add
+   * edges; they never move existing vertices).
+   */
   gapTolerance: number;
   /** discard faces / polygons smaller than this absolute area */
   minArea: number;
@@ -66,7 +88,7 @@ export type BucketFillOptions = {
 
 export const DEFAULT_BUCKET_FILL_OPTIONS: BucketFillOptions = {
   snapEpsilon: 0.5,
-  gapTolerance: 2,
+  gapTolerance: BUCKET_FILL_GAP_TOLERANCE,
   minArea: 4,
   maxBoundarySegments: 2000,
   maxGeneratedPoints: 256,
@@ -430,13 +452,20 @@ const buildFaces = (
   options: BucketFillOptions,
 ): Face[] | null => {
   const eps = options.snapEpsilon;
-  // Node merging / T-junctions use the larger gap tolerance so that tiny gaps
-  // left by clipping (e.g. where a thin coverer crosses a rounded corner) are
-  // bridged instead of leaving the region open. snapEpsilon stays for dropping
-  // genuinely degenerate segments/edges.
-  const gapEps = Math.max(eps, options.gapTolerance);
-  const store = new NodeStore(gapEps);
+  // Two distinct radii, deliberately decoupled:
+  // - `eps` (snapEpsilon) governs node merging and T-junction snapping. It
+  //   must stay small: merging RELOCATES vertices to the first-seen position
+  //   and T-junctions route edges THROUGH off-stroke nodes, so this radius
+  //   is the upper bound on how far the filled shape can deviate from the
+  //   actual strokes.
+  // - `gapTolerance` governs the bridging pass further down, which closes
+  //   visual gaps by ADDING short connector edges at loose stroke ends. It
+  //   can be generous (8px) without distorting the shape, because bridging
+  //   never moves existing vertices.
+  const store = new NodeStore(eps);
   const segments: WorkingSegment[] = [];
+  // first element that produced each node — used to attribute bridge edges
+  const nodeElement = new Map<number, string>();
 
   for (const { segment, elementId } of rawSegments) {
     // NOTE: sub-epsilon segments are NOT dropped here — their endpoints merge
@@ -446,6 +475,12 @@ const buildFaces = (
     // with roundness: null) and leave the region open.
     const a = store.getOrCreate(segment[0]);
     const b = store.getOrCreate(segment[1]);
+    if (!nodeElement.has(a)) {
+      nodeElement.set(a, elementId);
+    }
+    if (!nodeElement.has(b)) {
+      nodeElement.set(b, elementId);
+    }
     if (a === b) {
       continue;
     }
@@ -515,7 +550,10 @@ const buildFaces = (
     return null;
   }
 
-  // T-junctions: split any segment that passes through an existing node.
+  // T-junctions: split any segment that passes through (within `eps` of) an
+  // existing node. Deliberately tight — routing an edge through a node that
+  // sits further off the stroke would visibly bend the filled shape; wider
+  // gaps are closed by the bridging pass below instead.
   // Broad phase: nodes sorted by x (stable during this pass — no nodes are
   // created here), binary-searched per segment so only x-overlapping nodes
   // are inspected
@@ -523,8 +561,8 @@ const buildFaces = (
     .map((_, index) => index)
     .sort((a, b) => store.nodes[a][0] - store.nodes[b][0]);
   for (const segment of segments) {
-    const fromX = segment.box[0] - gapEps;
-    const toX = segment.box[2] + gapEps;
+    const fromX = segment.box[0] - eps;
+    const toX = segment.box[2] + eps;
     // lower bound of fromX in nodesByX
     let lo = 0;
     let hi = nodesByX.length;
@@ -545,7 +583,7 @@ const buildFaces = (
       if (n === segment.a || n === segment.b) {
         continue;
       }
-      if (q[1] < segment.box[1] - gapEps || q[1] > segment.box[3] + gapEps) {
+      if (q[1] < segment.box[1] - eps || q[1] > segment.box[3] + eps) {
         continue;
       }
       const t = projectParam(segment.pa, segment.pb, q);
@@ -553,7 +591,7 @@ const buildFaces = (
         continue;
       }
       if (
-        distanceToLineSegment(q, lineSegment(segment.pa, segment.pb)) <= gapEps
+        distanceToLineSegment(q, lineSegment(segment.pa, segment.pb)) <= eps
       ) {
         segment.splits.push({ node: n, t });
       }
@@ -614,6 +652,197 @@ const buildFaces = (
   if (edgeSet.size === 0) {
     // nothing usable — not an error, just no enclosed region
     return [];
+  }
+
+  // ---------------------------------------------------------------------------
+  // bridging pass — close visual gaps up to `gapTolerance` so sketchy joints
+  // (a stroke stopping a few px short of another) still enclose a region.
+  //
+  // Additive by design: each dangling stroke end gets a short connector EDGE
+  // to its nearest reachable geometry — either an existing node, or a point
+  // ON a nearby edge (the edge is split at the projection, which lies
+  // exactly on the stroke). Existing vertices are never relocated, so unlike
+  // snapping, a generous radius here cannot distort the filled shape — the
+  // worst artifact is a tiny connector edge spanning the visual gap,
+  // typically hidden under the stroke width.
+  //
+  // "Dangling end" is a ONE-SIDED node, not just a degree-1 node: rough
+  // rendering draws strokes as two jittery passes, so a stroke END is a node
+  // whose (two) incident edges both leave in nearly the same direction.
+  // Formally: all incident edge directions fit inside a narrow cone, i.e.
+  // the largest angular gap between them exceeds 225°. Interior chain nodes
+  // (~180° apart) and genuine crossings (edges all around) don't qualify;
+  // sharp corners (~270° gap) do, which is desirable — a corner sitting a
+  // few px from another stroke is exactly the kind of sketchy joint to
+  // close.
+  // ---------------------------------------------------------------------------
+  const bridgeRadius = Math.max(eps, options.gapTolerance);
+  const DANGLING_END_MIN_GAP = (Math.PI * 5) / 4; // 225°
+  const isDanglingEnd = (node: number): boolean => {
+    const unique = [...new Set(adjacency.get(node) ?? [])];
+    if (unique.length === 0) {
+      return false;
+    }
+    if (unique.length === 1) {
+      return true;
+    }
+    // more than 4 distinct directions is a busy junction, never a stroke end
+    if (unique.length > 4) {
+      return false;
+    }
+    const angles = unique
+      .map((neighbour) =>
+        Math.atan2(
+          store.nodes[neighbour][1] - store.nodes[node][1],
+          store.nodes[neighbour][0] - store.nodes[node][0],
+        ),
+      )
+      .sort((a, b) => a - b);
+    let maxGap = angles[0] + Math.PI * 2 - angles[angles.length - 1];
+    for (let i = 1; i < angles.length; i++) {
+      maxGap = Math.max(maxGap, angles[i] - angles[i - 1]);
+    }
+    return maxGap > DANGLING_END_MIN_GAP;
+  };
+  const looseEnds: number[] = [];
+  for (const node of adjacency.keys()) {
+    if (isDanglingEnd(node)) {
+      looseEnds.push(node);
+    }
+  }
+  if (looseEnds.length > 0) {
+    // live edge list; updated as bridging splits edges / adds connectors
+    const liveEdges: { u: number; v: number }[] = [];
+    for (const key of edgeSet) {
+      const [u, v] = key.split("-").map(Number);
+      liveEdges.push({ u, v });
+    }
+    const unlink = (u: number, v: number) => {
+      const key = edgeKey(u, v);
+      edgeSet.delete(key);
+      const owners = edgeToElements.get(key);
+      edgeToElements.delete(key);
+      const listU = adjacency.get(u);
+      const listV = adjacency.get(v);
+      listU?.splice(listU.indexOf(v), 1);
+      listV?.splice(listV.indexOf(u), 1);
+      return owners;
+    };
+
+    // a single sweep can spend an end's bridge on a useless nearby target
+    // (e.g. the unmerged twin endpoint of a rough double-pass stroke); such
+    // an end usually remains one-sided, so iterate to a fixed point
+    for (let round = 0; round < 3; round++) {
+      let bridgedAny = false;
+      for (const loose of looseEnds) {
+        // skip ends already closed by an earlier bridge
+        if (!isDanglingEnd(loose)) {
+          continue;
+        }
+        const p = store.nodes[loose];
+        const neighbours = adjacency.get(loose) ?? [];
+
+        // nearest non-adjacent node within the bridge radius. Candidates
+        // closer than the snap epsilon are skipped — they're effectively the
+        // same point and `addEdge` refuses such degenerate edges anyway
+        let bestNode = -1;
+        let bestNodeDistance = Infinity;
+        for (let n = 0; n < store.nodes.length; n++) {
+          if (n === loose || neighbours.includes(n)) {
+            continue;
+          }
+          const distance = pointDistance(p, store.nodes[n]);
+          if (
+            distance >= eps &&
+            distance <= bridgeRadius &&
+            distance < bestNodeDistance
+          ) {
+            bestNodeDistance = distance;
+            bestNode = n;
+          }
+        }
+
+        // nearest edge (not incident to the loose end) whose interior the
+        // loose end projects onto, within the bridge radius
+        let bestEdge: { u: number; v: number } | null = null;
+        let bestEdgeDistance = Infinity;
+        let bestEdgeT = 0;
+        for (const edge of liveEdges) {
+          if (
+            !edgeSet.has(edgeKey(edge.u, edge.v)) ||
+            edge.u === loose ||
+            edge.v === loose
+          ) {
+            continue;
+          }
+          const eu = store.nodes[edge.u];
+          const ev = store.nodes[edge.v];
+          if (
+            p[0] < Math.min(eu[0], ev[0]) - bridgeRadius ||
+            p[0] > Math.max(eu[0], ev[0]) + bridgeRadius ||
+            p[1] < Math.min(eu[1], ev[1]) - bridgeRadius ||
+            p[1] > Math.max(eu[1], ev[1]) + bridgeRadius
+          ) {
+            continue;
+          }
+          const t = projectParam(eu, ev, p);
+          if (t <= 0 || t >= 1) {
+            continue;
+          }
+          const distance = distanceToLineSegment(p, lineSegment(eu, ev));
+          if (distance <= bridgeRadius && distance < bestEdgeDistance) {
+            bestEdgeDistance = distance;
+            bestEdge = edge;
+            bestEdgeT = t;
+          }
+        }
+
+        const bridgeElement =
+          nodeElement.get(loose) ?? segments[0]?.elementId ?? "";
+        if (bestEdge && bestEdgeDistance < bestNodeDistance) {
+          // split the edge at the projection (a point ON the stroke) and
+          // connect the loose end to it
+          const eu = store.nodes[bestEdge.u];
+          const ev = store.nodes[bestEdge.v];
+          const projection = store.getOrCreate(pointAtParam(eu, ev, bestEdgeT));
+          if (projection === bestEdge.u || projection === bestEdge.v) {
+            // projection merged into an endpoint — plain node bridge
+            addEdge(loose, projection, bridgeElement);
+            liveEdges.push({ u: loose, v: projection });
+          } else {
+            if (!nodeElement.has(projection)) {
+              nodeElement.set(
+                projection,
+                edgeToElements
+                  .get(edgeKey(bestEdge.u, bestEdge.v))
+                  ?.values()
+                  .next().value ?? bridgeElement,
+              );
+            }
+            const owners =
+              unlink(bestEdge.u, bestEdge.v) ?? new Set([bridgeElement]);
+            for (const owner of owners) {
+              addEdge(bestEdge.u, projection, owner);
+              addEdge(projection, bestEdge.v, owner);
+            }
+            liveEdges.push(
+              { u: bestEdge.u, v: projection },
+              { u: projection, v: bestEdge.v },
+            );
+            addEdge(loose, projection, bridgeElement);
+            liveEdges.push({ u: loose, v: projection });
+          }
+          bridgedAny = true;
+        } else if (bestNode >= 0) {
+          addEdge(loose, bestNode, bridgeElement);
+          liveEdges.push({ u: loose, v: bestNode });
+          bridgedAny = true;
+        }
+      }
+      if (!bridgedAny) {
+        break;
+      }
+    }
   }
 
   // sort outgoing half-edges by angle around each node

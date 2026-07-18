@@ -1,5 +1,9 @@
 import { arrayToMap, ROUNDNESS } from "@excalidraw/common";
-import { pointFrom } from "@excalidraw/math";
+import {
+  distanceToLineSegment,
+  lineSegment,
+  pointFrom,
+} from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
@@ -760,9 +764,9 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -3);
   });
 
-  it("bridges wider endpoint gaps when gapTolerance is raised (zoomed out)", () => {
-    // triangle of open lines whose corners have ~5px gaps: unfillable at the
-    // default 2px tolerance, fillable when the app passes a zoom-scaled one
+  it("bridges endpoint gaps up to gapTolerance without distorting the shape", () => {
+    // triangle of open lines whose corners have ~5px gaps: bridged by the
+    // default tolerance (8), unfillable with a stricter one
     const mkLine = (pts: [number, number][]) =>
       API.createElement({
         type: "line",
@@ -787,16 +791,73 @@ describe("computeBucketFillPolygon", () => {
     const { elements, elementsMap } = setup([l1, l2, l3]);
     const point = pointFrom<GlobalPoint>(50, 30);
 
-    const strict = computeBucketFillPolygon({ point, elements, elementsMap });
-    expect(strict.ok).toBe(false);
+    const result = computeBucketFillPolygon({ point, elements, elementsMap });
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // fidelity: gaps are closed by ADDING connector edges, never by moving
+    // vertices — every polygon vertex must lie (near-)on one of the strokes,
+    // not be dragged toward a merged corner position
+    const strokes = [
+      lineSegment(pointFrom<GlobalPoint>(4, 0), pointFrom<GlobalPoint>(96, 0)),
+      lineSegment(
+        pointFrom<GlobalPoint>(100, 4),
+        pointFrom<GlobalPoint>(52, 96),
+      ),
+      lineSegment(pointFrom<GlobalPoint>(48, 96), pointFrom<GlobalPoint>(0, 4)),
+    ];
+    for (const vertex of result.scenePoints) {
+      const distance = Math.min(
+        ...strokes.map((stroke) => distanceToLineSegment(vertex, stroke)),
+      );
+      expect(distance).toBeLessThanOrEqual(2);
+    }
 
-    const zoomedOut = computeBucketFillPolygon({
+    const strict = computeBucketFillPolygon({
       point,
       elements,
       elementsMap,
-      options: { gapTolerance: 8 },
+      options: { gapTolerance: 2 },
     });
-    expect(zoomedOut.ok).toBe(true);
+    expect(strict.ok).toBe(false);
+  });
+
+  it("bridges a stroke ending short of a long edge at the projection point", () => {
+    // chord stopping 6px short of both rectangle walls: the nearest NODES on
+    // those walls are the far-away corners, so bridging must split the wall
+    // edge at the chord end's projection instead of snapping to a corner
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const chord = API.createElement({
+      type: "line",
+      x: 6,
+      y: 50,
+      width: 88,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(88, 0)],
+    });
+    const { elements, elementsMap } = setup([rect, chord]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 25),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // upper half of the rectangle, not the whole thing
+    expect(polygonArea(result.scenePoints)).toBeGreaterThan(4500);
+    expect(polygonArea(result.scenePoints)).toBeLessThan(5500);
   });
 
   it("returns no_owner for open canvas", () => {

@@ -8365,20 +8365,10 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getNonDeletedElementsMap();
     const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
 
-    const result = computeBucketFillPolygon({
-      point,
-      elements,
-      elementsMap,
-      options: {
-        // "visually touching" should connect at any zoom: ~2 screen px,
-        // clamped so zoomed-in stays precise and zoomed-out never bridges
-        // more than the isPathALoop closure threshold
-        gapTolerance: Math.min(
-          LINE_CONFIRM_THRESHOLD,
-          Math.max(0.5, 2 / this.state.zoom.value),
-        ),
-      },
-    });
+    // gap bridging is covered by the default gapTolerance (a bucket-specific
+    // constant): connector edges close visual gaps without distorting the
+    // shape, so no zoom-dependent tuning is needed
+    const result = computeBucketFillPolygon({ point, elements, elementsMap });
 
     if (!result.ok) {
       if (result.reason === "too_complex") {
