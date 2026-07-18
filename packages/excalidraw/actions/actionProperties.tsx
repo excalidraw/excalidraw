@@ -3,8 +3,8 @@ import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  BUCKET_FILL_BACKGROUND_COLOR_PALETTE,
   BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   getBucketFillBackgroundColor,
@@ -517,7 +517,10 @@ export const actionChangeBucketFillBackgroundColor = register<
         )}
         <ColorPicker
           topPicks={BUCKET_FILL_BACKGROUND_PICKS}
-          palette={BUCKET_FILL_BACKGROUND_COLOR_PALETTE}
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          // hidden rather than removed from the palette so the remaining
+          // colors keep their usual hotkeys (w for white etc.)
+          excludedColors={[COLOR_PALETTE.transparent]}
           type="elementBackground"
           label={t("labels.background")}
           color={getBucketFillBackgroundColor(

@@ -251,17 +251,6 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   ...COMMON_ELEMENT_SHADES,
 } as const;
 
-// same as the element background palette, without `transparent` (a
-// transparent bucket fill would be invisible)
-export const BUCKET_FILL_BACKGROUND_COLOR_PALETTE = {
-  white: COLOR_PALETTE.white,
-  gray: COLOR_PALETTE.gray,
-  black: COLOR_PALETTE.black,
-  bronze: COLOR_PALETTE.bronze,
-
-  ...COMMON_ELEMENT_SHADES,
-} as const;
-
 /**
  * The color the bucket fill tool actually fills with: the shared
  * `currentItemBackgroundColor`, falling back to green when that is
