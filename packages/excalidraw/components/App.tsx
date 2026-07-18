@@ -8365,7 +8365,20 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getNonDeletedElementsMap();
     const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
 
-    const result = computeBucketFillPolygon({ point, elements, elementsMap });
+    const result = computeBucketFillPolygon({
+      point,
+      elements,
+      elementsMap,
+      options: {
+        // "visually touching" should connect at any zoom: ~2 screen px,
+        // clamped so zoomed-in stays precise and zoomed-out never bridges
+        // more than the isPathALoop closure threshold
+        gapTolerance: Math.min(
+          LINE_CONFIRM_THRESHOLD,
+          Math.max(0.5, 2 / this.state.zoom.value),
+        ),
+      },
+    });
 
     if (!result.ok) {
       if (result.reason === "too_complex") {
@@ -8389,7 +8402,26 @@ class App extends React.Component<AppProps, AppState> {
       pointFrom<LocalPoint>(p[0] - originX, p[1] - originY),
     );
 
-    const owner = elementsMap.get(result.ownerId);
+    const owner = result.ownerId ? elementsMap.get(result.ownerId) : null;
+    // owner-less fills (regions formed by open lines) take their frame from
+    // the click position and only inherit a group shared by every boundary
+    const frameId = owner
+      ? isFrameLikeElement(owner)
+        ? owner.id
+        : owner.frameId
+      : this.getTopLayerFrameAtSceneCoords(scenePointer)?.id ?? null;
+    const groupIds = owner
+      ? owner.groupIds
+      : result.boundaryElementIds
+          .map((id) => elementsMap.get(id)?.groupIds)
+          .filter((groupIds): groupIds is string[] => !!groupIds)
+          .reduce(
+            (common, groupIds) =>
+              common === null
+                ? groupIds
+                : common.filter((groupId) => groupIds.includes(groupId)),
+            null as string[] | null,
+          ) ?? [];
 
     const fill = newLinearElement({
       type: "line",
@@ -8407,20 +8439,11 @@ class App extends React.Component<AppProps, AppState> {
       roughness: 0,
       roundness: null,
       opacity: this.state.currentItemOpacity,
-      frameId: owner
-        ? isFrameLikeElement(owner)
-          ? owner.id
-          : owner.frameId
-        : null,
-      groupIds: owner ? owner.groupIds : [],
-      customData: {
-        bucketFill: {
-          version: 1,
-          ownerId: result.ownerId,
-          boundaryElementIds: result.boundaryElementIds,
-          seedPoint: [scenePointer.x, scenePointer.y],
-        },
-      },
+      frameId,
+      groupIds,
+      // marks the element as a generated fill (excluded from acting as a
+      // fill owner/boundary); `version` future-proofs the format
+      customData: { bucketFill: { version: 1 } },
     });
 
     // resolve the geometry's relative placement against the

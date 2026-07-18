@@ -39,10 +39,11 @@ import type {
  * local `line` polygon and inserts it.
  *
  * All fills go through a single path: a planar segment arrangement is built
- * from the owner and any overlapping boundary elements (segments split at
- * intersections), and the smallest bounded face containing the click is
- * selected. A lone owner is simply the trivial arrangement with one bounded
- * face.
+ * (segments split at intersections) and the smallest bounded face containing
+ * the click is selected. Candidates come from the owner's surroundings when
+ * the click lands inside a closed element, or — for regions formed by open
+ * lines, including against other elements' outside walls — from an expanding
+ * search box around the click (owner-less fallback).
  */
 
 export type BucketFillOptions = {
@@ -56,6 +57,11 @@ export type BucketFillOptions = {
   maxBoundarySegments: number;
   /** cap on the number of generated polygon points */
   maxGeneratedPoints: number;
+  /**
+   * initial half-extent of the owner-less search box around the click
+   * (doubles up to 3 times while the found face touches the box frontier)
+   */
+  fallbackSearchRadius: number;
 };
 
 export const DEFAULT_BUCKET_FILL_OPTIONS: BucketFillOptions = {
@@ -64,6 +70,7 @@ export const DEFAULT_BUCKET_FILL_OPTIONS: BucketFillOptions = {
   minArea: 4,
   maxBoundarySegments: 2000,
   maxGeneratedPoints: 256,
+  fallbackSearchRadius: 512,
 };
 
 export type BucketFillFailureReason =
@@ -86,7 +93,11 @@ export type BucketFillInsertion = {
 export type BucketFillGeometryResult =
   | {
       ok: true;
-      ownerId: ExcalidrawElement["id"];
+      /**
+       * the closed element under the click, or null for fills resolved by
+       * the owner-less fallback (regions formed by open lines)
+       */
+      ownerId: ExcalidrawElement["id"] | null;
       boundaryElementIds: ExcalidrawElement["id"][];
       scenePoints: GlobalPoint[];
       insertion: BucketFillInsertion;
@@ -409,8 +420,10 @@ type Face = {
  * Returns `[]` when there are no usable edges (no enclosed region), or `null`
  * when the arrangement is too complex to process.
  *
- * Known gap (see spec): collinear/overlapping segments are not split against
- * each other; transversal intersections and T-junctions are handled.
+ * Collinear/overlapping segments need no dedicated pass: a 1D overlap always
+ * puts at least one segment's endpoint (a node) on the other segment, so the
+ * T-junction pass splits them and `addEdge`'s node-pair dedupe collapses the
+ * coincident pieces into one edge.
  */
 const buildFaces = (
   rawSegments: SourceSegment[],
@@ -457,12 +470,21 @@ const buildFaces = (
     });
   }
 
-  // transversal intersections (broad-phase by bbox)
-  for (let i = 0; i < segments.length; i++) {
-    const si = segments[i];
+  // transversal intersections. Broad phase: sort by bbox minX and sweep, so
+  // each segment is only tested against x-overlapping ones (near-linear for
+  // spread-out scenes instead of all-pairs)
+  const byMinX = segments
+    .map((_, index) => index)
+    .sort((a, b) => segments[a].box[0] - segments[b].box[0]);
+  for (let oi = 0; oi < byMinX.length; oi++) {
+    const si = segments[byMinX[oi]];
     const li = lineSegment(si.pa, si.pb);
-    for (let j = i + 1; j < segments.length; j++) {
-      const sj = segments[j];
+    const sweepMaxX = si.box[2] + eps;
+    for (let oj = oi + 1; oj < byMinX.length; oj++) {
+      const sj = segments[byMinX[oj]];
+      if (sj.box[0] > sweepMaxX) {
+        break;
+      }
       if (!doBoundsIntersect(expandBounds(si.box, eps), sj.box)) {
         continue;
       }
@@ -493,19 +515,37 @@ const buildFaces = (
     return null;
   }
 
-  // T-junctions: split any segment that passes through an existing node
+  // T-junctions: split any segment that passes through an existing node.
+  // Broad phase: nodes sorted by x (stable during this pass — no nodes are
+  // created here), binary-searched per segment so only x-overlapping nodes
+  // are inspected
+  const nodesByX = store.nodes
+    .map((_, index) => index)
+    .sort((a, b) => store.nodes[a][0] - store.nodes[b][0]);
   for (const segment of segments) {
-    for (let n = 0; n < store.nodes.length; n++) {
+    const fromX = segment.box[0] - gapEps;
+    const toX = segment.box[2] + gapEps;
+    // lower bound of fromX in nodesByX
+    let lo = 0;
+    let hi = nodesByX.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (store.nodes[nodesByX[mid]][0] < fromX) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    for (let k = lo; k < nodesByX.length; k++) {
+      const n = nodesByX[k];
+      const q = store.nodes[n];
+      if (q[0] > toX) {
+        break;
+      }
       if (n === segment.a || n === segment.b) {
         continue;
       }
-      const q = store.nodes[n];
-      if (
-        q[0] < segment.box[0] - gapEps ||
-        q[0] > segment.box[2] + gapEps ||
-        q[1] < segment.box[1] - gapEps ||
-        q[1] > segment.box[3] + gapEps
-      ) {
+      if (q[1] < segment.box[1] - gapEps || q[1] > segment.box[3] + gapEps) {
         continue;
       }
       const t = projectParam(segment.pa, segment.pb, q);
@@ -773,103 +813,199 @@ export const computeBucketFillPolygon = (args: {
   const options = { ...DEFAULT_BUCKET_FILL_OPTIONS, ...args.options };
   const { point, elements, elementsMap } = args;
 
-  // 1. owner under the pointer
+  // 1. owner under the pointer — the fast common case (click inside a closed
+  // element). When there is none (regions formed by open lines, or
+  // self-intersecting outlines whose hit-test fails), the owner-less
+  // fallback below builds the arrangement from everything near the click.
   const owner = findOwner(point, elements, elementsMap);
-  if (!owner) {
-    return { ok: false, reason: "no_owner" };
-  }
 
-  // 2. boundary elements overlapping the owner (z-order agnostic membership)
-  const ownerBounds = getElementBounds(owner, elementsMap);
-  const pad = options.gapTolerance + 2 + Math.max(owner.strokeWidth ?? 1, 1);
-  const expandedOwner = expandBounds(ownerBounds, pad);
-  const overlapsOwner = (element: ExcalidrawElement) =>
-    doBoundsIntersect(expandedOwner, getElementBounds(element, elementsMap));
-  const extraBoundaries = elements.filter(
-    (element) =>
-      element.id !== owner.id &&
-      isEligibleBoundary(element) &&
-      overlapsOwner(element),
-  );
-
-  // z-order index + the opaque elements that hide outlines beneath them
   const indexOf = new Map<string, number>();
   elements.forEach((element, i) => indexOf.set(element.id, i));
-  const coverers = elements.filter(
-    (element) =>
-      !isBucketFill(element) &&
-      rendersOpaqueFill(element) &&
-      overlapsOwner(element),
-  );
 
-  // 3. flatten to segments tagged with their source element, clipping each
-  // outline to its visible parts (portions hidden behind an opaque element
-  // above are not boundaries — only what the user actually sees can stop fill)
-  const rawSegments: SourceSegment[] = [];
-  const collect = (element: ExcalidrawElement) => {
-    const elementIndex = indexOf.get(element.id) ?? 0;
-    const coverersAbove = coverers.filter(
-      (coverer) =>
-        coverer.id !== element.id &&
-        (indexOf.get(coverer.id) ?? 0) > elementIndex,
+  // 2+3. collect boundary segments within `candidateBounds`, tagged with
+  // their source element and clipped to their visible parts (portions hidden
+  // behind an opaque element above are not boundaries — only what the user
+  // actually sees can stop fill). Returns null when over the segment cap.
+  const collectSegments = (
+    candidateBounds: Bounds,
+    primary: NonDeletedExcalidrawElement | null,
+  ): SourceSegment[] | null => {
+    const inRange = (element: ExcalidrawElement) =>
+      doBoundsIntersect(
+        candidateBounds,
+        getElementBounds(element, elementsMap),
+      );
+    const boundaries = elements.filter(
+      (element) =>
+        element.id !== primary?.id &&
+        isEligibleBoundary(element) &&
+        inRange(element),
     );
-    const segments = getElementLineSegments(element, elementsMap);
-    // freedraw and non-polygon line loops render as closed once their
-    // endpoints are within LINE_CONFIRM_THRESHOLD (isPathALoop), but their
-    // segment chain leaves that closure gap open — bridge it explicitly so
-    // the region reads as closed here too
-    if (
-      (element.type === "freedraw" ||
-        (isLineElement(element) && !element.polygon)) &&
-      isPathALoop(element.points) &&
-      segments.length > 0
-    ) {
-      const first = segments[0][0];
-      const last = segments[segments.length - 1][1];
-      if (pointDistance(first, last) >= options.snapEpsilon) {
-        segments.push(lineSegment(last, first));
-      }
-    }
-    for (const segment of segments) {
-      // keep sub-epsilon segments: buildFaces collapses them via node merging
-      // without breaking the chain (see note there); only true zero-length
-      // degenerates are noise
-      if (segmentLength(segment) === 0) {
-        continue;
-      }
-      if (coverersAbove.length === 0) {
-        rawSegments.push({ segment, elementId: element.id });
-        continue;
-      }
-      for (const [a, b] of clipSegmentToVisible(
-        segment[0],
-        segment[1],
-        coverersAbove,
-        elementsMap,
-        options.snapEpsilon,
-      )) {
-        rawSegments.push({ segment: lineSegment(a, b), elementId: element.id });
-      }
-    }
-  };
-  collect(owner);
-  for (const element of extraBoundaries) {
-    collect(element);
-  }
-  if (rawSegments.length > options.maxBoundarySegments) {
-    return { ok: false, reason: "too_complex" };
-  }
+    // the opaque elements that hide outlines beneath them
+    const coverers = elements.filter(
+      (element) =>
+        !isBucketFill(element) &&
+        rendersOpaqueFill(element) &&
+        inRange(element),
+    );
 
-  // 4. build the planar arrangement and select the face under the click. A
-  // lone owner is just the trivial arrangement (one bounded face + the outer
-  // face), so a single code path serves owner-only and overlap-aware fills.
-  const faces = buildFaces(rawSegments, options);
-  if (!faces) {
-    return { ok: false, reason: "too_complex" };
-  }
-  const face = selectFaceFromArrangement(faces, point, options);
-  if (!face) {
-    return { ok: false, reason: "open_region" };
+    const rawSegments: SourceSegment[] = [];
+    const collect = (element: ExcalidrawElement) => {
+      const elementIndex = indexOf.get(element.id) ?? 0;
+      const coverersAbove = coverers.filter(
+        (coverer) =>
+          coverer.id !== element.id &&
+          (indexOf.get(coverer.id) ?? 0) > elementIndex,
+      );
+      const segments = getElementLineSegments(element, elementsMap);
+      // freedraw and non-polygon line loops render as closed once their
+      // endpoints are within LINE_CONFIRM_THRESHOLD (isPathALoop), but their
+      // segment chain leaves that closure gap open — bridge it explicitly so
+      // the region reads as closed here too
+      if (
+        (element.type === "freedraw" ||
+          (isLineElement(element) && !element.polygon)) &&
+        isPathALoop(element.points) &&
+        segments.length > 0
+      ) {
+        const first = segments[0][0];
+        const last = segments[segments.length - 1][1];
+        if (pointDistance(first, last) >= options.snapEpsilon) {
+          segments.push(lineSegment(last, first));
+        }
+      }
+      for (const segment of segments) {
+        // keep sub-epsilon segments: buildFaces collapses them via node
+        // merging without breaking the chain (see note there); only true
+        // zero-length degenerates are noise
+        if (segmentLength(segment) === 0) {
+          continue;
+        }
+        if (coverersAbove.length === 0) {
+          rawSegments.push({ segment, elementId: element.id });
+          continue;
+        }
+        for (const [a, b] of clipSegmentToVisible(
+          segment[0],
+          segment[1],
+          coverersAbove,
+          elementsMap,
+          options.snapEpsilon,
+        )) {
+          rawSegments.push({
+            segment: lineSegment(a, b),
+            elementId: element.id,
+          });
+        }
+      }
+    };
+    if (primary) {
+      collect(primary);
+    }
+    for (const element of boundaries) {
+      collect(element);
+    }
+    return rawSegments.length > options.maxBoundarySegments
+      ? null
+      : rawSegments;
+  };
+
+  const buildAndSelect = (
+    rawSegments: SourceSegment[],
+  ): Face | null | "too_complex" => {
+    const faces = buildFaces(rawSegments, options);
+    if (!faces) {
+      return "too_complex";
+    }
+    return selectFaceFromArrangement(faces, point, options);
+  };
+
+  // 4. resolve the face under the click
+  let face: Face | null = null;
+  if (owner) {
+    const pad = options.gapTolerance + 2 + Math.max(owner.strokeWidth ?? 1, 1);
+    const searchBounds = expandBounds(
+      getElementBounds(owner, elementsMap),
+      pad,
+    );
+    const rawSegments = collectSegments(searchBounds, owner);
+    if (!rawSegments) {
+      return { ok: false, reason: "too_complex" };
+    }
+    const selected = buildAndSelect(rawSegments);
+    if (selected === "too_complex") {
+      return { ok: false, reason: "too_complex" };
+    }
+    if (!selected) {
+      return { ok: false, reason: "open_region" };
+    }
+    face = selected;
+  } else {
+    // owner-less fallback: search an expanding box around the click. A face
+    // is final once its ring stays clear of the box frontier — any element
+    // that could still subdivide it would intersect the box and is already
+    // included; a ring touching the frontier may be missing far-away
+    // boundaries, so grow and retry.
+    const totalEligible = elements.reduce(
+      (count, element) => count + (isEligibleBoundary(element) ? 1 : 0),
+      0,
+    );
+    let radius = options.fallbackSearchRadius;
+    for (let attempt = 0; attempt < 4 && !face; attempt++, radius *= 2) {
+      const box: Bounds = [
+        point[0] - radius,
+        point[1] - radius,
+        point[0] + radius,
+        point[1] + radius,
+      ];
+      const rawSegments = collectSegments(box, null);
+      // the fallback is speculative — never toast on its failures. Over the
+      // segment cap counts as a failure, not a "too complex" complaint.
+      if (!rawSegments || rawSegments.length === 0) {
+        return { ok: false, reason: "no_owner" };
+      }
+      const selected = buildAndSelect(rawSegments);
+      if (selected === "too_complex") {
+        return { ok: false, reason: "no_owner" };
+      }
+      const isLastAttempt = attempt === 3;
+      if (
+        selected &&
+        (isLastAttempt ||
+          selected.ring.every(
+            (p) =>
+              p[0] > box[0] + options.gapTolerance &&
+              p[1] > box[1] + options.gapTolerance &&
+              p[0] < box[2] - options.gapTolerance &&
+              p[1] < box[3] - options.gapTolerance,
+          ))
+      ) {
+        face = selected;
+      }
+      // growing only helps when it brings NEW elements into range; if every
+      // eligible boundary in the scene is already a candidate, a bigger box
+      // rebuilds the identical arrangement — bail out instead of burning up
+      // to 3 more full builds on a miss
+      if (!face) {
+        const inRange = elements.reduce(
+          (count, element) =>
+            count +
+            (isEligibleBoundary(element) &&
+            doBoundsIntersect(box, getElementBounds(element, elementsMap))
+              ? 1
+              : 0),
+          0,
+        );
+        if (inRange === totalEligible) {
+          break;
+        }
+      }
+    }
+    if (!face) {
+      // no enclosed region under the pointer — stay silent like `no_owner`;
+      // clicking open canvas shouldn't nag
+      return { ok: false, reason: "no_owner" };
+    }
   }
   const { ring, contributors } = face;
 
@@ -888,7 +1024,9 @@ export const computeBucketFillPolygon = (args: {
   // visible. A participant "covers" the fill when it paints an opaque
   // background (same predicate boundary clipping uses) and the filled
   // region lies inside it (the click lands inside).
-  const participantIds = new Set<string>([owner.id, ...contributors]);
+  const participantIds = new Set<string>(
+    owner ? [owner.id, ...contributors] : contributors,
+  );
   let lowestParticipant: ExcalidrawElement | null = null;
   let covering: ExcalidrawElement | null = null;
   for (const element of elements) {
@@ -903,15 +1041,20 @@ export const computeBucketFillPolygon = (args: {
       covering = element;
     }
   }
+  // a face always has contributors from `elements`, so a participant exists;
+  // the last-element fallback is defensive only
   const insertion: BucketFillInsertion = covering
     ? { placement: "above", elementId: covering.id }
-    : { placement: "below", elementId: (lowestParticipant ?? owner).id };
+    : {
+        placement: "below",
+        elementId: (lowestParticipant ?? elements[elements.length - 1]).id,
+      };
 
   return {
     ok: true,
-    ownerId: owner.id,
+    ownerId: owner?.id ?? null,
     // elements (other than the owner) whose outlines actually bound the fill
-    boundaryElementIds: [...contributors].filter((id) => id !== owner.id),
+    boundaryElementIds: [...contributors].filter((id) => id !== owner?.id),
     scenePoints,
     insertion,
   };

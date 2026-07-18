@@ -566,6 +566,239 @@ describe("computeBucketFillPolygon", () => {
     expect(result.ownerId).toBe(owner.id);
   });
 
+  it("fills a region enclosed only by open lines (owner-less)", () => {
+    // 4 open lines forming a diamond; no closed element anywhere
+    const mkLine = (pts: [number, number][]) =>
+      API.createElement({
+        type: "line",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        points: pts.map(([x, y]) => pointFrom<LocalPoint>(x, y)),
+      });
+    const l1 = mkLine([
+      [50, 0],
+      [100, 50],
+    ]);
+    const l2 = mkLine([
+      [100, 50],
+      [50, 100],
+    ]);
+    const l3 = mkLine([
+      [50, 100],
+      [0, 50],
+    ]);
+    const l4 = mkLine([
+      [0, 50],
+      [50, 0],
+    ]);
+    const { elements, elementsMap } = setup([l1, l2, l3, l4]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBeNull();
+    expect(result.boundaryElementIds.sort()).toEqual(
+      [l1.id, l2.id, l3.id, l4.id].sort(),
+    );
+    expect(isClosed(result.scenePoints)).toBe(true);
+    // diamond with diagonals 100 => area 5000
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(5000, -3);
+  });
+
+  it("fills a loop formed by a single self-crossing open polyline", () => {
+    // open polyline that crosses itself, enclosing a triangle
+    const line = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(100, 0),
+      ],
+    });
+    const { elements, elementsMap } = setup([line]);
+
+    // click inside the enclosed lower triangle (50,50)-(0,100)-(100,100)...
+    // actually the loop is the triangle between the two crossing diagonals
+    // and the bottom edge; its centroid is around (50, 83)
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 80),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBeNull();
+    expect(result.boundaryElementIds).toEqual([line.id]);
+    // triangle (50,50)-(0,100)-(100,100) => area 2500
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(2500, -3);
+  });
+
+  it("fills a region closed by an open line against a shape's outside wall", () => {
+    // an open V-line whose two ends touch the rectangle's right edge,
+    // enclosing a region OUTSIDE the rectangle
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const line = API.createElement({
+      type: "line",
+      x: 100,
+      y: 20,
+      width: 60,
+      height: 60,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(60, 30),
+        pointFrom<LocalPoint>(0, 60),
+      ],
+    });
+    const { elements, elementsMap } = setup([rect, line]);
+
+    // inside the triangle right of the rectangle's wall
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(115, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBeNull();
+    expect(result.boundaryElementIds.sort()).toEqual([line.id, rect.id].sort());
+    // triangle (100,20)-(160,50)-(100,80) => area 1800
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(1800, -3);
+  });
+
+  it("fills only the clicked lobe of a self-intersecting (figure-eight) polygon", () => {
+    const line = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(0, 0),
+      ],
+      polygon: true,
+    });
+    const { elements, elementsMap } = setup([line]);
+
+    // left lobe: triangle (0,0)-(50,50)-(0,100), centroid ~(17, 50)
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(17, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // one lobe (area 2500), not the whole figure-eight
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(2500, -3);
+  });
+
+  it("handles a line retracing part of the owner's edge (collinear overlap)", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    // line running exactly along the rect's top edge, extending past it
+    const retrace = API.createElement({
+      type: "line",
+      x: -50,
+      y: 0,
+      width: 200,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+    });
+    const { elements, elementsMap } = setup([rect, retrace]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBe(rect.id);
+    expect(isClosed(result.scenePoints)).toBe(true);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -3);
+  });
+
+  it("bridges wider endpoint gaps when gapTolerance is raised (zoomed out)", () => {
+    // triangle of open lines whose corners have ~5px gaps: unfillable at the
+    // default 2px tolerance, fillable when the app passes a zoom-scaled one
+    const mkLine = (pts: [number, number][]) =>
+      API.createElement({
+        type: "line",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        points: pts.map(([x, y]) => pointFrom<LocalPoint>(x, y)),
+      });
+    const l1 = mkLine([
+      [4, 0],
+      [96, 0],
+    ]);
+    const l2 = mkLine([
+      [100, 4],
+      [52, 96],
+    ]);
+    const l3 = mkLine([
+      [48, 96],
+      [0, 4],
+    ]);
+    const { elements, elementsMap } = setup([l1, l2, l3]);
+    const point = pointFrom<GlobalPoint>(50, 30);
+
+    const strict = computeBucketFillPolygon({ point, elements, elementsMap });
+    expect(strict.ok).toBe(false);
+
+    const zoomedOut = computeBucketFillPolygon({
+      point,
+      elements,
+      elementsMap,
+      options: { gapTolerance: 8 },
+    });
+    expect(zoomedOut.ok).toBe(true);
+  });
+
   it("returns no_owner for open canvas", () => {
     const { elements, elementsMap } = setup([]);
     const result = computeBucketFillPolygon({

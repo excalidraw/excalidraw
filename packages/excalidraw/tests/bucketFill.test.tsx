@@ -74,7 +74,8 @@ describe("bucket fill tool", () => {
     expect(fill!.backgroundColor).toBe("#ffec99");
     expect(fill!.strokeColor).toBe("transparent");
     expect(fill!.fillStyle).toBe("solid");
-    expect(fill!.customData?.bucketFill?.ownerId).toBe(rect.id);
+    // marked as a generated fill (no scene metadata beyond the marker)
+    expect(fill!.customData).toEqual({ bucketFill: { version: 1 } });
 
     // linear elements must be normalized: points[0] === [0, 0], and the
     // polygon is explicitly closed
@@ -228,7 +229,6 @@ describe("bucket fill tool", () => {
     const fill = h.elements.find((el) => el.type === "line" && !el.isDeleted)!;
     expect(fill).toBeDefined();
     // both rectangles bound the lens, so the fill goes below the lower one
-    expect(fill.customData?.bucketFill?.boundaryElementIds).toContain(below.id);
     expect(h.elements[0].id).toBe(fill.id);
     expect(h.elements[1].id).toBe(below.id);
     expect(h.elements[2].id).toBe(owner.id);
