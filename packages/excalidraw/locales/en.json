@@ -131,6 +131,8 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
+    "strokeColorPicker": "Stroke color picker",
+    "backgroundColorPicker": "Background color picker",
     "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
