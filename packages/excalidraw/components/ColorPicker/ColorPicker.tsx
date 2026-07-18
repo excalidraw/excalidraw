@@ -254,8 +254,8 @@ const ColorPickerTrigger = ({
       style={color ? { "--swatch-color": color } : undefined}
       title={
         type === "elementStroke"
-          ? t("labels.showStroke")
-          : t("labels.showBackground")
+          ? `${t("labels.showStroke")} — S`
+          : `${t("labels.showBackground")} — G`
       }
       data-openpopup={type}
       onClick={handleClick}
