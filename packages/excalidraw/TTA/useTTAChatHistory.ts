@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { atom, useAtom } from "../editor-jotai";
 import { useI18n } from "../i18n";
 
 import {
   compareConversationsByUpdatedAt,
-  getConversationTitleFromTurns,
-  messagesToTurns,
+  getConversationTitle,
 } from "./chatHelpers";
 
 import type {
@@ -18,6 +17,23 @@ import type {
 const ttaChatHistoryAtom = atom<ChatConversation[]>([]);
 const ttaActiveChatIdAtom = atom("");
 const ttaActiveChatUpdatedAtAtom = atom<number | null>(null);
+
+const AUTO_SAVE_DEBOUNCE_MS = 500;
+
+/**
+ * Persistence policy (tta_rewrite_final.md §2.5): user messages and *terminal*
+ * assistant messages only. Streaming bubbles are never serialized (a reload
+ * mid-generation yields a prompt-only turn) and session-scoped rate-limit
+ * warnings are dropped.
+ */
+const isPersistableMessage = (message: ChatMessage) =>
+  message.role === "user" ||
+  (message.role === "assistant" && message.status.kind !== "streaming");
+
+const areSameMessages = (
+  a: readonly ChatMessage[],
+  b: readonly ChatMessage[],
+) => a.length === b.length && a.every((message, index) => message === b[index]);
 
 type UseTTAChatHistoryOptions = {
   chatMessages: ChatMessage[];
@@ -38,76 +54,134 @@ export const useTTAChatHistory = ({
   const [activeChatUpdatedAt, setActiveChatUpdatedAt] = useAtom(
     ttaActiveChatUpdatedAtAtom,
   );
-  const [isHistoryHydrated, setIsHistoryHydrated] = useState(false);
 
+  // Identity-stable persistable subset: streaming skeleton patches replace
+  // only the streaming bubble (filtered out here), so the auto-save effect
+  // below doesn't re-serialize the chat on every partial.
+  const persistableMessagesRef = useRef<ChatMessage[]>([]);
+  const persistableMessages = useMemo(() => {
+    const next = chatMessages.filter(isPersistableMessage);
+    if (areSameMessages(persistableMessagesRef.current, next)) {
+      return persistableMessagesRef.current;
+    }
+    persistableMessagesRef.current = next;
+    return next;
+  }, [chatMessages]);
+
+  const persistChat = useCallback(
+    async (chat: ChatConversation) => {
+      try {
+        await persistenceAdapter.saveChat(chat);
+      } catch (error) {
+        console.warn("[AI Chat] Failed to save chat:", error);
+      }
+    },
+    [persistenceAdapter],
+  );
+
+  /**
+   * Upserts the chat's history row and persists it. Only ever writes the one
+   * chat it was called with — per-chat keys mean other chats stay untouched.
+   * No-ops when the row is already up to date (this is what terminates the
+   * save → history-change → save feedback loop).
+   */
   const saveConversationToHistory = useCallback(
     (
       chatId: string,
       messages: ChatMessage[],
       options?: SaveConversationToHistoryOptions,
     ) => {
-      if (!chatId || !messages.length) {
+      if (!chatId) {
+        return;
+      }
+      const persistable = messages.filter(isPersistableMessage);
+      if (!persistable.length) {
         return;
       }
 
-      const turns = messagesToTurns(messages);
-      if (!turns.length) {
+      const existingEntry =
+        chatHistory.find((conversation) => conversation.id === chatId) ?? null;
+      const autoTitle = getConversationTitle(
+        persistable,
+        t("ai.chat.untitledChat"),
+      );
+      const incomingUpdatedAt =
+        typeof options?.updatedAt === "number"
+          ? options.updatedAt
+          : chatId === activeChatId && typeof activeChatUpdatedAt === "number"
+          ? activeChatUpdatedAt
+          : null;
+      const updatedAt =
+        incomingUpdatedAt ?? existingEntry?.updatedAt ?? Date.now();
+      const title = existingEntry?.title || autoTitle;
+
+      if (
+        existingEntry &&
+        existingEntry.title === title &&
+        existingEntry.updatedAt === updatedAt &&
+        areSameMessages(existingEntry.messages, persistable)
+      ) {
         return;
       }
+
+      const entry: ChatConversation = {
+        id: chatId,
+        title,
+        messages: persistable,
+        updatedAt,
+      };
 
       setChatHistory((prev) => {
         const existingIndex = prev.findIndex(
           (conversation) => conversation.id === chatId,
         );
-        const existingEntry = existingIndex > -1 ? prev[existingIndex] : null;
-        const autoTitle = getConversationTitleFromTurns(
-          turns,
-          t("ai.chat.untitledChat"),
-        );
-        const incomingUpdatedAt =
-          typeof options?.updatedAt === "number"
-            ? options.updatedAt
-            : chatId === activeChatId && typeof activeChatUpdatedAt === "number"
-            ? activeChatUpdatedAt
-            : null;
-        const updatedAt =
-          incomingUpdatedAt ?? existingEntry?.updatedAt ?? Date.now();
-        const entry: ChatConversation = {
-          id: chatId,
-          title: existingEntry?.title || autoTitle,
-          turns,
-          updatedAt,
-        };
-
         if (existingIndex > -1) {
           const copy = [...prev];
           copy[existingIndex] = entry;
           return copy;
         }
-
         return [entry, ...prev];
       });
+      void persistChat(entry);
     },
-    [activeChatId, activeChatUpdatedAt, setChatHistory, t],
+    [
+      activeChatId,
+      activeChatUpdatedAt,
+      chatHistory,
+      persistChat,
+      setChatHistory,
+      t,
+    ],
   );
 
+  // Hydrate once per adapter; merge by id + updatedAt instead of replacing so
+  // a chat being written concurrently (or already updated in this session)
+  // isn't clobbered by a stale stored copy.
   useEffect(() => {
     let isCancelled = false;
 
-    setIsHistoryHydrated(false);
-
     (async () => {
       try {
-        const history = await persistenceAdapter.loadHistory();
-        if (!isCancelled && history) {
-          setChatHistory(history);
+        const storedChats = await persistenceAdapter.loadChats();
+        if (isCancelled || !storedChats) {
+          return;
         }
+        setChatHistory((prev) => {
+          const prevById = new Map(prev.map((chat) => [chat.id, chat]));
+          const storedIds = new Set(storedChats.map((chat) => chat.id));
+          const merged = storedChats.map((stored) => {
+            const existing = prevById.get(stored.id);
+            return existing && existing.updatedAt >= stored.updatedAt
+              ? existing
+              : stored;
+          });
+          return [
+            ...prev.filter((chat) => !storedIds.has(chat.id)),
+            ...merged,
+          ].sort(compareConversationsByUpdatedAt);
+        });
       } catch (error) {
         console.warn("[AI Chat] Failed to load history:", error);
-      } finally {
-        if (!isCancelled) {
-          setIsHistoryHydrated(true);
-        }
       }
     })();
 
@@ -116,34 +190,48 @@ export const useTTAChatHistory = ({
     };
   }, [persistenceAdapter, setChatHistory]);
 
+  // Auto-save the active chat. Gated on `activeChatId`: a brand-new chat is
+  // buffered in memory until `started` delivers the server chat id, so its
+  // history row is only ever created under the real id.
   useEffect(() => {
-    if (!chatMessages.length || !activeChatId) {
+    if (!persistableMessages.length || !activeChatId) {
       return;
     }
 
     const timer = setTimeout(() => {
-      saveConversationToHistory(activeChatId, chatMessages);
-    }, 500);
+      saveConversationToHistory(activeChatId, persistableMessages);
+    }, AUTO_SAVE_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [activeChatId, chatMessages, saveConversationToHistory]);
+  }, [activeChatId, persistableMessages, saveConversationToHistory]);
 
-  useEffect(() => {
-    if (!isHistoryHydrated) {
-      return;
-    }
-
-    const saveHistory = async () => {
-      try {
-        await persistenceAdapter.saveHistory(chatHistory);
-      } catch (error) {
-        console.warn("[AI Chat] Failed to save history:", error);
+  const renameChat = useCallback(
+    (chatId: string, newTitle: string) => {
+      const existing = chatHistory.find((chat) => chat.id === chatId);
+      if (!existing) {
+        return;
       }
-    };
+      const renamed: ChatConversation = { ...existing, title: newTitle };
+      setChatHistory((prev) =>
+        prev.map((chat) => (chat.id === chatId ? renamed : chat)),
+      );
+      void persistChat(renamed);
+    },
+    [chatHistory, persistChat, setChatHistory],
+  );
 
-    const timer = setTimeout(saveHistory, 500);
-    return () => clearTimeout(timer);
-  }, [chatHistory, isHistoryHydrated, persistenceAdapter]);
+  const deleteChat = useCallback(
+    (chatId: string) => {
+      if (!chatId) {
+        return;
+      }
+      setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId));
+      void persistenceAdapter.deleteChat(chatId).catch((error) => {
+        console.warn("[AI Chat] Failed to delete chat:", error);
+      });
+    },
+    [persistenceAdapter, setChatHistory],
+  );
 
   const latestHistoryChat = useMemo(() => {
     if (!chatHistory.length) {
@@ -157,6 +245,8 @@ export const useTTAChatHistory = ({
     chatHistory,
     latestHistoryChat,
     saveConversationToHistory,
+    renameChat,
+    deleteChat,
     setActiveChatId,
     setActiveChatUpdatedAt,
     setChatHistory,

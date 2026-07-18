@@ -244,7 +244,7 @@ const TTADialogPanelBody = ({
                 message.role === "assistant" &&
                 message.id === view.latestRetryableAssistantMessageId
               }
-              rateLimitRemaining={view.rateLimits?.rateLimitRemaining}
+              rateLimits={view.rateLimits}
               onDelete={() => actions.onRequestDelete(message.id)}
               showDelete={message.role === "assistant"}
               onPreview={(image) =>

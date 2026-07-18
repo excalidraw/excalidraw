@@ -20,8 +20,6 @@ const createMockApp = () =>
     syncActionResult: vi.fn(),
   } as unknown as AppClassProperties);
 
-const t = ((key: string) => key) as any;
-
 const TestHarness = ({
   streamResult,
   streamFetch: streamFetchProp,
@@ -53,14 +51,13 @@ const TestHarness = ({
       id: "assistant-1",
       role: "assistant",
       createdAt: 2,
-      isComplete: false,
+      status: { kind: "streaming", phase: "starting", startedAt: 2 },
     },
   ]);
 
   const lifecycle = useAIStreamingLifecycle({
     app,
     chatMessages,
-    t,
     setChatMessages,
     applyServerChatMetadata,
     removeGeneratedElementsByMessageId,
@@ -127,20 +124,19 @@ describe("useAIStreamingLifecycle", () => {
     expect(messages[1]).toMatchObject({
       id: "assistant-1",
       role: "assistant",
-      isComplete: true,
-      turnId: "turn-1",
-      messageId: "message-1",
-      generationElapsedMs: expect.any(Number),
-    });
-    expect(messages[2]).toMatchObject({
-      role: "assistant",
-      isComplete: true,
-      warningType: "messageLimitExceeded",
-      error: {
-        code: 429,
-        rateLimit: 100,
-        rateLimitRemaining: 0,
+      server: { turnId: "turn-1", messageId: "message-1" },
+      lastCompletedMessageId: "message-1",
+      status: {
+        kind: "done",
+        outcome: "empty",
+        elapsedMs: expect.any(Number),
       },
+    });
+    // session-scoped system warning bubble — the rate-limit numbers live in
+    // the rate-limits atom, not on the message
+    expect(messages[2]).toMatchObject({
+      role: "system",
+      variant: "messageLimitExceeded",
     });
   });
 
@@ -169,7 +165,7 @@ describe("useAIStreamingLifecycle", () => {
 
     await waitFor(() => {
       const messages = JSON.parse(screen.getByTestId("messages").textContent!);
-      expect(messages[1].isComplete).toBe(true);
+      expect(messages[1].status.kind).toBe("error");
     });
 
     const messages = JSON.parse(screen.getByTestId("messages").textContent!);
@@ -177,10 +173,12 @@ describe("useAIStreamingLifecycle", () => {
     expect(messages[1]).toMatchObject({
       id: "assistant-1",
       role: "assistant",
-      isComplete: true,
-      lifecycleStatus: "failed",
       skeletons: [skeleton],
-      error: { code: 1002 },
+      status: {
+        kind: "error",
+        elapsedMs: expect.any(Number),
+        error: { code: 1002 },
+      },
     });
   });
 });

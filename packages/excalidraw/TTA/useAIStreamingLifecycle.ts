@@ -5,7 +5,8 @@ import { randomId } from "@excalidraw/common";
 import {
   AI_ERRORS,
   type AIGenerateRequestPayload,
-  type AssistantChatMessage,
+  type AIStreamProgressPhase,
+  type AssistantMessage,
   type ChatMessage,
 } from "./types";
 import { getAIChatErrorCode, withAIChatErrorMeta } from "./chatErrors";
@@ -14,7 +15,6 @@ import { useAIStreamingCanvasPreview } from "./useAIStreamingCanvasPreview";
 import type { Dispatch, SetStateAction } from "react";
 
 import type { TTATransportAdapter } from "./client";
-import type { useI18n } from "../i18n";
 import type { AppClassProperties } from "../types";
 
 const isAbortError = (error: unknown) =>
@@ -31,13 +31,12 @@ const assistantMessageHasError = (
   assistantId: string,
 ) => {
   const message = messages.find((candidate) => candidate.id === assistantId);
-  return message?.role === "assistant" && Boolean(message.error);
+  return message?.role === "assistant" && message.status.kind === "error";
 };
 
 type UseAIStreamingLifecycleOptions = {
   app: AppClassProperties;
   chatMessages: ChatMessage[];
-  t: ReturnType<typeof useI18n>["t"];
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   applyServerChatMetadata: (metadata: {
     chatId?: string | null;
@@ -64,7 +63,6 @@ const getElapsedMs = (startedAt: number) => Math.max(0, Date.now() - startedAt);
 export const useAIStreamingLifecycle = ({
   app,
   chatMessages,
-  t,
   setChatMessages,
   applyServerChatMetadata,
   removeGeneratedElementsByMessageId,
@@ -79,59 +77,41 @@ export const useAIStreamingLifecycle = ({
   chatMessagesRef.current = chatMessages;
 
   const patchAssistantMessage = useCallback(
-    (assistantId: string, patch: Partial<AssistantChatMessage>) => {
+    (assistantId: string, patch: Partial<AssistantMessage>) => {
       setChatMessages((prev) =>
         prev.map((message) =>
-          message.id === assistantId ? { ...message, ...patch } : message,
+          message.id === assistantId && message.role === "assistant"
+            ? { ...message, ...patch }
+            : message,
         ),
       );
     },
     [setChatMessages],
   );
 
-  const appendRateLimitWarningMessage = useCallback(
-    (rateLimit?: number | null, rateLimitRemaining?: number | null) => {
-      setChatMessages((prev) => {
-        const lastMessage = prev.at(-1);
-        if (
-          lastMessage?.role === "assistant" &&
-          lastMessage.warningType === "messageLimitExceeded"
-        ) {
-          return prev.map((message, index) =>
-            index === prev.length - 1 && message.role === "assistant"
-              ? {
-                  ...message,
-                  error: {
-                    code: AI_ERRORS.RATE_LIMIT.code,
-                    message: AI_ERRORS.RATE_LIMIT.message,
-                    rateLimit,
-                    rateLimitRemaining,
-                  },
-                }
-              : message,
-          );
-        }
+  const appendRateLimitWarningMessage = useCallback(() => {
+    setChatMessages((prev) => {
+      const lastMessage = prev.at(-1);
+      // dedupe on repeat — the rate-limit numbers live in the atom, so a
+      // second exhausted response has nothing new to say
+      if (
+        lastMessage?.role === "system" &&
+        lastMessage.variant === "messageLimitExceeded"
+      ) {
+        return prev;
+      }
 
-        return [
-          ...prev,
-          {
-            id: `assistant-rate-limit-${randomId()}`,
-            role: "assistant",
-            createdAt: Date.now(),
-            isComplete: true,
-            warningType: "messageLimitExceeded",
-            error: {
-              code: AI_ERRORS.RATE_LIMIT.code,
-              message: AI_ERRORS.RATE_LIMIT.message,
-              rateLimit,
-              rateLimitRemaining,
-            },
-          },
-        ];
-      });
-    },
-    [setChatMessages],
-  );
+      return [
+        ...prev,
+        {
+          id: `system-rate-limit-${randomId()}`,
+          role: "system",
+          createdAt: Date.now(),
+          variant: "messageLimitExceeded",
+        },
+      ];
+    });
+  }, [setChatMessages]);
 
   const {
     applyStreamingCanvasPreviewResult,
@@ -163,6 +143,17 @@ export const useAIStreamingLifecycle = ({
       let hasReceivedRenderableChunk = false;
       const generationStartedAt = Date.now();
 
+      const streamingStatus = (
+        phase: AIStreamProgressPhase,
+        statusText?: string,
+      ) =>
+        ({
+          kind: "streaming",
+          phase,
+          startedAt: generationStartedAt,
+          ...(statusText ? { statusText } : {}),
+        } as const);
+
       const clearIdleStatusTimeout = () => {
         if (idleStatusTimeout !== null) {
           clearTimeout(idleStatusTimeout);
@@ -177,10 +168,9 @@ export const useAIStreamingLifecycle = ({
             return;
           }
           patchAssistantMessage(assistantId, {
-            progressPhase: hasReceivedRenderableChunk
-              ? "finalizing"
-              : "thinking",
-            statusText: undefined,
+            status: streamingStatus(
+              hasReceivedRenderableChunk ? "finalizing" : "thinking",
+            ),
           });
         }, STREAM_IDLE_STATUS_DELAY);
       };
@@ -198,13 +188,7 @@ export const useAIStreamingLifecycle = ({
         }
 
         patchAssistantMessage(assistantId, {
-          lifecycleStatus: "pending",
-          progressPhase: "starting",
-          statusText: undefined,
-          generationStartedAt,
-          generationElapsedMs: undefined,
-          isComplete: false,
-          stopReason: undefined,
+          status: streamingStatus("starting"),
         });
 
         const { finalPayload, error, rateLimit, rateLimitRemaining } =
@@ -213,8 +197,7 @@ export const useAIStreamingLifecycle = ({
             signal: abortController.signal,
             onStreamCreated: () => {
               patchAssistantMessage(assistantId, {
-                progressPhase: "waiting",
-                statusText: undefined,
+                status: streamingStatus("waiting"),
               });
               scheduleIdleStatus();
             },
@@ -223,18 +206,17 @@ export const useAIStreamingLifecycle = ({
               activeMessageId = startedPayload.messageId;
               applyServerChatMetadata(startedPayload);
               patchAssistantMessage(assistantId, {
-                lifecycleStatus: startedPayload.lifecycleStatus ?? "pending",
-                progressPhase: "generating",
-                statusText: undefined,
-                turnId: startedPayload.turnId,
-                messageId: startedPayload.messageId,
+                status: streamingStatus("generating"),
+                server: {
+                  turnId: startedPayload.turnId,
+                  messageId: startedPayload.messageId,
+                },
               });
               scheduleIdleStatus();
             },
             onMessage: (messagePayload) => {
               patchAssistantMessage(assistantId, {
-                progressPhase: "finalizing",
-                statusText: messagePayload.message,
+                status: streamingStatus("finalizing", messagePayload.message),
               });
               scheduleIdleStatus();
             },
@@ -245,17 +227,14 @@ export const useAIStreamingLifecycle = ({
               scheduleIdleStatus();
               if (!partialPayload.skeletons.length) {
                 patchAssistantMessage(assistantId, {
-                  progressPhase: "generating",
-                  statusText: undefined,
+                  status: streamingStatus("generating"),
                 });
                 return;
               }
               hasReceivedRenderableChunk = true;
               patchAssistantMessage(assistantId, {
-                progressPhase: "generating",
-                statusText: undefined,
+                status: streamingStatus("generating"),
                 skeletons: partialPayload.skeletons,
-                parseError: undefined,
               });
               if (!activeMessageId) {
                 return;
@@ -279,17 +258,11 @@ export const useAIStreamingLifecycle = ({
         if (error) {
           cancelPendingCanvasPreviewRenders();
           patchAssistantMessage(assistantId, {
-            lifecycleStatus: error.lifecycleStatus ?? "failed",
-            progressPhase: undefined,
-            generationElapsedMs: getElapsedMs(generationStartedAt),
-            statusText: undefined,
-            error: {
-              code: error.code,
-              message: error.message,
-              rateLimit,
-              rateLimitRemaining,
+            status: {
+              kind: "error",
+              elapsedMs: getElapsedMs(generationStartedAt),
+              error: { code: error.code, message: error.message },
             },
-            isComplete: true,
           });
           // On-error canvas policy (tta_rewrite_final.md §2.2): treat a failed
           // stream like user Stop — commit whatever draft rendered so the chat
@@ -318,25 +291,25 @@ export const useAIStreamingLifecycle = ({
         });
 
         // A `done` carrying finishReason "length"/"content_filter" parsed, but
-        // the generation was truncated/blocked — not a clean success (M10).
-        const isTruncated =
+        // the generation was truncated/blocked — surfaced as a warning on an
+        // otherwise successful status (M10); partials are kept.
+        const warning =
           finalPayload.finishReason === "length" ||
-          finalPayload.finishReason === "content_filter";
+          finalPayload.finishReason === "content_filter"
+            ? finalPayload.finishReason
+            : undefined;
 
         patchAssistantMessage(assistantId, {
-          lifecycleStatus: finalPayload.lifecycleStatus ?? "completed",
-          progressPhase: undefined,
-          generationElapsedMs: getElapsedMs(generationStartedAt),
-          statusText: isTruncated
-            ? t("ai.chat.status.truncatedResponse")
-            : finalPayload.skeletons.length
-            ? t("ai.chat.status.generatedResponse")
-            : t("ai.chat.status.emptyResponse"),
+          status: {
+            kind: "done",
+            elapsedMs: getElapsedMs(generationStartedAt),
+            outcome: finalPayload.skeletons.length ? "generated" : "empty",
+            ...(warning ? { warning } : {}),
+          },
           skeletons: finalPayload.skeletons,
-          parseError: undefined,
-          isComplete: true,
-          turnId: finalTurnId ?? undefined,
-          messageId: finalMessageId ?? undefined,
+          ...(finalTurnId && finalMessageId
+            ? { server: { turnId: finalTurnId, messageId: finalMessageId } }
+            : {}),
           // the successful attempt becomes the turn's retry target (N1)
           lastCompletedMessageId: finalMessageId ?? undefined,
         });
@@ -348,7 +321,7 @@ export const useAIStreamingLifecycle = ({
         }
 
         if (isExhaustedRateLimit(rateLimitRemaining)) {
-          appendRateLimitWarningMessage(rateLimit, rateLimitRemaining);
+          appendRateLimitWarningMessage();
         }
       } catch (error: unknown) {
         cancelPendingCanvasPreviewRenders();
@@ -375,15 +348,11 @@ export const useAIStreamingLifecycle = ({
         commitStreamingCanvasPreview();
 
         patchAssistantMessage(assistantId, {
-          lifecycleStatus: "failed",
-          progressPhase: undefined,
-          generationElapsedMs: getElapsedMs(generationStartedAt),
-          statusText: undefined,
-          error: {
-            code: errorCode,
-            message: errorMessage,
+          status: {
+            kind: "error",
+            elapsedMs: getElapsedMs(generationStartedAt),
+            error: { code: errorCode, message: errorMessage },
           },
-          isComplete: true,
         });
         throw withAIChatErrorMeta(new Error(errorMessage), {
           handled: true,
@@ -411,7 +380,6 @@ export const useAIStreamingLifecycle = ({
       onRateLimitInfo,
       patchAssistantMessage,
       resetCanvasPreviewRenderState,
-      t,
       throttledApplyStreamingCanvasPreviewResult,
       streamFetch,
     ],

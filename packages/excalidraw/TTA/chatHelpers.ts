@@ -2,165 +2,44 @@ import { getCommonBounds } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import type {
-  AssistantChatMessage,
-  AssistantChatTurnMessage,
-  ChatConversation,
-  ChatMessage,
-  ChatTurn,
-  UserChatMessage,
-} from "./types";
-
-/**
- * Deep clones messages to ensure no mutation reference issues.
- */
-export const cloneMessages = (messages: ChatMessage[]): ChatMessage[] =>
-  messages.map((message) => ({
-    ...message,
-    images:
-      message.role === "user" && message.images
-        ? [...message.images]
-        : undefined,
-    skeletons:
-      message.role === "assistant" && message.skeletons
-        ? [...message.skeletons]
-        : undefined,
-  }));
-
-const toAssistantTurnMessage = (
-  message: AssistantChatMessage,
-): AssistantChatTurnMessage => ({
-  messageId: message.messageId,
-  lastCompletedMessageId: message.lastCompletedMessageId,
-  lifecycleStatus: message.lifecycleStatus,
-  statusText: message.statusText,
-  progressPhase: message.progressPhase,
-  generationStartedAt: message.generationStartedAt,
-  generationElapsedMs: message.generationElapsedMs,
-  createdAt: message.createdAt,
-  skeletons: message.skeletons ? [...message.skeletons] : undefined,
-  parseError: message.parseError,
-  isComplete: message.isComplete,
-  stopReason: message.stopReason,
-  error: message.error ? { ...message.error } : undefined,
-});
-
-export const messagesToTurns = (messages: ChatMessage[]): ChatTurn[] => {
-  const turns: ChatTurn[] = [];
-  let currentUserMessage: UserChatMessage | null = null;
-
-  for (const message of messages) {
-    if (message.role === "user") {
-      currentUserMessage = message;
-      continue;
-    }
-
-    if (!currentUserMessage) {
-      continue;
-    }
-
-    const turnId = message.turnId ?? currentUserMessage.turnId;
-    if (!turnId) {
-      continue;
-    }
-
-    let turn = turns.find((candidate) => candidate.turnId === turnId);
-    if (!turn) {
-      turn = {
-        turnId,
-        prompt: currentUserMessage.content,
-        images: currentUserMessage.images
-          ? [...currentUserMessage.images]
-          : undefined,
-        createdAt: currentUserMessage.createdAt,
-        updatedAt: message.createdAt ?? currentUserMessage.createdAt,
-        assistantMessages: [],
-      };
-      turns.push(turn);
-    }
-
-    turn.assistantMessages.push(toAssistantTurnMessage(message));
-    turn.updatedAt = message.createdAt ?? turn.updatedAt;
-  }
-
-  return turns;
-};
-
-export const turnsToMessages = (turns: ChatTurn[]): ChatMessage[] =>
-  turns.flatMap((turn) => {
-    const userMessage: UserChatMessage = {
-      role: "user",
-      id: `user-${turn.turnId}`,
-      content: turn.prompt,
-      images: turn.images ? [...turn.images] : undefined,
-      createdAt: turn.createdAt,
-      turnId: turn.turnId,
-    };
-    const assistant = turn.assistantMessages.at(-1);
-    if (!assistant) {
-      return [userMessage];
-    }
-    const assistantMessage: AssistantChatMessage = {
-      id: `assistant-${assistant.messageId ?? turn.turnId}`,
-      role: "assistant",
-      lifecycleStatus: assistant.lifecycleStatus,
-      statusText: assistant.statusText,
-      progressPhase: assistant.progressPhase,
-      generationStartedAt: assistant.generationStartedAt,
-      generationElapsedMs: assistant.generationElapsedMs,
-      createdAt: assistant.createdAt,
-      turnId: turn.turnId,
-      messageId: assistant.messageId,
-      lastCompletedMessageId: assistant.lastCompletedMessageId,
-      skeletons: assistant.skeletons ? [...assistant.skeletons] : undefined,
-      parseError: assistant.parseError,
-      isComplete: assistant.isComplete,
-      stopReason: assistant.stopReason,
-      error: assistant.error ? { ...assistant.error } : undefined,
-    };
-    return [userMessage, assistantMessage];
-  });
-
-export const getConversationMessages = (
-  conversation: Pick<ChatConversation, "turns">,
-): ChatMessage[] => turnsToMessages(conversation.turns);
+import type { AssistantMessage, ChatConversation, ChatMessage } from "./types";
 
 export const compareConversationsByUpdatedAt = (
   a: Pick<ChatConversation, "updatedAt">,
   b: Pick<ChatConversation, "updatedAt">,
 ) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0);
 
+/**
+ * Marks generations that were still streaming (e.g. when a chat is re-opened
+ * after an interrupted session) as stopped/interrupted.
+ */
 export const stopIncompleteAssistantMessages = (
   messages: ChatMessage[],
 ): ChatMessage[] =>
-  cloneMessages(messages).map((message) => {
-    if (message.role === "assistant" && message.isComplete === false) {
-      return {
-        ...message,
-        lifecycleStatus: "aborted",
-        statusText: undefined,
-        progressPhase: undefined,
-        generationElapsedMs:
-          message.generationElapsedMs ??
-          Math.max(
-            0,
-            Date.now() -
-              (message.generationStartedAt ?? message.createdAt ?? Date.now()),
-          ),
-        isComplete: true,
-        stopReason: "interrupted",
-      };
-    }
-    return message;
-  });
+  messages.map((message) =>
+    message.role === "assistant" && message.status.kind === "streaming"
+      ? {
+          ...message,
+          status: {
+            kind: "stopped",
+            elapsedMs: Math.max(0, Date.now() - message.status.startedAt),
+            reason: "interrupted",
+          },
+        }
+      : message,
+  );
 
+/**
+ * Server message id of the latest assistant generation — the canvas tag of the
+ * conversation's current on-canvas result.
+ */
 export const getLatestAssistantMessageId = (
   messages: ChatMessage[],
 ): string | null => {
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index];
-    if (message.role === "assistant" && message.messageId) {
-      return message.messageId;
+    if (message.role === "assistant" && message.server?.messageId) {
+      return message.server.messageId;
     }
   }
   return null;
@@ -168,14 +47,10 @@ export const getLatestAssistantMessageId = (
 
 export const getLatestRetryableAssistantMessage = (
   messages: ChatMessage[],
-): Extract<ChatMessage, { role: "assistant" }> | null => {
+): AssistantMessage | null => {
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index];
-    if (
-      message.role === "assistant" &&
-      message.isComplete &&
-      !message.warningType
-    ) {
+    if (message.role === "assistant" && message.status.kind !== "streaming") {
       return message;
     }
   }
@@ -191,8 +66,8 @@ export const getAssistantGenerationTags = (
       continue;
     }
     let generationTag: string | null = null;
-    if (message.messageId) {
-      generationTag = message.messageId;
+    if (message.server?.messageId) {
+      generationTag = message.server.messageId;
     } else if (message.skeletons?.length) {
       generationTag = `ai-delete-${message.id}`;
     }
@@ -217,22 +92,26 @@ export const getTurnStartIndexForAssistantDelete = (
   return turnStartIndex;
 };
 
-export const getConversationTitleFromTurns = (
-  turns: ChatTurn[],
+export const getConversationTitle = (
+  messages: ChatMessage[],
   defaultTitle = "Untitled chat",
 ) => {
-  const title = turns[0]?.prompt.trim() || defaultTitle;
+  const firstUserMessage = messages.find(
+    (message): message is Extract<ChatMessage, { role: "user" }> =>
+      message.role === "user",
+  );
+  const title = firstUserMessage?.content.trim() || defaultTitle;
   return title.slice(0, 80);
 };
 
 export const getConversationPreviewMessage = (
   messages: ChatMessage[],
-): AssistantChatMessage | null => {
+): AssistantMessage | null => {
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index];
     if (
       message.role === "assistant" &&
-      !message.error &&
+      message.status.kind !== "error" &&
       message.skeletons?.length
     ) {
       return message;

@@ -20,12 +20,11 @@ import "./TTADialog.scss";
 import { TTA_CHAT_EMPTY_PLACEHOLDER_SRC } from "./assets";
 import {
   compareConversationsByUpdatedAt,
-  getConversationMessages,
   getConversationPreviewMessage,
 } from "./chatHelpers";
 import { useAIAssistantPreview } from "./useAIAssistantPreview";
 
-import type { AssistantChatMessage, ChatConversation } from "./types";
+import type { AssistantMessage, ChatConversation } from "./types";
 
 export interface TTAHistoryProps {
   history: ChatConversation[];
@@ -48,7 +47,7 @@ const TTAHistoryThumbnail = ({
 }: {
   chatId: string;
   isVisible: boolean;
-  message: AssistantChatMessage;
+  message: AssistantMessage;
 }) => {
   const { previewSvg } = useAIAssistantPreview(message, {
     enabled: isVisible,
@@ -141,9 +140,11 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
           }
           return (
             item.title.toLowerCase().includes(normalizedSearch) ||
-            item.turns.some((turn) => {
-              return turn.prompt.toLowerCase().includes(normalizedSearch);
-            })
+            item.messages.some(
+              (message) =>
+                message.role === "user" &&
+                message.content.toLowerCase().includes(normalizedSearch),
+            )
           );
         })
         .sort(compareConversationsByUpdatedAt),
@@ -274,9 +275,7 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
         <div className="tta-history__list" ref={historyListRef}>
           {filteredHistory.map((item) => {
             const isEditing = editingChatId === item.id;
-            const previewMessage = getConversationPreviewMessage(
-              getConversationMessages(item),
-            );
+            const previewMessage = getConversationPreviewMessage(item.messages);
             return (
               <div
                 key={item.id}

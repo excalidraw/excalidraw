@@ -506,6 +506,7 @@ export type {
   TTADialogRenderWelcomeScreen,
   TTADialogRenderWarning,
   TTAPersistenceAdapter,
+  ChatConversation as TTAChatConversation,
 } from "./TTA/types";
 export type {
   AIRateLimitWarningDescriptor,

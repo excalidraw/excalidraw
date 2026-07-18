@@ -2,14 +2,11 @@ import { formatTimeToHourMinute } from "@excalidraw/common";
 
 import { useI18n } from "../i18n";
 
-import {
-  getConversationMessages,
-  getConversationPreviewMessage,
-} from "./chatHelpers";
+import { getConversationPreviewMessage } from "./chatHelpers";
 import { useAIAssistantPreview } from "./useAIAssistantPreview";
 
 import type {
-  AssistantChatMessage,
+  AssistantMessage,
   ChatConversation,
   TTADialogRenderWelcomeScreen,
   TTARateLimits,
@@ -30,7 +27,7 @@ export const TTAChatEmptyState = ({
 }: TTAChatEmptyStateProps) => {
   const { t } = useI18n();
   const previewMessage = latestHistoryChat
-    ? getConversationPreviewMessage(getConversationMessages(latestHistoryChat))
+    ? getConversationPreviewMessage(latestHistoryChat.messages)
     : null;
   const renderedWelcomeScreen = renderWelcomeScreen?.({ rateLimits });
 
@@ -88,7 +85,7 @@ const TTAChatEmptyStatePreview = ({
   message,
   alt,
 }: {
-  message: AssistantChatMessage;
+  message: AssistantMessage;
   alt: string;
 }) => {
   const { previewSvg } = useAIAssistantPreview(message);

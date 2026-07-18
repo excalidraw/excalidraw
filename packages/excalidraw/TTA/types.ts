@@ -129,26 +129,51 @@ export type StreamChunk =
       };
     };
 
-export type UserChatMessage = {
+export type UserMessage = {
   role: "user";
-  id: string;
+  id: string; // stable, persisted (no re-minting on hydrate)
   content: string;
   images?: string[];
-  createdAt?: number;
-  turnId?: string;
+  createdAt: number;
 };
 
-export type AssistantChatMessage = {
-  id: string;
+/**
+ * The assistant generation lifecycle as a discriminated union — exactly one
+ * variant at a time, patched with single `status =` assignments. Everything
+ * else (spinner, terminal labels, retry-eligibility, elapsed display) is
+ * derived at render from `kind`.
+ */
+export type AssistantStatus =
+  | {
+      kind: "streaming";
+      phase: AIStreamProgressPhase;
+      startedAt: number;
+      /** Free server text (`message` frames) overriding the phase label. */
+      statusText?: string;
+    }
+  | {
+      kind: "done";
+      elapsedMs: number;
+      outcome: "generated" | "empty";
+      /** Provider finishReason surfaced: truncated/blocked, partials kept. */
+      warning?: "length" | "content_filter";
+    }
+  | { kind: "stopped"; elapsedMs: number; reason: "user" | "interrupted" }
+  | {
+      kind: "error";
+      elapsedMs?: number;
+      error: { code?: number; message: string };
+    };
+
+export type AssistantMessage = {
   role: "assistant";
-  lifecycleStatus?: AIAssistantLifecycleStatus;
-  statusText?: string;
-  progressPhase?: AIStreamProgressPhase;
-  generationStartedAt?: number;
-  generationElapsedMs?: number;
-  createdAt?: number;
-  turnId?: string;
-  messageId?: string;
+  /**
+   * Local generation id — stable across error-retries and persistence.
+   */
+  id: string;
+  createdAt: number;
+  /** Reconciled once from `started`; metadata only (retry/truncate ids). */
+  server?: { turnId: string; messageId: string };
   /**
    * Server id of the turn's last *successful* attempt — the only id the
    * server's retry lookup accepts (`current_message_id`). Survives failed
@@ -156,49 +181,26 @@ export type AssistantChatMessage = {
    */
   lastCompletedMessageId?: string;
   skeletons?: ReadonlyArray<ExcalidrawElementSkeleton>;
-  parseError?: string;
-  isComplete?: boolean;
-  stopReason?: "user" | "interrupted";
-  warningType?: AIRateLimitWarningDescriptor["variant"];
-  error?: {
-    code?: AI_ERROR_CODE | number;
-    message: string;
-    rateLimit?: number | null;
-    rateLimitRemaining?: number | null;
-  };
+  status: AssistantStatus;
 };
 
-export type ChatMessage = UserChatMessage | AssistantChatMessage;
-
-export type AssistantChatTurnMessage = {
-  messageId?: string;
-  lastCompletedMessageId?: string;
-  lifecycleStatus?: AIAssistantLifecycleStatus;
-  statusText?: string;
-  progressPhase?: AIStreamProgressPhase;
-  generationStartedAt?: number;
-  generationElapsedMs?: number;
-  createdAt?: number;
-  skeletons?: ReadonlyArray<ExcalidrawElementSkeleton>;
-  parseError?: string;
-  isComplete?: boolean;
-  stopReason?: "user" | "interrupted";
-  error?: AssistantChatMessage["error"];
+/**
+ * Session-scoped rate-limit warning bubble. Not persisted; the numbers live in
+ * the rate-limits atom, not on the message.
+ */
+export type SystemWarningMessage = {
+  role: "system";
+  id: string;
+  createdAt: number;
+  variant: AIRateLimitWarningDescriptor["variant"];
 };
 
-export type ChatTurn = {
-  turnId: string;
-  prompt: string;
-  images?: string[];
-  createdAt?: number;
-  updatedAt?: number;
-  assistantMessages: AssistantChatTurnMessage[];
-};
+export type ChatMessage = UserMessage | AssistantMessage | SystemWarningMessage;
 
 export type ChatConversation = {
   id: string;
   title: string;
-  turns: ChatTurn[];
+  messages: ChatMessage[];
   updatedAt: number;
 };
 
@@ -213,8 +215,9 @@ export type TTAChatScrollOptions = {
 };
 
 export interface TTAPersistenceAdapter {
-  loadHistory(): Promise<ChatConversation[]>;
-  saveHistory(history: ChatConversation[]): Promise<void>;
+  loadChats(): Promise<ChatConversation[]>;
+  saveChat(chat: ChatConversation): Promise<void>;
+  deleteChat(id: string): Promise<void>;
 }
 
 /**
@@ -228,9 +231,9 @@ export type TTADialogRenderWelcomeScreen = (props: {
 /**
  * Return `undefined` to use the built-in warning/error rendering.
  * Receives a shared warning descriptor as the first argument.
- * Returning a node replaces the full assistant message row.
+ * Returning a node replaces the full message row.
  */
 export type TTADialogRenderWarning = (
   warning: AIRateLimitWarningDescriptor,
-  chatMessage: Extract<ChatMessage, { role: "assistant" }>,
+  chatMessage: SystemWarningMessage,
 ) => ReactNode | undefined;

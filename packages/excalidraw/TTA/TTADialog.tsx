@@ -36,7 +36,6 @@ import {
 
 import {
   getAssistantGenerationTags,
-  getConversationMessages,
   getLatestAssistantMessageId,
   getLatestRetryableAssistantMessage,
   getTurnStartIndexForAssistantDelete,
@@ -110,6 +109,8 @@ const TTADialogContent = ({
     chatHistory,
     latestHistoryChat,
     saveConversationToHistory,
+    renameChat,
+    deleteChat,
     setActiveChatId,
     setActiveChatUpdatedAt,
     setChatHistory,
@@ -121,14 +122,9 @@ const TTADialogContent = ({
   const openSidebar = useAppStateValue("openSidebar");
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
-  const chatIdRef = useRef<string | null>(null);
   const pendingGenerationReplacementTagsRef = useRef<string[]>([]);
   const previousIsOpenRef = useRef(isOpen);
   const previousChatMessageCountRef = useRef(chatMessages.length);
-
-  useEffect(() => {
-    chatIdRef.current = activeChatId || null;
-  }, [activeChatId]);
 
   const hasConversation = chatMessages.length > 0;
   const latestRetryableAssistantMessageId = useMemo(
@@ -166,8 +162,7 @@ const TTADialogContent = ({
     if (
       latestMessage &&
       latestMessage.role === "assistant" &&
-      latestMessage.error &&
-      !latestMessage.warningType
+      latestMessage.status.kind === "error"
     ) {
       return latestMessage.id;
     }
@@ -183,41 +178,22 @@ const TTADialogContent = ({
     }
   }, [latestAssistantErrorMessageId]);
 
+  // Adopt the server chat id delivered by `started`. A brand-new chat is
+  // buffered in memory until then (useTTAChatHistory gates persistence on a
+  // non-empty active id), so its history row is only ever created under the
+  // real server id — there is no local-id row to swap/delete anymore.
   const applyServerChatId = useCallback(
     (nextChatId?: string | null) => {
       if (!nextChatId) {
         return;
       }
-      const previousChatId = chatIdRef.current;
-      if (previousChatId === nextChatId) {
-        setActiveChatId((prev) => (prev === nextChatId ? prev : nextChatId));
-        return;
-      }
-      chatIdRef.current = nextChatId;
-      setActiveChatId(nextChatId);
-      if (!previousChatId) {
-        return;
-      }
-      setChatHistory((prev) => {
-        const existingIndex = prev.findIndex(
-          (chat) => chat.id === previousChatId,
-        );
-        if (existingIndex === -1) {
-          return prev;
-        }
-        if (prev.some((chat) => chat.id === nextChatId)) {
-          return prev.filter((chat) => chat.id !== previousChatId);
-        }
-        const copy = [...prev];
-        copy[existingIndex] = { ...copy[existingIndex], id: nextChatId };
-        return copy;
-      });
+      setActiveChatId((prev) => (prev === nextChatId ? prev : nextChatId));
     },
-    [setActiveChatId, setChatHistory],
+    [setActiveChatId],
   );
 
   const getServerChatId = useCallback(() => {
-    return chatIdRef.current || activeChatId || null;
+    return activeChatId || null;
   }, [activeChatId]);
 
   const updateHistoryChatUpdatedAt = useCallback(
@@ -244,7 +220,7 @@ const TTADialogContent = ({
   const applyActiveChatUpdatedAt = useCallback(
     (updatedAt: number, chatId?: string | null) => {
       setActiveChatUpdatedAt(updatedAt);
-      const targetChatId = chatId || chatIdRef.current || activeChatId;
+      const targetChatId = chatId || activeChatId;
       if (targetChatId) {
         updateHistoryChatUpdatedAt(targetChatId, updatedAt);
       }
@@ -536,7 +512,9 @@ const TTADialogContent = ({
       }
 
       const message = chatMessages.find((entry) => {
-        return entry.role === "assistant" && entry.messageId === messageId;
+        return (
+          entry.role === "assistant" && entry.server?.messageId === messageId
+        );
       });
       if (message?.role !== "assistant" || !message.skeletons?.length) {
         return [];
@@ -628,7 +606,6 @@ const TTADialogContent = ({
   } = useAIStreamingLifecycle({
     app,
     chatMessages,
-    t,
     setChatMessages,
     applyServerChatMetadata,
     removeGeneratedElementsByMessageId,
@@ -695,22 +672,23 @@ const TTADialogContent = ({
 
       if (options?.insertAssistantMessage !== false) {
         const generationStartedAt = Date.now();
+        const retryingText = retryContext
+          ? retryContext.reason === "generation_error"
+            ? t("ai.chat.status.retrying")
+            : t("ai.chat.status.regenerating")
+          : undefined;
         setChatMessages((prev) => [
           ...prev,
           {
             id: assistantId,
             role: "assistant",
-            lifecycleStatus: "pending",
-            progressPhase: "starting",
-            statusText: retryContext
-              ? retryContext.reason === "generation_error"
-                ? t("ai.chat.status.retrying")
-                : t("ai.chat.status.regenerating")
-              : "",
             createdAt: generationStartedAt,
-            generationStartedAt,
-            generationElapsedMs: undefined,
-            isComplete: false,
+            status: {
+              kind: "streaming",
+              phase: "starting",
+              startedAt: generationStartedAt,
+              ...(retryingText ? { statusText: retryingText } : {}),
+            },
           },
         ]);
       }
@@ -773,11 +751,18 @@ const TTADialogContent = ({
                 m.id === assistantId && m.role === "assistant"
                   ? {
                       ...m,
-                      lifecycleStatus: "failed" as const,
-                      progressPhase: undefined,
-                      statusText: undefined,
-                      error: { message },
-                      isComplete: true,
+                      status: {
+                        kind: "error" as const,
+                        ...(m.status.kind === "streaming"
+                          ? {
+                              elapsedMs: Math.max(
+                                0,
+                                Date.now() - m.status.startedAt,
+                              ),
+                            }
+                          : {}),
+                        error: { message },
+                      },
                     }
                   : m,
               );
@@ -786,11 +771,9 @@ const TTADialogContent = ({
               ...prev,
               {
                 id: assistantId,
-                role: "assistant",
+                role: "assistant" as const,
                 createdAt: Date.now(),
-                lifecycleStatus: "failed" as const,
-                error: { message },
-                isComplete: true,
+                status: { kind: "error" as const, error: { message } },
               },
             ];
           });
@@ -870,26 +853,23 @@ const TTADialogContent = ({
       releaseGenerationSlot();
       touchActiveChatUpdatedAt();
 
-      // Mark the last assistant message as stopped/complete.
+      // Mark the last assistant message as stopped.
       setChatMessages((prev) => {
         const lastMsg = prev[prev.length - 1];
-        if (lastMsg && lastMsg.role === "assistant" && !lastMsg.isComplete) {
+        if (
+          lastMsg &&
+          lastMsg.role === "assistant" &&
+          lastMsg.status.kind === "streaming"
+        ) {
           return [
             ...prev.slice(0, -1),
             {
               ...lastMsg,
-              lifecycleStatus: "aborted",
-              progressPhase: undefined,
-              statusText: undefined,
-              generationElapsedMs: Math.max(
-                0,
-                Date.now() -
-                  (lastMsg.generationStartedAt ??
-                    lastMsg.createdAt ??
-                    Date.now()),
-              ),
-              isComplete: true,
-              stopReason,
+              status: {
+                kind: "stopped",
+                elapsedMs: Math.max(0, Date.now() - lastMsg.status.startedAt),
+                reason: stopReason,
+              },
             },
           ];
         }
@@ -919,7 +899,6 @@ const TTADialogContent = ({
         saveConversationToHistory(activeChatId, chatMessages);
       }
       clearStreamingCanvasPreview();
-      chatIdRef.current = null;
       setActiveChatUpdatedAt(null);
       setChatMessages([]);
       setComposerInputValue("");
@@ -986,13 +965,9 @@ const TTADialogContent = ({
 
   const handleRenameChat = useCallback(
     (chatId: string, newTitle: string) => {
-      setChatHistory((prev) =>
-        prev.map((chat) =>
-          chat.id === chatId ? { ...chat, title: newTitle } : chat,
-        ),
-      );
+      renameChat(chatId, newTitle);
     },
-    [setChatHistory],
+    [renameChat],
   );
 
   const handleDeleteChat = useCallback(
@@ -1003,12 +978,12 @@ const TTADialogContent = ({
         // re-point the active chat back to the deleted id)
         stopActiveGeneration("interrupted");
       }
-      setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId));
+      deleteChat(chatId);
       if (activeChatId === chatId) {
         handleStartNewChat({ saveCurrentToHistory: false });
       }
     },
-    [activeChatId, handleStartNewChat, setChatHistory, stopActiveGeneration],
+    [activeChatId, deleteChat, handleStartNewChat, stopActiveGeneration],
   );
 
   const handleSelectChat = useCallback(
@@ -1018,10 +993,7 @@ const TTADialogContent = ({
       // orphaned stream can no longer patch state or re-point the chat id.
       stopActiveGeneration("interrupted");
       clearQueuedGenerationReplacements();
-      setChatMessages(
-        stopIncompleteAssistantMessages(getConversationMessages(chat)),
-      );
-      chatIdRef.current = chat.id;
+      setChatMessages(stopIncompleteAssistantMessages(chat.messages));
       setActiveChatId(chat.id);
       setActiveChatUpdatedAt(chat.updatedAt);
       setIsHistoryVisible(false);
@@ -1062,7 +1034,7 @@ const TTADialogContent = ({
       const message = chatMessages[messageIndex];
       if (
         message.role !== "assistant" ||
-        !message.isComplete ||
+        message.status.kind === "streaming" ||
         message.id !== latestRetryableAssistantMessageId
       ) {
         return;
@@ -1080,7 +1052,7 @@ const TTADialogContent = ({
         return;
       }
 
-      const isErrorRetry = Boolean(message.error);
+      const isErrorRetry = message.status.kind === "error";
       const retryAssistantId = isErrorRetry
         ? messageId
         : `assistant-${randomId()}`;
@@ -1094,13 +1066,11 @@ const TTADialogContent = ({
       );
       // N1 (tta_rewrite_final.md §2.3): the server's retry lookup only accepts
       // the id of the turn's last *successful* attempt (current_message_id) —
-      // a failed/stopped attempt's id would 400. When the turn never
-      // succeeded, omit the target: the server starts a fresh turn with the
-      // explicitly-sent prompt. The `??` fallback covers chats persisted
-      // before `lastCompletedMessageId` existed.
-      const retryTargetMessageId =
-        message.lastCompletedMessageId ??
-        (!message.error && !message.stopReason ? message.messageId : undefined);
+      // a failed/stopped attempt's id would 400. Every `done` stamps
+      // `lastCompletedMessageId`, so it is the single source of truth; when
+      // the turn never succeeded, omit the target: the server starts a fresh
+      // turn with the explicitly-sent prompt.
+      const retryTargetMessageId = message.lastCompletedMessageId;
 
       runGeneration({
         replaceActive: true,
@@ -1113,27 +1083,25 @@ const TTADialogContent = ({
           // error-retry must queue it for replacement just like regenerate
           // does — otherwise the retried generation would render on top of
           // the stale partial.
-          queueGenerationReplacement(message.messageId ?? null);
+          queueGenerationReplacement(message.server?.messageId ?? null);
           if (isErrorRetry) {
             setChatMessages((prev) =>
               prev.map((entry) =>
                 entry.id === messageId && entry.role === "assistant"
                   ? {
                       ...entry,
-                      lifecycleStatus: "pending",
-                      progressPhase: "starting",
-                      statusText: retryingText,
                       createdAt: retryStartedAt,
-                      generationStartedAt: retryStartedAt,
-                      generationElapsedMs: undefined,
-                      error: undefined,
-                      isComplete: false,
-                      stopReason: undefined,
-                      turnId: undefined,
-                      messageId: undefined,
+                      status: {
+                        kind: "streaming" as const,
+                        phase: "starting" as const,
+                        startedAt: retryStartedAt,
+                        statusText: retryingText,
+                      },
+                      server: undefined,
                       skeletons: undefined,
-                      // deliberately NOT cleared: the turn's last successful
-                      // attempt survives failed retries (N1 retry target)
+                      // `lastCompletedMessageId` deliberately NOT cleared: the
+                      // turn's last successful attempt survives failed retries
+                      // (N1 retry target)
                     }
                   : entry,
               ),
@@ -1144,16 +1112,16 @@ const TTADialogContent = ({
               {
                 id: retryAssistantId,
                 role: "assistant",
-                lifecycleStatus: "pending",
-                progressPhase: "starting",
-                statusText: retryingText,
                 createdAt: retryStartedAt,
-                generationStartedAt: retryStartedAt,
-                generationElapsedMs: undefined,
-                isComplete: false,
-                // carry the regenerated (successful) attempt forward so a
+                status: {
+                  kind: "streaming",
+                  phase: "starting",
+                  startedAt: retryStartedAt,
+                  statusText: retryingText,
+                },
+                // carry the regenerated turn's successful attempt forward so a
                 // failed regenerate can still retry against the same turn
-                lastCompletedMessageId: message.messageId,
+                lastCompletedMessageId: message.lastCompletedMessageId,
               },
             ]);
           }
@@ -1164,7 +1132,7 @@ const TTADialogContent = ({
           );
 
           const retryImage = await (!isErrorRetry
-            ? exportImageFromMessageSkeletons(message.messageId)
+            ? exportImageFromMessageSkeletons(message.server?.messageId)
             : undefined);
 
           await streamAssistantResponse(
@@ -1238,9 +1206,7 @@ const TTADialogContent = ({
         setComposerInputValue("");
         setComposerImages([]);
         setIsHistoryVisible(false);
-        setChatHistory((prev) =>
-          prev.filter((chat) => chat.id !== activeChatId),
-        );
+        deleteChat(activeChatId);
         const currentChatId = getServerChatId();
         if (currentChatId) {
           try {
@@ -1252,7 +1218,6 @@ const TTADialogContent = ({
             console.warn("[AI Chat] Failed to clear chat on server:", error);
           }
         }
-        chatIdRef.current = null;
         setActiveChatUpdatedAt(null);
         setActiveChatId("");
         return;
@@ -1262,12 +1227,15 @@ const TTADialogContent = ({
       try {
         const lastAssistant = [...truncated]
           .reverse()
-          .find((entry) => entry.role === "assistant" && entry.turnId);
+          .find(
+            (entry): entry is Extract<ChatMessage, { role: "assistant" }> =>
+              entry.role === "assistant" && Boolean(entry.server?.turnId),
+          );
         const currentChatId = getServerChatId();
-        if (currentChatId && lastAssistant?.turnId) {
+        if (currentChatId && lastAssistant?.server?.turnId) {
           const response = await transportAdapter.truncate({
             chatId: currentChatId,
-            keepThroughTurnId: lastAssistant.turnId,
+            keepThroughTurnId: lastAssistant.server.turnId,
           });
           if (typeof response.updatedAt === "number") {
             applyActiveChatUpdatedAt(response.updatedAt);
@@ -1292,7 +1260,8 @@ const TTADialogContent = ({
         );
       if (latestAssistant?.skeletons?.length) {
         const generationId =
-          latestAssistant.messageId ?? `ai-delete-${latestAssistant.id}`;
+          latestAssistant.server?.messageId ??
+          `ai-delete-${latestAssistant.id}`;
         try {
           insertAISkeletons(app, latestAssistant.skeletons, {
             generationId,
@@ -1319,12 +1288,12 @@ const TTADialogContent = ({
       clearActiveCanvasDraftFromCanvas,
       clearStreamingCanvasPreview,
       clearQueuedGenerationReplacements,
+      deleteChat,
       getServerChatId,
       applyActiveChatUpdatedAt,
       removeGeneratedElementsByGenerationTags,
       setActiveChatId,
       setActiveChatUpdatedAt,
-      setChatHistory,
       setComposerImages,
       setComposerInputValue,
       setChatMessages,

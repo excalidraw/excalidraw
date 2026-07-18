@@ -15,7 +15,7 @@ import {
 
 import type { Dispatch, SetStateAction } from "react";
 
-import type { AssistantChatMessage } from "./types";
+import type { AssistantMessage } from "./types";
 import type { AppClassProperties, AppState } from "../types";
 
 const ASSISTANT_PREVIEW_RENDER_THROTTLE_DELAY = 300;
@@ -51,16 +51,11 @@ const assistantPreviewCache = new Map<string, AssistantPreviewCacheEntry>();
 
 const isDarkTheme = (theme: AppState["theme"]) => theme === "dark";
 
-const getRenderKey = (
-  message: AssistantChatMessage,
-  theme: AppState["theme"],
-) =>
+const getRenderKey = (message: AssistantMessage, theme: AppState["theme"]) =>
   [
     message.id,
-    message.messageId ?? "",
-    message.turnId ?? "",
     theme,
-    message.isComplete === false ? "streaming" : "complete",
+    message.status.kind === "streaming" ? "streaming" : "complete",
   ].join(":");
 
 const getCachedPreview = (
@@ -136,14 +131,14 @@ export const renderAIAssistantPreviewDataUrl = async ({
 };
 
 export const useAIAssistantPreview = (
-  message: AssistantChatMessage,
+  message: AssistantMessage,
   options: UseAIAssistantPreviewOptions = {},
 ): AIAssistantPreviewState => {
   const app = useApp();
   const theme = useAppStateValue("theme");
   const enabled = options.enabled ?? true;
   const skeletons = message.skeletons;
-  const isStreaming = message.isComplete === false && !message.error;
+  const isStreaming = message.status.kind === "streaming";
   const renderKey = getRenderKey(message, theme);
 
   const [previewState, setPreviewState] = useState<AIAssistantPreviewState>(
@@ -363,7 +358,6 @@ export const useAIAssistantPreview = (
     clearScheduledRender,
     enabled,
     isStreaming,
-    message.error,
     message.id,
     renderKey,
     requestPreviewRender,

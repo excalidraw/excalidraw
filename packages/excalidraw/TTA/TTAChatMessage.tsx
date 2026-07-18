@@ -15,12 +15,14 @@ import { getAIErrorMessageKey } from "./utils";
 import { useAIAssistantPreview } from "./useAIAssistantPreview";
 
 import type {
-  AIStreamProgressPhase,
-  AssistantChatMessage,
+  AssistantMessage,
+  AssistantStatus,
   ChatMessage as ChatMessageType,
+  SystemWarningMessage,
   TTAChatScrollOptions,
   TTADialogRenderWarning,
-  UserChatMessage,
+  TTARateLimits,
+  UserMessage,
 } from "./types";
 import type { AIRateLimitWarningDescriptor } from "../aiWarnings";
 
@@ -34,11 +36,11 @@ export interface TTAChatMessageProps {
   onPreview: (url: string) => void;
   scrollChatToBottom?: (options?: TTAChatScrollOptions) => void;
   renderWarning?: TTADialogRenderWarning;
-  rateLimitRemaining?: number | null;
+  rateLimits?: TTARateLimits | null;
 }
 
 type TTAUserChatMessageProps = Pick<TTAChatMessageProps, "onPreview"> & {
-  message: UserChatMessage;
+  message: UserMessage;
 };
 
 const TTAUserChatMessage = ({
@@ -48,9 +50,8 @@ const TTAUserChatMessage = ({
   const { t } = useI18n();
   const [isCopied, setIsCopied] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
-  const fallbackTimestampRef = useRef<number>(Date.now());
 
-  const handleCopy = useCallback((content: UserChatMessage["content"]) => {
+  const handleCopy = useCallback((content: UserMessage["content"]) => {
     if (content) {
       navigator.clipboard.writeText(content);
       setIsCopied(true);
@@ -84,7 +85,7 @@ const TTAUserChatMessage = ({
     <ChatMessage
       role="user"
       roleLabel={t("ai.chat.roles.you")}
-      timestamp={message.createdAt ?? fallbackTimestampRef.current}
+      timestamp={message.createdAt}
       content={message.content}
       images={message.images}
       onImageClick={onPreview}
@@ -93,11 +94,57 @@ const TTAUserChatMessage = ({
   );
 };
 
+type TTASystemWarningMessageProps = Pick<
+  TTAChatMessageProps,
+  "renderWarning" | "rateLimits"
+> & {
+  message: SystemWarningMessage;
+};
+
+const getRateLimitWarningDescriptor = (
+  variant: AIRateLimitWarningDescriptor["variant"],
+  rateLimits: TTARateLimits | null | undefined,
+): AIRateLimitWarningDescriptor => ({
+  kind: "rateLimit",
+  variant,
+  rateLimit: rateLimits?.rateLimit,
+  rateLimitRemaining: rateLimits?.rateLimitRemaining,
+});
+
+const TTASystemWarningMessage = ({
+  message,
+  renderWarning,
+  rateLimits,
+}: TTASystemWarningMessageProps) => {
+  const { t } = useI18n();
+
+  const customWarning = renderWarning?.(
+    getRateLimitWarningDescriptor(message.variant, rateLimits),
+    message,
+  );
+  if (customWarning !== undefined) {
+    return <>{customWarning}</>;
+  }
+
+  return (
+    <ChatMessage
+      role="system"
+      roleLabel={t("chat.role.system")}
+      timestamp={message.createdAt}
+      content={
+        message.variant === "messageLimitExceeded"
+          ? t("chat.rateLimit.messageLimit")
+          : t("chat.rateLimit.generalRateLimit")
+      }
+    />
+  );
+};
+
 type TTAAssistantChatMessageProps = Omit<
   TTAChatMessageProps,
   "message" | "onPreview"
 > & {
-  message: AssistantChatMessage;
+  message: AssistantMessage;
 };
 
 const formatElapsedTime = (elapsedMs?: number | null) => {
@@ -135,21 +182,16 @@ const useLiveNow = (enabled: boolean) => {
   return now;
 };
 
-const getProgressLabel = ({
-  message,
-  phase,
-  t,
-}: {
-  message: AssistantChatMessage;
-  phase?: AIStreamProgressPhase;
-  t: ReturnType<typeof useI18n>["t"];
-}): string | null => {
-  const statusText = message.statusText?.trim();
+const getStreamingProgressLabel = (
+  status: Extract<AssistantStatus, { kind: "streaming" }>,
+  t: ReturnType<typeof useI18n>["t"],
+): string | null => {
+  const statusText = status.statusText?.trim();
   if (statusText) {
     return statusText;
   }
 
-  switch (phase) {
+  switch (status.phase) {
     case "thinking":
       return t("ai.chat.status.thinking");
     case "finalizing":
@@ -168,22 +210,19 @@ const TTAAssistantChatMessage = ({
   showDelete = false,
   scrollChatToBottom,
   renderWarning,
-  rateLimitRemaining,
+  rateLimits,
 }: TTAAssistantChatMessageProps) => {
   const { t } = useI18n();
-  const fallbackTimestampRef = useRef<number>(Date.now());
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const scrolledStreamingPreviewKeyRef = useRef<string | null>(null);
   const pendingStreamingPreviewScrollKeyRef = useRef<string | null>(null);
   const { previewSvg, status: previewStatus } = useAIAssistantPreview(message);
 
-  const isGeneratingPreview = message.isComplete === false;
+  const status = message.status;
+  const isStreaming = status.kind === "streaming";
   const hasCurrentPreview = Boolean(previewSvg);
-  const assistantError = message.error;
-  const liveNow = useLiveNow(isGeneratingPreview && !assistantError);
-  const isRateLimitWarning = Boolean(
-    assistantError?.code === 429 && message.warningType,
-  );
+  const assistantError = status.kind === "error" ? status.error : null;
+  const liveNow = useLiveNow(isStreaming);
 
   const handleGeneratedPreviewClick = useCallback(() => {
     if (!message.skeletons?.length) {
@@ -192,11 +231,9 @@ const TTAAssistantChatMessage = ({
     onInsert();
   }, [message.skeletons?.length, onInsert]);
 
-  const previewKey = message.messageId ?? message.turnId ?? message.id;
+  const previewKey = message.id;
   const shouldScrollStreamingPreviewOnLoad =
-    message.isComplete === false &&
-    previewStatus === "done" &&
-    Boolean(previewSvg);
+    isStreaming && previewStatus === "done" && Boolean(previewSvg);
 
   useEffect(() => {
     if (!shouldScrollStreamingPreviewOnLoad) {
@@ -233,20 +270,20 @@ const TTAAssistantChatMessage = ({
   }, [previewKey, scrollChatToBottom, shouldScrollStreamingPreviewOnLoad]);
 
   // --- Content visibility ---
-  let visibleContent: string | undefined;
-  if (assistantError) {
-    visibleContent = undefined;
-  } else if (isGeneratingPreview) {
-    visibleContent = undefined;
-  } else if (message.isComplete && !hasCurrentPreview) {
-    visibleContent = message.statusText;
-  }
+  // Terminal without a preview: the outcome label ("Generated response." /
+  // "(empty response)"). Streaming and errors render no content text.
+  const visibleContent =
+    status.kind === "done" && !hasCurrentPreview
+      ? status.outcome === "generated"
+        ? t("ai.chat.status.generatedResponse")
+        : t("ai.chat.status.emptyResponse")
+      : undefined;
 
   // A failed generation may still carry the partial skeletons streamed before
   // the failure (e.g. connection interruptions — C2 in tta.md). Surface them
   // so the user can preview/insert the partial result alongside the error.
   const hasSalvageablePartialResult = Boolean(
-    assistantError && !isRateLimitWarning && message.skeletons?.length,
+    assistantError && message.skeletons?.length,
   );
   const assistantOutputExists =
     (!assistantError || hasSalvageablePartialResult) &&
@@ -254,9 +291,11 @@ const TTAAssistantChatMessage = ({
     hasCurrentPreview;
 
   // --- Error presentation ---
+  const isRateLimitError = assistantError?.code === 429;
+  const isQuotaExhausted = rateLimits?.rateLimitRemaining === 0;
   const errorPresentation = assistantError
-    ? assistantError.code === 429
-      ? assistantError.rateLimitRemaining === 0
+    ? isRateLimitError
+      ? isQuotaExhausted
         ? t("chat.rateLimit.messageLimit")
         : t("chat.rateLimit.generalRateLimit")
       : t(
@@ -266,72 +305,60 @@ const TTAAssistantChatMessage = ({
           }),
         )
     : null;
-  const customWarning =
-    assistantError?.code === 429
-      ? (() => {
-          const warning: AIRateLimitWarningDescriptor = {
-            kind: "rateLimit",
-            variant:
-              message.warningType ??
-              (assistantError.rateLimitRemaining === 0
-                ? "messageLimitExceeded"
-                : "rateLimitExceeded"),
-            rateLimit: assistantError.rateLimit,
-            rateLimitRemaining: assistantError.rateLimitRemaining,
-          };
-          return renderWarning?.(warning, message);
-        })()
-      : undefined;
+  // A generation rejected with 429 keeps the host warning treatment: the
+  // whole row is replaced, exactly like a SystemWarningMessage row. The
+  // rate-limit numbers come from the rate-limits atom, not the message.
+  const rateLimitVariant: AIRateLimitWarningDescriptor["variant"] =
+    isQuotaExhausted ? "messageLimitExceeded" : "rateLimitExceeded";
+  const customWarning = isRateLimitError
+    ? renderWarning?.(
+        getRateLimitWarningDescriptor(rateLimitVariant, rateLimits),
+        {
+          role: "system",
+          id: message.id,
+          createdAt: message.createdAt,
+          variant: rateLimitVariant,
+        },
+      )
+    : undefined;
 
   const retryActionLabel = !assistantError
     ? t("ai.chat.actions.regenerate")
     : t("ai.chat.actions.retry");
 
-  const generationStartedAt =
-    message.generationStartedAt ??
-    message.createdAt ??
-    fallbackTimestampRef.current;
-  const runningElapsedMs = isGeneratingPreview
-    ? liveNow - generationStartedAt
-    : undefined;
+  const runningElapsedMs =
+    status.kind === "streaming" ? liveNow - status.startedAt : undefined;
   const elapsedLabel = formatElapsedTime(
-    isGeneratingPreview ? runningElapsedMs : message.generationElapsedMs,
+    status.kind === "streaming" ? runningElapsedMs : status.elapsedMs,
   );
   const stopReasonText =
-    message.stopReason === "user"
-      ? t(`ai.chat.stopReason.user`)
-      : message.stopReason === "interrupted"
-      ? t(`ai.chat.stopReason.interrupted`)
+    status.kind === "stopped"
+      ? t(`ai.chat.stopReason.${status.reason}`)
+      : undefined;
+  const truncationWarningText =
+    status.kind === "done" && status.warning
+      ? t("ai.chat.status.truncatedResponse")
       : undefined;
   const activeProgressLabel =
-    isGeneratingPreview && !assistantError
-      ? getProgressLabel({
-          message,
-          phase: message.progressPhase,
-          t,
-        })
-      : null;
-  const headerProgress =
-    isGeneratingPreview && !assistantError ? (
-      <div
-        className="tta-chat-message__header-progress"
-        aria-label={
-          activeProgressLabel
-            ? `${activeProgressLabel} ${elapsedLabel ?? ""}`.trim()
-            : elapsedLabel ?? undefined
-        }
-        title={activeProgressLabel ?? undefined}
-      >
-        <span className="tta-chat-message__progress-spinner" aria-hidden />
-        {elapsedLabel && (
-          <span className="tta-chat-message__progress-time">
-            {elapsedLabel}
-          </span>
-        )}
-      </div>
-    ) : undefined;
+    status.kind === "streaming" ? getStreamingProgressLabel(status, t) : null;
+  const headerProgress = isStreaming ? (
+    <div
+      className="tta-chat-message__header-progress"
+      aria-label={
+        activeProgressLabel
+          ? `${activeProgressLabel} ${elapsedLabel ?? ""}`.trim()
+          : elapsedLabel ?? undefined
+      }
+      title={activeProgressLabel ?? undefined}
+    >
+      <span className="tta-chat-message__progress-spinner" aria-hidden />
+      {elapsedLabel && (
+        <span className="tta-chat-message__progress-time">{elapsedLabel}</span>
+      )}
+    </div>
+  ) : undefined;
   const statusLine = (() => {
-    if (isGeneratingPreview && !assistantError) {
+    if (isStreaming) {
       if (!activeProgressLabel) {
         return undefined;
       }
@@ -349,19 +376,24 @@ const TTAAssistantChatMessage = ({
     }
 
     const elapsedSummary = elapsedLabel
-      ? assistantError
+      ? status.kind === "error"
         ? t("ai.chat.status.failedAfter", { time: elapsedLabel })
-        : message.stopReason
+        : status.kind === "stopped"
         ? t("ai.chat.status.stoppedAfter", { time: elapsedLabel })
         : t("ai.chat.status.completedIn", { time: elapsedLabel })
       : undefined;
 
-    if (!stopReasonText && !elapsedSummary) {
+    if (!stopReasonText && !elapsedSummary && !truncationWarningText) {
       return undefined;
     }
 
     return (
       <div className="tta-chat-message__progress tta-chat-message__progress--complete">
+        {truncationWarningText && (
+          <span className="tta-chat-message__progress-label">
+            {truncationWarningText}
+          </span>
+        )}
         {stopReasonText && (
           <span className="tta-chat-message__progress-label">
             {stopReasonText}
@@ -380,17 +412,6 @@ const TTAAssistantChatMessage = ({
     return <>{customWarning}</>;
   }
 
-  if (isRateLimitWarning) {
-    return (
-      <ChatMessage
-        role="system"
-        roleLabel={t("chat.role.system")}
-        timestamp={message.createdAt ?? fallbackTimestampRef.current}
-        content={errorPresentation}
-      />
-    );
-  }
-
   // --- Error node ---
   const errorNode = errorPresentation ? (
     <div
@@ -403,8 +424,7 @@ const TTAAssistantChatMessage = ({
   ) : undefined;
 
   // --- Actions ---
-  const shouldShowActions =
-    !isRateLimitWarning && Boolean(message.isComplete || message.error);
+  const shouldShowActions = status.kind !== "streaming";
 
   const actionsNode = shouldShowActions ? (
     <>
@@ -425,12 +445,10 @@ const TTAAssistantChatMessage = ({
           onClick={onRetry}
           ariaLabel={retryActionLabel}
           title={retryActionLabel}
-          disabled={
-            rateLimitRemaining === 0 || assistantError?.rateLimitRemaining === 0
-          }
+          disabled={isQuotaExhausted}
         />
       )}
-      {showDelete && message.isComplete && (
+      {showDelete && (
         <ChatMessageActionButton
           icon={TrashIcon}
           onClick={onDelete}
@@ -447,9 +465,9 @@ const TTAAssistantChatMessage = ({
       role="assistant"
       containerRef={messageContainerRef}
       roleLabel={t("ai.chat.roles.assistant")}
-      timestamp={message.createdAt ?? fallbackTimestampRef.current}
+      timestamp={message.createdAt}
       content={visibleContent}
-      isGenerating={isGeneratingPreview}
+      isGenerating={isStreaming}
       previewSvg={assistantOutputExists ? previewSvg : undefined}
       onPreviewClick={handleGeneratedPreviewClick}
       onPreviewLoad={handleGeneratedPreviewLoad}
@@ -465,6 +483,16 @@ const TTAAssistantChatMessage = ({
 export const TTAChatMessage: React.FC<TTAChatMessageProps> = (props) => {
   if (props.message.role === "assistant") {
     return <TTAAssistantChatMessage {...props} message={props.message} />;
+  }
+
+  if (props.message.role === "system") {
+    return (
+      <TTASystemWarningMessage
+        message={props.message}
+        renderWarning={props.renderWarning}
+        rateLimits={props.rateLimits}
+      />
+    );
   }
 
   return (
