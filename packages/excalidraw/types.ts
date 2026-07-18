@@ -161,7 +161,8 @@ export type ToolType =
   | "magicframe"
   | "embeddable"
   | "laser"
-  | "autoshape";
+  | "autoshape"
+  | "bucketFill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -416,6 +417,7 @@ export interface AppState {
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
+  currentItemBucketFillBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];

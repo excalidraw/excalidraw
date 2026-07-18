@@ -5,6 +5,7 @@ import { KEYS } from "@excalidraw/common";
 
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { HintViewer } from "./HintViewer";
@@ -19,6 +20,7 @@ import {
   frameToolIcon,
   LassoIcon,
   laserPointerToolIcon,
+  bucketFillIcon,
   MagicIcon,
   mermaidLogoIcon,
   DotsIcon,
@@ -65,6 +67,7 @@ const ExtraToolsDropdown = ({
   const frameToolSelected = activeTool.type === "frame";
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
+  const bucketFillToolSelected = activeTool.type === "bucketFill";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -146,6 +149,16 @@ const ExtraToolsDropdown = ({
           disabled={isToolButtonDisabled(app, "laser")}
         >
           {t("toolBar.laser")}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+          icon={bucketFillIcon}
+          data-testid="toolbar-bucketFill"
+          selected={bucketFillToolSelected}
+          shortcut={getShortcutKey("Shift+F")}
+          disabled={isToolButtonDisabled(app, "bucketFill")}
+        >
+          {t("toolBar.bucketFill")}
         </DropdownMenu.Item>
         {isFullStylesPanel && (
           <DropdownMenu.Item

@@ -133,6 +133,7 @@ import {
   newElement,
   newImageElement,
   newLinearElement,
+  computeBucketFillPolygon,
   newTextElement,
   refreshTextDimensions,
   deepCopyElement,
@@ -5503,16 +5504,25 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      const isBucketFillShortcut =
+        event.shiftKey && event.key.toLowerCase() === KEYS.F;
+
       if (
         !shouldPreventToolSwitching &&
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
+        // so that an uppercase letter can only mean CapsLock (Shift+letter
+        // must not switch tools — findShapeByKey lowercases the key), except
+        // for the bucket fill tool's explicit Shift+F shortcut
+        (!event.shiftKey || isBucketFillShortcut) &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key, this, event.shiftKey);
+        const shape = isBucketFillShortcut
+          ? TOOL_TYPE.bucketFill
+          : findShapeByKey(event.key, this, event.shiftKey);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
           return;
@@ -8345,6 +8355,126 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private handleBucketFillOnPointerDown = (scenePointer: {
+    x: number;
+    y: number;
+  }) => {
+    const backgroundColor = this.state.currentItemBucketFillBackgroundColor;
+
+    if (backgroundColor === "transparent") {
+      this.setToast({ message: t("bucketFill.noBackground"), duration: 3000 });
+      return;
+    }
+
+    const elements = this.scene.getNonDeletedElements();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
+
+    const result = computeBucketFillPolygon({ point, elements, elementsMap });
+
+    if (!result.ok) {
+      if (result.reason === "too_complex") {
+        this.setToast({ message: t("bucketFill.tooComplex"), duration: 3000 });
+      } else if (
+        result.reason === "open_region" ||
+        result.reason === "too_small" ||
+        result.reason === "invalid_polygon"
+      ) {
+        this.setToast({ message: t("bucketFill.noRegion"), duration: 3000 });
+      }
+      // "no_owner" stays silent — clicking empty canvas shouldn't nag
+      return;
+    }
+
+    const xs = result.scenePoints.map((p) => p[0]);
+    const ys = result.scenePoints.map((p) => p[1]);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+    const maxX = Math.max(...xs);
+    const maxY = Math.max(...ys);
+    // linear elements are normalized so points[0] must be [0, 0]; use the
+    // first scene point as the element origin
+    const [originX, originY] = result.scenePoints[0];
+    const points = result.scenePoints.map((p) =>
+      pointFrom<LocalPoint>(p[0] - originX, p[1] - originY),
+    );
+
+    const owner = elementsMap.get(result.ownerId);
+
+    const fill = newLinearElement({
+      type: "line",
+      x: originX,
+      y: originY,
+      width: maxX - minX,
+      height: maxY - minY,
+      points,
+      polygon: true,
+      strokeColor: "transparent",
+      backgroundColor,
+      fillStyle: "solid",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roughness: 0,
+      roundness: null,
+      opacity: this.state.currentItemOpacity,
+      frameId: owner
+        ? isFrameLikeElement(owner)
+          ? owner.id
+          : owner.frameId
+        : null,
+      groupIds: owner ? owner.groupIds : [],
+      customData: {
+        bucketFill: {
+          version: 1,
+          ownerId: result.ownerId,
+          boundaryElementIds: result.boundaryElementIds,
+          seedPoint: [scenePointer.x, scenePointer.y],
+        },
+      },
+    });
+
+    // Z-order: the fill should sit above any participating element whose
+    // opaque background would otherwise render over (hide) it, but below
+    // participants that only contribute an outline, so their borders stay
+    // visible. A participant "covers" the fill when it has a non-transparent
+    // background and the filled region lies inside it (the click lands inside).
+    // Indices are computed against the deleted-inclusive array that
+    // `insertElementsAtIndex` operates on.
+    const participantIds = new Set<string>([
+      result.ownerId,
+      ...result.boundaryElementIds,
+    ]);
+    const orderedElements = this.scene.getElementsIncludingDeleted();
+    let lowestParticipantIndex = -1;
+    let aboveCoveringIndex = -1;
+    for (let i = 0; i < orderedElements.length; i++) {
+      const el = orderedElements[i];
+      if (!participantIds.has(el.id)) {
+        continue;
+      }
+      if (lowestParticipantIndex < 0) {
+        lowestParticipantIndex = i;
+      }
+      if (
+        el.backgroundColor !== "transparent" &&
+        isPointInElement(point, el, elementsMap)
+      ) {
+        aboveCoveringIndex = i;
+      }
+    }
+    const insertIndex =
+      aboveCoveringIndex >= 0 ? aboveCoveringIndex + 1 : lowestParticipantIndex;
+    this.scene.insertElementsAtIndex(
+      [fill],
+      insertIndex < 0 ? null : insertIndex,
+    );
+
+    // Keep the bucket fill tool active and do NOT select the new fill, so the
+    // user can keep filling regions back-to-back without re-selecting the tool
+    // (even when the tool isn't locked).
+    this.store.scheduleCapture();
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
@@ -8517,6 +8647,13 @@ class App extends React.Component<AppProps, AppState> {
     // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
+
+    // bucket fill is a one-shot click tool; resolve it before any drag /
+    // selection gesture machinery and return early.
+    if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
+      this.handleBucketFillOnPointerDown(scenePointer);
       return;
     }
 

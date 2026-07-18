@@ -30,6 +30,7 @@ import {
   EmbedIcon,
   laserPointerToolIcon,
   drawShapeToolIcon,
+  bucketFillIcon,
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
@@ -110,7 +111,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools: readonly typeof activeTool.type[] = (
-    ["text", "frame", "embeddable", "laser", "magicframe"] as const
+    [
+      "text",
+      "frame",
+      "embeddable",
+      "laser",
+      "bucketFill",
+      "magicframe",
+    ] as const
   ).filter((tool) => {
     if (showTextToolOutside && tool === "text") {
       return false;
@@ -132,6 +140,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
+      : activeTool.type === "bucketFill"
+      ? bucketFillIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
       : DotsIcon
