@@ -5,7 +5,6 @@ import { KEYS } from "@excalidraw/common";
 
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
-import { getShortcutKey } from "../shortcut";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { HintViewer } from "./HintViewer";
@@ -83,6 +82,7 @@ const ExtraToolsDropdown = ({
             embeddableToolSelected ||
             (isFullStylesPanel && drawShapeToolSelected) ||
             lassoToolSelected ||
+            bucketFillToolSelected ||
             // in collab we're already highlighting the laser button
             // outside toolbar, so let's not highlight extra-tools button
             // on top of it
@@ -104,6 +104,8 @@ const ExtraToolsDropdown = ({
           ? laserPointerToolIcon
           : lassoToolSelected
           ? LassoIcon
+          : bucketFillToolSelected
+          ? bucketFillIcon
           : DotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
@@ -155,7 +157,7 @@ const ExtraToolsDropdown = ({
           icon={bucketFillIcon}
           data-testid="toolbar-bucketFill"
           selected={bucketFillToolSelected}
-          shortcut={getShortcutKey("Shift+F")}
+          shortcut={KEYS.B.toLocaleUpperCase()}
           disabled={isToolButtonDisabled(app, "bucketFill")}
         >
           {t("toolBar.bucketFill")}

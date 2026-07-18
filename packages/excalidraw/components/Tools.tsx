@@ -146,6 +146,7 @@ export const TOOLS = defineTools({
   },
   bucketFill: {
     icon: bucketFillIcon,
+    letterKey: KEYS.B,
   },
   lasso: {
     icon: LassoIcon,

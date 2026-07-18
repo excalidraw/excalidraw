@@ -5505,25 +5505,19 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const isBucketFillShortcut =
-        event.shiftKey && event.key.toLowerCase() === KEYS.F;
-
       if (
         !shouldPreventToolSwitching &&
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
         // so that an uppercase letter can only mean CapsLock (Shift+letter
-        // must not switch tools — findShapeByKey lowercases the key), except
-        // for the bucket fill tool's explicit Shift+F shortcut
-        (!event.shiftKey || isBucketFillShortcut) &&
+        // must not switch tools — findShapeByKey lowercases the key)
+        !event.shiftKey &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = isBucketFillShortcut
-          ? TOOL_TYPE.bucketFill
-          : findShapeByKey(event.key, this, event.shiftKey);
+        const shape = findShapeByKey(event.key, this, event.shiftKey);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
           return;

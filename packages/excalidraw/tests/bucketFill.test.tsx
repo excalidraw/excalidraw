@@ -135,13 +135,37 @@ describe("bucket fill tool", () => {
     expect(panel!.querySelector('[aria-label="Stroke"]')).toBeNull();
   });
 
-  it("selects the tool with the shift+f shortcut", () => {
+  it("selects the tool with the b shortcut", () => {
     expect(h.state.activeTool.type).toBe("selection");
-    // frame owns plain "f"; bucket fill is shift+f (uppercase event.key)
+    Keyboard.keyPress(KEYS.B);
+    expect(h.state.activeTool.type).toBe("bucketFill");
+  });
+
+  it("shift+f opens the font popup instead of switching to bucket fill", () => {
+    // radix popover needs a ResizeObserver; jsdom has none (same stub as
+    // test-utils' togglePopover)
+    (global as any).ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+    // regression: bucket fill was originally bound to shift+f, shadowing the
+    // long-standing "show fonts" shortcut for text elements
+    const text = API.createElement({ type: "text", x: 20, y: 20 });
+    act(() => {
+      h.app.updateScene({
+        elements: [text],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      API.setAppState({ selectedElementIds: { [text.id]: true } });
+    });
+
     Keyboard.withModifierKeys({ shift: true }, () => {
       Keyboard.keyPress("F");
     });
-    expect(h.state.activeTool.type).toBe("bucketFill");
+
+    expect(h.state.activeTool.type).not.toBe("bucketFill");
+    expect(h.state.openPopup).toBe("fontFamily");
   });
 
   it("no-ops with a transparent background color", () => {
