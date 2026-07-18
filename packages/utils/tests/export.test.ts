@@ -112,21 +112,20 @@ describe("exportToSvg", () => {
     expect(passedConfig()).toMatchSnapshot();
   });
 
-  // FIXME whether the new consolidated export API should filter deleted
-  // elements at runtime is an open decision (master's #11470 added
-  // `getNonDeletedElements` to the old `@excalidraw/utils` wrappers, which the
-  // rewrite removed together with element restoration). Note this test can no
-  // longer observe filtering via the spy either way — `utils.exportToSvg` now
-  // IS the spied function, so the spy records the caller's raw arguments.
-  it.skip("with deleted elements", async () => {
-    await utils.exportToSvg({
+  // Regression test (#11470): deleted elements must be filtered out at
+  // runtime (inside `configExportDimension`), since the type contract alone
+  // doesn't protect JS consumers passing raw scene data. We assert on the
+  // rendered output — the spy can't observe the filtering as it happens
+  // inside the spied function itself.
+  it("with deleted elements", async () => {
+    const svg = await utils.exportToSvg({
       data: diagramFactory({
         overrides: { appState: void 0 },
         elementOverrides: { isDeleted: true },
       }),
     });
 
-    expect(passedData().elements.length).toBe(0);
+    expect(svg.querySelectorAll("[data-id]")).toHaveLength(0);
   });
 
   it("with padding", async () => {

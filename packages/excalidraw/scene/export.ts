@@ -19,6 +19,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getNonDeletedElements,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -53,7 +54,7 @@ import type {
 import { getDefaultAppState } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
-import { restoreAppState } from "../data/restore";
+import { restoreAppState, restoreElements } from "../data/restore";
 import { encodePngMetadata } from "../data/image";
 
 import { Fonts } from "../fonts";
@@ -383,7 +384,14 @@ const configExportDimension = async ({
 
   const { exportingFrame } = cfg;
 
-  const elements = data.elements;
+  // restore elements (normalizes & drops invisible elements) and filter out
+  // deleted ones. The type contract requires non-deleted elements already,
+  // but types alone don't protect JS consumers passing raw scene data.
+  // Note this only applies to rendering — when embedding the scene
+  // (`exportEmbedScene`), we serialize the original `data.elements`.
+  const elements = getNonDeletedElements(
+    restoreElements(data.elements, null, { deleteInvisibleElements: true }),
+  );
 
   // initialize defaults
   // ---------------------------------------------------------------------------
@@ -611,6 +619,9 @@ const configExportDimension = async ({
 
   return {
     config: cfg,
+    // the restored & non-deleted-filtered elements — use these (not
+    // `data.elements`) for all rendering purposes
+    elements,
     normalizedPadding,
     contentWidth: width,
     contentHeight: height,
@@ -642,6 +653,7 @@ export const exportToCanvas = async ({
 }) => {
   const {
     config: cfg,
+    elements,
     normalizedPadding,
     contentWidth: width,
     contentHeight: height,
@@ -689,7 +701,7 @@ export const exportToCanvas = async ({
       arrayToMap(elementsForRender),
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(syncInvalidIndices(data.elements)),
+      arrayToMap(syncInvalidIndices(elements)),
     ),
     visibleElements: elementsForRender,
     scale: exportScale,
@@ -770,6 +782,7 @@ export const exportToSvg = async ({
 }) => {
   const {
     config: cfg,
+    elements,
     normalizedPadding,
     exportWidth,
     exportHeight,
@@ -783,8 +796,6 @@ export const exportToSvg = async ({
 
   const offsetX = -(x - normalizedPadding);
   const offsetY = -(y - normalizedPadding);
-
-  const { elements } = data;
 
   const theme =
     cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
@@ -826,11 +837,18 @@ export const exportToSvg = async ({
     try {
       encodeSvgBase64Payload({
         metadataElement,
-        // when embedding scene, we want to embed the origionally supplied
-        // elements which don't contain the temp frame labels.
+        // when embedding scene, we want to embed the originally supplied
+        // elements which don't contain the temp frame labels, nor the
+        // restored/filtered variants — the payload should round-trip the
+        // caller's scene as-is (ids stable, restore happens again on import).
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(elements, appState, data.files || {}, "local"),
+        payload: serializeAsJSON(
+          data.elements,
+          appState,
+          data.files || {},
+          "local",
+        ),
       });
     } catch (error: any) {
       console.error(error);
