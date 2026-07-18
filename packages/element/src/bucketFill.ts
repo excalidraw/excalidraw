@@ -32,12 +32,11 @@ import type {
  * pointer. The Excalidraw app layer converts the returned `scenePoints` into a
  * local `line` polygon and inserts it.
  *
- * Two paths:
- * - owner-only (v1): when nothing overlaps the owner, the owner outline is
- *   chained into a single ring directly (robust, no arrangement needed).
- * - overlap-aware: when other boundary elements overlap the owner, a planar
- *   segment arrangement is built (segments split at intersections) and the
- *   smallest bounded face containing the click is selected.
+ * All fills go through a single path: a planar segment arrangement is built
+ * from the owner and any overlapping boundary elements (segments split at
+ * intersections), and the smallest bounded face containing the click is
+ * selected. A lone owner is simply the trivial arrangement with one bounded
+ * face.
  */
 
 export type BucketFillOptions = {
@@ -346,81 +345,7 @@ const findOwner = (
 };
 
 // -----------------------------------------------------------------------------
-// owner-only ring assembly (no intersections)
-// -----------------------------------------------------------------------------
-
-/**
- * Chain a set of segments that form a single closed loop into an ordered ring
- * of points. Returns null if the segments don't form exactly one closed loop
- * with every node of degree 2 (e.g. an open stroke).
- */
-const assembleRing = (
-  segments: LineSegment<GlobalPoint>[],
-  eps: number,
-): GlobalPoint[] | null => {
-  const store = new NodeStore(eps);
-  const adjacency = new Map<number, number[]>();
-  const edgeSet = new Set<string>();
-
-  const link = (u: number, v: number) => {
-    const list = adjacency.get(u);
-    if (list) {
-      list.push(v);
-    } else {
-      adjacency.set(u, [v]);
-    }
-  };
-
-  for (const segment of segments) {
-    const a = store.getOrCreate(segment[0]);
-    const b = store.getOrCreate(segment[1]);
-    if (a === b) {
-      continue;
-    }
-    const key = a < b ? `${a}-${b}` : `${b}-${a}`;
-    if (edgeSet.has(key)) {
-      continue;
-    }
-    edgeSet.add(key);
-    link(a, b);
-    link(b, a);
-  }
-
-  if (store.nodes.length < 3) {
-    return null;
-  }
-
-  // every node must have exactly two neighbours for a single simple loop
-  for (const [, neighbours] of adjacency) {
-    if (neighbours.length !== 2) {
-      return null;
-    }
-  }
-
-  const start = 0;
-  const ring: GlobalPoint[] = [];
-  let previous = -1;
-  let current = start;
-  do {
-    ring.push(store.nodes[current]);
-    const neighbours = adjacency.get(current);
-    if (!neighbours || neighbours.length !== 2) {
-      return null;
-    }
-    const next = neighbours[0] !== previous ? neighbours[0] : neighbours[1];
-    previous = current;
-    current = next;
-  } while (current !== start && ring.length <= store.nodes.length);
-
-  if (current !== start) {
-    return null;
-  }
-
-  return ring;
-};
-
-// -----------------------------------------------------------------------------
-// planar arrangement + face extraction (overlap-aware)
+// planar arrangement + face extraction
 // -----------------------------------------------------------------------------
 
 type WorkingSegment = {
@@ -450,6 +375,9 @@ type Face = {
  * intersections and T-junctions) and extract its face rings. Each face records
  * which source elements contributed an edge to its boundary.
  *
+ * Returns `[]` when there are no usable edges (no enclosed region), or `null`
+ * when the arrangement is too complex to process.
+ *
  * Known gap (see spec): collinear/overlapping segments are not split against
  * each other; transversal intersections and T-junctions are handled.
  */
@@ -467,9 +395,11 @@ const buildFaces = (
   const segments: WorkingSegment[] = [];
 
   for (const { segment, elementId } of rawSegments) {
-    if (segmentLength(segment) < eps) {
-      continue;
-    }
+    // NOTE: sub-epsilon segments are NOT dropped here — their endpoints merge
+    // into the same node (a === b below) which collapses them while keeping
+    // the outline chain connected. Dropping them instead would disconnect
+    // densely subdivided curves (e.g. the tiny corner arcs a diamond has even
+    // with roundness: null) and leave the region open.
     const a = store.getOrCreate(segment[0]);
     const b = store.getOrCreate(segment[1]);
     if (a === b) {
@@ -523,6 +453,13 @@ const buildFaces = (
         t: projectParam(sj.pa, sj.pb, store.nodes[node]),
       });
     }
+  }
+
+  // safety: intersection splitting can inflate the node count quadratically
+  // in pathological scenes; bail before the O(segments × nodes) T-junction
+  // pass turns a click into a multi-second freeze
+  if (store.nodes.length > options.maxBoundarySegments * 4) {
+    return null;
   }
 
   // T-junctions: split any segment that passes through an existing node
@@ -602,7 +539,8 @@ const buildFaces = (
   }
 
   if (edgeSet.size === 0) {
-    return null;
+    // nothing usable — not an error, just no enclosed region
+    return [];
   }
 
   // sort outgoing half-edges by angle around each node
@@ -868,8 +806,28 @@ export const computeBucketFillPolygon = (args: {
         coverer.id !== element.id &&
         (indexOf.get(coverer.id) ?? 0) > elementIndex,
     );
-    for (const segment of getElementLineSegments(element, elementsMap)) {
-      if (segmentLength(segment) < options.snapEpsilon) {
+    const segments = getElementLineSegments(element, elementsMap);
+    // freedraw and non-polygon line loops render as closed once their
+    // endpoints are within LINE_CONFIRM_THRESHOLD (isPathALoop), but their
+    // segment chain leaves that closure gap open — bridge it explicitly so
+    // the region reads as closed here too
+    if (
+      (element.type === "freedraw" ||
+        (isLineElement(element) && !element.polygon)) &&
+      isPathALoop(element.points) &&
+      segments.length > 0
+    ) {
+      const first = segments[0][0];
+      const last = segments[segments.length - 1][1];
+      if (pointDistance(first, last) >= options.snapEpsilon) {
+        segments.push(lineSegment(last, first));
+      }
+    }
+    for (const segment of segments) {
+      // keep sub-epsilon segments: buildFaces collapses them via node merging
+      // without breaking the chain (see note there); only true zero-length
+      // degenerates are noise
+      if (segmentLength(segment) === 0) {
         continue;
       }
       if (coverersAbove.length === 0) {
@@ -895,28 +853,18 @@ export const computeBucketFillPolygon = (args: {
     return { ok: false, reason: "too_complex" };
   }
 
-  // 4. select the ring to fill and the elements whose outlines bound it
-  let ring: GlobalPoint[] | null;
-  let contributors: Set<string>;
-  if (extraBoundaries.length === 0) {
-    // owner-only fill: chain the owner outline into a single ring
-    ring = assembleRing(
-      rawSegments.map((source) => source.segment),
-      options.snapEpsilon,
-    );
-    contributors = new Set([owner.id]);
-  } else {
-    const faces = buildFaces(rawSegments, options);
-    if (!faces) {
-      return { ok: false, reason: "too_complex" };
-    }
-    const face = selectFaceFromArrangement(faces, point, options);
-    ring = face ? face.ring : null;
-    contributors = face ? face.contributors : new Set();
+  // 4. build the planar arrangement and select the face under the click. A
+  // lone owner is just the trivial arrangement (one bounded face + the outer
+  // face), so a single code path serves owner-only and overlap-aware fills.
+  const faces = buildFaces(rawSegments, options);
+  if (!faces) {
+    return { ok: false, reason: "too_complex" };
   }
-  if (!ring) {
+  const face = selectFaceFromArrangement(faces, point, options);
+  if (!face) {
     return { ok: false, reason: "open_region" };
   }
+  const { ring, contributors } = face;
 
   // 5. simplify and validate
   const scenePoints = finalizePolygon(ring, options);

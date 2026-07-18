@@ -3,7 +3,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import { computeBucketFillPolygon } from "../src/bucketFill";
 
@@ -107,6 +107,101 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(7900);
     expect(result.scenePoints.length).toBeLessThanOrEqual(64);
     expect(result.scenePoints.length).toBeGreaterThan(6);
+  });
+
+  it("fills a diamond", () => {
+    // regression: a roundness:null diamond still has tiny (~2px chord) corner
+    // arcs whose densely-subdivided segments used to be dropped by the
+    // sub-epsilon length filter, disconnecting the outline at the corners
+    const diamond = API.createElement({
+      type: "diamond",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 150,
+      roundness: null,
+    });
+    const { elements, elementsMap } = setup([diamond]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(100, 75),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(isClosed(result.scenePoints)).toBe(true);
+    // diamond area = w*h/2 = 15000
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(15000, -3);
+  });
+
+  it("fills a freedraw loop with a hand-drawn closure gap", () => {
+    // regression: isPathALoop accepts closure gaps up to LINE_CONFIRM_THRESHOLD
+    // (8px), so the segment chain must be bridged explicitly or the region
+    // reads as open even though it renders (and hit-tests) as closed
+    const points: LocalPoint[] = [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(100, 0),
+      pointFrom<LocalPoint>(100, 100),
+      pointFrom<LocalPoint>(0, 100),
+      pointFrom<LocalPoint>(0, 5),
+    ];
+    const freedraw = API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points,
+    });
+    const { elements, elementsMap } = setup([freedraw]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(isClosed(result.scenePoints)).toBe(true);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -3);
+  });
+
+  it("fills a line polygon", () => {
+    const triangle = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(50, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+      ],
+      polygon: true,
+    });
+    const { elements, elementsMap } = setup([triangle]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 70),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(isClosed(result.scenePoints)).toBe(true);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(5000, -3);
   });
 
   it("fills the overlap region split by a rectangle below the owner", () => {
