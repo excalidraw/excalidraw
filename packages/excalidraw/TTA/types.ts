@@ -149,6 +149,12 @@ export type AssistantChatMessage = {
   createdAt?: number;
   turnId?: string;
   messageId?: string;
+  /**
+   * Server id of the turn's last *successful* attempt — the only id the
+   * server's retry lookup accepts (`current_message_id`). Survives failed
+   * retries; absent when the turn never completed successfully.
+   */
+  lastCompletedMessageId?: string;
   skeletons?: ReadonlyArray<ExcalidrawElementSkeleton>;
   parseError?: string;
   isComplete?: boolean;
@@ -166,6 +172,7 @@ export type ChatMessage = UserChatMessage | AssistantChatMessage;
 
 export type AssistantChatTurnMessage = {
   messageId?: string;
+  lastCompletedMessageId?: string;
   lifecycleStatus?: AIAssistantLifecycleStatus;
   statusText?: string;
   progressPhase?: AIStreamProgressPhase;

@@ -44,6 +44,7 @@ import {
 } from "./chatHelpers";
 import { isAIChatErrorHandled } from "./chatErrors";
 import { useAIStreamingLifecycle } from "./useAIStreamingLifecycle";
+import { useGenerationSlot } from "./useGenerationSlot";
 import { useTTAChatHistory } from "./useTTAChatHistory";
 
 import type {
@@ -93,7 +94,14 @@ const TTADialogContent = ({
   const [rateLimits, setRateLimits] = useAtom(ttaRateLimitsAtom);
   const [composerInputValue, setComposerInputValue] = useState("");
   const [composerImages, setComposerImages] = useState<TTAComposerImage[]>([]);
-  const [isSendingChat, setIsSendingChat] = useState(false);
+  // Single-flight: at most one generation at a time; `isSendingChat` is the
+  // slot's render mirror (drives every disabled state and the Stop button).
+  const {
+    isGenerationActive: isSendingChat,
+    hasActiveGeneration,
+    acquireGenerationSlot,
+    releaseGenerationSlot,
+  } = useGenerationSlot();
 
   // History Overlay State
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -712,7 +720,97 @@ const TTADialogContent = ({
     [generateResponse, getServerChatId, setChatMessages, t],
   );
 
-  const sendChatPrompt = async (prompt?: string, images?: string[]) => {
+  /**
+   * The single entry point for send and retry (tta_rewrite_final.md §2.3):
+   * reserves the in-flight slot synchronously BEFORE any chat mutation (so a
+   * concurrent Enter-send can never mutate the conversation — C1), then
+   * mutates, then streams, with one shared catch (C3). A second call while a
+   * generation is in flight is a no-op unless `replaceActive` (retry).
+   */
+  const runGeneration = useCallback(
+    ({
+      assistantId,
+      mutate,
+      stream,
+      replaceActive = false,
+    }: {
+      assistantId: string;
+      mutate: () => void;
+      stream: () => Promise<void>;
+      replaceActive?: boolean;
+    }): boolean => {
+      if (hasActiveGeneration()) {
+        if (!replaceActive) {
+          return false;
+        }
+        // cancel-and-replace (retry): abort the active stream and take over.
+        // The canceled stream's ownership-checked cleanup can't clobber us.
+        cancelActiveStream();
+        cancelPendingCanvasPreviewRenders();
+        releaseGenerationSlot();
+      }
+      const release = acquireGenerationSlot();
+      if (!release) {
+        return false;
+      }
+      mutate();
+      setStopRequested(false);
+      void stream()
+        .catch((err) => {
+          console.error("[AI Chat] error:", err);
+          clearStreamingCanvasPreview();
+          if (isAIChatErrorHandled(err)) {
+            return;
+          }
+          const message = err instanceof Error ? err.message : String(err);
+          setChatMessages((prev) => {
+            // patch the generation's own bubble when it exists (retry
+            // placeholders would otherwise spin forever), append otherwise
+            if (
+              prev.some((m) => m.id === assistantId && m.role === "assistant")
+            ) {
+              return prev.map((m) =>
+                m.id === assistantId && m.role === "assistant"
+                  ? {
+                      ...m,
+                      lifecycleStatus: "failed" as const,
+                      progressPhase: undefined,
+                      statusText: undefined,
+                      error: { message },
+                      isComplete: true,
+                    }
+                  : m,
+              );
+            }
+            return [
+              ...prev,
+              {
+                id: assistantId,
+                role: "assistant",
+                createdAt: Date.now(),
+                lifecycleStatus: "failed" as const,
+                error: { message },
+                isComplete: true,
+              },
+            ];
+          });
+        })
+        .finally(release);
+      return true;
+    },
+    [
+      acquireGenerationSlot,
+      cancelActiveStream,
+      cancelPendingCanvasPreviewRenders,
+      clearStreamingCanvasPreview,
+      hasActiveGeneration,
+      releaseGenerationSlot,
+      setChatMessages,
+      setStopRequested,
+    ],
+  );
+
+  const sendChatPrompt = (prompt?: string, images?: string[]) => {
     if (rateLimits?.rateLimitRemaining === 0) {
       return;
     }
@@ -732,43 +830,83 @@ const TTADialogContent = ({
     };
 
     const lastAssistantMessageId = getLatestAssistantMessageId(chatMessages);
-    setStopRequested(false);
-    touchActiveChatUpdatedAt();
-    setChatMessages((prev) => [...prev, userMessage]);
-    setComposerInputValue("");
-    setComposerImages([]);
-    setIsSendingChat(true);
+    const conversation = [...chatMessages, userMessage];
+    const assistantId = `assistant-${randomId()}`;
 
-    try {
-      const conversation = [...chatMessages, userMessage];
-      clearStreamingCanvasPreview();
-
-      if (lastAssistantMessageId) {
-        queueGenerationReplacement(lastAssistantMessageId);
-      }
-
-      await streamAssistantResponse(conversation);
-      return;
-    } catch (err) {
-      console.error("[AI Chat] error:", err);
-      clearStreamingCanvasPreview();
-      if (!isAIChatErrorHandled(err)) {
-        const message = err instanceof Error ? err.message : String(err);
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            id: `assistant-${randomId()}`,
-            role: "assistant",
-            createdAt: Date.now(),
-            error: { message },
-            isComplete: true,
-          },
-        ]);
-      }
-    } finally {
-      setIsSendingChat(false);
-    }
+    // NOTE the composer is only cleared when the slot was actually acquired —
+    // a send during an active generation is a no-op that keeps the draft text.
+    runGeneration({
+      assistantId,
+      mutate: () => {
+        touchActiveChatUpdatedAt();
+        setChatMessages((prev) => [...prev, userMessage]);
+        setComposerInputValue("");
+        setComposerImages([]);
+        clearStreamingCanvasPreview();
+        if (lastAssistantMessageId) {
+          queueGenerationReplacement(lastAssistantMessageId);
+        }
+      },
+      stream: () =>
+        streamAssistantResponse(conversation, undefined, { assistantId }),
+    });
   };
+
+  /**
+   * Full user-Stop semantics: abort the stream, commit the rendered draft to
+   * the canvas (NEVER→IMMEDIATELY dance), free the slot, mark the streaming
+   * bubble stopped. Also used by chat switch/delete mid-stream (N2), which
+   * behave exactly like pressing Stop first.
+   */
+  const stopActiveGeneration = useCallback(
+    (stopReason: "user" | "interrupted") => {
+      if (!hasActiveGeneration()) {
+        return;
+      }
+      setStopRequested(true);
+      cancelActiveStream();
+      cancelPendingCanvasPreviewRenders();
+      commitStreamingCanvasPreview();
+      releaseGenerationSlot();
+      touchActiveChatUpdatedAt();
+
+      // Mark the last assistant message as stopped/complete.
+      setChatMessages((prev) => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg && lastMsg.role === "assistant" && !lastMsg.isComplete) {
+          return [
+            ...prev.slice(0, -1),
+            {
+              ...lastMsg,
+              lifecycleStatus: "aborted",
+              progressPhase: undefined,
+              statusText: undefined,
+              generationElapsedMs: Math.max(
+                0,
+                Date.now() -
+                  (lastMsg.generationStartedAt ??
+                    lastMsg.createdAt ??
+                    Date.now()),
+              ),
+              isComplete: true,
+              stopReason,
+            },
+          ];
+        }
+        return prev;
+      });
+    },
+    [
+      cancelActiveStream,
+      cancelPendingCanvasPreviewRenders,
+      commitStreamingCanvasPreview,
+      hasActiveGeneration,
+      releaseGenerationSlot,
+      setChatMessages,
+      setStopRequested,
+      touchActiveChatUpdatedAt,
+    ],
+  );
 
   // --- Chat Actions ---
 
@@ -859,16 +997,26 @@ const TTADialogContent = ({
 
   const handleDeleteChat = useCallback(
     (chatId: string) => {
+      if (activeChatId === chatId) {
+        // deleting the chat that owns the in-flight generation — stop it
+        // first (N2: an orphaned stream would keep painting the canvas and
+        // re-point the active chat back to the deleted id)
+        stopActiveGeneration("interrupted");
+      }
       setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId));
       if (activeChatId === chatId) {
         handleStartNewChat({ saveCurrentToHistory: false });
       }
     },
-    [activeChatId, handleStartNewChat, setChatHistory],
+    [activeChatId, handleStartNewChat, setChatHistory, stopActiveGeneration],
   );
 
   const handleSelectChat = useCallback(
     (chat: ChatConversation) => {
+      // Switching chats mid-stream behaves like pressing Stop first (N2):
+      // the draft is committed to the canvas under the old chat and the
+      // orphaned stream can no longer patch state or re-point the chat id.
+      stopActiveGeneration("interrupted");
       clearQueuedGenerationReplacements();
       setChatMessages(
         stopIncompleteAssistantMessages(getConversationMessages(chat)),
@@ -889,6 +1037,7 @@ const TTADialogContent = ({
       setActiveChatId,
       setActiveChatUpdatedAt,
       setChatMessages,
+      stopActiveGeneration,
     ],
   );
 
@@ -900,7 +1049,7 @@ const TTADialogContent = ({
   }, [focusComposerInput]);
 
   const handleRetry = useCallback(
-    async (messageId: string) => {
+    (messageId: string) => {
       if (rateLimits?.rateLimitRemaining === 0) {
         return;
       }
@@ -931,18 +1080,7 @@ const TTADialogContent = ({
         return;
       }
 
-      cancelActiveStream();
-      cancelPendingCanvasPreviewRenders();
-      touchActiveChatUpdatedAt();
-
       const isErrorRetry = Boolean(message.error);
-      clearStreamingCanvasPreview();
-      // A failed generation commits its rendered partial to the canvas (the
-      // on-error policy in useAIStreamingLifecycle), so an error-retry must
-      // queue it for replacement just like regenerate does — otherwise the
-      // retried generation would render on top of the stale partial.
-      queueGenerationReplacement(message.messageId ?? null);
-
       const retryAssistantId = isErrorRetry
         ? messageId
         : `assistant-${randomId()}`;
@@ -950,88 +1088,109 @@ const TTADialogContent = ({
         ? t("ai.chat.status.retrying")
         : t("ai.chat.status.regenerating");
       const retryStartedAt = Date.now();
-      if (isErrorRetry) {
-        setChatMessages((prev) =>
-          prev.map((entry) =>
-            entry.id === messageId && entry.role === "assistant"
-              ? {
-                  ...entry,
-                  lifecycleStatus: "pending",
-                  progressPhase: "starting",
-                  statusText: retryingText,
-                  createdAt: retryStartedAt,
-                  generationStartedAt: retryStartedAt,
-                  generationElapsedMs: undefined,
-                  error: undefined,
-                  isComplete: false,
-                  stopReason: undefined,
-                  turnId: undefined,
-                  messageId: undefined,
-                  skeletons: undefined,
-                }
-              : entry,
-          ),
-        );
-      } else {
-        setChatMessages((prev) => [
-          ...prev.filter((m) => m.id !== messageId),
-          {
-            id: retryAssistantId,
-            role: "assistant",
-            lifecycleStatus: "pending",
-            progressPhase: "starting",
-            statusText: retryingText,
-            createdAt: retryStartedAt,
-            generationStartedAt: retryStartedAt,
-            generationElapsedMs: undefined,
-            isComplete: false,
-          },
-        ]);
-      }
-
-      await new Promise((resolve) =>
-        setTimeout(resolve, MIN_RETRYING_VISIBLE_MS),
-      );
-
       const conversationToRetry = chatMessages.slice(
         0,
         retryUserMessageIndex + 1,
       );
-      setStopRequested(false);
-      setIsSendingChat(true);
+      // N1 (tta_rewrite_final.md §2.3): the server's retry lookup only accepts
+      // the id of the turn's last *successful* attempt (current_message_id) —
+      // a failed/stopped attempt's id would 400. When the turn never
+      // succeeded, omit the target: the server starts a fresh turn with the
+      // explicitly-sent prompt. The `??` fallback covers chats persisted
+      // before `lastCompletedMessageId` existed.
+      const retryTargetMessageId =
+        message.lastCompletedMessageId ??
+        (!message.error && !message.stopReason ? message.messageId : undefined);
 
-      try {
-        const retryImage = await (!isErrorRetry
-          ? exportImageFromMessageSkeletons(message.messageId)
-          : undefined);
+      runGeneration({
+        replaceActive: true,
+        assistantId: retryAssistantId,
+        mutate: () => {
+          touchActiveChatUpdatedAt();
+          clearStreamingCanvasPreview();
+          // A failed generation commits its rendered partial to the canvas
+          // (the on-error policy in useAIStreamingLifecycle), so an
+          // error-retry must queue it for replacement just like regenerate
+          // does — otherwise the retried generation would render on top of
+          // the stale partial.
+          queueGenerationReplacement(message.messageId ?? null);
+          if (isErrorRetry) {
+            setChatMessages((prev) =>
+              prev.map((entry) =>
+                entry.id === messageId && entry.role === "assistant"
+                  ? {
+                      ...entry,
+                      lifecycleStatus: "pending",
+                      progressPhase: "starting",
+                      statusText: retryingText,
+                      createdAt: retryStartedAt,
+                      generationStartedAt: retryStartedAt,
+                      generationElapsedMs: undefined,
+                      error: undefined,
+                      isComplete: false,
+                      stopReason: undefined,
+                      turnId: undefined,
+                      messageId: undefined,
+                      skeletons: undefined,
+                      // deliberately NOT cleared: the turn's last successful
+                      // attempt survives failed retries (N1 retry target)
+                    }
+                  : entry,
+              ),
+            );
+          } else {
+            setChatMessages((prev) => [
+              ...prev.filter((m) => m.id !== messageId),
+              {
+                id: retryAssistantId,
+                role: "assistant",
+                lifecycleStatus: "pending",
+                progressPhase: "starting",
+                statusText: retryingText,
+                createdAt: retryStartedAt,
+                generationStartedAt: retryStartedAt,
+                generationElapsedMs: undefined,
+                isComplete: false,
+                // carry the regenerated (successful) attempt forward so a
+                // failed regenerate can still retry against the same turn
+                lastCompletedMessageId: message.messageId,
+              },
+            ]);
+          }
+        },
+        stream: async () => {
+          await new Promise((resolve) =>
+            setTimeout(resolve, MIN_RETRYING_VISIBLE_MS),
+          );
 
-        await streamAssistantResponse(
-          conversationToRetry,
-          {
-            reason: isErrorRetry ? "generation_error" : "user_not_happy",
-            avoidSimilarity: !isErrorRetry,
-            retryAssistantMessageId: message.messageId,
-          },
-          {
-            assistantId: retryAssistantId,
-            insertAssistantMessage: false,
-            images: retryImage ? [retryImage] : undefined,
-          },
-        );
-      } finally {
-        setIsSendingChat(false);
-      }
+          const retryImage = await (!isErrorRetry
+            ? exportImageFromMessageSkeletons(message.messageId)
+            : undefined);
+
+          await streamAssistantResponse(
+            conversationToRetry,
+            {
+              reason: isErrorRetry ? "generation_error" : "user_not_happy",
+              avoidSimilarity: !isErrorRetry,
+              retryAssistantMessageId: retryTargetMessageId,
+            },
+            {
+              assistantId: retryAssistantId,
+              insertAssistantMessage: false,
+              images: retryImage ? [retryImage] : undefined,
+            },
+          );
+        },
+      });
     },
     [
       chatMessages,
-      cancelActiveStream,
-      cancelPendingCanvasPreviewRenders,
       clearStreamingCanvasPreview,
       latestRetryableAssistantMessageId,
       queueGenerationReplacement,
       rateLimits?.rateLimitRemaining,
+      runGeneration,
       setChatMessages,
-      setStopRequested,
       exportImageFromMessageSkeletons,
       streamAssistantResponse,
       touchActiveChatUpdatedAt,
@@ -1051,10 +1210,12 @@ const TTADialogContent = ({
         return;
       }
 
-      // Cancel any in-flight generation and remove draft preview elements.
+      // Cancel any in-flight generation and remove draft preview elements
+      // (no draft commit: delete is destructive, the canvas is cleared below).
       setStopRequested(true);
       cancelActiveStream();
-      setIsSendingChat(false);
+      cancelPendingCanvasPreviewRenders();
+      releaseGenerationSlot();
       clearQueuedGenerationReplacements();
       clearStreamingCanvasPreview();
       clearActiveCanvasDraftFromCanvas();
@@ -1168,7 +1329,8 @@ const TTADialogContent = ({
       setComposerInputValue,
       setChatMessages,
       setIsHistoryVisible,
-      setIsSendingChat,
+      cancelPendingCanvasPreviewRenders,
+      releaseGenerationSlot,
       setStopRequested,
       touchActiveChatUpdatedAt,
       transportAdapter,
@@ -1193,45 +1355,8 @@ const TTADialogContent = ({
   }, [executeDelete, pendingDeleteMessageId]);
 
   const handleStopGeneration = useCallback(() => {
-    setStopRequested(true);
-    cancelActiveStream();
-    cancelPendingCanvasPreviewRenders();
-    commitStreamingCanvasPreview();
-    touchActiveChatUpdatedAt();
-
-    // Mark the last assistant message as stopped/complete.
-    setChatMessages((prev) => {
-      const lastMsg = prev[prev.length - 1];
-      if (lastMsg && lastMsg.role === "assistant" && !lastMsg.isComplete) {
-        return [
-          ...prev.slice(0, -1),
-          {
-            ...lastMsg,
-            lifecycleStatus: "aborted",
-            progressPhase: undefined,
-            statusText: undefined,
-            generationElapsedMs: Math.max(
-              0,
-              Date.now() -
-                (lastMsg.generationStartedAt ??
-                  lastMsg.createdAt ??
-                  Date.now()),
-            ),
-            isComplete: true,
-            stopReason: "user",
-          },
-        ];
-      }
-      return prev;
-    });
-  }, [
-    cancelActiveStream,
-    cancelPendingCanvasPreviewRenders,
-    commitStreamingCanvasPreview,
-    setChatMessages,
-    setStopRequested,
-    touchActiveChatUpdatedAt,
-  ]);
+    stopActiveGeneration("user");
+  }, [stopActiveGeneration]);
 
   // --- Render Sub-components ---
 

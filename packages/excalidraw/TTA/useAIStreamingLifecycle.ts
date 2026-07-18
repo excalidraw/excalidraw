@@ -185,9 +185,13 @@ export const useAIStreamingLifecycle = ({
         }, STREAM_IDLE_STATUS_DELAY);
       };
 
+      const abortController = new AbortController();
+
       try {
-        const abortController = new AbortController();
         activeStreamAbortControllerRef.current = abortController;
+        // A canceled predecessor skips its ownership-checked cleanup (see the
+        // `finally` below), so start from a clean throttle state here.
+        resetCanvasPreviewRenderState();
 
         if (stopRequestedRef.current) {
           abortController.abort();
@@ -333,6 +337,8 @@ export const useAIStreamingLifecycle = ({
           isComplete: true,
           turnId: finalTurnId ?? undefined,
           messageId: finalMessageId ?? undefined,
+          // the successful attempt becomes the turn's retry target (N1)
+          lastCompletedMessageId: finalMessageId ?? undefined,
         });
         // Without a message id the draft can't be tagged/keyed — unreachable
         // against today's server (`started` always precedes `done`), but never
@@ -384,10 +390,16 @@ export const useAIStreamingLifecycle = ({
         });
       } finally {
         clearIdleStatusTimeout();
-        cancelPendingCanvasPreviewRenders();
-        resetCanvasPreviewRenderState();
-        activeStreamAbortControllerRef.current = null;
-        stopRequestedRef.current = false;
+        // Ownership-checked cleanup: when this stream was canceled and a
+        // successor already took over (retry's cancel-and-replace), the ref
+        // holds the successor's controller (or null) — tearing down the
+        // shared throttle/stop state here would clobber the live stream.
+        if (activeStreamAbortControllerRef.current === abortController) {
+          cancelPendingCanvasPreviewRenders();
+          resetCanvasPreviewRenderState();
+          activeStreamAbortControllerRef.current = null;
+          stopRequestedRef.current = false;
+        }
       }
     },
     [

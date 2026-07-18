@@ -31,6 +31,7 @@ const toAssistantTurnMessage = (
   message: AssistantChatMessage,
 ): AssistantChatTurnMessage => ({
   messageId: message.messageId,
+  lastCompletedMessageId: message.lastCompletedMessageId,
   lifecycleStatus: message.lifecycleStatus,
   statusText: message.statusText,
   progressPhase: message.progressPhase,
@@ -110,6 +111,7 @@ export const turnsToMessages = (turns: ChatTurn[]): ChatMessage[] =>
       createdAt: assistant.createdAt,
       turnId: turn.turnId,
       messageId: assistant.messageId,
+      lastCompletedMessageId: assistant.lastCompletedMessageId,
       skeletons: assistant.skeletons ? [...assistant.skeletons] : undefined,
       parseError: assistant.parseError,
       isComplete: assistant.isComplete,
