@@ -7,7 +7,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import { act, render } from "./test-utils";
+import { act, fireEvent, GlobalTestState, render } from "./test-utils";
 
 const { h } = window;
 
@@ -250,6 +250,48 @@ describe("bucket fill tool", () => {
     selectBucketFill();
 
     mouse.clickAt(400, 400);
+
+    expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
+  });
+
+  it("does not fill on right-click or middle-click", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    for (const button of [1, 2]) {
+      fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+        clientX: 80,
+        clientY: 70,
+        button,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+      fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+        clientX: 80,
+        clientY: 70,
+        button,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+    }
+
+    expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
+  });
+
+  it("does not fill in view mode", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+    act(() => {
+      API.setAppState({ viewModeEnabled: true });
+    });
+
+    mouse.clickAt(80, 70);
 
     expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
   });

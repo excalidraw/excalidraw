@@ -6,6 +6,8 @@ import {
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
+import { isTransparent } from "@excalidraw/common";
+
 import type { Bounds } from "@excalidraw/common";
 import type { GlobalPoint, LineSegment } from "@excalidraw/math";
 
@@ -15,7 +17,8 @@ import {
   getElementLineSegments,
 } from "./bounds";
 import { intersectElementWithLineSegment, isPointInElement } from "./collision";
-import { isLineElement, isValidPolygon } from "./typeChecks";
+import { hasBackground } from "./comparisons";
+import { isFreeDrawElement, isLineElement, isValidPolygon } from "./typeChecks";
 import { isPathALoop } from "./utils";
 
 import type {
@@ -283,6 +286,34 @@ class NodeStore {
 const isBucketFill = (element: ExcalidrawElement): boolean =>
   !!element.customData?.bucketFill;
 
+/**
+ * Whether the element visually paints an opaque background fill — i.e. can
+ * actually hide outlines beneath it. Element types that never render their
+ * `backgroundColor` (text, image, frames), see-through fill styles
+ * (hachure/cross-hatch), partial opacity, and alpha colors all don't count.
+ *
+ * Shared with the app layer's z-order pass so "covers" means the same thing
+ * in boundary clipping and in fill insertion.
+ */
+export const rendersOpaqueFill = (element: ExcalidrawElement): boolean => {
+  if (
+    !hasBackground(element.type) ||
+    element.fillStyle !== "solid" ||
+    element.opacity < 100 ||
+    isTransparent(element.backgroundColor)
+  ) {
+    return false;
+  }
+  // open strokes never paint their background
+  if (
+    (isLineElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
   switch (element.type) {
     case "rectangle":
@@ -317,7 +348,7 @@ const isEligibleBoundary = (element: ExcalidrawElement): boolean => {
     case "line":
     case "freedraw":
       // skip outlines that don't render a visible stroke
-      return element.strokeColor !== "transparent";
+      return !isTransparent(element.strokeColor);
     default:
       // text, image, embeddable, iframe and arrows are excluded in v1
       return false;
@@ -789,9 +820,8 @@ export const computeBucketFillPolygon = (args: {
   elements.forEach((element, i) => indexOf.set(element.id, i));
   const coverers = elements.filter(
     (element) =>
-      element.opacity > 0 &&
-      element.backgroundColor !== "transparent" &&
       !isBucketFill(element) &&
+      rendersOpaqueFill(element) &&
       overlapsOwner(element),
   );
 

@@ -134,6 +134,7 @@ import {
   newImageElement,
   newLinearElement,
   computeBucketFillPolygon,
+  rendersOpaqueFill,
   newTextElement,
   refreshTextDimensions,
   deepCopyElement,
@@ -8361,7 +8362,7 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const backgroundColor = this.state.currentItemBucketFillBackgroundColor;
 
-    if (backgroundColor === "transparent") {
+    if (isTransparent(backgroundColor)) {
       this.setToast({ message: t("bucketFill.noBackground"), duration: 3000 });
       return;
     }
@@ -8436,8 +8437,9 @@ class App extends React.Component<AppProps, AppState> {
     // Z-order: the fill should sit above any participating element whose
     // opaque background would otherwise render over (hide) it, but below
     // participants that only contribute an outline, so their borders stay
-    // visible. A participant "covers" the fill when it has a non-transparent
-    // background and the filled region lies inside it (the click lands inside).
+    // visible. A participant "covers" the fill when it paints an opaque
+    // background (same predicate the geometry uses for boundary clipping)
+    // and the filled region lies inside it (the click lands inside).
     // Indices are computed against the deleted-inclusive array that
     // `insertElementsAtIndex` operates on.
     const participantIds = new Set<string>([
@@ -8455,10 +8457,7 @@ class App extends React.Component<AppProps, AppState> {
       if (lowestParticipantIndex < 0) {
         lowestParticipantIndex = i;
       }
-      if (
-        el.backgroundColor !== "transparent" &&
-        isPointInElement(point, el, elementsMap)
-      ) {
+      if (rendersOpaqueFill(el) && isPointInElement(point, el, elementsMap)) {
         aboveCoveringIndex = i;
       }
     }
@@ -8650,13 +8649,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // bucket fill is a one-shot click tool; resolve it before any drag /
-    // selection gesture machinery and return early.
-    if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
-      this.handleBucketFillOnPointerDown(scenePointer);
-      return;
-    }
-
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
@@ -8728,6 +8720,24 @@ class App extends React.Component<AppProps, AppState> {
 
     // don't select while panning
     if (gesture.pointers.size > 1) {
+      return;
+    }
+
+    // bucket fill is a one-shot click tool; resolve it before the drag /
+    // selection machinery below and return early. Sits after the shared
+    // guards above so that non-primary buttons (right/middle click) and
+    // multi-touch don't fill, and collab receives the pointer-down.
+    if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
+      if (!this.state.viewModeEnabled) {
+        this.handleBucketFillOnPointerDown(scenePointer);
+        const onBucketFillPointerUp = (event: PointerEvent) => {
+          this.setState({ cursorButton: "up" });
+          this.savePointer(event.clientX, event.clientY, "up");
+        };
+        addEventListener(window, EVENT.POINTER_UP, onBucketFillPointerUp, {
+          once: true,
+        });
+      }
       return;
     }
 
