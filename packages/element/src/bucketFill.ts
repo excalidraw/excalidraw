@@ -1,4 +1,7 @@
+import { simplify } from "points-on-curve";
+
 import {
+  distanceToLineSegment,
   lineSegment,
   lineSegmentIntersectionPoints,
   pointDistance,
@@ -118,17 +121,6 @@ const projectParam = (
     return 0;
   }
   return ((q[0] - a[0]) * dx + (q[1] - a[1]) * dy) / len2;
-};
-
-const distanceToSegment = (
-  q: GlobalPoint,
-  a: GlobalPoint,
-  b: GlobalPoint,
-): number => {
-  const t = Math.max(0, Math.min(1, projectParam(a, b, q)));
-  const px = a[0] + t * (b[0] - a[0]);
-  const py = a[1] + t * (b[1] - a[1]);
-  return Math.hypot(q[0] - px, q[1] - py);
 };
 
 const perpendicularDistance = (
@@ -314,46 +306,43 @@ export const rendersOpaqueFill = (element: ExcalidrawElement): boolean => {
   return true;
 };
 
-const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
-  switch (element.type) {
-    case "rectangle":
-    case "diamond":
-    case "ellipse":
-    case "frame":
-    case "magicframe":
-      return true;
-    case "line":
-      return (
-        isLineElement(element) &&
-        element.polygon &&
-        isValidPolygon(element.points)
-      );
-    case "freedraw":
-      return isPathALoop(element.points);
-    default:
-      return false;
-  }
-};
+/**
+ * Element types whose outlines can participate in a fill — as the owner
+ * (when closed) and as boundaries. Text, image, embeddable, iframe and
+ * arrows are excluded in v1.
+ */
+const FILL_BOUNDARY_TYPES = new Set<ExcalidrawElement["type"]>([
+  "rectangle",
+  "diamond",
+  "ellipse",
+  "frame",
+  "magicframe",
+  "line",
+  "freedraw",
+]);
 
-const isEligibleBoundary = (element: ExcalidrawElement): boolean => {
-  if (element.opacity <= 0 || isBucketFill(element)) {
+/** invisible or generated elements never participate in a fill */
+const isExcludedFromFill = (element: ExcalidrawElement): boolean =>
+  element.opacity <= 0 || isBucketFill(element);
+
+const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
+  if (!FILL_BOUNDARY_TYPES.has(element.type)) {
     return false;
   }
-  switch (element.type) {
-    case "rectangle":
-    case "diamond":
-    case "ellipse":
-    case "frame":
-    case "magicframe":
-    case "line":
-    case "freedraw":
-      // skip outlines that don't render a visible stroke
-      return !isTransparent(element.strokeColor);
-    default:
-      // text, image, embeddable, iframe and arrows are excluded in v1
-      return false;
+  if (isLineElement(element)) {
+    return element.polygon && isValidPolygon(element.points);
   }
+  if (isFreeDrawElement(element)) {
+    return isPathALoop(element.points);
+  }
+  return true;
 };
+
+const isEligibleBoundary = (element: ExcalidrawElement): boolean =>
+  !isExcludedFromFill(element) &&
+  FILL_BOUNDARY_TYPES.has(element.type) &&
+  // skip outlines that don't render a visible stroke
+  !isTransparent(element.strokeColor);
 
 const findOwner = (
   point: GlobalPoint,
@@ -362,7 +351,7 @@ const findOwner = (
 ): NonDeletedExcalidrawElement | null => {
   for (let i = elements.length - 1; i >= 0; i--) {
     const element = elements[i];
-    if (element.opacity <= 0 || isBucketFill(element)) {
+    if (isExcludedFromFill(element)) {
       continue;
     }
     if (!isClosedOwnerCandidate(element)) {
@@ -512,7 +501,9 @@ const buildFaces = (
       if (t <= 0 || t >= 1) {
         continue;
       }
-      if (distanceToSegment(q, segment.pa, segment.pb) <= gapEps) {
+      if (
+        distanceToLineSegment(q, lineSegment(segment.pa, segment.pb)) <= gapEps
+      ) {
         segment.splits.push({ node: n, t });
       }
     }
@@ -706,32 +697,6 @@ const dedupeConsecutive = (pts: GlobalPoint[], eps: number): GlobalPoint[] => {
   return out;
 };
 
-/** Ramer–Douglas–Peucker on an open polyline (endpoints preserved). */
-const ramerDouglasPeucker = (
-  pts: GlobalPoint[],
-  tolerance: number,
-): GlobalPoint[] => {
-  if (pts.length < 3) {
-    return pts.slice();
-  }
-  let maxDistance = 0;
-  let index = 0;
-  const end = pts.length - 1;
-  for (let i = 1; i < end; i++) {
-    const distance = perpendicularDistance(pts[i], pts[0], pts[end]);
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      index = i;
-    }
-  }
-  if (maxDistance > tolerance) {
-    const left = ramerDouglasPeucker(pts.slice(0, index + 1), tolerance);
-    const right = ramerDouglasPeucker(pts.slice(index), tolerance);
-    return left.slice(0, -1).concat(right);
-  }
-  return [pts[0], pts[end]];
-};
-
 const removeCollinear = (
   pts: GlobalPoint[],
   tolerance: number,
@@ -763,11 +728,13 @@ const finalizePolygon = (
     return null;
   }
 
+  // Ramer–Douglas–Peucker via the same `simplify` the freedraw renderer
+  // uses (identical default tolerance), escalating until under the point cap
   let tolerance = 0.75;
-  let simplified = ramerDouglasPeucker(pts, tolerance);
+  let simplified = simplify(pts, tolerance) as GlobalPoint[];
   while (simplified.length > options.maxGeneratedPoints && tolerance < 1e6) {
     tolerance *= 2;
-    simplified = ramerDouglasPeucker(pts, tolerance);
+    simplified = simplify(pts, tolerance) as GlobalPoint[];
   }
   if (simplified.length > options.maxGeneratedPoints) {
     return null;
@@ -790,7 +757,6 @@ export const computeBucketFillPolygon = (args: {
   point: GlobalPoint;
   elements: readonly NonDeletedExcalidrawElement[];
   elementsMap: ElementsMap;
-  ownerIndexHint?: number;
   options?: Partial<BucketFillOptions>;
 }): BucketFillGeometryResult => {
   const options = { ...DEFAULT_BUCKET_FILL_OPTIONS, ...args.options };

@@ -79,6 +79,7 @@ import {
   updateActiveTool,
   isTransparent,
   getBucketFillBackgroundColor,
+  getSizeFromPoints,
   muteFSAbortError,
   isTestEnv,
   isDevEnv,
@@ -8381,12 +8382,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const xs = result.scenePoints.map((p) => p[0]);
-    const ys = result.scenePoints.map((p) => p[1]);
-    const minX = Math.min(...xs);
-    const minY = Math.min(...ys);
-    const maxX = Math.max(...xs);
-    const maxY = Math.max(...ys);
+    const { width, height } = getSizeFromPoints(result.scenePoints);
     // linear elements are normalized so points[0] must be [0, 0]; use the
     // first scene point as the element origin
     const [originX, originY] = result.scenePoints[0];
@@ -8400,8 +8396,8 @@ class App extends React.Component<AppProps, AppState> {
       type: "line",
       x: originX,
       y: originY,
-      width: maxX - minX,
-      height: maxY - minY,
+      width,
+      height,
       points,
       polygon: true,
       strokeColor: "transparent",
