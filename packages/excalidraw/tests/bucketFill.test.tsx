@@ -20,6 +20,16 @@ const selectBucketFill = () => {
 };
 
 describe("bucket fill tool", () => {
+  beforeAll(() => {
+    // radix popovers (font family, color picker) need a ResizeObserver;
+    // jsdom has none (same stub as test-utils' togglePopover)
+    (global as any).ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+  });
+
   beforeEach(async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
@@ -48,11 +58,8 @@ describe("bucket fill tool", () => {
   it("creates a selected line polygon with the current background color", () => {
     const rect = seedRectangle();
     act(() => {
-      // the bucket fill color is independent from the generic shape background
-      API.setAppState({
-        currentItemBackgroundColor: "#000000",
-        currentItemBucketFillBackgroundColor: "#ffec99",
-      });
+      // the bucket fill color is the shared shape background color
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -108,7 +115,7 @@ describe("bucket fill tool", () => {
         elements: [first, second],
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       });
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -141,14 +148,13 @@ describe("bucket fill tool", () => {
     expect(h.state.activeTool.type).toBe("bucketFill");
   });
 
+  it("opens the background color popup with the g shortcut", () => {
+    selectBucketFill();
+    Keyboard.keyPress(KEYS.G);
+    expect(h.state.openPopup).toBe("elementBackground");
+  });
+
   it("shift+f opens the font popup instead of switching to bucket fill", () => {
-    // radix popover needs a ResizeObserver; jsdom has none (same stub as
-    // test-utils' togglePopover)
-    (global as any).ResizeObserver = class ResizeObserver {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
     // regression: bucket fill was originally bound to shift+f, shadowing the
     // long-standing "show fonts" shortcut for text elements
     const text = API.createElement({ type: "text", x: 20, y: 20 });
@@ -168,17 +174,22 @@ describe("bucket fill tool", () => {
     expect(h.state.openPopup).toBe("fontFamily");
   });
 
-  it("no-ops with a transparent background color", () => {
+  it("falls back to green when the shared background color is transparent", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "transparent" });
+      API.setAppState({ currentItemBackgroundColor: "transparent" });
     });
     selectBucketFill();
 
     mouse.clickAt(80, 70);
 
-    expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
-    expect(h.state.toast?.message).toMatch(/background color/i);
+    const fill = h.elements.find(
+      (el) => el.type === "line" && !el.isDeleted,
+    ) as ExcalidrawLineElement | undefined;
+    expect(fill).toBeDefined();
+    expect(fill!.backgroundColor).toBe("#b2f2bb");
+    // the shared appState value is left untouched
+    expect(h.state.currentItemBackgroundColor).toBe("transparent");
   });
 
   it("inserts the overlap fill below the lowest participating shape", () => {
@@ -207,7 +218,7 @@ describe("bucket fill tool", () => {
       });
     });
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -252,7 +263,7 @@ describe("bucket fill tool", () => {
       });
     });
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -269,7 +280,7 @@ describe("bucket fill tool", () => {
   it("does nothing when clicking empty canvas", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -281,7 +292,7 @@ describe("bucket fill tool", () => {
   it("does not fill on right-click or middle-click", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 
@@ -308,7 +319,7 @@ describe("bucket fill tool", () => {
   it("does not fill in view mode", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
     act(() => {
@@ -323,7 +334,7 @@ describe("bucket fill tool", () => {
   it("undo removes the generated fill in one step", () => {
     seedRectangle();
     act(() => {
-      API.setAppState({ currentItemBucketFillBackgroundColor: "#ffec99" });
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
     });
     selectBucketFill();
 

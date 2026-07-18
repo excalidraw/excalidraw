@@ -78,6 +78,7 @@ import {
   updateObject,
   updateActiveTool,
   isTransparent,
+  getBucketFillBackgroundColor,
   muteFSAbortError,
   isTestEnv,
   isDevEnv,
@@ -8354,12 +8355,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
-    const backgroundColor = this.state.currentItemBucketFillBackgroundColor;
-
-    if (isTransparent(backgroundColor)) {
-      this.setToast({ message: t("bucketFill.noBackground"), duration: 3000 });
-      return;
-    }
+    // shared with the generic shape background, but a transparent fill would
+    // be invisible, so fall back to a real color (appState is not mutated)
+    const backgroundColor = getBucketFillBackgroundColor(
+      this.state.currentItemBackgroundColor,
+    );
 
     const elements = this.scene.getNonDeletedElements();
     const elementsMap = this.scene.getNonDeletedElementsMap();

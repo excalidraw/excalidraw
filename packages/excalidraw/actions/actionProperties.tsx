@@ -3,8 +3,11 @@ import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  BUCKET_FILL_BACKGROUND_COLOR_PALETTE,
+  BUCKET_FILL_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  getBucketFillBackgroundColor,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
   ARROW_TYPE,
@@ -487,13 +490,14 @@ export const actionChangeBackgroundColor = register<
 });
 
 export const actionChangeBucketFillBackgroundColor = register<
-  Pick<AppState, "currentItemBucketFillBackgroundColor">
+  Pick<AppState, "currentItemBackgroundColor">
 >({
   name: "changeBucketFillBackgroundColor",
   label: "labels.changeBackground",
   trackEvent: false,
-  // the bucket fill tool has no element to mutate; it only updates the default
-  // fill color used when the user clicks a region
+  // the bucket fill tool has no element to mutate; it shares
+  // `currentItemBackgroundColor` but hides `transparent` (an invisible fill
+  // would be a no-op) and shows the effective fallback color instead
   perform: (elements, appState, value) => {
     return {
       appState: {
@@ -512,13 +516,15 @@ export const actionChangeBucketFillBackgroundColor = register<
           <h3 aria-hidden="true">{t("labels.background")}</h3>
         )}
         <ColorPicker
-          topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
-          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          topPicks={BUCKET_FILL_BACKGROUND_PICKS}
+          palette={BUCKET_FILL_BACKGROUND_COLOR_PALETTE}
           type="elementBackground"
           label={t("labels.background")}
-          color={appState.currentItemBucketFillBackgroundColor}
+          color={getBucketFillBackgroundColor(
+            appState.currentItemBackgroundColor,
+          )}
           onChange={(color) =>
-            updateData({ currentItemBucketFillBackgroundColor: color })
+            updateData({ currentItemBackgroundColor: color })
           }
           elements={elements}
           appState={appState}
